@@ -1,0 +1,23 @@
+/* You can add global styles to this file, and also import other style files */
+@use "sass:meta";
+
+
+@font-face {
+  font-family: 'SF Pro';
+  src: url('../../assets/fonts/SF-Pro.ttf') format('truetype');
+}
+
+
+body.light {
+  // Styles not related to syncfusion controls here
+
+  @include meta.load-css('./themes/material_l');
+}
+
+body.dark {
+  // Styles not related to syncfusion controls here
+  background-color: #212121;
+  color: #a2a2a2;
+
+  @include meta.load-css('./themes/material_d');
+}

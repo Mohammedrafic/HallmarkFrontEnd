@@ -31,7 +31,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/app/styles/styles.scss"
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
@@ -45,8 +45,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "10mb",
+                  "maximumError": "15mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -104,7 +104,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "src/app/styles/styles.scss"
             ],
             "scripts": []
           }
