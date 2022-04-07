@@ -1,0 +1,22 @@
+.shell {
+  #sidebar {
+    visibility: hidden;
+    background-color: rgb(25, 118, 210);
+    color: #ffffff;
+    padding: 10px
+  }
+
+  #sidebar.e-sidebar {
+    visibility: visible;
+  }
+
+  .icon-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    .icon {
+      padding-right: 0.5rem;
+    }
+  }
+}

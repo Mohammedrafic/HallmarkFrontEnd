@@ -1,0 +1,31 @@
+.sidebar {
+  .logo {
+    .logo-name {
+      margin: 0;
+    }
+  }
+
+  .menu {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .misc {
+    display: flex;
+    flex-direction: column;
+
+    .theme-toggle, .edu-faq {
+      margin-bottom: 2rem;
+    }
+
+    .icon-container {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      .icon {
+        padding-right: 0.5rem;
+      }
+    }
+  }
+}

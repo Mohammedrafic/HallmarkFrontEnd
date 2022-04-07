@@ -1,0 +1,29 @@
+<section class="sidebar">
+  <section class="logo">
+    <h1 class="logo-name">EII</h1>
+    <span>Powered by HHCS</span>
+  </section>
+
+  <section class="menu">
+    <app-menu></app-menu>
+  </section>
+
+  <section class="misc">
+    <section class="theme-toggle">
+      <ejs-switch [checked]="isDarkTheme" (click)="toggleTheme()"></ejs-switch>
+      <span>{{themeName}}</span>
+    </section>
+
+    <section class="edu-faq">
+      <div class="icon-container">
+        <i-feather name="folder" class="icon"></i-feather>
+        <span>Education Hub</span>
+      </div>
+
+      <div class="icon-container">
+        <i-feather name="info" class="icon"></i-feather>
+        <span>FAQ</span>
+      </div>
+    </section>
+  </section>
+</section>

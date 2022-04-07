@@ -1,0 +1,68 @@
+[
+  {
+    "path": "dashboard",
+    "children": [
+      {
+        "component": "DashboardHeaderComponent"
+      },
+      {
+        "component": "DashboardContentComponent"
+      }
+    ]
+  },
+  {
+    "path": "order-management",
+    "children": [
+      {
+        "component": "OrderManagementHeaderComponent"
+      },
+      {
+        "component": "OrderManagementContentComponent"
+      }
+    ]
+  },
+  {
+    "path": "timesheets",
+    "children": [
+      {
+        "component": "TimesheetsHeaderComponent"
+      },
+      {
+        "component": "TimesheetsContentComponent"
+      }
+    ]
+  },
+  {
+    "path": "invoices",
+    "children": [
+      {
+        "component": "InvoicesHeaderComponent"
+      },
+      {
+        "component": "InvoicesContentComponent"
+      }
+    ]
+  },
+  {
+    "path": "candidates",
+    "children": [
+      {
+        "component": "CandidatesHeaderComponent"
+      },
+      {
+        "component": "CandidatesContentComponent"
+      }
+    ]
+  },
+  {
+    "path": "reports",
+    "children": [
+      {
+        "component": "ReportsHeaderComponent"
+      },
+      {
+        "component": "ReportsContentComponent"
+      }
+    ]
+  }
+]

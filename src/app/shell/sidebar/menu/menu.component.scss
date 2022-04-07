@@ -1,0 +1,14 @@
+.client-dashboard {
+  .icon-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    text-decoration: none;
+
+    color: #ffffff; // TODO: should be defined from theme
+
+    .icon {
+      padding-right: 0.5rem;
+    }
+  }
+}

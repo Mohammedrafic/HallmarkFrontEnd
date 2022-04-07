@@ -1,0 +1,21 @@
+<section class="shell">
+  <ejs-sidebar id="sidebar" #sidebar [enableDock]='enableDock' [width]='width' [dockSize]='dockSize'>
+    <app-side-bar></app-side-bar>
+
+    <section class="collapse">
+      <div class="icon-container">
+        <i-feather name="sidebar" class="icon" (click)="toggleClick()"></i-feather>
+        <span>Collapse Sidebar</span>
+      </div>
+    </section>
+  </ejs-sidebar>
+  <section id="main">
+    <div class="header">
+      <router-outlet name="header"></router-outlet>
+    </div>
+
+    <div class="content">
+     <router-outlet name="content"></router-outlet>
+    </div>
+  </section>
+</section>

@@ -1,0 +1,14 @@
+[
+  {
+    "icon": "home",
+    "path": "dashboard",
+    "itemName": "Dashboard",
+    "children": []
+  },
+  {
+    "icon": "file-text",
+    "path": "client-management",
+    "itemName": "Client Management",
+    "children": []
+  }
+]
