@@ -1,46 +1,50 @@
 <section class="shell">
   <ejs-sidebar id="sidebar" #sidebar [enableDock]='enableDock' [width]='width' [dockSize]='dockSize'>
-    <section class="logo">
-      <span class="e-text">EINSTEIN-II</span>
-    </section>
+    <section class="primary-container">
+      <section class="logo">
+        <span class="e-text">EINSTEIN-II</span>
+      </section>
 
-    <section class="menu">
-      <section class="sidebar-menu">
-        <section *ngFor="let item of (sideBarMenu$ | async)">
-          <a [routerLink]="[item.route]"
-             routerLinkActive="active"
-             class="icon-container">
-            <i-feather [name]="item.icon" class="icon"></i-feather>
-            <span class="e-text">{{ item.title }}</span>
-          </a>
+      <section class="menu">
+        <section class="sidebar-menu">
+          <section *ngFor="let item of (sideBarMenu$ | async)">
+            <a [routerLink]="[item.route]"
+               routerLinkActive="active"
+               class="icon-container">
+              <i-feather [name]="item.icon" class="icon"></i-feather>
+              <span class="e-text">{{ item.title }}</span>
+            </a>
+          </section>
         </section>
       </section>
     </section>
 
-    <section class="misc">
-      <section class="theme-toggle">
-        <ejs-switch class="switch" [checked]="isDarkTheme" (click)="toggleTheme()"></ejs-switch>
-        <span class="e-text">{{themeName}}</span>
-      </section>
+    <aside class="secondary-container">
+      <section class="misc">
+        <section class="theme-toggle">
+          <ejs-switch class="switch" [checked]="isDarkTheme" (click)="toggleTheme()"></ejs-switch>
+          <span class="e-text">{{themeName}}</span>
+        </section>
 
-      <section class="edu-faq">
-        <a href="" class="icon-container">
-          <i-feather name="folder" class="icon"></i-feather>
-          <span class="e-text">Education Hub</span>
-        </a>
+        <section class="edu-faq">
+          <a href="" class="icon-container">
+            <i-feather name="folder" class="icon"></i-feather>
+            <span class="e-text">Education Hub</span>
+          </a>
 
-        <a href="" class="icon-container">
-          <i-feather name="info" class="icon"></i-feather>
-          <span class="e-text">FAQ</span>
+          <a href="" class="icon-container">
+            <i-feather name="info" class="icon"></i-feather>
+            <span class="e-text">FAQ</span>
+          </a>
+        </section>
+      </section>
+      <section class="collapse">
+        <a class="icon-container" (click)="toggleClick()">
+          <i-feather name="sidebar" class="icon"></i-feather>
+          <span class="e-text">Collapse Sidebar</span>
         </a>
       </section>
-    </section>
-    <section class="collapse">
-      <div class="icon-container">
-        <i-feather name="sidebar" class="icon" (click)="toggleClick()"></i-feather>
-        <span class="e-text">Collapse Sidebar</span>
-      </div>
-    </section>
+    </aside>
   </ejs-sidebar>
 
   <section id="main">

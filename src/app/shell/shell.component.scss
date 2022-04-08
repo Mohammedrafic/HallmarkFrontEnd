@@ -3,6 +3,9 @@
     visibility: hidden;
     background-color: #25263b;
     color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   #sidebar.e-sidebar {
@@ -17,8 +20,6 @@
   .menu {
     display: flex;
     flex-direction: column;
-
-    padding-bottom: 20rem; // TODO: need to adjust
 
     .active {
       border-left: 3px solid #3e7fff;
@@ -43,6 +44,12 @@
       margin-bottom: 1rem;
       border-top: 1px solid #2a2b43;
       border-bottom: 1px solid #2a2b43;
+    }
+  }
+
+  .collapse {
+    .icon-container {
+      cursor: pointer;
     }
   }
 
