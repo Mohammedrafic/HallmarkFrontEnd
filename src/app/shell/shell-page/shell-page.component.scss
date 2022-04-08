@@ -9,25 +9,54 @@
     visibility: visible;
   }
 
-  .collapse {
+  .logo {
+    height: 4rem;
+    padding: 0.5rem 1.5rem;
+  }
 
-    .icon-container {
-      height: 3rem;
-      display: flex;
-      align-items: center;
+  .menu {
+    display: flex;
+    flex-direction: column;
 
-      .icon {
-        padding-left: 1.5rem;
-        padding-right: 1rem;
-      }
+    padding-bottom: 20rem; // TODO: need to adjust
+  }
+
+  .misc {
+    display: flex;
+    flex-direction: column;
+
+    .theme-toggle {
+      padding: 1.5rem;
     }
 
-    .icon-container:hover {
-      background-color: #272f51;
+    .edu-faq {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      border-top: 1px solid #2a2b43;
+      border-bottom: 1px solid #2a2b43;
+    }
+  }
 
-      .icon {
-        color: #6499ff;
-      }
+  .e-close span.e-text {
+    display: none;
+  }
+
+  .icon-container {
+    height: 3rem;
+    display: flex;
+    align-items: center;
+
+    .icon {
+      padding-left: 1.5rem;
+      padding-right: 1rem;
+    }
+  }
+
+  .icon-container:hover {
+    background-color: #272f51;
+
+    .icon {
+      color: #6499ff;
     }
   }
 }

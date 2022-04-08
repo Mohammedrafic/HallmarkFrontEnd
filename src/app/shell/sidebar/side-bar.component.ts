@@ -11,9 +11,6 @@ enum THEME {
   styleUrls: ['./side-bar.component.scss'],
 })
 export class SideBarComponent {
-  width = '270px';
-  dockSize = '90px';
-
   themeName = 'Light Theme';
   isDarkTheme = true;
 
