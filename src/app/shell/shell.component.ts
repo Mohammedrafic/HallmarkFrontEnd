@@ -42,8 +42,8 @@ export class ShellPageComponent {
 
   private changeThemeLabel() {
     this.isDarkTheme
-      ? (this.themeName = 'Dark Theme')
-      : (this.themeName = 'Light Theme');
+      ? (this.themeName = 'Light Theme')
+      : (this.themeName = 'Dark Theme');
   }
 
   private setTheme(darkTheme: boolean) {

@@ -14,20 +14,20 @@ body {
 
   &.light {
     // Styles not related to syncfusion controls here
-  
+
     @include meta.load-css('./themes/material_l');
   }
-  
+
   &.dark {
     // Styles not related to syncfusion controls here
-    background-color: #212121;
+    background-color: #1a1b2e;
     color: #a2a2a2;
 
     .header {
       border-bottom: 1px solid #2a2b43;
       color: #fff;
     }
-  
+
     @include meta.load-css('./themes/material_d');
   }
 }
