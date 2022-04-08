@@ -1767,6 +1767,15 @@
     "@syncfusion/ej2-lists" "~20.1.47"
     "@syncfusion/ej2-popups" "~20.1.47"
 
+"@syncfusion/ej2-notifications@^20.1.47":
+  version "20.1.47"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-notifications/-/ej2-notifications-20.1.47.tgz#d72b6033e62e54c981d16874658559ba6b30ff2b"
+  integrity sha512-kGjX5+cJYEEVFZiucpsU2f6xfiIsMRfXdppkrI1BOkkpaGwU00aQqBTpXFA9jdJhqu+FYqjcUqKSNOSomZFv0g==
+  dependencies:
+    "@syncfusion/ej2-base" "~20.1.47"
+    "@syncfusion/ej2-buttons" "~20.1.47"
+    "@syncfusion/ej2-popups" "~20.1.47"
+
 "@syncfusion/ej2-pdf-export@~20.1.47":
   version "20.1.47"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-pdf-export/-/ej2-pdf-export-20.1.47.tgz#3220c455b73a85fc3e3cac0fc7d50df31b7f5d16"
