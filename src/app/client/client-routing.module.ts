@@ -7,12 +7,12 @@ import { TimesheetsContentComponent } from './timesheets/timesheets-content/time
 import { InvoicesContentComponent } from './invoices/invoices-content/invoices-content.component';
 import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
-import { ClientPageComponent } from './client-page.component';
+import { ClientComponent } from './client.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: ClientPageComponent,
+    component: ClientComponent,
     children: [
       {
         path: '',

@@ -16,9 +16,7 @@ import {
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
-import { ShellPageComponent } from './shell-page/shell-page.component';
-import { MenuComponent } from './sidebar/menu/menu.component';
-import { SideBarComponent } from './sidebar/side-bar.component';
+import { ShellPageComponent } from './shell-page.component';
 
 const sidebarIcons = {
   Sidebar,
@@ -32,7 +30,7 @@ const sidebarIcons = {
 };
 
 @NgModule({
-  declarations: [ShellPageComponent, MenuComponent, SideBarComponent],
+  declarations: [ShellPageComponent],
   imports: [
     CommonModule,
     ShellRoutingModule,

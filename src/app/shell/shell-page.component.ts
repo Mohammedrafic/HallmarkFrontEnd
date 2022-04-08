@@ -1,6 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
+import { Select } from '@ngxs/store';
 
 import { SidebarComponent } from '@syncfusion/ej2-angular-navigations';
+import { Observable } from 'rxjs';
+import { AppState } from 'src/app/store/app.state';
 
 enum THEME {
   light = 'light',
@@ -13,17 +16,20 @@ enum THEME {
   styleUrls: ['./shell-page.component.scss'],
 })
 export class ShellPageComponent {
-  @ViewChild('sidebar') sidebar: SidebarComponent;
   enableDock = true;
   width = '240px';
   dockSize = '70px';
+  themeName = 'Light Theme';
+  isDarkTheme = true;
+
+  @ViewChild('sidebar') sidebar: SidebarComponent;
+
+  @Select(AppState.sideBarMenu)
+  sideBarMenu$: Observable<any>;
 
   toggleClick() {
     this.sidebar.toggle();
   }
-
-  themeName = 'Light Theme';
-  isDarkTheme = true;
 
   toggleTheme() {
     this.isDarkTheme = !this.isDarkTheme;

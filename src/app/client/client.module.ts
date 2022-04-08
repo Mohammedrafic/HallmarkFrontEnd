@@ -8,12 +8,12 @@ import { CandidatesContentComponent } from './candidates/candidates-content/cand
 import { InvoicesContentComponent } from './invoices/invoices-content/invoices-content.component';
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
-import { ClientPageComponent } from './client-page.component';
+import { ClientComponent } from './client.component';
 
 @NgModule({
   declarations: [
     DashboardContentComponent,
-    ClientPageComponent,
+    ClientComponent,
     ClientManagementContentComponent,
     CandidatesContentComponent,
     InvoicesContentComponent,
