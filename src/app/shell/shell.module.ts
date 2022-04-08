@@ -16,7 +16,7 @@ import {
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
-import { ShellPageComponent } from './shell-page.component';
+import { ShellPageComponent } from './shell.component';
 
 const sidebarIcons = {
   Sidebar,

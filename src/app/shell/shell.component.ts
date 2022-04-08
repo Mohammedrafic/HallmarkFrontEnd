@@ -11,9 +11,9 @@ enum THEME {
 }
 
 @Component({
-  selector: 'app-shell-page',
-  templateUrl: './shell-page.component.html',
-  styleUrls: ['./shell-page.component.scss'],
+  selector: 'app-shell',
+  templateUrl: './shell.component.html',
+  styleUrls: ['./shell.component.scss'],
 })
 export class ShellPageComponent {
   enableDock = true;
