@@ -75,4 +75,20 @@
       color: #6499ff;
     }
   }
+
+  .header {
+    height: 60px;
+    width: 100%;
+    position: fixed;
+    display: flex;
+    align-items: center;
+
+    .stick-left {
+      margin-left: auto;
+    }
+  }
+
+  .content {
+    padding-top: 60px;
+  }
 }

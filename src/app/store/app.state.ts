@@ -6,6 +6,7 @@ export interface AppStateModel {
   sideBarMenu: any; // TODO: create model
   isMobile: boolean;
   isDarkTheme: boolean;
+  headerState: any; // TODO: create model
   isLoading: boolean;  
 }
 
@@ -15,6 +16,7 @@ export interface AppStateModel {
     sideBarMenu: null,
     isMobile: false,
     isDarkTheme: false,
+    headerState: null,
     isLoading: false,
   }
 })
