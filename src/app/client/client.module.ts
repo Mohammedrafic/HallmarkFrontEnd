@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { ClientRoutingModule } from './client-routing.module';
 import { DashboardContentComponent } from './dashboard/dashboard-content/dashboard-content.component';
-import { ClientManagementContentComponent } from './client-management/client-management-content/client-management-content.component';
+import { OrderManagementContentComponent } from './order-management/order-management-content/order-management-content.component';
 import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
 import { InvoicesContentComponent } from './invoices/invoices-content/invoices-content.component';
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
@@ -14,7 +14,7 @@ import { ClientComponent } from './client.component';
   declarations: [
     DashboardContentComponent,
     ClientComponent,
-    ClientManagementContentComponent,
+    OrderManagementContentComponent,
     CandidatesContentComponent,
     InvoicesContentComponent,
     TimesheetsContentComponent,

@@ -1,19 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ClientManagementContentComponent } from './client-management-content.component';
+import { OrderManagementContentComponent } from './order-management-content.component';
 
 describe('OrderManagementContentComponent', () => {
-  let component: ClientManagementContentComponent;
-  let fixture: ComponentFixture<ClientManagementContentComponent>;
+  let component: OrderManagementContentComponent;
+  let fixture: ComponentFixture<OrderManagementContentComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ClientManagementContentComponent],
-    }).compileComponents();
+      declarations: [ OrderManagementContentComponent ]
+    })
+    .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ClientManagementContentComponent);
+    fixture = TestBed.createComponent(OrderManagementContentComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

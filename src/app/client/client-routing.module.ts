@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { DashboardContentComponent } from './dashboard/dashboard-content/dashboard-content.component';
-import { ClientManagementContentComponent } from './client-management/client-management-content/client-management-content.component';
+import { OrderManagementContentComponent } from './order-management/order-management-content/order-management-content.component';
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
 import { InvoicesContentComponent } from './invoices/invoices-content/invoices-content.component';
 import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
@@ -19,8 +19,8 @@ const routes: Routes = [
         component: DashboardContentComponent,
       },
       {
-        path: 'client-management',
-        component: ClientManagementContentComponent,
+        path: 'order-management',
+        component: OrderManagementContentComponent,
       },
       {
         path: 'time-sheets',
@@ -40,7 +40,7 @@ const routes: Routes = [
       },
     ]
   },
-  
+
 ];
 
 @NgModule({
