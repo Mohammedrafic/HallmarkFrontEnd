@@ -1,31 +1,57 @@
 .sidebar {
   .logo {
-    .logo-name {
-      margin: 0;
-    }
+    height: 4rem;
+    padding: 0.5rem 1.5rem;
+  //  TODO: add logo EINSTEIN-II
   }
 
   .menu {
     display: flex;
     flex-direction: column;
+
+    padding-bottom: 20rem; // TODO: remove
   }
 
   .misc {
     display: flex;
     flex-direction: column;
 
-    .theme-toggle, .edu-faq {
-      margin-bottom: 2rem;
+    .theme-toggle {
+      padding: 1.5rem;
     }
 
     .icon-container {
+      height: 3rem;
       display: flex;
       align-items: center;
-      margin-bottom: 1rem;
 
       .icon {
-        padding-right: 0.5rem;
+        padding-left: 1.5rem;
+        padding-right: 1rem;
+      }
+    }
+
+    .icon-container:hover {
+      background-color: #272f51;
+
+      .icon {
+        color: #6499ff;
       }
     }
   }
+
+  .edu-faq {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-top: 1px solid #2a2b43;
+    border-bottom: 1px solid #2a2b43;
+  }
+
+  .e-close span.e-text {
+    display: none;
+  }
+
+  //.e-open span.e-text {
+  //  display: inline-block;
+  //}
 }

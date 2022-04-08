@@ -1,22 +1,33 @@
 .shell {
   #sidebar {
     visibility: hidden;
-    background-color: rgb(25, 118, 210);
+    background-color: #25263b;
     color: #ffffff;
-    padding: 10px
   }
 
   #sidebar.e-sidebar {
     visibility: visible;
   }
 
-  .icon-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
+  .collapse {
 
-    .icon {
-      padding-right: 0.5rem;
+    .icon-container {
+      height: 3rem;
+      display: flex;
+      align-items: center;
+
+      .icon {
+        padding-left: 1.5rem;
+        padding-right: 1rem;
+      }
+    }
+
+    .icon-container:hover {
+      background-color: #272f51;
+
+      .icon {
+        color: #6499ff;
+      }
     }
   }
 }

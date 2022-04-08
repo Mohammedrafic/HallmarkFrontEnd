@@ -1,7 +1,6 @@
 <section class="sidebar">
   <section class="logo">
-    <h1 class="logo-name">EII</h1>
-    <span>Powered by HHCS</span>
+    <span class="e-text">EINSTEIN-II</span>
   </section>
 
   <section class="menu">
@@ -10,20 +9,20 @@
 
   <section class="misc">
     <section class="theme-toggle">
-      <ejs-switch [checked]="isDarkTheme" (click)="toggleTheme()"></ejs-switch>
-      <span>{{themeName}}</span>
+      <ejs-switch class="switch" [checked]="isDarkTheme" (click)="toggleTheme()"></ejs-switch>
+      <span class="e-text">{{themeName}}</span>
     </section>
 
     <section class="edu-faq">
-      <div class="icon-container">
+      <a href="" class="icon-container">
         <i-feather name="folder" class="icon"></i-feather>
-        <span>Education Hub</span>
-      </div>
+        <span class="e-text">Education Hub</span>
+      </a>
 
-      <div class="icon-container">
+      <a href="" class="icon-container">
         <i-feather name="info" class="icon"></i-feather>
-        <span>FAQ</span>
-      </div>
+        <span class="e-text">FAQ</span>
+      </a>
     </section>
   </section>
 </section>

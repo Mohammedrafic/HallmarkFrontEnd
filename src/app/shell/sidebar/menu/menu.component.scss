@@ -1,14 +1,23 @@
 .client-dashboard {
   .icon-container {
+    height: 3rem;
     display: flex;
     align-items: center;
-    margin-bottom: 1rem;
     text-decoration: none;
 
     color: #ffffff; // TODO: should be defined from theme
 
     .icon {
-      padding-right: 0.5rem;
+      padding-left: 1.5rem;
+      padding-right: 1rem;
+    }
+  }
+
+  .icon-container:hover {
+    background-color: #272f51;
+
+    .icon {
+      color: #6499ff;
     }
   }
 }

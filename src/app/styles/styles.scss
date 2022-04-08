@@ -21,3 +21,10 @@ body.dark {
 
   @include meta.load-css('./themes/material_d');
 }
+
+@import "./controls/switch";
+
+a, a:hover, a:focus, a:active {
+  text-decoration: none;
+  color: inherit;
+}

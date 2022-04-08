@@ -10,7 +10,7 @@ import { SidebarComponent } from '@syncfusion/ej2-angular-navigations';
 export class ShellPageComponent {
   @ViewChild('sidebar') sidebar: SidebarComponent;
   enableDock = true;
-  width = '270px';
+  width = '240px';
   dockSize = '70px';
 
   toggleClick() {
