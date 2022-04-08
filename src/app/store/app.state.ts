@@ -7,7 +7,7 @@ export interface AppStateModel {
   isMobile: boolean;
   isDarkTheme: boolean;
   headerState: any; // TODO: create model
-  isLoading: boolean;  
+  isLoading: boolean;
 }
 
 @State<AppStateModel>({
@@ -15,15 +15,13 @@ export interface AppStateModel {
   defaults: {
     sideBarMenu: null,
     isMobile: false,
-    isDarkTheme: false,
+    isDarkTheme: true,
     headerState: null,
     isLoading: false,
-  }
+  },
 })
-
 @Injectable()
 export class AppState {
-
   @Selector()
   static isMobile(state: AppStateModel): boolean { return state.isMobile; }
 
@@ -36,7 +34,8 @@ export class AppState {
   @Selector()
   static headerState(state: AppStateModel): boolean { return state.headerState; }
 
-  constructor() { }
+  @Selector()
+  static isDarkTheme(state: AppStateModel): boolean { return state.isDarkTheme; }
 
   @Action(ToggleMobileView)
   ToggleMobileView({ patchState }: StateContext<AppStateModel>, { payload }: ToggleMobileView): void {

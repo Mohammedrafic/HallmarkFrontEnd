@@ -23,8 +23,8 @@
     <aside class="secondary-container">
       <section class="misc">
         <section class="theme-toggle">
-          <ejs-switch class="switch" [checked]="isDarkTheme" (click)="toggleTheme()"></ejs-switch>
-          <span class="e-text">{{themeName}}</span>
+          <ejs-switch class="switch" [checked]="isDarkTheme" (change)="toggleTheme()"></ejs-switch>
+          <span class="e-text">Dark Theme</span>
         </section>
 
         <section class="edu-faq">
