@@ -19,6 +19,15 @@
     flex-direction: column;
 
     padding-bottom: 20rem; // TODO: need to adjust
+
+    .active {
+      border-left: 3px solid #3e7fff;
+      background-color: #272f51;
+
+      .icon {
+        color: #6499ff;
+      }
+    }
   }
 
   .misc {

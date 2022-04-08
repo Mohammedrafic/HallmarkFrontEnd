@@ -7,7 +7,9 @@
     <section class="menu">
       <section class="sidebar-menu">
         <section *ngFor="let item of (sideBarMenu$ | async)">
-          <a [routerLink]="[item.route]" class="icon-container">
+          <a [routerLink]="[item.route]"
+             routerLinkActive="active"
+             class="icon-container">
             <i-feather [name]="item.icon" class="icon"></i-feather>
             <span class="e-text">{{ item.title }}</span>
           </a>

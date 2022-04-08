@@ -10,12 +10,13 @@ import { ReportsContentComponent } from './reports/reports-content/reports-conte
 import { ClientComponent } from './client.component';
 
 const routes: Routes = [
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
     path: '',
     component: ClientComponent,
     children: [
       {
-        path: '',
+        path: 'dashboard',
         component: DashboardContentComponent,
       },
       {
@@ -38,9 +39,8 @@ const routes: Routes = [
         path: 'reports',
         component: ReportsContentComponent,
       },
-    ]
+    ],
   },
-
 ];
 
 @NgModule({
