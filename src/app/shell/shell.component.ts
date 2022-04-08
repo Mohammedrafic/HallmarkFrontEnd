@@ -27,6 +27,9 @@ export class ShellPageComponent {
   @Select(AppState.sideBarMenu)
   sideBarMenu$: Observable<any>;
 
+  @Select(AppState.headerState)
+  headerState$: Observable<any>;
+
   toggleClick() {
     this.sidebar.toggle();
   }

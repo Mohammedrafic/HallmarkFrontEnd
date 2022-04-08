@@ -50,7 +50,7 @@
 
   <section id="main">
     <div class="header">
-      <div><h1>Header title</h1></div>
+      <div class="header-title-text"><h1>{{ (headerState$ | async).title }}</h1></div>
       <div class="stick-left">Header content</div>
     </div>
 

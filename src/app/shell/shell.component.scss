@@ -91,6 +91,10 @@
     display: flex;
     align-items: center;
 
+    .header-title-text {
+      margin: 0 25px;
+    }
+
     .stick-left {
       margin-left: auto;
     }

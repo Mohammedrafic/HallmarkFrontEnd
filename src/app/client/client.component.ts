@@ -6,7 +6,7 @@ import { CLIENT_SIDEBAR_MENU } from './client-menu.config';
 @Component({
   selector: 'app-client',
   template: '<router-outlet></router-outlet>',
-  styleUrls: ['./client-page.component.scss']
+  styleUrls: ['./client.component.scss']
 })
 export class ClientComponent  {
   constructor(private store: Store) {
