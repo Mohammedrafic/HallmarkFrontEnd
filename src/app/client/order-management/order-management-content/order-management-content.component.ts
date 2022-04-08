@@ -8,6 +8,8 @@ import { SetHeaderState } from 'src/app/store/app.actions';
   styleUrls: ['./order-management-content.component.scss']
 })
 export class OrderManagementContentComponent implements OnInit {
+  
+  public data: object[];
 
   constructor(private store: Store) {
     store.dispatch(new SetHeaderState({title: 'Order Management'}));

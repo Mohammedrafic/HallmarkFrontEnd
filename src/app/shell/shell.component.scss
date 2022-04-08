@@ -91,7 +91,7 @@
     display: flex;
     align-items: center;
 
-    .header-title-text {
+    .header-item {
       margin: 0 25px;
     }
 
@@ -101,6 +101,6 @@
   }
 
   .content {
-    padding-top: 60px;
+    padding: 60px 25px 0 25px;
   }
 }
