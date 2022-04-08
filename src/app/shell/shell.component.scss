@@ -1,0 +1,107 @@
+.shell {
+  #sidebar {
+    visibility: hidden;
+    background-color: #25263b;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  #sidebar.e-sidebar {
+    visibility: visible;
+  }
+
+  .logo {
+    height: 4rem;
+    padding: 0.5rem 1.5rem;
+  }
+
+  .menu {
+    display: flex;
+    flex-direction: column;
+
+    .active {
+      border-left: 3px solid #3e7fff;
+      background-color: #272f51;
+
+      .icon {
+        color: #6499ff;
+        padding-left: 1.3rem;
+      }
+    }
+  }
+
+  .misc {
+    display: flex;
+    flex-direction: column;
+
+    .theme-toggle {
+      padding: 1.5rem;
+    }
+
+    .edu-faq {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      border-top: 1px solid #2a2b43;
+      border-bottom: 1px solid #2a2b43;
+    }
+  }
+
+  .collapse {
+    .icon-container {
+      cursor: pointer;
+    }
+  }
+
+  span.e-text {
+    padding-right: 0.3rem;
+  }
+
+  .e-close i-feather.icon {
+    padding-right: 0;
+  }
+
+  .e-close span.e-text {
+    display: none;
+  }
+
+  .icon-container {
+    height: 3rem;
+    display: flex;
+    align-items: center;
+
+    .icon {
+      padding-left: 1.5rem;
+      padding-right: 1rem;
+    }
+  }
+
+  .icon-container:hover {
+    background-color: #272f51;
+
+    .icon {
+      color: #6499ff;
+    }
+  }
+
+  .header {
+    height: 60px;
+    width: 100%;
+    position: fixed;
+    display: flex;
+    align-items: center;
+
+    .header-item {
+      margin: 0 25px;
+    }
+
+    .stick-left {
+      margin-left: auto;
+    }
+  }
+
+  .content {
+    padding: 60px 25px 0 25px;
+  }
+}

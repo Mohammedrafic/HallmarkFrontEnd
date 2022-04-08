@@ -1,26 +1,30 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
-import { SidebarModule } from '@syncfusion/ej2-angular-navigations';
-import { PagerModule } from '@syncfusion/ej2-angular-grids';
-import { RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
-import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
-import { enableRipple } from '@syncfusion/ej2-base';
+import { NgxsModule } from '@ngxs/store';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
+import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
+import { environment } from '../environments/environment';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-
-enableRipple(true);
+import { AppState } from './store/app.state';
 
 @NgModule({
   declarations: [AppComponent],
   imports: [
-    SidebarModule,
-    PagerModule,
-    RadioButtonModule,
-    TextBoxModule,
     BrowserModule,
     AppRoutingModule,
+
+    //STORE
+    NgxsModule.forRoot([
+      AppState
+    ]),
+    NgxsReduxDevtoolsPluginModule.forRoot({
+      disabled: environment.production
+    }),
+    NgxsLoggerPluginModule.forRoot({
+      disabled: environment.production
+    }),
   ],
   providers: [],
   bootstrap: [AppComponent],
