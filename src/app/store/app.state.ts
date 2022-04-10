@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { State, Action, StateContext, Selector } from '@ngxs/store';
-import { ToggleMobileView, ToggleTheme, SetSidebarMenu, SetHeaderState } from './app.actions';
+import { ToggleMobileView, ToggleTheme, SetSidebarMenu, SetHeaderState, ToggleSidebarState } from './app.actions';
 
 export interface AppStateModel {
   sideBarMenu: any; // TODO: create model
@@ -8,6 +8,7 @@ export interface AppStateModel {
   isDarkTheme: boolean;
   headerState: any; // TODO: create model
   isLoading: boolean;
+  isSidebarOpened: boolean;
 }
 
 @State<AppStateModel>({
@@ -18,6 +19,7 @@ export interface AppStateModel {
     isDarkTheme: true,
     headerState: null,
     isLoading: false,
+    isSidebarOpened: true
   },
 })
 @Injectable()
@@ -37,6 +39,9 @@ export class AppState {
   @Selector()
   static isDarkTheme(state: AppStateModel): boolean { return state.isDarkTheme; }
 
+  @Selector()
+  static isSidebarOpened(state: AppStateModel): boolean { return state.isSidebarOpened; }
+
   @Action(ToggleMobileView)
   ToggleMobileView({ patchState }: StateContext<AppStateModel>, { payload }: ToggleMobileView): void {
     patchState({ isMobile: payload });
@@ -55,5 +60,10 @@ export class AppState {
   @Action(SetHeaderState)
   SetHeaderState({ patchState }: StateContext<AppStateModel>, { payload }: SetHeaderState): void {
     patchState({ headerState: payload });
+  }
+
+  @Action(ToggleSidebarState)
+  SetSidebarState({ patchState }: StateContext<AppStateModel>, { payload }: ToggleSidebarState): void {
+    patchState({ isSidebarOpened: payload });
   }
 }

@@ -17,3 +17,8 @@ export class SetHeaderState {
   static readonly type = '[app] Set application header state';
   constructor(public payload: any) { }
 }
+
+export class ToggleSidebarState {
+  static readonly type = '[app] Set side bar dock state';
+  constructor(public payload: any) { }
+}

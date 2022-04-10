@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { SetHeaderState } from 'src/app/store/app.actions';
 
@@ -7,15 +7,11 @@ import { SetHeaderState } from 'src/app/store/app.actions';
   templateUrl: './order-management-content.component.html',
   styleUrls: ['./order-management-content.component.scss']
 })
-export class OrderManagementContentComponent implements OnInit {
-  
+export class OrderManagementContentComponent  {
+
   public data: object[];
 
   constructor(private store: Store) {
     store.dispatch(new SetHeaderState({title: 'Order Management'}));
   }
-
-  ngOnInit(): void {
-  }
-
 }
