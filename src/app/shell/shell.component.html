@@ -8,9 +8,7 @@
       <section class="menu">
         <section class="sidebar-menu">
           <section *ngFor="let item of (sideBarMenu$ | async)">
-            <a [routerLink]="[item.route]"
-               routerLinkActive="active"
-               class="icon-container">
+            <a [routerLink]="[item.route]" routerLinkActive="active" class="icon-container">
               <i-feather [name]="item.icon" class="icon"></i-feather>
               <span class="e-text">{{ item.title }}</span>
               <span class="e-badge e-badge-success e-badge-circle">17</span>
@@ -29,7 +27,7 @@
 
         <section class="edu-faq">
           <a href="" class="icon-container">
-            <i-feather name="folder" class="icon"></i-feather>
+            <i-feather name="book-open" class="icon"></i-feather>
             <span class="e-text">Education Hub</span>
           </a>
 
@@ -41,7 +39,7 @@
       </section>
       <section class="collapse">
         <a class="icon-container" (click)="toggleClick()">
-          <i-feather name="sidebar" class="icon"></i-feather>
+          <i-feather name="log-in" class="icon"></i-feather>
           <span class="e-text">Collapse Sidebar</span>
         </a>
       </section>
@@ -50,7 +48,9 @@
 
   <section id="main">
     <div class="header">
-      <div class="header-item"><h1>{{ (headerState$ | async).title }}</h1></div>
+      <div class="header-item">
+        <h1>{{ (headerState$ | async).title }}</h1>
+      </div>
       <div class="header-item stick-left">Header content</div>
     </div>
 

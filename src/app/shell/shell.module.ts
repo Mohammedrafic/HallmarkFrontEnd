@@ -6,13 +6,15 @@ import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 import {
   DollarSign,
-  File,
+  Clock,
   FileText,
-  Folder,
+  BookOpen,
   Home,
   Info,
   Sidebar,
   Users,
+  Clipboard,
+  LogIn
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
@@ -20,13 +22,15 @@ import { ShellPageComponent } from './shell.component';
 
 const sidebarIcons = {
   Sidebar,
-  Folder,
+  BookOpen,
   Info,
   Home,
   FileText,
-  File,
+  Clock,
   Users,
   DollarSign,
+  Clipboard,
+  LogIn
 };
 
 @NgModule({

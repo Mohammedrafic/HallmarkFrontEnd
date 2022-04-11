@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { State, Action, StateContext, Selector } from '@ngxs/store';
+
+import { ClientSidebarMenu } from '../shared/models/client-sidebar-menu.model';
 import { ToggleMobileView, ToggleTheme, SetSidebarMenu, SetHeaderState, ToggleSidebarState } from './app.actions';
 
 export interface AppStateModel {
-  sideBarMenu: any; // TODO: create model
+  sideBarMenu: ClientSidebarMenu[];
   isMobile: boolean;
   isDarkTheme: boolean;
   headerState: any; // TODO: create model
@@ -14,7 +16,7 @@ export interface AppStateModel {
 @State<AppStateModel>({
   name: 'app',
   defaults: {
-    sideBarMenu: null,
+    sideBarMenu: [],
     isMobile: false,
     isDarkTheme: true,
     headerState: null,
@@ -31,7 +33,7 @@ export class AppState {
   static isLoading(state: AppStateModel): boolean { return state.isLoading; }
 
   @Selector()
-  static sideBarMenu(state: AppStateModel): boolean { return state.sideBarMenu; }
+  static sideBarMenu(state: AppStateModel): ClientSidebarMenu[] { return state.sideBarMenu; }
 
   @Selector()
   static headerState(state: AppStateModel): boolean { return state.headerState; }

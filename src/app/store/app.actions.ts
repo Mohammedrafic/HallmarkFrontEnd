@@ -1,3 +1,5 @@
+import { ClientSidebarMenu } from "../shared/models/client-sidebar-menu.model";
+
 export class ToggleMobileView {
   static readonly type = '[app] Toggle mobile view layout';
   constructor(public payload: boolean) { }
@@ -10,7 +12,7 @@ export class ToggleTheme {
 
 export class SetSidebarMenu {
   static readonly type = '[app] Set side bar menu content';
-  constructor(public payload: any) { }
+  constructor(public payload: ClientSidebarMenu[]) { }
 }
 
 export class SetHeaderState {

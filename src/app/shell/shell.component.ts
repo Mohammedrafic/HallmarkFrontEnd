@@ -5,6 +5,7 @@ import { SidebarComponent } from '@syncfusion/ej2-angular-navigations';
 import { Observable } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
+import { ClientSidebarMenu } from '../shared/models/client-sidebar-menu.model';
 import { ToggleSidebarState, ToggleTheme } from '../store/app.actions';
 
 enum THEME {
@@ -29,7 +30,7 @@ export class ShellPageComponent implements OnInit, AfterViewInit {
   isSideBarDocked$: Observable<boolean>;
 
   @Select(AppState.sideBarMenu)
-  sideBarMenu$: Observable<any>;
+  sideBarMenu$: Observable<ClientSidebarMenu[]>;
 
   @Select(AppState.isDarkTheme)
   isDarkTheme$: Observable<boolean>;
