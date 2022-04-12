@@ -1,7 +1,8 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { SidebarComponent } from '@syncfusion/ej2-angular-navigations';
+import { FieldSettingsModel, MenuItemModel, NodeSelectEventArgs, SidebarComponent, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
 import { Observable } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
@@ -18,13 +19,19 @@ enum THEME {
   templateUrl: './shell.component.html',
   styleUrls: ['./shell.component.scss'],
 })
-export class ShellPageComponent implements OnInit, AfterViewInit {
+export class ShellPageComponent implements OnInit {
   enableDock = true;
   width = '240px';
-  dockSize = '70px';
+  dockSize = '68px';
   isDarkTheme: boolean;
+  sideBarMenu: ClientSidebarMenu[];
+  sideBarMenuField: Object;
+
+  contextMenuItems: MenuItemModel[] = [];
+
 
   @ViewChild('sidebar') sidebar: SidebarComponent;
+  @ViewChild ('treevalidate') tree: TreeViewComponent;
 
   @Select(AppState.isSidebarOpened)
   isSideBarDocked$: Observable<boolean>;
@@ -38,25 +45,58 @@ export class ShellPageComponent implements OnInit, AfterViewInit {
   @Select(AppState.headerState)
   headerState$: Observable<any>;
 
-  constructor(private store: Store) { }
+  constructor(private store: Store,
+              private route: Router) { }
 
   ngOnInit() {
     this.isDarkTheme$.subscribe(isDark => {
       this.isDarkTheme = isDark;
       this.setTheme(isDark);
     });
+
+    this.initSidebarFields();
   }
 
-  ngAfterViewInit() {
+  sideBarCreated() {
     this.isSideBarDocked$.subscribe(isDocked => this.sidebar.isOpen = isDocked);
   }
 
   toggleClick() {
     this.store.dispatch(new ToggleSidebarState(!this.sidebar.isOpen));
+    this.tree.collapseAll();
   }
 
   toggleTheme() {
     this.store.dispatch(new ToggleTheme(!this.isDarkTheme));
+  }
+
+  initSidebarFields() {
+    this.sideBarMenu$.subscribe(items => {
+      this.sideBarMenu = items;
+      this.sideBarMenuField = { dataSource: items, id: 'title', text: 'title', child: 'children' };
+
+      items.forEach(item => {
+        let children: MenuItemModel[] = [];
+
+        item.children?.forEach(child => {
+          children.push({ text: child.title, url: child.route });
+        });
+
+        this.contextMenuItems.push({ items: children });
+      });
+    });
+  }
+
+  nodeSelect(args: NodeSelectEventArgs) {
+    if (args.node.classList.contains('e-level-1')) {
+      this.tree.collapseAll();
+      this.tree.expandAll([args.node]);
+      this.tree.expandOn = 'None'
+    }
+  }
+
+  onMenuItemClick(menuItem: ClientSidebarMenu) {
+    this.route.navigate([menuItem.route]);
   }
 
   private setTheme(darkTheme: boolean) {

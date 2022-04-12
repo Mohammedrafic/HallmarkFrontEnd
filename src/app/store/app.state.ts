@@ -21,7 +21,7 @@ export interface AppStateModel {
     isDarkTheme: true,
     headerState: null,
     isLoading: false,
-    isSidebarOpened: true
+    isSidebarOpened: false
   },
 })
 @Injectable()

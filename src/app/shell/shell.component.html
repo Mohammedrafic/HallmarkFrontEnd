@@ -1,5 +1,6 @@
 <section class="shell">
-  <ejs-sidebar id="sidebar" #sidebar [enableDock]='enableDock' [width]='width' [dockSize]='dockSize'>
+  <ejs-sidebar id="sidebar" #sidebar [enableDock]='enableDock' [width]='width' [dockSize]='dockSize' [type]="'Push'"
+    (created)="sideBarCreated()">
     <section class="primary-container">
       <section class="logo">
         <span class="e-text">EINSTEIN-II</span>
@@ -7,13 +8,19 @@
 
       <section class="menu">
         <section class="sidebar-menu">
-          <section *ngFor="let item of (sideBarMenu$ | async)">
-            <a [routerLink]="[item.route]" routerLinkActive="active" class="icon-container">
-              <i-feather [name]="item.icon" class="icon"></i-feather>
-              <span class="e-text">{{ item.title }}</span>
-              <span class="e-badge e-badge-success e-badge-circle">17</span>
-            </a>
-          </section>
+          <ejs-treeview id="template" #treevalidate [fields]="sideBarMenuField" (nodeClicked)='nodeSelect($event)'
+            [enablePersistence]="true" [fullRowSelect]="true" [loadOnDemand]="false">
+            <ng-template #nodeTemplate="" let-data="">
+              <section class="icon-container" (click)="onMenuItemClick(data)">
+                <i-feather [name]="data.icon" class="icon"></i-feather>
+                <span class="e-text">{{ data.title }}</span>
+                <span class=" e-badge e-badge-success e-badge-circle" *ngIf="data.count">{{ data.count }}</span>
+              </section>
+            </ng-template>
+          </ejs-treeview>
+
+          <!-- TODO: implement context menu -->
+          <!-- <ejs-menu [items]='contextMenuItems' orientation='Vertical'></ejs-menu> -->
         </section>
       </section>
     </section>

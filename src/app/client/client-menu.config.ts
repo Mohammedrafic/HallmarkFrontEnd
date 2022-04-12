@@ -9,77 +9,79 @@ export const CLIENT_SIDEBAR_MENU: ClientSidebarMenu[] = [
   },
   {
     title: 'Order Management',
-    icon: 'clock',
-    route: '/client/order-management',
+    icon: 'file-text',
+    route: '/client/order-management/all',
     children: [
       {
         title: 'All Orders',
         icon: '',
-        route: 'all'
+        route: '/client/order-management/all'
       },
       {
         title: 'Order Template',
         icon: '',
-        route: 'templates'
+        route: '/client/order-management/templates'
       },
       {
         title: 'Incomplete',
         icon: '',
-        route: 'incomplete'
+        route: '/client/order-management/incomplete'
       },
       {
         title: 'Pending Approval',
         icon: '',
-        route: 'pending'
+        route: '/client/order-management/pending'
       }
     ],
   },
   {
     title: 'Timesheets',
-    icon: 'users',
-    route: '/client/time-sheets',
+    icon: 'clock',
+    route: '/client/time-sheets/all',
+    count: 2,
     children: [
       {
         title: 'All Timesheets',
         icon: '',
-        route: 'all'
+        route: '/client/time-sheets/all'
       },
       {
         title: 'Pending Approval',
         icon: '',
-        route: 'pending'
+        route: '/client/time-sheets/pending'
       }
     ],
   },
   {
     title: 'Invoices',
     icon: 'dollar-sign',
-    route: '/client/invoices',
+    route: '/client/invoices/all',
+    count: 6,
     children: [
       {
         title: 'All Invoices',
         icon: '',
-        route: 'all'
+        route: '/client/invoices/all'
       },
       {
         title: 'Manual',
         icon: '',
-        route: 'manual'
+        route: '/client/invoices/manual'
       },
       {
         title: 'Submitted',
         icon: '',
-        route: 'submitted'
+        route: '/client/invoices/submitted'
       },
       {
         title: 'Approval',
         icon: '',
-        route: 'approval'
+        route: '/client/invoices/approval'
       },
       {
         title: 'Paid',
         icon: '',
-        route: 'paid'
+        route: '/client/invoices/paid'
       }
     ],
   },
@@ -94,5 +96,5 @@ export const CLIENT_SIDEBAR_MENU: ClientSidebarMenu[] = [
     icon: 'clipboard',
     route: '/client/reports',
     children: [],
-  },
+  }
 ];

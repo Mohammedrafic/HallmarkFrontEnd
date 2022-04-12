@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
-import { SidebarModule } from '@syncfusion/ej2-angular-navigations';
+import { MenuModule, SidebarModule, TreeViewModule } from '@syncfusion/ej2-angular-navigations';
 import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 import {
@@ -14,7 +14,9 @@ import {
   Sidebar,
   Users,
   Clipboard,
-  LogIn
+  LogIn,
+  ChevronDown,
+  ChevronUp
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
@@ -30,7 +32,9 @@ const sidebarIcons = {
   Users,
   DollarSign,
   Clipboard,
-  LogIn
+  LogIn,
+  ChevronDown,
+  ChevronUp
 };
 
 @NgModule({
@@ -40,6 +44,8 @@ const sidebarIcons = {
     ShellRoutingModule,
     SidebarModule,
     SwitchModule,
+    MenuModule,
+    TreeViewModule,
     FeatherModule.pick(sidebarIcons),
   ],
   providers: [],

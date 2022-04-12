@@ -21,14 +21,78 @@
     display: flex;
     flex-direction: column;
 
-    .active {
-      border-left: 3px solid #3e7fff;
-      background-color: #272f51;
+    .e-list-parent.e-ui {
+      overflow: hidden;
+    }
+
+    .e-active {
+
+      &.e-level-1, &.e-level-2 {
+        & > .e-text-content {
+          background-color: #272f51;
+          border: none;
+          border-left: 3px solid #3e7fff;
+        }
+      }
+
+      .e-fullrow {
+        background-color: transparent;
+      }
 
       .icon {
-        color: #6499ff;
-        padding-left: 1.3rem;
+          color: #6499ff;
+          padding-left: 1.3rem;
       }
+    }
+
+    .e-list-item.e-active > .e-text-content .e-list-text {
+      color: #fff;
+    }
+
+
+    .e-list-text {
+      display: block;
+      margin-right: auto;
+      flex-grow: 1;
+    }
+
+    .e-treeview .e-ul {
+      padding: 0;
+
+      .e-hover {
+
+        .e-text-content {
+          background-color: #272f51;
+        }
+
+        ul > li > .e-text-content {
+          background-color: transparent;
+        }
+
+        .e-fullrow {
+          background-color: transparent;
+        }
+
+        .icon {
+          color: #6499ff;
+        }
+      }
+
+      .e-text-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0;
+
+        .e-list-text.e-list-url {
+          color: #fff;
+        }
+      }
+    }
+
+    .e-list-item .e-icons {
+      order: 1;
+      margin: 0;
     }
   }
 
@@ -41,10 +105,18 @@
     }
 
     .edu-faq {
-      margin-top: 1rem;
-      margin-bottom: 1rem;
-      border-top: 1px solid #2a2b43;
-      border-bottom: 1px solid #2a2b43;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      border-top: 1px solid rgb(209 214 226 / 20%);;
+      border-bottom: 1px solid rgb(209 214 226 / 20%);;
+    }
+
+    .icon-container:hover {
+      background-color: #272f51;
+
+      .icon {
+        color: #6499ff;
+      }
     }
   }
 
@@ -58,12 +130,49 @@
     padding-right: 0.3rem;
   }
 
+  // Sidebar closed styles
   .e-close i-feather.icon {
     padding-right: 0;
   }
 
   .e-close span.e-text {
     display: none;
+  }
+
+  .e-close {
+    .e-list-text.e-list-url {
+      padding: 0;
+    }
+
+    .e-icons.e-icon-expandable {
+      display: none;
+    }
+  }
+
+  .e-close {
+    .e-text-content {
+      padding: 0;
+      border: none;
+
+      .e-list-text {
+        padding: 0;
+
+        .e-text {
+          padding: 0;
+        }
+      }
+
+
+      .icon {
+        padding-left: 1.3rem;
+      }
+    }
+
+    .e-active {
+      .icon {
+        padding-left: 1.1rem;
+      }
+    }
   }
 
   .icon-container {
@@ -74,14 +183,6 @@
     .icon {
       padding-left: 1.5rem;
       padding-right: 1rem;
-    }
-  }
-
-  .icon-container:hover {
-    background-color: #272f51;
-
-    .icon {
-      color: #6499ff;
     }
   }
 
@@ -103,5 +204,32 @@
 
   .content {
     padding: 60px 25px 0 25px;
+  }
+
+  // ejs-menu
+  .e-menu-wrapper {
+    position: absolute;
+    top: 5.3rem;
+    // left: 3.5rem;
+    background-color: transparent;
+    color: #fff;
+  }
+
+  .e-menu-wrapper ul.e-menu-item {
+    height: 3rem;
+    padding-left: 72px;
+  }
+
+  // will override only in global style.scss
+  .e-menu-wrapper.e-menu-popup {
+    background-color: transparent;
+  }
+
+  .e-icons.e-caret {
+    display: none;
+  }
+
+  .e-close {
+    // TODO: put ejs-menu styles gere
   }
 }

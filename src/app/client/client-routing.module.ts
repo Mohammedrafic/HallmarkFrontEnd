@@ -20,15 +20,15 @@ const routes: Routes = [
         component: DashboardContentComponent,
       },
       {
-        path: 'order-management',
+        path: 'order-management/:param',
         component: OrderManagementContentComponent,
       },
       {
-        path: 'time-sheets',
+        path: 'time-sheets/:param',
         component: TimesheetsContentComponent,
       },
       {
-        path: 'invoices',
+        path: 'invoices/:param',
         component: InvoicesContentComponent,
       },
       {
