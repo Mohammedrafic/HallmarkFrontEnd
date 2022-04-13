@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 
 import { ClientSidebarMenu } from '../shared/models/client-sidebar-menu.model';
-import { ToggleMobileView, ToggleTheme, SetSidebarMenu, SetHeaderState, ToggleSidebarState } from './app.actions';
+import { ToggleMobileView, ToggleTheme, SetSidebarMenu, SetHeaderState, ToggleSidebarState, SetIsFirstLoadState } from './app.actions';
 
 export interface AppStateModel {
   sideBarMenu: ClientSidebarMenu[];
@@ -10,6 +10,7 @@ export interface AppStateModel {
   isDarkTheme: boolean;
   headerState: any; // TODO: create model
   isLoading: boolean;
+  isFirstLoad: boolean;
   isSidebarOpened: boolean;
 }
 
@@ -21,6 +22,7 @@ export interface AppStateModel {
     isDarkTheme: true,
     headerState: null,
     isLoading: false,
+    isFirstLoad: true,
     isSidebarOpened: false
   },
 })
@@ -40,6 +42,9 @@ export class AppState {
 
   @Selector()
   static isDarkTheme(state: AppStateModel): boolean { return state.isDarkTheme; }
+
+  @Selector()
+  static isFirstLoad(state: AppStateModel): boolean { return state.isFirstLoad; }
 
   @Selector()
   static isSidebarOpened(state: AppStateModel): boolean { return state.isSidebarOpened; }
@@ -67,5 +72,10 @@ export class AppState {
   @Action(ToggleSidebarState)
   SetSidebarState({ patchState }: StateContext<AppStateModel>, { payload }: ToggleSidebarState): void {
     patchState({ isSidebarOpened: payload });
+  }
+
+  @Action(SetIsFirstLoadState)
+  SetIsFirstLoadState({ patchState }: StateContext<AppStateModel>, { payload }: SetIsFirstLoadState): void {
+    patchState({ isFirstLoad: payload });
   }
 }

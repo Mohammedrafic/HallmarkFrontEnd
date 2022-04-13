@@ -9,9 +9,11 @@
       <section class="menu">
         <section class="sidebar-menu">
           <ejs-treeview id="template" #treevalidate [fields]="sideBarMenuField" (nodeClicked)='nodeSelect($event)'
-            [enablePersistence]="true" [fullRowSelect]="true" [loadOnDemand]="false">
+            [fullRowSelect]="true" [loadOnDemand]="false">
             <ng-template #nodeTemplate="" let-data="">
-              <section class="icon-container" (click)="onMenuItemClick(data)">
+              <section class="icon-container"
+                       (click)="onMenuItemClick(data)"
+                        (mouseenter)="showContextMenu(data, $event)">
                 <i-feather [name]="data.icon" class="icon"></i-feather>
                 <span class="e-text">{{ data.title }}</span>
                 <span class=" e-badge e-badge-success e-badge-circle" *ngIf="data.count">{{ data.count }}</span>
@@ -19,8 +21,10 @@
             </ng-template>
           </ejs-treeview>
 
-          <!-- TODO: implement context menu -->
-          <!-- <ejs-menu [items]='contextMenuItems' orientation='Vertical'></ejs-menu> -->
+          <ejs-contextmenu id='contextmenu' #contextmenu target='#template'
+                           (onClose)="onContextMenuClose()"
+                           (select)="onSubMenuItemClick($event)"
+                           (onOpen)="onContextMenuOpen($event)"></ejs-contextmenu>
         </section>
       </section>
     </section>
@@ -35,19 +39,24 @@
         <section class="edu-faq">
           <a href="" class="icon-container">
             <i-feather name="book-open" class="icon"></i-feather>
-            <span class="e-text">Education Hub</span>
+            <span class="e-text">Education Materials</span>
           </a>
 
           <a href="" class="icon-container">
             <i-feather name="info" class="icon"></i-feather>
             <span class="e-text">FAQ</span>
           </a>
+
+          <a href="" class="icon-container">
+            <i-feather name="settings" class="icon"></i-feather>
+            <span class="e-text">Settings</span>
+          </a>
         </section>
       </section>
       <section class="collapse">
         <a class="icon-container" (click)="toggleClick()">
-          <i-feather name="log-in" class="icon"></i-feather>
-          <span class="e-text">Collapse Sidebar</span>
+          <i-feather name="sidebar" class="icon"></i-feather>
+          <span class="e-text">Collapse</span>
         </a>
       </section>
     </aside>

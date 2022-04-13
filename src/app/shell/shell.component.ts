@@ -1,13 +1,13 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { FieldSettingsModel, MenuItemModel, NodeSelectEventArgs, SidebarComponent, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
+import { BeforeOpenCloseMenuEventArgs, ContextMenuComponent, MenuItem, MenuItemModel, NodeSelectEventArgs, SidebarComponent, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
 import { Observable } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
 import { ClientSidebarMenu } from '../shared/models/client-sidebar-menu.model';
-import { ToggleSidebarState, ToggleTheme } from '../store/app.actions';
+import { SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
 
 enum THEME {
   light = 'light',
@@ -24,14 +24,14 @@ export class ShellPageComponent implements OnInit {
   width = '240px';
   dockSize = '68px';
   isDarkTheme: boolean;
+  isFirstLoad: boolean;
   sideBarMenu: ClientSidebarMenu[];
   sideBarMenuField: Object;
-
-  contextMenuItems: MenuItemModel[] = [];
-
+  activeMenuItemData: ClientSidebarMenu;
 
   @ViewChild('sidebar') sidebar: SidebarComponent;
   @ViewChild ('treevalidate') tree: TreeViewComponent;
+  @ViewChild('contextmenu') contextmenu: ContextMenuComponent;
 
   @Select(AppState.isSidebarOpened)
   isSideBarDocked$: Observable<boolean>;
@@ -45,6 +45,9 @@ export class ShellPageComponent implements OnInit {
   @Select(AppState.headerState)
   headerState$: Observable<any>;
 
+  @Select(AppState.isFirstLoad)
+  isFirstLoad$: Observable<boolean>;
+
   constructor(private store: Store,
               private route: Router) { }
 
@@ -52,6 +55,13 @@ export class ShellPageComponent implements OnInit {
     this.isDarkTheme$.subscribe(isDark => {
       this.isDarkTheme = isDark;
       this.setTheme(isDark);
+    });
+
+    this.isFirstLoad$.subscribe(isFirstLoad => {
+      this.isFirstLoad = isFirstLoad;
+      if (isFirstLoad) {
+        this.route.navigate(['/client/dashboard']); // TODO: Should be replaced from Login component
+      }
     });
 
     this.initSidebarFields();
@@ -74,21 +84,11 @@ export class ShellPageComponent implements OnInit {
     this.sideBarMenu$.subscribe(items => {
       this.sideBarMenu = items;
       this.sideBarMenuField = { dataSource: items, id: 'title', text: 'title', child: 'children' };
-
-      items.forEach(item => {
-        let children: MenuItemModel[] = [];
-
-        item.children?.forEach(child => {
-          children.push({ text: child.title, url: child.route });
-        });
-
-        this.contextMenuItems.push({ items: children });
-      });
     });
   }
 
   nodeSelect(args: NodeSelectEventArgs) {
-    if (args.node.classList.contains('e-level-1')) {
+    if (args.node.classList.contains('e-level-1') && this.sidebar.isOpen) {
       this.tree.collapseAll();
       this.tree.expandAll([args.node]);
       this.tree.expandOn = 'None'
@@ -96,7 +96,55 @@ export class ShellPageComponent implements OnInit {
   }
 
   onMenuItemClick(menuItem: ClientSidebarMenu) {
+    this.openSideBarForFirstLoad(menuItem.route);
     this.route.navigate([menuItem.route]);
+  }
+
+  onSubMenuItemClick(event: any) {
+    this.tree.selectedNodes = [this.activeMenuItemData.title];
+    this.openSideBarForFirstLoad(event.item.route);
+    this.route.navigate([event.item.route]);
+  }
+
+  showContextMenu(data: ClientSidebarMenu, event: any) {
+    // @ts-ignore: Object is possibly 'null'.
+    if (data && data.children?.length > 0 && !this.sidebar.isOpen) {
+      this.activeMenuItemData = data;
+      const boundingRectangle = event.target.getBoundingClientRect();
+      this.contextmenu.open(boundingRectangle.top, boundingRectangle.left + parseInt(this.dockSize));
+      this.contextmenu.items = data.children?.map((child: any) => {
+        child.text = child.title;
+        return child;
+      }) || [];
+    }
+  }
+
+  onContextMenuOpen(event: any) {
+    if (!this.sidebar.isOpen) {
+      event.items.forEach((item: any) => {
+        // added left colored border
+        if (item.route === this.route.url && item.id !== null) {
+          // @ts-ignore: Object is possibly 'null'.
+          document.getElementById(item.id).classList.add('e-selected');
+        }
+      });
+    }
+
+    // hide context menu items if sidebar is opened
+    if (this.sidebar.isOpen) {
+      Array.from(event.element.children).forEach((child: any) => child.classList.add('hide'));
+    }
+  }
+
+  onContextMenuClose() {
+    this.contextmenu.items = [];
+  }
+
+  private openSideBarForFirstLoad(route: string) {
+    if (this.isFirstLoad && route !== this.route.url) {
+      this.store.dispatch(new ToggleSidebarState(true));
+      this.store.dispatch(new SetIsFirstLoadState(false));
+    }
   }
 
   private setTheme(darkTheme: boolean) {

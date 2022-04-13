@@ -1,0 +1,24 @@
+.e-contextmenu-wrapper {
+  .e-control.e-contextmenu.e-menu-parent {
+
+    .e-menu-item.e-focused,
+    .e-menu-item.e-focused.e-selected {
+      background-color: #272f51;
+    }
+
+    .e-selected {
+      border-left: 3px solid #518CFF;
+    }
+
+    .e-menu-item {
+      display: flex;
+      align-items: center;
+      height: 2rem;
+      background-color: #25263b;
+    }
+  }
+
+  .hide {
+    display: none;
+  }
+}

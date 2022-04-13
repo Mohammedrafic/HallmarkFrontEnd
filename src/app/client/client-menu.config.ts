@@ -18,19 +18,9 @@ export const CLIENT_SIDEBAR_MENU: ClientSidebarMenu[] = [
         route: '/client/order-management/all'
       },
       {
-        title: 'Order Template',
+        title: 'Order Templates',
         icon: '',
         route: '/client/order-management/templates'
-      },
-      {
-        title: 'Incomplete',
-        icon: '',
-        route: '/client/order-management/incomplete'
-      },
-      {
-        title: 'Pending Approval',
-        icon: '',
-        route: '/client/order-management/pending'
       }
     ],
   },
@@ -44,11 +34,6 @@ export const CLIENT_SIDEBAR_MENU: ClientSidebarMenu[] = [
         title: 'All Timesheets',
         icon: '',
         route: '/client/time-sheets/all'
-      },
-      {
-        title: 'Pending Approval',
-        icon: '',
-        route: '/client/time-sheets/pending'
       }
     ],
   },
@@ -62,26 +47,6 @@ export const CLIENT_SIDEBAR_MENU: ClientSidebarMenu[] = [
         title: 'All Invoices',
         icon: '',
         route: '/client/invoices/all'
-      },
-      {
-        title: 'Manual',
-        icon: '',
-        route: '/client/invoices/manual'
-      },
-      {
-        title: 'Submitted',
-        icon: '',
-        route: '/client/invoices/submitted'
-      },
-      {
-        title: 'Approval',
-        icon: '',
-        route: '/client/invoices/approval'
-      },
-      {
-        title: 'Paid',
-        icon: '',
-        route: '/client/invoices/paid'
       }
     ],
   },

@@ -24,3 +24,8 @@ export class ToggleSidebarState {
   static readonly type = '[app] Set side bar dock state';
   constructor(public payload: any) { }
 }
+
+export class SetIsFirstLoadState {
+  static readonly type = '[app] Set isFirstLoad parameter state';
+  constructor(public payload: any) { }
+}
