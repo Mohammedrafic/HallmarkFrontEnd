@@ -17,6 +17,9 @@
 
     .e-selected {
       border-left: 3px solid $primary-active-blue-15;
+      padding-left: 0.81rem;
+      line-height: 20px;
+      font-weight: 700;
       color: $primary-active-blue-15;
     }
 
