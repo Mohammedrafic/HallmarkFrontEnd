@@ -63,3 +63,10 @@ export const CLIENT_SIDEBAR_MENU: ClientSidebarMenu[] = [
     children: [],
   }
 ];
+
+export const SIDEBAR_CONFIG = {
+  isDock: true,
+  dockSize: '68px',
+  width: '240px',
+  type: 'Push'
+}

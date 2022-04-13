@@ -12,9 +12,28 @@
     visibility: visible;
   }
 
-  .logo {
+  .logo-container {
     height: 4rem;
-    padding: 0.5rem 1.5rem;
+    padding: 1.63rem 1.25rem;
+
+    .logo {
+      height: 34px;
+      width: 127px;
+      background-image: url(../../assets/icons/logo.svg);
+    }
+
+    .small-logo {
+      height: 17px;
+      width: 25px;
+      background-image: url(../../assets/icons/small-logo.svg);
+    }
+  }
+
+  .icon {
+    height: 16px;
+    width: 16px;
+    display: flex;
+    padding-left: 1.5rem;
   }
 
   .menu {
@@ -37,11 +56,6 @@
 
       .e-fullrow {
         background-color: transparent;
-      }
-
-      .icon {
-          color: #518CFF;
-          padding-left: 1.3rem;
       }
     }
 
@@ -109,6 +123,7 @@
       }
 
       .icon {
+        padding-left: 1.3rem;
         color: #518CFF;
       }
     }
@@ -183,17 +198,6 @@
           padding: 0;
         }
       }
-
-
-      .icon {
-        padding-left: 1.3rem;
-      }
-    }
-
-    .e-active {
-      .icon {
-        padding-left: 1.1rem;
-      }
     }
   }
 
@@ -203,7 +207,6 @@
     align-items: center;
 
     .icon {
-      padding-left: 1.5rem;
       padding-right: 1rem;
     }
   }

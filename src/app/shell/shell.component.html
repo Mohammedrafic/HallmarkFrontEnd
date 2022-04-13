@@ -1,9 +1,10 @@
 <section class="shell">
-  <ejs-sidebar id="sidebar" #sidebar [enableDock]='enableDock' [width]='width' [dockSize]='dockSize' [type]="'Push'"
-    (created)="sideBarCreated()">
+  <ejs-sidebar id="sidebar" #sidebar [enableDock]='enableDock' [width]='width' [dockSize]='dockSize' [type]="sideBarType"
+    (created)="onSideBarCreated()">
     <section class="primary-container">
-      <section class="logo">
-        <span class="e-text">EINSTEIN-II</span>
+      <section class="logo-container">
+        <div class="logo" *ngIf="sidebar.isOpen"></div>
+        <div class="small-logo" *ngIf="!sidebar.isOpen"></div>
       </section>
 
       <section class="menu">

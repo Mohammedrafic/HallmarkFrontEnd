@@ -2,10 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { BeforeOpenCloseMenuEventArgs, ContextMenuComponent, MenuItem, MenuItemModel, NodeSelectEventArgs, SidebarComponent, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
+import { ContextMenuComponent, NodeSelectEventArgs, SidebarComponent, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
 import { Observable } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
+import { SIDEBAR_CONFIG } from '../client/client-menu.config';
 import { ClientSidebarMenu } from '../shared/models/client-sidebar-menu.model';
 import { SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
 
@@ -20,9 +21,11 @@ enum THEME {
   styleUrls: ['./shell.component.scss'],
 })
 export class ShellPageComponent implements OnInit {
-  enableDock = true;
-  width = '240px';
-  dockSize = '68px';
+  enableDock = SIDEBAR_CONFIG.isDock;
+  width = SIDEBAR_CONFIG.width;
+  dockSize = SIDEBAR_CONFIG.dockSize;
+  sideBarType = SIDEBAR_CONFIG.type;
+
   isDarkTheme: boolean;
   isFirstLoad: boolean;
   sideBarMenu: ClientSidebarMenu[];
@@ -51,7 +54,7 @@ export class ShellPageComponent implements OnInit {
   constructor(private store: Store,
               private route: Router) { }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.isDarkTheme$.subscribe(isDark => {
       this.isDarkTheme = isDark;
       this.setTheme(isDark);
@@ -67,27 +70,28 @@ export class ShellPageComponent implements OnInit {
     this.initSidebarFields();
   }
 
-  sideBarCreated() {
+  onSideBarCreated(): void {
+    // code placed here since this.sidebar = undefined in ngOnInit() as sidebar not creates in time
     this.isSideBarDocked$.subscribe(isDocked => this.sidebar.isOpen = isDocked);
   }
 
-  toggleClick() {
+  toggleClick(): void {
     this.store.dispatch(new ToggleSidebarState(!this.sidebar.isOpen));
     this.tree.collapseAll();
   }
 
-  toggleTheme() {
+  toggleTheme(): void {
     this.store.dispatch(new ToggleTheme(!this.isDarkTheme));
   }
 
-  initSidebarFields() {
+  initSidebarFields(): void {
     this.sideBarMenu$.subscribe(items => {
       this.sideBarMenu = items;
       this.sideBarMenuField = { dataSource: items, id: 'title', text: 'title', child: 'children' };
     });
   }
 
-  nodeSelect(args: NodeSelectEventArgs) {
+  nodeSelect(args: NodeSelectEventArgs): void {
     if (args.node.classList.contains('e-level-1') && this.sidebar.isOpen) {
       this.tree.collapseAll();
       this.tree.expandAll([args.node]);
@@ -95,18 +99,18 @@ export class ShellPageComponent implements OnInit {
     }
   }
 
-  onMenuItemClick(menuItem: ClientSidebarMenu) {
+  onMenuItemClick(menuItem: ClientSidebarMenu): void {
     this.openSideBarForFirstLoad(menuItem.route);
     this.route.navigate([menuItem.route]);
   }
 
-  onSubMenuItemClick(event: any) {
+  onSubMenuItemClick(event: any): void {
     this.tree.selectedNodes = [this.activeMenuItemData.title];
     this.openSideBarForFirstLoad(event.item.route);
     this.route.navigate([event.item.route]);
   }
 
-  showContextMenu(data: ClientSidebarMenu, event: any) {
+  showContextMenu(data: ClientSidebarMenu, event: any): void {
     // @ts-ignore: Object is possibly 'null'.
     if (data && data.children?.length > 0 && !this.sidebar.isOpen) {
       this.activeMenuItemData = data;
@@ -119,7 +123,7 @@ export class ShellPageComponent implements OnInit {
     }
   }
 
-  onContextMenuOpen(event: any) {
+  onContextMenuOpen(event: any): void {
     if (!this.sidebar.isOpen) {
       event.items.forEach((item: any) => {
         // added left colored border
@@ -136,18 +140,18 @@ export class ShellPageComponent implements OnInit {
     }
   }
 
-  onContextMenuClose() {
+  onContextMenuClose(): void {
     this.contextmenu.items = [];
   }
 
-  private openSideBarForFirstLoad(route: string) {
+  private openSideBarForFirstLoad(route: string): void {
     if (this.isFirstLoad && route !== this.route.url) {
       this.store.dispatch(new ToggleSidebarState(true));
       this.store.dispatch(new SetIsFirstLoadState(false));
     }
   }
 
-  private setTheme(darkTheme: boolean) {
+  private setTheme(darkTheme: boolean): void {
     document.body.classList.remove(darkTheme ? THEME.light : THEME.dark);
     document.body.classList.add(darkTheme ? THEME.dark : THEME.light);
   }
