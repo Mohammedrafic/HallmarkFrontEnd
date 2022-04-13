@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { SetHeaderState } from 'src/app/store/app.actions';
 
@@ -7,13 +7,9 @@ import { SetHeaderState } from 'src/app/store/app.actions';
   templateUrl: './dashboard-content.component.html',
   styleUrls: ['./dashboard-content.component.scss']
 })
-export class DashboardContentComponent implements OnInit {
+export class DashboardContentComponent  {
 
   constructor(private store: Store) {
     store.dispatch(new SetHeaderState({title: 'Dashboard'}));
   }
-
-  ngOnInit(): void {
-  }
-
 }

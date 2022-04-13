@@ -1,4 +1,6 @@
-export const CLIENT_SIDEBAR_MENU = [
+import { ClientSidebarMenu } from "../shared/models/client-sidebar-menu.model";
+
+export const CLIENT_SIDEBAR_MENU: ClientSidebarMenu[] = [
   {
     title: 'Dashboard',
     icon: 'home',
@@ -8,20 +10,45 @@ export const CLIENT_SIDEBAR_MENU = [
   {
     title: 'Order Management',
     icon: 'file-text',
-    route: '/client/order-management',
-    children: [],
+    route: '/client/order-management/all',
+    children: [
+      {
+        title: 'All Orders',
+        icon: '',
+        route: '/client/order-management/all'
+      },
+      {
+        title: 'Order Templates',
+        icon: '',
+        route: '/client/order-management/templates'
+      }
+    ],
   },
   {
     title: 'Timesheets',
-    icon: 'users',
-    route: '/client/time-sheets',
-    children: [],
+    icon: 'clock',
+    route: '/client/time-sheets/all',
+    count: 2,
+    children: [
+      {
+        title: 'All Timesheets',
+        icon: '',
+        route: '/client/time-sheets/all'
+      }
+    ],
   },
   {
     title: 'Invoices',
     icon: 'dollar-sign',
-    route: '/client/invoices',
-    children: [],
+    route: '/client/invoices/all',
+    count: 6,
+    children: [
+      {
+        title: 'All Invoices',
+        icon: '',
+        route: '/client/invoices/all'
+      }
+    ],
   },
   {
     title: 'Candidate List',
@@ -31,8 +58,15 @@ export const CLIENT_SIDEBAR_MENU = [
   },
   {
     title: 'Reports',
-    icon: 'file',
+    icon: 'clipboard',
     route: '/client/reports',
     children: [],
-  },
+  }
 ];
+
+export const SIDEBAR_CONFIG = {
+  isDock: true,
+  dockSize: '68px',
+  width: '240px',
+  type: 'Push'
+}

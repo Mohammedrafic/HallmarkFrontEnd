@@ -1,23 +1,29 @@
 import { Injectable } from '@angular/core';
 import { State, Action, StateContext, Selector } from '@ngxs/store';
-import { ToggleMobileView, ToggleTheme, SetSidebarMenu, SetHeaderState } from './app.actions';
+
+import { ClientSidebarMenu } from '../shared/models/client-sidebar-menu.model';
+import { ToggleMobileView, ToggleTheme, SetSidebarMenu, SetHeaderState, ToggleSidebarState, SetIsFirstLoadState } from './app.actions';
 
 export interface AppStateModel {
-  sideBarMenu: any; // TODO: create model
+  sideBarMenu: ClientSidebarMenu[];
   isMobile: boolean;
   isDarkTheme: boolean;
   headerState: any; // TODO: create model
   isLoading: boolean;
+  isFirstLoad: boolean;
+  isSidebarOpened: boolean;
 }
 
 @State<AppStateModel>({
   name: 'app',
   defaults: {
-    sideBarMenu: null,
+    sideBarMenu: [],
     isMobile: false,
     isDarkTheme: true,
     headerState: null,
     isLoading: false,
+    isFirstLoad: true,
+    isSidebarOpened: false
   },
 })
 @Injectable()
@@ -29,13 +35,19 @@ export class AppState {
   static isLoading(state: AppStateModel): boolean { return state.isLoading; }
 
   @Selector()
-  static sideBarMenu(state: AppStateModel): boolean { return state.sideBarMenu; }
+  static sideBarMenu(state: AppStateModel): ClientSidebarMenu[] { return state.sideBarMenu; }
 
   @Selector()
   static headerState(state: AppStateModel): boolean { return state.headerState; }
 
   @Selector()
   static isDarkTheme(state: AppStateModel): boolean { return state.isDarkTheme; }
+
+  @Selector()
+  static isFirstLoad(state: AppStateModel): boolean { return state.isFirstLoad; }
+
+  @Selector()
+  static isSidebarOpened(state: AppStateModel): boolean { return state.isSidebarOpened; }
 
   @Action(ToggleMobileView)
   ToggleMobileView({ patchState }: StateContext<AppStateModel>, { payload }: ToggleMobileView): void {
@@ -55,5 +67,15 @@ export class AppState {
   @Action(SetHeaderState)
   SetHeaderState({ patchState }: StateContext<AppStateModel>, { payload }: SetHeaderState): void {
     patchState({ headerState: payload });
+  }
+
+  @Action(ToggleSidebarState)
+  SetSidebarState({ patchState }: StateContext<AppStateModel>, { payload }: ToggleSidebarState): void {
+    patchState({ isSidebarOpened: payload });
+  }
+
+  @Action(SetIsFirstLoadState)
+  SetIsFirstLoadState({ patchState }: StateContext<AppStateModel>, { payload }: SetIsFirstLoadState): void {
+    patchState({ isFirstLoad: payload });
   }
 }

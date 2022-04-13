@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { SetHeaderState } from 'src/app/store/app.actions';
 
@@ -7,13 +7,9 @@ import { SetHeaderState } from 'src/app/store/app.actions';
   templateUrl: './invoices-content.component.html',
   styleUrls: ['./invoices-content.component.scss']
 })
-export class InvoicesContentComponent implements OnInit {
+export class InvoicesContentComponent  {
 
   constructor(private store: Store) {
     store.dispatch(new SetHeaderState({title: 'Invoices'}));
   }
-
-  ngOnInit(): void {
-  }
-
 }

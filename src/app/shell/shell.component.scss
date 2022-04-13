@@ -1,7 +1,7 @@
 .shell {
   #sidebar {
     visibility: hidden;
-    background-color: #25263b;
+    background-color: #25263e;
     color: #ffffff;
     display: flex;
     flex-direction: column;
@@ -12,22 +12,119 @@
     visibility: visible;
   }
 
-  .logo {
+  .logo-container {
     height: 4rem;
-    padding: 0.5rem 1.5rem;
+    padding: 1.63rem 1.25rem;
+
+    .logo {
+      height: 34px;
+      width: 127px;
+      background-image: url(../../assets/icons/logo.svg);
+    }
+
+    .small-logo {
+      height: 17px;
+      width: 25px;
+      background-image: url(../../assets/icons/small-logo.svg);
+    }
+  }
+
+  .icon {
+    height: 16px;
+    width: 16px;
+    display: flex;
+    padding-left: 1.5rem;
   }
 
   .menu {
     display: flex;
     flex-direction: column;
 
-    .active {
-      border-left: 3px solid #3e7fff;
-      background-color: #272f51;
+    .e-list-parent.e-ui {
+      overflow: hidden;
+    }
+
+    .e-active {
+
+      &.e-level-1, &.e-level-2 {
+        & > .e-text-content {
+          background-color: #272f51;
+          border: none;
+          border-left: 3px solid #3e7fff;
+        }
+      }
+
+      .e-fullrow {
+        background-color: transparent;
+      }
+    }
+
+    .e-list-item.e-active > .e-text-content .e-list-text {
+      color: #fff;
+    }
+
+
+    .e-list-text {
+      display: block;
+      margin-right: auto;
+      flex-grow: 1;
+    }
+
+    .e-treeview .e-ul {
+      padding: 0;
+
+      .e-hover {
+
+        .e-text-content {
+          background-color: #272f51;
+        }
+
+        ul > li > .e-text-content {
+          background-color: transparent;
+        }
+
+        .e-fullrow {
+          background-color: transparent;
+        }
+
+        .icon {
+          color: #518CFF;
+        }
+      }
+
+      .e-text-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0;
+
+        .e-list-text.e-list-url {
+          color: #fff;
+        }
+      }
+
+      .e-list-text, .e-icons {
+        color: #fff;
+      }
+    }
+
+    .e-list-item .e-icons {
+      order: 1;
+      margin: 0;
+    }
+
+    #template_active {
+      &.e-level-1, &.e-level-2 {
+        & > .e-text-content {
+          background-color: #272f51;
+          border: none;
+          border-left: 3px solid #3e7fff;
+        }
+      }
 
       .icon {
-        color: #6499ff;
         padding-left: 1.3rem;
+        color: #518CFF;
       }
     }
   }
@@ -41,10 +138,22 @@
     }
 
     .edu-faq {
-      margin-top: 1rem;
-      margin-bottom: 1rem;
-      border-top: 1px solid #2a2b43;
-      border-bottom: 1px solid #2a2b43;
+      height: 158px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      border-top: 1px solid rgb(209 214 226 / 20%);;
+      border-bottom: 1px solid rgb(209 214 226 / 20%);;
+    }
+
+    .icon-container:hover {
+      background-color: #272f51;
+
+      .icon {
+        color: #518CFF;
+      }
     }
   }
 
@@ -58,6 +167,7 @@
     padding-right: 0.3rem;
   }
 
+  // Sidebar closed styles
   .e-close i-feather.icon {
     padding-right: 0;
   }
@@ -66,22 +176,38 @@
     display: none;
   }
 
+  .e-close {
+    .e-list-text.e-list-url {
+      padding: 0;
+    }
+
+    .e-icons.e-icon-expandable {
+      display: none;
+    }
+  }
+
+  .e-close {
+    .e-text-content {
+      padding: 0;
+      border: none;
+
+      .e-list-text {
+        padding: 0;
+
+        .e-text {
+          padding: 0;
+        }
+      }
+    }
+  }
+
   .icon-container {
     height: 3rem;
     display: flex;
     align-items: center;
 
     .icon {
-      padding-left: 1.5rem;
       padding-right: 1rem;
-    }
-  }
-
-  .icon-container:hover {
-    background-color: #272f51;
-
-    .icon {
-      color: #6499ff;
     }
   }
 

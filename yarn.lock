@@ -1620,6 +1620,15 @@
     "@syncfusion/ej2-base" "~20.1.47"
     "@syncfusion/ej2-buttons" "20.1.47"
 
+"@syncfusion/ej2-angular-dropdowns@^20.1.47":
+  version "20.1.47"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-angular-dropdowns/-/ej2-angular-dropdowns-20.1.47.tgz#b8a96abd96d904bd4d1eb84fac62831b85625394"
+  integrity sha512-PhnlG6uDcTi1PPLpa9GWYvsUGHgzhRF5pynkYD7rDtoAHJV4yGRRc3e1Gi0fJMvdF/ebHYLHrbe5XkpCU97SJw==
+  dependencies:
+    "@syncfusion/ej2-angular-base" "~20.1.47"
+    "@syncfusion/ej2-base" "~20.1.47"
+    "@syncfusion/ej2-dropdowns" "20.1.47"
+
 "@syncfusion/ej2-angular-grids@^20.1.47":
   version "20.1.47"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-angular-grids/-/ej2-angular-grids-20.1.47.tgz#20ce5496ac933288fb48e3d86324a844aafece1e"
@@ -1686,7 +1695,7 @@
   dependencies:
     "@syncfusion/ej2-base" "~20.1.47"
 
-"@syncfusion/ej2-dropdowns@~20.1.47":
+"@syncfusion/ej2-dropdowns@20.1.47", "@syncfusion/ej2-dropdowns@~20.1.47":
   version "20.1.47"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-dropdowns/-/ej2-dropdowns-20.1.47.tgz#96a5a89d5e23864a9a4ade2d4e0e7172bb2e48ac"
   integrity sha512-OI1jDSF66sV7u8tjY/WjnW/BQdU9MWRYRLWzwdDcEpA71FolDoU1JWMRXc99d91zEkearcmrMRifZDn9KqE0PA==

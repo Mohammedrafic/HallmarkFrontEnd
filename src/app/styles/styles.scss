@@ -32,8 +32,9 @@ body {
   }
 }
 
-@import "./controls/switch";
-@import "./controls/badge";
+@import './controls/switch';
+@import './controls/badge';
+@import './controls/context-menu';
 
 a, a:hover, a:focus, a:active {
   text-decoration: none;
