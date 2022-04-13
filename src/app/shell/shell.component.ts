@@ -63,7 +63,7 @@ export class ShellPageComponent implements OnInit {
     this.isFirstLoad$.subscribe(isFirstLoad => {
       this.isFirstLoad = isFirstLoad;
       if (isFirstLoad) {
-        this.route.navigate(['/client/dashboard']); // TODO: Should be replaced from Login component
+        //this.route.navigate(['/client/dashboard']); // TODO: Should be replaced from Login component
       }
     });
 

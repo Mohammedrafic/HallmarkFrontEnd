@@ -1,3 +1,5 @@
+@import '../styles/variables/colors.scss';
+
 .shell {
   #sidebar {
     visibility: hidden;
@@ -88,7 +90,7 @@
         }
 
         .icon {
-          color: #518CFF;
+          color: $primary-active-blue-15;
         }
       }
 
@@ -124,7 +126,7 @@
 
       .icon {
         padding-left: 1.3rem;
-        color: #518CFF;
+        color: $primary-active-blue-15;
       }
     }
   }
@@ -152,7 +154,7 @@
       background-color: #272f51;
 
       .icon {
-        color: #518CFF;
+        color: $primary-active-blue-15;
       }
     }
   }

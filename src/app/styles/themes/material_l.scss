@@ -1,6 +1,6 @@
 $primary: #3f51b5;
 $primary-font: #fff;
-$accent: #ff4081;
+$accent: #3E7FFF;
 $accent-font: #fff;
 
 $primary-50: lighten($primary, 38%);
@@ -20057,12 +20057,12 @@ $btn-flat-danger-hover-bgcolor: mix($btn-danger-bgcolor, $btn-flat-bgcolor, 4%) 
 $btn-flat-danger-focus-bgcolor: mix($btn-danger-bgcolor, $btn-flat-bgcolor, 12%) !default;
 $btn-flat-danger-active-bgcolor: mix($btn-danger-bgcolor, $btn-flat-bgcolor, 24%) !default;
 $btn-flat-box-shadow: none !default;
-$btn-outline-color: $btn-color !default;
+$btn-outline-color: #3E7FFF !default;
 $btn-outline-bgcolor: transparent !default;
 $btn-outline-hover-color: $btn-color !default;
 $btn-outline-focus-color: $btn-color !default;
 $btn-outline-active-color: $btn-color !default;
-$btn-outline-border-color: #adadad !default;
+$btn-outline-border-color: #8BB2FF !default;
 $btn-outline-hover-bgcolor: rgba($grey-black, .12) !default;
 $btn-outline-focus-bgcolor: rgba($grey-black, .24) !default;
 $btn-outline-active-bgcolor: rgba($grey-black, .32) !default;

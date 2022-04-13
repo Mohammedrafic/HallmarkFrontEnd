@@ -1,5 +1,14 @@
+
+
+@import "../variables/colors.scss";
+
 .e-contextmenu-wrapper {
   .e-control.e-contextmenu.e-menu-parent {
+    color: $secondary-dark-blue-45;
+
+    .e-menu-item.e-menu-item.e-focused {
+      color: $secondary-dark-blue-45;
+    }
 
     .e-menu-item.e-focused,
     .e-menu-item.e-focused.e-selected {
@@ -7,7 +16,8 @@
     }
 
     .e-selected {
-      border-left: 3px solid #518CFF;
+      border-left: 3px solid $primary-active-blue-15;
+      color: $primary-active-blue-15;
     }
 
     .e-menu-item {

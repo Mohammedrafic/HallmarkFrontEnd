@@ -9,6 +9,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AppState } from './store/app.state';
 
+import { enableRipple } from '@syncfusion/ej2-base';
+
+enableRipple(true);
+
 @NgModule({
   declarations: [AppComponent],
   imports: [

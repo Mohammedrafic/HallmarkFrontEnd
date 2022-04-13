@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { GridModule } from '@syncfusion/ej2-angular-grids';
+import { GridModule, ResizeService } from '@syncfusion/ej2-angular-grids';
 
 import { ClientRoutingModule } from './client-routing.module';
 import { DashboardContentComponent } from './dashboard/dashboard-content/dashboard-content.component';
@@ -28,5 +28,8 @@ import { ClientComponent } from './client.component';
 
     GridModule
   ],
+  providers: [
+    ResizeService
+  ]
 })
 export class ClientModule {}

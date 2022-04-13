@@ -1,0 +1,33 @@
+$grid-border-radius: 10px;
+
+ejs-grid.e-control.e-grid {
+  border-radius: $grid-border-radius;
+  box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.05);
+
+  thead tr {
+    height: 52px !important;
+  }
+
+  thead tr,
+  .e-gridheader {
+    border-radius: $grid-border-radius $grid-border-radius 0 0;
+    font-variant: small-caps;
+
+    .e-headertext {
+      text-transform: lowercase;
+      font-weight: 600;
+    }
+
+    .e-icon-ascending::before {
+      content: "\e910";
+    }
+
+    .e-icon-descending::before {
+      content: "\e916";
+    }
+  }
+
+  .e-gridcontent {
+    border-radius: 0 0 $grid-border-radius $grid-border-radius;
+  }
+}

@@ -12,8 +12,23 @@ body {
   margin: 0;
   font-family: 'SF Pro';
 
+  // Default icon size
+  #main i-feather.icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  ejs-sidebar.e-control.e-sidebar.e-left {
+    border-right: none;
+  }
+
   &.light {
     // Styles not related to syncfusion controls here
+    background-color: #F6F6F6;
+
+    .header {
+      border-bottom: 1px solid #D1D6E2;
+    }
 
     @include meta.load-css('./themes/material_l');
   }
@@ -24,7 +39,7 @@ body {
     color: #a2a2a2;
 
     .header {
-      border-bottom: 1px solid #2a2b43;
+      border-bottom: 1px solid #4C5673;
       color: #fff;
     }
 
@@ -32,6 +47,9 @@ body {
   }
 }
 
+@import "./controls/grid";
+@import "./controls/button";
+@import "./controls/chip";
 @import './controls/switch';
 @import './controls/badge';
 @import './controls/context-menu';

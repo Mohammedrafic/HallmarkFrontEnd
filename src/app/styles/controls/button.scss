@@ -1,0 +1,36 @@
+@import "../variables/colors.scss";
+
+button.e-control.e-btn {
+  text-transform: initial;
+  border-radius: 5px;
+  padding: 8px 15px;
+
+  &.e-primary:active {
+    background-color: $primary-active-blue;
+  }
+
+  i-feather {
+    vertical-align: middle;
+    margin-left: 5px;
+  }
+}
+
+.dark {
+
+}
+
+.light {
+  .e-control.e-btn.e-outline {
+    background-color: #fff;
+    color: #3E7FFF !important;
+
+    &:hover {
+      background-color: rgba(139, 178, 255, .7);
+    }
+
+    &:active {
+      background-color: #fff;
+      border-color: $primary-active-blue;
+    }
+  }
+}

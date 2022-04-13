@@ -1,0 +1,22 @@
+@import "../../../styles/variables/colors.scss";
+
+.controls-container {
+  padding: 20px 0;
+
+  &>div {
+    display: flex;
+    flex-direction: row-reverse;
+
+    button {
+      margin-left: 10px;
+    }
+  }
+}
+
+.controls-cell, .controls-header {
+  .icon {
+    margin-left: 10px;
+    cursor: pointer;
+    color: $secondary-dark-blue-20;
+  }
+}

@@ -1,0 +1,30 @@
+@import "../../styles/variables/colors.scss";
+
+ejs-chiplist.e-control.e-chip-list {
+  .e-chip {
+    font-variant: small-caps;
+    font-weight: 600;
+    height: 25px;
+
+    &.e-success {
+      background-color: $supportive-green-40;
+      color: $supportive-green-10;
+
+      .e-chip-icon {
+        background-color: $supportive-green-10;
+      }
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      margin: 10px;
+    }
+
+    &.e-chip-icon-wrap {
+      .e-chip-text {
+        margin-right: 10px;
+      }
+    } 
+  }
+}

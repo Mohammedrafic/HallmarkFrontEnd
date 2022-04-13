@@ -1,1 +1,35 @@
-<p>client-management-content works!</p>
+<section class="controls-container">
+  <div>
+    <button ejs-button [isPrimary]="true">Add Organization</button>
+    <button ejs-button cssClass="e-outline">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+  </div>
+</section>
+<ejs-grid #grid [dataSource]="data" [allowSorting]="true" [allowResizing]="true" [resizeSettings]="resizeSettings" [sortSettings]='initialSort'>
+<e-columns>
+  <e-column field='name' headerText='Organization Name' textAlign='Left'></e-column>
+  <e-column field='status' headerText='Organization Status' textAlign='Left' width="120">
+    <ng-template #template let-data>
+      <div class="status-cell">
+        <ejs-chiplist>
+          <e-chips>
+            <e-chip [text]="data.status" cssClass="e-success" leadingIconCss="dot"></e-chip>
+          </e-chips>
+        </ejs-chiplist>
+      </div>
+    </ng-template>
+  </e-column>
+  <e-column field='city' headerText='City' textAlign='Left' format='C2' width="90"></e-column>
+  <e-column field='contact' headerText='Contract Person' textAlign='Left' format='yMd' width="120"></e-column>
+  <e-column field='phone' headerText='Phone' textAlign='Left' format='P2' width="120"></e-column>
+  <e-column field='' headerText='' textAlign='Right' width="50">
+    <ng-template #headerTemplate let-data>
+      <div class="controls-header"></div>
+    </ng-template>
+    <ng-template #template let-data>
+      <div class="controls-cell">
+        <i-feather name="edit" class="icon"></i-feather>
+      </div>
+    </ng-template>
+  </e-column>
+</e-columns>
+</ejs-grid>

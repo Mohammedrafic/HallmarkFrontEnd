@@ -19,7 +19,7 @@ export interface AppStateModel {
   defaults: {
     sideBarMenu: [],
     isMobile: false,
-    isDarkTheme: true,
+    isDarkTheme: false,
     headerState: null,
     isLoading: false,
     isFirstLoad: true,
