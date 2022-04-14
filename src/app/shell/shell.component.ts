@@ -63,7 +63,7 @@ export class ShellPageComponent implements OnInit {
     this.isFirstLoad$.subscribe(isFirstLoad => {
       this.isFirstLoad = isFirstLoad;
       if (isFirstLoad) {
-        //this.route.navigate(['/client/dashboard']); // TODO: Should be replaced from Login component
+        this.route.navigate(['/client/dashboard']); // TODO: Should be replaced from Login component
       }
     });
 
@@ -115,7 +115,7 @@ export class ShellPageComponent implements OnInit {
     if (data && data.children?.length > 0 && !this.sidebar.isOpen) {
       this.activeMenuItemData = data;
       const boundingRectangle = event.target.getBoundingClientRect();
-      this.contextmenu.open(boundingRectangle.top, boundingRectangle.left + parseInt(this.dockSize));
+      this.contextmenu.open(boundingRectangle.top, parseInt(this.dockSize));
       this.contextmenu.items = data.children?.map((child: any) => {
         child.text = child.title;
         return child;
