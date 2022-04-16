@@ -4,6 +4,7 @@ export const ADMIN_SIDEBAR_MENU = [
     icon: 'home',
     route: '/admin/dashboard',
     children: [],
+    isActive: true
   },
   {
     title: 'Client Management',

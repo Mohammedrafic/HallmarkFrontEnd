@@ -6,7 +6,7 @@ import { ContextMenuComponent, NodeSelectEventArgs, SidebarComponent, TreeViewCo
 import { Observable } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
-import { SIDEBAR_CONFIG } from '../client/client-menu.config';
+import { CLIENT_SIDEBAR_MENU, SIDEBAR_CONFIG } from '../client/client-menu.config';
 import { ClientSidebarMenu } from '../shared/models/client-sidebar-menu.model';
 import { SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
 
@@ -60,19 +60,25 @@ export class ShellPageComponent implements OnInit {
       this.setTheme(isDark);
     });
 
-    this.isFirstLoad$.subscribe(isFirstLoad => {
-      this.isFirstLoad = isFirstLoad;
-      if (isFirstLoad) {
-        this.route.navigate(['/client/dashboard']); // TODO: Should be replaced from Login component
-      }
-    });
-
     this.initSidebarFields();
   }
 
   onSideBarCreated(): void {
     // code placed here since this.sidebar = undefined in ngOnInit() as sidebar not creates in time
     this.isSideBarDocked$.subscribe(isDocked => this.sidebar.isOpen = isDocked);
+
+    this.isFirstLoad$.subscribe(isFirstLoad => {
+      this.isFirstLoad = isFirstLoad;
+      if (isFirstLoad) {
+        const currentConfiguration = CLIENT_SIDEBAR_MENU; // TODO: Should be decided after Login: CLIENT_SIDEBAR_MENU, ADMIN_SIDEBAR_MENU etc.
+        const activeMenuItem = currentConfiguration.find(item => item.isActive);
+
+        if (activeMenuItem) {
+          this.route.navigate([activeMenuItem.route]);
+          this.tree.selectedNodes = [activeMenuItem.title];
+        }
+      }
+    });
   }
 
   toggleClick(): void {
@@ -100,42 +106,44 @@ export class ShellPageComponent implements OnInit {
   }
 
   onMenuItemClick(menuItem: ClientSidebarMenu): void {
-    this.openSideBarForFirstLoad(menuItem.route);
+    this.setSideBarForFirstLoad(menuItem.route);
     this.route.navigate([menuItem.route]);
   }
 
   onSubMenuItemClick(event: any): void {
     this.tree.selectedNodes = [this.activeMenuItemData.title];
-    this.openSideBarForFirstLoad(event.item.route);
+    this.setSideBarForFirstLoad(event.item.route);
     this.route.navigate([event.item.route]);
   }
 
   showContextMenu(data: ClientSidebarMenu, event: any): void {
-    // @ts-ignore: Object is possibly 'null'.
-    if (data && data.children?.length > 0 && !this.sidebar.isOpen) {
+    this.contextmenu.items = [];
+    if (data.children && data.children.length > 0 && !this.sidebar.isOpen) {
       this.activeMenuItemData = data;
       const boundingRectangle = event.target.getBoundingClientRect();
-      this.contextmenu.open(boundingRectangle.top, parseInt(this.dockSize));
       this.contextmenu.items = data.children?.map((child: any) => {
         child.text = child.title;
         return child;
       }) || [];
+
+      // workaround to eliminate UI glitch with context menu resizing
+      setTimeout(() => this.contextmenu.open(boundingRectangle.top, parseInt(this.dockSize)));
     }
   }
 
-  onContextMenuOpen(event: any): void {
+  onBeforeContextMenuOpen(event: any): void {
     if (!this.sidebar.isOpen) {
       event.items.forEach((item: any) => {
-        // added left colored border
-        if (item.route === this.route.url && item.id !== null) {
-          // @ts-ignore: Object is possibly 'null'.
-          document.getElementById(item.id).classList.add('e-selected');
+        if (item.route === this.route.url && item.id) {
+          const contextMenuItem = document.getElementById(item.id)
+          if (contextMenuItem) {
+            // added left colored border
+            contextMenuItem.classList.add('e-selected');
+          }
         }
       });
-    }
-
-    // hide context menu items if sidebar is opened
-    if (this.sidebar.isOpen) {
+    } else {
+      // hide context menu items if sidebar is opened
       Array.from(event.element.children).forEach((child: any) => child.classList.add('hide'));
     }
   }
@@ -144,7 +152,7 @@ export class ShellPageComponent implements OnInit {
     this.contextmenu.items = [];
   }
 
-  private openSideBarForFirstLoad(route: string): void {
+  private setSideBarForFirstLoad(route: string): void {
     if (this.isFirstLoad && route !== this.route.url) {
       this.store.dispatch(new ToggleSidebarState(true));
       this.store.dispatch(new SetIsFirstLoadState(false));
