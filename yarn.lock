@@ -1755,6 +1755,13 @@
     "@syncfusion/ej2-popups" "~20.1.47"
     "@syncfusion/ej2-splitbuttons" "~20.1.47"
 
+"@syncfusion/ej2-layouts@^20.1.47":
+  version "20.1.47"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-layouts/-/ej2-layouts-20.1.47.tgz#b149c018804f40d7cc3b1d668c6423b7eaacb6d0"
+  integrity sha512-VHHH4HZ1tomocOwWiewVhtp9Z7Or8xVveHEDyGh1XJksOdhDFUz80HYf+g3sLkPisv0luyF96PKRTQ9iAsSMpw==
+  dependencies:
+    "@syncfusion/ej2-base" "~20.1.47"
+
 "@syncfusion/ej2-lists@~20.1.47":
   version "20.1.47"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-lists/-/ej2-lists-20.1.47.tgz#7eaf827dfa9541132c6f2d5054422b246997e4fe"

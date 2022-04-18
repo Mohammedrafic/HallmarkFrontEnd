@@ -1,0 +1,276 @@
+<section class="controls-container">
+  <div>
+    <button ejs-button cssClass="e-outline" (click)="navigateBack()">Back</button>
+  </div>
+  <div><h3>Add Organization</h3></div>
+  <div class="controls-form stick-right">
+    <button ejs-button cssClass="e-outline" (click)="navigateBack()">Clear</button>
+    <button ejs-button cssClass="e-outline" (click)="navigateBack()">Cancel</button>
+    <button ejs-button [isPrimary]="true" class="save-button">Save</button>
+  </div>
+</section>
+<section class="create-under-container bootstrap">
+  <div class="left-section">
+    <label>Create Under</label>
+    <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
+  </div>
+  <div class="right-section"></div>
+</section>
+
+<!---General information section--->
+<section class="organization-form">
+  <div class="left-section">
+    <div tabindex="0" class="e-card">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <div class="e-card-title">General Information</div>
+        </div>
+      </div>
+      <div class="e-card-content">
+        <div class="general-information">
+          <div class="org-section">
+            <div class="left-column bootstrap">
+              <div>
+                <div class="input-container ">
+                  <label>Name</label>
+                  <input class="e-input" type="text" placeholder="Enter Name"/>
+                </div>
+              </div>
+              <div>
+                <div class="id-container">
+                  <div class="input-container">
+                    <label>External ID</label>
+                    <input class="e-input" type="text" placeholder="External ID"/>
+                  </div>
+                  <div class="input-container">
+                    <label>Tax ID</label>
+                    <input class="e-input" type="text" placeholder="Tax ID"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="right-column"></div>
+          </div>
+          <div class="address-section bootstrap">
+            <div class="left-column">
+              <div class="input-container">
+                <label>Address 1</label>
+                <input class="e-input" type="text" placeholder="Address 1"/>
+              </div>
+              <div class="city-section">
+                <div class="dropdown-container">
+                  <label>Country</label>
+                  <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
+                </div>
+                <div class="dropdown-container">
+                  <label>Satate</label>
+                  <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
+                </div>
+                <div class="input-container">
+                  <label>City</label>
+                  <input class="e-input" type="text" placeholder="City"/>
+                </div>
+              </div>
+              <div class="city-section">
+                <div class="input-container">
+                  <label>Phone 1</label>
+                  <input class="e-input" type="text" placeholder="Phone 1"/>
+                </div>
+                <div class="input-container">
+                  <label>Phone 2</label>
+                  <input class="e-input" type="text" placeholder="Phone 2"/>
+                </div>
+                <div class="input-container">
+                  <label>Fax</label>
+                  <input class="e-input" type="text" placeholder="Fax"/>
+                </div>
+              </div>
+            </div>
+            <div class="right-column">
+              <div class="input-container">
+                <label>Address 2</label>
+                <input class="e-input" type="text" placeholder="Address 2"/>
+              </div>
+              <div class="zipcode-section">
+                <div class="input-container">
+                  <label>Zipcode</label>
+                  <input class="e-input" type="text" placeholder="Zipcode"/>
+                </div>
+                <div class="input-container"></div>
+              </div>
+              <div class="status-section">
+                <div class="dropdown-container">
+                  <label>Status</label>
+                  <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
+                </div>
+                <div class="input-container">
+                  <label>Website</label>
+                  <input class="e-input" type="text" placeholder="Website"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="billing-details bootstrap">
+          <div class="title">Billing Details</div>
+          <div class="org-address-checkbox">
+            <ejs-checkbox label="Same As Organization"></ejs-checkbox>
+          </div>
+          <div class="billing-details-section">
+            <div class="left-column">
+              <div class="billing-address-section">
+                <div class="input-container">
+                  <label>Name</label>
+                  <input class="e-input" type="text" placeholder="Name"/>
+                </div>
+                <div class="input-container">
+                  <label>Address 1</label>
+                  <input class="e-input" type="text" placeholder="Address 1"/>
+                </div>
+              </div>
+              <div class="billing-country-section">
+                <div class="dropdown-container">
+                  <label>Country</label>
+                  <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
+                </div>
+                <div class="dropdown-container">
+                  <label>State</label>
+                  <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
+                </div>
+                <div class="input-container">
+                  <label>City</label>
+                  <input class="e-input" type="text" placeholder="City"/>
+                </div>
+                <div class="input-container">
+                  <label>Zipcode</label>
+                  <input class="e-input" type="text" placeholder="Zipcode"/>
+                </div>
+              </div>
+              <div class="billing-phone-section">
+                <div class="input-container">
+                  <label>Phone 1</label>
+                  <input class="e-input" type="text" placeholder="Phone 1"/>
+                </div>
+                <div class="input-container">
+                  <label>Phone 2</label>
+                  <input class="e-input" type="text" placeholder="Phone 2"/>
+                </div>
+                <div class="input-container">
+                  <label>Fax</label>
+                  <input class="e-input" type="text" placeholder="Fax"/>
+                </div>
+                <div class="input-container"></div>
+              </div>
+              <div class="billing-phone-section">
+                <div class="input-container ext">
+                  <label>Ext</label>
+                  <input class="e-input" type="text" placeholder="Ext"/>
+                </div>
+                <div class="input-container website">
+                  <label>Website</label>
+                  <input class="e-input" type="text" placeholder="Website"/>
+                </div>
+                <div class="input-container"></div>
+              </div>
+            </div>
+            <div class="right-column"></div>
+          </div>
+        </div>
+        <div class="contact-details">
+          <div class="contact-header">
+            <div class="title">Contact Details</div>
+            <div class="stick-right add-contact-link"><i-feather name="plus" class="icon"></i-feather> Add Contact</div>
+          </div>
+          <div class="contact-item">
+            <div class="dropdown-container bootstrap">
+              <label>Title</label>
+              <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
+            </div>
+            <div class="input-container bootstrap">
+              <label>Contact Person</label>
+              <input class="e-input" type="text" placeholder="Contact Person"/>
+            </div>
+            <div class="input-container bootstrap">
+              <label>Phone 1</label>
+              <input class="e-input" type="text" placeholder="Phone 1"/>
+            </div>
+            <div class="input-container bootstrap">
+              <label>Email</label>
+              <input class="e-input" type="text" placeholder="Email"/>
+            </div>
+            <div class="input-container remove-button-container">
+              <button ejs-button cssClass="e-outline" class="icon-button">
+                <i-feather name="trash2" class="icon"></i-feather>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="right-section">
+
+    <!---Logo section-->
+    <div tabindex="0" class="e-card">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <div class="e-card-title">Logo</div>
+        </div>
+      </div>
+      <div class="e-card-content">
+        <div id="droparea" style='height: 130px'>
+          <span>Drag & Drop files here</span>
+        </div>
+        <ejs-uploader #previewupload id='previewfileupload' [autoUpload]="false" [asyncSettings]='path'
+            [dropArea]='dropElement' [allowedExtensions]='allowExtensions' (selected)='onImageSelect($event)'
+            (success)='onUploadSuccess($event)' (progress)='onFileUpload($event)' (failure)='onUploadFailed($event)' 
+            (removing)='onFileRemove($event)'>
+        </ejs-uploader>
+        <button ejs-button cssClass="e-outline upload-button" (click)="uploadImages()">
+          Upload <i-feather name="upload" class="icon"></i-feather>
+        </button>
+      </div>
+    </div>
+
+    <!---Preferences section-->
+    <div tabindex="0" class="e-card">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <div class="e-card-title">Preferences</div>
+        </div>
+      </div>
+      <div class="e-card-content">
+        <div class="inline-radio-container">
+          <ejs-radiobutton label="By Organization" name="prefType" value="1" checked="true"></ejs-radiobutton>
+          <ejs-radiobutton label="By Location" name="prefType" value="2"></ejs-radiobutton>
+        </div>
+        <div class="dropdown-container bootstrap">
+          <label>Send document to agency</label>
+          <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
+        </div>
+        <div class="column-radio-container">
+          <ejs-radiobutton label="Actual Time In/Time Out" name="hours" value="1" checked="true"></ejs-radiobutton>
+          <ejs-radiobutton label="Total Hours by Week" name="hours" value="2"></ejs-radiobutton>
+          <ejs-radiobutton label="Total Hours by Day" name="hours" value="3"></ejs-radiobutton>
+        </div>
+        <div class="dropdown-container bootstrap">
+          <label>Week Starts On</label>
+          <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
+        </div>
+        <div class="inline-radio-container">
+          <ejs-radiobutton label="Manual Payment" name="paymentType" value="1" checked="true"></ejs-radiobutton>
+          <ejs-radiobutton label="Electronic Payment" name="paymentType" value="2"></ejs-radiobutton>
+        </div>
+        <div class="input-container bootstrap">
+          <ejs-textbox [multiline]="true" value="" placeholder="Electronic Payment"></ejs-textbox>
+        </div>
+        <div class="lunch-checkbox bootstrap">
+          <ejs-checkbox label="Consider Lunch"></ejs-checkbox>
+        </div>
+        <div>
+          <button ejs-button cssClass="e-outline" [disabled]="true" (click)="navigateBack()">Time period in minutes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

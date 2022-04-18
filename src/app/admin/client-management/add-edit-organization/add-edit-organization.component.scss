@@ -1,0 +1,183 @@
+@import "../../../styles/variables/colors.scss";
+
+.controls-container {
+  padding: 20px 0;
+  display: flex;
+
+  h3 {
+    margin-left: 25px;
+  }
+
+  .controls-form {
+    button {
+      margin-left: 10px;
+
+      &.save-button {
+        width: 115px;
+      }
+    }
+  }
+}
+
+.create-under-container {
+  margin-bottom: 20px;
+}
+
+.create-under-container, .organization-form {
+  display: flex;
+
+  .left-section {
+    width: 70%;
+    padding-right: 20px;
+  }
+
+  .right-section {
+    width: 30%;
+
+    .e-card {
+      margin-bottom: 20px;
+    }
+  }
+}
+
+.organization-form {
+  .title {
+    color: #000;
+    font-weight: 700;
+    margin-top: 25px;
+  }
+
+  .general-information {
+    .org-section,
+    .address-section,
+    .city-section,
+    .status-section,
+    .zipcode-section {
+      display: flex;
+    }
+
+    .left-column {
+      width: 60%;
+    }
+
+    .right-column {
+      width: 40%;
+    }
+  }
+
+  .id-container {
+    display: flex;
+    width: 70%;
+  }
+
+  .input-container, .dropdown-container {
+    margin-bottom: 15px;
+    margin-right: 10px;
+    flex: 1 1 0px
+  }
+
+  input.e-input {
+    margin-top: 5px !important;
+  }
+
+  .billing-details {
+    .billing-details-section,
+    .billing-address-section,
+    .billing-country-section,
+    .billing-phone-section {
+      display: flex;
+
+      .left-column, .website {
+        flex: 1 0 80%;
+      }
+
+      .right-column, .ext {
+        flex: 1 0 20%;
+      }
+    }
+  }
+
+  .contact-details {
+    .title {
+      margin-bottom: 20px;
+    }
+
+    .contact-header {
+      display: flex;
+      align-items: center;
+
+      .add-contact-link {
+        cursor: pointer;
+        color: $primary-active-blue-10;
+
+        i-feather {
+          vertical-align: bottom;
+        }
+      }
+    }
+
+    .contact-item {
+      display: flex;
+      border-top: 1px solid $secondary-dark-blue-45;
+      border-bottom: 1px solid $secondary-dark-blue-45;
+      padding-top: 10px;
+
+      .remove-button-container {
+        flex: 0;
+
+        button {
+          margin-top: 21px;
+          margin-left: 10px;
+        }
+      }
+    }
+  }
+
+  .org-address-checkbox {
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
+  .inline-radio-container {
+    margin-bottom: 10px;
+
+    ejs-radiobutton {
+      margin-right: 20px;
+    }
+  }
+
+  .column-radio-container {
+    display: flex;
+    flex-direction: column;
+
+    ejs-radiobutton {
+      margin-bottom: 15px;
+    }
+  }
+
+  .lunch-checkbox {
+    margin-bottom: 10px;
+  }
+}
+
+#droparea {
+  height: 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $primary-active-blue-10;
+  font-size: 12px;
+}
+
+.e-file-select-wrap, .e-upload-actions {
+  display: none;
+}
+
+.upload-button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+ejs-dropdownlist.e-control>.e-input-group {
+  margin-top: 5px !important;
+}

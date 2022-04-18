@@ -1,0 +1,27 @@
+@import "../variables/colors.scss";
+
+body.light, body.dark {
+  .bootstrap {
+    ejs-dropdownlist.e-control {
+      span.e-input-group {
+        border-radius: 8px;
+        height: 35px;
+
+        &.e-input-focus, &:active {
+          box-shadow: none !important;
+          border-width: 2px !important;
+          border-radius: 8px !important;
+          border-color: $primary-active-blue-10 !important;
+
+          &::after, &::before {
+            display: none;
+          }
+        }
+
+        &:hover {
+          border-color: $primary-active-blue-10 !important;
+        }
+      }
+    }
+  }
+}

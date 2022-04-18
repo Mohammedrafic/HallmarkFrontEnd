@@ -1,5 +1,5 @@
 <section class="shell">
-  <ejs-sidebar id="sidebar" #sidebar [enableDock]='enableDock' [width]='width' [dockSize]='dockSize' [type]="sideBarType"
+  <ejs-sidebar id="sidebar" #sidebar [enableGestures]="false" [enableDock]='enableDock' [width]='width' [dockSize]='dockSize' [type]="sideBarType"
     (created)="onSideBarCreated()">
     <section class="primary-container">
       <section class="logo-container">
@@ -68,7 +68,7 @@
       <div class="header-item">
         <h1>{{ (headerState$ | async).title }}</h1>
       </div>
-      <div class="header-item stick-left">Header content</div>
+      <div class="header-item stick-right">Header content</div>
     </div>
 
     <div class="content">

@@ -1,0 +1,7 @@
+@import "../variables/colors.scss";
+
+#droparea {
+  border: 1px dashed $primary-active-blue-10;
+  border-radius: 5px;
+  background-color: $primary-active-blue-90;
+}

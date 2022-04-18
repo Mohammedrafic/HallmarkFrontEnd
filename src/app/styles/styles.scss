@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @use "sass:meta";
 
+@import "./variables/colors.scss";
 
 @font-face {
   font-family: 'SF Pro';
@@ -11,6 +12,19 @@ body {
   transition: background-color 0.5s ease;
   margin: 0;
   font-family: 'SF Pro';
+
+  h3 {
+    margin: 5px;
+    font-weight: normal;
+  }
+
+  label {
+    font-size: 14px;
+  }
+
+  .stick-right {
+    margin-left: auto !important;
+  }
 
   // Default icon size
   #main i-feather.icon {
@@ -30,7 +44,22 @@ body {
       border-bottom: 1px solid #D1D6E2;
     }
 
+    label {
+      color: $secondary-dark-blue-30;
+    }
+
     @include meta.load-css('./themes/material_l');
+
+    .bootstrap {
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-base/styles/bootstrap5.css');
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-buttons/styles/bootstrap5.css');
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-dropdowns/styles/bootstrap5.css');
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-inputs/styles/bootstrap5.css');
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-popups/styles/bootstrap5.css');
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-lists/styles/bootstrap5.css');
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-angular-dropdowns/styles/bootstrap5.css');
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-angular-inputs/styles/bootstrap5.css');
+    }
   }
 
   &.dark {
@@ -44,6 +73,25 @@ body {
     }
 
     @include meta.load-css('./themes/material_d');
+
+    .bootstrap {
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-base/styles/bootstrap5-dark.css');
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-buttons/styles/bootstrap5-dark.css');
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-dropdowns/styles/bootstrap5-dark.css');
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-inputs/styles/bootstrap5-dark.css');
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-popups/styles/bootstrap5-dark.css');
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-lists/styles/bootstrap5-dark.css');
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-angular-dropdowns/styles/bootstrap5-dark.css');
+      @include meta.load-css('../../../node_modules/@syncfusion/ej2-angular-inputs/styles/bootstrap5-dark.css');
+    }
+  }
+
+  &.light, &.dark {
+    .bootstrap {
+      .e-wrapper .e-label {
+        font-family: 'SF Pro';
+      }
+    }
   }
 }
 
@@ -53,6 +101,12 @@ body {
 @import './controls/switch';
 @import './controls/badge';
 @import './controls/context-menu';
+@import './controls/card';
+@import './controls/input';
+@import './controls/dropdown';
+@import './controls/checkbox';
+@import './controls/upload';
+@import './controls/radio';
 
 a, a:hover, a:focus, a:active {
   text-decoration: none;

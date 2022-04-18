@@ -1,13 +1,14 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
+import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { SetHeaderState } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-client-management-content',
   templateUrl: './client-management-content.component.html',
   styleUrls: ['./client-management-content.component.scss'],
-  providers: [SortService]
+  providers: [SortService, FreezeService]
 })
 export class ClientManagementContentComponent implements OnInit, AfterViewInit {
 
@@ -48,8 +49,8 @@ export class ClientManagementContentComponent implements OnInit, AfterViewInit {
 
   readonly ROW_HEIGHT = 64;
 
-  constructor(private store: Store) {
-    store.dispatch(new SetHeaderState({title: 'Client Management'}));
+  constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
+    store.dispatch(new SetHeaderState({title: 'Organization List'}));
   }
 
   ngOnInit(): void {
@@ -58,5 +59,9 @@ export class ClientManagementContentComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.grid.rowHeight = this.ROW_HEIGHT;
+  }
+
+  public navigateToOrganizationForm(): void {
+    this.router.navigate(['./add'], { relativeTo: this.route });
   }
 }

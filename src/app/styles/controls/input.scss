@@ -1,0 +1,30 @@
+@import "../variables/colors.scss";
+
+body.light, body.dark {
+  .bootstrap {
+    input.e-input {
+      height: 35px;
+      border-radius: 8px;
+      padding: 0 15px;
+
+      &::placeholder {
+        color: $secondary-dark-blue-30;
+      }
+
+      &:focus {
+        box-shadow: none !important;
+        border-width: 2px;
+        border-radius: 8px !important;
+        border-color: $primary-active-blue-10 !important;
+      }
+
+      &:hover {
+        border-color: $primary-active-blue-10;
+      }
+    }
+
+    textarea.e-control.e-textbox.e-input {
+        resize: none;
+    }
+  }
+} 

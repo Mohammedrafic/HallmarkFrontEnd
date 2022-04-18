@@ -13,6 +13,14 @@ button.e-control.e-btn {
     vertical-align: middle;
     margin-left: 5px;
   }
+
+  &.icon-button {
+    padding: 6px 9px;
+
+    i-feather {
+      margin-left: 0;
+    }
+  }
 }
 
 .dark {
@@ -22,7 +30,7 @@ button.e-control.e-btn {
 .light {
   .e-control.e-btn.e-outline {
     background-color: #fff;
-    color: #3E7FFF !important;
+    color: $primary-active-blue-10 !important;
 
     &:hover {
       background-color: rgba(139, 178, 255, .7);
@@ -31,6 +39,12 @@ button.e-control.e-btn {
     &:active {
       background-color: #fff;
       border-color: $primary-active-blue;
+    }
+
+    &:disabled {
+      color: $secondary-dark-blue-30 !important;
+      border-color: $secondary-dark-blue-40;
+      background-color:$secondary-dark-blue-50;
     }
   }
 }
