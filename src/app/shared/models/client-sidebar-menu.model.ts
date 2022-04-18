@@ -4,4 +4,5 @@ export class ClientSidebarMenu {
   icon: string;
   count?: number;
   children?: ClientSidebarMenu[];
+  isActive?: boolean = false;
 }

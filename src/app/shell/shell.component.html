@@ -24,8 +24,8 @@
 
           <ejs-contextmenu id='contextmenu' #contextmenu target='#template'
                            (onClose)="onContextMenuClose()"
-                           (select)="onSubMenuItemClick($event)"
-                           (onOpen)="onContextMenuOpen($event)"></ejs-contextmenu>
+                           (beforeOpen)="onBeforeContextMenuOpen($event)"
+                           (select)="onSubMenuItemClick($event)"></ejs-contextmenu>
         </section>
       </section>
     </section>

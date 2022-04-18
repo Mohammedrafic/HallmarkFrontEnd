@@ -1,10 +1,9 @@
-
-
-@import "../variables/colors.scss";
+@import '../variables/colors.scss';
 
 .e-contextmenu-wrapper {
   .e-control.e-contextmenu.e-menu-parent {
     color: $secondary-dark-blue-45;
+    background-color: $sidebar-background;
 
     .e-menu-item.e-menu-item.e-focused {
       color: $secondary-dark-blue-45;
@@ -12,22 +11,22 @@
 
     .e-menu-item.e-focused,
     .e-menu-item.e-focused.e-selected {
-      background-color: #272f51;
+      background-color: $sidebar-item-selected-hover-blue;
     }
 
     .e-selected {
-      border-left: 3px solid $primary-active-blue-15;
-      padding-left: 0.81rem;
+      border-left: 4px solid $primary-active-blue-15;
+      padding-left: 0.75rem;
       line-height: 20px;
       font-weight: 700;
       color: $primary-active-blue-15;
+      background-color: $sidebar-item-selected-hover-blue;
     }
 
     .e-menu-item {
       display: flex;
       align-items: center;
       height: 2rem;
-      background-color: #25263b;
     }
   }
 

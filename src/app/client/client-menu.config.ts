@@ -6,6 +6,7 @@ export const CLIENT_SIDEBAR_MENU: ClientSidebarMenu[] = [
     icon: 'home',
     route: '/client/dashboard',
     children: [],
+    isActive: true
   },
   {
     title: 'Order Management',

@@ -1,13 +1,15 @@
 @import '../styles/variables/colors.scss';
 
 .shell {
+
   #sidebar {
     visibility: hidden;
-    background-color: #25263e;
+    background-color: $sidebar-background;
     color: #ffffff;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    font-size: 14px
   }
 
   #sidebar.e-sidebar {
@@ -50,13 +52,12 @@
 
       &.e-level-1, &.e-level-2 {
         & > .e-text-content {
-          background-color: #272f51;
-          border: none;
-          border-left: 3px solid #3e7fff;
+          background-color: $sidebar-item-selected-hover-blue;
         }
       }
 
       .e-fullrow {
+        border: none;
         background-color: transparent;
       }
     }
@@ -72,13 +73,17 @@
       flex-grow: 1;
     }
 
+    .e-treeview .e-list-text {
+      font-size: 14px;
+    }
+
     .e-treeview .e-ul {
       padding: 0;
 
       .e-hover {
 
         .e-text-content {
-          background-color: #272f51;
+          background-color: $sidebar-item-selected-hover-blue;
         }
 
         ul > li > .e-text-content {
@@ -86,6 +91,7 @@
         }
 
         .e-fullrow {
+          border: none;
           background-color: transparent;
         }
 
@@ -118,14 +124,12 @@
     #template_active {
       &.e-level-1, &.e-level-2 {
         & > .e-text-content {
-          background-color: #272f51;
-          border: none;
-          border-left: 3px solid #3e7fff;
+          border-left: 4px solid $primary-active-blue-15;
         }
       }
 
       .icon {
-        padding-left: 1.3rem;
+        padding-left: 1.25rem;
         color: $primary-active-blue-15;
       }
     }
@@ -151,7 +155,7 @@
     }
 
     .icon-container:hover {
-      background-color: #272f51;
+      background-color: $sidebar-item-selected-hover-blue;
 
       .icon {
         color: $primary-active-blue-15;
