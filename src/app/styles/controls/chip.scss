@@ -1,4 +1,4 @@
-@import "../../styles/variables/colors.scss";
+@import '../../styles/variables/colors.scss';
 
 ejs-chiplist.e-control.e-chip-list {
   .e-chip {
@@ -6,12 +6,33 @@ ejs-chiplist.e-control.e-chip-list {
     font-weight: 600;
     height: 25px;
 
-    &.e-success {
+    &.e-success,
+    &.e-success:hover {
       background-color: $supportive-green-40;
       color: $supportive-green-10;
 
       .e-chip-icon {
         background-color: $supportive-green-10;
+      }
+    }
+
+    &.e-warning,
+    &.e-warning:hover {
+      background-color: $orange;
+      color: $supportive-orange;
+
+      .e-chip-icon {
+        background-color: $supportive-orange;
+      }
+    }
+
+    &.e-default,
+    &.e-default:hover {
+      background-color: $secondary-dark-blue-45;
+      color: $dark-blue-20;
+
+      .e-chip-icon {
+        background-color: $dark-blue-20;
       }
     }
 
@@ -25,6 +46,6 @@ ejs-chiplist.e-control.e-chip-list {
       .e-chip-text {
         margin-right: 10px;
       }
-    } 
+    }
   }
 }

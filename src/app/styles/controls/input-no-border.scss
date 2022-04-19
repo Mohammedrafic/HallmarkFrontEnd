@@ -1,0 +1,15 @@
+@import '../variables/colors';
+
+ejs-numerictextbox.e-lib {
+  width: 140px;
+  border-radius: 8px;
+
+  .e-input-group.e-control-wrapper {
+    margin-top: 4px;
+    padding-left: 17px;
+  }
+}
+
+ejs-numerictextbox.e-lib:hover {
+  background: $primary-active-blue-90;
+}
