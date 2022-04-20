@@ -27,6 +27,7 @@ steps:
   displayName: 'Install Node.js'
 
 - script: yarn install --frozen-lockfile
+- script: yarn run build
 # - script: |
 #     npm install -g @angular/cli
 #     npm install
