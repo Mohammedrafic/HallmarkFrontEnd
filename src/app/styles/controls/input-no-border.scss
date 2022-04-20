@@ -4,9 +4,14 @@ ejs-numerictextbox.e-lib {
   width: 140px;
   border-radius: 8px;
 
-  .e-input-group.e-control-wrapper {
+  .e-input-group.e-numeric.e-control-wrapper {
+    border: none;
     margin-top: 4px;
     padding-left: 17px;
+  }
+  .e-input-group.e-numeric.e-control-wrapper.e-input-focus {
+    border: 1px solid $primary-active-blue-10 !important;
+    border-radius: 9px !important;
   }
 }
 
