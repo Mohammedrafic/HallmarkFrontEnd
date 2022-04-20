@@ -1,5 +1,5 @@
-import { ClientSidebarMenu } from "../shared/models/client-sidebar-menu.model";
-import { ResizeSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
+import { ClientSidebarMenu } from '../shared/models/client-sidebar-menu.model';
+import { GRID_CONFIG } from '../shared/constants/grid-config';
 
 export const CLIENT_SIDEBAR_MENU: ClientSidebarMenu[] = [
   {
@@ -7,12 +7,12 @@ export const CLIENT_SIDEBAR_MENU: ClientSidebarMenu[] = [
     icon: 'home',
     route: '/client/dashboard',
     children: [],
+    isActive: true,
   },
   {
     title: 'Order Management',
     icon: 'file-text',
     route: '/client/order-management/all',
-    isActive: true,
     children: [
       {
         title: 'All Orders',
@@ -79,17 +79,7 @@ export enum SortingDirections {
 }
 
 export const ORDERS_GRID_CONFIG = {
-  initialRowsPerPage: 30,
-  rowsPerPageDropDown: [ '30 Rows', '50 Rows', '100 Rows' ],
-  isPagingEnabled: true,
-  isSortingEnabled: true,
-  isResizingEnabled: true,
-  isWordWrappingEnabled: true,
-  wordWrapSettings: { wrapMode: 'Content' } as TextWrapSettingsModel,
-  gridHeight: '660',
-  initialRowHeight: 64,
-  resizeSettings: { mode:'Auto' } as ResizeSettingsModel,
-  gridPageSettings: { pageSizes: true, pageSize: 30 },
+  ...GRID_CONFIG,
   columns: [
     { field: 'orderId', direction: SortingDirections.Descending },
     { field: 'status', direction: SortingDirections.Descending },
