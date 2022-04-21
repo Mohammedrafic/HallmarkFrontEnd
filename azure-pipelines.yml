@@ -2,6 +2,7 @@
 # Build a Node.js project that uses Angular.
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+name: $(SourceBranchName).$(Build.BuildId)
 
 trigger:
 - main
@@ -13,8 +14,22 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+resources: 
+- repo: self
+
 variables:
   YARN_CACHE_FOLDER: $(Pipeline.Workspace)/.yarn
+  buildId: '$(Build.BuildId)'
+  buildConfiguration: 'Release'
+  majorVersion: '1'
+  minorVersion: '0'
+  patchVersion: $[counter(format('{0}.{1}', variables['majorVersion'], variables['minorVersion']), 0)]
+  ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release.') }}: 
+   packageVersionIdentifier: ''
+   imageVersionIdentifier: ''
+  ${{ else }}: 
+   packageVersionIdentifier: '-beta'
+   imageVersionIdentifier: '-dev'
 
 steps:
 - task: Cache@2
@@ -30,10 +45,44 @@ steps:
     versionSpec: '16.x'
   displayName: 'Install Node.js'
 
-- script: yarn install --frozen-lockfile
-- script: yarn run build
-# - script: |
-#     npm install -g @angular/cli
-#     npm install
-#     ng build --prod
-#   displayName: 'npm install and build'
+- task: Bash@3
+  displayName: install yarn packages
+  inputs:
+    targetType: 'inline'
+    script: |
+      yarn install --frozen-lockfile
+          
+- task: Bash@3
+  displayName: Build angular project
+  inputs:
+    targetType: 'inline'
+    script: |
+      yarn run build
+
+- task: Docker@2
+  displayName: Build an image
+  inputs:
+    containerRegistry: 'shruse2acr'
+    repository: 'einsteinui'
+    command: 'buildAndPush'
+    dockerfile: '**/Dockerfile'
+    buildContext: $(Build.SourcesDirectory)
+    tags: |
+      $(buildId)$(imageVersionIdentifier)
+      
+- task: HelmInstaller@0
+  inputs:
+    helmVersion: '2.14.1'
+    installKubectl: false
+- task: Bash@3
+  displayName: Pack helm package
+  inputs:
+    targetType: 'inline'
+    script: 'helm package $(Build.SourcesDirectory)/helm --app-version=$(buildId)$(imageVersionIdentifier) -d $(Build.ArtifactStagingDirectory)/helm'
+    failOnStderr: true
+- task: PublishBuildArtifacts@1
+  displayName: publish helm package
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/helm'
+    ArtifactName: 'helm'
+    publishLocation: 'Container'
