@@ -5,6 +5,10 @@
 
 trigger:
 - main
+- qa
+- release.*
+- task*
+- strory*
 
 pool:
   vmImage: ubuntu-latest
