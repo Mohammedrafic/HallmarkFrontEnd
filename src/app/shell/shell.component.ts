@@ -6,7 +6,7 @@ import { ContextMenuComponent, NodeSelectEventArgs, SidebarComponent, TreeViewCo
 import { Observable } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
-import { CLIENT_SIDEBAR_MENU, SIDEBAR_CONFIG } from '../client/client-menu.config';
+import { CLIENT_SIDEBAR_MENU, SIDEBAR_CONFIG } from '../client/client.config';
 import { ClientSidebarMenu } from '../shared/models/client-sidebar-menu.model';
 import { SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
 
@@ -70,13 +70,14 @@ export class ShellPageComponent implements OnInit {
     this.isFirstLoad$.subscribe(isFirstLoad => {
       this.isFirstLoad = isFirstLoad;
       if (isFirstLoad) {
-        const currentConfiguration = CLIENT_SIDEBAR_MENU; // TODO: Should be decided after Login: CLIENT_SIDEBAR_MENU, ADMIN_SIDEBAR_MENU etc.
-        const activeMenuItem = currentConfiguration.find(item => item.isActive);
-
-        if (activeMenuItem) {
-          this.route.navigate([activeMenuItem.route]);
-          this.tree.selectedNodes = [activeMenuItem.title];
-        }
+        // TODO: Should be decided after Login: CLIENT_SIDEBAR_MENU, ADMIN_SIDEBAR_MENU etc.
+        // const currentConfiguration = CLIENT_SIDEBAR_MENU;
+        // const activeMenuItem = currentConfiguration.find(item => item.isActive);
+        //
+        // if (activeMenuItem) {
+        //   this.route.navigate([activeMenuItem.route]);
+        //   this.tree.selectedNodes = [activeMenuItem.title];
+        // }
       }
     });
   }

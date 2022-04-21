@@ -1,0 +1,59 @@
+@import '../variables/colors';
+
+.dropdown-no-border {
+  width: 116px;
+  border-radius: 8px;
+
+  .e-ddl.e-input-group:not(.e-disabled) {
+    padding-left: 16px;
+    margin-top: 4px;
+  }
+
+  .e-input-group.e-control-wrapper.e-ddl.e-valid-input {
+    border: none;
+
+    .e-ddl-icon::before {
+      content: '\e916';
+    }
+
+    .e-ddl-icon::after {
+      content: '\e910';
+    }
+  }
+
+  .e-input-group.e-control-wrapper.e-ddl.e-valid-input.e-input-focus.e-icon-anim {
+    color: $primary-active-blue-10;
+
+    .e-ddl-icon::after,
+    .e-ddl-icon::before {
+      color: $primary-active-blue-10;
+    }
+  }
+
+  &:hover {
+    background-color: $primary-active-blue-90;
+  }
+
+  .e-input-group.e-control-wrapper.e-input-focus:not(.e-float-icon-left):not(.e-success):not(.e-warning):not(.e-error) {
+    border-bottom: none !important;
+  }
+
+  .e-input-group:not(.e-float-icon-left):not(.e-float-input)::after,
+  .e-input-group.e-control-wrapper:not(.e-float-icon-left):not(.e-float-input)::after,
+  .e-input-group:not(.e-float-icon-left):not(.e-float-input)::before,
+  .e-input-group.e-control-wrapper:not(.e-float-icon-left):not(.e-float-input)::before {
+    background: transparent !important;
+  }
+}
+
+// context menu of the dropdown, out of dropdown scope
+.e-ddl.e-popup.e-control.e-popup-open {
+  border-radius: 8px;
+  .e-dropdownbase {
+    border-radius: 8px;
+  }
+  .e-list-item.e-active {
+    background-color: $primary-active-blue-10;
+    color: $secondary-dark-blue-40;
+  }
+}

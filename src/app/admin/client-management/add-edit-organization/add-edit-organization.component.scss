@@ -76,7 +76,7 @@
     flex: 1 1 0px
   }
 
-  input.e-input {
+  .input-container input.e-input {
     margin-top: 5px !important;
   }
 
@@ -87,12 +87,20 @@
     .billing-phone-section {
       display: flex;
 
-      .left-column, .website {
+      .left-column {
         flex: 1 0 80%;
       }
 
-      .right-column, .ext {
+      .website {
+        flex: 1 0 74%;
+      }
+
+      .right-column {
         flex: 1 0 20%;
+      }
+
+      .ext {
+        flex: 1 0 24%;
       }
     }
   }
@@ -122,12 +130,18 @@
       border-bottom: 1px solid $secondary-dark-blue-45;
       padding-top: 10px;
 
-      .remove-button-container {
+      .remove-button-container, .edit-button-container {
         flex: 0;
 
         button {
           margin-top: 21px;
           margin-left: 10px;
+        }
+      }
+
+      .edit-button-container {
+        button {
+          margin-left: 0;
         }
       }
     }
@@ -152,6 +166,11 @@
 
     ejs-radiobutton {
       margin-bottom: 15px;
+    }
+
+    &.submitted-by {
+      border-top: 1px solid $secondary-dark-blue-45;
+      padding-top: 10px;
     }
   }
 

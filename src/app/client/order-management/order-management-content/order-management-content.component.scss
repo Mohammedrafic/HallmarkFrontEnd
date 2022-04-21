@@ -1,0 +1,115 @@
+@import '../../../styles/variables/colors';
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 24px 0;
+
+  & div {
+    display: flex;
+  }
+
+  & div:last-child {
+    justify-content: end;
+  }
+
+  .button-filter {
+    margin-left: 12px;
+    margin-right: 6px;
+  }
+
+  .button-export {
+    margin-left: 6px;
+    margin-right: 12px;
+  }
+}
+
+.e-grid {
+  border-radius: 12px;
+
+  .e-row {
+    .e-checkbox-wrapper .e-frame.e-check, body.light .e-css.e-checkbox-wrapper .e-frame.e-check {
+      background-color: #fff;
+      color: $primary-active-blue-10;
+    }
+  }
+
+  &.e-gridhover tr[role=row]:not(.e-editedrow):hover .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
+    background-color: $primary-active-blue-90 !Important;
+  }
+
+  & td.e-active {
+    background-color: $primary-active-blue-10;
+    color: #fff !important;
+  }
+
+  .e-success-row {
+    background-color: $supportive-green-50;
+  }
+
+  .align-right {
+    text-align: right;
+  }
+
+  .e-sortnumber {
+    display: none;
+  }
+
+  .e-sortfilterdiv.e-icons.e-descending.e-icon-descending {
+    float: right;
+  }
+
+  .controls-header,
+  .row-tool-buttons {
+    display: flex;
+    justify-content: end;
+    cursor: pointer;
+
+    .scale-up-button {
+      padding-right: 18px;
+    }
+
+    .icon {
+      margin: 0;
+    }
+  }
+
+  .row-tool-buttons {
+    display: flex;
+    cursor: pointer;
+
+    .message-button,
+    .lock-button {
+      padding-right: 18px;
+    }
+  }
+
+  .e-item-active {
+    color: $primary-active-blue;
+  }
+
+  .e-pager {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+
+  .e-pagertemplate {
+    .content-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 51px;
+
+      .left-side-pager-controls {
+        display: flex;
+        margin-left: 16px;
+
+        #goToPage {
+          margin-left: 35px
+        }
+      }
+    }
+  }
+}

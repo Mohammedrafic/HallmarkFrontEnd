@@ -10,6 +10,7 @@ import { AppComponent } from './app.component';
 import { AppState } from './store/app.state';
 
 import { enableRipple } from '@syncfusion/ej2-base';
+import { HttpClientModule } from '@angular/common/http';
 
 enableRipple(true);
 
@@ -18,6 +19,7 @@ enableRipple(true);
   imports: [
     BrowserModule,
     AppRoutingModule,
+    HttpClientModule,
 
     //STORE
     NgxsModule.forRoot([

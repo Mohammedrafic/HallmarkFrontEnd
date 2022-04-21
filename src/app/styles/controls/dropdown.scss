@@ -21,6 +21,29 @@ body.light, body.dark {
         &:hover {
           border-color: $primary-active-blue-10 !important;
         }
+
+        &.e-disabled {
+          background-color: $secondary-dark-blue-50 !important;
+          border: 1px solid $secondary-dark-blue-40 !important;
+        }
+
+        input.e-input {
+          &::placeholder {
+            color: $secondary-dark-blue-30;
+          }
+        }
+      }
+
+      &.ng-touched.ng-invalid {
+        span.e-input-group {
+          border-color: $supportive-red !important;
+        }
+      }
+
+      &.ng-touched.ng-invalid {
+        &+i-feather {
+          display: block;
+        }
       }
     }
   }

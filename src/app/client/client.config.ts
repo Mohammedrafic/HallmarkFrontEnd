@@ -1,4 +1,5 @@
-import { ClientSidebarMenu } from "../shared/models/client-sidebar-menu.model";
+import { ClientSidebarMenu } from '../shared/models/client-sidebar-menu.model';
+import { GRID_CONFIG } from '../shared/constants/grid-config';
 
 export const CLIENT_SIDEBAR_MENU: ClientSidebarMenu[] = [
   {
@@ -6,7 +7,7 @@ export const CLIENT_SIDEBAR_MENU: ClientSidebarMenu[] = [
     icon: 'home',
     route: '/client/dashboard',
     children: [],
-    isActive: true
+    isActive: true,
   },
   {
     title: 'Order Management',
@@ -70,4 +71,26 @@ export const SIDEBAR_CONFIG = {
   dockSize: '68px',
   width: '240px',
   type: 'Push'
+}
+
+export enum SortingDirections {
+  Descending = 'Descending',
+  Ascending = 'Ascending'
+}
+
+export const ORDERS_GRID_CONFIG = {
+  ...GRID_CONFIG,
+  columns: [
+    { field: 'orderId', direction: SortingDirections.Descending },
+    { field: 'status', direction: SortingDirections.Descending },
+    { field: 'jobTitle', direction: SortingDirections.Descending },
+    { field: 'skill', direction: SortingDirections.Descending },
+    { field: 'numberOfPosition', direction: SortingDirections.Descending },
+    { field: 'location', direction: SortingDirections.Descending },
+    { field: 'department', direction: SortingDirections.Descending },
+    { field: 'type', direction: SortingDirections.Descending },
+    { field: 'billRate', direction: SortingDirections.Descending },
+    { field: 'candidates', direction: SortingDirections.Descending },
+    { field: 'startDate', direction: SortingDirections.Descending }
+  ]
 }

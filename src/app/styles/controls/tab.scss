@@ -1,0 +1,68 @@
+@import "../variables/colors.scss";
+
+body.light,
+body.dark {
+  .e-tab {
+    .e-tab-header {
+      &:not(.e-vertical) {
+        .e-indicator {
+          height: 3px;
+        }
+      }
+
+      .e-toolbar-item {
+        &.e-active {
+          .e-tab-text {
+            font-weight: 700;
+            color: $black;
+          }
+        }
+
+        .e-tab-wrap:hover {
+          .e-tab-text,
+          .e-tab-icon {
+            color: $primary-active-blue-10;
+          }
+        }
+        .e-tab-text {
+          font-size: 16px;
+          text-transform: capitalize;
+          color: $black;
+          font-weight: 400;
+
+          &:hover {
+            font-weight: 700;
+          }
+        }
+      }
+    }
+  }
+}
+
+body.dark {
+  .e-tab {
+    .e-tab-header {
+      .e-toolbar-item {
+        &.e-active {
+          .e-tab-text {
+            color: $white;
+          }
+
+          .e-tab-wrap:hover {
+            .e-tab-text,
+            .e-tab-icon {
+              color: $white;
+            }
+          }
+        }
+        .e-tab-text {
+          color: $white;
+
+          &:hover {
+            color: $black;
+          }
+        }
+      }
+    }
+  }
+}

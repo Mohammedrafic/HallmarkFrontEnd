@@ -1,0 +1,47 @@
+@import '../../../../styles/variables/colors';
+
+.e-input-group.e-float-icon-left {
+  height: 38px;
+  width: 398px;
+  margin: 0;
+  border: 1px solid $secondary-dark-blue-40;
+  border-radius: 8px;
+  align-items: center;
+  background: #fff;
+  color: $secondary-dark-blue-30;
+
+  .e-input-group-icon {
+    color: $secondary-dark-blue-30;
+
+    .icon {
+      height: 20px !important;
+      width: 20px !important;
+      padding-left: 13px;
+      padding-right: 8px;
+    }
+  }
+
+  .e-input-in-wrap {
+    margin: 0;
+    border: none;
+
+    .e-input {
+      font-size: 14px;
+    }
+  }
+}
+
+.e-input-group.e-float-icon-left:hover {
+  border-color: $primary-active-blue-10;
+}
+
+.e-search-input-active {
+  height: 36px !important;
+  width: 396px !important;
+  outline: none !important;
+  border: 2px solid $primary-active-blue-10 !important;
+
+  .icon {
+    color: $primary-active-blue-10 !important;
+  }
+}

@@ -21,10 +21,53 @@ body.light, body.dark {
       &:hover {
         border-color: $primary-active-blue-10;
       }
+
+      &[disabled] {
+        background-color: $secondary-dark-blue-50;
+      }
+
+      &.ng-touched.ng-invalid {
+        border-color: $supportive-red;
+
+        &+i-feather {
+          display: block;
+        }
+      }
     }
 
-    textarea.e-control.e-textbox.e-input {
-        resize: none;
+    ejs-textbox {
+      &.ng-touched.ng-invalid.e-control.e-textbox {
+        span.e-input-group {
+          border-color: $supportive-red;
+        }
+
+        &+i-feather {
+          display: block;
+        }
+      }
+
+      span.e-input-group {
+        border-radius: 8px !important;
+
+        &.e-input-focus, &:active {
+          box-shadow: none !important;
+          border-width: 2px !important;
+          border-radius: 8px !important;
+          border-color: $primary-active-blue-10 !important;
+
+          &::after, &::before {
+            display: none;
+          }
+        }
+
+        &:hover {
+          border-color: $primary-active-blue-10 !important;
+        }
+
+        textarea.e-control.e-textbox.e-input {
+          resize: none;
+        }
+      }
     }
   }
 } 

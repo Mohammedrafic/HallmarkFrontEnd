@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { Store } from '@ngxs/store';
+
 import { SetSidebarMenu } from '../store/app.actions';
-import { CLIENT_SIDEBAR_MENU } from './client-menu.config';
+import { CLIENT_SIDEBAR_MENU } from './client.config';
 
 @Component({
   selector: 'app-client',
