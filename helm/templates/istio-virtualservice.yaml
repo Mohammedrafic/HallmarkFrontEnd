@@ -10,9 +10,9 @@ spec:
   http:
   - match:
     - uri:
-        exact: /einsteinui
-    - uri:
-        prefix: /einsteinui/
+        exact: /
+    # - uri:
+    #     prefix: /einsteinui/
     rewrite:
       uri: /
     route:
