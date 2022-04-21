@@ -11,8 +11,8 @@ spec:
   - match:
     - uri:
         exact: /
-    # - uri:
-    #     prefix: /einsteinui/
+    - uri:
+        prefix: /
     rewrite:
       uri: /
     route:
