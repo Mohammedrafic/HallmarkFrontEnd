@@ -8,15 +8,20 @@ spec:
   gateways:
   - {{ include "einsteinui.fullname" . }}
   http:
-  - match:
-    - uri:
-        exact: /
-    - uri:
-        prefix: /
-    rewrite:
-      uri: /
-    route:
+  - route:
     - destination:
-        host: {{ include "einsteinui.fullname" . }}
         port:
           number: 80
+        host: {{ include "einsteinui.fullname" . }}
+  # - match:
+  #   - uri:
+  #       exact: /
+  #   - uri:
+  #       prefix: /
+  #   rewrite:
+  #     uri: /
+  #   route:
+  #   - destination:
+  #       host: {{ include "einsteinui.fullname" . }}
+  #       port:
+  #         number: 80
