@@ -2,9 +2,18 @@
 
 .toolbar {
   display: flex;
-  justify-content: right;
+  justify-content: space-between;
+  flex-wrap: wrap;
   align-items: center;
   padding: 24px 0;
+
+  & div {
+    display: flex;
+  }
+
+  & div:last-child {
+    justify-content: end;
+  }
 
   .button-filter {
     margin-left: 12px;

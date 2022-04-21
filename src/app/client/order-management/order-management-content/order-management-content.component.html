@@ -1,32 +1,40 @@
 <section class="toolbar">
-  <app-search></app-search>
-
-  <button ejs-button cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
-  <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
-  <button ejs-button [isPrimary]="true">Create Order</button>
+  <div>
+    <app-tab-navigation [incompleteCount]="2" [pandingCount]="2"></app-tab-navigation>
+  </div>
+  <div>
+    <app-search></app-search>
+    <button ejs-button cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+    <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+    <button ejs-button [isPrimary]="true">Create Order</button>
+  </div>
 </section>
 
 <section>
-  <ejs-grid #grid
-            (rowDataBound)='setRowHighlight($event)'
-            [dataSource]='gridDataSource'
-            [allowPaging]='allowPaging'
-            [pageSettings]='pageSettings'
-            [height]='gridHeight'
-            [rowHeight]='rowHeight'
-            [resizeSettings]='resizeSettings'
-            [allowSorting]='allowSorting'
-            [allowResizing]='allowResizing'
-            [allowTextWrap]='allowWrap'
-            [textWrapSettings]='wrapSettings'>
+  <ejs-grid
+    #grid
+    (rowDataBound)="setRowHighlight($event)"
+    [dataSource]="gridDataSource"
+    [allowPaging]="allowPaging"
+    [pageSettings]="pageSettings"
+    [height]="gridHeight"
+    [rowHeight]="rowHeight"
+    [resizeSettings]="resizeSettings"
+    [allowSorting]="allowSorting"
+    [allowResizing]="allowResizing"
+    [allowTextWrap]="allowWrap"
+    [textWrapSettings]="wrapSettings"
+  >
     <e-columns>
-      <e-column type='checkbox' [customAttributes]='{ class: "bootstrap" }' width='50'></e-column>
-      <e-column field='orderId' headerText="ORDER ID" width=120>
+      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
+      <e-column field="orderId" headerText="ORDER ID" width="120">
         <ng-template #template let-data>
-          <div><b>{{ data.orderId }}</b></div>
+          <div>
+            <b>{{ data.orderId }}</b>
+          </div>
         </ng-template>
       </e-column>
-      <e-column field='status' headerText="STATUS" width=200>
+      <e-column field="status" headerText="STATUS" width="200">
         <ng-template #template let-data>
           <div class="status-cell">
             <ejs-chiplist>
@@ -37,28 +45,28 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field='jobTitle' headerText="JOB TITLE" width=200></e-column>
-      <e-column field='skill' headerText="SKILL" textAlign='Left' width=200></e-column>
-      <e-column field='numberOfPosition' headerText="{{'# of position'| uppercase }}" width=150>
+      <e-column field="jobTitle" headerText="JOB TITLE" width="200"></e-column>
+      <e-column field="skill" headerText="SKILL" textAlign="Left" width="200"></e-column>
+      <e-column field="numberOfPosition" headerText="{{ '# of position' | uppercase }}" width="150">
         <ng-template #template let-data>
           <div class="align-right">{{ data.numberOfPosition }}</div>
         </ng-template>
       </e-column>
-      <e-column field='location' headerText="LOCATION" textAlign='Left' width=200></e-column>
-      <e-column field='department' headerText="DEPARTMENT" textAlign='Left' width=150></e-column>
-      <e-column field='type' headerText="TYPE" width=100></e-column>
-      <e-column field='billRate' headerText="BILL RATE &dollar;" width=120>
+      <e-column field="location" headerText="LOCATION" textAlign="Left" width="200"></e-column>
+      <e-column field="department" headerText="DEPARTMENT" textAlign="Left" width="150"></e-column>
+      <e-column field="type" headerText="TYPE" width="100"></e-column>
+      <e-column field="billRate" headerText="BILL RATE &dollar;" width="120">
         <ng-template #template let-data>
           <div class="align-right">{{ data.billRate }}</div>
         </ng-template>
       </e-column>
-      <e-column field='candidates' headerText="CANDIDATES" width=130>
+      <e-column field="candidates" headerText="CANDIDATES" width="130">
         <ng-template #template let-data>
           <div class="align-right">{{ data.candidates }}</div>
         </ng-template>
       </e-column>
-      <e-column field='startDate' headerText="START DATE" width=120></e-column>
-      <e-column headerTextAlign='Right' width=120>
+      <e-column field="startDate" headerText="START DATE" width="120"></e-column>
+      <e-column headerTextAlign="Right" width="120">
         <ng-template #headerTemplate let-data>
           <div class="controls-header">
             <span class="scale-up-button"><i-feather name="menu" class="icon" (click)="onRowScaleUpClick()"></i-feather></span>
@@ -80,31 +88,38 @@
         <div class="control-section">
           <div class="content-wrapper">
             <section class="left-side-pager-controls">
-              <ejs-dropdownlist id='rowsPerPage'
-                                class="dropdown-no-border"
-                                [dataSource]='rowsPerPageDropDown'
-                                [(value)]='activeRowsPerPageDropDown'
-                                (change)="onRowsDropDownChanged()">
+              <ejs-dropdownlist
+                id="rowsPerPage"
+                class="dropdown-no-border"
+                [dataSource]="rowsPerPageDropDown"
+                [(value)]="activeRowsPerPageDropDown"
+                (change)="onRowsDropDownChanged()"
+              >
               </ejs-dropdownlist>
-              <ejs-numerictextbox id="goToPage"
-                                  class="numeric-input-no-border"
-                                  format='#'
-                                  [validateDecimalOnType]='validateDecimalOnType'
-                                  [decimals]='decimals'
-                                  placeholder='Go to:'
-                                  min='1' [max]='lastAvailablePage'
-                                  [showSpinButton]='false'
-                                  (change)='onGoToClick($event)'>
+              <ejs-numerictextbox
+                id="goToPage"
+                class="numeric-input-no-border"
+                format="#"
+                [validateDecimalOnType]="validateDecimalOnType"
+                [decimals]="decimals"
+                placeholder="Go to:"
+                min="1"
+                [max]="lastAvailablePage"
+                [showSpinButton]="false"
+                (change)="onGoToClick($event)"
+              >
               </ejs-numerictextbox>
             </section>
             <section class="right-side-pager-controls">
-              <ejs-pager id="gridPager"
-                         #gridPager
-                         [pageSize]='pageSizePager'
-                         [totalRecordsCount]='totalDataRecords'
-                         [enablePagerMessage]='false'
-                         [currentPage]='currentPagerPage'
-                         (click)='onGoToClick($event)'>
+              <ejs-pager
+                id="gridPager"
+                #gridPager
+                [pageSize]="pageSizePager"
+                [totalRecordsCount]="totalDataRecords"
+                [enablePagerMessage]="false"
+                [currentPage]="currentPagerPage"
+                (click)="onGoToClick($event)"
+              >
               </ejs-pager>
             </section>
           </div>

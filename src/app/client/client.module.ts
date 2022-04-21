@@ -29,6 +29,7 @@ import { ButtonModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 import { NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { MenuModule } from '@syncfusion/ej2-angular-navigations';
+import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
 
 import { ClientRoutingModule } from './client-routing.module';
 import { DashboardContentComponent } from './dashboard/dashboard-content/dashboard-content.component';
@@ -39,6 +40,7 @@ import { InvoicesContentComponent } from './invoices/invoices-content/invoices-c
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { ClientComponent } from './client.component';
+import { TabNavigationComponent } from './order-management/order-management-content/tab-navigation/tab-navigation.component';
 
 const gridIcons = {
   MessageSquare,
@@ -61,7 +63,8 @@ const gridIcons = {
     InvoicesContentComponent,
     TimesheetsContentComponent,
     ReportsContentComponent,
-    SearchComponent
+    SearchComponent,
+    TabNavigationComponent  
   ],
   imports: [
     CommonModule,
@@ -74,7 +77,8 @@ const gridIcons = {
     DropDownListModule,
     PagerModule,
     NumericTextBoxModule,
-    MenuModule
+    MenuModule,
+    TabAllModule
   ],
   providers: [
     ResizeService,
