@@ -1,11 +1,11 @@
 @import '../variables/colors';
 
-ejs-numerictextbox.e-lib {
+.numeric-input-no-border {
   width: 140px;
   border-radius: 8px;
 
   .e-input-group.e-numeric.e-control-wrapper {
-    border: none;
+    border: none !important;
     margin-top: 4px;
     padding-left: 17px;
   }
@@ -13,8 +13,15 @@ ejs-numerictextbox.e-lib {
     border: 1px solid $primary-active-blue-10 !important;
     border-radius: 9px !important;
   }
-}
 
-ejs-numerictextbox.e-lib:hover {
-  background: $primary-active-blue-90;
+  &:hover {
+    background: $primary-active-blue-90;
+  }
+
+  .e-input-group:not(.e-float-icon-left):not(.e-float-input)::after,
+  .e-input-group.e-control-wrapper:not(.e-float-icon-left):not(.e-float-input)::after,
+  .e-input-group:not(.e-float-icon-left):not(.e-float-input)::before,
+  .e-input-group.e-control-wrapper:not(.e-float-icon-left):not(.e-float-input)::before {
+    background: transparent !important;
+  }
 }
