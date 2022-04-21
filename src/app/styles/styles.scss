@@ -13,6 +13,32 @@ body {
   margin: 0;
   font-family: 'SF Pro';
 
+  .input-group {
+    position: relative;
+
+    i-feather {
+      position: absolute;
+      top: 15px;
+      right: 10px;
+      color: $supportive-red;
+      display: none;
+    }
+
+    span.error {
+      position: absolute;
+      left: 0;
+      bottom: -14px;
+      font-size: 12px;
+      color: $supportive-red;
+    }
+
+    &.dropdown {
+      i-feather {
+        right: 30px;
+      }
+    }
+  }
+
   h3 {
     margin: 5px;
     font-weight: normal;
@@ -20,6 +46,11 @@ body {
 
   label {
     font-size: 14px;
+
+    .required {
+      color: $supportive-red;
+      vertical-align: top;
+    }
   }
 
   .stick-right {

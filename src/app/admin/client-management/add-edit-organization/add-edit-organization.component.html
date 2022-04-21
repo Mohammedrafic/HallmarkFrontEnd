@@ -6,13 +6,19 @@
   <div class="controls-form stick-right">
     <button ejs-button cssClass="e-outline" (click)="navigateBack()">Clear</button>
     <button ejs-button cssClass="e-outline" (click)="navigateBack()">Cancel</button>
-    <button ejs-button [isPrimary]="true" class="save-button">Save</button>
+    <button ejs-button [isPrimary]="true" (click)="save()" class="save-button">Save</button>
   </div>
 </section>
 <section class="create-under-container bootstrap">
   <div class="left-section">
-    <label>Create Under</label>
-    <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
+    <form [formGroup]="CreateUnderFormGroup">
+      <label>Create Under<span class="required">*</span></label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist [fields]="createUnderFields" formControlName="createUnder" [dataSource]="businessUnits$ | async" placeholder="Create Under"></ejs-dropdownlist>
+        <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+        <span class="error" *ngIf="!CreateUnderFormGroup.controls['createUnder'].untouched">{{ CreateUnderFormGroup.controls['createUnder'].errors | validationError }}</span>
+      </div>
+    </form>
   </div>
   <div class="right-section"></div>
 </section>
@@ -28,150 +34,224 @@
       </div>
       <div class="e-card-content">
         <div class="general-information">
-          <div class="org-section">
-            <div class="left-column bootstrap">
-              <div>
-                <div class="input-container ">
-                  <label>Name</label>
-                  <input class="e-input" type="text" placeholder="Enter Name"/>
-                </div>
-              </div>
-              <div>
-                <div class="id-container">
-                  <div class="input-container">
-                    <label>External ID</label>
-                    <input class="e-input" type="text" placeholder="External ID"/>
-                  </div>
-                  <div class="input-container">
-                    <label>Tax ID</label>
-                    <input class="e-input" type="text" placeholder="Tax ID"/>
+          <form [formGroup]="GeneralInformationFormGroup">
+            <div class="org-section">
+              <div class="left-column bootstrap">
+                <div>
+                  <div class="input-container ">
+                    <label>Name<span class="required">*</span></label>
+                    <div class="input-group">
+                      <input formControlName="name" class="e-input" type="text" placeholder="Enter Name" maxlength="50"/>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                      <span class="error" *ngIf="!GeneralInformationFormGroup.controls['name'].untouched">{{ GeneralInformationFormGroup.controls['name'].errors | validationError }}</span>
+                    </div>
                   </div>
                 </div>
+                <div>
+                  <div class="id-container">
+                    <div class="input-container">
+                      <label>External ID</label>
+                      <input formControlName="externalId" class="e-input" type="text" placeholder="External ID"/>
+                    </div>
+                    <div class="input-container">
+                      <label>Tax ID<span class="required">*</span></label>
+                      <div class="input-group">
+                        <input formControlName="taxId" class="e-input" type="text" placeholder="Tax ID" maxlength="12"/>
+                        <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                        <span class="error" *ngIf="!GeneralInformationFormGroup.controls['taxId'].untouched">{{ GeneralInformationFormGroup.controls['taxId'].errors | validationError }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="right-column"></div>
+            </div>
+            <div class="address-section bootstrap">
+              <div class="left-column">
+                <div class="input-container">
+                  <label>Address 1<span class="required">*</span></label>
+                  <div class="input-group">
+                    <input formControlName="addressLine1" class="e-input" type="text" placeholder="Address 1" maxlength="100"/>
+                    <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                    <span class="error" *ngIf="!GeneralInformationFormGroup.controls['addressLine1'].untouched">{{ GeneralInformationFormGroup.controls['addressLine1'].errors | validationError }}</span>
+                  </div>
+                </div>
+                <div class="city-section">
+                  <div class="dropdown-container">
+                    <label>Country<span class="required">*</span></label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist [fields]="optionFields" formControlName="country" [dataSource]="countries$ | async" placeholder="Country" (change)="onGeneralCountryChange($event)"></ejs-dropdownlist>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                      <span class="error" *ngIf="!GeneralInformationFormGroup.controls['country'].untouched">{{ GeneralInformationFormGroup.controls['country'].errors | validationError }}</span>
+                    </div>
+                  </div>
+                  <div class="dropdown-container">
+                    <label>State<span class="required">*</span></label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist formControlName="state" [dataSource]="statesGeneral$ | async" placeholder="State"></ejs-dropdownlist>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                      <span class="error" *ngIf="!GeneralInformationFormGroup.controls['state'].untouched">{{ GeneralInformationFormGroup.controls['state'].errors | validationError }}</span>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>City<span class="required">*</span></label>
+                    <div class="input-group">
+                      <input formControlName="city" class="e-input" type="text" placeholder="City" maxlength="20"/>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                      <span class="error" *ngIf="!GeneralInformationFormGroup.controls['city'].untouched">{{ GeneralInformationFormGroup.controls['city'].errors | validationError }}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="city-section">
+                  <div class="input-container">
+                    <label>Phone 1</label>
+                    <div class="input-group">
+                      <input formControlName="phone1Ext" class="e-input" type="text" placeholder="Phone 1" maxlength="10"/>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>Phone 2</label>
+                    <div class="input-group">
+                      <input formControlName="phone2Ext" class="e-input" type="text" placeholder="Phone 2" maxlength="10"/>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>Fax</label>
+                    <div class="input-group">
+                      <input formControlName="fax" class="e-input" type="text" placeholder="Fax" maxlength="10"/>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="right-column">
+                <div class="input-container">
+                  <label>Address 2</label>
+                  <input formControlName="addressLine2" class="e-input" type="text" placeholder="Address 2" maxlength="100"/>
+                </div>
+                <div class="zipcode-section">
+                  <div class="input-container">
+                    <label>Zipcode</label>
+                    <div class="input-group">
+                      <input formControlName="zipCode" class="e-input" type="text" placeholder="Zipcode" maxlength="6"/>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                      <span class="error" *ngIf="!GeneralInformationFormGroup.controls['zipCode'].untouched">{{ GeneralInformationFormGroup.controls['zipCode'].errors | validationError }}</span>
+                    </div>
+                  </div>
+                  <div class="input-container"></div>
+                </div>
+                <div class="status-section">
+                  <div class="dropdown-container">
+                    <label>Status<span class="required">*</span></label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist formControlName="status" [fields]="optionFields" [dataSource]="statuses$ | async" placeholder="Status"></ejs-dropdownlist>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                      <span class="error" *ngIf="!GeneralInformationFormGroup.controls['status'].untouched">{{ GeneralInformationFormGroup.controls['status'].errors | validationError }}</span>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>Website</label>
+                    <input formControlName="website" class="e-input" type="text" placeholder="Website"/>
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="right-column"></div>
-          </div>
-          <div class="address-section bootstrap">
-            <div class="left-column">
-              <div class="input-container">
-                <label>Address 1</label>
-                <input class="e-input" type="text" placeholder="Address 1"/>
-              </div>
-              <div class="city-section">
-                <div class="dropdown-container">
-                  <label>Country</label>
-                  <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
-                </div>
-                <div class="dropdown-container">
-                  <label>Satate</label>
-                  <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
-                </div>
-                <div class="input-container">
-                  <label>City</label>
-                  <input class="e-input" type="text" placeholder="City"/>
-                </div>
-              </div>
-              <div class="city-section">
-                <div class="input-container">
-                  <label>Phone 1</label>
-                  <input class="e-input" type="text" placeholder="Phone 1"/>
-                </div>
-                <div class="input-container">
-                  <label>Phone 2</label>
-                  <input class="e-input" type="text" placeholder="Phone 2"/>
-                </div>
-                <div class="input-container">
-                  <label>Fax</label>
-                  <input class="e-input" type="text" placeholder="Fax"/>
-                </div>
-              </div>
-            </div>
-            <div class="right-column">
-              <div class="input-container">
-                <label>Address 2</label>
-                <input class="e-input" type="text" placeholder="Address 2"/>
-              </div>
-              <div class="zipcode-section">
-                <div class="input-container">
-                  <label>Zipcode</label>
-                  <input class="e-input" type="text" placeholder="Zipcode"/>
-                </div>
-                <div class="input-container"></div>
-              </div>
-              <div class="status-section">
-                <div class="dropdown-container">
-                  <label>Status</label>
-                  <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
-                </div>
-                <div class="input-container">
-                  <label>Website</label>
-                  <input class="e-input" type="text" placeholder="Website"/>
-                </div>
-              </div>
-            </div>
-          </div>
+          </form>
         </div>
         <div class="billing-details bootstrap">
           <div class="title">Billing Details</div>
           <div class="org-address-checkbox">
-            <ejs-checkbox label="Same As Organization"></ejs-checkbox>
+            <ejs-checkbox (change)="sameAsOrgChange($event)" label="Same As Organization"></ejs-checkbox>
           </div>
           <div class="billing-details-section">
             <div class="left-column">
-              <div class="billing-address-section">
-                <div class="input-container">
-                  <label>Name</label>
-                  <input class="e-input" type="text" placeholder="Name"/>
+              <form [formGroup]="BillingDetailsFormGroup">
+                <div class="billing-address-section">
+                  <div class="input-container">
+                    <label>Name<span class="required">*</span></label>
+                    <div class="input-group">
+                      <input formControlName="name" class="e-input" type="text" placeholder="Name"/>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                      <span class="error" *ngIf="!BillingDetailsFormGroup.controls['name'].untouched">{{ BillingDetailsFormGroup.controls['name'].errors | validationError }}</span>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>Address</label>
+                    <input formControlName="address" class="e-input" type="text" placeholder="Address"/>
+                  </div>
                 </div>
-                <div class="input-container">
-                  <label>Address 1</label>
-                  <input class="e-input" type="text" placeholder="Address 1"/>
+                <div class="billing-country-section">
+                  <div class="dropdown-container">
+                    <label>Country<span class="required">*</span></label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist [fields]="optionFields" formControlName="country" [dataSource]="countries$ | async" placeholder="Country" (change)="onBillingCountryChange($event)"></ejs-dropdownlist>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                      <span class="error" *ngIf="!BillingDetailsFormGroup.controls['country'].untouched">{{ BillingDetailsFormGroup.controls['country'].errors | validationError }}</span>
+                    </div>
+                  </div>
+                  <div class="dropdown-container">
+                    <label>State<span class="required">*</span></label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist formControlName="state" [dataSource]="statesBilling$ | async" placeholder="State"></ejs-dropdownlist>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                      <span class="error" *ngIf="!BillingDetailsFormGroup.controls['state'].untouched">{{ BillingDetailsFormGroup.controls['state'].errors | validationError }}</span>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>City<span class="required">*</span></label>
+                    <div class="input-group">
+                      <input formControlName="city" class="e-input" type="text" placeholder="City"/>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                      <span class="error" *ngIf="!BillingDetailsFormGroup.controls['city'].untouched">{{ BillingDetailsFormGroup.controls['city'].errors | validationError }}</span>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>Zipcode</label>
+                    <div class="input-group">
+                      <input formControlName="zipCode" class="e-input" type="text" placeholder="Zipcode" maxlength="6"/>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                      <span class="error" *ngIf="!BillingDetailsFormGroup.controls['zipCode'].untouched">{{ BillingDetailsFormGroup.controls['zipCode'].errors | validationError }}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="billing-country-section">
-                <div class="dropdown-container">
-                  <label>Country</label>
-                  <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
+                <div class="billing-phone-section">
+                  <div class="input-container">
+                    <label>Phone 1</label>
+                    <div class="input-group">
+                      <input formControlName="phone1" class="e-input" type="text" placeholder="Phone 1" maxlength="10"/>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>Phone 2</label>
+                    <div class="input-group">
+                      <input formControlName="phone2" class="e-input" type="text" placeholder="Phone 2" maxlength="10"/>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>Fax</label>
+                    <div class="input-group">
+                      <input formControlName="fax" class="e-input" type="text" placeholder="Fax" maxlength="10"/>
+                      <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                    </div>                
+                  </div>
+                  <div class="input-container"></div>
                 </div>
-                <div class="dropdown-container">
-                  <label>State</label>
-                  <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
+                <div class="billing-phone-section">
+                  <div class="input-container ext">
+                    <label>Ext</label>
+                    <input formControlName="ext" class="e-input" type="text" placeholder="Ext"/>
+                  </div>
+                  <div class="input-container website">
+                    <label>Website</label>
+                    <input formControlName="website" class="e-input" type="text" placeholder="Website"/>
+                  </div>
+                  <div class="input-container"></div>
                 </div>
-                <div class="input-container">
-                  <label>City</label>
-                  <input class="e-input" type="text" placeholder="City"/>
-                </div>
-                <div class="input-container">
-                  <label>Zipcode</label>
-                  <input class="e-input" type="text" placeholder="Zipcode"/>
-                </div>
-              </div>
-              <div class="billing-phone-section">
-                <div class="input-container">
-                  <label>Phone 1</label>
-                  <input class="e-input" type="text" placeholder="Phone 1"/>
-                </div>
-                <div class="input-container">
-                  <label>Phone 2</label>
-                  <input class="e-input" type="text" placeholder="Phone 2"/>
-                </div>
-                <div class="input-container">
-                  <label>Fax</label>
-                  <input class="e-input" type="text" placeholder="Fax"/>
-                </div>
-                <div class="input-container"></div>
-              </div>
-              <div class="billing-phone-section">
-                <div class="input-container ext">
-                  <label>Ext</label>
-                  <input class="e-input" type="text" placeholder="Ext"/>
-                </div>
-                <div class="input-container website">
-                  <label>Website</label>
-                  <input class="e-input" type="text" placeholder="Website"/>
-                </div>
-                <div class="input-container"></div>
-              </div>
+              </form>
             </div>
             <div class="right-column"></div>
           </div>
@@ -179,35 +259,62 @@
         <div class="contact-details">
           <div class="contact-header">
             <div class="title">Contact Details</div>
-            <div class="stick-right add-contact-link"><i-feather name="plus" class="icon"></i-feather> Add Contact</div>
+            <div class="stick-right add-contact-link" (click)="addContact()"><i-feather name="plus" class="icon"></i-feather> Add Contact</div>
           </div>
-          <div class="contact-item">
-            <div class="dropdown-container bootstrap">
-              <label>Title</label>
-              <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
-            </div>
-            <div class="input-container bootstrap">
-              <label>Contact Person</label>
-              <input class="e-input" type="text" placeholder="Contact Person"/>
-            </div>
-            <div class="input-container bootstrap">
-              <label>Phone 1</label>
-              <input class="e-input" type="text" placeholder="Phone 1"/>
-            </div>
-            <div class="input-container bootstrap">
-              <label>Email</label>
-              <input class="e-input" type="text" placeholder="Email"/>
-            </div>
-            <div class="input-container remove-button-container">
-              <button ejs-button cssClass="e-outline" class="icon-button">
-                <i-feather name="trash2" class="icon"></i-feather>
-              </button>
-            </div>
-          </div>
+          <form [formGroup]="ContactFormGroup">
+            <ng-container formArrayName="contacts">
+              <div [formGroupName]="i" class="contact-item" *ngFor="let contact of ContactFormArray.controls; let i = index;">
+                <div *ngIf="!isEditTitle[i]" class="dropdown-container bootstrap">
+                  <label>Title</label>
+                  <ejs-dropdownlist formControlName="title" [dataSource]="titles$ | async" placeholder="Title"></ejs-dropdownlist>
+                </div>
+                <div *ngIf="isEditTitle[i]" class="input-container bootstrap">
+                  <label>Title</label>
+                  <div class="input-group">
+                    <input formControlName="title" class="e-input" type="text" placeholder="Title"/>
+                  </div>
+                </div>
+                <div class="input-container edit-button-container">
+                  <button ejs-button cssClass="e-outline" class="icon-button" (click)="editTitleHandler(i)">
+                    <i-feather name="edit3" class="icon"></i-feather>
+                  </button>
+                </div>
+                <div class="input-container bootstrap">
+                  <label>Contact Person<span class="required">*</span></label>
+                  <div class="input-group">
+                    <input formControlName="contactPerson" class="e-input" type="text" placeholder="Contact Person"/>
+                    <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                    <span class="error" *ngIf="!contact.get('contactPerson')?.untouched">{{ contact.get('contactPerson')?.errors | validationError }}</span>
+                  </div>
+                </div>
+                <div class="input-container bootstrap">
+                  <label>Phone 1</label>
+                  <div class="input-group">
+                    <input formControlName="phoneNumberExt" class="e-input" type="text" placeholder="Phone 1" maxlength="10"/>
+                    <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                  </div>   
+                </div>
+                <div class="input-container bootstrap">
+                  <label>Email</label>
+                  <div class="input-group">
+                    <input formControlName="email" class="e-input" type="text" placeholder="Email"/>
+                    <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+                    <span class="error" *ngIf="!contact.get('email')?.untouched">{{ contact.get('email')?.errors | validationError }}</span>
+                  </div>
+                </div>
+                <div class="input-container remove-button-container">
+                  <button *ngIf="ContactFormArray.controls.length > 1" ejs-button cssClass="e-outline" class="icon-button" (click)="removeContact(i)">
+                    <i-feather name="trash2" class="icon"></i-feather>
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+          </form>
         </div>
       </div>
     </div>
   </div>
+
   <div class="right-section">
 
     <!---Logo section-->
@@ -218,13 +325,13 @@
         </div>
       </div>
       <div class="e-card-content">
-        <div id="droparea" style='height: 130px'>
+        <div id="droparea" style="height: 130px">
           <span>Drag & Drop files here</span>
         </div>
-        <ejs-uploader #previewupload id='previewfileupload' [autoUpload]="false" [asyncSettings]='path'
-            [dropArea]='dropElement' [allowedExtensions]='allowExtensions' (selected)='onImageSelect($event)'
-            (success)='onUploadSuccess($event)' (progress)='onFileUpload($event)' (failure)='onUploadFailed($event)' 
-            (removing)='onFileRemove($event)'>
+        <ejs-uploader #previewupload id="previewfileupload" [autoUpload]="false" [asyncSettings]="path"
+            [dropArea]="dropElement" [allowedExtensions]="allowExtensions" (selected)="onImageSelect($event)"
+            (success)="onUploadSuccess($event)" (progress)="onFileUpload($event)" (failure)="onUploadFailed($event)" 
+            (removing)="onFileRemove($event)">
         </ejs-uploader>
         <button ejs-button cssClass="e-outline upload-button" (click)="uploadImages()">
           Upload <i-feather name="upload" class="icon"></i-feather>
@@ -240,36 +347,40 @@
         </div>
       </div>
       <div class="e-card-content">
-        <div class="inline-radio-container">
-          <ejs-radiobutton label="By Organization" name="prefType" value="1" checked="true"></ejs-radiobutton>
-          <ejs-radiobutton label="By Location" name="prefType" value="2"></ejs-radiobutton>
-        </div>
-        <div class="dropdown-container bootstrap">
-          <label>Send document to agency</label>
-          <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
-        </div>
-        <div class="column-radio-container">
-          <ejs-radiobutton label="Actual Time In/Time Out" name="hours" value="1" checked="true"></ejs-radiobutton>
-          <ejs-radiobutton label="Total Hours by Week" name="hours" value="2"></ejs-radiobutton>
-          <ejs-radiobutton label="Total Hours by Day" name="hours" value="3"></ejs-radiobutton>
-        </div>
-        <div class="dropdown-container bootstrap">
-          <label>Week Starts On</label>
-          <ejs-dropdownlist [dataSource]='data'></ejs-dropdownlist>
-        </div>
-        <div class="inline-radio-container">
-          <ejs-radiobutton label="Manual Payment" name="paymentType" value="1" checked="true"></ejs-radiobutton>
-          <ejs-radiobutton label="Electronic Payment" name="paymentType" value="2"></ejs-radiobutton>
-        </div>
-        <div class="input-container bootstrap">
-          <ejs-textbox [multiline]="true" value="" placeholder="Electronic Payment"></ejs-textbox>
-        </div>
-        <div class="lunch-checkbox bootstrap">
-          <ejs-checkbox label="Consider Lunch"></ejs-checkbox>
-        </div>
-        <div>
-          <button ejs-button cssClass="e-outline" [disabled]="true" (click)="navigateBack()">Time period in minutes</button>
-        </div>
+        <form [formGroup]="PreferencesFormGroup">
+          <div class="inline-radio-container">
+            <ejs-radiobutton formControlName="purchaseOrderBy" label="By Organization" name="purchaseOrderBy" value="0" checked="true"></ejs-radiobutton>
+            <ejs-radiobutton formControlName="purchaseOrderBy" label="By Location" name="purchaseOrderBy" value="1"></ejs-radiobutton>
+          </div>
+          <div class="column-radio-container submitted-by">
+            <ejs-radiobutton formControlName="timesheetSubmittedBy" label="Actual Time In/Time Out" name="timesheetSubmittedBy" value="0" checked="true"></ejs-radiobutton>
+            <ejs-radiobutton formControlName="timesheetSubmittedBy" label="Total Hours by Week" name="timesheetSubmittedBy" value="1"></ejs-radiobutton>
+            <ejs-radiobutton formControlName="timesheetSubmittedBy" label="Total Hours by Day" name="timesheetSubmittedBy" value="2"></ejs-radiobutton>
+          </div>
+          <div class="dropdown-container bootstrap">
+            <label>Week Starts On<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist formControlName="weekStartsOn" [fields]="optionFields" [dataSource]="days$ | async" placeholder="Week Starts On"></ejs-dropdownlist>
+              <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+              <span class="error" *ngIf="!PreferencesFormGroup.controls['weekStartsOn'].untouched">{{ PreferencesFormGroup.controls['weekStartsOn'].errors | validationError }}</span>
+            </div>
+          </div>
+          <div class="inline-radio-container">
+            <ejs-radiobutton formControlName="paymentOptions" label="Manual Payment" name="paymentOptions" value="0" checked="true"></ejs-radiobutton>
+            <ejs-radiobutton formControlName="paymentOptions" label="Electronic Payment" name="paymentOptions" value="1"></ejs-radiobutton>
+          </div>
+          <div class="input-container bootstrap">
+            <div class="input-group">
+              <ejs-textbox formControlName="paymentDescription" [multiline]="true" value="" placeholder="Electronic Payment"></ejs-textbox>
+              <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+              <span class="error" *ngIf="!PreferencesFormGroup.controls['paymentDescription'].untouched">{{ PreferencesFormGroup.controls['paymentDescription'].errors | validationError }}</span>
+            </div>
+          </div>
+          <div class="input-container bootstrap">
+            <label>Consider Lunch</label>
+            <input formControlName="timePeriodInMins" class="e-input" type="text" placeholder="Time period in minutes"/>
+          </div>
+        </form>
       </div>
     </div>
   </div>

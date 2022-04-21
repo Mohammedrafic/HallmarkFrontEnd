@@ -20,9 +20,15 @@ import {
   Menu,
   FileText,
   MapPin,
-  Plus
+  Plus,
+  AlertCircle,
+  Edit3
 } from 'angular-feather/icons';
 import { AddEditOrganizationComponent } from './client-management/add-edit-organization/add-edit-organization.component';
+import { NgxsModule } from '@ngxs/store';
+import { AdminState } from './store/admin.state';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ValidationErrorPipe } from '../shared/pipes/validation-error.pipe';
 
 const sidebarIcons = {
   Download,
@@ -34,17 +40,21 @@ const sidebarIcons = {
   Menu,
   FileText,
   MapPin,
-  Plus
+  Plus,
+  AlertCircle,
+  Edit3
 };
 @NgModule({
   declarations: [
     ClientManagementContentComponent,
     AddEditOrganizationComponent,
-    AdminComponent
+    AdminComponent,
+    ValidationErrorPipe
   ],
   imports: [
     CommonModule,
     AdminRoutingModule,
+    FormsModule, ReactiveFormsModule,
 
     GridModule,
     ButtonModule,
@@ -55,7 +65,12 @@ const sidebarIcons = {
     RadioButtonModule,
     TextBoxModule,
 
-    FeatherModule.pick(sidebarIcons)
+    FeatherModule.pick(sidebarIcons),
+
+    //STORE
+    NgxsModule.forFeature([
+      AdminState
+    ]),
   ],
   providers: [
     ResizeService
