@@ -81,11 +81,13 @@
           <div class="content-wrapper">
             <section class="left-side-pager-controls">
               <ejs-dropdownlist id='rowsPerPage'
+                                class="dropdown-no-border"
                                 [dataSource]='rowsPerPageDropDown'
                                 [(value)]='activeRowsPerPageDropDown'
                                 (change)="onRowsDropDownChanged()">
               </ejs-dropdownlist>
               <ejs-numerictextbox id="goToPage"
+                                  class="numeric-input-no-border"
                                   format='#'
                                   [validateDecimalOnType]='validateDecimalOnType'
                                   [decimals]='decimals'

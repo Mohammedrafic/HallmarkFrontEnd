@@ -1,6 +1,6 @@
 @import '../variables/colors';
 
-.e-dropdownlist {
+.dropdown-no-border {
   width: 116px;
   border-radius: 8px;
 
@@ -29,12 +29,24 @@
       color: $primary-active-blue-10;
     }
   }
+
+  &:hover {
+    background-color: $primary-active-blue-90;
+  }
+
+  .e-input-group.e-control-wrapper.e-input-focus:not(.e-float-icon-left):not(.e-success):not(.e-warning):not(.e-error) {
+    border-bottom: none !important;
+  }
+
+  .e-input-group:not(.e-float-icon-left):not(.e-float-input)::after,
+  .e-input-group.e-control-wrapper:not(.e-float-icon-left):not(.e-float-input)::after,
+  .e-input-group:not(.e-float-icon-left):not(.e-float-input)::before,
+  .e-input-group.e-control-wrapper:not(.e-float-icon-left):not(.e-float-input)::before {
+    background: transparent !important;
+  }
 }
 
-.e-dropdownlist:hover {
-  background: $primary-active-blue-90;
-}
-
+// context menu of the dropdown, out of dropdown scope
 .e-ddl.e-popup.e-control.e-popup-open {
   border-radius: 8px;
   .e-dropdownbase {
@@ -44,15 +56,4 @@
     background-color: $primary-active-blue-10;
     color: $secondary-dark-blue-40;
   }
-}
-
-body.light .e-input-group:not(.e-float-icon-left):not(.e-float-input)::after,
-body.light .e-input-group.e-control-wrapper:not(.e-float-icon-left):not(.e-float-input)::after,
-body.light .e-input-group:not(.e-float-icon-left):not(.e-float-input)::before,
-body.light .e-input-group.e-control-wrapper:not(.e-float-icon-left):not(.e-float-input)::before {
-  background: transparent;
-}
-
-body.light .e-input-group.e-control-wrapper.e-input-focus:not(.e-float-icon-left):not(.e-success):not(.e-warning):not(.e-error) {
-  border-bottom: none;
 }
