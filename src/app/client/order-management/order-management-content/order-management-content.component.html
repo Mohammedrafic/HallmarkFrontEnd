@@ -1,14 +1,14 @@
-<section class="toolbar">
-  <div>
+<app-page-toolbar>
+  <ng-container left>
     <app-tab-navigation [incompleteCount]="2" [pandingCount]="2"></app-tab-navigation>
-  </div>
-  <div>
+  </ng-container>
+  <ng-container right>
     <app-search></app-search>
     <button ejs-button cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
     <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
     <button ejs-button [isPrimary]="true">Create Order</button>
-  </div>
-</section>
+  </ng-container>
+</app-page-toolbar>
 
 <section>
   <ejs-grid

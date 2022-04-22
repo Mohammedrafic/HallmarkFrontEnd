@@ -41,6 +41,7 @@ import { TimesheetsContentComponent } from './timesheets/timesheets-content/time
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { ClientComponent } from './client.component';
 import { TabNavigationComponent } from './order-management/order-management-content/tab-navigation/tab-navigation.component';
+import { SharedModule } from '../shared/shared.module';
 
 const gridIcons = {
   MessageSquare,
@@ -68,6 +69,7 @@ const gridIcons = {
   ],
   imports: [
     CommonModule,
+    SharedModule,
     FeatherModule.pick(gridIcons),
     ClientRoutingModule,
     GridModule,

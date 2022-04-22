@@ -1,17 +1,19 @@
+$gap: 12px;
+
 .controls-container {
   padding: 20px 0;
   display: flex;
   justify-content: space-between;
 
   .left-content {
-    button {
-      margin-right: 10px;
+    & > *:not(:last-child) {
+      margin-right: $gap;
     }
   }
 
   .right-content {
-    button {
-      margin-left: 10px;
+    & > *:not(:first-child) {
+      margin-left: $gap;
     }
   }
 }
