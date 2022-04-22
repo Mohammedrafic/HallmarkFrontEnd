@@ -1656,6 +1656,15 @@
     "@syncfusion/ej2-base" "~20.1.47"
     "@syncfusion/ej2-navigations" "20.1.47"
 
+"@syncfusion/ej2-angular-popups@^20.1.47":
+  version "20.1.47"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-angular-popups/-/ej2-angular-popups-20.1.47.tgz#0d9584d7b5e4cb46df776c091f59293d9953bf86"
+  integrity sha512-t9u/85ztzsMXa84EGn6YcSAMpGOX6bJMxB4NWUCTqJoBwvgclFRckyNdvuw62XuyObNotDzWByitBG0+8IO2Rw==
+  dependencies:
+    "@syncfusion/ej2-angular-base" "~20.1.47"
+    "@syncfusion/ej2-base" "~20.1.47"
+    "@syncfusion/ej2-popups" "20.1.47"
+
 "@syncfusion/ej2-base@~20.1.47":
   version "20.1.47"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-base/-/ej2-base-20.1.47.tgz#f11685b5d223d0b0be8d8cfa1a1f56b8aa4d3430"
@@ -1799,7 +1808,7 @@
   dependencies:
     "@syncfusion/ej2-compression" "~20.1.47"
 
-"@syncfusion/ej2-popups@~20.1.47":
+"@syncfusion/ej2-popups@20.1.47", "@syncfusion/ej2-popups@~20.1.47":
   version "20.1.47"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-popups/-/ej2-popups-20.1.47.tgz#64ede9b094538735e4cdc93abe75525c3c6c820d"
   integrity sha512-8uSRBgyQkxhTjwR37eRAPuygsOImcvqwgJM78QAWFSl8TYyUJAGf8KRPi8yQa//izsdUcXkWdMLerirHJx1d6g==

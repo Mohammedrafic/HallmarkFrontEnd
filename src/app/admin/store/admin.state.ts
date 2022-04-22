@@ -9,7 +9,7 @@ import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '../services/organization.service';
 
-import { CreateOrganization, GetBusinessUnitList, SetBillingStatesByCountry, SetGeneralStatesByCountry } from './admin.actions';
+import { CreateOrganization, GetBusinessUnitList, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry } from './admin.actions';
 
 interface DropdownOption {
   id: number;
@@ -25,6 +25,7 @@ export interface AdminStateModel {
   statuses: DropdownOption[];
   titles: string[];
   isOrganizationLoading: boolean;
+  isDirty: boolean;
 }
 
 @State<AdminStateModel>({
@@ -38,6 +39,7 @@ export interface AdminStateModel {
     statuses: Statuses,
     titles: Titles,
     isOrganizationLoading: false,
+    isDirty: false
   },
 })
 @Injectable()
@@ -62,6 +64,9 @@ export class AdminState {
 
   @Selector()
   static titles(state: AdminStateModel): string[] { return state.titles; }
+
+  @Selector()
+  static isDirty(state: AdminStateModel): boolean { return state.isDirty; }
 
   constructor(
     private organizationService: OrganizationService,
@@ -92,5 +97,10 @@ export class AdminState {
       patchState({ businessUnits: payload});
       return payload;
     }));
+  }
+
+  @Action(SetDirtyState)
+  SetDirtyState({ patchState }: StateContext<AdminStateModel>, { payload }: SetDirtyState): void {
+    patchState({ isDirty: payload });
   }
 }

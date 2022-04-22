@@ -59,7 +59,6 @@ export class ShellPageComponent implements OnInit {
       this.isDarkTheme = isDark;
       this.setTheme(isDark);
     });
-
     this.initSidebarFields();
   }
 

@@ -19,3 +19,8 @@ export class GetBusinessUnitList {
   static readonly type = '[admin] Get The List Of Business Units';
   constructor() { }
 }
+
+export class SetDirtyState {
+  static readonly type = '[admin] Set Dirty State Of The Form';
+  constructor(public payload: boolean) { }
+}
