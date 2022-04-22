@@ -28,7 +28,7 @@ import { AddEditOrganizationComponent } from './client-management/add-edit-organ
 import { NgxsModule } from '@ngxs/store';
 import { AdminState } from './store/admin.state';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ValidationErrorPipe } from '../shared/pipes/validation-error.pipe';
+import { SharedModule } from '../shared/shared.module';
 
 const sidebarIcons = {
   Download,
@@ -48,13 +48,13 @@ const sidebarIcons = {
   declarations: [
     ClientManagementContentComponent,
     AddEditOrganizationComponent,
-    AdminComponent,
-    ValidationErrorPipe
+    AdminComponent
   ],
   imports: [
     CommonModule,
     AdminRoutingModule,
     FormsModule, ReactiveFormsModule,
+    SharedModule,
 
     GridModule,
     ButtonModule,

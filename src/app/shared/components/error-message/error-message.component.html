@@ -1,0 +1,6 @@
+<i-feather
+  name="alert-circle"
+  class="icon validation-icon"
+  [ngStyle]="{ display: !control?.untouched && control?.invalid ? 'block' : 'none' }"
+></i-feather>
+<span class="error" *ngIf="!control?.untouched">{{ control?.errors | validationError }}</span>
