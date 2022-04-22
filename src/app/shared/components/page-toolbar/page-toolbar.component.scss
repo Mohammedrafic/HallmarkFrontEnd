@@ -1,0 +1,17 @@
+.controls-container {
+  padding: 20px 0;
+  display: flex;
+  justify-content: space-between;
+
+  .left-content {
+    button {
+      margin-right: 10px;
+    }
+  }
+
+  .right-content {
+    button {
+      margin-left: 10px;
+    }
+  }
+}
