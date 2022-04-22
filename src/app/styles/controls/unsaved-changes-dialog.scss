@@ -1,0 +1,19 @@
+@import "../variables/colors.scss";
+
+body.light, body.dark {
+  .e-confirm-dialog.e-control.e-dialog.e-popup.unsaved-changes-dialog {
+    width: 300px;
+    border-radius: 8px;
+    
+    div.e-dlg-content {
+      border-radius: 8px 8px 0 0;
+      padding: 25px 15px;
+    }
+
+    div.e-footer-content {
+      border-radius: 0 0 8px 8px;
+      border-top: 1px solid $secondary-dark-blue-40;
+      padding: 15px;
+    }
+  }
+}

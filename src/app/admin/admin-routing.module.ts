@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { UnsavedChangesGuard } from '../shared/guards/unsaved-chages.guard';
 
 import { AdminComponent } from './admin.component';
 import { AddEditOrganizationComponent } from './client-management/add-edit-organization/add-edit-organization.component';
@@ -22,6 +23,7 @@ const routes: Routes = [
       {
         path: 'client-management/add',
         component: AddEditOrganizationComponent,
+        canDeactivate: [UnsavedChangesGuard]
       }
     ],
   },

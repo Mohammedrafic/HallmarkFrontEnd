@@ -4,11 +4,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { FileInfo, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
-import { Observable } from 'rxjs';
+import { debounceTime, Observable } from 'rxjs';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization } from 'src/app/shared/models/organization.model';
 import { SetHeaderState } from 'src/app/store/app.actions';
-import { CreateOrganization, GetBusinessUnitList, SetBillingStatesByCountry, SetGeneralStatesByCountry } from '../../store/admin.actions';
+import { CreateOrganization, GetBusinessUnitList, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
 
 @Component({
@@ -22,7 +22,6 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
   public filesDetails : FileInfo[] = [];
   public filesName: string[] = [];
   public filesList: HTMLElement[] = [];
-  public OrganizationFormArray = new FormArray([]);
   public ContactFormArray: FormArray;
   public CreateUnderFormGroup: FormGroup;
   public GeneralInformationFormGroup: FormGroup;
@@ -30,7 +29,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
   public ContactFormGroup: FormGroup;
   public PreferencesFormGroup: FormGroup;
   public isSameAsOrg: boolean = false;
-  public isEditTitle: boolean[] = [false];;
+  public isEditTitle: boolean[] = [false];
 
   public createUnderFields = { 
     text: 'name', value: 'id'
@@ -75,6 +74,9 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
     this.CreateUnderFormGroup = fb.group({
       createUnder: new FormControl('', [ Validators.required ])
     });
+    this.CreateUnderFormGroup.valueChanges.subscribe(() => {
+      store.dispatch(new SetDirtyState(this.CreateUnderFormGroup.dirty));
+    });
     this.GeneralInformationFormGroup = fb.group({
       name: new FormControl('', [ Validators.required ]),
       externalId: new FormControl(''),
@@ -91,6 +93,9 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
       status: new FormControl('', [ Validators.required ]),
       website: new FormControl('')
     });
+    this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      store.dispatch(new SetDirtyState(this.GeneralInformationFormGroup.dirty));
+    });
     this.BillingDetailsFormGroup = fb.group({
       name: new FormControl('', [ Validators.required ]),
       address: new FormControl(''),
@@ -104,8 +109,14 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
       ext: new FormControl(''),
       website: new FormControl('')
     });
+    this.BillingDetailsFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      store.dispatch(new SetDirtyState(this.BillingDetailsFormGroup.dirty));
+    });
     this.ContactFormGroup = fb.group({
       contacts: new FormArray([this.newContactFormGroup()])
+    });
+    this.ContactFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      store.dispatch(new SetDirtyState(this.ContactFormGroup.dirty));
     });
     this.ContactFormArray = this.ContactFormGroup.get("contacts") as FormArray;
     this.PreferencesFormGroup = fb.group({
@@ -115,6 +126,9 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
       paymentOptions: new FormControl(0, [ Validators.required ]),
       timePeriodInMins: new FormControl('', [ Validators.pattern(/^[0-9]+$/), Validators.min(1)] ),
       paymentDescription: new FormControl('', [ Validators.required ])
+    });
+    this.PreferencesFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      store.dispatch(new SetDirtyState(this.PreferencesFormGroup.dirty));
     });
   }
 
@@ -187,6 +201,15 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
 
   public navigateBack(): void {
     this.router.navigate(['../'], { relativeTo: this.route });
+  }
+
+  public clearForm(): void {
+    this.CreateUnderFormGroup.reset();
+    this.GeneralInformationFormGroup.reset();
+    this.BillingDetailsFormGroup.reset();
+    this.ContactFormArray.reset();
+    this.PreferencesFormGroup.reset();
+    this.store.dispatch(new SetDirtyState(false));
   }
 
   public onGeneralCountryChange(event: ChangeEventArgs): void {
