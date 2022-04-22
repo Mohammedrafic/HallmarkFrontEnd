@@ -4,24 +4,19 @@ metadata:
   name: {{ include "einsteinui.fullname" . }}
 spec:
   hosts:
-  - "*"
+  - "dev.einstein2.com"
   gateways:
   - {{ include "einsteinui.fullname" . }}
   http:
-  - route:
+  - match:
+    - uri:
+        exact: /
+    - uri:
+        prefix: /
+    rewrite:
+      uri: /
+    route:
     - destination:
+        host: {{ include "einsteinui.fullname" . }}
         port:
           number: 80
-        host: {{ include "einsteinui.fullname" . }}
-  # - match:
-  #   - uri:
-  #       exact: /
-  #   - uri:
-  #       prefix: /
-  #   rewrite:
-  #     uri: /
-  #   route:
-  #   - destination:
-  #       host: {{ include "einsteinui.fullname" . }}
-  #       port:
-  #         number: 80
