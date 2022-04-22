@@ -1,8 +1,14 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Store } from '@ngxs/store';
-import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
+import { Select, Store } from '@ngxs/store';
+import { FreezeService, GridComponent, PageSettingsModel, SortService } from '@syncfusion/ej2-angular-grids';
+import { Observable } from 'rxjs';
+import { ORDERS_GRID_CONFIG } from 'src/app/client/client.config';
+import { Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
+import { OrganizationPage } from 'src/app/shared/models/organization.model';
 import { SetHeaderState } from 'src/app/store/app.actions';
+import { GetOrganizationsByPage } from '../../store/admin.actions';
+import { AdminState } from '../../store/admin.state';
 
 @Component({
   selector: 'app-client-management-content',
@@ -12,32 +18,11 @@ import { SetHeaderState } from 'src/app/store/app.actions';
 })
 export class ClientManagementContentComponent implements OnInit, AfterViewInit {
 
-  public data: object[] = [
-    {
-      name: 'Organization name 1',
-      status: 'active',
-      city: 'City name',
-      contact: 'Johns Dou',
-      phone: '0992252247'
-    },
-    {
-      name: 'Organization name 2',
-      status: 'active',
-      city: '1 City name',
-      contact: 'Jhone Dou',
-      phone: '0992252247'
-    },
-    {
-      name: 'Organization name 3',
-      status: 'active',
-      city: 'R City name',
-      contact: 'Jhone Dou',
-      phone: '0993352247'
-    }
-  ];
-
-  @ViewChild('grid')
-  public grid: GridComponent;
+  public pageSettings: PageSettingsModel = ORDERS_GRID_CONFIG.gridPageSettings;
+  public allowPaging = ORDERS_GRID_CONFIG.isPagingEnabled;
+  public gridHeight = ORDERS_GRID_CONFIG.gridHeight;
+  public rowsPerPageDropDown = ORDERS_GRID_CONFIG.rowsPerPageDropDown;
+  public activeRowsPerPageDropDown = ORDERS_GRID_CONFIG.rowsPerPageDropDown[0];
 
   public initialSort = {
     columns: [
@@ -47,14 +32,25 @@ export class ClientManagementContentComponent implements OnInit, AfterViewInit {
 
   public resizeSettings = { mode: 'Auto' };
 
+  public readonly statusEnum = Status;
+
+  public currentPage = 1;
+  public pageSize = 30;
+
   readonly ROW_HEIGHT = 64;
+
+  @Select(AdminState.organizations)
+  organizations$: Observable<OrganizationPage>;
+
+  @ViewChild('grid')
+  public grid: GridComponent;
 
   constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
     store.dispatch(new SetHeaderState({title: 'Organization List'}));
   }
 
   ngOnInit(): void {
-
+    this.store.dispatch(new GetOrganizationsByPage(this.currentPage, this.pageSize));
   }
 
   ngAfterViewInit(): void {
@@ -63,5 +59,11 @@ export class ClientManagementContentComponent implements OnInit, AfterViewInit {
 
   public navigateToOrganizationForm(): void {
     this.router.navigate(['./add'], { relativeTo: this.route });
+  }
+
+  //TODO: create a pipe
+  public getChipCssClass(status: string): string {
+    const found = Object.entries(STATUS_COLOR_GROUP).find(item => item[1].includes(status));
+    return found ? found[0] : 'e-default';
   }
 }

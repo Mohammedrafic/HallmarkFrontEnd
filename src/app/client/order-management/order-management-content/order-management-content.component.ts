@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import { GridComponent, PagerComponent, PageSettingsModel } from '@syncfusion/ej2-angular-grids';
@@ -10,12 +10,7 @@ import { data } from './datasource';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { ResizeSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
-
-export const STATUS_COLOR_GROUP = {
-  'e-success': ['open'],
-  'e-warning': ['incomplete', 'in progress', 'pending', 'accepted', 'filled'],
-  'e-default': ['closed']
-}
+import { STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,

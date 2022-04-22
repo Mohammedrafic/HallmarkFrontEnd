@@ -271,6 +271,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
         this.ContactFormArray.getRawValue(),
         this.PreferencesFormGroup.getRawValue()
       )));
+      this.store.dispatch(new SetDirtyState(false));
     } else {
       this.CreateUnderFormGroup.markAllAsTouched();
       this.GeneralInformationFormGroup.markAllAsTouched();

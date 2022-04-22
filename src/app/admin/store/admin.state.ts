@@ -3,18 +3,20 @@ import { State, Action, StateContext, Selector } from '@ngxs/store';
 import { Observable, tap } from 'rxjs';
 import { Days } from 'src/app/shared/enums/days';
 import { Country, UsaStates, CanadaStates } from 'src/app/shared/enums/states';
-import { Statuses } from 'src/app/shared/enums/status';
+import { Status } from 'src/app/shared/enums/status';
 import { Titles } from 'src/app/shared/enums/title';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
-import { Organization } from 'src/app/shared/models/organization.model';
+import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '../services/organization.service';
 
-import { CreateOrganization, GetBusinessUnitList, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry } from './admin.actions';
+import { CreateOrganization, GetBusinessUnitList, GetOrganizationsByPage, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry } from './admin.actions';
 
 interface DropdownOption {
   id: number;
   text: string;
 }
+
+const StringIsNumber = (value: any) => isNaN(Number(value)) === true; // TODO: move to utils
 
 export interface AdminStateModel {
   countries: DropdownOption[];
@@ -25,6 +27,7 @@ export interface AdminStateModel {
   statuses: DropdownOption[];
   titles: string[];
   isOrganizationLoading: boolean;
+  organizations: OrganizationPage | null;
   isDirty: boolean;
 }
 
@@ -36,9 +39,10 @@ export interface AdminStateModel {
     statesBilling: null,
     businessUnits: [],
     days: Days,
-    statuses: Statuses,
+    statuses: Object.keys(Status).filter(StringIsNumber).map((statusName, index) => ({ id: index, text: statusName })),
     titles: Titles,
     isOrganizationLoading: false,
+    organizations: null,
     isDirty: false
   },
 })
@@ -68,6 +72,9 @@ export class AdminState {
   @Selector()
   static isDirty(state: AdminStateModel): boolean { return state.isDirty; }
 
+  @Selector()
+  static organizations(state: AdminStateModel): OrganizationPage | null { return state.organizations; }
+
   constructor(
     private organizationService: OrganizationService,
   ) { }
@@ -82,11 +89,20 @@ export class AdminState {
     patchState({ statesBilling: payload === Country[Country.USA] ? UsaStates : CanadaStates });
   }
 
+  @Action(GetOrganizationsByPage)
+  GetOrganizationsByPage({ patchState }: StateContext<AdminStateModel>, { pageNumber, pageSize }: GetOrganizationsByPage): Observable<OrganizationPage> {
+    patchState({ isOrganizationLoading: true });
+    return this.organizationService.getOrganizations(pageNumber, pageSize).pipe(tap((payload) => {
+      patchState({ isOrganizationLoading: false, organizations: payload });
+      return payload;
+    }));
+  }
+
   @Action(CreateOrganization)
   CreateOrganization({ patchState }: StateContext<AdminStateModel>, { payload }: CreateOrganization): Observable<Organization> {
     patchState({ isOrganizationLoading: true });
     return this.organizationService.saveOrganization(payload).pipe(tap((payload) => {
-      patchState({ isOrganizationLoading: false});
+      patchState({ isOrganizationLoading: false });
       return payload;
     }));
   }

@@ -37,7 +37,7 @@
   }
 
   &.e-gridhover tr[role=row]:not(.e-editedrow):hover .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
-    background-color: $primary-active-blue-90 !Important;
+    background-color: $primary-active-blue-90 !important;
   }
 
   & td.e-active {
@@ -88,28 +88,5 @@
 
   .e-item-active {
     color: $primary-active-blue;
-  }
-
-  .e-pager {
-    border-bottom-left-radius: 12px;
-    border-bottom-right-radius: 12px;
-  }
-
-  .e-pagertemplate {
-    .content-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 51px;
-
-      .left-side-pager-controls {
-        display: flex;
-        margin-left: 16px;
-
-        #goToPage {
-          margin-left: 35px
-        }
-      }
-    }
   }
 }

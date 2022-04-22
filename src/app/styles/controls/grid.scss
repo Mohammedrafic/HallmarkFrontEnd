@@ -4,6 +4,33 @@ ejs-grid.e-control.e-grid {
   border-radius: $grid-border-radius;
   box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.05);
 
+  ejs-pager {
+    border-top: none;
+  }
+
+  .e-pager {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+
+  .e-pagertemplate {
+    .content-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 51px;
+
+      .left-side-pager-controls {
+        display: flex;
+        margin-left: 16px;
+
+        #goToPage {
+          margin-left: 35px
+        }
+      }
+    }
+  }
+
   thead tr {
     height: 52px !important;
   }

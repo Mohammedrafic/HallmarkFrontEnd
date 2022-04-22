@@ -10,7 +10,8 @@ import { AppComponent } from './app.component';
 import { AppState } from './store/app.state';
 
 import { enableRipple } from '@syncfusion/ej2-base';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { ApiInterceptor } from './shared/interceptors/api.interceptor';
 
 enableRipple(true);
 
@@ -32,7 +33,13 @@ enableRipple(true);
       disabled: environment.production
     }),
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ApiInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -15,6 +15,11 @@ export class CreateOrganization {
   constructor(public payload: Organization) { }
 }
 
+export class GetOrganizationsByPage {
+  static readonly type = '[admin] Get Organizations by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}
+
 export class GetBusinessUnitList {
   static readonly type = '[admin] Get The List Of Business Units';
   constructor() { }

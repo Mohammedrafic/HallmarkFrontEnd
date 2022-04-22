@@ -82,3 +82,12 @@ export class Preferences {
   purchaseOrderBy: number;
   timePeriodInMins: number | string | null;
 }
+
+export class OrganizationPage {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  items: Organization[];
+  pageNumber: number;
+  totalCount: number;
+  totalPages: number;
+}

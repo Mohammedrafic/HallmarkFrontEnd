@@ -5,24 +5,32 @@
   </div>
 </section>
 <section>
-  <ejs-grid #grid [dataSource]="data" [allowSorting]="true" [allowResizing]="true" [resizeSettings]="resizeSettings" [sortSettings]='initialSort'>
+  <ejs-grid #grid 
+    [dataSource]="(organizations$ | async)?.items" 
+    [allowSorting]="true" 
+    [allowResizing]="true" 
+    [resizeSettings]="resizeSettings" 
+    [sortSettings]="initialSort"
+    [allowPaging]="allowPaging"
+    [pageSettings]="pageSettings"
+    [height]="gridHeight">
     <e-columns>
-      <e-column field='name' headerText='Organization Name' textAlign='Left' width="120"></e-column>
-      <e-column field='status' headerText='Organization Status' textAlign='Left' width="120">
+      <e-column field="createUnder.name" headerText="Organization Name" textAlign="Left" width="120"></e-column>
+      <e-column field="generalInformation.status" headerText="Organization Status" textAlign="Left" width="120">
         <ng-template #template let-data>
           <div class="status-cell">
             <ejs-chiplist>
               <e-chips>
-                <e-chip [text]="data.status" cssClass="e-success" leadingIconCss="dot"></e-chip>
+                <e-chip [text]="statusEnum[data.generalInformation.status]" [cssClass]="getChipCssClass(statusEnum[data.generalInformation.status])" leadingIconCss="dot"></e-chip>
               </e-chips>
             </ejs-chiplist>
           </div>
         </ng-template>
       </e-column>
-      <e-column field='city' headerText='City' textAlign='Left' format='C2' width="90"></e-column>
-      <e-column field='contact' headerText='Contract Person' textAlign='Left' format='yMd' width="120"></e-column>
-      <e-column field='phone' headerText='Phone' textAlign='Left' format='P2' width="90"></e-column>
-      <e-column field='' headerText='' textAlign='Right' width="90">
+      <e-column field="generalInformation.city" headerText="City" textAlign="Left" width="90"></e-column>
+      <e-column field="contactDetails.0.contactPerson" headerText="Contract Person" textAlign="Left" width="120"></e-column>
+      <e-column field="contactDetails.0.phoneNumberExt" headerText="Phone" textAlign="Left" width="90"></e-column>
+      <e-column field="" headerText="" textAlign="Right" width="90">
         <ng-template #headerTemplate let-data>
           <div class="controls-header"></div>
         </ng-template>
@@ -35,5 +43,44 @@
         </ng-template>
       </e-column>
     </e-columns>
+    <ng-template #pagerTemplate let-data>
+      <!--TODO: move to shared component-->
+      <div class="e-pagertemplate">
+        <div class="control-section">
+          <div class="content-wrapper">
+            <section class="left-side-pager-controls">
+              <ejs-dropdownlist
+                id="rowsPerPage"
+                class="dropdown-no-border"
+                [dataSource]="rowsPerPageDropDown"
+                [(value)]="activeRowsPerPageDropDown"
+              >
+              </ejs-dropdownlist>
+              <ejs-numerictextbox
+                id="goToPage"
+                class="numeric-input-no-border"
+                format="#"
+                placeholder="Go to:"
+                min="1"
+                [max]="10"
+                [showSpinButton]="false"
+              >
+              </ejs-numerictextbox>
+            </section>
+            <section class="right-side-pager-controls">
+              <ejs-pager
+                id="gridPager"
+                #gridPager
+                [pageSize]="30"
+                [totalRecordsCount]="30"
+                [enablePagerMessage]="false"
+                [currentPage]="1"
+              >
+              </ejs-pager>
+            </section>
+          </div>
+        </div>
+      </div>
+    </ng-template>
   </ejs-grid>
 </section>

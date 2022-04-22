@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { GridModule, ResizeService } from '@syncfusion/ej2-angular-grids';
+import { GridModule, ResizeService, PagerModule, PageService } from '@syncfusion/ej2-angular-grids';
 import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule  } from '@syncfusion/ej2-angular-buttons';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
-import { UploaderModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
+import { UploaderModule, TextBoxModule, NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 
 import { ClientManagementContentComponent } from './client-management/client-management-content/client-management-content.component';
 import { AdminRoutingModule } from './admin-routing.module';
@@ -64,6 +64,8 @@ const sidebarIcons = {
     UploaderModule,
     RadioButtonModule,
     TextBoxModule,
+    NumericTextBoxModule,
+    PagerModule,
 
     FeatherModule.pick(sidebarIcons),
 
@@ -73,7 +75,8 @@ const sidebarIcons = {
     ]),
   ],
   providers: [
-    ResizeService
+    ResizeService,
+    PageService
   ]
 })
 export class AdminModule { }
