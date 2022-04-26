@@ -1,0 +1,68 @@
+@import '../variables/colors';
+body.light, body.dark {
+  .error-toast {
+    .e-toast {
+      background-color: $error !important;
+      border-left: 6px solid $supportive-red;
+
+      .e-toast-message {
+
+        .e-toast-title {
+          color: $supportive-red !important;
+        }
+      }
+    }
+  }
+
+  .success-toast {
+    .e-toast {
+      background-color: $green !important;
+      border-left: 6px solid $supportive-green-10;
+
+      .e-toast-message {
+        .e-toast-title {
+          color: $supportive-green-10 !important;
+        }
+      }
+    }
+  }
+
+  .e-toast {
+    height: 86px !important;
+    width: 305px !important;
+
+    .e-toast-message {
+      justify-content: center;
+      height: 86px !important;
+
+      .e-toast-title {
+        font-style: normal;
+        font-weight: 700;
+        font-size: 16px;
+        line-height: 28px;
+
+        & > div {
+          display: flex;
+          align-items: center;
+
+          .icon {
+            padding-right: 9px;
+            width: 13.33px;
+          }
+        }
+      }
+
+      .e-toast-content {
+        padding: 0 !important;
+        & > div {
+          color: $pure-black !important;
+        }
+      }
+    }
+
+    .e-toast-close-icon::before {
+      content: "\e7e7";
+      color: $secondary-dark-blue-20;
+    }
+  }
+}

@@ -1,4 +1,6 @@
 import { Organization } from "src/app/shared/models/organization.model";
+import { Department } from '../../shared/models/department.model';
+import { SuccessErrorToast } from '../../shared/models/success-error-toast.model';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[admin] Set General States By Country';
@@ -13,6 +15,41 @@ export class SetBillingStatesByCountry {
 export class CreateOrganization {
   static readonly type = '[admin] Create Organization';
   constructor(public payload: Organization) { }
+}
+
+export class SaveDepartment {
+  static readonly type = '[admin] Create Department';
+  constructor(public payload: Department) { }
+}
+
+export class GetDepartmentsByLocationId {
+  static readonly type = '[admin] Get The List Of Departments by locationId';
+  constructor(public locationId: number) { }
+}
+
+export class UpdateDepartment {
+  static readonly type = '[admin] Update Department';
+  constructor(public department: Department) { }
+}
+
+export class DeleteDepartmentById {
+  static readonly type = '[admin] Delete Department by id';
+  constructor(public departmentId: number) { }
+}
+
+export class GetRegions {
+  static readonly type = '[admin] Get The List Of Regions';
+  constructor(public organizationId: number) { }
+}
+
+export class GetLocations {
+  static readonly type = '[admin] Get The List Of Locations';
+  constructor() { }
+}
+
+export class SetSuccessErrorToastState {
+  static readonly type = '[admin] Set Success Error Toast Shown state';
+  constructor(public payload: SuccessErrorToast | null) { }
 }
 
 export class GetOrganizationsByPage {

@@ -1,10 +1,24 @@
+import { GRID_CONFIG } from '../shared/constants/grid-config';
+
 export const ADMIN_SIDEBAR_MENU = [
   {
     title: 'Dashboard',
     icon: 'home',
     route: '/admin/dashboard',
-    children: [],
-    isActive: true
+    children: []
+  },
+  {
+    title: 'Org Management',
+    icon: 'file-text',
+    route: '/admin/organization-management',
+    isActive: true,
+    children: [
+      {
+        title: 'Config and Settings',
+        icon: '',
+        route: '/admin/organization-management'
+      }
+    ],
   },
   {
     title: 'Client Management',
@@ -13,3 +27,7 @@ export const ADMIN_SIDEBAR_MENU = [
     children: [],
   }
 ];
+
+export const DEPARTMENT_GRID_CONFIG = {
+  ...GRID_CONFIG
+}

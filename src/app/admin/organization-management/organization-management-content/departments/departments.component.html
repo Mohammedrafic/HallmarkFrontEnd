@@ -1,0 +1,259 @@
+<section>
+  <section class="toolbar">
+    <section class="department-details bootstrap">
+      <ejs-dropdownlist
+        id="regions"
+        class="region-dropdown" placeholder="Region"
+        [dataSource]="regions$ | async"
+        [fields]="regionFields"
+        (change)="onRegionDropDownChanged($event)"
+        ></ejs-dropdownlist>
+      <ejs-dropdownlist
+        id="locations"
+        class="location-dropdown"
+        placeholder="Location"
+        [dataSource]="locations$ | async"
+        [fields]="locationFields"
+        (change)="onLocationDropDownChanged($event)"
+      ></ejs-dropdownlist>
+    </section>
+    <section>
+      <button ejs-button cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+      <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+      <button ejs-button [isPrimary]="true" (click)='onAddDepartmentClick()'>Add Department</button>
+    </section>
+  </section>
+
+  <section class="grid">
+    <ejs-grid
+      #grid
+      [dataSource]="gridDataSource"
+      [allowPaging]="allowPaging"
+      [pageSettings]="pageSettings"
+      [height]="gridHeight"
+      [rowHeight]="rowHeight"
+      [resizeSettings]="resizeSettings"
+      [allowSorting]="allowSorting"
+      [allowResizing]="allowResizing"
+    >
+      <e-columns>
+        <e-column field="extDepartmentId" headerText="EXT DEPARTMENT ID" width=200></e-column>
+        <e-column field="invoiceDepartmentId" headerText="INVOICE DEPARTMENT ID" width=200></e-column>
+        <e-column field="departmentName" headerText="DEPARTMENT NAME" width=200></e-column>
+        <e-column field="facilityContact" headerText="FACILITY CONTACT" width=200></e-column>
+        <e-column field="facilityEmail" headerText="FACILITY EMAIL" width=200></e-column>
+        <e-column field="facilityPhoneNo" headerText="FACILITY PHONE NO" [valueAccessor]="formatPhoneNumber" width=200></e-column>
+        <e-column field="inactiveDate" headerText="INACTIVE DATE" format="MM/dd/yyyy" width=200></e-column>
+        <e-column textAlign="Right" width=120>
+          <ng-template #template let-data>
+            <div class="row-tool-buttons">
+              <span class="edit-button" (click)="editDepartment(data)"><i-feather name="edit" class="icon"></i-feather></span>
+              <span class="remove-button" (click)="removeDepartment(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
+            </div>
+          </ng-template>
+        </e-column>
+      </e-columns>
+      <ng-template #pagerTemplate let-data>
+        <div class="e-pagertemplate">
+          <div class="control-section">
+            <div class="content-wrapper">
+              <section class="left-side-pager-controls">
+                <ejs-dropdownlist
+                  id="rowsPerPage"
+                  class="dropdown-no-border"
+                  [dataSource]="rowsPerPageDropDown"
+                  [(value)]="activeRowsPerPageDropDown"
+                  (change)="onRowsDropDownChanged()"
+                >
+                </ejs-dropdownlist>
+                <ejs-numerictextbox
+                  id="goToPage"
+                  class="numeric-input-no-border"
+                  format="#"
+                  [validateDecimalOnType]="validateDecimalOnType"
+                  [decimals]="decimals"
+                  placeholder="Go to:"
+                  min="1" [max]="lastAvailablePage"
+                  [showSpinButton]="false"
+                  (change)="onGoToClick($event)"
+                >
+                </ejs-numerictextbox>
+              </section>
+              <section class="right-side-pager-controls">
+                <ejs-pager
+                  id="gridPager"
+                  #gridPager
+                  [pageSize]="pageSizePager"
+                  [totalRecordsCount]="totalDataRecords"
+                  [enablePagerMessage]="false"
+                  [currentPage]="currentPagerPage"
+                  (click)="onGoToClick($event)"
+                >
+                </ejs-pager>
+              </section>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ejs-grid>
+  </section>
+
+  <ejs-dialog
+    id="dialog"
+    #departmentDialog
+    cssClass="dialog"
+    [target]="targetElement"
+    [visible]="false"
+    [animationSettings]="animationSettings"
+  >
+    <ng-template #content>
+      <!--TODO: move to shared component-->
+      <form
+        class="container"
+        #departmentsForm
+        [formGroup]="departmentsDetailsFormGroup"
+        (ngSubmit)="onDepartmentFormSaveClick()">
+        <section class="header-container">
+          <div class="e-card-header">
+            <div class="e-card-header-caption">
+              <h3 class="e-card-title">Add Department</h3>
+            </div>
+            <div  class="e-card-content">
+              <button ejs-button cssClass="e-outline button-cancel" (click)="onDepartmentFormCancelClick()">Cancel</button>
+              <button ejs-button type="submit" [isPrimary]="true">Save</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-container bootstrap">
+          <div>
+            <div class="input-container">
+              <label for="ext-department-id">Ext Department ID <span class="field-required">*</span></label>
+              <div class="input-group">
+                <input id="ext-department-id"
+                       class="e-input"
+                       type="text"
+                       required
+                       appValidateWithMessage
+                       maxlength="50"
+                       placeholder="Ext Department ID"
+                       formControlName="extDepartmentId"/>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="input-container">
+              <label for="invoice-department-id">Invoice Department ID <span class="field-required">*</span></label>
+              <div class="input-group">
+                <input id="invoice-department-id"
+                       class="e-input"
+                       type="text"
+                       required
+                       appValidateWithMessage
+                       maxlength="50"
+                       placeholder="Invoice Department ID"
+                       formControlName="invoiceDepartmentId"/>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="input-container">
+              <label for="department-name">Department Name <span class="field-required">*</span></label>
+              <div class="input-group">
+                <input id="department-name"
+                       class="e-input"
+                       type="text"
+                       required
+                       appValidateWithMessage
+                       maxlength="50"
+                       placeholder="Department Name"
+                       formControlName="departmentName"/>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="input-container">
+              <label for="facility-contact">Facility Contact <span class="field-required">*</span></label>
+              <div class="input-group">
+                <input
+                  id="facility-contact"
+                  class="e-input"
+                  type="text"
+                  required
+                  appValidateWithMessage
+                  maxlength="50"
+                  placeholder="Facility Contact"
+                  formControlName="facilityContact"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="input-container">
+              <label for="facility-email">Facility Email <span class="field-required">*</span></label>
+              <div class="input-group">
+                <input
+                  id="facility-email"
+                  class="e-input"
+                  type="email"
+                  required
+                  maxlength="50"
+                  appValidateWithMessage
+                  placeholder="Facility Email"
+                  formControlName="facilityEmail"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="input-container facility-phone">
+              <label for="facility-phone-no">Facility Phone No <span class="field-required">*</span></label>
+              <div class="input-group">
+                <input
+                  id="facility-phone-no"
+                  class="e-input facility-phone"
+                  type="tel"
+                  required
+                  appValidateWithMessage
+                  pattern="^[0-9]+$"
+                  maxlength="10"
+                  placeholder="Facility Phone No"
+                  formControlName="facilityPhoneNo"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="input-container calendar">
+              <label for="inactive-date">Inactive Date <span class="field-required">*</span></label>
+              <div class="input-group datepicker">
+                <ejs-datepicker
+                  id="inactive-date"
+                  class="datepicker"
+                  format="MM/dd/yyyy"
+                  required
+                  appValidateWithMessage
+                  placeholder="MM/DD/YYYY"
+                  [enableMask]="true"
+                  [maskPlaceholder]="{ day: 'dd', month: 'MM', year: 'yyyy' }"
+                  [value]="dateValue"
+                  formControlName="inactiveDate"
+                  (renderDayCell)="onRenderCalendarCell($event)"
+                >
+                </ejs-datepicker>
+              </div>
+            </div>
+          </div>
+        </section>
+      </form>
+    </ng-template>
+  </ejs-dialog>`
+</section>
+
+<app-success-error-toast></app-success-error-toast>

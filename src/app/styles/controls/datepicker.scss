@@ -1,0 +1,67 @@
+@import '../../styles/variables/colors';
+
+ejs-datepicker.datepicker {
+  .e-input-group.e-control-wrapper.e-date-wrapper {
+    //width: 198px !important;
+    border-radius: 8px !important;
+    border: 1px solid $secondary-dark-blue-40 !important;
+    height: 35px !important;
+
+    .e-input {
+      color: $secondary-dark-blue-30 !important; // TODO: does not work
+      padding-left: 16px !important;
+    }
+
+    .e-input-group-icon:last-child {
+      border: none;
+
+      &:hover {
+        background-color: transparent;
+        color: $primary-active-blue-10;
+      }
+    }
+
+    &:hover {
+      border: 1px solid $primary-active-blue-10 !important;
+
+      .e-input-group-icon.e-date-icon.e-icons::before,
+      .e-input-group-icon.e-date-icon.e-icons::after{
+        background-color: transparent;
+        color: $primary-active-blue-10;
+      }
+    }
+
+    &.e-input-focus {
+      border: 2px solid $primary-active-blue-10 !important;
+      box-shadow: none !important;
+
+      .e-input-group-icon.e-date-icon.e-icons::before,
+      .e-input-group-icon.e-date-icon.e-icons::after{
+        background-color: transparent;
+        color: $primary-active-blue-10;
+      }
+    }
+  }
+
+  .e-input-group:not(.e-float-icon-left):not(.e-float-input)::after,
+  .e-input-group.e-control-wrapper:not(.e-float-icon-left):not(.e-float-input)::after,
+  .e-input-group:not(.e-float-icon-left):not(.e-float-input)::before,
+  .e-input-group.e-control-wrapper:not(.e-float-icon-left):not(.e-float-input)::before {
+    background: transparent !important;
+  }
+
+  .e-input-group.e-control-wrapper.e-float-input .e-float-text::after{
+    content: "*";
+    color: $supportive-red;
+  }
+
+  &.ng-touched.ng-invalid.e-control.e-textbox {
+    span.e-input-group {
+      border-color: $supportive-red;
+    }
+
+    &+i-feather {
+      display: block;
+    }
+  }
+}

@@ -8,10 +8,16 @@
   src: url('../../assets/fonts/SF-Pro.ttf') format('truetype');
 }
 
+html {
+  height: 100%;
+}
+
 body {
   transition: background-color 0.5s ease;
   margin: 0;
   font-family: 'SF Pro';
+  height: 100%;
+  overflow: hidden;
 
   .input-group {
     position: relative;
@@ -32,7 +38,8 @@ body {
       color: $supportive-red;
     }
 
-    &.dropdown {
+    &.dropdown,
+    &.datepicker {
       i-feather {
         right: 30px;
       }
@@ -58,7 +65,7 @@ body {
   }
 
   // Default icon size
-  #main i-feather.icon {
+  i-feather.icon {
     width: 16px;
     height: 16px;
   }
@@ -144,7 +151,8 @@ body {
 @import './controls/tab';
 @import './controls/unsaved-changes-dialog';
 @import './controls/accordion';
-
+@import './controls/datepicker';
+@import './controls/toast';
 a, a:hover, a:focus, a:active {
   text-decoration: none;
   color: inherit;

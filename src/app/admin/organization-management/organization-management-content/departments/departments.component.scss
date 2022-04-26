@@ -1,0 +1,117 @@
+@import '../../../../styles/variables/colors';
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+
+  .department-details {
+    display: flex;
+
+    .region-dropdown {
+      padding-right: 12px;
+    }
+
+    .e-input-group.e-control-wrapper input {
+      padding-left: 16px;
+    }
+  }
+
+  .button-filter {
+    margin-left: 12px;
+    margin-right: 6px;
+  }
+
+  .button-export {
+    margin-left: 6px;
+    margin-right: 12px;
+  }
+}
+
+.e-grid {
+  border-radius: 12px;
+
+  .row-tool-buttons {
+    .edit-button {
+      margin-right: 20px
+    }
+  }
+
+  .e-pager {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+
+  .e-pagertemplate {
+    .content-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 51px;
+
+      .left-side-pager-controls {
+        display: flex;
+        margin-left: 16px;
+
+        #goToPage {
+          margin-left: 35px
+        }
+      }
+    }
+  }
+}
+
+.dialog {
+  right: 0;
+  top: 60px !important;
+  left: auto !important;
+  height: calc(100% - 60px) !important;
+  width: 434px !important;
+
+  .e-dlg-content {
+    padding: 0;
+  }
+
+  .container {
+    padding: 24px;
+
+    .header-container {
+      .e-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .e-card-title {
+          color: $black;
+          font-size: 24px;
+        }
+
+        .e-card-content {
+          .button-cancel {
+            margin-right: 8px;
+          }
+        }
+      }
+    }
+
+    .form-container {
+      .input-container {
+        padding-top: 12px;
+        width: 400px;
+
+        .field-required {
+          color: $supportive-red;
+        }
+
+        &.facility-phone {
+          width: 207px;
+        }
+
+        &.calendar {
+          width: 198px;
+        }
+      }
+    }
+  }
+}

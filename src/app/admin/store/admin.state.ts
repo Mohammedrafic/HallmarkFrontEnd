@@ -9,7 +9,23 @@ import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '../services/organization.service';
 
-import { CreateOrganization, GetBusinessUnitList, GetOrganizationsByPage, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry } from './admin.actions';
+import {
+  SaveDepartment,
+  CreateOrganization,
+  GetBusinessUnitList,
+  GetDepartmentsByLocationId,
+  GetLocations,
+  GetRegions,
+  SetBillingStatesByCountry,
+  GetOrganizationsByPage,
+  SetDirtyState,
+  SetGeneralStatesByCountry, SetSuccessErrorToastState, UpdateDepartment, DeleteDepartmentById
+} from './admin.actions';
+import { DepartmentsService } from '../services/departments.service';
+import { Department } from '../../shared/models/department.model';
+import { Region } from '../../shared/models/region.model';
+import { Location } from '../../shared/models/location.model';
+import { SuccessErrorToast } from '../../shared/models/success-error-toast.model';
 
 interface DropdownOption {
   id: number;
@@ -28,6 +44,11 @@ export interface AdminStateModel {
   titles: string[];
   isOrganizationLoading: boolean;
   organizations: OrganizationPage | null;
+  isDepartmentLoading: boolean;
+  departments: Department[];
+  regions: Region[];
+  locations: Location[];
+  successErrorToastState: SuccessErrorToast | null;
   isDirty: boolean;
 }
 
@@ -43,6 +64,11 @@ export interface AdminStateModel {
     titles: Titles,
     isOrganizationLoading: false,
     organizations: null,
+    isDepartmentLoading: false,
+    departments: [],
+    regions: [],
+    locations: [],
+    successErrorToastState: null,
     isDirty: false
   },
 })
@@ -73,10 +99,23 @@ export class AdminState {
   static isDirty(state: AdminStateModel): boolean { return state.isDirty; }
 
   @Selector()
+  static departments(state: AdminStateModel): Department[] { return state.departments; }
+
+  @Selector()
+  static regions(state: AdminStateModel): Region[] { return state.regions; }
+
+  @Selector()
+  static locations(state: AdminStateModel): Location[] { return state.locations; }
+
+  @Selector()
+  static successErrorToastState(state: AdminStateModel): SuccessErrorToast | null { return state.successErrorToastState; }
+
+  @Selector()
   static organizations(state: AdminStateModel): OrganizationPage | null { return state.organizations; }
 
   constructor(
     private organizationService: OrganizationService,
+    private departmentService: DepartmentsService,
   ) { }
 
   @Action(SetGeneralStatesByCountry)
@@ -118,5 +157,57 @@ export class AdminState {
   @Action(SetDirtyState)
   SetDirtyState({ patchState }: StateContext<AdminStateModel>, { payload }: SetDirtyState): void {
     patchState({ isDirty: payload });
+  }
+
+  @Action(SaveDepartment)
+  SaveDepartment({ patchState }: StateContext<AdminStateModel>, { payload }: SaveDepartment): Observable<Department> {
+    patchState({ isDepartmentLoading: true });
+    return this.departmentService.saveDepartment(payload).pipe(tap((payload) => {
+      patchState({ isDepartmentLoading: false});
+      return payload;
+    }));
+  }
+
+  @Action(GetDepartmentsByLocationId)
+  GetDepartmentsByLocationId({ patchState }: StateContext<AdminStateModel>, { locationId }: GetDepartmentsByLocationId): Observable<Department[]> {
+    return this.departmentService.getDepartmentsByLocationId(locationId).pipe(tap((payload) => {
+      patchState({ departments: payload});
+      return payload;
+    }));
+  }
+
+  @Action(UpdateDepartment)
+  UpdateDepartments({ patchState }: StateContext<AdminStateModel>, { department }: UpdateDepartment): void {
+    this.departmentService.updateDepartment(department).pipe(tap(() => {
+      patchState({ isDepartmentLoading: false });
+    }));
+  }
+
+  @Action(DeleteDepartmentById)
+  DeleteDepartmentById({ patchState }: StateContext<AdminStateModel>, { departmentId }: DeleteDepartmentById): void {
+    this.departmentService.deleteDepartmentById(departmentId).pipe(tap(() => {
+      patchState({ isDepartmentLoading: false });
+    }));
+  }
+
+  @Action(GetRegions)
+  GetRegions({ patchState }: StateContext<AdminStateModel>, { organizationId }: GetRegions): Observable<Region[]> {
+    return this.departmentService.getRegions(organizationId).pipe(tap((payload) => {
+      patchState({ regions: payload});
+      return payload;
+    }));
+  }
+
+  @Action(GetLocations)
+  GetLocations({ patchState }: StateContext<AdminStateModel>, { }: GetRegions): Observable<Location[]> {
+    return this.departmentService.getLocations().pipe(tap((payload) => {
+      patchState({ locations: payload});
+      return payload;
+    }));
+  }
+
+  @Action(SetSuccessErrorToastState)
+  SetSuccessErrorToastState({ patchState }: StateContext<AdminStateModel>, { payload }: SetSuccessErrorToastState): void {
+    patchState({ successErrorToastState: payload });
   }
 }

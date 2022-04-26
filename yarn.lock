@@ -1620,6 +1620,15 @@
     "@syncfusion/ej2-base" "~20.1.47"
     "@syncfusion/ej2-buttons" "20.1.47"
 
+"@syncfusion/ej2-angular-calendars@^20.1.47":
+  version "20.1.47"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-angular-calendars/-/ej2-angular-calendars-20.1.47.tgz#be48053a7b9526e605d4cfe86cba1cc51fc1670f"
+  integrity sha512-3bbwkDRa1Je1kS+QOoptHajZ5y2V0ug0m/fh8XOdPhPPmVzDGKkc+aM2U8diIEjMfuevLRo65uiNJI6dNUg+VA==
+  dependencies:
+    "@syncfusion/ej2-angular-base" "~20.1.47"
+    "@syncfusion/ej2-base" "~20.1.47"
+    "@syncfusion/ej2-calendars" "20.1.47"
+
 "@syncfusion/ej2-angular-dropdowns@^20.1.47":
   version "20.1.47"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-angular-dropdowns/-/ej2-angular-dropdowns-20.1.47.tgz#b8a96abd96d904bd4d1eb84fac62831b85625394"
@@ -1656,6 +1665,15 @@
     "@syncfusion/ej2-base" "~20.1.47"
     "@syncfusion/ej2-navigations" "20.1.47"
 
+"@syncfusion/ej2-angular-notifications@^20.1.47":
+  version "20.1.47"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-angular-notifications/-/ej2-angular-notifications-20.1.47.tgz#0597b75585344368db52e83bbd07547a071d6929"
+  integrity sha512-WoPGm/IW1en0ITBn2+mv03VWuxuZAi2+bgXD3wH5AmZcTJN5oemDtAsdmG7Hafy+xOTHvKHYP5Y4wtGExMzPCw==
+  dependencies:
+    "@syncfusion/ej2-angular-base" "~20.1.47"
+    "@syncfusion/ej2-base" "~20.1.47"
+    "@syncfusion/ej2-notifications" "20.1.47"
+
 "@syncfusion/ej2-angular-popups@^20.1.47":
   version "20.1.47"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-angular-popups/-/ej2-angular-popups-20.1.47.tgz#0d9584d7b5e4cb46df776c091f59293d9953bf86"
@@ -1679,7 +1697,7 @@
   dependencies:
     "@syncfusion/ej2-base" "~20.1.47"
 
-"@syncfusion/ej2-calendars@~20.1.47":
+"@syncfusion/ej2-calendars@20.1.47", "@syncfusion/ej2-calendars@~20.1.47":
   version "20.1.47"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-calendars/-/ej2-calendars-20.1.47.tgz#882788a25dca6806bc9c42ee0a5c4c7c05dcd7b1"
   integrity sha512-MWACuzHGYdGUSvEnpD6pCDh94E/8XTMCQPYH6vZW23t/zCW8xuFEzjEdWg4YBEXVd+248dqvp3h8eKtPxNU0Cw==
@@ -1792,7 +1810,7 @@
     "@syncfusion/ej2-lists" "~20.1.47"
     "@syncfusion/ej2-popups" "~20.1.47"
 
-"@syncfusion/ej2-notifications@^20.1.47":
+"@syncfusion/ej2-notifications@20.1.47", "@syncfusion/ej2-notifications@^20.1.47":
   version "20.1.47"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-notifications/-/ej2-notifications-20.1.47.tgz#d72b6033e62e54c981d16874658559ba6b30ff2b"
   integrity sha512-kGjX5+cJYEEVFZiucpsU2f6xfiIsMRfXdppkrI1BOkkpaGwU00aQqBTpXFA9jdJhqu+FYqjcUqKSNOSomZFv0g==

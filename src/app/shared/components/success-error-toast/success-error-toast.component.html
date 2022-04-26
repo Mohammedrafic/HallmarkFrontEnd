@@ -1,0 +1,23 @@
+<section class="bootstrap">
+  <ejs-toast
+    [ngClass]="{ 'success-toast': isSuccess, 'error-toast': !isSuccess }"
+    #toast
+    showCloseButton="true"
+    [position]="{ X: 'Right', Y: 'Bottom' }"
+    (close)="onToastClose()"
+  >
+    <ng-template #title>
+      <div *ngIf="!isSuccess">
+        <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+        <div>Error</div>
+      </div>
+      <div *ngIf="isSuccess">
+        <i-feather name="check-circle" class="icon validation-icon"></i-feather>
+        <div>Success</div>
+      </div>
+    </ng-template>
+    <ng-template #content>
+      <div>{{messageContent}}</div>
+    </ng-template>
+  </ejs-toast>
+</section>
