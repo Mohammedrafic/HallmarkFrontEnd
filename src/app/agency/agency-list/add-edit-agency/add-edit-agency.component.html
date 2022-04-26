@@ -1,1 +1,44 @@
-<p>add-edit-agency works!</p>
+<app-page-toolbar>
+  <ng-container left>
+    <!-- <button ejs-button cssClass="e-outline">Back</button> -->
+
+    <h3>Add Agency</h3>
+  </ng-container>
+  <ng-container right>
+    <button ejs-button cssClass="e-outline">Clear</button>
+    <button ejs-button [isPrimary]="true" (click)="{}">Save</button>
+  </ng-container>
+</app-page-toolbar>
+
+<ejs-accordion #accordion expandMode='Single' (created)='acrdnCreated()'>
+  <e-accordionitems>
+    <e-accordionitem expanded="true">
+      <ng-template #header>
+        <span class="e-badge e-badge-success e-badge-circle">1</span> General Info
+      </ng-template>
+      <ng-template #content>
+        <div tabindex="0" class="e-card">
+            <div class="e-card-header">
+              <div class="e-card-header-caption">
+                <div class="e-card-title">Agency Details</div>
+              </div>
+            </div>
+        </div>
+      </ng-template>
+    </e-accordionitem>
+    <e-accordionitem>
+      <ng-template #header>
+        <span class="e-badge e-badge-success e-badge-circle">2</span> Associated Organizations
+      </ng-template>
+      <ng-template #content>
+        <div tabindex="0" class="e-card">
+            <div class="e-card-header">
+              <div class="e-card-header-caption">
+                <div class="e-card-title">Agency Details</div>
+              </div>
+            </div>
+        </div>
+      </ng-template>
+    </e-accordionitem>
+  </e-accordionitems>
+</ejs-accordion>

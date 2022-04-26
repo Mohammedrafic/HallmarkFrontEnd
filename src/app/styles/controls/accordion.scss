@@ -1,0 +1,54 @@
+@import "../variables/colors.scss";
+
+body.light,
+body.dark {
+  .e-accordion {
+    border: none;
+    background-color: unset;
+
+    .e-active {
+      background-color: unset;
+    }
+
+    .e-tgl-collapse-icon {
+      transform: none !important;
+      font-size: 1.5em;
+
+      &::before {
+        content: "+";
+      }
+      &.e-expand-icon {
+        &::before {
+          content: "-";
+        }
+      }
+    }
+
+    .e-acrdn-item {
+      margin-bottom: 12px;
+
+      &.e-select > .e-acrdn-header {
+        background: $primary-active-blue-10;
+        border-radius: 4px;
+      }
+
+      &.e-expand-state.e-select {
+          border: none;
+      }
+
+      .e-acrdn-header {
+        .e-acrdn-header-content {
+          display: flex;
+          align-items: center;
+        }
+      }
+      .e-acrdn-panel {
+          .e-acrdn-content {
+            padding: 0 0 12px;
+            margin-top: 12px;
+          }
+      }
+    }
+ 
+  }
+}

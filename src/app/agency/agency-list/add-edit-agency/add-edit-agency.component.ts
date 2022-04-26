@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Store } from '@ngxs/store';
+
+import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
 
@@ -9,7 +11,13 @@ import { SetHeaderState } from 'src/app/store/app.actions';
   styleUrls: ['./add-edit-agency.component.scss'],
 })
 export class AddEditAgencyComponent {
+  @ViewChild('accordion') accordion: AccordionComponent;
+
   constructor(private store: Store) {
     store.dispatch(new SetHeaderState({ title: 'Agency' }));
   }
+
+  public acrdnCreated(): void {
+    // this.accordion.enableItem(1, false);
+   }
 }

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-
+import { AccordionModule } from '@syncfusion/ej2-angular-navigations';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 import {
@@ -30,6 +30,7 @@ const sidebarIcons = {
     SharedModule,
 
     ButtonModule,
+    AccordionModule,
     FeatherModule.pick(sidebarIcons)
   ]
 })
