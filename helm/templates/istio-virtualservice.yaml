@@ -12,11 +12,7 @@ spec:
     - uri:
         exact: /
     - uri:
-        regex: "(?=einsteinapi)"
-    - uri:
-        regex: "(?=/einsteinapi)"
-    - uri:
-        regex: "(?=/einsteinapi/)"
+        regex: "^(?!\\einsteinapi).*"
     rewrite:
       uri: /
     route:
