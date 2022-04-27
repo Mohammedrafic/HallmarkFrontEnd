@@ -1,9 +1,23 @@
-body.light, body.dark {
+@import "../variables/colors.scss";
+
+body.light,
+body.dark {
   .e-card {
     border-radius: 10px;
 
     .e-card-title {
       font-weight: 700;
+      color: $title-black;
+    }
+
+    .e-card-content {
+      .e-card-title-wrapper {
+        box-sizing: border-box;
+        line-height: normal;
+        min-height: 22.5px;
+        padding: 12px 0;
+        width: inherit;
+      }
     }
   }
 }

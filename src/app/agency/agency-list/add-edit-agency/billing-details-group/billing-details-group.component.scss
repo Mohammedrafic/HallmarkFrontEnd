@@ -1,0 +1,36 @@
+.billing-details {
+  .billing-details-section,
+  .billing-address-section,
+  .billing-country-section,
+  .billing-phone-section {
+    display: flex;
+
+    .left-column {
+      flex: 1 0 80%;
+    }
+
+    .website {
+      flex: 1 0 74%;
+    }
+
+    .right-column {
+      flex: 1 0 20%;
+    }
+
+    .ext {
+      flex: 1 0 24%;
+    }
+  }
+
+  .input-container, .dropdown-container {
+    margin-bottom: 15px;
+    margin-right: 10px;
+    flex: 1 1 0px
+  }
+
+  .input-container label,
+  .dropdown-container label {
+    margin-bottom: 5px !important;
+    display: block;
+  }
+}

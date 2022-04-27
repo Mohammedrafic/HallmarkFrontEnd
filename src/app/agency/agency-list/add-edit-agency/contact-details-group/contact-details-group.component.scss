@@ -1,0 +1,25 @@
+.contact-item {
+  display: flex;
+  align-items: center;
+  padding-top: 12px;
+
+  .remove-button-container {
+    margin-top: 5px px;
+    
+    button {
+      width: 40px;
+      height: 35px;
+    }
+  }
+
+  .input-container {
+    margin-bottom: 15px;
+    margin-right: 10px;
+    flex: 1 1 0px;
+  }
+
+  .input-container label {
+    margin-bottom: 5px !important;
+    display: block;
+  }
+}

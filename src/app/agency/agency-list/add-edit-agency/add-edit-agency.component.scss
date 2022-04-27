@@ -1,0 +1,34 @@
+@import "../../../styles/variables/colors.scss";
+
+.general-info-container {
+  display: flex;
+  padding-bottom: 12px;
+
+  .left {
+    width: 70%;
+    padding-right: 20px;
+  }
+
+  .right {
+    width: 30%;
+  }
+
+  .billing-checkbox {
+    margin-bottom: 12px;
+  }
+
+  .contact-header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .add-contact-link {
+    cursor: pointer;
+    color: $primary-active-blue-10;
+    display: flex;
+
+    .icon {
+      margin-right: 5px;
+    }
+  }
+}

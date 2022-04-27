@@ -1,0 +1,112 @@
+<div class="billing-details bootstrap">
+    <div class="billing-details-section">
+      <div class="left-column">
+        <form [formGroup]="formGroup">
+          <div class="billing-address-section">
+            <div class="input-container">
+              <label>Name<span class="required">*</span></label>
+              <div class="input-group">
+                <input appValidateWithMessage formControlName="name" class="e-input" type="text" placeholder="Name" />
+              </div>
+            </div>
+            <div class="input-container">
+              <label>Address</label>
+              <input formControlName="address" class="e-input" type="text" placeholder="Address" />
+            </div>
+          </div>
+          <div class="billing-country-section">
+            <div class="dropdown-container">
+              <label>Country<span class="required">*</span></label>
+              <div class="input-group dropdown">
+                <ejs-dropdownlist
+                  appValidateWithMessage
+                  [fields]="optionFields"
+                  formControlName="country"
+                  [dataSource]="countries"
+                  placeholder="Country"
+               
+                ></ejs-dropdownlist>
+              </div>
+            </div>
+            <div class="dropdown-container">
+              <label>State<span class="required">*</span></label>
+              <div class="input-group dropdown">
+                <ejs-dropdownlist
+                  appValidateWithMessage
+                  formControlName="state"
+                  [dataSource]="states$| async"
+                  placeholder="State"
+                ></ejs-dropdownlist>
+              </div>
+            </div>
+            <div class="input-container">
+              <label>City<span class="required">*</span></label>
+              <div class="input-group">
+                <input appValidateWithMessage formControlName="city" class="e-input" type="text" placeholder="City" />
+              </div>
+            </div>
+            <div class="input-container">
+              <label>Zipcode</label>
+              <div class="input-group">
+                <input
+                  appValidateWithMessage
+                  formControlName="zipCode"
+                  class="e-input"
+                  type="text"
+                  placeholder="Zipcode"
+                  maxlength="6"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="billing-phone-section">
+            <div class="input-container">
+              <label>Phone 1</label>
+              <div class="input-group">
+                <input
+                  appValidateWithMessage
+                  formControlName="phone1"
+                  class="e-input"
+                  type="text"
+                  placeholder="Phone 1"
+                  maxlength="10"
+                />
+              </div>
+            </div>
+            <div class="input-container">
+              <label>Phone 2</label>
+              <div class="input-group">
+                <input
+                  appValidateWithMessage
+                  formControlName="phone2"
+                  class="e-input"
+                  type="text"
+                  placeholder="Phone 2"
+                  maxlength="10"
+                />
+              </div>
+            </div>
+            <div class="input-container">
+              <label>Fax</label>
+              <div class="input-group">
+                <input
+                  appValidateWithMessage
+                  formControlName="fax"
+                  class="e-input"
+                  type="text"
+                  placeholder="Fax"
+                  maxlength="10"
+                />
+              </div>
+            </div>
+            <div class="input-container">
+              <label>Ext</label>
+              <input formControlName="ext" class="e-input" type="text" placeholder="Ext" />
+            </div>
+   
+          </div>
+        </form>
+      </div>
+      <div class="right-column"></div>
+    </div>
+  </div>

@@ -1,0 +1,33 @@
+<div [formGroup]="formGroup">
+  <div class="contact-item">
+    <div class="input-container bootstrap">
+      <label>Title</label>
+      <div class="input-group">
+        <input formControlName="title" class="e-input" type="text" placeholder="Title" />
+      </div>
+    </div>
+    <div class="input-container bootstrap">
+      <label>Contact Person<span class="required">*</span></label>
+      <div class="input-group">
+        <input appValidateWithMessage formControlName="contactPerson" class="e-input" type="text" placeholder="Contact Person" />
+      </div>
+    </div>
+    <div class="input-container bootstrap">
+      <label>Phone 1</label>
+      <div class="input-group">
+        <input appValidateWithMessage formControlName="phoneNumberExt" class="e-input" type="text" placeholder="Phone 1" maxlength="10" />
+      </div>
+    </div>
+    <div class="input-container bootstrap">
+      <label>Email</label>
+      <div class="input-group">
+        <input appValidateWithMessage formControlName="email" class="e-input" type="text" placeholder="Email" />
+      </div>
+    </div>
+    <div class="remove-button-container" *ngIf="isRemovable">
+      <button *ngIf="true" ejs-button cssClass="e-outline" class="icon-button" (click)="removeContact()">
+        <i-feather name="trash2" class="icon"></i-feather>
+      </button>
+    </div>
+  </div>
+</div>
