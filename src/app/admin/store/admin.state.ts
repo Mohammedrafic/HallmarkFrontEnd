@@ -15,7 +15,7 @@ import {
   GetBusinessUnitList,
   GetDepartmentsByLocationId,
   GetLocations,
-  GetRegions,
+  GetRegionsByOrganizationId,
   SetBillingStatesByCountry,
   GetOrganizationsByPage,
   SetDirtyState,
@@ -160,10 +160,11 @@ export class AdminState {
   }
 
   @Action(SaveDepartment)
-  SaveDepartment({ patchState }: StateContext<AdminStateModel>, { payload }: SaveDepartment): Observable<Department> {
+  SaveDepartment({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveDepartment): Observable<Department> {
     patchState({ isDepartmentLoading: true });
     return this.departmentService.saveDepartment(payload).pipe(tap((payload) => {
       patchState({ isDepartmentLoading: false});
+      dispatch(new GetDepartmentsByLocationId(payload.locationId));
       return payload;
     }));
   }
@@ -190,16 +191,16 @@ export class AdminState {
     }));
   }
 
-  @Action(GetRegions)
-  GetRegions({ patchState }: StateContext<AdminStateModel>, { organizationId }: GetRegions): Observable<Region[]> {
-    return this.departmentService.getRegions(organizationId).pipe(tap((payload) => {
+  @Action(GetRegionsByOrganizationId)
+  GetRegionsByOrganizationId({ patchState }: StateContext<AdminStateModel>, { organizationId }: GetRegionsByOrganizationId): Observable<Region[]> {
+    return this.departmentService.getRegionsByOragnizationId(organizationId).pipe(tap((payload) => {
       patchState({ regions: payload});
       return payload;
     }));
   }
 
   @Action(GetLocations)
-  GetLocations({ patchState }: StateContext<AdminStateModel>, { }: GetRegions): Observable<Location[]> {
+  GetLocations({ patchState }: StateContext<AdminStateModel>, { }: GetRegionsByOrganizationId): Observable<Location[]> {
     return this.departmentService.getLocations().pipe(tap((payload) => {
       patchState({ locations: payload});
       return payload;

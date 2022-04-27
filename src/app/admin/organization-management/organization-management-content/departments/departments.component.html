@@ -47,8 +47,8 @@
         <e-column textAlign="Right" width=120>
           <ng-template #template let-data>
             <div class="row-tool-buttons">
-              <span class="edit-button" (click)="editDepartment(data)"><i-feather name="edit" class="icon"></i-feather></span>
-              <span class="remove-button" (click)="removeDepartment(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
+              <span class="edit-button" (click)="onEditDepartmentClick(data)"><i-feather name="edit" class="icon"></i-feather></span>
+              <span class="remove-button" (click)="onRemoveDepartmentClick(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
             </div>
           </ng-template>
         </e-column>
@@ -100,7 +100,7 @@
 
   <ejs-dialog
     id="dialog"
-    #departmentDialog
+    #addEditDepartmentDialog
     cssClass="dialog"
     [target]="targetElement"
     [visible]="false"
@@ -108,11 +108,7 @@
   >
     <ng-template #content>
       <!--TODO: move to shared component-->
-      <form
-        class="container"
-        #departmentsForm
-        [formGroup]="departmentsDetailsFormGroup"
-        (ngSubmit)="onDepartmentFormSaveClick()">
+      <section class="container">
         <section class="header-container">
           <div class="e-card-header">
             <div class="e-card-header-caption">
@@ -120,12 +116,13 @@
             </div>
             <div  class="e-card-content">
               <button ejs-button cssClass="e-outline button-cancel" (click)="onDepartmentFormCancelClick()">Cancel</button>
-              <button ejs-button type="submit" [isPrimary]="true">Save</button>
+              <button ejs-button type="submit" [isPrimary]="true" (click)="onDepartmentFormSaveClick()">Save</button>
             </div>
           </div>
         </section>
 
-        <section class="form-container bootstrap">
+        <form class="form-container bootstrap"
+              [formGroup]="departmentsDetailsFormGroup">
           <div>
             <div class="input-container">
               <label for="ext-department-id">Ext Department ID <span class="field-required">*</span></label>
@@ -133,9 +130,8 @@
                 <input id="ext-department-id"
                        class="e-input"
                        type="text"
-                       required
-                       appValidateWithMessage
                        maxlength="50"
+                       appValidateWithMessage
                        placeholder="Ext Department ID"
                        formControlName="extDepartmentId"/>
               </div>
@@ -149,9 +145,8 @@
                 <input id="invoice-department-id"
                        class="e-input"
                        type="text"
-                       required
-                       appValidateWithMessage
                        maxlength="50"
+                       appValidateWithMessage
                        placeholder="Invoice Department ID"
                        formControlName="invoiceDepartmentId"/>
               </div>
@@ -165,9 +160,8 @@
                 <input id="department-name"
                        class="e-input"
                        type="text"
-                       required
-                       appValidateWithMessage
                        maxlength="50"
+                       appValidateWithMessage
                        placeholder="Department Name"
                        formControlName="departmentName"/>
               </div>
@@ -182,9 +176,8 @@
                   id="facility-contact"
                   class="e-input"
                   type="text"
-                  required
-                  appValidateWithMessage
                   maxlength="50"
+                  appValidateWithMessage
                   placeholder="Facility Contact"
                   formControlName="facilityContact"
                 />
@@ -200,8 +193,6 @@
                   id="facility-email"
                   class="e-input"
                   type="email"
-                  required
-                  maxlength="50"
                   appValidateWithMessage
                   placeholder="Facility Email"
                   formControlName="facilityEmail"
@@ -218,10 +209,8 @@
                   id="facility-phone-no"
                   class="e-input facility-phone"
                   type="tel"
-                  required
-                  appValidateWithMessage
-                  pattern="^[0-9]+$"
                   maxlength="10"
+                  appValidateWithMessage
                   placeholder="Facility Phone No"
                   formControlName="facilityPhoneNo"
                 />
@@ -231,27 +220,24 @@
 
           <div>
             <div class="input-container calendar">
-              <label for="inactive-date">Inactive Date <span class="field-required">*</span></label>
+              <label for="inactive-date">Inactive Date</label>
               <div class="input-group datepicker">
                 <ejs-datepicker
                   id="inactive-date"
                   class="datepicker"
                   format="MM/dd/yyyy"
-                  required
                   appValidateWithMessage
                   placeholder="MM/DD/YYYY"
                   [enableMask]="true"
-                  [maskPlaceholder]="{ day: 'dd', month: 'MM', year: 'yyyy' }"
-                  [value]="dateValue"
+                  [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                   formControlName="inactiveDate"
-                  (renderDayCell)="onRenderCalendarCell($event)"
                 >
                 </ejs-datepicker>
               </div>
             </div>
           </div>
-        </section>
-      </form>
+        </form>
+      </section>
     </ng-template>
   </ejs-dialog>`
 </section>
