@@ -27,6 +27,9 @@ variables:
   ${{ if startsWith(variables['Build.SourceBranch'], 'refs/heads/release.') }}: 
    packageVersionIdentifier: ''
    imageVersionIdentifier: ''
+  ${{ elseif startsWith(variables['Build.SourceBranch'], 'refs/heads/qa') }}:
+    packageVersionIdentifier: '-beta'
+    imageVersionIdentifier: '-qa'
   ${{ else }}: 
    packageVersionIdentifier: '-beta'
    imageVersionIdentifier: '-dev'
@@ -69,6 +72,7 @@ steps:
     buildContext: $(Build.SourcesDirectory)
     tags: |
       $(buildId)$(imageVersionIdentifier)
+      latest$(imageVersionIdentifier)
       
 - task: HelmInstaller@0
   inputs:
