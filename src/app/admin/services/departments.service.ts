@@ -33,8 +33,8 @@ export class DepartmentsService {
    * Update department
    * @return Updated department
    */
-  public updateDepartment(department: Department): Observable<Department> {
-    return this.http.put<Department>(`/api/Departments/`, department);
+  public updateDepartment(department: Department): Observable<void> {
+    return this.http.put<void>(`/api/Departments/`, department);
   }
 
   /**
@@ -53,10 +53,26 @@ export class DepartmentsService {
   }
 
   /**
-   * Get the list of available locations
+   * Get the list of available locations by organizationId
    * @return Array of locations
    */
-  public getLocations(): Observable<Location[]> {
-    return this.http.get<Location[]>(`/api/Locations`);
+  public getLocationsByOrganizationId(organizationId: number): Observable<Location[]> {
+    return this.http.get<Location[]>(`/api/Locations/${organizationId}`);
+  }
+
+  /**
+   * Get the list of available locations by regionId
+   * @return Array of locations
+   */
+  public getLocationsByRegionId(regionId: number): Observable<Location[]> {
+    return this.http.get<Location[]>(`/api/Locations/${regionId}`);
+  }
+
+  /**
+   * Get the location by id
+   * @return Array of locations
+   */
+  public getLocationById(locationId: number): Observable<Location> {
+    return this.http.get<Location>(`/api/Locations/${locationId}`);
   }
 }

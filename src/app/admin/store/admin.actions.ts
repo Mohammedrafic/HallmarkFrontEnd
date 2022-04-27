@@ -42,9 +42,19 @@ export class GetRegionsByOrganizationId {
   constructor(public organizationId: number) { }
 }
 
-export class GetLocations {
-  static readonly type = '[admin] Get The List Of Locations';
-  constructor() { }
+export class GetLocationsByOrganizationId {
+  static readonly type = '[admin] Get The List Of Locations by organizationId';
+  constructor(public organizationId: number) { }
+}
+
+export class GetLocationsByRegionId {
+  static readonly type = '[admin] Get The List Of Locations by regionId';
+  constructor(public regionId: number) { }
+}
+
+export class GetLocationById {
+  static readonly type = '[admin] Get The Location by id';
+  constructor(public locationId: number) { }
 }
 
 export class SetSuccessErrorToastState {

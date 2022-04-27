@@ -16,7 +16,11 @@ import { Department } from '../../../../shared/models/department.model';
 import {
   SaveDepartment,
   GetDepartmentsByLocationId,
-  SetSuccessErrorToastState, DeleteDepartmentById, GetRegionsByOrganizationId
+  SetSuccessErrorToastState,
+  DeleteDepartmentById,
+  GetRegionsByOrganizationId,
+  UpdateDepartment,
+  GetLocationsByRegionId
 } from '../../../store/admin.actions';
 import { Region } from '../../../../shared/models/region.model';
 import { Location } from '../../../../shared/models/location.model';
@@ -66,19 +70,22 @@ export class DepartmentsComponent implements OnInit {
   departmentsDetailsFormGroup: FormGroup;
   formBuilder: FormBuilder;
 
-  @Select(AdminState.departments) // TODO: uncomment after BE implementation
+  @Select(AdminState.departments)
   departments$: Observable<Department[]>;
 
-  //@Select(AdminState.regions) // TODO: uncomment after BE implementation
+  @Select(AdminState.regions)
   regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedRegion: Region;
 
-
-  //@Select(AdminState.locations) // TODO: uncomment after BE implementation
+  @Select(AdminState.locationsByRegionId)
   locations$: Observable<Location[]>;
+  isLocationsDropDownEnabled: boolean = false;
   locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedLocation: Location;
+
+  editedDepartmentId: number | undefined;
+  isEdit: boolean;
 
   constructor(private store: Store,
               private router: Router,
@@ -90,16 +97,13 @@ export class DepartmentsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //this.store.dispatch(new GetRegionsByOrganizationId(1)); // TODO: provide valid organizationId
-    this.regions$ = of([{ id: 1, name: 'region 1', organizationId: 1 }]);//TODO: remove after BE implementation
-
-    // store.dispatch(new GetLocations()); // TODO: uncomment after BE implementation
-    this.locations$ = of([ {id: 1, name: 'location 1', locationId: 1 } ]); //TODO: remove after BE implementation
+    this.store.dispatch(new GetRegionsByOrganizationId(0)); // TODO: provide valid organizationId
   }
 
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
-    // TODO: add filter for locations by selected region after BE implementation
+    this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
+    this.isLocationsDropDownEnabled = true;
   }
 
   onLocationDropDownChanged(event: ChangeEventArgs): void {
@@ -144,7 +148,8 @@ export class DepartmentsComponent implements OnInit {
       facilityPhoneNo: department.facilityPhoneNo,
       inactiveDate: department.inactiveDate
     });
-
+    this.editedDepartmentId = department.departmentId;
+    this.isEdit = true;
     this.addEditDepartmentDialog.show();
   }
 
@@ -177,7 +182,8 @@ export class DepartmentsComponent implements OnInit {
 
   onDepartmentFormSaveClick(): void {
     if (this.departmentsDetailsFormGroup.valid) {
-      this.store.dispatch(new SaveDepartment({
+      const department: Department = {
+        departmentId: this.editedDepartmentId,
         locationId: this.selectedLocation.locationId,
         extDepartmentId: this.departmentsDetailsFormGroup.controls['extDepartmentId'].value,
         invoiceDepartmentId: this.departmentsDetailsFormGroup.controls['invoiceDepartmentId'].value,
@@ -186,7 +192,15 @@ export class DepartmentsComponent implements OnInit {
         facilityPhoneNo: this.departmentsDetailsFormGroup.controls['facilityPhoneNo'].value,
         facilityEmail: this.departmentsDetailsFormGroup.controls['facilityEmail'].value,
         facilityContact: this.departmentsDetailsFormGroup.controls['facilityContact'].value
-      }));
+      }
+
+      if (this.isEdit) {
+        this.store.dispatch(new UpdateDepartment(department));
+        this.isEdit = false;
+        this.editedDepartmentId = undefined;
+      } else {
+        this.store.dispatch(new SaveDepartment(department));
+      }
 
       this.addEditDepartmentDialog.hide();
       this.departmentsDetailsFormGroup.reset();

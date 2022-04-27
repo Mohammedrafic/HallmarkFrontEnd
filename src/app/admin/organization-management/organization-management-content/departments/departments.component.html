@@ -12,6 +12,7 @@
         id="locations"
         class="location-dropdown"
         placeholder="Location"
+        [enabled]="isLocationsDropDownEnabled"
         [dataSource]="locations$ | async"
         [fields]="locationFields"
         (change)="onLocationDropDownChanged($event)"
@@ -19,7 +20,7 @@
     </section>
     <section>
       <button ejs-button cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
-      <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+      <button ejs-button cssClass="e-outline button-export">Import <i-feather name="upload" class="icon"></i-feather></button>
       <button ejs-button [isPrimary]="true" (click)='onAddDepartmentClick()'>Add Department</button>
     </section>
   </section>
@@ -43,7 +44,7 @@
         <e-column field="facilityContact" headerText="FACILITY CONTACT" width=200></e-column>
         <e-column field="facilityEmail" headerText="FACILITY EMAIL" width=200></e-column>
         <e-column field="facilityPhoneNo" headerText="FACILITY PHONE NO" [valueAccessor]="formatPhoneNumber" width=200></e-column>
-        <e-column field="inactiveDate" headerText="INACTIVE DATE" format="MM/dd/yyyy" width=200></e-column>
+        <e-column field="inactiveDate" headerText="INACTIVE DATE" type='date' format="MM/dd/yyyy" width=200></e-column>
         <e-column textAlign="Right" width=120>
           <ng-template #template let-data>
             <div class="row-tool-buttons">

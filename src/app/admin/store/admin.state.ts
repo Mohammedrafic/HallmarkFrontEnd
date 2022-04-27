@@ -14,12 +14,17 @@ import {
   CreateOrganization,
   GetBusinessUnitList,
   GetDepartmentsByLocationId,
-  GetLocations,
+  GetLocationsByOrganizationId,
   GetRegionsByOrganizationId,
   SetBillingStatesByCountry,
   GetOrganizationsByPage,
   SetDirtyState,
-  SetGeneralStatesByCountry, SetSuccessErrorToastState, UpdateDepartment, DeleteDepartmentById
+  SetGeneralStatesByCountry,
+  SetSuccessErrorToastState,
+  UpdateDepartment,
+  DeleteDepartmentById,
+  GetLocationById,
+  GetLocationsByRegionId
 } from './admin.actions';
 import { DepartmentsService } from '../services/departments.service';
 import { Department } from '../../shared/models/department.model';
@@ -48,6 +53,7 @@ export interface AdminStateModel {
   departments: Department[];
   regions: Region[];
   locations: Location[];
+  location: Location | null;
   successErrorToastState: SuccessErrorToast | null;
   isDirty: boolean;
 }
@@ -68,6 +74,7 @@ export interface AdminStateModel {
     departments: [],
     regions: [],
     locations: [],
+    location: null,
     successErrorToastState: null,
     isDirty: false
   },
@@ -105,7 +112,10 @@ export class AdminState {
   static regions(state: AdminStateModel): Region[] { return state.regions; }
 
   @Selector()
-  static locations(state: AdminStateModel): Location[] { return state.locations; }
+  static locationsByRegionId(state: AdminStateModel): Location[] { return state.locations; }
+
+  @Selector()
+  static locationById(state: AdminStateModel): Location | null { return state.location; }
 
   @Selector()
   static successErrorToastState(state: AdminStateModel): SuccessErrorToast | null { return state.successErrorToastState; }
@@ -178,9 +188,11 @@ export class AdminState {
   }
 
   @Action(UpdateDepartment)
-  UpdateDepartments({ patchState }: StateContext<AdminStateModel>, { department }: UpdateDepartment): void {
-    this.departmentService.updateDepartment(department).pipe(tap(() => {
+  UpdateDepartments({ patchState, dispatch }: StateContext<AdminStateModel>, { department }: UpdateDepartment): Observable<void> {
+    return this.departmentService.updateDepartment(department).pipe(tap((payload) => {
       patchState({ isDepartmentLoading: false });
+      dispatch(new GetDepartmentsByLocationId(department.locationId));
+      return payload;
     }));
   }
 
@@ -199,10 +211,26 @@ export class AdminState {
     }));
   }
 
-  @Action(GetLocations)
-  GetLocations({ patchState }: StateContext<AdminStateModel>, { }: GetRegionsByOrganizationId): Observable<Location[]> {
-    return this.departmentService.getLocations().pipe(tap((payload) => {
+  @Action(GetLocationsByOrganizationId)
+  GetLocationsByOrganizationId({ patchState }: StateContext<AdminStateModel>, { organizationId }: GetLocationsByOrganizationId): Observable<Location[]> {
+    return this.departmentService.getLocationsByOrganizationId(organizationId).pipe(tap((payload) => {
       patchState({ locations: payload});
+      return payload;
+    }));
+  }
+
+  @Action(GetLocationsByRegionId)
+  GetLocationsByRegionId({ patchState }: StateContext<AdminStateModel>, { regionId }: GetLocationsByRegionId): Observable<Location[]> {
+    return this.departmentService.getLocationsByRegionId(regionId).pipe(tap((payload) => {
+      patchState({ locations: payload});
+      return payload;
+    }));
+  }
+
+  @Action(GetLocationById)
+  GetLocationById({ patchState }: StateContext<AdminStateModel>, { locationId }: GetLocationById): Observable<Location> {
+    return this.departmentService.getLocationById(locationId).pipe(tap((payload) => {
+      patchState({ location: payload});
       return payload;
     }));
   }
