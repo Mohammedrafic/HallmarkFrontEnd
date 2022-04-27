@@ -4,15 +4,15 @@ metadata:
   name: {{ include "einsteinui.fullname" . }}
 spec:
   hosts:
-  - "dev.einstein2.com"
+  - "*"
   gateways:
   - {{ include "einsteinui.fullname" . }}
   http:
   - match:
     - uri:
-        exact: /
+        exact: /ui
     - uri:
-        regex: "^(?!\\einsteinapi).*"
+        prefix: /ui/
     rewrite:
       uri: /
     route:
