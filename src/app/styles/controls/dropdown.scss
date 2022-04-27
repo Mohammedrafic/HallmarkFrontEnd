@@ -6,6 +6,7 @@ body.light, body.dark {
       span.e-input-group {
         border-radius: 8px;
         height: 35px;
+        align-items: center;
 
         &.e-input-focus, &:active {
           box-shadow: none !important;

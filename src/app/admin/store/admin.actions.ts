@@ -37,7 +37,7 @@ export class DeleteDepartmentById {
   constructor(public departmentId: number) { }
 }
 
-export class GetRegions {
+export class GetRegionsByOrganizationId {
   static readonly type = '[admin] Get The List Of Regions';
   constructor(public organizationId: number) { }
 }

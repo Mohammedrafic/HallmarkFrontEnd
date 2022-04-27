@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { environment } from 'src/environments/environment';
 import { Department } from '../../shared/models/department.model';
 import { Region } from '../../shared/models/region.model';
 import { Location } from '../../shared/models/location.model';
@@ -19,7 +18,7 @@ export class DepartmentsService {
    * @return Created department
    */
   public saveDepartment(department: Department): Observable<Department> {
-    return this.http.post<Department>(`${environment.host}/api/Departments`, department);
+    return this.http.post<Department>(`/api/Departments`, department);
   }
 
   /**
@@ -27,7 +26,7 @@ export class DepartmentsService {
    * @return Array of departments
    */
   public getDepartmentsByLocationId(locationId: number): Observable<Department[]> {
-    return this.http.get<Department[]>(`${environment.host}/api/Departments/byLocation/${locationId}`);
+    return this.http.get<Department[]>(`/api/Departments/byLocation/${locationId}`);
   }
 
   /**
@@ -35,22 +34,22 @@ export class DepartmentsService {
    * @return Updated department
    */
   public updateDepartment(department: Department): Observable<Department> {
-    return this.http.put<Department>(`${environment.host}/api/Departments/`, department);
+    return this.http.put<Department>(`/api/Departments/`, department);
   }
 
   /**
    * Delete department
    */
   public deleteDepartmentById(departmentId: number): Observable<void> {
-    return this.http.delete<void>(`${environment.host}/api/Departments/${departmentId}`);
+    return this.http.delete<void>(`/api/Departments/${departmentId}`);
   }
 
   /**
    * Get the list of available regions by organizationId
    * @return Array of regions
    */
-  public getRegions(organizationId: number): Observable<Region[]> {
-    return this.http.get<Region[]>(`${environment.host}/api/Regions/byorganizationId/${organizationId}`);
+  public getRegionsByOragnizationId(organizationId: number): Observable<Region[]> {
+    return this.http.get<Region[]>(`/api/Regions/byorganizationId/${organizationId}`);
   }
 
   /**
@@ -58,6 +57,6 @@ export class DepartmentsService {
    * @return Array of locations
    */
   public getLocations(): Observable<Location[]> {
-    return this.http.get<Location[]>(`${environment.host}/api/Locations`);
+    return this.http.get<Location[]>(`/api/Locations`);
   }
 }
