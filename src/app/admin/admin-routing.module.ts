@@ -29,6 +29,13 @@ const routes: Routes = [
       {
         path: 'client-management/add',
         component: AddEditOrganizationComponent,
+        data: { isEditing: false },
+        canDeactivate: [UnsavedChangesGuard]
+      },
+      {
+        path: 'client-management/edit/:organizationId',
+        component: AddEditOrganizationComponent,
+        data: { isEditing: true },
         canDeactivate: [UnsavedChangesGuard]
       },
       {

@@ -11,7 +11,6 @@ import { OrganizationService } from '../services/organization.service';
 
 import {
   SaveDepartment,
-  CreateOrganization,
   GetBusinessUnitList,
   GetDepartmentsByLocationId,
   GetLocationsByOrganizationId,
@@ -19,6 +18,11 @@ import {
   SetBillingStatesByCountry,
   GetOrganizationsByPage,
   SetDirtyState,
+  SaveOrganization,
+  UploadOrganizationLogo,
+  SaveOrganizationSucceeded,
+  GetOrganizationById,
+  GetOrganizationByIdSucceeded,
   SetGeneralStatesByCountry,
   SetSuccessErrorToastState,
   UpdateDepartment,
@@ -62,8 +66,8 @@ export interface AdminStateModel {
   name: 'admin',
   defaults: {
     countries: [{ id: Country.USA, text: Country[0] }, { id: Country.Canada, text: Country[1] }],
-    statesGeneral: null,
-    statesBilling: null,
+    statesGeneral: UsaStates,
+    statesBilling: UsaStates,
     businessUnits: [],
     days: Days,
     statuses: Object.keys(Status).filter(StringIsNumber).map((statusName, index) => ({ id: index, text: statusName })),
@@ -130,12 +134,12 @@ export class AdminState {
 
   @Action(SetGeneralStatesByCountry)
   SetGeneralStatesByCountry({ patchState }: StateContext<AdminStateModel>, { payload }: SetGeneralStatesByCountry): void {
-    patchState({ statesGeneral: payload === Country[Country.USA] ? UsaStates : CanadaStates });
+    patchState({ statesGeneral: payload === Country.USA ? UsaStates : CanadaStates });
   }
 
   @Action(SetBillingStatesByCountry)
   SetBillingStatesByCountry({ patchState }: StateContext<AdminStateModel>, { payload }: SetBillingStatesByCountry): void {
-    patchState({ statesBilling: payload === Country[Country.USA] ? UsaStates : CanadaStates });
+    patchState({ statesBilling: payload === Country.USA ? UsaStates : CanadaStates });
   }
 
   @Action(GetOrganizationsByPage)
@@ -147,10 +151,30 @@ export class AdminState {
     }));
   }
 
-  @Action(CreateOrganization)
-  CreateOrganization({ patchState }: StateContext<AdminStateModel>, { payload }: CreateOrganization): Observable<Organization> {
+  @Action(GetOrganizationById)
+  GetOrganizationById({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: GetOrganizationById): Observable<Organization> {
+    patchState({ isOrganizationLoading: true });
+    return this.organizationService.getOrganizationById(payload).pipe(tap((payload) => {
+      patchState({ isOrganizationLoading: false });
+      dispatch(new GetOrganizationByIdSucceeded(payload));
+      return payload;
+    }));
+  }
+
+  @Action(SaveOrganization)
+  SaveOrganization({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveOrganization): Observable<Organization> {
     patchState({ isOrganizationLoading: true });
     return this.organizationService.saveOrganization(payload).pipe(tap((payload) => {
+      patchState({ isOrganizationLoading: false });
+      dispatch(new SaveOrganizationSucceeded(payload));
+      return payload;
+    }));
+  }
+
+  @Action(UploadOrganizationLogo)
+  UploadOrganizationLogo({ patchState }: StateContext<AdminStateModel>, { file, businessUnitId }: UploadOrganizationLogo): Observable<any> {
+    patchState({ isOrganizationLoading: true });
+    return this.organizationService.saveOrganizationLogo(file, businessUnitId).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false });
       return payload;
     }));

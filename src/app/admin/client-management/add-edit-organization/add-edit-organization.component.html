@@ -1,17 +1,17 @@
 <section class="controls-container">
   <div>
-    <button ejs-button cssClass="e-outline" (click)="navigateBack()">Back</button>
+    <button ejs-button cssClass="e-outline" (click)="navigateBack()" id="backButton">Back</button>
   </div>
   <div><h3>Add Organization</h3></div>
   <div class="controls-form stick-right">
-    <button ejs-button cssClass="e-outline" (click)="clearForm()">Clear</button>
-    <button ejs-button cssClass="e-outline" (click)="navigateBack()">Cancel</button>
-    <button ejs-button [isPrimary]="true" (click)="save()" class="save-button">Save</button>
+    <button ejs-button cssClass="e-outline" (click)="clearForm()" id="clearButton">Clear</button>
+    <button ejs-button cssClass="e-outline" (click)="navigateBack()" id="cancelButton">Cancel</button>
+    <button ejs-button [isPrimary]="true" (click)="save()" class="save-button" id="saveButton">Save</button>
   </div>
 </section>
 <section class="create-under-container bootstrap">
   <div class="left-section">
-    <form [formGroup]="CreateUnderFormGroup">
+    <form *ngIf="CreateUnderFormGroup" [formGroup]="CreateUnderFormGroup" id="createUnder">
       <label>Create Under<span class="required">*</span></label>
       <div class="input-group dropdown">
         <ejs-dropdownlist appValidateWithMessage [fields]="createUnderFields" formControlName="createUnder" [dataSource]="businessUnits$ | async" placeholder="Create Under"></ejs-dropdownlist>
@@ -32,7 +32,7 @@
       </div>
       <div class="e-card-content">
         <div class="general-information">
-          <form [formGroup]="GeneralInformationFormGroup">
+          <form *ngIf="GeneralInformationFormGroup" [formGroup]="GeneralInformationFormGroup" id="generalInformation">
             <div class="org-section">
               <div class="left-column bootstrap">
                 <div>
@@ -119,7 +119,6 @@
                     <label>Zipcode</label>
                     <div class="input-group">
                       <input appValidateWithMessage formControlName="zipCode" class="e-input" type="text" placeholder="Zipcode" maxlength="6"/>
-                      <span class="error" *ngIf="!GeneralInformationFormGroup.controls['zipCode'].untouched">{{ GeneralInformationFormGroup.controls['zipCode'].errors | validationError }}</span>
                     </div>
                   </div>
                   <div class="input-container"></div>
@@ -143,11 +142,11 @@
         <div class="billing-details bootstrap">
           <div class="title">Billing Details</div>
           <div class="org-address-checkbox">
-            <ejs-checkbox (change)="sameAsOrgChange($event)" label="Same As Organization"></ejs-checkbox>
+            <ejs-checkbox [checked]="isSameAsOrg" (change)="sameAsOrgChange($event)" label="Same As Organization"></ejs-checkbox>
           </div>
           <div class="billing-details-section">
             <div class="left-column">
-              <form [formGroup]="BillingDetailsFormGroup">
+              <form *ngIf="BillingDetailsFormGroup" [formGroup]="BillingDetailsFormGroup" id="billingDetails">
                 <div class="billing-address-section">
                   <div class="input-container">
                     <label>Name<span class="required">*</span></label>
@@ -205,18 +204,10 @@
                       <input appValidateWithMessage formControlName="fax" class="e-input" type="text" placeholder="Fax" maxlength="10"/>
                     </div>                
                   </div>
-                  <div class="input-container"></div>
-                </div>
-                <div class="billing-phone-section">
-                  <div class="input-container ext">
+                  <div class="input-container">
                     <label>Ext</label>
                     <input formControlName="ext" class="e-input" type="text" placeholder="Ext"/>
                   </div>
-                  <div class="input-container website">
-                    <label>Website</label>
-                    <input formControlName="website" class="e-input" type="text" placeholder="Website"/>
-                  </div>
-                  <div class="input-container"></div>
                 </div>
               </form>
             </div>
@@ -228,7 +219,7 @@
             <div class="title">Contact Details</div>
             <div class="stick-right add-contact-link" (click)="addContact()"><i-feather name="plus" class="icon"></i-feather> Add Contact</div>
           </div>
-          <form [formGroup]="ContactFormGroup">
+          <form *ngIf="ContactFormGroup" [formGroup]="ContactFormGroup" id="contactDetailsGroup">
             <ng-container formArrayName="contacts">
               <div [formGroupName]="i" class="contact-item" *ngFor="let contact of ContactFormArray.controls; let i = index;">
                 <div *ngIf="!isEditTitle[i]" class="dropdown-container bootstrap">
@@ -289,16 +280,12 @@
       </div>
       <div class="e-card-content">
         <div id="droparea" style="height: 130px">
-          <span>Drag & Drop files here</span>
+          <span>Drag & Drop or <span class="browse-link" (click)="browse()">browse</span> files here</span>
         </div>
-        <ejs-uploader #previewupload id="previewfileupload" [autoUpload]="false" [asyncSettings]="path"
+        <ejs-uploader #previewupload id="previewfileupload" [autoUpload]="false" [multiple]="false"
             [dropArea]="dropElement" [allowedExtensions]="allowExtensions" (selected)="onImageSelect($event)"
-            (success)="onUploadSuccess($event)" (progress)="onFileUpload($event)" (failure)="onUploadFailed($event)" 
             (removing)="onFileRemove($event)">
         </ejs-uploader>
-        <button ejs-button cssClass="e-outline upload-button" (click)="uploadImages()">
-          Upload <i-feather name="upload" class="icon"></i-feather>
-        </button>
       </div>
     </div>
 
@@ -310,13 +297,15 @@
         </div>
       </div>
       <div class="e-card-content">
-        <form [formGroup]="PreferencesFormGroup">
-          <div class="inline-radio-container">
-            <ejs-radiobutton formControlName="purchaseOrderBy" label="By Organization" name="purchaseOrderBy" value="0" checked="true"></ejs-radiobutton>
+        <form *ngIf="PreferencesFormGroup" [formGroup]="PreferencesFormGroup" id="preferancesDetails">
+          <label class="radio-label">Select Purchase Order By</label>
+          <div class="inline-radio-container purchase-order-by">
+            <ejs-radiobutton formControlName="purchaseOrderBy" label="By Organization" name="purchaseOrderBy" value="0"></ejs-radiobutton>
             <ejs-radiobutton formControlName="purchaseOrderBy" label="By Location" name="purchaseOrderBy" value="1"></ejs-radiobutton>
           </div>
           <div class="column-radio-container submitted-by">
-            <ejs-radiobutton formControlName="timesheetSubmittedBy" label="Actual Time In/Time Out" name="timesheetSubmittedBy" value="0" checked="true"></ejs-radiobutton>
+            <label class="radio-label">Timesheet submitted By</label>
+            <ejs-radiobutton formControlName="timesheetSubmittedBy" label="Actual Time In/Time Out" name="timesheetSubmittedBy" value="0"></ejs-radiobutton>
             <ejs-radiobutton formControlName="timesheetSubmittedBy" label="Total Hours by Week" name="timesheetSubmittedBy" value="1"></ejs-radiobutton>
             <ejs-radiobutton formControlName="timesheetSubmittedBy" label="Total Hours by Day" name="timesheetSubmittedBy" value="2"></ejs-radiobutton>
           </div>
@@ -327,12 +316,12 @@
             </div>
           </div>
           <div class="inline-radio-container">
-            <ejs-radiobutton formControlName="paymentOptions" label="Manual Payment" name="paymentOptions" value="0" checked="true"></ejs-radiobutton>
+            <ejs-radiobutton formControlName="paymentOptions" label="Manual Payment" name="paymentOptions" value="0"></ejs-radiobutton>
             <ejs-radiobutton formControlName="paymentOptions" label="Electronic Payment" name="paymentOptions" value="1"></ejs-radiobutton>
           </div>
           <div class="input-container bootstrap">
             <div class="input-group">
-              <ejs-textbox appValidateWithMessage formControlName="paymentDescription" [multiline]="true" value="" placeholder="Electronic Payment"></ejs-textbox>
+              <ejs-textbox appValidateWithMessage formControlName="paymentDescription" [multiline]="true" placeholder="Electronic Payment"></ejs-textbox>
             </div>
           </div>
           <div class="input-container bootstrap">

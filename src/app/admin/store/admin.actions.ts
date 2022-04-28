@@ -1,19 +1,40 @@
+import { Country } from "src/app/shared/enums/states";
 import { Organization } from "src/app/shared/models/organization.model";
 import { Department } from '../../shared/models/department.model';
 import { SuccessErrorToast } from '../../shared/models/success-error-toast.model';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[admin] Set General States By Country';
-  constructor(public payload: string) { }
+  constructor(public payload: Country) { }
 }
 
 export class SetBillingStatesByCountry {
   static readonly type = '[admin] Set Billing States By Country';
-  constructor(public payload: string) { }
+  constructor(public payload: Country) { }
 }
 
-export class CreateOrganization {
-  static readonly type = '[admin] Create Organization';
+export class SaveOrganization {
+  static readonly type = '[admin] Save Organization';
+  constructor(public payload: Organization) { }
+}
+
+export class SaveOrganizationSucceeded {
+  static readonly type = '[admin] Save Organization Succeeded';
+  constructor(public payload: Organization) { }
+}
+
+export class UploadOrganizationLogo {
+  static readonly type = '[admin] Upload Organization Logo';
+  constructor(public file: Blob, public businessUnitId: number) { }
+}
+
+export class GetOrganizationById {
+  static readonly type = '[admin] Get Organization by ID';
+  constructor(public payload: number) { }
+}
+
+export class GetOrganizationByIdSucceeded {
+  static readonly type = '[admin] Get Organization by ID Succeeded';
   constructor(public payload: Organization) { }
 }
 

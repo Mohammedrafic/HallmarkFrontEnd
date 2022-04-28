@@ -2,10 +2,10 @@ import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { FreezeService, GridComponent, PageSettingsModel, SortService } from '@syncfusion/ej2-angular-grids';
-import { Observable } from 'rxjs';
+import { debounceTime, Observable, Subject } from 'rxjs';
 import { ORDERS_GRID_CONFIG } from 'src/app/client/client.config';
 import { Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
-import { OrganizationPage } from 'src/app/shared/models/organization.model';
+import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { GetOrganizationsByPage } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
@@ -23,10 +23,11 @@ export class ClientManagementContentComponent implements OnInit, AfterViewInit {
   public gridHeight = ORDERS_GRID_CONFIG.gridHeight;
   public rowsPerPageDropDown = ORDERS_GRID_CONFIG.rowsPerPageDropDown;
   public activeRowsPerPageDropDown = ORDERS_GRID_CONFIG.rowsPerPageDropDown[0];
+  private pageSubject = new Subject<number>();
 
   public initialSort = {
     columns: [
-      { field: 'name', direction: 'Ascending' }
+      { field: 'createUnder.name', direction: 'Ascending' }
     ]
   };
 
@@ -51,6 +52,10 @@ export class ClientManagementContentComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.store.dispatch(new GetOrganizationsByPage(this.currentPage, this.pageSize));
+    this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
+      this.currentPage = page;
+      this.store.dispatch(new GetOrganizationsByPage(this.currentPage, this.pageSize));
+    });
   }
 
   ngAfterViewInit(): void {
@@ -61,9 +66,23 @@ export class ClientManagementContentComponent implements OnInit, AfterViewInit {
     this.router.navigate(['./add'], { relativeTo: this.route });
   }
 
+  public onRowsDropDownChanged(): void {
+    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+  }
+
+  public onGoToClick(event: any): void {
+    if (event.currentPage || event.value) {
+      this.pageSubject.next(event.currentPage || event.value);
+    }
+  }
+
   //TODO: create a pipe
   public getChipCssClass(status: string): string {
     const found = Object.entries(STATUS_COLOR_GROUP).find(item => item[1].includes(status));
     return found ? found[0] : 'e-default';
+  }
+
+  public editOrganization(data: Organization): void {
+    this.router.navigate(['./edit', data.organizationId], { relativeTo: this.route });
   }
 }

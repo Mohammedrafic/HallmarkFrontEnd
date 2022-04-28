@@ -38,7 +38,7 @@
           <div class="controls-cell">
             <i-feather name="file-text" class="icon"></i-feather>
             <i-feather name="map-pin" class="icon"></i-feather>
-            <i-feather name="edit" class="icon"></i-feather>
+            <i-feather (click)="editOrganization(data)" name="edit" class="icon"></i-feather>
           </div>
         </ng-template>
       </e-column>
@@ -54,6 +54,7 @@
                 class="dropdown-no-border"
                 [dataSource]="rowsPerPageDropDown"
                 [(value)]="activeRowsPerPageDropDown"
+                (change)="onRowsDropDownChanged()"
               >
               </ejs-dropdownlist>
               <ejs-numerictextbox
@@ -62,8 +63,9 @@
                 format="#"
                 placeholder="Go to:"
                 min="1"
-                [max]="10"
+                [max]="(organizations$ | async)?.totalPages"
                 [showSpinButton]="false"
+                (change)="onGoToClick($event)"
               >
               </ejs-numerictextbox>
             </section>
@@ -71,10 +73,11 @@
               <ejs-pager
                 id="gridPager"
                 #gridPager
-                [pageSize]="30"
-                [totalRecordsCount]="30"
+                [pageSize]="pageSize"
+                [totalRecordsCount]="(organizations$ | async)?.totalCount"
                 [enablePagerMessage]="false"
-                [currentPage]="1"
+                [currentPage]="currentPage"
+                (click)="onGoToClick($event)"
               >
               </ejs-pager>
             </section>

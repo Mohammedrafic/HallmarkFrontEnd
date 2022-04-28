@@ -1,14 +1,15 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Actions, ofActionCompleted, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { FileInfo, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { debounceTime, Observable } from 'rxjs';
+import { Country } from 'src/app/shared/enums/states';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
-import { Organization } from 'src/app/shared/models/organization.model';
+import { ContactDetails, Organization } from 'src/app/shared/models/organization.model';
 import { SetHeaderState } from 'src/app/store/app.actions';
-import { CreateOrganization, GetBusinessUnitList, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry } from '../../store/admin.actions';
+import { SaveOrganization, GetBusinessUnitList, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry, UploadOrganizationLogo, SaveOrganizationSucceeded, GetOrganizationById, GetOrganizationByIdSucceeded } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
 
 @Component({
@@ -30,6 +31,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
   public PreferencesFormGroup: FormGroup;
   public isSameAsOrg: boolean = false;
   public isEditTitle: boolean[] = [false];
+  public currentBusinessUnitId: number | null = null;
 
   public createUnderFields = { 
     text: 'name', value: 'id'
@@ -63,73 +65,27 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
   @Select(AdminState.titles)
   titles$: Observable<[]>;
 
-  public path: Object = {
-    saveUrl: '',
-    removeUrl: ''
-  };
-
-  constructor(private store: Store, private router: Router, private route: ActivatedRoute, private fb: FormBuilder) {
+  constructor(private actions$: Actions, private store: Store, private router: Router, private route: ActivatedRoute, private fb: FormBuilder) {
+    //TODO: add unsubscribe
+    actions$.pipe(ofActionSuccessful(SaveOrganizationSucceeded)).subscribe((organization: { payload: Organization }) => {
+      this.currentBusinessUnitId = organization.payload.organizationId as number;
+      this.uploadImages(this.currentBusinessUnitId);
+    });
+    actions$.pipe(ofActionSuccessful(GetOrganizationByIdSucceeded)).subscribe((organization: { payload: Organization }) => {
+      this.currentBusinessUnitId = organization.payload.organizationId as number;
+      this.initForms(organization.payload);
+      this.isSameAsOrg = organization.payload.billingDetails.sameAsOrganization;
+      if (this.isSameAsOrg) {
+        this.disableBillingForm();
+      }
+    })
     store.dispatch(new SetHeaderState({title: 'Organization List'}));
     store.dispatch(new GetBusinessUnitList());
-    this.CreateUnderFormGroup = fb.group({
-      createUnder: new FormControl('', [ Validators.required ])
-    });
-    this.CreateUnderFormGroup.valueChanges.subscribe(() => {
-      store.dispatch(new SetDirtyState(this.CreateUnderFormGroup.dirty));
-    });
-    this.GeneralInformationFormGroup = fb.group({
-      name: new FormControl('', [ Validators.required ]),
-      externalId: new FormControl(''),
-      taxId: new FormControl('', [ Validators.required, Validators.minLength(9), Validators.pattern(/^[0-9\s\-]+$/) ]),
-      addressLine1: new FormControl('', [ Validators.required ]),
-      addressLine2: new FormControl(''),
-      country: new FormControl('', [ Validators.required ]),
-      state: new FormControl('', [ Validators.required ]),
-      city: new FormControl('', [ Validators.required ]),
-      zipCode: new FormControl('', [ Validators.minLength(5), Validators.pattern(/^[0-9]+$/) ]),
-      phone1Ext: new FormControl('', [ Validators.pattern(/^[0-9]+$/) ]),
-      phone2Ext: new FormControl('', [ Validators.pattern(/^[0-9]+$/) ]),
-      fax: new FormControl('', [ Validators.pattern(/^[0-9]+$/) ]),
-      status: new FormControl('', [ Validators.required ]),
-      website: new FormControl('')
-    });
-    this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
-      store.dispatch(new SetDirtyState(this.GeneralInformationFormGroup.dirty));
-    });
-    this.BillingDetailsFormGroup = fb.group({
-      name: new FormControl('', [ Validators.required ]),
-      address: new FormControl(''),
-      country: new FormControl('', [ Validators.required ]),
-      state: new FormControl('', [ Validators.required ]),
-      city: new FormControl('', [ Validators.required ]),
-      zipCode: new FormControl('', [ Validators.minLength(5), Validators.pattern(/^[0-9]+$/) ]),
-      phone1: new FormControl('', [ Validators.pattern(/^[0-9]+$/) ]),
-      phone2: new FormControl('', [ Validators.pattern(/^[0-9]+$/) ]),
-      fax: new FormControl('', [ Validators.pattern(/^[0-9]+$/) ]),
-      ext: new FormControl(''),
-      website: new FormControl('')
-    });
-    this.BillingDetailsFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
-      store.dispatch(new SetDirtyState(this.BillingDetailsFormGroup.dirty));
-    });
-    this.ContactFormGroup = fb.group({
-      contacts: new FormArray([this.newContactFormGroup()])
-    });
-    this.ContactFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
-      store.dispatch(new SetDirtyState(this.ContactFormGroup.dirty));
-    });
-    this.ContactFormArray = this.ContactFormGroup.get("contacts") as FormArray;
-    this.PreferencesFormGroup = fb.group({
-      purchaseOrderBy: new FormControl(0, [ Validators.required ]),
-      timesheetSubmittedBy: new FormControl(0, [ Validators.required ]),
-      weekStartsOn: new FormControl('', [ Validators.required ]),
-      paymentOptions: new FormControl(0, [ Validators.required ]),
-      timePeriodInMins: new FormControl('', [ Validators.pattern(/^[0-9]+$/), Validators.min(1)] ),
-      paymentDescription: new FormControl('', [ Validators.required ])
-    });
-    this.PreferencesFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
-      store.dispatch(new SetDirtyState(this.PreferencesFormGroup.dirty));
-    });
+    if (route.snapshot.paramMap.get('organizationId')) {
+      store.dispatch(new GetOrganizationById(parseInt(route.snapshot.paramMap.get('organizationId') as string)));
+    } else {
+      this.initForms();
+    }
   }
 
   ngOnInit(): void {
@@ -140,17 +96,109 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
     
   }
 
+  private initForms(organization?: Organization): void {
+    this.CreateUnderFormGroup = this.fb.group({
+      createUnder: new FormControl(organization ? organization.createUnder?.parentUnitId : '', [ Validators.required ])
+    });
+    this.CreateUnderFormGroup.valueChanges.subscribe(() => {
+      this.store.dispatch(new SetDirtyState(this.CreateUnderFormGroup.dirty));
+    });
+    this.GeneralInformationFormGroup = this.fb.group({
+      id: new FormControl(organization ? organization.generalInformation.id : 0),
+      name: new FormControl(organization ? organization.generalInformation.name : '', [ Validators.required ]),
+      externalId: new FormControl(organization ? organization.generalInformation.externalId : ''),
+      taxId: new FormControl(organization ? organization.generalInformation.taxId : '', [ Validators.required, Validators.minLength(9), Validators.pattern(/^[0-9\s\-]+$/) ]),
+      addressLine1: new FormControl(organization ? organization.generalInformation.addressLine1 : '', [ Validators.required ]),
+      addressLine2: new FormControl(organization ? organization.generalInformation.addressLine2 : ''),
+      country: new FormControl(organization ? organization.generalInformation.country : 0, [ Validators.required ]),
+      state: new FormControl(organization ? organization.generalInformation.state : '', [ Validators.required ]),
+      city: new FormControl(organization ? organization.generalInformation.city : '', [ Validators.required ]),
+      zipCode: new FormControl(organization ? organization.generalInformation.zipCode : '', [ Validators.minLength(5), Validators.pattern(/^[0-9]+$/) ]),
+      phone1Ext: new FormControl(organization ? organization.generalInformation.phone1Ext : '', [ Validators.pattern(/^[0-9]+$/) ]),
+      phone2Ext: new FormControl(organization ? organization.generalInformation.phone2Ext : '', [ Validators.pattern(/^[0-9]+$/) ]),
+      fax: new FormControl(organization ? organization.generalInformation.fax : '', [ Validators.pattern(/^[0-9]+$/) ]),
+      status: new FormControl(organization ? organization.generalInformation.status : '', [ Validators.required ]),
+      website: new FormControl(organization ? organization.generalInformation.website : '')
+    });
+    this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      this.store.dispatch(new SetDirtyState(this.GeneralInformationFormGroup.dirty));
+    });
+    this.BillingDetailsFormGroup = this.fb.group({
+      id: new FormControl(organization ? organization.billingDetails.id : 0),
+      name: new FormControl(organization ? organization.billingDetails.name : '', [ Validators.required ]),
+      address: new FormControl(organization ? organization.billingDetails.address : ''),
+      country: new FormControl(organization ? organization.billingDetails.country : 0, [ Validators.required ]),
+      state: new FormControl(organization ? organization.billingDetails.state : '', [ Validators.required ]),
+      city: new FormControl(organization ? organization.billingDetails.city : '', [ Validators.required ]),
+      zipCode: new FormControl(organization ? organization.billingDetails.zipCode : '', [ Validators.minLength(5), Validators.pattern(/^[0-9]+$/) ]),
+      phone1: new FormControl(organization ? organization.billingDetails.phone1 : '', [ Validators.pattern(/^[0-9]+$/) ]),
+      phone2: new FormControl(organization ? organization.billingDetails.phone2 : '', [ Validators.pattern(/^[0-9]+$/) ]),
+      fax: new FormControl(organization ? organization.billingDetails.fax : '', [ Validators.pattern(/^[0-9]+$/) ]),
+      ext: new FormControl(organization ? organization.billingDetails.ext : ''),
+    });
+    this.BillingDetailsFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      this.store.dispatch(new SetDirtyState(this.BillingDetailsFormGroup.dirty));
+    });
+    if (organization) {
+      this.ContactFormGroup = this.fb.group({
+        contacts: new FormArray(this.generateContactsFormArray(organization.contactDetails))
+      });
+    } else {
+      this.ContactFormGroup = this.fb.group({
+        contacts: new FormArray([this.newContactFormGroup()])
+      });
+    }
+    this.ContactFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      this.store.dispatch(new SetDirtyState(this.ContactFormGroup.dirty));
+    });
+    this.ContactFormArray = this.ContactFormGroup.get("contacts") as FormArray;
+    this.PreferencesFormGroup = this.fb.group({
+      id: new FormControl(organization ? organization.preferences.id : 0),
+      purchaseOrderBy: new FormControl(organization ? organization.preferences.purchaseOrderBy.toString() : '0', [ Validators.required ]),
+      timesheetSubmittedBy: new FormControl(organization ? organization.preferences.timesheetSubmittedBy.toString() : '0', [ Validators.required ]),
+      weekStartsOn: new FormControl(organization ? organization.preferences.weekStartsOn : '', [ Validators.required ]),
+      paymentOptions: new FormControl(organization ? organization.preferences.paymentOptions.toString() : '0', [ Validators.required ]),
+      timePeriodInMins: new FormControl(organization ? organization.preferences.timePeriodInMins : '', [ Validators.pattern(/^[0-9]+$/), Validators.min(1)] ),
+      paymentDescription: new FormControl(organization ? organization.preferences.paymentDescription : '', [ Validators.required ])
+    });
+    this.PreferencesFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      this.store.dispatch(new SetDirtyState(this.PreferencesFormGroup.dirty));
+    });
+    if (organization) {
+      //Populate state dropdown with values based on selected country
+      this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
+      this.store.dispatch(new SetBillingStatesByCountry(organization.billingDetails.country));
+      this.store.dispatch(new SetDirtyState(false));
+    }
+  }
+
+  public browse() : void {
+    const wrapper = document.getElementsByClassName('e-file-select-wrap')[0];
+    if (wrapper) {
+      wrapper.querySelector('button')?.click();
+    }
+  }
+
   public editTitleHandler(i: number): void {
     this.isEditTitle[i] = !this.isEditTitle[i];
   }
 
-  private newContactFormGroup(): FormGroup {
+  private generateContactsFormArray(contacts: ContactDetails[]): Array<FormGroup> {
+    const formArray: FormGroup[] = [];
+    contacts.forEach((contact: ContactDetails) => {
+      formArray.push(this.newContactFormGroup(contact));
+    });
+    return formArray;
+  }
+
+  private newContactFormGroup(contact?: ContactDetails): FormGroup {
     this.isEditTitle.push(false);
     return this.fb.group({
-      title: new FormControl(''),
-      contactPerson: new FormControl('', [ Validators.required ]),
-      phoneNumberExt: new FormControl('', [ Validators.pattern(/^[0-9]+$/) ]),
-      email: new FormControl('', [ Validators.pattern(/^\S+@\S+\.\S+$/) ])
+      id: new FormControl(contact ? contact.id : 0),
+      title: new FormControl(contact ? contact.title : ''),
+      contactPerson: new FormControl(contact ? contact.contactPerson : '', [ Validators.required ]),
+      phoneNumberExt: new FormControl(contact ? contact.phoneNumberExt : '', [ Validators.pattern(/^[0-9]+$/) ]),
+      email: new FormControl(contact ? contact.email : '', [ Validators.pattern(/^\S+@\S+\.\S+$/) ])
     })
   }
 
@@ -171,6 +219,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
     // Populate billing states dropdown with correct data
     this.store.dispatch(new SetBillingStatesByCountry(this.GeneralInformationFormGroup.controls['country'].value));
     this.BillingDetailsFormGroup.setValue({
+      id: this.BillingDetailsFormGroup.controls['id'].value,
       name: this.GeneralInformationFormGroup.controls['name'].value,
       address: this.GeneralInformationFormGroup.controls['addressLine1'].value,
       country: this.GeneralInformationFormGroup.controls['country'].value,
@@ -180,27 +229,34 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
       phone1: this.GeneralInformationFormGroup.controls['phone1Ext'].value,
       phone2: this.GeneralInformationFormGroup.controls['phone2Ext'].value,
       fax: this.GeneralInformationFormGroup.controls['fax'].value,
-      ext: '',
-      website: this.GeneralInformationFormGroup.controls['website'].value,
+      ext: ''
     })
+  }
+
+  private enableBillingForm(): void {
+    Object.keys(this.BillingDetailsFormGroup.controls).forEach((key: string) => {
+      this.BillingDetailsFormGroup.get(key)?.enable();
+    });
+  }
+
+  private disableBillingForm(): void {
+    Object.keys(this.BillingDetailsFormGroup.controls).forEach((key: string) => {
+      this.BillingDetailsFormGroup.get(key)?.disable();
+    });
   }
 
   public sameAsOrgChange(event: any): void {
     this.isSameAsOrg = event.checked;
     if (this.isSameAsOrg) {
-      Object.keys(this.BillingDetailsFormGroup.controls).forEach((key: string) => {
-        this.BillingDetailsFormGroup.get(key)?.disable();
-      });
+      this.disableBillingForm();
       this.copyGeneralToBilling();
     } else {
-      Object.keys(this.BillingDetailsFormGroup.controls).forEach((key: string) => {
-        this.BillingDetailsFormGroup.get(key)?.enable();
-      });
+      this.enableBillingForm();
     }
   }
 
   public navigateBack(): void {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    this.router.navigate(['/admin/client-management']);
   }
 
   public clearForm(): void {
@@ -213,16 +269,17 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
   }
 
   public onGeneralCountryChange(event: ChangeEventArgs): void {
-    this.store.dispatch(new SetGeneralStatesByCountry(event.value as string));
+    this.store.dispatch(new SetGeneralStatesByCountry(event.value as Country));
   }
 
   public onBillingCountryChange(event: ChangeEventArgs): void {
-    this.store.dispatch(new SetBillingStatesByCountry(event.value as string));
-    this.statesBilling$.subscribe(state => console.log(state))
+    this.store.dispatch(new SetBillingStatesByCountry(event.value as Country));
   }
 
-  public uploadImages(): void {
-    this.uploadObj.upload(this.filesDetails, true);
+  public uploadImages(businessUnitId: number): void {
+    if (this.filesDetails.length) {
+      this.store.dispatch(new UploadOrganizationLogo(this.filesDetails[0].rawFile as Blob, businessUnitId));
+    }
   }
 
   public onImageSelect(event: any): void {
@@ -232,19 +289,6 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
       return;
     }
     this.filesDetails = this.filesDetails.concat(validFiles);
-    console.log(event);
-  }
-
-  public onUploadSuccess(event: any): void {
-    console.log(event);
-  }
-
-  public onFileUpload(event: any): void {
-    console.log(event);
-  }
-
-  public onUploadFailed(event: any): void {
-    console.log(event);
   }
 
   public onFileRemove(event: any): void {
@@ -264,12 +308,14 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
       this.ContactFormArray.valid &&
       this.PreferencesFormGroup.valid 
     ) {
-      this.store.dispatch(new CreateOrganization(new Organization(
+      this.store.dispatch(new SaveOrganization(new Organization(
+        this.currentBusinessUnitId as number,
         this.CreateUnderFormGroup.controls['createUnder'].value,
         this.GeneralInformationFormGroup.getRawValue(),
         this.BillingDetailsFormGroup.getRawValue(),
         this.ContactFormArray.getRawValue(),
-        this.PreferencesFormGroup.getRawValue()
+        this.PreferencesFormGroup.getRawValue(),
+        this.isSameAsOrg
       )));
       this.store.dispatch(new SetDirtyState(false));
     } else {
