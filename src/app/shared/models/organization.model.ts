@@ -86,9 +86,9 @@ export class ContactDetails {
 export class Preferences {
   id?: number;
   organizationId?: number;
-  paymentOptions: number | string;;
+  paymentOptions: number | string;
   paymentDescription: string;
-  timesheetSubmittedBy: number | string;;
+  timesheetSubmittedBy: number | string;
   weekStartsOn: number;
   considerLunch: boolean;
   purchaseOrderBy: number | string;

@@ -1,7 +1,7 @@
 import { Country } from "src/app/shared/enums/states";
 import { Organization } from "src/app/shared/models/organization.model";
 import { Department } from '../../shared/models/department.model';
-import { SuccessErrorToast } from '../../shared/models/success-error-toast.model';
+import { Location } from '../../shared/models/location.model';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[admin] Set General States By Country';
@@ -45,7 +45,7 @@ export class SaveDepartment {
 
 export class GetDepartmentsByLocationId {
   static readonly type = '[admin] Get The List Of Departments by locationId';
-  constructor(public locationId: number) { }
+  constructor(public locationId?: number) { }
 }
 
 export class UpdateDepartment {
@@ -55,7 +55,7 @@ export class UpdateDepartment {
 
 export class DeleteDepartmentById {
   static readonly type = '[admin] Delete Department by id';
-  constructor(public departmentId: number) { }
+  constructor(public department: Department) { }
 }
 
 export class GetRegionsByOrganizationId {
@@ -78,9 +78,19 @@ export class GetLocationById {
   constructor(public locationId: number) { }
 }
 
-export class SetSuccessErrorToastState {
-  static readonly type = '[admin] Set Success Error Toast Shown state';
-  constructor(public payload: SuccessErrorToast | null) { }
+export class SaveLocation {
+  static readonly type = '[admin] Create Location';
+  constructor(public location: Location) { }
+}
+
+export class UpdateLocation {
+  static readonly type = '[admin] Update Location';
+  constructor(public location: Location) { }
+}
+
+export class DeleteLocationById {
+  static readonly type = '[admin] Delete Location by id';
+  constructor(public locationId: number) { }
 }
 
 export class GetOrganizationsByPage {

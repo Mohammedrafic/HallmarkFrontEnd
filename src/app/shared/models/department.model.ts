@@ -1,6 +1,6 @@
 export class Department {
   departmentId?: number;
-  locationId: number;
+  locationId?: number;
   extDepartmentId: string;
   invoiceDepartmentId: string;
   departmentName: string;

@@ -20,6 +20,7 @@ import {
 
 import { ShellRoutingModule } from './shell-routing.module';
 import { ShellPageComponent } from './shell.component';
+import { SharedModule } from '../shared/shared.module';
 
 const sidebarIcons = {
   Sidebar,
@@ -45,6 +46,7 @@ const sidebarIcons = {
     TreeViewModule,
     ContextMenuModule,
     DialogModule,
+    SharedModule,
     FeatherModule.pick(sidebarIcons),
   ],
   providers: [],

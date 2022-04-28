@@ -1,9 +1,8 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { Observable } from 'rxjs';
-import { AdminState } from '../../../admin/store/admin.state';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Store } from '@ngxs/store';
+
 import { SetImportFileDialogState } from '../../../admin/store/admin.actions';
 
 @Component({
@@ -15,13 +14,11 @@ export class FileUploadDialogComponent implements OnInit {
   @ViewChild('importDialog') importDialog: DialogComponent;
   @ViewChild('file') file: ElementRef;
 
-  @Select(AdminState.importFileDialogState)
-  importFileDialogState$: Observable<boolean>;
-
-  constructor(private store: Store,) { }
+  constructor(private store: Store,
+              private actions$: Actions) { }
 
   ngOnInit(): void {
-    this.importFileDialogState$.subscribe(isDialogShown => {
+    this.actions$.pipe(ofActionDispatched(SetImportFileDialogState)).subscribe(isDialogShown => {
       if (isDialogShown) {
         this.importDialog.show();
       }
@@ -30,10 +27,6 @@ export class FileUploadDialogComponent implements OnInit {
 
   hideImportDialog(): void {
     this.importDialog.hide();
-  }
-
-  closeDialog(): void {
-    this.store.dispatch(new SetImportFileDialogState(false));
   }
 
   onUploadFileClick(): void {

@@ -9,7 +9,7 @@ import { ValidateDirective } from './directives/validate.directive';
 import { ErrorMessageComponent } from './components/error-message/error-message.component';
 import { ValidationErrorPipe } from './pipes/validation-error.pipe';
 import { CommonModule } from '@angular/common';
-import { SuccessErrorToastComponent } from './components/success-error-toast/success-error-toast.component';
+import { MessageToastComponent } from './components/message-toast/message-toast.component';
 import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 import { ImageUploaderComponent } from './components/image-uploader/image-uploader.component';
 import { FileUploadDialogComponent } from './components/file-upload-dialog/file-upload-dialog.component';
@@ -22,8 +22,8 @@ const COMPONENTS = [PageToolbarComponent, ValidationErrorPipe, ValidateDirective
 
 @NgModule({
   imports: [FeatherModule.pick(icons), CommonModule, UploaderModule, ToastModule, DialogModule, ButtonModule],
-  exports: [...COMPONENTS, SuccessErrorToastComponent, FileUploadDialogComponent],
-  declarations: [...COMPONENTS, ValidateDirective, ErrorMessageComponent, SuccessErrorToastComponent, FileUploadDialogComponent],
+  exports: [...COMPONENTS, MessageToastComponent, FileUploadDialogComponent],
+  declarations: [...COMPONENTS, ValidateDirective, ErrorMessageComponent, MessageToastComponent, FileUploadDialogComponent],
   providers: [],
 })
 export class SharedModule {}

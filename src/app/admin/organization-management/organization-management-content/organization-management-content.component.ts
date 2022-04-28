@@ -14,6 +14,7 @@ import { SetHeaderState } from '../../../store/app.actions';
 export class OrganizationManagementContentComponent  {
   additionalSectionMenu: { [key: string]: Object }[] = [
     { text: 'Departments', id: 1, route: 'admin/organization-management/departments' },
+    { text: 'Locations', id: 2, route: 'admin/organization-management/locations' }
   ];
   selectionSettings: SelectionSettingsModel = { mode: 'Single' };
 
@@ -24,7 +25,6 @@ export class OrganizationManagementContentComponent  {
   }
 
   goToSection(event: ListBoxChangeEventArgs ): void {
-    console.log(event);
     this.router.navigate(['admin/organization-management/departments']);
   }
 }
