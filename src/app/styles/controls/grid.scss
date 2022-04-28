@@ -4,13 +4,48 @@ ejs-grid.e-control.e-grid {
   border-radius: $grid-border-radius;
   box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.05);
 
+  &.e-gridwithtoolbar {
+    .e-gridheader:not(.e-gridtoolbar) {
+      border-radius: unset;
+      border-top: none;
+    }
+
+    .e-gridtoolbar {
+      font-feature-settings: "smcp" 0;
+      font-variant: none;
+      height: 67px;
+      padding: 0 21px;
+      display: flex;
+    }
+  }
+
   ejs-pager {
     border-top: none;
+  }
+
+  &.e-resize-lines .e-headercell {
+    .e-rhandler,
+    .e-rsuppress {
+      border: none;
+    }
   }
 
   .e-pager {
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
+  }
+
+  .e-templatecell {
+    .e-grid-tool-buttons {
+      & > *:not(:first-child) {
+        margin-left: 20px;
+      }
+
+      .icon {
+        color: $secondary-dark-blue-20;
+        cursor: pointer;
+      }
+    }
   }
 
   .e-pagertemplate {
@@ -25,7 +60,7 @@ ejs-grid.e-control.e-grid {
         margin-left: 16px;
 
         #goToPage {
-          margin-left: 35px
+          margin-left: 35px;
         }
       }
     }
