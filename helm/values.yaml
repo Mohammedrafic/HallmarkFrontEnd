@@ -80,3 +80,6 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+env:
+  backendurl: "https://dev.einstein2.com/einsteinapi"
