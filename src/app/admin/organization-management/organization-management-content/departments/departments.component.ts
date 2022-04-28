@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ResizeSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { AnimationSettingsModel, DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
@@ -20,7 +20,7 @@ import {
   DeleteDepartmentById,
   GetRegionsByOrganizationId,
   UpdateDepartment,
-  GetLocationsByRegionId
+  GetLocationsByRegionId, SetImportFileDialogState
 } from '../../../store/admin.actions';
 import { Region } from '../../../../shared/models/region.model';
 import { Location } from '../../../../shared/models/location.model';
@@ -207,6 +207,11 @@ export class DepartmentsComponent implements OnInit {
     } else {
       this.departmentsDetailsFormGroup.markAllAsTouched();
     }
+  }
+
+  onImportDataClick(): void {
+    this.store.dispatch(new SetImportFileDialogState(true));
+    // TODO: implement data parse after BE implementation
   }
 
   private createDepartmentsForm(): void {

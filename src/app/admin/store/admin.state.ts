@@ -28,7 +28,7 @@ import {
   UpdateDepartment,
   DeleteDepartmentById,
   GetLocationById,
-  GetLocationsByRegionId
+  GetLocationsByRegionId, SetImportFileDialogState
 } from './admin.actions';
 import { DepartmentsService } from '../services/departments.service';
 import { Department } from '../../shared/models/department.model';
@@ -54,6 +54,7 @@ export interface AdminStateModel {
   isOrganizationLoading: boolean;
   organizations: OrganizationPage | null;
   isDepartmentLoading: boolean;
+  isImportFileDialogShown: boolean;
   departments: Department[];
   regions: Region[];
   locations: Location[];
@@ -75,6 +76,7 @@ export interface AdminStateModel {
     isOrganizationLoading: false,
     organizations: null,
     isDepartmentLoading: false,
+    isImportFileDialogShown: false,
     departments: [],
     regions: [],
     locations: [],
@@ -123,6 +125,9 @@ export class AdminState {
 
   @Selector()
   static successErrorToastState(state: AdminStateModel): SuccessErrorToast | null { return state.successErrorToastState; }
+
+  @Selector()
+  static importFileDialogState(state: AdminStateModel): boolean { return state.isImportFileDialogShown; }
 
   @Selector()
   static organizations(state: AdminStateModel): OrganizationPage | null { return state.organizations; }
@@ -262,5 +267,10 @@ export class AdminState {
   @Action(SetSuccessErrorToastState)
   SetSuccessErrorToastState({ patchState }: StateContext<AdminStateModel>, { payload }: SetSuccessErrorToastState): void {
     patchState({ successErrorToastState: payload });
+  }
+
+  @Action(SetImportFileDialogState)
+  SetFileImportDialogState({ patchState }: StateContext<AdminStateModel>, { payload }: SetImportFileDialogState): void {
+    patchState({ isImportFileDialogShown: payload });
   }
 }

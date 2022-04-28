@@ -12,15 +12,18 @@ import { CommonModule } from '@angular/common';
 import { SuccessErrorToastComponent } from './components/success-error-toast/success-error-toast.component';
 import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 import { ImageUploaderComponent } from './components/image-uploader/image-uploader.component';
+import { FileUploadDialogComponent } from './components/file-upload-dialog/file-upload-dialog.component';
+import { DialogModule } from '@syncfusion/ej2-angular-popups';
+import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 
 const icons = {AlertCircle, CheckCircle};
 
 const COMPONENTS = [PageToolbarComponent, ValidationErrorPipe, ValidateDirective, ImageUploaderComponent];
 
 @NgModule({
-  imports: [FeatherModule.pick(icons), CommonModule, ToastModule, UploaderModule],
-  exports: [...COMPONENTS, SuccessErrorToastComponent],
-  declarations: [...COMPONENTS, ValidateDirective, ErrorMessageComponent, SuccessErrorToastComponent],
+  imports: [FeatherModule.pick(icons), CommonModule, UploaderModule, ToastModule, DialogModule, ButtonModule],
+  exports: [...COMPONENTS, SuccessErrorToastComponent, FileUploadDialogComponent],
+  declarations: [...COMPONENTS, ValidateDirective, ErrorMessageComponent, SuccessErrorToastComponent, FileUploadDialogComponent],
   providers: [],
 })
 export class SharedModule {}

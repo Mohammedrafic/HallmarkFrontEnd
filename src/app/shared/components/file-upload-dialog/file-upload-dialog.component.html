@@ -1,0 +1,57 @@
+<ejs-dialog
+  id="importDialog"
+  cssClass="import-dialog"
+  #importDialog
+  isModal="true"
+  [visible]="false"
+  showCloseIcon="true"
+  (close)="closeDialog()"
+  (overlayClick)="hideImportDialog()"
+  width="448px"
+  height="282px"
+>
+  <ng-template #header>
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title">Import</h3>
+        </div>
+      </div>
+    </section>
+  </ng-template>
+
+  <ng-template #content>
+    <div class="instructions">
+      <p>Click + Upload File</p>
+      <p>browse CSV file and click Open</p>
+    </div>
+    <div>
+      <p class="instructions-disabled">Upload file to import data
+        <span>
+            <a href="" class="download-template-button">Download template</a>
+          </span>
+      </p>
+    </div>
+  </ng-template>
+
+  <ng-template #footerTemplate>
+    <div class="e-card-content">
+      <button
+        id="cancelImportButton"
+        ejs-button
+        cssClass="e-outline"
+        (click)="hideImportDialog()">Cancel</button>
+      <input
+        type="file"
+        #file
+        style="display: none"
+        (change)="onFilesAdded()"
+      />
+      <button
+        id="uploadFileButton"
+        ejs-button
+        [isPrimary]="true"
+        (click)="onUploadFileClick()">Upload File</button>
+    </div>
+  </ng-template>
+</ejs-dialog>

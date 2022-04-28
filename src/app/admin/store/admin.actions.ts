@@ -97,3 +97,8 @@ export class SetDirtyState {
   static readonly type = '[admin] Set Dirty State Of The Form';
   constructor(public payload: boolean) { }
 }
+
+export class SetImportFileDialogState {
+  static readonly type = '[admin] Set Import file dialog State';
+  constructor(public payload: boolean) { }
+}

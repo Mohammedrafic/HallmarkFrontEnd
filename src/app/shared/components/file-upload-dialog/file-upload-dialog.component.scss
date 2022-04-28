@@ -1,0 +1,49 @@
+@import '../../../styles/variables/colors';
+
+.import-dialog {
+  padding: 20px 24px 16px 24px;
+  border-radius: 10px !important;
+
+  .e-dlg-header-content {
+    padding: 0;
+    margin-bottom: 40px;
+
+    .e-dlg-closeicon-btn {
+      padding: 0;
+      height: 16px;
+      width: 16px;
+    }
+
+    .e-card-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 32px;
+    }
+  }
+
+  .e-dlg-content {
+    padding: 4px;
+    font-size: 14px;
+    line-height: 20px;
+
+    p {
+      margin: 0;
+    }
+
+    .instructions-disabled {
+      padding-top: 23px;
+      color: $secondary-dark-blue-20;
+
+      .download-template-button {
+        font-weight: 700;
+        color: $primary-active-blue-10;
+        padding-left: 28px;
+      }
+    }
+  }
+
+  .e-footer-content {
+    padding: 0;
+  }
+}

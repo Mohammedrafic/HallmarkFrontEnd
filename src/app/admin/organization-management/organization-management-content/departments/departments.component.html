@@ -2,14 +2,14 @@
   <section class="toolbar">
     <section class="department-details bootstrap">
       <ejs-dropdownlist
-        id="regions"
+        id="regionsDropDown"
         class="region-dropdown" placeholder="Region"
         [dataSource]="regions$ | async"
         [fields]="regionFields"
         (change)="onRegionDropDownChanged($event)"
         ></ejs-dropdownlist>
       <ejs-dropdownlist
-        id="locations"
+        id="locationsDropDown"
         class="location-dropdown"
         placeholder="Location"
         [enabled]="isLocationsDropDownEnabled"
@@ -19,9 +19,20 @@
       ></ejs-dropdownlist>
     </section>
     <section>
-      <button ejs-button cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
-      <button ejs-button cssClass="e-outline button-export">Import <i-feather name="upload" class="icon"></i-feather></button>
-      <button ejs-button [isPrimary]="true" (click)='onAddDepartmentClick()'>Add Department</button>
+      <button
+        ejs-button
+        id="filterButton"
+        cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+      <button
+        ejs-button
+        id="importButton"
+        cssClass="e-outline button-export"
+        (click)="onImportDataClick()">Import <i-feather name="upload" class="icon"></i-feather></button>
+      <button
+        ejs-button
+        id="addDepartmentButton"
+        [isPrimary]="true"
+        (click)='onAddDepartmentClick()'>Add Department</button>
     </section>
   </section>
 
@@ -116,19 +127,29 @@
               <h3 class="e-card-title">Add Department</h3>
             </div>
             <div  class="e-card-content">
-              <button ejs-button cssClass="e-outline button-cancel" (click)="onDepartmentFormCancelClick()">Cancel</button>
-              <button ejs-button type="submit" [isPrimary]="true" (click)="onDepartmentFormSaveClick()">Save</button>
+              <button
+                ejs-button
+                cssClass="e-outline button-cancel"
+                id="cancelFormButton"
+                (click)="onDepartmentFormCancelClick()">Cancel</button>
+              <button
+                ejs-button
+                id="addFormButton"
+                type="submit"
+                [isPrimary]="true"
+                (click)="onDepartmentFormSaveClick()">Save</button>
             </div>
           </div>
         </section>
 
         <form class="form-container bootstrap"
+              id="addEditRecordForm"
               [formGroup]="departmentsDetailsFormGroup">
           <div>
             <div class="input-container">
-              <label for="ext-department-id">Ext Department ID <span class="field-required">*</span></label>
+              <label for="extDepartmentId">Ext Department ID <span class="field-required">*</span></label>
               <div class="input-group">
-                <input id="ext-department-id"
+                <input id="extDepartmentId"
                        class="e-input"
                        type="text"
                        maxlength="50"
@@ -141,9 +162,9 @@
 
           <div>
             <div class="input-container">
-              <label for="invoice-department-id">Invoice Department ID <span class="field-required">*</span></label>
+              <label for="invoiceDepartmentId">Invoice Department ID <span class="field-required">*</span></label>
               <div class="input-group">
-                <input id="invoice-department-id"
+                <input id="invoiceDepartmentId"
                        class="e-input"
                        type="text"
                        maxlength="50"
@@ -156,9 +177,9 @@
 
           <div>
             <div class="input-container">
-              <label for="department-name">Department Name <span class="field-required">*</span></label>
+              <label for="departmentName">Department Name <span class="field-required">*</span></label>
               <div class="input-group">
-                <input id="department-name"
+                <input id="departmentName"
                        class="e-input"
                        type="text"
                        maxlength="50"
@@ -171,10 +192,10 @@
 
           <div>
             <div class="input-container">
-              <label for="facility-contact">Facility Contact <span class="field-required">*</span></label>
+              <label for="facilityContact">Facility Contact <span class="field-required">*</span></label>
               <div class="input-group">
                 <input
-                  id="facility-contact"
+                  id="facilityContact"
                   class="e-input"
                   type="text"
                   maxlength="50"
@@ -188,10 +209,10 @@
 
           <div>
             <div class="input-container">
-              <label for="facility-email">Facility Email <span class="field-required">*</span></label>
+              <label for="facilityEmail">Facility Email <span class="field-required">*</span></label>
               <div class="input-group">
                 <input
-                  id="facility-email"
+                  id="facilityEmail"
                   class="e-input"
                   type="email"
                   appValidateWithMessage
@@ -204,10 +225,10 @@
 
           <div>
             <div class="input-container facility-phone">
-              <label for="facility-phone-no">Facility Phone No <span class="field-required">*</span></label>
+              <label for="facilityPhoneNumber">Facility Phone No <span class="field-required">*</span></label>
               <div class="input-group">
                 <input
-                  id="facility-phone-no"
+                  id="facilityPhoneNumber"
                   class="e-input facility-phone"
                   type="tel"
                   maxlength="10"
@@ -221,10 +242,10 @@
 
           <div>
             <div class="input-container calendar">
-              <label for="inactive-date">Inactive Date</label>
+              <label for="inactiveDate">Inactive Date</label>
               <div class="input-group datepicker">
                 <ejs-datepicker
-                  id="inactive-date"
+                  id="inactiveDate"
                   class="datepicker"
                   format="MM/dd/yyyy"
                   appValidateWithMessage
@@ -240,7 +261,9 @@
         </form>
       </section>
     </ng-template>
-  </ejs-dialog>`
+  </ejs-dialog>
 </section>
+
+<app-file-upload-dialog></app-file-upload-dialog>
 
 <app-success-error-toast></app-success-error-toast>
