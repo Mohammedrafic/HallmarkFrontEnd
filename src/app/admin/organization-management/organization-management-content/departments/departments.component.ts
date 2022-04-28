@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
-import { AnimationSettingsModel, DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -42,7 +42,6 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   // department form data
   @ViewChild('addEditDepartmentDialog') addEditDepartmentDialog: DialogComponent;
   targetElement: HTMLElement = document.body;
-  animationSettings: AnimationSettingsModel = { effect: 'SlideRight' };
   departmentsDetailsFormGroup: FormGroup;
   formBuilder: FormBuilder;
 
@@ -57,10 +56,10 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   @Select(AdminState.locationsByRegionId)
   locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
-  locationFields: FieldSettingsModel = { text: 'locationName', value: 'locationId' };
+  locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedLocation: Location;
 
-  editedDepartmentId: number | undefined;
+  editedDepartmentId?: number;
   isEdit: boolean;
 
   constructor(private store: Store,
@@ -135,7 +134,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   onRemoveDepartmentClick(department: Department): void {
     if (department.departmentId) { // TODO: add verification to prevent remove if department has assigned Order with any status
-      this.store.dispatch(new DeleteDepartmentById(department.departmentId));
+      this.store.dispatch(new DeleteDepartmentById(department));
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_CANNOT_BE_DELETED));
     }

@@ -21,7 +21,7 @@ export class LocationService {
    * @return Array of locations
    */
   public getLocationsByRegionId(regionId: number): Observable<Location[]> {
-    return this.http.get<Location[]>(`/api/Locations/${regionId}`);
+    return this.http.get<Location[]>(`/api/Locations/region/${regionId}`);
   }
 
   /**

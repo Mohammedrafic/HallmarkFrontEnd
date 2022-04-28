@@ -55,7 +55,7 @@ export class UpdateDepartment {
 
 export class DeleteDepartmentById {
   static readonly type = '[admin] Delete Department by id';
-  constructor(public departmentId: number) { }
+  constructor(public department: Department) { }
 }
 
 export class GetRegionsByOrganizationId {

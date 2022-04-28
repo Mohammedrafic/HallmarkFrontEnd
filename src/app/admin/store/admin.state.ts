@@ -27,7 +27,7 @@ import {
   UpdateDepartment,
   DeleteDepartmentById,
   GetLocationById,
-  GetLocationsByRegionId, SetImportFileDialogState
+  GetLocationsByRegionId
 } from './admin.actions';
 import { DepartmentsService } from '../services/departments.service';
 import { Department } from '../../shared/models/department.model';
@@ -54,7 +54,6 @@ export interface AdminStateModel {
   isOrganizationLoading: boolean;
   organizations: OrganizationPage | null;
   isDepartmentLoading: boolean;
-  isImportFileDialogShown: boolean;
   departments: Department[];
   regions: Region[];
   locations: Location[];
@@ -75,7 +74,6 @@ export interface AdminStateModel {
     isOrganizationLoading: false,
     organizations: null,
     isDepartmentLoading: false,
-    isImportFileDialogShown: false,
     departments: [],
     regions: [],
     locations: [],
@@ -120,9 +118,6 @@ export class AdminState {
 
   @Selector()
   static locationById(state: AdminStateModel): Location | null { return state.location; }
-
-  @Selector()
-  static importFileDialogState(state: AdminStateModel): boolean { return state.isImportFileDialogShown; }
 
   @Selector()
   static organizations(state: AdminStateModel): OrganizationPage | null { return state.organizations; }
@@ -223,9 +218,11 @@ export class AdminState {
   }
 
   @Action(DeleteDepartmentById)
-  DeleteDepartmentById({ patchState }: StateContext<AdminStateModel>, { departmentId }: DeleteDepartmentById): void {
-    this.departmentService.deleteDepartmentById(departmentId).pipe(tap(() => {
+  DeleteDepartmentById({ patchState, dispatch }: StateContext<AdminStateModel>, { department }: DeleteDepartmentById): Observable<void> {
+    return this.departmentService.deleteDepartmentById(department.departmentId).pipe(tap((payload) => {
       patchState({ isDepartmentLoading: false });
+      dispatch(new GetDepartmentsByLocationId(department.locationId));
+      return payload;
     }));
   }
 
@@ -249,6 +246,7 @@ export class AdminState {
   GetLocationsByRegionId({ patchState }: StateContext<AdminStateModel>, { regionId }: GetLocationsByRegionId): Observable<Location[]> {
     return this.locationService.getLocationsByRegionId(regionId).pipe(tap((payload) => {
       patchState({ locations: payload});
+      // dispatch(new GetDepartmentsByLocationId(department.locationId));
       return payload;
     }));
   }
@@ -259,10 +257,5 @@ export class AdminState {
       patchState({ location: payload});
       return payload;
     }));
-  }
-
-  @Action(SetImportFileDialogState)
-  SetFileImportDialogState({ patchState }: StateContext<AdminStateModel>, { payload }: SetImportFileDialogState): void {
-    patchState({ isImportFileDialogShown: payload });
   }
 }

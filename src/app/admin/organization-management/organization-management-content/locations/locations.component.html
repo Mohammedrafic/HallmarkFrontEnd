@@ -41,7 +41,9 @@
       [allowResizing]="allowResizing"
     >
       <e-columns>
-        <!--  TODO: add columns  -->
+        <e-column field="externalId" headerText="EXT LOCATION ID" width=200></e-column>
+        <e-column field="invoiceId" headerText="INVOICE LOCATION ID" width=200></e-column>
+        <e-column field="name" headerText="LOCATION NAME" width=200></e-column>
         <e-column textAlign="Right" width=120>
           <ng-template #template let-data>
             <div class="row-tool-buttons">

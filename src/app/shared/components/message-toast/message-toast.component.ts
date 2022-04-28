@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { ToastComponent } from '@syncfusion/ej2-angular-notifications';
-import { Actions, ofAction, Store } from '@ngxs/store';
+import { Actions, ofAction, ofActionDispatched, Store } from '@ngxs/store';
 
 import { MessageTypes } from '../../enums/message-types';
 import { ShowToast } from '../../../store/app.actions';
@@ -22,11 +22,11 @@ export class MessageToastComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.actions$.pipe(ofAction(ShowToast)).subscribe((payload: { type: MessageTypes, messageContent: string }) => {
-      this.toast.show();
+    this.actions$.pipe(ofActionDispatched(ShowToast)).subscribe((payload: { type: MessageTypes, messageContent: string }) => {
       this.type = payload.type;
       this.messageContent = payload.messageContent;
       this.cssClass = this.getCssClass(this.type);
+      this.toast.show();
     });
   }
 

@@ -122,9 +122,9 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.addEditDialog.show();
   }
 
-  onRemoveButtonClick(department: Department): void {
-    if (department.departmentId) { // TODO: add verification to prevent remove if department has assigned Order with any status
-      this.store.dispatch(new DeleteDepartmentById(department.departmentId));
+  onRemoveButtonClick(location: Location): void {
+    if (location.id) { // TODO: add verification to prevent remove if department has assigned Order with any status
+      // this.store.dispatch(new DeleteLocationById(department.departmentId));
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_CANNOT_BE_DELETED));
     }
