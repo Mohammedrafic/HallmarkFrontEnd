@@ -24,7 +24,7 @@ import { Region } from '../../../../shared/models/region.model';
 import { Location } from '../../../../shared/models/location.model';
 import { AdminState } from '../../../store/admin.state';
 import { MessageTypes } from '../../../../shared/enums/message-types';
-import { AbstractGridComponentComponent } from '../../../../shared/components/abstract-grid-component/abstract-grid-component.component';
+import { AbstractGridConfigurationComponent } from '../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 export const MESSAGE_CANNOT_BE_DELETED = 'Department cannot be deleted';
@@ -35,7 +35,7 @@ export const MESSAGE_CANNOT_BE_DELETED = 'Department cannot be deleted';
   styleUrls: ['./departments.component.scss'],
   providers: [MaskedDateTimeService],
 })
-export class DepartmentsComponent extends AbstractGridComponentComponent implements OnInit {
+export class DepartmentsComponent extends AbstractGridConfigurationComponent implements OnInit {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
 

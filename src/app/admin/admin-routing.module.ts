@@ -8,6 +8,7 @@ import { ClientManagementContentComponent } from './client-management/client-man
 import {
   OrganizationManagementContentComponent
 } from './organization-management/organization-management-content/organization-management-content.component';
+import { LocationsComponent } from './organization-management/organization-management-content/locations/locations.component';
 import {
   DepartmentsComponent
 } from './organization-management/organization-management-content/departments/departments.component';
@@ -45,6 +46,10 @@ const routes: Routes = [
           {
             path: 'departments',
             component: DepartmentsComponent
+          },
+          {
+            path: 'locations',
+            component: LocationsComponent
           }
         ]
       }

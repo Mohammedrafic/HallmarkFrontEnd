@@ -2,7 +2,7 @@ import { ResizeSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-mo
 
 import { GRID_CONFIG } from '../../constants/grid-config';
 
-export abstract class AbstractGridComponentComponent {
+export abstract class AbstractGridConfigurationComponent {
 // grid
   gridDataSource: object[] = [];
   allowPaging = GRID_CONFIG.isPagingEnabled;
