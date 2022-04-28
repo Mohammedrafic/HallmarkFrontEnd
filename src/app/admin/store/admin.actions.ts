@@ -1,6 +1,7 @@
 import { Country } from "src/app/shared/enums/states";
 import { Organization } from "src/app/shared/models/organization.model";
 import { Department } from '../../shared/models/department.model';
+import { Location } from '../../shared/models/location.model';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[admin] Set General States By Country';
@@ -44,7 +45,7 @@ export class SaveDepartment {
 
 export class GetDepartmentsByLocationId {
   static readonly type = '[admin] Get The List Of Departments by locationId';
-  constructor(public locationId: number) { }
+  constructor(public locationId?: number) { }
 }
 
 export class UpdateDepartment {
@@ -74,6 +75,21 @@ export class GetLocationsByRegionId {
 
 export class GetLocationById {
   static readonly type = '[admin] Get The Location by id';
+  constructor(public locationId: number) { }
+}
+
+export class SaveLocation {
+  static readonly type = '[admin] Create Location';
+  constructor(public location: Location) { }
+}
+
+export class UpdateLocation {
+  static readonly type = '[admin] Update Location';
+  constructor(public location: Location) { }
+}
+
+export class DeleteLocationById {
+  static readonly type = '[admin] Delete Location by id';
   constructor(public locationId: number) { }
 }
 

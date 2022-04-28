@@ -57,7 +57,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   @Select(AdminState.locationsByRegionId)
   locations$: Observable<Location[]>;
   isLocationsDropDownEnabled: boolean = false;
-  locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  locationFields: FieldSettingsModel = { text: 'locationName', value: 'locationId' };
   selectedLocation: Location;
 
   editedDepartmentId: number | undefined;
@@ -86,7 +86,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   onLocationDropDownChanged(event: ChangeEventArgs): void {
     this.selectedLocation = event.itemData as Location;
-    this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocation.locationId));
+    if (this.selectedLocation.id) {
+      this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocation.id));
+    }
     this.mapGridData();
   }
 
@@ -148,7 +150,6 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   onDepartmentFormCancelClick(): void {
-    this.departmentsDetailsFormGroup.controls['extDepartmentId'].markAsUntouched();
     this.departmentsDetailsFormGroup.reset();
     this.addEditDepartmentDialog.hide();
     // TODO: add modal dialog to confirm close
@@ -158,7 +159,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     if (this.departmentsDetailsFormGroup.valid) {
       const department: Department = {
         departmentId: this.editedDepartmentId,
-        locationId: this.selectedLocation.locationId,
+        locationId: this.selectedLocation.id,
         extDepartmentId: this.departmentsDetailsFormGroup.controls['extDepartmentId'].value,
         invoiceDepartmentId: this.departmentsDetailsFormGroup.controls['invoiceDepartmentId'].value,
         departmentName: this.departmentsDetailsFormGroup.controls['departmentName'].value,

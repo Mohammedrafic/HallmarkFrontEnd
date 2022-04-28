@@ -23,7 +23,7 @@ export class DepartmentsService {
    * Get the list of available departments by locationId
    * @return Array of departments
    */
-  public getDepartmentsByLocationId(locationId: number): Observable<Department[]> {
+  public getDepartmentsByLocationId(locationId?: number): Observable<Department[]> {
     return this.http.get<Department[]>(`/api/Departments/byLocation/${locationId}`);
   }
 

@@ -3,19 +3,11 @@
     <section class="department-details bootstrap">
       <ejs-dropdownlist
         id="regionsDropDown"
-        class="region-dropdown" placeholder="Region"
+        class="region-dropdown"
+        placeholder="Region"
         [dataSource]="regions$ | async"
         [fields]="regionFields"
         (change)="onRegionDropDownChanged($event)"
-      ></ejs-dropdownlist>
-      <ejs-dropdownlist
-        id="locationsDropDown"
-        class="location-dropdown"
-        placeholder="Location"
-        [enabled]="isLocationsDropDownEnabled"
-        [dataSource]="locations$ | async"
-        [fields]="locationFields"
-        (change)="onLocationDropDownChanged($event)"
       ></ejs-dropdownlist>
     </section>
     <section>
@@ -32,7 +24,7 @@
         ejs-button
         id="addDepartmentButton"
         [isPrimary]="true"
-        (click)='onAddDepartmentClick()'>Add Department</button>
+        (click)='onAddDepartmentClick()'>Add Location</button>
     </section>
   </section>
 
@@ -49,18 +41,12 @@
       [allowResizing]="allowResizing"
     >
       <e-columns>
-        <e-column field="extDepartmentId" headerText="EXT DEPARTMENT ID" width=200></e-column>
-        <e-column field="invoiceDepartmentId" headerText="INVOICE DEPARTMENT ID" width=200></e-column>
-        <e-column field="departmentName" headerText="DEPARTMENT NAME" width=200></e-column>
-        <e-column field="facilityContact" headerText="FACILITY CONTACT" width=200></e-column>
-        <e-column field="facilityEmail" headerText="FACILITY EMAIL" width=200></e-column>
-        <e-column field="facilityPhoneNo" headerText="FACILITY PHONE NO" [valueAccessor]="formatPhoneNumber" width=200></e-column>
-        <e-column field="inactiveDate" headerText="INACTIVE DATE" type='date' format="MM/dd/yyyy" width=200></e-column>
+        <!--  TODO: add columns  -->
         <e-column textAlign="Right" width=120>
           <ng-template #template let-data>
             <div class="row-tool-buttons">
-              <span class="edit-button" (click)="onEditDepartmentClick(data)"><i-feather name="edit" class="icon"></i-feather></span>
-              <span class="remove-button" (click)="onRemoveDepartmentClick(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
+              <span class="edit-button" (click)="onEditButtonClick(data)"><i-feather name="edit" class="icon"></i-feather></span>
+              <span class="remove-button" (click)="onRemoveButtonClick(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
             </div>
           </ng-template>
         </e-column>
@@ -112,39 +98,38 @@
 
   <ejs-dialog
     id="dialog"
-    #addEditDepartmentDialog
+    #addEditDialog
     cssClass="dialog"
     [target]="targetElement"
     [visible]="false"
-    [animationSettings]="animationSettings"
+    [animationSettings]="{ effect: 'SlideRight' }"
   >
     <ng-template #content>
-      <!--TODO: move to shared component-->
       <section class="container">
         <section class="header-container">
           <div class="e-card-header">
             <div class="e-card-header-caption">
-              <h3 class="e-card-title">Add Department</h3>
+              <h3 class="e-card-title">Add Location</h3>
             </div>
             <div  class="e-card-content">
               <button
                 ejs-button
                 cssClass="e-outline button-cancel"
                 id="cancelFormButton"
-                (click)="onDepartmentFormCancelClick()">Cancel</button>
+                (click)="onFormCancelClick()">Cancel</button>
               <button
                 ejs-button
                 id="addFormButton"
                 type="submit"
                 [isPrimary]="true"
-                (click)="onDepartmentFormSaveClick()">Save</button>
+                (click)="onFormSaveClick()">Save</button>
             </div>
           </div>
         </section>
 
         <form class="form-container bootstrap"
               id="addEditRecordForm"
-              [formGroup]="departmentsDetailsFormGroup">
+              [formGroup]="locationDetailsFormGroup">
           <div>
             <div class="input-container">
               <label for="extDepartmentId">Ext Department ID <span class="field-required">*</span></label>
