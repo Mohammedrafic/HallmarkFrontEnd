@@ -33,6 +33,8 @@ import { DepartmentsService } from '../services/departments.service';
 import { Department } from '../../shared/models/department.model';
 import { Region } from '../../shared/models/region.model';
 import { Location } from '../../shared/models/location.model';
+import { RegionService } from '../services/region.service';
+import { LocationService } from '../services/location.service';
 
 interface DropdownOption {
   id: number;
@@ -128,6 +130,8 @@ export class AdminState {
   constructor(
     private organizationService: OrganizationService,
     private departmentService: DepartmentsService,
+    private regionService: RegionService,
+    private locationService: LocationService
   ) { }
 
   @Action(SetGeneralStatesByCountry)
@@ -227,7 +231,7 @@ export class AdminState {
 
   @Action(GetRegionsByOrganizationId)
   GetRegionsByOrganizationId({ patchState }: StateContext<AdminStateModel>, { organizationId }: GetRegionsByOrganizationId): Observable<Region[]> {
-    return this.departmentService.getRegionsByOragnizationId(organizationId).pipe(tap((payload) => {
+    return this.regionService.getRegionsByOrganizationId(organizationId).pipe(tap((payload) => {
       patchState({ regions: payload});
       return payload;
     }));
@@ -235,7 +239,7 @@ export class AdminState {
 
   @Action(GetLocationsByOrganizationId)
   GetLocationsByOrganizationId({ patchState }: StateContext<AdminStateModel>, { organizationId }: GetLocationsByOrganizationId): Observable<Location[]> {
-    return this.departmentService.getLocationsByOrganizationId(organizationId).pipe(tap((payload) => {
+    return this.locationService.getLocationsByOrganizationId(organizationId).pipe(tap((payload) => {
       patchState({ locations: payload});
       return payload;
     }));
@@ -243,7 +247,7 @@ export class AdminState {
 
   @Action(GetLocationsByRegionId)
   GetLocationsByRegionId({ patchState }: StateContext<AdminStateModel>, { regionId }: GetLocationsByRegionId): Observable<Location[]> {
-    return this.departmentService.getLocationsByRegionId(regionId).pipe(tap((payload) => {
+    return this.locationService.getLocationsByRegionId(regionId).pipe(tap((payload) => {
       patchState({ locations: payload});
       return payload;
     }));
@@ -251,7 +255,7 @@ export class AdminState {
 
   @Action(GetLocationById)
   GetLocationById({ patchState }: StateContext<AdminStateModel>, { locationId }: GetLocationById): Observable<Location> {
-    return this.departmentService.getLocationById(locationId).pipe(tap((payload) => {
+    return this.locationService.getLocationById(locationId).pipe(tap((payload) => {
       patchState({ location: payload});
       return payload;
     }));
