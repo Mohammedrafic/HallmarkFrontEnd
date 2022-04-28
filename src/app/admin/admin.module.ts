@@ -9,7 +9,6 @@ import { UploaderModule, TextBoxModule, NumericTextBoxModule } from '@syncfusion
 import { SidebarModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
-import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 import { FeatherModule } from 'angular-feather';
 import {
   Download,
@@ -35,6 +34,7 @@ import { AdminState } from './store/admin.state';
 import { SharedModule } from '../shared/shared.module';
 import { OrganizationManagementContentComponent } from './organization-management/organization-management-content/organization-management-content.component';
 import { DepartmentsComponent } from './organization-management/organization-management-content/departments/departments.component';
+import { LocationsComponent } from './organization-management/organization-management-content/locations/locations.component';
 
 const sidebarIcons = {
   Download,
@@ -56,7 +56,8 @@ const sidebarIcons = {
     AddEditOrganizationComponent,
     AdminComponent,
     OrganizationManagementContentComponent,
-    DepartmentsComponent
+    DepartmentsComponent,
+    LocationsComponent
   ],
   imports: [
     CommonModule,

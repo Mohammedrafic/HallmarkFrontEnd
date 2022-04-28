@@ -1,4 +1,5 @@
 import { ClientSidebarMenu } from "../shared/models/client-sidebar-menu.model";
+import { MessageTypes } from '../shared/enums/message-types';
 
 export class ToggleMobileView {
   static readonly type = '[app] Toggle mobile view layout';
@@ -28,4 +29,9 @@ export class ToggleSidebarState {
 export class SetIsFirstLoadState {
   static readonly type = '[app] Set isFirstLoad parameter state';
   constructor(public payload: any) { }
+}
+
+export class ShowToast {
+  static readonly type = '[app] Set Toast Showing state';
+  constructor(public type: MessageTypes, public messageContent: string) { }
 }

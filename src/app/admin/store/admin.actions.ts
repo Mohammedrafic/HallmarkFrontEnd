@@ -1,7 +1,6 @@
 import { Country } from "src/app/shared/enums/states";
 import { Organization } from "src/app/shared/models/organization.model";
 import { Department } from '../../shared/models/department.model';
-import { SuccessErrorToast } from '../../shared/models/success-error-toast.model';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[admin] Set General States By Country';
@@ -76,11 +75,6 @@ export class GetLocationsByRegionId {
 export class GetLocationById {
   static readonly type = '[admin] Get The Location by id';
   constructor(public locationId: number) { }
-}
-
-export class SetSuccessErrorToastState {
-  static readonly type = '[admin] Set Success Error Toast Shown state';
-  constructor(public payload: SuccessErrorToast | null) { }
 }
 
 export class GetOrganizationsByPage {

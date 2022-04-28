@@ -24,7 +24,6 @@ import {
   GetOrganizationById,
   GetOrganizationByIdSucceeded,
   SetGeneralStatesByCountry,
-  SetSuccessErrorToastState,
   UpdateDepartment,
   DeleteDepartmentById,
   GetLocationById,
@@ -34,7 +33,6 @@ import { DepartmentsService } from '../services/departments.service';
 import { Department } from '../../shared/models/department.model';
 import { Region } from '../../shared/models/region.model';
 import { Location } from '../../shared/models/location.model';
-import { SuccessErrorToast } from '../../shared/models/success-error-toast.model';
 
 interface DropdownOption {
   id: number;
@@ -59,7 +57,6 @@ export interface AdminStateModel {
   regions: Region[];
   locations: Location[];
   location: Location | null;
-  successErrorToastState: SuccessErrorToast | null;
   isDirty: boolean;
 }
 
@@ -81,7 +78,6 @@ export interface AdminStateModel {
     regions: [],
     locations: [],
     location: null,
-    successErrorToastState: null,
     isDirty: false
   },
 })
@@ -122,9 +118,6 @@ export class AdminState {
 
   @Selector()
   static locationById(state: AdminStateModel): Location | null { return state.location; }
-
-  @Selector()
-  static successErrorToastState(state: AdminStateModel): SuccessErrorToast | null { return state.successErrorToastState; }
 
   @Selector()
   static importFileDialogState(state: AdminStateModel): boolean { return state.isImportFileDialogShown; }
@@ -262,11 +255,6 @@ export class AdminState {
       patchState({ location: payload});
       return payload;
     }));
-  }
-
-  @Action(SetSuccessErrorToastState)
-  SetSuccessErrorToastState({ patchState }: StateContext<AdminStateModel>, { payload }: SetSuccessErrorToastState): void {
-    patchState({ successErrorToastState: payload });
   }
 
   @Action(SetImportFileDialogState)

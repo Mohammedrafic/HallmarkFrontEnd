@@ -1,5 +1,3 @@
-import { GRID_CONFIG } from '../shared/constants/grid-config';
-
 export const ADMIN_SIDEBAR_MENU = [
   {
     title: 'Dashboard',
@@ -27,7 +25,3 @@ export const ADMIN_SIDEBAR_MENU = [
     children: [],
   }
 ];
-
-export const DEPARTMENT_GRID_CONFIG = {
-  ...GRID_CONFIG
-}
