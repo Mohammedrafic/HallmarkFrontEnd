@@ -54,7 +54,9 @@
               </div>
             </div>
           </div>
-          <div class="right">Logo section here</div>
+          <div class="right">
+            <app-image-uploader uploaderTitle="Logo" (selectImage)="setLogoFile($event)"></app-image-uploader>
+          </div>
         </section>
       </ng-template>
     </e-accordionitem>

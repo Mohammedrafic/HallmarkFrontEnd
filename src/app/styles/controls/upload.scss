@@ -2,6 +2,21 @@
 
 #droparea {
   border: 1px dashed $primary-active-blue-10;
-  border-radius: 5px;
+  border-radius: 4px;
   background-color: $primary-active-blue-90;
+
+  &:hover {
+    border: 1px dashed $primary-active-blue;
+    background-color: $primary-active-blue-80;
+  }
+}
+
+.e-upload-drag-hover {
+  border: 1px dashed $primary-active-blue !important;
+  background-color: $primary-active-blue-80 !important;
+  outline: none !important;
+}
+
+.e-upload, .e-upload-file-list {
+  border: none !important;
 }
