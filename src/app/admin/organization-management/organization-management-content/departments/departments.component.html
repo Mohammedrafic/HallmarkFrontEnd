@@ -26,7 +26,7 @@
       <button
         ejs-button
         id="importButton"
-        cssClass="e-outline button-export"
+        cssClass="e-outline button-import"
         (click)="onImportDataClick()">Import <i-feather name="upload" class="icon"></i-feather></button>
       <button
         ejs-button
@@ -110,158 +110,129 @@
     </ejs-grid>
   </section>
 
-  <ejs-dialog
-    id="dialog"
-    #addEditDepartmentDialog
-    cssClass="dialog"
-    [target]="targetElement"
-    [visible]="false"
-    [animationSettings]="{ effect: 'SlideRight' }"
+  <app-side-dialog
+    (formCancelClicked)="onDepartmentFormCancelClick()"
+    (formSaveClicked)="onDepartmentFormSaveClick()"
+    [header]="'Add Department'"
   >
-    <ng-template #content>
-      <!--TODO: move to shared component-->
-      <section class="container">
-        <section class="header-container">
-          <div class="e-card-header">
-            <div class="e-card-header-caption">
-              <h3 class="e-card-title">Add Department</h3>
-            </div>
-            <div  class="e-card-content">
-              <button
-                ejs-button
-                cssClass="e-outline button-cancel"
-                id="cancelFormButton"
-                (click)="onDepartmentFormCancelClick()">Cancel</button>
-              <button
-                ejs-button
-                id="addFormButton"
-                type="submit"
-                [isPrimary]="true"
-                (click)="onDepartmentFormSaveClick()">Save</button>
-            </div>
+    <form class="form-container bootstrap"
+          id="addEditRecordForm"
+          [formGroup]="departmentsDetailsFormGroup">
+      <div>
+        <div class="input-container">
+          <label for="extDepartmentId">Ext Department ID <span class="field-required">*</span></label>
+          <div class="input-group">
+            <input id="extDepartmentId"
+                   class="e-input"
+                   type="text"
+                   maxlength="50"
+                   appValidateWithMessage
+                   placeholder="Ext Department ID"
+                   formControlName="extDepartmentId"/>
           </div>
-        </section>
+        </div>
+      </div>
 
-        <form class="form-container bootstrap"
-              id="addEditRecordForm"
-              [formGroup]="departmentsDetailsFormGroup">
-          <div>
-            <div class="input-container">
-              <label for="extDepartmentId">Ext Department ID <span class="field-required">*</span></label>
-              <div class="input-group">
-                <input id="extDepartmentId"
-                       class="e-input"
-                       type="text"
-                       maxlength="50"
-                       appValidateWithMessage
-                       placeholder="Ext Department ID"
-                       formControlName="extDepartmentId"/>
-              </div>
-            </div>
+      <div>
+        <div class="input-container">
+          <label for="invoiceDepartmentId">Invoice Department ID <span class="field-required">*</span></label>
+          <div class="input-group">
+            <input id="invoiceDepartmentId"
+                   class="e-input"
+                   type="text"
+                   maxlength="50"
+                   appValidateWithMessage
+                   placeholder="Invoice Department ID"
+                   formControlName="invoiceDepartmentId"/>
           </div>
+        </div>
+      </div>
 
-          <div>
-            <div class="input-container">
-              <label for="invoiceDepartmentId">Invoice Department ID <span class="field-required">*</span></label>
-              <div class="input-group">
-                <input id="invoiceDepartmentId"
-                       class="e-input"
-                       type="text"
-                       maxlength="50"
-                       appValidateWithMessage
-                       placeholder="Invoice Department ID"
-                       formControlName="invoiceDepartmentId"/>
-              </div>
-            </div>
+      <div>
+        <div class="input-container">
+          <label for="departmentName">Department Name <span class="field-required">*</span></label>
+          <div class="input-group">
+            <input id="departmentName"
+                   class="e-input"
+                   type="text"
+                   maxlength="50"
+                   appValidateWithMessage
+                   placeholder="Department Name"
+                   formControlName="departmentName"/>
           </div>
+        </div>
+      </div>
 
-          <div>
-            <div class="input-container">
-              <label for="departmentName">Department Name <span class="field-required">*</span></label>
-              <div class="input-group">
-                <input id="departmentName"
-                       class="e-input"
-                       type="text"
-                       maxlength="50"
-                       appValidateWithMessage
-                       placeholder="Department Name"
-                       formControlName="departmentName"/>
-              </div>
-            </div>
+      <div>
+        <div class="input-container">
+          <label for="facilityContact">Facility Contact <span class="field-required">*</span></label>
+          <div class="input-group">
+            <input
+              id="facilityContact"
+              class="e-input"
+              type="text"
+              maxlength="50"
+              appValidateWithMessage
+              placeholder="Facility Contact"
+              formControlName="facilityContact"
+            />
           </div>
+        </div>
+      </div>
 
-          <div>
-            <div class="input-container">
-              <label for="facilityContact">Facility Contact <span class="field-required">*</span></label>
-              <div class="input-group">
-                <input
-                  id="facilityContact"
-                  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  appValidateWithMessage
-                  placeholder="Facility Contact"
-                  formControlName="facilityContact"
-                />
-              </div>
-            </div>
+      <div>
+        <div class="input-container">
+          <label for="facilityEmail">Facility Email <span class="field-required">*</span></label>
+          <div class="input-group">
+            <input
+              id="facilityEmail"
+              class="e-input"
+              type="email"
+              appValidateWithMessage
+              placeholder="Facility Email"
+              formControlName="facilityEmail"
+            />
           </div>
+        </div>
+      </div>
 
-          <div>
-            <div class="input-container">
-              <label for="facilityEmail">Facility Email <span class="field-required">*</span></label>
-              <div class="input-group">
-                <input
-                  id="facilityEmail"
-                  class="e-input"
-                  type="email"
-                  appValidateWithMessage
-                  placeholder="Facility Email"
-                  formControlName="facilityEmail"
-                />
-              </div>
-            </div>
+      <div>
+        <div class="input-container facility-phone">
+          <label for="facilityPhoneNumber">Facility Phone No <span class="field-required">*</span></label>
+          <div class="input-group">
+            <input
+              id="facilityPhoneNumber"
+              class="e-input facility-phone"
+              type="tel"
+              maxlength="10"
+              appValidateWithMessage
+              placeholder="Facility Phone No"
+              formControlName="facilityPhoneNo"
+            />
           </div>
+        </div>
+      </div>
 
-          <div>
-            <div class="input-container facility-phone">
-              <label for="facilityPhoneNumber">Facility Phone No <span class="field-required">*</span></label>
-              <div class="input-group">
-                <input
-                  id="facilityPhoneNumber"
-                  class="e-input facility-phone"
-                  type="tel"
-                  maxlength="10"
-                  appValidateWithMessage
-                  placeholder="Facility Phone No"
-                  formControlName="facilityPhoneNo"
-                />
-              </div>
-            </div>
+      <div>
+        <div class="input-container calendar">
+          <label for="inactiveDate">Inactive Date</label>
+          <div class="input-group datepicker">
+            <ejs-datepicker
+              id="inactiveDate"
+              class="datepicker"
+              format="MM/dd/yyyy"
+              appValidateWithMessage
+              placeholder="MM/DD/YYYY"
+              [enableMask]="true"
+              [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+              formControlName="inactiveDate"
+            >
+            </ejs-datepicker>
           </div>
-
-          <div>
-            <div class="input-container calendar">
-              <label for="inactiveDate">Inactive Date</label>
-              <div class="input-group datepicker">
-                <ejs-datepicker
-                  id="inactiveDate"
-                  class="datepicker"
-                  format="MM/dd/yyyy"
-                  appValidateWithMessage
-                  placeholder="MM/DD/YYYY"
-                  [enableMask]="true"
-                  [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
-                  formControlName="inactiveDate"
-                >
-                </ejs-datepicker>
-              </div>
-            </div>
-          </div>
-        </form>
-      </section>
-    </ng-template>
-  </ejs-dialog>
+        </div>
+      </div>
+    </form>
+  </app-side-dialog>
 </section>
 
 <app-file-upload-dialog></app-file-upload-dialog>

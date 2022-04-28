@@ -35,3 +35,8 @@ export class ShowToast {
   static readonly type = '[app] Set Toast Showing state';
   constructor(public type: MessageTypes, public messageContent: string) { }
 }
+
+export class ShowSideDialog {
+  static readonly type = '[app] Set Side Dialog Showing state';
+  constructor(public isDialogShown: boolean) { }
+}

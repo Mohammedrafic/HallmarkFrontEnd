@@ -1,0 +1,43 @@
+@import '../../../../styles/variables/colors';
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+
+  .details {
+    display: flex;
+    align-items: center;
+
+    .region-dropdown {
+      padding-right: 12px;
+    }
+
+    .e-input-group.e-control-wrapper input {
+      padding-left: 16px;
+      padding-bottom: 7px;
+    }
+
+    .plus-button {
+      display: flex;
+      align-items: center;
+      color: $primary-active-blue-10;
+
+      .icon {
+        padding-right: 5px;
+      }
+    }
+  }
+
+  .button-filter {
+    margin-left: 12px;
+    margin-right: 6px;
+  }
+
+  .button-import {
+    margin-left: 6px;
+    margin-right: 12px;
+  }
+}
+

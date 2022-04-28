@@ -4,12 +4,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
-import { SetHeaderState, ShowToast } from '../../../../store/app.actions';
+import { SetHeaderState, ShowSideDialog, ShowToast } from '../../../../store/app.actions';
 import { Department } from '../../../../shared/models/department.model';
 import {
   SaveDepartment,
@@ -40,8 +39,6 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   @ViewChild('gridPager') pager: PagerComponent;
 
   // department form data
-  @ViewChild('addEditDepartmentDialog') addEditDepartmentDialog: DialogComponent;
-  targetElement: HTMLElement = document.body;
   departmentsDetailsFormGroup: FormGroup;
   formBuilder: FormBuilder;
 
@@ -129,7 +126,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     });
     this.editedDepartmentId = department.departmentId;
     this.isEdit = true;
-    this.addEditDepartmentDialog.show();
+    this.store.dispatch(new ShowSideDialog(true));
   }
 
   onRemoveDepartmentClick(department: Department): void {
@@ -142,7 +139,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   onAddDepartmentClick(): void {
     if (this.selectedLocation && this.selectedRegion) {
-      this.addEditDepartmentDialog.show();
+      this.store.dispatch(new ShowSideDialog(true));
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED));
     }
@@ -150,7 +147,6 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   onDepartmentFormCancelClick(): void {
     this.departmentsDetailsFormGroup.reset();
-    this.addEditDepartmentDialog.hide();
     // TODO: add modal dialog to confirm close
   }
 
@@ -162,7 +158,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         extDepartmentId: this.departmentsDetailsFormGroup.controls['extDepartmentId'].value,
         invoiceDepartmentId: this.departmentsDetailsFormGroup.controls['invoiceDepartmentId'].value,
         departmentName: this.departmentsDetailsFormGroup.controls['departmentName'].value,
-        inactiveDate: this.departmentsDetailsFormGroup.controls['inactiveDate'].value,
+        inactiveDate: this.departmentsDetailsFormGroup.controls['inactiveDate'].value === '' ? null
+          : this.departmentsDetailsFormGroup.controls['inactiveDate'].value,
         facilityPhoneNo: this.departmentsDetailsFormGroup.controls['facilityPhoneNo'].value,
         facilityEmail: this.departmentsDetailsFormGroup.controls['facilityEmail'].value,
         facilityContact: this.departmentsDetailsFormGroup.controls['facilityContact'].value
@@ -176,7 +173,6 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         this.store.dispatch(new SaveDepartment(department));
       }
 
-      this.addEditDepartmentDialog.hide();
       this.departmentsDetailsFormGroup.reset();
     } else {
       this.departmentsDetailsFormGroup.markAllAsTouched();

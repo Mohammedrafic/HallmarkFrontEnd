@@ -4,24 +4,23 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import {  DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 
 import { AbstractGridConfigurationComponent } from '../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { AdminState } from '../../../store/admin.state';
 import { Region } from '../../../../shared/models/region.model';
 import {
-  DeleteDepartmentById,
+  DeleteLocationById,
   GetLocationsByRegionId,
   GetRegionsByOrganizationId,
   SaveLocation,
   SetImportFileDialogState,
   UpdateLocation
 } from '../../../store/admin.actions';
-import { SetHeaderState, ShowToast } from '../../../../store/app.actions';
+import { SetHeaderState, ShowSideDialog, ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '../../../../shared/enums/message-types';
 import { Location } from '../../../../shared/models/location.model';
-import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
-import { Department } from '../../../../shared/models/department.model';
+
 import { MESSAGE_CANNOT_BE_DELETED } from '../departments/departments.component';
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
@@ -44,9 +43,6 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   @Select(AdminState.locationsByRegionId)
   locations$: Observable<Location[]>;
 
-  // location form data
-  @ViewChild('addEditDialog') addEditDialog: DialogComponent;
-  targetElement: HTMLElement = document.body;
   locationDetailsFormGroup: FormGroup;
   formBuilder: FormBuilder;
 
@@ -70,6 +66,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
     this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
+    this.mapGridData();
   }
 
   onImportDataClick(): void {
@@ -79,10 +76,18 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   onAddDepartmentClick(): void {
     if (this.selectedRegion) {
-      this.addEditDialog.show();
+      this.store.dispatch(new ShowSideDialog(true));
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_REGIONS_NOT_SELECTED));
     }
+  }
+
+  mapGridData(): void {
+    this.locations$.subscribe(data => {
+      this.lastAvailablePage = this.getLastPage(data);
+      this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
+      this.totalDataRecords = data.length;
+    });
   }
 
   onRowsDropDownChanged(): void {
@@ -119,12 +124,12 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     });
     this.editedLocationId = location.id;
     this.isEdit = true;
-    this.addEditDialog.show();
+    this.store.dispatch(new ShowSideDialog(true));
   }
 
   onRemoveButtonClick(location: Location): void {
     if (location.id) { // TODO: add verification to prevent remove if department has assigned Order with any status
-      // this.store.dispatch(new DeleteLocationById(department.departmentId));
+      this.store.dispatch(new DeleteLocationById(location.id));
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_CANNOT_BE_DELETED));
     }
@@ -132,7 +137,6 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   onFormCancelClick(): void {
     this.locationDetailsFormGroup.reset();
-    this.addEditDialog.hide();
     // TODO: add modal dialog to confirm close
   }
 
@@ -168,7 +172,6 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         this.store.dispatch(new SaveLocation(location));
       }
 
-      this.addEditDialog.hide();
       this.locationDetailsFormGroup.reset();
     } else {
       this.locationDetailsFormGroup.markAllAsTouched();

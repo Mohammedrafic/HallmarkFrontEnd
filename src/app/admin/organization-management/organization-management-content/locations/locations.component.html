@@ -1,6 +1,6 @@
 <section>
   <section class="toolbar">
-    <section class="department-details bootstrap">
+    <section class="details bootstrap">
       <ejs-dropdownlist
         id="regionsDropDown"
         class="region-dropdown"
@@ -9,6 +9,7 @@
         [fields]="regionFields"
         (change)="onRegionDropDownChanged($event)"
       ></ejs-dropdownlist>
+      <button ejs-button cssClass="e-flat plus-button"><i-feather name="plus" class="icon"></i-feather> Add Region</button>
     </section>
     <section>
       <button
@@ -18,7 +19,7 @@
       <button
         ejs-button
         id="importButton"
-        cssClass="e-outline button-export"
+        cssClass="e-outline button-import"
         (click)="onImportDataClick()">Import <i-feather name="upload" class="icon"></i-feather></button>
       <button
         ejs-button
@@ -44,6 +45,12 @@
         <e-column field="externalId" headerText="EXT LOCATION ID" width=200></e-column>
         <e-column field="invoiceId" headerText="INVOICE LOCATION ID" width=200></e-column>
         <e-column field="name" headerText="LOCATION NAME" width=200></e-column>
+        <e-column field="address1" headerText="ADDRESS 1" width=200></e-column>
+        <e-column field="address2" headerText="ADDRESS 2" width=200></e-column>
+        <e-column field="city" headerText="CITY" width=200></e-column>
+        <e-column field="state" headerText="STATE" width=200></e-column>
+        <e-column field="zip" headerText="ZIP" width=200></e-column>
+        <e-column field="contactPerson" headerText="CONTACT PERSON" width=200></e-column>
         <e-column textAlign="Right" width=120>
           <ng-template #template let-data>
             <div class="row-tool-buttons">
@@ -85,6 +92,7 @@
                   #gridPager
                   [pageSize]="pageSizePager"
                   [totalRecordsCount]="totalDataRecords"
+
                   [enablePagerMessage]="false"
                   [currentPage]="currentPagerPage"
                   (click)="onGoToClick($event)"
@@ -98,157 +106,33 @@
     </ejs-grid>
   </section>
 
-  <ejs-dialog
-    id="dialog"
-    #addEditDialog
-    cssClass="dialog"
-    [target]="targetElement"
-    [visible]="false"
-    [animationSettings]="{ effect: 'SlideRight' }"
+
+  <app-side-dialog
+    (formCancelClicked)="onFormCancelClick()"
+    (formSaveClicked)="onFormSaveClick()"
+    [header]="'Add Location'"
   >
-    <ng-template #content>
-      <section class="container">
-        <section class="header-container">
-          <div class="e-card-header">
-            <div class="e-card-header-caption">
-              <h3 class="e-card-title">Add Location</h3>
-            </div>
-            <div  class="e-card-content">
-              <button
-                ejs-button
-                cssClass="e-outline button-cancel"
-                id="cancelFormButton"
-                (click)="onFormCancelClick()">Cancel</button>
-              <button
-                ejs-button
-                id="addFormButton"
-                type="submit"
-                [isPrimary]="true"
-                (click)="onFormSaveClick()">Save</button>
-            </div>
+    <form
+      class="form-container bootstrap"
+      id="addEditRecordForm"
+      [formGroup]="locationDetailsFormGroup"
+    >
+      <div>
+        <div class="input-container">
+          <label for="externalId">Ext Location ID <span class="field-required">*</span></label>
+          <div class="input-group">
+            <input id="externalId"
+                   class="e-input"
+                   type="text"
+                   maxlength="50"
+                   appValidateWithMessage
+                   placeholder="Ext Location ID"
+                   formControlName="externalId"/>
           </div>
-        </section>
-
-        <form class="form-container bootstrap"
-              id="addEditRecordForm"
-              [formGroup]="locationDetailsFormGroup">
-          <div>
-            <div class="input-container">
-              <label for="extDepartmentId">Ext Department ID <span class="field-required">*</span></label>
-              <div class="input-group">
-                <input id="extDepartmentId"
-                       class="e-input"
-                       type="text"
-                       maxlength="50"
-                       appValidateWithMessage
-                       placeholder="Ext Department ID"
-                       formControlName="extDepartmentId"/>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="input-container">
-              <label for="invoiceDepartmentId">Invoice Department ID <span class="field-required">*</span></label>
-              <div class="input-group">
-                <input id="invoiceDepartmentId"
-                       class="e-input"
-                       type="text"
-                       maxlength="50"
-                       appValidateWithMessage
-                       placeholder="Invoice Department ID"
-                       formControlName="invoiceDepartmentId"/>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="input-container">
-              <label for="departmentName">Department Name <span class="field-required">*</span></label>
-              <div class="input-group">
-                <input id="departmentName"
-                       class="e-input"
-                       type="text"
-                       maxlength="50"
-                       appValidateWithMessage
-                       placeholder="Department Name"
-                       formControlName="departmentName"/>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="input-container">
-              <label for="facilityContact">Facility Contact <span class="field-required">*</span></label>
-              <div class="input-group">
-                <input
-                  id="facilityContact"
-                  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  appValidateWithMessage
-                  placeholder="Facility Contact"
-                  formControlName="facilityContact"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="input-container">
-              <label for="facilityEmail">Facility Email <span class="field-required">*</span></label>
-              <div class="input-group">
-                <input
-                  id="facilityEmail"
-                  class="e-input"
-                  type="email"
-                  appValidateWithMessage
-                  placeholder="Facility Email"
-                  formControlName="facilityEmail"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="input-container facility-phone">
-              <label for="facilityPhoneNumber">Facility Phone No <span class="field-required">*</span></label>
-              <div class="input-group">
-                <input
-                  id="facilityPhoneNumber"
-                  class="e-input facility-phone"
-                  type="tel"
-                  maxlength="10"
-                  appValidateWithMessage
-                  placeholder="Facility Phone No"
-                  formControlName="facilityPhoneNo"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <div class="input-container calendar">
-              <label for="inactiveDate">Inactive Date</label>
-              <div class="input-group datepicker">
-                <ejs-datepicker
-                  id="inactiveDate"
-                  class="datepicker"
-                  format="MM/dd/yyyy"
-                  appValidateWithMessage
-                  placeholder="MM/DD/YYYY"
-                  [enableMask]="true"
-                  [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
-                  formControlName="inactiveDate"
-                >
-                </ejs-datepicker>
-              </div>
-            </div>
-          </div>
-        </form>
-      </section>
-    </ng-template>
-  </ejs-dialog>
+        </div>
+      </div>
+    </form>
+  </app-side-dialog>
 </section>
 
 <app-file-upload-dialog></app-file-upload-dialog>

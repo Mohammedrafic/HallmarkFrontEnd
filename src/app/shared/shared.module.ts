@@ -15,15 +15,24 @@ import { ImageUploaderComponent } from './components/image-uploader/image-upload
 import { FileUploadDialogComponent } from './components/file-upload-dialog/file-upload-dialog.component';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { SideDialogComponent } from './components/side-dialog/side-dialog.component';
 
 const icons = {AlertCircle, CheckCircle};
 
-const COMPONENTS = [PageToolbarComponent, ValidationErrorPipe, ValidateDirective, ImageUploaderComponent];
+const COMPONENTS = [
+  PageToolbarComponent,
+  ValidationErrorPipe,
+  ValidateDirective,
+  ImageUploaderComponent,
+  SideDialogComponent,
+  MessageToastComponent,
+  FileUploadDialogComponent
+];
 
 @NgModule({
   imports: [FeatherModule.pick(icons), CommonModule, UploaderModule, ToastModule, DialogModule, ButtonModule],
-  exports: [...COMPONENTS, MessageToastComponent, FileUploadDialogComponent],
-  declarations: [...COMPONENTS, ValidateDirective, ErrorMessageComponent, MessageToastComponent, FileUploadDialogComponent],
+  exports: [...COMPONENTS],
+  declarations: [...COMPONENTS, ErrorMessageComponent],
   providers: [],
 })
 export class SharedModule {}
