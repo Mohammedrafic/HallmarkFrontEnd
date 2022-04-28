@@ -54,7 +54,10 @@ export class ShellPageComponent implements OnInit {
   constructor(private store: Store,
               private route: Router) { }
 
+  userName: string = "";
+
   ngOnInit(): void {
+    this.userName = window.localStorage.getItem("UserData") as string;
     this.isDarkTheme$.subscribe(isDark => {
       this.isDarkTheme = isDark;
       this.setTheme(isDark);

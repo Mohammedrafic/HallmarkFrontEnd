@@ -21,6 +21,14 @@ export class ApiInterceptor implements HttpInterceptor {
   ) {}
 
   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    let userId = window.localStorage.getItem("AuthKey");
+    if (userId){
+      request = request.clone({
+        // setHeaders: { Authorization: `UserId ${userId}` }
+        // setHeaders: { Custom: `UserId ${userId}` }
+        headers: request.headers.set('Authorization', `UserId ${userId}`)
+      });
+    }
     if (request.url === this.appSettingsUrl) {
       return next.handle(request);
     }
