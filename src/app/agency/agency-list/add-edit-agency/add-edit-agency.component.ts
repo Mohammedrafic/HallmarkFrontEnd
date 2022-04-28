@@ -26,6 +26,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   private populatedSubscription: Subscription | undefined;
   private isAlive = true;
+  private logoFile: Blob | null;
 
   constructor(private store: Store, private fb: FormBuilder) {
     this.store.dispatch(new SetHeaderState({ title: 'Agency' }));
@@ -52,6 +53,11 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
     this.agencyForm.get('isBillingPopulated');
     this.agencyForm.markAllAsTouched();
     console.log(this.agencyForm.value);
+  }
+
+  public setLogoFile(file: Blob | null) {
+    this.logoFile = file;
+    console.log(this.logoFile);
   }
 
   private onBillingPopulatedChange(): void {
