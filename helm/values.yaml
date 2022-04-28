@@ -83,3 +83,5 @@ affinity: {}
 
 env:
   backendurl: "https://dev.einstein2.com/einsteinapi"
+istio:
+  domain: dev.einstein2.com

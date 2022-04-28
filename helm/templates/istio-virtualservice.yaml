@@ -4,7 +4,7 @@ metadata:
   name: {{ include "einsteinui.fullname" . }}
 spec:
   hosts:
-  - "*"
+  - "{{ .Values.istio.domain }}"
   gateways:
   - {{ include "einsteinui.fullname" . }}
   http:
