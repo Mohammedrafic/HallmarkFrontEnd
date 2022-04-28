@@ -1,0 +1,17 @@
+<div tabindex="0" class="e-card">
+  <div class="e-card-header">
+    <div class="e-card-header-caption">
+      <div class="e-card-title">{{uploaderTitle}}</div>
+    </div>
+  </div>
+  <div class="e-card-content">
+    <div id="droparea" (click)="browse()">
+      <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
+    </div>
+    <ejs-uploader [dropArea]="dropElement" [allowedExtensions]="allowedExtensions"
+                  [autoUpload]="false" [multiple]="false"
+                  (selected)="onImageSelect($event)"
+                  (removing)="onImageRemove()">
+    </ejs-uploader>
+  </div>
+</div>

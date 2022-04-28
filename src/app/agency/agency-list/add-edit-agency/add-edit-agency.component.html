@@ -9,66 +9,50 @@
     <button ejs-button [isPrimary]="true" (click)="onNext()">Next</button>
   </ng-container>
 </app-page-toolbar>
-
-<ejs-accordion #accordion expandMode="Single">
-  <e-accordionitems>
-    <e-accordionitem expanded="true">
-      <ng-template #header> <span class="e-badge e-badge-success e-badge-circle">1</span> General Info </ng-template>
-      <ng-template #content>
-        <section class="general-info-container">
-          <div class="left">
-            <div class="e-card">
-              <div class="e-card-header">
-                <div class="e-card-header-caption">
-                  <div class="e-card-title">Agency Details</div>
-                </div>
-              </div>
-
-              <div class="e-card-content">
-                <form [formGroup]="agencyForm" id="agencyFormFirstStep">
-                  <app-general-info-group [formGroup]="$any(agencyForm.get('agency'))"></app-general-info-group>
-
-                  <div class="e-card-title-wrapper">
-                    <div class="e-card-title">Billing Details</div>
-                  </div>
-
-                  <div class="billing-checkbox bootstrap">
-                    <ejs-checkbox formControlName="isBillingPopulated" label="Same As Agency"></ejs-checkbox>
-                  </div>
-                  <app-billing-details-group [formGroup]="$any(agencyForm.get('billing'))"></app-billing-details-group>
-
-                  <div class="e-card-title-wrapper contact-header">
-                    <div class="e-card-title">Contact Details</div>
-                    <div class="add-contact-link" (click)="addContact()"><i-feather name="plus" class="icon"></i-feather> Add Contact</div>
-                  </div>
-                  <hr />
-                  <ng-container *ngFor="let contactGroup of contacts.controls; let i = index">
-                    <app-contact-details-group
-                      [formGroup]="$any(contactGroup)"
-                      [isRemovable]="contacts.length > 1"
-                      (deleteContactEvent)="deleteContact(i)"
-                    ></app-contact-details-group>
-                    <hr />
-                  </ng-container>
-                </form>
-              </div>
-            </div>
-          </div>
-          <div class="right">Logo section here</div>
-        </section>
-      </ng-template>
-    </e-accordionitem>
-    <e-accordionitem>
-      <ng-template #header> <span class="e-badge e-badge-success e-badge-circle">2</span> Associated Organizations </ng-template>
-      <ng-template #content>
-        <div tabindex="0" class="e-card">
-          <div class="e-card-header">
-            <div class="e-card-header-caption">
-              <div class="e-card-title">Agency Details</div>
-            </div>
-          </div>
+<!-- General info step -->
+<section class="general-info-container">
+  <div class="left">
+    <div class="e-card">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <div class="e-card-title">Agency Details</div>
         </div>
-      </ng-template>
-    </e-accordionitem>
-  </e-accordionitems>
-</ejs-accordion>
+      </div>
+
+      <div class="e-card-content">
+        <form [formGroup]="agencyForm" id="agencyFormFirstStep">
+          <app-general-info-group [formGroup]="$any(agencyForm.get('agency'))"></app-general-info-group>
+
+          <div class="e-card-title-wrapper">
+            <div class="e-card-title">Billing Details</div>
+          </div>
+
+          <div class="billing-checkbox bootstrap">
+            <ejs-checkbox formControlName="isBillingPopulated" label="Same As Agency"></ejs-checkbox>
+          </div>
+          <app-billing-details-group [formGroup]="$any(agencyForm.get('billing'))"></app-billing-details-group>
+
+          <div class="e-card-title-wrapper contact-header">
+            <div class="e-card-title">Contact Details</div>
+            <div class="add-contact-link" (click)="addContact()"><i-feather name="plus" class="icon"></i-feather> Add Contact</div>
+          </div>
+          <hr />
+          <ng-container *ngFor="let contactGroup of contacts.controls; let i = index">
+            <app-contact-details-group
+              [formGroup]="$any(contactGroup)"
+              [isRemovable]="contacts.length > 1"
+              (deleteContactEvent)="deleteContact(i)"
+            ></app-contact-details-group>
+            <hr />
+          </ng-container>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="right">
+    <app-image-uploader uploaderTitle="Logo" (selectImage)="setLogoFile($event)"></app-image-uploader>
+  </div>
+</section>
+<section class="payment-section last-content-section-padding">
+  <app-payment-details-grid></app-payment-details-grid>
+</section>

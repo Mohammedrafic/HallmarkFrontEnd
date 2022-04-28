@@ -8,7 +8,8 @@ import { FeatherModule } from 'angular-feather';
 import {
   Sliders,
   Plus,
-  Trash2
+  Trash2,
+  Edit
 } from 'angular-feather/icons';
 
 import { AgencyComponent } from './agency.component';
@@ -20,11 +21,15 @@ import { GeneralInfoGroupComponent } from './agency-list/add-edit-agency/general
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { BillingDetailsGroupComponent } from './agency-list/add-edit-agency/billing-details-group/billing-details-group.component';
 import { ContactDetailsGroupComponent } from './agency-list/add-edit-agency/contact-details-group/contact-details-group.component';
+import { PaymentDetailsGridComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-details-grid.component';
+import { GridAllModule, GridModule, PagerModule } from '@syncfusion/ej2-angular-grids';
+import { NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 
 const sidebarIcons = {
   Sliders,
   Plus,
-  Trash2
+  Trash2,
+  Edit
 };
 
 @NgModule({
@@ -34,7 +39,8 @@ const sidebarIcons = {
     AddEditAgencyComponent,
     GeneralInfoGroupComponent,
     BillingDetailsGroupComponent,
-    ContactDetailsGroupComponent
+    ContactDetailsGroupComponent,
+    PaymentDetailsGridComponent
   ],
   imports: [
     CommonModule,
@@ -46,6 +52,9 @@ const sidebarIcons = {
     AccordionModule,
     DropDownListModule,
     CheckBoxModule,
+    GridAllModule,
+    PagerModule,
+    NumericTextBoxModule,
     FeatherModule.pick(sidebarIcons)
   ]
 })

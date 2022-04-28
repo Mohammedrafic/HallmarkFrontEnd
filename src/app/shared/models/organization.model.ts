@@ -5,32 +5,41 @@ export class Organization {
     name: string,
     parentUnitId?: number
   };
-  businessUnitId?: number;
+  parentBusinessUnitId?: number;
+  organizationId?: number | null;
   generalInformation: GeneralInformation;
   billingDetails: BillingDetails;
   contactDetails: ContactDetails[];
   preferences: Preferences;
 
-  constructor(businessUnitId: number, generalInformation: GeneralInformation, billingDetails: BillingDetails, contactDetails: ContactDetails[], preferences: any) {
-    this.businessUnitId = businessUnitId;
+  constructor(organizationId: number, businessUnitId: number, generalInformation: GeneralInformation, billingDetails: BillingDetails, contactDetails: ContactDetails[], preferences: Preferences, isSameAsOrg: boolean) {
+    if (organizationId) {
+      this.organizationId = organizationId;
+    }
+    this.parentBusinessUnitId  = businessUnitId;
     this.generalInformation = generalInformation;
-    this.generalInformation.organizationId = 0;
+    this.generalInformation.organizationId = organizationId || 0;
     if (this.generalInformation.externalId === '') {
       this.generalInformation.externalId = null;
     }
     this.billingDetails = billingDetails;
-    this.billingDetails.organizationId = 0;
+    this.billingDetails.organizationId = organizationId || 0;
+    this.billingDetails.sameAsOrganization = isSameAsOrg;
     this.contactDetails = contactDetails;
-    this.contactDetails.forEach((contact: ContactDetails) => contact.organizationId = 0);
+    this.contactDetails.forEach((contact: ContactDetails) => contact.organizationId = organizationId || 0);
     this.preferences = preferences;
+    this.preferences.purchaseOrderBy = parseInt(this.preferences.purchaseOrderBy as string, 10);
+    this.preferences.timesheetSubmittedBy = parseInt(this.preferences.timesheetSubmittedBy as string, 10);
+    this.preferences.paymentOptions = parseInt(this.preferences.paymentOptions as string, 10);
     if (this.preferences.timePeriodInMins === '') {
       this.preferences.timePeriodInMins = null;
     }
-    this.preferences.organizationId = 0;
+    this.preferences.organizationId = organizationId || 0;
   }
 }
 
 export class GeneralInformation {
+  id?: number;
   organizationId?: number;
   externalId?: number | string | null;
   taxId: string;
@@ -49,6 +58,7 @@ export class GeneralInformation {
 }
 
 export class BillingDetails {
+  id?: number;
   organizationId: number;
   adminUserId: number;
   sameAsOrganization: boolean;
@@ -65,6 +75,7 @@ export class BillingDetails {
 }
 
 export class ContactDetails {
+  id?: number;
   organizationId?: number;
   title: string;
   contactPerson: string;
@@ -73,13 +84,14 @@ export class ContactDetails {
 }
 
 export class Preferences {
+  id?: number;
   organizationId?: number;
-  paymentOptions: number;
+  paymentOptions: number | string;
   paymentDescription: string;
-  timesheetSubmittedBy: number;
+  timesheetSubmittedBy: number | string;
   weekStartsOn: number;
   considerLunch: boolean;
-  purchaseOrderBy: number;
+  purchaseOrderBy: number | string;
   timePeriodInMins: number | string | null;
 }
 

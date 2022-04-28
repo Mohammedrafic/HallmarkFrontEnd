@@ -2,8 +2,9 @@
 
 button.e-control.e-btn {
   text-transform: initial;
-  border-radius: 5px;
+  border-radius: 8px;
   padding: 8px 15px;
+  box-shadow: none !important;
 
   &.e-primary:active {
     background-color: $primary-active-blue;

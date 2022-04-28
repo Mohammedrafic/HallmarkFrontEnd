@@ -1,0 +1,30 @@
+@import "../../../styles/variables/colors.scss";
+
+#droparea {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $primary-active-blue-10;
+  font-size: 12px;
+  cursor: pointer;
+
+  .browse-link {
+    text-decoration: underline;
+    font-weight: 700;
+  }
+}
+
+.e-card {
+  margin-bottom: 20px;
+}
+
+.e-file-select-wrap, .e-upload-actions {
+  display: none;
+}
+
+.e-card-content {
+  display: flex;
+  flex-direction: column;
+  height: 200px;
+}

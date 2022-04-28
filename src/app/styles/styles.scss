@@ -4,8 +4,8 @@
 @import "./variables/colors.scss";
 
 @font-face {
-  font-family: 'SF Pro';
-  src: url('../../assets/fonts/SF-Pro.ttf') format('truetype');
+  font-family: "SF Pro";
+  src: url("../../assets/fonts/SF-Pro.ttf") format("truetype");
 }
 
 html {
@@ -15,7 +15,7 @@ html {
 body {
   transition: background-color 0.5s ease;
   margin: 0;
-  font-family: 'SF Pro';
+  font-family: "SF Pro";
   height: 100%;
 
   .input-group {
@@ -76,27 +76,27 @@ body {
 
   &.light {
     // Styles not related to syncfusion controls here
-    background-color: #F6F6F6;
+    background-color: #f6f6f6;
 
     .header {
-      border-bottom: 1px solid #D1D6E2;
+      border-bottom: 1px solid #d1d6e2;
     }
 
     label {
       color: $secondary-dark-blue-30;
     }
 
-    @include meta.load-css('./themes/material_l');
+    @include meta.load-css("./themes/material_l");
 
     .bootstrap {
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-base/styles/bootstrap5.css');
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-buttons/styles/bootstrap5.css');
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-dropdowns/styles/bootstrap5.css');
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-inputs/styles/bootstrap5.css');
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-popups/styles/bootstrap5.css');
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-lists/styles/bootstrap5.css');
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-angular-dropdowns/styles/bootstrap5.css');
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-angular-inputs/styles/bootstrap5.css');
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-base/styles/bootstrap5.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-buttons/styles/bootstrap5.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-dropdowns/styles/bootstrap5.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-inputs/styles/bootstrap5.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-popups/styles/bootstrap5.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-lists/styles/bootstrap5.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-angular-dropdowns/styles/bootstrap5.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-angular-inputs/styles/bootstrap5.css");
     }
   }
 
@@ -106,28 +106,29 @@ body {
     color: #a2a2a2;
 
     .header {
-      border-bottom: 1px solid #4C5673;
+      border-bottom: 1px solid #4c5673;
       color: #fff;
     }
 
-    @include meta.load-css('./themes/material_d');
+    @include meta.load-css("./themes/material_d");
 
     .bootstrap {
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-base/styles/bootstrap5-dark.css');
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-buttons/styles/bootstrap5-dark.css');
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-dropdowns/styles/bootstrap5-dark.css');
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-inputs/styles/bootstrap5-dark.css');
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-popups/styles/bootstrap5-dark.css');
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-lists/styles/bootstrap5-dark.css');
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-angular-dropdowns/styles/bootstrap5-dark.css');
-      @include meta.load-css('../../../node_modules/@syncfusion/ej2-angular-inputs/styles/bootstrap5-dark.css');
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-base/styles/bootstrap5-dark.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-buttons/styles/bootstrap5-dark.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-dropdowns/styles/bootstrap5-dark.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-inputs/styles/bootstrap5-dark.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-popups/styles/bootstrap5-dark.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-lists/styles/bootstrap5-dark.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-angular-dropdowns/styles/bootstrap5-dark.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-angular-inputs/styles/bootstrap5-dark.css");
     }
   }
 
-  &.light, &.dark {
+  &.light,
+  &.dark {
     .bootstrap {
       .e-wrapper .e-label {
-        font-family: 'SF Pro';
+        font-family: "SF Pro";
       }
     }
   }
@@ -138,6 +139,10 @@ hr {
   height: 1px;
   border: 0;
   margin: 12px 0;
+}
+
+.last-content-section-padding {
+  padding-bottom: 25px;
 }
 
 @import "./controls/grid";
@@ -159,6 +164,7 @@ hr {
 @import './controls/unsaved-changes-dialog';
 @import './controls/accordion';
 @import './controls/datepicker';
+@import './controls/dialog';
 @import './controls/toast';
 a, a:hover, a:focus, a:active {
   text-decoration: none;

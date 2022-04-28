@@ -1,0 +1,76 @@
+<ejs-grid
+  #grid
+  [dataSource]="data"
+  [allowSorting]="true"
+  [allowResizing]="true"
+  [allowSelection]="false"
+  [resizeSettings]="resizeSettings"
+  [sortSettings]="initialSort"
+  [allowPaging]="allowPaging"
+  [pageSettings]="pageSettings"
+  [height]="gridHeight"
+  (dataBound)="dataBound()"
+  class="e-gridwithtoolbar"
+>
+<ng-template #toolbarTemplate let-data>
+  <div class="e-gridheader e-gridtoolbar">
+    <div class="payment-grid-toolbar">
+      <div class="title">
+        <h3>Payment Details</h3>
+      </div>
+      <div class="actions">
+        <span class="action-link" (click)="onFilter()"><i-feather name="sliders" class="icon"></i-feather> Filters</span>
+        <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Payment Detail</span>
+      </div>
+    </div>
+  </div>
+</ng-template>
+  <e-columns>
+    <e-column field="mode" headerText="Mode" textAlign="Left"></e-column>
+    <e-column field="payee" headerText="Payee" textAlign="left"></e-column>
+    <e-column field="address" headerText="Address" textAlign="left"></e-column>
+    <e-column field="city" headerText="City" textAlign="left"></e-column>
+    <e-column field="zip" headerText="Zip" textAlign="left"></e-column>
+    <e-column field="startDate" headerText="Start Date" textAlign="left" format="yMd"></e-column>
+    <e-column textAlign="Right" width="120">
+      <ng-template #template let-data>
+        <div class="e-grid-tool-buttons">
+          <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>
+          <span class="remove-button" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
+        </div>
+      </ng-template>
+    </e-column>
+  </e-columns>
+
+  <ng-template #pagerTemplate let-data>
+    <div class="e-pagertemplate">
+      <div class="control-section">
+        <div class="content-wrapper">
+          <section class="left-side-pager-controls">
+            <ejs-dropdownlist
+              id="rowsPerPage"
+              class="dropdown-no-border"
+              [dataSource]="rowsPerPageDropDown"
+              [(value)]="activeRowsPerPageDropDown"
+            >
+            </ejs-dropdownlist>
+            <ejs-numerictextbox
+              id="goToPage"
+              class="numeric-input-no-border"
+              format="#"
+              placeholder="Go to:"
+              min="1"
+              [max]="10"
+              [showSpinButton]="false"
+            >
+            </ejs-numerictextbox>
+          </section>
+          <section class="right-side-pager-controls">
+            <ejs-pager id="gridPager" #gridPager [pageSize]="30" [totalRecordsCount]="30" [enablePagerMessage]="false" [currentPage]="1">
+            </ejs-pager>
+          </section>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</ejs-grid>

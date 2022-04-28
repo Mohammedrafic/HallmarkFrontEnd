@@ -1,4 +1,5 @@
 @import "../../../styles/variables/colors.scss";
+@import "../../../styles/variables/mixins.scss";
 
 .general-info-container {
   display: flex;
@@ -23,12 +24,10 @@
   }
 
   .add-contact-link {
-    cursor: pointer;
-    color: $primary-active-blue-10;
-    display: flex;
-
-    .icon {
-      margin-right: 5px;
-    }
+    @include linkWithIcon;
   }
+}
+
+.payment-section {
+  margin-top: 12px;
 }

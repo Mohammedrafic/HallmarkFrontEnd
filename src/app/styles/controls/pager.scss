@@ -1,5 +1,13 @@
 @import '../variables/colors.scss';
 
+body.light, body.dark {
+  .e-pager {
+    .e-pagercontainer {
+      margin: 0 0 8px 0;
+    }
+  }
+}
+
 body.light .e-pager .e-currentitem, body.light .e-pager .e-currentitem:hover {
   background: transparent;
   color: $primary-active-blue-10;

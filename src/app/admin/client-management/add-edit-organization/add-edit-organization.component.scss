@@ -91,16 +91,8 @@
         flex: 1 0 80%;
       }
 
-      .website {
-        flex: 1 0 74%;
-      }
-
       .right-column {
         flex: 1 0 20%;
-      }
-
-      .ext {
-        flex: 1 0 24%;
       }
     }
   }
@@ -160,6 +152,14 @@
     }
   }
 
+  .purchase-order-by {
+    margin-top: 15px;
+  }
+
+  .radio-label {
+    padding-bottom: 15px;
+  }
+
   .column-radio-container {
     display: flex;
     flex-direction: column;
@@ -170,7 +170,7 @@
 
     &.submitted-by {
       border-top: 1px solid $secondary-dark-blue-45;
-      padding-top: 10px;
+      padding-top: 20px;
     }
   }
 
@@ -186,6 +186,12 @@
   align-items: center;
   color: $primary-active-blue-10;
   font-size: 12px;
+
+  .browse-link {
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: 700;
+  }
 }
 
 .e-file-select-wrap, .e-upload-actions {

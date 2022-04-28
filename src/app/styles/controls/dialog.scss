@@ -1,0 +1,10 @@
+@import '../variables/colors';
+
+body.light {
+  .e-dialog {
+    .e-icon-dlg-close::before {
+      content: "\e7e7" !important;
+      color: $secondary-dark-blue-30 !important;
+    }
+  }
+}
