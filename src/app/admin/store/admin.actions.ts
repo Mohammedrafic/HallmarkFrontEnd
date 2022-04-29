@@ -2,6 +2,7 @@ import { Country } from "src/app/shared/enums/states";
 import { Organization } from "src/app/shared/models/organization.model";
 import { Department } from '../../shared/models/department.model';
 import { Location } from '../../shared/models/location.model';
+import { Region } from '../../shared/models/region.model';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[admin] Set General States By Country';
@@ -63,6 +64,21 @@ export class GetRegionsByOrganizationId {
   constructor(public organizationId: number) { }
 }
 
+export class SaveRegion {
+  static readonly type = '[admin] Create Region';
+  constructor(public region: Region) { }
+}
+
+export class UpdateRegion {
+  static readonly type = '[admin] Update Region';
+  constructor(public region: Region) { }
+}
+
+export class DeleteRegionById {
+  static readonly type = '[admin] Delete Region by id';
+  constructor(public regionId: number, public organizationId: number) { }
+}
+
 export class GetLocationsByOrganizationId {
   static readonly type = '[admin] Get The List Of Locations by organizationId';
   constructor(public organizationId: number) { }
@@ -80,17 +96,17 @@ export class GetLocationById {
 
 export class SaveLocation {
   static readonly type = '[admin] Create Location';
-  constructor(public location: Location) { }
+  constructor(public location: Location, public regionId: number) { }
 }
 
 export class UpdateLocation {
   static readonly type = '[admin] Update Location';
-  constructor(public location: Location) { }
+  constructor(public location: Location, public regionId: number) { }
 }
 
 export class DeleteLocationById {
   static readonly type = '[admin] Delete Location by id';
-  constructor(public locationId: number) { }
+  constructor(public locationId: number, public regionId: number) { }
 }
 
 export class GetOrganizationsByPage {

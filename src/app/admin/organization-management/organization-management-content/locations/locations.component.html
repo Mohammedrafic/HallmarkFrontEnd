@@ -9,7 +9,11 @@
         [fields]="regionFields"
         (change)="onRegionDropDownChanged($event)"
       ></ejs-dropdownlist>
-      <button ejs-button cssClass="e-flat plus-button"><i-feather name="plus" class="icon"></i-feather> Add Region</button>
+      <button
+        ejs-button
+        cssClass="e-flat text-button-with-icon"
+        (click)="onAddRegionClick()"
+      ><i-feather name="plus" class="icon"></i-feather> Add Region</button>
     </section>
     <section>
       <button
@@ -111,6 +115,7 @@
     (formCancelClicked)="onFormCancelClick()"
     (formSaveClicked)="onFormSaveClick()"
     [header]="'Add Location'"
+    [width]="'832px'"
   >
     <form
       class="form-container bootstrap"
@@ -119,7 +124,7 @@
     >
       <div>
         <div class="input-container">
-          <label for="externalId">Ext Location ID <span class="field-required">*</span></label>
+          <label for="externalId">Ext Location ID <span class="required">*</span></label>
           <div class="input-group">
             <input id="externalId"
                    class="e-input"
@@ -131,8 +136,288 @@
           </div>
         </div>
       </div>
+
+      <div class="group">
+        <div class="input-container">
+          <label for="invoiceId">Invoice Location ID <span class="required">*</span></label>
+          <div class="input-group">
+            <input id="invoiceId"
+                   class="e-input"
+                   type="text"
+                   maxlength="50"
+                   appValidateWithMessage
+                   placeholder="Invoice Location ID"
+                   formControlName="invoiceId"/>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <label for="name">Location Name<span class="required">*</span></label>
+          <div class="input-group">
+            <input id="name"
+                   class="e-input"
+                   type="text"
+                   maxlength="50"
+                   appValidateWithMessage
+                   placeholder="Location Name"
+                   formControlName="name"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="large-group">
+        <div class="input-container">
+          <label for="address1">Address 1<span class="required">*</span></label>
+          <div class="input-group">
+            <input id="address1"
+                   class="e-input"
+                   type="text"
+                   maxlength="50"
+                   appValidateWithMessage
+                   placeholder="Address 1"
+                   formControlName="address1"/>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <label for="address2">Address 2</label>
+          <div class="input-group">
+            <input id="address2"
+                   class="e-input"
+                   type="text"
+                   maxlength="50"
+                   appValidateWithMessage
+                   placeholder="Address 2"
+                   formControlName="address2"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="input-container">
+          <label for="state">State <span class="required">*</span></label>
+            <div class="input-group">
+              <ejs-dropdownlist
+                id="state"
+                appValidateWithMessage
+                placeholder="State"
+                [dataSource]="statesGeneral$ | async"
+                formControlName="state">
+
+              </ejs-dropdownlist>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <label for="city">City <span class="required">*</span></label>
+          <div class="input-group">
+            <input
+              id="city"
+              class="e-input"
+              type="text"
+              maxlength="50"
+              appValidateWithMessage
+              placeholder="City"
+              formControlName="city"/>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <label for="zip">Zipcode <span class="required">*</span></label>
+          <div class="input-group">
+            <input id="zip"
+                   class="e-input"
+                   type="text"
+                   maxlength="50"
+                   appValidateWithMessage
+                   placeholder="Zipcode"
+                   formControlName="zip"/>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="title">Contacts</h3>
+
+        <div class="combined-group">
+          <div class="input-container">
+            <label for="contactPerson">Contact Person <span class="required">*</span></label>
+            <div class="input-group">
+              <input id="contactPerson"
+                     class="e-input"
+                     type="text"
+                     maxlength="50"
+                     appValidateWithMessage
+                     placeholder="Contact Person"
+                     formControlName="contactPerson"/>
+            </div>
+          </div>
+
+          <div class="input-container">
+            <label for="contactEmail">Contact Person Email<span class="required">*</span></label>
+            <div class="input-group">
+              <input id="contactEmail"
+                     class="e-input"
+                     type="email"
+                     appValidateWithMessage
+                     placeholder="Contact Person Email"
+                     formControlName="contactEmail"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="input-container">
+            <label for="phoneNumber">Phone Number<span class="required">*</span></label>
+            <div class="input-group">
+              <input id="phoneNumber"
+                     class="e-input"
+                     type="text"
+                     maxlength="10"
+                     appValidateWithMessage
+                     placeholder="Phone Number"
+                     formControlName="phoneNumber"/>
+            </div>
+          </div>
+
+          <div class="input-container">
+            <label for="phoneType">Phone Number, Type<span class="required">*</span></label>
+              <div class="input-group">
+                <ejs-dropdownlist
+                  id="phoneType"
+                  appValidateWithMessage
+                  placeholder="Phone Number, Type"
+                  formControlName="phoneType"
+                  [dataSource]="phoneTypes$ | async"
+                >
+                </ejs-dropdownlist>
+              </div>
+          </div>
+
+          <div class="input-container">
+            <label for="ext">Ext</label>
+            <div class="input-group">
+              <input id="ext"
+                     class="e-input"
+                     type="text"
+                     maxlength="50"
+                     appValidateWithMessage
+                     placeholder="Ext"
+                     formControlName="ext"/>
+            </div>
+          </div>
+
+          <div class="input-container">
+            <label for="glNumber">GL Number</label>
+            <div class="input-group">
+              <input id="glNumber"
+                     class="e-input"
+                     type="text"
+                     maxlength="50"
+                     appValidateWithMessage
+                     placeholder="GL Number"
+                     formControlName="glNumber"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="input-container">
+            <label for="invoiceNote">Invoice Note</label>
+            <div class="input-group">
+              <input id="invoiceNote"
+                     class="e-input"
+                     type="text"
+                     maxlength="50"
+                     appValidateWithMessage
+                     placeholder="Invoice Number"
+                     formControlName="invoiceNote"/>
+            </div>
+          </div>
+
+          <div>
+            <div class="input-container calendar">
+              <label for="inactiveDate">Inactive Date</label>
+              <div class="input-group datepicker">
+                <ejs-datepicker
+                  id="inactiveDate"
+                  class="datepicker"
+                  format="MM/dd/yyyy"
+                  appValidateWithMessage
+                  placeholder="MM/DD/YYYY"
+                  [enableMask]="true"
+                  [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                  formControlName="inactiveDate"
+                >
+                </ejs-datepicker>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bootstrap">
+          <ejs-checkbox
+            label="Allow deploy w/o credentials"
+            (change)="onAllowDeployWOCreadentialsCheck($event)"
+          ></ejs-checkbox>
+        </div>
+      </div>
     </form>
   </app-side-dialog>
 </section>
+
+<ejs-dialog
+  id="addRegionDialog"
+  cssClass="add-region-dialog"
+  #addRegionDialog
+  isModal="true"
+  [visible]="false"
+  showCloseIcon="true"
+  (overlayClick)="hideDialog()"
+  width="448px"
+  height="282px"
+>
+  <ng-template #header>
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title">Add Region</h3>
+        </div>
+      </div>
+    </section>
+  </ng-template>
+
+  <ng-template #content>
+    <div class="input-container bootstrap">
+      <label for="invoiceNote">Region</label>
+      <div class="input-group">
+        <input id="addRegion"
+               class="e-input"
+               type="text"
+               minlength="1"
+               maxlength="50"
+               required
+               appValidateWithMessage
+               placeholder="New Region"
+               [(ngModel)]="newRegionName"/>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #footerTemplate>
+    <div class="e-card-content">
+      <button
+        id="cancelDialogButton"
+        ejs-button
+        cssClass="e-outline"
+        (click)="hideDialog()">Cancel</button>
+      <button
+        id="okDialogButton"
+        ejs-button
+        [isPrimary]="true"
+        (click)="onOkDialogClick()">Save</button>
+    </div>
+  </ng-template>
+</ejs-dialog>
 
 <app-file-upload-dialog></app-file-upload-dialog>

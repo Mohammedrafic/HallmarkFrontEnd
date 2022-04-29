@@ -76,16 +76,18 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
-    this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
-    this.isLocationsDropDownEnabled = true;
+    if (this.selectedRegion.id) {
+      this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
+      this.isLocationsDropDownEnabled = true;
+    }
   }
 
   onLocationDropDownChanged(event: ChangeEventArgs): void {
     this.selectedLocation = event.itemData as Location;
     if (this.selectedLocation.id) {
       this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocation.id));
+      this.mapGridData();
     }
-    this.mapGridData();
   }
 
   mapGridData(): void {

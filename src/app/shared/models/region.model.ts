@@ -1,5 +1,5 @@
 export class Region {
-  id: number;
+  id?: number;
   name: string;
   organizationId: number;
 }

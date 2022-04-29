@@ -31,4 +31,25 @@ export class LocationService {
   public getLocationById(locationId: number): Observable<Location> {
     return this.http.get<Location>(`/api/Locations/${locationId}`);
   }
+
+  /**
+   * Save the location
+   */
+  public saveLocation(location: Location): Observable<Location> {
+    return this.http.post<Location>(`/api/Locations/`, location);
+  }
+
+  /**
+   * Update the location
+   */
+  public updateLocation(location: Location): Observable<void> {
+    return this.http.put<void>(`/api/Locations/`, location);
+  }
+
+  /**
+   * Delete the location by id
+   */
+  public deleteLocationById(locationId: number): Observable<void> {
+    return this.http.delete<void>(`/api/Locations/${locationId}`);
+  }
 }

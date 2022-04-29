@@ -1,7 +1,7 @@
 export class Location {
   id?: number;
   organizationId: number;
-  regionId: number;
+  regionId?: number;
   phoneType: number;
   externalId: string;
   invoiceId: string;

@@ -27,7 +27,13 @@ import {
   UpdateDepartment,
   DeleteDepartmentById,
   GetLocationById,
-  GetLocationsByRegionId
+  GetLocationsByRegionId,
+  UpdateLocation,
+  DeleteLocationById,
+  SaveLocation,
+  SaveRegion,
+  UpdateRegion,
+  DeleteRegionById
 } from './admin.actions';
 import { DepartmentsService } from '../services/departments.service';
 import { Department } from '../../shared/models/department.model';
@@ -35,6 +41,7 @@ import { Region } from '../../shared/models/region.model';
 import { Location } from '../../shared/models/location.model';
 import { RegionService } from '../services/region.service';
 import { LocationService } from '../services/location.service';
+import { GeneralPhoneTypes } from '../../shared/constants/general-phone-types';
 
 interface DropdownOption {
   id: number;
@@ -47,6 +54,7 @@ export interface AdminStateModel {
   countries: DropdownOption[];
   statesGeneral: string[] | null;
   statesBilling: string[] | null;
+  phoneTypes: string[] | null;
   businessUnits: BusinessUnit[];
   days: DropdownOption[];
   statuses: DropdownOption[];
@@ -54,10 +62,12 @@ export interface AdminStateModel {
   isOrganizationLoading: boolean;
   organizations: OrganizationPage | null;
   isDepartmentLoading: boolean;
+  isLocationLoading: boolean;
   departments: Department[];
   regions: Region[];
   locations: Location[];
   location: Location | null;
+  organization: Organization | null;
   isDirty: boolean;
 }
 
@@ -67,13 +77,16 @@ export interface AdminStateModel {
     countries: [{ id: Country.USA, text: Country[0] }, { id: Country.Canada, text: Country[1] }],
     statesGeneral: UsaStates,
     statesBilling: UsaStates,
+    phoneTypes: GeneralPhoneTypes,
     businessUnits: [],
     days: Days,
     statuses: Object.keys(Status).filter(StringIsNumber).map((statusName, index) => ({ id: index, text: statusName })),
     titles: Titles,
     isOrganizationLoading: false,
     organizations: null,
+    organization: null,
     isDepartmentLoading: false,
+    isLocationLoading: false,
     departments: [],
     regions: [],
     locations: [],
@@ -88,6 +101,9 @@ export class AdminState {
 
   @Selector()
   static statesGeneral(state: AdminStateModel): string[] | null { return state.statesGeneral; }
+
+  @Selector()
+  static phoneTypes(state: AdminStateModel): string[] | null { return state.phoneTypes; }
 
   @Selector()
   static statesBilling(state: AdminStateModel): string[] | null { return state.statesBilling; }
@@ -121,6 +137,9 @@ export class AdminState {
 
   @Selector()
   static organizations(state: AdminStateModel): OrganizationPage | null { return state.organizations; }
+
+  @Selector()
+  static organizationById(state: AdminStateModel): Organization | null { return state.organization; }
 
   constructor(
     private organizationService: OrganizationService,
@@ -234,6 +253,34 @@ export class AdminState {
     }));
   }
 
+  @Action(SaveRegion)
+  SaveRegion({ patchState, dispatch }: StateContext<AdminStateModel>, { region }: SaveRegion): Observable<Region> {
+    patchState({ isLocationLoading: true });
+    return this.regionService.saveRegion(region).pipe(tap((payload) => {
+      patchState({ isLocationLoading: false});
+      dispatch(new GetRegionsByOrganizationId(region.organizationId));
+      return payload;
+    }));
+  }
+
+  @Action(UpdateRegion)
+  UpdateRegion({ patchState, dispatch }: StateContext<AdminStateModel>, { region }: UpdateRegion): Observable<void> {
+    return this.regionService.updateRegion(region).pipe(tap((payload) => {
+      patchState({ isLocationLoading: false });
+      dispatch(new GetRegionsByOrganizationId(region.organizationId));
+      return payload;
+    }));
+  }
+
+  @Action(DeleteRegionById)
+  DeleteRegionById({ patchState, dispatch }: StateContext<AdminStateModel>, { regionId, organizationId }: DeleteRegionById): Observable<void> {
+    return this.regionService.deleteRegionById(regionId).pipe(tap((payload) => {
+      patchState({ isLocationLoading: false });
+      dispatch(new GetRegionsByOrganizationId(organizationId));
+      return payload;
+    }));
+  }
+
   @Action(GetLocationsByOrganizationId)
   GetLocationsByOrganizationId({ patchState }: StateContext<AdminStateModel>, { organizationId }: GetLocationsByOrganizationId): Observable<Location[]> {
     return this.locationService.getLocationsByOrganizationId(organizationId).pipe(tap((payload) => {
@@ -246,7 +293,6 @@ export class AdminState {
   GetLocationsByRegionId({ patchState }: StateContext<AdminStateModel>, { regionId }: GetLocationsByRegionId): Observable<Location[]> {
     return this.locationService.getLocationsByRegionId(regionId).pipe(tap((payload) => {
       patchState({ locations: payload});
-      // dispatch(new GetDepartmentsByLocationId(department.locationId));
       return payload;
     }));
   }
@@ -255,6 +301,34 @@ export class AdminState {
   GetLocationById({ patchState }: StateContext<AdminStateModel>, { locationId }: GetLocationById): Observable<Location> {
     return this.locationService.getLocationById(locationId).pipe(tap((payload) => {
       patchState({ location: payload});
+      return payload;
+    }));
+  }
+
+  @Action(SaveLocation)
+  SaveLocation({ patchState, dispatch }: StateContext<AdminStateModel>, { location, regionId }: SaveLocation): Observable<Location> {
+    patchState({ isLocationLoading: true });
+    return this.locationService.saveLocation(location).pipe(tap((payload) => {
+      patchState({ isLocationLoading: false});
+      dispatch(new GetLocationsByRegionId(regionId));
+      return payload;
+    }));
+  }
+
+  @Action(UpdateLocation)
+  UpdateLocation({ patchState, dispatch }: StateContext<AdminStateModel>, { location, regionId }: UpdateLocation): Observable<void> {
+    return this.locationService.updateLocation(location).pipe(tap((payload) => {
+      patchState({ isLocationLoading: false });
+      dispatch(new GetLocationsByRegionId(regionId));
+      return payload;
+    }));
+  }
+
+  @Action(DeleteLocationById)
+  DeleteLocationById({ patchState, dispatch }: StateContext<AdminStateModel>, { locationId, regionId }: DeleteLocationById): Observable<void> {
+    return this.locationService.deleteLocationById(locationId).pipe(tap((payload) => {
+      patchState({ isLocationLoading: false });
+      dispatch(new GetLocationsByRegionId(regionId));
       return payload;
     }));
   }

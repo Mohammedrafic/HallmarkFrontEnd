@@ -29,7 +29,6 @@ export class DepartmentsService {
 
   /**
    * Update department
-   * @return Updated department
    */
   public updateDepartment(department: Department): Observable<void> {
     return this.http.put<void>(`/api/Departments/`, department);

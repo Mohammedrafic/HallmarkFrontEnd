@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
@@ -11,9 +11,9 @@ import { AdminState } from '../../../store/admin.state';
 import { Region } from '../../../../shared/models/region.model';
 import {
   DeleteLocationById,
-  GetLocationsByRegionId,
+  GetLocationsByRegionId, GetOrganizationById,
   GetRegionsByOrganizationId,
-  SaveLocation,
+  SaveLocation, SaveRegion, SetGeneralStatesByCountry,
   SetImportFileDialogState,
   UpdateLocation
 } from '../../../store/admin.actions';
@@ -22,9 +22,14 @@ import { MessageTypes } from '../../../../shared/enums/message-types';
 import { Location } from '../../../../shared/models/location.model';
 
 import { MESSAGE_CANNOT_BE_DELETED } from '../departments/departments.component';
+import { PhoneTypes } from '../../../../shared/enums/phone-types';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { Organization } from '../../../../shared/models/organization.model';
+import { Country } from '../../../../shared/enums/states';
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
 export const MESSAGE_REGION_LOCATION_CANNOT_BE_DELETED = 'Region/Location cannot be deleted';
+export const MESSAGE_RECORD_HAS_BEEN_ADDED = 'Record has been added';
 
 @Component({
   selector: 'app-locations',
@@ -34,6 +39,13 @@ export const MESSAGE_REGION_LOCATION_CANNOT_BE_DELETED = 'Region/Location cannot
 export class LocationsComponent extends AbstractGridConfigurationComponent implements OnInit {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
+  @ViewChild('addRegionDialog') addRegionDialog: DialogComponent;
+
+  @Select(AdminState.statesGeneral)
+  statesGeneral$: Observable<string[]>;
+
+  @Select(AdminState.phoneTypes)
+  phoneTypes$: Observable<FieldSettingsModel[]>;
 
   @Select(AdminState.regions)
   regions$: Observable<Region[]>;
@@ -44,14 +56,16 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   locations$: Observable<Location[]>;
 
   locationDetailsFormGroup: FormGroup;
+  newRegionName: string;
   formBuilder: FormBuilder;
 
   isEdit: boolean;
   editedLocationId?: number;
 
-  fakeOrganizationId = 1; // TODO: remove after BE implementation
+  fakeOrganizationId = 2; // TODO: remove after BE implementation
 
   constructor(private store: Store,
+              private actions$: Actions,
               @Inject(FormBuilder) private builder: FormBuilder) {
     super();
     store.dispatch(new SetHeaderState({ title: 'Locations' }));
@@ -61,12 +75,36 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   ngOnInit(): void {
     this.store.dispatch(new GetRegionsByOrganizationId(this.fakeOrganizationId)); // TODO: provide valid organizationId
+    this.store.dispatch(new GetOrganizationById(this.fakeOrganizationId));  // TODO: provide valid organizationId
+
+    // TODO: get states list by countryId from organization
+    this.actions$.pipe(ofActionDispatched(GetOrganizationById)).subscribe(organization => {
+      this.store.dispatch(new SetGeneralStatesByCountry(parseInt(Country[organization.generalInformation.country])));
+    });
   }
 
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
-    this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
+    if (this.selectedRegion.id) {
+      this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
+    }
     this.mapGridData();
+  }
+
+  onAddRegionClick(): void {
+    this.addRegionDialog.show();
+  }
+
+  hideDialog(): void {
+    this.addRegionDialog.hide();
+  }
+
+  onOkDialogClick(): void {
+    this.newRegionName.trim();
+    if (this.newRegionName) {
+      this.store.dispatch(new SaveRegion({ name: this.newRegionName, organizationId: this.fakeOrganizationId }))
+      this.addRegionDialog.hide();
+    }
   }
 
   onImportDataClick(): void {
@@ -120,7 +158,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       contactPerson: location.contactPerson,
       inactiveDate: location.inactiveDate,
       phoneNumber: location.phoneNumber,
-      phoneType: location.phoneType
+      phoneType: PhoneTypes[location.phoneType]
     });
     this.editedLocationId = location.id;
     this.isEdit = true;
@@ -128,8 +166,8 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   onRemoveButtonClick(location: Location): void {
-    if (location.id) { // TODO: add verification to prevent remove if department has assigned Order with any status
-      this.store.dispatch(new DeleteLocationById(location.id));
+    if (location.id && this.selectedRegion.id) { // TODO: add verification to prevent remove if department has assigned Order with any status
+      this.store.dispatch(new DeleteLocationById(location.id, this.selectedRegion.id));
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_CANNOT_BE_DELETED));
     }
@@ -161,15 +199,20 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         contactPerson: this.locationDetailsFormGroup.controls['contactPerson'].value,
         inactiveDate: this.locationDetailsFormGroup.controls['inactiveDate'].value,
         phoneNumber: this.locationDetailsFormGroup.controls['phoneNumber'].value,
-        phoneType: this.locationDetailsFormGroup.controls['phoneType'].value,
+        phoneType: parseInt(PhoneTypes[this.locationDetailsFormGroup.controls['phoneType'].value]),
       }
 
       if (this.isEdit) {
-        this.store.dispatch(new UpdateLocation(location));
-        this.isEdit = false;
-        this.editedLocationId = undefined;
+        if (this.selectedRegion.id) {
+          this.store.dispatch(new UpdateLocation(location, this.selectedRegion.id));
+          this.isEdit = false;
+          this.editedLocationId = undefined;
+        }
       } else {
-        this.store.dispatch(new SaveLocation(location));
+        if (this.selectedRegion.id) {
+          this.store.dispatch(new SaveLocation(location, this.selectedRegion.id));
+          this.store.dispatch(new ShowToast(MessageTypes.Success, MESSAGE_RECORD_HAS_BEEN_ADDED))
+        }
       }
 
       this.locationDetailsFormGroup.reset();
@@ -178,24 +221,28 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     }
   }
 
+  onAllowDeployWOCreadentialsCheck(event: any): void {
+  //  TODO: add functionality after BE implementation
+  }
+
   private createLocationForm(): void {
     this.locationDetailsFormGroup = this.formBuilder.group({
       invoiceId: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       externalId: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       address1: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      address2: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
+      address2: ['', [Validators.maxLength(50)]],
       zip: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       city: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      state: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      glNumber: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      ext: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      invoiceNote: ['', [Validators.maxLength(50)]],
+      state: ['', [Validators.required]],
+      glNumber: ['', Validators.maxLength(50)],
+      invoiceNote: ['', Validators.maxLength(50)],
+      ext: ['', Validators.maxLength(50)],
       contactEmail: ['', [Validators.required, Validators.email]],
       contactPerson: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      inactiveDate: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      phoneNumber: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      phoneType: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
+      inactiveDate: [''],
+      phoneNumber: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(10)]],
+      phoneType: ['', Validators.required],
     });
   }
 

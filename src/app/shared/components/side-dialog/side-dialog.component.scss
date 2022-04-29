@@ -14,6 +14,8 @@
     padding: 24px;
 
     .header-container {
+      padding-bottom: 23px;
+
       .e-card-header {
         display: flex;
         justify-content: space-between;
@@ -38,10 +40,6 @@
 
         label {
           margin-bottom: 12px;
-        }
-
-        .field-required {
-          color: $supportive-red;
         }
 
         &.facility-phone {
