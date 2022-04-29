@@ -5,6 +5,7 @@ import { Store } from '@ngxs/store';
 import { ListBoxChangeEventArgs, SelectionSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 import { SetHeaderState } from '../../../store/app.actions';
+import { ORG_SETTINGS } from '../../admin-menu.config';
 
 @Component({
   selector: 'app-organization-management-content',
@@ -12,19 +13,12 @@ import { SetHeaderState } from '../../../store/app.actions';
   styleUrls: ['./organization-management-content.component.scss']
 })
 export class OrganizationManagementContentComponent  {
-  additionalSectionMenu: { [key: string]: Object }[] = [
-    { text: 'Departments', id: 1, route: 'admin/organization-management/departments' },
-    { text: 'Locations', id: 2, route: 'admin/organization-management/locations' }
-  ];
-  selectionSettings: SelectionSettingsModel = { mode: 'Single' };
+  public sideMenuConfig = ORG_SETTINGS;
 
   constructor(private store: Store,
               private router: Router,
               private route: ActivatedRoute) {
     store.dispatch(new SetHeaderState({ title: 'Organization Management' }));
   }
-
-  goToSection(event: ListBoxChangeEventArgs ): void {
-    this.router.navigate(['admin/organization-management/departments']);
-  }
+  
 }

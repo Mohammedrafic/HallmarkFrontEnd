@@ -6,7 +6,7 @@ import { GridModule, ResizeService, PagerModule, PageService } from '@syncfusion
 import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule  } from '@syncfusion/ej2-angular-buttons';
 import { DropDownListModule, ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 import { UploaderModule, TextBoxModule, NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
-import { SidebarModule } from '@syncfusion/ej2-angular-navigations';
+import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
@@ -34,7 +34,11 @@ import { AdminState } from './store/admin.state';
 import { SharedModule } from '../shared/shared.module';
 import { OrganizationManagementContentComponent } from './organization-management/organization-management-content/organization-management-content.component';
 import { DepartmentsComponent } from './organization-management/organization-management-content/departments/departments.component';
+import { MasterDataContentComponent } from './master-data/master-data-content.component';
+import { SkillsCategoriesComponent } from './master-data/skills/skills-categories.component';
 import { LocationsComponent } from './organization-management/organization-management-content/locations/locations.component';
+import { SkillsGridComponent } from './master-data/skills/skills-grid/skills-grid.component';
+import { SkillCategoriesGridComponent } from './master-data/skills/skill-categories-grid/skill-categories-grid.component';
 
 const sidebarIcons = {
   Download,
@@ -57,7 +61,11 @@ const sidebarIcons = {
     AdminComponent,
     OrganizationManagementContentComponent,
     DepartmentsComponent,
-    LocationsComponent
+    MasterDataContentComponent,
+    SkillsCategoriesComponent,
+    LocationsComponent,
+    SkillsGridComponent,
+    SkillCategoriesGridComponent
   ],
   imports: [
     CommonModule,
@@ -79,6 +87,8 @@ const sidebarIcons = {
     SidebarModule,
     DatePickerModule,
     DialogModule,
+    TabModule,
+    TabAllModule,
 
     FeatherModule.pick(sidebarIcons),
 

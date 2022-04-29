@@ -27,5 +27,8 @@ export abstract class AbstractGridConfigurationComponent {
   pageSizePager = GRID_CONFIG.initialRowsPerPage;
   currentPagerPage: number = 1;
 
+  pageSize = 30;
+  currentPage = 1;
+
   protected constructor() { }
 }

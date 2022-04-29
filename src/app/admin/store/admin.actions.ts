@@ -1,5 +1,7 @@
 import { Country } from "src/app/shared/enums/states";
 import { Organization } from "src/app/shared/models/organization.model";
+import { SkillCategory } from "src/app/shared/models/skill-category.model";
+import { Skill } from "src/app/shared/models/skill.model";
 import { Department } from '../../shared/models/department.model';
 import { Location } from '../../shared/models/location.model';
 import { Region } from '../../shared/models/region.model';
@@ -127,4 +129,59 @@ export class SetDirtyState {
 export class SetImportFileDialogState {
   static readonly type = '[admin] Set Import file dialog State';
   constructor(public payload: boolean) { }
+}
+
+export class GetMasterSkillsByPage {
+  static readonly type = '[admin] Get Master Skills by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}
+
+export class GetSkillsCategoriesByPage {
+  static readonly type = '[admin] Get Skills Categories by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}
+
+export class GetAllSkillsCategories {
+  static readonly type = '[admin] Get All Skills Categories by Page';
+  constructor() { }
+}
+
+export class SaveSkillsCategory {
+  static readonly type = '[admin] Save Skills Category';
+  constructor(public payload: SkillCategory) { }
+}
+
+export class SaveSkillsCategorySucceeded {
+  static readonly type = '[admin] Save Skills Category Succeeded';
+  constructor(public payload: SkillCategory) { }
+}
+
+export class RemoveSkillsCategory {
+  static readonly type = '[admin] Remove Skills Category';
+  constructor(public payload: SkillCategory) { }
+}
+
+export class SaveMasterSkill {
+  static readonly type = '[admin] Save Master Skill';
+  constructor(public payload: Skill) { }
+}
+
+export class RemoveMasterSkill {
+  static readonly type = '[admin] Remove Master Skill';
+  constructor(public payload: Skill) { }
+}
+
+export class SaveMasterSkillSucceeded {
+  static readonly type = '[admin] Save Master Skill Succeeded';
+  constructor(public payload: Skill) { }
+}
+
+export class RemoveMasterSkillSucceeded {
+  static readonly type = '[admin] Remove Master Skill by ID Succeeded';
+  constructor() { }
+}
+
+export class RemoveSkillsCategorySucceeded {
+  static readonly type = '[admin] Remove Skill Category by ID Succeeded';
+  constructor() { }
 }

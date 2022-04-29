@@ -3,6 +3,7 @@ import { FeatherModule } from 'angular-feather';
 
 import { AlertCircle, CheckCircle } from 'angular-feather/icons';
 import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
+import { ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 
 import { PageToolbarComponent } from './components/page-toolbar/page-toolbar.component';
 import { ValidateDirective } from './directives/validate.directive';
@@ -16,6 +17,7 @@ import { FileUploadDialogComponent } from './components/file-upload-dialog/file-
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { SideDialogComponent } from './components/side-dialog/side-dialog.component';
+import { SideMenuComponent } from './components/side-menu/side-menu.component';
 
 const icons = {AlertCircle, CheckCircle};
 
@@ -26,11 +28,12 @@ const COMPONENTS = [
   ImageUploaderComponent,
   SideDialogComponent,
   MessageToastComponent,
-  FileUploadDialogComponent
+  FileUploadDialogComponent,
+  SideMenuComponent,
 ];
 
 @NgModule({
-  imports: [FeatherModule.pick(icons), CommonModule, UploaderModule, ToastModule, DialogModule, ButtonModule],
+  imports: [FeatherModule.pick(icons), CommonModule, UploaderModule, ToastModule, DialogModule, ButtonModule, ListBoxModule],
   exports: [...COMPONENTS],
   declarations: [...COMPONENTS, ErrorMessageComponent],
   providers: [],

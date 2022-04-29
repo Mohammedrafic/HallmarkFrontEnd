@@ -13,6 +13,7 @@ body.light, body.dark {
           border-width: 2px !important;
           border-radius: 8px !important;
           border-color: $primary-active-blue-10 !important;
+          padding-left: 5px;
 
           &::after, &::before {
             display: none;
@@ -29,6 +30,8 @@ body.light, body.dark {
         }
 
         input.e-input {
+          padding-left: 15px;
+
           &::placeholder {
             color: $secondary-dark-blue-30;
           }

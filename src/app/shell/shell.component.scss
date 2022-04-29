@@ -1,6 +1,11 @@
 @import '../styles/variables/colors.scss';
 
 .shell {
+  height: 100%;
+
+  #main {
+    height: 100%;
+  }
 
   #sidebar {
     visibility: hidden;
@@ -231,9 +236,10 @@
 
   .content {
     padding: 60px 25px 0 25px;
+    height: calc(100% - 60px);
 
     .last-section {
       margin-bottom: 25px;
     }
-  }
+ }
 }

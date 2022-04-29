@@ -22,20 +22,20 @@ export class SideDialogComponent implements OnInit {
   constructor(private action$: Actions) { }
 
   ngOnInit(): void {
-    this.action$.pipe(ofActionDispatched(ShowSideDialog)).subscribe(isDialogShown => {
-      if (isDialogShown) {
+    this.action$.pipe(ofActionDispatched(ShowSideDialog)).subscribe(payload => {
+      if (payload.isDialogShown) {
         this.sideDialog.show();
+      } else {
+        this.sideDialog.hide();
       }
     });
   }
 
   onFormCancelClick(): void {
-    this.sideDialog.hide();
     this.formCancelClicked.emit();
   }
 
   onFormSaveClick(): void {
-    this.sideDialog.hide();
     this.formSaveClicked.emit();
   }
 }

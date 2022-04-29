@@ -1,0 +1,25 @@
+@import '../../../../styles/variables/colors';
+
+.grid {
+  margin-top: 20px;
+}
+
+.input-group {
+  margin-top: 5px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
+.skills-form-dialog {
+  &.form-container {
+    margin-top: 20px;
+  }
+
+  ejs-textbox {
+    textarea.e-textbox.e-input {
+      height: 100px;
+    }
+  }
+}

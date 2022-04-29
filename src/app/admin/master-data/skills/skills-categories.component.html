@@ -1,0 +1,31 @@
+<section class="controls-wrapper">
+  <button
+    ejs-button
+    id="filterButton"
+    cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+  <button
+    ejs-button
+    id="addDepartmentButton"
+    (click)="addSkill()"
+    [isPrimary]="true">Add {{ tabs[currentTab] }}</button>
+</section>
+<ejs-tab class="tabs" (selected)="tabSelected($event)">
+  <e-tabitems>
+    <e-tabitem>
+      <ng-template #headerText>
+        <div>Skills</div>
+      </ng-template>
+      <ng-template #content>
+        <app-skills-grid [isActive]="isSkillsActive"></app-skills-grid>
+      </ng-template>
+    </e-tabitem>
+    <e-tabitem>
+      <ng-template #headerText>
+        <div>Categories</div>
+      </ng-template>
+      <ng-template #content>
+        <app-skill-categories-grid [isActive]="isCategoriesActive"></app-skill-categories-grid>
+      </ng-template>
+    </e-tabitem>
+  </e-tabitems>
+</ejs-tab>

@@ -12,6 +12,8 @@ import { LocationsComponent } from './organization-management/organization-manag
 import {
   DepartmentsComponent
 } from './organization-management/organization-management-content/departments/departments.component';
+import { MasterDataContentComponent } from './master-data/master-data-content.component';
+import { SkillsCategoriesComponent } from './master-data/skills/skills-categories.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -50,6 +52,16 @@ const routes: Routes = [
           {
             path: 'locations',
             component: LocationsComponent
+          }
+        ]
+      },
+      {
+        path: 'master-data',
+        component: MasterDataContentComponent,
+        children: [
+          {
+            path: 'skills',
+            component: SkillsCategoriesComponent
           }
         ]
       }

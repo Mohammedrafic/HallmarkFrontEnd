@@ -1,0 +1,25 @@
+@import "../../../styles/variables/colors.scss";
+
+.side-menu {
+  background-color: #fff;
+  margin-right: 25px;
+  height: 100%;
+
+  .list-box {
+    .e-listbox-wrapper {
+      border: none;
+
+      .e-list-item {
+        height: 48px;
+        border-bottom: 1px solid $secondary-dark-blue-45;
+        padding: 17px 25px;
+
+        &.e-selected {
+          background-color: $primary-active-blue;
+          color: #FFF;
+          font-weight: 700;
+        }
+      }
+    }
+  }
+}

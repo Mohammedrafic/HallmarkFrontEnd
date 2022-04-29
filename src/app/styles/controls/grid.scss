@@ -23,13 +23,6 @@ ejs-grid.e-control.e-grid {
     border-top: none;
   }
 
-  &.e-resize-lines .e-headercell {
-    .e-rhandler,
-    .e-rsuppress {
-      border: none;
-    }
-  }
-
   .e-pager {
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;

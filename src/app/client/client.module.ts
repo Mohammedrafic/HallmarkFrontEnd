@@ -28,8 +28,7 @@ import {
 import { ButtonModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 import { NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
-import { MenuModule } from '@syncfusion/ej2-angular-navigations';
-import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
+import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 
 import { ClientRoutingModule } from './client-routing.module';
 import { DashboardContentComponent } from './dashboard/dashboard-content/dashboard-content.component';

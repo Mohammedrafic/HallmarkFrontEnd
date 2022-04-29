@@ -27,13 +27,24 @@ import {
   UpdateDepartment,
   DeleteDepartmentById,
   GetLocationById,
-  GetLocationsByRegionId,
   UpdateLocation,
   DeleteLocationById,
   SaveLocation,
   SaveRegion,
   UpdateRegion,
-  DeleteRegionById
+  DeleteRegionById,
+  GetLocationsByRegionId,
+  GetMasterSkillsByPage,
+  GetSkillsCategoriesByPage,
+  SaveSkillsCategory,
+  SaveSkillsCategorySucceeded,
+  RemoveSkillsCategory,
+  RemoveSkillsCategorySucceeded,
+  GetAllSkillsCategories,
+  SaveMasterSkill,
+  SaveMasterSkillSucceeded,
+  RemoveMasterSkill,
+  RemoveMasterSkillSucceeded
 } from './admin.actions';
 import { DepartmentsService } from '../services/departments.service';
 import { Department } from '../../shared/models/department.model';
@@ -42,6 +53,10 @@ import { Location } from '../../shared/models/location.model';
 import { RegionService } from '../services/region.service';
 import { LocationService } from '../services/location.service';
 import { GeneralPhoneTypes } from '../../shared/constants/general-phone-types';
+import { SkillsService } from '../services/skills.service';
+import { CategoriesService } from '../services/categories.service';
+import { Skill, SkillsPage } from 'src/app/shared/models/skill.model';
+import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 
 interface DropdownOption {
   id: number;
@@ -68,6 +83,9 @@ export interface AdminStateModel {
   locations: Location[];
   location: Location | null;
   organization: Organization | null;
+  masterSkills: SkillsPage | null;
+  skillsCategories: SkillCategoriesPage | null;
+  allSkillsCategories: SkillCategoriesPage | null;
   isDirty: boolean;
 }
 
@@ -91,6 +109,9 @@ export interface AdminStateModel {
     regions: [],
     locations: [],
     location: null,
+    masterSkills: null,
+    skillsCategories: null,
+    allSkillsCategories: null,
     isDirty: false
   },
 })
@@ -141,8 +162,19 @@ export class AdminState {
   @Selector()
   static organizationById(state: AdminStateModel): Organization | null { return state.organization; }
 
+  @Selector()
+  static masterSkills(state: AdminStateModel): SkillsPage | null { return state.masterSkills; }
+
+  @Selector()
+  static skillsCategories(state: AdminStateModel): SkillCategoriesPage | null { return state.skillsCategories; }
+
+  @Selector()
+  static allSkillsCategories(state: AdminStateModel): SkillCategoriesPage | null { return state.allSkillsCategories; }
+
   constructor(
     private organizationService: OrganizationService,
+    private skillsService: SkillsService,
+    private categoriesService: CategoriesService,
     private departmentService: DepartmentsService,
     private regionService: RegionService,
     private locationService: LocationService
@@ -329,6 +361,72 @@ export class AdminState {
     return this.locationService.deleteLocationById(locationId).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
       dispatch(new GetLocationsByRegionId(regionId));
+      return payload;
+    }));
+  }
+
+  @Action(GetMasterSkillsByPage)
+  GetMasterSkillsByPage({ patchState }: StateContext<AdminStateModel>, { pageNumber, pageSize }: GetMasterSkillsByPage): Observable<SkillsPage> {
+    patchState({ isOrganizationLoading: true });
+    return this.skillsService.getMasterSkills(pageNumber, pageSize).pipe(tap((payload) => {
+      patchState({ isOrganizationLoading: false, masterSkills: payload });
+      return payload;
+    }));
+  }
+
+  @Action(GetAllSkillsCategories)
+  GetAllSkillsCategories({ patchState }: StateContext<AdminStateModel>, { }: GetAllSkillsCategories): Observable<SkillCategoriesPage> {
+    return this.categoriesService.getAllSkillsCategories().pipe(tap((payload) => {
+      patchState({ allSkillsCategories: payload });
+      return payload;
+    }));
+  }
+
+  @Action(GetSkillsCategoriesByPage)
+  GetSkillsCategoriesByPage({ patchState }: StateContext<AdminStateModel>, { pageNumber, pageSize }: GetSkillsCategoriesByPage): Observable<SkillCategoriesPage> {
+    patchState({ isOrganizationLoading: true });
+    return this.categoriesService.getSkillsCategories(pageNumber, pageSize).pipe(tap((payload) => {
+      patchState({ isOrganizationLoading: false, skillsCategories: payload });
+      return payload;
+    }));
+  }
+
+  @Action(SaveSkillsCategory)
+  SaveSkillsCategory({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveSkillsCategory): Observable<SkillCategory> {
+    patchState({ isOrganizationLoading: true });
+    return this.categoriesService.saveSkillCategory(payload).pipe(tap((payload) => {
+      patchState({ isOrganizationLoading: false });
+      dispatch(new SaveSkillsCategorySucceeded(payload));
+      return payload;
+    }));
+  }
+
+  @Action(RemoveSkillsCategory)
+  RemoveSkillsCategory({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveSkillsCategory): Observable<SkillCategory> {
+    patchState({ isOrganizationLoading: true });
+    return this.categoriesService.removeSkillCategory(payload).pipe(tap((payload) => {
+      patchState({ isOrganizationLoading: false });
+      dispatch(new RemoveSkillsCategorySucceeded);
+      return payload;
+    }));
+  }
+
+  @Action(SaveMasterSkill)
+  SaveMasterSkill({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveMasterSkill): Observable<Skill> {
+    patchState({ isOrganizationLoading: true });
+    return this.skillsService.saveMasterSkill(payload).pipe(tap((payload) => {
+      patchState({ isOrganizationLoading: false });
+      dispatch(new SaveMasterSkillSucceeded(payload));
+      return payload;
+    }));
+  }
+
+  @Action(RemoveMasterSkill)
+  RemoveMasterSkill({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveMasterSkill): Observable<SkillCategory> {
+    patchState({ isOrganizationLoading: true });
+    return this.skillsService.removeMasterSkill(payload).pipe(tap((payload) => {
+      patchState({ isOrganizationLoading: false });
+      dispatch(new RemoveMasterSkillSucceeded);
       return payload;
     }));
   }

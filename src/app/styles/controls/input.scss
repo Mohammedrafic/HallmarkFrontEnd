@@ -66,6 +66,11 @@ body.light, body.dark {
 
         textarea.e-control.e-textbox.e-input {
           resize: none;
+          padding-left: 15px;
+
+          &::placeholder {
+            color: $secondary-dark-blue-30;
+          }
         }
       }
     }

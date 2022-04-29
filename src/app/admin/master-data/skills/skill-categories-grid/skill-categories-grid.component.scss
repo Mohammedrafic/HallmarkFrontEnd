@@ -1,0 +1,37 @@
+@import '../../../../styles/variables/colors';
+
+.grid {
+  margin-top: 20px;
+
+  .row-tool-buttons {
+    color: $secondary-dark-blue-20;
+
+    i-feather {
+      cursor: pointer;
+    }
+    
+    .edit-button {
+      margin-right: 20px
+    }
+  }
+}
+
+.input-group {
+  margin-top: 5px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
+.categories-form-dialog {
+  &.form-container {
+    margin-top: 20px;
+  }
+
+  ejs-textbox {
+    textarea.e-textbox.e-input {
+      height: 100px;
+    }
+  }
+}

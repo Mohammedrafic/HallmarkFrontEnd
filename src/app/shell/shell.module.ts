@@ -15,7 +15,8 @@ import {
   Sidebar,
   Users,
   Clipboard,
-  Settings
+  Settings,
+  User
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
@@ -32,7 +33,8 @@ const sidebarIcons = {
   Users,
   DollarSign,
   Clipboard,
-  Settings
+  Settings,
+  User
 };
 
 @NgModule({

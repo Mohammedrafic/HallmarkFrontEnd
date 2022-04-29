@@ -1,0 +1,7 @@
+<section class="side-menu" style="width: 231px; margin-left: -25px;">
+  <ejs-listbox #listBox
+               class="list-box"
+               [dataSource]="config"
+               [selectionSettings]="selectionSettings"
+               (change)='goToSection($event)'></ejs-listbox>
+</section>

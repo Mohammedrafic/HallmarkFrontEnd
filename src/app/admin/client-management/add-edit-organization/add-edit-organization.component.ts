@@ -32,6 +32,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
   public isSameAsOrg: boolean = false;
   public isEditTitle: boolean[] = [false];
   public currentBusinessUnitId: number | null = null;
+  public title = 'Add';
 
   public createUnderFields = { 
     text: 'name', value: 'id'
@@ -82,6 +83,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
     store.dispatch(new SetHeaderState({title: 'Organization List'}));
     store.dispatch(new GetBusinessUnitList());
     if (route.snapshot.paramMap.get('organizationId')) {
+      this.title = 'Edit';
       store.dispatch(new GetOrganizationById(parseInt(route.snapshot.paramMap.get('organizationId') as string)));
     } else {
       this.initForms();
