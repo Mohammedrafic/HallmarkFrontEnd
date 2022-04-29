@@ -1,1 +1,12 @@
-<p>login-page works!</p>
+<p>Simple login</p>
+
+  <select  (change)="changeUser($event)">
+    <option value="">Deselect</option>
+    <option *ngFor="let item of users" value="{{ item.id}}">{{ item.id}} - {{ item.businessUnitName}}</option>
+  </select>
+  <button [disabled]="!selectedUser?.id" (click)="onLogin()" style="margin-left: 10px;">
+      Login
+  </button>
+  <button (click)="onLogout()" style="margin-left: 10px;">
+      Logout
+  </button>
