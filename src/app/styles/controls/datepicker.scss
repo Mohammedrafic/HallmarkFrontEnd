@@ -6,7 +6,6 @@ ejs-datepicker.datepicker {
     border: 1px solid $secondary-dark-blue-40 !important;
     height: 35px;
     align-items: center;
-    margin-top: 5px !important;
 
     .e-input {
       color: $secondary-dark-blue-30 !important; // TODO: does not work
@@ -55,6 +54,13 @@ ejs-datepicker.datepicker {
     content: "*";
     color: $supportive-red;
   }
+
+  &.ng-touched.ng-invalid {
+    span.e-input-group  {
+      border-color: $supportive-red  !important;
+    }
+  }
+
 
   &.ng-touched.ng-invalid.e-control.e-textbox {
     span.e-input-group {

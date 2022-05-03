@@ -24,6 +24,7 @@ import { ContactDetailsGroupComponent } from './agency-list/add-edit-agency/cont
 import { PaymentDetailsGridComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-details-grid.component';
 import { GridAllModule, GridModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import { NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
+import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 
 const sidebarIcons = {
   Sliders,
@@ -55,6 +56,7 @@ const sidebarIcons = {
     GridAllModule,
     PagerModule,
     NumericTextBoxModule,
+    DatePickerModule,
     FeatherModule.pick(sidebarIcons)
   ]
 })
