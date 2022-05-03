@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
-import { AccordionModule } from '@syncfusion/ej2-angular-navigations';
+import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 import {
@@ -68,6 +68,7 @@ const sidebarIcons = {
     NumericTextBoxModule,
     TextBoxModule,
     DatePickerModule,
+    TabAllModule,
     FeatherModule.pick(sidebarIcons)
   ]
 })

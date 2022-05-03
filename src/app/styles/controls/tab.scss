@@ -12,7 +12,7 @@ body.dark {
 
       .e-toolbar-item {
         margin: 5px 20px 3px 0 !important;
-          
+
         div.e-tab-wrap {
           padding: 0 !important;
         }
@@ -41,6 +41,80 @@ body.dark {
           }
         }
       }
+    }
+  }
+
+  .e-tab.stepper {
+    .e-tab-header {
+      .e-indicator {
+        display: none;
+      }
+    }
+
+    .e-toolbar {
+      .e-toolbar-items {
+        .e-toolbar-item {
+          background-color: $white;
+          border-radius: 12px;
+          padding: 16px !important;
+          height: auto;
+          border: 1px solid $secondary-dark-blue-45;
+          box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.05);
+
+          .stepper-header {
+            position: relative;
+
+            &.required::after {
+              display: block;
+              content: '*';
+              position: absolute;
+              color: $supportive-red;
+              top: 0;
+              right: 0;
+            }
+
+            .stepper-title {
+              font-size: 14px;
+              color: $title-black;
+              line-height: 20px;
+              margin-bottom: 2px;
+            }
+
+            .stepper-sub-title {
+              font-size: 12px;
+              line-height: 16px;
+              color: $secondary-dark-blue-30;
+            }
+          }
+
+          &.e-active {
+            background-color: $primary-active-blue-10;
+
+            .stepper-header {
+              .stepper-title {
+                color: $white;
+              }
+  
+              .stepper-sub-title {
+                color: $white;
+              }
+            }
+          }
+
+          &.e-disable {
+            background-color: $secondary-dark-blue-45;
+            .stepper-header {
+              .stepper-title {
+                color: $secondary-dark-blue-30;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .e-content {
+      padding-top: 24px;
     }
   }
 }

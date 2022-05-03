@@ -66,8 +66,8 @@
             </ejs-numerictextbox>
           </section>
           <section class="right-side-pager-controls">
-            <ejs-pager id="gridPager" #gridPager [pageSize]="30" [totalRecordsCount]="30" [enablePagerMessage]="false" [currentPage]="1">
-            </ejs-pager>
+            <!-- <ejs-pager id="gridPager" #gridPager [pageSize]="30" [totalRecordsCount]="30" [enablePagerMessage]="false" [currentPage]="1">
+            </ejs-pager> -->
           </section>
         </div>
       </div>
@@ -141,13 +141,16 @@
     <div class="dropdown-container">
       <label>Zip</label>
       <div class="input-group dropdown">
-        <ejs-dropdownlist
-          appValidateWithMessage
-          formControlName="zip"
-          [dataSource]="[]"
-          placeholder="Zip"
-       
-        ></ejs-dropdownlist>
+        <div class="input-group">
+          <input
+            id="Zip"
+            class="e-input"
+            type="text"
+            appValidateWithMessage
+            placeholder="Zip"
+            formControlName="zip"
+          />
+        </div>
       </div>
     </div>
 
