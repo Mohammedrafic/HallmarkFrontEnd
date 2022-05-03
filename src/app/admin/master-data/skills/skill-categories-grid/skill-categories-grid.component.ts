@@ -3,13 +3,13 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FreezeService, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, Observable, Subject } from 'rxjs';
+import { debounceTime, filter, Observable, Subject } from 'rxjs';
 import { GetSkillsCategoriesByPage, RemoveSkillsCategory, RemoveSkillsCategorySucceeded, SaveSkillsCategory, SaveSkillsCategorySucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
-import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
+import { ConfirmService } from 'src/app/shared/services/confirm.service';
+import { ShowSideDialog } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-skill-categories-grid',
@@ -29,7 +29,8 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
 
   constructor(private store: Store,
               private actions$: Actions,
-              private fb: FormBuilder) {
+              private fb: FormBuilder,
+              private confirmService: ConfirmService) {
     super();
     this.CategoryFormGroup = this.fb.group({
       id: new FormControl(0),
@@ -42,7 +43,6 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
       this.closeDialog();
       this.store.dispatch(new GetSkillsCategoriesByPage(this.currentPage, this.pageSize));
       this.CategoryFormGroup.reset();
-      this.store.dispatch(new ShowToast(MessageTypes.Success, 'Record has been added'));
     });
     this.actions$.pipe(ofActionSuccessful(RemoveSkillsCategorySucceeded)).subscribe(() => {
       this.store.dispatch(new GetSkillsCategoriesByPage(this.currentPage, this.pageSize));
@@ -63,11 +63,21 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
   }
 
   public deleteCategory(data: SkillCategory): void {
-    this.store.dispatch(new RemoveSkillsCategory(data));
+    this.confirmService
+    .confirm('Are you sure want to delete?', {
+       title: 'Delete Record',
+       okButtonLabel: 'Delete',
+       okButtonClass: 'delete-button'
+    })
+    .pipe(filter((confirm) => !!confirm))
+    .subscribe(() => {
+      this.store.dispatch(new RemoveSkillsCategory(data));
+    });
   }
 
   public closeDialog(): void {
     this.store.dispatch(new ShowSideDialog(false));
+    this.CategoryFormGroup.reset();
   }
 
   public saveCategory(): void {
