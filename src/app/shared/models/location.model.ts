@@ -7,15 +7,15 @@ export class Location {
   invoiceId: string;
   name: string;
   address1: string;
-  address2: string;
+  address2?: string;
   city: string;
   state: string;
   zip: string;
   contactPerson: string;
   contactEmail: string;
   phoneNumber: string;
-  ext: string;
-  glNumber: string;
-  invoiceNote: string;
-  inactiveDate: string;
+  ext?: string;
+  glNumber?: string;
+  invoiceNote?: string;
+  inactiveDate?: string;
 }

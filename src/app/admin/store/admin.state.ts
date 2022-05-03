@@ -44,7 +44,10 @@ import {
   SaveMasterSkill,
   SaveMasterSkillSucceeded,
   RemoveMasterSkill,
-  RemoveMasterSkillSucceeded
+  RemoveMasterSkillSucceeded,
+  GetCredentialTypes,
+  SaveCredentialType,
+  RemoveCredentialType, GetCredential, SaveCredential, RemoveCredential
 } from './admin.actions';
 import { DepartmentsService } from '../services/departments.service';
 import { Department } from '../../shared/models/department.model';
@@ -57,6 +60,9 @@ import { SkillsService } from '../services/skills.service';
 import { CategoriesService } from '../services/categories.service';
 import { Skill, SkillsPage } from 'src/app/shared/models/skill.model';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
+import { CredentialType } from '../../shared/models/credential-type.model';
+import { CredentialsService } from '../services/credentials.service';
+import { Credential } from '../../shared/models/credential.model';
 
 interface DropdownOption {
   id: number;
@@ -87,6 +93,10 @@ export interface AdminStateModel {
   skillsCategories: SkillCategoriesPage | null;
   allSkillsCategories: SkillCategoriesPage | null;
   isDirty: boolean;
+  credentialTypes: CredentialType[];
+  credentials: Credential[];
+  isCredentialTypesLoading: boolean;
+  isCredentialLoading: boolean;
 }
 
 @State<AdminStateModel>({
@@ -112,7 +122,11 @@ export interface AdminStateModel {
     masterSkills: null,
     skillsCategories: null,
     allSkillsCategories: null,
-    isDirty: false
+    isDirty: false,
+    credentialTypes: [],
+    credentials: [],
+    isCredentialTypesLoading: false,
+    isCredentialLoading: false
   },
 })
 @Injectable()
@@ -160,7 +174,7 @@ export class AdminState {
   static organizations(state: AdminStateModel): OrganizationPage | null { return state.organizations; }
 
   @Selector()
-  static organizationById(state: AdminStateModel): Organization | null { return state.organization; }
+  static organization(state: AdminStateModel): Organization | null { return state.organization; }
 
   @Selector()
   static masterSkills(state: AdminStateModel): SkillsPage | null { return state.masterSkills; }
@@ -171,13 +185,20 @@ export class AdminState {
   @Selector()
   static allSkillsCategories(state: AdminStateModel): SkillCategoriesPage | null { return state.allSkillsCategories; }
 
+  @Selector()
+  static credentialTypes(state: AdminStateModel): CredentialType[] { return state.credentialTypes; }
+
+  @Selector()
+  static credentials(state: AdminStateModel): Credential[] { return state.credentials }
+
   constructor(
     private organizationService: OrganizationService,
     private skillsService: SkillsService,
     private categoriesService: CategoriesService,
     private departmentService: DepartmentsService,
     private regionService: RegionService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private credentialsService: CredentialsService
   ) { }
 
   @Action(SetGeneralStatesByCountry)
@@ -203,7 +224,7 @@ export class AdminState {
   GetOrganizationById({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: GetOrganizationById): Observable<Organization> {
     patchState({ isOrganizationLoading: true });
     return this.organizationService.getOrganizationById(payload).pipe(tap((payload) => {
-      patchState({ isOrganizationLoading: false });
+      patchState({ isOrganizationLoading: false, organization: payload });
       dispatch(new GetOrganizationByIdSucceeded(payload));
       return payload;
     }));
@@ -427,6 +448,58 @@ export class AdminState {
     return this.skillsService.removeMasterSkill(payload).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false });
       dispatch(new RemoveMasterSkillSucceeded);
+      return payload;
+    }));
+  }
+
+  @Action(GetCredentialTypes)
+  GetCredentialTypes({ patchState }: StateContext<AdminStateModel>, { }: GetCredentialTypes): Observable<CredentialType[]> {
+  return this.credentialsService.getCredentialTypes().pipe(tap((payload) => {
+      patchState({ credentialTypes: payload });
+      return payload;
+    }));
+  }
+
+  @Action(SaveCredentialType)
+  SaveCredentialTypes({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveCredentialType): Observable<CredentialType> {
+    return this.credentialsService.saveUpdateCredentialType(payload).pipe(tap((payload) => {
+      patchState({ isCredentialTypesLoading: false });
+      dispatch(new GetCredentialTypes());
+      return payload;
+    }));
+  }
+
+  @Action(RemoveCredentialType)
+  RemoveCredentialTypes({ patchState, dispatch }: StateContext<AdminStateModel>, { credentialType }: RemoveCredentialType): Observable<CredentialType> {
+    return this.credentialsService.removeCredentialType(credentialType).pipe(tap((payload) => {
+      patchState({ isCredentialTypesLoading: false });
+      dispatch(new GetCredentialTypes());
+      return payload;
+    }));
+  }
+
+  @Action(GetCredential)
+  GetCredential({ patchState }: StateContext<AdminStateModel>, { }: GetCredential): Observable<Credential[]> {
+    return this.credentialsService.getCredential().pipe(tap((payload) => {
+      patchState({ credentials: payload });
+      return payload;
+    }));
+  }
+
+  @Action(SaveCredential)
+  SaveCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveCredential): Observable<Credential> {
+    return this.credentialsService.saveUpdateCredential(payload).pipe(tap((payload) => {
+      patchState({ isCredentialLoading: false });
+      dispatch(new GetCredentialTypes());
+      return payload;
+    }));
+  }
+
+  @Action(RemoveCredential)
+  RemoveCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveCredential): Observable<Credential> {
+    return this.credentialsService.removeCredential(payload).pipe(tap((payload) => {
+      patchState({ isCredentialLoading: false });
+      dispatch(new GetCredentialTypes());
       return payload;
     }));
   }

@@ -1,27 +1,28 @@
 import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Observable } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { Observable } from 'rxjs';
 
 import {
   AbstractGridConfigurationComponent
-} from '../../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { ShowSideDialog, ShowToast } from '../../../../../store/app.actions';
-import { MessageTypes } from '../../../../../shared/enums/message-types';
-import { MESSAGE_RECORD_HAS_BEEN_ADDED } from '../../../../../shared/constants/messages';
-import { Location } from '../../../../../shared/models/location.model';
-import { Credential } from '../../../../../shared/models/credential.model';
-import { AdminState } from '../../../../store/admin.state';
-import { CredentialType } from '../../../../../shared/models/credential-type.model';
+} from '../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { Location } from '../../../../shared/models/location.model';
+import { ShowSideDialog, ShowToast } from '../../../../store/app.actions';
+import { MessageTypes } from '../../../../shared/enums/message-types';
+import { MESSAGE_RECORD_HAS_BEEN_ADDED } from '../../../../shared/constants/messages';
+import { CredentialType } from '../../../../shared/models/credential-type.model';
+import { AdminState } from '../../../store/admin.state';
+import { Credential } from '../../../../shared/models/credential.model';
 
 @Component({
-  selector: 'app-credentials-list',
-  templateUrl: './credentials-list.component.html',
-  styleUrls: ['./credentials-list.component.scss']
+  selector: 'app-master-credential',
+  templateUrl: './master-credential.component.html',
+  styleUrls: ['./master-credential.component.scss']
 })
-export class CredentialsListComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class MasterCredentialComponent extends AbstractGridConfigurationComponent implements OnInit {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
 
@@ -29,12 +30,14 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
   @Select(AdminState.credentialTypes)
   credentialType$: Observable<CredentialType[]>;
-
-  @Select(AdminState.credentials)
-  credentials$: Observable<Credential[]>;
+  credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   credentialsFormGroup: FormGroup;
   formBuilder: FormBuilder;
+
+  // TODO: add selector, MasterCredential model
+  @Select(AdminState.credentials)
+  masterCredentials$: Observable<Credential[]>;
 
   constructor(private store: Store,
               @Inject(FormBuilder) private builder: FormBuilder) {
@@ -44,14 +47,20 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnInit(): void {
+    // this.store.dispatch(new GetMasterCredentialTypes());
+    // this.mapGridData();
+  }
+
+  onExpiryDateApplicableChange(event: any): void {
+//  TODO: implementation
   }
 
   onEditButtonClick(credential: Location): void {
-
+//  TODO: implementation
   }
 
   onRemoveButtonClick(credential: Location): void {
-
+//  TODO: implementation
   }
 
   onRowsDropDownChanged(): void {
@@ -60,15 +69,11 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
   onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.credentials$.subscribe(data => {
+      this.masterCredentials$.subscribe(data => {
         this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
         this.currentPagerPage = event.currentPage || event.value;
       });
     }
-  }
-
-  onExpiryDateApplicableChange(event: any): void {
-    //   TODO: implementation
   }
 
   onFormCancelClick(): void {
@@ -95,8 +100,13 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     }
   }
 
-  onCredentialTypeDropDownChanged(event: any): void {
-//  TODO: implementation
+  mapGridData(): void {
+    // TODO: map credential types by id
+    this.masterCredentials$.subscribe(data => {
+      this.lastAvailablePage = this.getLastPage(data);
+      this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
+      this.totalDataRecords = data.length;
+    });
   }
 
   private createCredentialsForm(): void {

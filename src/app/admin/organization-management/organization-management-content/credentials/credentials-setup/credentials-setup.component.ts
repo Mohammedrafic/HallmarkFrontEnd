@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Observable, of } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
@@ -14,7 +15,6 @@ import { MESSAGE_RECORD_HAS_BEEN_ADDED } from '../../../../../shared/constants/m
 import { MessageTypes } from '../../../../../shared/enums/message-types';
 import { AdminState } from '../../../../store/admin.state';
 import { Region } from '../../../../../shared/models/region.model';
-import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GetMasterSkillsByPage, GetRegionsByOrganizationId } from '../../../../store/admin.actions';
 
 export enum Credentials {

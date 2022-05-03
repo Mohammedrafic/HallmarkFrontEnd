@@ -42,6 +42,11 @@ import { SkillsGridComponent } from './master-data/skills/skills-grid/skills-gri
 import { SkillCategoriesGridComponent } from './master-data/skills/skill-categories-grid/skill-categories-grid.component';
 import { CredentialsListComponent } from './organization-management/organization-management-content/credentials/credentials-list/credentials-list.component';
 import { CredentialsSetupComponent } from './organization-management/organization-management-content/credentials/credentials-setup/credentials-setup.component';
+import { MasterCredentialsComponent } from './master-data/master-credentials/master-credentials.component';
+import { MasterCredentialComponent } from './master-data/master-credentials/master-credential/master-credential.component';
+import {
+  MasterCredentialsTypesComponent
+} from './master-data/master-credentials/master-credentials-types/master-credentials-types.component';
 
 const sidebarIcons = {
   Download,
@@ -72,7 +77,10 @@ const sidebarIcons = {
     LocationsComponent,
     SkillsGridComponent,
     SkillCategoriesGridComponent,
-    CredentialsSetupComponent
+    CredentialsSetupComponent,
+    MasterCredentialsComponent,
+    MasterCredentialComponent,
+    MasterCredentialsTypesComponent
   ],
   imports: [
     CommonModule,
