@@ -10,9 +10,9 @@
   [allowResizing]="allowResizing"
 >
   <e-columns>
-    <e-column field="extDepartmentId" headerText="skill category" width=200></e-column>
-    <e-column field="invoiceDepartmentId" headerText="skill abbr" width=200></e-column>
-    <e-column field="departmentName" headerText="skill description" width=200></e-column>
+    <e-column field="skillCategory.name" headerText="skill category" width=200></e-column>
+    <e-column field="skillAbbr" headerText="skill abbr" width=200></e-column>
+    <e-column field="skillDescription" headerText="skill description" width=200></e-column>
     <e-column textAlign="Right" width=120>
       <ng-template #template let-data>
         <div class="row-tool-buttons">

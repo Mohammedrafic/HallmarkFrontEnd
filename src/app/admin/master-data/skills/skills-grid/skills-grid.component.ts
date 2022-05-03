@@ -2,17 +2,20 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { FreezeService, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, Observable, Subject } from 'rxjs';
 import { GetAllSkillsCategories, GetMasterSkillsByPage, RemoveMasterSkill, RemoveMasterSkillSucceeded, SaveMasterSkill, SaveMasterSkillSucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { Skill } from 'src/app/shared/models/skill.model';
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-skills-grid',
   templateUrl: './skills-grid.component.html',
-  styleUrls: ['./skills-grid.component.scss']
+  styleUrls: ['./skills-grid.component.scss'],
+  providers: [SortService, FreezeService]
 })
 export class SkillsGridComponent extends AbstractGridConfigurationComponent implements OnInit {
   private pageSubject = new Subject<number>();
@@ -52,6 +55,8 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
     this.actions$.pipe(ofActionSuccessful(SaveMasterSkillSucceeded)).subscribe(() => {
       this.closeDialog();
       this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
+      this.SkillFormGroup.reset();
+      this.store.dispatch(new ShowToast(MessageTypes.Success, 'Record has been added'));
     });
     this.actions$.pipe(ofActionSuccessful(RemoveMasterSkillSucceeded)).subscribe(() => {
       this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
@@ -59,7 +64,13 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
   }
 
   public editSkill(data: any): void {
-
+    this.SkillFormGroup.setValue({
+      id: data.id,
+      skillAbbr: data.skillAbbr,
+      skillCategoryId: data.skillCategory.id,
+      skillDescription: data.skillDescription
+    });
+    this.store.dispatch(new ShowSideDialog(true));
   }
 
   public deleteSkill(data: any): void {
