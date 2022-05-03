@@ -1,0 +1,19 @@
+<div class="professional-summary">
+  <div class="e-card-title-wrapper">
+    <div class="e-card-title">Professional Summary</div>
+  </div>
+  <form [formGroup]="formGroup">
+    <div class="bootstrap">
+      <div class="input-container">
+        <div class="input-group">
+          <ejs-textbox appValidateWithMessage
+                       formControlName="professionalSummary"
+                       cssClass="professional-summary-textbox"
+                       [multiline]="true"
+                       placeholder="Professional Summary">
+          </ejs-textbox>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

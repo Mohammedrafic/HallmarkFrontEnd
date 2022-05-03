@@ -1,7 +1,7 @@
 @import "../../../styles/variables/colors.scss";
 
 #droparea {
-  height: 100%;
+  height: 118px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -21,10 +21,4 @@
 
 .e-file-select-wrap, .e-upload-actions {
   display: none;
-}
-
-.e-card-content {
-  display: flex;
-  flex-direction: column;
-  height: 200px;
 }

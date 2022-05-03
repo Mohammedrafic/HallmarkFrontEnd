@@ -1,0 +1,29 @@
+<app-page-toolbar>
+  <ng-container left>
+    <button ejs-button cssClass="e-outline">Back</button>
+    <h3>Add Candidate</h3>
+  </ng-container>
+  <ng-container right>
+    <button ejs-button *ngIf="false" cssClass="e-danger">Delete</button>
+    <button ejs-button cssClass="e-outline">Clear</button>
+    <button ejs-button [isPrimary]="true">Save</button>
+  </ng-container>
+</app-page-toolbar>
+<!-- Candidate Profile step -->
+<section class="candidate-profile-container">
+  <div class="left">
+    <div class="e-card">
+      <div class="e-card-content">
+        <form [formGroup]="candidateForm" id="candidateProfile">
+          <app-candidate-general-info [formGroup]="$any(candidateForm.get('generalInfo'))"></app-candidate-general-info>
+          <app-candidate-contact-details [formGroup]="$any(candidateForm.get('contactDetails'))"></app-candidate-contact-details>
+          <app-candidate-professional-summary [formGroup]="$any(candidateForm.get('profSummary'))"></app-candidate-professional-summary>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="right">
+    <app-image-uploader uploaderTitle="Upload Photo" (selectImage)="setCandidatePhoto($event)"></app-image-uploader>
+  </div>
+</section>
+

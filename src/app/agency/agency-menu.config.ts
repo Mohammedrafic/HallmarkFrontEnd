@@ -18,9 +18,14 @@ export const AGENCY_SIDEBAR_MENU = [
     isActive: true,
     children: [
       {
-        title: 'Agency list',
+        title: 'Agency List',
         icon: '',
         route: '/agency/agency-list'
+      },
+      {
+        title: 'Candidates',
+        icon: '',
+        route: '/agency/candidates'
       },
     ],
   }

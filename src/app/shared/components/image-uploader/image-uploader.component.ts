@@ -24,7 +24,9 @@ export class ImageUploaderComponent implements OnInit {
   }
 
   public onImageSelect(event: SelectedEventArgs): void {
-    this.selectImage.emit(event.filesData[0].rawFile as Blob)
+    if (event.filesData[0].statusCode === '1') {
+      this.selectImage.emit(event.filesData[0].rawFile as Blob)
+    }
   }
 
   public onImageRemove(): void {
