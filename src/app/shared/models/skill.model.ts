@@ -2,16 +2,30 @@ import { SkillCategory } from "./skill-category.model";
 
 export class Skill {
   id: number;
+  organizationId?: number;
+  masterSkillId?: number;
+  masterSkill?: Skill;
   skillCategoryId: number;
   skillAbbr: string;
   skillDescription: string;
   skillCategory?: SkillCategory;
+  glNumber?: string;
+  allowOnboard?: boolean;
+  inactiveDate?: string;
 
-  constructor(skill: Skill) {
+  constructor(skill: Skill, organizationId?: number) {
     this.id = skill.id;
     this.skillCategoryId = skill.skillCategoryId;
     this.skillAbbr = skill.skillAbbr;
     this.skillDescription = skill.skillDescription;
+
+    if (organizationId) {
+      this.organizationId = organizationId;
+      this.inactiveDate = skill.inactiveDate;
+      this.allowOnboard = skill.allowOnboard;
+      this.glNumber = skill.glNumber;
+      this.masterSkillId = skill.masterSkillId;
+    }
   }
 }
 

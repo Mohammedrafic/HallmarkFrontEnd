@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { State, Action, StateContext, Selector } from '@ngxs/store';
-import { Observable, tap } from 'rxjs';
+import { catchError, Observable, of, tap } from 'rxjs';
 import { Days } from 'src/app/shared/enums/days';
 import { Country, UsaStates, CanadaStates } from 'src/app/shared/enums/states';
 import { Status } from 'src/app/shared/enums/status';
@@ -45,6 +45,11 @@ import {
   SaveMasterSkillSucceeded,
   RemoveMasterSkill,
   RemoveMasterSkillSucceeded,
+  SaveAssignedSkill,
+  GetAssignedSkillsByPage,
+  RemoveAssignedSkill,
+  SaveAssignedSkillSucceeded,
+  RemoveAssignedSkillSucceeded,
   GetCredentialTypes,
   SaveCredentialType,
   RemoveCredentialType, GetCredential, SaveCredential, RemoveCredential
@@ -60,6 +65,8 @@ import { SkillsService } from '../services/skills.service';
 import { CategoriesService } from '../services/categories.service';
 import { Skill, SkillsPage } from 'src/app/shared/models/skill.model';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { CredentialType } from '../../shared/models/credential-type.model';
 import { CredentialsService } from '../services/credentials.service';
 import { Credential } from '../../shared/models/credential.model';
@@ -71,6 +78,7 @@ interface DropdownOption {
 
 const StringIsNumber = (value: any) => isNaN(Number(value)) === true; // TODO: move to utils
 
+// TODO: separate states (skills, creds etc)
 export interface AdminStateModel {
   countries: DropdownOption[];
   statesGeneral: string[] | null;
@@ -90,6 +98,7 @@ export interface AdminStateModel {
   location: Location | null;
   organization: Organization | null;
   masterSkills: SkillsPage | null;
+  skills: SkillsPage | null;
   skillsCategories: SkillCategoriesPage | null;
   allSkillsCategories: SkillCategoriesPage | null;
   isDirty: boolean;
@@ -120,6 +129,7 @@ export interface AdminStateModel {
     locations: [],
     location: null,
     masterSkills: null,
+    skills: null,
     skillsCategories: null,
     allSkillsCategories: null,
     isDirty: false,
@@ -178,6 +188,9 @@ export class AdminState {
 
   @Selector()
   static masterSkills(state: AdminStateModel): SkillsPage | null { return state.masterSkills; }
+
+  @Selector()
+  static skills(state: AdminStateModel): SkillsPage | null { return state.skills; }
 
   @Selector()
   static skillsCategories(state: AdminStateModel): SkillCategoriesPage | null { return state.skillsCategories; }
@@ -415,41 +428,79 @@ export class AdminState {
   @Action(SaveSkillsCategory)
   SaveSkillsCategory({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveSkillsCategory): Observable<SkillCategory> {
     patchState({ isOrganizationLoading: true });
+    const isCreating = !payload.id;
     return this.categoriesService.saveSkillCategory(payload).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false });
       dispatch(new SaveSkillsCategorySucceeded(payload));
+      dispatch(new ShowToast(MessageTypes.Success, isCreating ? 'Record has been added' : 'Record has been modified'));
       return payload;
     }));
   }
 
   @Action(RemoveSkillsCategory)
-  RemoveSkillsCategory({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveSkillsCategory): Observable<SkillCategory> {
+  RemoveSkillsCategory({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveSkillsCategory): Observable<any> {
     patchState({ isOrganizationLoading: true });
     return this.categoriesService.removeSkillCategory(payload).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false });
       dispatch(new RemoveSkillsCategorySucceeded);
       return payload;
-    }));
+    }),
+    catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))));
   }
 
   @Action(SaveMasterSkill)
   SaveMasterSkill({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveMasterSkill): Observable<Skill> {
+    const isCreating = !payload.id;
     patchState({ isOrganizationLoading: true });
     return this.skillsService.saveMasterSkill(payload).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false });
       dispatch(new SaveMasterSkillSucceeded(payload));
+      dispatch(new ShowToast(MessageTypes.Success, isCreating ? 'Record has been added' : 'Record has been modified'));
       return payload;
     }));
   }
 
   @Action(RemoveMasterSkill)
-  RemoveMasterSkill({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveMasterSkill): Observable<SkillCategory> {
+  RemoveMasterSkill({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveMasterSkill): Observable<any> {
     patchState({ isOrganizationLoading: true });
     return this.skillsService.removeMasterSkill(payload).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false });
       dispatch(new RemoveMasterSkillSucceeded);
       return payload;
+    }),
+    catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))));
+  }
+
+  @Action(SaveAssignedSkill)
+  SaveAssignedSkill({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveAssignedSkill): Observable<Skill> {
+    const isCreating = !payload.id;
+    patchState({ isOrganizationLoading: true });
+    return this.skillsService.saveAssignedSkill(payload).pipe(tap((payload) => {
+      patchState({ isOrganizationLoading: false });
+      dispatch(new SaveAssignedSkillSucceeded(payload));
+      dispatch(new ShowToast(MessageTypes.Success, isCreating ? 'Record has been added' : 'Record has been modified'));
+      return payload;
     }));
+  }
+
+  @Action(GetAssignedSkillsByPage)
+  GetAssignedSkillsByPage({ patchState }: StateContext<AdminStateModel>, { pageNumber, pageSize }: GetAssignedSkillsByPage): Observable<SkillsPage> {
+    patchState({ isOrganizationLoading: true });
+    return this.skillsService.getAssignedSkills(pageNumber, pageSize).pipe(tap((payload) => {
+      patchState({ isOrganizationLoading: false, skills: payload });
+      return payload;
+    }));
+  }
+
+  @Action(RemoveAssignedSkill)
+  RemoveAssignedSkill({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveAssignedSkill): Observable<any> {
+    patchState({ isOrganizationLoading: true });
+    return this.skillsService.removeAssignedSkill(payload).pipe(tap((payload) => {
+      patchState({ isOrganizationLoading: false });
+      dispatch(new RemoveAssignedSkillSucceeded);
+      return payload;
+    }),
+    catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))));
   }
 
   @Action(GetCredentialTypes)

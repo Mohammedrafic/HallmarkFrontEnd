@@ -172,7 +172,7 @@
             <input id="address1"
                    class="e-input"
                    type="text"
-                   maxlength="50"
+                   maxlength="100"
                    appValidateWithMessage
                    placeholder="Address 1"
                    formControlName="address1"/>
@@ -203,7 +203,6 @@
                 placeholder="State"
                 [dataSource]="statesGeneral$ | async"
                 formControlName="state">
-
               </ejs-dropdownlist>
           </div>
         </div>
@@ -215,7 +214,7 @@
               id="city"
               class="e-input"
               type="text"
-              maxlength="50"
+              maxlength="20"
               appValidateWithMessage
               placeholder="City"
               formControlName="city"/>
@@ -228,7 +227,8 @@
             <input id="zip"
                    class="e-input"
                    type="text"
-                   maxlength="50"
+                   pattern="[0-9]*"
+                   maxlength="6"
                    appValidateWithMessage
                    placeholder="Zipcode"
                    formControlName="zip"/>
@@ -272,7 +272,8 @@
             <div class="input-group">
               <input id="phoneNumber"
                      class="e-input"
-                     type="text"
+                     type="tel"
+                     pattern="^[0-9]*$"
                      maxlength="10"
                      appValidateWithMessage
                      placeholder="Phone Number"
@@ -327,7 +328,7 @@
                      class="e-input"
                      type="text"
                      maxlength="50"
-                     placeholder="Invoice Number"
+                     placeholder="Invoice Note"
                      formControlName="invoiceNote"/>
             </div>
           </div>

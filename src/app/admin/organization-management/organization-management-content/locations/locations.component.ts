@@ -143,6 +143,9 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   onEditButtonClick(location: Location): void {
+    this.organization$.pipe(filter(Boolean)).subscribe(organization => {
+      this.store.dispatch(new SetGeneralStatesByCountry(parseInt(Country[organization.generalInformation.country])));
+    });
     this.locationDetailsFormGroup.setValue({
       invoiceId: location.invoiceId,
       externalId: location.externalId,
@@ -176,6 +179,8 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   onFormCancelClick(): void {
     this.store.dispatch(new ShowSideDialog(false));
+    this.isEdit = false;
+    this.editedLocationId = undefined;
     this.locationDetailsFormGroup.reset();
     // TODO: add modal dialog to confirm close
   }
@@ -233,10 +238,10 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       invoiceId: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       externalId: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      address1: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
+      address1: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(100)]],
       address2: [null, [Validators.maxLength(50)]],
-      zip: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      city: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
+      zip: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(6), Validators.pattern('^[0-9]*$')]],
+      city: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(20)]],
       state: ['', [Validators.required]],
       glNumber: [null, Validators.maxLength(50)],
       invoiceNote: [null, Validators.maxLength(50)],
@@ -244,7 +249,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       contactEmail: ['', [Validators.required, Validators.email]],
       contactPerson: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       inactiveDate: [null],
-      phoneNumber: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(10)]],
+      phoneNumber: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(10), Validators.pattern('^[0-9]*$')]],
       phoneType: ['', Validators.required],
     });
   }

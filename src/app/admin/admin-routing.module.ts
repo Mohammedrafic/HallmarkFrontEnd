@@ -15,6 +15,7 @@ import {
 import { CredentialsComponent } from './organization-management/organization-management-content/credentials/credentials.component';
 import { MasterDataContentComponent } from './master-data/master-data-content.component';
 import { SkillsCategoriesComponent } from './master-data/skills/skills-categories.component';
+import { SkillsComponent } from './organization-management/organization-management-content/skills/skills.component';
 import { MasterCredentialsComponent } from './master-data/master-credentials/master-credentials.component';
 
 const routes: Routes = [
@@ -58,6 +59,10 @@ const routes: Routes = [
           {
             path: 'credentials',
             component: CredentialsComponent
+          },
+          {
+            path: 'skills',
+            component: SkillsComponent
           }
         ]
       },

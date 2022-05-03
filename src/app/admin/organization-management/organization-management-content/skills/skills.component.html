@@ -1,0 +1,181 @@
+<section class="toolbar">
+  <section>
+    <button
+      ejs-button
+      id="filterButton"
+      cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+    <button
+      ejs-button
+      id="importButton"
+      cssClass="e-outline button-import"
+      (click)="onImportDataClick()">Import <i-feather name="upload" class="icon"></i-feather></button>
+    <button
+      ejs-button
+      id="addDepartmentButton"
+      [isPrimary]="true"
+      (click)='addSkill()'>Add Skill</button>
+  </section>
+</section>
+<ejs-grid class="grid"
+  #grid
+  [dataSource]="(skills$ | async)?.items"
+  [allowPaging]="allowPaging"
+  [pageSettings]="pageSettings"
+  [height]="gridHeight"
+  [rowHeight]="rowHeight"
+  [resizeSettings]="resizeSettings"
+  [allowSorting]="allowSorting"
+  [allowResizing]="allowResizing"
+>
+  <e-columns>
+    <e-column field="skillCategory.name" headerText="skill category" width=200></e-column>
+    <e-column field="masterSkill.skillAbbr" headerText="skill abbr" width=200></e-column>
+    <e-column field="masterSkill.skillDescription" headerText="skill description" width=200></e-column>
+    <e-column field="glNumber" headerText="gl number" width=200></e-column>
+    <e-column field="allowOnboard" headerText="allow onboard" width=200>
+      <ng-template #template let-data>
+        <div class="grid-checkbox bootstrap">
+          <ejs-checkbox [checked]="data.allowOnboard" label=""></ejs-checkbox>
+        </div>
+      </ng-template>
+    </e-column>
+    <e-column field="inactiveDate" type="date" [format]="format" headerText="inactive date" width=200></e-column>
+    <e-column textAlign="Right" width=120>
+      <ng-template #template let-data>
+        <div class="row-tool-buttons">
+          <span class="edit-button" (click)="editSkill(data)"><i-feather name="edit" class="icon"></i-feather></span>
+          <span class="remove-button" (click)="deleteSkill(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
+        </div>
+      </ng-template>
+    </e-column>
+  </e-columns>
+  <ng-template #pagerTemplate let-data>
+    <div class="e-pagertemplate">
+      <div class="control-section">
+        <div class="content-wrapper">
+          <section class="left-side-pager-controls">
+            <ejs-dropdownlist
+              id="rowsPerPage"
+              class="dropdown-no-border"
+              [dataSource]="rowsPerPageDropDown"
+              [(value)]="activeRowsPerPageDropDown"
+              (change)="onRowsDropDownChanged()"
+            >
+            </ejs-dropdownlist>
+            <ejs-numerictextbox
+              id="goToPage"
+              class="numeric-input-no-border"
+              format="#"
+              [validateDecimalOnType]="validateDecimalOnType"
+              [decimals]="decimals"
+              placeholder="Go to:"
+              min="1" [max]="lastAvailablePage"
+              [showSpinButton]="false"
+              (change)="onGoToClick($event)"
+            >
+            </ejs-numerictextbox>
+          </section>
+          <section class="right-side-pager-controls">
+            <ejs-pager
+              id="gridPager"
+              #gridPager
+              [pageSize]="pageSize"
+              [totalRecordsCount]="(skills$ | async)?.totalCount"
+              [enablePagerMessage]="false"
+              [currentPage]="currentPage"
+              (click)="onGoToClick($event)"
+            >
+            </ejs-pager>
+          </section>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</ejs-grid>
+
+<app-side-dialog
+  (formCancelClicked)="closeDialog()"
+  (formSaveClicked)="saveSkill()"
+  [header]="'Add Skill'"
+  >
+  <form class="skills-form-dialog form-container bootstrap"
+        id="addEditSkillsForm"
+        [formGroup]="SkillFormGroup">
+    <div>
+      <div class="input-container">
+        <label for="skillCategoryId">Skill Category <span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist name="skillCategoryId" [fields]="optionFields" appValidateWithMessage formControlName="skillCategoryId" [dataSource]="(allSkillsCategories$ | async)?.items" placeholder="State"></ejs-dropdownlist>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="input-container">
+        <label for="skillAbbr">Skill Abbr</label>
+        <div class="input-group">
+          <input class="e-input"
+                 type="text"
+                 maxlength="100"
+                 appValidateWithMessage
+                 placeholder="Skill Abbr"
+                 name="skillAbbr"
+                 formControlName="skillAbbr"/>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="input-container">
+        <label for="skillDescription">Skill description <span class="required">*</span></label>
+        <div class="input-group">
+          <input class="e-input"
+                 type="text"
+                 maxlength="100"
+                 appValidateWithMessage
+                 placeholder="Skill description"
+                 name="skillDescription"
+                 formControlName="skillDescription"/>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="input-container">
+        <label for="glNumber">GL Number</label>
+        <div class="input-group">
+          <input class="e-input"
+                 type="text"
+                 maxlength="100"
+                 appValidateWithMessage
+                 placeholder="GL Number"
+                 name="glNumber"
+                 formControlName="glNumber"/>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="input-container calendar">
+        <label for="inactiveDate">Inactive Date</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            id="inactiveDate"
+            class="datepicker"
+            format="MM/dd/yyyy"
+            placeholder="MM/DD/YYYY"
+            [enableMask]="true"
+            [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+            formControlName="inactiveDate"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+    </div>
+    <div>
+      <ejs-checkbox formControlName="allowOnboard" label="Allow Onboard"></ejs-checkbox>
+    </div>
+  </form>
+</app-side-dialog>
+
+<app-file-upload-dialog></app-file-upload-dialog>

@@ -149,6 +149,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   onDepartmentFormCancelClick(): void {
     this.store.dispatch(new ShowSideDialog(false));
+    this.isEdit = false;
+    this.editedDepartmentId = undefined;
     this.departmentsDetailsFormGroup.reset();
     // TODO: add modal dialog to confirm close
   }

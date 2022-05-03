@@ -1,12 +1,12 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 
-import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
-import { Subscription, takeWhile } from 'rxjs';
+import { filter, Subscription, takeWhile } from 'rxjs';
 
 import { MessageTypes } from 'src/app/shared/enums/message-types';
+import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { SetHeaderState, ShowToast } from 'src/app/store/app.actions';
 import { BillingDetailsGroupComponent } from './billing-details-group/billing-details-group.component';
 import { ContactDetailsGroupComponent } from './contact-details-group/contact-details-group.component';
@@ -14,17 +14,14 @@ import { GeneralInfoGroupComponent } from './general-info-group/general-info-gro
 
 enum MESSAGES {
   SAVE = 'Agency details saved successfully',
-  BACK = 'All the data will be lost',
+  BACK = 'Are you sure you want to cancel? All data will be deleted.',
 }
-
 @Component({
   selector: 'app-add-edit-agency',
   templateUrl: './add-edit-agency.component.html',
   styleUrls: ['./add-edit-agency.component.scss'],
 })
 export class AddEditAgencyComponent implements OnInit, OnDestroy {
-  @ViewChild('accordion') accordion: AccordionComponent;
-
   public agencyForm: FormGroup;
 
   get contacts(): FormArray {
@@ -35,7 +32,13 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   private isAlive = true;
   private logoFile: Blob | null;
 
-  constructor(private store: Store, private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {
+  constructor(
+    private store: Store,
+    private fb: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute,
+    private confirmService: ConfirmService
+  ) {
     this.store.dispatch(new SetHeaderState({ title: 'Agency' }));
   }
 
@@ -69,7 +72,14 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   }
 
   public onBack(): void {
-    this.router.navigate(['../'], { relativeTo: this.route });
+    if (this.agencyForm.dirty) {
+      this.confirmService
+        .confirm(MESSAGES.BACK)
+        .pipe(filter((confirm) => !!confirm))
+        .subscribe(() => {
+          this.router.navigate(['../'], { relativeTo: this.route });
+        });
+    }
   }
 
   public setLogoFile(file: Blob | null) {

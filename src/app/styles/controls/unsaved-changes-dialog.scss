@@ -4,16 +4,34 @@ body.light, body.dark {
   .e-confirm-dialog.e-control.e-dialog.e-popup.unsaved-changes-dialog {
     width: 300px;
     border-radius: 8px;
+
+    div.e-dlg-header-content {
+      border-radius: 8px 8px 0 0;
+      border-bottom: 1px solid $secondary-dark-blue-40;
+      padding: 12px 18px;
+
+      .e-dlg-header {
+        font-weight: 700;
+      }
+    }
     
     div.e-dlg-content {
       border-radius: 8px 8px 0 0;
       padding: 25px 15px;
+      min-height: 90px;
     }
 
     div.e-footer-content {
       border-radius: 0 0 8px 8px;
       border-top: 1px solid $secondary-dark-blue-40;
       padding: 15px;
+      display: flex;
+      justify-content: end;
+      flex-direction: row-reverse;
+
+      .delete-button {
+        background-color: $supportive-red;
+      }
     }
   }
 }
