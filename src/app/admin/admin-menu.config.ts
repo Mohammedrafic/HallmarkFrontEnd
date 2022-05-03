@@ -39,5 +39,6 @@ export const MASTER_DATA_CONFIG: { [key: string]: Object }[] = [
 
 export const ORG_SETTINGS: { [key: string]: Object }[] = [
   { text: 'Departments', id: 1, route: 'admin/organization-management/departments' },
-  { text: 'Locations', id: 2, route: 'admin/organization-management/locations' }
+  { text: 'Locations', id: 2, route: 'admin/organization-management/locations' },
+  { text: 'Credentials', id: 3, route: 'admin/organization-management/credentials' }
 ];

@@ -37,8 +37,11 @@ import { DepartmentsComponent } from './organization-management/organization-man
 import { MasterDataContentComponent } from './master-data/master-data-content.component';
 import { SkillsCategoriesComponent } from './master-data/skills/skills-categories.component';
 import { LocationsComponent } from './organization-management/organization-management-content/locations/locations.component';
+import { CredentialsComponent } from './organization-management/organization-management-content/credentials/credentials.component';
 import { SkillsGridComponent } from './master-data/skills/skills-grid/skills-grid.component';
 import { SkillCategoriesGridComponent } from './master-data/skills/skill-categories-grid/skill-categories-grid.component';
+import { CredentialsListComponent } from './organization-management/organization-management-content/credentials/credentials-list/credentials-list.component';
+import { CredentialsSetupComponent } from './organization-management/organization-management-content/credentials/credentials-setup/credentials-setup.component';
 
 const sidebarIcons = {
   Download,
@@ -61,11 +64,15 @@ const sidebarIcons = {
     AdminComponent,
     OrganizationManagementContentComponent,
     DepartmentsComponent,
+    LocationsComponent,
+    CredentialsComponent,
+    CredentialsListComponent,
     MasterDataContentComponent,
     SkillsCategoriesComponent,
     LocationsComponent,
     SkillsGridComponent,
-    SkillCategoriesGridComponent
+    SkillCategoriesGridComponent,
+    CredentialsSetupComponent
   ],
   imports: [
     CommonModule,

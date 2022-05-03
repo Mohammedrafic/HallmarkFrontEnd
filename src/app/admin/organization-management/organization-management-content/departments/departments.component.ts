@@ -148,6 +148,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   onDepartmentFormCancelClick(): void {
+    this.store.dispatch(new ShowSideDialog(false));
     this.departmentsDetailsFormGroup.reset();
     // TODO: add modal dialog to confirm close
   }
@@ -175,6 +176,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         this.store.dispatch(new SaveDepartment(department));
       }
 
+      this.store.dispatch(new ShowSideDialog(false));
       this.departmentsDetailsFormGroup.reset();
     } else {
       this.departmentsDetailsFormGroup.markAllAsTouched();

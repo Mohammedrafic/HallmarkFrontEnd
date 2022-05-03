@@ -24,12 +24,11 @@ import { Location } from '../../../../shared/models/location.model';
 import { MESSAGE_CANNOT_BE_DELETED } from '../departments/departments.component';
 import { PhoneTypes } from '../../../../shared/enums/phone-types';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { Organization } from '../../../../shared/models/organization.model';
 import { Country } from '../../../../shared/enums/states';
+import { MESSAGE_RECORD_HAS_BEEN_ADDED } from '../../../../shared/constants/messages';
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
 export const MESSAGE_REGION_LOCATION_CANNOT_BE_DELETED = 'Region/Location cannot be deleted';
-export const MESSAGE_RECORD_HAS_BEEN_ADDED = 'Record has been added';
 
 @Component({
   selector: 'app-locations',
@@ -174,6 +173,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   onFormCancelClick(): void {
+    this.store.dispatch(new ShowSideDialog(false));
     this.locationDetailsFormGroup.reset();
     // TODO: add modal dialog to confirm close
   }
@@ -188,16 +188,21 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         externalId: this.locationDetailsFormGroup.controls['externalId'].value,
         name: this.locationDetailsFormGroup.controls['name'].value,
         address1: this.locationDetailsFormGroup.controls['address1'].value,
-        address2: this.locationDetailsFormGroup.controls['address2'].value,
+        address2: this.locationDetailsFormGroup.controls['address2'].value === ''
+          ? null : this.locationDetailsFormGroup.controls['address2'].value,
         zip: this.locationDetailsFormGroup.controls['zip'].value,
         city: this.locationDetailsFormGroup.controls['city'].value,
         state: this.locationDetailsFormGroup.controls['state'].value,
-        glNumber: this.locationDetailsFormGroup.controls['glNumber'].value,
-        ext: this.locationDetailsFormGroup.controls['ext'].value,
-        invoiceNote: this.locationDetailsFormGroup.controls['invoiceNote'].value,
+        glNumber: this.locationDetailsFormGroup.controls['glNumber'].value === ''
+          ? null : this.locationDetailsFormGroup.controls['glNumber'].value,
+        ext: this.locationDetailsFormGroup.controls['ext'].value === ''
+          ? null : this.locationDetailsFormGroup.controls['ext'].value,
+        invoiceNote: this.locationDetailsFormGroup.controls['invoiceNote'].value === ''
+          ? null : this.locationDetailsFormGroup.controls['invoiceNote'].value,
         contactEmail: this.locationDetailsFormGroup.controls['contactEmail'].value,
         contactPerson: this.locationDetailsFormGroup.controls['contactPerson'].value,
-        inactiveDate: this.locationDetailsFormGroup.controls['inactiveDate'].value,
+        inactiveDate: this.locationDetailsFormGroup.controls['inactiveDate'].value === ''
+          ? null : this.locationDetailsFormGroup.controls['inactiveDate'].value,
         phoneNumber: this.locationDetailsFormGroup.controls['phoneNumber'].value,
         phoneType: parseInt(PhoneTypes[this.locationDetailsFormGroup.controls['phoneType'].value]),
       }
@@ -215,6 +220,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         }
       }
 
+      this.store.dispatch(new ShowSideDialog(false));
       this.locationDetailsFormGroup.reset();
     } else {
       this.locationDetailsFormGroup.markAllAsTouched();

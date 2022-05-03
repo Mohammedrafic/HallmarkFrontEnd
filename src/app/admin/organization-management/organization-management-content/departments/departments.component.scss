@@ -16,6 +16,7 @@
     .e-input-group.e-control-wrapper input {
       padding-left: 16px;
       padding-bottom: 7px;
+      padding-top: 5px;
     }
   }
 
@@ -59,6 +60,17 @@
           margin-left: 35px
         }
       }
+    }
+  }
+}
+
+.form-container {
+  .input-container {
+    margin-bottom: 12px;
+    width: 386px;
+
+    input {
+      height: 40px;
     }
   }
 }
