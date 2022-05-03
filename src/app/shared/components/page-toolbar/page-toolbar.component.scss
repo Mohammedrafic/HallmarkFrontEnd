@@ -6,6 +6,7 @@ $gap: 12px;
   justify-content: space-between;
 
   .left-content {
+    display: flex;
     & > *:not(:last-child) {
       margin-right: $gap;
     }

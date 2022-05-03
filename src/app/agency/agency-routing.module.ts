@@ -4,6 +4,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { AgencyComponent } from './agency.component';
 import { AgencyListComponent } from './agency-list/agency-list.component';
 import { AddEditAgencyComponent } from './agency-list/add-edit-agency/add-edit-agency.component';
+import { CandidatesComponent } from "./candidates/candidates.component";
+import { AddEditCandidateComponent } from "./candidates/add-edit-candidate/add-edit-candidate.component";
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -26,6 +28,14 @@ const routes: Routes = [
       {
         path: 'agency-list/add',
         component: AddEditAgencyComponent,
+      },
+      {
+        path: 'candidates',
+        component: CandidatesComponent,
+      },
+      {
+        path: 'candidates/add',
+        component: AddEditCandidateComponent,
       },
     ],
   },

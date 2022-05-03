@@ -1,8 +1,11 @@
+import { SkillCategory } from "./skill-category.model";
+
 export class Skill {
   id: number;
   skillCategoryId: number;
   skillAbbr: string;
   skillDescription: string;
+  skillCategory?: SkillCategory;
 
   constructor(skill: Skill) {
     this.id = skill.id;

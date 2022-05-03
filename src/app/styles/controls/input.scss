@@ -72,7 +72,15 @@ body.light, body.dark {
             color: $secondary-dark-blue-30;
           }
         }
+
+        textarea::placeholder {
+          color: $secondary-dark-blue-30 !important;
+        }
+      }
+
+      .professional-summary-textbox {
+        height: 190px;
       }
     }
   }
-} 
+}

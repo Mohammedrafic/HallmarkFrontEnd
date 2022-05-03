@@ -1,8 +1,8 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { filter, Observable } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 
@@ -11,7 +11,7 @@ import { AdminState } from '../../../store/admin.state';
 import { Region } from '../../../../shared/models/region.model';
 import {
   DeleteLocationById,
-  GetLocationsByRegionId, GetOrganizationById,
+  GetLocationsByRegionId, GetOrganizationById, GetOrganizationByIdSucceeded,
   GetRegionsByOrganizationId,
   SaveLocation, SaveRegion, SetGeneralStatesByCountry,
   SetImportFileDialogState,
@@ -24,12 +24,12 @@ import { Location } from '../../../../shared/models/location.model';
 import { MESSAGE_CANNOT_BE_DELETED } from '../departments/departments.component';
 import { PhoneTypes } from '../../../../shared/enums/phone-types';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { Organization } from '../../../../shared/models/organization.model';
 import { Country } from '../../../../shared/enums/states';
+import { MESSAGE_RECORD_HAS_BEEN_ADDED } from '../../../../shared/constants/messages';
+import { Organization } from '../../../../shared/models/organization.model';
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
 export const MESSAGE_REGION_LOCATION_CANNOT_BE_DELETED = 'Region/Location cannot be deleted';
-export const MESSAGE_RECORD_HAS_BEEN_ADDED = 'Record has been added';
 
 @Component({
   selector: 'app-locations',
@@ -59,6 +59,9 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   newRegionName: string;
   formBuilder: FormBuilder;
 
+  @Select(AdminState.organization)
+  organization$: Observable<Organization>;
+
   isEdit: boolean;
   editedLocationId?: number;
 
@@ -76,11 +79,6 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   ngOnInit(): void {
     this.store.dispatch(new GetRegionsByOrganizationId(this.fakeOrganizationId)); // TODO: provide valid organizationId
     this.store.dispatch(new GetOrganizationById(this.fakeOrganizationId));  // TODO: provide valid organizationId
-
-    // TODO: get states list by countryId from organization
-    this.actions$.pipe(ofActionDispatched(GetOrganizationById)).subscribe(organization => {
-      this.store.dispatch(new SetGeneralStatesByCountry(parseInt(Country[organization.generalInformation.country])));
-    });
   }
 
   onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -114,6 +112,9 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   onAddDepartmentClick(): void {
     if (this.selectedRegion) {
+      this.organization$.pipe(filter(Boolean)).subscribe(organization => {
+        this.store.dispatch(new SetGeneralStatesByCountry(parseInt(Country[organization.generalInformation.country])));
+      });
       this.store.dispatch(new ShowSideDialog(true));
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_REGIONS_NOT_SELECTED));
@@ -174,6 +175,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   onFormCancelClick(): void {
+    this.store.dispatch(new ShowSideDialog(false));
     this.locationDetailsFormGroup.reset();
     // TODO: add modal dialog to confirm close
   }
@@ -215,6 +217,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         }
       }
 
+      this.store.dispatch(new ShowSideDialog(false));
       this.locationDetailsFormGroup.reset();
     } else {
       this.locationDetailsFormGroup.markAllAsTouched();
@@ -231,16 +234,16 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       externalId: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       address1: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      address2: ['', [Validators.maxLength(50)]],
+      address2: [null, [Validators.maxLength(50)]],
       zip: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       city: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       state: ['', [Validators.required]],
-      glNumber: ['', Validators.maxLength(50)],
-      invoiceNote: ['', Validators.maxLength(50)],
-      ext: ['', Validators.maxLength(50)],
+      glNumber: [null, Validators.maxLength(50)],
+      invoiceNote: [null, Validators.maxLength(50)],
+      ext: [null, Validators.maxLength(50)],
       contactEmail: ['', [Validators.required, Validators.email]],
       contactPerson: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      inactiveDate: [''],
+      inactiveDate: [null],
       phoneNumber: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(10)]],
       phoneType: ['', Validators.required],
     });

@@ -1,12 +1,11 @@
 <app-page-toolbar>
   <ng-container left>
-    <!-- <button ejs-button cssClass="e-outline">Back</button> -->
-
+    <button ejs-button cssClass="e-outline" (click)="onBack()">Back</button>
     <h3>Add Agency</h3>
   </ng-container>
   <ng-container right>
-    <button ejs-button cssClass="e-outline">Clear</button>
-    <button ejs-button [isPrimary]="true" (click)="onNext()">Next</button>
+    <button ejs-button cssClass="e-outline" (click)="onClear()">Clear</button>
+    <button ejs-button [isPrimary]="true" (click)="onSave()">Save</button>
   </ng-container>
 </app-page-toolbar>
 <!-- General info step -->
@@ -54,5 +53,5 @@
   </div>
 </section>
 <section class="payment-section last-content-section-padding">
-  <app-payment-details-grid></app-payment-details-grid>
+  <app-payment-details-grid [paymentsFormArray]="$any(agencyForm.get('payments'))"></app-payment-details-grid>
 </section>

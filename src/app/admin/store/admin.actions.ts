@@ -5,6 +5,8 @@ import { Skill } from "src/app/shared/models/skill.model";
 import { Department } from '../../shared/models/department.model';
 import { Location } from '../../shared/models/location.model';
 import { Region } from '../../shared/models/region.model';
+import { CredentialType } from '../../shared/models/credential-type.model';
+import { Credential } from '../../shared/models/credential.model';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[admin] Set General States By Country';
@@ -184,4 +186,54 @@ export class RemoveMasterSkillSucceeded {
 export class RemoveSkillsCategorySucceeded {
   static readonly type = '[admin] Remove Skill Category by ID Succeeded';
   constructor() { }
+}
+
+export class GetCredentialTypes {
+  static readonly type = '[Admin] Get Credential Types';
+  constructor() { }
+}
+
+export class GetCredentialTypeById {
+  static readonly type = '[Admin] Get Credential Type by ID';
+  constructor(public payload: CredentialType) { }
+}
+
+export class SaveCredentialType {
+  static readonly type = '[admin] Save Credential Type';
+  constructor(public payload: CredentialType) { }
+}
+
+export class RemoveCredentialType {
+  static readonly type = '[admin] Remove Credential Type by ID';
+  constructor(public credentialType: CredentialType) { }
+}
+
+export class UpdateCredentialType {
+  static readonly type = '[admin] Update Credential Type';
+  constructor(public credentialType: CredentialType) { }
+}
+
+export class GetCredential {
+  static readonly type = '[Admin] Get Credential list';
+  constructor() { }
+}
+
+export class GetCredentialById {
+  static readonly type = '[Admin] Get Credential by ID';
+  constructor(public payload: Credential) { }
+}
+
+export class SaveCredential {
+  static readonly type = '[admin] Save Credential';
+  constructor(public payload: Credential) { }
+}
+
+export class UpdateCredential {
+  static readonly type = '[admin] Update Credential';
+  constructor(public payload: Credential) { }
+}
+
+export class RemoveCredential {
+  static readonly type = '[admin] Remove Credential by ID';
+  constructor(public payload: Credential) { }
 }

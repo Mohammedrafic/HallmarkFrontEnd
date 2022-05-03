@@ -1,14 +1,21 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { Subscription, takeWhile } from 'rxjs';
 
-import { SetHeaderState } from 'src/app/store/app.actions';
+import { MessageTypes } from 'src/app/shared/enums/message-types';
+import { SetHeaderState, ShowToast } from 'src/app/store/app.actions';
 import { BillingDetailsGroupComponent } from './billing-details-group/billing-details-group.component';
 import { ContactDetailsGroupComponent } from './contact-details-group/contact-details-group.component';
 import { GeneralInfoGroupComponent } from './general-info-group/general-info-group.component';
+
+enum MESSAGES {
+  SAVE = 'Agency details saved successfully',
+  BACK = 'All the data will be lost',
+}
 
 @Component({
   selector: 'app-add-edit-agency',
@@ -28,7 +35,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   private isAlive = true;
   private logoFile: Blob | null;
 
-  constructor(private store: Store, private fb: FormBuilder) {
+  constructor(private store: Store, private fb: FormBuilder, private router: Router, private route: ActivatedRoute) {
     this.store.dispatch(new SetHeaderState({ title: 'Agency' }));
   }
 
@@ -49,10 +56,20 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
     this.contacts.removeAt(index);
   }
 
-  public onNext(): void {
-    this.agencyForm.get('isBillingPopulated');
+  public onSave(): void {
     this.agencyForm.markAllAsTouched();
+    if (this.agencyForm.valid) {
+      this.store.dispatch(new ShowToast(MessageTypes.Success, MESSAGES.SAVE));
+    }
     console.log(this.agencyForm.value);
+  }
+
+  public onClear(): void {
+    this.agencyForm.reset();
+  }
+
+  public onBack(): void {
+    this.router.navigate(['../'], { relativeTo: this.route });
   }
 
   public setLogoFile(file: Blob | null) {
@@ -104,6 +121,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
       isBillingPopulated: false,
       billing: BillingDetailsGroupComponent.createFormGroup(),
       contacts: this.fb.array([ContactDetailsGroupComponent.createFormGroup()]),
+      payments: this.fb.array([]),
     });
   }
 }

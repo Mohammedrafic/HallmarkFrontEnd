@@ -1,7 +1,11 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Store } from '@ngxs/store';
 
 import { GridComponent, PageSettingsModel } from '@syncfusion/ej2-angular-grids';
+
 import { GRID_CONFIG } from 'src/app/shared/constants/grid-config';
+import { ShowSideDialog } from 'src/app/store/app.actions';
 
 enum PaymentDetailMode {
   Electronic = 'Electronic',
@@ -17,44 +21,36 @@ type PaymentDetail = {
   startDate: string;
 };
 
-const mockData: PaymentDetail[] = [
-  {
-    mode: 'Electronic',
-    payee: 'Payee',
-    address: '1901 Thornridge Cir. Shiloh, Hawaii 81063',
-    city: 'Naperville',
-    zip: 213456,
-    startDate: '04/04/2018',
-  },
-  {
-    mode: 'Manual',
-    payee: 'Payee',
-    address: '2118 Thornridge Cir. Syracuse, Connecticut 35624',
-    city: 'Toledo',
-    zip: 123454,
-    startDate: '04/04/2018',
-  },
-];
-
 @Component({
   selector: 'app-payment-details-grid',
   templateUrl: './payment-details-grid.component.html',
   styleUrls: ['./payment-details-grid.component.scss'],
 })
-export class PaymentDetailsGridComponent implements AfterViewInit {
+export class PaymentDetailsGridComponent implements OnInit, AfterViewInit {
+  @Input() paymentsFormArray: FormArray;
   @ViewChild('grid') grid: GridComponent;
 
-  public data: PaymentDetail[] = mockData;
   public pageSettings: PageSettingsModel = { pageSizes: true, pageSize: 3 };
   public resizeSettings = GRID_CONFIG.resizeSettings;
   public allowPaging = GRID_CONFIG.isPagingEnabled;
   public gridHeight = '250';
   public rowsPerPageDropDown = GRID_CONFIG.rowsPerPageDropDown;
   public activeRowsPerPageDropDown = GRID_CONFIG.rowsPerPageDropDown[0];
-
   public initialSort = {
     columns: [{ field: 'name', direction: 'Ascending' }],
   };
+  public paymentDetailsForm: FormGroup;
+  public paymentMode = Object.values(PaymentDetailMode);
+
+  get data(): PaymentDetail[] {
+    return this.paymentsFormArray.value;
+  }
+
+  constructor(private store: Store, private fb: FormBuilder) {}
+
+  ngOnInit(): void {
+   this.paymentDetailsForm = this.generatePaymentForm();
+  }
 
   ngAfterViewInit(): void {
     this.grid.rowHeight = GRID_CONFIG.initialRowHeight;
@@ -77,6 +73,33 @@ export class PaymentDetailsGridComponent implements AfterViewInit {
   }
 
   public addNew(): void {
-    // TBI
+    this.paymentDetailsForm.reset();
+    this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  public onPaymentFormSave(): void {
+    this.paymentDetailsForm.markAllAsTouched();
+    if (this.paymentDetailsForm.valid) {
+      const newPayment = this.generatePaymentForm();
+      newPayment.patchValue(this.paymentDetailsForm.value);
+
+      this.paymentsFormArray.push(newPayment);
+      this.store.dispatch(new ShowSideDialog(false));
+    }
+  }
+
+  public onPaymentFormCancel(): void {
+    this.store.dispatch(new ShowSideDialog(false));
+  }
+
+  private generatePaymentForm(): FormGroup {
+    return this.fb.group({
+      mode: new FormControl(PaymentDetailMode.Manual, [Validators.required]),
+      payee: new FormControl('', [Validators.required, Validators.maxLength(50)]),
+      address: new FormControl('', [Validators.maxLength(500)]),
+      city: new FormControl('', [Validators.maxLength(20)]),
+      zip: new FormControl(''),
+      startDate: new FormControl(undefined, [Validators.required]),
+    });
   }
 }

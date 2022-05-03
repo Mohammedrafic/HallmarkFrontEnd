@@ -1,0 +1,19 @@
+@import "../../../styles/variables/colors.scss";
+@import "../../../styles/variables/mixins.scss";
+
+.candidate-profile-container {
+  display: flex;
+
+  .e-card {
+    padding: 0 12px;
+  }
+
+  .left {
+    width: 70%;
+    padding-right: 20px;
+  }
+
+  .right {
+    width: 30%;
+  }
+}

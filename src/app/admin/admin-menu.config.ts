@@ -33,11 +33,12 @@ export const ADMIN_SIDEBAR_MENU = [
 
 export const MASTER_DATA_CONFIG: { [key: string]: Object }[] = [
   { text: 'Skills', id: 1, route: 'admin/master-data/skills' },
-  { text: 'Credentials', id: 1, route: 'admin/master-data/skills' },
-  { text: 'Holidays', id: 1, route: 'admin/master-data/skills' },
+  { text: 'Credentials', id: 2, route: 'admin/master-data/credentials' },
+  { text: 'Holidays', id: 3, route: 'admin/master-data/skills' }
 ];
 
 export const ORG_SETTINGS: { [key: string]: Object }[] = [
   { text: 'Departments', id: 1, route: 'admin/organization-management/departments' },
-  { text: 'Locations', id: 2, route: 'admin/organization-management/locations' }
+  { text: 'Locations', id: 2, route: 'admin/organization-management/locations' },
+  { text: 'Credentials', id: 3, route: 'admin/organization-management/credentials' }
 ];

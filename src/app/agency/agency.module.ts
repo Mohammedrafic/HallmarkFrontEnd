@@ -23,7 +23,13 @@ import { BillingDetailsGroupComponent } from './agency-list/add-edit-agency/bill
 import { ContactDetailsGroupComponent } from './agency-list/add-edit-agency/contact-details-group/contact-details-group.component';
 import { PaymentDetailsGridComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-details-grid.component';
 import { GridAllModule, GridModule, PagerModule } from '@syncfusion/ej2-angular-grids';
-import { NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
+import { NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
+import { CandidatesComponent } from './candidates/candidates.component';
+import { AddEditCandidateComponent } from './candidates/add-edit-candidate/add-edit-candidate.component';
+import { CandidateGeneralInfoComponent } from './candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
+import { CandidateContactDetailsComponent } from './candidates/add-edit-candidate/candidate-contact-details/candidate-contact-details.component';
+import { CandidateProfessionalSummaryComponent } from './candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
+import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 
 const sidebarIcons = {
   Sliders,
@@ -40,7 +46,12 @@ const sidebarIcons = {
     GeneralInfoGroupComponent,
     BillingDetailsGroupComponent,
     ContactDetailsGroupComponent,
-    PaymentDetailsGridComponent
+    PaymentDetailsGridComponent,
+    CandidatesComponent,
+    AddEditCandidateComponent,
+    CandidateGeneralInfoComponent,
+    CandidateContactDetailsComponent,
+    CandidateProfessionalSummaryComponent
   ],
   imports: [
     CommonModule,
@@ -55,6 +66,8 @@ const sidebarIcons = {
     GridAllModule,
     PagerModule,
     NumericTextBoxModule,
+    TextBoxModule,
+    DatePickerModule,
     FeatherModule.pick(sidebarIcons)
   ]
 })

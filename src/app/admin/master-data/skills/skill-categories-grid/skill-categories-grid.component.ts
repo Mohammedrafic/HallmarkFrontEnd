@@ -7,8 +7,9 @@ import { debounceTime, Observable, Subject } from 'rxjs';
 import { GetSkillsCategoriesByPage, RemoveSkillsCategory, RemoveSkillsCategorySucceeded, SaveSkillsCategory, SaveSkillsCategorySucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowSideDialog, ShowToast } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-skill-categories-grid',
@@ -40,6 +41,8 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
     this.actions$.pipe(ofActionSuccessful(SaveSkillsCategorySucceeded)).subscribe(() => {
       this.closeDialog();
       this.store.dispatch(new GetSkillsCategoriesByPage(this.currentPage, this.pageSize));
+      this.CategoryFormGroup.reset();
+      this.store.dispatch(new ShowToast(MessageTypes.Success, 'Record has been added'));
     });
     this.actions$.pipe(ofActionSuccessful(RemoveSkillsCategorySucceeded)).subscribe(() => {
       this.store.dispatch(new GetSkillsCategoriesByPage(this.currentPage, this.pageSize));

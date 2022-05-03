@@ -22,3 +22,18 @@
     }
   }
 }
+
+.payment-details-form {
+  & > * {
+    margin-bottom: 12px;
+  }
+
+  .calendar {
+    width: 50%;
+  }
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}

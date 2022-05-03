@@ -1,0 +1,29 @@
+.general-info {
+  .d-flex {
+    display: flex;
+  }
+
+  .left-column {
+    width: 60%;
+  }
+
+  .right-column {
+    width: 40%;
+  }
+
+  .input-container, .dropdown-container, .datepicker-container {
+    margin-bottom: 15px;
+    margin-right: 10px;
+    flex: 1 1 0px;
+  }
+
+  .input-container label,
+  .dropdown-container label {
+    margin-bottom: 5px !important;
+    display: block;
+  }
+
+  .f-grow-2 {
+    flex-grow: 2;
+  }
+}
