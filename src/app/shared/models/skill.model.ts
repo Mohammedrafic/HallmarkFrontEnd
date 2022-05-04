@@ -11,7 +11,7 @@ export class Skill {
   skillCategory?: SkillCategory;
   glNumber?: string;
   allowOnboard?: boolean;
-  inactiveDate?: string;
+  inactiveDate?: string | null;
 
   constructor(skill: Skill, organizationId?: number) {
     this.id = skill.id;
@@ -21,8 +21,8 @@ export class Skill {
 
     if (organizationId) {
       this.organizationId = organizationId;
-      this.inactiveDate = skill.inactiveDate;
-      this.allowOnboard = skill.allowOnboard;
+      this.inactiveDate = skill.inactiveDate || null;
+      this.allowOnboard = skill.allowOnboard || false;
       this.glNumber = skill.glNumber;
       this.masterSkillId = skill.masterSkillId;
     }

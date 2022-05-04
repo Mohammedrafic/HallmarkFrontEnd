@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
 import { ShowSideDialog } from 'src/app/store/app.actions';
+import { GetAllSkillsCategories } from '../../store/admin.actions';
 
 enum Tabs {
   'Skills',
@@ -20,9 +20,7 @@ export class SkillsCategoriesComponent implements OnInit {
   public isSkillsActive = true;
   public isCategoriesActive = false;
 
-  constructor(private store: Store,
-              private router: Router,
-              private route: ActivatedRoute) {
+  constructor(private store: Store) {
   }
 
   ngOnInit() {
@@ -31,6 +29,7 @@ export class SkillsCategoriesComponent implements OnInit {
 
   public addSkill(): void {
     this.store.dispatch(new ShowSideDialog(true));
+    this.isSkillsActive && this.store.dispatch(new GetAllSkillsCategories());
   }
 
   public tabSelected(data: any): void {
@@ -38,5 +37,4 @@ export class SkillsCategoriesComponent implements OnInit {
     this.isCategoriesActive = this.tabs['Categories'] === data.selectedIndex;
     this.currentTab = data.selectedIndex;
   }
-
 }

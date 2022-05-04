@@ -10,7 +10,7 @@ import {
 } from '../../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ShowSideDialog, ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '../../../../../shared/enums/message-types';
-import { MESSAGE_RECORD_HAS_BEEN_ADDED } from '../../../../../shared/constants/messages';
+import { RECORD_ADDED } from '../../../../../shared/constants/messages';
 import { Location } from '../../../../../shared/models/location.model';
 import { Credential } from '../../../../../shared/models/credential.model';
 import { AdminState } from '../../../../store/admin.state';
@@ -86,7 +86,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
       }
 
       // this.store.dispatch(new SaveCredential(credential)); //   TODO: implementation
-      this.store.dispatch(new ShowToast(MessageTypes.Success, MESSAGE_RECORD_HAS_BEEN_ADDED));
+      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
 
       this.store.dispatch(new ShowSideDialog(false));
       this.credentialsFormGroup.reset();
