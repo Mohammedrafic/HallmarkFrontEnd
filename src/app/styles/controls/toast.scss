@@ -29,7 +29,7 @@ body.light, body.dark {
 
   .e-toast {
     height: 86px !important;
-    width: 305px !important;
+    top: 8% !important;
 
     .e-toast-message {
       justify-content: center;
@@ -39,15 +39,17 @@ body.light, body.dark {
         font-style: normal;
         font-weight: 700;
         font-size: 16px;
-        line-height: 28px;
 
         & > div {
           display: flex;
           align-items: center;
 
+          & > div {
+            line-height: 28px;
+          }
+
           .icon {
             padding-right: 9px;
-            width: 13.33px;
           }
         }
       }
