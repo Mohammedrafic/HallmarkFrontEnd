@@ -1,16 +1,17 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Subject, takeWhile } from 'rxjs';
-
-import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { Select } from '@ngxs/store';
+import { map, Observable, Subject, takeWhile } from 'rxjs';
+import { AgencyState } from 'src/app/agency/store/agency.state';
 
 import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
+import { valuesOnly } from 'src/app/shared/utils/enum.utils';
 
 enum Status {
-  Pending ='Pending', 
-  Inactive = 'Inactive',
-  Active = 'Active',
-  Suspended = 'Suspended'
+  Pending,
+  Inactive,
+  Active,
+  Suspended,
 }
 
 @Component({
@@ -26,7 +27,9 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
     { id: Country.Canada, text: Country[1] },
   ];
   public states$ = new Subject();
-  public statuses =  Object.values(Status);
+  public statuses = Object.values(Status)
+    .filter(valuesOnly)
+    .map((text, id) => ({ text, id }));
   public optionFields = {
     text: 'text',
     value: 'id',
@@ -34,8 +37,12 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
 
   private isAlive = true;
 
+  @Select(AgencyState.isAgencyCreated)
+  public isAgencyCreated$: Observable<boolean>;
+
   ngOnInit(): void {
     this.onCountryChange();
+    this.isAgencyCreatedCahnge();
   }
 
   ngOnDestroy(): void {
@@ -49,6 +56,13 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       .subscribe((value) => {
         const statesValue = value === Country.USA ? UsaStates : CanadaStates;
         this.states$.next(statesValue);
+      });
+  }
+
+  public isAgencyCreatedCahnge(): void {
+    this.isAgencyCreated$.pipe(takeWhile(() => this.isAlive))
+      .subscribe((isCreated) => {
+        isCreated ? this.formGroup.get('status')?.enable() : this.formGroup.get('status')?.disable();
       });
   }
 
@@ -66,7 +80,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       phone1Ext: new FormControl('', [Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]),
       phone2Ext: new FormControl('', [Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]),
       fax: new FormControl('', [Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]),
-      status: new FormControl({value: Status.Active, disabled: true}, [Validators.required]),
+      status: new FormControl({ value: Status.Active, disabled: true }, [Validators.required]),
       website: new FormControl(''),
     });
   }

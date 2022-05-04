@@ -5,12 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
-import {
-  Sliders,
-  Plus,
-  Trash2,
-  Edit
-} from 'angular-feather/icons';
+import { Sliders, Plus, Trash2, Edit } from 'angular-feather/icons';
 
 import { AgencyComponent } from './agency.component';
 import { AgencyRoutingModule } from './agency-routing.module';
@@ -30,12 +25,14 @@ import { CandidateGeneralInfoComponent } from './candidates/add-edit-candidate/c
 import { CandidateContactDetailsComponent } from './candidates/add-edit-candidate/candidate-contact-details/candidate-contact-details.component';
 import { CandidateProfessionalSummaryComponent } from './candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
+import { NgxsModule } from '@ngxs/store';
+import { AgencyState } from './store/agency.state';
 
 const sidebarIcons = {
   Sliders,
   Plus,
   Trash2,
-  Edit
+  Edit,
 };
 
 @NgModule({
@@ -51,7 +48,7 @@ const sidebarIcons = {
     AddEditCandidateComponent,
     CandidateGeneralInfoComponent,
     CandidateContactDetailsComponent,
-    CandidateProfessionalSummaryComponent
+    CandidateProfessionalSummaryComponent,
   ],
   imports: [
     CommonModule,
@@ -69,7 +66,8 @@ const sidebarIcons = {
     TextBoxModule,
     DatePickerModule,
     TabAllModule,
-    FeatherModule.pick(sidebarIcons)
-  ]
+    FeatherModule.pick(sidebarIcons),
+    NgxsModule.forFeature([AgencyState]),
+  ],
 })
-export class AgencyModule { }
+export class AgencyModule {}
