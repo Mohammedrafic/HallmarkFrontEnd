@@ -5,11 +5,11 @@
   </div>
 </section>
 <section>
-  <ejs-grid #grid 
-    [dataSource]="(organizations$ | async)?.items" 
-    [allowSorting]="true" 
-    [allowResizing]="true" 
-    [resizeSettings]="resizeSettings" 
+  <ejs-grid #grid
+    [dataSource]="(organizations$ | async)?.items"
+    [allowSorting]="true"
+    [allowResizing]="true"
+    [resizeSettings]="resizeSettings"
     [sortSettings]="initialSort"
     [allowPaging]="allowPaging"
     [pageSettings]="pageSettings"
@@ -21,7 +21,7 @@
           <div class="status-cell">
             <ejs-chiplist>
               <e-chips>
-                <e-chip [text]="statusEnum[data.generalInformation.status]" [cssClass]="getChipCssClass(statusEnum[data.generalInformation.status])" leadingIconCss="dot"></e-chip>
+                <e-chip [text]="statusEnum[data.generalInformation.status]" [cssClass]="getChipCssClass(statusEnum[data.generalInformation.status])"></e-chip>
               </e-chips>
             </ejs-chiplist>
           </div>
@@ -35,10 +35,16 @@
           <div class="controls-header"></div>
         </ng-template>
         <ng-template #template let-data>
-          <div class="controls-cell">
-            <i-feather name="file-text" class="icon"></i-feather>
-            <i-feather name="map-pin" class="icon"></i-feather>
-            <i-feather (click)="editOrganization(data)" name="edit" class="icon"></i-feather>
+          <div class="row-tool-buttons">
+            <button ejs-button cssClass="e-flat default-icon-button">
+              <span><i-feather name="file-text" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat default-icon-button">
+              <span><i-feather name="map-pin" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editOrganization(data)">
+              <span><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
           </div>
         </ng-template>
       </e-column>

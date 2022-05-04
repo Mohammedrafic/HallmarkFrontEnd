@@ -16,8 +16,12 @@
     <e-column textAlign="Right" width=120>
       <ng-template #template let-data>
         <div class="row-tool-buttons">
-          <span class="edit-button" (click)="editSkill(data)"><i-feather name="edit" class="icon"></i-feather></span>
-          <span class="remove-button" (click)="deleteSkill(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
+          <button ejs-button cssClass="e-flat primary-icon-button" (click)="editSkill(data)">
+            <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+          </button>
+          <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteSkill(data)">
+            <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
+          </button>
         </div>
       </ng-template>
     </e-column>

@@ -41,10 +41,6 @@
     justify-content: end;
     cursor: pointer;
 
-    .scale-up-button {
-      padding-right: 18px;
-    }
-
     .icon {
       margin: 0;
     }
@@ -53,14 +49,23 @@
   .row-tool-buttons {
     display: flex;
     cursor: pointer;
-
-    .message-button,
-    .lock-button {
-      padding-right: 18px;
-    }
   }
 
   .e-item-active {
     color: $primary-active-blue;
+  }
+
+  .e-selectionbackground.e-active {
+    .row-tool-buttons {
+      .default-icon-button,
+      .secondary-icon-button,
+      .primary-icon-button {
+        color: $white;
+
+        &:hover {
+          background-color: $primary-active-blue-50;
+        }
+      }
+    }
   }
 }
