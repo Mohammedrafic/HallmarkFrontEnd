@@ -2,14 +2,15 @@ import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/cor
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 
-import { GridComponent, PageSettingsModel } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, PageSettingsModel, ValueAccessor } from '@syncfusion/ej2-angular-grids';
 
 import { GRID_CONFIG } from 'src/app/shared/constants/grid-config';
+import { valuesOnly } from 'src/app/shared/utils/enum.utils';
 import { ShowSideDialog } from 'src/app/store/app.actions';
 
 enum PaymentDetailMode {
-  Electronic = 'Electronic',
-  Manual = 'Manual',
+  Manual,
+  Electronic,
 }
 
 type PaymentDetail = {
@@ -40,16 +41,25 @@ export class PaymentDetailsGridComponent implements OnInit, AfterViewInit {
     columns: [{ field: 'name', direction: 'Ascending' }],
   };
   public paymentDetailsForm: FormGroup;
-  public paymentMode = Object.values(PaymentDetailMode);
+  public paymentMode = Object.values(PaymentDetailMode)
+    .filter(valuesOnly)
+    .map((text, id) => ({ text, id }));
+  public optionFields = {
+    text: 'text',
+    value: 'id',
+  };
+  public modeAccessor: ValueAccessor = (_, data: any) => PaymentDetailMode[data['mode']];
 
   get data(): PaymentDetail[] {
     return this.paymentsFormArray.value;
   }
 
+  private isEditMode = false;
+
   constructor(private store: Store, private fb: FormBuilder) {}
 
   ngOnInit(): void {
-   this.paymentDetailsForm = this.generatePaymentForm();
+    this.paymentDetailsForm = this.generatePaymentForm();
   }
 
   ngAfterViewInit(): void {
@@ -60,12 +70,14 @@ export class PaymentDetailsGridComponent implements OnInit, AfterViewInit {
     this.grid.autoFitColumns();
   }
 
-  public onEdit(item: unknown): void {
-    console.log(item);
+  public onEdit({ index, ...paymentValue }: { index: string } & PaymentDetail): void {
+    this.isEditMode = true;
+    this.paymentDetailsForm = this.paymentsFormArray.controls[Number(index)] as FormGroup;
+    this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public onRemove(item: unknown): void {
-    console.log(item);
+  public onRemove({ index }: { index: string }): void {
+    this.paymentsFormArray.removeAt(Number(index));
   }
 
   public onFilter(): void {
@@ -73,17 +85,22 @@ export class PaymentDetailsGridComponent implements OnInit, AfterViewInit {
   }
 
   public addNew(): void {
-    this.paymentDetailsForm.reset();
+    this.isEditMode = false;
+    this.paymentDetailsForm = this.generatePaymentForm();
+    this.paymentDetailsForm.patchValue({ mode: PaymentDetailMode.Manual });
     this.store.dispatch(new ShowSideDialog(true));
   }
 
   public onPaymentFormSave(): void {
     this.paymentDetailsForm.markAllAsTouched();
     if (this.paymentDetailsForm.valid) {
-      const newPayment = this.generatePaymentForm();
-      newPayment.patchValue(this.paymentDetailsForm.value);
+      if (!this.isEditMode) {
+        const newPayment = this.generatePaymentForm();
+        newPayment.patchValue(this.paymentDetailsForm.value);
 
-      this.paymentsFormArray.push(newPayment);
+        this.paymentsFormArray.push(newPayment);
+      }
+      this.paymentsFormArray.markAsDirty();
       this.store.dispatch(new ShowSideDialog(false));
     }
   }
@@ -94,12 +111,12 @@ export class PaymentDetailsGridComponent implements OnInit, AfterViewInit {
 
   private generatePaymentForm(): FormGroup {
     return this.fb.group({
-      mode: new FormControl(PaymentDetailMode.Manual, [Validators.required]),
+      mode: new FormControl({ value: PaymentDetailMode.Manual }, [Validators.required]),
       payee: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       address: new FormControl('', [Validators.maxLength(500)]),
       city: new FormControl('', [Validators.maxLength(20)]),
       zip: new FormControl(''),
-      startDate: new FormControl(undefined, [Validators.required]),
+      startDate: new FormControl('', [Validators.required]),
     });
   }
 }

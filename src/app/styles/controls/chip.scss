@@ -5,48 +5,49 @@ ejs-chiplist.e-control.e-chip-list {
     text-transform: lowercase;
     font-variant: small-caps;
     font-weight: 600;
-    height: 25px;
+    height: 20px;
+    width: 112px;
 
     &.e-success,
     &.e-success:hover {
-      background-color: $supportive-green-40;
-      color: $supportive-green-10;
-
-      .e-chip-icon {
-        background-color: $supportive-green-10;
-      }
+      background-color: $supportive-green-10;
+      color: $white;
     }
 
     &.e-warning,
     &.e-warning:hover {
-      background-color: $orange;
-      color: $supportive-orange;
-
-      .e-chip-icon {
-        background-color: $supportive-orange;
-      }
+      background-color: $supportive-orange;
+      color: $white;
     }
 
     &.e-default,
     &.e-default:hover {
-      background-color: $secondary-dark-blue-45;
-      color: $dark-blue-20;
-
-      .e-chip-icon {
-        background-color: $dark-blue-20;
-      }
+      background-color: $dark-blue-20;
+      color: $white;
     }
 
-    .dot {
-      width: 8px;
-      height: 8px;
-      margin: 10px;
+    &.e-pending,
+    &.e-pending:hover {
+      background-color: $supportive-red;
+      color: $white;
     }
 
-    &.e-chip-icon-wrap {
-      .e-chip-text {
-        margin-right: 10px;
-      }
+    &.e-progress,
+    &.e-progress:hover {
+      background-color: $primary-active-blue;
+      color: $white;
+    }
+
+    &.e-accepted,
+    &.e-accepted:hover {
+      background-color: $supportive-purple;
+      color: $white;
+    }
+
+    &.e-filled,
+    &.e-filled:hover {
+      background-color: $primary-active-blue-30;
+      color: $white;
     }
   }
 }

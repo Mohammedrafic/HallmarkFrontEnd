@@ -71,6 +71,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
     actions$.pipe(ofActionSuccessful(SaveOrganizationSucceeded)).subscribe((organization: { payload: Organization }) => {
       this.currentBusinessUnitId = organization.payload.organizationId as number;
       this.uploadImages(this.currentBusinessUnitId);
+      this.navigateBack();
     });
     actions$.pipe(ofActionSuccessful(GetOrganizationByIdSucceeded)).subscribe((organization: { payload: Organization }) => {
       this.currentBusinessUnitId = organization.payload.organizationId as number;

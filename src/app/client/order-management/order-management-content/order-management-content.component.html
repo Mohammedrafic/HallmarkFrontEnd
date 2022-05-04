@@ -39,7 +39,7 @@
           <div class="status-cell">
             <ejs-chiplist>
               <e-chips>
-                <e-chip [text]="data.status" [cssClass]="getChipCssClass(data.status)" leadingIconCss="dot"></e-chip>
+                <e-chip [text]="data.status" [cssClass]="getChipCssClass(data.status)"></e-chip>
               </e-chips>
             </ejs-chiplist>
           </div>
@@ -66,18 +66,28 @@
         </ng-template>
       </e-column>
       <e-column field="startDate" headerText="START DATE" width="120"></e-column>
-      <e-column headerTextAlign="Right" width="120">
+      <e-column headerTextAlign="Right" width="130">
         <ng-template #headerTemplate let-data>
           <div class="controls-header">
-            <span class="scale-up-button"><i-feather name="menu" class="icon" (click)="onRowScaleUpClick()"></i-feather></span>
-            <span class="scale-down-button"><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
+            <button ejs-button cssClass="e-flat icon-button">
+              <span><i-feather name="menu" class="icon" (click)="onRowScaleUpClick()"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat icon-button">
+              <span><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
+            </button>
           </div>
         </ng-template>
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <span class="message-button"><i-feather name="message-square" class="icon"></i-feather></span>
-            <span class="lock-button"><i-feather name="lock" class="icon"></i-feather></span>
-            <span class="more-button"><i-feather name="more-vertical" class="icon"></i-feather></span>
+            <button ejs-button cssClass="e-flat default-icon-button">
+              <span><i-feather name="message-square" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat secondary-icon-button">
+              <span><i-feather name="lock" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat primary-icon-button">
+              <span><i-feather name="more-vertical" class="icon"></i-feather></span>
+            </button>
           </div>
         </ng-template>
       </e-column>

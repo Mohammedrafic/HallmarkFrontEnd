@@ -1,0 +1,1 @@
+export const valuesOnly = (val: string | number) => typeof val !== 'number';

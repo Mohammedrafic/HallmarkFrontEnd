@@ -4,7 +4,9 @@
     <h3>Add Agency</h3>
   </ng-container>
   <ng-container right>
-    <button ejs-button cssClass="e-outline" (click)="onClear()">Clear</button>
+    <!-- TBD delete button -->
+    <!-- <button *ngIf="isAgencyCreated$ | async" ejs-button cssClass="e-danger" [isPrimary]="true"(click)="onDelete()">Delete</button> -->
+    <button [disabled]="!agencyForm.dirty" ejs-button cssClass="e-outline" (click)="onClear()">Clear</button>
     <button ejs-button [isPrimary]="true" (click)="onSave()">Save</button>
   </ng-container>
 </app-page-toolbar>
@@ -31,7 +33,7 @@
 
               <div class="e-card-content">
                 <form [formGroup]="agencyForm" id="agencyFormFirstStep">
-                  <app-general-info-group [formGroup]="$any(agencyForm.get('agency'))"></app-general-info-group>
+                  <app-general-info-group [formGroup]="$any(agencyControl)"></app-general-info-group>
 
                   <div class="e-card-title-wrapper">
                     <div class="e-card-title">Billing Details</div>
@@ -40,7 +42,7 @@
                   <div class="billing-checkbox bootstrap">
                     <ejs-checkbox formControlName="isBillingPopulated" label="Same As Agency"></ejs-checkbox>
                   </div>
-                  <app-billing-details-group [formGroup]="$any(agencyForm.get('billing'))"></app-billing-details-group>
+                  <app-billing-details-group [formGroup]="$any(billingControl)"></app-billing-details-group>
 
                   <div class="e-card-title-wrapper contact-header">
                     <div class="e-card-title">Contact Details</div>
@@ -64,11 +66,11 @@
           </div>
         </section>
         <section class="payment-section last-content-section-padding">
-          <app-payment-details-grid [paymentsFormArray]="$any(agencyForm.get('payments'))"></app-payment-details-grid>
+          <app-payment-details-grid [paymentsFormArray]="$any(agencyForm.get('agencyPaymentDetails'))"></app-payment-details-grid>
         </section>
       </ng-template>
     </e-tabitem>
-    <e-tabitem [disabled]="true">
+    <e-tabitem [disabled]="(isAgencyCreated$ | async) === false">
       <ng-template #headerText>
         <div class="stepper-header">
           <div class="stepper-title">Associated Organizations</div>

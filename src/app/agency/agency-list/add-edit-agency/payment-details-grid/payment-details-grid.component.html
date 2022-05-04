@@ -26,7 +26,7 @@
     </div>
   </ng-template>
   <e-columns>
-    <e-column field="mode" headerText="Mode" textAlign="Left"></e-column>
+    <e-column field="mode" headerText="Mode" textAlign="Left" [valueAccessor]='modeAccessor'></e-column>
     <e-column field="payee" headerText="Payee" textAlign="left"></e-column>
     <e-column field="address" headerText="Address" textAlign="left"></e-column>
     <e-column field="city" headerText="City" textAlign="left"></e-column>
@@ -82,10 +82,10 @@
       <div class="input-group dropdown">
         <ejs-dropdownlist
           appValidateWithMessage
+          [fields]="optionFields"
           formControlName="mode"
           [dataSource]="paymentMode"
           placeholder="Mode"
-       
         ></ejs-dropdownlist>
       </div>
     </div>
