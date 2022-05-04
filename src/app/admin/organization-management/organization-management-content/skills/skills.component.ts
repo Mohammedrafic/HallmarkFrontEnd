@@ -7,6 +7,7 @@ import { debounceTime, filter, Observable, Subject } from 'rxjs';
 import { GetAllSkillsCategories, GetAssignedSkillsByPage, RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded, SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { Skill } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
@@ -73,6 +74,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public addSkill(): void {
+    this.SkillFormGroup.controls['id'].setValue(0);
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -87,12 +89,17 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
       inactiveDate: data.inactiveDate
     });
     this.store.dispatch(new ShowSideDialog(true));
+    if (data.id === -1) {
+      this.SkillFormGroup.controls['skillAbbr'].disable();
+      this.SkillFormGroup.controls['skillCategoryId'].disable();
+      this.SkillFormGroup.controls['skillDescription'].disable();
+    }
   }
 
   public deleteSkill(data: any): void {
     this.confirmService
-      .confirm('Are you sure want to delete?', {
-        title: 'Delete Record',
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button'
       })

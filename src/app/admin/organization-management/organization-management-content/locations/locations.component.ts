@@ -25,7 +25,7 @@ import { MESSAGE_CANNOT_BE_DELETED } from '../departments/departments.component'
 import { PhoneTypes } from '../../../../shared/enums/phone-types';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Country } from '../../../../shared/enums/states';
-import { MESSAGE_RECORD_HAS_BEEN_ADDED } from '../../../../shared/constants/messages';
+import { RECORD_ADDED } from '../../../../shared/constants/messages';
 import { Organization } from '../../../../shared/models/organization.model';
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
@@ -218,7 +218,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       } else {
         if (this.selectedRegion.id) {
           this.store.dispatch(new SaveLocation(location, this.selectedRegion.id));
-          this.store.dispatch(new ShowToast(MessageTypes.Success, MESSAGE_RECORD_HAS_BEEN_ADDED))
+          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED))
         }
       }
 

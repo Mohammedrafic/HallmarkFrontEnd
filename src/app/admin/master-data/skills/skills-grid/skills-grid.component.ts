@@ -4,9 +4,10 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FreezeService, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject } from 'rxjs';
-import { GetAllSkillsCategories, GetMasterSkillsByPage, RemoveMasterSkill, RemoveMasterSkillSucceeded, SaveMasterSkill, SaveMasterSkillSucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
+import { GetMasterSkillsByPage, RemoveMasterSkill, RemoveMasterSkillSucceeded, SaveMasterSkill, SaveMasterSkillSucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { Skill } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
@@ -47,7 +48,6 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
   }
 
   ngOnInit() {
-    this.store.dispatch(new GetAllSkillsCategories());
     this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
@@ -75,8 +75,8 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
 
   public deleteSkill(data: any): void {
     this.confirmService
-      .confirm('Are you sure want to delete?', {
-         title: 'Delete Record',
+      .confirm(DELETE_RECORD_TEXT, {
+         title: DELETE_RECORD_TITLE,
          okButtonLabel: 'Delete',
          okButtonClass: 'delete-button'
       })

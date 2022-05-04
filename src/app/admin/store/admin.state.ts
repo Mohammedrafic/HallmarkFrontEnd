@@ -70,6 +70,7 @@ import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { CredentialType } from '../../shared/models/credential-type.model';
 import { CredentialsService } from '../services/credentials.service';
 import { Credential } from '../../shared/models/credential.model';
+import { RECORD_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
 
 interface DropdownOption {
   id: number;
@@ -432,7 +433,7 @@ export class AdminState {
     return this.categoriesService.saveSkillCategory(payload).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false });
       dispatch(new SaveSkillsCategorySucceeded(payload));
-      dispatch(new ShowToast(MessageTypes.Success, isCreating ? 'Record has been added' : 'Record has been modified'));
+      dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
       return payload;
     }));
   }
@@ -455,7 +456,7 @@ export class AdminState {
     return this.skillsService.saveMasterSkill(payload).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false });
       dispatch(new SaveMasterSkillSucceeded(payload));
-      dispatch(new ShowToast(MessageTypes.Success, isCreating ? 'Record has been added' : 'Record has been modified'));
+      dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
       return payload;
     }));
   }
@@ -472,21 +473,23 @@ export class AdminState {
   }
 
   @Action(SaveAssignedSkill)
-  SaveAssignedSkill({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveAssignedSkill): Observable<Skill> {
+  SaveAssignedSkill({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveAssignedSkill): Observable<Skill | void> {
     const isCreating = !payload.id;
     patchState({ isOrganizationLoading: true });
     return this.skillsService.saveAssignedSkill(payload).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false });
       dispatch(new SaveAssignedSkillSucceeded(payload));
-      dispatch(new ShowToast(MessageTypes.Success, isCreating ? 'Record has been added' : 'Record has been modified'));
+      dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
       return payload;
-    }));
+    }),
+    catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, 'Skill already exists')))
+    );
   }
 
   @Action(GetAssignedSkillsByPage)
   GetAssignedSkillsByPage({ patchState }: StateContext<AdminStateModel>, { pageNumber, pageSize }: GetAssignedSkillsByPage): Observable<SkillsPage> {
     patchState({ isOrganizationLoading: true });
-    return this.skillsService.getAssignedSkills(pageNumber, pageSize).pipe(tap((payload) => {
+    return this.skillsService.getAssignedSkills(pageNumber, pageSize, 2 /**TODO:  */).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false, skills: payload });
       return payload;
     }));
@@ -500,7 +503,7 @@ export class AdminState {
       dispatch(new RemoveAssignedSkillSucceeded);
       return payload;
     }),
-    catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))));
+    catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Skill cannot be deleted')))));
   }
 
   @Action(GetCredentialTypes)

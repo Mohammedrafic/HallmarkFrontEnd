@@ -7,6 +7,7 @@ import { debounceTime, filter, Observable, Subject } from 'rxjs';
 import { GetSkillsCategoriesByPage, RemoveSkillsCategory, RemoveSkillsCategorySucceeded, SaveSkillsCategory, SaveSkillsCategorySucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
@@ -64,8 +65,8 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
 
   public deleteCategory(data: SkillCategory): void {
     this.confirmService
-    .confirm('Are you sure want to delete?', {
-       title: 'Delete Record',
+    .confirm(DELETE_RECORD_TEXT, {
+       title: DELETE_RECORD_TITLE,
        okButtonLabel: 'Delete',
        okButtonClass: 'delete-button'
     })
