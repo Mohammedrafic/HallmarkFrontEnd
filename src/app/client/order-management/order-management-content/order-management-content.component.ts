@@ -51,7 +51,7 @@ export class OrderManagementContentComponent implements OnInit {
   @ViewChild('gridPager') pager: PagerComponent;
 
   constructor(private store: Store) {
-    store.dispatch(new SetHeaderState({ title: 'Order Management' }));
+    store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
   }
 
   ngOnInit(): void {

@@ -231,6 +231,15 @@
 
     .header-item {
       margin: 0 25px;
+      display: flex;
+      align-items: center;
+
+      .icon {
+        padding-left: 0;
+        padding-right: 14px;
+        height: 24px;
+        width: 24px;
+      }
     }
   }
 

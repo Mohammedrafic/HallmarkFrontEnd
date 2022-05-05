@@ -1,5 +1,9 @@
 import { Component } from '@angular/core';
 
+import { Store } from '@ngxs/store';
+
+import { SetHeaderState } from '../../../store/app.actions';
+
 @Component({
   selector: 'app-timesheets-content',
   templateUrl: './timesheets-content.component.html',
@@ -7,5 +11,7 @@ import { Component } from '@angular/core';
 })
 export class TimesheetsContentComponent  {
 
-  constructor() { }
+  constructor(private store: Store) {
+    store.dispatch(new SetHeaderState({ title: 'Timesheets', iconName: 'clock' }));
+  }
 }
