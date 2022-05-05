@@ -26,6 +26,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   public format = { 
     type:'date', format: 'MM/dd/yyyy'
   };
+  public title = '';
 
   @Select(AdminState.skills)
   skills$: Observable<any>;
@@ -42,6 +43,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     super();
     this.SkillFormGroup = this.fb.group({
       id: new FormControl(0),
+      masterSkillId: new FormControl(null),
       skillCategoryId: new FormControl('', [ Validators.required, Validators.minLength(3) ]),
       skillAbbr: new FormControl(''),
       skillDescription: new FormControl('', [ Validators.required, Validators.minLength(3) ]),
@@ -74,6 +76,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public addSkill(): void {
+    this.title = 'Add';
     this.SkillFormGroup.controls['id'].setValue(0);
     this.skillFieldsHandler(false);
     this.store.dispatch(new ShowSideDialog(true));
@@ -92,8 +95,10 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public editSkill(data: any): void {
+    this.title = 'Edit';
     this.SkillFormGroup.setValue({
       id: data.id,
+      masterSkillId: data.masterSkill?.id || null,
       skillAbbr: data.masterSkill.skillAbbr,
       skillCategoryId: data.skillCategory.id,
       skillDescription: data.masterSkill.skillDescription,

@@ -73,7 +73,7 @@
 <app-side-dialog *ngIf="isActive"
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveSkill()"
-  [header]="'Add Skill'"
+  header="{{ SkillFormGroup.get('id')?.value == 0 ? 'Add' : 'Edit' }} Skill"
   >
   <form class="skills-form-dialog form-container bootstrap"
         id="addEditSkillsForm"
@@ -104,9 +104,9 @@
 
     <div>
       <div class="input-container">
-        <label for="skillDescription">Skill description <span class="required">*</span></label>
+        <label for="skillDescription">Skill Description <span class="required">*</span></label>
         <div class="input-group">
-          <ejs-textbox name="skillDescription" appValidateWithMessage formControlName="skillDescription" [multiline]="true" placeholder="Skill description" maxlength="100"></ejs-textbox>
+          <ejs-textbox name="skillDescription" appValidateWithMessage formControlName="skillDescription" [multiline]="true" placeholder="Skill Description" maxlength="100"></ejs-textbox>
         </div>
       </div>
     </div>

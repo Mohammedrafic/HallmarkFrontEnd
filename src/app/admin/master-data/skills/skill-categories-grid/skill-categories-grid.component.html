@@ -71,7 +71,7 @@
 <app-side-dialog *ngIf="isActive"
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveCategory()"
-  [header]="'Add Category'"
+  header="{{ this.CategoryFormGroup.get('id')?.value == 0 ? 'Add' : 'Edit' }} Category"
   >
   <form class="categories-form-dialog form-container bootstrap"
         id="addEditCategoryForm"
