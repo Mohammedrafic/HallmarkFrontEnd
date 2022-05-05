@@ -10,20 +10,67 @@
   </ng-container>
 </app-page-toolbar>
 <!-- Candidate Profile step -->
-<section class="candidate-profile-container">
-  <div class="left">
-    <div class="e-card">
-      <div class="e-card-content">
-        <form [formGroup]="candidateForm" id="candidateProfile">
-          <app-candidate-general-info [formGroup]="$any(candidateForm.get('generalInfo'))"></app-candidate-general-info>
-          <app-candidate-contact-details [formGroup]="$any(candidateForm.get('contactDetails'))"></app-candidate-contact-details>
-          <app-candidate-professional-summary [formGroup]="$any(candidateForm.get('profSummary'))"></app-candidate-professional-summary>
-        </form>
-      </div>
-    </div>
-  </div>
-  <div class="right">
-    <app-image-uploader uploaderTitle="Upload Photo" (selectImage)="setCandidatePhoto($event)"></app-image-uploader>
-  </div>
-</section>
-
+<ejs-tab id="element" class="stepper">
+  <e-tabitems>
+    <e-tabitem>
+      <ng-template #headerText>
+        <div class="stepper-header required">
+          <div class="stepper-title">Candidate Profile<span>*</span></div>
+          <div class="stepper-sub-title">Overall Info</div>
+        </div>
+      </ng-template>
+      <ng-template #content>
+        <!-- Candidate Profile info step -->
+        <section class="candidate-profile-container">
+          <div class="left">
+            <div class="e-card">
+              <div class="e-card-content">
+                <form [formGroup]="candidateForm" id="candidateProfile">
+                  <app-candidate-general-info [formGroup]="$any(candidateForm.get('generalInfo'))"></app-candidate-general-info>
+                  <app-candidate-contact-details [formGroup]="$any(candidateForm.get('contactDetails'))"></app-candidate-contact-details>
+                  <app-candidate-professional-summary [formGroup]="$any(candidateForm.get('profSummary'))"></app-candidate-professional-summary>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div class="right">
+            <app-image-uploader uploaderTitle="Upload Photo" (selectImage)="setCandidatePhoto($event)"></app-image-uploader>
+          </div>
+        </section>
+      </ng-template>
+    </e-tabitem>
+    <e-tabitem [disabled]="false">
+      <ng-template #headerText>
+        <div class="stepper-header">
+          <div class="stepper-title">Experience</div>
+          <div class="stepper-sub-title">Additional info here</div>
+        </div>
+      </ng-template>
+      <ng-template #content>
+        Experience
+      </ng-template>
+    </e-tabitem>
+    <e-tabitem [disabled]="false">
+      <ng-template #headerText>
+        <div class="stepper-header">
+          <div class="stepper-title">Education</div>
+          <div class="stepper-sub-title">Additional info here</div>
+        </div>
+      </ng-template>
+      <ng-template #content>
+        Education
+      </ng-template>
+    </e-tabitem>
+    <e-tabitem [disabled]="false">
+      <ng-template #headerText>
+        <div class="stepper-header">
+          <div class="stepper-title">Credentials</div>
+          <div class="stepper-sub-title">Additional info here</div>
+        </div>
+      </ng-template>
+      <ng-template #content>
+        Credentials
+      </ng-template>
+    </e-tabitem>
+  </e-tabitems>
+</ejs-tab>
