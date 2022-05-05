@@ -7,7 +7,7 @@ import { Status } from 'src/app/shared/enums/status';
 import { Titles } from 'src/app/shared/enums/title';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
-import { OrganizationService } from '../services/organization.service';
+import { OrganizationService } from '../../shared/services/organization.service';
 
 import {
   SaveDepartment,

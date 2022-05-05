@@ -1,11 +1,20 @@
+import { PageOfCollections } from "./page.model";
+
 export type Agency = {
+  createUnder?: AgencyCreateUnder;
+  parentBusinessUnitId: number;
   agencyId?: number;
-  parentBusinessUnitId?: number;
-  createUnder?: CreateUnder;
   agencyDetails: AgencyDetails;
   agencyBillingDetails: AgencyBillingDetails;
   agencyContactDetails: AgencyContactDetails[];
   agencyPaymentDetails: AgencyPaymentDetails[];
+};
+
+export type AgencyCreateUnder = {
+  id: number;
+  businessUnitType: 1;
+  name: string;
+  parentUnitId: number;
 };
 
 export type AgencyDetails = {
@@ -61,18 +70,4 @@ export type AgencyPaymentDetails = {
   startDate: string;
 };
 
-export type CreateUnder = {
-  id?: number,
-  businessUnitType?: number,
-  name?: string,
-  parentUnitId?: number
-};
-
-export class AgencyPage {
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-  items: Agency[];
-  pageNumber: number;
-  totalCount: number;
-  totalPages: number;
-}
+export type AgencyPage = PageOfCollections<Agency>;

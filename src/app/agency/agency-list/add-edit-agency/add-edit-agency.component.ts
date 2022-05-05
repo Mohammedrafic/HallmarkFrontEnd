@@ -1,11 +1,12 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-
 import { filter, Observable, Subscription, takeWhile } from 'rxjs';
-import { CANCEL_COFIRM_TEXT, DELETE_RECORD_TEXT } from 'src/app/shared/constants/messages';
 
+import { TabComponent } from '@syncfusion/ej2-angular-navigations';
+
+import { CANCEL_COFIRM_TEXT, DELETE_RECORD_TEXT } from 'src/app/shared/constants/messages';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import {
   Agency,
@@ -37,7 +38,9 @@ type AgencyFormValue = {
   templateUrl: './add-edit-agency.component.html',
   styleUrls: ['./add-edit-agency.component.scss'],
 })
-export class AddEditAgencyComponent implements OnInit, OnDestroy {
+export class AddEditAgencyComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('stepper') tab: TabComponent;
+
   public agencyForm: FormGroup;
   public title = 'Add';
 
@@ -91,6 +94,18 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
     }
   }
 
+  ngAfterViewInit(): void {
+    this.tab.enableTab(1, false);
+
+    this.isAgencyCreated$.pipe(takeWhile(() => this.isAlive)).subscribe((res) => {
+      if (res) {
+        this.tab.enableTab(1, true);
+      } else {
+        this.tab.enableTab(1, false);
+      }
+    });
+  }
+
   ngOnDestroy(): void {
     this.isAlive = false;
   }
@@ -117,11 +132,9 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   public onDelete(): void {
     this.confirmService
-        .confirm(DELETE_RECORD_TEXT)
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
-
-        });
+      .confirm(DELETE_RECORD_TEXT)
+      .pipe(filter((confirm) => !!confirm))
+      .subscribe(() => {});
   }
 
   public onBack(): void {

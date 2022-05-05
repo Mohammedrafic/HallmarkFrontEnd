@@ -11,7 +11,7 @@
   </ng-container>
 </app-page-toolbar>
 
-<ejs-tab id="element" class="stepper">
+<ejs-tab class="stepper" #stepper>
   <e-tabitems>
     <e-tabitem>
       <ng-template #headerText>
@@ -70,7 +70,8 @@
         </section>
       </ng-template>
     </e-tabitem>
-    <e-tabitem [disabled]="(isAgencyCreated$ | async) === false">
+
+    <e-tabitem>
       <ng-template #headerText>
         <div class="stepper-header">
           <div class="stepper-title">Associated Organizations</div>
@@ -78,8 +79,8 @@
         </div>
       </ng-template>
       <ng-template #content>
-        Associated Organizations content here
+        <app-associated-org-grid></app-associated-org-grid>
       </ng-template>
     </e-tabitem>
-  </e-tabitems> </ejs-tab
->
+  </e-tabitems>
+</ejs-tab>
