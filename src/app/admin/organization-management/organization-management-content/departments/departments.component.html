@@ -59,10 +59,10 @@
         <e-column textAlign="Right" width=120>
           <ng-template #template let-data>
             <div class="row-tool-buttons">
-              <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditDepartmentClick(data)">
+              <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditDepartmentClick(data, $event)">
                 <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
               </button>
-              <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemoveDepartmentClick(data)">
+              <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemoveDepartmentClick(data, $event)">
                 <span class="remove-button" ><i-feather name="trash-2" class="icon"></i-feather></span>
               </button>
             </div>

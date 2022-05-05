@@ -55,7 +55,8 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
     });
   }
 
-  public editCategory(data: SkillCategory): void {
+  public editCategory(data: SkillCategory, event: any): void {
+    this.addActiveCssClass(event);
     this.CategoryFormGroup.setValue({
       id: data.id,
       name: data.name
@@ -63,16 +64,19 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public deleteCategory(data: SkillCategory): void {
+  public deleteCategory(data: SkillCategory, event: any): void {
+    this.addActiveCssClass(event);
     this.confirmService
     .confirm(DELETE_RECORD_TEXT, {
        title: DELETE_RECORD_TITLE,
        okButtonLabel: 'Delete',
        okButtonClass: 'delete-button'
     })
-    .pipe(filter((confirm) => !!confirm))
-    .subscribe(() => {
-      this.store.dispatch(new RemoveSkillsCategory(data));
+    .subscribe((confirm) => {
+      if (confirm) {
+        this.store.dispatch(new RemoveSkillsCategory(data));
+      }
+      this.removeActiveCssClass();
     });
   }
 
@@ -80,7 +84,8 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
     this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
       this.CategoryFormGroup.reset();
       this.CategoryFormGroup.get('id')?.setValue(0);
-    });;
+    });
+    this.removeActiveCssClass();
   }
 
   public saveCategory(): void {
@@ -89,11 +94,12 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
         this.CategoryFormGroup.getRawValue(),
       )));
       this.store.dispatch(new SetDirtyState(false));
+      this.removeActiveCssClass();
     } else {
       this.CategoryFormGroup.markAllAsTouched();
     }
   }
-  
+
   public onRowsDropDownChanged(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
   }

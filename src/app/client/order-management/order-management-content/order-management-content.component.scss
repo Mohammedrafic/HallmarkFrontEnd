@@ -54,18 +54,4 @@
   .e-item-active {
     color: $primary-active-blue;
   }
-
-  .e-selectionbackground.e-active {
-    .row-tool-buttons {
-      .default-icon-button,
-      .secondary-icon-button,
-      .primary-icon-button {
-        color: $white;
-
-        &:hover {
-          background-color: $primary-active-blue-50;
-        }
-      }
-    }
-  }
 }

@@ -107,7 +107,7 @@ ejs-grid.e-control.e-grid {
       .default-icon-button {
         color: $secondary_dark-blue-20;
 
-        &:active,
+        &.e-active,
         &:focus {
           color: $white;
           background-color: $primary-active-blue;
@@ -128,7 +128,7 @@ ejs-grid.e-control.e-grid {
       .secondary-icon-button {
         color: $supportive-red;
 
-        &:active,
+        &.e-active,
         &:focus {
           color: $white;
           background-color: $supportive-red-00;
@@ -148,7 +148,7 @@ ejs-grid.e-control.e-grid {
       .primary-icon-button {
         color: $primary-active-blue-10;
 
-        &:active,
+        &.e-active,
         &:focus {
           color: $white;
           background-color: $primary-active-blue;
@@ -163,6 +163,20 @@ ejs-grid.e-control.e-grid {
           pointer-events: none;
           background-color: transparent;
           color: $primary-active-blue-50;
+        }
+      }
+    }
+  }
+
+  .e-selectionbackground.e-active {
+    .row-tool-buttons {
+      .default-icon-button,
+      .secondary-icon-button,
+      .primary-icon-button {
+        color: $white;
+
+        &:hover {
+          background-color: $primary-active-blue-50;
         }
       }
     }
