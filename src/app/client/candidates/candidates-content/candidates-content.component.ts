@@ -10,6 +10,6 @@ import { SetHeaderState } from 'src/app/store/app.actions';
 export class CandidatesContentComponent  {
 
   constructor(private store: Store) {
-    store.dispatch(new SetHeaderState({title: 'Candidate List'}));
+    store.dispatch(new SetHeaderState({ title: 'Candidate List', iconName: 'users' }));
   }
 }

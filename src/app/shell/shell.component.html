@@ -66,6 +66,7 @@
   <section id="main">
     <div class="header">
       <div class="header-item">
+        <i-feather *ngIf="(headerState$ | async).iconName" name="{{ (headerState$ | async).iconName }}" class="icon"></i-feather>
         <h1>{{ (headerState$ | async).title }}</h1>
       </div>
       <div class="header-item stick-right">Header content</div>

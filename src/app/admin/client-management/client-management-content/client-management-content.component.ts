@@ -47,7 +47,7 @@ export class ClientManagementContentComponent implements OnInit, AfterViewInit {
   public grid: GridComponent;
 
   constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
-    store.dispatch(new SetHeaderState({title: 'Organization List'}));
+    store.dispatch(new SetHeaderState({ title: 'Organization List', iconName: 'file-text' }));
   }
 
   ngOnInit(): void {

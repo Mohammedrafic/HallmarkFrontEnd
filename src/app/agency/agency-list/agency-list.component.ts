@@ -12,7 +12,7 @@ import { SetHeaderState } from 'src/app/store/app.actions';
 export class AgencyListComponent {
 
   constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
-    this.store.dispatch(new SetHeaderState({ title: 'Agency' }));
+    store.dispatch(new SetHeaderState({ title: 'Agency', iconName: 'clock' }));
   }
 
   public navigateToAgencyForm(): void {

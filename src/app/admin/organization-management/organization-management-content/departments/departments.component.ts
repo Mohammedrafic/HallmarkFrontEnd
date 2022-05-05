@@ -65,7 +65,6 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
               private route: ActivatedRoute,
               @Inject(FormBuilder) private builder: FormBuilder) {
     super();
-    store.dispatch(new SetHeaderState({ title: 'Departments' }));
     this.formBuilder = builder;
     this.createDepartmentsForm();
   }

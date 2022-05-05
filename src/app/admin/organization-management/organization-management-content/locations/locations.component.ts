@@ -71,7 +71,6 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
               private actions$: Actions,
               @Inject(FormBuilder) private builder: FormBuilder) {
     super();
-    store.dispatch(new SetHeaderState({ title: 'Locations' }));
     this.formBuilder = builder;
     this.createLocationForm();
   }

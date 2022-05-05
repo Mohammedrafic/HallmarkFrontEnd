@@ -15,7 +15,7 @@ export class MasterDataContentComponent  {
   constructor(private store: Store,
               private router: Router,
               private route: ActivatedRoute) {
-    store.dispatch(new SetHeaderState({ title: 'Master Data' }));
+    store.dispatch(new SetHeaderState({ title: 'Master Data', iconName: 'user' }));
   }
 
   public sideMenuConfig = MASTER_DATA_CONFIG;

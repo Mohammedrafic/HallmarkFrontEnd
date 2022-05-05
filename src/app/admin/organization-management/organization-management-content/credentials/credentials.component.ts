@@ -27,7 +27,6 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent  {
 
   constructor(private store: Store) {
     super();
-    store.dispatch(new SetHeaderState({ title: 'Credentials' }));
   }
 
   onAddCredentialClick(): void {

@@ -1,5 +1,6 @@
 import { ClientSidebarMenu } from "../shared/models/client-sidebar-menu.model";
 import { MessageTypes } from '../shared/enums/message-types';
+import { HeaderState } from '../shared/models/header-state.model';
 
 export class ToggleMobileView {
   static readonly type = '[app] Toggle mobile view layout';
@@ -18,7 +19,7 @@ export class SetSidebarMenu {
 
 export class SetHeaderState {
   static readonly type = '[app] Set application header state';
-  constructor(public payload: any) { }
+  constructor(public payload: HeaderState) { }
 }
 
 export class ToggleSidebarState {

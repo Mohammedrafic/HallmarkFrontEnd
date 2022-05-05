@@ -3,12 +3,13 @@ import { State, Action, StateContext, Selector } from '@ngxs/store';
 
 import { ClientSidebarMenu } from '../shared/models/client-sidebar-menu.model';
 import { ToggleMobileView, ToggleTheme, SetSidebarMenu, SetHeaderState, ToggleSidebarState, SetIsFirstLoadState } from './app.actions';
+import { HeaderState } from '../shared/models/header-state.model';
 
 export interface AppStateModel {
   sideBarMenu: ClientSidebarMenu[];
   isMobile: boolean;
   isDarkTheme: boolean;
-  headerState: any; // TODO: create model
+  headerState: HeaderState | null;
   isLoading: boolean;
   isFirstLoad: boolean;
   isSidebarOpened: boolean;
@@ -38,8 +39,8 @@ export class AppState {
   static sideBarMenu(state: AppStateModel): ClientSidebarMenu[] { return state.sideBarMenu; }
 
   @Selector()
-  static headerState(state: AppStateModel): boolean { return state.headerState; }
 
+  static headerState(state: AppStateModel): HeaderState | null { return state.headerState; }
   @Selector()
   static isDarkTheme(state: AppStateModel): boolean { return state.isDarkTheme; }
 
