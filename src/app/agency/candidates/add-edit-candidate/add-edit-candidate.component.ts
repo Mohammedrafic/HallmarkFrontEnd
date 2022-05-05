@@ -19,7 +19,7 @@ export class AddEditCandidateComponent implements OnInit {
   private candidatePhoto: Blob | null;
 
   constructor(private store: Store, private fb: FormBuilder) {
-    store.dispatch(new SetHeaderState({ title: 'Agency' }));
+    store.dispatch(new SetHeaderState({ title: 'Candidates' }));
   }
 
   ngOnInit(): void {

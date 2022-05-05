@@ -30,6 +30,10 @@ const routes: Routes = [
         component: AddEditAgencyComponent,
       },
       {
+        path: 'agency-list/edit/:id',
+        component: AddEditAgencyComponent,
+      },
+      {
         path: 'candidates',
         component: CandidatesComponent,
       },

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
-import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 import { Sliders, Plus, Trash2, Edit } from 'angular-feather/icons';
 
@@ -61,6 +61,7 @@ const sidebarIcons = {
     DropDownListModule,
     CheckBoxModule,
     GridAllModule,
+    ChipListModule,
     PagerModule,
     NumericTextBoxModule,
     TextBoxModule,

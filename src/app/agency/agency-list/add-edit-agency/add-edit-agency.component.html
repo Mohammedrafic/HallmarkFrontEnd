@@ -1,12 +1,12 @@
 <app-page-toolbar>
   <ng-container left>
     <button ejs-button cssClass="e-outline" (click)="onBack()">Back</button>
-    <h3>Add Agency</h3>
+    <h3>{{title}} Agency</h3>
   </ng-container>
   <ng-container right>
     <!-- TBD delete button -->
     <!-- <button *ngIf="isAgencyCreated$ | async" ejs-button cssClass="e-danger" [isPrimary]="true"(click)="onDelete()">Delete</button> -->
-    <button [disabled]="!agencyForm.dirty" ejs-button cssClass="e-outline" (click)="onClear()">Clear</button>
+    <button [disabled]="!agencyForm?.dirty" ejs-button cssClass="e-outline" (click)="onClear()">Clear</button>
     <button ejs-button [isPrimary]="true" (click)="onSave()">Save</button>
   </ng-container>
 </app-page-toolbar>
@@ -66,7 +66,7 @@
           </div>
         </section>
         <section class="payment-section last-content-section-padding">
-          <app-payment-details-grid [paymentsFormArray]="$any(agencyForm.get('agencyPaymentDetails'))"></app-payment-details-grid>
+          <app-payment-details-grid [paymentsFormArray]="$any(agencyForm?.get('agencyPaymentDetails'))"></app-payment-details-grid>
         </section>
       </ng-template>
     </e-tabitem>

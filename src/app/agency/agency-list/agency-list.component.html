@@ -8,4 +8,78 @@
   </ng-container>
 </app-page-toolbar>
 
-<p>agency-list works!</p>
+<section>
+  <ejs-grid #grid
+            [dataSource]="(agencies$ | async)?.items"
+            [allowPaging]="allowPaging"
+            [pageSettings]="pageSettings"
+            [height]="gridHeight"
+            [rowHeight]="rowHeight"
+            [resizeSettings]="resizeSettings"
+            [allowSorting]="allowSorting"
+            [allowResizing]="allowResizing"
+            (dataBound)="dataBound()">
+    <e-columns>
+      <e-column field="agencyDetails.name" headerText="AGENCY NAME" width=400></e-column>
+      <e-column field="agencyDetails.status" headerText="AGENCY STATUS" width=200>
+        <ng-template #template let-data>
+          <div>
+            <ejs-chiplist>
+              <e-chips>
+                <e-chip [text]="statusEnum[data.agencyDetails.status]"
+                        [cssClass]="getChipCssClass(statusEnum[data.agencyDetails.status])">
+                </e-chip>
+              </e-chips>
+            </ejs-chiplist>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column field="agencyContactDetails.0.contactPerson" headerText="CONTACT PERSON" width=200></e-column>
+      <e-column field="agencyDetails.phone1Ext" headerText="PHONE" width=200></e-column>
+      <e-column textAlign="Right" width="120" freeze="Right">
+        <ng-template #template let-data>
+          <div class="e-grid-tool-buttons">
+            <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>
+            <span class="remove-button" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
+          </div>
+        </ng-template>
+      </e-column>
+    </e-columns>
+    <ng-template #pagerTemplate let-data>
+      <div class="e-pagertemplate">
+        <div class="control-section">
+          <div class="content-wrapper">
+            <section class="left-side-pager-controls">
+              <ejs-dropdownlist id="rowsPerPage"
+                                class="dropdown-no-border"
+                                [dataSource]="rowsPerPageDropDown"
+                                [(value)]="activeRowsPerPageDropDown"
+                                (change)="onRowsDropDownChanged()">
+              </ejs-dropdownlist>
+              <ejs-numerictextbox id="goToPage"
+                                  class="numeric-input-no-border"
+                                  format="#"
+                                  [validateDecimalOnType]="validateDecimalOnType"
+                                  [decimals]="decimals"
+                                  placeholder="Go to:"
+                                  min="1" [max]="lastAvailablePage"
+                                  [showSpinButton]="false"
+                                  (change)="onGoToClick($event)">
+              </ejs-numerictextbox>
+            </section>
+            <section class="right-side-pager-controls">
+              <ejs-pager id="gridPager"
+                         #gridPager
+                         [pageSize]="pageSizePager"
+                         [totalRecordsCount]="(agencies$ | async)?.totalCount"
+                         [enablePagerMessage]="false"
+                         [currentPage]="currentPagerPage"
+                         (click)="onGoToClick($event)">
+              </ejs-pager>
+            </section>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ejs-grid>
+</section>

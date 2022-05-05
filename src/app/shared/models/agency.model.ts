@@ -1,5 +1,7 @@
 export type Agency = {
-  parentBusinessUnitId: number;
+  agencyId?: number;
+  parentBusinessUnitId?: number;
+  createUnder?: CreateUnder;
   agencyDetails: AgencyDetails;
   agencyBillingDetails: AgencyBillingDetails;
   agencyContactDetails: AgencyContactDetails[];
@@ -58,3 +60,19 @@ export type AgencyPaymentDetails = {
   zip: string;
   startDate: string;
 };
+
+export type CreateUnder = {
+  id?: number,
+  businessUnitType?: number,
+  name?: string,
+  parentUnitId?: number
+};
+
+export class AgencyPage {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  items: Agency[];
+  pageNumber: number;
+  totalCount: number;
+  totalPages: number;
+}

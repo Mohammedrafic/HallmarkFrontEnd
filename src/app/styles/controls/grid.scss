@@ -182,4 +182,12 @@ ejs-grid.e-control.e-grid {
   .e-gridcontent {
     border-radius: 0 0 $grid-border-radius $grid-border-radius;
   }
+
+  .e-frozenheader.e-frozen-right-header > .e-table {
+    border-left: none;
+  }
+
+  .e-frozencontent.e-frozen-right-content > .e-table {
+    border-left: 1px solid #e0e0e0;
+  }
 }
