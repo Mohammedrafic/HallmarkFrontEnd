@@ -7,4 +7,42 @@ body.light {
       color: $secondary-dark-blue-30 !important;
     }
   }
+
+  .e-dialog.dialog {
+    right: 0;
+    top: 60px !important;
+    left: auto !important;
+    height: calc(100% - 60px) !important;
+    position: fixed !important;
+  
+    .e-dlg-content {
+      padding: 0;
+    }
+  
+    .container {
+      padding: 24px;
+  
+      .header-container {
+  
+        .e-card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+  
+          .e-card-title {
+            color: $black;
+            font-size: 24px;
+            font-weight: 700;
+          }
+  
+          .e-card-content {
+            .button-cancel {
+              margin-right: 8px;
+            }
+          }
+        }
+      }
+    }
+  }
+  
 }

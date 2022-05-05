@@ -1,11 +1,12 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-
 import { filter, Observable, Subscription, takeWhile } from 'rxjs';
-import { CANCEL_COFIRM_TEXT, DELETE_RECORD_TEXT } from 'src/app/shared/constants/messages';
 
+import { TabComponent } from '@syncfusion/ej2-angular-navigations';
+
+import { CANCEL_COFIRM_TEXT, DELETE_RECORD_TEXT } from 'src/app/shared/constants/messages';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import {
   Agency,
@@ -16,7 +17,7 @@ import {
 } from 'src/app/shared/models/agency.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { SetHeaderState, ShowToast } from 'src/app/store/app.actions';
-import { SaveAgency, SaveAgencySucceeded } from '../../store/agency.actions';
+import { GetAgencyById, GetAgencyByIdSucceeded, SaveAgency, SaveAgencySucceeded } from '../../store/agency.actions';
 import { AgencyState } from '../../store/agency.state';
 import { BillingDetailsGroupComponent } from './billing-details-group/billing-details-group.component';
 import { ContactDetailsGroupComponent } from './contact-details-group/contact-details-group.component';
@@ -37,8 +38,11 @@ type AgencyFormValue = {
   templateUrl: './add-edit-agency.component.html',
   styleUrls: ['./add-edit-agency.component.scss'],
 })
-export class AddEditAgencyComponent implements OnInit, OnDestroy {
+export class AddEditAgencyComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('stepper') tab: TabComponent;
+
   public agencyForm: FormGroup;
+  public title = 'Add';
 
   get contacts(): FormArray {
     return this.agencyForm.get('agencyContactDetails') as FormArray;
@@ -58,6 +62,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   private populatedSubscription: Subscription | undefined;
   private isAlive = true;
   private logoFile: Blob | null;
+  private fetchedAgency: Agency;
 
   constructor(
     private store: Store,
@@ -67,7 +72,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private confirmService: ConfirmService
   ) {
-    this.store.dispatch(new SetHeaderState({ title: 'Agency' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Agency List' }));
   }
 
   ngOnInit(): void {
@@ -78,14 +83,35 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
       // this.uploadImages(this.currentBusinessUnitId); // TBD how to upload logo?
       this.store.dispatch(new ShowToast(MessageTypes.Success, AGENCY_SAVED_TEXT));
     });
+    this.actions$.pipe(ofActionSuccessful(GetAgencyByIdSucceeded)).subscribe((agency: { payload: Agency }) => {
+      this.fetchedAgency = agency.payload;
+      this.patchAgencyFormValue(this.fetchedAgency);
+    })
+
+    if (this.route.snapshot.paramMap.get('id')) {
+      this.title = 'Edit';
+      this.store.dispatch(new GetAgencyById(parseInt(this.route.snapshot.paramMap.get('id') as string)));
+    }
+  }
+
+  ngAfterViewInit(): void {
+    this.tab.enableTab(1, false);
+
+    this.isAgencyCreated$.pipe(takeWhile(() => this.isAlive)).subscribe((res) => {
+      if (res) {
+        this.tab.enableTab(1, true);
+      } else {
+        this.tab.enableTab(1, false);
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.isAlive = false;
   }
 
-  public addContact(): void {
-    this.contacts.push(ContactDetailsGroupComponent.createFormGroup());
+  public addContact(contactDetails?: AgencyContactDetails): void {
+    this.contacts.push(ContactDetailsGroupComponent.createFormGroup(contactDetails));
   }
 
   public deleteContact(index: number): void {
@@ -106,11 +132,9 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   public onDelete(): void {
     this.confirmService
-        .confirm(DELETE_RECORD_TEXT)
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
-          
-        });
+      .confirm(DELETE_RECORD_TEXT)
+      .pipe(filter((confirm) => !!confirm))
+      .subscribe(() => {});
   }
 
   public onBack(): void {
@@ -119,8 +143,10 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
         .confirm(CANCEL_COFIRM_TEXT)
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
-          this.router.navigate(['../'], { relativeTo: this.route });
+          this.navigateToAgencyList();
         });
+    } else {
+      this.navigateToAgencyList();
     }
   }
 
@@ -175,13 +201,63 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
     });
   }
 
-  private valueToAngency({ isBillingPopulated, agencyBillingDetails, ...value }: AgencyFormValue): Agency {
-    return {
-      ...value,
+  private valueToAngency(agencyFormValue: AgencyFormValue): Agency {
+    const id = this.fetchedAgency?.agencyDetails.id;
+    const agencyContactDetails: AgencyContactDetails[] = [...agencyFormValue.agencyContactDetails];
+    const agencyPaymentDetails: AgencyPaymentDetails[] = [...agencyFormValue.agencyPaymentDetails];
+
+    agencyContactDetails.forEach(contact => contact.agencyId = id);
+    agencyPaymentDetails.forEach(payment => payment.agencyId = id);
+
+    return  {
+      agencyDetails: {...agencyFormValue.agencyDetails, id},
       agencyBillingDetails: {
-        ...agencyBillingDetails,
-        sameAsAgency: isBillingPopulated,
+        ...agencyFormValue.agencyBillingDetails,
+        sameAsAgency: agencyFormValue.isBillingPopulated,
+        id
       },
+      agencyContactDetails,
+      agencyPaymentDetails,
+      agencyId: id,
+      parentBusinessUnitId: this.fetchedAgency?.parentBusinessUnitId
     };
+  }
+
+  private patchAgencyFormValue(agency: Agency) {
+    this.agencyForm.get('parentBusinessUnitId')?.patchValue(agency.parentBusinessUnitId);
+    this.agencyControl?.patchValue({
+      name: agency.agencyDetails.name,
+      externalId: agency.agencyDetails.externalId,
+      taxId: agency.agencyDetails.taxId,
+      addressLine1: agency.agencyDetails.addressLine1,
+      addressLine2: agency.agencyDetails.addressLine2,
+      country: agency.agencyDetails.country,
+      state: agency.agencyDetails.state,
+      city: agency.agencyDetails.city,
+      zipCode: agency.agencyDetails.zipCode,
+      phone1Ext: agency.agencyDetails.phone1Ext,
+      phone2Ext: agency.agencyDetails.phone2Ext,
+      fax: agency.agencyDetails.fax,
+      status: agency.agencyDetails.status,
+      website: agency.agencyDetails.website
+    });
+    this.billingControl?.patchValue({
+      name: agency.agencyBillingDetails.name,
+      address: agency.agencyBillingDetails.address,
+      country: agency.agencyBillingDetails.country,
+      state: agency.agencyBillingDetails.state,
+      city: agency.agencyBillingDetails.city,
+      zipCode: agency.agencyBillingDetails.zipCode,
+      phone1: agency.agencyBillingDetails.phone1,
+      phone2: agency.agencyBillingDetails.phone2,
+      fax: agency.agencyBillingDetails.fax,
+      ext: agency.agencyBillingDetails.ext
+    });
+    this.contacts.clear();
+    agency.agencyContactDetails.forEach(contact => this.addContact(contact))
+  }
+
+  private navigateToAgencyList(): void {
+    this.router.navigate(['/agency/agency-list']);
   }
 }

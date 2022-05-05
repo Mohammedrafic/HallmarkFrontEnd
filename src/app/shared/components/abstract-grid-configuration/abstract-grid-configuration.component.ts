@@ -30,5 +30,19 @@ export abstract class AbstractGridConfigurationComponent {
   pageSize = 30;
   currentPage = 1;
 
+  clickedElement: any;
+
   protected constructor() { }
+
+  addActiveCssClass(event: any): void {
+    this.clickedElement = event.currentTarget;
+    this.clickedElement.classList.add('e-active');
+    this.clickedElement.focus();
+  }
+
+  removeActiveCssClass(): void {
+    this.clickedElement.classList.remove('e-active');
+    this.clickedElement.focus();
+    this.clickedElement = undefined;
+  }
 }

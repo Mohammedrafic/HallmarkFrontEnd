@@ -1,27 +1,4 @@
 @import "../../../../styles/variables/colors.scss";
-@import "../../../../styles/variables/mixins.scss";
-
-.payment-grid-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-
-  .title h3 {
-    color: $title-black;
-    margin: 0;
-  }
-  .actions {
-    display: flex;
-
-    .action-link {
-      &:not(:first-child) {
-        margin-left: 12px;
-      }
-      @include linkWithIcon;
-    }
-  }
-}
 
 .payment-details-form {
   & > * {

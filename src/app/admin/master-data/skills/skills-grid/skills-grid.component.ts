@@ -63,7 +63,8 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
     });
   }
 
-  public editSkill(data: any): void {
+  public editSkill(data: any, event: any): void {
+    this.addActiveCssClass(event);
     this.SkillFormGroup.setValue({
       id: data.id,
       skillAbbr: data.skillAbbr,
@@ -73,16 +74,19 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public deleteSkill(data: any): void {
+  public deleteSkill(data: any, event: any): void {
+    this.addActiveCssClass(event);
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
          title: DELETE_RECORD_TITLE,
          okButtonLabel: 'Delete',
          okButtonClass: 'delete-button'
       })
-      .pipe(filter((confirm) => !!confirm))
-      .subscribe(() => {
-        this.store.dispatch(new RemoveMasterSkill(data));
+      .subscribe((confirm) => {
+        if (confirm) {
+          this.store.dispatch(new RemoveMasterSkill(data));
+        }
+        this.removeActiveCssClass();
       });
   }
 
@@ -91,6 +95,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
       this.SkillFormGroup.reset();
       this.SkillFormGroup.get('id')?.setValue(0);
     });
+    this.removeActiveCssClass();
   }
 
   public saveSkill(): void {
@@ -99,11 +104,12 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
         this.SkillFormGroup.getRawValue(),
       )));
       this.store.dispatch(new SetDirtyState(false));
+      this.removeActiveCssClass();
     } else {
       this.SkillFormGroup.markAllAsTouched();
     }
   }
-  
+
   public onRowsDropDownChanged(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
   }

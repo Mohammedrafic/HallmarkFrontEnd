@@ -1,9 +1,20 @@
+import { PageOfCollections } from "./page.model";
+
 export type Agency = {
+  createUnder?: AgencyCreateUnder;
   parentBusinessUnitId: number;
+  agencyId?: number;
   agencyDetails: AgencyDetails;
   agencyBillingDetails: AgencyBillingDetails;
   agencyContactDetails: AgencyContactDetails[];
   agencyPaymentDetails: AgencyPaymentDetails[];
+};
+
+export type AgencyCreateUnder = {
+  id: number;
+  businessUnitType: 1;
+  name: string;
+  parentUnitId: number;
 };
 
 export type AgencyDetails = {
@@ -58,3 +69,5 @@ export type AgencyPaymentDetails = {
   zip: string;
   startDate: string;
 };
+
+export type AgencyPage = PageOfCollections<Agency>;

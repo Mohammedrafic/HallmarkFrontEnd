@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, Select, Store } from '@ngxs/store';
 import { filter, Observable } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
@@ -11,22 +11,23 @@ import { AdminState } from '../../../store/admin.state';
 import { Region } from '../../../../shared/models/region.model';
 import {
   DeleteLocationById,
-  GetLocationsByRegionId, GetOrganizationById, GetOrganizationByIdSucceeded,
+  GetLocationsByRegionId,
+  GetOrganizationById,
   GetRegionsByOrganizationId,
   SaveLocation, SaveRegion, SetGeneralStatesByCountry,
   SetImportFileDialogState,
   UpdateLocation
 } from '../../../store/admin.actions';
-import { SetHeaderState, ShowSideDialog, ShowToast } from '../../../../store/app.actions';
+import { ShowSideDialog, ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '../../../../shared/enums/message-types';
 import { Location } from '../../../../shared/models/location.model';
 
-import { MESSAGE_CANNOT_BE_DELETED } from '../departments/departments.component';
 import { PhoneTypes } from '../../../../shared/enums/phone-types';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Country } from '../../../../shared/enums/states';
-import { RECORD_ADDED } from '../../../../shared/constants/messages';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADDED } from '../../../../shared/constants/messages';
 import { Organization } from '../../../../shared/models/organization.model';
+import { ConfirmService } from '../../../../shared/services/confirm.service';
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
 export const MESSAGE_REGION_LOCATION_CANNOT_BE_DELETED = 'Region/Location cannot be deleted';
@@ -69,7 +70,8 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   constructor(private store: Store,
               private actions$: Actions,
-              @Inject(FormBuilder) private builder: FormBuilder) {
+              @Inject(FormBuilder) private builder: FormBuilder,
+              private confirmService: ConfirmService) {
     super();
     this.formBuilder = builder;
     this.createLocationForm();
@@ -141,7 +143,8 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     }
   }
 
-  onEditButtonClick(location: Location): void {
+  onEditButtonClick(location: Location, event: any): void {
+    this.addActiveCssClass(event);
     this.organization$.pipe(filter(Boolean)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(parseInt(Country[organization.generalInformation.country])));
     });
@@ -168,12 +171,20 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  onRemoveButtonClick(location: Location): void {
-    if (location.id && this.selectedRegion.id) { // TODO: add verification to prevent remove if department has assigned Order with any status
-      this.store.dispatch(new DeleteLocationById(location.id, this.selectedRegion.id));
-    } else {
-      this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_CANNOT_BE_DELETED));
-    }
+  onRemoveButtonClick(location: Location, event: any): void {
+    this.addActiveCssClass(event);
+    this.confirmService
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button'
+      })
+      .subscribe((confirm) => {
+        if (confirm && location.id && this.selectedRegion.id) { // TODO: add verification to prevent remove if location is used elsewhere
+          this.store.dispatch(new DeleteLocationById(location.id, this.selectedRegion.id));
+        }
+        this.removeActiveCssClass();
+      });
   }
 
   onFormCancelClick(): void {
@@ -181,6 +192,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.isEdit = false;
     this.editedLocationId = undefined;
     this.locationDetailsFormGroup.reset();
+    this.removeActiveCssClass();
     // TODO: add modal dialog to confirm close
   }
 
@@ -223,6 +235,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
       this.store.dispatch(new ShowSideDialog(false));
       this.locationDetailsFormGroup.reset();
+      this.removeActiveCssClass();
     } else {
       this.locationDetailsFormGroup.markAllAsTouched();
     }

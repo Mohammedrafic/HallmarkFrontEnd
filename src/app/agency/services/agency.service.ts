@@ -2,13 +2,32 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Agency } from 'src/app/shared/models/agency.model';
+import { Agency, AgencyPage } from 'src/app/shared/models/agency.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AgencyService {
   constructor(private http: HttpClient) {}
+
+  /**
+   * Get agencies by page number
+   * @param pageNumber
+   * @param pageSize
+   * @return list of agencies
+   */
+  public getAgencies(pageNumber: number, pageSize: number): Observable<AgencyPage> {
+    return this.http.get<AgencyPage>(`/api/agency`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+  }
+
+  /**
+   * Get agency by id
+   * @param id
+   * @return specific agency
+   */
+  public getAgencyById(id: number): Observable<Agency> {
+    return this.http.get<Agency>(`/api/agency/${id}`);
+  }
 
   /**
    * Create or update agency

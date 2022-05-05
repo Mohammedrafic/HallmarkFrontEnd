@@ -8,7 +8,7 @@ import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dro
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
-import { SetHeaderState, ShowSideDialog, ShowToast } from '../../../../store/app.actions';
+import { ShowSideDialog, ShowToast } from '../../../../store/app.actions';
 import { Department } from '../../../../shared/models/department.model';
 import {
   SaveDepartment,
@@ -24,6 +24,8 @@ import { Location } from '../../../../shared/models/location.model';
 import { AdminState } from '../../../store/admin.state';
 import { MessageTypes } from '../../../../shared/enums/message-types';
 import { AbstractGridConfigurationComponent } from '../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '../../../../shared/constants/messages';
+import { ConfirmService } from '../../../../shared/services/confirm.service';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 export const MESSAGE_CANNOT_BE_DELETED = 'Department cannot be deleted';
@@ -63,7 +65,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
               private actions$: Actions,
               private router: Router,
               private route: ActivatedRoute,
-              @Inject(FormBuilder) private builder: FormBuilder) {
+              @Inject(FormBuilder) private builder: FormBuilder,
+              private confirmService: ConfirmService) {
     super();
     this.formBuilder = builder;
     this.createDepartmentsForm();
@@ -115,7 +118,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     }
   }
 
-  onEditDepartmentClick(department: Department): void {
+  onEditDepartmentClick(department: Department, event: any ): void {
+    this.addActiveCssClass(event);
     this.departmentsDetailsFormGroup.setValue({
       extDepartmentId: department.extDepartmentId,
       invoiceDepartmentId: department.invoiceDepartmentId,
@@ -130,12 +134,20 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  onRemoveDepartmentClick(department: Department): void {
-    if (department.departmentId) { // TODO: add verification to prevent remove if department has assigned Order with any status
-      this.store.dispatch(new DeleteDepartmentById(department));
-    } else {
-      this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_CANNOT_BE_DELETED));
-    }
+  onRemoveDepartmentClick(department: Department, event: any): void {
+    this.addActiveCssClass(event);
+    this.confirmService
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button'
+      })
+      .subscribe((confirm) => {
+        if (confirm && department.departmentId) { // TODO: add verification to prevent remove if department has assigned Order with any status
+          this.store.dispatch(new DeleteDepartmentById(department));
+        }
+        this.removeActiveCssClass();
+      });
   }
 
   onAddDepartmentClick(): void {
@@ -151,6 +163,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.isEdit = false;
     this.editedDepartmentId = undefined;
     this.departmentsDetailsFormGroup.reset();
+    this.removeActiveCssClass();
     // TODO: add modal dialog to confirm close
   }
 
@@ -178,6 +191,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       }
 
       this.store.dispatch(new ShowSideDialog(false));
+      this.removeActiveCssClass();
       this.departmentsDetailsFormGroup.reset();
     } else {
       this.departmentsDetailsFormGroup.markAllAsTouched();

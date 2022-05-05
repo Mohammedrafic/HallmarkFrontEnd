@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
-import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 import { Sliders, Plus, Trash2, Edit } from 'angular-feather/icons';
 
@@ -13,7 +13,7 @@ import { AgencyListComponent } from './agency-list/agency-list.component';
 import { AddEditAgencyComponent } from './agency-list/add-edit-agency/add-edit-agency.component';
 import { SharedModule } from '../shared/shared.module';
 import { GeneralInfoGroupComponent } from './agency-list/add-edit-agency/general-info-group/general-info-group.component';
-import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
+import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { BillingDetailsGroupComponent } from './agency-list/add-edit-agency/billing-details-group/billing-details-group.component';
 import { ContactDetailsGroupComponent } from './agency-list/add-edit-agency/contact-details-group/contact-details-group.component';
 import { PaymentDetailsGridComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-details-grid.component';
@@ -27,6 +27,9 @@ import { CandidateProfessionalSummaryComponent } from './candidates/add-edit-can
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { NgxsModule } from '@ngxs/store';
 import { AgencyState } from './store/agency.state';
+import { AssociatedOrgGridComponent } from './agency-list/add-edit-agency/associated-org-grid/associated-org-grid.component';
+import { InviteDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/invite-dialog/invite-dialog.component';
+import { DialogAllModule } from '@syncfusion/ej2-angular-popups';
 
 const sidebarIcons = {
   Sliders,
@@ -49,6 +52,8 @@ const sidebarIcons = {
     CandidateGeneralInfoComponent,
     CandidateContactDetailsComponent,
     CandidateProfessionalSummaryComponent,
+    AssociatedOrgGridComponent,
+    InviteDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -61,11 +66,14 @@ const sidebarIcons = {
     DropDownListModule,
     CheckBoxModule,
     GridAllModule,
+    ChipListModule,
     PagerModule,
     NumericTextBoxModule,
     TextBoxModule,
     DatePickerModule,
     TabAllModule,
+    DialogAllModule,
+    MultiSelectAllModule,
     FeatherModule.pick(sidebarIcons),
     NgxsModule.forFeature([AgencyState]),
   ],

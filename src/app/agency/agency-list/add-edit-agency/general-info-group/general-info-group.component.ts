@@ -1,18 +1,12 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select } from '@ngxs/store';
-import { map, Observable, Subject, takeWhile } from 'rxjs';
+import { Observable, Subject, takeWhile } from 'rxjs';
 import { AgencyState } from 'src/app/agency/store/agency.state';
 
 import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
+import { AgencyStatus } from "src/app/shared/enums/status";
 import { valuesOnly } from 'src/app/shared/utils/enum.utils';
-
-enum Status {
-  Pending,
-  Inactive,
-  Active,
-  Suspended,
-}
 
 @Component({
   selector: 'app-general-info-group',
@@ -27,7 +21,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
     { id: Country.Canada, text: Country[1] },
   ];
   public states$ = new Subject();
-  public statuses = Object.values(Status)
+  public statuses = Object.values(AgencyStatus)
     .filter(valuesOnly)
     .map((text, id) => ({ text, id }));
   public optionFields = {
@@ -80,7 +74,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       phone1Ext: new FormControl('', [Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]),
       phone2Ext: new FormControl('', [Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]),
       fax: new FormControl('', [Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]),
-      status: new FormControl({ value: Status.Active, disabled: true }, [Validators.required]),
+      status: new FormControl({ value: AgencyStatus.Active, disabled: true }, [Validators.required]),
       website: new FormControl(''),
     });
   }

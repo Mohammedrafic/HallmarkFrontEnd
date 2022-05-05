@@ -14,19 +14,17 @@
 >
   <ng-template #toolbarTemplate let-data>
     <div class="e-gridheader e-gridtoolbar">
-      <div class="payment-grid-toolbar">
-        <div class="title">
-          <h3>Payment Details</h3>
-        </div>
-        <div class="actions">
-          <span class="action-link" (click)="onFilter()"><i-feather name="sliders" class="icon"></i-feather> Filters</span>
-          <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Payment Detail</span>
-        </div>
+      <div class="title">
+        <h3>Payment Details</h3>
+      </div>
+      <div class="actions">
+        <span class="action-link" (click)="onFilter()"><i-feather name="sliders" class="icon"></i-feather> Filters</span>
+        <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Payment Detail</span>
       </div>
     </div>
   </ng-template>
   <e-columns>
-    <e-column field="mode" headerText="Mode" textAlign="Left" [valueAccessor]='modeAccessor'></e-column>
+    <e-column field="mode" headerText="Mode" textAlign="Left" [valueAccessor]="modeAccessor"></e-column>
     <e-column field="payee" headerText="Payee" textAlign="left"></e-column>
     <e-column field="address" headerText="Address" textAlign="left"></e-column>
     <e-column field="city" headerText="City" textAlign="left"></e-column>
@@ -76,7 +74,7 @@
 </ejs-grid>
 
 <app-side-dialog (formCancelClicked)="onPaymentFormCancel()" (formSaveClicked)="onPaymentFormSave()" [header]="'Add Payment Detail'">
-  <form class="payment-details-form bootstrap" id="addEditRecordForm" [formGroup]="paymentDetailsForm">
+  <form class="payment-details-form bootstrap" id="addPaymentForm" [formGroup]="paymentDetailsForm">
     <div class="dropdown-container">
       <label>Mode<span class="required">*</span></label>
       <div class="input-group dropdown">
@@ -94,30 +92,16 @@
       <div class="input-container">
         <label for="payee">Payee<span class="required">*</span></label>
         <div class="input-group">
-          <input
-            id="payee"
-            class="e-input"
-            type="text"
-            appValidateWithMessage
-            placeholder="Payee"
-            formControlName="payee"
-          />
+          <input id="payee" class="e-input" type="text" appValidateWithMessage placeholder="Payee" formControlName="payee" />
         </div>
       </div>
     </div>
-    
+
     <div>
       <div class="input-container">
         <label for="address">Address</label>
         <div class="input-group">
-          <input
-            id="address"
-            class="e-input"
-            type="text"
-            appValidateWithMessage
-            placeholder="Address"
-            formControlName="address"
-          />
+          <input id="address" class="e-input" type="text" appValidateWithMessage placeholder="Address" formControlName="address" />
         </div>
       </div>
     </div>
@@ -126,14 +110,7 @@
       <div class="input-container">
         <label for="city">City</label>
         <div class="input-group">
-          <input
-            id="city"
-            class="e-input"
-            type="text"
-            appValidateWithMessage
-            placeholder="City"
-            formControlName="city"
-          />
+          <input id="city" class="e-input" type="text" appValidateWithMessage placeholder="City" formControlName="city" />
         </div>
       </div>
     </div>
@@ -142,14 +119,7 @@
       <label>Zip</label>
       <div class="input-group dropdown">
         <div class="input-group">
-          <input
-            id="Zip"
-            class="e-input"
-            type="text"
-            appValidateWithMessage
-            placeholder="Zip"
-            formControlName="zip"
-          />
+          <input id="Zip" class="e-input" type="text" appValidateWithMessage placeholder="Zip" formControlName="zip" />
         </div>
       </div>
     </div>
