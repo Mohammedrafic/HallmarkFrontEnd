@@ -35,14 +35,18 @@ export abstract class AbstractGridConfigurationComponent {
   protected constructor() { }
 
   addActiveCssClass(event: any): void {
-    this.clickedElement = event.currentTarget;
-    this.clickedElement.classList.add('e-active');
-    this.clickedElement.focus();
+    if (event) {
+      this.clickedElement = event.currentTarget;
+      this.clickedElement.classList.add('e-active');
+      this.clickedElement.focus();
+    }
   }
 
   removeActiveCssClass(): void {
-    this.clickedElement.classList.remove('e-active');
-    this.clickedElement.focus();
-    this.clickedElement = undefined;
+    if (this.clickedElement) {
+      this.clickedElement.classList.remove('e-active');
+      this.clickedElement.focus();
+      this.clickedElement = undefined;
+    }
   }
 }

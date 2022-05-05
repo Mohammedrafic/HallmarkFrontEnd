@@ -24,7 +24,7 @@ import { Location } from '../../../../shared/models/location.model';
 import { AdminState } from '../../../store/admin.state';
 import { MessageTypes } from '../../../../shared/enums/message-types';
 import { AbstractGridConfigurationComponent } from '../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '../../../../shared/constants/messages';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADDED } from '../../../../shared/constants/messages';
 import { ConfirmService } from '../../../../shared/services/confirm.service';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
@@ -61,6 +61,12 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   editedDepartmentId?: number;
   isEdit: boolean;
 
+  invalidDate = '0001-01-01T00:00:00+00:00';
+
+  get dialogHeader(): string {
+    return this.isEdit ? 'Edit' : 'Add';
+  }
+
   constructor(private store: Store,
               private actions$: Actions,
               private router: Router,
@@ -95,6 +101,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   mapGridData(): void {
     this.departments$.subscribe(data => {
       this.lastAvailablePage = this.getLastPage(data);
+      data.forEach(item => item.inactiveDate === this.invalidDate ? item.inactiveDate = '' : item.inactiveDate);
       this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
       this.totalDataRecords = data.length;
     });
@@ -175,8 +182,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         extDepartmentId: this.departmentsDetailsFormGroup.controls['extDepartmentId'].value,
         invoiceDepartmentId: this.departmentsDetailsFormGroup.controls['invoiceDepartmentId'].value,
         departmentName: this.departmentsDetailsFormGroup.controls['departmentName'].value,
-        inactiveDate: this.departmentsDetailsFormGroup.controls['inactiveDate'].value === '' ? null
-          : this.departmentsDetailsFormGroup.controls['inactiveDate'].value,
+        inactiveDate: this.departmentsDetailsFormGroup.controls['inactiveDate'].value,
         facilityPhoneNo: this.departmentsDetailsFormGroup.controls['facilityPhoneNo'].value,
         facilityEmail: this.departmentsDetailsFormGroup.controls['facilityEmail'].value,
         facilityContact: this.departmentsDetailsFormGroup.controls['facilityContact'].value
@@ -188,6 +194,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         this.editedDepartmentId = undefined;
       } else {
         this.store.dispatch(new SaveDepartment(department));
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
       }
 
       this.store.dispatch(new ShowSideDialog(false));
@@ -211,7 +218,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       facilityContact: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       facilityEmail: ['', [Validators.required, Validators.email]],
       facilityPhoneNo: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(10), Validators.pattern(/^\d+$/i)]],
-      inactiveDate: ['']
+      inactiveDate: [null]
     });
   }
 
