@@ -14,10 +14,13 @@ export class Skill {
   inactiveDate?: string | null;
 
   constructor(skill: Skill, organizationId?: number) {
-    this.id = skill.id;
-    this.skillCategoryId = skill.skillCategoryId;
-    this.skillAbbr = skill.skillAbbr;
-    this.skillDescription = skill.skillDescription;
+    this.id = skill.id || 0;
+    
+    if (this.id !== -1) {
+      this.skillCategoryId = skill.skillCategoryId;
+      this.skillAbbr = skill.skillAbbr;
+      this.skillDescription = skill.skillDescription;
+    }
 
     if (organizationId) {
       this.organizationId = organizationId;

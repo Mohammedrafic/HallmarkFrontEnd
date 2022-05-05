@@ -100,7 +100,7 @@
 <app-side-dialog
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveSkill()"
-  [header]="'Add Skill'"
+  header="{{ title }} Skill"
   >
   <form class="skills-form-dialog form-container bootstrap"
         id="addEditSkillsForm"
@@ -131,13 +131,13 @@
 
     <div>
       <div class="input-container">
-        <label for="skillDescription">Skill description <span class="required">*</span></label>
+        <label for="skillDescription">Skill Description <span class="required">*</span></label>
         <div class="input-group">
           <input class="e-input"
                  type="text"
                  maxlength="100"
                  appValidateWithMessage
-                 placeholder="Skill description"
+                 placeholder="Skill Description"
                  name="skillDescription"
                  formControlName="skillDescription"/>
         </div>

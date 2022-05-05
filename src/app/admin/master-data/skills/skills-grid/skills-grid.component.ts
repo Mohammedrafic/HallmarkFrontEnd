@@ -3,7 +3,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FreezeService, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, filter, Observable, Subject } from 'rxjs';
+import { debounceTime, delay, filter, Observable, Subject } from 'rxjs';
 import { GetMasterSkillsByPage, RemoveMasterSkill, RemoveMasterSkillSucceeded, SaveMasterSkill, SaveMasterSkillSucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -87,8 +87,10 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
   }
 
   public closeDialog(): void {
-    this.store.dispatch(new ShowSideDialog(false));
-    this.SkillFormGroup.reset();
+    this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
+      this.SkillFormGroup.reset();
+      this.SkillFormGroup.get('id')?.setValue(0);
+    });
   }
 
   public saveSkill(): void {
