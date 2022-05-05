@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
-import { SelectedEventArgs } from "@syncfusion/ej2-angular-inputs";
+import { SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
 
 @Component({
   selector: 'app-image-uploader',
@@ -9,9 +9,23 @@ import { SelectedEventArgs } from "@syncfusion/ej2-angular-inputs";
 })
 export class ImageUploaderComponent implements OnInit {
   @Input() uploaderTitle: string;
+  @Input() set logo(value: Blob | null) {
+    if (value) {
+      const reader = new FileReader();
+      reader.readAsDataURL(value as Blob); 
+      reader.onloadend = () => {
+        this.logoSrc = reader.result as string;     
+      }
+    }
+  }
 
   @Output() selectImage = new EventEmitter<Blob | null>()
 
+  @ViewChild('previewupload')
+  public uploadObj: UploaderComponent;
+
+  public logoSrc = '';
+  public isImageSelected = false;
   public readonly allowedExtensions: string = '.png, .jpg, .jpeg';
   public dropElement: HTMLElement;
 
@@ -26,10 +40,15 @@ export class ImageUploaderComponent implements OnInit {
   public onImageSelect(event: SelectedEventArgs): void {
     if (event.filesData[0].statusCode === '1') {
       this.selectImage.emit(event.filesData[0].rawFile as Blob)
+      this.isImageSelected = true;
     }
   }
 
   public onImageRemove(): void {
+    this.isImageSelected = false;
+    this.uploadObj.clearAll();
+    this.logo = null;
+    this.logoSrc = '';
     this.selectImage.emit(null);
   }
 }

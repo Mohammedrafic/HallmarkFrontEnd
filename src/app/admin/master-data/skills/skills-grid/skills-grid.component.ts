@@ -42,7 +42,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
     this.SkillFormGroup = this.fb.group({
       id: new FormControl(0),
       skillCategoryId: new FormControl('', [ Validators.required, Validators.minLength(3) ]),
-      skillAbbr: new FormControl(''),
+      skillAbbr: new FormControl('', [ Validators.minLength(3) ]),
       skillDescription: new FormControl('', [ Validators.required, Validators.minLength(3) ]),
     });
   }

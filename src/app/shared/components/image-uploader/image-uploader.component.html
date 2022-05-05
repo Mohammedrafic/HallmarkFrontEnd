@@ -5,13 +5,19 @@
     </div>
   </div>
   <div class="e-card-content">
-    <div id="droparea" (click)="browse()">
+    <div class="logo-container" *ngIf="logoSrc">
+      <img class="logo big" [src]="logoSrc" />
+      <img class="logo medium" [src]="logoSrc" />
+      <img class="logo small" [src]="logoSrc" />
+    </div>
+    <div *ngIf="!logoSrc" id="droparea" (click)="browse()">
       <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
     </div>
-    <ejs-uploader [dropArea]="dropElement" [allowedExtensions]="allowedExtensions"
+    <ejs-uploader #previewupload [dropArea]="dropElement" [allowedExtensions]="allowedExtensions"
                   [autoUpload]="false" [multiple]="false"
                   (selected)="onImageSelect($event)"
                   (removing)="onImageRemove()">
     </ejs-uploader>
+    <button *ngIf="isImageSelected || logoSrc" ejs-button class="clear-logo-button" cssClass="e-outline" (click)="onImageRemove()">Clear</button>
   </div>
 </div>

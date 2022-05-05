@@ -52,7 +52,7 @@ import {
   RemoveAssignedSkillSucceeded,
   GetCredentialTypes,
   SaveCredentialType,
-  RemoveCredentialType, GetCredential, SaveCredential, RemoveCredential
+  RemoveCredentialType, GetCredential, SaveCredential, RemoveCredential, GetOrganizationLogo, GetOrganizationLogoSucceeded
 } from './admin.actions';
 import { DepartmentsService } from '../services/departments.service';
 import { Department } from '../../shared/models/department.model';
@@ -259,6 +259,14 @@ export class AdminState {
     patchState({ isOrganizationLoading: true });
     return this.organizationService.saveOrganizationLogo(file, businessUnitId).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false });
+      return payload;
+    }));
+  }
+
+  @Action(GetOrganizationLogo)
+  GetOrganizationLogo({ dispatch }: StateContext<AdminStateModel>, { payload }: GetOrganizationLogo): Observable<any> {
+    return this.organizationService.getOrganizationLogo(payload).pipe(tap((payload) => {
+      dispatch(new GetOrganizationLogoSucceeded(payload));
       return payload;
     }));
   }

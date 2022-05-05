@@ -22,3 +22,32 @@
 .e-file-select-wrap, .e-upload-actions {
   display: none;
 }
+
+.clear-logo-button {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.logo-container {
+  display: flex;
+
+  .logo {
+    margin: auto;
+    margin-bottom: 0;
+    border-radius: 8px;
+
+    &.big {
+      width: 102px;
+      margin-left: 0;
+    }
+
+    &.medium {
+      width: 58px;
+    }
+
+    &.small {
+      width: 30px;
+      margin-right: 0;
+    }
+  }
+}
