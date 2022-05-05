@@ -33,6 +33,16 @@ export class UploadOrganizationLogo {
   constructor(public file: Blob, public businessUnitId: number) { }
 }
 
+export class GetOrganizationLogo {
+  static readonly type = '[admin] Get Organization Logo';
+  constructor(public payload: number) { }
+}
+
+export class GetOrganizationLogoSucceeded {
+  static readonly type = '[admin] Get Organization Logo Succeeded';
+  constructor(public payload: Blob) { }
+}
+
 export class GetOrganizationById {
   static readonly type = '[admin] Get Organization by ID';
   constructor(public payload: number) { }

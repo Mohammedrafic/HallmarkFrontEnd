@@ -10,6 +10,6 @@ import { SetHeaderState } from 'src/app/store/app.actions';
 export class DashboardContentComponent  {
 
   constructor(private store: Store) {
-    store.dispatch(new SetHeaderState({title: 'Dashboard'}));
+    store.dispatch(new SetHeaderState({ title: 'Dashboard', iconName: 'home' }));
   }
 }

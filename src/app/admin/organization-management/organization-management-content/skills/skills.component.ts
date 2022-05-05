@@ -75,7 +75,20 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
 
   public addSkill(): void {
     this.SkillFormGroup.controls['id'].setValue(0);
+    this.skillFieldsHandler(false);
     this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  private skillFieldsHandler(disable: boolean): void {
+    if (disable) {
+      this.SkillFormGroup.controls['skillAbbr'].disable();
+      this.SkillFormGroup.controls['skillCategoryId'].disable();
+      this.SkillFormGroup.controls['skillDescription'].disable();
+    } else {
+      this.SkillFormGroup.controls['skillAbbr'].enable();
+      this.SkillFormGroup.controls['skillCategoryId'].enable();
+      this.SkillFormGroup.controls['skillDescription'].enable();
+    }
   }
 
   public editSkill(data: any): void {
@@ -89,11 +102,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
       inactiveDate: data.inactiveDate
     });
     this.store.dispatch(new ShowSideDialog(true));
-    if (data.id === -1) {
-      this.SkillFormGroup.controls['skillAbbr'].disable();
-      this.SkillFormGroup.controls['skillCategoryId'].disable();
-      this.SkillFormGroup.controls['skillDescription'].disable();
-    }
+    this.skillFieldsHandler(data.id === -1);
   }
 
   public deleteSkill(data: any): void {

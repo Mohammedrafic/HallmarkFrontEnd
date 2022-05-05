@@ -56,4 +56,8 @@ export class OrganizationService {
     formData.append('logo', file);
     return this.http.post(`/api/BusinessUnit/${businessUnitId}/logo`, formData);
   }
+
+  public getOrganizationLogo(businessUnitId: number): Observable<Blob> {
+    return this.http.get(`/api/BusinessUnit/${businessUnitId}/logo`, { responseType: 'blob' });
+  }
 }

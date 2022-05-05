@@ -1,15 +1,14 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Actions, ofActionCompleted, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { FileInfo, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { debounceTime, Observable } from 'rxjs';
 import { Country } from 'src/app/shared/enums/states';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { ContactDetails, Organization } from 'src/app/shared/models/organization.model';
 import { SetHeaderState } from 'src/app/store/app.actions';
-import { SaveOrganization, GetBusinessUnitList, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry, UploadOrganizationLogo, SaveOrganizationSucceeded, GetOrganizationById, GetOrganizationByIdSucceeded } from '../../store/admin.actions';
+import { SaveOrganization, GetBusinessUnitList, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry, UploadOrganizationLogo, SaveOrganizationSucceeded, GetOrganizationById, GetOrganizationByIdSucceeded, GetOrganizationLogo, GetOrganizationLogoSucceeded } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
 
 @Component({
@@ -20,7 +19,7 @@ import { AdminState } from '../../store/admin.state';
 export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
   public allowExtensions: string = '.png, .jpg, .jpeg';
   public dropElement: HTMLElement;
-  public filesDetails : FileInfo[] = [];
+  public filesDetails : Blob[] = [];
   public filesName: string[] = [];
   public filesList: HTMLElement[] = [];
   public ContactFormArray: FormArray;
@@ -33,6 +32,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
   public isEditTitle: boolean[] = [false];
   public currentBusinessUnitId: number | null = null;
   public title = 'Add';
+  public logo: Blob | null = null;
 
   public createUnderFields = { 
     text: 'name', value: 'id'
@@ -41,9 +41,6 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
   public optionFields = {
     text: 'text', value: 'id'
   };
-
-  @ViewChild('previewupload')
-  public uploadObj: UploaderComponent;
 
   @Select(AdminState.countries)
   countries$: Observable<string[]>;
@@ -81,11 +78,16 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
         this.disableBillingForm();
       }
     })
+    actions$.pipe(ofActionSuccessful(GetOrganizationLogoSucceeded)).subscribe((logo: { payload: Blob }) => {
+      this.logo = logo.payload;
+    });
     store.dispatch(new SetHeaderState({title: 'Organization List'}));
     store.dispatch(new GetBusinessUnitList());
     if (route.snapshot.paramMap.get('organizationId')) {
       this.title = 'Edit';
-      store.dispatch(new GetOrganizationById(parseInt(route.snapshot.paramMap.get('organizationId') as string)));
+      const businessUnitId = parseInt(route.snapshot.paramMap.get('organizationId') as string);
+      store.dispatch(new GetOrganizationById(businessUnitId));
+      store.dispatch(new GetOrganizationLogo(businessUnitId));
     } else {
       this.initForms();
     }
@@ -281,26 +283,16 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
 
   public uploadImages(businessUnitId: number): void {
     if (this.filesDetails.length) {
-      this.store.dispatch(new UploadOrganizationLogo(this.filesDetails[0].rawFile as Blob, businessUnitId));
+      this.store.dispatch(new UploadOrganizationLogo(this.filesDetails[0] as Blob, businessUnitId));
     }
   }
 
-  public onImageSelect(event: any): void {
-    let validFiles: FileInfo[] = this.validateFiles(event, this.filesDetails);
-    if (validFiles.length === 0) {
-      event.cancel = true;
-      return;
+  public onImageSelect(event: Blob | null): void {
+    if (event) {
+      this.filesDetails = [event as Blob];
+    } else {
+      this.filesDetails = [];
     }
-    this.filesDetails = this.filesDetails.concat(validFiles);
-  }
-
-  public onFileRemove(event: any): void {
-    console.log(event);
-  }
-
-  public validateFiles(args: any, viewedFiles: FileInfo[]): FileInfo[] {
-    // TODO: validation goes here
-    return args.filesData;
   }
 
   public save(): void {

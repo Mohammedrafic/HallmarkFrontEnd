@@ -270,24 +270,7 @@
   </div>
 
   <div class="right-section">
-
-    <!---Logo section-->
-    <div tabindex="0" class="e-card">
-      <div class="e-card-header">
-        <div class="e-card-header-caption">
-          <div class="e-card-title">Logo</div>
-        </div>
-      </div>
-      <div class="e-card-content">
-        <div id="droparea" style="height: 130px">
-          <span>Drag & Drop or <span class="browse-link" (click)="browse()">browse</span> files here</span>
-        </div>
-        <ejs-uploader #previewupload id="previewfileupload" [autoUpload]="false" [multiple]="false"
-            [dropArea]="dropElement" [allowedExtensions]="allowExtensions" (selected)="onImageSelect($event)"
-            (removing)="onFileRemove($event)">
-        </ejs-uploader>
-      </div>
-    </div>
+    <app-image-uploader uploaderTitle="Logo" [logo]="logo" (selectImage)="onImageSelect($event)"></app-image-uploader>
 
     <!---Preferences section-->
     <div tabindex="0" class="e-card">

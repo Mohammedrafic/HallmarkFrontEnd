@@ -12,7 +12,7 @@ import { SetHeaderState } from "src/app/store/app.actions";
 export class CandidatesComponent implements OnInit {
 
   constructor(private store: Store) {
-    store.dispatch(new SetHeaderState({ title: 'Agency' }));
+    store.dispatch(new SetHeaderState({ title: 'Agency', iconName: 'clock' }));
   }
 
   ngOnInit(): void {

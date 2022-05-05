@@ -10,6 +10,6 @@ import { SetHeaderState } from 'src/app/store/app.actions';
 export class ReportsContentComponent  {
 
   constructor(private store: Store) {
-    store.dispatch(new SetHeaderState({title: 'Reports'}));
+    store.dispatch(new SetHeaderState({ title: 'Reports', iconName: 'clipboard' }));
   }
 }

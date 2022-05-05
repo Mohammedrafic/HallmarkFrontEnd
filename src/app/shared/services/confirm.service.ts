@@ -31,7 +31,7 @@ export class ConfirmService {
         },
         
       },
-      showCloseIcon: false,
+      showCloseIcon: true,
       closeOnEscape: true,
       position: { X: 'center', Y: 'center' },
       animationSettings: { effect: 'Zoom' },

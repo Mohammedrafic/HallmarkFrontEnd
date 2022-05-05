@@ -18,6 +18,6 @@ export class OrganizationManagementContentComponent  {
   constructor(private store: Store,
               private router: Router,
               private route: ActivatedRoute) {
-    store.dispatch(new SetHeaderState({ title: 'Organization Management' }));
+    store.dispatch(new SetHeaderState({ title: 'Organization Management', iconName: 'file-text' }));
   }
 }

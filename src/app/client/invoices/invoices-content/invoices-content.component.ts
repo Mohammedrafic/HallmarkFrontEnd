@@ -10,6 +10,6 @@ import { SetHeaderState } from 'src/app/store/app.actions';
 export class InvoicesContentComponent  {
 
   constructor(private store: Store) {
-    store.dispatch(new SetHeaderState({title: 'Invoices'}));
+    store.dispatch(new SetHeaderState({ title: 'Invoices', iconName: 'dollar-sign' }));
   }
 }
