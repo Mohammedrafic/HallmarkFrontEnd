@@ -72,7 +72,7 @@ export class AddEditAgencyComponent implements OnInit, AfterViewInit, OnDestroy 
     private route: ActivatedRoute,
     private confirmService: ConfirmService
   ) {
-    this.store.dispatch(new SetHeaderState({ title: 'Agency List' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Agency', iconName: 'clock' }));
   }
 
   ngOnInit(): void {

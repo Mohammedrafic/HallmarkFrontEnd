@@ -6,6 +6,7 @@ import { AgencyListComponent } from './agency-list/agency-list.component';
 import { AddEditAgencyComponent } from './agency-list/add-edit-agency/add-edit-agency.component';
 import { CandidatesComponent } from "./candidates/candidates.component";
 import { AddEditCandidateComponent } from "./candidates/add-edit-candidate/add-edit-candidate.component";
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -15,7 +16,7 @@ const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        component: AgencyListComponent,
+        component: DashboardComponent,
       },
       {
         path: 'organization',

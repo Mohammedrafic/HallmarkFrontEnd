@@ -7,7 +7,7 @@ import { environment } from './environments/environment';
 import { registerLicense } from '@syncfusion/ej2-base';
 
 // Registering Syncfusion license key
-registerLicense('ORg4AjUWIQA/Gnt2VVhhQlFaclhJWHxMYVF2R2FJelRwd19CZkwgOX1dQl9hSXpTc0VmWXpddnxWQWA='); //Trial key
+registerLicense('ORg4AjUWIQA/Gnt2VVhhQlFaclhJW3xNYVF2R2FJflR1fF9EYUwxOX1dQl9hSXtTc0RmW31aeXRTQWg='); //Trial key
 
 if (environment.production) {
   enableProdMode();

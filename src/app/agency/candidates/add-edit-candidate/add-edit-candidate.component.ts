@@ -7,6 +7,8 @@ import { CandidateGeneralInfoComponent } from "src/app/agency/candidates/add-edi
 import { CandidateProfessionalSummaryComponent } from "src/app/agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component";
 import { CandidateContactDetailsComponent } from "./candidate-contact-details/candidate-contact-details.component";
 import { SetHeaderState } from "src/app/store/app.actions";
+import { SaveCandidate } from '../../store/candidate.actions';
+import { Candidate } from 'src/app/shared/models/candidate.model';
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -19,7 +21,7 @@ export class AddEditCandidateComponent implements OnInit {
   private candidatePhoto: Blob | null;
 
   constructor(private store: Store, private fb: FormBuilder) {
-    store.dispatch(new SetHeaderState({ title: 'Candidates' }));
+    store.dispatch(new SetHeaderState({ title: 'Agency', iconName: 'clock' }));
   }
 
   ngOnInit(): void {
@@ -37,5 +39,13 @@ export class AddEditCandidateComponent implements OnInit {
       contactDetails: CandidateContactDetailsComponent.createFormGroup(),
       profSummary: CandidateProfessionalSummaryComponent.createFormGroup(),
     });
+  }
+
+  public save(): void {
+    if (this.candidateForm.valid) {
+      this.store.dispatch(new SaveCandidate(new Candidate(this.candidateForm.getRawValue())));
+    } else {
+      this.candidateForm.markAllAsTouched();
+    }
   }
 }
