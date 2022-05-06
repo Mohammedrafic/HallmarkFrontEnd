@@ -58,6 +58,9 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
   @Select(AdminState.businessUnits)
   businessUnits$: Observable<BusinessUnit[]>;
 
+  @Select(AdminState.sendDocumentAgencies)
+  sendDocumentAgencies$: Observable<[]>;
+
   @Select(AdminState.days)
   days$: Observable<[]>;
 
@@ -177,6 +180,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
     this.PreferencesFormGroup = this.fb.group({
       id: new FormControl(organization ? organization.preferences.id : 0),
       purchaseOrderBy: new FormControl(organization ? organization.preferences.purchaseOrderBy.toString() : '0', [ Validators.required ]),
+      sendDocumentToAgency: new FormControl(organization ? organization.preferences.sendDocumentToAgency : null),
       timesheetSubmittedBy: new FormControl(organization ? organization.preferences.timesheetSubmittedBy.toString() : '0', [ Validators.required ]),
       weekStartsOn: new FormControl(organization ? organization.preferences.weekStartsOn : '', [ Validators.required ]),
       paymentOptions: new FormControl(organization ? organization.preferences.paymentOptions.toString() : '0', [ Validators.required ]),

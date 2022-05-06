@@ -1,3 +1,5 @@
+import { SendDocumentAgency } from '../enums/send-document-agency';
+
 export class Organization {
   createUnder?: {
     id: number,
@@ -92,6 +94,7 @@ export class Preferences {
   weekStartsOn: number;
   considerLunch: boolean;
   purchaseOrderBy: number | string;
+  sendDocumentToAgency: SendDocumentAgency;
   timePeriodInMins: number | string | null;
 }
 
