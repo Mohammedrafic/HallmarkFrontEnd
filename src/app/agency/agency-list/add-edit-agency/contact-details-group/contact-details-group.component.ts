@@ -20,7 +20,7 @@ export class ContactDetailsGroupComponent {
     return new FormGroup({
       title: new FormControl(contactDetails ? contactDetails.title : '', [Validators.maxLength(100)]),
       contactPerson: new FormControl(contactDetails ? contactDetails.contactPerson : '', [Validators.required, Validators.maxLength(100)]),
-      phone1: new FormControl(contactDetails ? contactDetails.phone1 : '', [Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]),
+      phone1: new FormControl(contactDetails ? contactDetails.phone1 : '', [Validators.pattern(/^[0-9]+$/)]),
       email: new FormControl(contactDetails ? contactDetails.email : '', [Validators.email]),
     });
   }
