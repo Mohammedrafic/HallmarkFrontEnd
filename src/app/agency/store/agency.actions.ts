@@ -68,3 +68,8 @@ export class GetAgencyLogoSucceeded {
   static readonly type = '[agency] Get Agency Logo Succeeded';
   constructor(public payload: Blob) { }
 }
+
+export class ClearAgencyEditStore {
+  static readonly type = '[agency] Clear Agency Edit Store';
+  constructor() { }
+}

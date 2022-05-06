@@ -32,6 +32,8 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { AssociatedOrgGridComponent } from './agency-list/add-edit-agency/associated-org-grid/associated-org-grid.component';
 import { InviteDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/invite-dialog/invite-dialog.component';
 import { DialogAllModule } from '@syncfusion/ej2-angular-popups';
+import { ExperienceGridComponent } from './candidates/add-edit-candidate/experience-grid/experience-grid.component';
+import { EducationGridComponent } from './candidates/add-edit-candidate/education-grid/education-grid.component';
 import { EditAssociatedDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/edit-associated-dialog.component';
 import { FeeSettingsComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/fee-settings/fee-settings.component';
 
@@ -61,6 +63,8 @@ const sidebarIcons = {
     InviteDialogComponent,
     EditAssociatedDialogComponent,
     FeeSettingsComponent,
+    ExperienceGridComponent,
+    EducationGridComponent,
   ],
   imports: [
     CommonModule,

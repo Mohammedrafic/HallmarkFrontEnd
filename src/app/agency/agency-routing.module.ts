@@ -7,6 +7,7 @@ import { AddEditAgencyComponent } from './agency-list/add-edit-agency/add-edit-a
 import { CandidatesComponent } from "./candidates/candidates.component";
 import { AddEditCandidateComponent } from "./candidates/add-edit-candidate/add-edit-candidate.component";
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { ClearAgencyGuard } from './guards/clear-agency.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -29,10 +30,12 @@ const routes: Routes = [
       {
         path: 'agency-list/add',
         component: AddEditAgencyComponent,
+        canDeactivate: [ClearAgencyGuard]
       },
       {
         path: 'agency-list/edit/:id',
         component: AddEditAgencyComponent,
+        canDeactivate: [ClearAgencyGuard]
       },
       {
         path: 'candidates',

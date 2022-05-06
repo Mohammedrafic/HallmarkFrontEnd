@@ -52,9 +52,9 @@ export class BillingDetailsGroupComponent implements OnInit, OnDestroy {
       state: new FormControl('', [Validators.required]),
       city: new FormControl('', [Validators.required, Validators.maxLength(20)]),
       zipCode: new FormControl('', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]),
-      phone1: new FormControl('', [Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]),
-      phone2: new FormControl('', [Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]),
-      fax: new FormControl('', [Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]),
+      phone1: new FormControl('', [Validators.pattern(/^[0-9]+$/)]),
+      phone2: new FormControl('', [Validators.pattern(/^[0-9]+$/)]),
+      fax: new FormControl('', [Validators.pattern(/^[0-9]+$/)]),
       ext: new FormControl(''),
     });
   }

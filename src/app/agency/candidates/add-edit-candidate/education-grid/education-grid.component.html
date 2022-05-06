@@ -1,0 +1,91 @@
+<section>
+  <ejs-grid #grid class="e-gridwithtoolbar"
+            [dataSource]="educations$ | async"
+            [rowHeight]="rowHeight"
+            [resizeSettings]="resizeSettings"
+            [allowSorting]="allowSorting"
+            [allowResizing]="allowResizing"
+            [pageSettings]="pageSettings"
+            [height]="gridHeight"
+            (dataBound)="dataBound()">
+    <ng-template #toolbarTemplate let-data>
+      <div class="e-gridheader e-gridtoolbar">
+        <div class="title">
+          <h3>Education</h3>
+        </div>
+        <div class="actions">
+          <span class="action-link" (click)="onFilter()"><i-feather name="sliders" class="icon"></i-feather> Filters</span>
+          <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Education</span>
+        </div>
+      </div>
+    </ng-template>
+    <e-columns>
+      <e-column field="degree" headerText="Degree Type" width=300></e-column>
+      <e-column field="schoolName" headerText="School Name" width=300></e-column>
+      <e-column field="graduationDate" headerText="Graduation Month/Year" width=200 textAlign="Right"></e-column>
+      <e-column field="fieldOfStudy" headerText="Field Of Study" width=500></e-column>
+      <e-column textAlign="Right" width="120">
+        <ng-template #template let-data>
+          <div class="e-grid-tool-buttons">
+            <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>
+            <span class="remove-button" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
+          </div>
+        </ng-template>
+      </e-column>
+    </e-columns>
+  </ejs-grid>
+</section>
+
+<app-side-dialog header="{{ title }} Education"
+                 (formCancelClicked)="closeDialog()"
+                 (formSaveClicked)="saveEducation()">
+  <form class="education-form-dialog form-container bootstrap"
+        id="addEducationForm"
+        [formGroup]="educationForm">
+    <div class="dropdown-container">
+      <label>Degree Type</label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist appValidateWithMessage
+                          [fields]="optionFields"
+                          formControlName="degree"
+                          [dataSource]="degreeTypes"
+                          placeholder="Degree Type">
+        </ejs-dropdownlist>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>School Name</label>
+      <div class="input-group">
+        <input class="e-input"
+               type="text"
+               maxlength="50"
+               appValidateWithMessage
+               placeholder="School Name"
+               formControlName="schoolName"/>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Field Of Study</label>
+      <div class="input-group">
+        <input class="e-input"
+               type="text"
+               maxlength="50"
+               appValidateWithMessage
+               placeholder="Field Of Study"
+               formControlName="fieldOfStudy"/>
+      </div>
+    </div>
+    <div class="input-container calendar">
+      <label>Graduation Month/Year</label>
+      <div class="input-group datepicker">
+        <ejs-datepicker class="datepicker"
+                        format="MM/dd/yyyy"
+                        placeholder="MM/DD/YYYY"
+                        [enableMask]="true"
+                        [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                        formControlName="graduationDate">
+        </ejs-datepicker>
+      </div>
+    </div>
+  </form>
+</app-side-dialog>

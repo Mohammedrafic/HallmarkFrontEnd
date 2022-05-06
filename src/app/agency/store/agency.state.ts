@@ -23,7 +23,8 @@ import {
   GetFeeSettingByOrganizationIdSucceeded,
   GetAgencyLogo,
   GetAgencyLogoSucceeded,
-  UploadAgencyLogo
+  UploadAgencyLogo,
+  ClearAgencyEditStore
 } from './agency.actions';
 
 export interface AgencyStateModel {
@@ -194,5 +195,17 @@ export class AgencyState {
       dispatch(new GetAgencyLogoSucceeded(payload));
       return payload;
     }));
+  }
+
+  @Action(ClearAgencyEditStore)
+  ClearAgencyEditStore({ patchState }: StateContext<AgencyStateModel>): void {
+   patchState({
+     agency: null,
+     organizations: null,
+     associateOrganizationsPages: {
+       items: [],
+     },
+     feeSettings: null,
+   })
   }
 }

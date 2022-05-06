@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -46,7 +46,7 @@ type AgencyFormValue = {
   templateUrl: './add-edit-agency.component.html',
   styleUrls: ['./add-edit-agency.component.scss'],
 })
-export class AddEditAgencyComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AddEditAgencyComponent implements OnInit, OnDestroy {
   @ViewChild('stepper') tab: TabComponent;
 
   public agencyForm: FormGroup;
@@ -98,6 +98,7 @@ export class AddEditAgencyComponent implements OnInit, AfterViewInit, OnDestroy 
       this.agencyId = agency.payload.agencyDetails.id as number;
       this.uploadImages(this.agencyId);
       this.store.dispatch(new ShowToast(MessageTypes.Success, AGENCY_SAVED_TEXT));
+      this.agencyForm.markAsPristine();
     });
     this.actions$.pipe(ofActionSuccessful(GetAgencyByIdSucceeded)).subscribe((agency: { payload: Agency }) => {
       this.agencyId = agency.payload.agencyDetails.id as number;
@@ -115,7 +116,11 @@ export class AddEditAgencyComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  ngAfterViewInit(): void {
+  ngOnDestroy(): void {
+    this.isAlive = false;
+  }
+
+  public onStepperCreated(): void {
     this.tab.enableTab(1, false);
 
     this.isAgencyCreated$.pipe(takeWhile(() => this.isAlive)).subscribe((res) => {
@@ -125,10 +130,6 @@ export class AddEditAgencyComponent implements OnInit, AfterViewInit, OnDestroy 
         this.tab.enableTab(1, false);
       }
     });
-  }
-
-  ngOnDestroy(): void {
-    this.isAlive = false;
   }
 
   public addContact(contactDetails?: AgencyContactDetails): void {

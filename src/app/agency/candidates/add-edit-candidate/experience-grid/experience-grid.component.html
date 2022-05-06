@@ -1,0 +1,106 @@
+<section>
+  <ejs-grid #grid class="e-gridwithtoolbar"
+            [dataSource]="experiences$ | async"
+            [rowHeight]="rowHeight"
+            [resizeSettings]="resizeSettings"
+            [allowSorting]="allowSorting"
+            [allowResizing]="allowResizing"
+            [pageSettings]="pageSettings"
+            [height]="gridHeight"
+            (dataBound)="dataBound()">
+    <ng-template #toolbarTemplate let-data>
+      <div class="e-gridheader e-gridtoolbar">
+        <div class="title">
+          <h3>Experience</h3>
+        </div>
+        <div class="actions">
+          <span class="action-link" (click)="onFilter()"><i-feather name="sliders" class="icon"></i-feather> Filters</span>
+          <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Experience</span>
+        </div>
+      </div>
+    </ng-template>
+    <e-columns>
+      <e-column field="employer" headerText="Employer" width=300></e-column>
+      <e-column field="jobTitle" headerText="Job Title" width=300></e-column>
+      <e-column field="startDate" headerText="Start Month/Year" width=200 textAlign="Right"></e-column>
+      <e-column field="endDate" headerText="End Month/Year" width=200 textAlign="Right"></e-column>
+      <e-column field="comments" headerText="Comments" width=500></e-column>
+      <e-column textAlign="Right" width="120">
+        <ng-template #template let-data>
+          <div class="e-grid-tool-buttons">
+            <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>
+            <span class="remove-button" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
+          </div>
+        </ng-template>
+      </e-column>
+    </e-columns>
+  </ejs-grid>
+</section>
+
+<app-side-dialog header="{{ title }} Experience"
+                 (formCancelClicked)="closeDialog()"
+                 (formSaveClicked)="saveExperience()">
+  <form class="experience-form-dialog form-container bootstrap"
+        id="addExperienceForm"
+        [formGroup]="experienceForm">
+    <div class="input-container">
+      <label>Employer</label>
+      <div class="input-group">
+        <input class="e-input"
+               type="text"
+               maxlength="100"
+               appValidateWithMessage
+               placeholder="Employer"
+               formControlName="employer"/>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Job Title</label>
+      <div class="input-group">
+        <input class="e-input"
+               type="text"
+               maxlength="20"
+               appValidateWithMessage
+               placeholder="Job Title"
+               formControlName="jobTitle"/>
+      </div>
+    </div>
+    <div class="input-container calendar">
+      <label>Start Month/Year</label>
+      <div class="input-group datepicker">
+        <ejs-datepicker class="datepicker"
+                        format="MM/dd/yyyy"
+                        placeholder="MM/DD/YYYY"
+                        [enableMask]="true"
+                        [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                        formControlName="startDate">
+        </ejs-datepicker>
+      </div>
+    </div>
+    <div class="input-container calendar">
+      <label>End Month/Year</label>
+      <div class="input-group datepicker">
+        <ejs-datepicker class="datepicker"
+                        format="MM/dd/yyyy"
+                        placeholder="MM/DD/YYYY"
+                        [enableMask]="true"
+                        [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                        formControlName="endDate">
+        </ejs-datepicker>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Comments</label>
+      <div class="input-group">
+        <input class="e-input"
+               type="text"
+               maxlength="500"
+               appValidateWithMessage
+               placeholder="Comments"
+               formControlName="comments"/>
+      </div>
+    </div>
+
+
+  </form>
+</app-side-dialog>
