@@ -19,6 +19,7 @@ export class AssociatedOrgGridComponent extends AbstractGridConfigurationCompone
   public associateOrganizations$: Observable<AssociateOrganizations[]>;
 
   public openAssosiateOrgDialog = new EventEmitter<boolean>();
+  public openEditDialog = new EventEmitter<AssociateOrganizations>();
 
   constructor(private store: Store) {
     super();
@@ -40,8 +41,13 @@ export class AssociatedOrgGridComponent extends AbstractGridConfigurationCompone
     this.openAssosiateOrgDialog.emit(true);
   }
 
-  public onEdit({ index }: { index: string } & AssociateOrganizations): void {
+  public onEdit({ index, ...org }: { index: string } & AssociateOrganizations): void {
     this.grid.selectRow(Number(index) + 1);
+    this.openEditDialog.emit(org);
+  }
+
+  public onEditEnd(): void {
+    this.grid.clearRowSelection();
   }
 
   public onRemove(data: unknown): void {

@@ -15,8 +15,8 @@ export class CredentialsService {
    * Get credential types
    * @return list of credential types
    */
-  public getCredentialTypes(): Observable<CredentialType[]> { // TODO: correct after BE implementation
-    return this.http.get<CredentialType[]>(`/api/CredentialTypes`);
+  public getCredentialTypes(): Observable<CredentialType[]> {
+    return this.http.get<CredentialType[]>(`/api/CredentialTypes/all`);
   }
 
   /**
@@ -35,7 +35,7 @@ export class CredentialsService {
   public saveUpdateCredentialType(credentialType: CredentialType): Observable<CredentialType> {
     return credentialType.id ?
       this.http.put<CredentialType>(`/api/CredentialTypes`, credentialType) :
-      this.http.post<CredentialType>(`/api/CredentialTypes`, credentialType);
+      this.http.post<CredentialType>(`/api/CredentialTypes`, { names: [credentialType.name]});
   }
 
   /**
@@ -51,18 +51,25 @@ export class CredentialsService {
    * @return list of credentials
    */
   public getCredential(): Observable<Credential[]> { // TODO: correct after BE implementation
-    return this.http.get<Credential[]>(`/api/Credential`);
+    return this.http.get<Credential[]>(`/api/MasterCredential`);
   }
 
   /**
-   * Create or update credential
+   * Create credential
    * @param credential object to save
-   * @return Created/Updated credential
+   * @return Created credential in array
    */
-  public saveUpdateCredential(credential: Credential): Observable<Credential> {
-    return credential.id ?
-      this.http.put<Credential>(`/api/Credential`, credential) :
-      this.http.post<Credential>(`/api/Credential`, credential);
+  public saveCredential(credential: Credential): Observable<Credential[]> {
+    return this.http.post<Credential[]>(`/api/MasterCredential`, [credential]);
+  }
+
+  /**
+   * Update credential
+   * @param credential object to update
+   * @return Updated credential
+   */
+  public updateCredential(credential: Credential): Observable<Credential> {
+    return this.http.put<Credential>(`/api/MasterCredential`, credential);
   }
 
   /**
@@ -70,6 +77,6 @@ export class CredentialsService {
    * @param credential
    */
   public removeCredential(credential: Credential): Observable<any> {
-    return this.http.delete<CredentialType>(`/api/Credential/${credential.id}`);
+    return this.http.delete<any>(`/api/MasterCredential/${credential.id}`);
   }
 }

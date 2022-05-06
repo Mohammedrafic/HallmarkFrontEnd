@@ -5,6 +5,8 @@ import { Actions, Select, Store } from '@ngxs/store';
 import { filter, Observable } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { AbstractGridConfigurationComponent } from '../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { AdminState } from '../../../store/admin.state';
@@ -23,9 +25,14 @@ import { MessageTypes } from '../../../../shared/enums/message-types';
 import { Location } from '../../../../shared/models/location.model';
 
 import { PhoneTypes } from '../../../../shared/enums/phone-types';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Country } from '../../../../shared/enums/states';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADDED } from '../../../../shared/constants/messages';
+import {
+  CANCEL_COFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+  RECORD_ADDED
+} from '../../../../shared/constants/messages';
 import { Organization } from '../../../../shared/models/organization.model';
 import { ConfirmService } from '../../../../shared/services/confirm.service';
 
@@ -35,7 +42,8 @@ export const MESSAGE_REGION_LOCATION_CANNOT_BE_DELETED = 'Region/Location cannot
 @Component({
   selector: 'app-locations',
   templateUrl: './locations.component.html',
-  styleUrls: ['./locations.component.scss']
+  styleUrls: ['./locations.component.scss'],
+  providers: [MaskedDateTimeService],
 })
 export class LocationsComponent extends AbstractGridConfigurationComponent implements OnInit {
   @ViewChild('grid') grid: GridComponent;
@@ -192,12 +200,19 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   onFormCancelClick(): void {
-    this.store.dispatch(new ShowSideDialog(false));
-    this.isEdit = false;
-    this.editedLocationId = undefined;
-    this.locationDetailsFormGroup.reset();
-    this.removeActiveCssClass();
-    // TODO: add modal dialog to confirm close
+    this.confirmService
+      .confirm(CANCEL_COFIRM_TEXT, {
+        title: DELETE_CONFIRM_TITLE,
+        okButtonLabel: 'Leave',
+        okButtonClass: 'delete-button'
+      }).pipe(filter(confirm => !!confirm))
+      .subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false));
+        this.isEdit = false;
+        this.editedLocationId = undefined;
+        this.locationDetailsFormGroup.reset();
+        this.removeActiveCssClass();
+      });
   }
 
   onFormSaveClick(): void {

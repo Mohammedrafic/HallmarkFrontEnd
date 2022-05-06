@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MasterCredentialsComponent } from './credentials.component';
+import { FeeSettingsComponent } from './fee-settings.component';
 
-describe('CredentialsComponent', () => {
-  let component: MasterCredentialsComponent;
-  let fixture: ComponentFixture<MasterCredentialsComponent>;
+describe('FeeSettingsComponent', () => {
+  let component: FeeSettingsComponent;
+  let fixture: ComponentFixture<FeeSettingsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MasterCredentialsComponent ]
+      declarations: [ FeeSettingsComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MasterCredentialsComponent);
+    fixture = TestBed.createComponent(FeeSettingsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

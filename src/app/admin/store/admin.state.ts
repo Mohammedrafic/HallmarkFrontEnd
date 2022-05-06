@@ -52,7 +52,13 @@ import {
   RemoveAssignedSkillSucceeded,
   GetCredentialTypes,
   SaveCredentialType,
-  RemoveCredentialType, GetCredential, SaveCredential, RemoveCredential, GetOrganizationLogo, GetOrganizationLogoSucceeded
+  RemoveCredentialType,
+  GetCredential,
+  SaveCredential,
+  RemoveCredential,
+  UpdateCredential,
+  GetOrganizationLogo,
+  GetOrganizationLogoSucceeded, UpdateCredentialType
 } from './admin.actions';
 import { DepartmentsService } from '../services/departments.service';
 import { Department } from '../../shared/models/department.model';
@@ -536,9 +542,18 @@ export class AdminState {
     }));
   }
 
+  @Action(UpdateCredentialType)
+  UpdateCredentialTypes({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: UpdateCredentialType): Observable<CredentialType> {
+    return this.credentialsService.saveUpdateCredentialType(payload).pipe(tap((payload) => {
+      patchState({ isCredentialLoading: false });
+      dispatch(new GetCredentialTypes());
+      return payload;
+    }));
+  }
+
   @Action(RemoveCredentialType)
-  RemoveCredentialTypes({ patchState, dispatch }: StateContext<AdminStateModel>, { credentialType }: RemoveCredentialType): Observable<CredentialType> {
-    return this.credentialsService.removeCredentialType(credentialType).pipe(tap((payload) => {
+  RemoveCredentialTypes({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveCredentialType): Observable<CredentialType> {
+    return this.credentialsService.removeCredentialType(payload).pipe(tap((payload) => {
       patchState({ isCredentialTypesLoading: false });
       dispatch(new GetCredentialTypes());
       return payload;
@@ -554,10 +569,19 @@ export class AdminState {
   }
 
   @Action(SaveCredential)
-  SaveCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveCredential): Observable<Credential> {
-    return this.credentialsService.saveUpdateCredential(payload).pipe(tap((payload) => {
+  SaveCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveCredential): Observable<Credential[]> {
+    return this.credentialsService.saveCredential(payload).pipe(tap((payload) => {
       patchState({ isCredentialLoading: false });
-      dispatch(new GetCredentialTypes());
+      dispatch(new GetCredential());
+      return payload;
+    }));
+  }
+
+  @Action(UpdateCredential)
+  UpdateCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: UpdateCredential): Observable<Credential> {
+    return this.credentialsService.updateCredential(payload).pipe(tap((payload) => {
+      patchState({ isCredentialLoading: false });
+      dispatch(new GetCredential());
       return payload;
     }));
   }
@@ -566,7 +590,7 @@ export class AdminState {
   RemoveCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveCredential): Observable<Credential> {
     return this.credentialsService.removeCredential(payload).pipe(tap((payload) => {
       patchState({ isCredentialLoading: false });
-      dispatch(new GetCredentialTypes());
+      dispatch(new GetCredential());
       return payload;
     }));
   }

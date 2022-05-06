@@ -240,12 +240,12 @@ export class SaveCredentialType {
 
 export class RemoveCredentialType {
   static readonly type = '[admin] Remove Credential Type by ID';
-  constructor(public credentialType: CredentialType) { }
+  constructor(public payload: CredentialType) { }
 }
 
 export class UpdateCredentialType {
   static readonly type = '[admin] Update Credential Type';
-  constructor(public credentialType: CredentialType) { }
+  constructor(public payload: CredentialType) { }
 }
 
 export class GetCredential {

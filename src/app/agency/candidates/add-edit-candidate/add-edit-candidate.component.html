@@ -1,11 +1,11 @@
 <app-page-toolbar>
   <ng-container left>
-    <button ejs-button cssClass="e-outline">Back</button>
+    <button ejs-button cssClass="e-outline" (click)="navigateBack()">Back</button>
     <h3>Add Candidate</h3>
   </ng-container>
   <ng-container right>
     <button ejs-button *ngIf="false" cssClass="e-danger">Delete</button>
-    <button ejs-button cssClass="e-outline">Clear</button>
+    <button ejs-button cssClass="e-outline" (click)="clearForm()">Clear</button>
     <button ejs-button [isPrimary]="true" (click)="save()">Save</button>
   </ng-container>
 </app-page-toolbar>
@@ -34,7 +34,7 @@
             </div>
           </div>
           <div class="right">
-            <app-image-uploader uploaderTitle="Upload Photo" (selectImage)="setCandidatePhoto($event)"></app-image-uploader>
+            <app-image-uploader uploaderTitle="Upload Photo" (selectImage)="onImageSelect($event)"></app-image-uploader>
           </div>
         </section>
       </ng-template>

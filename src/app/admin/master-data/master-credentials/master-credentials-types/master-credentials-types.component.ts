@@ -2,7 +2,7 @@ import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { filter, Observable } from 'rxjs';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 
 import {
@@ -10,10 +10,17 @@ import {
 } from '../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ShowSideDialog, ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '../../../../shared/enums/message-types';
-import { RECORD_ADDED } from '../../../../shared/constants/messages';
+import {
+  CANCEL_COFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+  RECORD_ADDED
+} from '../../../../shared/constants/messages';
 import { AdminState } from '../../../store/admin.state';
 import { CredentialType } from '../../../../shared/models/credential-type.model';
-import { SaveCredentialType, UpdateCredentialType } from '../../../store/admin.actions';
+import { RemoveCredentialType, GetCredentialTypes, SaveCredentialType, UpdateCredentialType } from '../../../store/admin.actions';
+import { ConfirmService } from '../../../../shared/services/confirm.service';
 
 @Component({
   selector: 'app-master-credentials-types',
@@ -24,8 +31,6 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
 
-  @Input() isActive: boolean = false;
-
   @Select(AdminState.credentialTypes)
   credentialType$: Observable<CredentialType[]>;
 
@@ -35,19 +40,29 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
   isEdit: boolean;
   editedCredentialTypeId?: number;
 
+  get dialogHeader(): string {
+    return this.isEdit ? 'Edit' : 'Add';
+  }
+
   constructor(private store: Store,
-              @Inject(FormBuilder) private builder: FormBuilder) {
+              @Inject(FormBuilder) private builder: FormBuilder,
+              private confirmService: ConfirmService) {
     super();
     this.formBuilder = builder;
     this.createTypeForm();
-    this.mapGridData();
   }
 
   ngOnInit(): void {
-    // this.store.dispatch(new GetMasterCredentialTypes());
+    this.store.dispatch(new GetCredentialTypes()); // TODO: uncomment after BE implementation
+    this.mapGridData();
   }
 
-  onEditButtonClick(credentialType: CredentialType): void {
+  onAddCredentialTypeClick(): void {
+    this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  onEditButtonClick(credentialType: CredentialType, event: any): void {
+    this.addActiveCssClass(event);
     this.credentialTypeFormGroup.setValue({
       credentialTypeName: credentialType.name
     });
@@ -55,6 +70,22 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
     this.isEdit = true;
 
     this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  onRemoveButtonClick(credentialType: CredentialType, event: any): void {
+    this.addActiveCssClass(event);
+    this.confirmService
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button'
+      })
+      .subscribe((confirm) => {
+        if (confirm && credentialType.id) { // TODO: add verification to prevent remove if location is used elsewhere
+          this.store.dispatch(new RemoveCredentialType(credentialType));
+        }
+        this.removeActiveCssClass();
+      });
   }
 
   onRowsDropDownChanged(): void {
@@ -71,9 +102,18 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
   }
 
   onFormCancelClick(): void {
-    this.store.dispatch(new ShowSideDialog(false));
-    this.credentialTypeFormGroup.reset();
-    // TODO: add modal dialog to confirm close
+    this.confirmService
+      .confirm(CANCEL_COFIRM_TEXT, {
+        title: DELETE_CONFIRM_TITLE,
+        okButtonLabel: 'Leave',
+        okButtonClass: 'delete-button'
+      }).pipe(filter(confirm => !!confirm))
+      .subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false));
+        this.credentialTypeFormGroup.reset();
+        this.isEdit = false;
+        this.removeActiveCssClass();
+      });
   }
 
   onFormSaveClick(): void {
@@ -92,6 +132,8 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
       this.store.dispatch(new ShowSideDialog(false));
       this.credentialTypeFormGroup.reset();
+      this.isEdit = false;
+      this.removeActiveCssClass();
     } else {
       this.credentialTypeFormGroup.markAllAsTouched();
     }

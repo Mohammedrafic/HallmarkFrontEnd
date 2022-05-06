@@ -64,6 +64,10 @@ export class AddEditAgencyComponent implements OnInit, AfterViewInit, OnDestroy 
     return this.agencyForm.get('agencyBillingDetails');
   }
 
+  get isSeccondStepActive(): boolean {
+    return this.tab?.selectedItem === 1;
+  }
+
   @Select(AgencyState.isAgencyCreated)
   public isAgencyCreated$: Observable<boolean>;
 

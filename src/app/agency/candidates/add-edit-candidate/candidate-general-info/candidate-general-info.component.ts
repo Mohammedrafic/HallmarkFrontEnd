@@ -77,7 +77,7 @@ export class CandidateGeneralInfoComponent implements OnInit {
       middleName: new FormControl('', [Validators.maxLength(10)]),
       lastName: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       email: new FormControl('', [Validators.required, Validators.email, Validators.maxLength(20)]),
-      dob: new FormControl('', [Validators.maxLength(100)]),
+      dob: new FormControl('', [Validators.required, Validators.maxLength(100)]),
       region: new FormControl(''),
       classification: new FormControl(''),
       candidateProfileSkills: new FormControl('', [Validators.required]),
