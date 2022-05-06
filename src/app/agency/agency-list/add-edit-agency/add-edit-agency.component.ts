@@ -98,6 +98,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
       this.agencyId = agency.payload.agencyDetails.id as number;
       this.uploadImages(this.agencyId);
       this.store.dispatch(new ShowToast(MessageTypes.Success, AGENCY_SAVED_TEXT));
+      this.agencyForm.markAsPristine();
     });
     this.actions$.pipe(ofActionSuccessful(GetAgencyByIdSucceeded)).subscribe((agency: { payload: Agency }) => {
       this.agencyId = agency.payload.agencyDetails.id as number;

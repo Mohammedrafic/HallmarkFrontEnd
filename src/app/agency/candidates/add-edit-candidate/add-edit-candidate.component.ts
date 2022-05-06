@@ -19,12 +19,12 @@ import { Router } from '@angular/router';
 export class AddEditCandidateComponent implements OnInit {
   public candidateForm: FormGroup;
 
-  private candidatePhoto: Blob | null;
   private filesDetails : Blob[] = [];
   private candidateId: number;
+  private candidatePhoto: Blob | null;
 
-  constructor(private store: Store, 
-              private fb: FormBuilder, 
+  constructor(private store: Store,
+              private fb: FormBuilder,
               private actions$: Actions,
               private router: Router) {
     store.dispatch(new SetHeaderState({ title: 'Agency', iconName: 'clock' }));
@@ -35,16 +35,15 @@ export class AddEditCandidateComponent implements OnInit {
     this.actions$.pipe(ofActionSuccessful(SaveCandidateSucceeded)).subscribe((candidate: { payload: Candidate }) => {
       this.candidateId = candidate.payload.id as number;
       this.uploadImages(this.candidateId);
-      this.navigateBack();
     });
   }
 
-  private generateCandidateForm(): void {
-    this.candidateForm = this.fb.group({
-      generalInfo: CandidateGeneralInfoComponent.createFormGroup(),
-      contactDetails: CandidateContactDetailsComponent.createFormGroup(),
-      profSummary: CandidateProfessionalSummaryComponent.createFormGroup(),
-    });
+  public clearForm(): void {
+    this.candidateForm.reset();
+  }
+
+  public navigateBack(): void {
+    this.router.navigate(['/agency/candidates']);
   }
 
   public save(): void {
@@ -63,17 +62,17 @@ export class AddEditCandidateComponent implements OnInit {
     }
   }
 
+  private generateCandidateForm(): void {
+    this.candidateForm = this.fb.group({
+      generalInfo: CandidateGeneralInfoComponent.createFormGroup(),
+      contactDetails: CandidateContactDetailsComponent.createFormGroup(),
+      profSummary: CandidateProfessionalSummaryComponent.createFormGroup(),
+    });
+  }
+
   private uploadImages(businessUnitId: number): void {
     if (this.filesDetails.length) {
       this.store.dispatch(new UploadCandidatePhoto(this.filesDetails[0] as Blob, businessUnitId));
     }
-  }
-
-  public clearForm(): void {
-    this.candidateForm.reset();
-  }
-
-  public navigateBack(): void {
-    this.router.navigate(['/agency/candidates']);
   }
 }
