@@ -247,10 +247,15 @@ export class AdminState {
   @Action(SaveOrganization)
   SaveOrganization({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveOrganization): Observable<Organization> {
     patchState({ isOrganizationLoading: true });
-    return this.organizationService.saveOrganization(payload).pipe(tap((payload) => {
+    return this.organizationService.saveOrganization(payload).pipe(tap((payloadResponse) => {
       patchState({ isOrganizationLoading: false });
-      dispatch(new SaveOrganizationSucceeded(payload));
-      return payload;
+      dispatch(new SaveOrganizationSucceeded(payloadResponse));
+      if (payload.organizationId) {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      } else {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+      }
+      return payloadResponse;
     }));
   }
 
