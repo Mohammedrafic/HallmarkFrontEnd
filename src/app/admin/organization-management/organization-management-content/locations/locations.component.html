@@ -198,9 +198,9 @@
       </div>
 
       <div class="group">
-        <div class="input-container">
+        <div class="input-container form-dropdown">
           <label for="state">State <span class="required">*</span></label>
-            <div class="input-group">
+            <div class="input-group dropdown">
               <ejs-dropdownlist
                 id="state"
                 appValidateWithMessage
@@ -286,12 +286,12 @@
           </div>
 
           <div class="input-container">
-            <label for="phoneType">Phone Number, Type<span class="required">*</span></label>
-              <div class="input-group">
+            <label for="phoneType">Phone Type<span class="required">*</span></label>
+              <div class="input-group dropdown">
                 <ejs-dropdownlist
                   id="phoneType"
                   appValidateWithMessage
-                  placeholder="Phone Number, Type"
+                  placeholder="Phone Type"
                   formControlName="phoneType"
                   [dataSource]="phoneTypes$ | async"
                 >
