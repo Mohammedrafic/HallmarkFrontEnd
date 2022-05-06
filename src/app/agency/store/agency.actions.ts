@@ -44,3 +44,18 @@ export class GetAgencyByIdSucceeded {
   static readonly type = '[agency] Get Agency by ID Succeeded';
   constructor(public payload: Agency) { }
 }
+
+export class UploadAgencyLogo {
+  static readonly type = '[agency] Upload Agency Logo';
+  constructor(public file: Blob, public businessUnitId: number) { }
+}
+
+export class GetAgencyLogo {
+  static readonly type = '[agency] Get Agency Logo';
+  constructor(public payload: number) { }
+}
+
+export class GetAgencyLogoSucceeded {
+  static readonly type = '[agency] Get Agency Logo Succeeded';
+  constructor(public payload: Blob) { }
+}

@@ -62,7 +62,7 @@
             </div>
           </div>
           <div class="right">
-            <app-image-uploader uploaderTitle="Logo" (selectImage)="setLogoFile($event)"></app-image-uploader>
+            <app-image-uploader uploaderTitle="Logo" [logo]="logo" (selectImage)="onImageSelect($event)"></app-image-uploader>
           </div>
         </section>
         <section class="payment-section last-content-section-padding">
