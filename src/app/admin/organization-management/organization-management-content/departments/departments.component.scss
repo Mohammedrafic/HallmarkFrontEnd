@@ -78,5 +78,15 @@
         height: 40px !important;
       }
     }
+
+    &.calendar {
+      width: 198px;
+
+      ejs-datepicker.e-control {
+        span.e-input-group {
+          height: 40px !important;
+        }
+      }
+    }
   }
 }

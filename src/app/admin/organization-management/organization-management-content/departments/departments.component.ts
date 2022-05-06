@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { filter, Observable } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -24,7 +24,13 @@ import { Location } from '../../../../shared/models/location.model';
 import { AdminState } from '../../../store/admin.state';
 import { MessageTypes } from '../../../../shared/enums/message-types';
 import { AbstractGridConfigurationComponent } from '../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, RECORD_ADDED } from '../../../../shared/constants/messages';
+import {
+  CANCEL_COFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+  RECORD_ADDED
+} from '../../../../shared/constants/messages';
 import { ConfirmService } from '../../../../shared/services/confirm.service';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
@@ -166,12 +172,19 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   onDepartmentFormCancelClick(): void {
-    this.store.dispatch(new ShowSideDialog(false));
-    this.isEdit = false;
-    this.editedDepartmentId = undefined;
-    this.departmentsDetailsFormGroup.reset();
-    this.removeActiveCssClass();
-    // TODO: add modal dialog to confirm close
+    this.confirmService
+      .confirm(CANCEL_COFIRM_TEXT, {
+        title: DELETE_CONFIRM_TITLE,
+        okButtonLabel: 'Leave',
+        okButtonClass: 'delete-button'
+      }).pipe(filter(confirm => !!confirm))
+      .subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false));
+        this.isEdit = false;
+        this.editedDepartmentId = undefined;
+        this.departmentsDetailsFormGroup.reset();
+        this.removeActiveCssClass();
+      });
   }
 
   onDepartmentFormSaveClick(): void {
