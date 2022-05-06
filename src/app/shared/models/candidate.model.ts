@@ -10,6 +10,8 @@ export class Candidate {
   classification: number;
   professionalSummary: string;
   candidateProfileContactDetail: CandidateProfileContactDetail;
+  profileStatus: number;
+  candidateAgencyStatus: number;
   candidateProfileSkills: any[];
 
   constructor(candidateForm: any) {
@@ -23,6 +25,8 @@ export class Candidate {
     this.classification = candidateForm.generalInfo.classification || null;
     this.professionalSummary = candidateForm.profSummary.professionalSummary;
     this.candidateProfileContactDetail = new CandidateProfileContactDetail(candidateForm.contactDetails);
+    this.profileStatus = candidateForm.generalInfo.profileStatus;
+    this.candidateAgencyStatus = candidateForm.generalInfo.candidateAgencyStatus;
     this.candidateProfileSkills = candidateForm.generalInfo.candidateProfileSkills;
   }
 }

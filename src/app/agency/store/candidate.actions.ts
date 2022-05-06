@@ -14,3 +14,13 @@ export class GetAllSkills {
   static readonly type = '[candidate] Get All Skills';
   constructor() {}
 }
+
+export class UploadCandidatePhoto {
+  static readonly type = '[candidate] Upload Candidate Photo';
+  constructor(public file: Blob, public candidateProfileId: number) { }
+}
+
+export class GetCandidatePhoto {
+  static readonly type = '[candidate] Get Candidate Photo';
+  constructor(public payload: number) { }
+}
