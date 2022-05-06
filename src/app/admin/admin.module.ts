@@ -48,6 +48,7 @@ import { MasterCredentialComponent } from './master-data/master-credentials/mast
 import {
   MasterCredentialsTypesComponent
 } from './master-data/master-credentials/master-credentials-types/master-credentials-types.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 const sidebarIcons = {
   Download,
@@ -82,7 +83,8 @@ const sidebarIcons = {
     SkillsComponent,
     MasterCredentialsComponent,
     MasterCredentialComponent,
-    MasterCredentialsTypesComponent
+    MasterCredentialsTypesComponent,
+    DashboardComponent
   ],
   imports: [
     CommonModule,

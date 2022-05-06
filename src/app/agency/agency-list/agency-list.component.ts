@@ -20,6 +20,11 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
   @ViewChild('grid') grid: GridComponent;
 
   public readonly statusEnum = AgencyStatus;
+  public initialSort = {
+    columns: [
+      { field: 'agencyDetails.name', direction: 'Ascending' }
+    ]
+  };
 
   private pageSubject = new Subject<number>();
 
@@ -49,7 +54,8 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
   }
 
   public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+    this.pageSize  = parseInt(this.activeRowsPerPageDropDown);
+    this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
   }
 
   public onGoToClick(event: any): void {

@@ -61,7 +61,7 @@ import { Location } from '../../shared/models/location.model';
 import { RegionService } from '../services/region.service';
 import { LocationService } from '../services/location.service';
 import { GeneralPhoneTypes } from '../../shared/constants/general-phone-types';
-import { SkillsService } from '../services/skills.service';
+import { SkillsService } from '../../shared/services/skills.service';
 import { CategoriesService } from '../services/categories.service';
 import { Skill, SkillsPage } from 'src/app/shared/models/skill.model';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';

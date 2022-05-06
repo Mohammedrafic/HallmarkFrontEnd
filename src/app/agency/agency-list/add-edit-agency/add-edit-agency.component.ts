@@ -17,7 +17,15 @@ import {
 } from 'src/app/shared/models/agency.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { SetHeaderState, ShowToast } from 'src/app/store/app.actions';
-import { GetAgencyById, GetAgencyByIdSucceeded, SaveAgency, SaveAgencySucceeded } from '../../store/agency.actions';
+import {
+  GetAgencyById,
+  GetAgencyByIdSucceeded,
+  GetAgencyLogo,
+  GetAgencyLogoSucceeded,
+  SaveAgency,
+  SaveAgencySucceeded,
+  UploadAgencyLogo
+} from '../../store/agency.actions';
 import { AgencyState } from '../../store/agency.state';
 import { BillingDetailsGroupComponent } from './billing-details-group/billing-details-group.component';
 import { ContactDetailsGroupComponent } from './contact-details-group/contact-details-group.component';
@@ -59,10 +67,13 @@ export class AddEditAgencyComponent implements OnInit, AfterViewInit, OnDestroy 
   @Select(AgencyState.isAgencyCreated)
   public isAgencyCreated$: Observable<boolean>;
 
+  public logo: Blob | null = null;
+
   private populatedSubscription: Subscription | undefined;
   private isAlive = true;
-  private logoFile: Blob | null;
+  private filesDetails : Blob[] = [];
   private fetchedAgency: Agency;
+  private agencyId: number | null = null;
 
   constructor(
     private store: Store,
@@ -72,25 +83,31 @@ export class AddEditAgencyComponent implements OnInit, AfterViewInit, OnDestroy 
     private route: ActivatedRoute,
     private confirmService: ConfirmService
   ) {
-    this.store.dispatch(new SetHeaderState({ title: 'Agency List' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Agency', iconName: 'clock' }));
   }
 
   ngOnInit(): void {
     this.generateAgencyForm();
     this.onBillingPopulatedChange();
 
-    this.actions$.pipe(ofActionSuccessful(SaveAgencySucceeded)).subscribe(() => {
-      // this.uploadImages(this.currentBusinessUnitId); // TBD how to upload logo?
+    this.actions$.pipe(ofActionSuccessful(SaveAgencySucceeded)).subscribe((agency: { payload: Agency }) => {
+      this.agencyId = agency.payload.agencyDetails.id as number;
+      this.uploadImages(this.agencyId);
       this.store.dispatch(new ShowToast(MessageTypes.Success, AGENCY_SAVED_TEXT));
     });
     this.actions$.pipe(ofActionSuccessful(GetAgencyByIdSucceeded)).subscribe((agency: { payload: Agency }) => {
+      this.agencyId = agency.payload.agencyDetails.id as number;
       this.fetchedAgency = agency.payload;
       this.patchAgencyFormValue(this.fetchedAgency);
     })
+    this.actions$.pipe(ofActionSuccessful(GetAgencyLogoSucceeded)).subscribe((logo: { payload: Blob }) => {
+      this.logo = logo.payload;
+    });
 
     if (this.route.snapshot.paramMap.get('id')) {
       this.title = 'Edit';
       this.store.dispatch(new GetAgencyById(parseInt(this.route.snapshot.paramMap.get('id') as string)));
+      this.store.dispatch(new GetAgencyLogo(parseInt(this.route.snapshot.paramMap.get('id') as string)));
     }
   }
 
@@ -150,9 +167,18 @@ export class AddEditAgencyComponent implements OnInit, AfterViewInit, OnDestroy 
     }
   }
 
-  public setLogoFile(file: Blob | null) {
-    this.logoFile = file;
-    console.log(this.logoFile);
+  public onImageSelect(event: Blob | null) {
+    if (event) {
+      this.filesDetails = [event as Blob];
+    } else {
+      this.filesDetails = [];
+    }
+  }
+
+  private uploadImages(businessUnitId: number): void {
+    if (this.filesDetails.length) {
+      this.store.dispatch(new UploadAgencyLogo(this.filesDetails[0] as Blob, businessUnitId));
+    }
   }
 
   private onBillingPopulatedChange(): void {

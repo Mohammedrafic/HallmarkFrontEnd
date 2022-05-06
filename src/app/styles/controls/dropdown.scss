@@ -2,8 +2,8 @@
 
 body.light, body.dark {
   .bootstrap {
-    ejs-dropdownlist.e-control {
-      span.e-input-group {
+    ejs-dropdownlist.e-control, ejs-multiselect.e-control {
+      span.e-input-group, .e-multiselect.e-input-group {
         border-radius: 8px;
         height: 35px;
         align-items: center;
@@ -39,7 +39,7 @@ body.light, body.dark {
       }
 
       &.ng-touched.ng-invalid {
-        span.e-input-group {
+        span.e-input-group, .e-multiselect.e-input-group {
           border-color: $supportive-red !important;
         }
       }

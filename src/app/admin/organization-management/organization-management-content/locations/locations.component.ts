@@ -68,6 +68,10 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   fakeOrganizationId = 2; // TODO: remove after BE implementation
 
+  get dialogHeader(): string {
+    return this.isEdit ? 'Edit' : 'Add';
+  }
+
   constructor(private store: Store,
               private actions$: Actions,
               @Inject(FormBuilder) private builder: FormBuilder,

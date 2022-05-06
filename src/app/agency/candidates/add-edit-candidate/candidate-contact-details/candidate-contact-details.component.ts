@@ -28,8 +28,8 @@ export class CandidateContactDetailsComponent {
 
   static createFormGroup(): FormGroup {
     return new FormGroup({
-      country: new FormControl(''),
-      state: new FormControl(''),
+      country: new FormControl(null),
+      state: new FormControl(null),
       city: new FormControl('', [Validators.maxLength(20)]),
       zipCode: new FormControl('', [Validators.minLength(5), Validators.maxLength(6), Validators.pattern(/^[0-9]+$/)]),
       address: new FormControl('', [Validators.maxLength(100)]),

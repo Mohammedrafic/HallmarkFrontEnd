@@ -15,12 +15,9 @@ export class Skill {
 
   constructor(skill: Skill, organizationId?: number) {
     this.id = skill.id || 0;
-    
-    if (this.id !== -1) {
-      this.skillCategoryId = skill.skillCategoryId;
-      this.skillAbbr = skill.skillAbbr;
-      this.skillDescription = skill.skillDescription;
-    }
+    this.skillCategoryId = skill.skillCategoryId;
+    this.skillAbbr = skill.skillAbbr;
+    this.skillDescription = skill.skillDescription;
 
     if (organizationId) {
       this.organizationId = organizationId;

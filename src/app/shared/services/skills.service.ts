@@ -10,6 +10,14 @@ export class SkillsService {
   constructor(private http: HttpClient) { }
 
   /**
+   * Get all master skills
+   * @return list of master skills
+   */
+  public getAllMasterSkills(): Observable<SkillsPage> {
+    return this.http.get<any>(`/api/masterSkills`, { params: { PageNumber: 1, PageSize: 100 }}); // TODO: need API to get all skills
+  }
+
+  /**
    * Get master skills by page number
    * @param pageNumber
    * @param pageSize

@@ -7,6 +7,7 @@ import { AssociateOrganizations, AssociateOrganizationsPage } from 'src/app/shar
 import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
 import { AgencyService } from '../services/agency.service';
+
 import { AssociateOrganizationsService } from '../services/associate-organizations.service';
 import {
   GetAssociateOrganizationsById,
@@ -18,6 +19,9 @@ import {
   GetAgencyById,
   GetAgencyByIdSucceeded,
   GetAgencyByPage,
+  GetAgencyLogo,
+  GetAgencyLogoSucceeded,
+  UploadAgencyLogo
 } from './agency.actions';
 
 export interface AgencyStateModel {
@@ -153,5 +157,22 @@ export class AgencyState {
         return payload;
       })
     );
+  }
+
+  @Action(UploadAgencyLogo)
+  UploadOrganizationLogo({ patchState }: StateContext<AgencyStateModel>, { file, businessUnitId }: UploadAgencyLogo): Observable<any> {
+    patchState({ isAgencyLoading: true });
+    return this.agencyService.saveAgencyLogo(file, businessUnitId).pipe(tap((payload) => {
+      patchState({ isAgencyLoading: false });
+      return payload;
+    }));
+  }
+
+  @Action(GetAgencyLogo)
+  GetOrganizationLogo({ dispatch }: StateContext<AgencyStateModel>, { payload }: GetAgencyLogo): Observable<any> {
+    return this.agencyService.getAgencyLogo(payload).pipe(tap((payload) => {
+      dispatch(new GetAgencyLogoSucceeded(payload));
+      return payload;
+    }));
   }
 }

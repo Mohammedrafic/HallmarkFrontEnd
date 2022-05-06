@@ -17,6 +17,7 @@ import { MasterDataContentComponent } from './master-data/master-data-content.co
 import { SkillsCategoriesComponent } from './master-data/skills/skills-categories.component';
 import { SkillsComponent } from './organization-management/organization-management-content/skills/skills.component';
 import { MasterCredentialsComponent } from './master-data/master-credentials/master-credentials.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -26,7 +27,7 @@ const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        component: ClientManagementContentComponent,
+        component: DashboardComponent,
       },
       {
         path: 'client-management',

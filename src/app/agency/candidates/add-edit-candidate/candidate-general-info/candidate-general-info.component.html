@@ -10,9 +10,9 @@
             <label>Agency<span class="required">*</span></label>
             <div class="input-group dropdown">
               <ejs-dropdownlist appValidateWithMessage
-                                [fields]="optionFields"
+                                [fields]="agencyFields"
                                 formControlName="agencyId"
-                                [dataSource]="[]"
+                                [dataSource]="(agencies$ | async)?.items"
                                 placeholder="Agency">
               </ejs-dropdownlist>
             </div>
@@ -83,13 +83,15 @@
         <div class="d-flex">
           <div class="dropdown-container f-grow-2">
             <label>Primary Skill<span class="required">*</span></label>
-            <div class="input-group dropdown">
-              <ejs-dropdownlist appValidateWithMessage
-                                [fields]="optionFields"
-                                formControlName="candidateProfileSkills"
-                                [dataSource]="[]"
-                                placeholder="Primary Skill">
-              </ejs-dropdownlist>
+            <div class="input-group">
+              <ejs-multiselect appValidateWithMessage
+                               mode="CheckBox"
+                               [allowFiltering]="false"
+                               formControlName="candidateProfileSkills"
+                               [fields]="skillsFields"
+                               placeholder="Primary Skill"
+                               [dataSource]="(skills$ | async)?.items">
+              </ejs-multiselect>
             </div>
           </div>
           <div class="dropdown-container">
@@ -98,7 +100,7 @@
               <ejs-dropdownlist appValidateWithMessage
                                 [fields]="optionFields"
                                 formControlName="profileStatus"
-                                [dataSource]="[]"
+                                [dataSource]="statuses"
                                 placeholder="Status">
               </ejs-dropdownlist>
             </div>
@@ -129,7 +131,7 @@
               <ejs-dropdownlist appValidateWithMessage
                                 [fields]="optionFields"
                                 formControlName="classification"
-                                [dataSource]="[]"
+                                [dataSource]="classifications"
                                 placeholder="Classification">
               </ejs-dropdownlist>
             </div>
@@ -143,7 +145,7 @@
               <ejs-dropdownlist appValidateWithMessage
                                 [fields]="optionFields"
                                 formControlName="candidateAgencyStatus"
-                                [dataSource]="[]"
+                                [dataSource]="statuses"
                                 placeholder="Status">
               </ejs-dropdownlist>
             </div>

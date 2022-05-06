@@ -37,4 +37,18 @@ export class AgencyService {
   public saveAgency(agency: Agency): Observable<Agency> {
     return agency.agencyDetails.id ? this.http.put<Agency>(`/api/agency`, agency) : this.http.post<Agency>(`/api/agency`, agency);
   }
+
+  /**
+   * Get the list of available business units
+   * @return Array of units
+   */
+  public saveAgencyLogo(file: Blob, businessUnitId: number): Observable<any> {
+    const formData = new FormData();
+    formData.append('logo', file);
+    return this.http.post(`/api/BusinessUnit/${businessUnitId}/logo`, formData);
+  }
+
+  public getAgencyLogo(businessUnitId: number): Observable<Blob> {
+    return this.http.get(`/api/BusinessUnit/${businessUnitId}/logo`, { responseType: 'blob' });
+  }
 }

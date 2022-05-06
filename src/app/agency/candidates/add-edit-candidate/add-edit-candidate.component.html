@@ -6,7 +6,7 @@
   <ng-container right>
     <button ejs-button *ngIf="false" cssClass="e-danger">Delete</button>
     <button ejs-button cssClass="e-outline">Clear</button>
-    <button ejs-button [isPrimary]="true">Save</button>
+    <button ejs-button [isPrimary]="true" (click)="save()">Save</button>
   </ng-container>
 </app-page-toolbar>
 <!-- Candidate Profile step -->

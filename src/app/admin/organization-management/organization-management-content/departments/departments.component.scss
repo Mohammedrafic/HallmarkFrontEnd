@@ -9,6 +9,12 @@
   .department-details {
     display: flex;
 
+    ejs-dropdownlist.e-control {
+      span.e-input-group {
+        height: 40px !important;
+      }
+    }
+
     .region-dropdown {
       padding-right: 12px;
     }
@@ -66,11 +72,11 @@
     input {
       height: 40px;
     }
-  }
-}
 
-ejs-dropdownlist.e-control {
-  span.e-input-group {
-    height: 40px !important;
+    ejs-dropdownlist.e-control {
+      span.e-input-group {
+        height: 40px !important;
+      }
+    }
   }
 }
