@@ -1,13 +1,15 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { debounceTime, Observable } from 'rxjs';
+import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
+import { RECORD_ADDED } from 'src/app/shared/constants/messages';
+import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { Country } from 'src/app/shared/enums/states';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { ContactDetails, Organization } from 'src/app/shared/models/organization.model';
-import { SetHeaderState } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowToast } from 'src/app/store/app.actions';
 import { SaveOrganization, GetBusinessUnitList, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry, UploadOrganizationLogo, SaveOrganizationSucceeded, GetOrganizationById, GetOrganizationByIdSucceeded, GetOrganizationLogo, GetOrganizationLogoSucceeded } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
 
@@ -16,7 +18,7 @@ import { AdminState } from '../../store/admin.state';
   templateUrl: './add-edit-organization.component.html',
   styleUrls: ['./add-edit-organization.component.scss']
 })
-export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
+export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDestroy {
   public allowExtensions: string = '.png, .jpg, .jpeg';
   public dropElement: HTMLElement;
   public filesDetails : Blob[] = [];
@@ -42,6 +44,8 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
     text: 'text', value: 'id'
   };
 
+  private unsubscribe$: Subject<void> = new Subject();
+
   @Select(AdminState.countries)
   countries$: Observable<string[]>;
 
@@ -64,21 +68,29 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
   titles$: Observable<[]>;
 
   constructor(private actions$: Actions, private store: Store, private router: Router, private route: ActivatedRoute, private fb: FormBuilder) {
-    //TODO: add unsubscribe
-    actions$.pipe(ofActionSuccessful(SaveOrganizationSucceeded)).subscribe((organization: { payload: Organization }) => {
+    actions$.pipe(
+      takeUntil(this.unsubscribe$),
+      ofActionSuccessful(SaveOrganizationSucceeded)
+    ).subscribe((organization: { payload: Organization }) => {
       this.currentBusinessUnitId = organization.payload.organizationId as number;
       this.uploadImages(this.currentBusinessUnitId);
       this.navigateBack();
     });
-    actions$.pipe(ofActionSuccessful(GetOrganizationByIdSucceeded)).subscribe((organization: { payload: Organization }) => {
+    actions$.pipe(
+      takeUntil(this.unsubscribe$),
+      ofActionSuccessful(GetOrganizationByIdSucceeded)
+    ).subscribe((organization: { payload: Organization }) => {
       this.currentBusinessUnitId = organization.payload.organizationId as number;
       this.initForms(organization.payload);
       this.isSameAsOrg = organization.payload.billingDetails.sameAsOrganization;
       if (this.isSameAsOrg) {
         this.disableBillingForm();
       }
-    })
-    actions$.pipe(ofActionSuccessful(GetOrganizationLogoSucceeded)).subscribe((logo: { payload: Blob }) => {
+    });
+    actions$.pipe(
+      takeUntil(this.unsubscribe$),
+      ofActionSuccessful(GetOrganizationLogoSucceeded)
+    ).subscribe((logo: { payload: Blob }) => {
       this.logo = logo.payload;
     });
     store.dispatch(new SetHeaderState({title: 'Organization List'}));
@@ -99,6 +111,11 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   private initForms(organization?: Organization): void {
