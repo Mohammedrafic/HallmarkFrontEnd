@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { AssociateOrganizations, AssociateOrganizationsPage } from 'src/app/shared/models/associate-organizations.model';
+import { AssociateOrganizations, AssociateOrganizationsPage, FeeSettings } from 'src/app/shared/models/associate-organizations.model';
 
 @Injectable({
   providedIn: 'root',
@@ -28,5 +28,14 @@ export class AssociateOrganizationsService {
    */
   public getOrganizationsById(agencyId: number, pageNumber: number, pageSize: number): Observable<AssociateOrganizationsPage> {
     return this.http.get<AssociateOrganizationsPage>(`/api/AssociateOrganizations/${agencyId}`, { params: { PageNumber: pageNumber, PageSize: pageSize } });
+  }
+
+  /**
+   * Get Fee Setting By Organization Id
+   * @param agencyId
+   * @return Base fee with fee exceptions
+   */
+  public getFeeSettingByOrganizationId(associateOrganizationId: number): Observable<FeeSettings> {
+    return this.http.get<FeeSettings>(`/api/AssociateOrganizations/${associateOrganizationId}/feeSettings`);
   }
 }

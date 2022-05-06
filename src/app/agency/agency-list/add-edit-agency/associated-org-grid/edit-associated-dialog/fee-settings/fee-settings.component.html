@@ -1,0 +1,79 @@
+<section class="fee-settings" [formGroup]="form">
+  <div class="input-container bootstrap">
+    <label>Base Fee %</label>
+    <div class="input-group">
+      <input appValidateWithMessage formControlName="baseFee" class="e-input" type="text" placeholder="Base Fee %" />
+    </div>
+  </div>
+
+  <ejs-grid
+    #grid
+    [dataSource]="feeExceptions"
+    [allowSorting]="true"
+    [allowResizing]="true"
+    [allowSelection]="true"
+    [resizeSettings]="resizeSettings"
+    [allowPaging]="allowPaging"
+    [pageSettings]="pageSettings"
+    [height]="gridHeight"
+    (dataBound)="dataBound()"
+    class="e-gridwithtoolbar"
+  >
+    <ng-template #toolbarTemplate let-data>
+      <div class="e-gridheader e-gridtoolbar">
+        <div class="title">
+          <h3>Fee Exception</h3>
+        </div>
+        <div class="actions">
+          <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Fee Exception</span>
+        </div>
+      </div>
+    </ng-template>
+    <e-columns>
+      <e-column field="regionName" headerText="Region" textAlign="Left"></e-column>
+      <e-column field="classification" headerText="Classification" textAlign="left"></e-column>
+      <e-column field="skill" headerText="Skill" textAlign="left"></e-column>
+      <e-column field="fee" headerText="Fee %" textAlign="left"></e-column>
+      <e-column textAlign="Right" width="120">
+        <ng-template #template let-data>
+          <div class="e-grid-tool-buttons">
+            <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>
+            <span class="remove-button" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
+          </div>
+        </ng-template>
+      </e-column>
+    </e-columns>
+
+    <ng-template #pagerTemplate let-data>
+      <div class="e-pagertemplate">
+        <div class="control-section">
+          <div class="content-wrapper">
+            <section class="left-side-pager-controls">
+              <ejs-dropdownlist
+                id="rowsPerPage"
+                class="dropdown-no-border"
+                [dataSource]="rowsPerPageDropDown"
+                [(value)]="activeRowsPerPageDropDown"
+              >
+              </ejs-dropdownlist>
+              <ejs-numerictextbox
+                id="goToPage"
+                class="numeric-input-no-border"
+                format="#"
+                placeholder="Go to:"
+                min="1"
+                [max]="10"
+                [showSpinButton]="false"
+              >
+              </ejs-numerictextbox>
+            </section>
+            <section class="right-side-pager-controls">
+              <!-- <ejs-pager id="gridPager" #gridPager [pageSize]="30" [totalRecordsCount]="30" [enablePagerMessage]="false" [currentPage]="1">
+</ejs-pager> -->
+            </section>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ejs-grid>
+</section>

@@ -3,7 +3,7 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Observable, of, tap } from 'rxjs';
 
 import { Agency, AgencyPage } from 'src/app/shared/models/agency.model';
-import { AssociateOrganizations, AssociateOrganizationsPage } from 'src/app/shared/models/associate-organizations.model';
+import { AssociateOrganizations, AssociateOrganizationsPage, FeeSettings } from 'src/app/shared/models/associate-organizations.model';
 import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
 import { AgencyService } from '../services/agency.service';
@@ -19,6 +19,8 @@ import {
   GetAgencyById,
   GetAgencyByIdSucceeded,
   GetAgencyByPage,
+  GetFeeSettingByOrganizationId,
+  GetFeeSettingByOrganizationIdSucceeded,
   GetAgencyLogo,
   GetAgencyLogoSucceeded,
   UploadAgencyLogo
@@ -31,6 +33,7 @@ export interface AgencyStateModel {
   organizations: OrganizationPage | null;
   associateOrganizationsPages: AssociateOrganizationsPage | { items: AssociateOrganizationsPage['items'] };
   agencyPage: AgencyPage | null;
+  feeSettings: FeeSettings | null;
 }
 
 @State<AgencyStateModel>({
@@ -44,6 +47,7 @@ export interface AgencyStateModel {
     associateOrganizationsPages: {
       items: [],
     },
+    feeSettings: null,
   },
 })
 @Injectable()
@@ -106,7 +110,7 @@ export class AgencyState {
     { organizationIds }: InvateOrganizations
   ): Observable<AssociateOrganizations[]> {
     const state = getState();
-    const businessUnitId = state.agency?.createUnder?.id || 73;
+    const businessUnitId = state.agency?.createUnder?.id;
     return businessUnitId
       ? this.associateOrganizationsService.invateOrganizations(businessUnitId, organizationIds).pipe(
           tap((payload) => {
@@ -127,13 +131,15 @@ export class AgencyState {
     { pageNumber, pageSize }: GetAssociateOrganizationsById
   ): Observable<AssociateOrganizationsPage> {
     const state = getState();
-    const businessUnitId = state.agency?.createUnder?.id || 73;
-    return this.associateOrganizationsService.getOrganizationsById(businessUnitId, pageNumber, pageSize).pipe(
-      tap((payload) => {
-        patchState({ associateOrganizationsPages: payload });
-        return payload;
-      })
-    );
+    const businessUnitId = state.agency?.createUnder?.id;
+    return businessUnitId
+      ? this.associateOrganizationsService.getOrganizationsById(businessUnitId, pageNumber, pageSize).pipe(
+          tap((payload) => {
+            patchState({ associateOrganizationsPages: payload });
+            return payload;
+          })
+        )
+      : of();
   }
 
   @Action(GetAgencyByPage)
@@ -159,6 +165,20 @@ export class AgencyState {
     );
   }
 
+  @Action(GetFeeSettingByOrganizationId)
+  GetFeeSettingByOrganizationId(
+    { patchState, dispatch }: StateContext<AgencyStateModel>,
+    { organizationId }: GetFeeSettingByOrganizationId
+  ): Observable<FeeSettings> {
+    return this.associateOrganizationsService.getFeeSettingByOrganizationId(organizationId).pipe(
+      tap((payload) => {
+        patchState({ feeSettings: payload });
+        dispatch(new GetFeeSettingByOrganizationIdSucceeded(payload));
+        return payload;
+      })
+    );
+  }
+  
   @Action(UploadAgencyLogo)
   UploadOrganizationLogo({ patchState }: StateContext<AgencyStateModel>, { file, businessUnitId }: UploadAgencyLogo): Observable<any> {
     patchState({ isAgencyLoading: true });

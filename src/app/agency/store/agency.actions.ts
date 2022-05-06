@@ -1,5 +1,5 @@
 import { Agency } from 'src/app/shared/models/agency.model';
-import { AssociateOrganizations } from 'src/app/shared/models/associate-organizations.model';
+import { AssociateOrganizations, FeeSettings } from 'src/app/shared/models/associate-organizations.model';
 
 export class SaveAgency {
   static readonly type = '[agency] Save Agency';
@@ -45,6 +45,15 @@ export class GetAgencyByIdSucceeded {
   constructor(public payload: Agency) { }
 }
 
+export class GetFeeSettingByOrganizationId {
+  static readonly type = '[agency] Get Fee Setting By Organization Id';
+  constructor(public organizationId: number) { }
+}
+
+export class GetFeeSettingByOrganizationIdSucceeded {
+  static readonly type = '[agency] Get Fee Setting By Organization Id Succeeded';
+  constructor(public payload: FeeSettings) { }
+}
 export class UploadAgencyLogo {
   static readonly type = '[agency] Upload Agency Logo';
   constructor(public file: Blob, public businessUnitId: number) { }
