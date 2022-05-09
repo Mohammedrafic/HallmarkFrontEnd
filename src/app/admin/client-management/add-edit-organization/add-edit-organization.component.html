@@ -202,11 +202,13 @@
                     <label>Fax</label>
                     <div class="input-group">
                       <input appValidateWithMessage formControlName="fax" class="e-input" type="text" placeholder="Fax" maxlength="10"/>
-                    </div>                
+                    </div>
                   </div>
                   <div class="input-container">
                     <label>Ext</label>
-                    <input formControlName="ext" class="e-input" type="text" placeholder="Ext"/>
+                    <div class="input-group">
+                      <input appValidateWithMessage formControlName="ext" class="e-input" type="text" placeholder="Ext" maxlength="5"/>
+                    </div>
                   </div>
                 </div>
               </form>

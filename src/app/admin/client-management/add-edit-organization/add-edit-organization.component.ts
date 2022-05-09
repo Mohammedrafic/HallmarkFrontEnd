@@ -159,7 +159,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
       phone1: new FormControl(organization ? organization.billingDetails.phone1 : '', [ Validators.pattern(/^[0-9]+$/) ]),
       phone2: new FormControl(organization ? organization.billingDetails.phone2 : '', [ Validators.pattern(/^[0-9]+$/) ]),
       fax: new FormControl(organization ? organization.billingDetails.fax : '', [ Validators.pattern(/^[0-9]+$/) ]),
-      ext: new FormControl(organization ? organization.billingDetails.ext : ''),
+      ext: new FormControl(organization ? organization.billingDetails.ext : '', [ Validators.pattern(/^[0-9]{5}$/)]),
     });
     this.BillingDetailsFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.BillingDetailsFormGroup.dirty));
@@ -260,13 +260,13 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
   }
 
   private enableBillingForm(): void {
-    Object.keys(this.BillingDetailsFormGroup.controls).forEach((key: string) => {
+    Object.keys(this.BillingDetailsFormGroup.controls).filter((key: string) => key !== 'ext').forEach((key: string) => {
       this.BillingDetailsFormGroup.get(key)?.enable();
     });
   }
 
   private disableBillingForm(): void {
-    Object.keys(this.BillingDetailsFormGroup.controls).forEach((key: string) => {
+    Object.keys(this.BillingDetailsFormGroup.controls).filter((key: string) => key !== 'ext').forEach((key: string) => {
       this.BillingDetailsFormGroup.get(key)?.disable();
     });
   }
