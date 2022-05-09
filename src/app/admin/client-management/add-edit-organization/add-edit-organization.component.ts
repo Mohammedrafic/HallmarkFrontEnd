@@ -58,6 +58,9 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
   @Select(AdminState.businessUnits)
   businessUnits$: Observable<BusinessUnit[]>;
 
+  @Select(AdminState.sendDocumentAgencies)
+  sendDocumentAgencies$: Observable<[]>;
+
   @Select(AdminState.days)
   days$: Observable<[]>;
 
@@ -139,7 +142,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
       phone1Ext: new FormControl(organization ? organization.generalInformation.phone1Ext : '', [ Validators.pattern(/^[0-9]+$/) ]),
       phone2Ext: new FormControl(organization ? organization.generalInformation.phone2Ext : '', [ Validators.pattern(/^[0-9]+$/) ]),
       fax: new FormControl(organization ? organization.generalInformation.fax : '', [ Validators.pattern(/^[0-9]+$/) ]),
-      status: new FormControl(organization ? organization.generalInformation.status : '', [ Validators.required ]),
+      status: new FormControl(organization ? organization.generalInformation.status : 0, [ Validators.required ]),
       website: new FormControl(organization ? organization.generalInformation.website : '')
     });
     this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
@@ -156,7 +159,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
       phone1: new FormControl(organization ? organization.billingDetails.phone1 : '', [ Validators.pattern(/^[0-9]+$/) ]),
       phone2: new FormControl(organization ? organization.billingDetails.phone2 : '', [ Validators.pattern(/^[0-9]+$/) ]),
       fax: new FormControl(organization ? organization.billingDetails.fax : '', [ Validators.pattern(/^[0-9]+$/) ]),
-      ext: new FormControl(organization ? organization.billingDetails.ext : ''),
+      ext: new FormControl(organization ? organization.billingDetails.ext : '', [ Validators.pattern(/^[0-9]{5}$/)]),
     });
     this.BillingDetailsFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.BillingDetailsFormGroup.dirty));
@@ -177,6 +180,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
     this.PreferencesFormGroup = this.fb.group({
       id: new FormControl(organization ? organization.preferences.id : 0),
       purchaseOrderBy: new FormControl(organization ? organization.preferences.purchaseOrderBy.toString() : '0', [ Validators.required ]),
+      sendDocumentToAgency: new FormControl(organization ? organization.preferences.sendDocumentToAgency : null),
       timesheetSubmittedBy: new FormControl(organization ? organization.preferences.timesheetSubmittedBy.toString() : '0', [ Validators.required ]),
       weekStartsOn: new FormControl(organization ? organization.preferences.weekStartsOn : '', [ Validators.required ]),
       paymentOptions: new FormControl(organization ? organization.preferences.paymentOptions.toString() : '0', [ Validators.required ]),
@@ -218,7 +222,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
     return this.fb.group({
       id: new FormControl(contact ? contact.id : 0),
       title: new FormControl(contact ? contact.title : ''),
-      contactPerson: new FormControl(contact ? contact.contactPerson : '', [ Validators.required ]),
+      contactPerson: new FormControl(contact ? contact.contactPerson : '', [ Validators.required, Validators.maxLength(100) ]),
       phoneNumberExt: new FormControl(contact ? contact.phoneNumberExt : '', [ Validators.pattern(/^[0-9]+$/) ]),
       email: new FormControl(contact ? contact.email : '', [ Validators.pattern(/^\S+@\S+\.\S+$/) ])
     })
@@ -256,13 +260,13 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
   }
 
   private enableBillingForm(): void {
-    Object.keys(this.BillingDetailsFormGroup.controls).forEach((key: string) => {
+    Object.keys(this.BillingDetailsFormGroup.controls).filter((key: string) => key !== 'ext').forEach((key: string) => {
       this.BillingDetailsFormGroup.get(key)?.enable();
     });
   }
 
   private disableBillingForm(): void {
-    Object.keys(this.BillingDetailsFormGroup.controls).forEach((key: string) => {
+    Object.keys(this.BillingDetailsFormGroup.controls).filter((key: string) => key !== 'ext').forEach((key: string) => {
       this.BillingDetailsFormGroup.get(key)?.disable();
     });
   }

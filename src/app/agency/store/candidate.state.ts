@@ -49,6 +49,10 @@ export interface CandidateStateModel {
 })
 @Injectable()
 export class CandidateState {
+  @Selector()
+  static isCandidateCreated(state: CandidateStateModel): boolean {
+    return !!state.candidate?.id;
+  }
 
   @Selector()
   static skills(state: CandidateStateModel): any { return state.skills; }

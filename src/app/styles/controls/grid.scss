@@ -192,6 +192,7 @@ ejs-grid.e-control.e-grid {
       .left-side-pager-controls {
         display: flex;
         margin-left: 16px;
+        align-items: center;
 
         #goToPage {
           margin-left: 35px;

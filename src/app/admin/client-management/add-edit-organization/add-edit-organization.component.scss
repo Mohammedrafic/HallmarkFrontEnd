@@ -25,6 +25,7 @@
 
 .create-under-container, .organization-form {
   display: flex;
+  padding-bottom: 40px;
 
   .left-section {
     width: 70%;
@@ -76,8 +77,9 @@
     flex: 1 1 0px
   }
 
-  .input-container input.e-input {
-    margin-top: 5px !important;
+  label:not(.radio-label) {
+    display: inline-block;
+    margin-bottom: 5px;
   }
 
   .billing-details {
@@ -107,8 +109,15 @@
       align-items: center;
 
       .add-contact-link {
+        padding: 9px 10px;
+        border-radius: 8px;
         cursor: pointer;
         color: $primary-active-blue-10;
+        &:hover,
+        &:focus {
+          background-color: $primary-active-blue-70;
+          border-color: transparent;
+        }
 
         i-feather {
           vertical-align: bottom;
@@ -150,6 +159,10 @@
     ejs-radiobutton {
       margin-right: 20px;
     }
+
+    label {
+      margin: 0;
+    }
   }
 
   .purchase-order-by {
@@ -166,6 +179,10 @@
 
     ejs-radiobutton {
       margin-bottom: 15px;
+    }
+
+    label {
+      margin: 0;
     }
 
     &.submitted-by {
@@ -201,8 +218,4 @@
 .upload-button {
   width: 100%;
   margin-top: 10px;
-}
-
-ejs-dropdownlist.e-control>.e-input-group {
-  margin-top: 5px !important;
 }

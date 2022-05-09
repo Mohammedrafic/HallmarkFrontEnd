@@ -1,12 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
-import { GridComponent } from "@syncfusion/ej2-angular-grids";
+import { GridComponent, ValueAccessor } from "@syncfusion/ej2-angular-grids";
 import { delay, filter, Observable } from "rxjs";
 
 import {
   GetEducationByCandidateId,
-  RemoveEducation, RemoveEducationSucceeded,
+  RemoveEducation,
+  RemoveEducationSucceeded,
   RemoveExperienceSucceeded,
   SaveEducation,
   SaveEducationSucceeded
@@ -37,7 +38,7 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
     text: 'text',
     value: 'id',
   };
-  public readonly degreeTypesEnum = Degree;
+  public degreeAccessor: ValueAccessor = (_, data: any) => Degree[data['degree']];
   public degreeTypes = Object.values(Degree)
     .filter(valuesOnly)
     .map((text, id) => ({ text, id }));

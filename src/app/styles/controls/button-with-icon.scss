@@ -1,0 +1,22 @@
+@import '../variables/colors.scss';
+
+.button-with-icon {
+  display: flex !important;
+  align-items: center;
+  color: $primary-active-blue-10 !important;
+  border-radius: 8px !important;
+  padding: 9px 10px 9px 10px !important;
+  font-weight: 590 !important;
+  line-height: 20px !important;
+
+  .icon {
+    margin: 0 !important;
+    padding-right: 5px !important;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: $primary-active-blue-70 !important;
+    border-color: transparent !important;
+  }
+}

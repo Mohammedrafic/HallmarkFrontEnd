@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { Days } from 'src/app/shared/enums/days';
+import { SendDocumentAgency } from 'src/app/shared/enums/send-document-agency';
 import { Country, UsaStates, CanadaStates } from 'src/app/shared/enums/states';
 import { Status } from 'src/app/shared/enums/status';
 import { Titles } from 'src/app/shared/enums/title';
@@ -92,6 +93,7 @@ export interface AdminStateModel {
   statesBilling: string[] | null;
   phoneTypes: string[] | null;
   businessUnits: BusinessUnit[];
+  sendDocumentAgencies: DropdownOption[];
   days: DropdownOption[];
   statuses: DropdownOption[];
   titles: string[];
@@ -123,6 +125,11 @@ export interface AdminStateModel {
     statesBilling: UsaStates,
     phoneTypes: GeneralPhoneTypes,
     businessUnits: [],
+    sendDocumentAgencies: [
+      { id: SendDocumentAgency.Accepted, text: 'Accepted' },
+      { id: SendDocumentAgency.Offered, text: 'Offered' },
+      { id: SendDocumentAgency.Onboard, text: 'Onboard' }
+    ],
     days: Days,
     statuses: Object.keys(Status).filter(StringIsNumber).map((statusName, index) => ({ id: index, text: statusName })),
     titles: Titles,
@@ -162,6 +169,9 @@ export class AdminState {
 
   @Selector()
   static businessUnits(state: AdminStateModel): BusinessUnit[] { return state.businessUnits; }
+
+  @Selector()
+  static sendDocumentAgencies(state: AdminStateModel): DropdownOption[] { return state.sendDocumentAgencies; }
 
   @Selector()
   static days(state: AdminStateModel): DropdownOption[] { return state.days; }

@@ -1,8 +1,8 @@
 export enum Degree {
-  HighSchool = "High School",
-  AssociateDegree = "Associate Degree",
-  Undergraduate = "Undergraduate",
-  PostGraduate = "Post-graduate",
-  LPNProgram = "LPN Program",
-  CNAProgram = "CNA Program"
+  "High School",
+  "Associate Degree",
+  "Undergraduate",
+  "Post-graduate",
+  "LPN Program",
+  "CNA Program"
 }

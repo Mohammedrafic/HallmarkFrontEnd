@@ -4,13 +4,15 @@
     <h3>Add Candidate</h3>
   </ng-container>
   <ng-container right>
-    <button ejs-button *ngIf="false" cssClass="e-danger">Delete</button>
-    <button ejs-button cssClass="e-outline" (click)="clearForm()">Clear</button>
-    <button ejs-button [isPrimary]="true" (click)="save()">Save</button>
+    <ng-container *ngIf="showSaveProfileButtons">
+      <button ejs-button *ngIf="false" cssClass="e-danger">Delete</button>
+      <button ejs-button [disabled]="!candidateForm?.dirty" cssClass="e-outline"  (click)="clearForm()">Clear</button>
+      <button ejs-button [isPrimary]="true" (click)="save()">Save</button>
+    </ng-container>
   </ng-container>
 </app-page-toolbar>
 <!-- Candidate Profile step -->
-<ejs-tab id="element" class="stepper">
+<ejs-tab class="stepper" #stepper (created)="onStepperCreated()">
   <e-tabitems>
     <e-tabitem>
       <ng-template #headerText>
@@ -39,7 +41,7 @@
         </section>
       </ng-template>
     </e-tabitem>
-    <e-tabitem [disabled]="false">
+    <e-tabitem>
       <ng-template #headerText>
         <div class="stepper-header">
           <div class="stepper-title">Experience</div>
@@ -50,7 +52,7 @@
         <app-experience-grid></app-experience-grid>
       </ng-template>
     </e-tabitem>
-    <e-tabitem [disabled]="false">
+    <e-tabitem>
       <ng-template #headerText>
         <div class="stepper-header">
           <div class="stepper-title">Education</div>
@@ -61,16 +63,17 @@
         <app-education-grid></app-education-grid>
       </ng-template>
     </e-tabitem>
-    <e-tabitem [disabled]="false">
-      <ng-template #headerText>
-        <div class="stepper-header">
-          <div class="stepper-title">Credentials</div>
-          <div class="stepper-sub-title">Additional info here</div>
-        </div>
-      </ng-template>
-      <ng-template #content>
-        Credentials
-      </ng-template>
-    </e-tabitem>
+<!--    TODO: uncomment when credentials tab is implemented-->
+<!--    <e-tabitem>-->
+<!--      <ng-template #headerText>-->
+<!--        <div class="stepper-header">-->
+<!--          <div class="stepper-title">Credentials</div>-->
+<!--          <div class="stepper-sub-title">Additional info here</div>-->
+<!--        </div>-->
+<!--      </ng-template>-->
+<!--      <ng-template #content>-->
+<!--        Credentials-->
+<!--      </ng-template>-->
+<!--    </e-tabitem>-->
   </e-tabitems>
 </ejs-tab>

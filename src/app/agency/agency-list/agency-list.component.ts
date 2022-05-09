@@ -1,14 +1,15 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent } from "@syncfusion/ej2-angular-grids";
-import { debounceTime, Observable, Subject } from "rxjs";
+import { debounceTime, filter, Observable, Subject, takeUntil } from "rxjs";
 
-import { GetAgencyByPage } from "src/app/agency/store/agency.actions";
+import { GetAgencyByPage, SaveAgency, SaveAgencySucceeded } from "src/app/agency/store/agency.actions";
 import { AgencyState } from "src/app/agency/store/agency.state";
 import { AbstractGridConfigurationComponent } from "src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
 import { AgencyStatus, STATUS_COLOR_GROUP } from "src/app/shared/enums/status";
-import { AgencyPage } from "src/app/shared/models/agency.model";
+import { Agency, AgencyPage } from "src/app/shared/models/agency.model";
+import { ConfirmService } from "src/app/shared/services/confirm.service";
 import { SetHeaderState } from 'src/app/store/app.actions';
 
 @Component({
@@ -16,7 +17,7 @@ import { SetHeaderState } from 'src/app/store/app.actions';
   templateUrl: './agency-list.component.html',
   styleUrls: ['./agency-list.component.scss']
 })
-export class AgencyListComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class AgencyListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
 
   public readonly statusEnum = AgencyStatus;
@@ -27,12 +28,16 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
   };
 
   private pageSubject = new Subject<number>();
+  private unsubscribe$: Subject<void> = new Subject();
 
   @Select(AgencyState.agencies)
   agencies$: Observable<AgencyPage>;
 
 
-  constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
+  constructor(private store: Store,
+              private router: Router,
+              private actions$: Actions,
+              private confirmService: ConfirmService) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Agency List', iconName: 'clock' }));
   }
@@ -43,6 +48,17 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
       this.currentPage = page;
       this.store.dispatch(new GetAgencyByPage(this.currentPage, this.pageSize));
     });
+    this.actions$.pipe(
+      takeUntil(this.unsubscribe$),
+      ofActionSuccessful(SaveAgencySucceeded)
+    ).subscribe((agency: { payload: Agency }) => {
+      this.store.dispatch(new GetAgencyByPage(this.currentPage, this.pageSize));
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   public navigateToAgencyForm(): void {
@@ -74,5 +90,30 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
   }
 
 
-  public onRemove(data: any) {}
+  public onRemove(data: any) {
+    this.confirmService
+      .confirm(
+        'Are you sure to inactivate the Agency?',
+        { okButtonLabel: 'Inactivate',
+          okButtonClass: 'delete-button',
+          title: 'Inactivate the Agency'
+        })
+      .pipe(filter((confirm) => !!confirm))
+      .subscribe(() => {
+        this.inactivateAgency(data)
+      });
+  }
+
+  private inactivateAgency(agency: Agency) {
+    const inactiveAgency = {
+      agencyDetails: { ...agency.agencyDetails, status: AgencyStatus.Inactive },
+      agencyBillingDetails: agency.agencyBillingDetails,
+      agencyContactDetails: agency.agencyContactDetails,
+      agencyPaymentDetails: agency.agencyPaymentDetails,
+      agencyId: agency.agencyDetails.id,
+      parentBusinessUnitId: agency.parentBusinessUnitId
+    };
+
+    this.store.dispatch(new SaveAgency(inactiveAgency));
+  }
 }
