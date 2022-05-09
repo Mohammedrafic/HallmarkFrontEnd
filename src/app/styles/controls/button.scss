@@ -5,6 +5,7 @@ button.e-control.e-btn {
   border-radius: 8px;
   padding: 8px 15px;
   box-shadow: none !important;
+  height: 40px;
 
   &.e-primary:active {
     background-color: $primary-active-blue;

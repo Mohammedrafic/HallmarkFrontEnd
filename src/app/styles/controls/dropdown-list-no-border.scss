@@ -1,7 +1,7 @@
 @import '../variables/colors';
 
 .dropdown-no-border {
-  width: 116px;
+  width: 140px;
   border-radius: 8px;
 
   .e-ddl.e-input-group:not(.e-disabled) {
@@ -11,6 +11,7 @@
 
   .e-input-group.e-control-wrapper.e-ddl.e-valid-input {
     border: none;
+    height: 40px;
 
     .e-ddl-icon::before {
       content: '\e916';
@@ -18,6 +19,11 @@
 
     .e-ddl-icon::after {
       content: '\e910';
+    }
+
+    &:hover {
+      background-color: $primary-active-blue-90;
+      border-radius: 8px;
     }
   }
 
@@ -28,10 +34,6 @@
     .e-ddl-icon::before {
       color: $primary-active-blue-10;
     }
-  }
-
-  &:hover {
-    background-color: $primary-active-blue-90;
   }
 
   .e-input-group.e-control-wrapper.e-input-focus:not(.e-float-icon-left):not(.e-success):not(.e-warning):not(.e-error) {
