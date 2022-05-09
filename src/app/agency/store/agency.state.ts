@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Observable, of, tap } from 'rxjs';
+import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages";
+import { MessageTypes } from "src/app/shared/enums/message-types";
 
 import { Agency, AgencyPage } from 'src/app/shared/models/agency.model';
 import { AssociateOrganizations, AssociateOrganizationsPage, FeeSettings } from 'src/app/shared/models/associate-organizations.model';
 import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from 'src/app/shared/services/organization.service';
+import { ShowToast } from "src/app/store/app.actions";
 import { AgencyService } from '../services/agency.service';
 
 import { AssociateOrganizationsService } from '../services/associate-organizations.service';
@@ -86,6 +89,11 @@ export class AgencyState {
       tap((payload) => {
         patchState({ isAgencyLoading: false, agency: payload });
         dispatch(new SaveAgencySucceeded(payload));
+        if (payload.agencyDetails.id) {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        } else {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        }
         return payload;
       })
     );
@@ -179,7 +187,7 @@ export class AgencyState {
       })
     );
   }
-  
+
   @Action(UploadAgencyLogo)
   UploadOrganizationLogo({ patchState }: StateContext<AgencyStateModel>, { file, businessUnitId }: UploadAgencyLogo): Observable<any> {
     patchState({ isAgencyLoading: true });

@@ -7,7 +7,6 @@ import { filter, Observable, Subscription, takeWhile } from 'rxjs';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { CANCEL_COFIRM_TEXT, DELETE_RECORD_TEXT } from 'src/app/shared/constants/messages';
-import { MessageTypes } from 'src/app/shared/enums/message-types';
 import {
   Agency,
   AgencyBillingDetails,
@@ -16,7 +15,7 @@ import {
   AgencyPaymentDetails,
 } from 'src/app/shared/models/agency.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { SetHeaderState, ShowToast } from 'src/app/store/app.actions';
+import { SetHeaderState } from 'src/app/store/app.actions';
 import {
   GetAgencyById,
   GetAgencyByIdSucceeded,
@@ -30,8 +29,6 @@ import { AgencyState } from '../../store/agency.state';
 import { BillingDetailsGroupComponent } from './billing-details-group/billing-details-group.component';
 import { ContactDetailsGroupComponent } from './contact-details-group/contact-details-group.component';
 import { GeneralInfoGroupComponent } from './general-info-group/general-info-group.component';
-
-const AGENCY_SAVED_TEXT = 'Agency details saved successfully';
 
 type AgencyFormValue = {
   parentBusinessUnitId: number;
@@ -97,7 +94,6 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
     this.actions$.pipe(ofActionSuccessful(SaveAgencySucceeded)).subscribe((agency: { payload: Agency }) => {
       this.agencyId = agency.payload.agencyDetails.id as number;
       this.uploadImages(this.agencyId);
-      this.store.dispatch(new ShowToast(MessageTypes.Success, AGENCY_SAVED_TEXT));
       this.agencyForm.markAsPristine();
     });
     this.actions$.pipe(ofActionSuccessful(GetAgencyByIdSucceeded)).subscribe((agency: { payload: Agency }) => {
