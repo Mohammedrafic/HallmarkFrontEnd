@@ -142,7 +142,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
       phone1Ext: new FormControl(organization ? organization.generalInformation.phone1Ext : '', [ Validators.pattern(/^[0-9]+$/) ]),
       phone2Ext: new FormControl(organization ? organization.generalInformation.phone2Ext : '', [ Validators.pattern(/^[0-9]+$/) ]),
       fax: new FormControl(organization ? organization.generalInformation.fax : '', [ Validators.pattern(/^[0-9]+$/) ]),
-      status: new FormControl(organization ? organization.generalInformation.status : '', [ Validators.required ]),
+      status: new FormControl(organization ? organization.generalInformation.status : 0, [ Validators.required ]),
       website: new FormControl(organization ? organization.generalInformation.website : '')
     });
     this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
@@ -222,7 +222,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
     return this.fb.group({
       id: new FormControl(contact ? contact.id : 0),
       title: new FormControl(contact ? contact.title : ''),
-      contactPerson: new FormControl(contact ? contact.contactPerson : '', [ Validators.required ]),
+      contactPerson: new FormControl(contact ? contact.contactPerson : '', [ Validators.required, Validators.maxLength(100) ]),
       phoneNumberExt: new FormControl(contact ? contact.phoneNumberExt : '', [ Validators.pattern(/^[0-9]+$/) ]),
       email: new FormControl(contact ? contact.email : '', [ Validators.pattern(/^\S+@\S+\.\S+$/) ])
     })

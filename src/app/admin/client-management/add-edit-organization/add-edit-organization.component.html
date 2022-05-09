@@ -310,12 +310,14 @@
           </div>
           <div class="input-container bootstrap">
             <div class="input-group">
-              <ejs-textbox appValidateWithMessage formControlName="paymentDescription" [multiline]="true" placeholder="Electronic Payment"></ejs-textbox>
+              <ejs-textbox appValidateWithMessage formControlName="paymentDescription" [multiline]="true"></ejs-textbox>
             </div>
           </div>
           <div class="input-container bootstrap">
             <label>Consider Lunch</label>
-            <input formControlName="timePeriodInMins" class="e-input" type="text" placeholder="Time period in minutes"/>
+            <div class="input-group">
+              <input appValidateWithMessage formControlName="timePeriodInMins" class="e-input" type="text" placeholder="Time period in minutes"/>
+            </div>
           </div>
         </form>
       </div>
