@@ -22,8 +22,12 @@
     <e-columns>
       <e-column field="employer" headerText="Employer" width=300></e-column>
       <e-column field="jobTitle" headerText="Job Title" width=300></e-column>
-      <e-column field="startDate" headerText="Start Month/Year" width=200 textAlign="Right"></e-column>
-      <e-column field="endDate" headerText="End Month/Year" width=200 textAlign="Right"></e-column>
+      <e-column headerText="Start Month/Year" width=200 textAlign="Right">
+        <ng-template #template let-data>{{data.startDate | date:"MM/dd/yyyy"}}</ng-template>
+      </e-column>
+      <e-column headerText="End Month/Year" width=200 textAlign="Right">
+        <ng-template #template let-data>{{data.endDate | date:"MM/dd/yyyy"}}</ng-template>
+      </e-column>
       <e-column field="comments" headerText="Comments" width=500></e-column>
       <e-column textAlign="Right" width="120">
         <ng-template #template let-data>
