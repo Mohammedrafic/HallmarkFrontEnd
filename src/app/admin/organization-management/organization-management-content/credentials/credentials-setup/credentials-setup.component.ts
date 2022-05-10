@@ -16,8 +16,11 @@ import { MessageTypes } from '../../../../../shared/enums/message-types';
 import { AdminState } from '../../../../store/admin.state';
 import { Region } from '../../../../../shared/models/region.model';
 import { GetMasterSkillsByPage, GetRegionsByOrganizationId } from '../../../../store/admin.actions';
+import { CredentialType } from '../../../../../shared/models/credential-type.model';
+import { Credential } from '../../../../../shared/models/credential.model';
+import { SkillsPage } from '../../../../../shared/models/skill.model';
 
-export enum Credentials {
+export enum CredentialsFilter {
   ByOrg = 'By Org',
   ByRegion = 'By Region',
   BySkill = 'By Skill'
@@ -40,11 +43,13 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   isGroupDropDownShow = false;
   isAddGroupButtonShown = false;
 
-  // TODO: add selector, Credential model
-  credentials$: Observable<any> = of([Credentials.ByOrg, Credentials.ByRegion, Credentials.BySkill]);
+  credentialsFilter$: Observable<CredentialsFilter[]> = of([CredentialsFilter.ByOrg, CredentialsFilter.ByRegion, CredentialsFilter.BySkill]);
 
-  // TODO: add selector, CredentialType model
-  credentialType$: Observable<any>;
+  // @Select(AdminState.credentials)
+  credentials$: Observable<any>
+
+  @Select(AdminState.credentialTypes)
+  credentialType$: Observable<CredentialType[]>;
 
   @Select(AdminState.regions)
   regions$: Observable<Region[]>;
@@ -53,7 +58,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
 
   // TODO: add selector, Skill model
   @Select(AdminState.masterSkills)
-  skills$: Observable<any>;
+  skills$: Observable<SkillsPage[]>;
 
   // TODO: add selector, Group model
   groups$: Observable<any>;
@@ -73,20 +78,21 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   ngOnInit(): void {
     this.store.dispatch(new GetRegionsByOrganizationId(this.fakeOrganizationId)); // TODO: provide valid organizationId
     this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize)); // TODO: provide action without page
+    this.mapGridData();
   }
 
   onCredentialsDropDownChanged(data: any): void {
-    if (data.itemData.value === Credentials.ByOrg) {
+    if (data.itemData.value === CredentialsFilter.ByOrg) {
       this.isRegionDropDownShown = false;
       this.isSkillDropDownShown = false;
       this.isGroupDropDownShow = false;
       this.isAddGroupButtonShown = false;
-    } else if (data.itemData.value === Credentials.ByRegion) {
+    } else if (data.itemData.value === CredentialsFilter.ByRegion) {
       this.isRegionDropDownShown = true;
       this.isSkillDropDownShown = false;
       this.isGroupDropDownShow = false;
       this.isAddGroupButtonShown = false;
-    } else if (data.itemData.value === Credentials.BySkill) {
+    } else if (data.itemData.value === CredentialsFilter.BySkill) {
       this.isRegionDropDownShown = false;
       this.isSkillDropDownShown = true;
       this.isGroupDropDownShow = true;
@@ -176,6 +182,14 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     } else {
       this.credentialsFormGroup.markAllAsTouched();
     }
+  }
+
+  mapGridData(): void {
+    this.credentials$.subscribe(data => {
+      this.lastAvailablePage = this.getLastPage(data);
+      this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
+      this.totalDataRecords = data.length;
+    });
   }
 
   private createCredentialsForm(): void {

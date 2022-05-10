@@ -1,7 +1,7 @@
 import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { filter, Observable, of } from 'rxjs';
+import { combineLatestWith, filter, Observable } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
@@ -11,8 +11,8 @@ import {
 } from '../../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ShowSideDialog, ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '../../../../../shared/enums/message-types';
-import { RECORD_ADDED } from '../../../../../shared/constants/messages';
-import { GetCredentialTypes, RemoveCredential, SaveCredential, UpdateCredential } from '../../../../store/admin.actions';
+import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_ADDED } from '../../../../../shared/constants/messages';
+import { GetCredential, GetCredentialTypes, RemoveCredential, SaveCredential, UpdateCredential } from '../../../../store/admin.actions';
 import { Credential } from '../../../../../shared/models/credential.model';
 import { AdminState } from '../../../../store/admin.state';
 import { CredentialType } from '../../../../../shared/models/credential-type.model';
@@ -31,8 +31,8 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
   @Input() isActive: boolean = false;
 
-  // @Select(AdminState.credentialTypes) // TODO: uncomment after BE implementation
-  credentialType$: Observable<CredentialType[]> = of([{name: 'MockCredType 1', id: 1}]); // TODO: fix after BE implementation
+  @Select(AdminState.credentialTypes)
+  credentialTypes$: Observable<CredentialType[]> ;
   credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   @Select(AdminState.credentials)
@@ -43,6 +43,8 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
   editedCredentialId?: number;
   isEdit: boolean;
+
+  fakeOrganizationId = 2;
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
@@ -57,22 +59,25 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnInit(): void {
-    // this.store.dispatch(new GetCredentials()); // TODO: uncomment after BE implementation
-    // this.store.dispatch(new GetCredentialTypes()); // TODO: uncomment after BE implementation
+    this.store.dispatch(new GetCredential(this.fakeOrganizationId));
+    this.store.dispatch(new GetCredentialTypes());
     this.mapGridData();
   }
 
-  onEditButtonClick(credential: Credential): void {
+  onEditButtonClick(credential: Credential, event: any): void {
+    this.addActiveCssClass(event);
     this.credentialsFormGroup.setValue({
       credentialTypeId: credential.credentialTypeId,
-      credentialDescription: credential.name,
-      // TODO: ExpiryDate checkbox state
+      name: credential.name,
+      expireDateApplicable: credential.expireDateApplicable
     });
     this.editedCredentialId = credential.id;
     this.isEdit = true;
+    this.store.dispatch(new ShowSideDialog(true));
   }
 
-  onRemoveButtonClick(credential: Credential): void {
+  onRemoveButtonClick(credential: Credential, event: any): void {
+    this.addActiveCssClass(event);
     if (credential.id) { // TODO: add verification to prevent remove if credential is used elsewhere
       this.confirmService
         .confirm('Are you sure want to delete?', {
@@ -80,9 +85,11 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
           okButtonLabel: 'Delete',
           okButtonClass: 'delete-button'
         })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
-          this.store.dispatch(new RemoveCredential(credential));
+        .subscribe((confirm) => {
+          if (confirm) {
+            this.store.dispatch(new RemoveCredential(credential));
+          }
+          this.removeActiveCssClass();
         });
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_CANNOT_BE_DELETED));
@@ -103,52 +110,69 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   }
 
   onFormCancelClick(): void {
-    this.store.dispatch(new ShowSideDialog(false));
-    this.isEdit = false;
-    this.editedCredentialId = undefined;
-    this.credentialsFormGroup.reset();
-    // TODO: add modal dialog to confirm close
+    this.confirmService
+      .confirm(CANCEL_COFIRM_TEXT, {
+        title: DELETE_CONFIRM_TITLE,
+        okButtonLabel: 'Leave',
+        okButtonClass: 'delete-button'
+      }).pipe(filter(confirm => !!confirm))
+      .subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false));
+        this.isEdit = false;
+        this.editedCredentialId = undefined;
+        this.credentialsFormGroup.reset();
+        this.removeActiveCssClass();
+      });
   }
 
   onFormSaveClick(): void {
     if (this.credentialsFormGroup.valid) {
-      const credential: Credential = {
-        id: this.editedCredentialId,
-        credentialTypeId: this.credentialsFormGroup.controls['credentialTypeId'].value,
-        name: this.credentialsFormGroup.controls['credentialDescription'].value,
-        // TODO: add checkbox for expiry date applicable
-      }
-
       if (this.isEdit) {
-        this.store.dispatch(new UpdateCredential(credential));
+        const credential = new Credential({
+          id: this.editedCredentialId,
+          name: this.credentialsFormGroup.controls['name'].value,
+          credentialTypeId: this.credentialsFormGroup.controls['credentialTypeId'].value,
+          expireDateApplicable: this.credentialsFormGroup.controls['expireDateApplicable'].value
+        });
+
+        this.store.dispatch(new UpdateCredential(credential, this.fakeOrganizationId));
         this.isEdit = false;
         this.editedCredentialId = undefined;
       } else {
+        const credential = new Credential({
+          name: this.credentialsFormGroup.controls['name'].value,
+          credentialTypeId: this.credentialsFormGroup.controls['credentialTypeId'].value,
+          expireDateApplicable: this.credentialsFormGroup.controls['expireDateApplicable'].value,
+          businessUnitId: this.fakeOrganizationId  // TODO: replace with valid value after BE implementation
+        });
         this.store.dispatch(new SaveCredential(credential));
       }
 
-      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
       this.store.dispatch(new ShowSideDialog(false));
       this.credentialsFormGroup.reset();
+      this.removeActiveCssClass();
     } else {
       this.credentialsFormGroup.markAllAsTouched();
     }
   }
 
   mapGridData(): void {
-    // TODO: map credential types by id
-    this.credentials$.subscribe(data => {
-      this.lastAvailablePage = this.getLastPage(data);
-      this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
-      this.totalDataRecords = data.length;
+    this.credentials$.pipe(combineLatestWith(this.credentialTypes$),
+      filter(([credentials, credentialTypes]) => credentials.length > 0 && credentialTypes.length > 0))
+      .subscribe(([credentials, credentialTypes]) => {
+        this.lastAvailablePage = this.getLastPage(credentials);
+        // @ts-ignore
+        credentials.map(item => item.credentialTypeName = credentialTypes.find(type => type.id === item.credentialTypeId).name);
+        this.gridDataSource = this.getRowsPerPage(credentials, this.currentPagerPage);
+        this.totalDataRecords = credentials.length;
     });
   }
 
   private createCredentialsForm(): void {
     this.credentialsFormGroup = this.formBuilder.group({
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       credentialTypeId: ['', Validators.required],
-      credentialDescription: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
-      expiryDate: [false]
+      expireDateApplicable: [false]
     });
   }
 

@@ -78,6 +78,7 @@ import { CredentialType } from '../../shared/models/credential-type.model';
 import { CredentialsService } from '../services/credentials.service';
 import { Credential } from '../../shared/models/credential.model';
 import { RECORD_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
+import { SaveCandidateSucceeded } from '../../agency/store/candidate.actions';
 
 interface DropdownOption {
   id: number;
@@ -571,36 +572,48 @@ export class AdminState {
   }
 
   @Action(GetCredential)
-  GetCredential({ patchState }: StateContext<AdminStateModel>, { }: GetCredential): Observable<Credential[]> {
-    return this.credentialsService.getCredential().pipe(tap((payload) => {
+  GetCredential({ patchState }: StateContext<AdminStateModel>, { payload }: GetCredential): Observable<Credential[]> {
+    return this.credentialsService.getCredential(payload).pipe(tap((payload) => {
       patchState({ credentials: payload });
       return payload;
     }));
   }
 
   @Action(SaveCredential)
-  SaveCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveCredential): Observable<Credential[]> {
-    return this.credentialsService.saveCredential(payload).pipe(tap((payload) => {
-      patchState({ isCredentialLoading: false });
-      dispatch(new GetCredential());
-      return payload;
-    }));
+  SaveCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveCredential): Observable<Credential | void> {
+    return this.credentialsService.saveCredential(payload)
+      .pipe(
+        tap((payload) => {
+          patchState({ isCredentialLoading: false });
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+          dispatch(new GetCredential(payload.businessUnitId));
+          return payload;
+        }),
+        catchError((error: any) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
+        })
+      );
   }
 
   @Action(UpdateCredential)
-  UpdateCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: UpdateCredential): Observable<Credential> {
-    return this.credentialsService.updateCredential(payload).pipe(tap((payload) => {
+  UpdateCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { credential, businessUnitId }: UpdateCredential): Observable<Credential | void> {
+    return this.credentialsService.updateCredential(credential).pipe(tap((payload) => {
       patchState({ isCredentialLoading: false });
-      dispatch(new GetCredential());
+      dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      dispatch(new GetCredential(businessUnitId));
       return payload;
-    }));
+    }),
+      catchError((error: any) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
+      })
+    );
   }
 
   @Action(RemoveCredential)
-  RemoveCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveCredential): Observable<Credential> {
-    return this.credentialsService.removeCredential(payload).pipe(tap((payload) => {
+  RemoveCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveCredential): Observable<any> {
+    return this.credentialsService.removeCredential(payload).pipe(tap(() => {
       patchState({ isCredentialLoading: false });
-      dispatch(new GetCredential());
+      dispatch(new GetCredential(payload.businessUnitId));
       return payload;
     }));
   }

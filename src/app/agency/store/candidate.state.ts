@@ -91,7 +91,7 @@ export class CandidateState {
       tap((payload) => {
         patchState({ isCandidateLoading: false, candidate: payload });
         if (payload.id) {
-          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));``
         } else {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         }
