@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Candidate } from 'src/app/shared/models/candidate.model';
+import { Candidate, CandidatePage } from 'src/app/shared/models/candidate.model';
 import { Education } from "src/app/shared/models/education.model";
 import { Experience } from "src/app/shared/models/experience.model";
 
@@ -10,6 +10,16 @@ import { Experience } from "src/app/shared/models/experience.model";
 })
 export class CandidateService {
   constructor(private http: HttpClient) {}
+
+  /**
+   * Get candidates by page number
+   * @param pageNumber
+   * @param pageSize
+   * @return list of candidates
+   */
+  public getCandidates(pageNumber: number, pageSize: number): Observable<CandidatePage> {
+    return this.http.get<CandidatePage>(`/api/CandidateProfile`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+  }
 
   /**
    * Create or update candidate

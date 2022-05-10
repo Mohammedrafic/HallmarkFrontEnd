@@ -45,6 +45,10 @@ const routes: Routes = [
         path: 'candidates/add',
         component: AddEditCandidateComponent,
       },
+      {
+        path: 'candidates/edit/:id',
+        component: AddEditCandidateComponent,
+      },
     ],
   },
 ];

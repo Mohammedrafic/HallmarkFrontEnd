@@ -4,7 +4,7 @@ import { catchError, Observable, of, tap } from "rxjs";
 
 import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages";
 import { MessageTypes } from "src/app/shared/enums/message-types";
-import { Candidate } from 'src/app/shared/models/candidate.model';
+import { Candidate, CandidatePage } from 'src/app/shared/models/candidate.model';
 import { Education } from "src/app/shared/models/education.model";
 import { Experience } from "src/app/shared/models/experience.model";
 import { SkillsPage } from 'src/app/shared/models/skill.model';
@@ -14,6 +14,7 @@ import { CandidateService } from '../services/candidates.service';
 import {
   GetAllSkills,
   GetCandidatePhoto,
+  GetCandidatesByPage,
   GetEducationByCandidateId,
   GetExperienceByCandidateId,
   RemoveEducation,
@@ -35,11 +36,13 @@ export interface CandidateStateModel {
   skills: SkillsPage | null;
   experiences: Experience[];
   educations: Education[];
+  candidatePage: CandidatePage | null;
 }
 
 @State<CandidateStateModel>({
   name: 'candidate',
   defaults: {
+    candidatePage: null,
     candidate: null,
     isCandidateLoading: false,
     skills: null,
@@ -63,7 +66,23 @@ export class CandidateState {
   @Selector()
   static educations(state: CandidateStateModel): Education[] | null { return state.educations; }
 
+  @Selector()
+  static candidates(state: CandidateStateModel): CandidatePage | null {
+    return state.candidatePage;
+  }
+
   constructor(private candidateService: CandidateService, private skillsService: SkillsService) {}
+
+  @Action(GetCandidatesByPage)
+  GetCandidatesByPage({ patchState }: StateContext<CandidateStateModel>, { pageNumber, pageSize }: GetCandidatesByPage): Observable<CandidatePage> {
+    patchState({ isCandidateLoading: true });
+    return this.candidateService.getCandidates(pageNumber, pageSize).pipe(
+      tap((payload) => {
+        patchState({ isCandidateLoading: false, candidatePage: payload });
+        return payload;
+      })
+    );
+  }
 
   @Action(SaveCandidate)
   SaveCandidate({ patchState, dispatch }: StateContext<CandidateStateModel>, { payload }: SaveCandidate): Observable<Candidate | void> {
