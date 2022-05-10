@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Select, Store } from '@ngxs/store';
 import { CheckBoxSelectionService } from '@syncfusion/ej2-angular-dropdowns';
@@ -7,13 +7,8 @@ import { GetAgencyByPage } from 'src/app/agency/store/agency.actions';
 import { AgencyState } from 'src/app/agency/store/agency.state';
 import { GetAllSkills } from 'src/app/agency/store/candidate.actions';
 import { CandidateState } from 'src/app/agency/store/candidate.state';
+import { CandidateStatus } from "src/app/shared/enums/status";
 import { valuesOnly } from 'src/app/shared/utils/enum.utils';
-
-enum Status {
-  Active,
-  Inactive,
-  Incomplete
-}
 
 enum Classification {
   Alumni = 0,
@@ -29,7 +24,7 @@ enum Classification {
   styleUrls: ['./candidate-general-info.component.scss'],
   providers: [CheckBoxSelectionService]
 })
-export class CandidateGeneralInfoComponent implements OnInit {
+export class CandidateGeneralInfoComponent {
   @Input() formGroup: FormGroup;
 
   @Select(AgencyState.agencies)
@@ -53,21 +48,16 @@ export class CandidateGeneralInfoComponent implements OnInit {
     value: 'id',
   };
 
-  public statuses = Object.values(Status)
+  public statuses = Object.values(CandidateStatus)
     .filter(valuesOnly)
     .map((text, id) => ({ text, id }));
 
-    
   public classifications = Object.values(Classification)
     .filter(valuesOnly)
     .map((text, id) => ({ text, id }));
 
   constructor(private store: Store) {
     store.dispatch([new GetAgencyByPage(1, 100), new GetAllSkills()]); // TODO: needed until we dont have agency switcher in the header
-  }
-
-  ngOnInit(): void {
-
   }
 
   static createFormGroup(): FormGroup {

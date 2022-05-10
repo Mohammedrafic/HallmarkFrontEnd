@@ -1,8 +1,4 @@
 import { Component } from '@angular/core';
-import { Store } from '@ngxs/store';
-
-import { SetSidebarMenu } from '../store/app.actions';
-import { CLIENT_SIDEBAR_MENU } from './client.config';
 
 @Component({
   selector: 'app-client',
@@ -10,7 +6,7 @@ import { CLIENT_SIDEBAR_MENU } from './client.config';
   styleUrls: ['./client.component.scss']
 })
 export class ClientComponent  {
-  constructor(private store: Store) {
-    store.dispatch(new SetSidebarMenu(CLIENT_SIDEBAR_MENU));
+  constructor() {
+
   }
 }

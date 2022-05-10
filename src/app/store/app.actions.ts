@@ -1,4 +1,3 @@
-import { ClientSidebarMenu } from "../shared/models/client-sidebar-menu.model";
 import { MessageTypes } from '../shared/enums/message-types';
 import { HeaderState } from '../shared/models/header-state.model';
 
@@ -10,11 +9,6 @@ export class ToggleMobileView {
 export class ToggleTheme {
   static readonly type = '[app] Toggle dark-light theme';
   constructor(public payload: boolean) { }
-}
-
-export class SetSidebarMenu {
-  static readonly type = '[app] Set side bar menu content';
-  constructor(public payload: ClientSidebarMenu[]) { }
 }
 
 export class SetHeaderState {

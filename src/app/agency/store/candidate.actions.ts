@@ -2,6 +2,11 @@ import { Candidate } from "src/app/shared/models/candidate.model";
 import { Education } from "src/app/shared/models/education.model";
 import { Experience } from "src/app/shared/models/experience.model";
 
+export class GetCandidatesByPage {
+  static readonly type = '[candidate] Get Candidates by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}
+
 export class SaveCandidate {
   static readonly type = '[candidate] Save Candidate';
   constructor(public payload: Candidate) {}

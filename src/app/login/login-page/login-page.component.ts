@@ -1,10 +1,12 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Store } from '@ngxs/store';
 import { map, Subject } from 'rxjs';
 import { Observable } from 'rxjs/internal/Observable';
 import { tap } from 'rxjs/internal/operators/tap';
 import { User } from 'src/app/shared/models/user.model';
-import { UserService } from '../services/UserService';
+import { SetCurrentUser } from 'src/app/store/user.actions';
+import { UserService } from '../../shared/services/user.service';
 
 @Component({
   selector: 'app-login-page',
@@ -18,7 +20,8 @@ export class LoginPageComponent implements OnInit {
 
   constructor(
     private usersService: UserService,
-    private router: Router
+    private router: Router,
+    private store: Store
     ) { 
   }
 
@@ -37,9 +40,8 @@ export class LoginPageComponent implements OnInit {
   }
 
   public onLogin(){
-    window.localStorage.setItem("AuthKey", this.selectedUser.id);
-    window.localStorage.setItem("UserData", this.selectedUser.businessUnitName + this.selectedUser.id);
-    this.router.navigate(['./client/dashboard']);
+    this.store.dispatch(new SetCurrentUser(this.selectedUser));
+    this.router.navigate(['./']);
   }
 
   public onLogout(){

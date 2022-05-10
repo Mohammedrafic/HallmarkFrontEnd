@@ -16,7 +16,10 @@ import {
   Users,
   Clipboard,
   Settings,
-  User
+  User,
+  Package,
+  Trello,
+  Lock
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
@@ -34,7 +37,10 @@ const sidebarIcons = {
   DollarSign,
   Clipboard,
   Settings,
-  User
+  User,
+  Package,
+  Trello,
+  Lock
 };
 
 @NgModule({

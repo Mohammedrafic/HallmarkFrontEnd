@@ -50,8 +50,8 @@ export class CredentialsService {
    * Get credential list
    * @return list of credentials
    */
-  public getCredential(): Observable<Credential[]> { // TODO: correct after BE implementation
-    return this.http.get<Credential[]>(`/api/MasterCredential`);
+  public getCredential(businessUnitId: number | undefined): Observable<Credential[]> {
+    return this.http.get<Credential[]>(`/api/MasterCredentials/businessUnitId/${businessUnitId}`);
   }
 
   /**
@@ -59,8 +59,8 @@ export class CredentialsService {
    * @param credential object to save
    * @return Created credential in array
    */
-  public saveCredential(credential: Credential): Observable<Credential[]> {
-    return this.http.post<Credential[]>(`/api/MasterCredential`, [credential]);
+  public saveCredential(credential: Credential): Observable<Credential> {
+    return this.http.post<Credential>(`/api/MasterCredentials`, credential);
   }
 
   /**
@@ -69,7 +69,7 @@ export class CredentialsService {
    * @return Updated credential
    */
   public updateCredential(credential: Credential): Observable<Credential> {
-    return this.http.put<Credential>(`/api/MasterCredential`, credential);
+    return this.http.put<Credential>(`/api/MasterCredentials`, credential);
   }
 
   /**
@@ -77,6 +77,6 @@ export class CredentialsService {
    * @param credential
    */
   public removeCredential(credential: Credential): Observable<any> {
-    return this.http.delete<any>(`/api/MasterCredential/${credential.id}`);
+    return this.http.delete<any>(`/api/MasterCredentials/${credential.id}`);
   }
 }

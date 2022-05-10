@@ -12,6 +12,7 @@ import { AppState } from './store/app.state';
 import { enableRipple } from '@syncfusion/ej2-base';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ApiInterceptor } from './shared/interceptors/api.interceptor';
+import { UserState } from './store/user.state';
 
 enableRipple(true);
 
@@ -24,7 +25,8 @@ enableRipple(true);
 
     //STORE
     NgxsModule.forRoot([
-      AppState
+      AppState,
+      UserState
     ]),
     NgxsReduxDevtoolsPluginModule.forRoot({
       disabled: environment.production

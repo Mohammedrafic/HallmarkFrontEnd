@@ -1,3 +1,5 @@
+import { PageOfCollections } from "./page.model";
+
 export class Candidate {
   id?: number;
   agencyId: number;
@@ -50,7 +52,7 @@ export class CandidateProfileContactDetail {
     if (contactDetails.candidateProfileId) {
       this.candidateProfileId = contactDetails.candidateProfileId;
     }
-    
+
     this.address = contactDetails.address;
     this.state = contactDetails.state || null;
     this.city = contactDetails.city;
@@ -60,3 +62,5 @@ export class CandidateProfileContactDetail {
     this.phone2 = contactDetails.phone2;
   }
 }
+
+export type CandidatePage = PageOfCollections<Candidate>;

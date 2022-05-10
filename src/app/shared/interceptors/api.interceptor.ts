@@ -3,6 +3,8 @@ import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpClient, HttpH
 import { Observable, throwError } from 'rxjs';
 import { map, shareReplay, switchMap, take, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { Store } from '@ngxs/store';
+import { AppState } from 'src/app/store/app.state';
 
 interface IAppSettings {
   API_BASE_URL: string;
@@ -18,15 +20,19 @@ export class ApiInterceptor implements HttpInterceptor {
   constructor(
     private httpClient: HttpClient,
     private router: Router,
+    private store: Store,
   ) {}
 
   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     let userId = window.localStorage.getItem("AuthKey");
     if (userId){
+      const currentPage = this.store.selectSnapshot(AppState.headerState)?.title || 'Login';
       request = request.clone({
-        // setHeaders: { Authorization: `UserId ${userId}` }
-        // setHeaders: { Custom: `UserId ${userId}` }
-        headers: request.headers.set('Authorization', `UserId ${userId}`)
+        headers: new HttpHeaders({ 
+          'Authorization':  `UserId ${userId}`,
+          'Einstein-ScreenName': currentPage as string,
+          'Einstein-ScreenUrl': this.router.url
+        })
       });
     }
     if (request.url === this.appSettingsUrl) {
