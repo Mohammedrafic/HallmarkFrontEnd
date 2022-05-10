@@ -6,7 +6,7 @@ import { filter, Observable, Subscription, takeWhile } from 'rxjs';
 
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
-import { CANCEL_COFIRM_TEXT, DELETE_RECORD_TEXT } from 'src/app/shared/constants/messages';
+import { DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import {
   Agency,
   AgencyBillingDetails,
@@ -161,7 +161,11 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   public onBack(): void {
     if (this.agencyForm.dirty) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT)
+        .confirm(DELETE_RECORD_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
           this.navigateToAgencyList();
@@ -256,8 +260,8 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   private patchAgencyFormValue({ agencyDetails, agencyBillingDetails, parentBusinessUnitId, agencyContactDetails }: Agency) {
     this.agencyForm.get('parentBusinessUnitId')?.patchValue(parentBusinessUnitId);
     this.agencyForm.get('isBillingPopulated')?.patchValue(agencyBillingDetails.sameAsAgency);
-    this.agencyControl?.patchValue({...agencyDetails});
-    this.billingControl?.patchValue({...agencyBillingDetails});
+    this.agencyControl?.patchValue({ ...agencyDetails });
+    this.billingControl?.patchValue({ ...agencyBillingDetails });
     this.contacts.clear();
     agencyContactDetails.forEach((contact) => this.addContact(contact));
   }
