@@ -49,27 +49,31 @@
         <div class="control-section">
           <div class="content-wrapper">
             <section class="left-side-pager-controls">
-              <ejs-dropdownlist
-                id="rowsPerPage"
-                class="dropdown-no-border"
-                [dataSource]="rowsPerPageDropDown"
-                [(value)]="activeRowsPerPageDropDown"
-              >
+              <ejs-dropdownlist id="rowsPerPage"
+                                class="dropdown-no-border"
+                                [dataSource]="rowsPerPageDropDown"
+                                [(value)]="activeRowsPerPageDropDown"
+                                (change)="onRowsDropDownChanged()">
               </ejs-dropdownlist>
-              <ejs-numerictextbox
-                id="goToPage"
-                class="numeric-input-no-border"
-                format="#"
-                placeholder="Go to:"
-                min="1"
-                [max]="10"
-                [showSpinButton]="false"
-              >
+              <ejs-numerictextbox id="goToPage"
+                                  class="numeric-input-no-border"
+                                  format="#"
+                                  placeholder="Go to:"
+                                  min="1"
+                                  [max]="(feeExceptionsPage$ | async)?.totalPages"
+                                  [showSpinButton]="false"
+                                  (change)="onGoToClick($event)">
               </ejs-numerictextbox>
             </section>
             <section class="right-side-pager-controls">
-              <!-- <ejs-pager id="gridPager" #gridPager [pageSize]="30" [totalRecordsCount]="30" [enablePagerMessage]="false" [currentPage]="1">
-</ejs-pager> -->
+              <ejs-pager id="gridPager"
+                         #gridPager
+                         [pageSize]="pageSize"
+                         [totalRecordsCount]="(feeExceptionsPage$ | async)?.totalCount"
+                         [enablePagerMessage]="false"
+                         [currentPage]="currentPage"
+                         (click)="onGoToClick($event)">
+              </ejs-pager>
             </section>
           </div>
         </div>
@@ -77,3 +81,5 @@
     </ng-template>
   </ejs-grid>
 </section>
+
+<app-add-new-fee-dialog [openEvent]="openAddNewFeeDialog"></app-add-new-fee-dialog>

@@ -1,5 +1,5 @@
 import { Agency } from 'src/app/shared/models/agency.model';
-import { AssociateOrganizations, FeeSettings } from 'src/app/shared/models/associate-organizations.model';
+import { AssociateOrganizations, FeeSettings, JobDistribution } from 'src/app/shared/models/associate-organizations.model';
 
 export class SaveAgency {
   static readonly type = '[agency] Save Agency';
@@ -30,6 +30,17 @@ export class GetAssociateOrganizationsById {
   static readonly type = '[agency] Get Associate Organizations Pages By ID ';
   constructor(public pageNumber: number, public pageSize: number) {}
 }
+
+export class DeleteAssociateOrganizationsById {
+  static readonly type = '[agency] Delete Associate Organizations By ID ';
+  constructor(public id: number) {}
+}
+
+export class DeleteAssociateOrganizationsByIdSucceeded {
+  static readonly type = '[agency] Delete Associate Organizations By ID Succeeded';
+  constructor() {}
+}
+
 export class GetAgencyByPage {
   static readonly type = '[agency] Get Agency by Page';
   constructor(public pageNumber: number, public pageSize: number) { }
@@ -47,7 +58,7 @@ export class GetAgencyByIdSucceeded {
 
 export class GetFeeSettingByOrganizationId {
   static readonly type = '[agency] Get Fee Setting By Organization Id';
-  constructor(public organizationId: number) { }
+  constructor(public organizationId: number, public pageNumber: number, public pageSize: number) { }
 }
 
 export class GetFeeSettingByOrganizationIdSucceeded {
@@ -72,4 +83,29 @@ export class GetAgencyLogoSucceeded {
 export class ClearAgencyEditStore {
   static readonly type = '[agency] Clear Agency Edit Store';
   constructor() { }
+}
+
+export class GetFeeExceptionsInitialData {
+  static readonly type = '[agency] Get Fee Exceptions Initial Data';
+  constructor(public organizationId: number) { }
+}
+
+export class GetJobDistributionInitialData {
+  static readonly type = '[agency] Get Job Distribution Initial Data';
+  constructor(public organizationId: number) { }
+}
+
+export class SaveJobDistribution {
+  static readonly type = '[agency] Save Job Distribution';
+  constructor(public payload: JobDistribution) {}
+}
+
+export class SaveJobDistributionSucceeded {
+  static readonly type = '[agency] Save Job Distribution Succeeded';
+  constructor(public payload: JobDistribution) {}
+}
+
+export class GetJobDistributionId {
+  static readonly type = '[agency] Get Job Distribution By Organization Id';
+  constructor(public organizationId: number) { }
 }

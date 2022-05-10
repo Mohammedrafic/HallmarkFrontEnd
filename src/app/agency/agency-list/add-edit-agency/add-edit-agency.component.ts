@@ -23,7 +23,7 @@ import {
   GetAgencyLogoSucceeded,
   SaveAgency,
   SaveAgencySucceeded,
-  UploadAgencyLogo
+  UploadAgencyLogo,
 } from '../../store/agency.actions';
 import { AgencyState } from '../../store/agency.state';
 import { BillingDetailsGroupComponent } from './billing-details-group/billing-details-group.component';
@@ -65,6 +65,10 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
     return this.tab?.selectedItem === 1;
   }
 
+  get isSaveDisabled(): boolean {
+    return !this.agencyForm.dirty;
+  }
+
   @Select(AgencyState.isAgencyCreated)
   public isAgencyCreated$: Observable<boolean>;
 
@@ -72,7 +76,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   private populatedSubscription: Subscription | undefined;
   private isAlive = true;
-  private filesDetails : Blob[] = [];
+  private filesDetails: Blob[] = [];
   private fetchedAgency: Agency;
   private agencyId: number | null = null;
 
@@ -100,7 +104,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
       this.agencyId = agency.payload.agencyDetails.id as number;
       this.fetchedAgency = agency.payload;
       this.patchAgencyFormValue(this.fetchedAgency);
-    })
+    });
     this.actions$.pipe(ofActionSuccessful(GetAgencyLogoSucceeded)).subscribe((logo: { payload: Blob }) => {
       this.logo = logo.payload;
     });
@@ -118,7 +122,6 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   public onStepperCreated(): void {
     this.tab.enableTab(1, false);
-
     this.isAgencyCreated$.pipe(takeWhile(() => this.isAlive)).subscribe((res) => {
       if (res) {
         this.tab.enableTab(1, true);
@@ -233,55 +236,30 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
     const agencyContactDetails: AgencyContactDetails[] = [...agencyFormValue.agencyContactDetails];
     const agencyPaymentDetails: AgencyPaymentDetails[] = [...agencyFormValue.agencyPaymentDetails];
 
-    agencyContactDetails.forEach(contact => contact.agencyId = id);
-    agencyPaymentDetails.forEach(payment => payment.agencyId = id);
+    agencyContactDetails.forEach((contact) => (contact.agencyId = id));
+    agencyPaymentDetails.forEach((payment) => (payment.agencyId = id));
 
-    return  {
-      agencyDetails: {...agencyFormValue.agencyDetails, id},
+    return {
+      agencyDetails: { ...agencyFormValue.agencyDetails, id },
       agencyBillingDetails: {
         ...agencyFormValue.agencyBillingDetails,
         sameAsAgency: agencyFormValue.isBillingPopulated,
-        id
+        id,
       },
       agencyContactDetails,
       agencyPaymentDetails,
       agencyId: id,
-      parentBusinessUnitId: this.fetchedAgency?.parentBusinessUnitId
+      parentBusinessUnitId: this.fetchedAgency?.parentBusinessUnitId,
     };
   }
 
-  private patchAgencyFormValue(agency: Agency) {
-    this.agencyForm.get('parentBusinessUnitId')?.patchValue(agency.parentBusinessUnitId);
-    this.agencyControl?.patchValue({
-      name: agency.agencyDetails.name,
-      externalId: agency.agencyDetails.externalId,
-      taxId: agency.agencyDetails.taxId,
-      addressLine1: agency.agencyDetails.addressLine1,
-      addressLine2: agency.agencyDetails.addressLine2,
-      country: agency.agencyDetails.country,
-      state: agency.agencyDetails.state,
-      city: agency.agencyDetails.city,
-      zipCode: agency.agencyDetails.zipCode,
-      phone1Ext: agency.agencyDetails.phone1Ext,
-      phone2Ext: agency.agencyDetails.phone2Ext,
-      fax: agency.agencyDetails.fax,
-      status: agency.agencyDetails.status,
-      website: agency.agencyDetails.website
-    });
-    this.billingControl?.patchValue({
-      name: agency.agencyBillingDetails.name,
-      address: agency.agencyBillingDetails.address,
-      country: agency.agencyBillingDetails.country,
-      state: agency.agencyBillingDetails.state,
-      city: agency.agencyBillingDetails.city,
-      zipCode: agency.agencyBillingDetails.zipCode,
-      phone1: agency.agencyBillingDetails.phone1,
-      phone2: agency.agencyBillingDetails.phone2,
-      fax: agency.agencyBillingDetails.fax,
-      ext: agency.agencyBillingDetails.ext
-    });
+  private patchAgencyFormValue({ agencyDetails, agencyBillingDetails, parentBusinessUnitId, agencyContactDetails }: Agency) {
+    this.agencyForm.get('parentBusinessUnitId')?.patchValue(parentBusinessUnitId);
+    this.agencyForm.get('isBillingPopulated')?.patchValue(agencyBillingDetails.sameAsAgency);
+    this.agencyControl?.patchValue({...agencyDetails});
+    this.billingControl?.patchValue({...agencyBillingDetails});
     this.contacts.clear();
-    agency.agencyContactDetails.forEach(contact => this.addContact(contact))
+    agencyContactDetails.forEach((contact) => this.addContact(contact));
   }
 
   private navigateToAgencyList(): void {

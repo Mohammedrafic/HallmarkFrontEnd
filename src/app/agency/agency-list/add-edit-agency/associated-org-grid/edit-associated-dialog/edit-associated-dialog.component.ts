@@ -1,13 +1,28 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
-import { Subject, takeWhile } from 'rxjs';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Observable, Subject, takeWhile } from 'rxjs';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
-import { AssociateOrganizations, FeeSettings } from 'src/app/shared/models/associate-organizations.model';
+import {
+  AssociateOrganizations,
+  FeeSettingsClassification,
+  JobDistribution,
+  JobDistributionInitialData,
+  JobDistributionOrderType,
+} from 'src/app/shared/models/associate-organizations.model';
 import { FeeSettingsComponent } from './fee-settings/fee-settings.component';
-import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
-import { GetFeeSettingByOrganizationId, GetFeeSettingByOrganizationIdSucceeded } from 'src/app/agency/store/agency.actions';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import {
+  GetFeeExceptionsInitialData,
+  GetFeeSettingByOrganizationIdSucceeded,
+  GetJobDistributionId,
+  GetJobDistributionInitialData,
+  SaveJobDistribution,
+} from 'src/app/agency/store/agency.actions';
+import { AgencyState } from 'src/app/agency/store/agency.state';
+import { valuesOnly } from 'src/app/shared/utils/enum.utils';
+import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
 @Component({
   selector: 'app-edit-associated-dialog',
@@ -19,12 +34,34 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
   @Output() editEndEvent = new EventEmitter<never>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
+  @ViewChild('editOrgTab') editOrgTab: TabComponent;
+
+  @Select(AgencyState.jobDistributionInitialData)
+  public jobDistributionInitialData$: Observable<JobDistributionInitialData>;
+
+  @Select(AgencyState.jobDistribution)
+  public jobDistribution$: Observable<JobDistribution>;
 
   public targetElement: HTMLElement = document.body;
   public editOrg: AssociateOrganizations;
   public width: string;
   public feeSettingsForm: FormGroup;
   public jobDistributionForm: FormGroup;
+  public optionFields = {
+    text: 'name',
+    value: 'id',
+  };
+
+  public classification = Object.values(FeeSettingsClassification)
+    .filter(valuesOnly)
+    .map((name, id) => ({ name, id }));
+  public orderType = Object.values(JobDistributionOrderType)
+    .filter(valuesOnly)
+    .map((name, id) => ({ name, id }));
+
+  get isSaveActive(): boolean {
+    return this.editOrgTab?.selectedItem === 0 ? this.feeSettingsForm.dirty : this.jobDistributionForm.dirty;
+  }
 
   private isAlive = true;
 
@@ -36,12 +73,12 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
     this.feeSettingsForm = FeeSettingsComponent.createFormGroup();
     this.onGetFeeSettingByOrganizationIdSucceeded();
 
-    this.jobDistributionForm = new FormGroup({
-      region: new FormControl(),
-      orderType: new FormControl(),
-      classification: new FormControl(),
-      skillCategory: new FormControl(),
-    })
+    this.jobDistributionForm = this.generateJobDistributionForm();
+
+    this.jobDistribution$.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
+      this.jobDistributionForm.reset();
+      this.jobDistributionForm.patchValue({ ...value });
+    });
   }
 
   ngOnDestroy(): void {
@@ -54,7 +91,24 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
     this.editEndEvent.emit();
   }
 
-  public onSave(): void {}
+  public onSave(): void {
+    if (this.editOrgTab.selectedItem === 1) {
+      this.jobDistributionForm.markAllAsTouched();
+      if (this.jobDistributionForm.valid) {
+        const jobDistributionFormValue = this.jobDistributionForm.getRawValue();
+        this.store.dispatch(new SaveJobDistribution({ ...jobDistributionFormValue, associateOrganizationId: this.editOrg.organizationId }));
+      }
+    }
+  }
+
+  private generateJobDistributionForm(): FormGroup {
+    return new FormGroup({
+      regionIds: new FormControl([], [Validators.required]),
+      orderTypes: new FormControl([], [Validators.required]),
+      classifications: new FormControl([], [Validators.required]),
+      skillCategoryIds: new FormControl([], [Validators.required]),
+    });
+  }
 
   private onOpenEvent(): void {
     this.openEvent.pipe(takeWhile(() => this.isAlive)).subscribe((org) => {
@@ -63,7 +117,10 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
         this.sideDialog.show();
 
         if (org.organizationId) {
-          this.store.dispatch(new GetFeeSettingByOrganizationId(org.organizationId));
+          this.feeSettingsForm.patchValue({ id: org.organizationId });
+          this.store.dispatch(new GetFeeExceptionsInitialData(org.organizationId));
+          this.store.dispatch(new GetJobDistributionInitialData(org.organizationId));
+          this.store.dispatch(new GetJobDistributionId(org.organizationId));
         }
       }
     });

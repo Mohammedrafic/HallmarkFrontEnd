@@ -25,6 +25,8 @@ ejs-grid.e-control.e-grid {
 
       .title h3 {
         color: $title-black;
+        font-weight: 700;
+        font-size: 16px;
         margin: 0;
       }
       .actions {
@@ -50,6 +52,9 @@ ejs-grid.e-control.e-grid {
   }
 
   .e-headercelldiv {
+    font-size: 14px;
+    font-weight: 600;
+
     .controls-header {
       .icon-button {
         padding: 10px;
@@ -232,11 +237,18 @@ ejs-grid.e-control.e-grid {
     background-color: $primary-active-blue-10;
     color: $white !important;
   }
+
   .e-frozenheader.e-frozen-right-header > .e-table {
     border-left: none;
   }
 
   .e-frozencontent.e-frozen-right-content > .e-table {
     border-left: 1px solid #e0e0e0;
+  }
+
+  .e-emptyrow {
+    .e-lastrowcell, td {
+      padding-left: 21px;
+    }
   }
 }

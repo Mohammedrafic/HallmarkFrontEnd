@@ -36,6 +36,7 @@ import { ExperienceGridComponent } from './candidates/add-edit-candidate/experie
 import { EducationGridComponent } from './candidates/add-edit-candidate/education-grid/education-grid.component';
 import { EditAssociatedDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/edit-associated-dialog.component';
 import { FeeSettingsComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/fee-settings/fee-settings.component';
+import { AddNewFeeDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/fee-settings/add-new-fee-dialog/add-new-fee-dialog.component';
 
 const sidebarIcons = {
   Sliders,
@@ -65,6 +66,7 @@ const sidebarIcons = {
     FeeSettingsComponent,
     ExperienceGridComponent,
     EducationGridComponent,
+    AddNewFeeDialogComponent,
   ],
   imports: [
     CommonModule,

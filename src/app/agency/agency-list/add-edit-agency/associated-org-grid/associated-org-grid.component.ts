@@ -1,12 +1,14 @@
 import { AfterViewInit, Component, EventEmitter, OnInit, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { Observable, Subject } from 'rxjs';
-import { GetAssociateOrganizationsById } from 'src/app/agency/store/agency.actions';
+import { filter, Observable, Subject } from 'rxjs';
+import { DeleteAssociateOrganizationsById, GetAssociateOrganizationsById } from 'src/app/agency/store/agency.actions';
 import { AgencyState } from 'src/app/agency/store/agency.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { GRID_CONFIG } from 'src/app/shared/constants/grid-config';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { AssociateOrganizations } from 'src/app/shared/models/associate-organizations.model';
+import { ConfirmService } from 'src/app/shared/services/confirm.service';
 @Component({
   selector: 'app-associated-org-grid',
   templateUrl: './associated-org-grid.component.html',
@@ -21,12 +23,12 @@ export class AssociatedOrgGridComponent extends AbstractGridConfigurationCompone
   public openAssosiateOrgDialog = new EventEmitter<boolean>();
   public openEditDialog = new EventEmitter<AssociateOrganizations>();
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private confirmService: ConfirmService) {
     super();
   }
 
   ngOnInit(): void {
-   this.store.dispatch(new GetAssociateOrganizationsById(this.currentPage, this.pageSize));
+    this.store.dispatch(new GetAssociateOrganizationsById(this.currentPage, this.pageSize));
   }
 
   ngAfterViewInit(): void {
@@ -50,8 +52,19 @@ export class AssociatedOrgGridComponent extends AbstractGridConfigurationCompone
     this.grid.clearRowSelection();
   }
 
-  public onRemove(data: unknown): void {
-    //TBI
+  public onRemove({ index, ...org }: { index: string } & AssociateOrganizations): void {
+    this.confirmService
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button',
+      })
+      .pipe(filter((confirm) => !!confirm))
+      .subscribe(() => {
+        if (org.id) {
+          this.store.dispatch(new DeleteAssociateOrganizationsById(org.id))
+        }
+      });
   }
 
   public dataBound(): void {

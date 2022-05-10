@@ -16,13 +16,13 @@
           </div>
           <div class="e-card-content">
             <button ejs-button cssClass="e-outline button-cancel" id="cancelFormButton" (click)="onCancel()">Cancel</button>
-            <button ejs-button id="addFormButton" type="submit" [isPrimary]="true" (click)="onSave()">Save</button>
+            <button [disabled]="!isSaveActive" ejs-button id="addFormButton" type="submit" [isPrimary]="true" (click)="onSave()">Save</button>
           </div>
         </div>
       </section>
 
       <section class="edit-org">
-        <ejs-tab #tab>
+        <ejs-tab #editOrgTab>
           <e-tabitems>
             <e-tabitem>
               <ng-template #headerText> Fee Settings </ng-template>
@@ -34,52 +34,62 @@
             <e-tabitem>
               <ng-template #headerText> Job Distribution </ng-template>
               <ng-template #content>
-                <section class="job-distribution bootstrap" [formGroup]="jobDistributionForm">
-                  <div class="dropdown-container">
-                    <label>Region</label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        appValidateWithMessage
-                        formControlName="region"
-                        [dataSource]="[]"
-                        placeholder="Region"
-                      ></ejs-dropdownlist>
+                <ng-container *ngIf="jobDistributionInitialData$ | async as jobDistributionInitialData">
+                  <section class="job-distribution bootstrap" [formGroup]="jobDistributionForm">
+                    <div class="dropdown-container">
+                      <label>Region<span class="required">*</span></label>
+                      <div class="input-group dropdown">
+                        <ejs-multiselect
+                          mode="CheckBox"
+                          appValidateWithMessage
+                          formControlName="regionIds"
+                          [fields]="optionFields"
+                          [dataSource]="jobDistributionInitialData.regions"
+                          placeholder="Region"
+                        ></ejs-multiselect>
+                      </div>
                     </div>
-                  </div>
-                  <div class="dropdown-container">
-                    <label>Order Type</label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        appValidateWithMessage
-                        formControlName="orderType"
-                        [dataSource]="[]"
-                        placeholder="Order Type"
-                      ></ejs-dropdownlist>
+                    <div class="dropdown-container">
+                      <label>Order Type<span class="required">*</span></label>
+                      <div class="input-group dropdown">
+                        <ejs-multiselect
+                          mode="CheckBox"
+                          appValidateWithMessage
+                          formControlName="orderTypes"
+                          [fields]="optionFields"
+                          [dataSource]="orderType"
+                          placeholder="Order Type"
+                        ></ejs-multiselect>
+                      </div>
                     </div>
-                  </div>
-                  <div class="dropdown-container">
-                    <label>Classification</label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        appValidateWithMessage
-                        formControlName="classification"
-                        [dataSource]="[]"
-                        placeholder="Classification"
-                      ></ejs-dropdownlist>
+                    <div class="dropdown-container">
+                      <label>Classification<span class="required">*</span></label>
+                      <div class="input-group dropdown">
+                        <ejs-multiselect
+                          mode="CheckBox"
+                          appValidateWithMessage
+                          formControlName="classifications"
+                          [fields]="optionFields"
+                          [dataSource]="classification"
+                          placeholder="Classification"
+                        ></ejs-multiselect>
+                      </div>
                     </div>
-                  </div>
-                  <div class="dropdown-container">
-                    <label>Skill Category</label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        appValidateWithMessage
-                        formControlName="skillCategory"
-                        [dataSource]="[]"
-                        placeholder="Skill Category"
-                      ></ejs-dropdownlist>
+                    <div class="dropdown-container">
+                      <label>Skill Category<span class="required">*</span></label>
+                      <div class="input-group dropdown">
+                        <ejs-multiselect
+                          mode="CheckBox"
+                          appValidateWithMessage
+                          formControlName="skillCategoryIds"
+                          [fields]="optionFields"
+                          [dataSource]="jobDistributionInitialData.skillCategories"
+                          placeholder="Skill Category"
+                        ></ejs-multiselect>
+                      </div>
                     </div>
-                  </div>
-                </section>
+                  </section>
+                </ng-container>
               </ng-template>
             </e-tabitem>
           </e-tabitems>
