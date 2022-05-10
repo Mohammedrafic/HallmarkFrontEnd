@@ -3,12 +3,15 @@ import { Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
 import { ContextMenuComponent, NodeSelectEventArgs, SidebarComponent, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
-import { Observable } from 'rxjs';
+import { filter, Observable } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
-import { CLIENT_SIDEBAR_MENU, SIDEBAR_CONFIG } from '../client/client.config';
-import { ClientSidebarMenu } from '../shared/models/client-sidebar-menu.model';
+import { SIDEBAR_CONFIG } from '../client/client.config';
+import { Menu, MenuItem } from '../shared/models/menu.model';
+import { User } from '../shared/models/user.model';
 import { SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
+import { GetUserMenuConfig } from '../store/user.actions';
+import { UserState } from '../store/user.state';
 
 enum THEME {
   light = 'light',
@@ -28,9 +31,9 @@ export class ShellPageComponent implements OnInit {
 
   isDarkTheme: boolean;
   isFirstLoad: boolean;
-  sideBarMenu: ClientSidebarMenu[];
+  sideBarMenu: MenuItem[];
   sideBarMenuField: Object;
-  activeMenuItemData: ClientSidebarMenu;
+  activeMenuItemData: MenuItem;
 
   @ViewChild('sidebar') sidebar: SidebarComponent;
   @ViewChild ('treevalidate') tree: TreeViewComponent;
@@ -38,9 +41,6 @@ export class ShellPageComponent implements OnInit {
 
   @Select(AppState.isSidebarOpened)
   isSideBarDocked$: Observable<boolean>;
-
-  @Select(AppState.sideBarMenu)
-  sideBarMenu$: Observable<ClientSidebarMenu[]>;
 
   @Select(AppState.isDarkTheme)
   isDarkTheme$: Observable<boolean>;
@@ -51,10 +51,16 @@ export class ShellPageComponent implements OnInit {
   @Select(AppState.isFirstLoad)
   isFirstLoad$: Observable<boolean>;
 
-  constructor(private store: Store,
-              private route: Router) { }
+  @Select(UserState.user)
+  user$: Observable<User>;
 
-  userName: string = "";
+  @Select(UserState.menu)
+  menu$: Observable<Menu>;
+
+  constructor(private store: Store,
+              private router: Router) { }
+
+  userName: string = '';
 
   ngOnInit(): void {
     this.userName = window.localStorage.getItem("UserData") as string;
@@ -63,6 +69,13 @@ export class ShellPageComponent implements OnInit {
       this.setTheme(isDark);
     });
     this.initSidebarFields();
+    this.user$.subscribe((user: User) => {
+      if (user) {
+        this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
+      } else {
+        this.router.navigate(['./login']);
+      }
+    });
   }
 
   onSideBarCreated(): void {
@@ -94,9 +107,12 @@ export class ShellPageComponent implements OnInit {
   }
 
   initSidebarFields(): void {
-    this.sideBarMenu$.subscribe(items => {
-      this.sideBarMenu = items;
-      this.sideBarMenuField = { dataSource: items, id: 'title', text: 'title', child: 'children' };
+    this.menu$.subscribe((menu: Menu) => {
+      if (menu.menuItems.length) {
+        this.sideBarMenu = menu.menuItems;
+        this.router.navigate([this.sideBarMenu[0].route]);
+        this.sideBarMenuField = { dataSource: this.sideBarMenu, id: 'title', text: 'title', child: 'children' };
+      }
     });
   }
 
@@ -108,23 +124,23 @@ export class ShellPageComponent implements OnInit {
     }
   }
 
-  onMenuItemClick(menuItem: ClientSidebarMenu): void {
-    this.setSideBarForFirstLoad(menuItem.route);
-    this.route.navigate([menuItem.route]);
+  onMenuItemClick(menuItem: MenuItem): void {
+    this.setSideBarForFirstLoad(menuItem.route as string);
+    this.router.navigate([menuItem.route]);
   }
 
   onSubMenuItemClick(event: any): void {
     this.tree.selectedNodes = [this.activeMenuItemData.title];
     this.setSideBarForFirstLoad(event.item.route);
-    this.route.navigate([event.item.route]);
+    this.router.navigate([event.item.route]);
   }
 
-  showContextMenu(data: ClientSidebarMenu, event: any): void {
+  showContextMenu(data: MenuItem, event: any): void {
     this.contextmenu.items = [];
     if (data.children && data.children.length > 0 && !this.sidebar.isOpen) {
       this.activeMenuItemData = data;
       const boundingRectangle = event.target.getBoundingClientRect();
-      this.contextmenu.items = data.children?.map((child: any) => {
+      this.contextmenu.items = data.children.map((child: any) => {
         child.text = child.title;
         return child;
       }) || [];
@@ -137,7 +153,7 @@ export class ShellPageComponent implements OnInit {
   onBeforeContextMenuOpen(event: any): void {
     if (!this.sidebar.isOpen) {
       event.items.forEach((item: any) => {
-        if (item.route === this.route.url && item.id) {
+        if (item.route === this.router.url && item.id) {
           const contextMenuItem = document.getElementById(item.id)
           if (contextMenuItem) {
             // added left colored border
@@ -156,7 +172,7 @@ export class ShellPageComponent implements OnInit {
   }
 
   private setSideBarForFirstLoad(route: string): void {
-    if (this.isFirstLoad && route !== this.route.url) {
+    if (this.isFirstLoad && route !== this.router.url) {
       this.store.dispatch(new ToggleSidebarState(true));
       this.store.dispatch(new SetIsFirstLoadState(false));
     }

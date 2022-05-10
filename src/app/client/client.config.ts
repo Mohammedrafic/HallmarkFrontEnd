@@ -1,7 +1,7 @@
-import { ClientSidebarMenu } from '../shared/models/client-sidebar-menu.model';
+
 import { GRID_CONFIG } from '../shared/constants/grid-config';
 
-export const CLIENT_SIDEBAR_MENU: ClientSidebarMenu[] = [
+export const CLIENT_SIDEBAR_MENU: any[] = [
   {
     title: 'Dashboard',
     icon: 'home',
