@@ -36,13 +36,16 @@ export class Candidate {
 export class CandidateProfileContactDetail {
   id?: number;
   candidateProfileId: number;
-  address: string;
+  address1: string;
+  address2: string;
   state: string | null;
   city: string;
   country: number | null;
   zip: string;
   phone1: string;
   phone2: string;
+  phoneType1: number;
+  phoneType2: number;
 
   constructor(contactDetails: CandidateProfileContactDetail) {
     if (contactDetails.id) {
@@ -53,7 +56,10 @@ export class CandidateProfileContactDetail {
       this.candidateProfileId = contactDetails.candidateProfileId;
     }
 
-    this.address = contactDetails.address;
+    this.address1 = contactDetails.address1;
+    this.address2 = contactDetails.address2;
+    this.phoneType1 = contactDetails.phoneType1;
+    this.phoneType2 = contactDetails.phoneType2;
     this.state = contactDetails.state || null;
     this.city = contactDetails.city;
     this.country = contactDetails.country || null;

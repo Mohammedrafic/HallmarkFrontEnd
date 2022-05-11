@@ -12,6 +12,7 @@
   <ejs-grid #grid
             [dataSource]="(agencies$ | async)?.items"
             [allowPaging]="allowPaging"
+            [allowSelection]="false"
             [pageSettings]="pageSettings"
             [height]="gridHeight"
             [rowHeight]="rowHeight"
@@ -41,7 +42,11 @@
         <ng-template #template let-data>
           <div class="e-grid-tool-buttons">
             <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>
-            <span class="remove-button" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
+            <span class="remove-button"
+                  *ngIf="data.agencyDetails.status !== statusEnum.Inactive"
+                  (click)="onRemove(data)">
+              <i-feather name="trash-2" class="icon"></i-feather>
+            </span>
           </div>
         </ng-template>
       </e-column>

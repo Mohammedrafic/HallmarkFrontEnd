@@ -13,7 +13,10 @@ import { ShowToast } from "src/app/store/app.actions";
 import { CandidateService } from '../services/candidates.service';
 import {
   GetAllSkills,
+  GetCandidateById,
+  GetCandidateByIdSucceeded,
   GetCandidatePhoto,
+  GetCandidatePhotoSucceeded,
   GetCandidatesByPage,
   GetEducationByCandidateId,
   GetExperienceByCandidateId,
@@ -84,6 +87,18 @@ export class CandidateState {
     );
   }
 
+  @Action(GetCandidateById)
+  GetCandidateById({ patchState, dispatch }: StateContext<CandidateStateModel>, { payload }: GetCandidateById): Observable<Candidate> {
+    patchState({ isCandidateLoading: true });
+    return this.candidateService.getCandidateById(payload).pipe(
+      tap((payload) => {
+        patchState({ isCandidateLoading: false, candidate: payload });
+        dispatch(new GetCandidateByIdSucceeded(payload));
+        return payload;
+      })
+    );
+  }
+
   @Action(SaveCandidate)
   SaveCandidate({ patchState, dispatch }: StateContext<CandidateStateModel>, { payload }: SaveCandidate): Observable<Candidate | void> {
     patchState({ isCandidateLoading: true });
@@ -126,6 +141,7 @@ export class CandidateState {
   @Action(GetCandidatePhoto)
   GetCandidatePhoto({ dispatch }: StateContext<CandidateStateModel>, { payload }: GetCandidatePhoto): Observable<any> {
     return this.candidateService.getCandidatePhoto(payload).pipe(tap((payload) => {
+      dispatch(new GetCandidatePhotoSucceeded(payload));
       return payload;
     }));
   }

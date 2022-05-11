@@ -22,6 +22,15 @@ export class CandidateService {
   }
 
   /**
+   * Get Candidate by id
+   * @param id
+   * @return specific Candidate
+   */
+  public getCandidateById(id: number): Observable<Candidate> {
+    return this.http.get<Candidate>(`/api/CandidateProfile/${id}`);
+  }
+
+  /**
    * Create or update candidate
    * @param candidate object to save
    * @return Created/Updated candidate
