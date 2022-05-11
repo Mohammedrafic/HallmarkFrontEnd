@@ -2,7 +2,7 @@
   <div class="input-container bootstrap">
     <label>Base Fee %</label>
     <div class="input-group">
-      <input appValidateWithMessage formControlName="baseFee" class="e-input" type="text" placeholder="Base Fee %" />
+      <input appValidateWithMessage formControlName="baseFee" class="e-input" type="number" placeholder="Base Fee %" />
     </div>
   </div>
 
@@ -31,8 +31,8 @@
     </ng-template>
     <e-columns>
       <e-column field="regionName" headerText="Region" textAlign="Left"></e-column>
-      <e-column field="classification" headerText="Classification" textAlign="left"></e-column>
-      <e-column field="skill" headerText="Skill" textAlign="left"></e-column>
+      <e-column field="classification" headerText="Classification" textAlign="left" [valueAccessor]='classificationValueAccess'></e-column>
+      <e-column field="skillName" headerText="Skill" textAlign="left"></e-column>
       <e-column field="fee" headerText="Fee %" textAlign="left"></e-column>
       <e-column textAlign="Right" width="120">
         <ng-template #template let-data>
@@ -82,4 +82,4 @@
   </ejs-grid>
 </section>
 
-<app-add-new-fee-dialog [openEvent]="openAddNewFeeDialog"></app-add-new-fee-dialog>
+<app-add-new-fee-dialog [openEvent]="openAddNewFeeDialog" [openEditEvent]="editFeeData"></app-add-new-fee-dialog>

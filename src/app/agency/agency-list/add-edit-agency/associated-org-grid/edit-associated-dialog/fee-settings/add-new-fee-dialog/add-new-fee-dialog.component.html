@@ -12,7 +12,7 @@
       <section class="header-container">
         <div class="e-card-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title">Add Fee Exception</h3>
+            <h3 class="e-card-title">{{ title }}</h3>
           </div>
           <div class="e-card-content">
             <button ejs-button cssClass="e-outline button-cancel" id="cancelFormButton" (click)="onCancel()">Cancel</button>
@@ -31,7 +31,7 @@
           <div class="input-group dropdown">
             <ejs-multiselect
               appValidateWithMessage
-              formControlName="region"
+              formControlName="regionIds"
               mode="CheckBox"
               [fields]="optionFields"
               [dataSource]="feeExceptionsInitialData.regions"
@@ -45,7 +45,7 @@
             <ejs-multiselect
               mode="CheckBox"
               appValidateWithMessage
-              formControlName="classification"
+              formControlName="classifications"
               [fields]="optionFields"
               [dataSource]="classification"
               placeholder="Classification"
@@ -58,7 +58,7 @@
             <ejs-multiselect
               mode="CheckBox"
               appValidateWithMessage
-              formControlName="skill"
+              formControlName="masterSkillIds"
               [fields]="masterSkillsFields"
               [dataSource]="feeExceptionsInitialData.masterSkills"
               placeholder="Skill"
@@ -68,7 +68,7 @@
         <div class="input-container">
           <label>Fee %<span class="required">*</span></label>
           <div class="input-group">
-            <input appValidateWithMessage formControlName="fee" class="e-input" type="text" placeholder="% 5.00" />
+            <input appValidateWithMessage formControlName="fee" class="e-input" type="number" placeholder="% 5.00" />
           </div>
         </div>
       </section>

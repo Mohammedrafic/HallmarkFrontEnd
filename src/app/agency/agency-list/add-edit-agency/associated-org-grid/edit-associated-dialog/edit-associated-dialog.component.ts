@@ -1,28 +1,34 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subject, takeWhile } from 'rxjs';
+import { Actions, Select, Store } from '@ngxs/store';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
 import {
   AssociateOrganizations,
+  FeeExceptionsPage,
   FeeSettingsClassification,
   JobDistribution,
   JobDistributionInitialData,
   JobDistributionOrderType,
 } from 'src/app/shared/models/associate-organizations.model';
 import { FeeSettingsComponent } from './fee-settings/fee-settings.component';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
   GetFeeExceptionsInitialData,
-  GetFeeSettingByOrganizationIdSucceeded,
   GetJobDistributionId,
   GetJobDistributionInitialData,
+  SaveBaseFee,
   SaveJobDistribution,
 } from 'src/app/agency/store/agency.actions';
 import { AgencyState } from 'src/app/agency/store/agency.state';
 import { valuesOnly } from 'src/app/shared/utils/enum.utils';
-import { TabComponent } from '@syncfusion/ej2-angular-navigations';
+
+enum Tabs {
+  FeeSettings,
+  JobDistribution
+}
 
 @Component({
   selector: 'app-edit-associated-dialog',
@@ -41,6 +47,12 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
 
   @Select(AgencyState.jobDistribution)
   public jobDistribution$: Observable<JobDistribution>;
+
+  @Select(AgencyState.feeExceptionsPage)
+  public feeExceptionsPage$: Observable<FeeExceptionsPage>;
+
+  @Select(AgencyState.baseFee)
+  public baseFee$: Observable<number>;
 
   public targetElement: HTMLElement = document.body;
   public editOrg: AssociateOrganizations;
@@ -71,7 +83,8 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
     this.onOpenEvent();
     this.width = `${window.innerWidth / 2}px`;
     this.feeSettingsForm = FeeSettingsComponent.createFormGroup();
-    this.onGetFeeSettingByOrganizationIdSucceeded();
+    this.onBaseFeeChanged();
+    this.onFeeExceptionsPageChanged();
 
     this.jobDistributionForm = this.generateJobDistributionForm();
 
@@ -92,12 +105,25 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
   }
 
   public onSave(): void {
-    if (this.editOrgTab.selectedItem === 1) {
-      this.jobDistributionForm.markAllAsTouched();
-      if (this.jobDistributionForm.valid) {
-        const jobDistributionFormValue = this.jobDistributionForm.getRawValue();
-        this.store.dispatch(new SaveJobDistribution({ ...jobDistributionFormValue, associateOrganizationId: this.editOrg.organizationId }));
-      }
+    switch (this.editOrgTab.selectedItem) {
+      case Tabs.JobDistribution:
+        this.jobDistributionForm.markAllAsTouched();
+        if (this.jobDistributionForm.valid) {
+          const jobDistributionFormValue = this.jobDistributionForm.getRawValue();
+          this.store.dispatch(
+            new SaveJobDistribution({ ...jobDistributionFormValue, associateOrganizationId: this.editOrg.organizationId })
+          );
+        }
+        break;
+      case Tabs.FeeSettings:
+        this.feeSettingsForm.markAllAsTouched();
+        if (this.feeSettingsForm.valid && this.editOrg.organizationId) {
+          const { baseFee } = this.feeSettingsForm.getRawValue();
+          this.store.dispatch(new SaveBaseFee(this.editOrg.organizationId, baseFee));
+        }
+        break;
+      default:
+        break;
     }
   }
 
@@ -126,26 +152,25 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
     });
   }
 
-  private onGetFeeSettingByOrganizationIdSucceeded(): void {
-    this.actions$
-      .pipe(
-        ofActionSuccessful(GetFeeSettingByOrganizationIdSucceeded),
-        takeWhile(() => this.isAlive)
-      )
-      .subscribe(
-        ({
-          payload: {
-            baseFee,
-            feeExceptions: { items },
-          },
-        }: GetFeeSettingByOrganizationIdSucceeded) => {
-          const feeExceptions = items.forEach((fee) => {
-            const control = FeeSettingsComponent.createFeeExceptionsForm();
-            control.patchValue({ ...fee });
-            return control;
-          });
-          this.feeSettingsForm.patchValue({ baseFee, feeExceptions });
-        }
-      );
+  private onBaseFeeChanged(): void {
+    this.baseFee$.pipe(takeWhile(() => this.isAlive)).subscribe((baseFee) => {
+      this.feeSettingsForm.patchValue({ baseFee });
+    });
+  }
+
+  private onFeeExceptionsPageChanged(): void {
+    this.feeExceptionsPage$.pipe(takeWhile(() => this.isAlive)).subscribe((feeExceptions) => {
+      this.updateFeeExceptions(feeExceptions);
+    });
+  }
+
+  private updateFeeExceptions(feeExceptions: FeeExceptionsPage): void {
+    const feeExceptionsControl = this.feeSettingsForm.get('feeExceptions') as FormArray;
+    feeExceptionsControl.clear();
+    feeExceptions?.items.forEach((fee) => {
+      const control = FeeSettingsComponent.createFeeExceptionsForm();
+      control.patchValue({ ...fee });
+      feeExceptionsControl.push(control);
+    });
   }
 }
