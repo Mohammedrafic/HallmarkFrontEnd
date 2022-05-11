@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
 import { ContextMenuModule, MenuModule, SidebarModule, TreeViewModule } from '@syncfusion/ej2-angular-navigations';
-import { SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
 import {
@@ -48,6 +48,7 @@ const sidebarIcons = {
   imports: [
     CommonModule,
     ShellRoutingModule,
+    ButtonModule,
     SidebarModule,
     SwitchModule,
     MenuModule,

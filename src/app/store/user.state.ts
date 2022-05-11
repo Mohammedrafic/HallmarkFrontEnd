@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import { Observable, tap } from 'rxjs';
 import { MENU_CONFIG } from '../shared/constants/menu-config';
-import { BusinessUnitType } from '../shared/enums/business-unit-type';
+import { AUTH_STORAGE_KEY, USER_STORAGE_KEY } from '@shared/constants/local-storage-keys';
 import { ChildMenuItem, Menu, MenuItem } from '../shared/models/menu.model';
 
 import { User } from '../shared/models/user.model';
 import { UserService } from '../shared/services/user.service';
-import { GetUserMenuConfig, SetCurrentUser } from './user.actions';
+import { GetUserMenuConfig, SetCurrentUser, LogoutUser } from './user.actions';
 
 export interface UserStateModel {
   user: User | null;
@@ -17,14 +18,17 @@ export interface UserStateModel {
 @State<UserStateModel>({
   name: 'user',
   defaults: {
-    user: JSON.parse(window.localStorage.getItem('User') as string),
+    user: JSON.parse(window.localStorage.getItem(USER_STORAGE_KEY) as string),
     menu: { menuItems: [] },
   },
 })
 @Injectable()
 export class UserState {
 
-  constructor(private userService: UserService) { }
+  constructor(
+    private router: Router,
+    private userService: UserService
+  ) { }
 
   @Selector()
   static user(state: UserStateModel): User | null { return state.user; }
@@ -34,10 +38,17 @@ export class UserState {
 
   @Action(SetCurrentUser)
   SetCurrentUser({ patchState }: StateContext<UserStateModel>, { payload }: SetCurrentUser): void {
-    window.localStorage.setItem("AuthKey", payload.id);
-    window.localStorage.setItem("UserData", payload.businessUnitName + payload.id);
-    window.localStorage.setItem("User", JSON.stringify(payload));
+    window.localStorage.setItem(AUTH_STORAGE_KEY, payload.id);
+    window.localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(payload));
     patchState({ user: payload });
+  }
+
+  @Action(LogoutUser)
+  LogoutUser({ patchState }: StateContext<UserStateModel>): void {
+    window.localStorage.removeItem(AUTH_STORAGE_KEY);
+    window.localStorage.removeItem(USER_STORAGE_KEY);
+    this.router.navigate(['/login']);
+    patchState({ user: null });
   }
 
   @Action(GetUserMenuConfig)
