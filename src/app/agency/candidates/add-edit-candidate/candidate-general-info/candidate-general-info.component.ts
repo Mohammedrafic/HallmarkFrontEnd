@@ -62,15 +62,14 @@ export class CandidateGeneralInfoComponent {
 
   static createFormGroup(): FormGroup {
     return new FormGroup({
-      agencyId: new FormControl('', [Validators.required]),
-      firstName: new FormControl('', [Validators.required, Validators.maxLength(50)]),
-      middleName: new FormControl('', [Validators.maxLength(10)]),
-      lastName: new FormControl('', [Validators.required, Validators.maxLength(50)]),
-      email: new FormControl('', [Validators.required, Validators.email, Validators.maxLength(20)]),
-      dob: new FormControl('', [Validators.required, Validators.maxLength(100)]),
-      region: new FormControl(''),
-      classification: new FormControl(''),
-      candidateProfileSkills: new FormControl('', [Validators.required]),
+      agencyId: new FormControl(null, [Validators.required]),
+      firstName: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
+      middleName: new FormControl(null, [Validators.maxLength(10)]),
+      lastName: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
+      email: new FormControl(null, [Validators.required, Validators.email, Validators.maxLength(20)]),
+      dob: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
+      classification: new FormControl(null),
+      candidateProfileSkills: new FormControl(null, [Validators.required]),
       profileStatus: new FormControl(2, [Validators.required]),
       candidateAgencyStatus: new FormControl(2, [Validators.required]),
       ssn: new FormControl('', [Validators.required, Validators.minLength(9), Validators.pattern(/^[0-9\s\-]+$/)]),

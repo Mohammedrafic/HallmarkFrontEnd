@@ -11,6 +11,7 @@
 <section>
   <ejs-grid #grid
             [dataSource]="(candidates$ | async)?.items"
+            [allowSelection]="false"
             [allowPaging]="allowPaging"
             [pageSettings]="pageSettings"
             [height]="gridHeight"
@@ -38,7 +39,7 @@
       </e-column>
       <e-column headerText="Primary Skill" width=200>
         <ng-template #template let-data>
-          <div *ngFor="let skill of data.candidateProfileSkills">{{skill.skillAbbr}}</div>
+          <div *ngFor="let skill of data.candidateProfileSkills">{{skill.skillDescription}}</div>
         </ng-template>
       </e-column>
       <e-column headerText="Assignment"></e-column>
@@ -50,7 +51,11 @@
         <ng-template #template let-data>
           <div class="e-grid-tool-buttons">
             <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>
-            <span class="remove-button" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
+            <span class="remove-button"
+                  *ngIf="data.profileStatus !== statusEnum.Inactive"
+                  (click)="onRemove(data)">
+              <i-feather name="trash-2" class="icon"></i-feather>
+            </span>
           </div>
         </ng-template>
       </e-column>

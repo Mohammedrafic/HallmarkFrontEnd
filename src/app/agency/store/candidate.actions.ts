@@ -7,6 +7,16 @@ export class GetCandidatesByPage {
   constructor(public pageNumber: number, public pageSize: number) { }
 }
 
+export class GetCandidateById {
+  static readonly type = '[candidate] Get Candidate by ID';
+  constructor(public payload: number) { }
+}
+
+export class GetCandidateByIdSucceeded {
+  static readonly type = '[candidate] Get Candidate by ID Succeeded';
+  constructor(public payload: Candidate) { }
+}
+
 export class SaveCandidate {
   static readonly type = '[candidate] Save Candidate';
   constructor(public payload: Candidate) {}
@@ -80,4 +90,9 @@ export class UploadCandidatePhoto {
 export class GetCandidatePhoto {
   static readonly type = '[candidate] Get Candidate Photo';
   constructor(public payload: number) { }
+}
+
+export class GetCandidatePhotoSucceeded {
+  static readonly type = '[candidate] Get Candidate Photo Succeeded';
+  constructor(public payload: Blob) { }
 }

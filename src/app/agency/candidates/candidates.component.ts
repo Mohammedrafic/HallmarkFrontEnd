@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { GridComponent } from "@syncfusion/ej2-angular-grids";
 import { debounceTime, filter, Observable, Subject, takeUntil } from "rxjs";
-import { GetCandidatesByPage, SaveCandidateSucceeded } from "src/app/agency/store/candidate.actions";
+import { GetCandidatesByPage, SaveCandidate, SaveCandidateSucceeded } from "src/app/agency/store/candidate.actions";
 import { CandidateState } from "src/app/agency/store/candidate.state";
 import { AbstractGridConfigurationComponent } from "src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
 import { CandidateStatus, STATUS_COLOR_GROUP } from "src/app/shared/enums/status";
@@ -64,7 +64,6 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
 
   public dataBound(): void {
     this.grid.hideScroll();
-    this.grid.autoFitColumns();
   }
 
   public onRowsDropDownChanged(): void {
@@ -102,7 +101,15 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
       });
   }
 
-  private inactivateCandidate(candidate: Candidate) {
-    // TODO
+  private inactivateCandidate({ id, agencyId, ssn, firstName, middleName, lastName, email, dob, classification, candidateAgencyStatus,
+                                professionalSummary, candidateProfileContactDetail, candidateProfileSkills }: Candidate) {
+    const inactiveCandidate: Candidate = {
+      id, agencyId, ssn, firstName, middleName, lastName, email, dob, classification,
+      candidateAgencyStatus, professionalSummary, candidateProfileContactDetail,
+      profileStatus: CandidateStatus.Inactive,
+      candidateProfileSkills: candidateProfileSkills.map(skill => skill.id)
+    }
+
+    this.store.dispatch(new SaveCandidate(inactiveCandidate));
   }
 }

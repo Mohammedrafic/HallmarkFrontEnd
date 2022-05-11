@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { LoginGuard, ShellGuard } from '@shared/guards';
+
 const routes: Routes = [
   {
     path: '',
@@ -10,14 +12,14 @@ const routes: Routes = [
         loadChildren: () =>
           import('./login/login.module').then((m) => m.LoginModule),
         // canLoad: [ LoginGuard ],
-        // canActivate: [ LoginGuard ],
+        canActivate: [ LoginGuard ],
       },
       {
         path: '',
         loadChildren: () =>
           import('./shell/shell.module').then((m) => m.ShellModule),
         // canLoad: [ LoginGuard ],
-        // canActivate: [ ShellGuard ]
+        canActivate: [ ShellGuard ]
       },
     ],
   },

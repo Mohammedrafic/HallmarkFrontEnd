@@ -1,16 +1,16 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
 import { ContextMenuComponent, NodeSelectEventArgs, SidebarComponent, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
-import { filter, Observable } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '../client/client.config';
 import { Menu, MenuItem } from '../shared/models/menu.model';
 import { User } from '../shared/models/user.model';
 import { SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
-import { GetUserMenuConfig } from '../store/user.actions';
+import { GetUserMenuConfig, LogoutUser } from '../store/user.actions';
 import { UserState } from '../store/user.state';
 
 enum THEME {
@@ -23,7 +23,7 @@ enum THEME {
   templateUrl: './shell.component.html',
   styleUrls: ['./shell.component.scss'],
 })
-export class ShellPageComponent implements OnInit {
+export class ShellPageComponent implements OnInit, OnDestroy {
   enableDock = SIDEBAR_CONFIG.isDock;
   width = SIDEBAR_CONFIG.width;
   dockSize = SIDEBAR_CONFIG.dockSize;
@@ -34,6 +34,8 @@ export class ShellPageComponent implements OnInit {
   sideBarMenu: MenuItem[];
   sideBarMenuField: Object;
   activeMenuItemData: MenuItem;
+
+  private unsubscribe$: Subject<void> = new Subject();
 
   @ViewChild('sidebar') sidebar: SidebarComponent;
   @ViewChild ('treevalidate') tree: TreeViewComponent;
@@ -60,29 +62,29 @@ export class ShellPageComponent implements OnInit {
   constructor(private store: Store,
               private router: Router) { }
 
-  userName: string = '';
-
   ngOnInit(): void {
-    this.userName = window.localStorage.getItem("UserData") as string;
-    this.isDarkTheme$.subscribe(isDark => {
+    this.isDarkTheme$.pipe(takeUntil(this.unsubscribe$)).subscribe(isDark => {
       this.isDarkTheme = isDark;
       this.setTheme(isDark);
     });
     this.initSidebarFields();
-    this.user$.subscribe((user: User) => {
+    this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
       if (user) {
         this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
-      } else {
-        this.router.navigate(['./login']);
       }
     });
   }
 
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
   onSideBarCreated(): void {
     // code placed here since this.sidebar = undefined in ngOnInit() as sidebar not creates in time
-    this.isSideBarDocked$.subscribe(isDocked => this.sidebar.isOpen = isDocked);
+    this.isSideBarDocked$.pipe(takeUntil(this.unsubscribe$)).subscribe(isDocked => this.sidebar.isOpen = isDocked);
 
-    this.isFirstLoad$.subscribe(isFirstLoad => {
+    this.isFirstLoad$.pipe(takeUntil(this.unsubscribe$)).subscribe(isFirstLoad => {
       this.isFirstLoad = isFirstLoad;
       if (isFirstLoad) {
         // TODO: Should be decided after Login: CLIENT_SIDEBAR_MENU, ADMIN_SIDEBAR_MENU etc.
@@ -107,10 +109,12 @@ export class ShellPageComponent implements OnInit {
   }
 
   initSidebarFields(): void {
-    this.menu$.subscribe((menu: Menu) => {
+    this.menu$.pipe(takeUntil(this.unsubscribe$)).subscribe((menu: Menu) => {
       if (menu.menuItems.length) {
         this.sideBarMenu = menu.menuItems;
-        this.router.navigate([this.sideBarMenu[0].route]);
+        if (this.router.url === '/') {
+          this.router.navigate([this.sideBarMenu[0].route]);
+        }
         this.sideBarMenuField = { dataSource: this.sideBarMenu, id: 'title', text: 'title', child: 'children' };
       }
     });
@@ -169,6 +173,10 @@ export class ShellPageComponent implements OnInit {
 
   onContextMenuClose(): void {
     this.contextmenu.items = [];
+  }
+
+  logout(): void {
+    this.store.dispatch(new LogoutUser());
   }
 
   private setSideBarForFirstLoad(route: string): void {

@@ -1,12 +1,22 @@
-<p>Simple login</p>
+<div class="login-container">
+  <h1>Simple login</h1>
 
-  <select  (change)="changeUser($event)">
-    <option value="">Deselect</option>
-    <option *ngFor="let item of users" value="{{ item.id}}">{{ item.id}} - {{ item.businessUnitName}}</option>
-  </select>
-  <button [disabled]="!selectedUser?.id" (click)="onLogin()" style="margin-left: 10px;">
-      Login
-  </button>
-  <button (click)="onLogout()" style="margin-left: 10px;">
-      Logout
-  </button>
+  <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+    <div class="dropdown-container bootstrap">
+      <ejs-dropdownlist
+        [fields]="optionFields"
+        formControlName="user"
+        [dataSource]="usersDropDownData" >
+      </ejs-dropdownlist>
+    </div>
+
+    <div class="button-container">
+      <button
+        [disabled]="!loginForm.controls['user'].value"
+        class="e-control e-btn e-lib e-primary"
+        type="submit">
+        Login
+      </button>
+    </div>
+  </form>
+</div>

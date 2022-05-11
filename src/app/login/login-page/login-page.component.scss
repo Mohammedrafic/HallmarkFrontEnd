@@ -1,0 +1,26 @@
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 24px;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-container {
+  margin-bottom: 25px;
+}
+
+.button-container {
+  text-align: center;
+}
