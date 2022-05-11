@@ -8,7 +8,7 @@
       <!-- TBD delete button -->
       <!-- <button *ngIf="isAgencyCreated$ | async" ejs-button cssClass="e-danger" [isPrimary]="true"(click)="onDelete()">Delete</button> -->
       <button [disabled]="!agencyForm?.dirty" ejs-button cssClass="e-outline" (click)="onClear()">Clear</button>
-      <button ejs-button [isPrimary]="true" (click)="onSave()">Save</button>
+      <button ejs-button [isPrimary]="true" [disabled]="isSaveDisabled" (click)="onSave()">Save</button>
     </ng-container>
   </ng-container>
 </app-page-toolbar>
