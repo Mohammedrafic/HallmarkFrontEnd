@@ -161,8 +161,14 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
       filter(([credentials, credentialTypes]) => credentials.length > 0 && credentialTypes.length > 0))
       .subscribe(([credentials, credentialTypes]) => {
         this.lastAvailablePage = this.getLastPage(credentials);
-        // @ts-ignore
-        credentials.map(item => item.credentialTypeName = credentialTypes.find(type => type.id === item.credentialTypeId).name);
+        if (credentialTypes) {
+          credentials.map(item => {
+            let credentialType = credentialTypes.find(type => type.id === item.credentialTypeId);
+            item.credentialTypeName = credentialType ? credentialType.name : '';
+          });
+          // TODO: remove line below after credential type would have verification before removing if used elsewhere
+          credentials = credentials.filter(credential => credential.credentialTypeName !== '');
+        }
         this.gridDataSource = this.getRowsPerPage(credentials, this.currentPagerPage);
         this.totalDataRecords = credentials.length;
     });

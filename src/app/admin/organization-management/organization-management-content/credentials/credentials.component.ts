@@ -1,10 +1,9 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { Store } from '@ngxs/store';
 
 import { ShowSideDialog } from '../../../../store/app.actions';
-import { UrlService } from '../../../../shared/services/url.service';
 
 export enum CredentialsNavigationTabs {
   CredentialsList,
@@ -16,28 +15,17 @@ export enum CredentialsNavigationTabs {
   templateUrl: './credentials.component.html',
   styleUrls: ['./credentials.component.scss']
 })
-export class CredentialsComponent implements AfterViewInit {
+export class CredentialsComponent {
   @ViewChild('navigationTabs') navigationTabs: TabComponent;
   isToolButtonsShown = true;
 
   isCredentialListActive = true;
   isCredentialSetupActive = false;
 
-  private skillGroupPathName = 'admin/organization-management/credentials/groups-setup';
-
-  constructor(private store: Store,
-              private urlService: UrlService) {}
+  constructor(private store: Store) {}
 
   onAddCredentialClick(): void {
     this.store.dispatch(new ShowSideDialog(true));
-  }
-
-  ngAfterViewInit() {
-    this.urlService.previousUrl$.subscribe(url => {
-      if (url === this.skillGroupPathName) {
-        this.onTabSelected({ selectedIndex: CredentialsNavigationTabs.Setup });
-      }
-    });
   }
 
   onTabSelected(selectedTab: any): void {
