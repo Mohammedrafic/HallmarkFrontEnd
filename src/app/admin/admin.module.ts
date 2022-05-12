@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { GridModule, ResizeService, PagerModule, PageService } from '@syncfusion/ej2-angular-grids';
-import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule  } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownListModule, ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 import { UploaderModule, TextBoxModule, NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
@@ -22,7 +22,9 @@ import {
   MapPin,
   Plus,
   AlertCircle,
-  Edit3
+  Edit3,
+  ChevronDown,
+  ChevronRight
 } from 'angular-feather/icons';
 
 import { ClientManagementContentComponent } from './client-management/client-management-content/client-management-content.component';
@@ -47,6 +49,7 @@ import {
   MasterCredentialsTypesComponent
 } from './master-data/master-credentials/master-credentials-types/master-credentials-types.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { SettingsComponent } from './organization-management/organization-management-content/settings/settings.component';
 
 const sidebarIcons = {
   Download,
@@ -60,7 +63,9 @@ const sidebarIcons = {
   MapPin,
   Plus,
   AlertCircle,
-  Edit3
+  Edit3,
+  ChevronDown,
+  ChevronRight
 };
 @NgModule({
   declarations: [
@@ -80,7 +85,8 @@ const sidebarIcons = {
     CredentialsSetupComponent,
     SkillsComponent,
     MasterCredentialsTypesComponent,
-    DashboardComponent
+    DashboardComponent,
+    SettingsComponent
   ],
   imports: [
     CommonModule,
@@ -104,6 +110,7 @@ const sidebarIcons = {
     DialogModule,
     TabModule,
     TabAllModule,
+    SwitchModule,
 
     FeatherModule.pick(sidebarIcons),
 

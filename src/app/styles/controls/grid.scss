@@ -229,6 +229,20 @@ ejs-grid.e-control.e-grid {
     }
   }
 
+  tbody tr {
+    td.e-detailrowcollapse {
+      div.e-icons.e-dtdiagonalright.e-icon-grightarrow::before {
+        content: '\e913' !important;
+      }
+    }
+
+    td.e-detailrowexpand {
+      div.e-icons.e-dtdiagonaldown.e-icon-gdownarrow::before {
+        content: '\e916' !important;
+      }
+    }
+  }
+
   .e-gridcontent {
     border-radius: 0 0 $grid-border-radius $grid-border-radius;
   }

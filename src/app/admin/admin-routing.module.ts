@@ -20,6 +20,7 @@ import {
   MasterCredentialsTypesComponent
 } from './master-data/master-credentials/master-credentials-types/master-credentials-types.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { SettingsComponent } from '@admin/organization-management/organization-management-content/settings/settings.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -66,6 +67,10 @@ const routes: Routes = [
           {
             path: 'skills',
             component: SkillsComponent
+          },
+          {
+            path: 'settings',
+            component:SettingsComponent
           }
         ]
       },

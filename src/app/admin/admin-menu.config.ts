@@ -41,5 +41,6 @@ export const ORG_SETTINGS: { [key: string]: Object }[] = [
   { text: 'Locations', id: 2, route: 'admin/organization-management/locations' },
   { text: 'Departments', id: 1, route: 'admin/organization-management/departments' },
   { text: 'Skills', id: 3, route: 'admin/organization-management/skills'},
-  { text: 'Credentials', id: 4, route: 'admin/organization-management/credentials' }
+  { text: 'Credentials', id: 4, route: 'admin/organization-management/credentials' },
+  { text: 'Settings', id: 5, route: 'admin/organization-management/settings' }
 ];
