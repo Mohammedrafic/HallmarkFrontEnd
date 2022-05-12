@@ -218,6 +218,7 @@ ejs-grid.e-control.e-grid {
     .e-headertext {
       text-transform: lowercase;
       font-weight: 600;
+      color: $secondary-dark-blue-15;
     }
 
     .e-icon-ascending::before {
@@ -226,6 +227,20 @@ ejs-grid.e-control.e-grid {
 
     .e-icon-descending::before {
       content: "\e916";
+    }
+  }
+
+  tbody tr {
+    td.e-detailrowcollapse {
+      div.e-icons.e-dtdiagonalright.e-icon-grightarrow::before {
+        content: '\e913' !important;
+      }
+    }
+
+    td.e-detailrowexpand {
+      div.e-icons.e-dtdiagonaldown.e-icon-gdownarrow::before {
+        content: '\e916' !important;
+      }
     }
   }
 

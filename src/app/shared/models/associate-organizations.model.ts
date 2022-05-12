@@ -17,16 +17,26 @@ export type AssociateOrganizations = {
 export type AssociateOrganizationsPage = PageOfCollections<AssociateOrganizations>;
 
 export type FeeExceptions = {
+  id: number;
   regionId: number;
   regionName: string;
-  classification: string;
-  skill: string;
+  classification: number;
+  skillName: string;
+  skillId: number;
+  fee: number;
+};
+
+export type FeeExceptionsDTO = {
+  associateOrganizationId: number;
+  regionIds: number[];
+  classifications: number[];
+  masterSkillIds: number[];
   fee: number;
 };
 
 export type FeeSettings = {
-  baseFee: number;
-  feeExceptions: FeeExceptionsPage;
+  baseFee: number | null | undefined;
+  feeExceptions: FeeExceptionsPage | undefined;
 };
 
 export type FeeExceptionsPage = PageOfCollections<FeeExceptions>;

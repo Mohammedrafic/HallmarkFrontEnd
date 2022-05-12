@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { CandidateCredentialPage } from "@shared/models/candidate-credential.model";
 import { Observable } from 'rxjs';
 import { Candidate, CandidatePage } from 'src/app/shared/models/candidate.model';
 import { Education } from "src/app/shared/models/education.model";
@@ -111,5 +112,19 @@ export class CandidateService {
    */
   public removeEducation(education: Education): Observable<Education> {
     return this.http.delete<Education>(`/api/Education/${education.id}`);
+  }
+
+  /**
+   * Get candidates credential by page number
+   * @param pageNumber
+   * @param pageSize
+   * @param id
+   * @return list of candidates credential
+   */
+  public getCredentialByCandidateId(pageNumber: number, pageSize: number, id: number): Observable<CandidateCredentialPage> {
+    return this.http.get<CandidateCredentialPage>(
+      `/api/CandidateCredentials/candidateProfileId/${id}`,
+      { params: { PageNumber: pageNumber, PageSize: pageSize }}
+    );
   }
 }

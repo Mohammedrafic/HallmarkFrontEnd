@@ -120,17 +120,21 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
     const profileTabIndex = 0;
     const experienceTabIndex = 1;
     const educationTabIndex = 2;
+    const credentialTabIndex = 3;
 
     this.tab.enableTab(experienceTabIndex, false);
     this.tab.enableTab(educationTabIndex, false);
+    this.tab.enableTab(credentialTabIndex, false);
 
     this.isCandidateCreated$.pipe(takeUntil(this.unsubscribe$)).subscribe((res) => {
       if (res) {
         this.tab.enableTab(experienceTabIndex, true);
         this.tab.enableTab(educationTabIndex, true);
+        this.tab.enableTab(credentialTabIndex, true);
       } else {
         this.tab.enableTab(experienceTabIndex, false);
         this.tab.enableTab(educationTabIndex, false);
+        this.tab.enableTab(credentialTabIndex, false);
       }
     });
 

@@ -122,8 +122,14 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
   }
 
   private initForms(organization?: Organization): void {
+    let businessUnitId: string | number = '';
+    if (organization?.createUnder?.parentUnitId) {
+      businessUnitId = organization.createUnder.parentUnitId;
+    } else if (organization?.createUnder?.parentUnitId === null) {
+      businessUnitId = 0;
+    }
     this.CreateUnderFormGroup = this.fb.group({
-      createUnder: new FormControl(organization ? organization.createUnder?.parentUnitId : '', [ Validators.required ])
+      createUnder: new FormControl(businessUnitId, [ Validators.required ])
     });
     this.CreateUnderFormGroup.valueChanges.subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.CreateUnderFormGroup.dirty));

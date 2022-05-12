@@ -1,5 +1,5 @@
 import { Agency } from 'src/app/shared/models/agency.model';
-import { AssociateOrganizations, FeeSettings, JobDistribution } from 'src/app/shared/models/associate-organizations.model';
+import { AssociateOrganizations, FeeExceptionsDTO, FeeExceptionsPage, FeeSettings, JobDistribution } from 'src/app/shared/models/associate-organizations.model';
 
 export class SaveAgency {
   static readonly type = '[agency] Save Agency';
@@ -108,4 +108,24 @@ export class SaveJobDistributionSucceeded {
 export class GetJobDistributionId {
   static readonly type = '[agency] Get Job Distribution By Organization Id';
   constructor(public organizationId: number) { }
+}
+
+export class SaveFeeExceptions {
+  static readonly type = '[agency] Save Fee Exceptions';
+  constructor(public feeExceptionsDTO: FeeExceptionsDTO) {}
+}
+
+export class RemoveFeeExceptionsById {
+  static readonly type = '[agency] Remove Fee Exceptions By Id';
+  constructor(public id: number) {}
+}
+
+export class SaveFeeExceptionsSucceeded {
+  static readonly type = '[agency] Save Fee Exceptions Succeeded';
+  constructor(public feeExceptionsDTO: FeeExceptionsPage) {}
+}
+
+export class SaveBaseFee {
+  static readonly type = '[agency] Save Base Fee';
+  constructor(public associateOrganizationId: number, public baseFee: number) {}
 }

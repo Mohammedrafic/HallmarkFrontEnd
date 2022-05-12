@@ -1,13 +1,14 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable, Subject } from 'rxjs';
-import { Select, Store } from '@ngxs/store';
+import { Observable, Subject, takeWhile } from 'rxjs';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { AgencyState } from 'src/app/agency/store/agency.state';
-import { FeeExceptionsInitialData, FeeSettingsClassification } from 'src/app/shared/models/associate-organizations.model';
+import { FeeExceptions, FeeExceptionsInitialData, FeeSettingsClassification } from 'src/app/shared/models/associate-organizations.model';
 import { valuesOnly } from 'src/app/shared/utils/enum.utils';
+import { SaveFeeExceptions, SaveFeeExceptionsSucceeded } from '@agency/store/agency.actions';
 
 type AddNewFeeExceptionFormValue = {
   region: number[];
@@ -21,8 +22,9 @@ type AddNewFeeExceptionFormValue = {
   templateUrl: './add-new-fee-dialog.component.html',
   styleUrls: ['./add-new-fee-dialog.component.scss'],
 })
-export class AddNewFeeDialogComponent implements OnInit {
-  @Input() openEvent: Subject<boolean>;
+export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
+  @Input() openEvent: Subject<number>;
+  @Input() openEditEvent: Subject<FeeExceptions>;
 
   @ViewChild('addFeeSideDialog') sideDialog: DialogComponent;
 
@@ -30,6 +32,7 @@ export class AddNewFeeDialogComponent implements OnInit {
   public feeExceptionsInitialData$: Observable<FeeExceptionsInitialData>;
 
   public targetElement: HTMLElement = document.body;
+  public editMode = true;
   public feeFormGroup: FormGroup = this.generateNewForm();
   public optionFields = {
     text: 'name',
@@ -43,13 +46,33 @@ export class AddNewFeeDialogComponent implements OnInit {
     .filter(valuesOnly)
     .map((name, id) => ({ name, id }));
 
-  constructor(private store: Store) {}
+  get title(): string {
+    return this.editMode ? "Edit Fee Exception" : "Add Fee Exception";
+  }
+
+  private organizationId: number;
+  private isAlive = true;
+
+  constructor(private store: Store, private actions$: Actions) {}
 
   ngOnInit(): void {
     this.onOpenEvent();
+    this.onOpenEditEvent();
+
+    this.actions$
+      .pipe(ofActionSuccessful(SaveFeeExceptionsSucceeded))
+      .pipe(takeWhile(() => this.isAlive))
+      .subscribe(() => {
+        this.sideDialog.hide();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.isAlive = false;
   }
 
   public onCancel(): void {
+    this.editMode = false;
     this.sideDialog.hide();
   }
 
@@ -57,23 +80,39 @@ export class AddNewFeeDialogComponent implements OnInit {
     this.feeFormGroup.markAllAsTouched();
     if (this.feeFormGroup.valid) {
       const value = this.feeFormGroup.getRawValue();
+      this.store.dispatch(new SaveFeeExceptions({ ...value, associateOrganizationId: this.organizationId }));
     }
   }
 
   private onOpenEvent(): void {
-    this.openEvent.subscribe((open) => {
-      if (open) {
+    this.openEvent.subscribe((id) => {
+      if (id) {
+        this.organizationId = id;
         this.feeFormGroup.reset();
         this.sideDialog.show();
       }
     });
   }
 
+  private onOpenEditEvent(): void {
+    this.openEditEvent.subscribe((feeData) => {
+      if (feeData) {
+        this.editMode = true;
+        this.feeFormGroup.patchValue({
+          regionIds: [feeData.regionId],
+          classifications: [feeData.classification],
+          masterSkillIds: [feeData.skillId],
+          fee: feeData.fee,
+        })
+      }
+    });
+  }
+
   private generateNewForm(): FormGroup {
     return new FormGroup({
-      region: new FormControl([], [Validators.required]),
-      classification: new FormControl([], [Validators.required]),
-      skill: new FormControl([], [Validators.required]),
+      regionIds: new FormControl([], [Validators.required]),
+      classifications: new FormControl([], [Validators.required]),
+      masterSkillIds: new FormControl([], [Validators.required]),
       fee: new FormControl(null, [Validators.required]),
     });
   }

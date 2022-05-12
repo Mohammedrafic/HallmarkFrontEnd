@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { catchError, Observable, of, tap } from "rxjs";
 
+import { CandidateCredentialPage } from "@shared/models/candidate-credential.model";
 import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages";
 import { MessageTypes } from "src/app/shared/enums/message-types";
 import { Candidate, CandidatePage } from 'src/app/shared/models/candidate.model';
@@ -18,6 +19,7 @@ import {
   GetCandidatePhoto,
   GetCandidatePhotoSucceeded,
   GetCandidatesByPage,
+  GetCandidatesCredentialByPage,
   GetEducationByCandidateId,
   GetExperienceByCandidateId,
   RemoveEducation,
@@ -40,6 +42,7 @@ export interface CandidateStateModel {
   experiences: Experience[];
   educations: Education[];
   candidatePage: CandidatePage | null;
+  candidateCredentialPage: CandidateCredentialPage | null;
 }
 
 @State<CandidateStateModel>({
@@ -50,7 +53,8 @@ export interface CandidateStateModel {
     isCandidateLoading: false,
     skills: null,
     experiences: [],
-    educations: []
+    educations: [],
+    candidateCredentialPage: null
   },
 })
 @Injectable()
@@ -72,6 +76,11 @@ export class CandidateState {
   @Selector()
   static candidates(state: CandidateStateModel): CandidatePage | null {
     return state.candidatePage;
+  }
+
+  @Selector()
+  static candidateCredential(state: CandidateStateModel): CandidateCredentialPage | null {
+    return state.candidateCredentialPage;
   }
 
   constructor(private candidateService: CandidateService, private skillsService: SkillsService) {}
@@ -218,5 +227,17 @@ export class CandidateState {
         return payload;
       }),
       catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Education cannot be deleted')))));
+  }
+
+  @Action(GetCandidatesCredentialByPage)
+  GetCandidatesCredentialByPage({ patchState, dispatch, getState  }: StateContext<CandidateStateModel>, { pageNumber, pageSize }: GetCandidatesCredentialByPage): Observable<CandidateCredentialPage> {
+    patchState({ isCandidateLoading: true });
+    const id = getState().candidate?.id as number;
+    return this.candidateService.getCredentialByCandidateId(pageNumber, pageSize, id).pipe(
+      tap((payload) => {
+        patchState({ isCandidateLoading: false, candidateCredentialPage: payload });
+        return payload;
+      })
+    );
   }
 }

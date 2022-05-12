@@ -43,6 +43,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     super();
     this.SkillFormGroup = this.fb.group({
       id: new FormControl(0),
+      isDefault: new FormControl(false),
       masterSkillId: new FormControl(null),
       skillCategoryId: new FormControl('', [ Validators.required, Validators.minLength(3) ]),
       skillAbbr: new FormControl(''),
@@ -78,6 +79,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   public addSkill(): void {
     this.title = 'Add';
     this.SkillFormGroup.controls['id'].setValue(0);
+    this.SkillFormGroup.controls['isDefault'].setValue(false);
     this.skillFieldsHandler(false);
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -99,6 +101,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     this.title = 'Edit';
     this.SkillFormGroup.setValue({
       id: data.id,
+      isDefault: data.masterSkill?.isDefault || false,
       masterSkillId: data.masterSkill?.id || null,
       skillAbbr: data.masterSkill.skillAbbr,
       skillCategoryId: data.skillCategory.id,

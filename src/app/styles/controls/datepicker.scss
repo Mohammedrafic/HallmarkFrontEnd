@@ -1,7 +1,14 @@
 @import '../../styles/variables/colors';
 
-ejs-datepicker.datepicker {
-  .e-input-group.e-control-wrapper.e-date-wrapper {
+ejs-timepicker.e-timepicker.ng-invalid.ng-touched {
+  .e-clear-icon {
+    margin-right: 11px;
+  }
+}
+
+ejs-datepicker.datepicker, ejs-timepicker.e-timepicker {
+  .e-input-group.e-control-wrapper.e-date-wrapper,
+  .e-input-group.e-control-wrapper.e-time-wrapper {
     border-radius: 8px !important;
     border: 1px solid $secondary-dark-blue-40 !important;
     height: 35px;

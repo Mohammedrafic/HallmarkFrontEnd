@@ -59,17 +59,6 @@ export class AssociateOrganizationsService {
   }
 
   /**
-   * Get Fee Exceptions Initial Data By Organization Id
-   * @param OrganizationId
-   * @return Initial Data for Fee Exceptions
-   */
-  public getFeeExceptionsInitialData(OrganizationId: number): Observable<FeeExceptionsInitialData> {
-    return this.http.get<FeeExceptionsInitialData>(`/api/AssociateOrganizations/feeExceptionsInitialData`, {
-      params: { OrganizationId },
-    });
-  }
-
-  /**
    * Get Job Distribution Initial Data By Organization Id
    * @param OrganizationId
    * @return Initial Data for Job Distribution
@@ -89,12 +78,21 @@ export class AssociateOrganizationsService {
     return this.http.put<JobDistribution>(`/api/AssociateOrganizations/jobDistribution`, jobDistribution);
   }
 
-    /**
+  /**
    * Get Job Distribution By Organization Id
-   * @param agencyId
+   * @param associateOrganizationId
    * @return Job Distribution
    */
-     public getJobDistributionById(associateOrganizationId: number): Observable<JobDistribution> {
-      return this.http.get<JobDistribution>(`/api/AssociateOrganizations/${associateOrganizationId}/jobDistribution`);
-    }
+  public getJobDistributionById(associateOrganizationId: number): Observable<JobDistribution> {
+    return this.http.get<JobDistribution>(`/api/AssociateOrganizations/${associateOrganizationId}/jobDistribution`);
+  }
+
+  /**
+   * Save Base Fee
+   * @param associateOrganizationId
+   * @return FeeSettings
+   */
+  public saveBaseFee(associateOrganizationId: number, baseFee: number): Observable<FeeSettings> {
+    return this.http.put<FeeSettings>(`/api/AssociateOrganizations/baseFee`, { associateOrganizationId, baseFee });
+  }
 }
