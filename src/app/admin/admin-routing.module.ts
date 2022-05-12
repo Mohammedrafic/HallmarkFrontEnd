@@ -22,6 +22,9 @@ import {
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ShiftsComponent } from './organization-management/organization-management-content/shifts/shifts.component';
 import { SettingsComponent } from '@admin/organization-management/organization-management-content/settings/settings.component';
+import {
+  AddEditSkillGroupComponent
+} from './organization-management/organization-management-content/credentials/credentials-setup/add-edit-skill-group/add-edit-skill-group.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -64,6 +67,10 @@ const routes: Routes = [
           {
             path: 'credentials',
             component: CredentialsComponent
+          },
+          {
+            path: 'credentials/groups-setup',
+            component: AddEditSkillGroupComponent
           },
           {
             path: 'skills',

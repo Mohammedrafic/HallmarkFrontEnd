@@ -38,6 +38,7 @@ body {
       color: $supportive-red;
     }
 
+    &.multiselect,
     &.dropdown,
     &.datepicker {
       i-feather {

@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 
 import { CredentialType } from '../../shared/models/credential-type.model';
 import { Credential } from '../../shared/models/credential.model';
+import { CredentialSetup } from '../../shared/models/credential-setup.model';
 
 @Injectable({ providedIn: 'root' })
 export class CredentialsService {
@@ -78,5 +79,27 @@ export class CredentialsService {
    */
   public removeCredential(credential: Credential): Observable<any> {
     return this.http.delete<any>(`/api/MasterCredentials/${credential.id}`);
+  }
+
+  /**
+   * Get credential setup list
+   * @param businessUnitId object to search by
+   * @return list of credential setup
+   */
+  public getCredentialSetup(businessUnitId: number | undefined): Observable<CredentialSetup[]> {
+    return this.http.get<CredentialSetup[]>(`/api/CredentialSetup/businessUnitId/${businessUnitId}`);
+  }
+
+  /**
+   * Create/Update credential setup
+   * @param credentialSetup object to save
+   * @return Created/Updated credential setup
+   */
+  public saveUpdateCredentialSetup(credentialSetup: CredentialSetup): Observable<CredentialSetup> {
+    if (credentialSetup.id) {
+      return this.http.put<CredentialSetup>(`/api/CredentialSetup`, credentialSetup);
+    } else {
+      return this.http.post<CredentialSetup>(`/api/CredentialSetup`, credentialSetup);
+    }
   }
 }

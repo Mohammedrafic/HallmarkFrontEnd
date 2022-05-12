@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { GridModule, ResizeService, PagerModule, PageService } from '@syncfusion/ej2-angular-grids';
 import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
-import { DropDownListModule, ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
+import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { UploaderModule, TextBoxModule, NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
@@ -50,6 +50,7 @@ import {
 } from './master-data/master-credentials/master-credentials-types/master-credentials-types.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ShiftsComponent } from './organization-management/organization-management-content/shifts/shifts.component';
+import { AddEditSkillGroupComponent } from './organization-management/organization-management-content/credentials/credentials-setup/add-edit-skill-group/add-edit-skill-group.component';
 import { ShiftsState } from './store/shifts.state';
 import { SettingsComponent } from './organization-management/organization-management-content/settings/settings.component';
 
@@ -89,6 +90,7 @@ const sidebarIcons = {
     MasterCredentialsTypesComponent,
     DashboardComponent,
     ShiftsComponent,
+    AddEditSkillGroupComponent,
     SettingsComponent
   ],
   imports: [
@@ -114,6 +116,7 @@ const sidebarIcons = {
     TabModule,
     TabAllModule,
     TimePickerModule,
+    MultiSelectAllModule,
     SwitchModule,
 
     FeatherModule.pick(sidebarIcons),
