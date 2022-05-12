@@ -5,7 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
-import { Sliders, Plus, Trash2, Edit } from 'angular-feather/icons';
+import { Sliders, Plus, Trash2, Edit, Copy, Download } from 'angular-feather/icons';
 
 import { AgencyComponent } from './agency.component';
 import { AgencyRoutingModule } from './agency-routing.module';
@@ -37,12 +37,15 @@ import { EducationGridComponent } from './candidates/add-edit-candidate/educatio
 import { EditAssociatedDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/edit-associated-dialog.component';
 import { FeeSettingsComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/fee-settings/fee-settings.component';
 import { AddNewFeeDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/fee-settings/add-new-fee-dialog/add-new-fee-dialog.component';
+import { CredentialsGridComponent } from './candidates/add-edit-candidate/credentials-grid/credentials-grid.component';
 
 const sidebarIcons = {
   Sliders,
   Plus,
   Trash2,
   Edit,
+  Copy,
+  Download,
 };
 
 @NgModule({
@@ -67,6 +70,7 @@ const sidebarIcons = {
     ExperienceGridComponent,
     EducationGridComponent,
     AddNewFeeDialogComponent,
+    CredentialsGridComponent,
   ],
   imports: [
     CommonModule,

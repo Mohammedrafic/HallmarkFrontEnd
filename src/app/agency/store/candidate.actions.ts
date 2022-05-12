@@ -96,3 +96,8 @@ export class GetCandidatePhotoSucceeded {
   static readonly type = '[candidate] Get Candidate Photo Succeeded';
   constructor(public payload: Blob) { }
 }
+
+export class GetCandidatesCredentialByPage {
+  static readonly type = '[candidate] Get Candidates Credential by Page';
+  constructor(public pageNumber: number, public pageSize: number) { }
+}

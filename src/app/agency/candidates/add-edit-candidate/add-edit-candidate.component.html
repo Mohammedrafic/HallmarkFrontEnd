@@ -65,17 +65,16 @@
         <app-education-grid></app-education-grid>
       </ng-template>
     </e-tabitem>
-<!--    TODO: uncomment when credentials tab is implemented-->
-<!--    <e-tabitem>-->
-<!--      <ng-template #headerText>-->
-<!--        <div class="stepper-header">-->
-<!--          <div class="stepper-title">Credentials</div>-->
-<!--          <div class="stepper-sub-title">Additional info here</div>-->
-<!--        </div>-->
-<!--      </ng-template>-->
-<!--      <ng-template #content>-->
-<!--        Credentials-->
-<!--      </ng-template>-->
-<!--    </e-tabitem>-->
+    <e-tabitem>
+      <ng-template #headerText>
+        <div class="stepper-header">
+          <div class="stepper-title">Credentials</div>
+          <div class="stepper-sub-title">Additional info here</div>
+        </div>
+      </ng-template>
+      <ng-template #content>
+        <app-credentials-grid></app-credentials-grid>
+      </ng-template>
+    </e-tabitem>
   </e-tabitems>
 </ejs-tab>
