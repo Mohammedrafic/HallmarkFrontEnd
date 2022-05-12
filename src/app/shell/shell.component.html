@@ -1,5 +1,5 @@
 <section class="shell">
-  <ejs-sidebar id="sidebar" #sidebar [enableGestures]="false" [enableDock]='enableDock' [width]='width' [dockSize]='dockSize' [type]="sideBarType"
+  <ejs-sidebar id="sidebar" #sidebar [enableGestures]="false" [enableDock]="enableDock" [width]="width" [dockSize]="dockSize" [type]="sideBarType"
     (created)="onSideBarCreated()">
     <section class="primary-container">
       <section class="logo-container">
@@ -32,22 +32,12 @@
 
     <aside class="secondary-container">
       <section class="misc">
-        <section class="theme-toggle">
+        <!--section class="theme-toggle">
           <ejs-switch class="switch" [checked]="isDarkTheme" (change)="toggleTheme()"></ejs-switch>
-          <span class="e-text">Dark Theme</span>
-        </section>
+          <span class="e-text">Dark Theme</span> TODO: move to settings
+        </!--section-->
 
         <section class="edu-faq">
-          <a href="" class="icon-container">
-            <i-feather name="book-open" class="icon"></i-feather>
-            <span class="e-text">Education Materials</span>
-          </a>
-
-          <a href="" class="icon-container">
-            <i-feather name="info" class="icon"></i-feather>
-            <span class="e-text">FAQ</span>
-          </a>
-
           <a href="" class="icon-container">
             <i-feather name="settings" class="icon"></i-feather>
             <span class="e-text">Settings</span>
