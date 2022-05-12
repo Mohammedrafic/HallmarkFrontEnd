@@ -150,7 +150,7 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
 
   private createTypeForm(): void {
     this.credentialTypeFormGroup = this.formBuilder.group({
-      credentialTypeName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]]
+      credentialTypeName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]]
     });
   }
 
