@@ -12,12 +12,14 @@ export class Skill {
   glNumber?: string;
   allowOnboard?: boolean;
   inactiveDate?: string | null;
+  isDefault?: boolean;
 
   constructor(skill: Skill, organizationId?: number) {
     this.id = skill.id || 0;
     this.skillCategoryId = skill.skillCategoryId;
     this.skillAbbr = skill.skillAbbr;
     this.skillDescription = skill.skillDescription;
+    this.isDefault = skill.isDefault;
 
     if (organizationId) {
       this.organizationId = organizationId;

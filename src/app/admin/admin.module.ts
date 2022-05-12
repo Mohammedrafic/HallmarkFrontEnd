@@ -7,7 +7,7 @@ import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule, Switch
 import { DropDownListModule, ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 import { UploaderModule, TextBoxModule, NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
-import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
+import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
 import {
@@ -49,6 +49,8 @@ import {
   MasterCredentialsTypesComponent
 } from './master-data/master-credentials/master-credentials-types/master-credentials-types.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { ShiftsComponent } from './organization-management/organization-management-content/shifts/shifts.component';
+import { ShiftsState } from './store/shifts.state';
 import { SettingsComponent } from './organization-management/organization-management-content/settings/settings.component';
 
 const sidebarIcons = {
@@ -86,6 +88,7 @@ const sidebarIcons = {
     SkillsComponent,
     MasterCredentialsTypesComponent,
     DashboardComponent,
+    ShiftsComponent,
     SettingsComponent
   ],
   imports: [
@@ -110,13 +113,15 @@ const sidebarIcons = {
     DialogModule,
     TabModule,
     TabAllModule,
+    TimePickerModule,
     SwitchModule,
 
     FeatherModule.pick(sidebarIcons),
 
     //STORE
     NgxsModule.forFeature([
-      AdminState
+      AdminState,
+      ShiftsState
     ]),
   ],
   providers: [

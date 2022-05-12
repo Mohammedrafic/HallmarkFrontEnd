@@ -41,6 +41,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
     super();
     this.SkillFormGroup = this.fb.group({
       id: new FormControl(0),
+      isDefault: new FormControl(true),
       skillCategoryId: new FormControl('', [ Validators.required, Validators.minLength(3) ]),
       skillAbbr: new FormControl('', [ Validators.minLength(3) ]),
       skillDescription: new FormControl('', [ Validators.required, Validators.minLength(3) ]),
@@ -67,6 +68,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
     this.addActiveCssClass(event);
     this.SkillFormGroup.setValue({
       id: data.id,
+      isDefault: data.isDefault,
       skillAbbr: data.skillAbbr,
       skillCategoryId: data.skillCategory.id,
       skillDescription: data.skillDescription
