@@ -22,7 +22,7 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    6: { // User Management
+    6: { // Security
       icon: 'lock',
       route: ''
     },
@@ -107,6 +107,14 @@ export const MENU_CONFIG: any = {
       route: ''
     },
     27: { // Configuration and Setting
+      icon: '',
+      route: ''
+    },
+    30: { // Roles & Permissions
+      icon: '',
+      route: 'security/roles-and-permissions'
+    },
+    31: { // User List
       icon: '',
       route: ''
     }
@@ -133,7 +141,7 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    6: { // User Management
+    6: { // Security
       icon: 'lock',
       route: ''
     },
@@ -220,6 +228,14 @@ export const MENU_CONFIG: any = {
     27: { // Configuration and Setting
       icon: '',
       route: ''
+    },
+    30: { // Roles & Permissions
+      icon: '',
+      route: 'security/roles-and-permissions'
+    },
+    31: { // User List
+      icon: '',
+      route: ''
     }
   },
 
@@ -244,7 +260,7 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    6: { // User Management
+    6: { // Security
       icon: 'lock',
       route: ''
     },
@@ -331,6 +347,14 @@ export const MENU_CONFIG: any = {
     27: { // Configuration and Setting
       icon: '',
       route: ''
+    },
+    30: { // Roles & Permissions
+      icon: '',
+      route: 'security/roles-and-permissions'
+    },
+    31: { // User List
+      icon: '',
+      route: ''
     }
   },
 
@@ -355,7 +379,7 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    6: { // User Management
+    6: { // Security
       icon: 'lock',
       route: ''
     },
@@ -445,6 +469,14 @@ export const MENU_CONFIG: any = {
     },
     28: { // User Management
       icon: 'lock',
+      route: ''
+    },
+    30: { // Roles & Permissions
+      icon: '',
+      route: 'security/roles-and-permissions'
+    },
+    31: { // User List
+      icon: '',
       route: ''
     }
   },

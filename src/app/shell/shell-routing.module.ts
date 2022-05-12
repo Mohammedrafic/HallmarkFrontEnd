@@ -29,6 +29,13 @@ const shellRoutes: Routes = [
         //     canLoad: [ AdminGuard ],
         //     canActivate: [ AdminGuard ]
       },
+      {
+        path: 'security',
+        loadChildren: () =>
+          import('../security/security.module').then((m) => m.SecurityModule),
+        //     canLoad: [ AdminGuard ],
+        //     canActivate: [ AdminGuard ]
+      },
     ],
   },
 ];

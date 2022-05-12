@@ -33,11 +33,11 @@ export class SkillsService {
    * @return Created/Updated master skill
    */
   public saveMasterSkill(skill: Skill): Observable<Skill> {
-    return skill.id ? 
+    return skill.id ?
       this.http.put<Skill>(`/api/masterSkills`, skill) :
       this.http.post<Skill>(`/api/masterSkills`, skill);
   }
-  
+
   /**
    * Remove master skills by its id
    * @param skill
@@ -62,7 +62,7 @@ export class SkillsService {
    * @return Created/Updated Assigned skill
    */
   public saveAssignedSkill(skill: Skill): Observable<Skill> {
-    return skill.id ? 
+    return skill.id ?
       this.http.put<Skill>(`/api/AssignedSkills`, skill) :
       this.http.post<Skill>(`/api/AssignedSkills`, skill);
   }

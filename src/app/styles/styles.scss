@@ -12,6 +12,39 @@ html {
   height: 100%;
 }
 
+/* scrollbar styling */
+/* firefox */
+* {
+  scrollbar-width: thin;
+}
+
+/* webkit */
+*::-webkit-scrollbar {
+  background-color: transparent;
+  width: 4px;
+  height: 4px;
+}
+
+*::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+*::-webkit-scrollbar-track:hover {
+  background-color: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: $secondary-dark-blue-40;
+  border-radius: 16px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: $secondary-dark-blue-30;
+}
+
+*::-webkit-scrollbar-button {
+  display: none;
+}
+
 body {
   transition: background-color 0.5s ease;
   margin: 0;
@@ -38,6 +71,7 @@ body {
       color: $supportive-red;
     }
 
+    &.multiselect,
     &.dropdown,
     &.datepicker {
       i-feather {

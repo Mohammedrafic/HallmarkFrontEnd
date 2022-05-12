@@ -7,6 +7,8 @@ import { Location } from '../../shared/models/location.model';
 import { Region } from '../../shared/models/region.model';
 import { CredentialType } from '../../shared/models/credential-type.model';
 import { Credential } from '../../shared/models/credential.model';
+import { SkillGroup } from '../../shared/models/skill-group.model';
+import { CredentialSetup } from '../../shared/models/credential-setup.model';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[admin] Set General States By Country';
@@ -271,4 +273,39 @@ export class UpdateCredential {
 export class RemoveCredential {
   static readonly type = '[admin] Remove Credential by ID';
   constructor(public payload: Credential) { }
+}
+
+export class GetAllSkills {
+  static readonly type = '[admin] Get All Skills';
+  constructor() {}
+}
+
+export class GetSkillGroup {
+  static readonly type = '[admin] Get Skill Group by Organization ID';
+  constructor(public payload: number) {}
+}
+
+export class SaveSkillGroup {
+  static readonly type = '[admin] Save Skill Group';
+  constructor(public skillGroup: SkillGroup, public organizationId: number) { }
+}
+
+export class UpdateSkillGroup {
+  static readonly type = '[admin] Update Skill Group';
+  constructor(public skillGroup: SkillGroup, public organizationId: number) { }
+}
+
+export class RemoveSkillGroup {
+  static readonly type = '[admin] Remove Skill Group';
+  constructor(public skillGroup: SkillGroup, public organizationId: number) { }
+}
+
+export class GetCredentialSetup {
+  static readonly type = '[admin] Get Credential Setup by Organization ID';
+  constructor(public payload: number) {}
+}
+
+export class SaveUpdateCredentialSetup {
+  static readonly type = '[admin] Save Credential Setup';
+  constructor(public credentialSetup: CredentialSetup, public organizationId: number) { }
 }

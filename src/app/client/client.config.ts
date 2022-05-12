@@ -1,75 +1,10 @@
 
 import { GRID_CONFIG } from '../shared/constants/grid-config';
 
-export const CLIENT_SIDEBAR_MENU: any[] = [
-  {
-    title: 'Dashboard',
-    icon: 'home',
-    route: '/client/dashboard',
-    children: [],
-    isActive: true,
-  },
-  {
-    title: 'Order Management',
-    icon: 'file-text',
-    route: '/client/order-management/all',
-    children: [
-      {
-        title: 'All Orders',
-        icon: '',
-        route: '/client/order-management/all'
-      },
-      {
-        title: 'Order Templates',
-        icon: '',
-        route: '/client/order-management/templates'
-      }
-    ],
-  },
-  {
-    title: 'Timesheets',
-    icon: 'clock',
-    route: '/client/time-sheets/all',
-    count: 2,
-    children: [
-      {
-        title: 'All Timesheets',
-        icon: '',
-        route: '/client/time-sheets/all'
-      }
-    ],
-  },
-  {
-    title: 'Invoices',
-    icon: 'dollar-sign',
-    route: '/client/invoices/all',
-    count: 6,
-    children: [
-      {
-        title: 'All Invoices',
-        icon: '',
-        route: '/client/invoices/all'
-      }
-    ],
-  },
-  {
-    title: 'Candidate List',
-    icon: 'users',
-    route: '/client/candidates',
-    children: [],
-  },
-  {
-    title: 'Reports',
-    icon: 'clipboard',
-    route: '/client/reports',
-    children: [],
-  }
-];
-
 export const SIDEBAR_CONFIG = {
   isDock: true,
   dockSize: '68px',
-  width: '240px',
+  width: '260px',
   type: 'Push'
 }
 

@@ -59,7 +59,15 @@ import {
   RemoveCredential,
   UpdateCredential,
   GetOrganizationLogo,
-  GetOrganizationLogoSucceeded, UpdateCredentialType
+  GetOrganizationLogoSucceeded,
+  UpdateCredentialType,
+  GetAllSkills,
+  GetSkillGroup,
+  SaveSkillGroup,
+  UpdateSkillGroup,
+  RemoveSkillGroup,
+  GetCredentialSetup,
+  SaveUpdateCredentialSetup,
 } from './admin.actions';
 import { DepartmentsService } from '../services/departments.service';
 import { Department } from '../../shared/models/department.model';
@@ -78,7 +86,10 @@ import { CredentialType } from '../../shared/models/credential-type.model';
 import { CredentialsService } from '../services/credentials.service';
 import { Credential } from '../../shared/models/credential.model';
 import { RECORD_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
-import { SaveCandidateSucceeded } from '../../agency/store/candidate.actions';
+import { SkillGroupService } from '../services/skill-group.service';
+import { CandidateStateModel } from '../../agency/store/candidate.state';
+import { SkillGroup } from '../../shared/models/skill-group.model';
+import { CredentialSetup } from '../../shared/models/credential-setup.model';
 
 interface DropdownOption {
   id: number;
@@ -116,6 +127,10 @@ export interface AdminStateModel {
   credentials: Credential[];
   isCredentialTypesLoading: boolean;
   isCredentialLoading: boolean;
+  skillGroups: SkillGroup[] | null;
+  isSkillGroupLoading: boolean;
+  credentialSetups: CredentialSetup[] | null;
+  isCredentialSetupLoading: boolean;
 }
 
 @State<AdminStateModel>({
@@ -151,7 +166,11 @@ export interface AdminStateModel {
     credentialTypes: [],
     credentials: [],
     isCredentialTypesLoading: false,
-    isCredentialLoading: false
+    isCredentialLoading: false,
+    skillGroups: [],
+    isSkillGroupLoading: false,
+    credentialSetups: [],
+    isCredentialSetupLoading: false
   },
 })
 @Injectable()
@@ -222,6 +241,12 @@ export class AdminState {
   @Selector()
   static credentials(state: AdminStateModel): Credential[] { return state.credentials }
 
+  @Selector()
+  static skillGroups(state: AdminStateModel): SkillGroup[]  | null { return state.skillGroups }
+
+  @Selector()
+  static credentialSetups(state: AdminStateModel): CredentialSetup[] | null { return state.credentialSetups }
+
   constructor(
     private organizationService: OrganizationService,
     private skillsService: SkillsService,
@@ -229,7 +254,8 @@ export class AdminState {
     private departmentService: DepartmentsService,
     private regionService: RegionService,
     private locationService: LocationService,
-    private credentialsService: CredentialsService
+    private credentialsService: CredentialsService,
+    private skillGroupService: SkillGroupService
   ) { }
 
   @Action(SetGeneralStatesByCountry)
@@ -614,6 +640,75 @@ export class AdminState {
     return this.credentialsService.removeCredential(payload).pipe(tap(() => {
       patchState({ isCredentialLoading: false });
       dispatch(new GetCredential(payload.businessUnitId));
+      return payload;
+    }));
+  }
+
+  @Action(GetAllSkills)
+  GetAllSkills({ patchState }: StateContext<CandidateStateModel>, { }: GetAllSkills): Observable<SkillsPage> {
+    return this.skillsService.getAllMasterSkills().pipe(
+      tap((payload) => {
+        patchState({ skills: payload });
+        return payload;
+      })
+    );
+  }
+
+  @Action(GetSkillGroup)
+  GetSkillGroupsByOrganizationId({ patchState }: StateContext<AdminStateModel>, { payload }: GetSkillGroup): Observable<SkillGroup[]> {
+    return this.skillGroupService.getSkillGroups(payload).pipe(tap((payload) => {
+      patchState({ skillGroups: payload });
+      return payload;
+    }));
+  }
+
+  @Action(SaveSkillGroup)
+  SaveSkillGroup({ patchState, dispatch }: StateContext<AdminStateModel>, { skillGroup, organizationId }: SaveSkillGroup): Observable<SkillGroup> {
+    return this.skillGroupService.saveUpdateSkillGroup(skillGroup).pipe(tap((payload) => {
+      patchState({ isSkillGroupLoading: false });
+      dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+      dispatch(new GetSkillGroup(organizationId));
+      return payload;
+    }));
+  }
+
+  @Action(UpdateSkillGroup)
+  UpdateSkillGroup({ patchState, dispatch }: StateContext<AdminStateModel>, { skillGroup, organizationId }: UpdateSkillGroup): Observable<SkillGroup> {
+    return this.skillGroupService.saveUpdateSkillGroup(skillGroup).pipe(tap((payload) => {
+      patchState({ isSkillGroupLoading: false });
+      dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      dispatch(new GetSkillGroup(organizationId));
+      return payload;
+    }));
+  }
+
+  @Action(RemoveSkillGroup)
+  RemoveSkillGroup({ patchState, dispatch }: StateContext<AdminStateModel>, { skillGroup, organizationId }: RemoveSkillGroup): Observable<void> {
+    return this.skillGroupService.removeSkillGroup(skillGroup).pipe(tap((payload) => {
+      patchState({ isSkillGroupLoading: false });
+      dispatch(new GetSkillGroup(organizationId));
+      return payload;
+    }));
+  }
+
+  @Action(GetCredentialSetup)
+  GetCredentialSetupsByOrganizationId({ patchState }: StateContext<AdminStateModel>, { payload }: GetCredentialSetup): Observable<CredentialSetup[]> {
+    return this.credentialsService.getCredentialSetup(payload).pipe(tap((payload) => {
+      patchState({ credentialSetups: payload });
+      return payload;
+    }));
+  }
+
+  @Action(SaveUpdateCredentialSetup)
+  SaveUpdateCredentialSetup({ patchState, dispatch }: StateContext<AdminStateModel>, { credentialSetup, organizationId }: SaveUpdateCredentialSetup): Observable<CredentialSetup> {
+    return this.credentialsService.saveUpdateCredentialSetup(credentialSetup).pipe(tap((payload) => {
+      patchState({ isCredentialSetupLoading: false });
+      if (credentialSetup.id) {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      } else {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+      }
+      dispatch(new GetCredentialSetup(organizationId));
       return payload;
     }));
   }

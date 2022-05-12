@@ -3,10 +3,7 @@ import { Component, ViewChild } from '@angular/core';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { Store } from '@ngxs/store';
 
-import {
-  AbstractGridConfigurationComponent
-} from '../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { SetHeaderState, ShowSideDialog } from '../../../../store/app.actions';
+import { ShowSideDialog } from '../../../../store/app.actions';
 
 export enum CredentialsNavigationTabs {
   CredentialsList,
@@ -18,16 +15,14 @@ export enum CredentialsNavigationTabs {
   templateUrl: './credentials.component.html',
   styleUrls: ['./credentials.component.scss']
 })
-export class CredentialsComponent extends AbstractGridConfigurationComponent  {
+export class CredentialsComponent {
   @ViewChild('navigationTabs') navigationTabs: TabComponent;
   isToolButtonsShown = true;
 
   isCredentialListActive = true;
   isCredentialSetupActive = false;
 
-  constructor(private store: Store) {
-    super();
-  }
+  constructor(private store: Store) {}
 
   onAddCredentialClick(): void {
     this.store.dispatch(new ShowSideDialog(true));
