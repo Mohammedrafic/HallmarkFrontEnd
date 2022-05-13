@@ -110,6 +110,10 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: ''
     },
+    29: { // MSP List
+      icon: '',
+      route: ''
+    },
     30: { // Roles & Permissions
       icon: '',
       route: 'security/roles-and-permissions'
@@ -229,6 +233,10 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: ''
     },
+    29: { // MSP List
+      icon: '',
+      route: ''
+    },
     30: { // Roles & Permissions
       icon: '',
       route: 'security/roles-and-permissions'
@@ -345,6 +353,10 @@ export const MENU_CONFIG: any = {
       route: ''
     },
     27: { // Configuration and Setting
+      icon: '',
+      route: ''
+    },
+    29: { // MSP List
       icon: '',
       route: ''
     },
@@ -469,6 +481,10 @@ export const MENU_CONFIG: any = {
     },
     28: { // User Management
       icon: 'lock',
+      route: ''
+    },
+    29: { // MSP List
+      icon: '',
       route: ''
     },
     30: { // Roles & Permissions

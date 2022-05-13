@@ -68,6 +68,7 @@ export class ClientManagementContentComponent implements OnInit, AfterViewInit {
 
   public onRowsDropDownChanged(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+    this.grid.pageSettings.pageSize = this.pageSize;
   }
 
   public onGoToClick(event: any): void {

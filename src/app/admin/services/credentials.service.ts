@@ -44,7 +44,7 @@ export class CredentialsService {
    * @param credentialType
    */
   public removeCredentialType(credentialType: CredentialType): Observable<any> {
-    return this.http.delete<CredentialType>(`/api/CredentialTypes/${credentialType.id}`);
+    return this.http.delete<any>(`/api/CredentialTypes/${credentialType.id}`);
   }
 
   /**

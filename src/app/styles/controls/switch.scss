@@ -4,19 +4,17 @@
   margin-right: 1rem;
 
   .e-switch-on {
-    background-color: $primary-active-blue-10 !important;
+    background-color: $primary-active-blue-80 !important;
   }
 
   .e-switch-off {
-    background-color: #fff !important;
+    background-color: $secondary-dark-blue-40 !important;
   }
 
   .e-switch-handle {
-    background-color: #fff !important;
-  }
-
-  .e-switch-handle.e-switch-active {
-    background-color: #fff !important;
+    .e-switch-active {
+      background-color: $primary-active-blue-10 !important;
+    }
   }
 }
 

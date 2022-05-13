@@ -46,7 +46,7 @@
               [validateDecimalOnType]="validateDecimalOnType"
               [decimals]="decimals"
               placeholder="Go to:"
-              min="1" [max]="lastAvailablePage"
+              min="1" [max]="(masterSkills$ | async)?.totalPages"
               [showSpinButton]="false"
               (change)="onGoToClick($event)"
             >

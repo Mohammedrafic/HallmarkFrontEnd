@@ -71,6 +71,12 @@ body {
       color: $supportive-red;
     }
 
+    &.datetimepicker {
+      i-feather {
+        right: 58px;
+      }
+    }
+
     &.multiselect,
     &.dropdown,
     &.datepicker {
@@ -201,6 +207,7 @@ hr {
 @import './controls/dialog';
 @import './controls/toast';
 @import './controls/button-with-icon';
+@import './controls/treeview';
 
 a, a:hover, a:focus, a:active {
   text-decoration: none;

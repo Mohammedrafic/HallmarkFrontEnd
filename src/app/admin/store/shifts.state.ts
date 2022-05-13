@@ -47,15 +47,15 @@ export class ShiftsState {
   SaveShift({ patchState, dispatch }: StateContext<ShiftsStateModel>, { payload }: SaveShift): Observable<Shift | void> {
     patchState({ isShiftLoading: true });
     return this.shiftsService.saveUpdateShift(payload).pipe(
-      tap((payload) => {
+      tap((payloadResponse) => {
         patchState({ isShiftLoading: false });
         if (payload.id) {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));``
         } else {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         }
-        dispatch(new SaveShiftSucceeded(payload));
-        return payload;
+        dispatch(new SaveShiftSucceeded(payloadResponse));
+        return payloadResponse;
       }),
       catchError((error: any) => {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))

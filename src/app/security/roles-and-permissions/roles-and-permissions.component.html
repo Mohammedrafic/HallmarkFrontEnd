@@ -1,1 +1,42 @@
-<p>roles-and-permissions works!</p>
+<app-page-toolbar>
+  <ng-container left>
+    <div class="bootstrap business-dropdowns">
+      <div class="dropdown-container">
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            appValidateWithMessage
+            [formControl]="businessUnitControl"
+            [dataSource]="[]"
+            placeholder="Business Unit"
+          ></ejs-dropdownlist>
+        </div>
+      </div>
+      <div class="dropdown-container">
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            appValidateWithMessage
+            [formControl]="businessControl"
+            [dataSource]="[]"
+            placeholder="Business"
+          ></ejs-dropdownlist>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container right>
+    <ng-container>
+      <button ejs-button cssClass="e-outline">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+      <button ejs-button [isPrimary]="true" (click)="onAddNewRole()">Add Role</button>
+    </ng-container>
+  </ng-container>
+</app-page-toolbar>
+
+<section class="role-and-permissions last-content-section-padding">
+  <app-roles-grid (editRoleEvent)="onEdit($event)"></app-roles-grid>
+</section>
+
+<app-side-dialog [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()">
+  <section>
+    <app-role-form [form]="$any(roleFormGroup)"></app-role-form>
+  </section>
+</app-side-dialog>

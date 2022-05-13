@@ -1,0 +1,35 @@
+@import "../variables/colors";
+
+body.light,
+body.dark {
+  .e-treeview {
+    .e-ul {
+      padding: 0;
+    }
+
+    .e-icon-collapsible,
+    .e-icon-expandable {
+      color: $secondary-dark-blue-20;
+    }
+
+    .e-list-text {
+      font-size: 14px;
+      color: $pure-black;
+    }
+
+    .e-checkbox-wrapper {
+      .e-frame {
+        border-color: $secondary-dark-blue-40;
+
+        &.e-check,
+        &.e-stop {
+          border-color: $secondary-dark-blue-45;
+        }
+        &.e-stop {
+          background-color: $primary-active-blue-10;
+          color: $white;
+        }
+      }
+    }
+  }
+}

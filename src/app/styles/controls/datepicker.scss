@@ -6,9 +6,44 @@ ejs-timepicker.e-timepicker.ng-invalid.ng-touched {
   }
 }
 
-ejs-datepicker.datepicker, ejs-timepicker.e-timepicker {
+ejs-datetimepicker.e-datetimepicker {
+  .e-clear-icon {
+    margin-right: -6px;
+  }
+
+  &.ng-invalid.ng-touched {
+    .e-clear-icon {
+      margin-right: 13px;
+    }
+  }
+}
+
+body.light, body.dark {
+  .bootstrap {
+    ejs-datetimepicker.e-datetimepicker {
+      .e-input-group-icon.e-icons {
+        &.e-time-icon {
+          margin-left: 0;
+        }
+    
+        &.e-date-icon {
+          margin-right: -5px;
+          border: none !important;
+
+          &:hover {
+            background-color: transparent;
+            color: $primary-active-blue-10;
+          }
+        }
+      }
+    }
+  }
+}
+
+ejs-datepicker.datepicker, ejs-timepicker.e-timepicker, ejs-datetimepicker.e-datetimepicker {
   .e-input-group.e-control-wrapper.e-date-wrapper,
-  .e-input-group.e-control-wrapper.e-time-wrapper {
+  .e-input-group.e-control-wrapper.e-time-wrapper,
+  .e-input-group.e-control-wrapper.e-datetime-wrapper {
     border-radius: 8px !important;
     border: 1px solid $secondary-dark-blue-40 !important;
     height: 35px;

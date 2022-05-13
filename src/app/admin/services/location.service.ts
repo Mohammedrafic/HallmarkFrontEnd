@@ -49,7 +49,7 @@ export class LocationService {
   /**
    * Delete the location by id
    */
-  public deleteLocationById(locationId: number): Observable<void> {
-    return this.http.delete<void>(`/api/Locations/${locationId}`);
+  public deleteLocationById(locationId: number): Observable<any> {
+    return this.http.delete<any>(`/api/Locations/${locationId}`);
   }
 }

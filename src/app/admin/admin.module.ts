@@ -7,7 +7,7 @@ import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule, Switch
 import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { UploaderModule, TextBoxModule, NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
-import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
+import { DatePickerModule, TimePickerModule, DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
 import {
@@ -24,7 +24,8 @@ import {
   AlertCircle,
   Edit3,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Copy
 } from 'angular-feather/icons';
 
 import { ClientManagementContentComponent } from './client-management/client-management-content/client-management-content.component';
@@ -53,6 +54,8 @@ import { ShiftsComponent } from './organization-management/organization-manageme
 import { AddEditSkillGroupComponent } from './organization-management/organization-management-content/credentials/credentials-setup/add-edit-skill-group/add-edit-skill-group.component';
 import { ShiftsState } from './store/shifts.state';
 import { SettingsComponent } from './organization-management/organization-management-content/settings/settings.component';
+import { MasterHolidaysComponent } from './master-data/holidays/holidays.component';
+import { HolidaysState } from './store/holidays.state';
 
 const sidebarIcons = {
   Download,
@@ -68,7 +71,8 @@ const sidebarIcons = {
   AlertCircle,
   Edit3,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Copy
 };
 @NgModule({
   declarations: [
@@ -91,7 +95,8 @@ const sidebarIcons = {
     DashboardComponent,
     ShiftsComponent,
     AddEditSkillGroupComponent,
-    SettingsComponent
+    SettingsComponent,
+    MasterHolidaysComponent,
   ],
   imports: [
     CommonModule,
@@ -116,6 +121,7 @@ const sidebarIcons = {
     TabModule,
     TabAllModule,
     TimePickerModule,
+    DateTimePickerModule,
     MultiSelectAllModule,
     SwitchModule,
 
@@ -124,7 +130,8 @@ const sidebarIcons = {
     //STORE
     NgxsModule.forFeature([
       AdminState,
-      ShiftsState
+      ShiftsState,
+      HolidaysState,
     ]),
   ],
   providers: [

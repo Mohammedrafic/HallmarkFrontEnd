@@ -44,7 +44,7 @@
               [validateDecimalOnType]="validateDecimalOnType"
               [decimals]="decimals"
               placeholder="Go to:"
-              min="1" [max]="lastAvailablePage"
+              min="1" [max]="(skillsCategories$ | async)?.totalPages"
               [showSpinButton]="false"
               (change)="onGoToClick($event)"
             >
