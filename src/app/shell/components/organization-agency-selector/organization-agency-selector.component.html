@@ -1,0 +1,34 @@
+<div class="dropdown-container bootstrap">
+  <div class="input-group dropdown">
+    <ejs-dropdownlist
+      id="organization-agency-dropdown"
+      cssClass="organization-agency-dropdown-popup"
+      [fields]="optionFields"
+      [dataSource]="organizationAgencies"
+      [formControl]="organizationAgencyControl"
+      popupHeight="402px">
+      <ng-template #itemTemplate let-data>
+        <div class="item-container">
+          <div class="logo-container">
+            <img [src]="data.logo" alt="logo">
+          </div>
+
+          <div class="details">
+            <p class="name">{{data.name}}</p>
+            <p class="type">{{data.type}}</p>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #valueTemplate let-data>
+        <div class="value-container">
+          <div class="logo-container">
+            <img [src]="data.logo" alt="logo">
+          </div>
+
+          <p class="title">{{data.name}}</p>
+        </div>
+      </ng-template>
+    </ejs-dropdownlist>
+  </div>
+</div>

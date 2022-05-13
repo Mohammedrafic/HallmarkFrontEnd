@@ -59,11 +59,15 @@
         <i-feather *ngIf="(headerState$ | async)?.iconName" name="{{ (headerState$ | async)?.iconName }}" class="icon"></i-feather>
         <h1>{{ (headerState$ | async)?.title }}</h1>
       </div>
-      <div class="header-item stick-right">Header content</div>
-      <div class="header-item stick-right">{{ (user$ | async)?.businessUnitName }}</div>
 
-      <!-- Temporary solution to log out from the application -->
-      <button class="logout-button" ejs-button cssClass="e-primary" (click)="logout()">Logout</button>
+      <div class="stick-right header-content">
+        <app-organization-agency-selector></app-organization-agency-selector>
+        <div class="devider"></div>
+        <div class="header-item">{{ (user$ | async)?.businessUnitName }}</div>
+
+        <!-- Temporary solution to log out from the application -->
+        <button class="logout-button" ejs-button cssClass="e-primary" (click)="logout()">Logout</button>
+      </div>
     </div>
 
     <div class="content">

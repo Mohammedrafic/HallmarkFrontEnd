@@ -1,0 +1,49 @@
+@import "colors";
+@import "mixins";
+
+.item-container {
+  display: flex;
+  padding: 20px;
+}
+
+.logo-container {
+  @include flex-center;
+  img {
+    max-width: 32px;
+    max-height: 32px;
+  }
+}
+
+.details {
+  overflow: hidden;
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 20px;
+    @include with-ellipsis;
+    &.name {
+      font-weight: 700;
+      color: $secondary-dark-blue-15;
+    }
+
+    &.type {
+      font-weight: 400;
+      color: $secondary-dark-blue-30;
+    }
+  }
+}
+
+.value-container {
+  display: flex;
+  max-width: 231px;
+  padding: 10px 14px 10px 10px;
+  .logo-container {
+    margin-right: 12px;
+  }
+
+  .title {
+    font-size: 14px;
+    font-weight: 700;
+    @include with-ellipsis;
+  }
+}

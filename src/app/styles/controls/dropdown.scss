@@ -52,3 +52,55 @@ body.light, body.dark {
     }
   }
 }
+
+/** Begin organization-agency-dropdown styles */
+
+#organization-agency-dropdown {
+  .e-input-group {
+    height: 56px;
+    border: none;
+    background-color: transparent;
+    color: $secondary-dark-blue-15;
+    &:hover {
+      background-color: $primary-active-blue-70;
+      color: $primary-active-blue-10;
+    }
+    &:active {
+      background-color: $primary-active-blue;
+      color: $white;
+    }
+    &.e-input-focus {
+      padding-left: 0;
+    }
+    .e-input-group-icon {
+      align-items: flex-start;
+      color: inherit;
+    }
+  }
+}
+
+.organization-agency-dropdown-popup {
+  &.e-popup {
+    width: auto !important;
+    max-width: 320px;
+  }
+
+  .e-content .e-list-parent .e-list-item {
+    padding-right: 0;
+    &.e-item-focus {
+      background-color: transparent;
+    }
+    &.e-hover {
+      background-color: $primary-active-blue-80;
+    }
+    &.e-active {
+      background-color: $primary-active-blue;
+      color: $white;
+      p {
+        color: $white;
+      }
+    }
+  }
+}
+
+/** End organization-agency-dropdown styles */
