@@ -83,7 +83,6 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   onSideBarCreated(): void {
     // code placed here since this.sidebar = undefined in ngOnInit() as sidebar not creates in time
     this.isSideBarDocked$.pipe(takeUntil(this.unsubscribe$)).subscribe(isDocked => this.sidebar.isOpen = isDocked);
-
     this.isFirstLoad$.pipe(takeUntil(this.unsubscribe$)).subscribe(isFirstLoad => {
       this.isFirstLoad = isFirstLoad;
       if (isFirstLoad) {

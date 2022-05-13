@@ -1,8 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { FreezeService, SortService } from '@syncfusion/ej2-angular-grids';
+import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, delay, filter, Observable, Subject } from 'rxjs';
 import { GetSkillsCategoriesByPage, RemoveSkillsCategory, RemoveSkillsCategorySucceeded, SaveSkillsCategory, SaveSkillsCategorySucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
@@ -22,6 +22,9 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
   private pageSubject = new Subject<number>();
 
   @Input() isActive: boolean = false;
+
+  @ViewChild('grid')
+  public grid: GridComponent;
 
   @Select(AdminState.skillsCategories)
   skillsCategories$: Observable<SkillCategoriesPage>;
@@ -102,6 +105,7 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
 
   public onRowsDropDownChanged(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+    this.grid.pageSettings.pageSize = this.pageSize;
   }
 
   public onGoToClick(event: any): void {

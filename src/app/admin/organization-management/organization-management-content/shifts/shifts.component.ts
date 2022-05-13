@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { Department } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
-import { FreezeService, SortService } from '@syncfusion/ej2-angular-grids';
+import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, Observable, Subject } from 'rxjs';
 import { GetDepartmentsByLocationId, GetLocationsByRegionId, GetRegionsByOrganizationId, SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
@@ -24,6 +24,9 @@ import { ShowSideDialog } from 'src/app/store/app.actions';
 })
 export class ShiftsComponent extends AbstractGridConfigurationComponent implements OnInit {
   private pageSubject = new Subject<number>();
+
+  @ViewChild('grid')
+  public grid: GridComponent;
 
   @Select(ShiftsState.shiftsPage)
   shiftsPage$: Observable<any>;
@@ -165,6 +168,7 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
 
   public onRowsDropDownChanged(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+    this.grid.pageSettings.pageSize = this.pageSize;
   }
 
   public onGoToClick(event: any): void {

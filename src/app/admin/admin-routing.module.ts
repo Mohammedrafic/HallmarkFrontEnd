@@ -25,6 +25,7 @@ import { SettingsComponent } from '@admin/organization-management/organization-m
 import {
   AddEditSkillGroupComponent
 } from './organization-management/organization-management-content/credentials/credentials-setup/add-edit-skill-group/add-edit-skill-group.component';
+import { MasterHolidaysComponent } from './master-data/holidays/holidays.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -98,6 +99,10 @@ const routes: Routes = [
           {
             path: 'credential-types',
             component: MasterCredentialsTypesComponent
+          },
+          {
+            path: 'holidays',
+            component: MasterHolidaysComponent
           }
         ]
       }
