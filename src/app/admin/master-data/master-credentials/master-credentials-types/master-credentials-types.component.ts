@@ -81,7 +81,7 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
         okButtonClass: 'delete-button'
       })
       .subscribe((confirm) => {
-        if (confirm && credentialType.id) { // TODO: add verification to prevent remove if location is used elsewhere
+        if (confirm && credentialType.id) {
           this.store.dispatch(new RemoveCredentialType(credentialType));
         }
         this.removeActiveCssClass();

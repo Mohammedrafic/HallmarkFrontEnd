@@ -34,7 +34,6 @@ import {
 import { ConfirmService } from '../../../../shared/services/confirm.service';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
-export const MESSAGE_CANNOT_BE_DELETED = 'Department cannot be deleted';
 
 @Component({
   selector: 'app-departments',
@@ -156,7 +155,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         okButtonClass: 'delete-button'
       })
       .subscribe((confirm) => {
-        if (confirm && department.departmentId) { // TODO: add verification to prevent remove if department has assigned Order with any status
+        if (confirm && department.departmentId) {
           this.store.dispatch(new DeleteDepartmentById(department));
         }
         this.removeActiveCssClass();

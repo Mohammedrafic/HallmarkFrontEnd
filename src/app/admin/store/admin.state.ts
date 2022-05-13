@@ -360,12 +360,13 @@ export class AdminState {
   }
 
   @Action(DeleteDepartmentById)
-  DeleteDepartmentById({ patchState, dispatch }: StateContext<AdminStateModel>, { department }: DeleteDepartmentById): Observable<void> {
+  DeleteDepartmentById({ patchState, dispatch }: StateContext<AdminStateModel>, { department }: DeleteDepartmentById): Observable<any> {
     return this.departmentService.deleteDepartmentById(department.departmentId).pipe(tap((payload) => {
       patchState({ isDepartmentLoading: false });
       dispatch(new GetDepartmentsByLocationId(department.locationId));
       return payload;
-    }));
+    }),
+      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
   }
 
   @Action(GetRegionsByOrganizationId)
@@ -448,12 +449,13 @@ export class AdminState {
   }
 
   @Action(DeleteLocationById)
-  DeleteLocationById({ patchState, dispatch }: StateContext<AdminStateModel>, { locationId, regionId }: DeleteLocationById): Observable<void> {
+  DeleteLocationById({ patchState, dispatch }: StateContext<AdminStateModel>, { locationId, regionId }: DeleteLocationById): Observable<any> {
     return this.locationService.deleteLocationById(locationId).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
       dispatch(new GetLocationsByRegionId(regionId));
       return payload;
-    }));
+    }),
+    catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
   }
 
   @Action(GetMasterSkillsByPage)
@@ -589,12 +591,13 @@ export class AdminState {
   }
 
   @Action(RemoveCredentialType)
-  RemoveCredentialTypes({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveCredentialType): Observable<CredentialType> {
+  RemoveCredentialTypes({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveCredentialType): Observable<any> {
     return this.credentialsService.removeCredentialType(payload).pipe(tap((payload) => {
       patchState({ isCredentialTypesLoading: false });
       dispatch(new GetCredentialTypes());
       return payload;
-    }));
+    }),
+    catchError((error: any) =>  dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
   }
 
   @Action(GetCredential)
@@ -641,7 +644,8 @@ export class AdminState {
       patchState({ isCredentialLoading: false });
       dispatch(new GetCredential(payload.businessUnitId));
       return payload;
-    }));
+    }),
+    catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
   }
 
   @Action(GetAllSkills)

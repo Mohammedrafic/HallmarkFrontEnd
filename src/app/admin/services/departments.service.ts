@@ -37,7 +37,7 @@ export class DepartmentsService {
   /**
    * Delete department
    */
-  public deleteDepartmentById(departmentId?: number): Observable<void> {
-    return this.http.delete<void>(`/api/Departments/${departmentId}`);
+  public deleteDepartmentById(departmentId?: number): Observable<any> {
+    return this.http.delete<any>(`/api/Departments/${departmentId}`);
   }
 }

@@ -37,7 +37,6 @@ import { Organization } from '../../../../shared/models/organization.model';
 import { ConfirmService } from '../../../../shared/services/confirm.service';
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
-export const MESSAGE_REGION_LOCATION_CANNOT_BE_DELETED = 'Region/Location cannot be deleted';
 
 @Component({
   selector: 'app-locations',
@@ -192,7 +191,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         okButtonClass: 'delete-button'
       })
       .subscribe((confirm) => {
-        if (confirm && location.id && this.selectedRegion.id) { // TODO: add verification to prevent remove if location is used elsewhere
+        if (confirm && location.id && this.selectedRegion.id) {
           this.store.dispatch(new DeleteLocationById(location.id, this.selectedRegion.id));
         }
         this.removeActiveCssClass();
