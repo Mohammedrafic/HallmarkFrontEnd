@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject } from 'rxjs';
@@ -11,13 +11,14 @@ import { AbstractGridConfigurationComponent } from 'src/app/shared/components/ab
 import { FeeExceptions, FeeExceptionsPage, FeeSettingsClassification } from 'src/app/shared/models/associate-organizations.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT } from '@shared/constants/messages';
+import { GRID_CONFIG } from '@shared/constants/grid-config';
 
 @Component({
   selector: 'app-fee-settings',
   templateUrl: './fee-settings.component.html',
   styleUrls: ['./fee-settings.component.scss'],
 })
-export class FeeSettingsComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class FeeSettingsComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit {
   @Input() form: FormGroup;
 
   @ViewChild('grid') grid: GridComponent;
@@ -46,6 +47,10 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
       this.organizationId = organizationId;
       this.store.dispatch(new GetFeeSettingByOrganizationId(organizationId, this.currentPage, this.pageSize));
     });
+  }
+
+  ngAfterViewInit(): void {
+    this.grid.rowHeight = GRID_CONFIG.initialRowHeight;
   }
 
   public addNew(): void {

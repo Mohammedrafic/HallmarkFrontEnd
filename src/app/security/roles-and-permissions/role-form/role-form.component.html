@@ -1,0 +1,48 @@
+<div [formGroup]="form" id="addNewRoleForm" class="role-form">
+  <div class="dropdown-container bootstrap">
+    <label>Bussines Unit<span class="required">*</span></label>
+    <div class="input-group dropdown">
+      <ejs-dropdownlist
+        appValidateWithMessage
+        formControlName="businessUnit"
+        [dataSource]="[]"
+        placeholder="Bussines Unit"
+      ></ejs-dropdownlist>
+    </div>
+  </div>
+
+  <div class="dropdown-container bootstrap">
+    <label>Business<span class="required">*</span></label>
+    <div class="input-group dropdown">
+      <ejs-dropdownlist appValidateWithMessage formControlName="business" [dataSource]="[]" placeholder="Business"></ejs-dropdownlist>
+    </div>
+  </div>
+
+  <div class="input-container bootstrap">
+    <label>Role<span class="required">*</span></label>
+    <div class="input-group">
+      <input appValidateWithMessage formControlName="role" class="e-input" type="text" placeholder="Role" />
+    </div>
+  </div>
+
+  <div class="dropdown-container bootstrap">
+    <label>Copy Role From</label>
+    <div class="input-group dropdown">
+      <ejs-dropdownlist
+        appValidateWithMessage
+        [formControl]="copyRoleControl"
+        [dataSource]="[]"
+        placeholder="Copy Role From"
+      ></ejs-dropdownlist>
+    </div>
+  </div>
+
+  <div class="active-toggle">
+    <ejs-switch class="switch" [checked]="form.get('isActive')?.value" (change)="toggleActive()"></ejs-switch>
+    <span class="e-text">Active</span>
+  </div>
+
+  <hr class="divider" />
+
+  <ejs-treeview #tree [fields]="treeField" [showCheckBox]="true" (nodeClicked)="onSelecting()" (dataBound)="dataBound()"></ejs-treeview>
+</div>

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { FeatherModule } from 'angular-feather';
 
-import { AlertCircle, CheckCircle } from 'angular-feather/icons';
+import { AlertCircle, CheckCircle, allIcons } from 'angular-feather/icons';
 import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
 import { ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 
