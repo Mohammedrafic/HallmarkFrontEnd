@@ -5,7 +5,7 @@ export class Credential {
   name: string;
   businessUnitId?: number;
   expireDateApplicable: boolean;
-  description?: string; // TODO: remove after BE fix
+  comment?: string;
 
   constructor(credential: Credential) {
     if (credential.id) {
@@ -17,7 +17,8 @@ export class Credential {
     }
 
     this.credentialTypeId = credential.credentialTypeId;
-    this.description = this.name = credential.name;
+    this.name = credential.name;
+    this.comment = credential.comment;
     this.expireDateApplicable = credential.expireDateApplicable;
   }
 }

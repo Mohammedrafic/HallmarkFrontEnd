@@ -222,7 +222,7 @@
   }
 
   .header {
-    height: 60px;
+    height: 80px;
     width: 100%;
     position: fixed;
     display: flex;
@@ -248,11 +248,30 @@
   }
 
   .content {
-    padding: 60px 25px 0 25px;
-    height: calc(100% - 60px);
+    padding: 80px 25px 0 25px;
+    height: calc(100% - 80px);
 
     .last-section {
       margin-bottom: 25px;
     }
  }
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.devider {
+  box-sizing: border-box;
+  height: 100%;
+  padding: 24px 10px;
+  background-color:$secondary-dark-blue-40;
+  background-clip: content-box;
+  &::before {
+    display: block;
+    width: 1px;
+    content: "";
+  }
 }
