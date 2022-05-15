@@ -1,24 +1,19 @@
 import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
 import { combineLatestWith, filter, Observable } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-
 import {
   AbstractGridConfigurationComponent
-} from '../../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { ShowSideDialog, ShowToast } from '../../../../../store/app.actions';
-import { MessageTypes } from '../../../../../shared/enums/message-types';
-import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, RECORD_ADDED } from '../../../../../shared/constants/messages';
-import { GetCredential, GetCredentialTypes, RemoveCredential, SaveCredential, UpdateCredential } from '../../../../store/admin.actions';
-import { Credential } from '../../../../../shared/models/credential.model';
-import { AdminState } from '../../../../store/admin.state';
-import { CredentialType } from '../../../../../shared/models/credential-type.model';
-import { ConfirmService } from '../../../../../shared/services/confirm.service';
-
-export const MESSAGE_CANNOT_BE_DELETED = 'Credential cannot be deleted';
+} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { ShowSideDialog } from '../../../../../store/app.actions';
+import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
+import { GetCredential, GetCredentialTypes, RemoveCredential, SaveCredential, UpdateCredential } from '@admin/store/admin.actions';
+import { Credential } from '@shared/models/credential.model';
+import { AdminState } from '@admin/store/admin.state';
+import { CredentialType } from '@shared/models/credential-type.model';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 @Component({
   selector: 'app-credentials-list',
@@ -69,7 +64,8 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     this.credentialsFormGroup.setValue({
       credentialTypeId: credential.credentialTypeId,
       name: credential.name,
-      expireDateApplicable: credential.expireDateApplicable
+      expireDateApplicable: credential.expireDateApplicable,
+      comment: credential.comment
     });
     this.editedCredentialId = credential.id;
     this.isEdit = true;
@@ -78,22 +74,18 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
   onRemoveButtonClick(credential: Credential, event: any): void {
     this.addActiveCssClass(event);
-    if (credential.id) { // TODO: add verification to prevent remove if credential is used elsewhere
-      this.confirmService
-        .confirm('Are you sure want to delete?', {
-          title: 'Delete Record',
-          okButtonLabel: 'Delete',
-          okButtonClass: 'delete-button'
-        })
-        .subscribe((confirm) => {
-          if (confirm) {
-            this.store.dispatch(new RemoveCredential(credential));
-          }
-          this.removeActiveCssClass();
-        });
-    } else {
-      this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_CANNOT_BE_DELETED));
-    }
+    this.confirmService
+      .confirm('Are you sure want to delete?', {
+        title: 'Delete Record',
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button'
+      })
+      .subscribe((confirm) => {
+        if (confirm) {
+          this.store.dispatch(new RemoveCredential(credential));
+        }
+        this.removeActiveCssClass();
+      });
   }
 
   onRowsDropDownChanged(): void {
@@ -132,7 +124,8 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
           id: this.editedCredentialId,
           name: this.credentialsFormGroup.controls['name'].value,
           credentialTypeId: this.credentialsFormGroup.controls['credentialTypeId'].value,
-          expireDateApplicable: this.credentialsFormGroup.controls['expireDateApplicable'].value
+          expireDateApplicable: this.credentialsFormGroup.controls['expireDateApplicable'].value,
+          comment: this.credentialsFormGroup.controls['comment'].value,
         });
 
         this.store.dispatch(new UpdateCredential(credential, this.fakeOrganizationId));
@@ -143,6 +136,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
           name: this.credentialsFormGroup.controls['name'].value,
           credentialTypeId: this.credentialsFormGroup.controls['credentialTypeId'].value,
           expireDateApplicable: this.credentialsFormGroup.controls['expireDateApplicable'].value,
+          comment: this.credentialsFormGroup.controls['comment'].value,
           businessUnitId: this.fakeOrganizationId  // TODO: replace with valid value after BE implementation
         });
         this.store.dispatch(new SaveCredential(credential));
@@ -178,7 +172,8 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     this.credentialsFormGroup = this.formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       credentialTypeId: ['', Validators.required],
-      expireDateApplicable: [false]
+      expireDateApplicable: [false],
+      comment: ['', Validators.maxLength(500)]
     });
   }
 
