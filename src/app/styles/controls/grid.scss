@@ -73,6 +73,12 @@ ejs-grid.e-control.e-grid {
     }
   }
 
+  &.e-grid-without-header {
+    .e-gridheader {
+      display: none;
+    }
+  }
+
   ejs-pager {
     border-top: none;
   }

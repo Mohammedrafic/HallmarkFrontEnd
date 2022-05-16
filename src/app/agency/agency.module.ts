@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
+import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
 import { FeatherModule } from 'angular-feather';
 import { Sliders, Plus, Trash2, Edit, Copy, Download } from 'angular-feather/icons';
 
@@ -88,6 +89,7 @@ const sidebarIcons = {
     NumericTextBoxModule,
     TextBoxModule,
     DatePickerModule,
+    UploaderModule,
     TabAllModule,
     DialogAllModule,
     MultiSelectAllModule,

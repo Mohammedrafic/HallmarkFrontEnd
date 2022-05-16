@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CandidateCredentialPage } from "@shared/models/candidate-credential.model";
+import { CandidateCredential, CandidateCredentialPage } from "@shared/models/candidate-credential.model";
+import { CredentialType } from "@shared/models/credential-type.model";
+import { Credential } from "@shared/models/credential.model";
 import { Observable } from 'rxjs';
 import { Candidate, CandidatePage } from 'src/app/shared/models/candidate.model';
 import { Education } from "src/app/shared/models/education.model";
@@ -126,5 +128,42 @@ export class CandidateService {
       `/api/CandidateCredentials/candidateProfileId/${id}`,
       { params: { PageNumber: pageNumber, PageSize: pageSize }}
     );
+  }
+
+  /**
+   * Get Master Credentials by searchTerm and credentialTypeId
+   * @param searchTerm
+   * @param credentialTypeId
+   * @return list of candidates credential
+   */
+  public getMasterCredentials(searchTerm: string, credentialTypeId: number | string): Observable<Credential[]> {
+    return this.http.get<Credential[]>(`/api/MasterCredentials`, { params: { SearchTerm: searchTerm, CredentialTypeId: credentialTypeId }});
+  }
+
+  /**
+   * Create or update CandidateCredential
+   * @param credential object to save
+   * @return Created/Updated CandidateCredential
+   */
+  public saveCredential(credential: CandidateCredential): Observable<CandidateCredential> {
+    return credential.id ?
+      this.http.put<CandidateCredential>(`/api/CandidateCredentials`, credential) :
+      this.http.post<CandidateCredential>(`/api/CandidateCredentials`, credential);
+  }
+
+  /**
+   * Remove CandidateCredential
+   * @param credential
+   */
+  public removeCredential(credential: CandidateCredential): Observable<CandidateCredential> {
+    return this.http.delete<CandidateCredential>(`/api/CandidateCredentials/${credential.id}`);
+  }
+
+  /**
+   * Get credential types
+   * @return list of credential types
+   */
+  public getCredentialTypes(): Observable<CredentialType[]> {
+    return this.http.get<CredentialType[]>(`/api/CredentialTypes/all`);
   }
 }

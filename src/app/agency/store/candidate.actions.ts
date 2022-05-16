@@ -1,3 +1,4 @@
+import { CandidateCredential } from "@shared/models/candidate-credential.model";
 import { Candidate } from "src/app/shared/models/candidate.model";
 import { Education } from "src/app/shared/models/education.model";
 import { Experience } from "src/app/shared/models/experience.model";
@@ -100,4 +101,34 @@ export class GetCandidatePhotoSucceeded {
 export class GetCandidatesCredentialByPage {
   static readonly type = '[candidate] Get Candidates Credential by Page';
   constructor(public pageNumber: number, public pageSize: number) { }
+}
+
+export class GetMasterCredentials {
+  static readonly type = '[candidate] Get Master Credentials by searchTerm and credentialTypeId';
+  constructor(public searchTerm: string, public credentialTypeId: number | string) { }
+}
+
+export class SaveCandidatesCredential {
+  static readonly type = '[candidate] Save Candidates Credential';
+  constructor(public payload: CandidateCredential) { }
+}
+
+export class SaveCandidatesCredentialSucceeded {
+  static readonly type = '[candidate] Save Candidates Credential Succeeded';
+  constructor(public payload: CandidateCredential) { }
+}
+
+export class RemoveCandidatesCredential {
+  static readonly type = '[candidate] Remove Candidates Credential';
+  constructor(public payload: CandidateCredential) { }
+}
+
+export class RemoveCandidatesCredentialSucceeded {
+  static readonly type = '[candidate] Remove Candidates Credential Succeeded';
+  constructor() { }
+}
+
+export class GetCredentialTypes {
+  static readonly type = '[candidate] Get Credential Types';
+  constructor() { }
 }
