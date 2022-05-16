@@ -1,9 +1,12 @@
 import { PageOfCollections } from "@shared/models/page.model";
 
 export type CandidateCredential = {
-  id: number;
+  id?: number;
+  candidateProfileId?: number;
+  status?: number;
+  completedDate: string | null;
+  masterName?: string;
   masterCredentialId: number;
-  masterName: string;
   number: string;
   insitute: string;
   experience: string;

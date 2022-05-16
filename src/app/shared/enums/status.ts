@@ -27,3 +27,9 @@ export enum CandidateStatus {
   Active,
   Incomplete
 }
+
+export enum CredentialVerifiedStatus {
+  Pending,
+  Verified,
+  Completed
+}

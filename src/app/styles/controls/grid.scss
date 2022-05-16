@@ -50,6 +50,10 @@ ejs-grid.e-control.e-grid {
   .e-gridcontent {
     .e-content {
       .e-table {
+        tr[role=row]:not(.e-editedrow):hover .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
+          background-color: $primary-active-blue-90;
+        }
+
         .e-emptyrow {
           height: 100%;
           position: absolute;
@@ -70,6 +74,12 @@ ejs-grid.e-control.e-grid {
           }
         }
       }
+    }
+  }
+
+  &.e-grid-without-header {
+    .e-gridheader {
+      display: none;
     }
   }
 

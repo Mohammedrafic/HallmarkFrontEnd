@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { CredentialType } from "@shared/models/credential-type.model";
+import { Credential } from "@shared/models/credential.model";
 import { catchError, Observable, of, tap } from "rxjs";
 
-import { CandidateCredentialPage } from "@shared/models/candidate-credential.model";
+import { CandidateCredential, CandidateCredentialPage } from "@shared/models/candidate-credential.model";
 import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages";
 import { MessageTypes } from "src/app/shared/enums/message-types";
 import { Candidate, CandidatePage } from 'src/app/shared/models/candidate.model';
@@ -20,13 +22,19 @@ import {
   GetCandidatePhotoSucceeded,
   GetCandidatesByPage,
   GetCandidatesCredentialByPage,
+  GetCredentialTypes,
   GetEducationByCandidateId,
   GetExperienceByCandidateId,
+  GetMasterCredentials,
+  RemoveCandidatesCredential,
+  RemoveCandidatesCredentialSucceeded,
   RemoveEducation,
   RemoveEducationSucceeded,
   RemoveExperience,
   RemoveExperienceSucceeded,
   SaveCandidate,
+  SaveCandidatesCredential,
+  SaveCandidatesCredentialSucceeded,
   SaveCandidateSucceeded,
   SaveEducation,
   SaveEducationSucceeded,
@@ -43,6 +51,8 @@ export interface CandidateStateModel {
   educations: Education[];
   candidatePage: CandidatePage | null;
   candidateCredentialPage: CandidateCredentialPage | null;
+  credentialTypes: CredentialType[];
+  masterCredentials: Credential[];
 }
 
 @State<CandidateStateModel>({
@@ -54,7 +64,9 @@ export interface CandidateStateModel {
     skills: null,
     experiences: [],
     educations: [],
-    candidateCredentialPage: null
+    candidateCredentialPage: null,
+    credentialTypes: [],
+    masterCredentials: []
   },
 })
 @Injectable()
@@ -81,6 +93,16 @@ export class CandidateState {
   @Selector()
   static candidateCredential(state: CandidateStateModel): CandidateCredentialPage | null {
     return state.candidateCredentialPage;
+  }
+
+  @Selector()
+  static credentialTypes(state: CandidateStateModel): CredentialType[] {
+    return state.credentialTypes;
+  }
+
+  @Selector()
+  static masterCredentials(state: CandidateStateModel): Credential[] {
+    return state.masterCredentials;
   }
 
   constructor(private candidateService: CandidateService, private skillsService: SkillsService) {}
@@ -239,5 +261,49 @@ export class CandidateState {
         return payload;
       })
     );
+  }
+
+  @Action(GetMasterCredentials)
+  GetMasterCredentials({ patchState }: StateContext<CandidateStateModel>, { searchTerm, credentialTypeId }: GetMasterCredentials): Observable<Credential[]> {
+    patchState({ isCandidateLoading: true });
+    return this.candidateService.getMasterCredentials(searchTerm, credentialTypeId).pipe(
+      tap((payload) => {
+        patchState({ isCandidateLoading: false, masterCredentials: payload });
+        return payload;
+      })
+    );
+  }
+
+  @Action(SaveCandidatesCredential)
+  SaveCandidatesCredential({ patchState, dispatch, getState }: StateContext<CandidateStateModel>, { payload }: SaveCandidatesCredential): Observable<CandidateCredential | void> {
+    const isCreating = !payload.id;
+    patchState({ isCandidateLoading: true });
+    return this.candidateService.saveCredential(payload).pipe(tap((payload) => {
+        patchState({ isCandidateLoading: false });
+        dispatch(new SaveCandidatesCredentialSucceeded(payload));
+        dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
+        return payload;
+      }),
+      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, 'Credential already exists')))
+    );
+  }
+
+  @Action(RemoveCandidatesCredential)
+  RemoveCandidatesCredential({ patchState, dispatch }: StateContext<CandidateStateModel>, { payload }: RemoveCandidatesCredential): Observable<any> {
+    patchState({ isCandidateLoading: true });
+    return this.candidateService.removeCredential(payload).pipe(tap((payload) => {
+        patchState({ isCandidateLoading: false });
+        dispatch(new RemoveCandidatesCredentialSucceeded());
+        return payload;
+      }),
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Credential cannot be deleted')))));
+  }
+
+  @Action(GetCredentialTypes)
+  GetCredentialTypes({ patchState }: StateContext<CandidateStateModel>, { }: GetCredentialTypes): Observable<CredentialType[]> {
+    return this.candidateService.getCredentialTypes().pipe(tap((payload) => {
+      patchState({ credentialTypes: payload });
+      return payload;
+    }));
   }
 }

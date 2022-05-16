@@ -51,9 +51,6 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
     this.actions$.pipe(ofActionSuccessful(RemoveExperienceSucceeded)).subscribe(() => {
       this.store.dispatch(new GetExperienceByCandidateId());
     });
-    this.actions$.pipe(ofActionSuccessful(RemoveExperienceSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetExperienceByCandidateId());
-    });
   }
 
   public dataBound(): void {

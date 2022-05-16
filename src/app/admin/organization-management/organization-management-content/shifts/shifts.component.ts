@@ -1,17 +1,15 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { Department } from '@shared/models/department.model';
-import { Region } from '@shared/models/region.model';
+import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, Observable, Subject } from 'rxjs';
-import { GetDepartmentsByLocationId, GetLocationsByRegionId, GetRegionsByOrganizationId, SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/admin.actions';
-import { AdminState } from 'src/app/admin/store/admin.state';
+import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/admin.actions';
 import { DeleteShift, DeleteShiftSucceeded, GetShiftsByPage, SaveShift, SaveShiftSucceeded } from 'src/app/admin/store/shifts.actions';
 import { ShiftsState } from 'src/app/admin/store/shifts.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { Shift } from 'src/app/shared/models/shift.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
@@ -22,8 +20,9 @@ import { ShowSideDialog } from 'src/app/store/app.actions';
   styleUrls: ['./shifts.component.scss'],
   providers: [SortService, FreezeService]
 })
-export class ShiftsComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class ShiftsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();
+  private unsubscribe$: Subject<void> = new Subject();
 
   @ViewChild('grid')
   public grid: GridComponent;
@@ -31,21 +30,9 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   @Select(ShiftsState.shiftsPage)
   shiftsPage$: Observable<any>;
 
-  @Select(AdminState.departments)
-  departments$: Observable<Department[]>;
-
-  @Select(AdminState.regions)
-  regions$: Observable<Region[]>;
-
-  @Select(AdminState.locationsByRegionId)
-  locations$: Observable<Location[]>;
-
   public ShiftFormGroup: FormGroup;
   public optionFields = {
     text: 'name', value: 'id'
-  };
-  public departmentFields = {
-    text: 'departmentName', value: 'departmentId'
   };
   public title = '';
   public startTimeField: AbstractControl;
@@ -58,9 +45,6 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
     super();
     this.ShiftFormGroup = this.fb.group({
       id: new FormControl(0, [ Validators.required ]),
-      regionId: new FormControl(null, [ Validators.required ]),
-      locationId: new FormControl(null, [ Validators.required ]),
-      departmentId: new FormControl(null, [ Validators.required ]),
       name: new FormControl(null, [ Validators.required ]),
       shortName: new FormControl(null, [ Validators.required ]),
       startTime: new FormControl(null, [ Validators.required ]),
@@ -69,65 +53,50 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
 
     this.startTimeField = this.ShiftFormGroup.get('startTime') as AbstractControl;
     this.endTimeField = this.ShiftFormGroup.get('endTime') as AbstractControl;
-
-    this.ShiftFormGroup.get('regionId')?.valueChanges.subscribe((value : number) => {
-      if (value) {
-        this.store.dispatch(new GetLocationsByRegionId(value));
-      } 
-    });
-
-    this.ShiftFormGroup.get('locationId')?.valueChanges.subscribe((value : number) => {
-      if (value) {
-        this.store.dispatch(new GetDepartmentsByLocationId(value));
-      }
-    });
   }
 
   ngOnInit() {
     this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
-    this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
+    this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
     });
-    this.actions$.pipe(ofActionSuccessful(SaveShiftSucceeded)).subscribe(() => {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveShiftSucceeded)).subscribe(() => {
       this.closeDialog();
       this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
       this.ShiftFormGroup.reset();
     });
-    this.actions$.pipe(ofActionSuccessful(DeleteShiftSucceeded)).subscribe(() => {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(DeleteShiftSucceeded)).subscribe(() => {
       this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
     });
   }
 
-  public onImportDataClick(): void {
-    this.store.dispatch(new SetImportFileDialogState(true));
-    // TODO: implement data parse after BE implementation
-  }
-
-  private getRegions(): void {
-    this.store.dispatch(new GetRegionsByOrganizationId(1)); // TODO: must be gotten from org selector
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   public addShift(): void {
-    this.getRegions();
     this.title = 'Add';
     this.ShiftFormGroup.controls['id'].setValue(0);
     this.store.dispatch(new ShowSideDialog(true));
   }
 
   public editShift(data: any, event: any): void {
-    this.getRegions();
     this.addActiveCssClass(event);
     this.title = 'Edit';
+    let [startH, startM, startS] = getHoursMinutesSeconds(data.startTime);
+    let [endH, endM, endS] = getHoursMinutesSeconds(data.endTime);
+    let startDate = new Date();
+    let endDate = new Date();
+    startDate.setHours(startH, startM, startS);
+    endDate.setHours(endH, endM, endS);
     this.ShiftFormGroup.setValue({
       id: data.id,
-      regionId: null,
-      locationId: null,
-      departmentId: null,
-      name: null,
-      shortName: null,
-      startTime: null,
-      endTime: null,
+      name: data.name,
+      shortName: data.shortName,
+      startTime: startDate,
+      endTime: endDate,
     });
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -149,9 +118,23 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public closeDialog(): void {
-    this.store.dispatch(new ShowSideDialog(false));
-    this.ShiftFormGroup.reset();
-    this.removeActiveCssClass();
+    if (this.ShiftFormGroup.dirty) {
+      this.confirmService
+      .confirm(CANCEL_COFIRM_TEXT, {
+        title: DELETE_CONFIRM_TITLE,
+        okButtonLabel: 'Leave',
+        okButtonClass: 'delete-button'
+      }).pipe(filter(confirm => !!confirm))
+      .subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false));
+        this.ShiftFormGroup.reset();
+        this.removeActiveCssClass();
+      });
+    } else {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.ShiftFormGroup.reset();
+      this.removeActiveCssClass();
+    }
   }
 
   public saveShift(): void {

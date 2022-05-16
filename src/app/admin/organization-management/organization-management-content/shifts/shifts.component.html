@@ -2,15 +2,6 @@
   <section>
     <button
       ejs-button
-      id="filterButton"
-      cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
-    <button
-      ejs-button
-      id="importButton"
-      cssClass="e-outline button-import"
-      (click)="onImportDataClick()">Import <i-feather name="upload" class="icon"></i-feather></button>
-    <button
-      ejs-button
       id="addDepartmentButton"
       [isPrimary]="true"
       (click)='addShift()'>Add Shift</button>
@@ -28,13 +19,10 @@
   [allowResizing]="allowResizing"
 >
   <e-columns>
-    <e-column field="skillCategory.name" headerText="region" width=200></e-column>
-    <e-column field="masterSkill.skillAbbr" headerText="location" width=200></e-column>
-    <e-column field="masterSkill.skillDescription" headerText="department" width=200></e-column>
-    <e-column field="glNumber" headerText="shift name" width=200></e-column>
-    <e-column field="glNumber" headerText="shift short name" width=200></e-column>
-    <e-column field="glNumber" headerText="start time" width=120></e-column>
-    <e-column field="glNumber" headerText="end time" width=120></e-column>
+    <e-column field="name" headerText="shift name" width=200></e-column>
+    <e-column field="shortName" headerText="shift short name" width=200></e-column>
+    <e-column field="standardStartTime" headerText="start time" width=120></e-column>
+    <e-column field="standardEndTime" headerText="end time" width=120></e-column>
     <e-column textAlign="Right" width=120>
       <ng-template #template let-data>
         <div class="row-tool-buttons">
@@ -95,55 +83,11 @@
 <app-side-dialog
   (formCancelClicked)="closeDialog()"
   (formSaveClicked)="saveShift()"
-  header="{{ title }} Shifts"
+  header="{{ title }} Shift"
   >
   <form class="shifts-form-dialog form-container bootstrap"
         id="addEditShiftsForm"
         [formGroup]="ShiftFormGroup">
-    <div>
-      <div class="input-container">
-        <label for="regionId">Region <span class="required">*</span></label>
-        <div class="input-group dropdown">
-          <ejs-dropdownlist name="regionId" 
-                            [fields]="optionFields"
-                            appValidateWithMessage 
-                            formControlName="regionId" 
-                            [dataSource]="regions$ | async"
-                            placeholder="Region">
-            </ejs-dropdownlist>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="input-container">
-        <label for="locationId">Location <span class="required">*</span></label>
-        <div class="input-group dropdown">
-          <ejs-dropdownlist name="locationId" 
-                            [fields]="optionFields" 
-                            appValidateWithMessage 
-                            formControlName="locationId" 
-                            [dataSource]="locations$ | async" 
-                            placeholder="Location">
-          </ejs-dropdownlist>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="input-container">
-        <label for="departmentId">Department <span class="required">*</span></label>
-        <div class="input-group dropdown">
-          <ejs-dropdownlist name="departmentId" 
-                            [fields]="departmentFields" 
-                            appValidateWithMessage 
-                            formControlName="departmentId" 
-                            [dataSource]="departments$ | async" 
-                            placeholder="Department">
-          </ejs-dropdownlist>
-        </div>
-      </div>
-    </div>
 
     <div>
       <div class="input-container">
@@ -183,7 +127,7 @@
                           name="startTime"
                           formControlName="startTime"
                           placeholder="HH:MM"
-                          format="HH:mm"
+                          format="hh:mm a"
                           [max]="endTimeField.value"
                           [step]="30">
           </ejs-timepicker>
@@ -199,7 +143,7 @@
                           name="endTime"
                           formControlName="endTime"
                           placeholder="HH:MM"
-                          format="HH:mm"
+                          format="hh:mm a"
                           [min]="startTimeField.value"
                           [step]="30">
           </ejs-timepicker>

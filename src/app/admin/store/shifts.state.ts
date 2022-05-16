@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { militaryToStandard } from '@shared/utils/date-time.utils';
 import { catchError, Observable, of, tap } from "rxjs";
 
 import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages";
@@ -35,8 +36,12 @@ export class ShiftsState {
   @Action(GetShiftsByPage)
   GetShiftsByPage({ patchState }: StateContext<ShiftsStateModel>, { pageNumber, pageSize }: GetShiftsByPage): Observable<ShiftsPage> {
     patchState({ isShiftLoading: true });
-    return this.shiftsService.getShifts(pageNumber, pageSize).pipe(
+    return this.shiftsService.getShifts(pageNumber, pageSize, 2).pipe( // TODO: pass org id after switcher is ready
       tap((payload) => {
+        let shiftsPage = payload.items.map((val) => {
+          val.standardStartTime = militaryToStandard(val.startTime);
+          val.standardEndTime = militaryToStandard(val.endTime);
+        })
         patchState({ isShiftLoading: false, shiftsPage: payload });
         return payload;
       })

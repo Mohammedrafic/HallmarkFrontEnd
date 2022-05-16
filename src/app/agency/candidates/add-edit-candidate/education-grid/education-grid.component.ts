@@ -62,9 +62,6 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
     this.actions$.pipe(ofActionSuccessful(RemoveEducationSucceeded)).subscribe(() => {
       this.store.dispatch(new GetEducationByCandidateId());
     });
-    this.actions$.pipe(ofActionSuccessful(RemoveExperienceSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetEducationByCandidateId());
-    });
   }
 
   public dataBound(): void {
