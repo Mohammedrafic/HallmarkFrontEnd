@@ -96,7 +96,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
     ).subscribe((logo: { payload: Blob }) => {
       this.logo = logo.payload;
     });
-    store.dispatch(new SetHeaderState({title: 'Organization List'}));
+    store.dispatch(new SetHeaderState({iconName: 'file-text', title: 'Organization List'}));
     store.dispatch(new GetBusinessUnitList());
     if (route.snapshot.paramMap.get('organizationId')) {
       this.title = 'Edit';

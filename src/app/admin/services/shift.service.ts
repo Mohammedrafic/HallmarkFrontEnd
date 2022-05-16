@@ -16,8 +16,8 @@ export class ShiftsService {
    */
   public saveUpdateShift(shift: Shift): Observable<Shift> {
     return shift.id ?
-      this.http.put<Shift>(`/api/Shifts`, shift) :
-      this.http.post<Shift>(`/api/Shifts/create`, shift);
+      this.http.put<Shift>(`/api/MasterShifts`, shift) :
+      this.http.post<Shift>(`/api/MasterShifts/create`, shift);
   }
 
   /**
@@ -26,8 +26,8 @@ export class ShiftsService {
    * @param pageSize
    * @return list of shifts
    */
-  public getShifts(pageNumber: number, pageSize: number): Observable<ShiftsPage> {
-    return this.http.get<ShiftsPage>(`/api/shifts`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+  public getShifts(pageNumber: number, pageSize: number, organizationId: number): Observable<ShiftsPage> {
+    return this.http.post<ShiftsPage>(`/api/MasterShifts/filter`, { organizationId: organizationId, pageNumber: pageNumber, pageSize: pageSize });
   }
 
   /**
@@ -35,6 +35,6 @@ export class ShiftsService {
    * @param shift
    */
   public removeShift(shift: Shift): Observable<any> {
-    return this.http.delete<any>(`/api/shifts/${shift.id}`);
+    return this.http.delete<any>(`/api/MasterShifts/${shift.id}`);
   }
 }

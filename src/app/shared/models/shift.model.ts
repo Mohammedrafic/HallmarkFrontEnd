@@ -11,6 +11,8 @@ export class Shift {
   shortName: string;
   startTime: string;
   endTime: string;
+  standardStartTime?: string;
+  standardEndTime?: string;
 
   constructor(shift: Shift, organizationId: number) {
     this.id = shift.id;
