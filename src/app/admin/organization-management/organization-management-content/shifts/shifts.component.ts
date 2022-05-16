@@ -4,12 +4,12 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/admin.actions';
 import { DeleteShift, DeleteShiftSucceeded, GetShiftsByPage, SaveShift, SaveShiftSucceeded } from 'src/app/admin/store/shifts.actions';
 import { ShiftsState } from 'src/app/admin/store/shifts.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { Shift } from 'src/app/shared/models/shift.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
@@ -118,9 +118,23 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public closeDialog(): void {
-    this.store.dispatch(new ShowSideDialog(false));
-    this.ShiftFormGroup.reset();
-    this.removeActiveCssClass();
+    if (this.ShiftFormGroup.dirty) {
+      this.confirmService
+      .confirm(CANCEL_COFIRM_TEXT, {
+        title: DELETE_CONFIRM_TITLE,
+        okButtonLabel: 'Leave',
+        okButtonClass: 'delete-button'
+      }).pipe(filter(confirm => !!confirm))
+      .subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false));
+        this.ShiftFormGroup.reset();
+        this.removeActiveCssClass();
+      });
+    } else {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.ShiftFormGroup.reset();
+      this.removeActiveCssClass();
+    }
   }
 
   public saveShift(): void {

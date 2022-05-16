@@ -6,10 +6,10 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { Holiday } from '@shared/models/holiday.model';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
+import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/admin.actions';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
 
@@ -140,9 +140,23 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
   }
 
   public closeDialog(): void {
-    this.store.dispatch(new ShowSideDialog(false));
-    this.HolidayFormGroup.reset();
-    this.removeActiveCssClass();
+    if (this.HolidayFormGroup.dirty) {
+      this.confirmService
+      .confirm(CANCEL_COFIRM_TEXT, {
+        title: DELETE_CONFIRM_TITLE,
+        okButtonLabel: 'Leave',
+        okButtonClass: 'delete-button'
+      }).pipe(filter(confirm => !!confirm))
+      .subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false));
+        this.HolidayFormGroup.reset();
+        this.removeActiveCssClass();
+      });
+    } else {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.HolidayFormGroup.reset();
+      this.removeActiveCssClass();
+    }
   }
 
   public saveHoliday(): void {
