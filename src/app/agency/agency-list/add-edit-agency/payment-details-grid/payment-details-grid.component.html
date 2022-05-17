@@ -1,14 +1,15 @@
 <ejs-grid
   #grid
   [dataSource]="data"
-  [allowSorting]="true"
-  [allowResizing]="true"
-  [allowSelection]="false"
-  [resizeSettings]="resizeSettings"
-  [sortSettings]="initialSort"
   [allowPaging]="allowPaging"
+  [allowSelection]="false"
   [pageSettings]="pageSettings"
   [height]="gridHeight"
+  [rowHeight]="rowHeight"
+  [resizeSettings]="resizeSettings"
+  [sortSettings]="initialSort"
+  [allowSorting]="allowSorting"
+  [allowResizing]="allowResizing"
   (dataBound)="dataBound()"
   class="e-gridwithtoolbar"
 >

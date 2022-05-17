@@ -1,12 +1,13 @@
 <app-page-toolbar>
   <ng-container left>
-    <div class="bootstrap business-dropdowns">
+    <div class="bootstrap business-dropdowns" [formGroup]="businessForm">
       <div class="dropdown-container">
         <div class="input-group dropdown">
           <ejs-dropdownlist
             appValidateWithMessage
-            [formControl]="businessUnitControl"
-            [dataSource]="[]"
+            formControlName="businessUnit"
+            [fields]="optionFields"
+            [dataSource]="businessUnits"
             placeholder="Business Unit"
           ></ejs-dropdownlist>
         </div>
@@ -15,8 +16,9 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             appValidateWithMessage
-            [formControl]="businessControl"
-            [dataSource]="[]"
+            formControlName="business"
+            [fields]="bussinesDataFields"
+            [dataSource]="bussinesData$ | async"
             placeholder="Business"
           ></ejs-dropdownlist>
         </div>
@@ -32,7 +34,7 @@
 </app-page-toolbar>
 
 <section class="role-and-permissions last-content-section-padding">
-  <app-roles-grid (editRoleEvent)="onEdit($event)"></app-roles-grid>
+  <app-roles-grid [filterForm]="businessForm" (editRoleEvent)="onEdit($event)"></app-roles-grid>
 </section>
 
 <app-side-dialog [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()">

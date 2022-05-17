@@ -5,7 +5,8 @@
       <ejs-dropdownlist
         appValidateWithMessage
         formControlName="businessUnit"
-        [dataSource]="[]"
+        [fields]="optionFields"
+        [dataSource]="businessUnits"
         placeholder="Bussines Unit"
       ></ejs-dropdownlist>
     </div>

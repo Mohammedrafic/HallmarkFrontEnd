@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
+import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 
 import { GridComponent, PageSettingsModel, ValueAccessor } from '@syncfusion/ej2-angular-grids';
 
@@ -27,16 +28,12 @@ type PaymentDetail = {
   templateUrl: './payment-details-grid.component.html',
   styleUrls: ['./payment-details-grid.component.scss'],
 })
-export class PaymentDetailsGridComponent implements OnInit, AfterViewInit {
+export class PaymentDetailsGridComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit {
   @Input() paymentsFormArray: FormArray;
   @ViewChild('grid') grid: GridComponent;
 
-  public pageSettings: PageSettingsModel = { pageSizes: true, pageSize: 3 };
-  public resizeSettings = GRID_CONFIG.resizeSettings;
-  public allowPaging = GRID_CONFIG.isPagingEnabled;
-  public gridHeight = '250';
-  public rowsPerPageDropDown = GRID_CONFIG.rowsPerPageDropDown;
-  public activeRowsPerPageDropDown = GRID_CONFIG.rowsPerPageDropDown[0];
+  public override gridHeight = '250';
+  
   public initialSort = {
     columns: [{ field: 'name', direction: 'Ascending' }],
   };
@@ -56,7 +53,9 @@ export class PaymentDetailsGridComponent implements OnInit, AfterViewInit {
 
   private isEditMode = false;
 
-  constructor(private store: Store, private fb: FormBuilder) {}
+  constructor(private store: Store, private fb: FormBuilder) {
+    super();
+  }
 
   ngOnInit(): void {
     this.paymentDetailsForm = this.generatePaymentForm();

@@ -1,6 +1,8 @@
 <ejs-grid
   #rolesGrid
-  [dataSource]="dataSource"
+  id="roles-grid"
+  class="roles-grid"
+  [dataSource]="roleGirdData$ | async"
   [allowSorting]="true"
   [allowResizing]="true"
   [allowSelection]="true"
@@ -8,11 +10,13 @@
   [allowPaging]="allowPaging"
   [pageSettings]="pageSettings"
   [height]="gridHeight"
+  (rowDataBound)='rowDataBound($event)'
+  (dataBound)="dataBound()"
 >
   <e-columns>
-    <e-column field="business" headerText="Business" textAlign="Left"></e-column>
-    <e-column field="roleName" headerText="Role Name" textAlign="Left"></e-column>
-    <e-column field="active" headerText="Active" textAlign="Left" maxWidth=500 [valueAccessor]='activeValueAccess'></e-column>
+    <e-column field="businessUnitName" headerText="Business" textAlign="Left" [valueAccessor]='businessValueAccess'></e-column>
+    <e-column field="name" headerText="Role Name" textAlign="Left"></e-column>
+    <e-column field="isActive" headerText="Active" textAlign="Left" maxWidth=500 [valueAccessor]='activeValueAccess'></e-column>
 
     <e-column textAlign="Right" width="80" maxWidth=111>
       <ng-template #template let-data>
@@ -20,7 +24,7 @@
           <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
             <span><i-feather name="edit" class="icon"></i-feather></span>
           </button>
-          <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
+          <button ejs-button [disabled]="data.isDefault" cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
             <span><i-feather name="trash-2" class="icon"></i-feather></span>
           </button>
         </div>
@@ -47,7 +51,7 @@
               format="#"
               placeholder="Go to:"
               min="1"
-              [max]="0"
+              [max]="(rolesPage$ | async)?.totalCount"
               [showSpinButton]="false"
               (change)="onGoToClick($event)"
             >
@@ -58,7 +62,7 @@
               id="gridPager"
               #gridPager
               [pageSize]="pageSize"
-              [totalRecordsCount]="0"
+              [totalRecordsCount]="(rolesPage$ | async)?.totalPages"
               [enablePagerMessage]="false"
               [currentPage]="currentPage"
               (click)="onGoToClick($event)"

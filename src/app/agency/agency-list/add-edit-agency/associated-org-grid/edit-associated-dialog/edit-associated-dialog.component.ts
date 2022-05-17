@@ -111,15 +111,15 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
         if (this.jobDistributionForm.valid) {
           const jobDistributionFormValue = this.jobDistributionForm.getRawValue();
           this.store.dispatch(
-            new SaveJobDistribution({ ...jobDistributionFormValue, associateOrganizationId: this.editOrg.organizationId })
+            new SaveJobDistribution({ ...jobDistributionFormValue, associateOrganizationId: this.editOrg.id })
           );
         }
         break;
       case Tabs.FeeSettings:
         this.feeSettingsForm.markAllAsTouched();
-        if (this.feeSettingsForm.valid && this.editOrg.organizationId) {
+        if (this.feeSettingsForm.valid && this.editOrg.id) {
           const { baseFee } = this.feeSettingsForm.getRawValue();
-          this.store.dispatch(new SaveBaseFee(this.editOrg.organizationId, baseFee));
+          this.store.dispatch(new SaveBaseFee(this.editOrg.id, baseFee));
         }
         break;
       default:
@@ -142,11 +142,11 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
         this.editOrg = org;
         this.sideDialog.show();
 
-        if (org.organizationId) {
-          this.feeSettingsForm.patchValue({ id: org.organizationId });
+        if (org.id && org.organizationId) {
+          this.feeSettingsForm.patchValue({ id: org.id });
           this.store.dispatch(new GetFeeExceptionsInitialData(org.organizationId));
           this.store.dispatch(new GetJobDistributionInitialData(org.organizationId));
-          this.store.dispatch(new GetJobDistributionId(org.organizationId));
+          this.store.dispatch(new GetJobDistributionId(org.id));
         }
       }
     });
