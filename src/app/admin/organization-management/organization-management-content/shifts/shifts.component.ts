@@ -37,6 +37,7 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   public title = '';
   public startTimeField: AbstractControl;
   public endTimeField: AbstractControl;
+  public showForm = true;
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -62,9 +63,9 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
       this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveShiftSucceeded)).subscribe(() => {
+      this.ShiftFormGroup.reset();
       this.closeDialog();
       this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
-      this.ShiftFormGroup.reset();
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(DeleteShiftSucceeded)).subscribe(() => {
       this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
@@ -77,12 +78,14 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public addShift(): void {
+    this.showForm = true;
     this.title = 'Add';
     this.ShiftFormGroup.controls['id'].setValue(0);
     this.store.dispatch(new ShowSideDialog(true));
   }
 
   public editShift(data: any, event: any): void {
+    this.showForm = true;
     this.addActiveCssClass(event);
     this.title = 'Edit';
     let [startH, startM, startS] = getHoursMinutesSeconds(data.startTime);
@@ -126,11 +129,13 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
         okButtonClass: 'delete-button'
       }).pipe(filter(confirm => !!confirm))
       .subscribe(() => {
+        this.showForm = false;
         this.store.dispatch(new ShowSideDialog(false));
         this.ShiftFormGroup.reset();
         this.removeActiveCssClass();
       });
     } else {
+      this.showForm = false;
       this.store.dispatch(new ShowSideDialog(false));
       this.ShiftFormGroup.reset();
       this.removeActiveCssClass();
@@ -142,6 +147,7 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
       this.store.dispatch(new SaveShift(new Shift(
         this.ShiftFormGroup.getRawValue(), 2 // TODO: remove after org selection implementation
       )));
+      this.showForm = false;
       this.store.dispatch(new SetDirtyState(false));
     } else {
       this.ShiftFormGroup.markAllAsTouched();

@@ -99,7 +99,7 @@
   (formSaveClicked)="saveHoliday()"
   header="{{ title }} Holiday"
   >
-  <form class="holidays-form-dialog form-container bootstrap"
+  <form *ngIf="showForm" class="holidays-form-dialog form-container bootstrap"
         id="addEditHolidaysForm"
         [formGroup]="HolidayFormGroup">
     <div>
@@ -125,8 +125,7 @@
                           name="startDateTime"
                           formControlName="startDateTime"
                           placeholder="Select Date and Time"
-                          [min]="today"
-                          [max]="endTimeField.value || maxDate"
+                          [min]="startTimeField.value || today"
                           [step]="30">
           </ejs-datetimepicker>
         </div>
