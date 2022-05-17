@@ -1,0 +1,42 @@
+@import '../variables/colors.scss';
+
+body.light, body.dark {
+  .bootstrap {
+    ejs-numerictextbox {
+      &.ng-touched.ng-invalid {
+        span.e-input-group {
+          border-color: $supportive-red !important;
+        }
+
+        &+i-feather {
+          display: block;
+        }
+      }
+
+      span.e-input-group {
+        border-radius: 8px !important;
+
+        &.e-input-focus, &:active {
+          box-shadow: none !important;
+          border-width: 2px !important;
+          border-radius: 8px !important;
+          border-color: $primary-active-blue-10 !important;
+
+          &::after, &::before {
+            display: none;
+          }
+        }
+
+        &:hover {
+          border-color: $primary-active-blue-10 !important;
+        }
+
+        input {
+          height: 35px !important;
+          border-radius: 8px !important;
+          padding: 0 15px !important;
+        }
+      }
+    }
+  }
+}

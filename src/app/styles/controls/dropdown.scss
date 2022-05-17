@@ -29,12 +29,16 @@ body.light, body.dark {
           border: 1px solid $secondary-dark-blue-40 !important;
         }
 
-        input.e-input {
+        input.e-input, input.e-dropdownbase {
           padding-left: 15px;
 
           &::placeholder {
             color: $secondary-dark-blue-30;
           }
+        }
+
+        span.e-delim-view.e-delim-values {
+          padding-left: 15px;
         }
       }
 
