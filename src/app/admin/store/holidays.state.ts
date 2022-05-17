@@ -1,7 +1,7 @@
-import { HolidaysService } from '@admin/services/holidays.service';
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Holiday, HolidaysPage } from '@shared/models/holiday.model';
+import { HolidaysService } from '@shared/services/holidays.service';
 import { catchError, Observable, of, tap } from "rxjs";
 
 import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages";

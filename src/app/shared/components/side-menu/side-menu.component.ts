@@ -28,11 +28,11 @@ export class SideMenuComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     const menuItem = this.config[0];
     this.listBox.selectItems([menuItem['text'] as string]);
-    this.router.navigate([(menuItem as any).route]);
+    this.router.navigate([(menuItem as any).route], { relativeTo: this.route });
   }
 
   goToSection(event: ListBoxChangeEventArgs): void {
     const menuItem = event.items[0];
-    this.router.navigate([(menuItem as any).route]);
+    this.router.navigate([(menuItem as any).route], { relativeTo: this.route });
   }
 }

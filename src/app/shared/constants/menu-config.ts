@@ -294,7 +294,7 @@ export const MENU_CONFIG: any = {
     },
     18: { // Settings 
       icon: 'user',
-      route: ''
+      route: 'client/organization-management'
     },
     19: { // User Management
       icon: 'lock',

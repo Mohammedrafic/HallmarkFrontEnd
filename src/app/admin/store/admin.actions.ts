@@ -2,14 +2,8 @@ import { Country } from "src/app/shared/enums/states";
 import { Organization } from "src/app/shared/models/organization.model";
 import { SkillCategory } from "src/app/shared/models/skill-category.model";
 import { Skill } from "src/app/shared/models/skill.model";
-import { Department } from '../../shared/models/department.model';
-import { Location } from '../../shared/models/location.model';
-import { Region } from '../../shared/models/region.model';
 import { CredentialType } from '../../shared/models/credential-type.model';
 import { Credential } from '../../shared/models/credential.model';
-import { SkillGroup } from '../../shared/models/skill-group.model';
-import { CredentialSetup } from '../../shared/models/credential-setup.model';
-import { OrganizationSettingsPost } from '@shared/models/organization-settings.model';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[admin] Set General States By Country';
@@ -54,76 +48,6 @@ export class GetOrganizationById {
 export class GetOrganizationByIdSucceeded {
   static readonly type = '[admin] Get Organization by ID Succeeded';
   constructor(public payload: Organization) { }
-}
-
-export class SaveDepartment {
-  static readonly type = '[admin] Create Department';
-  constructor(public payload: Department) { }
-}
-
-export class GetDepartmentsByLocationId {
-  static readonly type = '[admin] Get The List Of Departments by locationId';
-  constructor(public locationId?: number) { }
-}
-
-export class UpdateDepartment {
-  static readonly type = '[admin] Update Department';
-  constructor(public department: Department) { }
-}
-
-export class DeleteDepartmentById {
-  static readonly type = '[admin] Delete Department by id';
-  constructor(public department: Department) { }
-}
-
-export class GetRegionsByOrganizationId {
-  static readonly type = '[admin] Get The List Of Regions';
-  constructor(public organizationId: number) { }
-}
-
-export class SaveRegion {
-  static readonly type = '[admin] Create Region';
-  constructor(public region: Region) { }
-}
-
-export class UpdateRegion {
-  static readonly type = '[admin] Update Region';
-  constructor(public region: Region) { }
-}
-
-export class DeleteRegionById {
-  static readonly type = '[admin] Delete Region by id';
-  constructor(public regionId: number, public organizationId: number) { }
-}
-
-export class GetLocationsByOrganizationId {
-  static readonly type = '[admin] Get The List Of Locations by organizationId';
-  constructor(public organizationId: number) { }
-}
-
-export class GetLocationsByRegionId {
-  static readonly type = '[admin] Get The List Of Locations by regionId';
-  constructor(public regionId: number) { }
-}
-
-export class GetLocationById {
-  static readonly type = '[admin] Get The Location by id';
-  constructor(public locationId: number) { }
-}
-
-export class SaveLocation {
-  static readonly type = '[admin] Create Location';
-  constructor(public location: Location, public regionId: number) { }
-}
-
-export class UpdateLocation {
-  static readonly type = '[admin] Update Location';
-  constructor(public location: Location, public regionId: number) { }
-}
-
-export class DeleteLocationById {
-  static readonly type = '[admin] Delete Location by id';
-  constructor(public locationId: number, public regionId: number) { }
 }
 
 export class GetOrganizationsByPage {
@@ -279,44 +203,4 @@ export class RemoveCredential {
 export class GetAllSkills {
   static readonly type = '[admin] Get All Skills';
   constructor() {}
-}
-
-export class GetSkillGroup {
-  static readonly type = '[admin] Get Skill Group by Organization ID';
-  constructor(public payload: number) {}
-}
-
-export class SaveSkillGroup {
-  static readonly type = '[admin] Save Skill Group';
-  constructor(public skillGroup: SkillGroup, public organizationId: number) { }
-}
-
-export class UpdateSkillGroup {
-  static readonly type = '[admin] Update Skill Group';
-  constructor(public skillGroup: SkillGroup, public organizationId: number) { }
-}
-
-export class RemoveSkillGroup {
-  static readonly type = '[admin] Remove Skill Group';
-  constructor(public skillGroup: SkillGroup, public organizationId: number) { }
-}
-
-export class GetCredentialSetup {
-  static readonly type = '[admin] Get Credential Setup by Organization ID';
-  constructor(public payload: number) {}
-}
-
-export class SaveUpdateCredentialSetup {
-  static readonly type = '[admin] Save Credential Setup';
-  constructor(public credentialSetup: CredentialSetup, public organizationId: number) { }
-}
-
-export class GetOrganizationSettings {
-  static readonly type = '[admin] Get Organization Settings by Organization ID';
-  constructor(public payload: number) {}
-}
-
-export class SaveOrganizationSettings {
-  static readonly type = '[admin] Save Organization Settings';
-  constructor(public organizationSettings: OrganizationSettingsPost, public organizationId: number) { }
 }

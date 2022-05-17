@@ -3,7 +3,7 @@
 body.light, body.dark {
   .bootstrap {
     input.e-input {
-      height: 35px;
+      height: 40px;
       border-radius: 8px;
       padding: 0 15px;
 
@@ -80,6 +80,46 @@ body.light, body.dark {
 
       .professional-summary-textbox {
         height: 190px;
+      }
+    }
+    ejs-maskedtextbox.e-mask-container {
+      &.ng-touched.ng-invalid {
+        span.e-input-group {
+          border-color: $supportive-red !important;
+        }
+
+        &+i-feather {
+          display: block;
+        }
+      }
+
+      .e-input-group input.e-input,
+      .e-input-group.e-control-wrapper input.e-input,
+      .e-input-group textarea.e-input,
+      .e-input-group.e-control-wrapper textarea.e-input {
+        height: 40px;
+      }
+
+      span.e-input-group {
+        border-radius: 8px !important;
+        height: 40px;
+        padding: 0 15px;
+
+        &:hover {
+          border-color: $primary-active-blue-10 !important;
+        }
+
+        &.e-input-focus, &:active {
+          box-shadow: none !important;
+          border-width: 2px !important;
+          border-radius: 8px !important;
+          border-color: $primary-active-blue-10 !important;
+          height: 38px;
+
+          &::after, &::before {
+            display: none;
+          }
+        }
       }
     }
   }
