@@ -1,5 +1,13 @@
 @import "../../../styles/variables/colors.scss";
 
+.form-title {
+  color: #333;
+}
+
+.create-under-dropdown {
+  margin-top: 3px;
+}
+
 .controls-container {
   padding: 20px 0;
   display: flex;
@@ -50,15 +58,10 @@
 
   .organization-input {
     span.e-input-group {
-      height: 33px;
       padding: 0;
 
       input.e-input.e-maskedtextbox {
         padding: 15px;
-      }
-
-      &.e-input-focus, &:active {
-        height: 31px;
       }
     }
   }

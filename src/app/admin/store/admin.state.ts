@@ -5,7 +5,6 @@ import { Days } from 'src/app/shared/enums/days';
 import { SendDocumentAgency } from 'src/app/shared/enums/send-document-agency';
 import { Country, UsaStates, CanadaStates } from 'src/app/shared/enums/states';
 import { Status } from 'src/app/shared/enums/status';
-import { Titles } from 'src/app/shared/enums/title';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '../../shared/services/organization.service';
@@ -79,7 +78,6 @@ export interface AdminStateModel {
   sendDocumentAgencies: DropdownOption[];
   days: DropdownOption[];
   statuses: DropdownOption[];
-  titles: string[];
   isOrganizationLoading: boolean;
   organizations: OrganizationPage | null;
   isDepartmentLoading: boolean;
@@ -111,7 +109,6 @@ export interface AdminStateModel {
     ],
     days: Days,
     statuses: Object.keys(Status).filter(StringIsNumber).map((statusName, index) => ({ id: index, text: statusName })),
-    titles: Titles,
     isOrganizationLoading: false,
     organizations: null,
     organization: null,
@@ -153,9 +150,6 @@ export class AdminState {
 
   @Selector()
   static statuses(state: AdminStateModel): DropdownOption[] { return state.statuses; }
-
-  @Selector()
-  static titles(state: AdminStateModel): string[] { return state.titles; }
 
   @Selector()
   static isDirty(state: AdminStateModel): boolean { return state.isDirty; }

@@ -2,6 +2,7 @@ import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Titles } from '@shared/enums/title';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { RECORD_ADDED } from 'src/app/shared/constants/messages';
@@ -31,10 +32,11 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
   public ContactFormGroup: FormGroup;
   public PreferencesFormGroup: FormGroup;
   public isSameAsOrg: boolean = false;
-  public isEditTitle: boolean[] = [false];
+  public isEditTitle: boolean[] = [];
   public currentBusinessUnitId: number | null = null;
   public title = 'Add';
   public logo: Blob | null = null;
+  public titles = Titles;
 
   public createUnderFields = { 
     text: 'name', value: 'id'
@@ -66,9 +68,6 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
 
   @Select(AdminState.statuses)
   statuses$: Observable<[]>;
-
-  @Select(AdminState.titles)
-  titles$: Observable<[]>;
 
   constructor(private actions$: Actions, private store: Store, private router: Router, private route: ActivatedRoute, private fb: FormBuilder) {
     actions$.pipe(
@@ -224,7 +223,11 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
   }
 
   private newContactFormGroup(contact?: ContactDetails): FormGroup {
-    this.isEditTitle.push(false);
+    if (contact && contact.title) {
+      this.isEditTitle.push(!this.titles.find(val => val === contact.title));
+    } else {
+      this.isEditTitle.push(false);
+    }
     return this.fb.group({
       id: new FormControl(contact ? contact.id : 0),
       title: new FormControl(contact ? contact.title : ''),
