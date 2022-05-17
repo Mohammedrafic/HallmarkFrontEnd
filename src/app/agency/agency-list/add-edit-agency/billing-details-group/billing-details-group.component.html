@@ -24,7 +24,7 @@
                   formControlName="country"
                   [dataSource]="countries"
                   placeholder="Country"
-               
+
                 ></ejs-dropdownlist>
               </div>
             </div>
@@ -48,14 +48,15 @@
             <div class="input-container">
               <label>Zipcode</label>
               <div class="input-group">
-                <input
+                <ejs-maskedtextbox
+                  promptChar="_"
+                  mask='00000'
                   appValidateWithMessage
                   formControlName="zipCode"
                   class="e-input"
-                  type="text"
                   placeholder="Zipcode"
                   maxlength="6"
-                />
+                ></ejs-maskedtextbox>
               </div>
             </div>
           </div>
@@ -63,47 +64,50 @@
             <div class="input-container">
               <label>Phone 1</label>
               <div class="input-group">
-                <input
+                <ejs-maskedtextbox
+                  promptChar="_"
+                  mask='000-000-0000'
                   appValidateWithMessage
                   formControlName="phone1"
                   class="e-input"
-                  type="text"
                   placeholder="Phone 1"
-                  maxlength="10"
-                />
+                  maxlength="10">
+                </ejs-maskedtextbox>
               </div>
             </div>
             <div class="input-container">
               <label>Phone 2</label>
               <div class="input-group">
-                <input
+                <ejs-maskedtextbox
+                  promptChar="_"
+                  mask='000-000-0000'
                   appValidateWithMessage
                   formControlName="phone2"
                   class="e-input"
-                  type="text"
                   placeholder="Phone 2"
-                  maxlength="10"
-                />
+                  maxlength="10">
+                </ejs-maskedtextbox>
               </div>
             </div>
             <div class="input-container">
               <label>Fax</label>
               <div class="input-group">
-                <input
+                <ejs-maskedtextbox
+                  promptChar="_"
+                  mask='000-000-0000'
                   appValidateWithMessage
                   formControlName="fax"
                   class="e-input"
-                  type="text"
                   placeholder="Fax"
-                  maxlength="10"
-                />
+                  maxlength="10">
+                </ejs-maskedtextbox>
               </div>
             </div>
             <div class="input-container">
               <label>Ext</label>
               <input formControlName="ext" class="e-input" type="text" placeholder="Ext" />
             </div>
-   
+
           </div>
         </form>
       </div>

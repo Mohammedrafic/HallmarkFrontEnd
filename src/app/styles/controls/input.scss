@@ -82,5 +82,38 @@ body.light, body.dark {
         height: 190px;
       }
     }
+
+    ejs-maskedtextbox {
+      &.ng-touched.ng-invalid {
+        span.e-input-group {
+          border-color: $supportive-red !important;
+        }
+
+        &+i-feather {
+          display: block;
+        }
+      }
+
+      span.e-input-group {
+        border-radius: 8px !important;
+        height: 35px;
+        padding: 0 15px;
+
+        &:hover {
+          border-color: $primary-active-blue-10 !important;
+        }
+
+        &.e-input-focus, &:active {
+          box-shadow: none !important;
+          border-width: 2px !important;
+          border-radius: 8px !important;
+          border-color: $primary-active-blue-10 !important;
+
+          &::after, &::before {
+            display: none;
+          }
+        }
+      }
+    }
   }
 }
