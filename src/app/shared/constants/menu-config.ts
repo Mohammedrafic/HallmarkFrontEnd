@@ -316,9 +316,9 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    18: { // Configuration and Setting (Master Data)
+    18: { // Configuration and Setting
       icon: 'user',
-      route: ''
+      route: 'client/organization-management'
     },
     19: { // User Management
       icon: 'lock',

@@ -11,11 +11,7 @@ import { Organization, OrganizationPage } from 'src/app/shared/models/organizati
 import { OrganizationService } from '../../shared/services/organization.service';
 
 import {
-  SaveDepartment,
   GetBusinessUnitList,
-  GetDepartmentsByLocationId,
-  GetLocationsByOrganizationId,
-  GetRegionsByOrganizationId,
   SetBillingStatesByCountry,
   GetOrganizationsByPage,
   SetDirtyState,
@@ -25,16 +21,6 @@ import {
   GetOrganizationById,
   GetOrganizationByIdSucceeded,
   SetGeneralStatesByCountry,
-  UpdateDepartment,
-  DeleteDepartmentById,
-  GetLocationById,
-  UpdateLocation,
-  DeleteLocationById,
-  SaveLocation,
-  SaveRegion,
-  UpdateRegion,
-  DeleteRegionById,
-  GetLocationsByRegionId,
   GetMasterSkillsByPage,
   GetSkillsCategoriesByPage,
   SaveSkillsCategory,
@@ -61,37 +47,20 @@ import {
   GetOrganizationLogo,
   GetOrganizationLogoSucceeded,
   UpdateCredentialType,
-  GetAllSkills,
-  GetSkillGroup,
-  SaveSkillGroup,
-  UpdateSkillGroup,
-  RemoveSkillGroup,
-  GetCredentialSetup,
-  SaveUpdateCredentialSetup, GetOrganizationSettings, SaveOrganizationSettings,
+  GetAllSkills
 } from './admin.actions';
-import { DepartmentsService } from '../services/departments.service';
-import { Department } from '../../shared/models/department.model';
-import { Region } from '../../shared/models/region.model';
-import { Location } from '../../shared/models/location.model';
-import { RegionService } from '../services/region.service';
-import { LocationService } from '../services/location.service';
 import { GeneralPhoneTypes } from '../../shared/constants/general-phone-types';
 import { SkillsService } from '../../shared/services/skills.service';
-import { CategoriesService } from '../services/categories.service';
+import { CategoriesService } from '../../shared/services/categories.service';
 import { Skill, SkillsPage } from 'src/app/shared/models/skill.model';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { CredentialType } from '../../shared/models/credential-type.model';
-import { CredentialsService } from '../services/credentials.service';
 import { Credential } from '../../shared/models/credential.model';
 import { RECORD_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
-import { SkillGroupService } from '../services/skill-group.service';
 import { CandidateStateModel } from '../../agency/store/candidate.state';
-import { SkillGroup } from '../../shared/models/skill-group.model';
-import { CredentialSetup } from '../../shared/models/credential-setup.model';
-import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
-import { OrganizationSettingsService } from '@admin/services/organization-settings.service';
+import { CredentialsService } from '@shared/services/credentials.service';
 
 interface DropdownOption {
   id: number;
@@ -115,10 +84,6 @@ export interface AdminStateModel {
   organizations: OrganizationPage | null;
   isDepartmentLoading: boolean;
   isLocationLoading: boolean;
-  departments: Department[];
-  regions: Region[];
-  locations: Location[];
-  location: Location | null;
   organization: Organization | null;
   masterSkills: SkillsPage | null;
   skills: SkillsPage | null;
@@ -129,12 +94,6 @@ export interface AdminStateModel {
   credentials: Credential[];
   isCredentialTypesLoading: boolean;
   isCredentialLoading: boolean;
-  skillGroups: SkillGroup[] | null;
-  isSkillGroupLoading: boolean;
-  credentialSetups: CredentialSetup[] | null;
-  isCredentialSetupLoading: boolean;
-  isOrganizationSettingsLoading: boolean;
-  organizationSettings: OrganizationSettingsGet[];
 }
 
 @State<AdminStateModel>({
@@ -158,10 +117,6 @@ export interface AdminStateModel {
     organization: null,
     isDepartmentLoading: false,
     isLocationLoading: false,
-    departments: [],
-    regions: [],
-    locations: [],
-    location: null,
     masterSkills: null,
     skills: null,
     skillsCategories: null,
@@ -171,12 +126,6 @@ export interface AdminStateModel {
     credentials: [],
     isCredentialTypesLoading: false,
     isCredentialLoading: false,
-    skillGroups: [],
-    isSkillGroupLoading: false,
-    credentialSetups: [],
-    isCredentialSetupLoading: false,
-    isOrganizationSettingsLoading: false,
-    organizationSettings: []
   },
 })
 @Injectable()
@@ -212,18 +161,6 @@ export class AdminState {
   static isDirty(state: AdminStateModel): boolean { return state.isDirty; }
 
   @Selector()
-  static departments(state: AdminStateModel): Department[] { return state.departments; }
-
-  @Selector()
-  static regions(state: AdminStateModel): Region[] { return state.regions; }
-
-  @Selector()
-  static locationsByRegionId(state: AdminStateModel): Location[] { return state.locations; }
-
-  @Selector()
-  static locationById(state: AdminStateModel): Location | null { return state.location; }
-
-  @Selector()
   static organizations(state: AdminStateModel): OrganizationPage | null { return state.organizations; }
 
   @Selector()
@@ -247,25 +184,11 @@ export class AdminState {
   @Selector()
   static credentials(state: AdminStateModel): Credential[] { return state.credentials }
 
-  @Selector()
-  static skillGroups(state: AdminStateModel): SkillGroup[]  | null { return state.skillGroups }
-
-  @Selector()
-  static credentialSetups(state: AdminStateModel): CredentialSetup[] | null { return state.credentialSetups }
-
-  @Selector()
-  static organizationSettings(state: AdminStateModel): OrganizationSettingsGet[] { return state.organizationSettings }
-
   constructor(
     private organizationService: OrganizationService,
     private skillsService: SkillsService,
     private categoriesService: CategoriesService,
-    private departmentService: DepartmentsService,
-    private regionService: RegionService,
-    private locationService: LocationService,
     private credentialsService: CredentialsService,
-    private skillGroupService: SkillGroupService,
-    private organizationSettingsService: OrganizationSettingsService
   ) { }
 
   @Action(SetGeneralStatesByCountry)
@@ -340,132 +263,6 @@ export class AdminState {
   @Action(SetDirtyState)
   SetDirtyState({ patchState }: StateContext<AdminStateModel>, { payload }: SetDirtyState): void {
     patchState({ isDirty: payload });
-  }
-
-  @Action(SaveDepartment)
-  SaveDepartment({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveDepartment): Observable<Department> {
-    patchState({ isDepartmentLoading: true });
-    return this.departmentService.saveDepartment(payload).pipe(tap((payload) => {
-      patchState({ isDepartmentLoading: false});
-      dispatch(new GetDepartmentsByLocationId(payload.locationId));
-      return payload;
-    }));
-  }
-
-  @Action(GetDepartmentsByLocationId)
-  GetDepartmentsByLocationId({ patchState }: StateContext<AdminStateModel>, { locationId }: GetDepartmentsByLocationId): Observable<Department[]> {
-    return this.departmentService.getDepartmentsByLocationId(locationId).pipe(tap((payload) => {
-      patchState({ departments: payload});
-      return payload;
-    }));
-  }
-
-  @Action(UpdateDepartment)
-  UpdateDepartments({ patchState, dispatch }: StateContext<AdminStateModel>, { department }: UpdateDepartment): Observable<void> {
-    return this.departmentService.updateDepartment(department).pipe(tap((payload) => {
-      patchState({ isDepartmentLoading: false });
-      dispatch(new GetDepartmentsByLocationId(department.locationId));
-      return payload;
-    }));
-  }
-
-  @Action(DeleteDepartmentById)
-  DeleteDepartmentById({ patchState, dispatch }: StateContext<AdminStateModel>, { department }: DeleteDepartmentById): Observable<any> {
-    return this.departmentService.deleteDepartmentById(department.departmentId).pipe(tap((payload) => {
-      patchState({ isDepartmentLoading: false });
-      dispatch(new GetDepartmentsByLocationId(department.locationId));
-      return payload;
-    }),
-      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
-  }
-
-  @Action(GetRegionsByOrganizationId)
-  GetRegionsByOrganizationId({ patchState }: StateContext<AdminStateModel>, { organizationId }: GetRegionsByOrganizationId): Observable<Region[]> {
-    return this.regionService.getRegionsByOrganizationId(organizationId).pipe(tap((payload) => {
-      patchState({ regions: payload});
-      return payload;
-    }));
-  }
-
-  @Action(SaveRegion)
-  SaveRegion({ patchState, dispatch }: StateContext<AdminStateModel>, { region }: SaveRegion): Observable<Region> {
-    patchState({ isLocationLoading: true });
-    return this.regionService.saveRegion(region).pipe(tap((payload) => {
-      patchState({ isLocationLoading: false});
-      dispatch(new GetRegionsByOrganizationId(region.organizationId));
-      return payload;
-    }));
-  }
-
-  @Action(UpdateRegion)
-  UpdateRegion({ patchState, dispatch }: StateContext<AdminStateModel>, { region }: UpdateRegion): Observable<void> {
-    return this.regionService.updateRegion(region).pipe(tap((payload) => {
-      patchState({ isLocationLoading: false });
-      dispatch(new GetRegionsByOrganizationId(region.organizationId));
-      return payload;
-    }));
-  }
-
-  @Action(DeleteRegionById)
-  DeleteRegionById({ patchState, dispatch }: StateContext<AdminStateModel>, { regionId, organizationId }: DeleteRegionById): Observable<void> {
-    return this.regionService.deleteRegionById(regionId).pipe(tap((payload) => {
-      patchState({ isLocationLoading: false });
-      dispatch(new GetRegionsByOrganizationId(organizationId));
-      return payload;
-    }));
-  }
-
-  @Action(GetLocationsByOrganizationId)
-  GetLocationsByOrganizationId({ patchState }: StateContext<AdminStateModel>, { organizationId }: GetLocationsByOrganizationId): Observable<Location[]> {
-    return this.locationService.getLocationsByOrganizationId(organizationId).pipe(tap((payload) => {
-      patchState({ locations: payload});
-      return payload;
-    }));
-  }
-
-  @Action(GetLocationsByRegionId)
-  GetLocationsByRegionId({ patchState }: StateContext<AdminStateModel>, { regionId }: GetLocationsByRegionId): Observable<Location[]> {
-    return this.locationService.getLocationsByRegionId(regionId).pipe(tap((payload) => {
-      patchState({ locations: payload});
-      return payload;
-    }));
-  }
-
-  @Action(GetLocationById)
-  GetLocationById({ patchState }: StateContext<AdminStateModel>, { locationId }: GetLocationById): Observable<Location> {
-    return this.locationService.getLocationById(locationId).pipe(tap((payload) => {
-      patchState({ location: payload});
-      return payload;
-    }));
-  }
-
-  @Action(SaveLocation)
-  SaveLocation({ patchState, dispatch }: StateContext<AdminStateModel>, { location, regionId }: SaveLocation): Observable<Location> {
-    patchState({ isLocationLoading: true });
-    return this.locationService.saveLocation(location).pipe(tap((payload) => {
-      patchState({ isLocationLoading: false});
-      dispatch(new GetLocationsByRegionId(regionId));
-      return payload;
-    }));
-  }
-
-  @Action(UpdateLocation)
-  UpdateLocation({ patchState, dispatch }: StateContext<AdminStateModel>, { location, regionId }: UpdateLocation): Observable<void> {
-    return this.locationService.updateLocation(location).pipe(tap((payload) => {
-      patchState({ isLocationLoading: false });
-      dispatch(new GetLocationsByRegionId(regionId));
-      return payload;
-    }));
-  }
-
-  @Action(DeleteLocationById)
-  DeleteLocationById({ patchState, dispatch }: StateContext<AdminStateModel>, { locationId, regionId }: DeleteLocationById): Observable<any> {
-    return this.locationService.deleteLocationById(locationId).pipe(tap((payload) => {
-      patchState({ isLocationLoading: false });
-      dispatch(new GetLocationsByRegionId(regionId));
-      return payload;
-    }),
-    catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
   }
 
   @Action(GetMasterSkillsByPage)
@@ -666,82 +463,5 @@ export class AdminState {
         return payload;
       })
     );
-  }
-
-  @Action(GetSkillGroup)
-  GetSkillGroupsByOrganizationId({ patchState }: StateContext<AdminStateModel>, { payload }: GetSkillGroup): Observable<SkillGroup[]> {
-    return this.skillGroupService.getSkillGroups(payload).pipe(tap((payload) => {
-      patchState({ skillGroups: payload });
-      return payload;
-    }));
-  }
-
-  @Action(SaveSkillGroup)
-  SaveSkillGroup({ patchState, dispatch }: StateContext<AdminStateModel>, { skillGroup, organizationId }: SaveSkillGroup): Observable<SkillGroup> {
-    return this.skillGroupService.saveUpdateSkillGroup(skillGroup).pipe(tap((payload) => {
-      patchState({ isSkillGroupLoading: false });
-      dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-      dispatch(new GetSkillGroup(organizationId));
-      return payload;
-    }));
-  }
-
-  @Action(UpdateSkillGroup)
-  UpdateSkillGroup({ patchState, dispatch }: StateContext<AdminStateModel>, { skillGroup, organizationId }: UpdateSkillGroup): Observable<SkillGroup> {
-    return this.skillGroupService.saveUpdateSkillGroup(skillGroup).pipe(tap((payload) => {
-      patchState({ isSkillGroupLoading: false });
-      dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      dispatch(new GetSkillGroup(organizationId));
-      return payload;
-    }));
-  }
-
-  @Action(RemoveSkillGroup)
-  RemoveSkillGroup({ patchState, dispatch }: StateContext<AdminStateModel>, { skillGroup, organizationId }: RemoveSkillGroup): Observable<void> {
-    return this.skillGroupService.removeSkillGroup(skillGroup).pipe(tap((payload) => {
-      patchState({ isSkillGroupLoading: false });
-      dispatch(new GetSkillGroup(organizationId));
-      return payload;
-    }));
-  }
-
-  @Action(GetCredentialSetup)
-  GetCredentialSetupsByOrganizationId({ patchState }: StateContext<AdminStateModel>, { payload }: GetCredentialSetup): Observable<CredentialSetup[]> {
-    return this.credentialsService.getCredentialSetup(payload).pipe(tap((payload) => {
-      patchState({ credentialSetups: payload });
-      return payload;
-    }));
-  }
-
-  @Action(SaveUpdateCredentialSetup)
-  SaveUpdateCredentialSetup({ patchState, dispatch }: StateContext<AdminStateModel>, { credentialSetup, organizationId }: SaveUpdateCredentialSetup): Observable<CredentialSetup> {
-    return this.credentialsService.saveUpdateCredentialSetup(credentialSetup).pipe(tap((payload) => {
-      patchState({ isCredentialSetupLoading: false });
-      if (credentialSetup.id) {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      } else {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-      }
-      dispatch(new GetCredentialSetup(organizationId));
-      return payload;
-    }));
-  }
-
-  @Action(GetOrganizationSettings)
-  GetOrganizationSettingsByOrganizationId({ patchState }: StateContext<AdminStateModel>, { payload }: GetOrganizationSettings): Observable<OrganizationSettingsGet[]> {
-    return this.organizationSettingsService.getOrganizationSettingsByOrganizationId(payload).pipe(tap((payload) => {
-      patchState({ organizationSettings: payload });
-      return payload;
-    }));
-  }
-
-  @Action(SaveOrganizationSettings)
-  SaveOverrideOrganizationSettings({ patchState, dispatch }: StateContext<AdminStateModel>, { organizationSettings, organizationId }: SaveOrganizationSettings): Observable<void> {
-    return this.organizationSettingsService.saveOrganizationSetting(organizationSettings).pipe(tap((payload) => {
-      patchState({ isCredentialSetupLoading: false });
-      dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      dispatch(new GetCredentialSetup(organizationId));
-      return payload;
-    }));
   }
 }
