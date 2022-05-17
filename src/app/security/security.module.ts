@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { NgxsModule } from '@ngxs/store';
 
 import { SharedModule } from '@shared/shared.module';
 
@@ -17,6 +18,7 @@ import { RolesAndPermissionsComponent } from './roles-and-permissions/roles-and-
 import { SecurityComponent } from './security.component';
 import { RolesGridComponent } from './roles-and-permissions/roles-grid/roles-grid.component';
 import { RoleFormComponent } from './roles-and-permissions/role-form/role-form.component';
+import { SecurityState } from './store/security.state';
 
 const scurityIcons = {
   Sliders,
@@ -46,6 +48,7 @@ const scurityIcons = {
     TreeViewAllModule,
 
     FeatherModule.pick(scurityIcons),
+    NgxsModule.forFeature([SecurityState]),
   ]
 })
 export class SecurityModule { }

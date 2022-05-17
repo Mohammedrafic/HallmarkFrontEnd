@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
+import { BUSINESS_UNITS_VALUES, OPRION_FIELDS } from '../roles-and-permissions.constants';
 
 const mock = [
   { id: 1, name: 'Australia', hasChild: true },
@@ -41,7 +42,8 @@ export class RoleFormComponent implements OnInit {
 
   public pages: Object[] = mock;
   public treeField: Object = { dataSource: this.pages, id: 'id', parentID: 'pid', text: 'name', hasChildren: 'hasChild' };
-
+  public businessUnits = BUSINESS_UNITS_VALUES;
+  public optionFields = OPRION_FIELDS;
   public copyRoleControl = new FormControl();
 
   constructor() {}
