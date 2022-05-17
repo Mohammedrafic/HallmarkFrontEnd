@@ -92,6 +92,7 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
   }
 
   public copyHoliday(data: any, event: any): void {
+    this.showForm = true;
     this.title = 'Copy';
     this.addActiveCssClass(event);
     this.HolidayFormGroup.setValue({

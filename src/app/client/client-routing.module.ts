@@ -39,6 +39,13 @@ const routes: Routes = [
         path: 'reports',
         component: ReportsContentComponent,
       },
+      {
+        path: 'organization-management',
+        loadChildren: () =>
+          import('../organization-management/organization-management.module').then((m) => m.OrganizationManagementModule),
+        //     canLoad: [ AdminGuard ],
+        //     canActivate: [ AdminGuard ]
+      },
     ],
   },
 ];

@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GridModule, ResizeService, PagerModule, PageService } from '@syncfusion/ej2-angular-grids';
 import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
-import {UploaderModule, TextBoxModule, NumericTextBoxModule, MaskedTextBoxModule} from '@syncfusion/ej2-angular-inputs';
+import { UploaderModule, TextBoxModule, NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, TimePickerModule, DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
@@ -28,23 +28,21 @@ import {
   Copy
 } from 'angular-feather/icons';
 
-import { ClientManagementContentComponent } from './client-management/client-management-content/client-management-content.component';
-import { AdminRoutingModule } from './admin-routing.module';
-import { AdminComponent } from './admin.component';
-import { AddEditOrganizationComponent } from './client-management/add-edit-organization/add-edit-organization.component';
 import { NgxsModule } from '@ngxs/store';
-import { AdminState } from './store/admin.state';
+import { OrganizationManagementState } from './store/organization-management.state';
 import { SharedModule } from '../shared/shared.module';
-import { MasterDataContentComponent } from './master-data/master-data-content.component';
-import { SkillsCategoriesComponent } from './master-data/skills/skills-categories.component';
-import { SkillsGridComponent } from './master-data/skills/skills-grid/skills-grid.component';
-import { SkillCategoriesGridComponent } from './master-data/skills/skill-categories-grid/skill-categories-grid.component';
-import {
-  MasterCredentialsTypesComponent
-} from './master-data/master-credentials/master-credentials-types/master-credentials-types.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { MasterHolidaysComponent } from './master-data/holidays/holidays.component';
-import { HolidaysState } from './store/holidays.state';
+import { ShiftsState } from './store/shifts.state';
+import { OrganizationManagementComponent } from './organization-management.component';
+import { OrganizationManagementRoutingModule } from './organization-management-routing.module';
+import { DepartmentsComponent } from './departments/departments.component';
+import { LocationsComponent } from './locations/locations.component';
+import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
+import { SkillsComponent } from './skills/skills.component';
+import { ShiftsComponent } from './shifts/shifts.component';
+import { AddEditSkillGroupComponent } from './credentials/credentials-setup/add-edit-skill-group/add-edit-skill-group.component';
+import { SettingsComponent } from './settings/settings.component';
+import { CredentialsComponent } from './credentials/credentials.component';
+import { CredentialsListComponent } from './credentials/credentials-list/credentials-list.component';
 
 const sidebarIcons = {
   Download,
@@ -65,20 +63,20 @@ const sidebarIcons = {
 };
 @NgModule({
   declarations: [
-    ClientManagementContentComponent,
-    AddEditOrganizationComponent,
-    AdminComponent,
-    MasterDataContentComponent,
-    SkillsCategoriesComponent,
-    SkillsGridComponent,
-    SkillCategoriesGridComponent,
-    MasterCredentialsTypesComponent,
-    DashboardComponent,
-    MasterHolidaysComponent,
+    OrganizationManagementComponent,
+    DepartmentsComponent,
+    LocationsComponent,
+    CredentialsSetupComponent,
+    CredentialsComponent,
+    CredentialsListComponent,
+    SkillsComponent,
+    ShiftsComponent,
+    AddEditSkillGroupComponent,
+    SettingsComponent,
   ],
   imports: [
     CommonModule,
-    AdminRoutingModule,
+    OrganizationManagementRoutingModule,
     FormsModule,
     ReactiveFormsModule,
     SharedModule,
@@ -102,15 +100,14 @@ const sidebarIcons = {
     DateTimePickerModule,
     MultiSelectAllModule,
     SwitchModule,
-    MaskedTextBoxModule,
     MultiSelectAllModule,
 
     FeatherModule.pick(sidebarIcons),
 
     //STORE
     NgxsModule.forFeature([
-      AdminState,
-      HolidaysState,
+      OrganizationManagementState,
+      ShiftsState
     ]),
   ],
   providers: [
@@ -118,4 +115,4 @@ const sidebarIcons = {
     PageService
   ]
 })
-export class AdminModule { }
+export class OrganizationManagementModule { }
