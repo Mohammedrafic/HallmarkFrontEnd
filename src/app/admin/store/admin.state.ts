@@ -67,7 +67,7 @@ import {
   UpdateSkillGroup,
   RemoveSkillGroup,
   GetCredentialSetup,
-  SaveUpdateCredentialSetup,
+  SaveUpdateCredentialSetup, GetOrganizationSettings, SaveOrganizationSettings,
 } from './admin.actions';
 import { DepartmentsService } from '../services/departments.service';
 import { Department } from '../../shared/models/department.model';
@@ -90,6 +90,8 @@ import { SkillGroupService } from '../services/skill-group.service';
 import { CandidateStateModel } from '../../agency/store/candidate.state';
 import { SkillGroup } from '../../shared/models/skill-group.model';
 import { CredentialSetup } from '../../shared/models/credential-setup.model';
+import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { OrganizationSettingsService } from '@admin/services/organization-settings.service';
 
 interface DropdownOption {
   id: number;
@@ -131,6 +133,8 @@ export interface AdminStateModel {
   isSkillGroupLoading: boolean;
   credentialSetups: CredentialSetup[] | null;
   isCredentialSetupLoading: boolean;
+  isOrganizationSettingsLoading: boolean;
+  organizationSettings: OrganizationSettingsGet[];
 }
 
 @State<AdminStateModel>({
@@ -170,7 +174,9 @@ export interface AdminStateModel {
     skillGroups: [],
     isSkillGroupLoading: false,
     credentialSetups: [],
-    isCredentialSetupLoading: false
+    isCredentialSetupLoading: false,
+    isOrganizationSettingsLoading: false,
+    organizationSettings: []
   },
 })
 @Injectable()
@@ -247,6 +253,9 @@ export class AdminState {
   @Selector()
   static credentialSetups(state: AdminStateModel): CredentialSetup[] | null { return state.credentialSetups }
 
+  @Selector()
+  static organizationSettings(state: AdminStateModel): OrganizationSettingsGet[] { return state.organizationSettings }
+
   constructor(
     private organizationService: OrganizationService,
     private skillsService: SkillsService,
@@ -255,7 +264,8 @@ export class AdminState {
     private regionService: RegionService,
     private locationService: LocationService,
     private credentialsService: CredentialsService,
-    private skillGroupService: SkillGroupService
+    private skillGroupService: SkillGroupService,
+    private organizationSettingsService: OrganizationSettingsService
   ) { }
 
   @Action(SetGeneralStatesByCountry)
@@ -712,6 +722,24 @@ export class AdminState {
       } else {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
       }
+      dispatch(new GetCredentialSetup(organizationId));
+      return payload;
+    }));
+  }
+
+  @Action(GetOrganizationSettings)
+  GetOrganizationSettingsByOrganizationId({ patchState }: StateContext<AdminStateModel>, { payload }: GetOrganizationSettings): Observable<OrganizationSettingsGet[]> {
+    return this.organizationSettingsService.getOrganizationSettingsByOrganizationId(payload).pipe(tap((payload) => {
+      patchState({ organizationSettings: payload });
+      return payload;
+    }));
+  }
+
+  @Action(SaveOrganizationSettings)
+  SaveOverrideOrganizationSettings({ patchState, dispatch }: StateContext<AdminStateModel>, { organizationSettings, organizationId }: SaveOrganizationSettings): Observable<void> {
+    return this.organizationSettingsService.saveOrganizationSetting(organizationSettings).pipe(tap((payload) => {
+      patchState({ isCredentialSetupLoading: false });
+      dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       dispatch(new GetCredentialSetup(organizationId));
       return payload;
     }));

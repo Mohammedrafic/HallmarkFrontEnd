@@ -9,6 +9,7 @@ import { CredentialType } from '../../shared/models/credential-type.model';
 import { Credential } from '../../shared/models/credential.model';
 import { SkillGroup } from '../../shared/models/skill-group.model';
 import { CredentialSetup } from '../../shared/models/credential-setup.model';
+import { OrganizationSettingsPost } from '@shared/models/organization-settings.model';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[admin] Set General States By Country';
@@ -308,4 +309,14 @@ export class GetCredentialSetup {
 export class SaveUpdateCredentialSetup {
   static readonly type = '[admin] Save Credential Setup';
   constructor(public credentialSetup: CredentialSetup, public organizationId: number) { }
+}
+
+export class GetOrganizationSettings {
+  static readonly type = '[admin] Get Organization Settings by Organization ID';
+  constructor(public payload: number) {}
+}
+
+export class SaveOrganizationSettings {
+  static readonly type = '[admin] Save Organization Settings';
+  constructor(public organizationSettings: OrganizationSettingsPost, public organizationId: number) { }
 }

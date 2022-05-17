@@ -71,6 +71,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
+  fakeOrganizationId = 2; //TODO: remove after BE implementation
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -84,7 +85,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetRegionsByOrganizationId(1)); // TODO: provide valid organizationId
+    this.store.dispatch(new GetRegionsByOrganizationId(this.fakeOrganizationId)); // TODO: provide valid organizationId
   }
 
   onRegionDropDownChanged(event: ChangeEventArgs): void {

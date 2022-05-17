@@ -271,6 +271,24 @@ ejs-grid.e-control.e-grid {
     }
   }
 
+  tbody {
+    .e-detailrow {
+      background-color: $secondary_dark-blue-50;
+
+      .e-detailindentcell, .e-detailcell {
+        border: none;
+      }
+
+      .e-detailcell {
+        padding: 0;
+        td:last-child {
+          padding-right: 19px;
+          text-align: end;
+        }
+      }
+    }
+  }
+
   tbody tr {
     td.e-detailrowcollapse {
       div.e-icons.e-dtdiagonalright.e-icon-grightarrow::before {

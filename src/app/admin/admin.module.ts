@@ -124,6 +124,7 @@ const sidebarIcons = {
     DateTimePickerModule,
     MultiSelectAllModule,
     SwitchModule,
+    MultiSelectAllModule,
 
     FeatherModule.pick(sidebarIcons),
 

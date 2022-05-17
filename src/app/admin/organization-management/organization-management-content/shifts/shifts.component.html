@@ -85,7 +85,7 @@
   (formSaveClicked)="saveShift()"
   header="{{ title }} Shift"
   >
-  <form class="shifts-form-dialog form-container bootstrap"
+  <form *ngIf="showForm" class="shifts-form-dialog form-container bootstrap"
         id="addEditShiftsForm"
         [formGroup]="ShiftFormGroup">
 
@@ -128,7 +128,7 @@
                           formControlName="startTime"
                           placeholder="HH:MM"
                           format="hh:mm a"
-                          [max]="endTimeField.value"
+                          [max]="endTimeField.value || false"
                           [step]="30">
           </ejs-timepicker>
         </div>
@@ -144,7 +144,7 @@
                           formControlName="endTime"
                           placeholder="HH:MM"
                           format="hh:mm a"
-                          [min]="startTimeField.value"
+                          [min]="startTimeField.value || false"
                           [step]="30">
           </ejs-timepicker>
         </div>

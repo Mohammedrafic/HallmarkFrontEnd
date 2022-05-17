@@ -14,6 +14,7 @@ import { Credential } from '@shared/models/credential.model';
 import { AdminState } from '@admin/store/admin.state';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { SortSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
 @Component({
   selector: 'app-credentials-list',
@@ -23,6 +24,8 @@ import { ConfirmService } from '@shared/services/confirm.service';
 export class CredentialsListComponent extends AbstractGridConfigurationComponent implements OnInit {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
+
+  gridSortSettings: SortSettingsModel = { columns: [{ field: 'credentialTypeName', direction: 'Ascending' }] };
 
   @Input() isActive: boolean = false;
 

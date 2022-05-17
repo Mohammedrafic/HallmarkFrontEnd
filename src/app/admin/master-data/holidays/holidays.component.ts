@@ -5,6 +5,7 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { Holiday } from '@shared/models/holiday.model';
+import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/admin.actions';
@@ -38,12 +39,14 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
   public format = { 
     type:'date', format: 'MM/dd/yyyy hh:mm a'
   };
+  public showForm = true;
 
   constructor(private store: Store,
               private actions$: Actions,
               private fb: FormBuilder,
               private confirmService: ConfirmService) {
     super();
+    this.today.setHours(0, 0, 0);
     this.HolidayFormGroup = this.fb.group({
       id: new FormControl(0, [ Validators.required ]),
       holidayName: new FormControl(null, [ Validators.required ]),
@@ -57,7 +60,11 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
     }
 
     this.startTimeField = this.HolidayFormGroup.get('startDateTime') as AbstractControl;
+    this.startTimeField.addValidators(startDateValidator(this.HolidayFormGroup, 'endDateTime', this.today));
+    this.startTimeField.valueChanges.subscribe(() => this.endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
     this.endTimeField = this.HolidayFormGroup.get('endDateTime') as AbstractControl;
+    this.endTimeField.addValidators(endDateValidator(this.HolidayFormGroup, 'startDateTime', this.today));
+    this.endTimeField.valueChanges.subscribe(() => this.startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
   }
 
   ngOnInit() {
@@ -67,9 +74,9 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
       this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize));
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveHolidaySucceeded)).subscribe(() => {
-      this.closeDialog();
-      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize));
       this.HolidayFormGroup.reset();
+    this.closeDialog();
+      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize));
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(DeleteHolidaySucceeded)).subscribe(() => {
       this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize));
@@ -106,12 +113,14 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
   }
 
   public addHoliday(): void {
+    this.showForm = true;
     this.title = 'Add';
     this.HolidayFormGroup.controls['id'].setValue(0);
     this.store.dispatch(new ShowSideDialog(true));
   }
 
   public editHoliday(data: any, event: any): void {
+    this.showForm = true;
     this.addActiveCssClass(event);
     this.title = 'Edit';
     this.HolidayFormGroup.setValue({
@@ -149,11 +158,13 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
       }).pipe(filter(confirm => !!confirm))
       .subscribe(() => {
         this.store.dispatch(new ShowSideDialog(false));
+        this.showForm = false;
         this.HolidayFormGroup.reset();
         this.removeActiveCssClass();
       });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
+      this.showForm = false;
       this.HolidayFormGroup.reset();
       this.removeActiveCssClass();
     }
