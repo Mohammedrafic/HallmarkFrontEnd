@@ -166,4 +166,22 @@ export class CandidateService {
   public getCredentialTypes(): Observable<CredentialType[]> {
     return this.http.get<CredentialType[]>(`/api/CredentialTypes/all`);
   }
+
+  /**
+   * Save credential files in blob storage
+   * @return
+   */
+  public saveCredentialFiles(files: Blob[], candidateCredentialId: number): Observable<any> {
+    const formData = new FormData();
+    files.forEach(file => formData.append('credentialFiles', file))
+    return this.http.post(`/api/CandidateCredentials/${candidateCredentialId}/credentialFile`, formData);
+  }
+
+  /**
+   * Get credential files from blob storage
+   * @return blob
+   */
+  public getCredentialFile(credentialFileId: number): Observable<any> {
+    return this.http.get(`/api/CandidateCredentials/${credentialFileId}/credentialFile`, { responseType: 'blob' });
+  }
 }

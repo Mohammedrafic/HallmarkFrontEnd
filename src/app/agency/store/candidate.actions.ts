@@ -132,3 +132,23 @@ export class GetCredentialTypes {
   static readonly type = '[candidate] Get Credential Types';
   constructor() { }
 }
+
+export class UploadCredentialFiles {
+  static readonly type = '[candidate] Upload Credential Files';
+  constructor(public files: Blob[], public candidateCredentialId: number) { }
+}
+
+export class GetCredentialFiles {
+  static readonly type = '[candidate] Get Credential Files';
+  constructor(public payload: number) { }
+}
+
+export class GetCredentialFilesSucceeded {
+  static readonly type = '[candidate] Get Credential Files Succeeded';
+  constructor(public payload: Blob) { }
+}
+
+export class UploadCredentialFilesSucceeded {
+  static readonly type = '[candidate] Upload Credential Files Succeeded';
+  constructor() { }
+}

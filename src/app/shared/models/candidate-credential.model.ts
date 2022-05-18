@@ -12,6 +12,14 @@ export type CandidateCredential = {
   experience: string;
   createdOn: string;
   createdUntil: string;
+  credentialFiles?: CredentialFile[];
+}
+
+export type CredentialFile = {
+  id: number;
+  candidateCredentialId: number;
+  name: string;
+  fileId: string;
 }
 
 export type CandidateCredentialPage = PageOfCollections<CandidateCredential>;
