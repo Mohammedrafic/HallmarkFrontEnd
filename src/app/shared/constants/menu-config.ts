@@ -6,7 +6,7 @@ export const MENU_CONFIG: any = {
       icon: 'home',
       route: '/admin/dashboard'
     },
-    2: { // Organizations
+    2: { // Organization
       icon: 'file-text',
       route: '/admin/client-management'
     },
@@ -30,17 +30,9 @@ export const MENU_CONFIG: any = {
       icon: 'dollar-sign',
       route: ''
     },
-    8: { // Configuration and Setting
+    8: { // Master Data
       icon: 'user',
       route: '/admin/master-data'
-    },
-    9: { // Education materials
-      icon: 'book-open',
-      route: ''
-    },
-    10: { // FAQ
-      icon: 'info',
-      route: ''
     },
     11: { // Organization List
       icon: '',
@@ -62,7 +54,7 @@ export const MENU_CONFIG: any = {
       icon: 'clock',
       route: '' 
     },
-    16: { // Invoice
+    16: { // Invoices
       icon: 'dollar-sign',
       route: ''
     },
@@ -70,7 +62,7 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    18: { // Configuration and Setting
+    18: { // Settings
       icon: 'user',
       route: '/admin/organization-management'
     },
@@ -98,7 +90,7 @@ export const MENU_CONFIG: any = {
       icon: 'clock',
       route: ''
     },
-    25: { // Invoice
+    25: { // Invoices
       icon: 'dollar-sign',
       route: ''
     },
@@ -106,7 +98,7 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    27: { // Configuration and Setting
+    27: { // Settings
       icon: '',
       route: ''
     },
@@ -129,7 +121,7 @@ export const MENU_CONFIG: any = {
       icon: 'home',
       route: '/admin/dashboard'
     },
-    2: { // Organizations
+    2: { // Organization
       icon: 'file-text',
       route: '/admin/client-management'
     },
@@ -153,17 +145,9 @@ export const MENU_CONFIG: any = {
       icon: 'dollar-sign',
       route: ''
     },
-    8: { // Configuration and Setting
+    8: { // Master Data
       icon: 'user',
       route: '/admin/master-data'
-    },
-    9: { // Education materials
-      icon: 'book-open',
-      route: ''
-    },
-    10: { // FAQ
-      icon: 'info',
-      route: ''
     },
     11: { // Organization List
       icon: '',
@@ -185,7 +169,7 @@ export const MENU_CONFIG: any = {
       icon: 'clock',
       route: '' 
     },
-    16: { // Invoice
+    16: { // Invoices
       icon: 'dollar-sign',
       route: ''
     },
@@ -193,7 +177,7 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    18: { // Configuration and Setting
+    18: { // Settings
       icon: 'user',
       route: '/admin/organization-management'
     },
@@ -221,7 +205,7 @@ export const MENU_CONFIG: any = {
       icon: 'clock',
       route: ''
     },
-    25: { // Invoice
+    25: { // Invoices
       icon: 'dollar-sign',
       route: ''
     },
@@ -229,7 +213,7 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    27: { // Configuration and Setting
+    27: { // Settings
       icon: '',
       route: ''
     },
@@ -252,7 +236,7 @@ export const MENU_CONFIG: any = {
       icon: 'home',
       route: '/client/dashboard'
     },
-    2: { // Organizations
+    2: { // Organization
       icon: 'file-text',
       route: ''
     },
@@ -276,16 +260,8 @@ export const MENU_CONFIG: any = {
       icon: 'dollar-sign',
       route: ''
     },
-    8: { // Configuration and Setting
+    8: { // Master Data
       icon: 'user',
-      route: ''
-    },
-    9: { // Education materials
-      icon: 'book-open',
-      route: ''
-    },
-    10: { // FAQ
-      icon: 'info',
       route: ''
     },
     11: { // Organization List
@@ -308,7 +284,7 @@ export const MENU_CONFIG: any = {
       icon: 'clock',
       route: '' 
     },
-    16: { // Invoice
+    16: { // Invoices
       icon: 'dollar-sign',
       route: ''
     },
@@ -316,7 +292,7 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    18: { // Configuration and Setting
+    18: { // Settings 
       icon: 'user',
       route: 'client/organization-management'
     },
@@ -344,7 +320,7 @@ export const MENU_CONFIG: any = {
       icon: 'clock',
       route: ''
     },
-    25: { // Invoice
+    25: { // Invoices
       icon: 'dollar-sign',
       route: ''
     },
@@ -352,7 +328,7 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    27: { // Configuration and Setting
+    27: { // Settings
       icon: '',
       route: ''
     },
@@ -375,7 +351,7 @@ export const MENU_CONFIG: any = {
       icon: 'home',
       route: '/agency/dashboard'
     },
-    2: { // Organizations
+    2: { // Organization
       icon: 'file-text',
       route: ''
     },
@@ -399,16 +375,8 @@ export const MENU_CONFIG: any = {
       icon: 'dollar-sign',
       route: ''
     },
-    8: { // Configuration and Setting
+    8: { // Master Data
       icon: 'user',
-      route: ''
-    },
-    9: { // Education materials
-      icon: 'book-open',
-      route: ''
-    },
-    10: { // FAQ
-      icon: 'info',
       route: ''
     },
     11: { // Organization List
@@ -431,7 +399,7 @@ export const MENU_CONFIG: any = {
       icon: 'clock',
       route: '' 
     },
-    16: { // Invoice
+    16: { // Invoices
       icon: 'dollar-sign',
       route: ''
     },
@@ -439,7 +407,7 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    18: { // Configuration and Setting (Master Data)
+    18: { // Settings 
       icon: 'user',
       route: ''
     },
@@ -467,7 +435,7 @@ export const MENU_CONFIG: any = {
       icon: 'clock',
       route: ''
     },
-    25: { // Invoice
+    25: { // Invoices
       icon: 'dollar-sign',
       route: ''
     },
@@ -475,7 +443,7 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    27: { // Configuration and Setting
+    27: { // Settings
       icon: 'user',
       route: ''
     },
