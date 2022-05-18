@@ -12,9 +12,9 @@ export class ImageUploaderComponent implements OnInit {
   @Input() set logo(value: Blob | null) {
     if (value) {
       const reader = new FileReader();
-      reader.readAsDataURL(value as Blob); 
+      reader.readAsDataURL(value as Blob);
       reader.onloadend = () => {
-        this.logoSrc = reader.result as string;     
+        this.logoSrc = reader.result as string;
       }
     }
   }
@@ -34,7 +34,9 @@ export class ImageUploaderComponent implements OnInit {
   }
 
   public browse() : void {
-    document.getElementsByClassName('e-file-select-wrap')[0]?.querySelector('button')?.click();
+    document.getElementById('image-uploader')
+      ?.getElementsByClassName('e-file-select-wrap')[0]
+      ?.querySelector('button')?.click();
   }
 
   public onImageSelect(event: SelectedEventArgs): void {

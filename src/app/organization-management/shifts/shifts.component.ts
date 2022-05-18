@@ -13,7 +13,7 @@ import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RE
 import { Shift } from 'src/app/shared/models/shift.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
-import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
+import { endTimeValidator, startTimeValidator } from '@shared/validators/date.validator';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 @Component({
@@ -69,8 +69,8 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
     this.startTimeField.valueChanges.subscribe(val => {
       this.minTime = val || this.defaultMinTime; this.endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
     });
-    this.startTimeField.addValidators(startDateValidator(this.ShiftFormGroup, 'endTime', this.defaultMinTime));
-    this.endTimeField.addValidators(endDateValidator(this.ShiftFormGroup, 'startTime', this.defaultMinTime));
+    this.startTimeField.addValidators(startTimeValidator(this.ShiftFormGroup, 'endTime'));
+    this.endTimeField.addValidators(endTimeValidator(this.ShiftFormGroup, 'startTime'));
   }
 
   ngOnInit() {
@@ -164,7 +164,6 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
       this.store.dispatch(new SaveShift(new Shift(
         this.ShiftFormGroup.getRawValue(), 2 // TODO: remove after org selection implementation
       )));
-      this.showForm = false;
       this.store.dispatch(new SetDirtyState(false));
     } else {
       this.ShiftFormGroup.markAllAsTouched();

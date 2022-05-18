@@ -31,3 +31,23 @@ export function endDateValidator(form: AbstractControl, controlName: string, min
     return null;
   };
 }
+
+export function startTimeValidator(form: AbstractControl, controlName: string): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (form && control.value && form.get(controlName)?.value) {
+      const forbidden = control.value > new Date(form.get(controlName)?.value);
+      return forbidden ? {invalidDate: {value: control.value}} : null;
+    }
+    return null;
+  };
+}
+
+export function endTimeValidator(form: AbstractControl, controlName: string): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    if (form && control.value && form.get(controlName)?.value) {
+      const forbidden = control.value < new Date(form.get(controlName)?.value);
+      return forbidden ? {invalidDate: { value: control.value }} : null;
+    }
+    return null;
+  };
+}

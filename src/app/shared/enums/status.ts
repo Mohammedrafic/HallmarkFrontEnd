@@ -6,11 +6,11 @@ export enum Status {
 }
 
 export const STATUS_COLOR_GROUP = {
-  'e-success': ['open', 'Active'],
+  'e-success': ['open', 'Active', 'Completed'],
   'e-warning': ['incomplete', 'Suspended', 'Incomplete'],
   'e-default': ['closed', 'Inactive'],
   'e-pending': ['pending', 'Pending'],
-  'e-progress': ['in progress', 'In Progress'],
+  'e-progress': ['in progress', 'In Progress', 'Verified'],
   'e-accepted': ['accepted'],
   'e-filled': ['filled']
 }

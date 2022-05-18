@@ -22,6 +22,8 @@ import {
   GetCandidatePhotoSucceeded,
   GetCandidatesByPage,
   GetCandidatesCredentialByPage,
+  GetCredentialFiles,
+  GetCredentialFilesSucceeded,
   GetCredentialTypes,
   GetEducationByCandidateId,
   GetExperienceByCandidateId,
@@ -40,7 +42,9 @@ import {
   SaveEducationSucceeded,
   SaveExperience,
   SaveExperienceSucceeded,
-  UploadCandidatePhoto
+  UploadCandidatePhoto,
+  UploadCredentialFiles,
+  UploadCredentialFilesSucceeded
 } from './candidate.actions';
 
 export interface CandidateStateModel {
@@ -305,5 +309,26 @@ export class CandidateState {
       patchState({ credentialTypes: payload });
       return payload;
     }));
+  }
+
+  @Action(UploadCredentialFiles)
+  UploadCredentialFiles({ patchState, dispatch }: StateContext<CandidateStateModel>, { files, candidateCredentialId }: UploadCredentialFiles): Observable<any> {
+    patchState({ isCandidateLoading: true });
+    return this.candidateService.saveCredentialFiles(files, candidateCredentialId).pipe(tap((payload) => {
+      patchState({ isCandidateLoading: false });
+      dispatch(new UploadCredentialFilesSucceeded());
+      return payload;
+    }));
+  }
+
+  @Action(GetCredentialFiles)
+  GetCredentialFiles({ dispatch }: StateContext<CandidateStateModel>, { payload }: GetCredentialFiles): Observable<any> {
+    return this.candidateService.getCredentialFile(payload).pipe(
+      tap((payload) => {
+        dispatch(new GetCredentialFilesSucceeded(payload));
+        return payload;
+      }),
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'No files found'))))
+    );
   }
 }
