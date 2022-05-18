@@ -29,7 +29,6 @@ export class ConfirmService {
           dialog.close();
           isAllowed$.complete();
         },
-        
       },
       showCloseIcon: true,
       closeOnEscape: true,
