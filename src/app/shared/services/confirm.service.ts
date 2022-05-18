@@ -30,6 +30,10 @@ export class ConfirmService {
           isAllowed$.complete();
         },
       },
+      close: () => {
+        isAllowed$.next(false);
+        isAllowed$.complete();
+      },
       showCloseIcon: true,
       closeOnEscape: true,
       position: { X: 'center', Y: 'center' },
