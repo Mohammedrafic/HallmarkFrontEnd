@@ -1,15 +1,16 @@
-<section class="grid">
+<section class="grid flex-column">
   <ejs-grid
     #grid
     [dataSource]="gridDataSource"
     (rowDataBound)="rowDataBound($event)"
     [allowPaging]="allowPaging"
     [pageSettings]="pageSettings"
-    [height]="gridHeight"
+    [height]="fullScreenGridHeight"
     [rowHeight]="rowHeight"
     [resizeSettings]="resizeSettings"
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
+    class="grid-component"
   >
     <ng-template #detailTemplate let-data>
       <table class="detailtable" width="100%">

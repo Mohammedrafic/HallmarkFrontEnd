@@ -51,6 +51,16 @@ body {
   font-family: "SF Pro";
   height: 100%;
 
+  .flex-column {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+  }
+
+  .full-screen-box {
+    height: calc(100% - 80px) !important;
+  }
+
   .input-group {
     position: relative;
 

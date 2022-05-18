@@ -9,6 +9,7 @@ export const GRID_CONFIG = {
   isWordWrappingEnabled: true,
   wordWrapSettings: { wrapMode: 'Content' } as TextWrapSettingsModel,
   gridHeight: '660',
+  fullScreenGridHeight: '100%',
   initialRowHeight: 64,
   resizeSettings: { mode:'Auto' } as ResizeSettingsModel,
   gridPageSettings: { pageSizes: true, pageSize: 30 },

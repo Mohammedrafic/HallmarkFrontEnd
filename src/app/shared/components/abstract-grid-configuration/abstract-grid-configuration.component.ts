@@ -8,6 +8,7 @@ export abstract class AbstractGridConfigurationComponent {
   allowPaging = GRID_CONFIG.isPagingEnabled;
   pageSettings = GRID_CONFIG.gridPageSettings;
   gridHeight = GRID_CONFIG.gridHeight;
+  fullScreenGridHeight = GRID_CONFIG.fullScreenGridHeight;
   rowHeight = GRID_CONFIG.initialRowHeight;
   resizeSettings: ResizeSettingsModel = GRID_CONFIG.resizeSettings;
   allowSorting = GRID_CONFIG.isSortingEnabled;

@@ -22,6 +22,11 @@
   }
 }
 
+.grid-component {
+  margin-top: 25px;
+  overflow-y: auto;
+}
+
 .e-row[aria-selected='true'] {
   .e-customized-expand-cell {
     background-color: $primary-active-blue-10;

@@ -1,12 +1,12 @@
 @import '../../styles/variables/colors';
 
 .container {
-
+  .grid {
+    margin-bottom: 25px;
+  }
+  
   .side-menu {
     background-color: #fff;
     margin-right: 25px;
-
-    .list-box {
-    }
   }
 }
