@@ -33,7 +33,7 @@ export class PaymentDetailsGridComponent extends AbstractGridConfigurationCompon
   @ViewChild('grid') grid: GridComponent;
 
   public override gridHeight = '250';
-  
+
   public initialSort = {
     columns: [{ field: 'name', direction: 'Ascending' }],
   };
@@ -114,7 +114,7 @@ export class PaymentDetailsGridComponent extends AbstractGridConfigurationCompon
       payee: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       address: new FormControl('', [Validators.maxLength(500)]),
       city: new FormControl('', [Validators.maxLength(20)]),
-      zip: new FormControl(''),
+      zip: new FormControl('', [Validators.minLength(5),]),
       startDate: new FormControl('', [Validators.required]),
     });
   }

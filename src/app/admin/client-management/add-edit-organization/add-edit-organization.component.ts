@@ -38,7 +38,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
   public logo: Blob | null = null;
   public titles = Titles;
 
-  public createUnderFields = { 
+  public createUnderFields = {
     text: 'name', value: 'id'
   };
 
@@ -112,7 +112,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
   }
 
   ngAfterViewInit(): void {
-    
+
   }
 
   ngOnDestroy(): void {
@@ -144,9 +144,9 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
       state: new FormControl(organization ? organization.generalInformation.state : '', [ Validators.required ]),
       city: new FormControl(organization ? organization.generalInformation.city : '', [ Validators.required ]),
       zipCode: new FormControl(organization ? organization.generalInformation.zipCode : '', [ Validators.minLength(5), Validators.pattern(/^[0-9]+$/) ]),
-      phone1Ext: new FormControl(organization ? organization.generalInformation.phone1Ext : '', [ Validators.pattern(/^[0-9]+$/) ]),
-      phone2Ext: new FormControl(organization ? organization.generalInformation.phone2Ext : '', [ Validators.pattern(/^[0-9]+$/) ]),
-      fax: new FormControl(organization ? organization.generalInformation.fax : '', [ Validators.pattern(/^[0-9]+$/) ]),
+      phone1Ext: new FormControl(organization ? organization.generalInformation.phone1Ext : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/) ]),
+      phone2Ext: new FormControl(organization ? organization.generalInformation.phone2Ext : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/) ]),
+      fax: new FormControl(organization ? organization.generalInformation.fax : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/) ]),
       status: new FormControl(organization ? organization.generalInformation.status : 0, [ Validators.required ]),
       website: new FormControl(organization ? organization.generalInformation.website : '')
     });
@@ -161,9 +161,9 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
       state: new FormControl(organization ? organization.billingDetails.state : '', [ Validators.required ]),
       city: new FormControl(organization ? organization.billingDetails.city : '', [ Validators.required ]),
       zipCode: new FormControl(organization ? organization.billingDetails.zipCode : '', [ Validators.minLength(5), Validators.pattern(/^[0-9]+$/) ]),
-      phone1: new FormControl(organization ? organization.billingDetails.phone1 : '', [ Validators.pattern(/^[0-9]+$/) ]),
-      phone2: new FormControl(organization ? organization.billingDetails.phone2 : '', [ Validators.pattern(/^[0-9]+$/) ]),
-      fax: new FormControl(organization ? organization.billingDetails.fax : '', [ Validators.pattern(/^[0-9]+$/) ]),
+      phone1: new FormControl(organization ? organization.billingDetails.phone1 : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/) ]),
+      phone2: new FormControl(organization ? organization.billingDetails.phone2 : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/) ]),
+      fax: new FormControl(organization ? organization.billingDetails.fax : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/) ]),
       ext: new FormControl(organization ? organization.billingDetails.ext : '', [ Validators.pattern(/^[0-9]{5}$/)]),
     });
     this.BillingDetailsFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
@@ -232,7 +232,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
       id: new FormControl(contact ? contact.id : 0),
       title: new FormControl(contact ? contact.title : ''),
       contactPerson: new FormControl(contact ? contact.contactPerson : '', [ Validators.required, Validators.maxLength(100) ]),
-      phoneNumberExt: new FormControl(contact ? contact.phoneNumberExt : '', [ Validators.pattern(/^[0-9]+$/) ]),
+      phoneNumberExt: new FormControl(contact ? contact.phoneNumberExt : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/) ]),
       email: new FormControl(contact ? contact.email : '', [ Validators.pattern(/^\S+@\S+\.\S+$/) ])
     })
   }
@@ -331,7 +331,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
       this.GeneralInformationFormGroup.valid &&
       (this.BillingDetailsFormGroup.valid || this.isSameAsOrg) &&
       this.ContactFormArray.valid &&
-      this.PreferencesFormGroup.valid 
+      this.PreferencesFormGroup.valid
     ) {
       this.store.dispatch(new SaveOrganization(new Organization(
         this.currentBusinessUnitId as number,

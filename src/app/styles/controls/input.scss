@@ -82,6 +82,7 @@ body.light, body.dark {
         height: 190px;
       }
     }
+
     ejs-maskedtextbox.e-mask-container {
       &.ng-touched.ng-invalid {
         span.e-input-group {
@@ -98,12 +99,18 @@ body.light, body.dark {
       .e-input-group textarea.e-input,
       .e-input-group.e-control-wrapper textarea.e-input {
         height: 40px;
+        padding-left: 0;
       }
 
       span.e-input-group {
         border-radius: 8px !important;
         height: 40px;
         padding: 0 15px;
+
+        &.e-disabled {
+          background: $secondary-dark-blue-50 !important;
+          border-color: $secondary-dark-blue-40 !important;
+        }
 
         &:hover {
           border-color: $primary-active-blue-10 !important;

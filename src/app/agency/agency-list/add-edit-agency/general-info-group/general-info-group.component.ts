@@ -71,9 +71,9 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
       state: new FormControl('', [Validators.required]),
       city: new FormControl('', [Validators.required, Validators.max(20)]),
       zipCode: new FormControl('', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]),
-      phone1Ext: new FormControl('', [Validators.pattern(/^[0-9]+$/)]),
-      phone2Ext: new FormControl('', [Validators.pattern(/^[0-9]+$/)]),
-      fax: new FormControl('', [Validators.pattern(/^[0-9]+$/)]),
+      phone1Ext: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
+      phone2Ext: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
+      fax: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       status: new FormControl({ value: AgencyStatus.Active, disabled: true }, [Validators.required]),
       website: new FormControl(''),
     });
