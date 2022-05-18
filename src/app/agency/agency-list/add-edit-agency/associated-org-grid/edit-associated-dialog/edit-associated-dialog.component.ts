@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable, Subject, takeWhile } from 'rxjs';
+import { filter, Observable, Subject, takeWhile } from 'rxjs';
 import { Actions, Select, Store } from '@ngxs/store';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -24,10 +24,12 @@ import {
 } from 'src/app/agency/store/agency.actions';
 import { AgencyState } from 'src/app/agency/store/agency.state';
 import { valuesOnly } from 'src/app/shared/utils/enum.utils';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 
 enum Tabs {
   FeeSettings,
-  JobDistribution
+  JobDistribution,
 }
 
 @Component({
@@ -77,7 +79,7 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
 
   private isAlive = true;
 
-  constructor(private store: Store, private actions$: Actions) {}
+  constructor(private store: Store, private actions$: Actions, private confirmService: ConfirmService) {}
 
   ngOnInit(): void {
     this.onOpenEvent();
@@ -100,8 +102,24 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
   }
 
   public onCancel(): void {
-    this.sideDialog.hide();
-    this.editEndEvent.emit();
+    if (this.feeSettingsForm.dirty || this.jobDistributionForm.dirty) {
+      this.confirmService
+      .confirm(DELETE_CONFIRM_TEXT, {
+        title: DELETE_CONFIRM_TITLE,
+        okButtonLabel: 'Leave',
+        okButtonClass: 'delete-button',
+      })
+      .pipe(filter((confirm) => !!confirm))
+      .subscribe(() => {
+        this.feeSettingsForm.reset();
+        this.jobDistributionForm.reset();
+        this.sideDialog.hide();
+        this.editEndEvent.emit();
+      });
+    } else {
+      this.sideDialog.hide();
+      this.editEndEvent.emit();
+    }
   }
 
   public onSave(): void {
@@ -110,9 +128,7 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
         this.jobDistributionForm.markAllAsTouched();
         if (this.jobDistributionForm.valid) {
           const jobDistributionFormValue = this.jobDistributionForm.getRawValue();
-          this.store.dispatch(
-            new SaveJobDistribution({ ...jobDistributionFormValue, associateOrganizationId: this.editOrg.id })
-          );
+          this.store.dispatch(new SaveJobDistribution({ ...jobDistributionFormValue, associateOrganizationId: this.editOrg.id }));
         }
         break;
       case Tabs.FeeSettings:
@@ -143,7 +159,7 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
         this.sideDialog.show();
 
         if (org.id && org.organizationId) {
-          this.feeSettingsForm.patchValue({ id: org.id });
+          this.feeSettingsForm.patchValue({ id: org.id, baseFee: org.baseFee });
           this.store.dispatch(new GetFeeExceptionsInitialData(org.organizationId));
           this.store.dispatch(new GetJobDistributionInitialData(org.organizationId));
           this.store.dispatch(new GetJobDistributionId(org.id));

@@ -54,6 +54,7 @@
               class="dropdown-no-border"
               [dataSource]="rowsPerPageDropDown"
               [(value)]="activeRowsPerPageDropDown"
+              (change)="onRowsDropDownChanged()"
             >
             </ejs-dropdownlist>
             <ejs-numerictextbox
@@ -62,14 +63,23 @@
               format="#"
               placeholder="Go to:"
               min="1"
-              [max]="10"
+              [max]="(associateOrganizationsPages$ | async)?.totalCount"
               [showSpinButton]="false"
+              (change)="onGoToClick($event)"
             >
             </ejs-numerictextbox>
           </section>
           <section class="right-side-pager-controls">
-            <!-- <ejs-pager id="gridPager" #gridPager [pageSize]="30" [totalRecordsCount]="30" [enablePagerMessage]="false" [currentPage]="1">
-            </ejs-pager> -->
+            <ejs-pager
+              id="gridPager"
+              #gridPager
+              [pageSize]="pageSize"
+              [totalRecordsCount]="(associateOrganizationsPages$ | async)?.totalPages"
+              [enablePagerMessage]="false"
+              [currentPage]="currentPage"
+              (click)="onGoToClick($event)"
+            >
+            </ejs-pager>
           </section>
         </div>
       </div>

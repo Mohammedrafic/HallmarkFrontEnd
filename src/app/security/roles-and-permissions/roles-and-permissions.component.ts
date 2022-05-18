@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { Role, RoleDTO } from '@shared/models/roles.model';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -9,13 +9,13 @@ import { filter, Observable, takeWhile } from 'rxjs';
 
 import { SetHeaderState, ShowSideDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { GetBusinessByUnitType, GetPermissionsTree, SaveRole, SaveRoleSucceeded } from '../store/security.actions';
+import { GetBusinessByUnitType, SaveRole, SaveRoleSucceeded } from '../store/security.actions';
 import { SecurityState } from '../store/security.state';
 import { RoleFormComponent } from './role-form/role-form.component';
 import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS } from './roles-and-permissions.constants';
 
 const DEFAULT_DIALOG_TITLE = 'Add Role';
-const EDIT_DIALOG_TITLE = 'Role';
+const EDIT_DIALOG_TITLE = 'Edit Role';
 
 @Component({
   selector: 'app-roles-and-permissions',
@@ -47,6 +47,7 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
   }
 
   private isAlive = true;
+  private existingRoleName: string[];
 
   constructor(private store: Store, private actions$: Actions, private confirmService: ConfirmService) {
     this.store.dispatch(new SetHeaderState({ title: 'Security', iconName: 'lock' }));
@@ -66,11 +67,17 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
     }
 
     this.actions$
-      .pipe(ofActionSuccessful(SaveRoleSucceeded))
-      .pipe(takeWhile(() => this.isAlive))
+      .pipe(
+        ofActionSuccessful(SaveRoleSucceeded),
+        takeWhile(() => this.isAlive)
+      )
       .subscribe(() => {
         this.store.dispatch(new ShowSideDialog(false));
       });
+
+    this.bussinesData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
+      this.existingRoleName = data.map(({ name }) => name);
+    });
   }
 
   ngOnDestroy(): void {
@@ -93,7 +100,11 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
   public onAddCancel(): void {
     if (this.roleFormGroup.dirty) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT)
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
           this.store.dispatch(new ShowSideDialog(false));

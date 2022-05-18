@@ -1,10 +1,14 @@
 @import '../variables/colors';
 
-body.light {
+body.light, body.dark {
   .e-dialog {
     .e-icon-dlg-close::before {
       content: "\e7e7" !important;
       color: $secondary-dark-blue-30 !important;
+    }
+
+    & + .e-dlg-overlay {
+      background-color: unset;
     }
   }
 

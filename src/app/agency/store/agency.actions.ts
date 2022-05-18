@@ -129,3 +129,8 @@ export class SaveBaseFee {
   static readonly type = '[agency] Save Base Fee';
   constructor(public associateOrganizationId: number, public baseFee: number) {}
 }
+
+export class UpdateAssociateOrganizationsPage {
+  static readonly type = '[agency] Update Associate Organizations Page';
+  constructor() {}
+}

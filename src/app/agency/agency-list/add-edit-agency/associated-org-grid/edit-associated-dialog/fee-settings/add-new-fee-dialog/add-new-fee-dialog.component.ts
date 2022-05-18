@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable, Subject, takeWhile } from 'rxjs';
+import { filter, Observable, Subject, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -9,6 +9,8 @@ import { AgencyState } from 'src/app/agency/store/agency.state';
 import { FeeExceptions, FeeExceptionsInitialData, FeeSettingsClassification } from 'src/app/shared/models/associate-organizations.model';
 import { valuesOnly } from 'src/app/shared/utils/enum.utils';
 import { SaveFeeExceptions, SaveFeeExceptionsSucceeded } from '@agency/store/agency.actions';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 
 type AddNewFeeExceptionFormValue = {
   region: number[];
@@ -39,7 +41,7 @@ export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
     value: 'id',
   };
   public masterSkillsFields = {
-    text: 'skillAbbr',
+    text: 'skillDescription',
     value: 'id',
   };
   public classification = Object.values(FeeSettingsClassification)
@@ -47,13 +49,13 @@ export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
     .map((name, id) => ({ name, id }));
 
   get title(): string {
-    return this.editMode ? "Edit Fee Exception" : "Add Fee Exception";
+    return this.editMode ? 'Edit Fee Exception' : 'Add Fee Exception';
   }
 
   private organizationId: number;
   private isAlive = true;
 
-  constructor(private store: Store, private actions$: Actions) {}
+  constructor(private store: Store, private actions$: Actions, private confirmService: ConfirmService) {}
 
   ngOnInit(): void {
     this.onOpenEvent();
@@ -72,8 +74,22 @@ export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
   }
 
   public onCancel(): void {
-    this.editMode = false;
-    this.sideDialog.hide();
+    if (this.feeFormGroup.dirty) {
+      this.confirmService
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => !!confirm))
+        .subscribe(() => {
+          this.editMode = false;
+          this.sideDialog.hide();
+        });
+    } else {
+      this.editMode = false;
+      this.sideDialog.hide();
+    }
   }
 
   public onAdd(): void {
@@ -103,7 +119,7 @@ export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
           classifications: [feeData.classification],
           masterSkillIds: [feeData.skillId],
           fee: feeData.fee,
-        })
+        });
       }
     });
   }

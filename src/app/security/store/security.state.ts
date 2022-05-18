@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { catchError, Observable, tap } from 'rxjs';
+import { catchError, Observable, of, tap } from 'rxjs';
 
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { BusinessUnitService } from '@shared/services/business-unit.service';
@@ -134,9 +134,11 @@ export class SecurityState {
   }
 
   @Action(SaveRole)
-  SaveRole({ patchState, getState, dispatch }: StateContext<SecurityStateModel>, { role }: SaveRole): Observable<Role> {
+  SaveRole({ patchState, getState, dispatch }: StateContext<SecurityStateModel>, { role }: SaveRole): Observable<Role | void> {
     const state = getState();
-    return this.roleService.seveRoles(role).pipe(
+    const existingRoleNames = state.rolesPage?.items.map(({ name }) => name);
+
+    return !existingRoleNames?.includes(role.name) ? this.roleService.seveRoles(role).pipe(
       tap((payload) => {
         if (state.rolesPage && role.id) {
           const editedRole = state.rolesPage.items.find(({ id }) => id === role.id) as Role;
@@ -153,7 +155,7 @@ export class SecurityState {
         dispatch(new SaveRoleSucceeded(payload));
         return payload;
       })
-    );
+    ) : dispatch(new ShowToast(MessageTypes.Error, 'Role Name already exists'));
   }
 
   @Action(RemoveRole)
