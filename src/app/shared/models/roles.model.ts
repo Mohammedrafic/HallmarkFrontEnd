@@ -3,7 +3,7 @@ import { PageOfCollections } from "./page.model";
 import { Permissions } from "./permission.model";
 
 export type Role = {
-  id: number;
+  id?: number;
   name: string;
   isDefault: boolean;
   isActive: boolean;
@@ -12,5 +12,7 @@ export type Role = {
   businessUnitName: string;
   permissions: Permissions;
 };
+
+export type RoleDTO = Omit<Role, 'isDefault' | 'businessUnitName'>;
 
 export type RolesPage = PageOfCollections<Role>;

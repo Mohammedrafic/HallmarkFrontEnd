@@ -128,7 +128,7 @@
                           formControlName="startTime"
                           placeholder="HH:MM"
                           format="hh:mm a"
-                          [max]="endTimeField.value || false"
+                          [max]="maxTime"
                           [step]="30">
           </ejs-timepicker>
         </div>
@@ -144,7 +144,7 @@
                           formControlName="endTime"
                           placeholder="HH:MM"
                           format="hh:mm a"
-                          [min]="startTimeField.value || false"
+                          [min]="minTime"
                           [step]="30">
           </ejs-timepicker>
         </div>

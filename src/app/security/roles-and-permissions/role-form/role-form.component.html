@@ -4,7 +4,7 @@
     <div class="input-group dropdown">
       <ejs-dropdownlist
         appValidateWithMessage
-        formControlName="businessUnit"
+        formControlName="businessUnitType"
         [fields]="optionFields"
         [dataSource]="businessUnits"
         placeholder="Bussines Unit"
@@ -15,14 +15,20 @@
   <div class="dropdown-container bootstrap">
     <label>Business<span class="required">*</span></label>
     <div class="input-group dropdown">
-      <ejs-dropdownlist appValidateWithMessage formControlName="business" [dataSource]="[]" placeholder="Business"></ejs-dropdownlist>
+      <ejs-dropdownlist
+        appValidateWithMessage
+        formControlName="businessUnitId"
+        [fields]="bussinesDataFields"
+        [dataSource]="newRoleBussinesData$ | async"
+        placeholder="Business"
+      ></ejs-dropdownlist>
     </div>
   </div>
 
   <div class="input-container bootstrap">
     <label>Role<span class="required">*</span></label>
     <div class="input-group">
-      <input appValidateWithMessage formControlName="role" class="e-input" type="text" placeholder="Role" />
+      <input appValidateWithMessage formControlName="name" class="e-input" type="text" placeholder="Role" />
     </div>
   </div>
 
@@ -33,17 +39,26 @@
         appValidateWithMessage
         [formControl]="copyRoleControl"
         [dataSource]="[]"
+        [disabled]="form.disabled"
         placeholder="Copy Role From"
       ></ejs-dropdownlist>
     </div>
   </div>
 
   <div class="active-toggle">
-    <ejs-switch class="switch" [checked]="form.get('isActive')?.value" (change)="toggleActive()"></ejs-switch>
+    <ejs-switch class="switch" [disabled]="form.disabled" [checked]="form.get('isActive')?.value" (change)="toggleActive()"></ejs-switch>
     <span class="e-text">Active</span>
   </div>
 
   <hr class="divider" />
 
-  <ejs-treeview #tree [fields]="treeField" [showCheckBox]="true" (nodeClicked)="onSelecting()" (dataBound)="dataBound()"></ejs-treeview>
+  <ejs-treeview
+    #tree
+    [disabled]="(isNewRoleDataLoading$ | async) || form.disabled"
+    [fields]="roleTreeField$ | async"
+    [showCheckBox]="true"
+    (nodeClicked)="onSelecting()"
+    (drawNode)="drawNode($event)"
+    (dataBound)="dataBound()"
+  ></ejs-treeview>
 </div>

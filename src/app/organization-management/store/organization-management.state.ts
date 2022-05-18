@@ -7,7 +7,7 @@ import { Country, UsaStates, CanadaStates } from 'src/app/shared/enums/states';
 import { Status } from 'src/app/shared/enums/status';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization } from 'src/app/shared/models/organization.model';
-import { OrganizationService } from '../../shared/services/organization.service';
+import { OrganizationService } from '@shared/services/organization.service';
 
 import {
   SaveDepartment,
@@ -65,23 +65,27 @@ import {
   UpdateSkillGroup,
   RemoveSkillGroup,
   GetCredentialSetup,
-  SaveUpdateCredentialSetup, GetOrganizationSettings, SaveOrganizationSettings,
+  SaveUpdateCredentialSetup,
+  GetOrganizationSettings,
+  SaveOrganizationSettings,
+  ClearDepartmentList,
+  ClearLocationList,
 } from './organization-management.actions';
-import { Department } from '../../shared/models/department.model';
-import { Region } from '../../shared/models/region.model';
-import { Location } from '../../shared/models/location.model';
-import { GeneralPhoneTypes } from '../../shared/constants/general-phone-types';
-import { SkillsService } from '../../shared/services/skills.service';
+import { Department } from '@shared/models/department.model';
+import { Region } from '@shared/models/region.model';
+import { Location } from '@shared/models/location.model';
+import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
+import { SkillsService } from '@shared/services/skills.service';
 import { Skill, SkillsPage } from 'src/app/shared/models/skill.model';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
-import { CredentialType } from '../../shared/models/credential-type.model';
-import { Credential } from '../../shared/models/credential.model';
+import { CredentialType } from '@shared/models/credential-type.model';
+import { Credential } from '@shared/models/credential.model';
 import { RECORD_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
-import { CandidateStateModel } from '../../agency/store/candidate.state';
-import { SkillGroup } from '../../shared/models/skill-group.model';
-import { CredentialSetup } from '../../shared/models/credential-setup.model';
+import { CandidateStateModel } from '@agency/store/candidate.state';
+import { SkillGroup } from '@shared/models/skill-group.model';
+import { CredentialSetup } from '@shared/models/credential-setup.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { CategoriesService } from '@shared/services/categories.service';
 import { DepartmentsService } from '@shared/services/departments.service';
@@ -719,8 +723,20 @@ export class OrganizationManagementState {
     return this.organizationSettingsService.saveOrganizationSetting(organizationSettings).pipe(tap((payload) => {
       patchState({ isCredentialSetupLoading: false });
       dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      dispatch(new GetCredentialSetup(organizationId));
+      dispatch(new GetOrganizationSettings(organizationId));
       return payload;
     }));
   }
+
+  @Action(ClearDepartmentList)
+  ClearDepartmentList({ patchState }: StateContext<OrganizationManagementStateModel>, { }: ClearDepartmentList): Observable<any> {
+    patchState({ departments: [] });
+    return of([]);
+  };
+
+  @Action(ClearLocationList)
+  ClearLocationList({ patchState }: StateContext<OrganizationManagementStateModel>, { }: ClearLocationList): Observable<any> {
+    patchState({locations: []});
+    return of([]);
+  };
 }

@@ -1,15 +1,18 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { Observable, takeWhile } from 'rxjs';
+import { Role, RoleDTO } from '@shared/models/roles.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { filter, Observable, takeWhile } from 'rxjs';
 
 import { SetHeaderState, ShowSideDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { GetBusinessByUnitType } from '../store/security.actions';
+import { GetBusinessByUnitType, GetPermissionsTree, SaveRole, SaveRoleSucceeded } from '../store/security.actions';
 import { SecurityState } from '../store/security.state';
 import { RoleFormComponent } from './role-form/role-form.component';
-import { BUSINESS_UNITS_VALUES, DISABLED_GROUP, OPRION_FIELDS } from './roles-and-permissions.constants';
+import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS } from './roles-and-permissions.constants';
 
 const DEFAULT_DIALOG_TITLE = 'Add Role';
 const EDIT_DIALOG_TITLE = 'Role';
@@ -29,10 +32,7 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
   public isBusinessFormDisabled = false;
   public businessUnits = BUSINESS_UNITS_VALUES;
   public optionFields = OPRION_FIELDS;
-  public bussinesDataFields = {
-    text: 'name',
-    value: 'id',
-  };
+  public bussinesDataFields = BUSSINES_DATA_FIELDS;
 
   get dialogTitle(): string {
     return this.isEditRole ? EDIT_DIALOG_TITLE : DEFAULT_DIALOG_TITLE;
@@ -48,7 +48,7 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
 
   private isAlive = true;
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private actions$: Actions, private confirmService: ConfirmService) {
     this.store.dispatch(new SetHeaderState({ title: 'Security', iconName: 'lock' }));
   }
 
@@ -59,11 +59,18 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
 
     const user = this.store.selectSnapshot(UserState.user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
-    this.businessControl.patchValue(user?.businessUnitId);
+    this.businessControl.patchValue(user?.businessUnitId || 0);
     if (user?.businessUnitType) {
       this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
       this.isBusinessFormDisabled && this.businessForm.disable();
     }
+
+    this.actions$
+      .pipe(ofActionSuccessful(SaveRoleSucceeded))
+      .pipe(takeWhile(() => this.isAlive))
+      .subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false));
+      });
   }
 
   ngOnDestroy(): void {
@@ -72,21 +79,60 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
 
   public onAddNewRole(): void {
     this.isEditRole = false;
+    this.roleFormGroup.reset();
+    this.roleFormGroup.enable();
+    this.roleFormGroup.patchValue({
+      businessUnitType: this.businessUnitControl.value,
+      businessUnitId: this.businessControl.value,
+      isActive: true,
+    });
+    this.disableBussinesUnitForRole();
     this.store.dispatch(new ShowSideDialog(true));
   }
 
   public onAddCancel(): void {
-    this.store.dispatch(new ShowSideDialog(false));
+    if (this.roleFormGroup.dirty) {
+      this.confirmService
+        .confirm(CANCEL_COFIRM_TEXT)
+        .pipe(filter((confirm) => !!confirm))
+        .subscribe(() => {
+          this.store.dispatch(new ShowSideDialog(false));
+        });
+    } else {
+      this.store.dispatch(new ShowSideDialog(false));
+    }
   }
 
   public onSave(): void {
-    const value = this.roleFormGroup.getRawValue();
-    console.log(value);
-    this.store.dispatch(new ShowSideDialog(false));
+    this.roleFormGroup.markAllAsTouched();
+    if (this.roleFormGroup.valid) {
+      const value = this.roleFormGroup.getRawValue();
+      const roleDTO: RoleDTO = {
+        ...value,
+        businessUnitId: value.businessUnitId || null,
+        permissions: value.permissions.map((stringValue: string) => Number(stringValue)),
+      };
+      this.store.dispatch(new SaveRole(roleDTO));
+    }
   }
 
-  public onEdit(data: unknown): void {
+  public onEdit({ index, column, foreignKeyData, ...role }: Role & { index: string; column: unknown; foreignKeyData: unknown }): void {
     this.isEditRole = true;
+    this.roleFormGroup.reset();
+    this.roleFormGroup.enable();
+
+    const editedValue = {
+      ...role,
+      businessUnitId: role.businessUnitId || 0,
+      permissions: role.permissions.map((stringValue: number) => String(stringValue)),
+    };
+    this.roleFormGroup.patchValue({
+      ...editedValue,
+    });
+    if (role.isDefault) {
+      this.roleFormGroup.disable();
+    }
+    this.disableBussinesUnitForRole();
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -97,10 +143,15 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
     });
   }
 
+  private disableBussinesUnitForRole(): void {
+    if (this.isBusinessFormDisabled) {
+      this.roleFormGroup.get('businessUnitType')?.disable();
+      this.roleFormGroup.get('businessUnitId')?.disable();
+    }
+  }
+
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      const newRoleBusinessUnitControl = this.roleFormGroup.get('businessUnit');
-      newRoleBusinessUnitControl?.patchValue(value);
       this.store.dispatch(new GetBusinessByUnitType(value));
 
       if (!this.isBusinessFormDisabled) {

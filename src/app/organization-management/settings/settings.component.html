@@ -22,32 +22,42 @@
           <col width="120">
         </colgroup>
         <tbody>
-          <tr *ngFor="let child of data.children">
-            <td class="e-rowcell e-templatecell"></td>
-            <td class="e-rowcell e-templatecell">{{child.regionName}}</td>
-            <td class="e-rowcell e-templatecell">{{child.locationName}}</td>
-            <td class="e-rowcell e-templatecell">{{child.departmentName}}</td>
-            <td class="e-rowcell e-templatecell">
-              <span *ngIf="data.controlType === organizationSettingControlType.Checkbox">{{child.value === 'true' ? 'Yes' : 'No'}}</span>
-              <span *ngIf="data.controlType === organizationSettingControlType.Multiselect || child.controlType === organizationSettingControlType.Select">
+        <tr *ngFor="let child of data.children">
+          <td class="e-rowcell e-templatecell"></td>
+          <td class="e-rowcell e-templatecell">{{child.regionName}}</td>
+          <td class="e-rowcell e-templatecell">{{child.locationName}}</td>
+          <td class="e-rowcell e-templatecell">{{child.departmentName}}</td>
+          <td class="e-rowcell e-templatecell">
+            <span *ngIf="data.controlType === organizationSettingControlType.Checkbox">{{child.value === 'true' ? 'Yes' : 'No'}}</span>
+            <span *ngIf="data.controlType === organizationSettingControlType.Multiselect || child.controlType === organizationSettingControlType.Select">
                 <span *ngFor="let option of child.value; let i = index">{{option.text}}
                   <span *ngIf="i !== data.value.length - 1">, </span>
                 </span>
               </span>
-              <span *ngIf="data.controlType === organizationSettingControlType.Text">{{child.value}}</span>
-              <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{child.value | date: 'MM/dd/yyyy'}}</span>
-            </td>
-            <td class="e-rowcell e-templatecell">
-              <div class="row-tool-buttons">
-                <button ejs-button cssClass="e-flat default-icon-button" (click)="onOverrideButtonClick(child)">
-                  <span class="edit-button" ><i-feather name="plus" class="icon"></i-feather></span>
-                </button>
-                <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditButtonClick(data, child, $event)">
-                  <span class="edit-button" ><i-feather name="edit" class="icon"></i-feather></span>
-                </button>
-              </div>
-            </td>
-          </tr>
+            <span *ngIf="data.controlType === organizationSettingControlType.Text">{{child.value}}</span>
+            <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{child.value | date: 'MM/dd/yyyy'}}</span>
+          </td>
+          <td class="e-rowcell e-templatecell">
+            <div class="row-tool-buttons">
+              <button
+                ejs-button
+                cssClass="e-flat default-icon-button"
+                (click)="onOverrideButtonClick(data)"
+                [disabled]="(!data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment) || !hasAccess"
+              >
+                <span class="edit-button" ><i-feather name="plus" class="icon"></i-feather></span>
+              </button>
+              <button
+                ejs-button
+                cssClass="e-flat primary-icon-button"
+                (click)="onEditButtonClick(data, child, $event)"
+                [disabled]="!data.overridableByOrganization || !hasAccess"
+              >
+                <span class="edit-button" ><i-feather name="edit" class="icon"></i-feather></span>
+              </button>
+            </div>
+          </td>
+        </tr>
         </tbody>
       </table>
     </ng-template>
@@ -75,7 +85,7 @@
               ejs-button
               cssClass="e-flat default-icon-button"
               (click)="onOverrideButtonClick(data)"
-              [disabled]="!data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment"
+              [disabled]="(!data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment) || !hasAccess"
             >
               <span class="edit-button" ><i-feather name="plus" class="icon"></i-feather></span>
             </button>
@@ -83,7 +93,7 @@
               ejs-button
               cssClass="e-flat primary-icon-button"
               (click)="onEditButtonClick(data, undefined, $event)"
-              [disabled]="!data.overridableByOrganization"
+              [disabled]="!data.overridableByOrganization || !hasAccess"
             >
               <span class="edit-button" ><i-feather name="edit" class="icon"></i-feather></span>
             </button>
@@ -144,6 +154,7 @@
 >
   <form class="form-container"
         id="addEditRecordForm"
+        *ngIf="isFormShown"
         [formGroup]="organizationSettingsFormGroup">
     <div>
       <div class="input-container bootstrap">
@@ -242,7 +253,6 @@
               class="e-input"
               type="email"
               placeholder="Value"
-              [maxlength]="maxFieldLength"
               formControlName="value"
             />
             <i-feather
@@ -292,14 +302,18 @@
         <label for="dropdownMulti">Value</label>
         <div class="input-group">
           <ejs-multiselect
+            #multiSelectComponent
             id="dropdownMulti"
             mode="CheckBox"
             [allowFiltering]="false"
             [dataSource]="dropdownDataSource"
             [fields]="dropdownFields"
+            selectAllText="All"
+            showSelectAll="true"
             placeholder="Value"
             formControlName="value"
-          ></ejs-multiselect>
+          >
+          </ejs-multiselect>
         </div>
       </div>
     </div>

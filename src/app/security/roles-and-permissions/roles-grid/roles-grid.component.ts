@@ -12,7 +12,7 @@ import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants/messa
 import { Role, RolesPage } from '@shared/models/roles.model';
 
 import { ShowSideDialog } from 'src/app/store/app.actions';
-import { GetRolesPage } from '../../store/security.actions';
+import { GetRolesPage, RemoveRole } from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
 
 enum Active {
@@ -81,7 +81,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     this.editRoleEvent.emit(data);
   }
 
-  public onRemove(data: unknown): void {
+  public onRemove(data: Role): void {
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
@@ -90,8 +90,8 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
       })
       .subscribe((confirm) => {
         this.grid.clearRowSelection();
-        if (confirm) {
-          // On confirm here
+        if (confirm && data.id) {
+         this.store.dispatch(new RemoveRole(data.id))
         }
       });
   }

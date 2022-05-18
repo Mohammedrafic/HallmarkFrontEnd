@@ -29,7 +29,10 @@ export class ConfirmService {
           dialog.close();
           isAllowed$.complete();
         },
-        
+      },
+      close: () => {
+        isAllowed$.next(false);
+        isAllowed$.complete();
       },
       showCloseIcon: true,
       closeOnEscape: true,

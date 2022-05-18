@@ -315,3 +315,13 @@ export class SaveOrganizationSettings {
   static readonly type = '[organizationManagement] Save Organization Settings';
   constructor(public organizationSettings: OrganizationSettingsPost, public organizationId: number) { }
 }
+
+export class ClearDepartmentList {
+  static readonly type = '[admin] Clear Department list';
+  constructor() { }
+}
+
+export class ClearLocationList {
+  static readonly type = '[admin] Clear Location list';
+  constructor() { }
+}

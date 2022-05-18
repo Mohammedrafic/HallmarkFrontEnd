@@ -13,6 +13,7 @@ import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RE
 import { Shift } from 'src/app/shared/models/shift.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
+import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 
 @Component({
   selector: 'app-shifts',
@@ -38,12 +39,18 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   public startTimeField: AbstractControl;
   public endTimeField: AbstractControl;
   public showForm = true;
+  public defaultMaxTime = new Date();
+  public defaultMinTime = new Date();
+  public maxTime = this.defaultMaxTime;
+  public minTime = this.defaultMinTime;
 
   constructor(private store: Store,
               private actions$: Actions,
               private fb: FormBuilder,
               private confirmService: ConfirmService) {
     super();
+    this.defaultMaxTime.setHours(23, 59, 59);
+    this.defaultMinTime.setHours(0, 0, 0);
     this.ShiftFormGroup = this.fb.group({
       id: new FormControl(0, [ Validators.required ]),
       name: new FormControl(null, [ Validators.required ]),
@@ -54,6 +61,14 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
 
     this.startTimeField = this.ShiftFormGroup.get('startTime') as AbstractControl;
     this.endTimeField = this.ShiftFormGroup.get('endTime') as AbstractControl;
+    this.endTimeField.valueChanges.subscribe(val => { 
+      this.maxTime = val || this.defaultMaxTime; this.startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false }); 
+    });
+    this.startTimeField.valueChanges.subscribe(val => {
+      this.minTime = val || this.defaultMinTime; this.endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    });
+    this.startTimeField.addValidators(startDateValidator(this.ShiftFormGroup, 'endTime', this.defaultMinTime));
+    this.endTimeField.addValidators(endDateValidator(this.ShiftFormGroup, 'startTime', this.defaultMinTime));
   }
 
   ngOnInit() {
