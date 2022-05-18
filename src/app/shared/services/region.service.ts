@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { Region } from '../../shared/models/region.model';
+import { Region } from '@shared/models/region.model';
 
 @Injectable({ providedIn: 'root' })
 export class RegionService {
@@ -14,8 +14,8 @@ export class RegionService {
    * Get the list of available regions by organizationId
    * @return Array of regions
    */
-  public getRegionsByOrganizationId(organizationId: number): Observable<Region[]> {
-    return this.http.get<Region[]>(`/api/Regions/byorganizationId/${organizationId}`);
+  public getRegionsByOrganizationId(): Observable<Region[]> {
+    return this.http.get<Region[]>(`/api/Regions`);
   }
 
   /**

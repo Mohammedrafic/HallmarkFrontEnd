@@ -363,8 +363,8 @@ export class OrganizationManagementState {
   }
 
   @Action(GetRegionsByOrganizationId)
-  GetRegionsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { organizationId }: GetRegionsByOrganizationId): Observable<Region[]> {
-    return this.regionService.getRegionsByOrganizationId(organizationId).pipe(tap((payload) => {
+  GetRegionsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetRegionsByOrganizationId): Observable<Region[]> {
+    return this.regionService.getRegionsByOrganizationId().pipe(tap((payload) => {
       patchState({ regions: payload});
       return payload;
     }));
