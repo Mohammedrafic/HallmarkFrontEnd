@@ -128,6 +128,8 @@
                           formControlName="startTime"
                           placeholder="HH:MM"
                           format="hh:mm a"
+                          [enableMask]="true"
+                          [maskPlaceholder]="maskPlaceholderValue"
                           [max]="maxTime"
                           [step]="30">
           </ejs-timepicker>
@@ -144,6 +146,8 @@
                           formControlName="endTime"
                           placeholder="HH:MM"
                           format="hh:mm a"
+                          [enableMask]="true"
+                          [maskPlaceholder]="maskPlaceholderValue"
                           [min]="minTime"
                           [step]="30">
           </ejs-timepicker>

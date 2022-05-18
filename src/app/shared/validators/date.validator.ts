@@ -22,10 +22,10 @@ export function endDateValidator(form: AbstractControl, controlName: string, min
       const isLessThanMin = control.value < minDate;
       if (form.get(controlName)?.value) {
         const forbidden = isLessThanMin || control.value < new Date(form.get(controlName)?.value);
-        return forbidden ? {invalidDate: {value: control.value}} : null;
+        return forbidden ? {invalidDate: { value: control.value }} : null;
       } else {
         const forbidden = isLessThanMin;
-        return forbidden ? {invalidDate: {value: control.value}} : null;
+        return forbidden ? {invalidDate: { value: control.value }} : null;
       }
     }
     return null;

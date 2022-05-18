@@ -159,7 +159,7 @@
       </div>
     </div>
 
-    <div>
+    <div class="inactive-date-container">
       <div class="input-container calendar">
         <label for="inactiveDate">Inactive Date</label>
         <div class="input-group datepicker">
@@ -171,6 +171,7 @@
             [enableMask]="true"
             [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
             formControlName="inactiveDate"
+            [strictMode]='true'
           >
           </ejs-datepicker>
         </div>

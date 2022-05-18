@@ -3,20 +3,21 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, Observable, Subject } from 'rxjs';
+import { debounceTime, filter, Observable, Subject } from 'rxjs';
 import { GetAllSkillsCategories, GetAssignedSkillsByPage, RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded, SetDirtyState, SetImportFileDialogState } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { Skill } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 @Component({
   selector: 'app-skills',
   templateUrl: './skills.component.html',
   styleUrls: ['./skills.component.scss'],
-  providers: [SortService, FreezeService]
+  providers: [SortService, FreezeService, MaskedDateTimeService]
 })
 export class SkillsComponent extends AbstractGridConfigurationComponent implements OnInit {
   private pageSubject = new Subject<number>();
@@ -49,7 +50,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
       isDefault: new FormControl(false),
       masterSkillId: new FormControl(null),
       skillCategoryId: new FormControl('', [ Validators.required, Validators.minLength(3) ]),
-      skillAbbr: new FormControl(''),
+      skillAbbr: new FormControl('', [ Validators.minLength(3) ]),
       skillDescription: new FormControl('', [ Validators.required, Validators.minLength(3) ]),
       glNumber: new FormControl('', [ Validators.minLength(3) ]),
       allowOnboard: new FormControl(false),
@@ -65,9 +66,9 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
       this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize));
     });
     this.actions$.pipe(ofActionSuccessful(SaveAssignedSkillSucceeded)).subscribe(() => {
+      this.SkillFormGroup.reset();
       this.closeDialog();
       this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize));
-      this.SkillFormGroup.reset();
     });
     this.actions$.pipe(ofActionSuccessful(RemoveAssignedSkillSucceeded)).subscribe(() => {
       this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize));
@@ -134,15 +135,29 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public closeDialog(): void {
-    this.store.dispatch(new ShowSideDialog(false));
-    this.SkillFormGroup.reset();
-    this.removeActiveCssClass();
+    if (this.SkillFormGroup.dirty) {
+      this.confirmService
+      .confirm(CANCEL_COFIRM_TEXT, {
+        title: DELETE_CONFIRM_TITLE,
+        okButtonLabel: 'Leave',
+        okButtonClass: 'delete-button'
+      }).pipe(filter(confirm => !!confirm))
+      .subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false));
+        this.SkillFormGroup.reset();
+        this.removeActiveCssClass();
+      });
+    } else {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.SkillFormGroup.reset();
+      this.removeActiveCssClass();
+    }
   }
 
   public saveSkill(): void {
     if (this.SkillFormGroup.valid) {
       this.store.dispatch(new SaveAssignedSkill(new Skill(
-        this.SkillFormGroup.getRawValue(), 2 // TODO: remove after org selection implementation
+        this.SkillFormGroup.getRawValue()
       )));
       this.store.dispatch(new SetDirtyState(false));
     } else {
