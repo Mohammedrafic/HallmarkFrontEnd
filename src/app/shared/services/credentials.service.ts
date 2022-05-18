@@ -3,9 +3,9 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { CredentialType } from '../../shared/models/credential-type.model';
-import { Credential } from '../../shared/models/credential.model';
-import { CredentialSetup } from '../../shared/models/credential-setup.model';
+import { CredentialType } from '@shared/models/credential-type.model';
+import { Credential } from '@shared/models/credential.model';
+import { CredentialSetup, CredentialSetupGetGroup, CredentialSetupPage } from '@shared/models/credential-setup.model';
 
 @Injectable({ providedIn: 'root' })
 export class CredentialsService {
@@ -83,11 +83,11 @@ export class CredentialsService {
 
   /**
    * Get credential setup list
-   * @param businessUnitId object to search by
+   * @param data group of objects to search by
    * @return list of credential setup
    */
-  public getCredentialSetup(businessUnitId: number | undefined): Observable<CredentialSetup[]> {
-    return this.http.get<CredentialSetup[]>(`/api/CredentialSetup/businessUnitId/${businessUnitId}`);
+  public getCredentialSetup(data: CredentialSetupGetGroup): Observable<CredentialSetupPage> {
+    return this.http.get<CredentialSetupPage>(`/api/CredentialSetups/${data}`);
   }
 
   /**

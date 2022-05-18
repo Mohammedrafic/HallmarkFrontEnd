@@ -12,21 +12,22 @@ import { ShowSideDialog } from '../../../store/app.actions';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import { OrganizationManagementState } from '../../store/organization-management.state';
 import { Region } from '@shared/models/region.model';
+import { Location }  from '@shared/models/location.model';
 import {
-  GetCredentialTypes,
-  GetMasterSkillsByPage,
+  GetCredential, GetCredentialSetup,
+  GetCredentialTypes, GetDepartmentsByLocationId, GetLocationsByRegionId,
   GetRegionsByOrganizationId,
-  GetSkillGroup, SaveUpdateCredentialSetup
+  GetCredentialSkillGroup
 } from '../../store/organization-management.actions';
 import { CredentialType } from '@shared/models/credential-type.model';
-import { SkillsPage } from '@shared/models/skill.model';
-import { SkillGroup } from '@shared/models/skill-group.model';
+import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CredentialSetup } from '@shared/models/credential-setup.model';
+import { Department } from '@shared/models/department.model';
+import { Credential } from '@shared/models/credential.model';
 
 export enum CredentialsFilter {
-  ByOrg = 'By Org',
-  ByRegion = 'By Region',
+  ByOrganization = 'By Organization',
   BySkill = 'By Skill'
 }
 
@@ -41,45 +42,42 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
 
   @Input() isActive: boolean = false;
 
-  isRegionDropDownShown = false;
-  isSkillDropDownShown = false;
-  isGroupDropDownShow = false;
-  isAddGroupButtonShown = false;
-
-  isSkillDropDownEnabled = false;
-
-  isReadMore = false;
-
-  invalidDate = '0001-01-01T00:00:00+00:00';
-
-  credentials = [CredentialsFilter.ByOrg, CredentialsFilter.ByRegion, CredentialsFilter.BySkill];
-  initialValue = CredentialsFilter.ByOrg;
+  public isFilteredBySkill = false;
+  public credentials = [CredentialsFilter.ByOrganization, CredentialsFilter.BySkill];
 
   @Select(OrganizationManagementState.credentialTypes)
   credentialType$: Observable<CredentialType[]>;
-  credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' }
+
+  @Select(OrganizationManagementState.credentials)
+  credentials$: Observable<Credential[]>;
+
+  public regionLocationSkillGroupDropDownFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   @Select(OrganizationManagementState.regions)
   regions$: Observable<Region[]>;
-  regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  selectedRegion: Region;
+  public selectedRegionId: number;
 
-  @Select(OrganizationManagementState.masterSkills)
-  skills$: Observable<SkillsPage[]>;
+  @Select(OrganizationManagementState.locationsByRegionId)
+  locations$: Observable<Location[]>;
+  public selectedLocationId: number;
+
+  @Select(OrganizationManagementState.departments)
+  departments$: Observable<Department[]>;
+  public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
+  public selectedDepartmentId: number;
 
   @Select(OrganizationManagementState.skillGroups)
-  groups$: Observable<SkillGroup>;
-  skillGroupsFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  groups$: Observable<CredentialSkillGroup>;
+  public selectedSkillGroupId: number;
 
-  credentialsSetupFormGroup: FormGroup;
-  formBuilder: FormBuilder;
+  public credentialsSetupFormGroup: FormGroup;
+  public formBuilder: FormBuilder;
 
-  isEdit: boolean;
-  editedCredentialSetupId?: number;
+  public editedCredentialSetupId?: number;
 
-  fakeOrganizationId = 2; // TODO: remove after BE implementation
-
-  credentialsData$: Observable<any>;
+  private fakeOrganizationId = 2; // TODO: remove after BE implementation
+  private invalidDate = '0001-01-01T00:00:00+00:00';
+  private credentialsData$: Observable<any>;
 
   constructor(private store: Store,
               @Inject(FormBuilder) private builder: FormBuilder,
@@ -93,55 +91,49 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
 
   ngOnInit(): void {
     this.store.dispatch(new GetCredentialTypes());
-    // this.store.dispatch(new GetCredentialSetup(this.fakeOrganizationId)); // TODO: uncomment after BE implementation
+    this.store.dispatch(new GetCredential(this.fakeOrganizationId));
+    // this.store.dispatch(new GetCredentialSetup()); // TODO: uncomment after BE implementation
     // this.mapGridData(); // TODO: uncomment after BE implementation
   }
 
-  onCredentialsDropDownChanged(data: any): void {
-    if (data.itemData.value === CredentialsFilter.ByOrg) {
-      this.isRegionDropDownShown = false;
-      this.isSkillDropDownShown = false;
-      this.isGroupDropDownShow = false;
-      this.isAddGroupButtonShown = false;
-    } else if (data.itemData.value === CredentialsFilter.ByRegion) {
-      this.isRegionDropDownShown = true;
-      this.isSkillDropDownShown = false;
-      this.isGroupDropDownShow = false;
-      this.isAddGroupButtonShown = false;
-      this.store.dispatch(new GetRegionsByOrganizationId(this.fakeOrganizationId)); // TODO: provide valid organizationId
+  onFilterDropDownChanged(data: any): void {
+    if (data.itemData.value === CredentialsFilter.ByOrganization) {
+      this.isFilteredBySkill = false;
     } else if (data.itemData.value === CredentialsFilter.BySkill) {
-      this.isRegionDropDownShown = false;
-      this.isSkillDropDownShown = true;
-      this.isGroupDropDownShow = true;
-      this.isAddGroupButtonShown = true;
-      this.store.dispatch(new GetSkillGroup(this.fakeOrganizationId));
-      this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize)); // TODO: provide action without page
+      this.isFilteredBySkill = true;
+      this.store.dispatch(new GetCredentialSkillGroup(this.fakeOrganizationId));
+      this.store.dispatch(new GetRegionsByOrganizationId(this.fakeOrganizationId)); // TODO: provide valid organizationId
     }
   }
 
-  onCredentialTypeDropDownChanged(event: any): void {
-    //  TODO: implementation
+  onRegionDropDownChanged(event: any): void {
+    this.selectedRegionId = event.itemData.id;
+    this.store.dispatch(new GetLocationsByRegionId(this.selectedRegionId));
   }
 
-  onRegionDropDownChanged(event: any): void {
-    this.selectedRegion = event.itemData as Region;
-    //  TODO: implementation
+  onLocationDropDownChanged(event: any): void {
+    this.selectedLocationId = event.itemData.id;
+    this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocationId));
+  }
+
+  onDepartmentDropDownChanged(event: any): void {
+    this.selectedDepartmentId = event.itemData.id;
   }
 
   onGroupDropDownChanged(event: any): void {
-    this.isSkillDropDownEnabled = true;
-  }
-
-  onSkillDropDownChanged(event: any): void {
-    //  TODO: implementation
+    this.selectedSkillGroupId = event.itemData.id;
   }
 
   onGroupsSetupClick(): void {
     this.router.navigate(['./groups-setup'], { relativeTo: this.route });
   }
 
-  onIncludeExcludeChange(event: any): void {
-//  TODO: implementation
+  onExpiryDateAppliedChange(event: any): void {
+    //  TODO: implementation
+  }
+
+  onOptionChange(event: any): void {
+    //  TODO: implementation
   }
 
   onReqForSubmissionChange(event: any): void {
@@ -149,15 +141,67 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   }
 
   onReqForOnboardChange(event: any): void {
-//  TODO: implementation
+    //  TODO: implementation
   }
 
-  onEditButtonClick(credential: any): void {
+  onEditButtonClick(credentialSetup: any): void {
+    //  TODO: setup form values
+
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  onViewMoreLessTextClick(): void {
-    this.isReadMore = !this.isReadMore;
+  onFormCancelClick(): void {
+    this.confirmService
+      .confirm(CANCEL_COFIRM_TEXT, {
+        title: DELETE_CONFIRM_TITLE,
+        okButtonLabel: 'Leave',
+        okButtonClass: 'delete-button'
+      }).pipe(filter(confirm => !!confirm))
+      .subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false));
+        this.clearFormData();
+        this.removeActiveCssClass();
+      });
+  }
+
+  onFormSaveClick(): void {
+    if (this.credentialsSetupFormGroup.valid) {
+      const credentialSetup: CredentialSetup = {
+        id: 1,
+        isActive: false, // TODO: clarify with BE
+        masterCredentialId: 1,
+        regionId: this.selectedRegionId,
+        organizationId: this.fakeOrganizationId,
+        skillGroupId: this.selectedSkillGroupId,
+        comments: this.credentialsSetupFormGroup.controls['comments'].value,
+        inactiveDate: this.credentialsSetupFormGroup.controls['inactiveDate'].value,
+        expiryDateApplied: this.credentialsSetupFormGroup.controls['expiryDateApplied'].value,
+        optional: this.credentialsSetupFormGroup.controls['optional'].value,
+        reqSubmission: this.credentialsSetupFormGroup.controls['reqSubmission'].value,
+        reqOnboard: this.credentialsSetupFormGroup.controls['reqOnboard'].value,
+      }
+
+      console.log(credentialSetup); // TODO: remove after implementation
+      // this.store.dispatch(new SaveUpdateCredentialSetup(credentialSetup, this.fakeOrganizationId)); // TODO: uncomment after implementation
+      this.store.dispatch(new ShowSideDialog(false));
+      this.clearFormData();
+      this.removeActiveCssClass();
+    } else {
+      this.credentialsSetupFormGroup.markAllAsTouched();
+    }
+  }
+
+  mapGridData(): void {
+    // TODO: map credential types by id
+    this.credentialsData$.subscribe(data => {
+      this.lastAvailablePage = this.getLastPage(data);
+      data.forEach((item: any) => {
+        item.inactiveDate === this.invalidDate ? item.inactiveDate = '' : item.inactiveDate;
+      });
+
+      this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
+      this.totalDataRecords = data.length;
+    });
   }
 
   onRowsDropDownChanged(): void {
@@ -173,49 +217,9 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     }
   }
 
-  onFormCancelClick(): void {
-    this.confirmService
-      .confirm(CANCEL_COFIRM_TEXT, {
-        title: DELETE_CONFIRM_TITLE,
-        okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false));
-        this.credentialsSetupFormGroup.reset();
-        this.isEdit = false;
-        this.editedCredentialSetupId = undefined;
-        this.removeActiveCssClass();
-      });
-  }
-
-  onFormSaveClick(): void {
-    if (this.credentialsSetupFormGroup.valid) {
-      const credentialSetup = new CredentialSetup( {
-        description: this.credentialsSetupFormGroup.controls['description'].value,
-        comments: this.credentialsSetupFormGroup.controls['comments'].value,
-        inactiveDate: this.credentialsSetupFormGroup.controls['inactiveDate'].value,
-        include: this.credentialsSetupFormGroup.controls['include'].value,
-        reqForSubmission: this.credentialsSetupFormGroup.controls['reqForSubmission'].value,
-        reqForOnboard: this.credentialsSetupFormGroup.controls['reqForOnboard'].value,
-      });
-
-      this.store.dispatch(new SaveUpdateCredentialSetup(credentialSetup, this.fakeOrganizationId));
-      this.store.dispatch(new ShowSideDialog(false));
-      this.credentialsSetupFormGroup.reset();
-    } else {
-      this.credentialsSetupFormGroup.markAllAsTouched();
-    }
-  }
-
-  mapGridData(): void {
-    // TODO: map credential types by id
-    this.credentialsData$.subscribe(data => {
-      this.lastAvailablePage = this.getLastPage(data);
-      data.forEach((item: any) => item.inactiveDate === this.invalidDate ? item.inactiveDate = '' : item.inactiveDate);
-      this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
-      this.totalDataRecords = data.length;
-    });
+  private clearFormData(): void {
+    this.credentialsSetupFormGroup.reset();
+    this.editedCredentialSetupId = undefined;
   }
 
   private createCredentialsForm(): void {
@@ -224,9 +228,10 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       description: [{ value: '', disabled: true }, Validators.required],
       comments: ['', Validators.maxLength(500)],
       inactiveDate: [null],
-      include: [false],
-      reqForSubmission: [true],
-      reqForOnboard: [false]
+      expiryDateApplied: [false],
+      optional: [false],
+      reqSubmission: [true],
+      reqOnboard: [false]
     });
   }
 

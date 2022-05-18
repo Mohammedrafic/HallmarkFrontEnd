@@ -1,44 +1,40 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
-
 import {
   AbstractGridConfigurationComponent
-} from '../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { OrganizationManagementState } from '../../../store/organization-management.state';
-
 import { ShowSideDialog } from '../../../../store/app.actions';
 import {
   CANCEL_COFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE
-} from '../../../../shared/constants/messages';
-import { ConfirmService } from '../../../../shared/services/confirm.service';
-import { SkillGroup } from '../../../../shared/models/skill-group.model';
+} from '@shared/constants/messages';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import {
-  GetAssignedSkillsByPage, GetSkillGroup,
-  RemoveSkillGroup,
-  SaveSkillGroup,
-  UpdateSkillGroup
+  GetAssignedSkillsByPage, GetCredentialSkillGroup,
+  RemoveCredentialSkillGroup,
+  SaveCredentialSkillGroup,
+  UpdateCredentialSkillGroup
 } from '../../../store/organization-management.actions';
-import { UrlService } from '../../../../shared/services/url.service';
 
 @Component({
-  selector: 'app-add-edit-skill-group',
-  templateUrl: './add-edit-skill-group.component.html',
-  styleUrls: ['./add-edit-skill-group.component.scss']
+  selector: 'app-group-setup',
+  templateUrl: './group-setup.component.html',
+  styleUrls: ['./group-setup.component.scss']
 })
-export class AddEditSkillGroupComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class GroupSetupComponent extends AbstractGridConfigurationComponent implements OnInit {
   @ViewChild('grid') grid: GridComponent;
-  @ViewChild('gridPager') pager: PagerComponent;
+
+  @Input() isActive: boolean = false;
 
   @Select(OrganizationManagementState.skillGroups)
-  skillGroups$: Observable<SkillGroup[]>;
+  skillGroups$: Observable<CredentialSkillGroup[]>;
 
   @Select(OrganizationManagementState.skills)
   skills$: Observable<any>;
@@ -62,23 +58,19 @@ export class AddEditSkillGroupComponent extends AbstractGridConfigurationCompone
 
   constructor(private store: Store,
               @Inject(FormBuilder) private builder: FormBuilder,
-              private router: Router,
-              private route: ActivatedRoute,
-              private confirmService: ConfirmService,
-              private urlService: UrlService) {
+              private confirmService: ConfirmService) {
     super();
     this.formBuilder = builder;
     this.createSkillGroupFormGroup();
   }
 
   ngOnInit(): void {
-    this.urlService.setPreviousUrl(this.skillGroupPathName);
-    this.store.dispatch(new GetSkillGroup(this.fakeOrganizationId));
+    this.store.dispatch(new GetCredentialSkillGroup(this.fakeOrganizationId));
     this.mapGridData();
-    this.store.dispatch(new GetAssignedSkillsByPage(1, 30));
+    // this.store.dispatch(new GetAssignedSkillsByPage(1, 30));
   }
 
-  onEditButtonClick(skillGroup: SkillGroup, event: any): void {
+  onEditButtonClick(skillGroup: CredentialSkillGroup, event: any): void {
     this.addActiveCssClass(event);
     this.skillGroupsFormGroup.setValue({
       name: skillGroup.name,
@@ -89,7 +81,7 @@ export class AddEditSkillGroupComponent extends AbstractGridConfigurationCompone
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  onRemoveButtonClick(skillGroup: SkillGroup, event: any): void {
+  onRemoveButtonClick(skillGroup: CredentialSkillGroup, event: any): void {
     this.addActiveCssClass(event);
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
@@ -99,22 +91,10 @@ export class AddEditSkillGroupComponent extends AbstractGridConfigurationCompone
       })
       .subscribe((confirm) => {
         if (confirm) { // TODO: add verification to prevent remove if skillGroup is used elsewhere
-          this.store.dispatch(new RemoveSkillGroup(skillGroup, this.fakeOrganizationId));
+          this.store.dispatch(new RemoveCredentialSkillGroup(skillGroup, this.fakeOrganizationId));
         }
       });
     this.removeActiveCssClass();
-  }
-
-  onAddGroupClick(): void {
-    this.store.dispatch(new ShowSideDialog(true));
-  }
-
-  onCancelClick(): void {
-    this.router.navigate(['..'], { relativeTo: this.route });
-  }
-
-  onSaveClick(): void {
-    this.router.navigate(['..'], { relativeTo: this.route });
   }
 
   onFormCancelClick(): void {
@@ -126,29 +106,27 @@ export class AddEditSkillGroupComponent extends AbstractGridConfigurationCompone
       }).pipe(filter(confirm => !!confirm))
       .subscribe(() => {
         this.store.dispatch(new ShowSideDialog(false));
-        this.isEdit = false;
-        this.editedSkillGroupId = undefined;
-        this.skillGroupsFormGroup.reset();
+        this.clearFormDetails();
+        this.removeActiveCssClass();
       });
-    this.removeActiveCssClass();
   }
 
   onFormSaveClick(): void {
     if (this.skillGroupsFormGroup.valid) {
       if (this.isEdit) {
-        const skillGroup = new SkillGroup({
+        const skillGroup = new CredentialSkillGroup({
           id: this.editedSkillGroupId,
           skillIds: this.skillGroupsFormGroup.controls['skillIds'].value
         });
-        this.store.dispatch(new UpdateSkillGroup(skillGroup, this.fakeOrganizationId)); // TODO: remove fakeOrganizationId after BE implementation
+        this.store.dispatch(new UpdateCredentialSkillGroup(skillGroup, this.fakeOrganizationId)); // TODO: remove fakeOrganizationId after BE implementation
         this.isEdit = false;
       } else {
-        const skillGroup = new SkillGroup({
+        const skillGroup = new CredentialSkillGroup({
           name: this.skillGroupsFormGroup.controls['name'].value,
           organizationId: this.fakeOrganizationId,
           skillIds: this.skillGroupsFormGroup.controls['skillIds'].value
         });
-        this.store.dispatch(new SaveSkillGroup(skillGroup, this.fakeOrganizationId));  // TODO: remove fakeOrganizationId after BE implementation
+        this.store.dispatch(new SaveCredentialSkillGroup(skillGroup, this.fakeOrganizationId));  // TODO: remove fakeOrganizationId after BE implementation
         this.store.dispatch(new ShowSideDialog(false));
         this.skillGroupsFormGroup.reset();
         this.removeActiveCssClass();
@@ -177,6 +155,12 @@ export class AddEditSkillGroupComponent extends AbstractGridConfigurationCompone
       this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
       this.totalDataRecords = data.length;
     });
+  }
+
+  private clearFormDetails(): void {
+    this.isEdit = false;
+    this.editedSkillGroupId = undefined;
+    this.skillGroupsFormGroup.reset();
   }
 
   private createSkillGroupFormGroup(): void {
