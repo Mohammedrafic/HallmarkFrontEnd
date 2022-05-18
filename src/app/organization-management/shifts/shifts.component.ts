@@ -14,12 +14,13 @@ import { Shift } from 'src/app/shared/models/shift.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 @Component({
   selector: 'app-shifts',
   templateUrl: './shifts.component.html',
   styleUrls: ['./shifts.component.scss'],
-  providers: [SortService, FreezeService]
+  providers: [SortService, FreezeService, MaskedDateTimeService]
 })
 export class ShiftsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();
@@ -43,6 +44,7 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   public defaultMinTime = new Date();
   public maxTime = this.defaultMaxTime;
   public minTime = this.defaultMinTime;
+  public maskPlaceholderValue: Object = { hour: 'HH', minute: 'MM' }
 
   constructor(private store: Store,
               private actions$: Actions,

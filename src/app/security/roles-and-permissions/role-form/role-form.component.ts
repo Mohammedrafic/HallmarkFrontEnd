@@ -53,11 +53,13 @@ export class RoleFormComponent implements OnInit, OnDestroy {
   }
 
   private isAlive = true;
+  private notAssignableIds: number[];
 
   constructor(private store: Store) {}
 
   ngOnInit(): void {
     this.onBusinessUnitControlChanged();
+    this.onRoleTreeFieldChanged();
   }
 
   ngOnDestroy(): void {
@@ -71,21 +73,30 @@ export class RoleFormComponent implements OnInit, OnDestroy {
 
   public onSelecting(): void {
     const roleDataControl = this.form.get('permissions');
-    roleDataControl?.patchValue(this.tree.getAllCheckedNodes());
+    const checkeNodes = this.tree.getAllCheckedNodes();
+    const value = this.getAssignableValues(checkeNodes);
+    roleDataControl?.patchValue(value);
   }
 
   public dataBound(): void {
     if (this.permissionsControl?.value) {
       this.tree.checkAll(this.permissionsControl.value);
+      this.tree.expandAll(this.tree.getAllCheckedNodes());
     }
   }
 
   public drawNode(args: DrawNodeEventArgs): void {
-    // TDI After BE Changes
-    // if (!args.nodeData['isAvailable']) {
-    //   let ele: any = args.node.querySelector('.e-checkbox-wrapper');
-    //   ele.classList.add('e-checkbox-disabled');
-    // }
+    if (!args.nodeData['isAvailable']) {
+      const ele = args.node.querySelector('.e-checkbox-wrapper') as HTMLElement;
+      ele.classList.add('e-checkbox-disabled');
+    }
+  }
+
+  private getAssignableValues(rawValue: string[]): number[] {
+    return rawValue.map((stringId) => {
+        const id = Number(stringId);
+        return this.notAssignableIds.includes(id) ? NaN : id;
+      }).filter(Number);
   }
 
   private onBusinessUnitControlChanged(): void {
@@ -98,6 +109,12 @@ export class RoleFormComponent implements OnInit, OnDestroy {
         this.store.dispatch(new GetPermissionsTree(value));
         this.store.dispatch(new GetNewRoleBusinessByUnitType(value));
       });
+  }
+
+  private onRoleTreeFieldChanged(): void {
+    this.roleTreeField$.pipe(takeWhile(() => this.isAlive)).subscribe((roleTreeField) => {
+      this.notAssignableIds = roleTreeField.dataSource.filter(({ isAssignable }) => !isAssignable).map(({ id }) => id);
+    });
   }
 
   static createForm(): FormGroup {

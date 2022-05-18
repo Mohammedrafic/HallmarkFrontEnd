@@ -7,7 +7,7 @@ import { debounceTime, delay, filter, Observable, Subject } from 'rxjs';
 import { GetMasterSkillsByPage, RemoveMasterSkill, RemoveMasterSkillSucceeded, SaveMasterSkill, SaveMasterSkillSucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { Skill } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
@@ -58,9 +58,9 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
       this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
     });
     this.actions$.pipe(ofActionSuccessful(SaveMasterSkillSucceeded)).subscribe(() => {
+      this.SkillFormGroup.reset();
       this.closeDialog();
       this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
-      this.SkillFormGroup.reset();
     });
     this.actions$.pipe(ofActionSuccessful(RemoveMasterSkillSucceeded)).subscribe(() => {
       this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
@@ -96,11 +96,27 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
   }
 
   public closeDialog(): void {
-    this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
-      this.SkillFormGroup.reset();
-      this.SkillFormGroup.get('id')?.setValue(0);
-    });
-    this.removeActiveCssClass();
+    if (this.SkillFormGroup.dirty) {
+      this.confirmService
+      .confirm(CANCEL_COFIRM_TEXT, {
+        title: DELETE_CONFIRM_TITLE,
+        okButtonLabel: 'Leave',
+        okButtonClass: 'delete-button'
+      }).pipe(filter(confirm => !!confirm))
+      .subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
+          this.SkillFormGroup.reset();
+          this.SkillFormGroup.get('id')?.setValue(0);
+        });
+        this.removeActiveCssClass();
+      });
+    } else {
+      this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
+        this.SkillFormGroup.reset();
+        this.SkillFormGroup.get('id')?.setValue(0);
+      });
+      this.removeActiveCssClass();
+    }
   }
 
   public saveSkill(): void {

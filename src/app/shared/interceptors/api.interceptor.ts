@@ -41,7 +41,8 @@ export class ApiInterceptor implements HttpInterceptor {
         headers: new HttpHeaders({
           'Authorization': `UserId ${userId}`,
           'Einstein-ScreenName': currentPage as string,
-          'Einstein-ScreenUrl': this.router.url
+          'Einstein-ScreenUrl': this.router.url,
+          'selected-businessunit-id': '2' // TODO: replace with logged/selected org/agency
         })
       });
     } else {

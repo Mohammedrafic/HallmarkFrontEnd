@@ -33,8 +33,8 @@ export class CandidateContactDetailsComponent {
       city: new FormControl(null, [Validators.maxLength(20)]),
       zip: new FormControl(null, [Validators.minLength(5), Validators.maxLength(6), Validators.pattern(/^[0-9]+$/)]),
       address1: new FormControl(null, [Validators.maxLength(100)]),
-      phone1: new FormControl(null, [Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]),
-      phone2: new FormControl(null, [Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]),
+      phone1: new FormControl(null, [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
+      phone2: new FormControl(null, [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
     });
   }
 }

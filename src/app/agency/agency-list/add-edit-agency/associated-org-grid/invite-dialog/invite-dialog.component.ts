@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { Observable, Subject, takeWhile } from 'rxjs';
+import { filter, Observable, Subject, takeWhile } from 'rxjs';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
@@ -9,6 +9,8 @@ import { GetOrganizationsByPage, InvateOrganizations, InvateOrganizationsSucceed
 import { AgencyState } from 'src/app/agency/store/agency.state';
 
 import { Organization } from 'src/app/shared/models/organization.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 
 @Component({
   selector: 'app-invite-dialog',
@@ -32,7 +34,7 @@ export class InviteDialogComponent implements OnInit {
 
   private isAlive = true;
 
-  constructor(private store: Store, private actions$: Actions) {}
+  constructor(private store: Store, private actions$: Actions, private confirmService: ConfirmService) {}
 
   ngOnInit(): void {
     this.onOpenEvent();
@@ -53,12 +55,27 @@ export class InviteDialogComponent implements OnInit {
   }
 
   public onCancel(): void {
-    this.sideDialog.hide();
+    if (this.control.dirty) {
+      this.confirmService
+      .confirm(DELETE_CONFIRM_TEXT, {
+        title: DELETE_CONFIRM_TITLE,
+        okButtonLabel: 'Leave',
+        okButtonClass: 'delete-button',
+      })
+      .pipe(filter((confirm) => !!confirm))
+      .subscribe(() => {
+        this.control.reset();
+        this.sideDialog.hide();
+      });
+    } else {
+      this.sideDialog.hide();
+    }
   }
 
   private onOpenEvent(): void {
     this.openEvent.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (isOpen) {
+        this.control.reset();
         this.sideDialog.show();
       } else {
         this.sideDialog.hide();

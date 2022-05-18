@@ -7,7 +7,7 @@ import { debounceTime, delay, filter, Observable, Subject } from 'rxjs';
 import { GetSkillsCategoriesByPage, RemoveSkillsCategory, RemoveSkillsCategorySucceeded, SaveSkillsCategory, SaveSkillsCategorySucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
@@ -44,9 +44,9 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
 
   ngOnInit() {
     this.actions$.pipe(ofActionSuccessful(SaveSkillsCategorySucceeded)).subscribe(() => {
+      this.CategoryFormGroup.reset();
       this.closeDialog();
       this.store.dispatch(new GetSkillsCategoriesByPage(this.currentPage, this.pageSize));
-      this.CategoryFormGroup.reset();
     });
     this.actions$.pipe(ofActionSuccessful(RemoveSkillsCategorySucceeded)).subscribe(() => {
       this.store.dispatch(new GetSkillsCategoriesByPage(this.currentPage, this.pageSize));
@@ -84,11 +84,27 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
   }
 
   public closeDialog(): void {
-    this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
-      this.CategoryFormGroup.reset();
-      this.CategoryFormGroup.get('id')?.setValue(0);
-    });
-    this.removeActiveCssClass();
+    if (this.CategoryFormGroup.dirty) {
+      this.confirmService
+      .confirm(CANCEL_COFIRM_TEXT, {
+        title: DELETE_CONFIRM_TITLE,
+        okButtonLabel: 'Leave',
+        okButtonClass: 'delete-button'
+      }).pipe(filter(confirm => !!confirm))
+      .subscribe(() => {
+        this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
+          this.CategoryFormGroup.reset();
+          this.CategoryFormGroup.get('id')?.setValue(0);
+        });
+        this.removeActiveCssClass();
+      });
+    } else {
+      this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
+        this.CategoryFormGroup.reset();
+        this.CategoryFormGroup.get('id')?.setValue(0);
+      });
+      this.removeActiveCssClass();
+    }
   }
 
   public saveCategory(): void {

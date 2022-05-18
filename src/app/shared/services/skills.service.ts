@@ -53,7 +53,7 @@ export class SkillsService {
    * @return list of Assigned skills
    */
   public getAssignedSkills(pageNumber: number, pageSize: number, organizationId: number): Observable<SkillsPage> {
-    return this.http.get<any>(`/api/AssignedSkills`, { params: { PageNumber: pageNumber, PageSize: pageSize, organizationId: organizationId }});
+    return this.http.get<any>(`/api/AssignedSkills`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
   }
 
   /**

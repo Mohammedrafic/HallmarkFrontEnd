@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { FormArray, FormControl, FormGroup } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject } from 'rxjs';
 
@@ -91,7 +91,7 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
   static createFormGroup(): FormGroup {
     return new FormGroup({
       id: new FormControl(null),
-      baseFee: new FormControl(''),
+      baseFee: new FormControl('', [Validators.min(0)]),
       feeExceptions: new FormArray([]),
     });
   }

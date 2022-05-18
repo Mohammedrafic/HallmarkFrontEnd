@@ -47,6 +47,7 @@ import {
   SaveFeeExceptionsSucceeded,
   SaveBaseFee,
   RemoveFeeExceptionsById,
+  UpdateAssociateOrganizationsPage,
 } from './agency.actions';
 
 export interface AgencyStateModel {
@@ -88,12 +89,18 @@ export class AgencyState {
 
   @Selector()
   static organizations(state: AgencyStateModel): Organization[] {
-    return state.organizations?.items || [];
+    const existOrg = state.associateOrganizationsPages.items.map(({organizationId}) => organizationId);
+    return state.organizations?.items.filter(({ organizationId }) => !existOrg.includes(organizationId as number)) || [];
   }
 
   @Selector()
   static associateOrganizationsItems(state: AgencyStateModel): AssociateOrganizations[] {
     return state.associateOrganizationsPages.items;
+  }
+
+  @Selector()
+  static associateOrganizationsPages(state: AgencyStateModel): AssociateOrganizationsPage| { items: AssociateOrganizationsPage['items'] } {
+    return state.associateOrganizationsPages;
   }
 
   @Selector()
@@ -324,6 +331,7 @@ export class AgencyState {
       tap((payload) => {
         patchState({ jobDistribution: payload });
         dispatch(new SaveJobDistributionSucceeded(payload));
+        dispatch(new UpdateAssociateOrganizationsPage());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
         return payload;
       })
@@ -377,6 +385,7 @@ export class AgencyState {
           baseFee,
         };
         patchState({ feeSettings });
+        dispatch(new UpdateAssociateOrganizationsPage())
         dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
       })
     );
