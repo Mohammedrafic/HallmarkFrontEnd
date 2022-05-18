@@ -33,6 +33,8 @@ export class CandidateGeneralInfoComponent {
   @Select(CandidateState.skills)
   skills$: Observable<any>;
 
+  public readonly limitDate: Date = new Date();
+
   public agencyFields = {
     text: 'createUnder.name',
     value: 'createUnder.id',
@@ -66,7 +68,7 @@ export class CandidateGeneralInfoComponent {
       firstName: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
       middleName: new FormControl(null, [Validators.maxLength(10)]),
       lastName: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
-      email: new FormControl(null, [Validators.email, Validators.maxLength(20)]),
+      email: new FormControl(null, [Validators.email, Validators.maxLength(200), Validators.pattern(/\S+@\S+\.com/)]),
       dob: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
       classification: new FormControl(null),
       candidateProfileSkills: new FormControl(null, [Validators.required]),

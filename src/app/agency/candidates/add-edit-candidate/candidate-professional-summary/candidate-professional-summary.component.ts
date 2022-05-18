@@ -12,7 +12,7 @@ export class CandidateProfessionalSummaryComponent {
 
   static createFormGroup(): FormGroup {
     return new FormGroup({
-      professionalSummary: new FormControl(null, [Validators.maxLength(500)]),
+      professionalSummary: new FormControl(null, [Validators.maxLength(2000)]),
     });
   }
 }

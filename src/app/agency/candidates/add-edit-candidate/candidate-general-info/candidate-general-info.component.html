@@ -51,7 +51,7 @@
                      class="e-input"
                      type="text"
                      placeholder="Email"
-                     maxlength="20"/>
+                     maxlength="200"/>
             </div>
           </div>
           <div class="datepicker-container">
@@ -64,6 +64,7 @@
                               placeholder="MM/DD/YYYY"
                               [enableMask]="true"
                               [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                              [max]="limitDate"
                               formControlName="dob">
               </ejs-datepicker>
             </div>
