@@ -11,3 +11,8 @@ export const OPRION_FIELDS = {
 };
 
 export const DISABLED_GROUP = [BusinessUnitType.Agency, BusinessUnitType.Organization];
+
+export const BUSSINES_DATA_FIELDS = {
+  text: 'name',
+  value: 'id',
+};
