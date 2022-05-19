@@ -22,17 +22,30 @@
       </ng-template>
       <ng-template #content>
         <!-- General info step -->
-        <section class="general-info-container">
-          <div class="left">
-            <div class="e-card">
-              <div class="e-card-header">
-                <div class="e-card-header-caption">
-                  <div class="e-card-title">Agency Details</div>
-                </div>
-              </div>
+        <form [formGroup]="agencyForm" id="agencyFormFirstStep">
+          <div class="dropdown-container bootstrap create-under" *ngIf="createUnderAvailable">
+            <label>Create Under<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist
+                appValidateWithMessage
+                formControlName="parentBusinessUnitId"
+                [fields]="createUnderFields"
+                [dataSource]="createUnderValues"
+                placeholder="Create Under"
+              ></ejs-dropdownlist>
+            </div>
+          </div>
 
-              <div class="e-card-content">
-                <form [formGroup]="agencyForm" id="agencyFormFirstStep">
+          <section class="general-info-container">
+            <div class="left">
+              <div class="e-card">
+                <div class="e-card-header">
+                  <div class="e-card-header-caption">
+                    <div class="e-card-title">Agency Details</div>
+                  </div>
+                </div>
+
+                <div class="e-card-content">
                   <app-general-info-group [formGroup]="$any(agencyControl)"></app-general-info-group>
 
                   <div class="e-card-title-wrapper">
@@ -57,17 +70,17 @@
                     ></app-contact-details-group>
                     <hr />
                   </ng-container>
-                </form>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="right">
-            <app-image-uploader uploaderTitle="Logo" [logo]="logo" (selectImage)="onImageSelect($event)"></app-image-uploader>
-          </div>
-        </section>
-        <section class="payment-section last-content-section-padding">
-          <app-payment-details-grid [paymentsFormArray]="$any(agencyForm?.get('agencyPaymentDetails'))"></app-payment-details-grid>
-        </section>
+            <div class="right">
+              <app-image-uploader uploaderTitle="Logo" [logo]="logo" (selectImage)="onImageSelect($event)"></app-image-uploader>
+            </div>
+          </section>
+          <section class="payment-section last-content-section-padding">
+            <app-payment-details-grid [paymentsFormArray]="$any(agencyForm?.get('agencyPaymentDetails'))"></app-payment-details-grid>
+          </section>
+        </form>
       </ng-template>
     </e-tabitem>
 

@@ -26,6 +26,18 @@
   .add-contact-link {
     @include linkWithIcon;
   }
+
+}
+
+.create-under {
+  max-width: calc(70% - 14px);
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  margin-bottom: 16px;
 }
 
 .payment-section {

@@ -2,7 +2,7 @@ import { PageOfCollections } from "./page.model";
 
 export type Agency = {
   createUnder?: AgencyCreateUnder;
-  parentBusinessUnitId: number;
+  parentBusinessUnitId: number | null;
   agencyId?: number;
   agencyDetails: AgencyDetails;
   agencyBillingDetails: AgencyBillingDetails;
