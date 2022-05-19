@@ -16,7 +16,7 @@ import { Location }  from '@shared/models/location.model';
 import {
   GetCredential, GetCredentialSetup,
   GetCredentialTypes, GetDepartmentsByLocationId, GetLocationsByRegionId,
-  GetRegionsByOrganizationId,
+  GetRegions,
   GetCredentialSkillGroup
 } from '../../store/organization-management.actions';
 import { CredentialType } from '@shared/models/credential-type.model';
@@ -102,7 +102,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     } else if (data.itemData.value === CredentialsFilter.BySkill) {
       this.isFilteredBySkill = true;
       this.store.dispatch(new GetCredentialSkillGroup(this.fakeOrganizationId));
-      this.store.dispatch(new GetRegionsByOrganizationId(this.fakeOrganizationId)); // TODO: provide valid organizationId
+      this.store.dispatch(new GetRegions());
     }
   }
 

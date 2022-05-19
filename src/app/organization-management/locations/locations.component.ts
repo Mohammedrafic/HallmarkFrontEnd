@@ -1,40 +1,41 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, Select, Store } from '@ngxs/store';
-import { filter, Observable } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
-import { AbstractGridConfigurationComponent } from '../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { OrganizationManagementState } from '../store/organization-management.state';
-import { Region } from '../../shared/models/region.model';
+import { Region } from '@shared/models/region.model';
 import {
   DeleteLocationById,
   GetLocationsByRegionId,
   GetOrganizationById,
-  GetRegionsByOrganizationId,
+  GetRegions,
   SaveLocation, SaveRegion, SetGeneralStatesByCountry,
   SetImportFileDialogState,
   UpdateLocation
 } from '../store/organization-management.actions';
 import { ShowSideDialog, ShowToast } from '../../store/app.actions';
-import { MessageTypes } from '../../shared/enums/message-types';
-import { Location } from '../../shared/models/location.model';
+import { MessageTypes } from '@shared/enums/message-types';
+import { Location } from '@shared/models/location.model';
 
-import { PhoneTypes } from '../../shared/enums/phone-types';
-import { Country } from '../../shared/enums/states';
+import { PhoneTypes } from '@shared/enums/phone-types';
+import { Country } from '@shared/enums/states';
 import {
   CANCEL_COFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
   RECORD_ADDED
-} from '../../shared/constants/messages';
-import { Organization } from '../../shared/models/organization.model';
-import { ConfirmService } from '../../shared/services/confirm.service';
+} from '@shared/constants';
+import { Organization } from '@shared/models/organization.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { UserState } from '../../store/user.state';
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
 
@@ -44,7 +45,7 @@ export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
   styleUrls: ['./locations.component.scss'],
   providers: [MaskedDateTimeService],
 })
-export class LocationsComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class LocationsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
   @ViewChild('addRegionDialog') addRegionDialog: DialogComponent;
@@ -70,10 +71,13 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   @Select(OrganizationManagementState.organization)
   organization$: Observable<Organization>;
 
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
+
   isEdit: boolean;
   editedLocationId?: number;
 
-  fakeOrganizationId = 2; // TODO: remove after BE implementation
+  private unsubscribe$: Subject<void> = new Subject();
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
@@ -89,8 +93,19 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetRegionsByOrganizationId(this.fakeOrganizationId)); // TODO: provide valid organizationId
-    this.store.dispatch(new GetOrganizationById(this.fakeOrganizationId));  // TODO: provide valid organizationId
+    this.store.dispatch(new GetRegions());
+    this.organizationId$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(id => {
+      this.store.dispatch(new GetOrganizationById(id));
+    });
+
+    this.organization$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(organization => {
+      this.store.dispatch(new SetGeneralStatesByCountry(parseInt(Country[organization.generalInformation.country])));
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -112,7 +127,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   onOkDialogClick(): void {
     this.newRegionName.trim();
     if (this.newRegionName) {
-      this.store.dispatch(new SaveRegion({ name: this.newRegionName, organizationId: this.fakeOrganizationId }))
+      this.store.dispatch(new SaveRegion({ name: this.newRegionName }))
       this.addRegionDialog.hide();
     }
   }
@@ -124,9 +139,6 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   onAddDepartmentClick(): void {
     if (this.selectedRegion) {
-      this.organization$.pipe(filter(Boolean)).subscribe(organization => {
-        this.store.dispatch(new SetGeneralStatesByCountry(parseInt(Country[organization.generalInformation.country])));
-      });
       this.store.dispatch(new ShowSideDialog(true));
     } else {
       this.store.dispatch(new ShowToast(MessageTypes.Error, MESSAGE_REGIONS_NOT_SELECTED));
@@ -156,9 +168,6 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   onEditButtonClick(location: Location, event: any): void {
     this.addActiveCssClass(event);
-    this.organization$.pipe(filter(Boolean)).subscribe(organization => {
-      this.store.dispatch(new SetGeneralStatesByCountry(parseInt(Country[organization.generalInformation.country])));
-    });
     this.locationDetailsFormGroup.setValue({
       invoiceId: location.invoiceId,
       externalId: location.externalId,
@@ -219,7 +228,6 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       const location: Location = {
         id: this.editedLocationId,
         regionId: this.selectedRegion.id,
-        organizationId: this.fakeOrganizationId,
         invoiceId: this.locationDetailsFormGroup.controls['invoiceId'].value,
         externalId: this.locationDetailsFormGroup.controls['externalId'].value,
         name: this.locationDetailsFormGroup.controls['name'].value,

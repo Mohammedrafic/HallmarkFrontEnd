@@ -7,7 +7,7 @@ import { Country, UsaStates, CanadaStates } from 'src/app/shared/enums/states';
 import { Status } from 'src/app/shared/enums/status';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
-import { OrganizationService } from '../../shared/services/organization.service';
+import { OrganizationService } from '@shared/services/organization.service';
 
 import {
   GetBusinessUnitList,
@@ -33,7 +33,11 @@ import {
   RemoveMasterSkillSucceeded,
   GetOrganizationLogo,
   GetOrganizationLogoSucceeded,
-  GetAllSkills
+  GetAllSkills,
+  GetCredentialTypes,
+  SaveCredentialType,
+  UpdateCredentialType,
+  RemoveCredentialType
 } from './admin.actions';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
@@ -44,6 +48,9 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
 import { CandidateStateModel } from '@agency/store/candidate.state';
+import { OrganizationManagementStateModel } from '../../organization-management/store/organization-management.state';
+import { CredentialType } from '@shared/models/credential-type.model';
+import { CredentialsService } from '@shared/services/credentials.service';
 
 interface DropdownOption {
   id: number;
@@ -71,6 +78,7 @@ export interface AdminStateModel {
   skills: SkillsPage | null;
   skillsCategories: SkillCategoriesPage | null;
   allSkillsCategories: SkillCategoriesPage | null;
+  credentialTypes: CredentialType[];
   isDirty: boolean;
 }
 
@@ -98,6 +106,7 @@ export interface AdminStateModel {
     skills: null,
     skillsCategories: null,
     allSkillsCategories: null,
+    credentialTypes: [],
     isDirty: false
   },
 })
@@ -148,10 +157,14 @@ export class AdminState {
   @Selector()
   static allSkillsCategories(state: AdminStateModel): SkillCategoriesPage | null { return state.allSkillsCategories; }
 
+  @Selector()
+  static credentialTypes(state: OrganizationManagementStateModel): CredentialType[] { return state.credentialTypes; }
+
   constructor(
     private organizationService: OrganizationService,
     private skillsService: SkillsService,
-    private categoriesService: CategoriesService
+    private categoriesService: CategoriesService,
+    private credentialsService: CredentialsService
   ) { }
 
   @Action(SetGeneralStatesByCountry)
@@ -308,5 +321,41 @@ export class AdminState {
         return payload;
       })
     );
+  }
+
+  @Action(GetCredentialTypes)
+  GetCredentialTypes({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetCredentialTypes): Observable<CredentialType[]> {
+    return this.credentialsService.getCredentialTypes().pipe(tap((payload) => {
+      patchState({ credentialTypes: payload });
+      return payload;
+    }));
+  }
+
+  @Action(SaveCredentialType)
+  SaveCredentialTypes({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveCredentialType): Observable<CredentialType> {
+    return this.credentialsService.saveUpdateCredentialType(payload).pipe(tap((payload) => {
+      patchState({ isCredentialTypesLoading: false });
+      dispatch(new GetCredentialTypes());
+      return payload;
+    }));
+  }
+
+  @Action(UpdateCredentialType)
+  UpdateCredentialTypes({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: UpdateCredentialType): Observable<CredentialType> {
+    return this.credentialsService.saveUpdateCredentialType(payload).pipe(tap((payload) => {
+      patchState({ isCredentialLoading: false });
+      dispatch(new GetCredentialTypes());
+      return payload;
+    }));
+  }
+
+  @Action(RemoveCredentialType)
+  RemoveCredentialTypes({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: RemoveCredentialType): Observable<any> {
+    return this.credentialsService.removeCredentialType(payload).pipe(tap((payload) => {
+        patchState({ isCredentialTypesLoading: false });
+        dispatch(new GetCredentialTypes());
+        return payload;
+      }),
+      catchError((error: any) =>  dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
   }
 }

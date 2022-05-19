@@ -14,7 +14,7 @@ import {
   GetBusinessUnitList,
   GetDepartmentsByLocationId,
   GetLocationsByOrganizationId,
-  GetRegionsByOrganizationId,
+  GetRegions,
   SetBillingStatesByCountry,
   SetDirtyState,
   SaveOrganization,
@@ -362,8 +362,8 @@ export class OrganizationManagementState {
       catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
   }
 
-  @Action(GetRegionsByOrganizationId)
-  GetRegionsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetRegionsByOrganizationId): Observable<Region[]> {
+  @Action(GetRegions)
+  GetRegionsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetRegions): Observable<Region[]> {
     return this.regionService.getRegionsByOrganizationId().pipe(tap((payload) => {
       patchState({ regions: payload});
       return payload;
@@ -375,7 +375,7 @@ export class OrganizationManagementState {
     patchState({ isLocationLoading: true });
     return this.regionService.saveRegion(region).pipe(tap((payload) => {
       patchState({ isLocationLoading: false});
-      dispatch(new GetRegionsByOrganizationId(region.organizationId));
+      dispatch(new GetRegions());
       return payload;
     }));
   }
@@ -384,16 +384,16 @@ export class OrganizationManagementState {
   UpdateRegion({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { region }: UpdateRegion): Observable<void> {
     return this.regionService.updateRegion(region).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
-      dispatch(new GetRegionsByOrganizationId(region.organizationId));
+      dispatch(new GetRegions());
       return payload;
     }));
   }
 
   @Action(DeleteRegionById)
-  DeleteRegionById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { regionId, organizationId }: DeleteRegionById): Observable<void> {
+  DeleteRegionById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { regionId }: DeleteRegionById): Observable<void> {
     return this.regionService.deleteRegionById(regionId).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
-      dispatch(new GetRegionsByOrganizationId(organizationId));
+      dispatch(new GetRegions());
       return payload;
     }));
   }
@@ -707,19 +707,19 @@ export class OrganizationManagementState {
   }
 
   @Action(GetOrganizationSettings)
-  GetOrganizationSettingsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetOrganizationSettings): Observable<OrganizationSettingsGet[]> {
-    return this.organizationSettingsService.getOrganizationSettingsByOrganizationId(payload).pipe(tap((payload) => {
+  GetOrganizationSettingsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetOrganizationSettings): Observable<OrganizationSettingsGet[]> {
+    return this.organizationSettingsService.getOrganizationSettings().pipe(tap((payload) => {
       patchState({ organizationSettings: payload });
       return payload;
     }));
   }
 
   @Action(SaveOrganizationSettings)
-  SaveOverrideOrganizationSettings({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { organizationSettings, organizationId }: SaveOrganizationSettings): Observable<void> {
+  SaveOverrideOrganizationSettings({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { organizationSettings }: SaveOrganizationSettings): Observable<void> {
     return this.organizationSettingsService.saveOrganizationSetting(organizationSettings).pipe(tap((payload) => {
       patchState({ isCredentialSetupLoading: false });
       dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      dispatch(new GetOrganizationSettings(organizationId));
+      dispatch(new GetOrganizationSettings());
       return payload;
     }));
   }
