@@ -594,8 +594,8 @@ export class OrganizationManagementState {
   }
 
   @Action(GetCredential)
-  GetCredential({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetCredential): Observable<Credential[]> {
-    return this.credentialsService.getCredential(payload).pipe(tap((payload) => {
+  GetCredential({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetCredential): Observable<Credential[]> {
+    return this.credentialsService.getCredential().pipe(tap((payload) => {
       patchState({ credentials: payload });
       return payload;
     }));
@@ -608,7 +608,7 @@ export class OrganizationManagementState {
         tap((payload) => {
           patchState({ isCredentialLoading: false });
           dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-          dispatch(new GetCredential(payload.businessUnitId));
+          dispatch(new GetCredential());
           return payload;
         }),
         catchError((error: any) => {
@@ -618,11 +618,11 @@ export class OrganizationManagementState {
   }
 
   @Action(UpdateCredential)
-  UpdateCredential({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { credential, businessUnitId }: UpdateCredential): Observable<Credential | void> {
+  UpdateCredential({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { credential }: UpdateCredential): Observable<Credential | void> {
     return this.credentialsService.updateCredential(credential).pipe(tap((payload) => {
       patchState({ isCredentialLoading: false });
       dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      dispatch(new GetCredential(businessUnitId));
+      dispatch(new GetCredential());
       return payload;
     }),
       catchError((error: any) => {
@@ -635,7 +635,7 @@ export class OrganizationManagementState {
   RemoveCredential({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: RemoveCredential): Observable<any> {
     return this.credentialsService.removeCredential(payload).pipe(tap(() => {
       patchState({ isCredentialLoading: false });
-      dispatch(new GetCredential(payload.businessUnitId));
+      dispatch(new GetCredential());
       return payload;
     }),
     catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));

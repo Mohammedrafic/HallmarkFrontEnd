@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
@@ -7,20 +7,25 @@ import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 
 import {
   AbstractGridConfigurationComponent
-} from '../../../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+} from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ShowSideDialog, ShowToast } from '../../../../store/app.actions';
-import { MessageTypes } from '../../../../shared/enums/message-types';
+import { MessageTypes } from '@shared/enums/message-types';
 import {
   CANCEL_COFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
   RECORD_ADDED
-} from '../../../../shared/constants/messages';
-import { AdminState } from '../../../store/admin.state';
-import { CredentialType } from '../../../../shared/models/credential-type.model';
-import { RemoveCredentialType, GetCredentialTypes, SaveCredentialType, UpdateCredentialType } from '../../../store/admin.actions';
-import { ConfirmService } from '../../../../shared/services/confirm.service';
+} from '@shared/constants/messages';
+import { CredentialType } from '@shared/models/credential-type.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import {
+  GetCredentialTypes,
+  RemoveCredentialType,
+  SaveCredentialType,
+  UpdateCredentialType
+} from '../../../../organization-management/store/organization-management.actions';
+import { OrganizationManagementState } from '../../../../organization-management/store/organization-management.state';
 
 @Component({
   selector: 'app-master-credentials-types',
@@ -31,7 +36,7 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
 
-  @Select(AdminState.credentialTypes)
+  @Select(OrganizationManagementState.credentialTypes)
   credentialType$: Observable<CredentialType[]>;
 
   credentialTypeFormGroup: FormGroup;
@@ -53,7 +58,7 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetCredentialTypes()); // TODO: uncomment after BE implementation
+    this.store.dispatch(new GetCredentialTypes());
     this.mapGridData();
   }
 
