@@ -34,7 +34,7 @@ export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
   public feeExceptionsInitialData$: Observable<FeeExceptionsInitialData>;
 
   public targetElement: HTMLElement = document.body;
-  public editMode = true;
+  public editMode = false;
   public feeFormGroup: FormGroup = this.generateNewForm();
   public optionFields = {
     text: 'name',

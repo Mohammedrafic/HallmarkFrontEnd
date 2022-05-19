@@ -1,16 +1,41 @@
 @import "../variables/mixins";
-@import '../../styles/variables/colors';
+@import "../../styles/variables/colors";
 
 $grid-border-radius: 10px;
 
-.e-grid.e-resize-lines .e-headercell .e-rhandler {
-  height: 20px !important;
-  margin-top: 15px;
+.e-grid.e-resize-lines {
+  .e-headercell .e-rhandler {
+    height: 20px !important;
+    margin-top: 15px;
+  }
 }
 
 ejs-grid.e-control.e-grid {
   border-radius: $grid-border-radius;
   box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.05);
+
+  &.e-gridsubheader {
+    thead tr {
+      height: 25px !important;
+    }
+
+    .e-gridheader table th[rowspan] {
+      padding-bottom: 16px;
+    }
+
+    .sub-header, .e-stackedheadercell {
+      .e-rhandler.e-rcursor {
+        height: 100%;
+        margin-top: 2px;
+      }
+    }
+  }
+
+  .e-gridheader {
+    .e-stackedheadercelldiv {
+      padding: 0;
+    }
+  }
 
   &.e-gridwithtoolbar {
     .e-gridheader:not(.e-gridtoolbar) {
@@ -50,7 +75,8 @@ ejs-grid.e-control.e-grid {
   .e-gridcontent {
     .e-content {
       .e-table {
-        tr[role=row]:not(.e-editedrow):hover .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
+        tr[role="row"]:not(.e-editedrow):hover
+          .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
           background-color: $primary-active-blue-90;
         }
 
@@ -116,7 +142,8 @@ ejs-grid.e-control.e-grid {
     border-bottom-right-radius: 12px;
   }
 
-  .e-headercelldiv {
+  .e-headercelldiv,
+  .e-stackedheadercelldiv {
     font-size: 14px;
     font-weight: 600;
 
@@ -280,7 +307,8 @@ ejs-grid.e-control.e-grid {
     border-radius: $grid-border-radius $grid-border-radius 0 0;
     font-variant: small-caps;
 
-    .e-headertext {
+    .e-headertext,
+    .e-stackedheadercelldiv {
       text-transform: lowercase;
       font-weight: 600;
       color: $secondary-dark-blue-15;
@@ -299,7 +327,8 @@ ejs-grid.e-control.e-grid {
     .e-detailrow {
       background-color: $secondary_dark-blue-50;
 
-      .e-detailindentcell, .e-detailcell {
+      .e-detailindentcell,
+      .e-detailcell {
         border: none;
       }
 
@@ -316,13 +345,13 @@ ejs-grid.e-control.e-grid {
   tbody tr {
     td.e-detailrowcollapse {
       div.e-icons.e-dtdiagonalright.e-icon-grightarrow::before {
-        content: '\e913' !important;
+        content: "\e913" !important;
       }
     }
 
     td.e-detailrowexpand {
       div.e-icons.e-dtdiagonaldown.e-icon-gdownarrow::before {
-        content: '\e916' !important;
+        content: "\e916" !important;
       }
     }
   }
@@ -341,7 +370,8 @@ ejs-grid.e-control.e-grid {
   }
 
   .e-emptyrow {
-    .e-lastrowcell, td {
+    .e-lastrowcell,
+    td {
       padding-left: 21px;
     }
   }
