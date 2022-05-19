@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { Role, RoleDTO } from '@shared/models/roles.model';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -64,6 +65,10 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
     if (user?.businessUnitType) {
       this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
       this.isBusinessFormDisabled && this.businessForm.disable();
+    }
+    if (user?.businessUnitType === BusinessUnitType.MSP) {
+      const [Hallmark, ...rest] = this.businessUnits;
+      this.businessUnits = rest;
     }
 
     this.actions$

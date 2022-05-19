@@ -34,17 +34,28 @@ export class ApiInterceptor implements HttpInterceptor {
 
   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const userId = this.store.selectSnapshot(UserState.user)?.id;
+    const lastSelectedOrganizationId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId);
+    const lastSelectedAgencyId = this.store.selectSnapshot(UserState.lastSelectedAgencyId);
 
     if (userId) {
       const currentPage = this.store.selectSnapshot(AppState.headerState)?.title || 'Login';
-      request = request.clone({
-        headers: new HttpHeaders({
-          'Authorization': `UserId ${userId}`,
-          'Einstein-ScreenName': currentPage as string,
-          'Einstein-ScreenUrl': this.router.url,
-          'selected-businessunit-id': '2' // TODO: replace with logged/selected org/agency
-        })
-      });
+      const headers: {[key: string]: string} = {
+        'Authorization': `UserId ${userId}`,
+        'Einstein-ScreenName': currentPage as string,
+        'Einstein-ScreenUrl': this.router.url
+      };
+
+      const { isOrganizationArea, isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+
+      if (isOrganizationArea && lastSelectedOrganizationId) {
+        headers['selected-businessunit-id'] = lastSelectedOrganizationId.toString();
+      }
+
+      if (isAgencyArea && lastSelectedAgencyId) {
+        headers['selected-businessunit-id'] = lastSelectedAgencyId.toString();
+      }
+
+      request = request.clone({ headers: new HttpHeaders(headers) });
     } else {
       this.store.dispatch(new LogoutUser());
     }

@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { filter, Observable, Subscription, takeWhile } from 'rxjs';
 
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
-import { DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import {DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT} from '@shared/constants/messages';
 import {
   Agency,
   AgencyBillingDetails,
@@ -29,6 +29,10 @@ import { AgencyState } from '../../store/agency.state';
 import { BillingDetailsGroupComponent } from './billing-details-group/billing-details-group.component';
 import { ContactDetailsGroupComponent } from './contact-details-group/contact-details-group.component';
 import { GeneralInfoGroupComponent } from './general-info-group/general-info-group.component';
+import { CREATE_UNDER_VALUE, DISABLED_BUSINESS_TYPES, OPRION_FIELDS } from './add-edit-agency.constants';
+import { UserState } from 'src/app/store/user.state';
+import { User } from '@shared/models/user.model';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 type AgencyFormValue = {
   parentBusinessUnitId: number;
@@ -47,7 +51,11 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   @ViewChild('stepper') tab: TabComponent;
 
   public agencyForm: FormGroup;
+  public createUnderAvailable = false;
+  public createUnderFields = OPRION_FIELDS;
+  public createUnderValues = CREATE_UNDER_VALUE;
   public title = 'Add';
+
 
   get contacts(): FormArray {
     return this.agencyForm.get('agencyContactDetails') as FormArray;
@@ -94,6 +102,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.generateAgencyForm();
     this.onBillingPopulatedChange();
+    this.enableCreateUnderControl();
 
     this.actions$.pipe(ofActionSuccessful(SaveAgencySucceeded)).subscribe((agency: { payload: Agency }) => {
       this.agencyId = agency.payload.agencyDetails.id as number;
@@ -118,6 +127,18 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.isAlive = false;
+  }
+
+  public enableCreateUnderControl(): void {
+    const user = this.store.selectSnapshot(UserState.user) as User;
+    if (!DISABLED_BUSINESS_TYPES.includes(user?.businessUnitType)) {
+      this.createUnderAvailable = true;
+      if (user.businessUnitType === BusinessUnitType.MSP) {
+        const parentBusinessUnitIdControl = this.agencyForm.get('parentBusinessUnitId');
+        parentBusinessUnitIdControl?.patchValue(BusinessUnitType.MSP);
+        parentBusinessUnitIdControl?.disable();
+      }
+    }
   }
 
   public onStepperCreated(): void {
@@ -161,7 +182,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   public onBack(): void {
     if (this.agencyForm.dirty) {
       this.confirmService
-        .confirm(DELETE_RECORD_TEXT, {
+        .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
@@ -226,7 +247,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   private generateAgencyForm(): void {
     this.agencyForm = this.fb.group({
-      parentBusinessUnitId: this.fb.control(0),
+      parentBusinessUnitId: this.fb.control(null),
       agencyDetails: GeneralInfoGroupComponent.createFormGroup(),
       isBillingPopulated: false,
       agencyBillingDetails: BillingDetailsGroupComponent.createFormGroup(),
@@ -253,12 +274,12 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
       agencyContactDetails,
       agencyPaymentDetails,
       agencyId: id,
-      parentBusinessUnitId: this.fetchedAgency?.parentBusinessUnitId,
+      parentBusinessUnitId: null, // TODO: Change it after we will get MSP from BE
     };
   }
 
-  private patchAgencyFormValue({ agencyDetails, agencyBillingDetails, parentBusinessUnitId, agencyContactDetails }: Agency) {
-    this.agencyForm.get('parentBusinessUnitId')?.patchValue(parentBusinessUnitId);
+  private patchAgencyFormValue({ agencyDetails, agencyBillingDetails, agencyContactDetails, createUnder }: Agency) {
+    this.agencyForm.get('parentBusinessUnitId')?.patchValue(createUnder?.businessUnitType);
     this.agencyForm.get('isBillingPopulated')?.patchValue(agencyBillingDetails.sameAsAgency);
     this.agencyControl?.patchValue({ ...agencyDetails });
     this.billingControl?.patchValue({ ...agencyBillingDetails });

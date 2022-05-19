@@ -329,7 +329,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
     if (
       this.CreateUnderFormGroup.valid &&
       this.GeneralInformationFormGroup.valid &&
-      (this.BillingDetailsFormGroup.valid || this.isSameAsOrg) &&
+      (this.BillingDetailsFormGroup.valid) &&
       this.ContactFormArray.valid &&
       this.PreferencesFormGroup.valid
     ) {

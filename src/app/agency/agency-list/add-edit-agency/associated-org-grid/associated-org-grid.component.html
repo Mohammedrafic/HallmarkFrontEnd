@@ -3,13 +3,13 @@
   [dataSource]="associateOrganizations$ | async"
   [allowSorting]="true"
   [allowResizing]="true"
-  [allowSelection]="true"
+  [allowSelection]="false"
   [resizeSettings]="resizeSettings"
   [allowPaging]="allowPaging"
   [pageSettings]="pageSettings"
   [height]="gridHeight"
   (dataBound)="dataBound()"
-  class="e-gridwithtoolbar"
+  class="e-gridwithtoolbar e-gridsubheader"
 >
   <ng-template #toolbarTemplate let-data>
     <div class="e-gridheader e-gridtoolbar">
@@ -25,11 +25,9 @@
   <e-columns>
     <e-column field="organizationName" headerText="Organization" textAlign="Left"></e-column>
     <e-column field="baseFee" headerText="Base Fee %" textAlign="left"></e-column>
-    <e-column field="exeptionFee" headerText="Exeption Fee" textAlign="left"></e-column>
-    <e-column field="region" headerText="Region" textAlign="left"></e-column>
-    <e-column field="classification" headerText="Classification" textAlign="left"></e-column>
-    <e-column field="orderType" headerText="Order Type" textAlign="left"></e-column>
-    <e-column field="skillCategory" headerText="Skill Category" textAlign="left"></e-column>
+    <e-column field="exeptionFee" headerText="Exception Fee" textAlign="left"></e-column>
+    <e-column headerText="Job Distribution" [columns]="jobDistributionColumns" textAlign="left"></e-column>
+
     <e-column textAlign="Right" width="120">
       <ng-template #template let-data>
         <div class="row-tool-buttons">

@@ -5,8 +5,6 @@
   </ng-container>
   <ng-container right>
     <ng-container *ngIf="!isSeccondStepActive">
-      <!-- TBD delete button -->
-      <!-- <button *ngIf="isAgencyCreated$ | async" ejs-button cssClass="e-danger" [isPrimary]="true"(click)="onDelete()">Delete</button> -->
       <button [disabled]="!agencyForm?.dirty" ejs-button cssClass="e-outline" (click)="onClear()">Clear</button>
       <button ejs-button [isPrimary]="true" [disabled]="isSaveDisabled" (click)="onSave()">Save</button>
     </ng-container>
@@ -24,17 +22,30 @@
       </ng-template>
       <ng-template #content>
         <!-- General info step -->
-        <section class="general-info-container">
-          <div class="left">
-            <div class="e-card">
-              <div class="e-card-header">
-                <div class="e-card-header-caption">
-                  <div class="e-card-title">Agency Details</div>
-                </div>
-              </div>
+        <form [formGroup]="agencyForm" id="agencyFormFirstStep">
+          <div class="dropdown-container bootstrap create-under" *ngIf="createUnderAvailable">
+            <label>Create Under<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist
+                appValidateWithMessage
+                formControlName="parentBusinessUnitId"
+                [fields]="createUnderFields"
+                [dataSource]="createUnderValues"
+                placeholder="Create Under"
+              ></ejs-dropdownlist>
+            </div>
+          </div>
 
-              <div class="e-card-content">
-                <form [formGroup]="agencyForm" id="agencyFormFirstStep">
+          <section class="general-info-container">
+            <div class="left">
+              <div class="e-card">
+                <div class="e-card-header">
+                  <div class="e-card-header-caption">
+                    <div class="e-card-title">Agency Details</div>
+                  </div>
+                </div>
+
+                <div class="e-card-content">
                   <app-general-info-group [formGroup]="$any(agencyControl)"></app-general-info-group>
 
                   <div class="e-card-title-wrapper">
@@ -59,24 +70,24 @@
                     ></app-contact-details-group>
                     <hr />
                   </ng-container>
-                </form>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="right">
-            <app-image-uploader uploaderTitle="Logo" [logo]="logo" (selectImage)="onImageSelect($event)"></app-image-uploader>
-          </div>
-        </section>
-        <section class="payment-section last-content-section-padding">
-          <app-payment-details-grid [paymentsFormArray]="$any(agencyForm?.get('agencyPaymentDetails'))"></app-payment-details-grid>
-        </section>
+            <div class="right">
+              <app-image-uploader uploaderTitle="Logo" [logo]="logo" (selectImage)="onImageSelect($event)"></app-image-uploader>
+            </div>
+          </section>
+          <section class="payment-section last-content-section-padding">
+            <app-payment-details-grid [paymentsFormArray]="$any(agencyForm?.get('agencyPaymentDetails'))"></app-payment-details-grid>
+          </section>
+        </form>
       </ng-template>
     </e-tabitem>
 
     <e-tabitem>
       <ng-template #headerText>
         <div class="stepper-header">
-          <div class="stepper-title">Associated Organizations</div>
+          <div class="stepper-title">Associate Organizations</div>
           <div class="stepper-sub-title">Additional info here</div>
         </div>
       </ng-template>

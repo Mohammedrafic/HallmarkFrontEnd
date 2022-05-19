@@ -26,7 +26,7 @@
         <ng-template #template let-data>{{data.graduationDate | date:"MM/yyyy"}}</ng-template>
       </e-column>
       <e-column field="fieldOfStudy" headerText="Field Of Study" width=500></e-column>
-      <e-column textAlign="Right" width="120">
+      <e-column textAlign="Right" minWidth="112" width="112" freeze="Right">
         <ng-template #template let-data>
           <div class="e-grid-tool-buttons">
             <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>

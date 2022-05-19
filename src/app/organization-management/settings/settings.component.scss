@@ -27,6 +27,12 @@
   overflow-y: auto;
 }
 
+.e-row {
+  .e-customized-expand-cell {
+    border-top: 1px solid $grid-row-border;
+  }
+}
+
 .e-row[aria-selected='true'] {
   .e-customized-expand-cell {
     background-color: $primary-active-blue-10;

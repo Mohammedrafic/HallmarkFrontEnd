@@ -36,7 +36,7 @@ export class ShiftsState {
   @Action(GetShiftsByPage)
   GetShiftsByPage({ patchState }: StateContext<ShiftsStateModel>, { pageNumber, pageSize }: GetShiftsByPage): Observable<ShiftsPage> {
     patchState({ isShiftLoading: true });
-    return this.shiftsService.getShifts(pageNumber, pageSize, 2).pipe( // TODO: pass org id after switcher is ready
+    return this.shiftsService.getShifts(pageNumber, pageSize).pipe(
       tap((payload) => {
         payload.items.map((val) => {
           val.standardStartTime = militaryToStandard(val.startTime);

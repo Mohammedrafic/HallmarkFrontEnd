@@ -123,31 +123,6 @@ export class RemoveSkillsCategorySucceeded {
   constructor() { }
 }
 
-export class GetAssignedSkillsByPage {
-  static readonly type = '[admin] Get Assigned Skills by Page';
-  constructor(public pageNumber: number, public pageSize: number) { }
-}
-
-export class SaveAssignedSkill {
-  static readonly type = '[admin] Save Assigned Skill';
-  constructor(public payload: Skill) { }
-}
-
-export class SaveAssignedSkillSucceeded {
-  static readonly type = '[admin] Save Assigned Skill Succeeded';
-  constructor(public payload: Skill) { }
-}
-
-export class RemoveAssignedSkill {
-  static readonly type = '[admin] Remove Assigned Skill';
-  constructor(public payload: Skill) { }
-}
-
-export class RemoveAssignedSkillSucceeded {
-  static readonly type = '[admin] Remove Assigned Skill by ID Succeeded';
-  constructor() { }
-}
-
 export class GetAllSkills {
   static readonly type = '[admin] Get All Skills';
   constructor() {}

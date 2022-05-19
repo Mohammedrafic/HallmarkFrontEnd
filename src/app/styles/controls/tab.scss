@@ -11,7 +11,7 @@ body.dark {
       }
 
       .e-toolbar-item {
-        margin: 5px 20px 3px 0 !important;
+        margin: 5px 14px 3px 0 !important;
 
         div.e-tab-wrap {
           padding: 0 !important;
@@ -76,6 +76,7 @@ body.dark {
             .stepper-title {
               font-size: 14px;
               color: $title-black;
+              font-weight: 590;
               line-height: 20px;
               margin-bottom: 2px;
             }
@@ -95,7 +96,7 @@ body.dark {
               .stepper-title {
                 color: $white;
               }
-  
+
               .stepper-sub-title {
                 color: $white;
               }
