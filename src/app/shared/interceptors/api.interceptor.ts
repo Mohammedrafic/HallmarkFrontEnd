@@ -45,10 +45,14 @@ export class ApiInterceptor implements HttpInterceptor {
         'Einstein-ScreenUrl': this.router.url
       };
 
-      const selectedBusinessunitId = (lastSelectedOrganizationId || lastSelectedAgencyId)?.toString();
+      const { isOrganizationArea, isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
 
-      if (selectedBusinessunitId) {
-        headers['selected-businessunit-id'] = selectedBusinessunitId;
+      if (isOrganizationArea && lastSelectedOrganizationId) {
+        headers['selected-businessunit-id'] = lastSelectedOrganizationId.toString();
+      }
+
+      if (isAgencyArea && lastSelectedAgencyId) {
+        headers['selected-businessunit-id'] = lastSelectedAgencyId.toString();
       }
 
       request = request.clone({ headers: new HttpHeaders(headers) });

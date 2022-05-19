@@ -76,7 +76,14 @@ export class UserState {
     window.localStorage.removeItem(AUTH_STORAGE_KEY);
     window.localStorage.removeItem(USER_STORAGE_KEY);
     this.router.navigate(['/login']);
-    patchState({ user: null });
+    patchState({
+      user: null,
+      lastSelectedAgencyId: null,
+      lastSelectedOrganizationId: null,
+      organizations: null,
+      agencies: null,
+      menu: { menuItems: [] }
+     });
   }
 
   @Action(GetUserMenuConfig)

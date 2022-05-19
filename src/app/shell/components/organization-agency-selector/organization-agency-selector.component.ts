@@ -89,13 +89,13 @@ export class OrganizationAgencySelectorComponent implements OnDestroy {
       if (selectedType === 'Organization' && selectedOrganizationAgencyId !== lastSelectedOrganizationId) {
         this.store.dispatch(new SaveLastSelectedOrganizationAgencyId({
           lastSelectedOrganizationId: selectedOrganizationAgencyId,
-          lastSelectedAgencyId: null
+          lastSelectedAgencyId: this.store.selectSnapshot(UserState.lastSelectedAgencyId)
         }));
       }
 
       if (selectedType === 'Agency' && selectedOrganizationAgencyId !== lastSelectedAgencyId) {
         this.store.dispatch(new SaveLastSelectedOrganizationAgencyId({
-          lastSelectedOrganizationId: null,
+          lastSelectedOrganizationId: this.store.selectSnapshot(UserState.lastSelectedOrganizationId),
           lastSelectedAgencyId: selectedOrganizationAgencyId
         }));
       }
