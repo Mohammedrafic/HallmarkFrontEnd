@@ -126,7 +126,7 @@ body {
 
   &.light {
     // Styles not related to syncfusion controls here
-    background-color: #f6f6f6;
+    background-color: $background;
 
     .header {
       border-bottom: 1px solid #d1d6e2;

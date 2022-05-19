@@ -3,7 +3,6 @@ import { PageOfCollections } from "./page.model";
 
 export class Shift {
   id: number;
-  organizationId: number;
   regionId: number;
   locationI: number;
   departmentId: number;
@@ -14,9 +13,8 @@ export class Shift {
   standardStartTime?: string;
   standardEndTime?: string;
 
-  constructor(shift: Shift, organizationId: number) {
+  constructor(shift: Shift) {
     this.id = shift.id;
-    this.organizationId = organizationId;
     this.regionId = shift.regionId;
     this.departmentId = shift.departmentId;
     this.name = shift.name;

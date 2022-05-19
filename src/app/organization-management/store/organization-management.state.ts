@@ -540,7 +540,7 @@ export class OrganizationManagementState {
   @Action(GetAssignedSkillsByPage)
   GetAssignedSkillsByPage({ patchState }: StateContext<OrganizationManagementStateModel>, { pageNumber, pageSize }: GetAssignedSkillsByPage): Observable<SkillsPage> {
     patchState({ isOrganizationLoading: true });
-    return this.skillsService.getAssignedSkills(pageNumber, pageSize, 2 /**TODO:  */).pipe(tap((payload) => {
+    return this.skillsService.getAssignedSkills(pageNumber, pageSize).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false, skills: payload });
       return payload;
     }));

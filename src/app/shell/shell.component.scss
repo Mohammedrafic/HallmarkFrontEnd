@@ -1,5 +1,44 @@
 @import '../styles/variables/colors.scss';
 
+.header {
+  height: 80px;
+  width: calc(100% - 62px);
+  position: fixed;
+  display: flex;
+  align-items: center;
+  z-index: 2;
+  background-color: $background;
+  padding-left: 60px;
+  transition: 0.6s all ease;
+
+  &.expanded {
+    width: calc(100% - 259px);
+    padding-left: 257px;
+  }
+
+  .header-item {
+    margin: 0 25px;
+    display: flex;
+    align-items: center;
+    color: $secondary-dark-blue-10;
+
+    h1 {
+      font-size: 1.17em;
+    }
+
+    .icon {
+      padding-left: 0;
+      padding-right: 14px;
+      height: 24px;
+      width: 24px;
+    }
+  }
+
+  .logout-button {
+    margin: 0 25px;
+  }
+}
+
 .shell {
   height: 100%;
 
@@ -218,32 +257,6 @@
 
     .icon {
       padding-right: 1rem;
-    }
-  }
-
-  .header {
-    height: 80px;
-    width: 100%;
-    position: fixed;
-    display: flex;
-    align-items: center;
-
-    .header-item {
-      margin: 0 25px;
-      display: flex;
-      align-items: center;
-      color: $secondary-dark-blue-10;
-
-      .icon {
-        padding-left: 0;
-        padding-right: 14px;
-        height: 24px;
-        width: 24px;
-      }
-    }
-
-    .logout-button {
-      margin: 0 25px;
     }
   }
 

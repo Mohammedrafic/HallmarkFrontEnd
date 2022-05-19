@@ -162,7 +162,7 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   public saveShift(): void {
     if (this.ShiftFormGroup.valid) {
       this.store.dispatch(new SaveShift(new Shift(
-        this.ShiftFormGroup.getRawValue(), 2 // TODO: remove after org selection implementation
+        this.ShiftFormGroup.getRawValue()
       )));
       this.store.dispatch(new SetDirtyState(false));
     } else {

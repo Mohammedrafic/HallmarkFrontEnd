@@ -26,8 +26,8 @@ export class ShiftsService {
    * @param pageSize
    * @return list of shifts
    */
-  public getShifts(pageNumber: number, pageSize: number, organizationId: number): Observable<ShiftsPage> {
-    return this.http.post<ShiftsPage>(`/api/MasterShifts/filter`, { organizationId: organizationId, pageNumber: pageNumber, pageSize: pageSize });
+  public getShifts(pageNumber: number, pageSize: number): Observable<ShiftsPage> {
+    return this.http.post<ShiftsPage>(`/api/MasterShifts/filter`, { pageNumber: pageNumber, pageSize: pageSize });
   }
 
   /**
