@@ -70,11 +70,7 @@ export class GroupMappingComponent extends AbstractGridConfigurationComponent im
   }
 
   mapGridData(): void {
-    // this.gridData$.subscribe(data => {
-    //   this.lastAvailablePage = this.getLastPage(data);
-    //   this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
-    //   this.totalDataRecords = data.length;
-    // });
+    // TODO: need implementation
   }
 
   onRowsDropDownChanged(): void {
@@ -82,12 +78,7 @@ export class GroupMappingComponent extends AbstractGridConfigurationComponent im
   }
 
   onGoToClick(event: any): void {
-    // if (event.currentPage || event.value) {
-    //   this.skillGroups$.subscribe(data => {
-    //     this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
-    //     this.currentPagerPage = event.currentPage || event.value;
-    //   });
-    // }
+    // TODO: need implementation
   }
 
   onFormCancelClick(): void {
