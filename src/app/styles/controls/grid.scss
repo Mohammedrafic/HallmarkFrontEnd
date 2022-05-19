@@ -80,6 +80,10 @@ ejs-grid.e-control.e-grid {
           background-color: $primary-active-blue-90;
         }
 
+        .e-rowcell {
+          font-size: 14px;
+        }
+
         .e-emptyrow {
           height: 100%;
           position: absolute;

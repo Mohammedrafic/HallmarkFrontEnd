@@ -90,7 +90,7 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
   public onRemove(data: any) {
     this.confirmService
       .confirm(
-        'Are you sure to inactivate the Candidate?',
+        'Are you sure you want to inactivate the Candidate?',
         { okButtonLabel: 'Inactivate',
           okButtonClass: 'delete-button',
           title: 'Inactivate the Candidate'
