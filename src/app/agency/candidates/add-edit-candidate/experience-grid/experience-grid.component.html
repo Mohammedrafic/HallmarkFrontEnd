@@ -29,7 +29,7 @@
         <ng-template #template let-data>{{data.endDate | date:"MM/yyyy"}}</ng-template>
       </e-column>
       <e-column field="comments" headerText="Comments" width=500></e-column>
-      <e-column textAlign="Right" minWidth="112" width="112" freeze="Right">
+      <e-column textAlign="Right" width="120">
         <ng-template #template let-data>
           <div class="e-grid-tool-buttons">
             <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>

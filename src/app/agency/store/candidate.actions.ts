@@ -28,12 +28,6 @@ export class SaveCandidateSucceeded {
   constructor(public payload: Candidate) {}
 }
 
-export class RemoveCandidateFromStore {
-  static readonly type = '[candidate] Remove Candidate From Store';
-  constructor() {}
-}
-
-
 export class GetAllSkills {
   static readonly type = '[candidate] Get All Skills';
   constructor() {}

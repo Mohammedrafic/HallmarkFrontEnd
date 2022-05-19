@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { GroupComponent } from './credentials/credentials-setup/group/group.component';
+import { AddEditSkillGroupComponent } from './credentials/credentials-setup/add-edit-skill-group/add-edit-skill-group.component';
 import { CredentialsComponent } from './credentials/credentials.component';
 import { DepartmentsComponent } from './departments/departments.component';
 import { LocationsComponent } from './locations/locations.component';
@@ -28,7 +28,7 @@ const routes: Routes = [
       },
       {
         path: 'credentials/groups-setup',
-        component: GroupComponent
+        component: AddEditSkillGroupComponent
       },
       {
         path: 'skills',

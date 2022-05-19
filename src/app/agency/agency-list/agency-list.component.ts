@@ -93,7 +93,7 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
   public onRemove(data: any) {
     this.confirmService
       .confirm(
-        'Are you sure you want to inactivate the Agency?',
+        'Are you sure to inactivate the Agency?',
         { okButtonLabel: 'Inactivate',
           okButtonClass: 'delete-button',
           title: 'Inactivate the Agency'

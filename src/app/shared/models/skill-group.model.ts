@@ -1,6 +1,6 @@
 import { Skill } from './skill.model';
 
-export class CredentialSkillGroup {
+export class SkillGroup {
   id?: number;
   name?: string;
   organizationId?: number;
@@ -8,7 +8,7 @@ export class CredentialSkillGroup {
   skillIds: number[];
   skillNames?: string[];
 
-  constructor(skillGroup: CredentialSkillGroup) {
+  constructor(skillGroup: SkillGroup) {
     if (skillGroup.id) {
       this.id = skillGroup.id;
     }

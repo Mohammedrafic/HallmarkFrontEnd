@@ -1,16 +1,8 @@
 import { Injectable } from '@angular/core';
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 
-import {
-  ToggleMobileView,
-  ToggleTheme,
-  SetHeaderState,
-  ToggleSidebarState,
-  SetIsFirstLoadState,
-  SetIsOrganizationAgencyArea
-} from './app.actions';
+import { ToggleMobileView, ToggleTheme, SetHeaderState, ToggleSidebarState, SetIsFirstLoadState } from './app.actions';
 import { HeaderState } from '../shared/models/header-state.model';
-import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 
 export interface AppStateModel {
   isMobile: boolean;
@@ -19,7 +11,6 @@ export interface AppStateModel {
   isLoading: boolean;
   isFirstLoad: boolean;
   isSidebarOpened: boolean;
-  isOrganizationAgencyArea: IsOrganizationAgencyAreaStateModel;
 }
 
 @State<AppStateModel>({
@@ -30,11 +21,7 @@ export interface AppStateModel {
     headerState: null,
     isLoading: false,
     isFirstLoad: true,
-    isSidebarOpened: false,
-    isOrganizationAgencyArea: {
-      isOrganizationArea: false,
-      isAgencyArea: false
-    }
+    isSidebarOpened: false
   },
 })
 @Injectable()
@@ -56,9 +43,6 @@ export class AppState {
 
   @Selector()
   static isSidebarOpened(state: AppStateModel): boolean { return state.isSidebarOpened; }
-
-  @Selector()
-  static isOrganizationAgencyArea(state: AppStateModel): IsOrganizationAgencyAreaStateModel { return state.isOrganizationAgencyArea; }
 
   @Action(ToggleMobileView)
   ToggleMobileView({ patchState }: StateContext<AppStateModel>, { payload }: ToggleMobileView): void {
@@ -83,10 +67,5 @@ export class AppState {
   @Action(SetIsFirstLoadState)
   SetIsFirstLoadState({ patchState }: StateContext<AppStateModel>, { payload }: SetIsFirstLoadState): void {
     patchState({ isFirstLoad: payload });
-  }
-
-  @Action(SetIsOrganizationAgencyArea)
-  SetIsOrganizationAgencyArea({ patchState }: StateContext<AppStateModel>, { payload }: SetIsOrganizationAgencyArea): void {
-    patchState({ isOrganizationAgencyArea: payload });
   }
 }

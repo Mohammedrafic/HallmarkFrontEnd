@@ -7,8 +7,8 @@ import { Location } from '../../shared/models/location.model';
 import { Region } from '../../shared/models/region.model';
 import { CredentialType } from '../../shared/models/credential-type.model';
 import { Credential } from '../../shared/models/credential.model';
-import { CredentialSkillGroup } from '../../shared/models/skill-group.model';
-import { CredentialSetup, CredentialSetupGetGroup } from '../../shared/models/credential-setup.model';
+import { SkillGroup } from '../../shared/models/skill-group.model';
+import { CredentialSetup } from '../../shared/models/credential-setup.model';
 import { OrganizationSettingsPost } from '@shared/models/organization-settings.model';
 
 export class SetGeneralStatesByCountry {
@@ -276,34 +276,34 @@ export class GetAllSkills {
   constructor() {}
 }
 
-export class GetCredentialSkillGroup {
-  static readonly type = '[organizationManagement] Get Credential Skill Group by Organization ID';
+export class GetSkillGroup {
+  static readonly type = '[organizationManagement] Get Skill Group by Organization ID';
   constructor(public payload: number) {}
 }
 
-export class SaveCredentialSkillGroup {
-  static readonly type = '[organizationManagement] Save Credential Skill Group';
-  constructor(public skillGroup: CredentialSkillGroup, public organizationId: number) { }
+export class SaveSkillGroup {
+  static readonly type = '[organizationManagement] Save Skill Group';
+  constructor(public skillGroup: SkillGroup, public organizationId: number) { }
 }
 
-export class UpdateCredentialSkillGroup {
-  static readonly type = '[organizationManagement] Update Credential Skill Group';
-  constructor(public credentialSkillGroup: CredentialSkillGroup, public organizationId: number) { }
+export class UpdateSkillGroup {
+  static readonly type = '[organizationManagement] Update Skill Group';
+  constructor(public skillGroup: SkillGroup, public organizationId: number) { }
 }
 
-export class RemoveCredentialSkillGroup {
-  static readonly type = '[organizationManagement] Remove Credential Skill Group';
-  constructor(public credentialSkillGroup: CredentialSkillGroup, public organizationId: number) { }
+export class RemoveSkillGroup {
+  static readonly type = '[organizationManagement] Remove Skill Group';
+  constructor(public skillGroup: SkillGroup, public organizationId: number) { }
 }
 
 export class GetCredentialSetup {
-  static readonly type = '[organizationManagement] Get Credential Setup by group of CredentialTypeId, OrganizationId, SkillGroupId, RegionId, PageNumber, PageSize';
-  constructor(public payload: CredentialSetupGetGroup) {}
+  static readonly type = '[organizationManagement] Get Credential Setup by Organization ID';
+  constructor(public payload: number) {}
 }
 
 export class SaveUpdateCredentialSetup {
   static readonly type = '[organizationManagement] Save Credential Setup';
-  constructor(public credentialSetup: CredentialSetup, public credentialSetupGetGroup: CredentialSetupGetGroup) { }
+  constructor(public credentialSetup: CredentialSetup, public organizationId: number) { }
 }
 
 export class GetOrganizationSettings {
