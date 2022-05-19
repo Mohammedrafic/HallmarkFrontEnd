@@ -1,15 +1,15 @@
-<div class="dropdown-container bootstrap">
+<div *ngIf="!isAgencyOrOrganization" class="dropdown-container bootstrap">
   <div class="input-group dropdown">
     <ejs-dropdownlist
       id="organization-agency-dropdown"
       cssClass="organization-agency-dropdown-popup"
       [fields]="optionFields"
-      [dataSource]="organizationAgencies"
+      [dataSource]="organizationsAgencies$ | async"
       [formControl]="organizationAgencyControl"
       popupHeight="402px">
       <ng-template #itemTemplate let-data>
         <div class="item-container">
-          <div class="logo-container">
+          <div *ngIf="data.logo" class="logo-container">
             <img [src]="data.logo" alt="logo">
           </div>
 
@@ -22,7 +22,7 @@
 
       <ng-template #valueTemplate let-data>
         <div class="value-container">
-          <div class="logo-container">
+          <div *ngIf="data.logo" class="logo-container">
             <img [src]="data.logo" alt="logo">
           </div>
 
@@ -31,4 +31,12 @@
       </ng-template>
     </ejs-dropdownlist>
   </div>
+</div>
+
+<div *ngIf="isAgencyOrOrganization" class="organization-agency-title-container">
+  <div *ngIf="organizationAgency?.logo" class="logo-container">
+    <img [src]="organizationAgency?.logo" alt="logo">
+  </div>
+
+  <p class="title">{{organizationAgency?.name}}</p>
 </div>

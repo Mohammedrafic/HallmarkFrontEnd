@@ -5,8 +5,6 @@
   </ng-container>
   <ng-container right>
     <ng-container *ngIf="!isSeccondStepActive">
-      <!-- TBD delete button -->
-      <!-- <button *ngIf="isAgencyCreated$ | async" ejs-button cssClass="e-danger" [isPrimary]="true"(click)="onDelete()">Delete</button> -->
       <button [disabled]="!agencyForm?.dirty" ejs-button cssClass="e-outline" (click)="onClear()">Clear</button>
       <button ejs-button [isPrimary]="true" [disabled]="isSaveDisabled" (click)="onSave()">Save</button>
     </ng-container>
@@ -76,7 +74,7 @@
     <e-tabitem>
       <ng-template #headerText>
         <div class="stepper-header">
-          <div class="stepper-title">Associated Organizations</div>
+          <div class="stepper-title">Associate Organizations</div>
           <div class="stepper-sub-title">Additional info here</div>
         </div>
       </ng-template>

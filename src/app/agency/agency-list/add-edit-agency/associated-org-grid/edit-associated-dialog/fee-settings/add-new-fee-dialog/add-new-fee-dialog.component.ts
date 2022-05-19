@@ -34,7 +34,7 @@ export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
   public feeExceptionsInitialData$: Observable<FeeExceptionsInitialData>;
 
   public targetElement: HTMLElement = document.body;
-  public editMode = true;
+  public editMode = false;
   public feeFormGroup: FormGroup = this.generateNewForm();
   public optionFields = {
     text: 'name',
@@ -118,7 +118,7 @@ export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
           regionIds: [feeData.regionId],
           classifications: [feeData.classification],
           masterSkillIds: [feeData.skillId],
-          fee: feeData.fee,
+          fee: String(feeData.fee),
         });
       }
     });
