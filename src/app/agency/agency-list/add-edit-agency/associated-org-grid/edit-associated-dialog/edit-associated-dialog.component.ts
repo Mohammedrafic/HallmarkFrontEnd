@@ -65,6 +65,7 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
     text: 'name',
     value: 'id',
   };
+  public firstActive = true;
 
   public classification = Object.values(FeeSettingsClassification)
     .filter(valuesOnly)
@@ -141,6 +142,10 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
       default:
         break;
     }
+  }
+
+  public onTabSelecting(): void {
+    this.firstActive = false;
   }
 
   private generateJobDistributionForm(): FormGroup {

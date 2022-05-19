@@ -1,19 +1,26 @@
 .edit-org {
-    padding-top: 24px;
+  padding-top: 24px;
 
-    .e-content.e-lib.e-touch {
-        padding-top: 24px;
+  .e-content.e-lib.e-touch {
+    padding-top: 24px;
+  }
+
+  &.first-active {
+    .e-tab .e-tab-header:not(.e-vertical) .e-indicator {
+      left: 0px !important;
+      right: 160px !important;
     }
+  }
 }
 
 .job-distribution {
-    label {
-        display: block;
-        margin-bottom: 5px;
-    }
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
 
-    .dropdown-container {
-        max-width: 50%;
-        margin-bottom: 12px;
-    }
+  .dropdown-container {
+    max-width: 50%;
+    margin-bottom: 12px;
+  }
 }
