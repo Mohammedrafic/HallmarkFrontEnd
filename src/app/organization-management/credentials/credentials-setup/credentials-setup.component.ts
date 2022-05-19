@@ -91,7 +91,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
 
   ngOnInit(): void {
     this.store.dispatch(new GetCredentialTypes());
-    this.store.dispatch(new GetCredential(this.fakeOrganizationId));
+    this.store.dispatch(new GetCredential());
     // this.store.dispatch(new GetCredentialSetup()); // TODO: uncomment after BE implementation
     // this.mapGridData(); // TODO: uncomment after BE implementation
   }
