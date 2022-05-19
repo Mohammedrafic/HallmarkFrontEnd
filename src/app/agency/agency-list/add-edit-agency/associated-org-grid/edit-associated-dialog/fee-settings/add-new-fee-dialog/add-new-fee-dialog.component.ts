@@ -118,7 +118,7 @@ export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
           regionIds: [feeData.regionId],
           classifications: [feeData.classification],
           masterSkillIds: [feeData.skillId],
-          fee: feeData.fee,
+          fee: String(feeData.fee),
         });
       }
     });

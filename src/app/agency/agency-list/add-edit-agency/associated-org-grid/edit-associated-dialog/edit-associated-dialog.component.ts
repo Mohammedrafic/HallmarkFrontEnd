@@ -175,7 +175,7 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
 
   private onBaseFeeChanged(): void {
     this.baseFee$.pipe(takeWhile(() => this.isAlive)).subscribe((baseFee) => {
-      this.feeSettingsForm.patchValue({ baseFee });
+      this.feeSettingsForm.patchValue({ baseFee: String(baseFee) });
     });
   }
 
