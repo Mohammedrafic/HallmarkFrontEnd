@@ -14,7 +14,7 @@ import {
   SaveDepartment,
   GetDepartmentsByLocationId,
   DeleteDepartmentById,
-  GetRegionsByOrganizationId,
+  GetRegions,
   UpdateDepartment,
   GetLocationsByRegionId,
   SetImportFileDialogState,
@@ -85,7 +85,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetRegionsByOrganizationId(this.fakeOrganizationId)); // TODO: provide valid organizationId
+    this.store.dispatch(new GetRegions());
   }
 
   onRegionDropDownChanged(event: ChangeEventArgs): void {

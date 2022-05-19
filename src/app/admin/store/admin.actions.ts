@@ -2,6 +2,7 @@ import { Country } from 'src/app/shared/enums/states';
 import { Organization } from 'src/app/shared/models/organization.model';
 import { SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { Skill } from 'src/app/shared/models/skill.model';
+import { CredentialType } from '@shared/models/credential-type.model';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[admin] Set General States By Country';
@@ -126,4 +127,29 @@ export class RemoveSkillsCategorySucceeded {
 export class GetAllSkills {
   static readonly type = '[admin] Get All Skills';
   constructor() {}
+}
+
+export class GetCredentialTypes {
+  static readonly type = '[organizationManagement] Get Credential Types';
+  constructor() { }
+}
+
+export class GetCredentialTypeById {
+  static readonly type = '[organizationManagement] Get Credential Type by ID';
+  constructor(public payload: CredentialType) { }
+}
+
+export class SaveCredentialType {
+  static readonly type = '[organizationManagement] Save Credential Type';
+  constructor(public payload: CredentialType) { }
+}
+
+export class RemoveCredentialType {
+  static readonly type = '[organizationManagement] Remove Credential Type by ID';
+  constructor(public payload: CredentialType) { }
+}
+
+export class UpdateCredentialType {
+  static readonly type = '[organizationManagement] Update Credential Type';
+  constructor(public payload: CredentialType) { }
 }

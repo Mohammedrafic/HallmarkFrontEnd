@@ -19,13 +19,9 @@ import {
 } from '@shared/constants/messages';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import {
-  GetCredentialTypes,
-  RemoveCredentialType,
-  SaveCredentialType,
-  UpdateCredentialType
-} from '../../../../organization-management/store/organization-management.actions';
-import { OrganizationManagementState } from '../../../../organization-management/store/organization-management.state';
+
+import { AdminState } from '@admin/store/admin.state';
+import { GetCredentialTypes, RemoveCredentialType, SaveCredentialType, UpdateCredentialType } from '@admin/store/admin.actions';
 
 @Component({
   selector: 'app-master-credentials-types',
@@ -36,7 +32,7 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
 
-  @Select(OrganizationManagementState.credentialTypes)
+  @Select(AdminState.credentialTypes)
   credentialType$: Observable<CredentialType[]>;
 
   credentialTypeFormGroup: FormGroup;
@@ -145,11 +141,12 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
   }
 
   mapGridData(): void {
-    // TODO: map credential types by id
     this.credentialType$.subscribe(data => {
-      this.lastAvailablePage = this.getLastPage(data);
-      this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
-      this.totalDataRecords = data.length;
+      if (data) {
+        this.lastAvailablePage = this.getLastPage(data);
+        this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
+        this.totalDataRecords = data.length;
+      }
     });
   }
 

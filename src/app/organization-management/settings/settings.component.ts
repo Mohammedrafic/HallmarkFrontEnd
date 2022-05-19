@@ -21,7 +21,7 @@ import {
   GetDepartmentsByLocationId,
   GetLocationsByRegionId,
   GetOrganizationSettings,
-  GetRegionsByOrganizationId,
+  GetRegions,
   SaveOrganizationSettings,
 } from '../store/organization-management.actions';
 import { ShowSideDialog } from '../../store/app.actions';
@@ -110,8 +110,8 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetOrganizationSettings(this.fakeOrganizationId)); // TODO: replace with valid organizationId after BE implementation
-    this.store.dispatch(new GetRegionsByOrganizationId(this.fakeOrganizationId)); // TODO: replace with valid organizationId after BE implementation
+    this.store.dispatch(new GetOrganizationSettings());
+    this.store.dispatch(new GetRegions());
     this.mapGridData();
     this.subscribeToRegionLocationDepartment();
     this.isEditOverrideAccessible();
@@ -207,7 +207,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
         value: dynamicValue
       }
 
-      this.store.dispatch(new SaveOrganizationSettings(setting, this.fakeOrganizationId));  // TODO: uncomment after override functionality implementation
+      this.store.dispatch(new SaveOrganizationSettings(setting));
       this.store.dispatch(new ShowSideDialog(false));
       this.removeActiveCssClass();
       this.clearFormDetails();

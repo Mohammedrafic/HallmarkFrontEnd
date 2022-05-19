@@ -76,9 +76,9 @@ export class DeleteDepartmentById {
   constructor(public department: Department) { }
 }
 
-export class GetRegionsByOrganizationId {
+export class GetRegions {
   static readonly type = '[organizationManagement] Get The List Of Regions';
-  constructor(public organizationId: number) { }
+  constructor() { }
 }
 
 export class SaveRegion {
@@ -93,7 +93,7 @@ export class UpdateRegion {
 
 export class DeleteRegionById {
   static readonly type = '[organizationManagement] Delete Region by id';
-  constructor(public regionId: number, public organizationId: number) { }
+  constructor(public regionId: number) { }
 }
 
 export class GetLocationsByOrganizationId {
@@ -307,13 +307,13 @@ export class SaveUpdateCredentialSetup {
 }
 
 export class GetOrganizationSettings {
-  static readonly type = '[organizationManagement] Get Organization Settings by Organization ID';
-  constructor(public payload: number) {}
+  static readonly type = '[organizationManagement] Get Organization Settings';
+  constructor() {}
 }
 
 export class SaveOrganizationSettings {
   static readonly type = '[organizationManagement] Save Organization Settings';
-  constructor(public organizationSettings: OrganizationSettingsPost, public organizationId: number) { }
+  constructor(public organizationSettings: OrganizationSettingsPost) { }
 }
 
 export class ClearDepartmentList {

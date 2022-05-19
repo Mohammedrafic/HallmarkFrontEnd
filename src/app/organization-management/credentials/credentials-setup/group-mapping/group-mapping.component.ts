@@ -13,7 +13,7 @@ import { Region } from '@shared/models/region.model';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Location } from '@shared/models/location.model';
 import { Department } from '@shared/models/department.model';
-import { GetRegionsByOrganizationId } from '../../../store/organization-management.actions';
+import { GetRegions } from '../../../store/organization-management.actions';
 
 @Component({
   selector: 'app-group-mapping',
@@ -57,7 +57,7 @@ export class GroupMappingComponent extends AbstractGridConfigurationComponent im
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetRegionsByOrganizationId(this.fakeOrganizationId)); // TODO: replace with valid after BE implementation
+    this.store.dispatch(new GetRegions());
   }
 
   onEditButtonClick(data: any, event: any): void {
