@@ -6,7 +6,7 @@ import { filter, Observable, Subscription, takeWhile } from 'rxjs';
 
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
-import { DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import {DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT} from '@shared/constants/messages';
 import {
   Agency,
   AgencyBillingDetails,
@@ -161,7 +161,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   public onBack(): void {
     if (this.agencyForm.dirty) {
       this.confirmService
-        .confirm(DELETE_RECORD_TEXT, {
+        .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button',
