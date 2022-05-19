@@ -1,9 +1,7 @@
-import { Country } from "src/app/shared/enums/states";
-import { Organization } from "src/app/shared/models/organization.model";
-import { SkillCategory } from "src/app/shared/models/skill-category.model";
-import { Skill } from "src/app/shared/models/skill.model";
-import { CredentialType } from '../../shared/models/credential-type.model';
-import { Credential } from '../../shared/models/credential.model';
+import { Country } from 'src/app/shared/enums/states';
+import { Organization } from 'src/app/shared/models/organization.model';
+import { SkillCategory } from 'src/app/shared/models/skill-category.model';
+import { Skill } from 'src/app/shared/models/skill.model';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[admin] Set General States By Country';
@@ -148,56 +146,6 @@ export class RemoveAssignedSkill {
 export class RemoveAssignedSkillSucceeded {
   static readonly type = '[admin] Remove Assigned Skill by ID Succeeded';
   constructor() { }
-}
-
-export class GetCredentialTypes {
-  static readonly type = '[Admin] Get Credential Types';
-  constructor() { }
-}
-
-export class GetCredentialTypeById {
-  static readonly type = '[Admin] Get Credential Type by ID';
-  constructor(public payload: CredentialType) { }
-}
-
-export class SaveCredentialType {
-  static readonly type = '[admin] Save Credential Type';
-  constructor(public payload: CredentialType) { }
-}
-
-export class RemoveCredentialType {
-  static readonly type = '[admin] Remove Credential Type by ID';
-  constructor(public payload: CredentialType) { }
-}
-
-export class UpdateCredentialType {
-  static readonly type = '[admin] Update Credential Type';
-  constructor(public payload: CredentialType) { }
-}
-
-export class GetCredential {
-  static readonly type = '[Admin] Get Credential list by business unit id';
-  constructor(public payload: number | undefined) { }
-}
-
-export class GetCredentialById {
-  static readonly type = '[Admin] Get Credential by ID';
-  constructor(public payload: Credential) { }
-}
-
-export class SaveCredential {
-  static readonly type = '[admin] Save Credential';
-  constructor(public payload: Credential) { }
-}
-
-export class UpdateCredential {
-  static readonly type = '[admin] Update Credential';
-  constructor(public credential: Credential, public businessUnitId: number) { }
-}
-
-export class RemoveCredential {
-  static readonly type = '[admin] Remove Credential by ID';
-  constructor(public payload: Credential) { }
 }
 
 export class GetAllSkills {

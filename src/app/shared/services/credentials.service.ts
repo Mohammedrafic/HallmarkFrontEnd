@@ -51,8 +51,8 @@ export class CredentialsService {
    * Get credential list
    * @return list of credentials
    */
-  public getCredential(businessUnitId: number | undefined): Observable<Credential[]> {
-    return this.http.get<Credential[]>(`/api/MasterCredentials/businessUnitId/${businessUnitId}`);
+  public getCredential(): Observable<Credential[]> {
+    return this.http.get<Credential[]>(`/api/MasterCredentials/all`);
   }
 
   /**

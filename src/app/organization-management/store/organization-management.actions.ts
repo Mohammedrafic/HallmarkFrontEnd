@@ -247,8 +247,8 @@ export class UpdateCredentialType {
 }
 
 export class GetCredential {
-  static readonly type = '[organizationManagement] Get Credential list by business unit id';
-  constructor(public payload: number | undefined) { }
+  static readonly type = '[organizationManagement] Get Credential list';
+  constructor() { }
 }
 
 export class GetCredentialById {
@@ -263,7 +263,7 @@ export class SaveCredential {
 
 export class UpdateCredential {
   static readonly type = '[organizationManagement] Update Credential';
-  constructor(public credential: Credential, public businessUnitId: number) { }
+  constructor(public credential: Credential) { }
 }
 
 export class RemoveCredential {

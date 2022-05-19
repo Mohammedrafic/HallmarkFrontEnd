@@ -57,7 +57,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetCredential(this.fakeOrganizationId));
+    this.store.dispatch(new GetCredential());
     this.store.dispatch(new GetCredentialTypes());
     this.mapGridData();
   }
@@ -131,7 +131,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
           comment: this.credentialsFormGroup.controls['comment'].value,
         });
 
-        this.store.dispatch(new UpdateCredential(credential, this.fakeOrganizationId));
+        this.store.dispatch(new UpdateCredential(credential));
         this.isEdit = false;
         this.editedCredentialId = undefined;
       } else {

@@ -36,29 +36,21 @@ import {
   RemoveAssignedSkill,
   SaveAssignedSkillSucceeded,
   RemoveAssignedSkillSucceeded,
-  GetCredentialTypes,
-  SaveCredentialType,
-  RemoveCredentialType,
-  GetCredential,
-  SaveCredential,
-  RemoveCredential,
-  UpdateCredential,
   GetOrganizationLogo,
   GetOrganizationLogoSucceeded,
-  UpdateCredentialType,
   GetAllSkills
 } from './admin.actions';
-import { GeneralPhoneTypes } from '../../shared/constants/general-phone-types';
-import { SkillsService } from '../../shared/services/skills.service';
-import { CategoriesService } from '../../shared/services/categories.service';
+import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
+import { SkillsService } from '@shared/services/skills.service';
+import { CategoriesService } from '@shared/services/categories.service';
 import { Skill, SkillsPage } from 'src/app/shared/models/skill.model';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
-import { CredentialType } from '../../shared/models/credential-type.model';
-import { Credential } from '../../shared/models/credential.model';
+import { CredentialType } from '@shared/models/credential-type.model';
+import { Credential } from '@shared/models/credential.model';
 import { RECORD_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
-import { CandidateStateModel } from '../../agency/store/candidate.state';
+import { CandidateStateModel } from '@agency/store/candidate.state';
 import { CredentialsService } from '@shared/services/credentials.service';
 
 interface DropdownOption {
@@ -88,10 +80,6 @@ export interface AdminStateModel {
   skillsCategories: SkillCategoriesPage | null;
   allSkillsCategories: SkillCategoriesPage | null;
   isDirty: boolean;
-  credentialTypes: CredentialType[];
-  credentials: Credential[];
-  isCredentialTypesLoading: boolean;
-  isCredentialLoading: boolean;
 }
 
 @State<AdminStateModel>({
@@ -118,11 +106,7 @@ export interface AdminStateModel {
     skills: null,
     skillsCategories: null,
     allSkillsCategories: null,
-    isDirty: false,
-    credentialTypes: [],
-    credentials: [],
-    isCredentialTypesLoading: false,
-    isCredentialLoading: false,
+    isDirty: false
   },
 })
 @Injectable()
@@ -172,17 +156,10 @@ export class AdminState {
   @Selector()
   static allSkillsCategories(state: AdminStateModel): SkillCategoriesPage | null { return state.allSkillsCategories; }
 
-  @Selector()
-  static credentialTypes(state: AdminStateModel): CredentialType[] { return state.credentialTypes; }
-
-  @Selector()
-  static credentials(state: AdminStateModel): Credential[] { return state.credentials }
-
   constructor(
     private organizationService: OrganizationService,
     private skillsService: SkillsService,
-    private categoriesService: CategoriesService,
-    private credentialsService: CredentialsService,
+    private categoriesService: CategoriesService
   ) { }
 
   @Action(SetGeneralStatesByCountry)
@@ -363,90 +340,6 @@ export class AdminState {
       return payload;
     }),
     catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Skill cannot be deleted')))));
-  }
-
-  @Action(GetCredentialTypes)
-  GetCredentialTypes({ patchState }: StateContext<AdminStateModel>, { }: GetCredentialTypes): Observable<CredentialType[]> {
-  return this.credentialsService.getCredentialTypes().pipe(tap((payload) => {
-      patchState({ credentialTypes: payload });
-      return payload;
-    }));
-  }
-
-  @Action(SaveCredentialType)
-  SaveCredentialTypes({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveCredentialType): Observable<CredentialType> {
-    return this.credentialsService.saveUpdateCredentialType(payload).pipe(tap((payload) => {
-      patchState({ isCredentialTypesLoading: false });
-      dispatch(new GetCredentialTypes());
-      return payload;
-    }));
-  }
-
-  @Action(UpdateCredentialType)
-  UpdateCredentialTypes({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: UpdateCredentialType): Observable<CredentialType> {
-    return this.credentialsService.saveUpdateCredentialType(payload).pipe(tap((payload) => {
-      patchState({ isCredentialLoading: false });
-      dispatch(new GetCredentialTypes());
-      return payload;
-    }));
-  }
-
-  @Action(RemoveCredentialType)
-  RemoveCredentialTypes({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveCredentialType): Observable<any> {
-    return this.credentialsService.removeCredentialType(payload).pipe(tap((payload) => {
-      patchState({ isCredentialTypesLoading: false });
-      dispatch(new GetCredentialTypes());
-      return payload;
-    }),
-    catchError((error: any) =>  dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
-  }
-
-  @Action(GetCredential)
-  GetCredential({ patchState }: StateContext<AdminStateModel>, { payload }: GetCredential): Observable<Credential[]> {
-    return this.credentialsService.getCredential(payload).pipe(tap((payload) => {
-      patchState({ credentials: payload });
-      return payload;
-    }));
-  }
-
-  @Action(SaveCredential)
-  SaveCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveCredential): Observable<Credential | void> {
-    return this.credentialsService.saveCredential(payload)
-      .pipe(
-        tap((payload) => {
-          patchState({ isCredentialLoading: false });
-          dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-          dispatch(new GetCredential(payload.businessUnitId));
-          return payload;
-        }),
-        catchError((error: any) => {
-          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
-        })
-      );
-  }
-
-  @Action(UpdateCredential)
-  UpdateCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { credential, businessUnitId }: UpdateCredential): Observable<Credential | void> {
-    return this.credentialsService.updateCredential(credential).pipe(tap((payload) => {
-      patchState({ isCredentialLoading: false });
-      dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      dispatch(new GetCredential(businessUnitId));
-      return payload;
-    }),
-      catchError((error: any) => {
-        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
-      })
-    );
-  }
-
-  @Action(RemoveCredential)
-  RemoveCredential({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveCredential): Observable<any> {
-    return this.credentialsService.removeCredential(payload).pipe(tap(() => {
-      patchState({ isCredentialLoading: false });
-      dispatch(new GetCredential(payload.businessUnitId));
-      return payload;
-    }),
-    catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
   }
 
   @Action(GetAllSkills)

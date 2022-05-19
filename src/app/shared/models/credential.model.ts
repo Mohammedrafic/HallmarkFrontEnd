@@ -3,7 +3,7 @@ export class Credential {
   credentialTypeId: number;
   credentialTypeName?: string;
   name: string;
-  businessUnitId?: number;
+  businessUnitId?: number; // TODO: pending remove
   expireDateApplicable: boolean;
   comment?: string;
 
