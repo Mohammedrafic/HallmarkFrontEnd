@@ -17,17 +17,20 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from
 import { ActivatedRoute, Router } from "@angular/router";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
-import { CANCEL_COFIRM_TEXT, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from "@shared/constants/messages";
+import {
+  DELETE_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE
+} from "@shared/constants/messages";
 import { CredentialVerifiedStatus, STATUS_COLOR_GROUP } from "@shared/enums/status";
 import { CandidateCredential, CandidateCredentialPage, CredentialFile } from "@shared/models/candidate-credential.model";
 import { CredentialType } from "@shared/models/credential-type.model";
 import { ConfirmService } from "@shared/services/confirm.service";
 import { valuesOnly } from "@shared/utils/enum.utils";
 import { FieldSettingsModel } from "@syncfusion/ej2-angular-dropdowns";
-import { DropDownListComponent } from "@syncfusion/ej2-angular-dropdowns/src/drop-down-list/dropdownlist.component";
 import { GridComponent } from "@syncfusion/ej2-angular-grids";
 import { FileInfo, SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
-import { ItemModel } from "@syncfusion/ej2-angular-navigations";
 import { debounceTime, delay, filter, merge, Observable, Subject, takeUntil } from "rxjs";
 import { SetHeaderState, ShowSideDialog } from "src/app/store/app.actions";
 
@@ -162,7 +165,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public closeDialog(): void {
     if (this.addCredentialForm.dirty) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT)
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
           this.closeSideDialog()

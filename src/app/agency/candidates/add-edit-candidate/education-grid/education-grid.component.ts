@@ -8,13 +8,17 @@ import {
   GetEducationByCandidateId,
   RemoveEducation,
   RemoveEducationSucceeded,
-  RemoveExperienceSucceeded,
   SaveEducation,
   SaveEducationSucceeded
 } from "src/app/agency/store/candidate.actions";
 import { CandidateState } from "src/app/agency/store/candidate.state";
 import { AbstractGridConfigurationComponent } from "src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
-import { CANCEL_COFIRM_TEXT, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from "src/app/shared/constants/messages";
+import {
+  DELETE_CONFIRM_TEXT,
+  DELETE_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE
+} from "src/app/shared/constants/messages";
 import { Degree } from "src/app/shared/enums/degree-types";
 import { Education } from "src/app/shared/models/education.model";
 import { ConfirmService } from "src/app/shared/services/confirm.service";
@@ -106,7 +110,11 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
   public closeDialog(): void {
     if (this.educationForm.dirty) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT)
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
           this.closeSideDialog()

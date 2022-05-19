@@ -28,6 +28,7 @@ import {
   GetEducationByCandidateId,
   GetExperienceByCandidateId,
   GetMasterCredentials,
+  RemoveCandidateFromStore,
   RemoveCandidatesCredential,
   RemoveCandidatesCredentialSucceeded,
   RemoveEducation,
@@ -152,6 +153,11 @@ export class CandidateState {
         return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
       })
     );
+  }
+
+  @Action(RemoveCandidateFromStore)
+  RemoveCandidateFromStore({ patchState }: StateContext<CandidateStateModel>, { }: GetAllSkills): void {
+    patchState({ candidate: null });
   }
 
   @Action(GetAllSkills)
