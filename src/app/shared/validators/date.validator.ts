@@ -5,7 +5,7 @@ export function startDateValidator(form: AbstractControl, controlName: string, m
     if (form && control.value) {
       const isLessThanMin = control.value < minDate;
       if (form.get(controlName)?.value) {
-        const forbidden = isLessThanMin || control.value > new Date(form.get(controlName)?.value);
+        const forbidden = isLessThanMin || control.value >= new Date(form.get(controlName)?.value);
         return forbidden ? {invalidDate: {value: control.value}} : null;
       } else {
         const forbidden = isLessThanMin;
@@ -21,7 +21,7 @@ export function endDateValidator(form: AbstractControl, controlName: string, min
     if (form && control.value) {
       const isLessThanMin = control.value < minDate;
       if (form.get(controlName)?.value) {
-        const forbidden = isLessThanMin || control.value < new Date(form.get(controlName)?.value);
+        const forbidden = isLessThanMin || control.value <= new Date(form.get(controlName)?.value);
         return forbidden ? {invalidDate: { value: control.value }} : null;
       } else {
         const forbidden = isLessThanMin;
