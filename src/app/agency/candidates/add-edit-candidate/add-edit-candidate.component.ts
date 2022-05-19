@@ -1,16 +1,14 @@
-import { CandidateAgencyComponent } from "@agency/candidates/add-edit-candidate/candidate-agency/candidate-agency.component";
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from "@angular/forms";
 
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
-import { CreatedCandidateStatus } from "@shared/enums/status";
 import { SelectEventArgs, TabComponent } from "@syncfusion/ej2-angular-navigations";
 import { filter, Observable, Subject, takeUntil } from "rxjs";
 
 import { CandidateGeneralInfoComponent } from "src/app/agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component";
 import { CandidateProfessionalSummaryComponent } from "src/app/agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component";
 import { CandidateState } from "src/app/agency/store/candidate.state";
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "src/app/shared/constants/messages";
+import { CANCEL_COFIRM_TEXT } from "src/app/shared/constants/messages";
 import { ConfirmService } from "src/app/shared/services/confirm.service";
 import { CandidateContactDetailsComponent } from "./candidate-contact-details/candidate-contact-details.component";
 import { SetHeaderState } from "src/app/store/app.actions";
@@ -19,7 +17,6 @@ import {
   GetCandidateByIdSucceeded,
   GetCandidatePhoto,
   GetCandidatePhotoSucceeded,
-  RemoveCandidateFromStore,
   SaveCandidate,
   SaveCandidateSucceeded,
   UploadCandidatePhoto
@@ -45,7 +42,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   private fetchedCandidate: Candidate;
 
   @Select(CandidateState.isCandidateCreated)
-  public isCandidateCreated$: Observable<boolean>;
+  private isCandidateCreated$: Observable<boolean>;
 
   constructor(private store: Store,
               private fb: FormBuilder,
@@ -81,7 +78,6 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.store.dispatch(new RemoveCandidateFromStore());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
@@ -93,11 +89,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   public navigateBack(): void {
     if (this.candidateForm.dirty) {
       this.confirmService
-        .confirm(DELETE_CONFIRM_TEXT, {
-          title: DELETE_CONFIRM_TITLE,
-          okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button',
-        })
+        .confirm(CANCEL_COFIRM_TEXT)
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
           this.navigateToCandidates();
@@ -110,16 +102,6 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   public save(): void {
     if (this.candidateForm.valid) {
       const candidate = this.getCandidateRequestObj(this.candidateForm.getRawValue());
-
-      if (!candidate.id) {
-        candidate.candidateAgencyStatus = CreatedCandidateStatus.Active;
-        candidate.profileStatus = CreatedCandidateStatus.Active;
-        this.candidateForm.get('generalInfo')?.patchValue({
-          profileStatus: CreatedCandidateStatus.Active,
-          candidateAgencyStatus: CreatedCandidateStatus.Active
-        });
-      }
-
       this.store.dispatch(new SaveCandidate(candidate));
     } else {
       this.candidateForm.markAllAsTouched();
@@ -171,7 +153,6 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
 
   private generateCandidateForm(): void {
     this.candidateForm = this.fb.group({
-      agency: CandidateAgencyComponent.createFormGroup(),
       generalInfo: CandidateGeneralInfoComponent.createFormGroup(),
       contactDetails: CandidateContactDetailsComponent.createFormGroup(),
       profSummary: CandidateProfessionalSummaryComponent.createFormGroup(),
@@ -187,7 +168,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   private patchAgencyFormValue({ agencyId, firstName, middleName, lastName, email, dob, classification, profileStatus,
                                  candidateAgencyStatus, ssn, candidateProfileContactDetail, professionalSummary, candidateProfileSkills }: Candidate) {
     this.candidateForm.get('generalInfo')?.patchValue({
-      firstName, middleName, lastName, dob,
+      agencyId, firstName, middleName, lastName, email, dob,
       classification, profileStatus, candidateAgencyStatus, ssn,
       candidateProfileSkills: candidateProfileSkills.map(skill => skill.id),
     });
@@ -197,34 +178,23 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
       city: candidateProfileContactDetail.city,
       zip: candidateProfileContactDetail.zip,
       address1: candidateProfileContactDetail.address1,
-      address2: candidateProfileContactDetail.address2,
       phone1: candidateProfileContactDetail.phone1,
       phone2: candidateProfileContactDetail.phone2,
-      email
     });
     this.candidateForm.get('profSummary')?.patchValue({ professionalSummary });
-    this.candidateForm.get('agency')?.patchValue({ agencyId });
   }
 
   private getCandidateRequestObj(formValue: any): Candidate {
     return {
       id: this.fetchedCandidate?.id,
       ...formValue.generalInfo,
-      agencyId: formValue.agency.agencyId,
-      email: formValue.contactDetails.email,
       professionalSummary: formValue.profSummary.professionalSummary,
       candidateProfileContactDetail: {
         candidateProfileId: this.fetchedCandidate?.candidateProfileContactDetail.candidateProfileId,
+        address2: this.fetchedCandidate?.candidateProfileContactDetail.address2,
         phoneType1: this.fetchedCandidate?.candidateProfileContactDetail.phoneType1,
         phoneType2: this.fetchedCandidate?.candidateProfileContactDetail.phoneType2,
-        country: formValue.contactDetails.country,
-        state: formValue.contactDetails.state,
-        city: formValue.contactDetails.city,
-        zip: formValue.contactDetails.zip,
-        address1: formValue.contactDetails.address1,
-        address2: formValue.contactDetails.address2,
-        phone1: formValue.contactDetails.phone1,
-        phone2: formValue.contactDetails.phone2
+        ...formValue.contactDetails
       }
     };
   }

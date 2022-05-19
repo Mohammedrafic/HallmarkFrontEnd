@@ -39,12 +39,10 @@ import { LocationsComponent } from './locations/locations.component';
 import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
 import { SkillsComponent } from './skills/skills.component';
 import { ShiftsComponent } from './shifts/shifts.component';
-import { GroupSetupComponent } from './credentials/credentials-setup/group-setup/group-setup.component';
+import { AddEditSkillGroupComponent } from './credentials/credentials-setup/add-edit-skill-group/add-edit-skill-group.component';
 import { SettingsComponent } from './settings/settings.component';
 import { CredentialsComponent } from './credentials/credentials.component';
 import { CredentialsListComponent } from './credentials/credentials-list/credentials-list.component';
-import { GroupMappingComponent } from './credentials/credentials-setup/group-mapping/group-mapping.component';
-import { GroupComponent } from './credentials/credentials-setup/group/group.component';
 
 const sidebarIcons = {
   Download,
@@ -73,10 +71,8 @@ const sidebarIcons = {
     CredentialsListComponent,
     SkillsComponent,
     ShiftsComponent,
-    GroupSetupComponent,
+    AddEditSkillGroupComponent,
     SettingsComponent,
-    GroupMappingComponent,
-    GroupComponent,
   ],
   imports: [
     CommonModule,

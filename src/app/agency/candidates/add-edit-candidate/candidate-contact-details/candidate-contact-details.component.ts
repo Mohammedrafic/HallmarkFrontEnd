@@ -28,13 +28,11 @@ export class CandidateContactDetailsComponent {
 
   static createFormGroup(): FormGroup {
     return new FormGroup({
-      email: new FormControl(null, [Validators.email, Validators.maxLength(200), Validators.pattern(/\S+@\S+\.com/)]),
       country: new FormControl(null),
       state: new FormControl(null),
       city: new FormControl(null, [Validators.maxLength(20)]),
       zip: new FormControl(null, [Validators.minLength(5), Validators.maxLength(6), Validators.pattern(/^[0-9]+$/)]),
       address1: new FormControl(null, [Validators.maxLength(100)]),
-      address2: new FormControl(null, [Validators.maxLength(100)]),
       phone1: new FormControl(null, [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       phone2: new FormControl(null, [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
     });

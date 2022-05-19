@@ -65,7 +65,6 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
     text: 'name',
     value: 'id',
   };
-  public firstActive = true;
 
   public classification = Object.values(FeeSettingsClassification)
     .filter(valuesOnly)
@@ -144,10 +143,6 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  public onTabSelecting(): void {
-    this.firstActive = false;
-  }
-
   private generateJobDistributionForm(): FormGroup {
     return new FormGroup({
       regionIds: new FormControl([], [Validators.required]),
@@ -175,7 +170,7 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
 
   private onBaseFeeChanged(): void {
     this.baseFee$.pipe(takeWhile(() => this.isAlive)).subscribe((baseFee) => {
-      this.feeSettingsForm.patchValue({ baseFee: String(baseFee) });
+      this.feeSettingsForm.patchValue({ baseFee });
     });
   }
 

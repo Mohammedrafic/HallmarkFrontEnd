@@ -61,10 +61,8 @@
       </div>
 
       <div class="stick-right header-content">
-        <ng-container *ngIf="(isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea">
-          <app-organization-agency-selector></app-organization-agency-selector>
-          <div class="devider"></div>
-        </ng-container>
+        <app-organization-agency-selector></app-organization-agency-selector>
+        <div class="devider"></div>
         <div class="header-item">{{ (user$ | async)?.businessUnitName }}</div>
 
         <!-- Temporary solution to log out from the application -->

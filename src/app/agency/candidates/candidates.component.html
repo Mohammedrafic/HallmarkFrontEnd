@@ -49,13 +49,13 @@
       <e-column headerText="Job Start Date" textAlign="Right"></e-column>
       <e-column textAlign="Right" width="120" freeze="Right">
         <ng-template #template let-data>
-          <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
-              <span><i-feather name="edit" class="icon"></i-feather></span>
-            </button>
-            <button ejs-button [disabled]="data.profileStatus === statusEnum.Inactive" cssClass="e-flat secondary-icon-button" (click)="onRemove(data)">
-              <span><i-feather name="trash-2" class="icon"></i-feather></span>
-            </button>
+          <div class="e-grid-tool-buttons">
+            <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>
+            <span class="remove-button"
+                  *ngIf="data.profileStatus !== statusEnum.Inactive"
+                  (click)="onRemove(data)">
+              <i-feather name="trash-2" class="icon"></i-feather>
+            </span>
           </div>
         </ng-template>
       </e-column>

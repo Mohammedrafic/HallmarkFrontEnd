@@ -13,12 +13,7 @@ import {
 } from "src/app/agency/store/candidate.actions";
 import { CandidateState } from "src/app/agency/store/candidate.state";
 import { AbstractGridConfigurationComponent } from "src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
-import {
-  DELETE_CONFIRM_TEXT,
-  DELETE_CONFIRM_TITLE,
-  DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE
-} from "src/app/shared/constants/messages";
+import { CANCEL_COFIRM_TEXT, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from "src/app/shared/constants/messages";
 import { Experience } from "src/app/shared/models/experience.model";
 import { ConfirmService } from "src/app/shared/services/confirm.service";
 import { ShowSideDialog } from "src/app/store/app.actions";
@@ -101,11 +96,7 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
   public closeDialog(): void {
     if (this.experienceForm.dirty) {
       this.confirmService
-        .confirm(DELETE_CONFIRM_TEXT, {
-          title: DELETE_CONFIRM_TITLE,
-          okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button',
-        })
+        .confirm(CANCEL_COFIRM_TEXT)
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
           this.closeSideDialog()

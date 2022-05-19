@@ -1,4 +1,3 @@
-import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { MessageTypes } from '../shared/enums/message-types';
 import { HeaderState } from '../shared/models/header-state.model';
 
@@ -35,9 +34,4 @@ export class ShowToast {
 export class ShowSideDialog {
   static readonly type = '[app] Set Side Dialog Showing state';
   constructor(public isDialogShown: boolean) { }
-}
-
-export class SetIsOrganizationAgencyArea {
-  static readonly type = '[app] Set Is Organization/Agency Area';
-  constructor(public payload: IsOrganizationAgencyAreaStateModel) { }
 }

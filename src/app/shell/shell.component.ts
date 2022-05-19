@@ -2,7 +2,6 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 import { ContextMenuComponent, NodeSelectEventArgs, SidebarComponent, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
@@ -59,9 +58,6 @@ export class ShellPageComponent implements OnInit, OnDestroy {
 
   @Select(UserState.menu)
   menu$: Observable<Menu>;
-
-  @Select(AppState.isOrganizationAgencyArea)
-  isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
 
   constructor(private store: Store,
               private router: Router) { }

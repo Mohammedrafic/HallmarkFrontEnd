@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { UsersPage } from 'src/app/shared/models/user.model';
 import { BusinessUnitType } from '../enums/business-unit-type';
 import { Menu } from '../models/menu.model';
-import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -25,31 +24,5 @@ export class UserService {
    */
   public getUserMenuConfig(businessUnitType: BusinessUnitType): Observable<Menu> {
     return this.http.get<Menu>(`/api/Menu`, { params: { BusinessUnitType: businessUnitType }});
-  }
-
-  /**
-   * Get users menu configuration by business unit type
-   * @returns list of user's agencies
-   */
-  public getUserAgencies(): Observable<UserAgencyOrganization> {
-    return this.http.get<UserAgencyOrganization>(`/api/Users/agencies`);
-  }
-
-  /**
-   * Get users menu configuration by business unit type
-   * @returns list of user's organizations
-   */
-  public getUserOrganizations(): Observable<UserAgencyOrganization> {
-    return this.http.get<UserAgencyOrganization>(`/api/Users/organizations`);
-  }
-
-  /**
-   * Add User Organization Access Setting
-   * @param lasSelectedOrganizationAgency
-   * @returns void
-   */
-  public saveLastSelectedOrganizationAgencyId(lasSelectedOrganizationAgency: LasSelectedOrganizationAgency): Observable<void> {
-    const { lastSelectedOrganizationId, lastSelectedAgencyId } = lasSelectedOrganizationAgency;
-    return this.http.post<void>('/api/Users/savestate', { lastSelectedOrganizationId, lastSelectedAgencyId });
   }
 }

@@ -12,7 +12,7 @@ export const MENU_CONFIG: any = {
     },
     3: { // Agency
       icon: 'clock',
-      route: 'agency/agency-list'
+      route: ''
     },
     4: { // MSP
       icon: 'package',
@@ -48,11 +48,11 @@ export const MENU_CONFIG: any = {
     },
     14: { // Candidates
       icon: 'file-text',
-      route: 'agency/candidates'
+      route: ''
     },
     15: { // Timesheets
       icon: 'clock',
-      route: ''
+      route: '' 
     },
     16: { // Invoices
       icon: 'dollar-sign',
@@ -72,7 +72,7 @@ export const MENU_CONFIG: any = {
     },
     20: { // Agency List
       icon: '',
-      route: 'agency/agency-list'
+      route: ''
     },
     21: { // Associated Organizations
       icon: 'file-text',
@@ -84,7 +84,7 @@ export const MENU_CONFIG: any = {
     },
     23: { // Candidates
       icon: 'file-text',
-      route: 'agency/candidates'
+      route: ''
     },
     24: { // Timesheets
       icon: 'clock',
@@ -127,7 +127,7 @@ export const MENU_CONFIG: any = {
     },
     3: { // Agency
       icon: 'clock',
-      route: 'agency/agency-list'
+      route: ''
     },
     4: { // MSP
       icon: 'package',
@@ -163,11 +163,11 @@ export const MENU_CONFIG: any = {
     },
     14: { // Candidates
       icon: 'file-text',
-      route: 'agency/candidates'
+      route: ''
     },
     15: { // Timesheets
       icon: 'clock',
-      route: ''
+      route: '' 
     },
     16: { // Invoices
       icon: 'dollar-sign',
@@ -187,7 +187,7 @@ export const MENU_CONFIG: any = {
     },
     20: { // Agency List
       icon: '',
-      route: 'agency/agency-list'
+      route: ''
     },
     21: { // Associated Organizations
       icon: 'file-text',
@@ -199,7 +199,7 @@ export const MENU_CONFIG: any = {
     },
     23: { // Candidates
       icon: 'file-text',
-      route: 'agency/candidates'
+      route: ''
     },
     24: { // Timesheets
       icon: 'clock',
@@ -242,7 +242,7 @@ export const MENU_CONFIG: any = {
     },
     3: { // Agency
       icon: 'clock',
-      route: 'agency/agency-list'
+      route: ''
     },
     4: { // MSP
       icon: 'package',
@@ -278,11 +278,11 @@ export const MENU_CONFIG: any = {
     },
     14: { // Candidates
       icon: 'file-text',
-      route: 'agency/candidates'
+      route: ''
     },
     15: { // Timesheets
       icon: 'clock',
-      route: ''
+      route: '' 
     },
     16: { // Invoices
       icon: 'dollar-sign',
@@ -292,7 +292,7 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    18: { // Settings
+    18: { // Settings 
       icon: 'user',
       route: 'client/organization-management'
     },
@@ -302,7 +302,7 @@ export const MENU_CONFIG: any = {
     },
     20: { // Agency List
       icon: '',
-      route: 'agency/agency-list'
+      route: ''
     },
     21: { // Associated Organizations
       icon: 'file-text',
@@ -314,7 +314,7 @@ export const MENU_CONFIG: any = {
     },
     23: { // Candidates
       icon: 'file-text',
-      route: 'agency/candidates'
+      route: ''
     },
     24: { // Timesheets
       icon: 'clock',
@@ -357,7 +357,7 @@ export const MENU_CONFIG: any = {
     },
     3: { // Agency
       icon: 'clock',
-      route: 'agency/agency-list'
+      route: ''
     },
     4: { // MSP
       icon: 'package',
@@ -393,11 +393,11 @@ export const MENU_CONFIG: any = {
     },
     14: { // Candidates
       icon: 'file-text',
-      route: 'agency/candidates'
+      route: ''
     },
     15: { // Timesheets
       icon: 'clock',
-      route: ''
+      route: '' 
     },
     16: { // Invoices
       icon: 'dollar-sign',
@@ -407,7 +407,7 @@ export const MENU_CONFIG: any = {
       icon: 'trello',
       route: ''
     },
-    18: { // Settings
+    18: { // Settings 
       icon: 'user',
       route: ''
     },
@@ -417,7 +417,7 @@ export const MENU_CONFIG: any = {
     },
     20: { // Agency List
       icon: '',
-      route: 'agency/agency-list'
+      route: ''
     },
     21: { // Associated Organizations
       icon: 'file-text',

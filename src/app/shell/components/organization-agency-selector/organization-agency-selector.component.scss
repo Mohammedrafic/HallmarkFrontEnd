@@ -47,18 +47,3 @@
     @include with-ellipsis;
   }
 }
-
-.organization-agency-title-container {
-  display: flex;
-  max-width: 231px;
-  margin-right: 30px;
-  .logo-container {
-    margin-right: 12px;
-  }
-  .title {
-    font-size: 14px;
-    font-weight: 700;
-    color: $secondary-dark-blue-15;
-    @include with-ellipsis;
-  }
-}

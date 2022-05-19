@@ -14,9 +14,6 @@ import { GRID_CONFIG } from 'src/app/shared/constants/grid-config';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { AssociateOrganizations, AssociateOrganizationsPage } from 'src/app/shared/models/associate-organizations.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { JOB_DISTRIBUTION_COLUMNS } from './associated-org-grid.constant';
-
-
 @Component({
   selector: 'app-associated-org-grid',
   templateUrl: './associated-org-grid.component.html',
@@ -33,7 +30,6 @@ export class AssociatedOrgGridComponent extends AbstractGridConfigurationCompone
 
   public openAssosiateOrgDialog = new EventEmitter<boolean>();
   public openEditDialog = new EventEmitter<AssociateOrganizations>();
-  public jobDistributionColumns = JOB_DISTRIBUTION_COLUMNS;
 
   private isAlive = true;
 
