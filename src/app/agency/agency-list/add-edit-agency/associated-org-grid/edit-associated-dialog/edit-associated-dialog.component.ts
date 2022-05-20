@@ -105,7 +105,7 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
   }
 
   public onCancel(): void {
-    if ((this.feeSettingsForm && this.feeSettingsForm.value.baseFee) || this.jobDistributionForm.dirty) {
+    if ((this.feeSettingsForm.dirty && this.feeSettingsForm.value.baseFee) || this.jobDistributionForm.dirty) {
       this.confirmService
         .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
