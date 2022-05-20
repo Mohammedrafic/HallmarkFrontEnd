@@ -74,7 +74,7 @@ export class CandidateGeneralInfoComponent {
       candidateProfileSkills: new FormControl(null, [Validators.required]),
       profileStatus: new FormControl(2, [Validators.required]),
       candidateAgencyStatus: new FormControl(2, [Validators.required]),
-      ssn: new FormControl(null, [Validators.minLength(9), Validators.pattern(/^[0-9\s\-]+$/)]),
+      ssn: new FormControl(null),
     });
   }
 }
