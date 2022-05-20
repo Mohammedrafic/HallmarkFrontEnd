@@ -179,7 +179,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    this.store.dispatch(new LogoutUser());
+    this.store.dispatch(new LogoutUser()).subscribe(() => this.router.navigate(['/login']));
   }
 
   private setSideBarForFirstLoad(route: string): void {

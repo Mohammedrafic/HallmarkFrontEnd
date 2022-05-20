@@ -124,6 +124,11 @@ export class SaveCandidatesCredentialSucceeded {
   constructor(public payload: CandidateCredential) { }
 }
 
+export class SaveCandidatesCredentialFailed {
+  static readonly type = '[candidate] Save Candidates Credential Failed';
+  constructor() { }
+}
+
 export class RemoveCandidatesCredential {
   static readonly type = '[candidate] Remove Candidates Credential';
   constructor(public payload: CandidateCredential) { }

@@ -34,8 +34,8 @@
     <e-column field="glNumber" headerText="gl number" width=200></e-column>
     <e-column field="allowOnboard" headerText="allow onboard" width=150>
       <ng-template #template let-data>
-        <div class="grid-checkbox bootstrap">
-          <ejs-checkbox [checked]="data.allowOnboard" label=""></ejs-checkbox>
+        <div class="bootstrap">
+          <ejs-checkbox [checked]="data.allowOnboard" (change)="allowOnBoardChange(data, $event)" label=""></ejs-checkbox>
         </div>
       </ng-template>
     </e-column>

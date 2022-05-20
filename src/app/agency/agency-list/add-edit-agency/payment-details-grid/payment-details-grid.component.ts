@@ -1,9 +1,9 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
+import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 
-import { GridComponent, PageSettingsModel, ValueAccessor } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, ValueAccessor } from '@syncfusion/ej2-angular-grids';
 
 import { GRID_CONFIG } from 'src/app/shared/constants/grid-config';
 import { valuesOnly } from 'src/app/shared/utils/enum.utils';
@@ -86,7 +86,6 @@ export class PaymentDetailsGridComponent extends AbstractGridConfigurationCompon
   public addNew(): void {
     this.isEditMode = false;
     this.paymentDetailsForm = this.generatePaymentForm();
-    this.paymentDetailsForm.patchValue({ mode: PaymentDetailMode.Manual });
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -110,7 +109,7 @@ export class PaymentDetailsGridComponent extends AbstractGridConfigurationCompon
 
   private generatePaymentForm(): FormGroup {
     return this.fb.group({
-      mode: new FormControl({ value: PaymentDetailMode.Manual }, [Validators.required]),
+      mode: new FormControl(PaymentDetailMode.Electronic, [Validators.required]),
       payee: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       address: new FormControl('', [Validators.maxLength(500)]),
       city: new FormControl('', [Validators.maxLength(20)]),

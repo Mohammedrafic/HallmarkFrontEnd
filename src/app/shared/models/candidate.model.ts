@@ -3,7 +3,7 @@ import { PageOfCollections } from "./page.model";
 export class Candidate {
   id?: number;
   agencyId: number;
-  ssn: number;
+  ssn: number | null;
   firstName: string;
   middleName: string;
   lastName: string;

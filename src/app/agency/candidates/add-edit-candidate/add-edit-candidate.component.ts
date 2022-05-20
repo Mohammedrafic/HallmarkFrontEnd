@@ -109,8 +109,12 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
 
   public save(): void {
     if (this.candidateForm.valid) {
-      const candidate = this.getCandidateRequestObj(this.candidateForm.getRawValue());
-
+      let candidate = this.getCandidateRequestObj(this.candidateForm.getRawValue());
+      candidate = {
+        ...candidate,
+        ssn: candidate.ssn ? +candidate.ssn : null
+      };
+      
       if (!candidate.id) {
         candidate.candidateAgencyStatus = CreatedCandidateStatus.Active;
         candidate.profileStatus = CreatedCandidateStatus.Active;
@@ -188,7 +192,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
                                  candidateAgencyStatus, ssn, candidateProfileContactDetail, professionalSummary, candidateProfileSkills }: Candidate) {
     this.candidateForm.get('generalInfo')?.patchValue({
       firstName, middleName, lastName, dob,
-      classification, profileStatus, candidateAgencyStatus, ssn,
+      classification, profileStatus, candidateAgencyStatus, ssn: String(ssn),
       candidateProfileSkills: candidateProfileSkills.map(skill => skill.id),
     });
     this.candidateForm.get('contactDetails')?.patchValue({

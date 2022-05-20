@@ -37,6 +37,7 @@ import {
   RemoveExperienceSucceeded,
   SaveCandidate,
   SaveCandidatesCredential,
+  SaveCandidatesCredentialFailed,
   SaveCandidatesCredentialSucceeded,
   SaveCandidateSucceeded,
   SaveEducation,
@@ -294,7 +295,10 @@ export class CandidateState {
         dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
         return payload;
       }),
-      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, 'Credential already exists')))
+      catchError((error: any) => {
+        dispatch(new SaveCandidatesCredentialFailed());
+        return dispatch(new ShowToast(MessageTypes.Error, 'Credential already exists'));
+      })
     );
   }
 

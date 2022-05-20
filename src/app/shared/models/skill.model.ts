@@ -14,15 +14,14 @@ export class Skill {
   inactiveDate?: string | null;
   isDefault?: boolean;
 
-  constructor(skill: Skill, organizationId?: number) {
+  constructor(skill: Skill, assigned: boolean = false) {
     this.id = skill.id || 0;
     this.skillCategoryId = skill.skillCategoryId;
     this.skillAbbr = skill.skillAbbr;
     this.skillDescription = skill.skillDescription;
     this.isDefault = skill.isDefault;
 
-    if (organizationId) {
-      this.organizationId = organizationId;
+    if (assigned) {
       this.inactiveDate = skill.inactiveDate || null;
       this.allowOnboard = skill.allowOnboard || false;
       this.glNumber = skill.glNumber;

@@ -61,7 +61,6 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
 
     const user = this.store.selectSnapshot(UserState.user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
-    this.businessControl.patchValue(user?.businessUnitId || 0);
     if (user?.businessUnitType) {
       this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
       this.isBusinessFormDisabled && this.businessForm.disable();
@@ -70,6 +69,8 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
       const [Hallmark, ...rest] = this.businessUnits;
       this.businessUnits = rest;
     }
+    this.businessControl.patchValue(this.isBusinessFormDisabled ? user?.businessUnitId : 0);
+
 
     this.actions$
       .pipe(

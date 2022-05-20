@@ -21,6 +21,7 @@ import { RoleTreeField } from '../roles-and-permissions/role-form/role-form.comp
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants/messages';
+import { HttpErrorResponse } from '@angular/common/http';
 
 const BUSINNESS_DATA_DEFAULT_VALUE = { id: 0, name: 'All' };
 
@@ -136,9 +137,7 @@ export class SecurityState {
   @Action(SaveRole)
   SaveRole({ patchState, getState, dispatch }: StateContext<SecurityStateModel>, { role }: SaveRole): Observable<Role | void> {
     const state = getState();
-    const existingRoleNames = state.rolesPage?.items.map(({ name }) => name);
-
-    return !existingRoleNames?.includes(role.name) ? this.roleService.seveRoles(role).pipe(
+    return this.roleService.seveRoles(role).pipe(
       tap((payload) => {
         if (state.rolesPage && role.id) {
           const editedRole = state.rolesPage.items.find(({ id }) => id === role.id) as Role;
@@ -154,8 +153,9 @@ export class SecurityState {
         }
         dispatch(new SaveRoleSucceeded(payload));
         return payload;
-      })
-    ) : dispatch(new ShowToast(MessageTypes.Error, 'Role Name already exists'));
+      }),
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+    );
   }
 
   @Action(RemoveRole)

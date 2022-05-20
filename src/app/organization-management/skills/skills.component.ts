@@ -88,6 +88,24 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     this.store.dispatch(new ShowSideDialog(true));
   }
 
+  public allowOnBoardChange(data: Skill, event: any): void {
+    console.log(data);
+    data.allowOnboard = event.checked;
+    this.store.dispatch(new SaveAssignedSkill(new Skill(
+      {
+        id: data.id,
+        isDefault: data.masterSkill?.isDefault || false,
+        masterSkillId: data.masterSkill?.id as number,
+        skillAbbr: data.masterSkill?.skillAbbr || '',
+        skillCategoryId: data.skillCategory?.id as number,
+        skillDescription: data.masterSkill?.skillDescription as string,
+        glNumber: data.glNumber,
+        allowOnboard: data.allowOnboard,
+        inactiveDate: data.inactiveDate
+      }, true
+    )));
+  }
+
   private skillFieldsHandler(disable: boolean): void {
     if (disable) {
       this.SkillFormGroup.controls['skillAbbr'].disable();
@@ -157,7 +175,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   public saveSkill(): void {
     if (this.SkillFormGroup.valid) {
       this.store.dispatch(new SaveAssignedSkill(new Skill(
-        this.SkillFormGroup.getRawValue()
+        this.SkillFormGroup.getRawValue(), true
       )));
       this.store.dispatch(new SetDirtyState(false));
     } else {

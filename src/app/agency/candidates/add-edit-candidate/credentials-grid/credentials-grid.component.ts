@@ -7,6 +7,7 @@ import {
   RemoveCandidatesCredential,
   RemoveCandidatesCredentialSucceeded,
   SaveCandidatesCredential,
+  SaveCandidatesCredentialFailed,
   SaveCandidatesCredentialSucceeded,
   UploadCredentialFiles,
   UploadCredentialFilesSucceeded,
@@ -50,6 +51,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public dropElement: HTMLElement;
   public addCredentialForm: FormGroup;
   public searchCredentialForm: FormGroup;
+  public disabledCopy = false;
   public credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public optionFields = { text: 'text', value: 'id' };
   public verifiedStatuses = Object.values(CredentialVerifiedStatus)
@@ -114,6 +116,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     });
     this.actions$.pipe(ofActionSuccessful(SaveCandidatesCredentialSucceeded)).subscribe((credential: { payload: CandidateCredential }) => {
       this.credentialId = credential.payload.id as number;
+      this.disabledCopy = false;
       this.uploadFiles(this.credentialId);
 
       if (!this.removeFiles) {
@@ -121,6 +124,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
         this.addCredentialForm.markAsPristine();
         this.closeDialog();
       }
+    });
+    this.actions$.pipe(ofActionSuccessful(SaveCandidatesCredentialFailed)).subscribe(() => {
+      this.disabledCopy = false;
     });
     this.actions$.pipe(ofActionSuccessful(UploadCredentialFilesSucceeded)).subscribe(() => {
       this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
@@ -202,6 +208,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public onCopy(event: MouseEvent, data: any) {
     event.stopPropagation();
+    this.disabledCopy = true;
     this.masterCredentialId = data.masterCredentialId;
     this.saveCredential(data);
   }
@@ -333,7 +340,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       .pipe(takeUntil(this.unsubscribe$), debounceTime(300))
       .subscribe(() => {
         this.store.dispatch(new GetMasterCredentials(
-          this.searchTermControl?.value,
+          this.searchTermControl?.value || '',
           this.credentialTypeIdControl?.value || ''
         ));
       });
