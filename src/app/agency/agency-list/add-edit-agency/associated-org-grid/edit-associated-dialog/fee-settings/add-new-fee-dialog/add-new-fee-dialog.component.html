@@ -69,14 +69,7 @@
         <div class="input-container">
           <label>Fee %<span class="required">*</span></label>
           <div class="input-group">
-            <ejs-maskedtextbox
-              class="e-input"
-              promptChar="_"
-              mask='00.00'
-              appValidateWithMessage
-              formControlName="fee"
-              placeholder="% 5.00">
-            </ejs-maskedtextbox>
+            <input appValidateWithMessage formControlName="fee" class="e-input" placeholder="% 5.00" maxlength="2"/>
           </div>
         </div>
       </section>
