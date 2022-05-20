@@ -317,11 +317,11 @@ export class SaveOrganizationSettings {
 }
 
 export class ClearDepartmentList {
-  static readonly type = '[admin] Clear Department list';
+  static readonly type = '[organizationManagement] Clear Department list';
   constructor() { }
 }
 
 export class ClearLocationList {
-  static readonly type = '[admin] Clear Location list';
+  static readonly type = '[organizationManagement] Clear Location list';
   constructor() { }
 }
