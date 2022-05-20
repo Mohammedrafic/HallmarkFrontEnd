@@ -42,14 +42,6 @@
             <div class="row-tool-buttons">
               <button
                 ejs-button
-                cssClass="e-flat default-icon-button"
-                (click)="onOverrideButtonClick(data)"
-                [disabled]="(!data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment) || !hasAccess"
-              >
-                <span class="edit-button" ><i-feather name="plus" class="icon"></i-feather></span>
-              </button>
-              <button
-                ejs-button
                 cssClass="e-flat primary-icon-button"
                 (click)="onEditButtonClick(data, child, $event)"
                 [disabled]="!data.overridableByOrganization || !hasAccess"
@@ -170,7 +162,7 @@
       </div>
     </div>
 
-    <div>
+    <form [formGroup]="regionFormGroup" *ngIf="isEdit">
       <div class="input-container bootstrap">
         <label for="region">Region</label>
         <div class="input-group dropdown">
@@ -178,15 +170,33 @@
             id="region"
             placeholder="Region"
             [dataSource]="regions$ | async"
-            [fields]="regionFields"
+            [fields]="regionLocationFields"
             (change)="onRegionChange($event)"
-            [(value)]="selectedRegion">
+            [enabled]="!isParentEdit"
+            formControlName="regionId">
           </ejs-dropdownlist>
         </div>
       </div>
-    </div>
+    </form>
 
-    <div>
+    <form [formGroup]="regionRequiredFormGroup" *ngIf="!isEdit">
+      <div class="input-container bootstrap">
+        <label for="regionRequired">Region <span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            id="regionRequired"
+            placeholder="Region"
+            appValidateWithMessage
+            [dataSource]="regions$ | async"
+            [fields]="regionLocationFields"
+            (change)="onRegionChange($event)"
+            formControlName="regionId">
+          </ejs-dropdownlist>
+        </div>
+      </div>
+    </form>
+
+    <form [formGroup]="locationFormGroup">
       <div class="input-container bootstrap">
         <label for="location">Location</label>
         <div class="input-group dropdown">
@@ -194,15 +204,16 @@
             id="location"
             placeholder="Location"
             [dataSource]="locations$ | async"
-            [fields]="locationFields"
+            [fields]="regionLocationFields"
             (change)="onLocationChange($event)"
-            [(value)]="selectedLocation">
+            [enabled]="!isParentEdit"
+            formControlName="locationId">
           </ejs-dropdownlist>
         </div>
       </div>
-    </div>
+    </form>
 
-    <div>
+    <form [formGroup]="departmentFormGroup">
       <div class="input-container bootstrap">
         <label for="department">Department</label>
         <div class="input-group dropdown">
@@ -212,11 +223,12 @@
             [dataSource]="departments$ | async"
             [fields]="departmentFields"
             (change)="onDepartmentChange($event)"
-            [(value)]="selectedDepartment">
+            [enabled]="!isParentEdit"
+            formControlName="departmentId">
           </ejs-dropdownlist>
         </div>
       </div>
-    </div>
+    </form>
 
     <div [ngSwitch]="formControlType">
       <div class="input-container" *ngSwitchCase="organizationSettingControlType.Checkbox">
@@ -231,13 +243,15 @@
       </div>
 
       <div class="input-container datepicker bootstrap" *ngSwitchCase="organizationSettingControlType.DateTime">
-        <label for="datepicker">Value</label>
-        <div class="input-group">
+        <label for="datepicker">Value <span class="required">*</span></label>
+        <div class="input-group datepicker">
           <ejs-datepicker
             id="datepicker"
             class="datepicker"
             format="MM/dd/yyyy"
             placeholder="MM/DD/YYYY"
+            appValidateWithMessage
+            [showClearButton]="false"
             [enableMask]="true"
             [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
             formControlName="value"
@@ -287,12 +301,13 @@
       </div>
 
       <div class="input-container dropdown bootstrap" *ngSwitchCase="organizationSettingControlType.Select">
-        <label for="dropdown">Value</label>
+        <label for="dropdown">Value  <span class="required">*</span></label>
         <div class="input-group">
           <ejs-dropdownlist
             id="dropdown"
             [dataSource]="dropdownDataSource"
             [fields]="dropdownFields"
+            appValidateWithMessage
             placeholder="Value"
             formControlName="value"
           ></ejs-dropdownlist>
@@ -300,12 +315,12 @@
       </div>
 
       <div class="input-container dropdown bootstrap" *ngSwitchCase="organizationSettingControlType.Multiselect">
-        <label for="dropdownMulti">Value</label>
+        <label for="dropdownMulti">Value <span class="required">*</span></label>
         <div class="input-group">
           <ejs-multiselect
-            #multiSelectComponent
             id="dropdownMulti"
             mode="CheckBox"
+            appValidateWithMessage
             [allowFiltering]="false"
             [dataSource]="dropdownDataSource"
             [fields]="dropdownFields"

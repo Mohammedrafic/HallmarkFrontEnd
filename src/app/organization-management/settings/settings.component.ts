@@ -2,7 +2,7 @@ import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { DetailRowService, GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { Department } from '@shared/models/department.model';
 import { Location } from '@shared/models/location.model';
@@ -11,10 +11,11 @@ import {
   OrganizationSettingsDropDownOption,
   OrganizationSettingsGet,
   OrganizationSettingsPost,
-  OrganizationSettingValidation, OrganizationSettingValueOptions
+  OrganizationSettingValidation,
+  OrganizationSettingValueOptions
 } from '@shared/models/organization-settings.model';
 import { OrganizationSettingControlType } from '@shared/enums/organization-setting-control-type';
-import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import {
   ClearDepartmentList,
   ClearLocationList,
@@ -22,7 +23,7 @@ import {
   GetLocationsByRegionId,
   GetOrganizationSettings,
   GetRegions,
-  SaveOrganizationSettings,
+  SaveOrganizationSettings
 } from '../store/organization-management.actions';
 import { ShowSideDialog } from '../../store/app.actions';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
@@ -48,11 +49,12 @@ export enum TextFieldTypeControl {
 })
 export class SettingsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
-  @ViewChild('gridPager') pager: PagerComponent;
-  @ViewChild('multiSelectComponent') multiSelectComponent: MultiSelectComponent;
-  public isAllDropDownOptionsSelected = false;
 
   public organizationSettingsFormGroup: FormGroup;
+  public regionFormGroup: FormGroup;
+  public regionRequiredFormGroup: FormGroup;
+  public locationFormGroup: FormGroup;
+  public departmentFormGroup: FormGroup;
   public formBuilder: FormBuilder;
 
   @Select(OrganizationManagementState.organizationSettings)
@@ -60,22 +62,18 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
 
   @Select(OrganizationManagementState.regions)
   regions$: Observable<Region[]>;
-  public regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  public selectedRegion: number | null;
 
   @Select(OrganizationManagementState.locationsByRegionId)
   locations$: Observable<Location[]>;
-  public locationFields: FieldSettingsModel = { text: 'name', value: 'id' };
-  public selectedLocation: number | null;
+
+  public regionLocationFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   @Select(OrganizationManagementState.departments)
   departments$: Observable<Department[]>;
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
-  public selectedDepartment: number | null;
-
-  private fakeOrganizationId = 2; // TODO: remove after BE implementation
 
   public isEdit: boolean;
+  public isParentEdit = false;
   public hasAccess = false;
   public isFormShown = false;
   public organizationSettingControlType = OrganizationSettingControlType;
@@ -107,6 +105,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     super();
     this.formBuilder = builder;
     this.createSettingsForm();
+    this.createRegionLocationDepartmentForm();
   }
 
   ngOnInit(): void {
@@ -125,7 +124,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   public onOverrideButtonClick(data: any): void {
     this.isFormShown = true;
     this.formControlType = data.controlType;
-    this.regionChanged(this.initialRegionId);
+    this.regionChanged(this.invalidId);
     this.locationChanged(this.invalidId);
     this.departmentChanged(this.invalidId);
     this.setFormValidation(data);
@@ -141,10 +140,11 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.setFormValidation(parentRecord);
 
     if (!childRecord) {
+      this.isParentEdit = true;
       this.organizationHierarchy = OrganizationHierarchy.Organization;
       this.organizationHierarchyId = parentRecord.organizationId;
       this.regionChanged(this.invalidId);
-      this.setFormValuesForEdit(parentRecord, true);
+      this.setFormValuesForEdit(parentRecord, null);
     } else {
       this.childRecord = childRecord;
       if (childRecord.regionId) {
@@ -161,7 +161,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
         this.departmentChanged(childRecord.departmentId);
       }
 
-      this.setFormValuesForEdit(parentRecord, false);
+      this.setFormValuesForEdit(parentRecord, childRecord);
     }
 
     this.store.dispatch(new ShowSideDialog(true));
@@ -183,35 +183,22 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   }
 
   public onFormSaveClick(): void {
-    if (this.organizationSettingsFormGroup.valid) {
-      let dynamicValue: any;
-
-      if (this.organizationSettingsFormGroup.controls['controlType'].value === OrganizationSettingControlType.Multiselect) {
-        const options: string[] = [];
-        this.organizationSettingsFormGroup.controls['value'].value
-          .forEach((item: string) => options.push(item));
-        dynamicValue = options.join(';');
-      } else if (this.organizationSettingsFormGroup.controls['controlType'].value === OrganizationSettingControlType.Checkbox)  {
-        dynamicValue = this.organizationSettingsFormGroup.controls['value'].value
-          ? this.organizationSettingsFormGroup.controls['value'].value.toString() : 'false';
-      } else if (this.organizationSettingsFormGroup.controls['controlType'].value === OrganizationSettingControlType.Text) {
-        dynamicValue = this.organizationSettingsFormGroup.controls['value'].value.toString()
+    if (this.isEdit) {
+      if (this.organizationSettingsFormGroup.valid) {
+        this.sendForm();
       } else {
-        dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
+        this.organizationSettingsFormGroup.markAllAsTouched();
       }
-
-      const setting: OrganizationSettingsPost = {
-        settingKey: this.organizationSettingsFormGroup.controls['settingKey'].value,
-        hierarchyId: this.organizationHierarchyId,
-        hierarchyLevel: this.organizationHierarchy,
-        value: dynamicValue
+    } else {
+      if (this.regionRequiredFormGroup.valid) {
+        if (this.organizationSettingsFormGroup.valid) {
+          this.sendForm();
+        } else {
+          this.organizationSettingsFormGroup.markAllAsTouched();
+        }
+      } else {
+        this.regionRequiredFormGroup.markAllAsTouched();
       }
-
-      this.store.dispatch(new SaveOrganizationSettings(setting));
-      this.store.dispatch(new ShowSideDialog(false));
-      this.removeActiveCssClass();
-      this.clearFormDetails();
-      this.isFormShown = false;
     }
   }
 
@@ -271,6 +258,45 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     }
   }
 
+  private sendForm(): void {
+    let dynamicValue: any;
+
+    switch (this.organizationSettingsFormGroup.controls['controlType'].value) {
+      case OrganizationSettingControlType.Multiselect:
+        const options: string[] = [];
+        if (this.organizationSettingsFormGroup.controls['value'].value) {
+          this.organizationSettingsFormGroup.controls['value'].value
+            .forEach((item: string) => options.push(item));
+        }
+        dynamicValue = options.join(';');
+        break;
+      case OrganizationSettingControlType.Checkbox:
+        dynamicValue = this.organizationSettingsFormGroup.controls['value'].value
+          ? this.organizationSettingsFormGroup.controls['value'].value.toString() : 'false';
+        break;
+      case OrganizationSettingControlType.Text:
+        dynamicValue = this.organizationSettingsFormGroup.controls['value'].value.toString()
+        break;
+      default:
+        dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;
+        break;
+    }
+
+    const setting: OrganizationSettingsPost = {
+      settingValueId: this.organizationSettingsFormGroup.controls['settingValueId'].value,
+      settingKey: this.organizationSettingsFormGroup.controls['settingKey'].value,
+      hierarchyId: this.organizationHierarchyId,
+      hierarchyLevel: this.organizationHierarchy,
+      value: dynamicValue
+    }
+
+    this.store.dispatch(new SaveOrganizationSettings(setting));
+    this.store.dispatch(new ShowSideDialog(false));
+    this.removeActiveCssClass();
+    this.clearFormDetails();
+    this.isFormShown = false;
+  }
+
   private setFormValidation(data: any): void {
     let validators: ValidatorFn[] = [];
     data.validations.forEach((validation: OrganizationSettingValidation) => {
@@ -304,57 +330,47 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   private setFormValuesForOverride(data: any): void {
     if (this.formControlType === OrganizationSettingControlType.Multiselect
       || this.formControlType === OrganizationSettingControlType.Select) {
-      this.dropdownDataSource = data.valueOptions
+      this.dropdownDataSource = data.valueOptions;
     }
 
-    setTimeout(() => {
-      this.organizationSettingsFormGroup.setValue({
-        settingKey: data.settingKey,
-        controlType: data.controlType,
-        name: data.name,
-        value: null
-      });
-
-      if (this.multiSelectComponent) {
-        this.multiSelectComponent.selectAll(true);
-      }
+    this.organizationSettingsFormGroup.setValue({
+      settingValueId: null,
+      settingKey: data.settingKey,
+      controlType: data.controlType,
+      name: data.name,
+      value: null
     });
   }
 
-  private setFormValuesForEdit(data: any, isParent: boolean): void {
+  private setFormValuesForEdit(parentData: any, childData: any): void {
     let dynamicValue: any;
 
     if (this.formControlType === OrganizationSettingControlType.Checkbox) {
-      dynamicValue = isParent ? data.value === 'true' : data.children[0].value === 'true';
+      dynamicValue = this.isParentEdit ? parentData.value === 'true' : childData.value === 'true';
     }
 
     if (this.formControlType === OrganizationSettingControlType.DateTime
       || this.formControlType === OrganizationSettingControlType.Text) {
-      dynamicValue = isParent ? data.value : data.children[0].value;
+      dynamicValue = this.isParentEdit ? parentData.value : childData.value;
     }
 
     if (this.formControlType === OrganizationSettingControlType.Multiselect) {
-      this.dropdownDataSource = data.valueOptions;
-      dynamicValue = isParent ? this.getDropDownOptionIds(data.value) : this.getDropDownOptionIds(data.children[0].value);
+      this.dropdownDataSource = parentData.valueOptions;
+      dynamicValue = this.isParentEdit ? this.getDropDownOptionIds(parentData.value) : this.getDropDownOptionIds(childData.value);
     }
 
     if (this.formControlType === OrganizationSettingControlType.Select) {
-      this.dropdownDataSource = data.valueOptions;
-      dynamicValue = isParent ? this.getDropDownOptionIds(data.value) : this.getDropDownOptionIds(data.children[0].value);
+      this.dropdownDataSource = parentData.valueOptions;
+      dynamicValue = this.isParentEdit ? this.getDropDownOptionIds(parentData.value) : this.getDropDownOptionIds(childData.value);
       dynamicValue = dynamicValue.length !== 0 ? dynamicValue[0] : '';
     }
 
-    setTimeout(() => {
-      this.organizationSettingsFormGroup.setValue({
-        settingKey: data.settingKey,
-        controlType: data.controlType,
-        name: data.name,
-        value: dynamicValue
-      });
-
-      if (dynamicValue && dynamicValue.length === 0 && this.multiSelectComponent) {
-        this.multiSelectComponent.selectAll(true);
-      }
+    this.organizationSettingsFormGroup.setValue({
+      settingValueId: this.isParentEdit ? null : childData.settingValueId,
+      settingKey: parentData.settingKey,
+      controlType: parentData.controlType,
+      name: parentData.name,
+      value: dynamicValue
     });
   }
 
@@ -384,9 +400,11 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       this.store.dispatch(new GetLocationsByRegionId(regionId));
       this.organizationHierarchy = OrganizationHierarchy.Region;
       this.organizationHierarchyId = regionId;
-      this.selectedRegion = regionId;
+      this.regionFormGroup.setValue({ regionId: regionId });
+      this.regionRequiredFormGroup.setValue({ regionId: regionId });
     } else {
-      this.selectedRegion = null;
+      this.regionFormGroup.reset();
+      this.regionRequiredFormGroup.reset();
     }
   }
 
@@ -395,9 +413,9 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       this.store.dispatch(new GetDepartmentsByLocationId(locationId));
       this.organizationHierarchy = OrganizationHierarchy.Location;
       this.organizationHierarchyId = locationId;
-      this.selectedLocation = locationId
+      this.locationFormGroup.setValue({ locationId: locationId });
     } else {
-      this.selectedLocation = null;
+      this.locationFormGroup.reset();
       this.store.dispatch(new ClearLocationList());
     }
   }
@@ -406,9 +424,9 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     if (departmentId && departmentId !== this.invalidId) {
       this.organizationHierarchy = OrganizationHierarchy.Department;
       this.organizationHierarchyId = departmentId;
-      this.selectedDepartment = departmentId
+      this.departmentFormGroup.setValue({ departmentId: departmentId });
     } else {
-      this.selectedDepartment = null;
+      this.departmentFormGroup.reset();
       this.store.dispatch(new ClearDepartmentList());
     }
   }
@@ -441,9 +459,9 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   private clearFormDetails(): void {
     this.organizationSettingsFormGroup.reset();
     this.isEdit = false;
+    this.isParentEdit = false;
     this.dropdownDataSource = [];
     this.childRecord = undefined;
-    this.isAllDropDownOptionsSelected = false;
     this.regionChanged(this.invalidId);
     this.locationChanged(this.invalidId);
     this.departmentChanged(this.invalidId);
@@ -451,11 +469,19 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
 
   private createSettingsForm(): void {
     this.organizationSettingsFormGroup = this.formBuilder.group({
+      settingValueId: [null],
       settingKey: [null],
       controlType: [null],
       name: [{ value: '', disabled: true }],
       value: [null]
     });
+  }
+
+  private createRegionLocationDepartmentForm(): void {
+    this.regionFormGroup = this.formBuilder.group({ regionId: [null] });
+    this.regionRequiredFormGroup = this.formBuilder.group({ regionId: [null, Validators.required] });
+    this.locationFormGroup = this.formBuilder.group({ locationId: [null] });
+    this.departmentFormGroup = this.formBuilder.group({ departmentId: [null] });
   }
 
   private getActiveRowsPerPage(): number {

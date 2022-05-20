@@ -13,7 +13,7 @@ export class OrganizationSettingsService {
    * @return Array of organization settings
    */
   public getOrganizationSettings(): Observable<OrganizationSettingsGet[]> {
-    return this.http.get<OrganizationSettingsGet[]>(`/api/OrganizationSettings/2`); // TODO: parameter 2 will be removed in settings sub-task
+    return this.http.get<OrganizationSettingsGet[]>(`/api/OrganizationSettings/`);
   }
 
   /**
