@@ -302,7 +302,7 @@
 
       <div class="input-container dropdown bootstrap" *ngSwitchCase="organizationSettingControlType.Select">
         <label for="dropdown">Value  <span class="required">*</span></label>
-        <div class="input-group">
+        <div class="input-group dropdown">
           <ejs-dropdownlist
             id="dropdown"
             [dataSource]="dropdownDataSource"
@@ -316,7 +316,7 @@
 
       <div class="input-container dropdown bootstrap" *ngSwitchCase="organizationSettingControlType.Multiselect">
         <label for="dropdownMulti">Value <span class="required">*</span></label>
-        <div class="input-group">
+        <div class="input-group dropdown">
           <ejs-multiselect
             id="dropdownMulti"
             mode="CheckBox"

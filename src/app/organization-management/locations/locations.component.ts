@@ -93,13 +93,13 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetRegions());
     this.organizationId$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(id => {
       this.store.dispatch(new GetOrganizationById(id));
     });
 
     this.organization$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(parseInt(Country[organization.generalInformation.country])));
+      this.store.dispatch(new GetRegions());
     });
   }
 
