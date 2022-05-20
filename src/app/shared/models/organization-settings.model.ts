@@ -1,5 +1,6 @@
 export class OrganizationSettingsGet {
   settingKey: string;
+  settingValueId?: number;
   name: string;
   controlType: number;
   value: any;
@@ -15,6 +16,7 @@ export class OrganizationSettingsGet {
 }
 
 export class OrganizationSettingChild {
+  settingValueId?: number;
   settingKey: string;
   value: any;
   organizationId: number;
@@ -27,6 +29,7 @@ export class OrganizationSettingChild {
 }
 
 export class OrganizationSettingsPost {
+  settingValueId?: number;
   hierarchyLevel: number;
   hierarchyId: number;
   settingKey: string;
