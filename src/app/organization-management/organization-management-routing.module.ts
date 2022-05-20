@@ -16,32 +16,52 @@ const routes: Routes = [
     children: [
       {
         path: 'departments',
-        component: DepartmentsComponent
+        component: DepartmentsComponent,
+        data: {
+          isOrganizationArea: true
+        }
       },
       {
         path: 'locations',
-        component: LocationsComponent
+        component: LocationsComponent,
+        data: {
+          isOrganizationArea: true
+        }
       },
       {
         path: 'credentials',
-        component: CredentialsComponent
+        component: CredentialsComponent,
+        data: {
+          isOrganizationArea: true
+        }
       },
       {
         path: 'credentials/groups-setup',
-        component: GroupComponent
+        component: GroupComponent,
+        data: {
+          isOrganizationArea: true
+        }
       },
       {
         path: 'skills',
-        component: SkillsComponent
+        component: SkillsComponent,
+        data: {
+          isOrganizationArea: true
+        }
       },
       {
         path: 'shifts',
-        component: ShiftsComponent
+        component: ShiftsComponent,
+        data: {
+          isOrganizationArea: true
+        }
       },
       {
         path: 'settings',
-        component: SettingsComponent
-
+        component: SettingsComponent,
+        data: {
+          isOrganizationArea: true
+        }
       }
     ]
   },

@@ -18,6 +18,10 @@ const routes: Routes = [
       {
         path: 'dashboard',
         component: DashboardContentComponent,
+        data: {
+          isOrganizationArea: true,
+          isAgencyArea: true
+        }
       },
       {
         path: 'order-management/:param',

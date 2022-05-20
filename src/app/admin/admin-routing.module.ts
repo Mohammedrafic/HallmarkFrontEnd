@@ -22,6 +22,10 @@ const routes: Routes = [
       {
         path: 'dashboard',
         component: DashboardComponent,
+        data: {
+          isOrganizationArea: true,
+          isAgencyArea: true
+        }
       },
       {
         path: 'client-management',

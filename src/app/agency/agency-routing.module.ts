@@ -18,6 +18,10 @@ const routes: Routes = [
       {
         path: 'dashboard',
         component: DashboardComponent,
+        data: {
+          isOrganizationArea: true,
+          isAgencyArea: true
+        }
       },
       {
         path: 'organization',
@@ -40,14 +44,23 @@ const routes: Routes = [
       {
         path: 'candidates',
         component: CandidatesComponent,
+        data: {
+          isAgencyArea: true
+        }
       },
       {
         path: 'candidates/add',
         component: AddEditCandidateComponent,
+        data: {
+          isAgencyArea: true
+        }
       },
       {
         path: 'candidates/edit/:id',
         component: AddEditCandidateComponent,
+        data: {
+          isAgencyArea: true
+        }
       },
     ],
   },
