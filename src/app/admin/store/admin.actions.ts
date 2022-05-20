@@ -130,26 +130,26 @@ export class GetAllSkills {
 }
 
 export class GetCredentialTypes {
-  static readonly type = '[organizationManagement] Get Credential Types';
+  static readonly type = '[admin] Get Credential Types';
   constructor() { }
 }
 
 export class GetCredentialTypeById {
-  static readonly type = '[organizationManagement] Get Credential Type by ID';
+  static readonly type = '[admin] Get Credential Type by ID';
   constructor(public payload: CredentialType) { }
 }
 
 export class SaveCredentialType {
-  static readonly type = '[organizationManagement] Save Credential Type';
+  static readonly type = '[admin] Save Credential Type';
   constructor(public payload: CredentialType) { }
 }
 
 export class RemoveCredentialType {
-  static readonly type = '[organizationManagement] Remove Credential Type by ID';
+  static readonly type = '[admin] Remove Credential Type by ID';
   constructor(public payload: CredentialType) { }
 }
 
 export class UpdateCredentialType {
-  static readonly type = '[organizationManagement] Update Credential Type';
+  static readonly type = '[admin] Update Credential Type';
   constructor(public payload: CredentialType) { }
 }
