@@ -366,6 +366,7 @@ export class AgencyState {
         };
         patchState({ feeSettings });
         dispatch(new SaveFeeExceptionsSucceeded(payload));
+        dispatch(new UpdateAssociateOrganizationsPage());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         return payload;
       })

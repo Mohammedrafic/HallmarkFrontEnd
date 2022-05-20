@@ -103,20 +103,20 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
   }
 
   public onCancel(): void {
-    if (this.feeSettingsForm.dirty || this.jobDistributionForm.dirty) {
+    if ((this.feeSettingsForm && this.feeSettingsForm.value.baseFee) || this.jobDistributionForm.dirty) {
       this.confirmService
-      .confirm(DELETE_CONFIRM_TEXT, {
-        title: DELETE_CONFIRM_TITLE,
-        okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button',
-      })
-      .pipe(filter((confirm) => !!confirm))
-      .subscribe(() => {
-        this.feeSettingsForm.reset();
-        this.jobDistributionForm.reset();
-        this.sideDialog.hide();
-        this.editEndEvent.emit();
-      });
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => !!confirm))
+        .subscribe(() => {
+          this.feeSettingsForm.reset();
+          this.jobDistributionForm.reset();
+          this.sideDialog.hide();
+          this.editEndEvent.emit();
+        });
     } else {
       this.sideDialog.hide();
       this.editEndEvent.emit();
