@@ -5,7 +5,6 @@ export class OrganizationSettingsGet {
   controlType: number;
   value: any;
   valueOptions: OrganizationSettingValueOptions[];
-  organizationId: number;
   overridableByOrganization: boolean;
   overridableByRegion: boolean;
   overridableByLocation: boolean;
@@ -19,7 +18,6 @@ export class OrganizationSettingChild {
   settingValueId?: number;
   settingKey: string;
   value: any;
-  organizationId: number;
   regionId?: number;
   regionName?: string;
   locationId?: number;

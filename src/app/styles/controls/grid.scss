@@ -114,27 +114,6 @@ ejs-grid.e-control.e-grid {
     .e-gridheader {
       display: none;
     }
-
-    .e-gridcontent {
-      .e-content {
-        .e-table {
-          .e-emptyrow {
-            background-color: $secondary-dark-blue-50;
-
-            &::before {
-              content: "There are no records to display";
-              color: $secondary-dark-blue-30;
-              font-size: 14px;
-              padding-top: 100px;
-            }
-
-            td {
-              display: none;
-            }
-          }
-        }
-      }
-    }
   }
 
   ejs-pager {

@@ -6,7 +6,7 @@ import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigatio
 import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
 import { FeatherModule } from 'angular-feather';
-import { Sliders, Plus, Trash2, Edit, Copy, Download } from 'angular-feather/icons';
+import { Sliders, Plus, Trash2, Edit, Copy, Download, AlertCircle } from 'angular-feather/icons';
 
 import { AgencyComponent } from './agency.component';
 import { AgencyRoutingModule } from './agency-routing.module';
@@ -45,6 +45,7 @@ const sidebarIcons = {
   Sliders,
   Plus,
   Trash2,
+  AlertCircle,
   Edit,
   Copy,
   Download,

@@ -45,6 +45,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   public readonly statusEnum = CredentialVerifiedStatus;
   public readonly allowedExtensions: string = '.pdf, .doc, .docx';
+  public readonly maxFileSize = 10485760; // 10 mb
+  public uploaderErrorMessageElement: HTMLElement;
   public dropElement: HTMLElement;
   public addCredentialForm: FormGroup;
   public searchCredentialForm: FormGroup;
@@ -250,6 +252,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       args.modifiedFilesData = args.filesData;
     }
     args.isModified = true;
+    allFiles.forEach((file, index) => this.addFilesValidationMessage(file, index));
   }
 
   public onRemove(event: MouseEvent, data: any) {
@@ -360,5 +363,16 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   private setDropElement(): void {
     this.dropElement = document.getElementById('files-droparea') as HTMLElement;
+  }
+
+  private addFilesValidationMessage(file: FileInfo, fileIndex: number) {
+    requestAnimationFrame(() => {
+      this.uploaderErrorMessageElement = document.getElementsByClassName('e-validation-fails')[fileIndex] as HTMLElement;
+      if (this.uploaderErrorMessageElement) {
+        this.uploaderErrorMessageElement.innerText = file.size > this.maxFileSize
+          ? 'The file exceeds the limitation, max allowed 10 MB.'
+          : 'The file should be in Pdf, Doc, Docx format.';
+      }
+    });
   }
 }

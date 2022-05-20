@@ -10,7 +10,7 @@ import { AgencyState } from 'src/app/agency/store/agency.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { FeeExceptions, FeeExceptionsPage, FeeSettingsClassification } from 'src/app/shared/models/associate-organizations.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT } from '@shared/constants/messages';
+import { DELETE_RECORD_TITLE, DELETE_RECORD_TEXT } from '@shared/constants/messages';
 import { GRID_CONFIG } from '@shared/constants/grid-config';
 
 @Component({
@@ -65,7 +65,7 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
   public onRemove(data: { index: string } & FeeExceptions): void {
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
-        title: DELETE_CONFIRM_TITLE,
+        title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
       })

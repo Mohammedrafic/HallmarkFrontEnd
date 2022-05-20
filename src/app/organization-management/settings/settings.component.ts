@@ -20,7 +20,7 @@ import {
   ClearDepartmentList,
   ClearLocationList,
   GetDepartmentsByLocationId,
-  GetLocationsByRegionId,
+  GetLocationsByRegionId, GetOrganizationById,
   GetOrganizationSettings,
   GetRegions,
   SaveOrganizationSettings
@@ -35,6 +35,7 @@ import { User } from '@shared/models/user.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { customEmailValidator } from '@shared/validators/email.validator';
+import { UserState } from '../../store/user.state';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -72,6 +73,9 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   departments$: Observable<Department[]>;
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
 
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
+
   public isEdit: boolean;
   public isParentEdit = false;
   public hasAccess = false;
@@ -87,7 +91,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
 
   public textFieldType: number;
   public textFieldTypeControl = TextFieldTypeControl;
-
+  public organizationId: number;
   public maxFieldLength = 100;
 
   get dialogHeader(): string {
@@ -111,6 +115,9 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   ngOnInit(): void {
     this.store.dispatch(new GetOrganizationSettings());
     this.store.dispatch(new GetRegions());
+    this.organizationId$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(id => {
+      this.organizationId = id;
+    });
     this.mapGridData();
     this.subscribeToRegionLocationDepartment();
     this.isEditOverrideAccessible();
@@ -142,7 +149,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     if (!childRecord) {
       this.isParentEdit = true;
       this.organizationHierarchy = OrganizationHierarchy.Organization;
-      this.organizationHierarchyId = parentRecord.organizationId;
+      this.organizationHierarchyId = this.organizationId;
       this.regionChanged(this.invalidId);
       this.setFormValuesForEdit(parentRecord, null);
     } else {
@@ -365,12 +372,14 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       dynamicValue = dynamicValue.length !== 0 ? dynamicValue[0] : '';
     }
 
-    this.organizationSettingsFormGroup.setValue({
-      settingValueId: this.isParentEdit ? null : childData.settingValueId,
-      settingKey: parentData.settingKey,
-      controlType: parentData.controlType,
-      name: parentData.name,
-      value: dynamicValue
+    setTimeout(() => {
+      this.organizationSettingsFormGroup.setValue({
+        settingValueId: this.isParentEdit ? null : childData.settingValueId,
+        settingKey: parentData.settingKey,
+        controlType: parentData.controlType,
+        name: parentData.name,
+        value: dynamicValue
+      });
     });
   }
 
