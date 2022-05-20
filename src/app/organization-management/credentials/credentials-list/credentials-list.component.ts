@@ -62,6 +62,17 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     this.mapGridData();
   }
 
+  public expireDateApplicableChange(data: Credential, event: any): void {
+    data.expireDateApplicable = event.checked;
+    this.store.dispatch(new UpdateCredential({
+      id: data.id,
+      name: data.name,
+      credentialTypeId: data.credentialTypeId,
+      expireDateApplicable: data.expireDateApplicable,
+      comment: data.comment,
+    }));
+  }
+
   onEditButtonClick(credential: Credential, event: any): void {
     this.addActiveCssClass(event);
     this.credentialsFormGroup.setValue({

@@ -1,7 +1,7 @@
 <div class="login-container">
   <h1>Simple login</h1>
 
-  <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+  <form *ngIf="usersDropDownData?.length" [formGroup]="loginForm" (ngSubmit)="onLogin()">
     <div class="dropdown-container bootstrap">
       <ejs-dropdownlist
         [fields]="optionFields"

@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import { map, Observable, tap } from 'rxjs';
 import { MENU_CONFIG } from '../shared/constants/menu-config';
-import { AUTH_STORAGE_KEY, USER_STORAGE_KEY } from '@shared/constants/local-storage-keys';
+import { AUTH_STORAGE_KEY, USER_STORAGE_KEY, ORG_ID_STORAGE_KEY, AGENCY_ID_STORAGE_KEY } from '@shared/constants/local-storage-keys';
 import { ChildMenuItem, Menu, MenuItem } from '../shared/models/menu.model';
 
 import { User } from '../shared/models/user.model';
@@ -34,8 +34,8 @@ export interface UserStateModel {
     menu: { menuItems: [] },
     agencies: null,
     organizations: null,
-    lastSelectedOrganizationId: null,
-    lastSelectedAgencyId: null
+    lastSelectedOrganizationId: parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string),
+    lastSelectedAgencyId: parseInt(window.localStorage.getItem(AGENCY_ID_STORAGE_KEY) as string)
   },
 })
 @Injectable()
@@ -75,7 +75,8 @@ export class UserState {
   LogoutUser({ patchState }: StateContext<UserStateModel>): void {
     window.localStorage.removeItem(AUTH_STORAGE_KEY);
     window.localStorage.removeItem(USER_STORAGE_KEY);
-    this.router.navigate(['/login']);
+    window.localStorage.removeItem(ORG_ID_STORAGE_KEY);
+    window.localStorage.removeItem(AGENCY_ID_STORAGE_KEY);
     patchState({
       user: null,
       lastSelectedAgencyId: null,
@@ -133,6 +134,8 @@ export class UserState {
     { patchState }: StateContext<UserStateModel>,
     { payload }: SaveLastSelectedOrganizationAgencyId
   ): LasSelectedOrganizationAgency {
+    window.localStorage.setItem(ORG_ID_STORAGE_KEY, payload.lastSelectedOrganizationId?.toString() as string);
+    window.localStorage.setItem(AGENCY_ID_STORAGE_KEY, payload.lastSelectedAgencyId?.toString() as string);
     return patchState({
       lastSelectedOrganizationId: payload.lastSelectedOrganizationId,
       lastSelectedAgencyId: payload.lastSelectedAgencyId
@@ -141,14 +144,12 @@ export class UserState {
 
   @Action(SaveLastSelectedOrganizationAgencyId)
   SaveLastSelectedOrganizationAgencyId(
-    { patchState }: StateContext<UserStateModel>,
+    { dispatch }: StateContext<UserStateModel>,
     { payload }: SaveLastSelectedOrganizationAgencyId
   ): Observable<LasSelectedOrganizationAgency> {
     return this.userService.saveLastSelectedOrganizationAgencyId(payload).pipe(map(() => {
-      return patchState({
-        lastSelectedOrganizationId: payload.lastSelectedOrganizationId,
-        lastSelectedAgencyId: payload.lastSelectedAgencyId
-      });
+      dispatch(new SetLastSelectedOrganizationAgencyId(payload));
+      return payload;
     }));
   }
 }
