@@ -3,13 +3,13 @@
     <div class="input-container bootstrap">
       <label>Title</label>
       <div class="input-group">
-        <input formControlName="title" class="e-input" type="text" placeholder="Title" />
+        <input formControlName="title" class="e-input" type="text" placeholder="Title" maxlength="100"/>
       </div>
     </div>
     <div class="input-container bootstrap">
       <label>Contact Person<span class="required">*</span></label>
       <div class="input-group">
-        <input appValidateWithMessage formControlName="contactPerson" class="e-input" type="text" placeholder="Contact Person" />
+        <input appValidateWithMessage formControlName="contactPerson" class="e-input" type="text" placeholder="Contact Person" maxlength="100"/>
       </div>
     </div>
     <div class="input-container bootstrap">
@@ -21,7 +21,7 @@
     <div class="input-container bootstrap">
       <label>Email</label>
       <div class="input-group">
-        <input appValidateWithMessage formControlName="email" class="e-input" type="text" placeholder="Email" />
+        <input appValidateWithMessage formControlName="email" class="e-input" type="text" placeholder="Email" maxlength="100"/>
       </div>
     </div>
     <div class="remove-button-container" *ngIf="isRemovable">

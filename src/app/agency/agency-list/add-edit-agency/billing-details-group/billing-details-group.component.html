@@ -6,12 +6,12 @@
             <div class="input-container">
               <label>Name<span class="required">*</span></label>
               <div class="input-group">
-                <input appValidateWithMessage formControlName="name" class="e-input" type="text" placeholder="Name" />
+                <input appValidateWithMessage formControlName="name" class="e-input" type="text" placeholder="Name" maxlength="100"/>
               </div>
             </div>
             <div class="input-container">
               <label>Address</label>
-              <input formControlName="address" class="e-input" type="text" placeholder="Address" />
+              <input formControlName="address" class="e-input" type="text" placeholder="Address" maxlength="100"/>
             </div>
           </div>
           <div class="billing-country-section">
@@ -105,9 +105,8 @@
             </div>
             <div class="input-container">
               <label>Ext</label>
-              <input formControlName="ext" class="e-input" type="text" placeholder="Ext" />
+              <input formControlName="ext" class="e-input" type="text" placeholder="Ext" maxlength="5"/>
             </div>
-
           </div>
         </form>
       </div>
