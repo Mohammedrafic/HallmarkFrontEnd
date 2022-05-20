@@ -139,13 +139,14 @@ export class CandidateState {
   @Action(SaveCandidate)
   SaveCandidate({ patchState, dispatch }: StateContext<CandidateStateModel>, { payload }: SaveCandidate): Observable<Candidate | void> {
     patchState({ isCandidateLoading: true });
+    const isCreating = !payload.id;
     return this.candidateService.saveCandidate(payload).pipe(
       tap((payload) => {
         patchState({ isCandidateLoading: false, candidate: payload });
-        if (payload.id) {
-          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));``
-        } else {
+        if (isCreating) {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        } else {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
         }
         dispatch(new SaveCandidateSucceeded(payload));
         return payload;
