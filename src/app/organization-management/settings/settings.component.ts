@@ -17,10 +17,8 @@ import {
 import { OrganizationSettingControlType } from '@shared/enums/organization-setting-control-type';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import {
-  ClearDepartmentList,
-  ClearLocationList,
   GetDepartmentsByLocationId,
-  GetLocationsByRegionId, GetOrganizationById,
+  GetLocationsByRegionId,
   GetOrganizationSettings,
   GetRegions,
   SaveOrganizationSettings
@@ -98,9 +96,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     return this.isEdit ? 'Edit' : 'Add';
   }
 
-  private childRecord: any;
   private initialRegionId: number;
-  private invalidId = -99;
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private store: Store,
@@ -119,7 +115,6 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       this.organizationId = id;
     });
     this.mapGridData();
-    this.subscribeToRegionLocationDepartment();
     this.isEditOverrideAccessible();
   }
 
@@ -131,9 +126,10 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   public onOverrideButtonClick(data: any): void {
     this.isFormShown = true;
     this.formControlType = data.controlType;
-    this.regionChanged(this.invalidId);
-    this.locationChanged(this.invalidId);
-    this.departmentChanged(this.invalidId);
+    this.regionFormGroup.reset();
+    this.regionRequiredFormGroup.reset();
+    this.locationFormGroup.reset();
+    this.departmentFormGroup.reset();
     this.setFormValidation(data);
     this.setFormValuesForOverride(data);
     this.store.dispatch(new ShowSideDialog(true));
@@ -150,10 +146,10 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       this.isParentEdit = true;
       this.organizationHierarchy = OrganizationHierarchy.Organization;
       this.organizationHierarchyId = this.organizationId;
-      this.regionChanged(this.invalidId);
+      this.regionFormGroup.reset();
+      this.regionRequiredFormGroup.reset();
       this.setFormValuesForEdit(parentRecord, null);
     } else {
-      this.childRecord = childRecord;
       if (childRecord.regionId) {
         this.regionChanged(childRecord.regionId);
       } else {
@@ -235,6 +231,14 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
           || item.controlType === OrganizationSettingControlType.Multiselect) {
           if (typeof item.value === 'string') {
             item.value = this.getDropDownOptionsFromString(item.value, item.valueOptions);
+          }
+
+          if (item.children && item.children.length > 0) {
+            item.children.forEach(child => {
+              if (typeof child.value === 'string') {
+                child.value = this.getDropDownOptionsFromString(child.value, item.valueOptions);
+              }
+            });
           }
         }
       });
@@ -363,7 +367,11 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
 
     if (this.formControlType === OrganizationSettingControlType.Multiselect) {
       this.dropdownDataSource = parentData.valueOptions;
-      dynamicValue = this.isParentEdit ? this.getDropDownOptionIds(parentData.value) : this.getDropDownOptionIds(childData.value);
+      if (this.isParentEdit) {
+        dynamicValue = this.getDropDownOptionIds(parentData.value);
+      } else {
+        dynamicValue = typeof childData.value === 'string' ? childData.value.split(';') : this.getDropDownOptionIds(childData.value);
+      }
     }
 
     if (this.formControlType === OrganizationSettingControlType.Select) {
@@ -383,60 +391,33 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     });
   }
 
-  private subscribeToRegionLocationDepartment(): void {
-    this.regions$.pipe(takeUntil(this.unsubscribe$)).subscribe(region => {
-      if (region[0] && region[0].id) {
-        this.initialRegionId = region[0].id;
-        this.regionChanged(region[0].id);
-      }
-    });
-
-    this.locations$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      if (this.childRecord && this.childRecord.locationId) {
-        this.locationChanged(this.childRecord.locationId);
-      }
-    });
-
-    this.departments$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      if (this.childRecord && this.childRecord.departmentId) {
-        this.departmentChanged(this.childRecord.departmentId);
-      }
-    });
-  }
-
   private regionChanged(regionId: number): void {
-    if (regionId && regionId !== this.invalidId) {
+    if (regionId) {
       this.store.dispatch(new GetLocationsByRegionId(regionId));
       this.organizationHierarchy = OrganizationHierarchy.Region;
       this.organizationHierarchyId = regionId;
       this.regionFormGroup.setValue({ regionId: regionId });
       this.regionRequiredFormGroup.setValue({ regionId: regionId });
-    } else {
-      this.regionFormGroup.reset();
-      this.regionRequiredFormGroup.reset();
+      this.locationFormGroup.reset();
+      this.departmentFormGroup.reset();
     }
   }
 
   private locationChanged(locationId: number): void {
-    if (locationId && locationId !== this.invalidId) {
+    if (locationId) {
       this.store.dispatch(new GetDepartmentsByLocationId(locationId));
       this.organizationHierarchy = OrganizationHierarchy.Location;
       this.organizationHierarchyId = locationId;
       this.locationFormGroup.setValue({ locationId: locationId });
-    } else {
-      this.locationFormGroup.reset();
-      this.store.dispatch(new ClearLocationList());
+      this.departmentFormGroup.reset();
     }
   }
 
   private departmentChanged(departmentId: number): void {
-    if (departmentId && departmentId !== this.invalidId) {
+    if (departmentId) {
       this.organizationHierarchy = OrganizationHierarchy.Department;
       this.organizationHierarchyId = departmentId;
       this.departmentFormGroup.setValue({ departmentId: departmentId });
-    } else {
-      this.departmentFormGroup.reset();
-      this.store.dispatch(new ClearDepartmentList());
     }
   }
 
@@ -467,13 +448,13 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
 
   private clearFormDetails(): void {
     this.organizationSettingsFormGroup.reset();
+    this.regionFormGroup.reset();
+    this.regionRequiredFormGroup.reset();
+    this.locationFormGroup.reset();
+    this.departmentFormGroup.reset();
     this.isEdit = false;
     this.isParentEdit = false;
     this.dropdownDataSource = [];
-    this.childRecord = undefined;
-    this.regionChanged(this.invalidId);
-    this.locationChanged(this.invalidId);
-    this.departmentChanged(this.invalidId);
   }
 
   private createSettingsForm(): void {
