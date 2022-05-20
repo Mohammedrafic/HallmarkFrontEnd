@@ -15,6 +15,7 @@
     </div>
     <ejs-uploader #previewupload [dropArea]="dropElement" [allowedExtensions]="allowedExtensions"
                   [autoUpload]="false" [multiple]="false"
+                  [maxFileSize]="maxFileSize"
                   (selected)="onImageSelect($event)"
                   (removing)="onImageRemove()">
     </ejs-uploader>

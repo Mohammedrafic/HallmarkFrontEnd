@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 import { SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
+import { FileInfo } from "@syncfusion/ej2-inputs/src/uploader/uploader";
 
 @Component({
   selector: 'app-image-uploader',
@@ -26,7 +27,9 @@ export class ImageUploaderComponent implements OnInit {
 
   public logoSrc = '';
   public isImageSelected = false;
-  public readonly allowedExtensions: string = '.png, .jpg, .jpeg';
+  public uploaderErrorMessageElement: HTMLElement;
+  public readonly allowedExtensions: string = '.png, .jpg';
+  public readonly maxFileSize = 10485760; // 10 mb
   public dropElement: HTMLElement;
 
   ngOnInit(): void {
@@ -43,6 +46,8 @@ export class ImageUploaderComponent implements OnInit {
     if (event.filesData[0].statusCode === '1') {
       this.selectImage.emit(event.filesData[0].rawFile as Blob)
       this.isImageSelected = true;
+    } else {
+     this.addValidationMessage(event.filesData[0]);
     }
   }
 
@@ -52,5 +57,16 @@ export class ImageUploaderComponent implements OnInit {
     this.logo = null;
     this.logoSrc = '';
     this.selectImage.emit(null);
+  }
+
+  private addValidationMessage(file: FileInfo) {
+    requestAnimationFrame(() => {
+      this.uploaderErrorMessageElement = document.getElementsByClassName('e-validation-fails')[0] as HTMLElement;
+      if (this.uploaderErrorMessageElement) {
+        this.uploaderErrorMessageElement.innerText = file.size > this.maxFileSize
+          ? 'The file should not exceed 10MB.'
+          : 'The file should be in png, jpeg format.';
+      }
+    });
   }
 }
