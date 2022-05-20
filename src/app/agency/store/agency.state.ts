@@ -394,7 +394,7 @@ export class AgencyState {
 
   @Action(RemoveFeeExceptionsById)
   RemoveFeeExceptionsById(
-    { patchState, getState }: StateContext<AgencyStateModel>,
+    { patchState, getState, dispatch }: StateContext<AgencyStateModel>,
     { id }: RemoveFeeExceptionsById
   ): Observable<never> {
     const state = getState();
@@ -408,6 +408,7 @@ export class AgencyState {
           baseFee: state.feeSettings?.baseFee,
         } as FeeSettings;
         patchState({ feeSettings });
+        dispatch(new UpdateAssociateOrganizationsPage());
       })
     );
   }
