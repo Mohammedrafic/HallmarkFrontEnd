@@ -5,6 +5,7 @@ import { Store } from '@ngxs/store';
 import { map, Subject, takeUntil } from 'rxjs';
 import { tap } from 'rxjs/internal/operators/tap';
 import { User } from 'src/app/shared/models/user.model';
+import { SetIsFirstLoadState, ToggleSidebarState } from 'src/app/store/app.actions';
 import { SetCurrentUser } from 'src/app/store/user.actions';
 import { UserService } from '../../shared/services/user.service';
 
@@ -64,6 +65,9 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   }
 
   public onLogin(): void {
+    // Reset sidebar settings on relogin
+    this.store.dispatch([new SetIsFirstLoadState(true), new ToggleSidebarState(false)]);
+    
     const selectedUserId: string = this.loginForm.controls['user'].value;
     const index = this.users.findIndex(u => u.id === selectedUserId);
 
