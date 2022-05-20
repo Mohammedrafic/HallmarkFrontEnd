@@ -11,6 +11,7 @@ import { PermissionsTree } from '@shared/models/permission.model';
 import { GetNewRoleBusinessByUnitType, GetPermissionsTree } from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
 import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, OPRION_FIELDS } from '../roles-and-permissions.constants';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 export type RoleTreeField = {
   dataSource: PermissionsTree;
@@ -27,6 +28,7 @@ export type RoleTreeField = {
 })
 export class RoleFormComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
+  @Input() businessUnits: { text: string | BusinessUnitType, id: number }[];
 
   @ViewChild('tree') tree: TreeViewComponent;
 
@@ -39,7 +41,6 @@ export class RoleFormComponent implements OnInit, OnDestroy {
   @Select(SecurityState.isNewRoleDataLoading)
   public isNewRoleDataLoading$: Observable<boolean>;
 
-  public businessUnits = BUSINESS_UNITS_VALUES;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public optionFields = OPRION_FIELDS;
   public copyRoleControl = new FormControl();
@@ -60,6 +61,10 @@ export class RoleFormComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.onBusinessUnitControlChanged();
     this.onRoleTreeFieldChanged();
+
+    this.form.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
+      this.form.disabled ? this.copyRoleControl.disable() : this.copyRoleControl.enable();
+    });
   }
 
   ngOnDestroy(): void {
@@ -81,7 +86,7 @@ export class RoleFormComponent implements OnInit, OnDestroy {
   public dataBound(): void {
     if (this.permissionsControl?.value) {
       this.tree.checkAll(this.permissionsControl.value);
-      this.tree.expandAll(this.tree.getAllCheckedNodes());
+      this.tree.expandAll();
     }
   }
 
@@ -93,10 +98,12 @@ export class RoleFormComponent implements OnInit, OnDestroy {
   }
 
   private getAssignableValues(rawValue: string[]): number[] {
-    return rawValue.map((stringId) => {
+    return rawValue
+      .map((stringId) => {
         const id = Number(stringId);
         return this.notAssignableIds.includes(id) ? NaN : id;
-      }).filter(Number);
+      })
+      .filter(Number);
   }
 
   private onBusinessUnitControlChanged(): void {
@@ -113,7 +120,7 @@ export class RoleFormComponent implements OnInit, OnDestroy {
 
   private onRoleTreeFieldChanged(): void {
     this.roleTreeField$.pipe(takeWhile(() => this.isAlive)).subscribe((roleTreeField) => {
-      this.notAssignableIds = roleTreeField.dataSource.filter(({ isAssignable }) => !isAssignable).map(({ id }) => id);
+      this.notAssignableIds = roleTreeField.dataSource.filter(({ isAssignable, isAvailable }) => !isAssignable || !isAvailable).map(({ id }) => id);
     });
   }
 
@@ -122,7 +129,7 @@ export class RoleFormComponent implements OnInit, OnDestroy {
       id: new FormControl(),
       businessUnitType: new FormControl('', [Validators.required]),
       businessUnitId: new FormControl('', [Validators.required]),
-      name: new FormControl('', [Validators.required]),
+      name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       isActive: new FormControl(true),
       permissions: new FormControl([], [Validators.required]),
     });
