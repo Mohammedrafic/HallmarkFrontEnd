@@ -91,7 +91,7 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
   static createFormGroup(): FormGroup {
     return new FormGroup({
       id: new FormControl(null),
-      baseFee: new FormControl('', [Validators.min(0)]),
+      baseFee: new FormControl('', [Validators.min(0), Validators.maxLength(2), Validators.pattern(/^[0-9]+$/)]),
       feeExceptions: new FormArray([]),
     });
   }

@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { NavigationStart, Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
+import { filter, map, mergeMap } from 'rxjs/operators';
 
-import { ORGANIZATION_URL_AREAS_REG_EXPS, AGENCY_URL_AREAS_REG_EXPS } from '@shared/constants';
 import { SetIsOrganizationAgencyArea } from './store/app.actions';
 
 @Component({
@@ -13,13 +13,18 @@ import { SetIsOrganizationAgencyArea } from './store/app.actions';
 })
 export class AppComponent {
   constructor(private router: Router, private store: Store) {
-    this.router.events.pipe().subscribe((event: any) => {
-      if (event instanceof NavigationStart) {
-        const isOrganizationArea = ORGANIZATION_URL_AREAS_REG_EXPS.some(regexp => regexp.test(event.url));
-        const isAgencyArea = AGENCY_URL_AREAS_REG_EXPS.some(regexp => regexp.test(event.url));
-
-        this.store.dispatch(new SetIsOrganizationAgencyArea({ isOrganizationArea, isAgencyArea }));
-      }
+    router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map(() => this.router.routerState.root),
+      map(route => {
+        while (route.firstChild) route = route.firstChild;
+        return route;
+      }),
+      mergeMap(route => route.data)
+    ).subscribe(data => {
+      const isOrganizationArea = data?.['isOrganizationArea'] || false;
+      const isAgencyArea = data?.['isAgencyArea'] || false;
+      this.store.dispatch(new SetIsOrganizationAgencyArea({ isOrganizationArea, isAgencyArea }));
     });
   }
 }

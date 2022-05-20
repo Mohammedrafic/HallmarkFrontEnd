@@ -197,13 +197,19 @@ export class OrganizationAgencySelectorComponent implements OnDestroy {
     const lastSelectedOrganizationId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId);
     const lastSelectedAgencyId = this.store.selectSnapshot(UserState.lastSelectedAgencyId);
 
-    const selectedOrganizationAgencyId = lastSelectedOrganizationId || lastSelectedAgencyId;
+    let newOrganizationAgencyControlValue: number | null;
 
-    this.organizationAgencyControl.patchValue(
-      selectedOrganizationAgencyId && organizationsAgencies.find(i => i.id === selectedOrganizationAgencyId)
-        ? selectedOrganizationAgencyId
-        :organizationsAgencies[0]?.id
-    );
+    if (isAgencyArea) {
+      newOrganizationAgencyControlValue = organizationsAgencies.find(i => i.id === lastSelectedAgencyId)
+        ? lastSelectedAgencyId
+        : organizationsAgencies[0]?.id || null;
+    } else {
+      newOrganizationAgencyControlValue = organizationsAgencies.find(i => i.id === lastSelectedOrganizationId)
+        ? lastSelectedOrganizationId
+        : organizationsAgencies[0]?.id || null;
+    }
+
+    this.organizationAgencyControl.patchValue(newOrganizationAgencyControlValue);
 
     setTimeout(() => this.cd.markForCheck());
   }

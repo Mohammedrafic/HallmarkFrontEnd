@@ -1,13 +1,13 @@
 <div [formGroup]="form" id="addNewRoleForm" class="role-form">
   <div class="dropdown-container bootstrap">
-    <label>Bussines Unit<span class="required">*</span></label>
+    <label>Business Unit<span class="required">*</span></label>
     <div class="input-group dropdown">
       <ejs-dropdownlist
         appValidateWithMessage
         formControlName="businessUnitType"
         [fields]="optionFields"
         [dataSource]="businessUnits"
-        placeholder="Bussines Unit"
+        placeholder="Business Unit"
       ></ejs-dropdownlist>
     </div>
   </div>

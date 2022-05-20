@@ -71,6 +71,7 @@ export class ApiInterceptor implements HttpInterceptor {
             /** If we got 401 Error then do log out */
             if (error.status === 401) {
               this.store.dispatch(new LogoutUser());
+              this.router.navigate(['/login']);
             }
 
             return throwError(() => error);
