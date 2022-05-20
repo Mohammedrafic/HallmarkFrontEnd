@@ -63,7 +63,7 @@ export class SecurityState {
   @Selector()
   static roleTreeField(state: SecurityStateModel): RoleTreeField {
     return {
-      dataSource: state.permissionsTree,
+      dataSource: state.permissionsTree.filter(({ isAvailable }) => isAvailable),
       id: 'id',
       parentID: 'parentId',
       text: 'name',
