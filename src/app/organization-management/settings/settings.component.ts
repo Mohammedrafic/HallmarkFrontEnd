@@ -1,7 +1,7 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
-import { DetailRowService, GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
+import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { Department } from '@shared/models/department.model';
@@ -17,6 +17,8 @@ import {
 import { OrganizationSettingControlType } from '@shared/enums/organization-setting-control-type';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import {
+  ClearDepartmentList,
+  ClearLocationList,
   GetDepartmentsByLocationId,
   GetLocationsByRegionId,
   GetOrganizationSettings,
@@ -95,8 +97,6 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
-
-  private initialRegionId: number;
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private store: Store,
@@ -130,6 +130,8 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.regionRequiredFormGroup.reset();
     this.locationFormGroup.reset();
     this.departmentFormGroup.reset();
+    this.store.dispatch(new ClearLocationList());
+    this.store.dispatch(new ClearDepartmentList());
     this.setFormValidation(data);
     this.setFormValuesForOverride(data);
     this.store.dispatch(new ShowSideDialog(true));
@@ -146,18 +148,19 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       this.isParentEdit = true;
       this.organizationHierarchy = OrganizationHierarchy.Organization;
       this.organizationHierarchyId = this.organizationId;
-      this.regionFormGroup.reset();
-      this.regionRequiredFormGroup.reset();
       this.setFormValuesForEdit(parentRecord, null);
     } else {
       if (childRecord.regionId) {
         this.regionChanged(childRecord.regionId);
       } else {
-        this.regionChanged(this.initialRegionId);
+        this.store.dispatch(new ClearLocationList());
+        this.store.dispatch(new ClearDepartmentList());
       }
 
       if (childRecord.locationId) {
         this.locationChanged(childRecord.locationId);
+      } else {
+        this.store.dispatch(new ClearDepartmentList());
       }
 
       if (childRecord.departmentId) {
@@ -207,6 +210,8 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
 
   public onRegionChange(event: any): void {
     if (event.itemData && event.itemData.id) {
+      this.store.dispatch(new ClearLocationList());
+      this.store.dispatch(new ClearDepartmentList());
       this.regionChanged(event.itemData.id);
     }
   }
@@ -409,7 +414,6 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       this.organizationHierarchy = OrganizationHierarchy.Location;
       this.organizationHierarchyId = locationId;
       this.locationFormGroup.setValue({ locationId: locationId });
-      this.departmentFormGroup.reset();
     }
   }
 

@@ -60,17 +60,10 @@ export class CredentialsService {
    * @param credential object to save
    * @return Created credential in array
    */
-  public saveCredential(credential: Credential): Observable<Credential> {
-    return this.http.post<Credential>(`/api/MasterCredentials`, credential);
-  }
-
-  /**
-   * Update credential
-   * @param credential object to update
-   * @return Updated credential
-   */
-  public updateCredential(credential: Credential): Observable<Credential> {
-    return this.http.put<Credential>(`/api/MasterCredentials`, credential);
+  public saveUpdateCredential(credential: Credential): Observable<Credential> {
+    return credential.id ?
+      this.http.put<Credential>(`/api/MasterCredentials`, credential) :
+      this.http.post<Credential>(`/api/MasterCredentials`, credential);
   }
 
   /**

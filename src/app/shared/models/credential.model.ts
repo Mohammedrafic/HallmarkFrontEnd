@@ -3,17 +3,12 @@ export class Credential {
   credentialTypeId: number;
   credentialTypeName?: string;
   name: string;
-  businessUnitId?: number; // TODO: pending remove
   expireDateApplicable: boolean;
   comment?: string;
 
   constructor(credential: Credential) {
     if (credential.id) {
       this.id = credential.id;
-    }
-
-    if (credential.businessUnitId) {
-      this.businessUnitId = credential.businessUnitId;
     }
 
     this.credentialTypeId = credential.credentialTypeId;

@@ -2,13 +2,13 @@ import { Country } from "src/app/shared/enums/states";
 import { Organization } from "src/app/shared/models/organization.model";
 import { SkillCategory } from "src/app/shared/models/skill-category.model";
 import { Skill } from "src/app/shared/models/skill.model";
-import { Department } from '../../shared/models/department.model';
-import { Location } from '../../shared/models/location.model';
-import { Region } from '../../shared/models/region.model';
-import { CredentialType } from '../../shared/models/credential-type.model';
-import { Credential } from '../../shared/models/credential.model';
-import { CredentialSkillGroup } from '../../shared/models/skill-group.model';
-import { CredentialSetup, CredentialSetupGetGroup } from '../../shared/models/credential-setup.model';
+import { Department } from '@shared/models/department.model';
+import { Location } from '@shared/models/location.model';
+import { Region } from '@shared/models/region.model';
+import { CredentialType } from '@shared/models/credential-type.model';
+import { Credential } from '@shared/models/credential.model';
+import { CredentialSkillGroup } from '@shared/models/skill-group.model';
+import { CredentialSetup, CredentialSetupGetGroup } from '@shared/models/credential-setup.model';
 import { OrganizationSettingsPost } from '@shared/models/organization-settings.model';
 
 export class SetGeneralStatesByCountry {
@@ -261,9 +261,9 @@ export class SaveCredential {
   constructor(public payload: Credential) { }
 }
 
-export class UpdateCredential {
-  static readonly type = '[organizationManagement] Update Credential';
-  constructor(public credential: Credential) { }
+export class SaveCredentialSucceeded {
+  static readonly type = '[organizationManagement] Save Credential Succeeded';
+  constructor(public payload: Credential) {}
 }
 
 export class RemoveCredential {
