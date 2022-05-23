@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { GroupComponent } from './credentials/credentials-setup/group/group.component';
 import { CredentialsComponent } from './credentials/credentials.component';
 import { DepartmentsComponent } from './departments/departments.component';
+import { HolidaysComponent } from './holidays/holidays.component';
 import { LocationsComponent } from './locations/locations.component';
 import { OrganizationManagementComponent } from './organization-management.component';
 import { SettingsComponent } from './settings/settings.component';
@@ -59,6 +60,13 @@ const routes: Routes = [
       {
         path: 'settings',
         component: SettingsComponent,
+        data: {
+          isOrganizationArea: true
+        }
+      },
+      {
+        path: 'holidays',
+        component: HolidaysComponent,
         data: {
           isOrganizationArea: true
         }

@@ -1,0 +1,46 @@
+@import '../../styles/variables/colors';
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+
+  &>section {
+    display: flex;
+  }
+
+  button {
+    margin-left: 18px;
+  }
+}
+
+.grid-component {
+  margin-top: 25px;
+  overflow-y: auto;
+}
+
+.grid {
+  margin-top: 20px;
+
+  .grid-checkbox {
+    pointer-events: none;
+  }
+}
+
+.input-group {
+  margin-top: 5px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
+.holidays-form-dialog {
+  &.form-container {
+    margin-top: 20px;
+  }
+
+  .timepicker-field {
+    width: 60%;
+  }
+}

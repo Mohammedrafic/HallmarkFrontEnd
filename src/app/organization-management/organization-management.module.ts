@@ -45,6 +45,8 @@ import { CredentialsComponent } from './credentials/credentials.component';
 import { CredentialsListComponent } from './credentials/credentials-list/credentials-list.component';
 import { GroupMappingComponent } from './credentials/credentials-setup/group-mapping/group-mapping.component';
 import { GroupComponent } from './credentials/credentials-setup/group/group.component';
+import { HolidaysState } from './store/holidays.state';
+import { HolidaysComponent } from './holidays/holidays.component';
 
 const sidebarIcons = {
   Download,
@@ -77,6 +79,7 @@ const sidebarIcons = {
     SettingsComponent,
     GroupMappingComponent,
     GroupComponent,
+    HolidaysComponent
   ],
   imports: [
     CommonModule,
@@ -111,7 +114,8 @@ const sidebarIcons = {
     //STORE
     NgxsModule.forFeature([
       OrganizationManagementState,
-      ShiftsState
+      ShiftsState,
+      HolidaysState
     ]),
   ],
   providers: [
