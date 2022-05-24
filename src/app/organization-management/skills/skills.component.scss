@@ -1,12 +1,22 @@
-@import '../../styles/variables/colors';
+@import "../../styles/variables/colors";
+.flex-column {
+  .toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
 
-.toolbar {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
+    & > section {
+      display: flex;
+    }
 
-  button {
-    margin-left: 18px;
+    button {
+      margin-left: 18px;
+    }
+  }
+
+  .grid-component {
+    margin-top: 25px;
+    overflow-y: auto;
   }
 }
 
