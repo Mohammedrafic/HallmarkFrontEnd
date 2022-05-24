@@ -22,19 +22,19 @@
     [allowResizing]="allowResizing"
   >
     <e-columns>
-      <e-column field="skillCategory.name" headerText="skill category" width="200"></e-column>
-      <e-column field="masterSkill.skillAbbr" headerText="skill abbr" width="200"></e-column>
-      <e-column field="masterSkill.skillDescription" headerText="skill description" width="200"></e-column>
-      <e-column field="glNumber" headerText="gl number" width="200"></e-column>
-      <e-column field="allowOnboard" headerText="allow onboard" width="150">
+      <e-column field="skillCategory.name" headerText="skill category" width=200></e-column>
+      <e-column field="masterSkill.skillAbbr" headerText="skill abbr" width=200></e-column>
+      <e-column field="masterSkill.skillDescription" headerText="skill description" width=200></e-column>
+      <e-column field="glNumber" headerText="gl number" width=200></e-column>
+      <e-column field="allowOnboard" headerText="allow onboard" width=150>
         <ng-template #template let-data>
           <div class="bootstrap">
             <ejs-checkbox [checked]="data.allowOnboard" (change)="allowOnBoardChange(data, $event)" label=""></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
-      <e-column field="inactiveDate" type="date" [format]="format" headerText="inactive date" width="140"></e-column>
-      <e-column textAlign="Right" width="120">
+      <e-column field="inactiveDate" type="date" [format]="format" headerText="inactive date" width=140></e-column>
+      <e-column textAlign="Right" width=120>
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="editSkill(data, $event)">

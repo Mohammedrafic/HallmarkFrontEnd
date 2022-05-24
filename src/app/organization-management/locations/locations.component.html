@@ -45,16 +45,16 @@
     [allowResizing]="allowResizing"
   >
     <e-columns>
-      <e-column field="externalId" headerText="EXT LOCATION ID" width="200"></e-column>
-      <e-column field="invoiceId" headerText="INVOICE LOCATION ID" width="200"></e-column>
-      <e-column field="name" headerText="LOCATION NAME" width="200"></e-column>
-      <e-column field="address1" headerText="ADDRESS 1" width="200"></e-column>
-      <e-column field="address2" headerText="ADDRESS 2" width="200"></e-column>
-      <e-column field="city" headerText="CITY" width="200"></e-column>
-      <e-column field="state" headerText="STATE" width="200"></e-column>
-      <e-column field="zip" headerText="ZIP" width="200"></e-column>
-      <e-column field="contactPerson" headerText="CONTACT PERSON" width="200"></e-column>
-      <e-column textAlign="Right" width="120">
+      <e-column field="externalId" headerText="EXT LOCATION ID" width=200></e-column>
+      <e-column field="invoiceId" headerText="INVOICE LOCATION ID" width=200></e-column>
+      <e-column field="name" headerText="LOCATION NAME" width=200></e-column>
+      <e-column field="address1" headerText="ADDRESS 1" width=200></e-column>
+      <e-column field="address2" headerText="ADDRESS 2" width=200></e-column>
+      <e-column field="city" headerText="CITY" width=200></e-column>
+      <e-column field="state" headerText="STATE" width=200></e-column>
+      <e-column field="zip" headerText="ZIP" width=200></e-column>
+      <e-column field="contactPerson" headerText="CONTACT PERSON" width=200></e-column>
+      <e-column textAlign="Right" width=120>
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditButtonClick(data, $event)">
