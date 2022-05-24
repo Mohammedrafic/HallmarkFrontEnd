@@ -277,23 +277,23 @@ export class GetAllSkills {
 }
 
 export class GetCredentialSkillGroup {
-  static readonly type = '[organizationManagement] Get Credential Skill Group by Organization ID';
-  constructor(public payload: number) {}
+  static readonly type = '[organizationManagement] Get Credential Skill Group';
+  constructor() {}
 }
 
 export class SaveCredentialSkillGroup {
   static readonly type = '[organizationManagement] Save Credential Skill Group';
-  constructor(public skillGroup: CredentialSkillGroup, public organizationId: number) { }
+  constructor(public payload: CredentialSkillGroup) { }
 }
 
 export class UpdateCredentialSkillGroup {
   static readonly type = '[organizationManagement] Update Credential Skill Group';
-  constructor(public credentialSkillGroup: CredentialSkillGroup, public organizationId: number) { }
+  constructor(public payload: CredentialSkillGroup) { }
 }
 
 export class RemoveCredentialSkillGroup {
   static readonly type = '[organizationManagement] Remove Credential Skill Group';
-  constructor(public credentialSkillGroup: CredentialSkillGroup, public organizationId: number) { }
+  constructor(public payload: CredentialSkillGroup) { }
 }
 
 export class GetCredentialSetup {

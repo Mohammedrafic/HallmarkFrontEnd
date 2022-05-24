@@ -3,7 +3,6 @@ import { Skill } from './skill.model';
 export class CredentialSkillGroup {
   id?: number;
   name?: string;
-  organizationId?: number;
   skills?: any; // TODO: add object model
   skillIds: number[];
   skillNames?: string[];
@@ -15,10 +14,6 @@ export class CredentialSkillGroup {
 
     if (skillGroup.name) {
       this.name = skillGroup.name;
-    }
-
-    if (skillGroup.organizationId) {
-      this.organizationId = skillGroup.organizationId;
     }
 
     if (skillGroup.skills) {

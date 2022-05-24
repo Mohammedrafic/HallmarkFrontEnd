@@ -42,7 +42,6 @@ export class GroupMappingComponent extends AbstractGridConfigurationComponent im
   public regionLocationSkillGroupDropDownFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   private formBuilder: FormBuilder;
-  private fakeOrganizationId = 2; // TODO: remove after BE implementation
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';

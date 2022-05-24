@@ -18,6 +18,7 @@ import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { SideDialogComponent } from './components/side-dialog/side-dialog.component';
 import { SideMenuComponent } from './components/side-menu/side-menu.component';
+import { SearchComponent } from '@shared/components/search/search.component';
 
 const icons = {AlertCircle, CheckCircle};
 
@@ -30,6 +31,7 @@ const COMPONENTS = [
   MessageToastComponent,
   FileUploadDialogComponent,
   SideMenuComponent,
+  SearchComponent
 ];
 
 @NgModule({

@@ -25,7 +25,8 @@ import {
   Edit3,
   ChevronDown,
   ChevronRight,
-  Copy
+  Copy,
+  Search
 } from 'angular-feather/icons';
 
 import { NgxsModule } from '@ngxs/store';
@@ -63,7 +64,8 @@ const sidebarIcons = {
   Edit3,
   ChevronDown,
   ChevronRight,
-  Copy
+  Copy,
+  Search
 };
 @NgModule({
   declarations: [

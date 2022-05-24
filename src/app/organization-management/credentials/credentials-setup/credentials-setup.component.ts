@@ -14,10 +14,12 @@ import { OrganizationManagementState } from '../../store/organization-management
 import { Region } from '@shared/models/region.model';
 import { Location }  from '@shared/models/location.model';
 import {
-  GetCredential, GetCredentialSetup,
-  GetCredentialTypes, GetDepartmentsByLocationId, GetLocationsByRegionId,
+  GetCredential,
+  GetCredentialTypes,
+  GetDepartmentsByLocationId,
+  GetLocationsByRegionId,
   GetRegions,
-  GetCredentialSkillGroup
+  GetCredentialSkillGroup, ClearDepartmentList
 } from '../../store/organization-management.actions';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
@@ -75,7 +77,6 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
 
   public editedCredentialSetupId?: number;
 
-  private fakeOrganizationId = 2; // TODO: remove after BE implementation
   private invalidDate = '0001-01-01T00:00:00+00:00';
   private credentialsData$: Observable<any>;
 
@@ -101,35 +102,40 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       this.isFilteredBySkill = false;
     } else if (data.itemData.value === CredentialsFilter.BySkill) {
       this.isFilteredBySkill = true;
-      this.store.dispatch(new GetCredentialSkillGroup(this.fakeOrganizationId));
+      this.store.dispatch(new GetCredentialSkillGroup());
       this.store.dispatch(new GetRegions());
     }
   }
 
   onRegionDropDownChanged(event: any): void {
-    this.selectedRegionId = event.itemData.id;
-    this.store.dispatch(new GetLocationsByRegionId(this.selectedRegionId));
+    if (event.itemData) {
+      this.selectedRegionId = event.itemData.id;
+      this.store.dispatch(new GetLocationsByRegionId(this.selectedRegionId));
+      this.store.dispatch(new ClearDepartmentList());
+    }
   }
 
   onLocationDropDownChanged(event: any): void {
-    this.selectedLocationId = event.itemData.id;
-    this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocationId));
+    if (event.itemData) {
+      this.selectedLocationId = event.itemData.id;
+      this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocationId));
+    }
   }
 
   onDepartmentDropDownChanged(event: any): void {
-    this.selectedDepartmentId = event.itemData.id;
+    if (event.itemData) {
+      this.selectedDepartmentId = event.itemData.id;
+    }
   }
 
   onGroupDropDownChanged(event: any): void {
-    this.selectedSkillGroupId = event.itemData.id;
+    if (event.itemData) {
+      this.selectedSkillGroupId = event.itemData.id;
+    }
   }
 
   onGroupsSetupClick(): void {
     this.router.navigate(['./groups-setup'], { relativeTo: this.route });
-  }
-
-  onExpiryDateAppliedChange(event: any): void {
-    //  TODO: implementation
   }
 
   onOptionChange(event: any): void {
@@ -167,22 +173,20 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   onFormSaveClick(): void {
     if (this.credentialsSetupFormGroup.valid) {
       const credentialSetup: CredentialSetup = {
-        id: 1,
+        id: 1, // TODO: clarify with BE
         isActive: false, // TODO: clarify with BE
-        masterCredentialId: 1,
+        masterCredentialId: 1, // TODO: clarify with BE
         regionId: this.selectedRegionId,
-        organizationId: this.fakeOrganizationId,
         skillGroupId: this.selectedSkillGroupId,
         comments: this.credentialsSetupFormGroup.controls['comments'].value,
         inactiveDate: this.credentialsSetupFormGroup.controls['inactiveDate'].value,
-        expiryDateApplied: this.credentialsSetupFormGroup.controls['expiryDateApplied'].value,
         optional: this.credentialsSetupFormGroup.controls['optional'].value,
         reqSubmission: this.credentialsSetupFormGroup.controls['reqSubmission'].value,
         reqOnboard: this.credentialsSetupFormGroup.controls['reqOnboard'].value,
       }
 
       console.log(credentialSetup); // TODO: remove after implementation
-      // this.store.dispatch(new SaveUpdateCredentialSetup(credentialSetup, this.fakeOrganizationId)); // TODO: uncomment after implementation
+      // this.store.dispatch(new SaveUpdateCredentialSetup(credentialSetup)); // TODO: uncomment after implementation
       this.store.dispatch(new ShowSideDialog(false));
       this.clearFormData();
       this.removeActiveCssClass();
@@ -192,7 +196,6 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   }
 
   mapGridData(): void {
-    // TODO: map credential types by id
     this.credentialsData$.subscribe(data => {
       this.lastAvailablePage = this.getLastPage(data);
       data.forEach((item: any) => {

@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
 import { Observable } from 'rxjs';
-
-import { CredentialSkillGroup } from '../../shared/models/skill-group.model';
+import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 
 @Injectable({ providedIn: 'root' })
 export class SkillGroupService {
@@ -11,11 +9,11 @@ export class SkillGroupService {
   constructor(private http: HttpClient) {}
 
   /**
-   * Get all skill groups by organization id
+   * Get all skill groups
    * @return skill groups
    */
-  public getSkillGroups(organizationId: number): Observable<CredentialSkillGroup[]> {
-    return this.http.get<CredentialSkillGroup[]>(`/api/SkillGroups/organization/${organizationId}`)
+  public getSkillGroups(): Observable<CredentialSkillGroup[]> {
+    return this.http.get<CredentialSkillGroup[]>(`/api/SkillGroups`)
   }
 
   /**

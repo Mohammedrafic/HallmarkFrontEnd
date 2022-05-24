@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-search',
@@ -7,6 +7,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 })
 export class SearchComponent  {
   @ViewChild('inputWithIcon') search: ElementRef;
+  @Output() inputKeyUpEnter = new EventEmitter();
 
   constructor() { }
 
@@ -16,5 +17,9 @@ export class SearchComponent  {
 
   onSearchBlur(): void {
     this.search.nativeElement.classList.remove('e-search-input-active');
+  }
+
+  onKeyUp($event: any): void {
+    this.inputKeyUpEnter.emit($event);
   }
 }
