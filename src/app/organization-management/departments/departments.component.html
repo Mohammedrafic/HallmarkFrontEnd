@@ -1,13 +1,14 @@
-<section>
+<section class="flex-column">
   <section class="toolbar">
     <section class="department-details bootstrap">
       <ejs-dropdownlist
         id="regionsDropDown"
-        class="region-dropdown" placeholder="Region"
+        class="region-dropdown"
+        placeholder="Region"
         [dataSource]="regions$ | async"
         [fields]="regionFields"
         (change)="onRegionDropDownChanged($event)"
-        ></ejs-dropdownlist>
+      ></ejs-dropdownlist>
       <ejs-dropdownlist
         id="locationsDropDown"
         class="location-dropdown"
@@ -32,87 +33,87 @@
         ejs-button
         id="addDepartmentButton"
         [isPrimary]="true"
-        (click)='onAddDepartmentClick()'>Add Department</button>
+        (click)="onAddDepartmentClick()">Add Department</button>
     </section>
   </section>
 
-  <section class="grid">
-    <ejs-grid
-      #grid
-      [dataSource]="gridDataSource"
-      [allowPaging]="allowPaging"
-      [pageSettings]="pageSettings"
-      [height]="gridHeight"
-      [rowHeight]="rowHeight"
-      [resizeSettings]="resizeSettings"
-      [allowSorting]="allowSorting"
-      [allowResizing]="allowResizing"
-    >
-      <e-columns>
-        <e-column field="extDepartmentId" headerText="EXT DEPARTMENT ID" width=200></e-column>
-        <e-column field="invoiceDepartmentId" headerText="INVOICE DEPARTMENT ID" width=200></e-column>
-        <e-column field="departmentName" headerText="DEPARTMENT NAME" width=200></e-column>
-        <e-column field="facilityContact" headerText="FACILITY CONTACT" width=200></e-column>
-        <e-column field="facilityEmail" headerText="FACILITY EMAIL" width=200></e-column>
-        <e-column field="facilityPhoneNo" headerText="FACILITY PHONE NO" [valueAccessor]="formatPhoneNumber" width=200></e-column>
-        <e-column field="inactiveDate" headerText="INACTIVE DATE" type='date' format="MM/dd/yyyy" width=200></e-column>
-        <e-column textAlign="Right" width=120>
-          <ng-template #template let-data>
-            <div class="row-tool-buttons">
-              <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditDepartmentClick(data, $event)">
-                <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
-              </button>
-              <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemoveDepartmentClick(data, $event)">
-                <span class="remove-button" ><i-feather name="trash-2" class="icon"></i-feather></span>
-              </button>
-            </div>
-          </ng-template>
-        </e-column>
-      </e-columns>
-      <ng-template #pagerTemplate let-data>
-        <div class="e-pagertemplate">
-          <div class="control-section">
-            <div class="content-wrapper">
-              <section class="left-side-pager-controls">
-                <ejs-dropdownlist
-                  id="rowsPerPage"
-                  class="dropdown-no-border"
-                  [dataSource]="rowsPerPageDropDown"
-                  [(value)]="activeRowsPerPageDropDown"
-                  (change)="onRowsDropDownChanged()"
-                >
-                </ejs-dropdownlist>
-                <ejs-numerictextbox
-                  id="goToPage"
-                  class="numeric-input-no-border"
-                  format="#"
-                  [validateDecimalOnType]="validateDecimalOnType"
-                  [decimals]="decimals"
-                  placeholder="Go to:"
-                  min="1" [max]="lastAvailablePage"
-                  [showSpinButton]="false"
-                  (change)="onGoToClick($event)"
-                >
-                </ejs-numerictextbox>
-              </section>
-              <section class="right-side-pager-controls">
-                <ejs-pager
-                  id="gridPager"
-                  #gridPager
-                  [pageSize]="pageSizePager"
-                  [totalRecordsCount]="totalDataRecords"
-                  [enablePagerMessage]="false"
-                  [currentPage]="currentPagerPage"
-                  (click)="onGoToClick($event)"
-                >
-                </ejs-pager>
-              </section>
-            </div>
+  <ejs-grid class="grid grid-component"
+    #grid
+    [dataSource]="gridDataSource"
+    [allowPaging]="allowPaging"
+    [pageSettings]="pageSettings"
+    [height]="fullScreenGridHeight"
+    [rowHeight]="rowHeight"
+    [resizeSettings]="resizeSettings"
+    [allowSorting]="allowSorting"
+    [allowResizing]="allowResizing"
+  >
+    <e-columns>
+      <e-column field="extDepartmentId" headerText="EXT DEPARTMENT ID" width=200></e-column>
+      <e-column field="invoiceDepartmentId" headerText="INVOICE DEPARTMENT ID" width=200></e-column>
+      <e-column field="departmentName" headerText="DEPARTMENT NAME" width=200></e-column>
+      <e-column field="facilityContact" headerText="FACILITY CONTACT" width=200></e-column>
+      <e-column field="facilityEmail" headerText="FACILITY EMAIL" width=200></e-column>
+      <e-column field="facilityPhoneNo" headerText="FACILITY PHONE NO" [valueAccessor]="formatPhoneNumber" width=200></e-column>
+      <e-column field="inactiveDate" headerText="INACTIVE DATE" type="date" format="MM/dd/yyyy" width=200></e-column>
+      <e-column textAlign="Right" width=120>
+        <ng-template #template let-data>
+          <div class="row-tool-buttons">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditDepartmentClick(data, $event)">
+              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemoveDepartmentClick(data, $event)">
+              <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
+    </e-columns>
+    <ng-template #pagerTemplate let-data>
+      <div class="e-pagertemplate">
+        <div class="control-section">
+          <div class="content-wrapper">
+            <section class="left-side-pager-controls">
+              <ejs-dropdownlist
+                id="rowsPerPage"
+                class="dropdown-no-border"
+                [dataSource]="rowsPerPageDropDown"
+                [(value)]="activeRowsPerPageDropDown"
+                (change)="onRowsDropDownChanged()"
+              >
+              </ejs-dropdownlist>
+              <ejs-numerictextbox
+                id="goToPage"
+                class="numeric-input-no-border"
+                format="#"
+                [validateDecimalOnType]="validateDecimalOnType"
+                [decimals]="decimals"
+                placeholder="Go to:"
+                min="1"
+                [max]="lastAvailablePage"
+                [showSpinButton]="false"
+                (change)="onGoToClick($event)"
+              >
+              </ejs-numerictextbox>
+            </section>
+            <section class="right-side-pager-controls">
+              <ejs-pager
+                id="gridPager"
+                #gridPager
+                [pageSize]="pageSizePager"
+                [totalRecordsCount]="totalDataRecords"
+                [enablePagerMessage]="false"
+                [currentPage]="currentPagerPage"
+                (click)="onGoToClick($event)"
+              >
+              </ejs-pager>
+            </section>
           </div>
         </div>
-      </ng-template>
-    </ejs-grid>
-  </section>
+      </div>
+    </ng-template>
+  </ejs-grid>
+</section>
 
   <app-side-dialog
     (formCancelClicked)="onDepartmentFormCancelClick()"
@@ -236,6 +237,4 @@
       </div>
     </form>
   </app-side-dialog>
-</section>
-
 <app-file-upload-dialog></app-file-upload-dialog>

@@ -1,39 +1,45 @@
-@import '../../styles/variables/colors';
-
-.toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px 0;
-
-  .department-details {
+@import "../../styles/variables/colors";
+.flex-column {
+  .toolbar {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 0;
 
-    ejs-dropdownlist.e-control {
-      span.e-input-group {
-        height: 40px !important;
+    .department-details {
+      display: flex;
+
+      ejs-dropdownlist.e-control {
+        span.e-input-group {
+          height: 40px !important;
+        }
+      }
+
+      .region-dropdown {
+        padding-right: 12px;
+      }
+
+      .e-input-group.e-control-wrapper input {
+        padding-left: 16px;
+        padding-bottom: 7px;
+        padding-top: 5px;
       }
     }
 
-    .region-dropdown {
-      padding-right: 12px;
+    .button-filter {
+      margin-left: 12px;
+      margin-right: 6px;
     }
 
-    .e-input-group.e-control-wrapper input {
-      padding-left: 16px;
-      padding-bottom: 7px;
-      padding-top: 5px;
+    .button-import {
+      margin-left: 6px;
+      margin-right: 12px;
     }
   }
 
-  .button-filter {
-    margin-left: 12px;
-    margin-right: 6px;
-  }
-
-  .button-import {
-    margin-left: 6px;
-    margin-right: 12px;
+  .grid-component {
+    margin-top: 25px;
+    overflow-y: auto;
   }
 }
 

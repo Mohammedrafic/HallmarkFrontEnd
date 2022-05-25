@@ -21,7 +21,7 @@
         (click)='addHoliday()'>Add Holiday</button>
     </section>
   </section>
-  <ejs-grid class="grid"
+  <ejs-grid class="grid grid-component"
     #grid
     [dataSource]="(holidaysPage$ | async)?.items"
     [allowPaging]="allowPaging"
@@ -31,7 +31,6 @@
     [resizeSettings]="resizeSettings"
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
-    class="grid-component"
   >
     <e-columns>
       <e-column field="regionId" headerText="region" width=200>
