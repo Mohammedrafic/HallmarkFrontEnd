@@ -34,7 +34,7 @@
         </ng-template>
       </e-column>
       <e-column field="inactiveDate" type="date" [format]="format" headerText="inactive date" width=140></e-column>
-      <e-column textAlign="Right" width=120>
+      <e-column textAlign="Right" width=120 freeze="Right">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="editSkill(data, $event)">

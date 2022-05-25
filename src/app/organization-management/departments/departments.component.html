@@ -56,7 +56,7 @@
       <e-column field="facilityEmail" headerText="FACILITY EMAIL" width=200></e-column>
       <e-column field="facilityPhoneNo" headerText="FACILITY PHONE NO" [valueAccessor]="formatPhoneNumber" width=200></e-column>
       <e-column field="inactiveDate" headerText="INACTIVE DATE" type="date" format="MM/dd/yyyy" width=200></e-column>
-      <e-column textAlign="Right" width=120>
+      <e-column textAlign="Right" width=120 freeze="Right">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditDepartmentClick(data, $event)">

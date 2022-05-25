@@ -54,7 +54,7 @@
       <e-column field="state" headerText="STATE" width=200></e-column>
       <e-column field="zip" headerText="ZIP" width=200></e-column>
       <e-column field="contactPerson" headerText="CONTACT PERSON" width=200></e-column>
-      <e-column textAlign="Right" width=120>
+      <e-column textAlign="Right" width=120 freeze="Right">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditButtonClick(data, $event)">
