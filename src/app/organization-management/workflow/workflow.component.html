@@ -1,0 +1,24 @@
+<section class="container">
+  <div class="tools-button-container">
+<!-- TODO: -->
+  </div>
+  <ejs-tab
+    id="navigationTabs"
+    (selected)="onTabSelected($event)"
+  >
+    <e-tabitems>
+      <e-tabitem>
+        <ng-template #headerText><div>Job Order Workflow</div></ng-template>
+        <ng-template #content>
+          <app-job-order [isActive]="isJobOrderWorkflowTabActive"></app-job-order>
+        </ng-template>
+      </e-tabitem>
+      <e-tabitem>
+        <ng-template #headerText><div>Workflow Mapping</div></ng-template>
+        <ng-template #content>
+          <app-workflow-mapping [isActive]="isWorkflowMappingTabActive"></app-workflow-mapping>
+        </ng-template>
+      </e-tabitem>
+    </e-tabitems>
+  </ejs-tab>
+</section>
