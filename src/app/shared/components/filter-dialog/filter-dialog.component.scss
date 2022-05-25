@@ -1,0 +1,72 @@
+@import '../../../styles/variables/colors';
+
+.dialog {
+  right: 0;
+  top: 60px !important;
+  left: auto !important;
+  height: calc(100% - 60px) !important;
+
+  .e-dlg-content {
+    padding: 0;
+  }
+
+  .container {
+    padding: 24px;
+
+    .form-container {
+      .input-container {
+        padding-top: 20px;
+
+        label {
+          margin-bottom: 12px;
+        }
+      }
+    }
+  }
+
+  .e-dlg-header-content {
+    padding: 24px;
+
+    .e-dlg-closeicon-btn {
+      margin-top: 5px;
+    }
+
+    .container {
+      padding: 0;
+
+      .header-container {
+        .e-card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .e-card-title {
+            color: $black;
+            font-size: 24px;
+            font-weight: 700;
+          }
+        }
+      }
+    }
+  }
+
+  .e-footer-content {
+    padding: 0;
+
+    .e-card-content {
+      display: flex;
+      justify-content: space-between;
+
+      .button-clear {
+        width: 100%;
+        margin-right: 12px;
+        margin-left: 0;
+      }
+
+      .button-filter {
+        width: 100%;
+        margin-left: 0;
+      }
+    }
+  }
+}

@@ -35,7 +35,6 @@ export class GroupMappingComponent extends AbstractGridConfigurationComponent im
   @ViewChild('grid') grid: GridComponent;
 
   @Input() isActive: boolean = false;
-  @Input() isFilterActive: boolean = false;
 
   @Select(OrganizationManagementState.skillGroups)
   skillGroups$: Observable<CredentialSkillGroup[]>;
@@ -157,6 +156,14 @@ export class GroupMappingComponent extends AbstractGridConfigurationComponent im
     } else {
       this.groupMappingFormGroup.markAllAsTouched();
     }
+  }
+
+  public onClearAllFiltersClick(): void {
+    // TODO: add implementation
+  }
+
+  public onApplyFilterClick(): void {
+    // TODO: add implementation
   }
 
   public onCredentialSetupLinkClick(data: any): void {
