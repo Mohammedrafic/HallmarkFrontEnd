@@ -1,5 +1,3 @@
-import { Skill } from './skill.model';
-
 export class CredentialSkillGroup {
   id?: number;
   name?: string;
@@ -24,4 +22,9 @@ export class CredentialSkillGroup {
       this.skillIds = skillGroup.skillIds;
     }
   }
+}
+
+export class CredentialSkillGroupMapping {
+  id: number;
+  name?: string;
 }
