@@ -1,8 +1,8 @@
-import { Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { combineLatestWith, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
+import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import {
   AbstractGridConfigurationComponent
@@ -29,26 +29,21 @@ import { SortSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-mode
 })
 export class CredentialsListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
-  @ViewChild('gridPager') pager: PagerComponent;
 
-  gridSortSettings: SortSettingsModel = { columns: [{ field: 'credentialTypeName', direction: 'Ascending' }] };
-
-  @Input() isActive: boolean = false;
+  public gridSortSettings: SortSettingsModel = { columns: [{ field: 'credentialTypeName', direction: 'Ascending' }] };
 
   @Select(OrganizationManagementState.credentialTypes)
   credentialTypes$: Observable<CredentialType[]> ;
-  credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  public credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   @Select(OrganizationManagementState.credentials)
   credentials$: Observable<Credential[]>;
 
-  credentialsFormGroup: FormGroup;
-  formBuilder: FormBuilder;
+  public credentialsFormGroup: FormGroup;
+  public formBuilder: FormBuilder;
 
-  editedCredentialId?: number;
-  isEdit: boolean;
-
-  fakeOrganizationId = 2;
+  public editedCredentialId?: number;
+  public isEdit: boolean;
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -91,7 +86,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     }));
   }
 
-  onEditButtonClick(credential: Credential, event: any): void {
+  public onEditButtonClick(credential: Credential, event: any): void {
     this.addActiveCssClass(event);
     this.credentialsFormGroup.setValue({
       credentialTypeId: credential.credentialTypeId,
@@ -104,7 +99,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  onRemoveButtonClick(credential: Credential, event: any): void {
+  public onRemoveButtonClick(credential: Credential, event: any): void {
     this.addActiveCssClass(event);
     this.confirmService
       .confirm('Are you sure want to delete?', {
@@ -120,11 +115,11 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
       });
   }
 
-  onRowsDropDownChanged(): void {
+  public onRowsDropDownChanged(): void {
     this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
   }
 
-  onGoToClick(event: any): void {
+  public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
       this.credentials$.subscribe(data => {
         this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
@@ -133,7 +128,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     }
   }
 
-  onFormCancelClick(): void {
+  public onFormCancelClick(): void {
     this.confirmService
       .confirm(CANCEL_COFIRM_TEXT, {
         title: DELETE_CONFIRM_TITLE,
@@ -145,7 +140,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
       });
   }
 
-  onFormSaveClick(): void {
+  public onFormSaveClick(): void {
     if (this.credentialsFormGroup.valid) {
       if (this.isEdit) {
         const credential = new Credential({
@@ -173,7 +168,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     }
   }
 
-  mapGridData(): void {
+  private mapGridData(): void {
     this.credentials$.pipe(combineLatestWith(this.credentialTypes$),
       filter(([credentials, credentialTypes]) => credentials?.length > 0 && credentialTypes.length > 0))
       .subscribe(([credentials, credentialTypes]) => {

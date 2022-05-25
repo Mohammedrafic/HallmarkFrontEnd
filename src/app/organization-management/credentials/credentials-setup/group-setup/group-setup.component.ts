@@ -71,7 +71,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetCredentialSkillGroup());
+    // this.store.dispatch(new GetCredentialSkillGroup()); // TODO: uncomment after BE fixed
     this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize));
     this.mapGridData();
   }

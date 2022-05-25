@@ -31,6 +31,7 @@ import {
 
 import { NgxsModule } from '@ngxs/store';
 import { OrganizationManagementState } from './store/organization-management.state';
+import { CredentialsState } from './store/credentials.state';
 import { SharedModule } from '../shared/shared.module';
 import { ShiftsState } from './store/shifts.state';
 import { OrganizationManagementComponent } from './organization-management.component';
@@ -116,6 +117,7 @@ const sidebarIcons = {
     //STORE
     NgxsModule.forFeature([
       OrganizationManagementState,
+      CredentialsState,
       ShiftsState,
       HolidaysState
     ]),

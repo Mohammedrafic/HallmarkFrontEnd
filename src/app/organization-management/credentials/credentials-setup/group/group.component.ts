@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ShowSideDialog } from '../../../../store/app.actions';
 import { Store } from '@ngxs/store';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { SetNavigationTab } from '../../../store/credentials.actions';
+import { CredentialsNavigationTabs } from '@shared/enums/credentials-navigation-tabs';
 
 export enum GroupNavigationTabs {
   GroupSetupTab,
@@ -13,16 +15,12 @@ export enum GroupNavigationTabs {
   templateUrl: './group.component.html',
   styleUrls: ['./group.component.scss']
 })
-export class GroupComponent implements OnInit {
+export class GroupComponent {
   public isGroupSetupTabActive = true;
   public isGroupMappingTabActive = false;
 
   constructor(private store: Store,
-              private router: Router,
-              private route: ActivatedRoute) { }
-
-  ngOnInit() {
-  }
+              private router: Router) { }
 
   onTabSelected(selectedTab: any): void {
     this.isGroupSetupTabActive = GroupNavigationTabs['GroupSetupTab'] === selectedTab.selectedIndex;
@@ -31,7 +29,8 @@ export class GroupComponent implements OnInit {
   }
 
   onBackButtonClick(): void {
-    this.router.navigate(['..'], { relativeTo: this.route });
+    this.store.dispatch(new SetNavigationTab(CredentialsNavigationTabs.Setup));
+    this.router.navigateByUrl('admin/organization-management/credentials/setup');
   }
 
   onOpenFormButtonClick(): void {
