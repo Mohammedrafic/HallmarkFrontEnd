@@ -1,7 +1,7 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GridComponent } from '@syncfusion/ej2-angular-grids';
+import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { filter, Observable, of, Subject, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
@@ -20,7 +20,7 @@ import {
   GetLocationsByRegionId,
   GetRegions,
   ClearDepartmentList,
-  GetCredentialSkillGroup, ClearLocationList
+  ClearLocationList
 } from '../../store/organization-management.actions';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
@@ -37,7 +37,8 @@ import { SetCredentialSetupFilter } from '../../store/credentials.actions';
 @Component({
   selector: 'app-credentials-setup',
   templateUrl: './credentials-setup.component.html',
-  styleUrls: ['./credentials-setup.component.scss']
+  styleUrls: ['./credentials-setup.component.scss'],
+  providers: [FreezeService]
 })
 export class CredentialsSetupComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
