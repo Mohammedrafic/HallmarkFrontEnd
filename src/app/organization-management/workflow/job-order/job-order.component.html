@@ -1,0 +1,50 @@
+<section class="container">
+  <div class="toolbar-buttons">
+    <button ejs-button cssClass="e-outline delete-button">Delete</button>
+    <button ejs-button [isPrimary]="true">Save</button>
+  </div>
+
+  <section>
+    <div class="cards-container">
+      <div class="cards">
+<!--TODO: add cards-->
+      </div>
+
+      <button
+        ejs-button
+        cssClass="e-flat button-with-icon"
+        (click)="onAddNewWorkflowClick()"
+      ><i-feather name="plus" class="icon"></i-feather> Add New Workflow</button>
+    </div>
+
+    <div class="workflows-container">
+<!--      TODO: add workflows-->
+    </div>
+  </section>
+
+  <app-side-dialog
+    *ngIf="isActive"
+    (formCancelClicked)="onCancelFormClick()"
+    (formSaveClicked)="onSaveFormClick()"
+    [header]="dialogHeader + ' Workflow'"
+  >
+    <form class="form-container bootstrap"
+          id="addWorkflow"
+          [formGroup]="workflowFormGroup">
+      <div>
+        <div class="input-container">
+          <label for="workflow">Workflow <span class="required">*</span></label>
+          <div class="input-group">
+            <input id="workflow"
+                   class="e-input"
+                   type="text"
+                   maxlength="50"
+                   appValidateWithMessage
+                   placeholder="Workflow"
+                   formControlName="workflow"/>
+          </div>
+        </div>
+      </div>
+    </form>
+  </app-side-dialog>
+</section>

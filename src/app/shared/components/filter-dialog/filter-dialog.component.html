@@ -1,0 +1,46 @@
+<ejs-dialog
+  id="filterDialog"
+  #filterDialog
+  cssClass="dialog"
+  [width]="width"
+  [target]="targetElement"
+  [visible]="false"
+  [isModal]="true"
+  [showCloseIcon]="true"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #header>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">Filters</h3>
+          </div>
+        </div>
+      </section>
+    </section>
+  </ng-template>
+  <ng-template #content>
+    <section class="container">
+      <ng-content></ng-content>
+    </section>
+  </ng-template>
+  <ng-template #footerTemplate>
+    <div class="container">
+      <div class="e-card-content">
+        <button
+          ejs-button
+          cssClass="e-outline button-clear"
+          id="clearAllButton"
+          (click)="onClearAllFilterClick()">Clear All</button>
+        <button
+          ejs-button
+          cssClass="button-filter"
+          id="filterButton"
+          type="submit"
+          [isPrimary]="true"
+          (click)="onFilterClick()">Filter</button>
+      </div>
+    </div>
+  </ng-template>
+</ejs-dialog>

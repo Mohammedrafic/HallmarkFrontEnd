@@ -19,6 +19,7 @@ import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { SideDialogComponent } from './components/side-dialog/side-dialog.component';
 import { SideMenuComponent } from './components/side-menu/side-menu.component';
 import { SearchComponent } from '@shared/components/search/search.component';
+import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.component';
 
 const icons = {AlertCircle, CheckCircle};
 
@@ -28,6 +29,7 @@ const COMPONENTS = [
   ValidateDirective,
   ImageUploaderComponent,
   SideDialogComponent,
+  FilterDialogComponent,
   MessageToastComponent,
   FileUploadDialogComponent,
   SideMenuComponent,

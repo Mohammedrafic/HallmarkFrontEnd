@@ -49,6 +49,9 @@ import { GroupMappingComponent } from './credentials/credentials-setup/group-map
 import { GroupComponent } from './credentials/credentials-setup/group/group.component';
 import { HolidaysState } from './store/holidays.state';
 import { HolidaysComponent } from './holidays/holidays.component';
+import { WorkflowComponent } from './workflow/workflow.component';
+import { JobOrderComponent } from './workflow/job-order/job-order.component';
+import { WorkflowMappingComponent } from './workflow/workflow-mapping/workflow-mapping.component';
 
 const sidebarIcons = {
   Download,
@@ -82,7 +85,10 @@ const sidebarIcons = {
     SettingsComponent,
     GroupMappingComponent,
     GroupComponent,
-    HolidaysComponent
+    HolidaysComponent,
+    WorkflowComponent,
+    JobOrderComponent,
+    WorkflowMappingComponent
   ],
   imports: [
     CommonModule,

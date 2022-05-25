@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ShowSideDialog } from '../../../../store/app.actions';
+import { ShowFilterDialog, ShowSideDialog } from '../../../../store/app.actions';
 import { Store } from '@ngxs/store';
 import { Router } from '@angular/router';
 import { SetNavigationTab } from '../../../store/credentials.actions';
@@ -35,5 +35,9 @@ export class GroupComponent {
 
   onOpenFormButtonClick(): void {
     this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  onOpenFilterButtonClick(): void {
+    this.store.dispatch(new ShowFilterDialog(true));
   }
 }
