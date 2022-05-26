@@ -5,10 +5,9 @@ import { Observable } from 'rxjs';
 import {
   AssociateOrganizations,
   AssociateOrganizationsPage,
-  FeeExceptionsInitialData,
   FeeSettings,
-  JobDistribution,
   JobDistributionInitialData,
+  PartnershipSettings,
 } from 'src/app/shared/models/associate-organizations.model';
 
 @Injectable({
@@ -70,21 +69,21 @@ export class AssociateOrganizationsService {
   }
 
   /**
-   * Save Job Distribution
-   * @param JobDistribution
-   * @return Job Distribution
+   * Save Partnership Settings
+   * @param PartnershipSettings
+   * @return Partnership Settings
    */
-  public saveJobDistribution(jobDistribution: JobDistribution): Observable<JobDistribution> {
-    return this.http.put<JobDistribution>(`/api/AssociateOrganizations/jobDistribution`, jobDistribution);
+  public savePartnershipSettings(jobDistribution: PartnershipSettings): Observable<PartnershipSettings> {
+    return this.http.put<PartnershipSettings>(`/api/AssociateOrganizations/partnershipSettings`, jobDistribution);
   }
 
   /**
-   * Get Job Distribution By Organization Id
+   * Get Partnership SettingsBy Organization Id
    * @param associateOrganizationId
-   * @return Job Distribution
+   * @return Partnership Settings
    */
-  public getJobDistributionById(associateOrganizationId: number): Observable<JobDistribution> {
-    return this.http.get<JobDistribution>(`/api/AssociateOrganizations/${associateOrganizationId}/jobDistribution`);
+  public getPartnershipSettingsById(associateOrganizationId: number): Observable<PartnershipSettings> {
+    return this.http.get<PartnershipSettings>(`/api/AssociateOrganizations/${associateOrganizationId}/partnershipSettings`);
   }
 
   /**

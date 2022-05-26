@@ -1,3 +1,4 @@
+import { DistributionLevels, PartnershipStatus, SubmissionPercentageOverrideRestriction } from '@shared/enums/partnership-settings';
 import { PageOfCollections } from './page.model';
 import { Region } from './region.model';
 import { SkillCategory } from './skill-category.model';
@@ -7,11 +8,15 @@ export type AssociateOrganizations = {
   organizationId?: number;
   organizationName: string;
   baseFee: number;
+  tier: number;
+  tierTitle: string;
   exeptionFee: string;
   region: string;
   classification: string;
   orderType: string;
   skillCategory: string;
+  partnershipStatus: number;
+  partnershipStatusTitle: string;
 };
 
 export type AssociateOrganizationsPage = PageOfCollections<AssociateOrganizations>;
@@ -78,10 +83,19 @@ export type JobDistributionInitialData = {
   skillCategories: SkillCategory[];
 };
 
-export type JobDistribution = {
-  associateOrganizationId: number;
+export type PartnershipSettings = {
+  status: PartnershipStatus;
+  agencyCategory: DistributionLevels;
   regionIds: number[];
   skillCategoryIds: number[];
   classifications: number[];
   orderTypes: number[];
+  allowOnBoard: boolean;
+  allowDeployCredentials: boolean;
+  excludeExperience: boolean;
+  sendCandidateDistributionEmail: boolean;
+  updateBySelf: boolean;
+  loadAgencyCandidateDetails: boolean;
+  applyProhibited: boolean;
+  submissionPercentageOverrideRestriction: SubmissionPercentageOverrideRestriction;
 };

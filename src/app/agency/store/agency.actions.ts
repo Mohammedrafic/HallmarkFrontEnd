@@ -1,5 +1,5 @@
 import { Agency } from 'src/app/shared/models/agency.model';
-import { AssociateOrganizations, FeeExceptionsDTO, FeeExceptionsPage, FeeSettings, JobDistribution } from 'src/app/shared/models/associate-organizations.model';
+import { AssociateOrganizations, FeeExceptionsDTO, FeeExceptionsPage, FeeSettings, PartnershipSettings } from 'src/app/shared/models/associate-organizations.model';
 
 export class SaveAgency {
   static readonly type = '[agency] Save Agency';
@@ -95,18 +95,18 @@ export class GetJobDistributionInitialData {
   constructor(public organizationId: number) { }
 }
 
-export class SaveJobDistribution {
-  static readonly type = '[agency] Save Job Distribution';
-  constructor(public payload: JobDistribution) {}
+export class SavePartnershipSettings {
+  static readonly type = '[agency] Save Partnership Settings';
+  constructor(public payload: PartnershipSettings) {}
 }
 
-export class SaveJobDistributionSucceeded {
-  static readonly type = '[agency] Save Job Distribution Succeeded';
-  constructor(public payload: JobDistribution) {}
+export class SavePartnershipSettingsSucceeded {
+  static readonly type = '[agency] Save Partnership Settings Succeeded';
+  constructor(public payload: PartnershipSettings) {}
 }
 
-export class GetJobDistributionId {
-  static readonly type = '[agency] Get Job Distribution By Organization Id';
+export class GetPartnershipSettings {
+  static readonly type = '[agency] Get Partnership Settings By Organization Id';
   constructor(public organizationId: number) { }
 }
 
