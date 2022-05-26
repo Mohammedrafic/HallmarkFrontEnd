@@ -37,6 +37,11 @@ export class ShowSideDialog {
   constructor(public isDialogShown: boolean) { }
 }
 
+export class ShowFilterDialog {
+  static readonly type = '[app] Set Filter Dialog Showing state';
+  constructor(public isDialogShown: boolean) { }
+}
+
 export class SetIsOrganizationAgencyArea {
   static readonly type = '[app] Set Is Organization/Agency Area';
   constructor(public payload: IsOrganizationAgencyAreaStateModel) { }

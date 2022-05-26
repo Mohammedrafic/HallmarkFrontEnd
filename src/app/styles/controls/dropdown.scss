@@ -2,7 +2,7 @@
 
 body.light, body.dark {
   .bootstrap {
-    ejs-dropdownlist.e-control, ejs-multiselect.e-control {
+    ejs-dropdownlist.e-control, ejs-multiselect.e-control, ejs-autocomplete.e-control {
       span.e-input-group, .e-multiselect.e-input-group {
         border-radius: 8px;
         height: 40px;
@@ -39,6 +39,22 @@ body.light, body.dark {
 
         span.e-delim-view.e-delim-values {
           padding-left: 15px;
+        }
+
+        .e-down-icon {
+          .e-input-group-icon {
+            background: transparent;
+            color: $secondary-dark-blue-10;
+            border: none;
+          }
+        }
+
+        .e-input-group-icon {
+          &.e-search-icon {
+            background: transparent !important;
+            color: $secondary-dark-blue-10 !important;
+            border-left: none;
+          }
         }
       }
 

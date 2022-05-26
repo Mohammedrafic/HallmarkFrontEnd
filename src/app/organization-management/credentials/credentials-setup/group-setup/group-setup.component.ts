@@ -1,7 +1,7 @@
-import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
-import { filter, Observable } from 'rxjs';
+import { Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { GridComponent, SearchService } from '@syncfusion/ej2-angular-grids';
+import { filter, Observable, of } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import {
   AbstractGridConfigurationComponent
@@ -17,7 +17,8 @@ import {
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import {
-  GetAssignedSkillsByPage, GetCredentialSkillGroup,
+  GetAssignedSkillsByPage,
+  GetCredentialSkillGroup,
   RemoveCredentialSkillGroup,
   SaveCredentialSkillGroup,
   UpdateCredentialSkillGroup
@@ -26,10 +27,13 @@ import {
 @Component({
   selector: 'app-group-setup',
   templateUrl: './group-setup.component.html',
-  styleUrls: ['./group-setup.component.scss']
+  styleUrls: ['./group-setup.component.scss'],
+  providers: [SearchService]
 })
 export class GroupSetupComponent extends AbstractGridConfigurationComponent implements OnInit {
   @ViewChild('grid') grid: GridComponent;
+  @ViewChild('searchGrid') searchGrid: GridComponent;
+  @ViewChild('searchInputWithIcon') search: ElementRef;
 
   @Input() isActive: boolean = false;
 
@@ -42,6 +46,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     text: 'masterSkill.skillDescription',
     value: 'id',
   };
+  skillsId = new Set<number>();
 
   skillGroupsFormGroup: FormGroup;
   formBuilder: FormBuilder;
@@ -49,11 +54,12 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   isEdit: boolean;
   editedSkillGroupId?: number;
 
-  private fakeOrganizationId = 2; // TODO: remove after BE implementation
-  private skillGroupPathName = 'admin/organization-management/credentials/groups-setup';
-
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
+  }
+
+  get searchTermControl(): AbstractControl | null {
+    return this.skillGroupsFormGroup.get('skillIds');
   }
 
   constructor(private store: Store,
@@ -65,9 +71,9 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetCredentialSkillGroup(this.fakeOrganizationId));
+    // this.store.dispatch(new GetCredentialSkillGroup()); // TODO: uncomment after BE fixed
+    this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize));
     this.mapGridData();
-    // this.store.dispatch(new GetAssignedSkillsByPage(1, 30));
   }
 
   onEditButtonClick(skillGroup: CredentialSkillGroup, event: any): void {
@@ -90,11 +96,11 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
         okButtonClass: 'delete-button'
       })
       .subscribe((confirm) => {
-        if (confirm) { // TODO: add verification to prevent remove if skillGroup is used elsewhere
-          this.store.dispatch(new RemoveCredentialSkillGroup(skillGroup, this.fakeOrganizationId));
+        if (confirm) {
+          this.store.dispatch(new RemoveCredentialSkillGroup(skillGroup));
         }
+        this.removeActiveCssClass();
       });
-    this.removeActiveCssClass();
   }
 
   onFormCancelClick(): void {
@@ -118,15 +124,14 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
           id: this.editedSkillGroupId,
           skillIds: this.skillGroupsFormGroup.controls['skillIds'].value
         });
-        this.store.dispatch(new UpdateCredentialSkillGroup(skillGroup, this.fakeOrganizationId)); // TODO: remove fakeOrganizationId after BE implementation
+        this.store.dispatch(new UpdateCredentialSkillGroup(skillGroup));
         this.isEdit = false;
       } else {
         const skillGroup = new CredentialSkillGroup({
           name: this.skillGroupsFormGroup.controls['name'].value,
-          organizationId: this.fakeOrganizationId,
           skillIds: this.skillGroupsFormGroup.controls['skillIds'].value
         });
-        this.store.dispatch(new SaveCredentialSkillGroup(skillGroup, this.fakeOrganizationId));  // TODO: remove fakeOrganizationId after BE implementation
+        this.store.dispatch(new SaveCredentialSkillGroup(skillGroup));
         this.store.dispatch(new ShowSideDialog(false));
         this.skillGroupsFormGroup.reset();
         this.removeActiveCssClass();
@@ -157,6 +162,34 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     });
   }
 
+  selectSkillId(event: any): void {
+    if (event.data.length) {
+      event.data.forEach((item: any) => {
+        if (item.data && item.data.masterSkill) {
+          this.skillsId.add(item.masterSkill.id);
+        }
+      });
+    } else if (event.data.masterSkill) {
+      this.skillsId.add(event.data.masterSkill.id);
+    }
+  }
+
+  removeSkillId(event: any): void {
+    if (event.data.length) {
+      event.data.forEach((item: any) => {
+        if (item.data && item.data.masterSkill) {
+          this.skillsId.delete(item.data.masterSkill.id);
+        }
+      });
+    } else if (event.data.masterSkill) {
+      this.skillsId.delete(event.data.masterSkill.id);
+    }
+  }
+
+  searchSkill(event: any): void {
+    this.searchGrid.search((event.target as HTMLInputElement).value);
+  }
+
   private clearFormDetails(): void {
     this.isEdit = false;
     this.editedSkillGroupId = undefined;
@@ -166,7 +199,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   private createSkillGroupFormGroup(): void {
     this.skillGroupsFormGroup = this.formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
-      skillIds: ['', Validators.required]
+      skillIds: ['']
     });
   }
 

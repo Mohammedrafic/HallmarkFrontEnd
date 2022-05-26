@@ -1,8 +1,7 @@
-@import '../../../../styles/variables/colors';
+@import '../../styles/variables/colors';
 
-.e-input-group.e-float-icon-left {
-  height: 38px;
-  width: 398px;
+.e-input-group.e-float-icon-left.search-with-icon {
+  height: 40px;
   margin: 0;
   border: 1px solid $secondary-dark-blue-40;
   border-radius: 8px;
@@ -23,7 +22,7 @@
 
   .e-input-in-wrap {
     margin: 0;
-    border: none;
+    border: none !important;
 
     .e-input {
       font-size: 14px;
@@ -36,8 +35,7 @@
 }
 
 .e-search-input-active {
-  height: 36px !important;
-  width: 396px !important;
+  height: 40px !important;
   outline: none !important;
   border: 2px solid $primary-active-blue-10 !important;
 

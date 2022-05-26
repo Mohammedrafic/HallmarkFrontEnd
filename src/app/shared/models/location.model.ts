@@ -18,3 +18,8 @@ export class Location {
   invoiceNote?: string;
   inactiveDate?: string;
 }
+
+export class LocationMapping {
+  id: number;
+  name?: string;
+}

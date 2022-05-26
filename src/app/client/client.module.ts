@@ -33,7 +33,6 @@ import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { ClientRoutingModule } from './client-routing.module';
 import { DashboardContentComponent } from './dashboard/dashboard-content/dashboard-content.component';
 import { OrderManagementContentComponent } from './order-management/order-management-content/order-management-content.component';
-import { SearchComponent } from './order-management/order-management-content/search/search.component';
 import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
 import { InvoicesContentComponent } from './invoices/invoices-content/invoices-content.component';
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
@@ -63,8 +62,7 @@ const gridIcons = {
     InvoicesContentComponent,
     TimesheetsContentComponent,
     ReportsContentComponent,
-    SearchComponent,
-    TabNavigationComponent  
+    TabNavigationComponent
   ],
   imports: [
     CommonModule,

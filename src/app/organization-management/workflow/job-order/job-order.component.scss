@@ -1,0 +1,19 @@
+@import 'colors.scss';
+
+.container {
+  .toolbar-buttons {
+    display: flex;
+    justify-content: end;
+  }
+}
+
+.e-control.e-btn.e-outline.delete-button {
+  background-color: $supportive-red;
+  border-color: $supportive-red;
+  color: $white !important;
+  margin-right: 12px;
+}
+
+.form-container {
+  padding-top: 24px;
+}

@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { GridModule, ResizeService, PagerModule, PageService } from '@syncfusion/ej2-angular-grids';
 import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
-import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
+import { DropDownListModule, ListBoxModule, MultiSelectAllModule, AutoCompleteModule } from '@syncfusion/ej2-angular-dropdowns';
 import { UploaderModule, TextBoxModule, NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, TimePickerModule, DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
@@ -25,11 +25,13 @@ import {
   Edit3,
   ChevronDown,
   ChevronRight,
-  Copy
+  Copy,
+  Search
 } from 'angular-feather/icons';
 
 import { NgxsModule } from '@ngxs/store';
 import { OrganizationManagementState } from './store/organization-management.state';
+import { CredentialsState } from './store/credentials.state';
 import { SharedModule } from '../shared/shared.module';
 import { ShiftsState } from './store/shifts.state';
 import { OrganizationManagementComponent } from './organization-management.component';
@@ -45,6 +47,11 @@ import { CredentialsComponent } from './credentials/credentials.component';
 import { CredentialsListComponent } from './credentials/credentials-list/credentials-list.component';
 import { GroupMappingComponent } from './credentials/credentials-setup/group-mapping/group-mapping.component';
 import { GroupComponent } from './credentials/credentials-setup/group/group.component';
+import { HolidaysState } from './store/holidays.state';
+import { HolidaysComponent } from './holidays/holidays.component';
+import { WorkflowComponent } from './workflow/workflow.component';
+import { JobOrderComponent } from './workflow/job-order/job-order.component';
+import { WorkflowMappingComponent } from './workflow/workflow-mapping/workflow-mapping.component';
 
 const sidebarIcons = {
   Download,
@@ -61,7 +68,8 @@ const sidebarIcons = {
   Edit3,
   ChevronDown,
   ChevronRight,
-  Copy
+  Copy,
+  Search
 };
 @NgModule({
   declarations: [
@@ -77,6 +85,10 @@ const sidebarIcons = {
     SettingsComponent,
     GroupMappingComponent,
     GroupComponent,
+    HolidaysComponent,
+    WorkflowComponent,
+    JobOrderComponent,
+    WorkflowMappingComponent
   ],
   imports: [
     CommonModule,
@@ -105,13 +117,16 @@ const sidebarIcons = {
     MultiSelectAllModule,
     SwitchModule,
     MultiSelectAllModule,
+    AutoCompleteModule,
 
     FeatherModule.pick(sidebarIcons),
 
     //STORE
     NgxsModule.forFeature([
       OrganizationManagementState,
-      ShiftsState
+      CredentialsState,
+      ShiftsState,
+      HolidaysState
     ]),
   ],
   providers: [

@@ -1,15 +1,21 @@
-import { Component, Inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { combineLatestWith, filter, Observable } from 'rxjs';
-import { Select, Store } from '@ngxs/store';
-import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
+import { combineLatestWith, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import {
   AbstractGridConfigurationComponent
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ShowSideDialog } from '../../../store/app.actions';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
-import { GetCredential, GetCredentialTypes, RemoveCredential, SaveCredential, UpdateCredential } from '../../store/organization-management.actions';
+import {
+  GetCredential,
+  GetCredentialTypes,
+  RemoveCredential,
+  SaveCredential,
+  SaveCredentialSucceeded,
+} from '../../store/organization-management.actions';
 import { Credential } from '@shared/models/credential.model';
 import { OrganizationManagementState } from '../../store/organization-management.state';
 import { CredentialType } from '@shared/models/credential-type.model';
@@ -21,34 +27,32 @@ import { SortSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-mode
   templateUrl: './credentials-list.component.html',
   styleUrls: ['./credentials-list.component.scss']
 })
-export class CredentialsListComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class CredentialsListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
-  @ViewChild('gridPager') pager: PagerComponent;
 
-  gridSortSettings: SortSettingsModel = { columns: [{ field: 'credentialTypeName', direction: 'Ascending' }] };
-
-  @Input() isActive: boolean = false;
+  public gridSortSettings: SortSettingsModel = { columns: [{ field: 'credentialTypeName', direction: 'Ascending' }] };
 
   @Select(OrganizationManagementState.credentialTypes)
   credentialTypes$: Observable<CredentialType[]> ;
-  credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  public credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   @Select(OrganizationManagementState.credentials)
   credentials$: Observable<Credential[]>;
 
-  credentialsFormGroup: FormGroup;
-  formBuilder: FormBuilder;
+  public credentialsFormGroup: FormGroup;
+  public formBuilder: FormBuilder;
 
-  editedCredentialId?: number;
-  isEdit: boolean;
+  public editedCredentialId?: number;
+  public isEdit: boolean;
 
-  fakeOrganizationId = 2;
+  private unsubscribe$: Subject<void> = new Subject();
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
 
   constructor(private store: Store,
+              private actions$: Actions,
               private confirmService: ConfirmService,
               @Inject(FormBuilder) private builder: FormBuilder) {
     super();
@@ -60,11 +64,20 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new GetCredential());
     this.store.dispatch(new GetCredentialTypes());
     this.mapGridData();
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveCredentialSucceeded)).subscribe(() => {
+      this.clearFormDetails();
+      this.store.dispatch(new GetCredential());
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   public expireDateApplicableChange(data: Credential, event: any): void {
     data.expireDateApplicable = event.checked;
-    this.store.dispatch(new UpdateCredential({
+    this.store.dispatch(new SaveCredential({
       id: data.id,
       name: data.name,
       credentialTypeId: data.credentialTypeId,
@@ -73,7 +86,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     }));
   }
 
-  onEditButtonClick(credential: Credential, event: any): void {
+  public onEditButtonClick(credential: Credential, event: any): void {
     this.addActiveCssClass(event);
     this.credentialsFormGroup.setValue({
       credentialTypeId: credential.credentialTypeId,
@@ -86,7 +99,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  onRemoveButtonClick(credential: Credential, event: any): void {
+  public onRemoveButtonClick(credential: Credential, event: any): void {
     this.addActiveCssClass(event);
     this.confirmService
       .confirm('Are you sure want to delete?', {
@@ -102,11 +115,11 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
       });
   }
 
-  onRowsDropDownChanged(): void {
+  public onRowsDropDownChanged(): void {
     this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
   }
 
-  onGoToClick(event: any): void {
+  public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
       this.credentials$.subscribe(data => {
         this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
@@ -115,7 +128,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     }
   }
 
-  onFormCancelClick(): void {
+  public onFormCancelClick(): void {
     this.confirmService
       .confirm(CANCEL_COFIRM_TEXT, {
         title: DELETE_CONFIRM_TITLE,
@@ -123,15 +136,11 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
         okButtonClass: 'delete-button'
       }).pipe(filter(confirm => !!confirm))
       .subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false));
-        this.isEdit = false;
-        this.editedCredentialId = undefined;
-        this.credentialsFormGroup.reset();
-        this.removeActiveCssClass();
+        this.clearFormDetails();
       });
   }
 
-  onFormSaveClick(): void {
+  public onFormSaveClick(): void {
     if (this.credentialsFormGroup.valid) {
       if (this.isEdit) {
         const credential = new Credential({
@@ -142,7 +151,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
           comment: this.credentialsFormGroup.controls['comment'].value,
         });
 
-        this.store.dispatch(new UpdateCredential(credential));
+        this.store.dispatch(new SaveCredential(credential));
         this.isEdit = false;
         this.editedCredentialId = undefined;
       } else {
@@ -150,21 +159,16 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
           name: this.credentialsFormGroup.controls['name'].value,
           credentialTypeId: this.credentialsFormGroup.controls['credentialTypeId'].value,
           expireDateApplicable: this.credentialsFormGroup.controls['expireDateApplicable'].value,
-          comment: this.credentialsFormGroup.controls['comment'].value,
-          businessUnitId: this.fakeOrganizationId  // TODO: replace with valid value after BE implementation
+          comment: this.credentialsFormGroup.controls['comment'].value
         });
         this.store.dispatch(new SaveCredential(credential));
       }
-
-      this.store.dispatch(new ShowSideDialog(false));
-      this.credentialsFormGroup.reset();
-      this.removeActiveCssClass();
     } else {
       this.credentialsFormGroup.markAllAsTouched();
     }
   }
 
-  mapGridData(): void {
+  private mapGridData(): void {
     this.credentials$.pipe(combineLatestWith(this.credentialTypes$),
       filter(([credentials, credentialTypes]) => credentials?.length > 0 && credentialTypes.length > 0))
       .subscribe(([credentials, credentialTypes]) => {
@@ -174,12 +178,18 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
             let credentialType = credentialTypes.find(type => type.id === item.credentialTypeId);
             item.credentialTypeName = credentialType ? credentialType.name : '';
           });
-          // TODO: remove line below after credential type would have verification before removing if used elsewhere
-          credentials = credentials.filter(credential => credential.credentialTypeName !== '');
         }
         this.gridDataSource = this.getRowsPerPage(credentials, this.currentPagerPage);
         this.totalDataRecords = credentials.length;
     });
+  }
+
+  private clearFormDetails(): void {
+    this.store.dispatch(new ShowSideDialog(false));
+    this.isEdit = false;
+    this.editedCredentialId = undefined;
+    this.credentialsFormGroup.reset();
+    this.removeActiveCssClass();
   }
 
   private createCredentialsForm(): void {

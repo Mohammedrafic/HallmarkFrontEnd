@@ -55,7 +55,6 @@ import {
   GetCredential,
   SaveCredential,
   RemoveCredential,
-  UpdateCredential,
   GetOrganizationLogo,
   GetOrganizationLogoSucceeded,
   UpdateCredentialType,
@@ -70,6 +69,7 @@ import {
   SaveOrganizationSettings,
   ClearDepartmentList,
   ClearLocationList,
+  SaveCredentialSucceeded,
 } from './organization-management.actions';
 import { Department } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
@@ -603,32 +603,22 @@ export class OrganizationManagementState {
 
   @Action(SaveCredential)
   SaveCredential({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveCredential): Observable<Credential | void> {
-    return this.credentialsService.saveCredential(payload)
+    return this.credentialsService.saveUpdateCredential(payload)
       .pipe(
-        tap((payload) => {
+        tap((payloadResponse) => {
           patchState({ isCredentialLoading: false });
-          dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-          dispatch(new GetCredential());
-          return payload;
+          if (payload.id) {
+            dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+          } else {
+            dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+          }
+          dispatch(new SaveCredentialSucceeded(payloadResponse));
+          return payloadResponse;
         }),
         catchError((error: any) => {
           return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
         })
       );
-  }
-
-  @Action(UpdateCredential)
-  UpdateCredential({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { credential }: UpdateCredential): Observable<Credential | void> {
-    return this.credentialsService.updateCredential(credential).pipe(tap((payload) => {
-      patchState({ isCredentialLoading: false });
-      dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      dispatch(new GetCredential());
-      return payload;
-    }),
-      catchError((error: any) => {
-        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
-      })
-    );
   }
 
   @Action(RemoveCredential)
@@ -652,40 +642,45 @@ export class OrganizationManagementState {
   }
 
   @Action(GetCredentialSkillGroup)
-  GetSkillGroupsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetCredentialSkillGroup): Observable<CredentialSkillGroup[]> {
-    return this.skillGroupService.getSkillGroups(payload).pipe(tap((payload) => {
+  GetSkillGroupsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetCredentialSkillGroup): Observable<CredentialSkillGroup[]> {
+    return this.skillGroupService.getSkillGroups().pipe(tap((payload) => {
       patchState({ skillGroups: payload });
       return payload;
     }));
   }
 
   @Action(SaveCredentialSkillGroup)
-  SaveSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { skillGroup, organizationId }: SaveCredentialSkillGroup): Observable<CredentialSkillGroup> {
-    return this.skillGroupService.saveUpdateSkillGroup(skillGroup).pipe(tap((payload) => {
+  SaveSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveCredentialSkillGroup): Observable<CredentialSkillGroup> {
+    return this.skillGroupService.saveUpdateSkillGroup(payload).pipe(tap((payload) => {
       patchState({ isSkillGroupLoading: false });
       dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-      dispatch(new GetCredentialSkillGroup(organizationId));
+      dispatch(new GetCredentialSkillGroup());
       return payload;
     }));
   }
 
   @Action(UpdateCredentialSkillGroup)
-  UpdateSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { credentialSkillGroup, organizationId }: UpdateCredentialSkillGroup): Observable<CredentialSkillGroup> {
-    return this.skillGroupService.saveUpdateSkillGroup(credentialSkillGroup).pipe(tap((payload) => {
+  UpdateSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: UpdateCredentialSkillGroup): Observable<CredentialSkillGroup> {
+    return this.skillGroupService.saveUpdateSkillGroup(payload).pipe(tap((payload) => {
       patchState({ isSkillGroupLoading: false });
       dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      dispatch(new GetCredentialSkillGroup(organizationId));
+      dispatch(new GetCredentialSkillGroup());
       return payload;
     }));
   }
 
   @Action(RemoveCredentialSkillGroup)
-  RemoveSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { credentialSkillGroup, organizationId }: RemoveCredentialSkillGroup): Observable<void> {
-    return this.skillGroupService.removeSkillGroup(credentialSkillGroup).pipe(tap((payload) => {
+  RemoveSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: RemoveCredentialSkillGroup): Observable<void> {
+    return this.skillGroupService.removeSkillGroup(payload).pipe(
+      tap((payload) => {
       patchState({ isSkillGroupLoading: false });
-      dispatch(new GetCredentialSkillGroup(organizationId));
+      dispatch(new GetCredentialSkillGroup());
       return payload;
-    }));
+    }),
+      catchError((error: any) => {
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
+      })
+    );
   }
 
   @Action(GetCredentialSetup)

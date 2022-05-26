@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
+import { Organization, OrganizationPage, OrganizationStructure } from 'src/app/shared/models/organization.model';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 
 @Injectable({ providedIn: 'root' })
@@ -17,6 +17,13 @@ export class OrganizationService {
    */
   public getOrganizations(pageNumber: number, pageSize: number): Observable<OrganizationPage> {
     return this.http.get<OrganizationPage>(`/api/Organizations`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+  }
+
+  /**
+   * Get organization structure with its regions-locations-departments
+   */
+  public getOrganizationStructure(): Observable<OrganizationStructure> {
+    return this.http.get<OrganizationStructure>(`/api/Organizations/structure`);
   }
 
   /**

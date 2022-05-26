@@ -1,0 +1,14 @@
+<div class="e-input-group e-float-icon-left search-with-icon" #inputWithIcon>
+    <span class="e-input-group-icon">
+      <i-feather name="search" class="icon"></i-feather>
+    </span>
+  <div class="e-input-in-wrap">
+    <input
+      class="e-input" type="text"
+      placeholder="Search"
+      (click)='onSearchClick()'
+      (blur)='onSearchBlur()'
+      (keyup)="onKeyUp($event)"
+    >
+  </div>
+</div>

@@ -75,7 +75,9 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
     .map((name, id) => ({ name, id }));
 
   get isSaveActive(): boolean {
-    return this.editOrgTab?.selectedItem === 0 ? this.feeSettingsForm.dirty : this.jobDistributionForm.dirty;
+    return this.editOrgTab?.selectedItem === 0
+      ? this.feeSettingsForm.touched && this.feeSettingsForm.dirty
+      : this.jobDistributionForm.touched && this.jobDistributionForm.dirty;
   }
 
   private isAlive = true;
@@ -103,7 +105,7 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
   }
 
   public onCancel(): void {
-    if ((this.feeSettingsForm && this.feeSettingsForm.value.baseFee) || this.jobDistributionForm.dirty) {
+    if ((this.feeSettingsForm.dirty && this.feeSettingsForm.value.baseFee) || this.jobDistributionForm.dirty) {
       this.confirmService
         .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
@@ -130,6 +132,7 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
         if (this.jobDistributionForm.valid) {
           const jobDistributionFormValue = this.jobDistributionForm.getRawValue();
           this.store.dispatch(new SaveJobDistribution({ ...jobDistributionFormValue, associateOrganizationId: this.editOrg.id }));
+          this.jobDistributionForm.markAsUntouched();
         }
         break;
       case Tabs.FeeSettings:
@@ -137,6 +140,7 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
         if (this.feeSettingsForm.valid && this.editOrg.id) {
           const { baseFee } = this.feeSettingsForm.getRawValue();
           this.store.dispatch(new SaveBaseFee(this.editOrg.id, baseFee));
+          this.feeSettingsForm.markAsUntouched();
         }
         break;
       default:

@@ -3,11 +3,15 @@ import { RouterModule, Routes } from '@angular/router';
 import { GroupComponent } from './credentials/credentials-setup/group/group.component';
 import { CredentialsComponent } from './credentials/credentials.component';
 import { DepartmentsComponent } from './departments/departments.component';
+import { HolidaysComponent } from './holidays/holidays.component';
 import { LocationsComponent } from './locations/locations.component';
 import { OrganizationManagementComponent } from './organization-management.component';
 import { SettingsComponent } from './settings/settings.component';
 import { ShiftsComponent } from './shifts/shifts.component';
 import { SkillsComponent } from './skills/skills.component';
+import { CredentialsListComponent } from './credentials/credentials-list/credentials-list.component';
+import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
+import { WorkflowComponent } from './workflow/workflow.component';
 
 const routes: Routes = [
   {
@@ -33,7 +37,19 @@ const routes: Routes = [
         component: CredentialsComponent,
         data: {
           isOrganizationArea: true
-        }
+        },
+        children: [
+          {
+            path: 'list',
+            component: CredentialsListComponent,
+            data: { isOrganizationArea: true }
+          },
+          {
+            path: 'setup',
+            component: CredentialsSetupComponent,
+            data: { isOrganizationArea: true }
+          }
+        ]
       },
       {
         path: 'credentials/groups-setup',
@@ -59,6 +75,20 @@ const routes: Routes = [
       {
         path: 'settings',
         component: SettingsComponent,
+        data: {
+          isOrganizationArea: true
+        }
+      },
+      {
+        path: 'holidays',
+        component: HolidaysComponent,
+        data: {
+          isOrganizationArea: true
+        }
+      },
+      {
+        path: 'workflow',
+        component: WorkflowComponent,
         data: {
           isOrganizationArea: true
         }

@@ -9,3 +9,8 @@ export class Department {
   facilityPhoneNo: string;
   inactiveDate: string;
 }
+
+export class DepartmentMapping {
+  departmentId: number;
+  departmentName?: string;
+}
