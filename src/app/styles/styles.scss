@@ -224,3 +224,5 @@ a, a:hover, a:focus, a:active {
   text-decoration: none;
   color: inherit;
 }
+
+@include meta.load-css( "../../node_modules/@syncfusion/ej2-angular-layouts/styles/material.css");
