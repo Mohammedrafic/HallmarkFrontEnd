@@ -4,6 +4,12 @@ import { ResizeSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-mo
 
 import { GRID_CONFIG } from '../../constants/grid-config';
 
+enum ExportType {
+  'Excel File',
+  'CSV File',
+  'Custom'
+}
+
 export abstract class AbstractGridConfigurationComponent {
 // grid
   gridDataSource: object[] = [];
@@ -38,6 +44,12 @@ export abstract class AbstractGridConfigurationComponent {
 
   clickedElement: any;
 
+  exportOptions = [
+    { text: ExportType[0], id: 0 },
+    { text: ExportType[1], id: 1 },
+    { text: ExportType[2], id: 2 }
+  ];
+
   protected constructor() { }
 
   addActiveCssClass(event: any): void {
@@ -54,6 +66,21 @@ export abstract class AbstractGridConfigurationComponent {
       this.clickedElement.focus();
       this.clickedElement = undefined;
     }
+  }
+
+  exportSelected(event: any): void {
+    if (event.item.properties.id === ExportType['Excel File']) {
+      console.log('Excel file selected');
+    } else if (event.item.properties.id === ExportType['CSV File']) {
+      console.log('CSV file selected');
+    } else if (event.item.properties.id === ExportType['Custom']) {
+      this.customExport();
+    }
+  }
+
+  customExport(): void {
+    console.warn('Override customExport() method in child component:');
+    console.warn('public override customExport(): void { }');
   }
 
   updatePage(): void {
