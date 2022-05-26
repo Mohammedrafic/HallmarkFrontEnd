@@ -2,16 +2,18 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { OrganizationHoliday } from '@shared/models/holiday.model';
+import { Holiday, OrganizationHoliday, OrganizationHolidaysPage } from '@shared/models/holiday.model';
+import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/admin.actions';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import { CANCEL_COFIRM_TEXT, DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowSideDialog } from 'src/app/store/app.actions';
-import { DeleteHoliday, DeleteHolidaySucceeded, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded } from '../store/holidays.actions';
+import { UserState } from 'src/app/store/user.state';
+import { CheckIfExist, DeleteHoliday, DeleteHolidaySucceeded, GetAllMasterHolidays, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded } from '../store/holidays.actions';
 import { HolidaysState } from '../store/holidays.state';
 
 @Component({
@@ -27,7 +29,13 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   @ViewChild('grid') grid: GridComponent;
 
   @Select(HolidaysState.holidaysPage)
-  holidaysPage$: Observable<any>;
+  holidaysPage$: Observable<OrganizationHolidaysPage>;
+
+  @Select(HolidaysState.masterHolidays)
+  masterHolidays$: Observable<Holiday[]>;
+
+  @Select(UserState.organizationStructure)
+  organizationStructure$: Observable<OrganizationStructure>;
 
   public HolidayFormGroup: FormGroup;
   public title = '';
@@ -38,7 +46,19 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   public format = { 
     type:'date', format: 'MM/dd/yyyy hh:mm a'
   };
+  public optionFields = {
+    text: 'name', value: 'id'
+  };
+  public holidayOptionFields = {
+    value: 'holidayName'
+  };
   public showForm = true;
+  public regions: OrganizationRegion[] = [];
+  public orgStructure: OrganizationStructure;
+  public selectedRegions: OrganizationRegion[] = [];
+  public locations: OrganizationLocation[] = [];
+  public masterHolidays: Holiday[] = [];
+  private isAllRegionsSelected = false;
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -48,9 +68,11 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     this.today.setHours(0, 0, 0);
     this.HolidayFormGroup = this.fb.group({
       id: new FormControl(0, [ Validators.required ]),
-      masterHolidayId: new FormControl(null),
-      regionId: new FormControl(null),
-      locationId: new FormControl(null),
+      masterHolidayId: new FormControl(0),
+      regionId: new FormControl(0, [ Validators.required ]),
+      locationId: new FormControl(0, [ Validators.required ]),
+      locations: new FormControl(null, [ Validators.required ]),
+      regions: new FormControl(null, [ Validators.required ]),
       holidayName: new FormControl(null, [ Validators.required ]),
       startDateTime: new FormControl(null, [ Validators.required ]),
       endDateTime: new FormControl(null, [ Validators.required ]),
@@ -62,27 +84,79 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     this.endTimeField = this.HolidayFormGroup.get('endDateTime') as AbstractControl;
     this.endTimeField.addValidators(endDateValidator(this.HolidayFormGroup, 'startDateTime', this.today));
     this.endTimeField.valueChanges.subscribe(() => this.startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
+    this.HolidayFormGroup.get('regionId')?.valueChanges.subscribe((val: number) => {
+      if (this.title === 'Edit' || this.title === 'Copy') {
+        this.selectedRegions = [];
+        if (val !== null) {
+          this.selectedRegions.push(this.regions.find(region => region.id === val) as OrganizationRegion);
+          this.selectedRegions.forEach(region => {
+            region.locations?.forEach(location => location.regionName = region.name);
+            this.locations = [...region.locations as []];
+          });
+        } else {
+          this.locations = [];
+          this.isAllRegionsSelected = false;
+        }
+      }
+    });
+    this.HolidayFormGroup.get('regions')?.valueChanges.subscribe((val: number[]) => {
+      if (this.title === 'Add') {
+        this.selectedRegions = [];
+        if (val) {
+          val.forEach(id => this.selectedRegions.push(this.regions.find(region => region.id === id) as OrganizationRegion));
+          this.locations = [];
+          this.isAllRegionsSelected = val.length === this.regions.length;
+          this.selectedRegions.forEach(region => {
+            region.locations?.forEach(location => location.regionName = region.name);
+            this.locations.push(...region.locations as [])
+          });
+        } else {
+          this.locations = [];
+          this.isAllRegionsSelected = false;
+        }
+      }
+    });
+    this.HolidayFormGroup.get('holidayName')?.valueChanges.subscribe((val: string) => {
+      const selectedHoliday = this.masterHolidays.find(holiday => holiday.holidayName === val);
+      if (selectedHoliday) {
+        this.HolidayFormGroup.get('masterHolidayId')?.setValue(selectedHoliday.id);
+      } else {
+        this.HolidayFormGroup.get('masterHolidayId')?.setValue(0);
+      }
+    })
   }
 
   ngOnInit() {
-    this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize));
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
+    this.store.dispatch(new GetAllMasterHolidays());
+    this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy));
+    this.masterHolidays$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((holidays: Holiday[]) => {
+      this.masterHolidays = holidays;
+    });
+    this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
+      this.orgStructure = structure;
+      this.regions = structure.regions;
+    });
+    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize));
+      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy));
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveHolidaySucceeded)).subscribe(() => {
       this.HolidayFormGroup.reset();
     this.closeDialog();
-      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize));
+      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy));
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(DeleteHolidaySucceeded)).subscribe(() => {
-      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize));
+      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy));
     });
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public override updatePage(): void {
+    this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy));
   }
 
   public onImportDataClick(): void {
@@ -93,19 +167,67 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   public addHoliday(): void {
     this.showForm = true;
     this.title = 'Add';
+    this.regions = this.orgStructure.regions;
     this.HolidayFormGroup.controls['id'].setValue(0);
+    this.HolidayFormGroup.controls['regionId'].setValue(0);
+    this.HolidayFormGroup.controls['locationId'].setValue(0);
     this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  private populateDropdownWithAll(data: any): void {
+    if (data.regionId === null) {
+      this.regions =[{
+        name: 'All', 
+        id: 0, 
+        locations: [{
+          name: 'All', 
+          id: 0, 
+          departments: []
+        }]
+      }];
+    } else {
+      this.regions = this.orgStructure.regions;
+    }
+    if (data.locationId === null) {
+      this.locations = [{
+        name: 'All', 
+        id: 0, 
+        departments: []
+      }];
+    }
   }
 
   public editHoliday(data: any, event: any): void {
     this.showForm = true;
     this.addActiveCssClass(event);
     this.title = 'Edit';
+    this.populateDropdownWithAll(data);
     this.HolidayFormGroup.setValue({
       id: data.id,
       masterHolidayId: data.masterHolidayId,
-      regionId: data.regionId,
-      locationId: data.locationId,
+      regionId: data.regionId || 0,
+      locationId: data.locationId || 0,
+      locations: [0],
+      regions: [0],
+      holidayName: data.holidayName,
+      startDateTime: data.startDateTime,
+      endDateTime: data.endDateTime,
+    });
+    this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  public copyHoliday(data: any, event: any): void {
+    this.showForm = true;
+    this.title = 'Copy';
+    this.addActiveCssClass(event);
+    this.populateDropdownWithAll(data);
+    this.HolidayFormGroup.setValue({
+      id: 0,
+      masterHolidayId: data.masterHolidayId,
+      regionId: data.regionId || 0,
+      locationId: data.locationId || 0,
+      locations: [data.locationId || 0],
+      regions: [data.regionId || 0],
       holidayName: data.holidayName,
       startDateTime: data.startDateTime,
       endDateTime: data.endDateTime,
@@ -151,12 +273,42 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     }
   }
 
+  private saveHandler(isExist?: boolean): void {
+    this.store.dispatch(new SaveHoliday(new OrganizationHoliday(
+      this.HolidayFormGroup.getRawValue(), 
+      this.title === 'Add' || this.title === 'Copy' ? this.selectedRegions : undefined,
+      this.isAllRegionsSelected,
+      isExist
+    )));
+    this.store.dispatch(new SetDirtyState(false));
+  }
+
   public saveHoliday(): void {
     if (this.HolidayFormGroup.valid) {
-      this.store.dispatch(new SaveHoliday(new OrganizationHoliday(
-        this.HolidayFormGroup.getRawValue()
-      )));
-      this.store.dispatch(new SetDirtyState(false));
+      if (this.title === 'Add') {
+        this.store.dispatch(new CheckIfExist(new OrganizationHoliday(
+          this.HolidayFormGroup.getRawValue(), 
+          this.title === 'Add' ? this.selectedRegions : undefined,
+          this.isAllRegionsSelected
+        ))).subscribe(val => {
+          if (val.orgHolidays.isExist) {
+            this.confirmService
+            .confirm(DATA_OVERRIDE_TEXT, {
+              title: DATA_OVERRIDE_TITLE,
+              okButtonLabel: 'Confirm',
+              okButtonClass: ''
+            }).pipe(filter(confirm => !!confirm))
+            .subscribe(() => {
+              this.saveHandler(true);
+            });
+          } else {
+            this.saveHandler(false);
+          }
+          console.log(val)
+        });
+      } else {
+        this.saveHandler();
+      }
     } else {
       this.HolidayFormGroup.markAllAsTouched();
     }

@@ -6,3 +6,5 @@ export const DELETE_RECORD_TITLE = 'Delete Record';
 export const DELETE_CONFIRM_TEXT = 'Are you sure you want to leave this page without saving?';
 export const DELETE_CONFIRM_TITLE = 'Unsaved Progress'
 export const CANCEL_COFIRM_TEXT = 'Are you sure you want to cancel? All data will be deleted.';
+export const DATA_OVERRIDE_TITLE = 'Data Override';
+export const DATA_OVERRIDE_TEXT = 'Are you sure want to override existing data?';

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import { map, Observable, tap } from 'rxjs';
 import { MENU_CONFIG } from '../shared/constants/menu-config';
@@ -14,9 +13,12 @@ import {
   LogoutUser,
   GetUserAgencies,
   SaveLastSelectedOrganizationAgencyId,
-  SetLastSelectedOrganizationAgencyId
+  SetLastSelectedOrganizationAgencyId,
+  GetOrganizationStructure
 } from './user.actions';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
+import { OrganizationStructure } from '@shared/models/organization.model';
+import { OrganizationService } from '@shared/services/organization.service';
 
 export interface UserStateModel {
   user: User | null;
@@ -25,6 +27,7 @@ export interface UserStateModel {
   organizations: UserAgencyOrganization | null;
   lastSelectedOrganizationId: number | null;
   lastSelectedAgencyId: number | null;
+  organizationStructure: OrganizationStructure | null;
 }
 
 @State<UserStateModel>({
@@ -35,15 +38,16 @@ export interface UserStateModel {
     agencies: null,
     organizations: null,
     lastSelectedOrganizationId: parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string),
-    lastSelectedAgencyId: parseInt(window.localStorage.getItem(AGENCY_ID_STORAGE_KEY) as string)
+    lastSelectedAgencyId: parseInt(window.localStorage.getItem(AGENCY_ID_STORAGE_KEY) as string),
+    organizationStructure: null,
   },
 })
 @Injectable()
 export class UserState {
 
   constructor(
-    private router: Router,
-    private userService: UserService
+    private userService: UserService,
+    private organizationService: OrganizationService,
   ) { }
 
   @Selector()
@@ -63,6 +67,9 @@ export class UserState {
 
   @Selector()
   static lastSelectedAgencyId(state: UserStateModel): number | null { return state.lastSelectedAgencyId }
+
+  @Selector()
+  static organizationStructure(state: UserStateModel): OrganizationStructure | null { return state.organizationStructure }
 
   @Action(SetCurrentUser)
   SetCurrentUser({ patchState }: StateContext<UserStateModel>, { payload }: SetCurrentUser): void {
@@ -149,7 +156,15 @@ export class UserState {
   ): Observable<LasSelectedOrganizationAgency> {
     return this.userService.saveLastSelectedOrganizationAgencyId(payload).pipe(map(() => {
       dispatch(new SetLastSelectedOrganizationAgencyId(payload));
+      dispatch(new GetOrganizationStructure());
       return payload;
+    }));
+  }
+
+  @Action(GetOrganizationStructure)
+  GetOrganizationStructure({ patchState }: StateContext<UserStateModel>): Observable<OrganizationStructure> {
+    return this.organizationService.getOrganizationStructure().pipe(tap((structure: OrganizationStructure) => {
+      return patchState({ organizationStructure: structure });
     }));
   }
 }

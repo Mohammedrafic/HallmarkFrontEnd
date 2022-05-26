@@ -106,3 +106,26 @@ export class OrganizationPage {
   totalCount: number;
   totalPages: number;
 }
+
+export class OrganizationDepartment {
+  id: number;
+  name: string;
+}
+
+export class OrganizationLocation {
+  id: number;
+  name: string;
+  regionName?: string;
+  departments: OrganizationDepartment[];
+}
+
+export class OrganizationRegion {
+  id: number | null;
+  name?: string;
+  locations: any[] | null;
+}
+
+export class OrganizationStructure {
+  organizationId: number;
+  regions: OrganizationRegion[];
+}

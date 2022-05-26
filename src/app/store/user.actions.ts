@@ -36,3 +36,8 @@ export class SaveLastSelectedOrganizationAgencyId {
   static readonly type = '[user] Save Last Selected Organization Or Agency Id';
   constructor(public payload: LasSelectedOrganizationAgency) { }
 }
+
+export class GetOrganizationStructure {
+  static readonly type = '[user] Get Organization Structure Of Current User';
+  constructor() { }
+}

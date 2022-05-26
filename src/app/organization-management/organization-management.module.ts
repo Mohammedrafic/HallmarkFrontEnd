@@ -4,7 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { GridModule, ResizeService, PagerModule, PageService } from '@syncfusion/ej2-angular-grids';
 import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
-import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
+import { DropDownListModule, ListBoxModule, MultiSelectAllModule, AutoCompleteModule } from '@syncfusion/ej2-angular-dropdowns';
 import { UploaderModule, TextBoxModule, NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, TimePickerModule, DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
@@ -117,6 +117,7 @@ const sidebarIcons = {
     MultiSelectAllModule,
     SwitchModule,
     MultiSelectAllModule,
+    AutoCompleteModule,
 
     FeatherModule.pick(sidebarIcons),
 

@@ -2,7 +2,12 @@ import { OrganizationHoliday } from "@shared/models/holiday.model";
 
 export class GetHolidaysByPage {
   static readonly type = '[orgHoliday] Get Holiday by Page';
-  constructor(public pageNumber: number, public pageSize: number) { }
+  constructor(public pageNumber: number, public pageSize: number, public orderBy: string) { }
+}
+
+export class GetAllMasterHolidays {
+  static readonly type = '[orgHoliday] Get All Master Holiday';
+  constructor() { }
 }
 
 export class SaveHoliday {
@@ -28,4 +33,9 @@ export class DeleteHolidaySucceeded {
 export class FilterChanged {
   static readonly type = '[orgHoliday] Emit Filter Change';
   constructor() { }
+}
+
+export class CheckIfExist {
+  static readonly type = '[orgHoliday] Check If Exist';
+  constructor(public payload: OrganizationHoliday) { }
 }

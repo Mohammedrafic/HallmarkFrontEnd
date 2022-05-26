@@ -31,28 +31,39 @@
     [resizeSettings]="resizeSettings"
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
+    (actionBegin)="actionBegin($event)"
+    class="grid-component"
   >
     <e-columns>
       <e-column field="regionId" headerText="region" width=200>
         <ng-template #template let-data>
-          <ng-container *ngIf="data.masterHolidayId">
+          <ng-container *ngIf="!data.regionId">
             All
+          </ng-container>
+          <ng-container *ngIf="data.regionId">
+            {{ data.regionName }}
           </ng-container>
         </ng-template>
       </e-column>
       <e-column field="locationId" headerText="location" type="location" width=200>
         <ng-template #template let-data>
-          <ng-container *ngIf="data.masterHolidayId">
+          <ng-container *ngIf="!data.locationId">
             All
+          </ng-container>
+          <ng-container *ngIf="data.locationId">
+            {{ data.locationName }}
           </ng-container>
         </ng-template>
       </e-column>
       <e-column field="holidayName" headerText="holiday name" width=200></e-column>
       <e-column field="startDateTime" type="date" [format]="format" headerText="start date & time" width=200></e-column>
       <e-column field="endDateTime" type="date" [format]="format" headerText="end date & time" width=200></e-column>
-      <e-column textAlign="Right" width=120 freeze="Right">
+      <e-column textAlign="Right" width=150 freeze="Right">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
+            <button ejs-button cssClass="e-flat default-icon-button" (click)="copyHoliday(data, $event)">
+              <span class="edit-button"><i-feather name="copy" class="icon"></i-feather></span>
+            </button>
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="editHoliday(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
@@ -116,17 +127,99 @@
   <form *ngIf="showForm" class="holidays-form-dialog form-container bootstrap"
         id="addEditHolidaysForm"
         [formGroup]="HolidayFormGroup">
+    <ng-container *ngIf="title === 'Add'">
+      <div>
+        <div class="input-container">
+          <label>Region <span class="required">*</span></label>
+          <div class="input-group multiselect">
+            <ejs-multiselect appValidateWithMessage
+                             mode="CheckBox"
+                             formControlName="regions"
+                             placeholder="Region"
+                             selectAllText="Select All"
+                             [fields]="optionFields"
+                             [showSelectAll]="true"
+                             [allowFiltering]="false"
+                             [showDropDownIcon]="true"
+                             [dataSource]="regions">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+  
+      <div>
+        <div class="input-container">
+          <label>Location <span class="required">*</span></label>
+          <div class="input-group multiselect">
+            <ejs-multiselect appValidateWithMessage
+                             mode="CheckBox"
+                             formControlName="locations"
+                             placeholder="Location"
+                             selectAllText="Select All"
+                             [fields]="optionFields"
+                             [showSelectAll]="true"
+                             [allowFiltering]="false"
+                             [showDropDownIcon]="true"
+                             [dataSource]="locations">
+              <ng-template #itemTemplate="" let-data="">
+                  <div *ngIf="data.id" class="location-option-container">
+                    <span class="location-name">{{data.name}}</span>
+                    <span class="region-name">{{data.regionName}}</span>
+                  </div>
+                  <ng-container *ngIf="!data.id">
+                    <span class="location-name">{{data.name}}</span>
+                  </ng-container>         
+              </ng-template>
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="title === 'Edit' || title === 'Copy'">
+      <div>
+        <div class="input-container">
+          <label for="region">Region <span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist
+              appValidateWithMessage
+              placeholder="Region"
+              [dataSource]="regions"
+              [fields]="optionFields"
+              formControlName="regionId">
+            </ejs-dropdownlist>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="input-container">
+          <label for="region">Location <span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist
+              appValidateWithMessage
+              placeholder="Location"
+              [dataSource]="locations"
+              [fields]="optionFields"
+              formControlName="locationId">
+            </ejs-dropdownlist>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
     <div>
       <div class="input-container">
         <label for="holidayName">Holiday Name <span class="required">*</span></label>
-        <div class="input-group">
-          <input class="e-input"
-                 type="text"
-                 maxlength="50"
-                 appValidateWithMessage
-                 placeholder="Holiday Name"
-                 name="holidayName"
-                 formControlName="holidayName"/>
+        <div class="input-group dropdown">
+          <ejs-autocomplete [dataSource]="masterHolidays"
+                            appValidateWithMessage
+                            placeholder="Holiday Name"
+                            name="holidayName"
+                            formControlName="holidayName"
+                            [fields]="holidayOptionFields"
+                            maxlength="50"
+                            [showPopupButton]="true">
+          </ejs-autocomplete>
         </div>
       </div>
     </div>

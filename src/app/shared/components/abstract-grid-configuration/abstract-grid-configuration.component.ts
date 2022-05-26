@@ -1,3 +1,5 @@
+import { SortingDirections } from '@shared/enums/sorting';
+import { PageEventArgs } from '@syncfusion/ej2-angular-grids';
 import { ResizeSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
 import { GRID_CONFIG } from '../../constants/grid-config';
@@ -30,6 +32,9 @@ export abstract class AbstractGridConfigurationComponent {
 
   pageSize = 30;
   currentPage = 1;
+  orderBy = '';
+
+  refreshing = false;
 
   clickedElement: any;
 
@@ -48,6 +53,35 @@ export abstract class AbstractGridConfigurationComponent {
       this.clickedElement.classList.remove('e-active');
       this.clickedElement.focus();
       this.clickedElement = undefined;
+    }
+  }
+
+  updatePage(): void {
+    console.warn('Override updatePage() method in child component:');
+    console.warn('public override updatePage(): void { }');
+  }
+
+  sortingHandler(args: any): void {
+    if (args.columnName) {
+      const direction = args.direction === 'Ascending' ? SortingDirections.Ascending : SortingDirections.Descending;
+      this.orderBy = args.columnName + ' ' + direction;
+    } else {
+      this.orderBy = '';
+    }
+    this.updatePage();
+  }
+
+  actionBegin(args: PageEventArgs): void {
+    if (args.requestType === 'sorting') {
+      this.sortingHandler(args);
+      this.refreshing = true;
+    }
+    if (args.requestType === 'refresh') {
+      // prevent double re-render on sorting
+      if (this.refreshing) {
+        args.cancel = true;
+        this.refreshing = false;
+      }
     }
   }
 }
