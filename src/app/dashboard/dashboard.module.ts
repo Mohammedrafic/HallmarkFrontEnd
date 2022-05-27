@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DashboardComponent } from './dashboard.components';
-import { DashboardLayoutModule } from '@syncfusion/ej2-angular-layouts';
-import { DashboardService } from './services/dashboard.service';
-import { NgxsModule } from '@ngxs/store';
-import { DashboardState } from './store/dashboard.state';
 import { RouterModule } from '@angular/router';
+
+import { DashboardLayoutModule } from '@syncfusion/ej2-angular-layouts';
+import { NgxsModule } from '@ngxs/store';
+
+import { DashboardState } from './store/dashboard.state';
+import { DashboardService } from './services/dashboard.service';
+import { DashboardComponent } from './dashboard.components';
 
 
 @NgModule({
