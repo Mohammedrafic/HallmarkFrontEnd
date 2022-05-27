@@ -1,0 +1,42 @@
+<section class="controls-container">
+  <div>
+    <button ejs-button cssClass="e-outline" (click)="navigateBack()">Back</button>
+  </div>
+  <div class="form-title"><h3>{{ title }} Order</h3></div>
+  <div class="controls-form stick-right">
+    <button ejs-button cssClass="e-outline button-import" (click)="onImportDataClick()">
+      Import
+      <i-feather name="upload" class="icon"></i-feather>
+    </button>
+
+    <ejs-splitbutton content="Submit" cssClass="e-primary" [items]="submitMenuItems"></ejs-splitbutton>
+  </div>
+</section>
+
+<ejs-tab class="stepper">
+  <e-tabitems>
+    <e-tabitem>
+      <ng-template #headerText>
+        <div class="stepper-header">
+          <div class="stepper-title">Order Details<span>*</span></div>
+          <div class="stepper-sub-title">Overall Order Info</div>
+        </div>
+      </ng-template>
+      <ng-template #content>
+        <app-order-details-form></app-order-details-form>
+      </ng-template>
+    </e-tabitem>
+
+    <e-tabitem>
+      <ng-template #headerText>
+        <div class="stepper-header">
+          <div class="stepper-title">Credentials</div>
+          <div class="stepper-sub-title">Set Credentials</div>
+        </div>
+      </ng-template>
+      <ng-template #content>
+        <app-order-credentials-form></app-order-credentials-form>
+      </ng-template>
+    </e-tabitem>
+  </e-tabitems>
+</ejs-tab>

@@ -44,7 +44,7 @@ export const MENU_CONFIG: any = {
     },
     13: { // Order Management
       icon: 'file-text',
-      route: ''
+      route: '/client/order-management'
     },
     14: { // Candidates
       icon: 'file-text',
@@ -274,7 +274,7 @@ export const MENU_CONFIG: any = {
     },
     13: { // Order Management
       icon: 'file-text',
-      route: 'client/order-management/all'
+      route: 'client/order-management'
     },
     14: { // Candidates
       icon: 'file-text',

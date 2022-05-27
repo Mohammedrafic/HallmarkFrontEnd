@@ -13,6 +13,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { MessageToastComponent } from './components/message-toast/message-toast.component';
 import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 import { ImageUploaderComponent } from './components/image-uploader/image-uploader.component';
+import { DocumentUploaderComponent } from './components/document-uploader/document-uploader.component';
 import { FileUploadDialogComponent } from './components/file-upload-dialog/file-upload-dialog.component';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { ButtonModule, ChipListAllModule, RadioButtonAllModule } from '@syncfusion/ej2-angular-buttons';
@@ -31,6 +32,7 @@ const COMPONENTS = [
   ValidationErrorPipe,
   ValidateDirective,
   ImageUploaderComponent,
+  DocumentUploaderComponent,
   SideDialogComponent,
   FilterDialogComponent,
   MessageToastComponent,
