@@ -1,0 +1,37 @@
+@import "../../../../styles/variables/colors.scss";
+
+.user-setting-section {
+  .section-tittle {
+    margin-top: 26px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    color: $title-black;
+  }
+
+  .section-container{
+    display: flex;
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .dropdown-container,
+    .input-container {
+      margin-bottom: 15px;
+      margin-right: 10px;
+      flex: 1 1 0;
+    }
+
+    .active-toggle {
+      margin-top: 24px;
+    }
+
+    .left-section,
+    .right-section {
+      flex: 1 0 50%;
+    }
+  }
+}
+

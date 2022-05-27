@@ -1,4 +1,4 @@
-import { AbstractControl, ValidationErrors, Validators } from '@angular/forms';
+import {AbstractControl, ValidationErrors, Validators} from '@angular/forms';
 
 export function customEmailValidator(control: AbstractControl): ValidationErrors | null {
   if (!control.value) {

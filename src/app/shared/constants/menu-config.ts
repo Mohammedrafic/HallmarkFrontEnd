@@ -112,7 +112,7 @@ export const MENU_CONFIG: any = {
     },
     31: { // User List
       icon: '',
-      route: ''
+      route: 'security/user-list'
     }
   },
 
@@ -227,7 +227,7 @@ export const MENU_CONFIG: any = {
     },
     31: { // User List
       icon: '',
-      route: ''
+      route: 'security/user-list'
     }
   },
 
@@ -342,7 +342,7 @@ export const MENU_CONFIG: any = {
     },
     31: { // User List
       icon: '',
-      route: ''
+      route: 'security/user-list'
     }
   },
 
@@ -461,7 +461,7 @@ export const MENU_CONFIG: any = {
     },
     31: { // User List
       icon: '',
-      route: ''
+      route: 'security/user-list'
     }
   },
 }

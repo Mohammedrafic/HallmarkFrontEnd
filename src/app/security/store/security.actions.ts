@@ -1,6 +1,6 @@
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { PermissionsTree } from '@shared/models/permission.model';
 import { Role, RoleDTO } from '@shared/models/roles.model';
+import { User, UserDTO } from "@shared/models/user-managment-page.model";
 
 export class GetBusinessByUnitType {
   static readonly type = '[security] Get Business By Unit Type';
@@ -9,6 +9,25 @@ export class GetBusinessByUnitType {
 
 export class GetRolesPage {
   static readonly type = '[security] Get Roles Page';
+  constructor(
+    public businessUnitType: BusinessUnitType,
+    public businessUnitId: number,
+    public pageNumber: number,
+    public pageSize: number
+  ) {}
+}
+
+export class GetRolePerUser {
+  static readonly type = '[security] Get Roles Per User';
+  constructor(
+    public businessUnitType: BusinessUnitType,
+    public businessUnitId: number,
+  ) {
+  }
+}
+
+export class GetUsersPage {
+  static readonly type = '[security] Get Users Page';
   constructor(
     public businessUnitType: BusinessUnitType,
     public businessUnitId: number,
@@ -30,6 +49,16 @@ export class GetNewRoleBusinessByUnitType {
 export class SaveRole {
   static readonly type = '[security] Save role';
   constructor(public role: RoleDTO) {}
+}
+
+export class SaveUser {
+  static readonly type = '[security] Save user';
+  constructor(public user: UserDTO) {}
+}
+
+export class SaveUserSucceeded {
+  static readonly type = '[security] Save role Succeeded';
+  constructor(public user: User) {}
 }
 
 export class SaveRoleSucceeded {
