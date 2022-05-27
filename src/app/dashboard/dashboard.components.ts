@@ -1,46 +1,79 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from "@angular/core";
-import { Store } from "@ngxs/store";
-import { DashboardLayoutComponent, PanelModel } from "@syncfusion/ej2-angular-layouts";
-import { SetHeaderState } from "../store/app.actions";
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
+import { DashboardLayoutComponent, PanelModel } from '@syncfusion/ej2-angular-layouts';
+import { Observable, Subject, takeUntil } from 'rxjs';
+
+import { ToggleSidebarState } from '../store/app.actions';
+import { AddDashboardPanel, DashboardPanelIsMoved, GetDashboardPanels, SaveDashboard } from './store/dashboard.actions';
+import { DashboardState } from './store/dashboard.state';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.components.html',
   styleUrls: ['dashboard.components.scss'],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
-export class DashboardComponent implements OnInit {
-  @ViewChild('dashboardLayout')
-    public dashboard: DashboardLayoutComponent;
+export class DashboardComponent implements OnInit, OnDestroy {
+  @ViewChild('dashboardLayout', { static: true }) dashboard: DashboardLayoutComponent;
 
-  constructor(private store: Store){ }
+  @Select(DashboardState.dashboardPanels) panels$: Observable<PanelModel[]>;
+  @Select(DashboardState.isDashboardLoading) isLoading$: Observable<boolean>;
+
+  private unsubsribe$ = new Subject();
 
   cellSpacing = [10, 10];
   columns = 5;
-  cellAspectRatio: number = 100/150;
-  public panels: any = [
-  { "sizeX": 1, "sizeY": 1, "row": 0, "col": 0, content:'<div class="content">1</div>' },
-  { "sizeX": 1, "sizeY": 1, "row": 0, "col": 1, content:'<div class="content">2</div>' },
-  { "sizeX": 1, "sizeY": 1, "row": 0, "col": 2, content:'<div class="content">3</div>' },
-  { "sizeX": 1, "sizeY": 1, "row": 0, "col": 3, content:'<div class="content">4</div>' },
-  { "sizeX": 1, "sizeY": 1, "row": 0, "col": 4, content:'<div class="content">5</div>' },
-  { "sizeX": 1, "sizeY": 1, "row": 1, "col": 0, content:'<div class="content">6</div>' },
-  { "sizeX": 1, "sizeY": 1, "row": 1, "col": 1, content:'<div class="content">7</div>' }
-  ];
+
+  constructor(private store: Store, private actions$: Actions) {}
 
   ngOnInit(): void {
-    this.store.dispatch(new SetHeaderState({ title: 'Dashboard', iconName: 'home' }));
+    this.store.dispatch(new GetDashboardPanels());
+    this.refreshDashboard();
+  }
+
+  ngOnDestroy(): void {
+    this.saveDashboard();
+    this.unsubsribe$.next(true);
+    this.unsubsribe$.complete();
+  }
+
+  private refreshDashboard() {
+    this.refreshGrid();
+    this.actions$.pipe(ofActionDispatched(ToggleSidebarState), takeUntil(this.unsubsribe$)).subscribe(() => {
+      this.refreshGrid();
+    });
+  }
+
+  private refreshGrid() {
+    setTimeout(() => this.dashboard.refresh(), 500);
+  }
+
+  private saveDashboard(): void {
+    this.store.dispatch(new SaveDashboard());
+  }
+
+  private getDashboardPanels(): PanelModel[] {
+    return this.dashboard.panels.map((panel: any) => panel.properties);
+  }
+
+  moveDashboardPanel(): void {
+    const panels = this.getDashboardPanels();
+    this.store.dispatch(new DashboardPanelIsMoved(panels));
   }
 
   addPanel(): void {
-    const allPanels = this.dashboard.panels.length ;
-    const panel: PanelModel = { 
+    const allPanels = this.dashboard.panels.length;
+    const panel: PanelModel = {
+      id: 'layout_' + allPanels,
       sizeX: 1,
       sizeY: 1,
-      row: Math.floor(allPanels / this.columns),
-      col: allPanels % this.columns,
-      content:`<div class="content">${allPanels+1}</div>`
-    }
-    this.dashboard.addPanel(panel);
+      row: 0,
+      col: 0,
+      content: `<div class="content">${allPanels + 1}</div>`,
+    };
+    this.dashboard.addPanel(panel)
+    const panels = this.getDashboardPanels();
+    this.store.dispatch(new AddDashboardPanel(panels));
   }
 }

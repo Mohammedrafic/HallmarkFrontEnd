@@ -1,14 +1,14 @@
 <div class="control-section">
   <div style="padding: 5px; text-align: right">
-    <button id="add" class="e-btn e-info" (click)="addPanel()">Add Panel</button>
+    <button id="add" class="e-btn e-info" [disabled]="isLoading$ | async" (click)="addPanel()">Add Panel</button>
   </div>
+
   <ejs-dashboardlayout
     id="dashboardLayout"
     [columns]="columns"
     [cellSpacing]="cellSpacing"
-    [cellAspectRatio]="cellAspectRatio"
-    [panels]="panels"
-    [allowFloating]="true"
+    [panels]="panels$ | async"
+    (dragStop)="moveDashboardPanel()"
     #dashboardLayout
   ></ejs-dashboardlayout>
 </div>
