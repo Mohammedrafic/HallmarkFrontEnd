@@ -42,7 +42,6 @@ import { SkillCategoriesGridComponent } from './master-data/skills/skill-categor
 import {
   MasterCredentialsTypesComponent
 } from './master-data/master-credentials/master-credentials-types/master-credentials-types.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { MasterHolidaysComponent } from './master-data/holidays/holidays.component';
 import { HolidaysState } from './store/holidays.state';
 
@@ -73,7 +72,6 @@ const sidebarIcons = {
     SkillsGridComponent,
     SkillCategoriesGridComponent,
     MasterCredentialsTypesComponent,
-    DashboardComponent,
     MasterHolidaysComponent,
   ],
   imports: [

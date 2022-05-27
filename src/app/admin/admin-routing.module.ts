@@ -10,7 +10,6 @@ import { SkillsCategoriesComponent } from './master-data/skills/skills-categorie
 import {
   MasterCredentialsTypesComponent
 } from './master-data/master-credentials/master-credentials-types/master-credentials-types.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { MasterHolidaysComponent } from './master-data/holidays/holidays.component';
 
 const routes: Routes = [
@@ -21,7 +20,7 @@ const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        component: DashboardComponent,
+        loadChildren: () => import('../dashboard/dashboard.module').then((mod) => mod.DashboardModule),
         data: {
           isOrganizationArea: true,
           isAgencyArea: true

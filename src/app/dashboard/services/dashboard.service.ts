@@ -14,16 +14,7 @@ export class DashboardService {
       return of(panels);
     }
     return of([
-      { id: 'layout_0', sizeX: 1, sizeY: 1, row: 0, col: 0, content: `
-        <div class="content">
-          <button
-            ejs-button
-            class="e-btn e-info"
-            id="filterButton"
-            cssClass="e-outline button-filter">Filters
-          </button>
-        </div>`,
-      },
+      { id: 'layout_0', sizeX: 1, sizeY: 1, row: 0, col: 0, content: '<div class="content">1</div>' },
       { id: 'layout_1', sizeX: 1, sizeY: 1, row: 0, col: 1, content: '<div class="content">2</div>' },
       { id: 'layout_2', sizeX: 1, sizeY: 1, row: 0, col: 2, content: '<div class="content">3</div>' },
       { id: 'layout_3', sizeX: 1, sizeY: 1, row: 0, col: 3, content: '<div class="content">4</div>' },

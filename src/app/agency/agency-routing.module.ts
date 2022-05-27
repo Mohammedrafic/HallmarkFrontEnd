@@ -6,7 +6,6 @@ import { AgencyListComponent } from './agency-list/agency-list.component';
 import { AddEditAgencyComponent } from './agency-list/add-edit-agency/add-edit-agency.component';
 import { CandidatesComponent } from "./candidates/candidates.component";
 import { AddEditCandidateComponent } from "./candidates/add-edit-candidate/add-edit-candidate.component";
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { ClearAgencyGuard } from './guards/clear-agency.guard';
 
 const routes: Routes = [
@@ -17,7 +16,7 @@ const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        component: DashboardComponent,
+        loadChildren: () => import('../dashboard/dashboard.module').then((mod) => mod.DashboardModule),
         data: {
           isOrganizationArea: true,
           isAgencyArea: true
