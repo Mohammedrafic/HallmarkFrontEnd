@@ -1,0 +1,44 @@
+<app-page-toolbar>
+  <ng-container left>
+    <div class="bootstrap business-dropdowns" [formGroup]="businessForm">
+      <div class="dropdown-container">
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            appValidateWithMessage
+            formControlName="businessUnit"
+            [fields]="unitFields"
+            [dataSource]="businessUnits"
+            placeholder="Business Unit"
+          ></ejs-dropdownlist>
+        </div>
+      </div>
+      <div class="dropdown-container">
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            appValidateWithMessage
+            formControlName="business"
+            [fields]="bussinesDataFields"
+            [dataSource]="bussinesUserData$ | async"
+            placeholder="Business"
+          ></ejs-dropdownlist>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+  <ng-container right>
+    <ng-container>
+      <button ejs-button cssClass="e-outline">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+      <button ejs-button [isPrimary]="true" (click)="onAddNewUser()">Add User</button>
+    </ng-container>
+  </ng-container>
+</app-page-toolbar>
+
+<section class="last-content-section-padding">
+  <app-user-grid [filterForm]="businessForm"></app-user-grid>
+</section>
+
+<app-side-dialog width="832" [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()">
+  <section>
+    <app-add-edit-user [form]="$any(userSettingForm)" [businessUnits]="businessUnits"></app-add-edit-user>
+  </section>
+</app-side-dialog>

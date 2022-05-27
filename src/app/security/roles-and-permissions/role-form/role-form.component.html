@@ -32,17 +32,22 @@
     </div>
   </div>
 
-  <div class="dropdown-container bootstrap">
-    <label>Copy Role From</label>
-    <div class="input-group dropdown">
-      <ejs-dropdownlist
-        appValidateWithMessage
-        [formControl]="copyRoleControl"
-        [dataSource]="[]"
-        [disabled]="form.disabled"
-        placeholder="Copy Role From"
-      ></ejs-dropdownlist>
+  <div class="copy-role">
+    <div class="dropdown-container bootstrap">
+      <label>Copy Role From</label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist
+          appValidateWithMessage
+          [formControl]="copyRoleControl"
+          [dataSource]="copyRoleData$ | async"
+          [fields]="copyRoleFields"
+          placeholder="Copy Role From"
+        ></ejs-dropdownlist>
+      </div>
     </div>
+    <button ejs-button [disabled]="!copyRoleControl.value" cssClass="e-outline button-cancel" id="copy-role" (click)="onApply()">
+      Apply
+    </button>
   </div>
 
   <div class="active-toggle">
@@ -51,7 +56,17 @@
   </div>
 
   <hr class="divider" />
-
+  <div class="tree-lebel">
+    <label>Permission tree<span class="required">*</span></label>
+    <span class="error-validation"
+      ><i-feather
+        name="alert-circle"
+        class="icon validation-icon"
+        [ngStyle]="{ display: !permissionsControl?.untouched && permissionsControl?.invalid ? 'inline-block' : 'none' }"
+      ></i-feather>
+      <span class="error" *ngIf="!permissionsControl?.untouched">{{ permissionsControl?.errors | validationError }}</span></span
+    >
+  </div>
   <ejs-treeview
     #tree
     [disabled]="(isNewRoleDataLoading$ | async) || form.disabled"

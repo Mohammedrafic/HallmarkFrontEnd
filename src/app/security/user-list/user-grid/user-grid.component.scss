@@ -1,0 +1,11 @@
+@import "../../../styles/variables/colors.scss";
+
+.users-grid {
+  .default-role {
+    background-color: $secondary-dark-blue-50;
+
+    .secondary-icon-button {
+      opacity: 0.5;
+    }
+  }
+}

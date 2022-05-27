@@ -39,6 +39,7 @@ import { FeeSettingsComponent } from './agency-list/add-edit-agency/associated-o
 import { AddNewFeeDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/fee-settings/add-new-fee-dialog/add-new-fee-dialog.component';
 import { CredentialsGridComponent } from './candidates/add-edit-candidate/credentials-grid/credentials-grid.component';
 import { CandidateAgencyComponent } from './candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
+import { PartnershipSettingsComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/partnership-settings/partnership-settings.component';
 
 const sidebarIcons = {
   Sliders,
@@ -73,6 +74,7 @@ const sidebarIcons = {
     AddNewFeeDialogComponent,
     CredentialsGridComponent,
     CandidateAgencyComponent,
+    PartnershipSettingsComponent,
   ],
   imports: [
     CommonModule,

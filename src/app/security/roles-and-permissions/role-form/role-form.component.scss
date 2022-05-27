@@ -14,11 +14,50 @@
   }
 
   .active-toggle {
-      margin-top: 24px;
+    margin-top: 24px;
   }
 
   .divider {
     margin: 24px -24px;
     background-color: $secondary-dark-blue-40;
+  }
+
+  .tree-lebel {
+    label {
+      display: inline-block;
+      font-weight: 700;
+      font-size: 14px;
+      color: $pure-black;
+    }
+
+    .error-validation {
+      display: inline-block;
+      margin-left: 35px;
+      color: $supportive-red;
+      font-size: 12px;
+      font-weight: 400;
+      position: relative;
+
+      i-feather {
+        position: absolute;
+        top: -2px;
+        left: -24px;
+      }
+    }
+  }
+
+  .copy-role {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .dropdown-container {
+      flex-grow: 1;
+      margin-right: 12px;
+    }
+
+    .button-cancel {
+      margin-top: 10px;
+    }
   }
 }

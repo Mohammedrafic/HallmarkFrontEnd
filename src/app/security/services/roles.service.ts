@@ -54,4 +54,14 @@ export class RolesService {
   public removeRoles(id: number): Observable<never> {
     return this.http.delete<never>(`/api/Roles/${id}`);
   }
+
+    /**
+   * Get Role by business unit type and id
+   * @param BusinessUnitType
+   * @param BusinessUnitId
+   * @return Roles array
+   */
+     public getRolesForCopy(BusinessUnitType: BusinessUnitType, BusinessUnitId: number): Observable<Role[]> {
+      return this.http.get<Role[]>(`/api/Roles/listByBusinessUnit`, { params: { BusinessUnitType, BusinessUnitId } });
+    }
 }

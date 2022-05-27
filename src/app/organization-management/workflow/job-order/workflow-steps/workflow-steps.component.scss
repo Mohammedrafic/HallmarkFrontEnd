@@ -1,0 +1,88 @@
+@import 'colors.scss';
+
+.workflow-details {
+  width: 100%;
+
+  .e-card-title {
+    color: $pure-black;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 28px;
+  }
+
+  .e-card {
+    padding: 16px;
+
+    &.group {
+      display: flex;
+      flex-direction: row;
+
+      .input-container {
+        width: 100%;
+      }
+
+      .with-padding {
+        padding-left: 12px;
+      }
+
+      &.child {
+        width: calc(100% - 30px);
+        margin-left: 30px;
+        margin-top: 12px;
+
+        .remove-custom-step-button {
+          display: flex;
+          align-items: end;
+
+          button.e-control.e-btn {
+            i-feather {
+              margin: 0;
+            }
+          }
+
+          .default-icon-button {
+            width: 40px;
+            height: 40px;
+            border: 1px solid $primary-active-blue-40;
+            border-radius: 8px;
+            color: $primary-active-blue-10;
+            background-color: $white;
+
+            &.e-active,
+            &:focus {
+              color: $white;
+              background-color: $primary-active-blue;
+            }
+
+            &:hover {
+              color: $primary-active-blue-10;
+              background-color: $primary-active-blue-70;
+            }
+          }
+        }
+      }
+    }
+
+    .input-container {
+      label.initial-step-label {
+        color: $secondary-dark-blue-10;
+      }
+
+      .input-group.input-readonly {
+        .e-input[readonly] {
+          background-color: $secondary-dark-blue-50;
+          color: $secondary-dark-blue-10;
+
+          &:hover,
+          &:focus {
+            border: 1px solid $secondary-dark-blue-40 !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+.button-container {
+  padding: 12px;
+}

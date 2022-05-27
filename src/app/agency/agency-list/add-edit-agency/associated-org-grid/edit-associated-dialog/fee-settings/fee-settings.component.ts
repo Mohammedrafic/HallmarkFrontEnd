@@ -73,10 +73,6 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
       .subscribe(() => this.store.dispatch(new RemoveFeeExceptionsById(data.id)));
   }
 
-  public dataBound(): void {
-    this.grid.autoFitColumns();
-  }
-
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
       this.store.dispatch(new GetFeeSettingByOrganizationId(this.organizationId, this.currentPage, this.pageSize));

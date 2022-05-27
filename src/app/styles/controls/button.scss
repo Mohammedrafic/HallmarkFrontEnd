@@ -25,6 +25,23 @@ button.e-control.e-btn {
   }
 }
 
+.e-control.e-popup.e-popup-open.e-dropdown-popup.button-export {
+  ul {
+    border-radius: 8px;
+  }
+}
+
+button.e-control.e-btn.e-dropdown-btn {
+  span.e-btn-icon {
+    display: none;
+  }
+
+  &.e-active {
+    background-color: #fff;
+    border: 1px solid $primary-active-blue;
+  }
+}
+
 .dark {
 
 }

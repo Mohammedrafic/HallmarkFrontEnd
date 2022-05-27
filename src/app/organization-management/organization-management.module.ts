@@ -52,6 +52,10 @@ import { HolidaysComponent } from './holidays/holidays.component';
 import { WorkflowComponent } from './workflow/workflow.component';
 import { JobOrderComponent } from './workflow/job-order/job-order.component';
 import { WorkflowMappingComponent } from './workflow/workflow-mapping/workflow-mapping.component';
+import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { CardMenuComponent } from './workflow/job-order/card-menu/card-menu.component';
+import { WorkflowStepsComponent } from './workflow/job-order/workflow-steps/workflow-steps.component';
+import { WorkflowState } from './store/workflow.state';
 
 const sidebarIcons = {
   Download,
@@ -88,7 +92,9 @@ const sidebarIcons = {
     HolidaysComponent,
     WorkflowComponent,
     JobOrderComponent,
-    WorkflowMappingComponent
+    WorkflowMappingComponent,
+    CardMenuComponent,
+    WorkflowStepsComponent
   ],
   imports: [
     CommonModule,
@@ -118,12 +124,14 @@ const sidebarIcons = {
     SwitchModule,
     MultiSelectAllModule,
     AutoCompleteModule,
+    DropDownButtonModule,
 
     FeatherModule.pick(sidebarIcons),
 
     //STORE
     NgxsModule.forFeature([
       OrganizationManagementState,
+      WorkflowState,
       CredentialsState,
       ShiftsState,
       HolidaysState

@@ -8,19 +8,7 @@
   &.first-active {
     .e-tab .e-tab-header:not(.e-vertical) .e-indicator {
       left: 0px !important;
-      right: 160px !important;
+      right: 182px !important;
     }
-  }
-}
-
-.job-distribution {
-  label {
-    display: block;
-    margin-bottom: 5px;
-  }
-
-  .dropdown-container {
-    max-width: 50%;
-    margin-bottom: 12px;
   }
 }

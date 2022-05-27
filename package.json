@@ -31,6 +31,7 @@
     "@syncfusion/ej2-angular-navigations": "^20.1.47",
     "@syncfusion/ej2-angular-notifications": "^20.1.47",
     "@syncfusion/ej2-angular-popups": "^20.1.47",
+    "@syncfusion/ej2-angular-splitbuttons": "^20.1.47",
     "@syncfusion/ej2-layouts": "^20.1.47",
     "@syncfusion/ej2-notifications": "^20.1.47",
     "angular-feather": "^6.3.0",

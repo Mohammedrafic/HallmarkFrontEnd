@@ -1,0 +1,122 @@
+<section class="workflow-details">
+  <div class="workflow-step">
+    <div class="e-card-header">
+      <div class="e-card-header-caption">
+        <h3 class="e-card-title">{{ workflow.type === 1 ? 'Order Workflow' : 'Application' }}</h3>
+      </div>
+    </div>
+
+    <form
+      [formGroup]="customStepFormGroup"
+      class="form-container bootstrap"
+    >
+      <!-- Incomplete/Shortlisted Steps -->
+      <div class="e-card group">
+        <div class="input-container">
+          <label class="initial-step-label">Step</label>
+          <div class="input-group input-readonly">
+            <input
+              class="e-input"
+              type="text"
+              readonly
+              [value]="workflow.steps[0].name"
+            />
+          </div>
+        </div>
+
+        <div class="input-container with-padding" *ngIf="customSteps.length > 1">
+          <label>Current Status <span class="required">*</span></label>
+          <div class="input-group">
+            <input
+              class="e-input"
+              type="text"
+              maxlength="50"
+              appValidateWithMessage
+              formControlName="customParentStatus"
+              [placeholder]="workflow.steps[0].status"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Custom Steps -->
+      <div
+        class="custom-step-container"
+        *ngFor="let step of customSteps | slice:1; let i = index"
+      >
+        <div class="e-card group child">
+          <div class="input-container">
+            <label>Custom Step <span class="required">*</span></label>
+            <div class="input-group" formArrayName="customStepName">
+              <input
+                class="e-input"
+                type="text"
+                maxlength="50"
+                placeholder="Custom Step"
+                appValidateWithMessage
+                [formControlName]="i"
+              />
+            </div>
+          </div>
+          <div class="input-container with-padding">
+            <label>Current Status <span class="required">*</span></label>
+            <div class="input-group" formArrayName="customStepStatus">
+              <input
+                class="e-input"
+                type="text"
+                maxlength="50"
+                placeholder="Current Status"
+                appValidateWithMessage
+                [formControlName]="i"
+              />
+            </div>
+          </div>
+
+          <div class="remove-custom-step-button with-padding">
+            <button
+              ejs-button
+              cssClass="e-flat default-icon-button"
+              (click)="onRemoveCustomStepButtonClick(i)">
+              <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="button-container">
+      <button
+        ejs-button
+        cssClass="e-flat button-with-icon"
+        (click)="onAddCustomStepClick()"
+      ><i-feather name="plus" class="icon"></i-feather> Add Custom Step</button>
+    </div>
+
+    <!-- Published/Offered Steps -->
+    <div class="e-card group">
+      <div class="input-container bootstrap">
+        <label for="publishedStep" class="initial-step-label">Step</label>
+        <div class="input-group input-readonly">
+          <input id="publishedStep"
+                 class="e-input"
+                 type="text"
+                 readonly
+                 [value]="workflow.steps[1].name"
+          />
+        </div>
+      </div>
+
+      <div class="input-container bootstrap with-padding" *ngIf="customSteps.length > 1">
+        <label>Current Status <span class="required">*</span></label>
+        <div class="input-group input-readonly">
+          <input
+            class="e-input"
+            type="text"
+            readonly
+            [value]="workflow.steps[1].status"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

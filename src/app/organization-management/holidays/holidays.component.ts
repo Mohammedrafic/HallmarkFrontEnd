@@ -1,7 +1,9 @@
+import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { ExportColumn } from '@shared/models/export.model';
 import { Holiday, OrganizationHoliday, OrganizationHolidaysPage } from '@shared/models/holiday.model';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
@@ -11,7 +13,7 @@ import { SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/adm
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CANCEL_COFIRM_TEXT, DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { CheckIfExist, DeleteHoliday, DeleteHolidaySucceeded, GetAllMasterHolidays, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded } from '../store/holidays.actions';
 import { HolidaysState } from '../store/holidays.state';
@@ -59,12 +61,22 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   public locations: OrganizationLocation[] = [];
   public masterHolidays: Holiday[] = [];
   private isAllRegionsSelected = false;
+  public columnsToExport: ExportColumn[] = [
+    { text:'Region', column: 'regionId'},
+    { text:'Location', column: 'locationId'},
+    { text:'Holiday Name', column: 'holidayName'},
+    { text:'Start Date & Time', column: 'startDateTime'},
+    { text:'End Date & Time', column: 'endDateTime'}
+  ];
+  public fileName: string;
 
   constructor(private store: Store,
               private actions$: Actions,
               private fb: FormBuilder,
-              private confirmService: ConfirmService) {
+              private confirmService: ConfirmService,
+              private datePipe: DatePipe) {
     super();
+    this.fileName = 'Organization Holidays ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.today.setHours(0, 0, 0);
     this.HolidayFormGroup = this.fb.group({
       id: new FormControl(0, [ Validators.required ]),
@@ -159,6 +171,14 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy));
   }
 
+  public closeExport() {
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: any): void {
+    console.log(event);
+  }
+
   public onImportDataClick(): void {
     this.store.dispatch(new SetImportFileDialogState(true));
     // TODO: implement data parse after BE implementation
@@ -195,6 +215,10 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
         departments: []
       }];
     }
+  }
+
+  public override customExport(): void {
+    this.store.dispatch(new ShowExportDialog(true));
   }
 
   public editHoliday(data: any, event: any): void {

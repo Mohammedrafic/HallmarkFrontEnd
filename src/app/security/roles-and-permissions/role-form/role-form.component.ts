@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { filter, Observable, takeWhile } from 'rxjs';
+import { combineLatest, filter, map, Observable, takeWhile } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
 import { DrawNodeEventArgs, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
@@ -8,10 +8,11 @@ import { DrawNodeEventArgs, TreeViewComponent } from '@syncfusion/ej2-angular-na
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { PermissionsTree } from '@shared/models/permission.model';
 
-import { GetNewRoleBusinessByUnitType, GetPermissionsTree } from '../../store/security.actions';
+import { GetNewRoleBusinessByUnitType, GetPermissionsTree, GetRolesForCopy } from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
-import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, OPRION_FIELDS } from '../roles-and-permissions.constants';
+import { BUSSINES_DATA_FIELDS, OPRION_FIELDS } from '../roles-and-permissions.constants';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { Role } from '@shared/models/roles.model';
 
 export type RoleTreeField = {
   dataSource: PermissionsTree;
@@ -28,7 +29,7 @@ export type RoleTreeField = {
 })
 export class RoleFormComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
-  @Input() businessUnits: { text: string | BusinessUnitType, id: number }[];
+  @Input() businessUnits: { text: string | BusinessUnitType; id: number }[];
 
   @ViewChild('tree') tree: TreeViewComponent;
 
@@ -41,9 +42,14 @@ export class RoleFormComponent implements OnInit, OnDestroy {
   @Select(SecurityState.isNewRoleDataLoading)
   public isNewRoleDataLoading$: Observable<boolean>;
 
+  public copyRoleData$: Observable<Role[]>;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public optionFields = OPRION_FIELDS;
   public copyRoleControl = new FormControl();
+  public copyRoleFields = {
+    text: 'name',
+    value: 'id',
+  };
 
   get businessUnitControl(): AbstractControl | null {
     return this.form.get('businessUnitType');
@@ -61,10 +67,15 @@ export class RoleFormComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.onBusinessUnitControlChanged();
     this.onRoleTreeFieldChanged();
+    this.onBusinessUnitOrIdChange();
+    this.onFormChange();
 
-    this.form.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
-      this.form.disabled ? this.copyRoleControl.disable() : this.copyRoleControl.enable();
-    });
+    this.copyRoleData$ = this.store.select(SecurityState.copyRoleData).pipe(
+      map((roles) => {
+        const id = this.form.value.id;
+        return id ? roles.filter((role) => role.id !== id) : roles;
+      })
+    );
   }
 
   ngOnDestroy(): void {
@@ -77,10 +88,7 @@ export class RoleFormComponent implements OnInit, OnDestroy {
   }
 
   public onSelecting(): void {
-    const roleDataControl = this.form.get('permissions');
-    const checkeNodes = this.tree.getAllCheckedNodes();
-    const value = this.getAssignableValues(checkeNodes);
-    roleDataControl?.patchValue(value);
+    this.updatePermissionValue();
   }
 
   public dataBound(): void {
@@ -95,6 +103,42 @@ export class RoleFormComponent implements OnInit, OnDestroy {
       const ele = args.node.querySelector('.e-checkbox-wrapper') as HTMLElement;
       ele.classList.add('e-checkbox-disabled');
     }
+  }
+
+  public onApply(): void {
+    const permissions = this.store.selectSnapshot(SecurityState.getPermissionsForCopyById(this.copyRoleControl.value));
+    const merge = new Set([...(this.permissionsControl?.value || []), ...permissions]);
+    this.tree.checkAll([...merge.values()]);
+    this.updatePermissionValue();
+  }
+
+  private onBusinessUnitOrIdChange(): void {
+    const businessUnitTypeControl = this.form.get('businessUnitType');
+    const businessUnitIdControl = this.form.get('businessUnitId');
+    if (businessUnitTypeControl && businessUnitIdControl) {
+      combineLatest([businessUnitTypeControl.valueChanges, businessUnitIdControl.valueChanges])
+        .pipe(
+          takeWhile(() => this.isAlive),
+          filter((values) => values.every((value) => typeof value === 'number'))
+        )
+        .subscribe(([type, id]) => {
+          this.copyRoleControl.reset();
+          this.store.dispatch(new GetRolesForCopy(type, id));
+        });
+    }
+  }
+
+  private updatePermissionValue(): void {
+    const roleDataControl = this.form.get('permissions');
+    const checkeNodes = this.tree.getAllCheckedNodes();
+    const value = this.getAssignableValues(checkeNodes);
+    roleDataControl?.patchValue(value);
+  }
+
+  private onFormChange(): void {
+    this.form.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
+      this.form.disabled ? this.copyRoleControl.disable() : this.copyRoleControl.enable();
+    });
   }
 
   private getAssignableValues(rawValue: string[]): number[] {
@@ -120,7 +164,9 @@ export class RoleFormComponent implements OnInit, OnDestroy {
 
   private onRoleTreeFieldChanged(): void {
     this.roleTreeField$.pipe(takeWhile(() => this.isAlive)).subscribe((roleTreeField) => {
-      this.notAssignableIds = roleTreeField.dataSource.filter(({ isAssignable, isAvailable }) => !isAssignable || !isAvailable).map(({ id }) => id);
+      this.notAssignableIds = roleTreeField.dataSource
+        .filter(({ isAssignable, isAvailable }) => !isAssignable || !isAvailable)
+        .map(({ id }) => id);
     });
   }
 

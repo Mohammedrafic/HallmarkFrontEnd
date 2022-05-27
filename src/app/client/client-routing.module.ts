@@ -7,6 +7,8 @@ import { InvoicesContentComponent } from './invoices/invoices-content/invoices-c
 import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { ClientComponent } from './client.component';
+import { AddEditOrderComponent } from './order-management/add-edit-order/add-edit-order.component';
+import { UnsavedChangesGuard } from '@shared/guards';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -23,8 +25,19 @@ const routes: Routes = [
         }
       },
       {
-        path: 'order-management/:param',
+        path: 'order-management',
         component: OrderManagementContentComponent,
+        data: {
+          isOrganizationArea: true
+        }
+      },
+      {
+        path: 'order-management/add',
+        component: AddEditOrderComponent,
+        data: {
+          isEditing: false
+        },
+        canDeactivate: [UnsavedChangesGuard]
       },
       {
         path: 'time-sheets/:param',

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { catchError, Observable, tap } from 'rxjs';
+import { Action, createSelector, Selector, State, StateContext } from '@ngxs/store';
 
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { BusinessUnitService } from '@shared/services/business-unit.service';
@@ -8,11 +8,16 @@ import { BusinessUnitService } from '@shared/services/business-unit.service';
 import {
   GetBusinessByUnitType,
   GetNewRoleBusinessByUnitType,
+  GetRolesForCopy,
   GetPermissionsTree,
+  GetRolePerUser,
   GetRolesPage,
+  GetUsersPage,
   RemoveRole,
   SaveRole,
   SaveRoleSucceeded,
+  SaveUser,
+  SaveUserSucceeded
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -22,15 +27,20 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants/messages';
 import { HttpErrorResponse } from '@angular/common/http';
+import { UsersService } from "../services/users.service";
+import { RolesPerUser, User, UsersPage } from "@shared/models/user-managment-page.model";
 
 const BUSINNESS_DATA_DEFAULT_VALUE = { id: 0, name: 'All' };
 
 interface SecurityStateModel {
   bussinesData: BusinessUnit[];
+  usersPage: UsersPage | null;
   rolesPage: RolesPage | null;
+  rolesPerUsers: RolesPerUser[] | null;
   permissionsTree: PermissionsTree;
   isNewRoleDataLoading: boolean;
   newRoleBussinesData: BusinessUnit[];
+  copyRoleData: Role[]
 }
 
 @State<SecurityStateModel>({
@@ -38,9 +48,12 @@ interface SecurityStateModel {
   defaults: {
     bussinesData: [],
     rolesPage: null,
+    usersPage: null,
+    rolesPerUsers: [],
     permissionsTree: [],
     isNewRoleDataLoading: false,
     newRoleBussinesData: [],
+    copyRoleData: []
   },
 })
 @Injectable()
@@ -56,8 +69,35 @@ export class SecurityState {
   }
 
   @Selector()
+  static rolesPerUsers(state: SecurityStateModel): RolesPerUser[] | null {
+    return state.rolesPerUsers;
+  }
+
+  @Selector()
   static rolesPage(state: SecurityStateModel): RolesPage | null {
     return state.rolesPage;
+  }
+
+  @Selector()
+  static userGridData(state: SecurityStateModel): User[] {
+    return state.usersPage?.items || [];
+  }
+
+  @Selector()
+  static usersPage(state: SecurityStateModel): UsersPage | null {
+    return state.usersPage;
+  }
+
+  @Selector()
+  static copyRoleData(state: SecurityStateModel): Role[] {
+    return state.copyRoleData;
+  }
+
+  static getPermissionsForCopyById(id: number) {
+    return createSelector([SecurityState], (state: SecurityStateModel): string[] => {
+      const role = state.copyRoleData.find((role) => role.id === id);
+      return role?.permissions.map(String) || [];
+    });
   }
 
   @Selector()
@@ -81,7 +121,11 @@ export class SecurityState {
     return [BUSINNESS_DATA_DEFAULT_VALUE, ...state.newRoleBussinesData] as BusinessUnit[];
   }
 
-  constructor(private businessUnitService: BusinessUnitService, private roleService: RolesService) {}
+  constructor(
+    private businessUnitService: BusinessUnitService,
+    private roleService: RolesService,
+    private userService: UsersService
+  ) {}
 
   @Action(GetBusinessByUnitType)
   GetBusinessByUnitType({ patchState }: StateContext<SecurityStateModel>, { type }: GetBusinessByUnitType): Observable<BusinessUnit[]> {
@@ -117,6 +161,32 @@ export class SecurityState {
     return this.roleService.getRolesPage(businessUnitType, businessUnitId, pageNumber, pageSize).pipe(
       tap((payload) => {
         patchState({ rolesPage: payload });
+        return payload;
+      })
+    );
+  }
+
+  @Action(GetRolePerUser)
+  GetRolesPerPage(
+    { patchState }: StateContext<SecurityStateModel>,
+    { businessUnitId, businessUnitType }: GetRolePerUser
+  ): Observable<RolesPerUser[]>{
+    return this.userService.getRolesPerUser(businessUnitId, businessUnitType).pipe(
+      tap((payload) => {
+        patchState({ rolesPerUsers: payload });
+        return payload;
+      })
+    );
+  }
+
+  @Action(GetUsersPage)
+  GetUsersPage(
+    { patchState }: StateContext<SecurityStateModel>,
+    { businessUnitId, businessUnitType, pageNumber, pageSize }: GetUsersPage
+  ): Observable<UsersPage> {
+    return this.userService.getUsersPage(businessUnitType, businessUnitId, pageNumber, pageSize).pipe(
+      tap((payload) => {
+        patchState({usersPage : payload });
         return payload;
       })
     );
@@ -158,8 +228,26 @@ export class SecurityState {
     );
   }
 
+  @Action(SaveUser)
+  SaveUser({ patchState, getState, dispatch }: StateContext<SecurityStateModel>, { user }: SaveUser): Observable<User | void> {
+    const state = getState();
+    return this.userService.saveUser(user).pipe(
+      tap((payload) => {
+        if(state.usersPage) {
+          const items = [payload,...state.usersPage?.items];
+          const usersPage = { ...state.usersPage, items } as UsersPage;
+          patchState({ usersPage });
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        }
+        dispatch(new SaveUserSucceeded(payload));
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+    );
+  }
+
   @Action(RemoveRole)
-  RemoveRole({ patchState, getState, dispatch }: StateContext<SecurityStateModel>, { id }: RemoveRole): Observable<RolesPage> {
+  RemoveRole({ patchState, getState }: StateContext<SecurityStateModel>, { id }: RemoveRole): Observable<RolesPage> {
     const state = getState();
     return this.roleService.removeRoles(id).pipe(
       tap(() => {
@@ -168,6 +256,15 @@ export class SecurityState {
           const rolesPage = { ...state.rolesPage, items };
           patchState({ rolesPage });
         }
+      })
+    );
+  }
+
+  @Action(GetRolesForCopy)
+  GetRolesForCopy({ patchState }: StateContext<SecurityStateModel>, { id, type }: GetRolesForCopy): Observable<Role[]> {
+    return this.roleService.getRolesForCopy(type, id).pipe(
+      tap((payload) => {
+        patchState({ copyRoleData: payload })
       })
     );
   }

@@ -1,32 +1,51 @@
 <section class="container">
   <div class="toolbar-buttons">
-    <button ejs-button cssClass="e-outline delete-button">Delete</button>
-    <button ejs-button [isPrimary]="true">Save</button>
+    <button
+      ejs-button
+      cssClass="e-outline delete-button"
+      *ngIf="workflowsWithDetails.length !== 0"
+      (click)="onDeleteWorkflowClick()">Delete</button>
+    <button
+      ejs-button
+      cssClass="save-button"
+      [isPrimary]="true"
+      [disabled]="workflowsWithDetails.length === 0"
+      (click)="onUpdateWorkflowClick()">Save</button>
   </div>
 
-  <section>
-    <div class="cards-container">
-      <div class="cards">
-<!--TODO: add cards-->
-      </div>
-
-      <button
-        ejs-button
-        cssClass="e-flat button-with-icon"
-        (click)="onAddNewWorkflowClick()"
-      ><i-feather name="plus" class="icon"></i-feather> Add New Workflow</button>
-    </div>
-
-    <div class="workflows-container">
-<!--      TODO: add workflows-->
-    </div>
+  <section class="workflows-container">
+    <app-card-menu
+      [cards]="workflowsWithDetails"
+      (addNewWorkflowClick)="onAddNewWorkflowClick()"
+      (cardClicked)="onCardSelected($event)"
+    ></app-card-menu>
+    <section class="workflow-details-container" [formGroup]="customStepOrderFormGroup">
+      <app-workflow-steps
+        *ngIf="orderWorkflow"
+        class="workflow-steps"
+        [workflow]="orderWorkflow"
+        [customSteps]="customOrderSteps"
+        [customStepFormGroup]="customStepOrderFormGroup"
+        (customStepAddClick)="onCustomStepClick($event)"
+        (customStepRemoveClick)="onCustomStepRemoveClick($event)"
+      ></app-workflow-steps>
+      <app-workflow-steps
+        *ngIf="applicationWorkflow"
+        class="workflow-steps"
+        [workflow]="applicationWorkflow"
+        [customSteps]="customApplicationSteps"
+        [customStepFormGroup]="customStepApplicationFormGroup"
+        (customStepAddClick)="onCustomStepClick($event)"
+        (customStepRemoveClick)="onCustomStepRemoveClick($event)"
+      ></app-workflow-steps>
+    </section>
   </section>
 
   <app-side-dialog
     *ngIf="isActive"
     (formCancelClicked)="onCancelFormClick()"
     (formSaveClicked)="onSaveFormClick()"
-    [header]="dialogHeader + ' Workflow'"
+    header="Add Workflow"
   >
     <form class="form-container bootstrap"
           id="addWorkflow"

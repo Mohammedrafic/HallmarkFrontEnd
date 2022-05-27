@@ -25,6 +25,9 @@ export class InviteDialogComponent implements OnInit {
   @Select(AgencyState.organizations)
   public organizations$: Observable<Organization[]>;
 
+  @Select(AgencyState.agencyName)
+  public agencyName$: Observable<string>;
+
   public targetElement: HTMLElement = document.body;
   public control = new FormControl('');
   public optionFields = {

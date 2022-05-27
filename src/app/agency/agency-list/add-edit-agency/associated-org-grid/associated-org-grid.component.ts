@@ -96,7 +96,7 @@ export class AssociatedOrgGridComponent extends AbstractGridConfigurationCompone
   }
 
   public dataBound(): void {
-    this.grid.autoFitColumns();
+    this.grid.autoFitColumns(['organizationName', 'baseFee', 'tierTitle', 'exeptionFee', 'partnershipStatusTitle']);
   }
 
   public onGoToClick(event: any): void {

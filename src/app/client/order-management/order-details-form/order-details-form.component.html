@@ -1,0 +1,525 @@
+<section class="order-type-status-container bootstrap">
+  <div class="left-section">
+    <form class="order-type-status-form">
+      <div class="input-container order-type-container">
+        <label>Order Type</label>
+        <div class="input-group dropdown create-under-dropdown">
+          <ejs-dropdownlist placeholder="Order Type"></ejs-dropdownlist>
+        </div>
+      </div>
+
+      <div class="input-container order-status-container">
+        <label>Status</label>
+        <div class="input-group dropdown create-under-dropdown">
+          <ejs-dropdownlist placeholder="Order Status"></ejs-dropdownlist>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="right-section"></div>
+</section>
+
+<section class="order-form-container">
+  <div class="left-section">
+    <div tabindex="0" class="e-card">
+      <div class="e-card-content">
+        <div class="general-information">
+          <div class="title">General Information</div>
+          <div class="general-information-form-container">
+            <form>
+              <div class="form-line">
+                <!-- Job Title -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Job Title<span class="required">*</span></label>
+                  <div class="input-group">
+                    <input class="e-input" type="text" placeholder="Job Title" />
+                  </div>
+                </div>
+
+                <!-- Region -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Region<span class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist placeholder="Region"></ejs-dropdownlist>
+                  </div>
+                </div>
+
+                <!-- Location -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Location<span class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist placeholder="Location"></ejs-dropdownlist>
+                  </div>
+                </div>
+
+                <!-- Department -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Department<span class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist placeholder="Department"></ejs-dropdownlist>
+                  </div>
+                </div>
+
+                <!-- Skill -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Skill<span class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist placeholder="Skill"></ejs-dropdownlist>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-line">
+                <!-- Project Type -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Project Type<span class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist placeholder="Project Type"></ejs-dropdownlist>
+                  </div>
+                </div>
+
+                <!-- Project Name -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Project Name<span class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist placeholder="Project Name"></ejs-dropdownlist>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-line">
+                <!-- Hourly rate ($) -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Hourly rate ($)<span class="required">*</span></label>
+                  <div class="input-group">
+                    <input class="e-input" type="text" placeholder="Hourly rate ($)" />
+                  </div>
+                </div>
+
+                <!-- # of Phisitions req. -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label># of Phisitions req.<span class="required">*</span></label>
+                  <div class="input-group">
+                    <input class="e-input" type="text" placeholder="# of Phisitions req." />
+                  </div>
+                </div>
+
+                <!-- Min Yrs. Req. -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Min Yrs. Req.<span class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist placeholder="Min Yrs. Req."></ejs-dropdownlist>
+                  </div>
+                </div>
+
+                <!-- Joining Bonus ($) -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Joining Bonus ($)<span class="required">*</span></label>
+                  <div class="input-group">
+                    <input class="e-input" type="text" placeholder="Joining Bonus ($)" />
+                  </div>
+                </div>
+
+                <!-- Comp. Bonus ($) -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Comp. Bonus ($)<span class="required">*</span></label>
+                  <div class="input-group">
+                    <input class="e-input" type="text" placeholder="Comp. Bonus ($)" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-line">
+                <!-- Duration -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Duration<span class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist placeholder="Duration"></ejs-dropdownlist>
+                  </div>
+                </div>
+
+                <!-- Days -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Days<span class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist placeholder="Days"></ejs-dropdownlist>
+                  </div>
+                </div>
+
+                <!-- Days Q-ty -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Days Q-ty<span class="required">*</span></label>
+                  <div class="input-group">
+                    <input class="e-input" type="text" placeholder="Days Q-ty" />
+                  </div>
+                </div>
+
+                <!-- Job Start Date -->
+                <div class="datepicker-container form-line-item-20">
+                  <label>Job Start Date<span class="required">*</span></label>
+                  <div class="input-group datepicker bootstrap">
+                    <ejs-datepicker
+                      class="datepicker"
+                      format="MM/dd/yyyy"
+                      placeholder="MM/DD/YYYY"
+                      [enableMask]="true"
+                      [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }">
+                    </ejs-datepicker>
+                  </div>
+                </div>
+
+                <!-- Job End Date -->
+                <div class="datepicker-container form-line-item-20">
+                  <label>Job End Date<span class="required">*</span></label>
+                  <div class="input-group datepicker bootstrap">
+                    <ejs-datepicker
+                      class="datepicker"
+                      format="MM/dd/yyyy"
+                      placeholder="MM/DD/YYYY"
+                      [enableMask]="true"
+                      [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }">
+                    </ejs-datepicker>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-line">
+                <!-- Shift Requirements -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Shift Requirements<span class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist placeholder="Shift Requirements"></ejs-dropdownlist>
+                  </div>
+                </div>
+
+                <!-- Shift Start Time -->
+                <div class="input-container calendar form-line-item-20">
+                  <label for="startTime">Shift Start Time<span class="required">*</span></label>
+                  <div class="input-group datepicker bootstrap">
+                    <ejs-timepicker
+                      placeholder="HH:MM"
+                      format="hh:mm a"
+                      [enableMask]="true"
+                      maskPlaceholder="HH:MM">
+                    </ejs-timepicker>
+                  </div>
+                </div>
+
+                <!-- Shift End Time -->
+                <div class="input-container calendar form-line-item-20">
+                  <label for="startTime">Shift End Time<span class="required">*</span></label>
+                  <div class="input-group datepicker bootstrap">
+                    <ejs-timepicker
+                      placeholder="HH:MM"
+                      format="hh:mm a"
+                      [enableMask]="true"
+                      maskPlaceholder="HH:MM">
+                    </ejs-timepicker>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="job-distibution">
+          <div class="title">Job Distibution</div>
+          <div class="job-distribution-form-container">
+            <form>
+              <div class="form-line">
+                <!-- Job Distribution -->
+                <div class="input-container bootstrap form-line-item-40">
+                  <label>Job Distribution<span class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist placeholder="Job Distribution"></ejs-dropdownlist>
+                  </div>
+                </div>
+
+                <!-- Agency -->
+                <div class="input-container bootstrap form-line-item-40">
+                  <label>Agency<span class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist placeholder="Agency"></ejs-dropdownlist>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+
+        </div>
+        <div class="job-description">
+          <div class="title">Job Description</div>
+          <div class="job-description-form-container">
+            <form>
+              <div class="form-line">
+                <!-- Classification -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Classification<span class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist placeholder="Classification"></ejs-dropdownlist>
+                  </div>
+                </div>
+
+                <div class="bootstrap job-description-checkboxes-container">
+                  <ejs-checkbox label="On Call Required"></ejs-checkbox>
+                  <ejs-checkbox label="ASAP Start"></ejs-checkbox>
+                  <ejs-checkbox label="Critical Order"></ejs-checkbox>
+                  <ejs-checkbox label="NO OT"></ejs-checkbox>
+                </div>
+              </div>
+
+              <div class="form-line">
+                <!-- Job Description -->
+                <div class="input-container bootstrap form-line-item-40">
+                  <label for="comments">Job Description</label>
+                  <div class="input-group">
+                    <ejs-textbox
+                      class="e-input"
+                      type="text"
+                      [multiline]="true"
+                      placeholder="Job Description...">
+                    </ejs-textbox>
+                  </div>
+                </div>
+
+                <!-- Unit Description -->
+                <div class="input-container bootstrap form-line-item-40">
+                  <label for="comments">Unit Description</label>
+                  <div class="input-group">
+                    <ejs-textbox
+                      class="e-input"
+                      type="text"
+                      [multiline]="true"
+                      placeholder="Unit Description...">
+                    </ejs-textbox>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-line">
+                <!-- Reason of Requisition -->
+                <div class="input-container bootstrap form-line-item-40">
+                  <label>Reason of Requisition<span class="required">*</span></label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist placeholder="Reason of Requisition"></ejs-dropdownlist>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="contact-details">
+          <div class="contact-header">
+            <div class="title">Contact Details</div>
+            <div class="stick-right add-contact-link">
+              <i-feather name="plus" class="icon"></i-feather>
+              Add Contact
+            </div>
+          </div>
+          <div class="contact-details-form-container">
+            <form>
+              <div class="form-line">
+                <!-- Title -->
+                <div class="contact-details-title-container form-line-item-25">
+                  <div class="input-container bootstrap">
+                    <label>Title</label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist placeholder="Title"></ejs-dropdownlist>
+                    </div>
+                  </div>
+                  <div class="input-container edit-button-container">
+                    <button ejs-button type="button" cssClass="e-outline" class="icon-button">
+                      <i-feather name="edit3" class="icon"></i-feather>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Contact Person -->
+                <div class="input-container bootstrap form-line-item-25">
+                  <label>Contact Person</label>
+                  <div class="input-group">
+                    <input class="e-input" type="text" placeholder="Contact Person" />
+                  </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="input-container bootstrap form-line-item-25">
+                  <label>Phone</label>
+                  <div class="input-group">
+                    <input class="e-input" type="text" placeholder="Phone" />
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div class="input-container bootstrap form-line-item-25">
+                  <label>Email</label>
+                  <div class="input-group">
+                    <input class="e-input" type="email" placeholder="Email" />
+                  </div>
+                </div>
+
+                <!-- Remove button -->
+                <div class="input-container remove-button-container"></div>
+              </div>
+
+              <div class="form-line">
+                <!-- Title -->
+                <div class="contact-details-title-container form-line-item-25">
+                  <div class="input-container bootstrap">
+                    <label>Title</label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist placeholder="Title"></ejs-dropdownlist>
+                    </div>
+                  </div>
+                  <div class="input-container edit-button-container">
+                    <button ejs-button type="button" cssClass="e-outline" class="icon-button">
+                      <i-feather name="edit3" class="icon"></i-feather>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Contact Person -->
+                <div class="input-container bootstrap form-line-item-25">
+                  <label>Contact Person</label>
+                  <div class="input-group">
+                    <input class="e-input" type="text" placeholder="Contact Person" />
+                  </div>
+                </div>
+
+                <!-- Phone -->
+                <div class="input-container bootstrap form-line-item-25">
+                  <label>Phone</label>
+                  <div class="input-group">
+                    <input class="e-input" type="text" placeholder="Phone" />
+                  </div>
+                </div>
+
+                <!-- Email -->
+                <div class="input-container bootstrap form-line-item-25">
+                  <label>Email</label>
+                  <div class="input-group">
+                    <input class="e-input" type="email" placeholder="Email" />
+                  </div>
+                </div>
+
+                <!-- Remove button -->
+                <div class="input-container remove-button-container">
+                  <button ejs-button type="button" cssClass="e-outline" class="icon-button">
+                    <i-feather name="trash2" class="icon"></i-feather>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="work-location">
+          <div class="work-location-header">
+            <div class="title">Work Location</div>
+            <div class="stick-right add-contact-link">
+              <i-feather name="plus" class="icon"></i-feather>
+              Add More
+            </div>
+          </div>
+
+          <form>
+            <div class="form-line">
+              <!-- Address -->
+              <div class="input-container bootstrap form-line-item-40">
+                <label>Address<span class="required">*</span></label>
+                <div class="input-group">
+                  <input class="e-input" type="text" placeholder="Address" />
+                </div>
+              </div>
+
+              <!-- State -->
+              <div class="input-container bootstrap form-line-item-20">
+                <label>State<span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-dropdownlist placeholder="State"></ejs-dropdownlist>
+                </div>
+              </div>
+
+              <!-- City -->
+              <div class="input-container bootstrap form-line-item-20">
+                <label>City<span class="required">*</span></label>
+                <div class="input-group">
+                  <input class="e-input" type="text" placeholder="City" />
+                </div>
+              </div>
+
+              <!-- Zipcode -->
+              <div class="input-container bootstrap form-line-item-20">
+                <label>Zipcode<span class="required">*</span></label>
+                <div class="input-group">
+                  <input class="e-input" type="text" placeholder="Zipcode" />
+                </div>
+              </div>
+
+              <!-- Remove button -->
+              <div class="input-container remove-button-container"></div>
+            </div>
+
+            <div class="form-line">
+              <!-- Address -->
+              <div class="input-container bootstrap form-line-item-40">
+                <label>Address<span class="required">*</span></label>
+                <div class="input-group">
+                  <input class="e-input" type="text" placeholder="Address" />
+                </div>
+              </div>
+
+              <!-- State -->
+              <div class="input-container bootstrap form-line-item-20">
+                <label>State<span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-dropdownlist placeholder="State"></ejs-dropdownlist>
+                </div>
+              </div>
+
+              <!-- City -->
+              <div class="input-container bootstrap form-line-item-20">
+                <label>City<span class="required">*</span></label>
+                <div class="input-group">
+                  <input class="e-input" type="text" placeholder="City" />
+                </div>
+              </div>
+
+              <!-- Zipcode -->
+              <div class="input-container bootstrap form-line-item-20">
+                <label>Zipcode<span class="required">*</span></label>
+                <div class="input-group">
+                  <input class="e-input" type="text" placeholder="Zipcode" />
+                </div>
+              </div>
+
+              <!-- Remove button -->
+              <div class="input-container remove-button-container">
+                <button ejs-button type="button" cssClass="e-outline" class="icon-button">
+                  <i-feather name="trash2" class="icon"></i-feather>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="workflow">
+          <div class="title">Workflow</div>
+          <form>
+            <div class="form-line">
+              <!-- Workflow -->
+              <div class="input-container bootstrap form-line-item-60">
+                <label>Workflow<span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-dropdownlist placeholder="Workflow"></ejs-dropdownlist>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-section">
+    <app-document-uploader uploaderTitle="Documents"></app-document-uploader>
+  </div>
+</section>

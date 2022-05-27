@@ -13,39 +13,37 @@
       <section class="header-container">
         <div class="e-card-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title">Assoсiate Organization </h3>
+            <h3 class="e-card-title">Assoсiate Organization</h3>
           </div>
-          <div  class="e-card-content">
-            <button
-              ejs-button
-              cssClass="e-outline button-cancel"
-              id="cancelFormButton"
-              (click)="onCancel()">Cancel</button>
-            <button
-              ejs-button
-              id="addFormButton"
-              type="submit"
-              [isPrimary]="true"
-              [disabled]="!control.dirty"
-              (click)="onInvite()">Send Invite</button>
+          <div class="e-card-content">
+            <button ejs-button cssClass="e-outline button-cancel" id="cancelFormButton" (click)="onCancel()">Cancel</button>
+            <button ejs-button id="addFormButton" type="submit" [isPrimary]="true" [disabled]="!control.dirty" (click)="onInvite()">
+              Save
+            </button>
           </div>
         </div>
       </section>
 
       <section class="invite bootstrap">
-        <div class="dropdown-container">
-            <label>Organization</label>
-            <div class="input-group dropdown">
-              <ejs-multiselect
-                appValidateWithMessage
-                [formControl]="control"
-                mode="CheckBox"
-                [fields]="optionFields"
-                [dataSource]="organizations$ | async"
-                placeholder="Organization"
-              ></ejs-multiselect>
-            </div>
+        <div class="input-container">
+          <label>Agency</label>
+          <div class="input-group">
+            <input class="e-input" type="text" placeholder="Agency" disabled [value]="agencyName$ | async"/>
           </div>
+        </div>
+        <div class="dropdown-container">
+          <label>Organization</label>
+          <div class="input-group dropdown">
+            <ejs-multiselect
+              appValidateWithMessage
+              [formControl]="control"
+              mode="CheckBox"
+              [fields]="optionFields"
+              [dataSource]="organizations$ | async"
+              placeholder="Organization"
+            ></ejs-multiselect>
+          </div>
+        </div>
       </section>
     </section>
   </ng-template>

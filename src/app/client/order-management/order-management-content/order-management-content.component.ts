@@ -1,4 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
 import { GridComponent, PagerComponent, PageSettingsModel } from '@syncfusion/ej2-angular-grids';
@@ -50,7 +51,7 @@ export class OrderManagementContentComponent implements OnInit {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
   }
 
@@ -60,6 +61,10 @@ export class OrderManagementContentComponent implements OnInit {
       this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
       this.totalDataRecords = data.length;
     });
+  }
+
+  public navigateToOrderForm(): void {
+    this.router.navigate(['./add'], { relativeTo: this.route });
   }
 
   onRowScaleUpClick(): void {
