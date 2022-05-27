@@ -14,17 +14,17 @@
       <div class="e-card group">
         <div class="input-container">
           <label class="initial-step-label">Step</label>
-          <div class="input-group e-disabled">
+          <div class="input-group input-readonly">
             <input
               class="e-input"
               type="text"
-              disabled
-              [placeholder]="workflow.steps[0].name"
+              readonly
+              [value]="workflow.steps[0].name"
             />
           </div>
         </div>
 
-        <div class="input-container with-padding" *ngIf="customSteps.length > 0">
+        <div class="input-container with-padding" *ngIf="customSteps.length > 1">
           <label>Current Status <span class="required">*</span></label>
           <div class="input-group">
             <input
@@ -42,12 +42,12 @@
       <!-- Custom Steps -->
       <div
         class="custom-step-container"
-        *ngFor="let step of customSteps; let i = index"
+        *ngFor="let step of customSteps | slice:1; let i = index"
       >
         <div class="e-card group child">
           <div class="input-container">
             <label>Custom Step <span class="required">*</span></label>
-            <div class="input-group" formArrayName="customStepStatus">
+            <div class="input-group" formArrayName="customStepName">
               <input
                 class="e-input"
                 type="text"
@@ -60,7 +60,7 @@
           </div>
           <div class="input-container with-padding">
             <label>Current Status <span class="required">*</span></label>
-            <div class="input-group" formArrayName="customStepName">
+            <div class="input-group" formArrayName="customStepStatus">
               <input
                 class="e-input"
                 type="text"
@@ -96,24 +96,24 @@
     <div class="e-card group">
       <div class="input-container bootstrap">
         <label for="publishedStep" class="initial-step-label">Step</label>
-        <div class="input-group e-disabled">
+        <div class="input-group input-readonly">
           <input id="publishedStep"
                  class="e-input"
                  type="text"
-                 disabled
-                 [placeholder]="workflow.steps[1].name"
+                 readonly
+                 [value]="workflow.steps[1].name"
           />
         </div>
       </div>
 
-      <div class="input-container bootstrap with-padding" *ngIf="customSteps.length > 0">
+      <div class="input-container bootstrap with-padding" *ngIf="customSteps.length > 1">
         <label>Current Status <span class="required">*</span></label>
-        <div class="input-group e-disabled">
+        <div class="input-group input-readonly">
           <input
             class="e-input"
             type="text"
-            disabled
-            [placeholder]="workflow.steps[1].status"
+            readonly
+            [value]="workflow.steps[1].status"
           />
         </div>
       </div>

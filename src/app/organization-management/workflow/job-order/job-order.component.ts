@@ -11,6 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 import { UserState } from '../../../store/user.state';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 import { WorkflowType } from '@shared/enums/workflow-type';
+import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 
 @Component({
   selector: 'app-job-order',
@@ -25,7 +26,8 @@ export class JobOrderComponent implements OnInit, OnDestroy {
 
   public workflowsWithDetails: WorkflowWithDetails[] = [];
   public workflowFormGroup: FormGroup;
-  public customStepFormGroup: FormGroup;
+  public customStepOrderFormGroup: FormGroup;
+  public customStepApplicationFormGroup: FormGroup;
   public currentBusinessUnitId: number | null = null;
 
   public selectedCard: WorkflowWithDetails;
@@ -74,30 +76,54 @@ export class JobOrderComponent implements OnInit, OnDestroy {
     if (card && card.workflows && card.workflows.length > 0) {
       this.customOrderSteps = [];
       this.customApplicationSteps = [];
+      this.customStepOrderFormGroup.reset();
       this.workflowsWithDetails.forEach(card => card.isActive = false);
       card.isActive = true;
       this.selectedCard = card;
       this.orderWorkflow = card.workflows[0];
       this.applicationWorkflow = card.workflows[1];
-      this.customStepFormGroup.reset();
     }
   }
 
   public onCustomStepClick(workFlowType: WorkflowType): void {
     if (workFlowType === WorkflowType.OrderWorkflow) {
+      // add element to override parent status
+      if (this.customOrderSteps.length === 0) {
+        this.customOrderSteps.push({
+          id: this.orderWorkflow.steps[0].id,
+          name: this.orderWorkflow.steps[0].name,
+          status: '',
+          type: this.orderWorkflow.steps[0].type,
+          order: this.orderWorkflow.steps[0].order,
+          workflowId: this.orderWorkflow.steps[0].workflowId
+        });
+      }
+
       let newCustomStep: Step = {
         name: '',
         status: '',
-        type: WorkflowType.OrderWorkflow,
-        workflowId: this.selectedCard.id
+        type: WorkflowStepType.Custom,
+        workflowId: this.orderWorkflow.steps[0].workflowId
       }
       this.customOrderSteps.push(newCustomStep);
     } else {
+      if (this.customApplicationSteps.length === 0) {
+        // add element to override parent status
+        this.customApplicationSteps.push({
+          id: this.applicationWorkflow.steps[0].id,
+          name: this.applicationWorkflow.steps[0].name,
+          status: '',
+          type: this.applicationWorkflow.steps[0].type,
+          order: this.applicationWorkflow.steps[0].order,
+          workflowId: this.applicationWorkflow.steps[0].workflowId
+        });
+      }
+
       let newCustomStep: Step = {
         name: '',
         status: '',
-        type: WorkflowType.ApplicationWorkflow,
-        workflowId: this.selectedCard.id
+        type: WorkflowStepType.Custom,
+        workflowId: this.applicationWorkflow.steps[0].workflowId
       }
       this.customApplicationSteps.push(newCustomStep);
     }
@@ -106,8 +132,14 @@ export class JobOrderComponent implements OnInit, OnDestroy {
   public onCustomStepRemoveClick(stepDetails: any): void {
     if (stepDetails.type === WorkflowType.OrderWorkflow) {
       this.customOrderSteps.splice(stepDetails.index, 1);
+      if (this.customOrderSteps.length === 1) {
+        this.customOrderSteps = [];
+      }
     } else {
       this.customApplicationSteps.splice(stepDetails.index, 1);
+      if (this.customApplicationSteps.length === 1) {
+        this.customApplicationSteps = [];
+      }
     }
   }
 
@@ -155,21 +187,57 @@ export class JobOrderComponent implements OnInit, OnDestroy {
   }
 
   public onUpdateWorkflowClick(): void {
-    if (this.customStepFormGroup.valid){
+    if ((this.customStepOrderFormGroup.valid && this.customOrderSteps.length > 0)
+      || (this.customStepApplicationFormGroup.valid && this.customApplicationSteps.length > 0)) {
+
+      if (this.customOrderSteps.length > 0) {
+        // map Order workflow custom steps and override parent status
+        this.customOrderSteps[0].status = this.customStepOrderFormGroup.controls['customParentStatus'].value;
+        this.customOrderSteps.forEach((step, i) => {
+          if (i !== 0) {
+            step.name = this.customStepOrderFormGroup.controls['customStepName'].value[i - 1];
+            step.status = this.customStepOrderFormGroup.controls['customStepStatus'].value[i - 1];
+            step.order = i;
+          }
+        });
+      }
+
+      if (this.customApplicationSteps.length > 0) {
+        // map Application workflow custom steps and override parent status
+        this.customApplicationSteps[0].status = this.customStepApplicationFormGroup.controls['customParentStatus'].value;
+        this.customApplicationSteps.forEach((step, i) => {
+          if (i !== 0) {
+            step.name = this.customStepApplicationFormGroup.controls['customStepName'].value[i - 1];
+            step.status = this.customStepApplicationFormGroup.controls['customStepStatus'].value[i - 1];
+            step.order = i;
+          }
+        });
+      }
+
       const workflowWithDetailsPut: WorkflowWithDetailsPut = {
         id: this.selectedCard.id,
         name: this.selectedCard.name,
         customSteps: this.customOrderSteps.concat(this.customApplicationSteps)
       }
-      console.log(workflowWithDetailsPut); // TODO: remove after implementation
-      // this.store.dispatch(new UpdateWorkflow(workflowWithDetailsPut, this.selectedCard.businessUnitId)); //TODO: uncomment after implementation
+
+      console.log(workflowWithDetailsPut); // TODO: remove after BE fix
+      // this.store.dispatch(new UpdateWorkflow(workflowWithDetailsPut, this.selectedCard.businessUnitId)); //TODO: uncomment BE after fix
+      this.customStepOrderFormGroup.reset();
+      this.customStepApplicationFormGroup.reset();
     } else {
-      this.customStepFormGroup.markAllAsTouched();
+      this.customStepOrderFormGroup.markAllAsTouched();
+      this.customStepApplicationFormGroup.markAllAsTouched();
     }
   }
 
   public createCustomStepFormGroup(): void {
-    this.customStepFormGroup = this.formBuilder.group({
+    this.customStepOrderFormGroup = this.formBuilder.group({
+      customParentStatus: ['', [Validators.required, Validators.maxLength(50)]],
+      customStepStatus: this.formBuilder.array([]),
+      customStepName: this.formBuilder.array([])
+    });
+
+    this.customStepApplicationFormGroup = this.formBuilder.group({
       customParentStatus: ['', [Validators.required, Validators.maxLength(50)]],
       customStepStatus: this.formBuilder.array([]),
       customStepName: this.formBuilder.array([])

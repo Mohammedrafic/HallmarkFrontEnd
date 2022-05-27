@@ -30,20 +30,22 @@ export class WorkflowStepsComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.customSteps.length > 0) {
-      this.customSteps.forEach(item => {
-        this.customStepStatus.push(this.formBuilder.control(item.status, [Validators.required, Validators.maxLength(50)]));
-        this.customStepName.push(this.formBuilder.control(item.name, [Validators.required, Validators.maxLength(50)]));
+      this.customSteps.map((item, i) => {
+        if (i !== 0) {
+          this.customStepName.push(this.formBuilder.control(item.name, [Validators.required, Validators.maxLength(50)]));
+          this.customStepStatus.push(this.formBuilder.control(item.status, [Validators.required, Validators.maxLength(50)]));
+        }
       });
     }
   }
 
   public onAddCustomStepClick(): void {
-    this.customStepStatus.push(this.formBuilder.control('', [Validators.required, Validators.maxLength(50)]));
     this.customStepName.push(this.formBuilder.control('', [Validators.required, Validators.maxLength(50)]));
+    this.customStepStatus.push(this.formBuilder.control('', [Validators.required, Validators.maxLength(50)]));
     this.customStepAddClick.emit(this.workflow.type);
   }
 
   public onRemoveCustomStepButtonClick(index: number): void {
-    this.customStepRemoveClick.emit({ type: this.workflow.type, index: index });
+    this.customStepRemoveClick.emit({ type: this.workflow.type, index: index + 1 });
   }
 }
