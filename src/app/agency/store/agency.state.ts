@@ -12,7 +12,7 @@ import {
   FeeExceptionsInitialData,
   FeeExceptionsPage,
   FeeSettings,
-  JobDistribution,
+  PartnershipSettings,
   JobDistributionInitialData,
 } from 'src/app/shared/models/associate-organizations.model';
 import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
@@ -40,14 +40,14 @@ import {
   DeleteAssociateOrganizationsByIdSucceeded,
   GetFeeExceptionsInitialData,
   GetJobDistributionInitialData,
-  SaveJobDistribution,
-  SaveJobDistributionSucceeded,
-  GetJobDistributionId,
+  SavePartnershipSettingsSucceeded,
   SaveFeeExceptions,
   SaveFeeExceptionsSucceeded,
   SaveBaseFee,
   RemoveFeeExceptionsById,
   UpdateAssociateOrganizationsPage,
+  GetPartnershipSettings,
+  SavePartnershipSettings,
 } from './agency.actions';
 
 export interface AgencyStateModel {
@@ -60,7 +60,7 @@ export interface AgencyStateModel {
   feeSettings: FeeSettings | null;
   feeExceptionsInitialData: FeeExceptionsInitialData | null;
   jobDistributionInitialData: JobDistributionInitialData | null;
-  jobDistribution: JobDistribution | null;
+  partnershipSettings: PartnershipSettings | null;
 }
 
 @State<AgencyStateModel>({
@@ -77,7 +77,7 @@ export interface AgencyStateModel {
     feeSettings: null,
     feeExceptionsInitialData: null,
     jobDistributionInitialData: null,
-    jobDistribution: null,
+    partnershipSettings: null,
   },
 })
 @Injectable()
@@ -85,6 +85,10 @@ export class AgencyState {
   @Selector()
   static isAgencyCreated(state: AgencyStateModel): boolean {
     return !!state.agency?.agencyDetails.id;
+  }
+  @Selector()
+  static agencyName(state: AgencyStateModel): string | undefined {
+    return state.agency?.agencyDetails.name;
   }
 
   @Selector()
@@ -124,8 +128,8 @@ export class AgencyState {
   }
 
   @Selector()
-  static jobDistribution(state: AgencyStateModel): JobDistribution | null {
-    return state.jobDistribution;
+  static partnershipSettings(state: AgencyStateModel): PartnershipSettings | null {
+    return state.partnershipSettings;
   }
 
   @Selector()
@@ -321,16 +325,16 @@ export class AgencyState {
     );
   }
 
-  @Action(SaveJobDistribution)
-  SaveJobDistribution(
+  @Action(SavePartnershipSettings)
+  SavePartnershipSettings(
     { patchState, dispatch }: StateContext<AgencyStateModel>,
-    { payload }: SaveJobDistribution
-  ): Observable<JobDistribution> {
+    { payload }: SavePartnershipSettings
+  ): Observable<PartnershipSettings> {
     patchState({ isAgencyLoading: true });
-    return this.associateOrganizationsService.saveJobDistribution(payload).pipe(
+    return this.associateOrganizationsService.savePartnershipSettings(payload).pipe(
       tap((payload) => {
-        patchState({ jobDistribution: payload });
-        dispatch(new SaveJobDistributionSucceeded(payload));
+        patchState({ partnershipSettings: payload });
+        dispatch(new SavePartnershipSettingsSucceeded(payload));
         dispatch(new UpdateAssociateOrganizationsPage());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
         return payload;
@@ -338,14 +342,14 @@ export class AgencyState {
     );
   }
 
-  @Action(GetJobDistributionId)
-  GetJobDistributionId(
+  @Action(GetPartnershipSettings)
+  GetPartnershipSettings(
     { patchState }: StateContext<AgencyStateModel>,
-    { organizationId }: GetJobDistributionId
-  ): Observable<JobDistribution> {
-    return this.associateOrganizationsService.getJobDistributionById(organizationId).pipe(
+    { organizationId }: GetPartnershipSettings
+  ): Observable<PartnershipSettings> {
+    return this.associateOrganizationsService.getPartnershipSettingsById(organizationId).pipe(
       tap((payload) => {
-        patchState({ jobDistribution: payload });
+        patchState({ partnershipSettings: payload });
         return payload;
       })
     );

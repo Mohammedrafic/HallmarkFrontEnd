@@ -11,9 +11,11 @@
         cssClass="e-outline button-import"
         (click)="onImportDataClick()">Import <i-feather name="upload" class="icon"></i-feather></button>
       <button
-        ejs-button
+        ejs-dropdownbutton
+        [items]="exportOptions"
+        (select)="exportSelected($event)"
         id="importButton"
-        cssClass="e-outline button-import">Export <i-feather name="download" class="icon"></i-feather></button>
+        cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
       <button
         ejs-button
         id="addDepartmentButton"
@@ -118,6 +120,8 @@
     </ng-template>
   </ejs-grid>
 </section>
+
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
 <app-side-dialog
   (formCancelClicked)="closeDialog()"

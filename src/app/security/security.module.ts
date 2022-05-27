@@ -6,11 +6,11 @@ import { NgxsModule } from '@ngxs/store';
 import { SharedModule } from '@shared/shared.module';
 
 import { Sliders, Edit, Trash2 } from 'angular-feather/icons';
-import { ButtonAllModule, SwitchAllModule } from '@syncfusion/ej2-angular-buttons';
-import { TreeViewAllModule } from '@syncfusion/ej2-angular-navigations';
-import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
+import {ButtonAllModule, ChipListModule, SwitchAllModule} from '@syncfusion/ej2-angular-buttons';
+import {TabAllModule, TreeViewAllModule} from '@syncfusion/ej2-angular-navigations';
+import {DropDownListModule, MultiSelectAllModule} from '@syncfusion/ej2-angular-dropdowns';
 import { GridAllModule, PagerAllModule } from '@syncfusion/ej2-angular-grids';
-import { NumericTextBoxAllModule } from '@syncfusion/ej2-angular-inputs';
+import {MaskedTextBoxModule, NumericTextBoxAllModule} from '@syncfusion/ej2-angular-inputs';
 import { FeatherModule } from 'angular-feather';
 
 import { SecurityRoutingModule } from './security-routing.module';
@@ -19,6 +19,11 @@ import { SecurityComponent } from './security.component';
 import { RolesGridComponent } from './roles-and-permissions/roles-grid/roles-grid.component';
 import { RoleFormComponent } from './roles-and-permissions/role-form/role-form.component';
 import { SecurityState } from './store/security.state';
+import { UserListComponent } from './user-list/user-list.component';
+import { UserGridComponent } from './user-list/user-grid/user-grid.component';
+import { AddEditUserComponent } from './user-list/add-edit-user/add-edit-user.component';
+import { UserSettingsComponent } from './user-list/add-edit-user/user-settings/user-settings.component';
+import { VisibilitySettingsComponent } from './user-list/add-edit-user/visibility-settings/visibility-settings.component';
 
 const scurityIcons = {
   Sliders,
@@ -31,7 +36,12 @@ const scurityIcons = {
     SecurityComponent,
     RolesAndPermissionsComponent,
     RolesGridComponent,
-    RoleFormComponent
+    RoleFormComponent,
+    UserListComponent,
+    UserGridComponent,
+    AddEditUserComponent,
+    UserSettingsComponent,
+    VisibilitySettingsComponent
   ],
   imports: [
     CommonModule,
@@ -46,6 +56,10 @@ const scurityIcons = {
     PagerAllModule,
     SwitchAllModule,
     TreeViewAllModule,
+    TabAllModule,
+    MaskedTextBoxModule,
+    MultiSelectAllModule,
+    ChipListModule,
 
     FeatherModule.pick(scurityIcons),
     NgxsModule.forFeature([SecurityState]),

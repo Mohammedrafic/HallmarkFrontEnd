@@ -17,12 +17,14 @@
           </div>
           <div class="e-card-content">
             <button ejs-button cssClass="e-outline button-cancel" id="cancelFormButton" (click)="onCancel()">Cancel</button>
-            <button [disabled]="!isSaveActive" ejs-button id="addFormButton" type="submit" [isPrimary]="true" (click)="onSave()">Save</button>
+            <button [disabled]="!isSaveActive" ejs-button id="addFormButton" type="submit" [isPrimary]="true" (click)="onSave()">
+              Save
+            </button>
           </div>
         </div>
       </section>
 
-      <section class="edit-org" [ngClass]="{'first-active': firstActive}">
+      <section class="edit-org" [ngClass]="{ 'first-active': firstActive }">
         <ejs-tab #editOrgTab (selecting)="onTabSelecting()">
           <e-tabitems>
             <e-tabitem>
@@ -33,64 +35,9 @@
             </e-tabitem>
 
             <e-tabitem>
-              <ng-template #headerText> Job Distribution </ng-template>
+              <ng-template #headerText> Partnership Settings </ng-template>
               <ng-template #content>
-                <ng-container *ngIf="jobDistributionInitialData$ | async as jobDistributionInitialData">
-                  <section class="job-distribution bootstrap" [formGroup]="jobDistributionForm">
-                    <div class="dropdown-container">
-                      <label>Region<span class="required">*</span></label>
-                      <div class="input-group dropdown">
-                        <ejs-multiselect
-                          mode="CheckBox"
-                          appValidateWithMessage
-                          formControlName="regionIds"
-                          [fields]="optionFields"
-                          [dataSource]="jobDistributionInitialData.regions"
-                          placeholder="Region"
-                        ></ejs-multiselect>
-                      </div>
-                    </div>
-                    <div class="dropdown-container">
-                      <label>Order Type<span class="required">*</span></label>
-                      <div class="input-group dropdown">
-                        <ejs-multiselect
-                          mode="CheckBox"
-                          appValidateWithMessage
-                          formControlName="orderTypes"
-                          [fields]="optionFields"
-                          [dataSource]="orderType"
-                          placeholder="Order Type"
-                        ></ejs-multiselect>
-                      </div>
-                    </div>
-                    <div class="dropdown-container">
-                      <label>Classification<span class="required">*</span></label>
-                      <div class="input-group dropdown">
-                        <ejs-multiselect
-                          mode="CheckBox"
-                          appValidateWithMessage
-                          formControlName="classifications"
-                          [fields]="optionFields"
-                          [dataSource]="classification"
-                          placeholder="Classification"
-                        ></ejs-multiselect>
-                      </div>
-                    </div>
-                    <div class="dropdown-container">
-                      <label>Skill Category<span class="required">*</span></label>
-                      <div class="input-group dropdown">
-                        <ejs-multiselect
-                          mode="CheckBox"
-                          appValidateWithMessage
-                          formControlName="skillCategoryIds"
-                          [fields]="optionFields"
-                          [dataSource]="jobDistributionInitialData.skillCategories"
-                          placeholder="Skill Category"
-                        ></ejs-multiselect>
-                      </div>
-                    </div>
-                  </section>
-                </ng-container>
+                <app-partnership-settings [partnershipForm]="$any(partnershipForm)"></app-partnership-settings>
               </ng-template>
             </e-tabitem>
           </e-tabitems>

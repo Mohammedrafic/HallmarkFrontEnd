@@ -1633,6 +1633,19 @@
     rxjs-compat "^6.5.4"
     zone.js "^0.10.2"
 
+"@syncfusion/ej2-angular-base@~20.1.55":
+  version "20.1.55"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-angular-base/-/ej2-angular-base-20.1.55.tgz#230f53481d31583f7e883030bdc5c7812dcad0ec"
+  integrity sha512-IIVBO1SSAycctWOyVdlgQ5Ryj6lSalQw01swlfAkf1+grJQGE7+szGwuBhQps3Mb9NMhzjXXRbNQp1cesuTNPw==
+  dependencies:
+    "@syncfusion/ej2-base" "~20.1.55"
+    "@syncfusion/ej2-icons" "~20.1.55"
+    core-js "^3.4.8"
+    reflect-metadata "^0.1.9"
+    rxjs "^6.5.4"
+    rxjs-compat "^6.5.4"
+    zone.js "^0.10.2"
+
 "@syncfusion/ej2-angular-buttons@^20.1.47":
   version "20.1.50"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-angular-buttons/-/ej2-angular-buttons-20.1.50.tgz#1da6638bade1a932a79f849e246823715165aacc"
@@ -1705,6 +1718,15 @@
     "@syncfusion/ej2-base" "~20.1.47"
     "@syncfusion/ej2-popups" "20.1.47"
 
+"@syncfusion/ej2-angular-splitbuttons@^20.1.47":
+  version "20.1.57"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-angular-splitbuttons/-/ej2-angular-splitbuttons-20.1.57.tgz#83f203a60f7fcb89800d12f43a4af109dbba3a5c"
+  integrity sha512-dECOXpM12+z2HK9d7UeT9OA9RoWFLwnLGBXRBCjQhhFP1DfGsllX6rG8iPWOTG4BDNs0ZI27j0bzAG78xypeBw==
+  dependencies:
+    "@syncfusion/ej2-angular-base" "~20.1.55"
+    "@syncfusion/ej2-base" "~20.1.56"
+    "@syncfusion/ej2-splitbuttons" "20.1.57"
+
 "@syncfusion/ej2-base@~20.1.47", "@syncfusion/ej2-base@~20.1.48", "@syncfusion/ej2-base@~20.1.50":
   version "20.1.50"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-base/-/ej2-base-20.1.50.tgz#99617a09b18a46430b5250bb3af28a46c93c71f5"
@@ -1712,12 +1734,26 @@
   dependencies:
     "@syncfusion/ej2-icons" "~20.1.47"
 
+"@syncfusion/ej2-base@~20.1.55", "@syncfusion/ej2-base@~20.1.56":
+  version "20.1.57"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-base/-/ej2-base-20.1.57.tgz#e8168432e2572ee4aff612429b2618795fb3f802"
+  integrity sha512-mHexHWIh7Zwy9FnVyQp0AKRAwvagprUv7Sf95Ibe4mV+ArjCsCOg71bc7B8OdsxvDJj651fVvi7fWaUARKHauA==
+  dependencies:
+    "@syncfusion/ej2-icons" "~20.1.55"
+
 "@syncfusion/ej2-buttons@20.1.50", "@syncfusion/ej2-buttons@~20.1.47", "@syncfusion/ej2-buttons@~20.1.50":
   version "20.1.50"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-buttons/-/ej2-buttons-20.1.50.tgz#fd4c1feed478296ac6a96afc02402103c54e506b"
   integrity sha512-qQr3t660fU/Du/kcZsXknJadS5MKesPABO/NxeDCY7scrfe2QLM//gsvOuGfUuGPPLSb1L+MXMlgxE0wnt5png==
   dependencies:
     "@syncfusion/ej2-base" "~20.1.50"
+
+"@syncfusion/ej2-buttons@~20.1.55":
+  version "20.1.55"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-buttons/-/ej2-buttons-20.1.55.tgz#687e61c11bd315842fdf425cbf623c7835775dd3"
+  integrity sha512-4Dw5z9RL5TY5z3mZ7X66pzHegdgmeSt41gRDnhXqmq6k60k9O5dqCvfSe7op4Ufo8rRt9SWDd8UEqUAfzIxGfg==
+  dependencies:
+    "@syncfusion/ej2-base" "~20.1.55"
 
 "@syncfusion/ej2-calendars@20.1.47", "@syncfusion/ej2-calendars@~20.1.47":
   version "20.1.47"
@@ -1794,6 +1830,11 @@
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-icons/-/ej2-icons-20.1.47.tgz#a67f70e882aeb769932b71791837f663aeab31bc"
   integrity sha512-0P5enxVZSl+AISIlRvQV/d/k0EgP8RDN/gBmb2AQuldMoz+Nx64G7zLEXd1l9Ib2j5Si9JgXF37aYhwc2brdNw==
 
+"@syncfusion/ej2-icons@~20.1.55":
+  version "20.1.55"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-icons/-/ej2-icons-20.1.55.tgz#3cef77ca9c20441b179fdcf736fad6bb58cb81d7"
+  integrity sha512-+0KxvnfK1SIXHpfXoh5I0Boa73FyWn53oaJgD+UmR5Qnbd2xt2g/mRXvpsegDd+Y3fcJPAwcncHDfzeXG3Xb7w==
+
 "@syncfusion/ej2-inputs@20.1.48", "@syncfusion/ej2-inputs@~20.1.47", "@syncfusion/ej2-inputs@~20.1.48":
   version "20.1.48"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-inputs/-/ej2-inputs-20.1.48.tgz#58619601d73d4559c4794cdb052cc53671263688"
@@ -1855,6 +1896,22 @@
   dependencies:
     "@syncfusion/ej2-base" "~20.1.47"
     "@syncfusion/ej2-buttons" "~20.1.47"
+
+"@syncfusion/ej2-popups@~20.1.57":
+  version "20.1.57"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-popups/-/ej2-popups-20.1.57.tgz#383cbe91661c2cfd03c76864595a7f91e57ca555"
+  integrity sha512-y5B+r8Nu3mCS3Q6fP/ZPv3WUn4FlsgUs1UhoO0UAgQpylkPSSLdeqTufswQJgDUlnNlOabjlyijLOIoVb1tDhQ==
+  dependencies:
+    "@syncfusion/ej2-base" "~20.1.56"
+    "@syncfusion/ej2-buttons" "~20.1.55"
+
+"@syncfusion/ej2-splitbuttons@20.1.57":
+  version "20.1.57"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-splitbuttons/-/ej2-splitbuttons-20.1.57.tgz#712f3249c90a249013d52a6d9ef1f33125b87243"
+  integrity sha512-C4Rm2oQuGELh34cHsAxgKvACF0skS+T1h8Gx/fyGNoG6p+MKX5sg8/A1cr1suNPfgpzcf6QzUmYPqRgqQVYvLA==
+  dependencies:
+    "@syncfusion/ej2-base" "~20.1.56"
+    "@syncfusion/ej2-popups" "~20.1.57"
 
 "@syncfusion/ej2-splitbuttons@~20.1.47":
   version "20.1.47"

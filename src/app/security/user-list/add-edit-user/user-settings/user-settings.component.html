@@ -1,0 +1,148 @@
+<div class="user-setting-section">
+  <form [formGroup]="form">
+    <div class="section-container">
+      <div class="left-section">
+        <div class="dropdown-container bootstrap">
+          <label>Business Unit<span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist
+              appValidateWithMessage
+              formControlName="businessUnitType"
+              [fields]="unitFields"
+              [dataSource]="businessUnits"
+              placeholder="Business Unit"
+            ></ejs-dropdownlist>
+          </div>
+        </div>
+        <div class="input-container bootstrap">
+          <label>First Name<span class="required">*</span></label>
+          <div class="input-group">
+            <input appValidateWithMessage formControlName="firstName" class="e-input" type="text" placeholder="First Name" maxlength="50"/>
+          </div>
+        </div>
+        <div class="dropdown-container bootstrap">
+          <label>Role<span class="required">*</span></label>
+          <div class="input-group">
+            <ejs-multiselect appValidateWithMessage
+                             mode="CheckBox"
+                             [allowFiltering]="false"
+                             formControlName="roles"
+                             [fields]="roleFields"
+                             placeholder="Role"
+                             [dataSource]="rolesPerUsers$ | async">
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="active-toggle">
+          <ejs-switch class="switch" [disabled]="form.disabled" [checked]="form.get('isDeleted')?.value" (change)="toggleActive()"></ejs-switch>
+          <span class="e-text">Active</span>
+        </div>
+      </div>
+      <div class="right-section">
+        <div class="dropdown-container bootstrap">
+          <label>Business<span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist
+              appValidateWithMessage
+              formControlName="businessUnitId"
+              [fields]="bussinesDataFields"
+              [dataSource]="newRoleBussinesData$ | async"
+              placeholder="Business"
+            ></ejs-dropdownlist>
+          </div>
+        </div>
+        <div class="input-container bootstrap">
+          <label>Last Name<span class="required">*</span></label>
+          <div class="input-group">
+            <input appValidateWithMessage formControlName="lastName" class="e-input" type="text" placeholder="Last Name" maxlength="50"/>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section-tittle">
+      Address
+    </div>
+    <div class="section-container">
+      <div class="left-section">
+        <div class="input-container bootstrap">
+          <label>Address 1</label>
+          <input formControlName="address1" class="e-input" type="text" placeholder="Address 1" maxlength="100"/>
+        </div>
+      </div>
+      <div class="right-section">
+        <div class="input-container bootstrap">
+          <label>Address 2</label>
+          <input formControlName="address2" class="e-input" type="text" placeholder="Address 2" maxlength="100"/>
+        </div>
+      </div>
+    </div>
+    <div class="section-container">
+      <div class="dropdown-container bootstrap">
+        <label>Country</label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            appValidateWithMessage
+            [fields]="unitFields"
+            formControlName="country"
+            [dataSource]="countries"
+            placeholder="Country"
+            (change)="onCountryChange($event)">
+          </ejs-dropdownlist>
+        </div>
+      </div>
+      <div class="dropdown-container">
+        <label>State</label>
+        <div class="input-group dropdown bootstrap">
+          <ejs-dropdownlist appValidateWithMessage
+                            formControlName="state"
+                            [dataSource]="countryState$ | async"
+                            placeholder="State">
+
+          </ejs-dropdownlist>
+        </div>
+      </div>
+      <div class="input-container bootstrap">
+        <label>City</label>
+        <div class="input-group">
+          <input appValidateWithMessage formControlName="city" class="e-input" type="text" placeholder="City" maxlength="20"/>
+        </div>
+      </div>
+      <div class="input-container bootstrap">
+        <label>Zipcode</label>
+        <div class="input-group">
+          <ejs-maskedtextbox class="organization-input" promptChar="_" mask='00000' appValidateWithMessage formControlName="zipCode" placeholder="Zipcode" maxlength="6"></ejs-maskedtextbox>
+        </div>
+      </div>
+    </div>
+    <div class="section-tittle">
+      Contacts
+    </div>
+    <div class="section-container">
+      <div class="input-container bootstrap">
+        <label>Email<span class="required">*</span></label>
+        <div class="input-group">
+          <input appValidateWithMessage formControlName="email" class="e-input" type="text" placeholder="Email" maxlength="100"/>
+        </div>
+      </div>
+      <div class="input-container bootstrap">
+        <label>Confirm Email<span class="required">*</span></label>
+        <div class="input-group">
+          <input appValidateWithMessage formControlName="emailConfirmation" class="e-input" type="text" placeholder="Confirm Email" maxlength="100"/>
+        </div>
+      </div>
+      <div class="input-container bootstrap">
+        <label>Phone Number</label>
+        <div class="input-group">
+          <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="phoneNumber" placeholder="Phone Number" maxlength="10"></ejs-maskedtextbox>
+        </div>
+      </div>
+      <div class="input-container bootstrap">
+        <label>Fax</label>
+        <div class="input-group">
+          <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="fax" placeholder="Fax" maxlength="10"></ejs-maskedtextbox>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+

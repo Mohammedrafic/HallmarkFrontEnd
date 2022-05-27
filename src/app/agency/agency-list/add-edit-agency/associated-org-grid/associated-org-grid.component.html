@@ -25,10 +25,12 @@
   <e-columns>
     <e-column field="organizationName" headerText="Organization" textAlign="Left"></e-column>
     <e-column field="baseFee" headerText="Base Fee %" textAlign="left"></e-column>
+    <e-column field="tierTitle" headerText="Tier" textAlign="left"></e-column>
     <e-column field="exeptionFee" headerText="Exception Fee" textAlign="left"></e-column>
     <e-column headerText="Job Distribution" [columns]="jobDistributionColumns" textAlign="left"></e-column>
+    <e-column field="partnershipStatusTitle" headerText="Partnership Status" textAlign="left"></e-column>
 
-    <e-column textAlign="Right" width="120">
+    <e-column textAlign="Right" width="120" freeze="Right">
       <ng-template #template let-data>
         <div class="row-tool-buttons">
           <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">

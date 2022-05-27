@@ -38,3 +38,8 @@ export enum CredentialVerifiedStatus {
   Verified,
   Completed
 }
+
+export enum CreateUserStatus {
+  Inactive,
+  Active,
+}
