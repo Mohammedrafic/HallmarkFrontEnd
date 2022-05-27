@@ -5,6 +5,27 @@
     display: flex;
     justify-content: end;
   }
+
+  .workflows-container {
+    display: flex;
+    width: 100%;
+
+    .workflow-steps {
+      width: 100%;
+    }
+
+    .workflow-details-container {
+      border-left: 1px solid $secondary-dark-blue-40;
+      padding-left: 15px;
+      width: 100%;
+    }
+  }
+}
+
+.e-control.e-btn.save-button[disabled] {
+  background-color: $primary-active-blue-10;
+  color: $white;
+  opacity: 40%;
 }
 
 .e-control.e-btn.e-outline.delete-button {

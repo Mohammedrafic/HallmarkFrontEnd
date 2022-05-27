@@ -1,0 +1,29 @@
+export class WorkflowWithDetails {
+  id?: number;
+  name: string;
+  type: number;
+  businessUnitId: number | null;
+  workflows?: Workflow[];
+  isActive?: boolean; // used only on UI to highlight clicked card
+}
+
+export class WorkflowWithDetailsPut {
+  id?: number;
+  name: string;
+  customSteps: Step[];
+}
+
+export class Workflow {
+  id?: number;
+  type: number;
+  steps: Step[];
+}
+
+export class Step {
+  id?: number;
+  workflowId?: number;
+  name: string;
+  status: string;
+  type: number;
+  order?: number;
+}
