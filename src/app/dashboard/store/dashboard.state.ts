@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
+
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { Observable, tap } from 'rxjs';
+
 import { DashboardService } from '../services/dashboard.service';
-import { AddDashboardPanel, GetDashboardPanels } from './dashboard.actions';
+import { AddDashboardPanel, DashboardPanelIsMoved, GetDashboardPanels, SaveDashboard } from './dashboard.actions';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
@@ -47,8 +49,24 @@ export class DashboardState {
     return this.dashboardService.addDashboardPanel(payload).pipe(
       tap((panel) => {
         const state = getState();
-        patchState({ panels: [...state.panels, panel], isDashboardLoading: false });
+        patchState({ panels: payload, isDashboardLoading: false });
       })
     );
+  }
+
+  @Action(DashboardPanelIsMoved)
+  dashboardPanelIsMoved({ patchState }: StateContext<DashboardStateModel>, { payload }: DashboardPanelIsMoved) {
+    patchState({ panels: payload });
+  }
+
+  @Action(SaveDashboard)
+  saveDashboard({ getState, patchState }: StateContext<DashboardStateModel>) {
+    patchState({ isDashboardLoading: true });
+    const state = getState();
+    return this.dashboardService.saveDashboard(state.panels).pipe(
+      tap(() => {
+        patchState({ isDashboardLoading: false });
+      })
+    )
   }
 }

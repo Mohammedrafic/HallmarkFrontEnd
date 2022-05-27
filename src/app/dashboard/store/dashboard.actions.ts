@@ -6,5 +6,14 @@ export class GetDashboardPanels {
 
 export class AddDashboardPanel {
   static readonly type = '[dashboard] Add Dashboard Panel';
-  constructor(public payload: PanelModel) {}
+  constructor(public payload: PanelModel[]) {}
+}
+
+export class DashboardPanelIsMoved {
+  static readonly type = '[dashboard] Dashboard Panel Is Moved';
+  constructor(public payload: PanelModel[]) {}
+}
+
+export class SaveDashboard {
+  static readonly type = '[dashboard] Save Dashboard';
 }
