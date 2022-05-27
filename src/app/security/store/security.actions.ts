@@ -41,3 +41,8 @@ export class RemoveRole {
   static readonly type = '[security] Remove Role';
   constructor(public id: number) {}
 }
+
+export class GetRolesForCopy {
+  static readonly type = '[security] Get Roles For Copy';
+  constructor(public type: BusinessUnitType, public id: number) {}
+}
