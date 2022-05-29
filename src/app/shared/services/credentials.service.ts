@@ -75,12 +75,13 @@ export class CredentialsService {
   }
 
   /**
-   * Get credential setup list
-   * @param data group of objects to search by
-   * @return list of credential setup
+   * Get credential setup list pages
+   * @param pageNumber
+   * @param pageSize
+   * @return list of credential setup pages
    */
-  public getCredentialSetup(data: CredentialSetupGetGroup): Observable<CredentialSetupPage> {
-    return this.http.get<CredentialSetupPage>(`/api/CredentialSetups/${data}`);
+  public getCredentialSetup(pageNumber: number, pageSize: number): Observable<CredentialSetupPage> {
+    return this.http.get<CredentialSetupPage>(`/api/CredentialSetups/`, { params: { PageNumber: pageNumber, PageSize: pageSize } });
   }
 
   /**

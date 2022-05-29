@@ -296,14 +296,19 @@ export class RemoveCredentialSkillGroup {
   constructor(public payload: CredentialSkillGroup) { }
 }
 
-export class GetCredentialSetup {
-  static readonly type = '[organizationManagement] Get Credential Setup by group of CredentialTypeId, OrganizationId, SkillGroupId, RegionId, PageNumber, PageSize';
-  constructor(public payload: CredentialSetupGetGroup) {}
+export class GetCredentialSetupByPage {
+  static readonly type = '[organizationManagement] Get Credential Setup by Page';
+  constructor(public pageNumber: number, public pageSize: number) {}
 }
 
 export class SaveUpdateCredentialSetup {
   static readonly type = '[organizationManagement] Save Credential Setup';
-  constructor(public credentialSetup: CredentialSetup, public credentialSetupGetGroup: CredentialSetupGetGroup) { }
+  constructor(public credentialSetup: CredentialSetup) { }
+}
+
+export class SaveUpdateCredentialSetupSucceeded {
+  static readonly type = '[organizationManagement] Save/Update Credential Setup Succeeded';
+  constructor(public credentialSetup: CredentialSetup) { }
 }
 
 export class GetOrganizationSettings {

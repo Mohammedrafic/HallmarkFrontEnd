@@ -63,13 +63,13 @@ import {
   SaveCredentialSkillGroup,
   UpdateCredentialSkillGroup,
   RemoveCredentialSkillGroup,
-  GetCredentialSetup,
+  GetCredentialSetupByPage,
   SaveUpdateCredentialSetup,
   GetOrganizationSettings,
   SaveOrganizationSettings,
   ClearDepartmentList,
   ClearLocationList,
-  SaveCredentialSucceeded,
+  SaveCredentialSucceeded, SaveUpdateCredentialSetupSucceeded,
 } from './organization-management.actions';
 import { Department } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
@@ -131,7 +131,7 @@ export interface OrganizationManagementStateModel {
   isCredentialLoading: boolean;
   skillGroups: CredentialSkillGroup[] | null;
   isSkillGroupLoading: boolean;
-  credentialSetups: CredentialSetup[] | null;
+  credentialSetupPage: CredentialSetupPage | null;
   isCredentialSetupLoading: boolean;
   isOrganizationSettingsLoading: boolean;
   organizationSettings: OrganizationSettingsGet[];
@@ -171,7 +171,7 @@ export interface OrganizationManagementStateModel {
     isCredentialLoading: false,
     skillGroups: [],
     isSkillGroupLoading: false,
-    credentialSetups: [],
+    credentialSetupPage: null,
     isCredentialSetupLoading: false,
     isOrganizationSettingsLoading: false,
     organizationSettings: []
@@ -243,7 +243,7 @@ export class OrganizationManagementState {
   static skillGroups(state: OrganizationManagementStateModel): CredentialSkillGroup[]  | null { return state.skillGroups }
 
   @Selector()
-  static credentialSetups(state: OrganizationManagementStateModel): CredentialSetup[] | null { return state.credentialSetups }
+  static credentialSetups(state: OrganizationManagementStateModel): CredentialSetupPage | null { return state.credentialSetupPage }
 
   @Selector()
   static organizationSettings(state: OrganizationManagementStateModel): OrganizationSettingsGet[] { return state.organizationSettings }
@@ -683,20 +683,22 @@ export class OrganizationManagementState {
     );
   }
 
-  @Action(GetCredentialSetup)
-  GetCredentialSetupsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetCredentialSetup): Observable<CredentialSetupPage> {
-    return this.credentialsService.getCredentialSetup(payload).pipe(tap((payload) => {
-      patchState({ credentialSetups: payload.items });
+  @Action(GetCredentialSetupByPage)
+  GetCredentialSetupByPage({ patchState }: StateContext<OrganizationManagementStateModel>, { pageNumber, pageSize }: GetCredentialSetupByPage): Observable<CredentialSetupPage> {
+    return this.credentialsService.getCredentialSetup(pageNumber, pageSize).pipe(tap((payload) => {
+      const invalidDate = '0001-01-01T00:00:00+00:00';
+      payload?.items.forEach((item: any) => item.inactiveDate === invalidDate ? item.inactiveDate = '' : item.inactiveDate);
+      patchState({ credentialSetupPage: payload });
       return payload;
     }));
   }
 
   @Action(SaveUpdateCredentialSetup)
-  SaveUpdateCredentialSetup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { credentialSetup, credentialSetupGetGroup }: SaveUpdateCredentialSetup): Observable<CredentialSetup> {
+  SaveUpdateCredentialSetup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { credentialSetup }: SaveUpdateCredentialSetup): Observable<CredentialSetup> {
     return this.credentialsService.saveUpdateCredentialSetup(credentialSetup).pipe(tap((payload) => {
       patchState({ isCredentialSetupLoading: false });
       dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      dispatch(new GetCredentialSetup(credentialSetupGetGroup));
+      dispatch(new SaveUpdateCredentialSetupSucceeded(payload));
       return payload;
     }));
   }

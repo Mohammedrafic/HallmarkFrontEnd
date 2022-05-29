@@ -77,6 +77,7 @@ export class JobOrderComponent implements OnInit, OnDestroy {
       this.customOrderSteps = [];
       this.customApplicationSteps = [];
       this.customStepOrderFormGroup.reset();
+      this.customStepApplicationFormGroup.reset();
       this.workflowsWithDetails.forEach(card => card.isActive = false);
       card.isActive = true;
       this.selectedCard = card;

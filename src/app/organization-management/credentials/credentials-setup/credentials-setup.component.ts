@@ -3,8 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { filter, Observable, of, Subject, takeUntil } from 'rxjs';
-import { Select, Store } from '@ngxs/store';
+import { filter, Observable, of, Subject, takeUntil, throttleTime } from 'rxjs';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
   AbstractGridConfigurationComponent
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -20,18 +20,20 @@ import {
   GetLocationsByRegionId,
   GetRegions,
   ClearDepartmentList,
-  ClearLocationList
+  ClearLocationList,
+  GetCredentialSetupByPage,
+  SaveUpdateCredentialSetupSucceeded
 } from '../../store/organization-management.actions';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CredentialSetup } from '@shared/models/credential-setup.model';
+import { CredentialSetup, CredentialSetupPage } from '@shared/models/credential-setup.model';
 import { Department } from '@shared/models/department.model';
 import { Credential } from '@shared/models/credential.model';
 import { FilterCredentialSetup } from '@shared/enums/credential-setup-filter';
 import { CredentialsState } from '../../store/credentials.state';
 import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
-import { MockCredentialSetupList } from './mock-credential-setup-list';
+import { MockCredentialSetupList, MockCredentialSetupPage } from './mock-credential-setup-list';
 import { SetCredentialSetupFilter } from '../../store/credentials.actions';
 
 @Component({
@@ -80,13 +82,15 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
 
   public editedCredentialSetupId?: number;
 
-  // @Select(OrganizationManagementState.credentialSetups) // TODO: uncomment after BE implementation
-  credentialsData$: Observable<CredentialSetup[]> = of(MockCredentialSetupList);
+  //@Select(OrganizationManagementState.credentialSetups) // TODO: uncomment after BE implementation
+  credentialsData$: Observable<CredentialSetupPage> = of(MockCredentialSetupPage);
 
   private invalidDate = '0001-01-01T00:00:00+00:00';
+  private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private store: Store,
+              private actions$: Actions,
               @Inject(FormBuilder) private builder: FormBuilder,
               private router: Router,
               private route: ActivatedRoute,
@@ -100,7 +104,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     this.store.dispatch(new GetRegions());
     this.store.dispatch(new GetCredentialTypes());
     this.store.dispatch(new GetCredential());
-    // this.store.dispatch(new GetCredentialSkillGroup()); // TODO: uncomment after BE implementation
+    // this.store.dispatch(new GetCredentialSkillGroup()); // TODO: uncomment after BE fix
 
     this.setupFilter$.pipe(takeUntil(this.unsubscribe$)).subscribe(setupFilter => {
       if (setupFilter) {
@@ -117,14 +121,23 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
         }, 500);
       } else {
         this.selectedFilterSetupBy = FilterCredentialSetup.ByOrganization;
-          // this.store.dispatch(new GetCredentialSetup()); // TODO: uncomment after BE implementation
-        this.mapGridData();
+          // this.store.dispatch(new GetCredentialSetupByPage(this.currentPage, this.pageSize)); // TODO: uncomment after BE implementation
         this.groups$.pipe(filter(Boolean),takeUntil(this.unsubscribe$)).subscribe((groups) => {
           if (groups && groups.length > 0 && groups[0].id) {
             this.selectedSkillGroupId = groups[0].id;
           }
         });
       }
+    });
+
+    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
+      this.currentPage = page;
+      // this.store.dispatch(new GetCredentialSetupByPage(this.currentPage, this.pageSize)); // TODO: uncomment after BE implementation
+    });
+
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveUpdateCredentialSetupSucceeded)).subscribe(() => {
+      this.clearFormData();
+      // this.store.dispatch(new GetCredentialSetupByPage(this.currentPage, this.pageSize)); // TODO: uncomment after BE implementation
     });
   }
 
@@ -177,12 +190,11 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   public onOptionChange(credentialSetup: any, event: any): void {
     this.credentialsSetupFormGroup.setValue({
       id: credentialSetup.id,
-      isActive: credentialSetup.isActive,
+      isActive: event.checked,
       masterCredentialId: credentialSetup.masterCredentialId,
       description: credentialSetup.description,
       comments: credentialSetup.comments,
       inactiveDate: credentialSetup.inactiveDate,
-      optional: event.checked,
       reqSubmission: credentialSetup.reqSubmission,
       reqOnboard: credentialSetup.reqOnboard
     });
@@ -197,7 +209,6 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       description: credentialSetup.description,
       comments: credentialSetup.comments,
       inactiveDate: credentialSetup.inactiveDate,
-      optional: credentialSetup.optional,
       reqSubmission: event.checked,
       reqOnboard: credentialSetup.reqOnboard
     });
@@ -212,7 +223,6 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       description: credentialSetup.description,
       comments: credentialSetup.comments,
       inactiveDate: credentialSetup.inactiveDate,
-      optional: credentialSetup.optional,
       reqSubmission: credentialSetup.reqSubmission,
       reqOnboard: event.checked
     });
@@ -228,7 +238,6 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       description: credentialSetup.description,
       comments: credentialSetup.comments,
       inactiveDate: credentialSetup.inactiveDate,
-      optional: credentialSetup.optional,
       reqSubmission: credentialSetup.reqSubmission,
       reqOnboard: credentialSetup.reqOnboard
     });
@@ -254,13 +263,11 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     if (this.credentialsSetupFormGroup.valid) {
       const credentialSetup: CredentialSetup = {
         id: this.credentialsSetupFormGroup.controls['id'].value,
-        isActive: this.credentialsSetupFormGroup.controls['isActive'].value, // TODO: clarify with BE
+        isActive: this.credentialsSetupFormGroup.controls['isActive'].value,
         masterCredentialId: this.credentialsSetupFormGroup.controls['masterCredentialId'].value, // TODO: clarify with BE
-        regionId: this.selectedRegionId,
         skillGroupId: this.selectedSkillGroupId,
         comments: this.credentialsSetupFormGroup.controls['comments'].value,
         inactiveDate: this.credentialsSetupFormGroup.controls['inactiveDate'].value,
-        optional: this.credentialsSetupFormGroup.controls['optional'].value,
         reqSubmission: this.credentialsSetupFormGroup.controls['reqSubmission'].value,
         reqOnboard: this.credentialsSetupFormGroup.controls['reqOnboard'].value,
       }
@@ -276,27 +283,18 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   }
 
   public onRowsDropDownChanged(): void {
-    this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
+    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+    this.grid.pageSettings.pageSize = this.pageSize;
   }
 
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.credentialsData$.subscribe(data => {
-        this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
-        this.currentPagerPage = event.currentPage || event.value;
-      });
+      this.pageSubject.next(event.currentPage || event.value);
+      // this.credentialsData$.subscribe(data => {
+      //   this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
+      //   this.currentPagerPage = event.currentPage || event.value;
+      // });
     }
-  }
-
-  private mapGridData(): void {
-    this.credentialsData$.subscribe(data => {
-      this.lastAvailablePage = this.getLastPage(data);
-      data.forEach((item: any) => {
-        item.inactiveDate === this.invalidDate ? item.inactiveDate = '' : item.inactiveDate;
-      });
-      this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
-      this.totalDataRecords = data.length;
-    });
   }
 
   private clearFormData(): void {
@@ -313,22 +311,8 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       description: [{ value: '', disabled: true }, Validators.required],
       comments: ['', Validators.maxLength(500)],
       inactiveDate: [null],
-      optional: [false],
       reqSubmission: [false],
       reqOnboard: [false]
     });
-  }
-
-  private getActiveRowsPerPage(): number {
-    return parseInt(this.activeRowsPerPageDropDown);
-  }
-
-  private getRowsPerPage(data: object[], currentPage: number): object[] {
-    return data.slice((currentPage * this.getActiveRowsPerPage()) - this.getActiveRowsPerPage(),
-      (currentPage * this.getActiveRowsPerPage()));
-  }
-
-  private getLastPage(data: object[]): number {
-    return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
   }
 }
