@@ -13,6 +13,7 @@ export class Skill {
   allowOnboard?: boolean;
   inactiveDate?: string | null;
   isDefault?: boolean;
+  foreignKey?: string;
 
   constructor(skill: Skill, assigned: boolean = false) {
     this.id = skill.id || 0;

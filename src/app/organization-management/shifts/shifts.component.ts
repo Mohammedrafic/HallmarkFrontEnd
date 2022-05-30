@@ -12,9 +12,11 @@ import { AbstractGridConfigurationComponent } from 'src/app/shared/components/ab
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { Shift } from 'src/app/shared/models/shift.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { endTimeValidator, startTimeValidator } from '@shared/validators/date.validator';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { DatePipe } from '@angular/common';
+import { ExportColumn } from '@shared/models/export.model';
 
 @Component({
   selector: 'app-shifts',
@@ -44,13 +46,22 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   public defaultMinTime = new Date();
   public maxTime = this.defaultMaxTime;
   public minTime = this.defaultMinTime;
-  public maskPlaceholderValue: Object = { hour: 'HH', minute: 'MM' }
+  public maskPlaceholderValue: Object = { hour: 'HH', minute: 'MM' };
+  public columnsToExport: ExportColumn[] = [
+    { text:'Shift Name', column: 'name'},
+    { text:'Shift Short Name', column: 'shortName'},
+    { text:'Start Time', column: 'startTime'},
+    { text:'End Time', column: 'endTime'}
+  ];
+  public fileName: string;
 
   constructor(private store: Store,
               private actions$: Actions,
               private fb: FormBuilder,
-              private confirmService: ConfirmService) {
+              private confirmService: ConfirmService,
+              private datePipe: DatePipe) {
     super();
+    this.fileName = 'Organization Shifts ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.defaultMaxTime.setHours(23, 59, 59);
     this.defaultMinTime.setHours(0, 0, 0);
     this.ShiftFormGroup = this.fb.group({
@@ -92,6 +103,20 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public override customExport(): void {
+    this.store.dispatch(new ShowExportDialog(true));
+  }
+
+  public closeExport() {
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: any): void {
+    console.log(event);
+    this.store.dispatch(new ShowExportDialog(false));
+    this.clearSelection(this.grid);
   }
 
   public addShift(): void {

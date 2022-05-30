@@ -45,6 +45,7 @@ import {
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MasterHolidaysComponent } from './master-data/holidays/holidays.component';
 import { HolidaysState } from './store/holidays.state';
+import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 
 const sidebarIcons = {
   Download,
@@ -104,6 +105,7 @@ const sidebarIcons = {
     SwitchModule,
     MaskedTextBoxModule,
     MultiSelectAllModule,
+    DropDownButtonModule,
 
     FeatherModule.pick(sidebarIcons),
 

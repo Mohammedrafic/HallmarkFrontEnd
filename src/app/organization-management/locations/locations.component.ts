@@ -20,7 +20,7 @@ import {
   SetImportFileDialogState,
   UpdateLocation
 } from '../store/organization-management.actions';
-import { ShowSideDialog, ShowToast } from '../../store/app.actions';
+import { ShowExportDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { Location } from '@shared/models/location.model';
 
@@ -36,6 +36,8 @@ import {
 import { Organization } from '@shared/models/organization.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { UserState } from '../../store/user.state';
+import { ExportColumn } from '@shared/models/export.model';
+import { DatePipe } from '@angular/common';
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
 
@@ -83,11 +85,26 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     return this.isEdit ? 'Edit' : 'Add';
   }
 
+  public columnsToExport: ExportColumn[] = [
+    { text:'Ext Location ID', column: 'externalId'},
+    { text:'Invoice Location ID', column: 'invoiceId'},
+    { text:'Location Name', column: 'name'},
+    { text:'Address 1', column: 'address1'},
+    { text:'Address 2', column: 'address2'},
+    { text:'City', column: 'city'},
+    { text:'State', column: 'state'},
+    { text:'Zip', column: 'zip'},
+    { text:'Contact Person', column: 'contactPerson'}
+  ];
+  public fileName: string;
+
   constructor(private store: Store,
               private actions$: Actions,
               @Inject(FormBuilder) private builder: FormBuilder,
-              private confirmService: ConfirmService) {
+              private confirmService: ConfirmService,
+              private datePipe: DatePipe) {
     super();
+    this.fileName = 'Organization Locations ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.formBuilder = builder;
     this.createLocationForm();
   }
@@ -108,10 +125,25 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.unsubscribe$.complete();
   }
 
+  public override customExport(): void {
+    this.store.dispatch(new ShowExportDialog(true));
+  }
+
+  public closeExport() {
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: any): void {
+    console.log(event);
+    this.store.dispatch(new ShowExportDialog(false));
+    this.clearSelection(this.grid);
+  }
+
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion.id) {
       this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
+      this.clearSelection(this.grid);
     }
     this.mapGridData();
   }

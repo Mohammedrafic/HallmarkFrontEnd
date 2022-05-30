@@ -32,8 +32,10 @@ button.e-control.e-btn {
 }
 
 button.e-control.e-btn.e-dropdown-btn {
-  span.e-btn-icon {
-    display: none;
+  &.button-export {
+    span.e-btn-icon {
+      display: none;
+    }
   }
 
   &.e-active {

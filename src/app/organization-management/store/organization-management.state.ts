@@ -541,6 +541,9 @@ export class OrganizationManagementState {
   GetAssignedSkillsByPage({ patchState }: StateContext<OrganizationManagementStateModel>, { pageNumber, pageSize }: GetAssignedSkillsByPage): Observable<SkillsPage> {
     patchState({ isOrganizationLoading: true });
     return this.skillsService.getAssignedSkills(pageNumber, pageSize).pipe(tap((payload) => {
+      payload.items.forEach(item => {
+        item.foreignKey = item.id + '-' + item.masterSkill?.id;
+      });
       patchState({ isOrganizationLoading: false, skills: payload });
       return payload;
     }));

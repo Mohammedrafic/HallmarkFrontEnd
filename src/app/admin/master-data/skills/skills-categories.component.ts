@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { GetAllSkillsCategories } from '../../store/admin.actions';
 
 enum Tabs {
@@ -14,17 +15,22 @@ enum Tabs {
   templateUrl: './skills-categories.component.html',
   styleUrls: ['./skills-categories.component.scss']
 })
-export class SkillsCategoriesComponent implements OnInit {
+export class SkillsCategoriesComponent extends AbstractGridConfigurationComponent implements OnInit {
   public currentTab: Tabs = 0;
   public tabs = Tabs;
   public isSkillsActive = true;
   public isCategoriesActive = false;
 
   constructor(private store: Store) {
+    super();
   }
 
   ngOnInit() {
 
+  }
+
+  public override customExport(): void {
+    this.store.dispatch(new ShowExportDialog(true));
   }
 
   public addSkill(): void {

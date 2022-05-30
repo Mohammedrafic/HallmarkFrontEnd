@@ -50,10 +50,57 @@ export abstract class AbstractGridConfigurationComponent {
     { text: ExportType[2], id: 2 }
   ];
 
+  selectionSettings = {
+    persistSelection: true
+  };
+  selectedItems: any[] = [];
+  idFieldName = 'id'; // Override in child component in case different id property
+
   protected constructor() { }
+
+  rowSelected(event: any, grid: any): void {
+    if (!event.target) {
+      return;
+    }
+    if (event.data?.length === 0) {
+      this.selectedItems.push(...grid.dataSource);
+    } else {
+      this.selectedItems.push(event.data);
+    }
+    console.log(this.selectedItems);
+    console.log(event);
+  }
+
+  rowDeselected(event: any, grid: any): void {
+    const closest = event.target && event.target.closest('.e-pagercontainer');
+    if (closest) {
+      return;
+    }
+    if (event.data?.length === 0) {
+      grid.dataSource.forEach((element: any) => {
+        const index = this.selectedItems.map((e) => e[this.idFieldName]).indexOf(element[this.idFieldName]);
+        if (index > -1) {
+          this.selectedItems.splice(index, 1);
+        }
+      });
+    } else {
+      const index = this.selectedItems.map((e) => e[this.idFieldName]).indexOf(event.data[this.idFieldName]);
+      if (index > -1) {
+        this.selectedItems.splice(index, 1);
+      }
+    }
+    console.log(this.selectedItems);
+    console.log(event);
+  }
+
+  clearSelection(grid: any): void {
+    this.selectedItems = [];
+    grid.clearSelection();
+  }
 
   addActiveCssClass(event: any): void {
     if (event) {
+      event.stopPropagation();
       this.clickedElement = event.currentTarget;
       this.clickedElement.classList.add('e-active');
       this.clickedElement.focus();
@@ -96,6 +143,18 @@ export abstract class AbstractGridConfigurationComponent {
       this.orderBy = '';
     }
     this.updatePage();
+  }
+
+  gridDataBound(grid: any): void {
+    if (this.selectedItems.length) {
+      const selectedIndexes: number[] = [];
+      grid.dataSource.map((item: any, i: number) => {
+        if (this.selectedItems.find((selectedItem: any) => selectedItem[this.idFieldName] === item[this.idFieldName])) {
+          selectedIndexes.push(i);
+        }
+      });
+      grid.selectRows(selectedIndexes);
+    }
   }
 
   actionBegin(args: PageEventArgs): void {

@@ -30,6 +30,12 @@
         cssClass="e-outline button-import"
         (click)="onImportDataClick()">Import <i-feather name="upload" class="icon"></i-feather></button>
       <button
+        ejs-dropdownbutton
+        [items]="exportOptions"
+        (select)="exportSelected($event)"
+        id="importButton"
+        cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+      <button
         ejs-button
         id="addDepartmentButton"
         [isPrimary]="true"
@@ -47,8 +53,13 @@
     [resizeSettings]="resizeSettings"
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
+    (rowSelected)="rowSelected($event, grid)"
+    (rowDeselected)="rowDeselected($event, grid)"
+    (dataBound)="gridDataBound(grid)"
+    [selectionSettings]="selectionSettings"
   >
     <e-columns>
+      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column field="extDepartmentId" headerText="EXT DEPARTMENT ID" width=200></e-column>
       <e-column field="invoiceDepartmentId" headerText="INVOICE DEPARTMENT ID" width=200></e-column>
       <e-column field="departmentName" headerText="DEPARTMENT NAME" width=200></e-column>
@@ -115,126 +126,128 @@
   </ejs-grid>
 </section>
 
-  <app-side-dialog
-    (formCancelClicked)="onDepartmentFormCancelClick()"
-    (formSaveClicked)="onDepartmentFormSaveClick()"
-    [header]="dialogHeader + ' Department'"
-  >
-    <form class="form-container bootstrap"
-          id="addEditRecordForm"
-          [formGroup]="departmentsDetailsFormGroup">
-      <div>
-        <div class="input-container">
-          <label for="extDepartmentId">Ext Department ID <span class="required">*</span></label>
-          <div class="input-group">
-            <input id="extDepartmentId"
-                   class="e-input"
-                   type="text"
-                   maxlength="50"
-                   appValidateWithMessage
-                   placeholder="Ext Department ID"
-                   formControlName="extDepartmentId"/>
-          </div>
-        </div>
-      </div>
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
-      <div>
-        <div class="input-container">
-          <label for="invoiceDepartmentId">Invoice Department ID <span class="required">*</span></label>
-          <div class="input-group">
-            <input id="invoiceDepartmentId"
-                   class="e-input"
-                   type="text"
-                   maxlength="50"
-                   appValidateWithMessage
-                   placeholder="Invoice Department ID"
-                   formControlName="invoiceDepartmentId"/>
-          </div>
+<app-side-dialog
+  (formCancelClicked)="onDepartmentFormCancelClick()"
+  (formSaveClicked)="onDepartmentFormSaveClick()"
+  [header]="dialogHeader + ' Department'"
+>
+  <form class="form-container bootstrap"
+        id="addEditRecordForm"
+        [formGroup]="departmentsDetailsFormGroup">
+    <div>
+      <div class="input-container">
+        <label for="extDepartmentId">Ext Department ID <span class="required">*</span></label>
+        <div class="input-group">
+          <input id="extDepartmentId"
+                  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  appValidateWithMessage
+                  placeholder="Ext Department ID"
+                  formControlName="extDepartmentId"/>
         </div>
       </div>
+    </div>
 
-      <div>
-        <div class="input-container">
-          <label for="departmentName">Department Name <span class="required">*</span></label>
-          <div class="input-group">
-            <input id="departmentName"
-                   class="e-input"
-                   type="text"
-                   maxlength="50"
-                   appValidateWithMessage
-                   placeholder="Department Name"
-                   formControlName="departmentName"/>
-          </div>
+    <div>
+      <div class="input-container">
+        <label for="invoiceDepartmentId">Invoice Department ID <span class="required">*</span></label>
+        <div class="input-group">
+          <input id="invoiceDepartmentId"
+                  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  appValidateWithMessage
+                  placeholder="Invoice Department ID"
+                  formControlName="invoiceDepartmentId"/>
         </div>
       </div>
+    </div>
 
-      <div>
-        <div class="input-container">
-          <label for="facilityContact">Facility Contact <span class="required">*</span></label>
-          <div class="input-group">
-            <input
-              id="facilityContact"
-              class="e-input"
-              type="text"
-              maxlength="50"
-              appValidateWithMessage
-              placeholder="Facility Contact"
-              formControlName="facilityContact"
-            />
-          </div>
+    <div>
+      <div class="input-container">
+        <label for="departmentName">Department Name <span class="required">*</span></label>
+        <div class="input-group">
+          <input id="departmentName"
+                  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  appValidateWithMessage
+                  placeholder="Department Name"
+                  formControlName="departmentName"/>
         </div>
       </div>
+    </div>
 
-      <div>
-        <div class="input-container">
-          <label for="facilityEmail">Facility Email <span class="required">*</span></label>
-          <div class="input-group">
-            <input
-              id="facilityEmail"
-              class="e-input"
-              type="email"
-              appValidateWithMessage
-              placeholder="Facility Email"
-              formControlName="facilityEmail"
-            />
-          </div>
+    <div>
+      <div class="input-container">
+        <label for="facilityContact">Facility Contact <span class="required">*</span></label>
+        <div class="input-group">
+          <input
+            id="facilityContact"
+            class="e-input"
+            type="text"
+            maxlength="50"
+            appValidateWithMessage
+            placeholder="Facility Contact"
+            formControlName="facilityContact"
+          />
         </div>
       </div>
+    </div>
 
-      <div>
-        <div class="input-container facility-phone">
-          <label for="facilityPhoneNumber">Facility Phone No <span class="required">*</span></label>
-          <div class="input-group">
-            <input
-              id="facilityPhoneNumber"
-              class="e-input facility-phone"
-              type="tel"
-              maxlength="10"
-              appValidateWithMessage
-              placeholder="Facility Phone No"
-              formControlName="facilityPhoneNo"
-            />
-          </div>
+    <div>
+      <div class="input-container">
+        <label for="facilityEmail">Facility Email <span class="required">*</span></label>
+        <div class="input-group">
+          <input
+            id="facilityEmail"
+            class="e-input"
+            type="email"
+            appValidateWithMessage
+            placeholder="Facility Email"
+            formControlName="facilityEmail"
+          />
         </div>
       </div>
+    </div>
 
-      <div>
-        <div class="input-container calendar">
-          <label for="inactiveDate">Inactive Date</label>
-          <div class="input-group datepicker">
-            <ejs-datepicker
-              id="inactiveDate"
-              class="datepicker"
-              format="MM/dd/yyyy"
-              placeholder="MM/DD/YYYY"
-              [enableMask]="true"
-              [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
-              formControlName="inactiveDate"
-            >
-            </ejs-datepicker>
-          </div>
+    <div>
+      <div class="input-container facility-phone">
+        <label for="facilityPhoneNumber">Facility Phone No <span class="required">*</span></label>
+        <div class="input-group">
+          <input
+            id="facilityPhoneNumber"
+            class="e-input facility-phone"
+            type="tel"
+            maxlength="10"
+            appValidateWithMessage
+            placeholder="Facility Phone No"
+            formControlName="facilityPhoneNo"
+          />
         </div>
       </div>
-    </form>
-  </app-side-dialog>
+    </div>
+
+    <div>
+      <div class="input-container calendar">
+        <label for="inactiveDate">Inactive Date</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            id="inactiveDate"
+            class="datepicker"
+            format="MM/dd/yyyy"
+            placeholder="MM/DD/YYYY"
+            [enableMask]="true"
+            [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+            formControlName="inactiveDate"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+    </div>
+  </form>
+</app-side-dialog>
 <app-file-upload-dialog></app-file-upload-dialog>
