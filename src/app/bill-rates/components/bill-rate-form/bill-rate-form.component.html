@@ -1,0 +1,71 @@
+<form>
+  <div class="form-line">
+    <!-- Bill Rate Title -->
+    <div class="input-container bootstrap">
+      <label>Bill Rate Title<span class="required">*</span></label>
+      <div class="input-group">
+        <input class="e-input" type="text" placeholder="Bill Rate Title" />
+      </div>
+    </div>
+  </div>
+
+  <div class="form-line">
+    <!-- Bill Rates Category -->
+    <div class="input-container bootstrap form-line-item-20">
+      <label>Bill Rates Category<span class="required">*</span></label>
+      <div class="input-group">
+        <input class="e-input" type="text" placeholder="Bill Rates Category" />
+      </div>
+    </div>
+
+    <!-- Bill Rates Type -->
+    <div class="input-container bootstrap form-line-item-20">
+      <label>Bill Rates Type<span class="required">*</span></label>
+      <div class="input-group">
+        <input class="e-input" type="text" placeholder="Bill Rates Type" />
+      </div>
+    </div>
+  </div>
+
+  <div class="form-line">
+    <!-- Rates/Hours -->
+    <div class="input-container bootstrap">
+      <label>Rates/Hours<span class="required">*</span></label>
+      <div class="input-group">
+        <input class="e-input" type="text" placeholder="Rates/Hours" />
+      </div>
+    </div>
+
+    <!-- Effective Date -->
+    <div class="datepicker-container bootstrap">
+      <label>Effective Date<span class="required">*</span></label>
+      <div class="input-group datepicker">
+        <ejs-datepicker
+          class="datepicker"
+          format="MM/dd/yyyy"
+          placeholder="MM/DD/YYYY"
+          [enableMask]="true"
+          [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }">
+        </ejs-datepicker>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-line">
+    <!-- Internal Min -->
+    <div class="input-container bootstrap">
+      <label>Internal Min<span class="required">*</span></label>
+      <div class="input-group">
+        <input class="e-input" type="text" placeholder="Internal Min" />
+      </div>
+    </div>
+
+    <!-- Internal Max -->
+    <div class="input-container bootstrap">
+      <label>Internal Max<span class="required">*</span></label>
+      <div class="input-group">
+        <input class="e-input" type="text" placeholder="Internal Max" />
+      </div>
+    </div>
+  </div>
+</form>

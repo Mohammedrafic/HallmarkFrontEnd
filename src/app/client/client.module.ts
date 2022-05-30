@@ -48,7 +48,9 @@ import { TabNavigationComponent } from './order-management/order-management-cont
 import { SharedModule } from '../shared/shared.module';
 import { AddEditOrderComponent } from './order-management/add-edit-order/add-edit-order.component';
 import { OrderDetailsFormComponent } from './order-management/order-details-form/order-details-form.component';
-import { OrderCredentialsFormComponent } from './order-management/order-credentials-form/order-credentials-form.component';
+
+import { BillRatesModule } from '@bill-rates/bill-rates.module';
+import { OrderCredentialsModule } from '@order-credentials/order-credentials.module';
 
 const gridIcons = {
   MessageSquare,
@@ -77,8 +79,7 @@ const gridIcons = {
     ReportsContentComponent,
     TabNavigationComponent,
     AddEditOrderComponent,
-    OrderDetailsFormComponent,
-    OrderCredentialsFormComponent
+    OrderDetailsFormComponent
   ],
   imports: [
     CommonModule,
@@ -97,7 +98,9 @@ const gridIcons = {
     TabAllModule,
     SplitButtonModule,
     DatePickerModule,
-    TimePickerModule
+    TimePickerModule,
+    BillRatesModule,
+    OrderCredentialsModule
   ],
   providers: [
     ResizeService,

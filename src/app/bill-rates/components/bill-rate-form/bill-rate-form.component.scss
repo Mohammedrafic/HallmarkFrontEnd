@@ -1,0 +1,24 @@
+form {
+  margin-top: 20px;
+}
+
+.form-line {
+  display: flex;
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
+  .input-container,
+  .datepicker-container {
+    width: 100%;
+    + .input-container,
+    + .datepicker-container {
+      margin-left: 10px;
+    }
+  }
+}
+
+label {
+  display: inline-block;
+  margin-bottom: 2px;
+  line-height: 20px;
+}
