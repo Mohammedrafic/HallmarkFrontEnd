@@ -2,7 +2,7 @@
   <div class="workflow-step">
     <div class="e-card-header">
       <div class="e-card-header-caption">
-        <h3 class="e-card-title">{{ workflow.type === 1 ? 'Order Workflow' : 'Application' }}</h3>
+        <h3 class="e-card-title">{{ workflowTypeName }}</h3>
       </div>
     </div>
 
@@ -19,21 +19,24 @@
               class="e-input"
               type="text"
               readonly
-              [value]="workflow.steps[0].name"
+              [value]="incompleteShortlistedStepName"
             />
           </div>
         </div>
 
-        <div class="input-container with-padding" *ngIf="customSteps.length > 1">
+        <div
+          class="input-container with-padding"
+          *ngFor="let item of customParentStatus.controls; let i = index"
+        >
           <label>Current Status <span class="required">*</span></label>
-          <div class="input-group">
+          <div class="input-group" formArrayName="customParentStatus">
             <input
               class="e-input"
               type="text"
               maxlength="50"
               appValidateWithMessage
-              formControlName="customParentStatus"
-              [placeholder]="workflow.steps[0].status"
+              placeholder="Current Status"
+              [formControlName]="i"
             />
           </div>
         </div>
@@ -42,7 +45,7 @@
       <!-- Custom Steps -->
       <div
         class="custom-step-container"
-        *ngFor="let step of customSteps | slice:1; let i = index"
+        *ngFor="let step of customSteps; let i = index"
       >
         <div class="e-card group child">
           <div class="input-container">
@@ -101,19 +104,19 @@
                  class="e-input"
                  type="text"
                  readonly
-                 [value]="workflow.steps[1].name"
+                 [value]="publishedOfferedStepName"
           />
         </div>
       </div>
 
-      <div class="input-container bootstrap with-padding" *ngIf="customSteps.length > 1">
+      <div class="input-container bootstrap with-padding" *ngIf="workflow.steps.length > 2">
         <label>Current Status</label>
         <div class="input-group input-readonly">
           <input
             class="e-input"
             type="text"
             readonly
-            [value]="workflow.steps[1].status"
+            [placeholder]="publishedOfferedStepStatus"
           />
         </div>
       </div>

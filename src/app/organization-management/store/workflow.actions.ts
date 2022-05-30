@@ -1,4 +1,4 @@
-import { WorkflowWithDetails, WorkflowWithDetailsPut } from "@shared/models/workflow.model";
+import { Step, WorkflowWithDetails, WorkflowWithDetailsPut } from "@shared/models/workflow.model";
 
 export class GetWorkflows {
   static readonly type = '[workflow] Get Workflow list by businessUnitId';
@@ -24,4 +24,14 @@ export class UpdateWorkflow {
 export class RemoveWorkflow {
   static readonly type = '[workflow] Remove Workflow';
   constructor(public payload: WorkflowWithDetails) {}
+}
+
+export class UpdateOrderCustomSteps {
+  static readonly type = '[workflow] Updates Order Custom Steps';
+  constructor(public payload: Step[]) {}
+}
+
+export class UpdateApplicationCustomSteps {
+  static readonly type = '[workflow] Updates Application Custom Steps';
+  constructor(public payload: Step[]) {}
 }

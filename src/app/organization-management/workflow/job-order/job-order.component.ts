@@ -2,16 +2,24 @@ import { Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShowSideDialog } from '../../../store/app.actions';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, of, Subject, takeUntil } from 'rxjs';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
-import { GetWorkflows, GetWorkflowsSucceed, RemoveWorkflow, SaveWorkflow, UpdateWorkflow } from '../../store/workflow.actions';
+import {
+  GetWorkflows,
+  GetWorkflowsSucceed,
+  RemoveWorkflow,
+  SaveWorkflow, UpdateApplicationCustomSteps,
+  UpdateOrderCustomSteps,
+  UpdateWorkflow
+} from '../../store/workflow.actions';
 import { Step, Workflow, WorkflowWithDetails, WorkflowWithDetailsPut } from '@shared/models/workflow.model';
 import { ActivatedRoute } from '@angular/router';
 import { UserState } from '../../../store/user.state';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 import { WorkflowType } from '@shared/enums/workflow-type';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
+import { WorkflowState } from '../../store/workflow.state';
 
 @Component({
   selector: 'app-job-order',
@@ -34,8 +42,13 @@ export class JobOrderComponent implements OnInit, OnDestroy {
   public orderWorkflow: Workflow;
   public applicationWorkflow: Workflow;
 
-  public customOrderSteps: Step[] = [];
-  public customApplicationSteps: Step[] = [];
+  @Select(WorkflowState.customOrderSteps)
+  public customOrderSteps$: Observable<Step[]>;
+  private customOrderSteps: Step[] = [];
+
+  @Select(WorkflowState.customApplicationSteps)
+  public customApplicationSteps$: Observable<Step[]>;
+  private customApplicationSteps: Step[] = [];
 
   private formBuilder: FormBuilder;
   private unsubscribe$: Subject<void> = new Subject();
@@ -46,8 +59,9 @@ export class JobOrderComponent implements OnInit, OnDestroy {
               @Inject(FormBuilder) private builder: FormBuilder,
               private confirmService: ConfirmService) {
     this.formBuilder = builder;
-    this.createCustomStepFormGroup();
     this.createWorkflowFormGroup();
+    this.createCustomOrderStepFormGroup();
+    this.createCustomApplicationStepFormGroup();
   }
 
   ngOnInit(): void {
@@ -74,59 +88,69 @@ export class JobOrderComponent implements OnInit, OnDestroy {
 
   public onCardSelected(card: WorkflowWithDetails): void {
     if (card && card.workflows && card.workflows.length > 0) {
-      this.customOrderSteps = [];
-      this.customApplicationSteps = [];
       this.customStepOrderFormGroup.reset();
       this.customStepApplicationFormGroup.reset();
       this.workflowsWithDetails.forEach(card => card.isActive = false);
+
       card.isActive = true;
       this.selectedCard = card;
       this.orderWorkflow = card.workflows[0];
       this.applicationWorkflow = card.workflows[1];
+
+      const filteredCustomOrderSteps = card.workflows[0].steps.filter(item => item.type !== WorkflowStepType.Published);
+      const filteredCustomApplicationSteps = card.workflows[1].steps.filter(item => item.type !== WorkflowStepType.Offered);
+      this.customOrderSteps = filteredCustomOrderSteps.length > 1 ? filteredCustomOrderSteps : [];
+      this.customApplicationSteps = filteredCustomApplicationSteps.length > 1 ? filteredCustomApplicationSteps : [];
+      this.store.dispatch(new UpdateOrderCustomSteps(this.customOrderSteps));
+      this.store.dispatch(new UpdateApplicationCustomSteps(this.customApplicationSteps));
     }
   }
 
-  public onCustomStepClick(workFlowType: WorkflowType): void {
+  public onCustomStepAddClick(workFlowType: WorkflowType): void {
     if (workFlowType === WorkflowType.OrderWorkflow) {
-      // add element to override parent status
       if (this.customOrderSteps.length === 0) {
-        this.customOrderSteps.push({
+        // add element to override parent status
+        const customParentStatus:Step = {
           id: this.orderWorkflow.steps[0].id,
           name: this.orderWorkflow.steps[0].name,
           status: '',
           type: this.orderWorkflow.steps[0].type,
           order: this.orderWorkflow.steps[0].order,
           workflowId: this.orderWorkflow.steps[0].workflowId
-        });
+        };
+        this.customOrderSteps.push(customParentStatus);
       }
 
-      let newCustomStep: Step = {
+      const newCustomStep: Step = {
         name: '',
         status: '',
         type: WorkflowStepType.Custom,
         workflowId: this.orderWorkflow.steps[0].workflowId
       }
       this.customOrderSteps.push(newCustomStep);
+      this.store.dispatch(new UpdateOrderCustomSteps(this.customOrderSteps));
     } else {
       if (this.customApplicationSteps.length === 0) {
         // add element to override parent status
-        this.customApplicationSteps.push({
+        const customParentStatus:Step = {
           id: this.applicationWorkflow.steps[0].id,
           name: this.applicationWorkflow.steps[0].name,
           status: '',
           type: this.applicationWorkflow.steps[0].type,
           order: this.applicationWorkflow.steps[0].order,
           workflowId: this.applicationWorkflow.steps[0].workflowId
-        });
+        }
+        this.customApplicationSteps.push(customParentStatus);
       }
 
-      let newCustomStep: Step = {
+      const newCustomStep: Step = {
         name: '',
         status: '',
         type: WorkflowStepType.Custom,
         workflowId: this.applicationWorkflow.steps[0].workflowId
       }
       this.customApplicationSteps.push(newCustomStep);
+      this.store.dispatch(new UpdateApplicationCustomSteps(this.customApplicationSteps));
     }
   }
 
@@ -136,12 +160,18 @@ export class JobOrderComponent implements OnInit, OnDestroy {
       if (this.customOrderSteps.length === 1) {
         this.customOrderSteps = [];
       }
+
+      this.store.dispatch(new UpdateOrderCustomSteps(this.customOrderSteps));
     } else {
       this.customApplicationSteps.splice(stepDetails.index, 1);
       if (this.customApplicationSteps.length === 1) {
         this.customApplicationSteps = [];
       }
+
+      this.store.dispatch(new UpdateApplicationCustomSteps(this.customApplicationSteps));
     }
+
+    this.onUpdateWorkflowClick();
   }
 
   public onCancelFormClick(): void {
@@ -188,12 +218,10 @@ export class JobOrderComponent implements OnInit, OnDestroy {
   }
 
   public onUpdateWorkflowClick(): void {
-    if ((this.customStepOrderFormGroup.valid && this.customOrderSteps.length > 0)
-      || (this.customStepApplicationFormGroup.valid && this.customApplicationSteps.length > 0)) {
-
+    if (this.customStepOrderFormGroup.valid && this.customStepApplicationFormGroup.valid) {
       if (this.customOrderSteps.length > 0) {
         // map Order workflow custom steps and override parent status
-        this.customOrderSteps[0].status = this.customStepOrderFormGroup.controls['customParentStatus'].value;
+        this.customOrderSteps[0].status = this.customStepOrderFormGroup.controls['customParentStatus'].value[0];
         this.customOrderSteps.forEach((step, i) => {
           if (i !== 0) {
             step.name = this.customStepOrderFormGroup.controls['customStepName'].value[i - 1];
@@ -205,7 +233,7 @@ export class JobOrderComponent implements OnInit, OnDestroy {
 
       if (this.customApplicationSteps.length > 0) {
         // map Application workflow custom steps and override parent status
-        this.customApplicationSteps[0].status = this.customStepApplicationFormGroup.controls['customParentStatus'].value;
+        this.customApplicationSteps[0].status = this.customStepApplicationFormGroup.controls['customParentStatus'].value[0];
         this.customApplicationSteps.forEach((step, i) => {
           if (i !== 0) {
             step.name = this.customStepApplicationFormGroup.controls['customStepName'].value[i - 1];
@@ -231,15 +259,17 @@ export class JobOrderComponent implements OnInit, OnDestroy {
     }
   }
 
-  public createCustomStepFormGroup(): void {
+  public createCustomOrderStepFormGroup(): void {
     this.customStepOrderFormGroup = this.formBuilder.group({
-      customParentStatus: ['', [Validators.required, Validators.maxLength(50)]],
+      customParentStatus: this.formBuilder.array([]),
       customStepStatus: this.formBuilder.array([]),
       customStepName: this.formBuilder.array([])
     });
+  }
 
+  public createCustomApplicationStepFormGroup(): void {
     this.customStepApplicationFormGroup = this.formBuilder.group({
-      customParentStatus: ['', [Validators.required, Validators.maxLength(50)]],
+      customParentStatus: this.formBuilder.array([]),
       customStepStatus: this.formBuilder.array([]),
       customStepName: this.formBuilder.array([])
     });

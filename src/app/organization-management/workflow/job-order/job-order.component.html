@@ -19,23 +19,25 @@
       (addNewWorkflowClick)="onAddNewWorkflowClick()"
       (cardClicked)="onCardSelected($event)"
     ></app-card-menu>
-    <section class="workflow-details-container" [formGroup]="customStepOrderFormGroup">
+    <section class="workflow-details-container">
       <app-workflow-steps
+        [formGroup]="customStepOrderFormGroup"
         *ngIf="orderWorkflow"
         class="workflow-steps"
         [workflow]="orderWorkflow"
-        [customSteps]="customOrderSteps"
+        [workflowSteps]="customOrderSteps$"
         [customStepFormGroup]="customStepOrderFormGroup"
-        (customStepAddClick)="onCustomStepClick($event)"
+        (customStepAddClick)="onCustomStepAddClick($event)"
         (customStepRemoveClick)="onCustomStepRemoveClick($event)"
       ></app-workflow-steps>
       <app-workflow-steps
+        [formGroup]="customStepApplicationFormGroup"
         *ngIf="applicationWorkflow"
         class="workflow-steps"
         [workflow]="applicationWorkflow"
-        [customSteps]="customApplicationSteps"
+        [workflowSteps]="customApplicationSteps$"
         [customStepFormGroup]="customStepApplicationFormGroup"
-        (customStepAddClick)="onCustomStepClick($event)"
+        (customStepAddClick)="onCustomStepAddClick($event)"
         (customStepRemoveClick)="onCustomStepRemoveClick($event)"
       ></app-workflow-steps>
     </section>
