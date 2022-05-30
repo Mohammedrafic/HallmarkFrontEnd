@@ -10,6 +10,7 @@ export class CredentialSetup {
   reqOnboard: boolean;
   inactiveDate: string;
   comments: string;
+  credentialTypeName?: string; // used only on UI
 }
 
 export class CredentialSetupGetGroup {

@@ -1,24 +1,16 @@
-import { CredentialGroupMapping } from '@shared/models/credential-group-mapping.model';
+import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
 
-export const MockGroupMapping: CredentialGroupMapping[] = [
+export const MockGroupMapping: SkillGroupMapping[] = [
   {
-    id: 1,
-    region: {
-      id: 10,
-      name: 'Re g1'
-    },
-    location: {
-      id: 20,
-      name: 'locaTION',
-    },
-    department: {
-      departmentId: 21,
-      departmentName: 'name'
-    },
-    skillGroup: {
-      id: 1,
-      name: 'Test Skill'
-    }
+    mappingId: 1,
+    regionId: 10,
+    regionName:'Re g1',
+    locationId: 20,
+    locationName: 'locaTION',
+    departmentId: 21,
+    departmentName: 'name',
+    skillGroupId: 1,
+    skillGroupName: 'Test Skill Group'
   }
 ]
 

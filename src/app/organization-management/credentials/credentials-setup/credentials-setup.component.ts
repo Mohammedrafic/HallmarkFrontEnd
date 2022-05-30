@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { filter, Observable, of, Subject, takeUntil, throttleTime } from 'rxjs';
+import { combineLatest, filter, Observable, of, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
   AbstractGridConfigurationComponent
@@ -122,6 +122,17 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       } else {
         this.selectedFilterSetupBy = FilterCredentialSetup.ByOrganization;
           // this.store.dispatch(new GetCredentialSetupByPage(this.currentPage, this.pageSize)); // TODO: uncomment after BE implementation
+
+        combineLatest([this.credentialType$, this.credentials$, this.credentialsData$])
+          .pipe(filter(Boolean),takeUntil(this.unsubscribe$))
+          .subscribe(([credentialTypes, credentials, credentialSetups]) => {
+            credentialSetups?.items.map((setup: CredentialSetup) => {
+              let foundCredential = credentials.find((cred: Credential) => cred.id === setup.masterCredentialId);
+              let foundCredentialType = credentialTypes.find((type: CredentialType) => type.id === foundCredential?.credentialTypeId);
+              setup.credentialTypeName = foundCredentialType?.name;
+            });
+        });
+
         this.groups$.pipe(filter(Boolean),takeUntil(this.unsubscribe$)).subscribe((groups) => {
           if (groups && groups.length > 0 && groups[0].id) {
             this.selectedSkillGroupId = groups[0].id;
@@ -160,6 +171,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   public onRegionDropDownChanged(event: any): void {
     if (event.itemData) {
       this.selectedRegionId = event.itemData.id;
+      this.store.dispatch(new ClearDepartmentList());
       this.store.dispatch(new GetLocationsByRegionId(this.selectedRegionId));
     }
   }

@@ -3,12 +3,12 @@ import { CredentialSetup, CredentialSetupPage } from '@shared/models/credential-
 export const MockCredentialSetupList: CredentialSetup[] = [
   {
     id: 1,
-    masterCredentialId: 1,
+    masterCredentialId: 37,
     comments: 'test comment message',
     skillGroupId: 1,
     isActive: false,
     inactiveDate: '2022-05-14T21:00:00.000Z',
-    description: 'Setup Name',
+    description: 'uniq descr',
     reqOnboard: true,
     reqSubmission: true
   }

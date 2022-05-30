@@ -1,5 +1,5 @@
 import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
-import { CredentialGroupMapping } from '@shared/models/credential-group-mapping.model';
+import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
 
 export class SetNavigationTab {
   static readonly type = '[credentials] Set Navigation Tab';
@@ -18,7 +18,7 @@ export class GetCredentialGroupMapping {
 
 export class SaveCredentialGroupMapping {
   static readonly type = '[credentials] Save Credential Group Mapping';
-  constructor(public payload: CredentialGroupMapping) {}
+  constructor(public payload: SkillGroupMapping) {}
 }
 
 export class DeleteCredentialGroupMappingById {

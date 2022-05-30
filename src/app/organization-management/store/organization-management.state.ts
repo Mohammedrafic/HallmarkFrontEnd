@@ -645,7 +645,7 @@ export class OrganizationManagementState {
   }
 
   @Action(GetCredentialSkillGroup)
-  GetSkillGroupsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetCredentialSkillGroup): Observable<CredentialSkillGroup[]> {
+  GetSkillGroups({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetCredentialSkillGroup): Observable<CredentialSkillGroup[]> {
     return this.skillGroupService.getSkillGroups().pipe(tap((payload) => {
       patchState({ skillGroups: payload });
       return payload;
@@ -687,10 +687,13 @@ export class OrganizationManagementState {
   }
 
   @Action(GetCredentialSetupByPage)
-  GetCredentialSetupByPage({ patchState }: StateContext<OrganizationManagementStateModel>, { pageNumber, pageSize }: GetCredentialSetupByPage): Observable<CredentialSetupPage> {
+  GetCredentialSetupByPage({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { pageNumber, pageSize }: GetCredentialSetupByPage): Observable<CredentialSetupPage> {
     return this.credentialsService.getCredentialSetup(pageNumber, pageSize).pipe(tap((payload) => {
+      dispatch(new GetCredentialTypes());
       const invalidDate = '0001-01-01T00:00:00+00:00';
-      payload?.items.forEach((item: any) => item.inactiveDate === invalidDate ? item.inactiveDate = '' : item.inactiveDate);
+      payload?.items.forEach((item: any) => {
+        item.inactiveDate === invalidDate ? item.inactiveDate = '' : item.inactiveDate;
+      });
       patchState({ credentialSetupPage: payload });
       return payload;
     }));
