@@ -5,8 +5,10 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
+import { PdfViewerModule } from "@syncfusion/ej2-angular-pdfviewer";
+import { ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 import { FeatherModule } from 'angular-feather';
-import { Sliders, Plus, Trash2, Edit, Copy, Download, AlertCircle } from 'angular-feather/icons';
+import { Sliders, Plus, Trash2, Edit, Copy, Download, AlertCircle, Maximize2, X, Minimize2 } from 'angular-feather/icons';
 
 import { AgencyComponent } from './agency.component';
 import { AgencyRoutingModule } from './agency-routing.module';
@@ -41,6 +43,7 @@ import { AddNewFeeDialogComponent } from './agency-list/add-edit-agency/associat
 import { CredentialsGridComponent } from './candidates/add-edit-candidate/credentials-grid/credentials-grid.component';
 import { CandidateAgencyComponent } from './candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
 import { PartnershipSettingsComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/partnership-settings/partnership-settings.component';
+import { FileViewerComponent } from './candidates/add-edit-candidate/file-viewer/file-viewer.component';
 
 const sidebarIcons = {
   Sliders,
@@ -50,6 +53,9 @@ const sidebarIcons = {
   Edit,
   Copy,
   Download,
+  Maximize2,
+  Minimize2,
+  X
 };
 
 @NgModule({
@@ -76,6 +82,7 @@ const sidebarIcons = {
     AddNewFeeDialogComponent,
     CredentialsGridComponent,
     CandidateAgencyComponent,
+    FileViewerComponent,
     PartnershipSettingsComponent,
   ],
   imports: [
@@ -84,6 +91,8 @@ const sidebarIcons = {
     SharedModule,
     ReactiveFormsModule,
 
+    PdfViewerModule,
+    ListBoxModule,
     ButtonModule,
     AccordionModule,
     DropDownListModule,
