@@ -2,10 +2,10 @@ import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@ang
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { DashboardLayoutComponent, PanelModel } from '@syncfusion/ej2-angular-layouts';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, take, takeUntil } from 'rxjs';
 
 import { ToggleSidebarState } from '../store/app.actions';
-import { AddDashboardPanel, DashboardPanelIsMoved, GetDashboardPanels, SaveDashboard } from './store/dashboard.actions';
+import { AddDashboardPanel, DashboardPanelIsMoved, GetDashboardPanels } from './store/dashboard.actions';
 import { DashboardState } from './store/dashboard.state';
 
 @Component({
@@ -21,59 +21,63 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @Select(DashboardState.isDashboardLoading) isLoading$: Observable<boolean>;
 
   private unsubsribe$ = new Subject();
-
-  cellSpacing = [10, 10];
-  columns = 5;
+  panels: PanelModel[] = [];
+  cellSpacing = [15, 15];
+  columns = 12;
 
   constructor(private store: Store, private actions$: Actions) {}
 
   ngOnInit(): void {
-    this.store.dispatch(new GetDashboardPanels());
+    this.getDashboardPanels();
     this.refreshDashboard();
   }
 
   ngOnDestroy(): void {
-    this.saveDashboard();
     this.unsubsribe$.next(true);
     this.unsubsribe$.complete();
   }
 
-  private refreshDashboard() {
+  private getDashboardPanels() {
+    this.store.dispatch(new GetDashboardPanels());
+    this.panels$.pipe(take(1)).subscribe((panels) => (this.panels = panels));
+  }
+
+  private refreshDashboard(): void {
     this.refreshGrid();
     this.actions$.pipe(ofActionDispatched(ToggleSidebarState), takeUntil(this.unsubsribe$)).subscribe(() => {
       this.refreshGrid();
     });
   }
 
-  private refreshGrid() {
+  private refreshGrid(): void {
     setTimeout(() => this.dashboard.refresh(), 500);
   }
 
-  private saveDashboard(): void {
-    this.store.dispatch(new SaveDashboard());
-  }
-
-  private getDashboardPanels(): PanelModel[] {
-    return this.dashboard.panels.map((panel: any) => panel.properties);
+  private dashboardPanels(): PanelModel[] {
+    return this.dashboard.serialize();
   }
 
   moveDashboardPanel(): void {
-    const panels = this.getDashboardPanels();
+    const panels = this.dashboardPanels().map((panel, idx) => {
+      return {
+        ...panel,
+        content: `<div class='content'>${idx}</div>`,
+      };
+    });
     this.store.dispatch(new DashboardPanelIsMoved(panels));
   }
 
   addPanel(): void {
-    const allPanels = this.dashboard.panels.length;
+    const allPanels = this.dashboardPanels().length;
     const panel: PanelModel = {
       id: 'layout_' + allPanels,
-      sizeX: 1,
-      sizeY: 1,
+      sizeX: 3,
+      sizeY: 3,
       row: 0,
       col: 0,
       content: `<div class="content">${allPanels + 1}</div>`,
     };
-    this.dashboard.addPanel(panel)
-    const panels = this.getDashboardPanels();
-    this.store.dispatch(new AddDashboardPanel(panels));
+    this.dashboard.addPanel(panel);
+    this.store.dispatch(new AddDashboardPanel(this.dashboardPanels()));
   }
 }

@@ -7,8 +7,25 @@
     id="dashboardLayout"
     [columns]="columns"
     [cellSpacing]="cellSpacing"
-    [panels]="panels$ | async"
     (dragStop)="moveDashboardPanel()"
     #dashboardLayout
-  ></ejs-dashboardlayout>
+  >
+    <e-panels>
+      <e-panel
+        *ngFor="let panel of panels"
+        [sizeX]="panel.sizeX"
+        [sizeY]="panel.sizeY"
+        [row]="panel.row"
+        [col]="panel.col"
+        [id]="panel.id"
+      >
+        <ng-template #content [ngSwitch]="panel.id" >
+            <app-candidate-widget *ngSwitchCase="'candidate'"></app-candidate-widget>
+            <app-invoice-widget *ngSwitchCase="'invoice'"></app-invoice-widget>
+            <app-simple-chart-widget *ngSwitchCase="'simple'"></app-simple-chart-widget>
+            <div *ngSwitchDefault >{{panel.id}}</div>
+        </ng-template>
+      </e-panel>
+    </e-panels>
+  </ejs-dashboardlayout>
 </div>
