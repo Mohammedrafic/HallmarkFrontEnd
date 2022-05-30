@@ -38,25 +38,25 @@ export class DashboardState {
     return this.dashboardService.getDashboardsPanels().pipe(
       tap((payload) => {
         patchState({ panels: payload, isDashboardLoading: false });
-        return payload;
       })
     );
   }
 
   @Action(AddDashboardPanel)
-  addDashboardPanel({ getState, patchState }: StateContext<DashboardStateModel>, { payload }: AddDashboardPanel) {
+  addDashboardPanel({ patchState, dispatch }: StateContext<DashboardStateModel>, { payload }: AddDashboardPanel) {
     patchState({ isDashboardLoading: true });
     return this.dashboardService.addDashboardPanel(payload).pipe(
-      tap((panel) => {
-        const state = getState();
+      tap(() => {
         patchState({ panels: payload, isDashboardLoading: false });
+        dispatch(new SaveDashboard());
       })
     );
   }
 
   @Action(DashboardPanelIsMoved)
-  dashboardPanelIsMoved({ patchState }: StateContext<DashboardStateModel>, { payload }: DashboardPanelIsMoved) {
+  dashboardPanelIsMoved({ patchState, dispatch }: StateContext<DashboardStateModel>, { payload }: DashboardPanelIsMoved) {
     patchState({ panels: payload });
+    dispatch(new SaveDashboard());
   }
 
   @Action(SaveDashboard)
@@ -67,6 +67,6 @@ export class DashboardState {
       tap(() => {
         patchState({ isDashboardLoading: false });
       })
-    )
+    );
   }
 }
