@@ -1,12 +1,11 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { catchError, Observable, tap } from 'rxjs';
 import {
   GetWorkflows,
   GetWorkflowsSucceed,
   RemoveWorkflow,
-  SaveWorkflow, UpdateApplicationCustomSteps,
-  UpdateOrderCustomSteps,
+  SaveWorkflow,
   UpdateWorkflow
 } from './workflow.actions';
 import { WorkflowService } from '@shared/services/workflow.service';
@@ -17,28 +16,18 @@ import { Step, WorkflowWithDetails } from '@shared/models/workflow.model';
 
 export interface WorkflowStateModel {
   workflows: WorkflowWithDetails[] | null;
-  customOrderSteps: Step[] | null;
-  customApplicationSteps: Step[] | null;
 }
 
 @State<WorkflowStateModel>({
   name: 'workflow',
   defaults: {
-    workflows: [],
-    customOrderSteps: [],
-    customApplicationSteps: []
+    workflows: []
   }
 })
 @Injectable()
 export class WorkflowState {
   @Selector()
   static workflows(state: WorkflowStateModel): WorkflowWithDetails[] | null { return state.workflows; }
-
-  @Selector()
-  static customOrderSteps(state: WorkflowStateModel): Step[] | null { return state.customOrderSteps; }
-
-  @Selector()
-  static customApplicationSteps(state: WorkflowStateModel): Step[] | null { return state.customApplicationSteps; }
 
   constructor(private workflowService: WorkflowService) {}
 
@@ -83,17 +72,5 @@ export class WorkflowState {
           return payload;
         }),
         catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
-  }
-
-  @Action(UpdateOrderCustomSteps)
-  UpdateOrderCustomSteps({ patchState }: StateContext<WorkflowStateModel>, { payload }: UpdateOrderCustomSteps): Observable<Step[]> {
-    patchState({ customOrderSteps: payload });
-    return of(payload);
-  }
-
-  @Action(UpdateApplicationCustomSteps)
-  UpdateApplicationCustomSteps({ patchState }: StateContext<WorkflowStateModel>, { payload }: UpdateApplicationCustomSteps): Observable<Step[]> {
-    patchState({ customApplicationSteps: payload });
-    return of(payload);
   }
 }

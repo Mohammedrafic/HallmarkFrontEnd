@@ -1,16 +1,15 @@
 import { Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ShowSideDialog } from '../../../store/app.actions';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { filter, Observable, of, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import {
   GetWorkflows,
   GetWorkflowsSucceed,
   RemoveWorkflow,
-  SaveWorkflow, UpdateApplicationCustomSteps,
-  UpdateOrderCustomSteps,
+  SaveWorkflow,
   UpdateWorkflow
 } from '../../store/workflow.actions';
 import { Step, Workflow, WorkflowWithDetails, WorkflowWithDetailsPut } from '@shared/models/workflow.model';
@@ -19,7 +18,6 @@ import { UserState } from '../../../store/user.state';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 import { WorkflowType } from '@shared/enums/workflow-type';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
-import { WorkflowState } from '../../store/workflow.state';
 
 @Component({
   selector: 'app-job-order',
@@ -42,13 +40,11 @@ export class JobOrderComponent implements OnInit, OnDestroy {
   public orderWorkflow: Workflow;
   public applicationWorkflow: Workflow;
 
-  @Select(WorkflowState.customOrderSteps)
-  public customOrderSteps$: Observable<Step[]>;
-  private customOrderSteps: Step[] = [];
+  public customOrderSteps$: Subject<Step[]> = new Subject<Step[]>();
+  public customOrderSteps: Step[] = [];
 
-  @Select(WorkflowState.customApplicationSteps)
-  public customApplicationSteps$: Observable<Step[]>;
-  private customApplicationSteps: Step[] = [];
+  public customApplicationSteps$: Subject<Step[]> = new Subject<Step[]>();
+  public customApplicationSteps: Step[] = [];
 
   private formBuilder: FormBuilder;
   private unsubscribe$: Subject<void> = new Subject();
@@ -73,6 +69,8 @@ export class JobOrderComponent implements OnInit, OnDestroy {
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetWorkflowsSucceed))
       .subscribe((workflows) => {
         this.workflowsWithDetails = workflows.payload;
+        this.customStepOrderFormGroup.reset();
+        this.customStepApplicationFormGroup.reset();
         this.onCardSelected(this.workflowsWithDetails[0]);
       });
   }
@@ -88,8 +86,6 @@ export class JobOrderComponent implements OnInit, OnDestroy {
 
   public onCardSelected(card: WorkflowWithDetails): void {
     if (card && card.workflows && card.workflows.length > 0) {
-      this.customStepOrderFormGroup.reset();
-      this.customStepApplicationFormGroup.reset();
       this.workflowsWithDetails.forEach(card => card.isActive = false);
 
       card.isActive = true;
@@ -101,8 +97,8 @@ export class JobOrderComponent implements OnInit, OnDestroy {
       const filteredCustomApplicationSteps = card.workflows[1].steps.filter(item => item.type !== WorkflowStepType.Offered);
       this.customOrderSteps = filteredCustomOrderSteps.length > 1 ? filteredCustomOrderSteps : [];
       this.customApplicationSteps = filteredCustomApplicationSteps.length > 1 ? filteredCustomApplicationSteps : [];
-      this.store.dispatch(new UpdateOrderCustomSteps(this.customOrderSteps));
-      this.store.dispatch(new UpdateApplicationCustomSteps(this.customApplicationSteps));
+      this.customOrderSteps$.next(this.customOrderSteps);
+      this.customApplicationSteps$.next(this.customApplicationSteps);
     }
   }
 
@@ -128,7 +124,7 @@ export class JobOrderComponent implements OnInit, OnDestroy {
         workflowId: this.orderWorkflow.steps[0].workflowId
       }
       this.customOrderSteps.push(newCustomStep);
-      this.store.dispatch(new UpdateOrderCustomSteps(this.customOrderSteps));
+      this.customOrderSteps$.next(this.customOrderSteps);
     } else {
       if (this.customApplicationSteps.length === 0) {
         // add element to override parent status
@@ -150,7 +146,7 @@ export class JobOrderComponent implements OnInit, OnDestroy {
         workflowId: this.applicationWorkflow.steps[0].workflowId
       }
       this.customApplicationSteps.push(newCustomStep);
-      this.store.dispatch(new UpdateApplicationCustomSteps(this.customApplicationSteps));
+      this.customApplicationSteps$.next(this.customApplicationSteps);
     }
   }
 
@@ -161,17 +157,15 @@ export class JobOrderComponent implements OnInit, OnDestroy {
         this.customOrderSteps = [];
       }
 
-      this.store.dispatch(new UpdateOrderCustomSteps(this.customOrderSteps));
+      this.customOrderSteps$.next(this.customOrderSteps);
     } else {
       this.customApplicationSteps.splice(stepDetails.index, 1);
       if (this.customApplicationSteps.length === 1) {
         this.customApplicationSteps = [];
       }
 
-      this.store.dispatch(new UpdateApplicationCustomSteps(this.customApplicationSteps));
+      this.customApplicationSteps$.next(this.customApplicationSteps);
     }
-
-    this.onUpdateWorkflowClick();
   }
 
   public onCancelFormClick(): void {
@@ -249,10 +243,7 @@ export class JobOrderComponent implements OnInit, OnDestroy {
         customSteps: this.customOrderSteps.concat(this.customApplicationSteps)
       }
 
-      console.log(workflowWithDetailsPut); // TODO: remove after BE fix
-      // this.store.dispatch(new UpdateWorkflow(workflowWithDetailsPut, this.selectedCard.businessUnitId)); //TODO: uncomment BE after fix
-      this.customStepOrderFormGroup.reset();
-      this.customStepApplicationFormGroup.reset();
+      this.store.dispatch(new UpdateWorkflow(workflowWithDetailsPut, this.selectedCard.businessUnitId));
     } else {
       this.customStepOrderFormGroup.markAllAsTouched();
       this.customStepApplicationFormGroup.markAllAsTouched();
