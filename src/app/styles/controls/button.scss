@@ -23,6 +23,41 @@ button.e-control.e-btn {
       margin-left: 0;
     }
   }
+
+  &.e-flat {
+    &.close-button {
+      padding: 10px;
+      border: none;
+
+      i-feather {
+        margin: 0;
+      }
+      
+      &.e-ripple {
+        overflow: initial;
+        position: initial;
+        transform: none;
+      }
+    
+      color: $supportive-red;
+    
+      &.e-active,
+      &:focus {
+        color: $white;
+        background-color: $supportive-red-00;
+      }
+    
+      &:hover {
+        background-color: $supportive-red-40;
+      }
+    
+      &[disabled] {
+        pointer-events: none;
+        background-color: transparent;
+        color: $supportive-red-40;
+      }
+    }
+  }
 }
 
 .e-control.e-popup.e-popup-open.e-dropdown-popup.button-export {
@@ -32,8 +67,10 @@ button.e-control.e-btn {
 }
 
 button.e-control.e-btn.e-dropdown-btn {
-  span.e-btn-icon {
-    display: none;
+  &.button-export {
+    span.e-btn-icon {
+      display: none;
+    }
   }
 
   &.e-active {

@@ -21,8 +21,18 @@
     </section>
   </ng-template>
   <ng-template #content>
-    <section class="container">
-      <ng-content></ng-content>
+    <section class="filter-wrapper">
+      <section class="container">
+        <ng-content></ng-content>
+      </section>
+      <section class="applied-filters" *ngIf="items.length">
+        <div class="chips-container">
+          <ejs-chiplist [chips]="items" enableDelete="true"></ejs-chiplist>
+        </div>
+        <div class="results-counter">
+          <span class="label">Results </span><span class="count">{{ count }}</span>
+        </div>
+      </section>
     </section>
   </ng-template>
   <ng-template #footerTemplate>

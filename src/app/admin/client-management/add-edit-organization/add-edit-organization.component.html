@@ -17,6 +17,12 @@
         <ejs-dropdownlist appValidateWithMessage [fields]="createUnderFields" formControlName="createUnder" [dataSource]="businessUnits$ | async" placeholder="Create Under"></ejs-dropdownlist>
       </div>
     </form>
+    <form id="connectionString" *ngIf="false && title === 'Add' && (user$ | async)?.businessUnitType === businessUnitType.Hallmark">
+      <label>Data Base<span class="required">*</span></label>
+      <div class="input-group dropdown connection-string-dropdown">
+        <ejs-dropdownlist [fields]="[]" [dataSource]="[]" placeholder="Data Base"></ejs-dropdownlist>
+      </div>
+    </form>
   </div>
   <div class="right-section"></div>
 </section>

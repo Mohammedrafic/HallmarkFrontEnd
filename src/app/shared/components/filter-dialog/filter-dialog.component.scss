@@ -10,8 +10,67 @@
     padding: 0;
   }
 
+  .filter-wrapper {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .applied-filters {
+    .results-counter {
+      padding: 16px 29px;
+      font-size: 12px;
+      font-weight: 600;
+
+      .label {
+        color: $secondary-dark-blue-30;
+      }
+
+      .count {
+        color: $black;
+      }
+    }
+
+    .chips-container {
+      max-height: 200px;
+      overflow: auto;
+      background-color: $secondary-dark-blue-50;
+      padding: 16px 29px;
+
+      .e-chip-list {
+        .e-chip {
+          margin: 5px 10px 5px 0;
+          width: auto;
+          text-transform: initial;
+          font-variant: common-ligatures;
+          font-weight: normal;
+          font-size: 12px;
+          height: 24px;
+          background-color: $secondary-dark-blue-50;
+          color: $black;
+          border: 1px solid $secondary-dark-blue-40;
+
+          .e-chip-delete.e-dlt-btn {
+            color: $black;
+            font-weight: 600;
+
+            &::before {
+              content: "\e7e7";
+            }
+          }
+        }
+      }
+    }
+  }
+
   .container {
     padding: 24px;
+    flex: 1;
+    height: 100%;
+    overflow: auto;
 
     .form-container {
       .input-container {

@@ -29,8 +29,9 @@ export class OrganizationHoliday {
   regionName?: string;
   organizationId?: number;
   toOverwrite?: boolean;
+  foreignKey?: string;
 
-  constructor(holiday: OrganizationHoliday, selectedRegions?: OrganizationRegion[], allRegions?: boolean, isExist?: boolean) {
+  constructor(holiday: OrganizationHoliday, selectedRegions?: OrganizationRegion[], allRegionsAndLocations?: boolean, isExist?: boolean) {
     this.id = holiday.id;
     this.masterHolidayId = holiday.masterHolidayId;
     this.holidayName = holiday.holidayName;
@@ -45,16 +46,23 @@ export class OrganizationHoliday {
 
     if (selectedRegions) {
       const regions: OrganizationRegion[] = [];
-      holiday.regions?.forEach((regionId: number) => {
-        const region = selectedRegions.find(region => region.id === regionId);
-        const locations = region?.locations?.filter(location => holiday.locations?.includes(location.id)).map(location => location.id);
-        if (region) {
-          regions.push({
-            id: region.id,
-            locations: locations as []
-          });
-        }
-      });
+      if (allRegionsAndLocations) {
+        regions.push({
+          id: null,
+          locations: null
+        });
+      } else {
+        holiday.regions?.forEach((regionId: number) => {
+          const region = selectedRegions.find(region => region.id === regionId);
+          const locations = region?.locations?.filter(location => holiday.locations?.includes(location.id)).map(location => location.id);
+          if (region) {
+            regions.push({
+              id: region.id,
+              locations: locations as []
+            });
+          }
+        });
+      }
       this.regions = regions;
     }
   }

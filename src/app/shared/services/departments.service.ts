@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { Department } from '../../shared/models/department.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
 export class DepartmentsService {
@@ -39,5 +40,15 @@ export class DepartmentsService {
    */
   public deleteDepartmentById(departmentId?: number): Observable<any> {
     return this.http.delete<any>(`/api/Departments/${departmentId}`);
+  }
+
+  /**
+   * Export departments
+   */
+  public export(payload: ExportPayload): Observable<any> {
+    if (payload.ids) {
+      return this.http.post(`/api/Departments/export/byIds`, payload, { responseType: 'blob' });
+    }
+    return this.http.post(`/api/Departments/export`, payload, { responseType: 'blob' });
   }
 }

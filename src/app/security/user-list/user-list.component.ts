@@ -6,16 +6,16 @@ import { filter, Observable, takeWhile } from "rxjs";
 import { BusinessUnit } from "@shared/models/business-unit.model";
 import { AbstractControl, FormControl, FormGroup } from "@angular/forms";
 import { SetHeaderState, ShowSideDialog } from "../../store/app.actions";
-import { GetBusinessByUnitType, SaveUser, SaveUserSucceeded } from "../store/security.actions";
+import { GetBusinessByUnitType, GetRolePerUser, SaveUser, SaveUserSucceeded } from "../store/security.actions";
 import { UserState } from "../../store/user.state";
-import { User } from "@shared/models/user.model";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
 import { UserSettingsComponent } from "./add-edit-user/user-settings/user-settings.component";
 import { ConfirmService } from "@shared/services/confirm.service";
-import { UserDTO } from "@shared/models/user-managment-page.model";
+import { UserDTO, User } from "@shared/models/user-managment-page.model";
 
 const DEFAULT_DIALOG_TITLE = 'Add User';
+const EDIT_DIALOG_TITLE = 'Edit User';
 
 @Component({
   selector: 'app-user-list',
@@ -28,6 +28,7 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   public businessForm: FormGroup;
   public userSettingForm: FormGroup;
+  public isEditRole = false;
   public unitFields = UNIT_FIELDS;
   public businessUnits = BUSINESS_UNITS_VALUES;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
@@ -42,7 +43,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   get dialogTitle(): string {
-    return DEFAULT_DIALOG_TITLE;
+    return this.isEditRole ? EDIT_DIALOG_TITLE : DEFAULT_DIALOG_TITLE;
   }
 
   private isAlive = true;
@@ -56,12 +57,11 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const user = this.store.selectSnapshot(UserState.user);
-
     this.businessForm = this.generateBusinessForm();
     this.userSettingForm = UserSettingsComponent.createForm();
     this.onBusinessUnitValueChanged();
 
+    const user = this.store.selectSnapshot(UserState.user) as User;
     this.disableBusinessControls(user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
     this.businessControl.patchValue(this.isBusinessFormDisabled ? user?.businessUnitId : 0);
@@ -73,6 +73,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   public onAddNewUser() {
+    this.isEditRole = false;
     this.userSettingForm.reset();
     this.userSettingForm.enable();
     this.userSettingForm.patchValue({
@@ -105,13 +106,40 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.userSettingForm.markAllAsTouched();
     if(this.userSettingForm.valid) {
       const value = this.userSettingForm.getRawValue();
-      const userDTO : UserDTO = {
+      let userDTO : UserDTO = {
         businessUnitId: value.businessUnitId || null,
         metadata: {...value},
         roleIds: value.roles
       }
+      if(this.isEditRole) {
+         userDTO = {
+          ...userDTO,
+           userId: value.id
+        }
+      }
       this.store.dispatch(new SaveUser(userDTO));
     }
+  }
+
+  public onEdit(user: User): void {
+    this.isEditRole = true;
+    this.userSettingForm.reset();
+    this.userSettingForm.enable();
+
+    if(user.roles) {
+      const editedUser = {
+        ...user,
+        roles: [...user.roles],
+        businessUnitId: user.businessUnitId || 0,
+        emailConfirmation: user.email
+      }
+      this.userSettingForm.patchValue({
+        ...editedUser,
+        roles: user.roles.map((role: any) => role.id)
+      });
+    }
+    this.disableBussinesUnitForRole();
+    this.store.dispatch(new ShowSideDialog(true));
   }
 
   private generateBusinessForm(): FormGroup {
@@ -121,13 +149,13 @@ export class UserListComponent implements OnInit, OnDestroy {
     });
   }
 
-  private disableBusinessControls(user: User | null) {
+  private disableBusinessControls(user: User) {
     if (user?.businessUnitType) {
       this.isBusinessFormDisabled = DISABLED_GROUP.includes(user?.businessUnitType);
       this.isBusinessFormDisabled && this.businessForm.disable();
     }
     if (user?.businessUnitType === BusinessUnitType.MSP) {
-      const [...rest] = this.businessUnits;
+      const [Hallmark, ...rest] = this.businessUnits;
       this.businessUnits = rest;
     }
   }

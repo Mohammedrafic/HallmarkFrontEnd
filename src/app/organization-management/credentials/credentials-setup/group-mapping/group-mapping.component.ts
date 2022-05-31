@@ -16,15 +16,22 @@ import { Department } from '@shared/models/department.model';
 import {
   ClearDepartmentList,
   ClearLocationList,
+  GetCredentialSkillGroup,
   GetDepartmentsByLocationId,
-  GetLocationsByRegionId,
-  GetRegions
+  GetLocationsByRegionId
 } from '../../../store/organization-management.actions';
 import { Router } from '@angular/router';
 import { CredentialsNavigationTabs } from '@shared/enums/credentials-navigation-tabs';
-import { SaveCredentialGroupMapping, DeleteCredentialGroupMappingById, SetCredentialSetupFilter, SetNavigationTab } from '../../../store/credentials.actions';
-import { CredentialGroupMapping } from '@shared/models/credential-group-mapping.model';
+import {
+  SaveCredentialGroupMapping,
+  DeleteCredentialGroupMappingById,
+  SetCredentialSetupFilter,
+  SetNavigationTab,
+  GetCredentialGroupMapping
+} from '../../../store/credentials.actions';
+import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
 import { MockGroupMapping } from './mock-group-mapping';
+import { CredentialsState } from '../../../store/credentials.state';
 
 @Component({
   selector: 'app-group-mapping',
@@ -49,8 +56,8 @@ export class GroupMappingComponent extends AbstractGridConfigurationComponent im
   departments$: Observable<Department[]>;
   departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
 
-  // @Select(OrganizationManagementState.) // TODO: add state after BE implementation
-  groupsData$: Observable<CredentialGroupMapping[]> = of(MockGroupMapping);
+  //@Select(CredentialsState.groupMappings) // TODO: uncomment after BE implementation
+  groupsData$: Observable<SkillGroupMapping[]> = of(MockGroupMapping); // TODO: remove mock after BE implementation
 
   public isEdit: boolean;
   public editRecordId: number | undefined;
@@ -73,9 +80,8 @@ export class GroupMappingComponent extends AbstractGridConfigurationComponent im
   }
 
   ngOnInit(): void {
-    // TODO: get list for gridData after BE implementation
-    this.store.dispatch(new GetRegions());
-    // TODO: get Locations by regionId, get departments by locationId
+    //this.store.dispatch(new GetCredentialGroupMapping()) // TODO: uncomment after BE implementation
+    //this.store.dispatch(new GetCredentialSkillGroup()); // TODO: uncomment after BE fix
     this.mapGridData();
   }
 
@@ -84,17 +90,17 @@ export class GroupMappingComponent extends AbstractGridConfigurationComponent im
     this.editRecordId = data.id;
     this.addActiveCssClass(event);
 
-    this.store.dispatch(new GetLocationsByRegionId(data.region.id));
-    this.store.dispatch(new GetDepartmentsByLocationId(data.location.id));
+    this.store.dispatch(new GetLocationsByRegionId(data.regionId));
+    this.store.dispatch(new GetDepartmentsByLocationId(data.locationId));
 
     setTimeout(() => {
       this.groupMappingFormGroup.setValue({
-        regionId: data.region.id,
-        locationId: data.location.id,
-        departmentId: data.department.departmentId,
-        skillGroupId: data.skillGroup.id
+        regionId: data.regionId,
+        locationId: data.locationId,
+        departmentId: data.departmentId,
+        skillGroupId: data.skillGroupId
       });
-    }, 150);
+    }, 250);
 
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -132,20 +138,12 @@ export class GroupMappingComponent extends AbstractGridConfigurationComponent im
   public onFormSaveClick(): void {
     if (this.groupMappingFormGroup.valid) {
 
-      let credentialGroupMapping: CredentialGroupMapping = {
-        id: this.editRecordId,
-        region: {
-          id: this.groupMappingFormGroup.controls['regionId'].value
-        },
-        location: {
-          id: this.groupMappingFormGroup.controls['locationId'].value
-        },
-        department: {
-          departmentId: this.groupMappingFormGroup.controls['departmentId'].value
-        },
-        skillGroup: {
-          id: this.groupMappingFormGroup.controls['skillGroupId'].value
-        }
+      let credentialGroupMapping: SkillGroupMapping = {
+        mappingId: this.editRecordId,
+        regionId: this.groupMappingFormGroup.controls['regionId'].value,
+        locationId: this.groupMappingFormGroup.controls['locationId'].value,
+        departmentId: this.groupMappingFormGroup.controls['departmentId'].value,
+        skillGroupId: this.groupMappingFormGroup.controls['skillGroupId'].value
       }
 
       console.log(credentialGroupMapping); // TODO: remove after implementation
@@ -169,10 +167,10 @@ export class GroupMappingComponent extends AbstractGridConfigurationComponent im
   public onCredentialSetupLinkClick(data: any): void {
     this.store.dispatch(new SetNavigationTab(CredentialsNavigationTabs.Setup));
     this.store.dispatch(new SetCredentialSetupFilter({
-      regionId: data.region.id,
-      locationId: data.location.id,
-      departmentId: data.department.departmentId,
-      skillGroupId: data.skillGroup.id
+      regionId: data.regionId,
+      locationId: data.locationId,
+      departmentId: data.departmentId,
+      skillGroupId: data.skillGroupId
     }));
     this.router.navigateByUrl('admin/organization-management/credentials/setup');
   }

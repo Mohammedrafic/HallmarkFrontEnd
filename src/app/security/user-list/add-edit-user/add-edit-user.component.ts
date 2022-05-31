@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { FormGroup } from "@angular/forms";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
+import { SelectEventArgs } from "@syncfusion/ej2-angular-navigations";
 
 @Component({
   selector: 'app-add-edit-user',
@@ -15,8 +16,11 @@ export class AddEditUserComponent {
 
   constructor() { }
 
-  public onTabSelecting(): void {
+  public onTabSelecting(event: SelectEventArgs): void {
+    if (event.isSwiped) {
+      event.cancel = true;
+    }
+    
     this.firstActive = false;
   }
-
 }

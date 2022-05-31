@@ -94,6 +94,16 @@ body {
         right: 30px;
       }
     }
+
+    &.workflow {
+      i-feather {
+        top: 35%;
+      }
+
+      span {
+        bottom: -25px;
+      }
+    }
   }
 
   h3 {
@@ -219,6 +229,7 @@ hr {
 @import './controls/button-with-icon';
 @import './controls/treeview';
 @import './controls/numeric-textbox';
+@import './controls/pdf-viewer';
 
 a, a:hover, a:focus, a:active {
   text-decoration: none;

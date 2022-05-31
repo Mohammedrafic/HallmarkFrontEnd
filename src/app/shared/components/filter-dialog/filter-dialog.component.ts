@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Actions, ofActionDispatched } from '@ngxs/store';
 import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
+import { FilteredItem } from '@shared/models/filter.model';
 
 @Component({
   selector: 'app-filter-dialog',
@@ -13,6 +14,8 @@ export class FilterDialogComponent implements OnInit {
   targetElement: HTMLElement = document.body;
 
   @Input() width: string = '532px';
+  @Input() items: FilteredItem[] = [];
+  @Input() count: number = 0;
   @Output() clearAllFiltersClicked = new EventEmitter();
   @Output() applyFilterClicked = new EventEmitter();
   @Output() closeDialogClicked = new EventEmitter();

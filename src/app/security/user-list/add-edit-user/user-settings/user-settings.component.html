@@ -34,7 +34,7 @@
           </div>
         </div>
         <div class="active-toggle">
-          <ejs-switch class="switch" [disabled]="form.disabled" [checked]="form.get('isDeleted')?.value" (change)="toggleActive()"></ejs-switch>
+          <ejs-switch #swithActive formControlName="isDeleted" class="switch" [disabled]="form.disabled" [checked]="form.get('isDeleted')?.value" (click)="toggleActive()"></ejs-switch>
           <span class="e-text">Active</span>
         </div>
       </div>
@@ -97,7 +97,6 @@
                             formControlName="state"
                             [dataSource]="countryState$ | async"
                             placeholder="State">
-
           </ejs-dropdownlist>
         </div>
       </div>
@@ -110,7 +109,7 @@
       <div class="input-container bootstrap">
         <label>Zipcode</label>
         <div class="input-group">
-          <ejs-maskedtextbox class="organization-input" promptChar="_" mask='00000' appValidateWithMessage formControlName="zipCode" placeholder="Zipcode" maxlength="6"></ejs-maskedtextbox>
+          <ejs-maskedtextbox class="organization-input" promptChar="_" mask='00000' appValidateWithMessage formControlName="zip" placeholder="Zipcode" maxlength="6"></ejs-maskedtextbox>
         </div>
       </div>
     </div>

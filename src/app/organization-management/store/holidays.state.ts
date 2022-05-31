@@ -53,6 +53,7 @@ export class HolidaysState {
             item.locationName = location?.name;
             item.regionName = region?.name;
           }
+          item.foreignKey = item.id + '-' + item.masterHolidayId;
         });
         patchState({ isHolidayLoading: false, holidaysPage: payload });
         return payload;

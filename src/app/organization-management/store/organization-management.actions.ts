@@ -10,6 +10,7 @@ import { Credential } from '@shared/models/credential.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { CredentialSetup, CredentialSetupGetGroup } from '@shared/models/credential-setup.model';
 import { OrganizationSettingsPost } from '@shared/models/organization-settings.model';
+import { ExportPayload } from "@shared/models/export.model";
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[organizationManagement] Set General States By Country';
@@ -296,14 +297,19 @@ export class RemoveCredentialSkillGroup {
   constructor(public payload: CredentialSkillGroup) { }
 }
 
-export class GetCredentialSetup {
-  static readonly type = '[organizationManagement] Get Credential Setup by group of CredentialTypeId, OrganizationId, SkillGroupId, RegionId, PageNumber, PageSize';
-  constructor(public payload: CredentialSetupGetGroup) {}
+export class GetCredentialSetupByPage {
+  static readonly type = '[organizationManagement] Get Credential Setup by Page';
+  constructor(public pageNumber: number, public pageSize: number) {}
 }
 
 export class SaveUpdateCredentialSetup {
   static readonly type = '[organizationManagement] Save Credential Setup';
-  constructor(public credentialSetup: CredentialSetup, public credentialSetupGetGroup: CredentialSetupGetGroup) { }
+  constructor(public credentialSetup: CredentialSetup) { }
+}
+
+export class SaveUpdateCredentialSetupSucceeded {
+  static readonly type = '[organizationManagement] Save/Update Credential Setup Succeeded';
+  constructor(public credentialSetup: CredentialSetup) { }
 }
 
 export class GetOrganizationSettings {
@@ -324,4 +330,14 @@ export class ClearDepartmentList {
 export class ClearLocationList {
   static readonly type = '[organizationManagement] Clear Location list';
   constructor() { }
+}
+
+export class ExportLocations {
+  static readonly type = '[organizationManagement] Export Location list';
+  constructor(public payload: ExportPayload) { }
+}
+
+export class ExportDepartments {
+  static readonly type = '[organizationManagement] Export Department list';
+  constructor(public payload: ExportPayload) { }
 }

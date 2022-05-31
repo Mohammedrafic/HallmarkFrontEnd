@@ -5,19 +5,17 @@ export class CredentialSetup {
   masterCredentialId: number;
   skillGroupId: number;
   description?: string;
-  regionId: number;
-  isActive: boolean;  // TODO: clarify with BE
-  optional?: boolean; // TODO: not present on API
+  isActive: boolean;
   reqSubmission: boolean;
   reqOnboard: boolean;
   inactiveDate: string;
   comments: string;
+  credentialTypeName?: string; // used only on UI
 }
 
 export class CredentialSetupGetGroup {
   credentialTypeId: number;
   skillGroupId: number;
-  regionId: number;
   pageNumber: number;
   pageSize: number;
 }

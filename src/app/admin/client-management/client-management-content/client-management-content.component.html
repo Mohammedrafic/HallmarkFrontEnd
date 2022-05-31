@@ -1,95 +1,110 @@
-<section class="controls-container">
-  <div>
-    <button ejs-button [isPrimary]="true" (click)="navigateToOrganizationForm()">Add Organization</button>
-    <button ejs-button cssClass="e-outline">Filters <i-feather name="sliders" class="icon"></i-feather></button>
-  </div>
-</section>
-<section>
-  <ejs-grid #grid
-    [dataSource]="(organizations$ | async)?.items"
-    [allowSorting]="true"
-    [allowResizing]="true"
-    [resizeSettings]="resizeSettings"
-    [sortSettings]="initialSort"
-    [allowPaging]="allowPaging"
-    [pageSettings]="pageSettings"
-    [height]="gridHeight">
-    <e-columns>
-      <e-column field="createUnder.name" headerText="Organization Name" textAlign="Left" width="120"></e-column>
-      <e-column field="generalInformation.status" headerText="Organization Status" textAlign="Left" width="120">
-        <ng-template #template let-data>
-          <div class="status-cell">
-            <ejs-chiplist>
-              <e-chips>
-                <e-chip [text]="statusEnum[data.generalInformation.status]" [cssClass]="getChipCssClass(statusEnum[data.generalInformation.status])"></e-chip>
-              </e-chips>
-            </ejs-chiplist>
-          </div>
-        </ng-template>
-      </e-column>
-      <e-column field="generalInformation.city" headerText="City" textAlign="Left" width="90"></e-column>
-      <e-column field="contactDetails.0.contactPerson" headerText="Contact" textAlign="Left" width="120"></e-column>
-      <e-column field="contactDetails.0.phoneNumberExt" headerText="Phone" textAlign="Left" width="90"></e-column>
-      <e-column field="" headerText="" textAlign="Right" width="90">
-        <ng-template #headerTemplate let-data>
-          <div class="controls-header"></div>
-        </ng-template>
-        <ng-template #template let-data>
-          <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat default-icon-button">
-              <span><i-feather name="file-text" class="icon"></i-feather></span>
-            </button>
-            <button ejs-button cssClass="e-flat default-icon-button">
-              <span><i-feather name="map-pin" class="icon"></i-feather></span>
-            </button>
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editOrganization(data)">
-              <span><i-feather name="edit" class="icon"></i-feather></span>
-            </button>
-          </div>
-        </ng-template>
-      </e-column>
-    </e-columns>
-    <ng-template #pagerTemplate let-data>
-      <!--TODO: move to shared component-->
-      <div class="e-pagertemplate">
-        <div class="control-section">
-          <div class="content-wrapper">
-            <section class="left-side-pager-controls">
-              <ejs-dropdownlist
-                id="rowsPerPage"
-                class="dropdown-no-border"
-                [dataSource]="rowsPerPageDropDown"
-                [(value)]="activeRowsPerPageDropDown"
-                (change)="onRowsDropDownChanged()"
-              >
-              </ejs-dropdownlist>
-              <ejs-numerictextbox
-                id="goToPage"
-                class="numeric-input-no-border"
-                format="#"
-                placeholder="Go to:"
-                min="1"
-                [max]="(organizations$ | async)?.totalPages"
-                [showSpinButton]="false"
-                (change)="onGoToClick($event)"
-              >
-              </ejs-numerictextbox>
-            </section>
-            <section class="right-side-pager-controls">
-              <ejs-pager
-                id="gridPager"
-                #gridPager
-                [pageSize]="pageSize"
-                [totalRecordsCount]="(organizations$ | async)?.totalCount"
-                [enablePagerMessage]="false"
-                [currentPage]="currentPage"
-                (click)="onGoToClick($event)"
-              >
-              </ejs-pager>
-            </section>
+<section class="flex-column">
+  <section class="controls-container">
+    <div>
+      <button ejs-button [isPrimary]="true" (click)="navigateToOrganizationForm()">Add Organization</button>
+      <button
+          ejs-dropdownbutton
+          [items]="exportOptions"
+          (select)="exportSelected($event)"
+          id="importButton"
+          cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+      <button ejs-button cssClass="e-outline">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+    </div>
+  </section>
+  <section class="grid-component">
+    <ejs-grid #grid
+      [dataSource]="(organizations$ | async)?.items"
+      [allowSorting]="true"
+      [allowResizing]="true"
+      [resizeSettings]="resizeSettings"
+      [sortSettings]="initialSort"
+      [allowPaging]="allowPaging"
+      [pageSettings]="pageSettings"
+      [height]="fullScreenGridHeight"
+      (rowSelected)="rowSelected($event, grid)"
+      (rowDeselected)="rowDeselected($event, grid)"
+      (dataBound)="gridDataBound(grid)"
+      [selectionSettings]="selectionSettings">
+      <e-columns>
+        <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="40"></e-column>
+        <e-column field="createUnder.name" headerText="Organization Name" textAlign="Left" width="220"></e-column>
+        <e-column field="generalInformation.status" headerText="Organization Status" textAlign="Left" width="120">
+          <ng-template #template let-data>
+            <div class="status-cell">
+              <ejs-chiplist>
+                <e-chips>
+                  <e-chip [text]="statusEnum[data.generalInformation.status]" [cssClass]="getChipCssClass(statusEnum[data.generalInformation.status])"></e-chip>
+                </e-chips>
+              </ejs-chiplist>
+            </div>
+          </ng-template>
+        </e-column>
+        <e-column field="generalInformation.city" headerText="City" textAlign="Left" width="90"></e-column>
+        <e-column field="contactDetails.0.contactPerson" headerText="Contact" textAlign="Left" width="120"></e-column>
+        <e-column field="contactDetails.0.phoneNumberExt" headerText="Phone" textAlign="Left" width="90"></e-column>
+        <e-column field="" headerText="" textAlign="Right" width="90">
+          <ng-template #headerTemplate let-data>
+            <div class="controls-header"></div>
+          </ng-template>
+          <ng-template #template let-data>
+            <div class="row-tool-buttons">
+              <button ejs-button cssClass="e-flat default-icon-button">
+                <span><i-feather name="file-text" class="icon"></i-feather></span>
+              </button>
+              <button ejs-button cssClass="e-flat default-icon-button">
+                <span><i-feather name="map-pin" class="icon"></i-feather></span>
+              </button>
+              <button ejs-button cssClass="e-flat primary-icon-button" (click)="editOrganization(data)">
+                <span><i-feather name="edit" class="icon"></i-feather></span>
+              </button>
+            </div>
+          </ng-template>
+        </e-column>
+      </e-columns>
+      <ng-template #pagerTemplate let-data>
+        <!--TODO: move to shared component-->
+        <div class="e-pagertemplate">
+          <div class="control-section">
+            <div class="content-wrapper">
+              <section class="left-side-pager-controls">
+                <ejs-dropdownlist
+                  id="rowsPerPage"
+                  class="dropdown-no-border"
+                  [dataSource]="rowsPerPageDropDown"
+                  [(value)]="activeRowsPerPageDropDown"
+                  (change)="onRowsDropDownChanged()"
+                >
+                </ejs-dropdownlist>
+                <ejs-numerictextbox
+                  id="goToPage"
+                  class="numeric-input-no-border"
+                  format="#"
+                  placeholder="Go to:"
+                  min="1"
+                  [max]="(organizations$ | async)?.totalPages"
+                  [showSpinButton]="false"
+                  (change)="onGoToClick($event)"
+                >
+                </ejs-numerictextbox>
+              </section>
+              <section class="right-side-pager-controls">
+                <ejs-pager
+                  id="gridPager"
+                  #gridPager
+                  [pageSize]="pageSize"
+                  [totalRecordsCount]="(organizations$ | async)?.totalCount"
+                  [enablePagerMessage]="false"
+                  [currentPage]="currentPage"
+                  (click)="onGoToClick($event)"
+                >
+                </ejs-pager>
+              </section>
+            </div>
           </div>
         </div>
-      </div>
-    </ng-template>
-  </ejs-grid>
+      </ng-template>
+    </ejs-grid>
+  </section>  
 </section>
+
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>

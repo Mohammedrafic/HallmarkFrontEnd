@@ -9,7 +9,7 @@ import {
   SetNavigationTab
 } from './credentials.actions';
 import { catchError, Observable, tap } from 'rxjs';
-import { CredentialGroupMapping } from '@shared/models/credential-group-mapping.model';
+import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
 import { SkillGroupService } from '@shared/services/skill-group.service';
 import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -18,7 +18,7 @@ import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 export interface CredentialsStateModel {
   activeTab: number;
   setupFilter: CredentialSetupFilter | null;
-  groupMappings: CredentialGroupMapping[]
+  groupMappings: SkillGroupMapping[]
 }
 
 @State<CredentialsStateModel>({
@@ -38,7 +38,7 @@ export class CredentialsState {
   static setupFilter(state: CredentialsStateModel): CredentialSetupFilter | null { return state.setupFilter; }
 
   @Selector()
-  static groupMappings(state: CredentialsStateModel): CredentialGroupMapping[] { return state.groupMappings; }
+  static groupMappings(state: CredentialsStateModel): SkillGroupMapping[] { return state.groupMappings; }
 
   constructor(private skillGroupService: SkillGroupService) {}
 
@@ -53,7 +53,7 @@ export class CredentialsState {
   }
 
   @Action(GetCredentialGroupMapping)
-  GetCredentialGroupMapping({ patchState }: StateContext<CredentialsStateModel>, { }: GetCredentialGroupMapping): Observable<CredentialGroupMapping[]> {
+  GetCredentialGroupMapping({ patchState }: StateContext<CredentialsStateModel>, { }: GetCredentialGroupMapping): Observable<SkillGroupMapping[]> {
     return this.skillGroupService.getSkillGroupsMapping().pipe(tap((payload) => {
       patchState({ groupMappings: payload });
       return payload;
@@ -61,10 +61,10 @@ export class CredentialsState {
   }
 
   @Action(SaveCredentialGroupMapping)
-  SaveCredentialGroupMapping({ patchState, dispatch }: StateContext<CredentialsStateModel>, { payload }: SaveCredentialGroupMapping): Observable<CredentialGroupMapping | void> {
+  SaveCredentialGroupMapping({ patchState, dispatch }: StateContext<CredentialsStateModel>, { payload }: SaveCredentialGroupMapping): Observable<SkillGroupMapping | void> {
     return this.skillGroupService.saveUpdateSkillGroupMapping(payload)
       .pipe(tap((payloadResponse) => {
-          if (payload.id) {
+          if (payload.mappingId) {
             dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
           } else {
             dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));

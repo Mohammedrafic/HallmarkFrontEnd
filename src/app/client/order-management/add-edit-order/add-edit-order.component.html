@@ -13,7 +13,7 @@
   </div>
 </section>
 
-<ejs-tab class="stepper">
+<ejs-tab class="stepper" #stepper (created)="onStepperCreated()">
   <e-tabitems>
     <e-tabitem>
       <ng-template #headerText>
@@ -23,7 +23,15 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-order-details-form></app-order-details-form>
+        <ng-container *ngIf="selectedTab === SelectedTab.OrderDetails">
+          <section class="order-details-form-section">
+            <app-order-details-form></app-order-details-form>
+          </section>
+
+          <section class="bill-rates-section">
+            <app-bill-rates></app-bill-rates>
+          </section>
+        </ng-container>
       </ng-template>
     </e-tabitem>
 
@@ -35,7 +43,7 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-order-credentials-form></app-order-credentials-form>
+        <app-order-credentials *ngIf="selectedTab === SelectedTab.Credentials"></app-order-credentials>
       </ng-template>
     </e-tabitem>
   </e-tabitems>

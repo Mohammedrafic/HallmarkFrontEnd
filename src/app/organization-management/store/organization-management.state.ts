@@ -63,13 +63,13 @@ import {
   SaveCredentialSkillGroup,
   UpdateCredentialSkillGroup,
   RemoveCredentialSkillGroup,
-  GetCredentialSetup,
+  GetCredentialSetupByPage,
   SaveUpdateCredentialSetup,
   GetOrganizationSettings,
   SaveOrganizationSettings,
   ClearDepartmentList,
   ClearLocationList,
-  SaveCredentialSucceeded,
+  SaveCredentialSucceeded, SaveUpdateCredentialSetupSucceeded, ExportLocations, ExportDepartments,
 } from './organization-management.actions';
 import { Department } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
@@ -94,6 +94,7 @@ import { LocationService } from '@shared/services/location.service';
 import { CredentialsService } from '@shared/services/credentials.service';
 import { SkillGroupService } from '@shared/services/skill-group.service';
 import { OrganizationSettingsService } from '@shared/services/organization-settings.service';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 
 interface DropdownOption {
   id: number;
@@ -131,7 +132,7 @@ export interface OrganizationManagementStateModel {
   isCredentialLoading: boolean;
   skillGroups: CredentialSkillGroup[] | null;
   isSkillGroupLoading: boolean;
-  credentialSetups: CredentialSetup[] | null;
+  credentialSetupPage: CredentialSetupPage | null;
   isCredentialSetupLoading: boolean;
   isOrganizationSettingsLoading: boolean;
   organizationSettings: OrganizationSettingsGet[];
@@ -171,7 +172,7 @@ export interface OrganizationManagementStateModel {
     isCredentialLoading: false,
     skillGroups: [],
     isSkillGroupLoading: false,
-    credentialSetups: [],
+    credentialSetupPage: null,
     isCredentialSetupLoading: false,
     isOrganizationSettingsLoading: false,
     organizationSettings: []
@@ -243,7 +244,7 @@ export class OrganizationManagementState {
   static skillGroups(state: OrganizationManagementStateModel): CredentialSkillGroup[]  | null { return state.skillGroups }
 
   @Selector()
-  static credentialSetups(state: OrganizationManagementStateModel): CredentialSetup[] | null { return state.credentialSetups }
+  static credentialSetups(state: OrganizationManagementStateModel): CredentialSetupPage | null { return state.credentialSetupPage }
 
   @Selector()
   static organizationSettings(state: OrganizationManagementStateModel): OrganizationSettingsGet[] { return state.organizationSettings }
@@ -541,6 +542,9 @@ export class OrganizationManagementState {
   GetAssignedSkillsByPage({ patchState }: StateContext<OrganizationManagementStateModel>, { pageNumber, pageSize }: GetAssignedSkillsByPage): Observable<SkillsPage> {
     patchState({ isOrganizationLoading: true });
     return this.skillsService.getAssignedSkills(pageNumber, pageSize).pipe(tap((payload) => {
+      payload.items.forEach(item => {
+        item.foreignKey = item.id + '-' + item.masterSkill?.id;
+      });
       patchState({ isOrganizationLoading: false, skills: payload });
       return payload;
     }));
@@ -642,7 +646,7 @@ export class OrganizationManagementState {
   }
 
   @Action(GetCredentialSkillGroup)
-  GetSkillGroupsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetCredentialSkillGroup): Observable<CredentialSkillGroup[]> {
+  GetSkillGroups({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetCredentialSkillGroup): Observable<CredentialSkillGroup[]> {
     return this.skillGroupService.getSkillGroups().pipe(tap((payload) => {
       patchState({ skillGroups: payload });
       return payload;
@@ -683,20 +687,25 @@ export class OrganizationManagementState {
     );
   }
 
-  @Action(GetCredentialSetup)
-  GetCredentialSetupsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetCredentialSetup): Observable<CredentialSetupPage> {
-    return this.credentialsService.getCredentialSetup(payload).pipe(tap((payload) => {
-      patchState({ credentialSetups: payload.items });
+  @Action(GetCredentialSetupByPage)
+  GetCredentialSetupByPage({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { pageNumber, pageSize }: GetCredentialSetupByPage): Observable<CredentialSetupPage> {
+    return this.credentialsService.getCredentialSetup(pageNumber, pageSize).pipe(tap((payload) => {
+      dispatch(new GetCredentialTypes());
+      const invalidDate = '0001-01-01T00:00:00+00:00';
+      payload?.items.forEach((item: any) => {
+        item.inactiveDate === invalidDate ? item.inactiveDate = '' : item.inactiveDate;
+      });
+      patchState({ credentialSetupPage: payload });
       return payload;
     }));
   }
 
   @Action(SaveUpdateCredentialSetup)
-  SaveUpdateCredentialSetup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { credentialSetup, credentialSetupGetGroup }: SaveUpdateCredentialSetup): Observable<CredentialSetup> {
+  SaveUpdateCredentialSetup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { credentialSetup }: SaveUpdateCredentialSetup): Observable<CredentialSetup> {
     return this.credentialsService.saveUpdateCredentialSetup(credentialSetup).pipe(tap((payload) => {
       patchState({ isCredentialSetupLoading: false });
       dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      dispatch(new GetCredentialSetup(credentialSetupGetGroup));
+      dispatch(new SaveUpdateCredentialSetupSucceeded(payload));
       return payload;
     }));
   }
@@ -729,5 +738,21 @@ export class OrganizationManagementState {
   ClearLocationList({ patchState }: StateContext<OrganizationManagementStateModel>, { }: ClearLocationList): Observable<any> {
     patchState({locations: []});
     return of([]);
+  };
+
+  @Action(ExportLocations)
+  ExportLocations({ }: StateContext<OrganizationManagementStateModel>, { payload }: ExportLocations): Observable<any> {
+    return this.locationService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
+
+  @Action(ExportDepartments)
+  ExportDepartments({ }: StateContext<OrganizationManagementStateModel>, { payload }: ExportDepartments): Observable<any> {
+    return this.departmentService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
   };
 }

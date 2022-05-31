@@ -19,12 +19,19 @@
       <button
         ejs-button
         id="filterButton"
-        cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+        cssClass="e-outline button-filter"
+        (click)="showFilters()">Filters <i-feather name="sliders" class="icon"></i-feather></button>
       <button
         ejs-button
         id="importButton"
         cssClass="e-outline button-import"
         (click)="onImportDataClick()">Import <i-feather name="upload" class="icon"></i-feather></button>
+      <button
+        ejs-dropdownbutton
+        [items]="exportOptions"
+        (select)="exportSelected($event)"
+        id="importButton"
+        cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
       <button
         ejs-button
         id="addDepartmentButton"
@@ -43,8 +50,13 @@
     [resizeSettings]="resizeSettings"
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
+    (rowSelected)="rowSelected($event, grid)"
+    (rowDeselected)="rowDeselected($event, grid)"
+    (dataBound)="gridDataBound(grid)"
+    [selectionSettings]="selectionSettings"
   >
     <e-columns>
+      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column field="externalId" headerText="EXT LOCATION ID" width=200></e-column>
       <e-column field="invoiceId" headerText="INVOICE LOCATION ID" width=200></e-column>
       <e-column field="name" headerText="LOCATION NAME" width=200></e-column>
@@ -113,256 +125,262 @@
   </ejs-grid>
 </section>
 
-  <app-side-dialog
-    (formCancelClicked)="onFormCancelClick()"
-    (formSaveClicked)="onFormSaveClick()"
-    [header]="dialogHeader + ' Location'"
-    [width]="'832px'"
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+
+<app-filter-dialog [items]="filteredItems" [count]="filteredCount">
+<!-- TODO: add controls -->
+</app-filter-dialog>
+
+<app-side-dialog
+  (formCancelClicked)="onFormCancelClick()"
+  (formSaveClicked)="onFormSaveClick()"
+  [header]="dialogHeader + ' Location'"
+  [width]="'832px'"
+>
+  <form
+    class="form-container bootstrap"
+    id="addEditRecordForm"
+    [formGroup]="locationDetailsFormGroup"
   >
-    <form
-      class="form-container bootstrap"
-      id="addEditRecordForm"
-      [formGroup]="locationDetailsFormGroup"
-    >
-      <div>
+    <div>
+      <div class="input-container">
+        <label for="externalId">Ext Location ID <span class="required">*</span></label>
+        <div class="input-group">
+          <input id="externalId"
+                  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  appValidateWithMessage
+                  placeholder="Ext Location ID"
+                  formControlName="externalId"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="input-container">
+        <label for="invoiceId">Invoice Location ID <span class="required">*</span></label>
+        <div class="input-group">
+          <input id="invoiceId"
+                  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  appValidateWithMessage
+                  placeholder="Invoice Location ID"
+                  formControlName="invoiceId"/>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label for="name">Location Name<span class="required">*</span></label>
+        <div class="input-group">
+          <input id="name"
+                  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  appValidateWithMessage
+                  placeholder="Location Name"
+                  formControlName="name"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="large-group">
+      <div class="input-container">
+        <label for="address1">Address 1<span class="required">*</span></label>
+        <div class="input-group">
+          <input id="address1"
+                  class="e-input"
+                  type="text"
+                  maxlength="100"
+                  appValidateWithMessage
+                  placeholder="Address 1"
+                  formControlName="address1"/>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label for="address2">Address 2</label>
+        <div class="input-group">
+          <input id="address2"
+                  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  appValidateWithMessage
+                  placeholder="Address 2"
+                  formControlName="address2"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="input-container form-dropdown">
+        <label for="state">State <span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist
+              id="state"
+              appValidateWithMessage
+              placeholder="State"
+              [dataSource]="statesGeneral$ | async"
+              formControlName="state">
+            </ejs-dropdownlist>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label for="city">City <span class="required">*</span></label>
+        <div class="input-group">
+          <input
+            id="city"
+            class="e-input"
+            type="text"
+            maxlength="20"
+            appValidateWithMessage
+            placeholder="City"
+            formControlName="city"/>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label for="zip">Zipcode <span class="required">*</span></label>
+        <div class="input-group">
+          <input id="zip"
+                  class="e-input"
+                  type="text"
+                  pattern="[0-9]*"
+                  maxlength="6"
+                  appValidateWithMessage
+                  placeholder="Zipcode"
+                  formControlName="zip"/>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h3 class="title">Contacts</h3>
+
+      <div class="combined-group">
         <div class="input-container">
-          <label for="externalId">Ext Location ID <span class="required">*</span></label>
+          <label for="contactPerson">Contact Person <span class="required">*</span></label>
           <div class="input-group">
-            <input id="externalId"
-                   class="e-input"
-                   type="text"
-                   maxlength="50"
-                   appValidateWithMessage
-                   placeholder="Ext Location ID"
-                   formControlName="externalId"/>
+            <input id="contactPerson"
+                    class="e-input"
+                    type="text"
+                    maxlength="50"
+                    appValidateWithMessage
+                    placeholder="Contact Person"
+                    formControlName="contactPerson"/>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <label for="contactEmail">Contact Person Email<span class="required">*</span></label>
+          <div class="input-group">
+            <input id="contactEmail"
+                    class="e-input"
+                    type="email"
+                    appValidateWithMessage
+                    placeholder="Contact Person Email"
+                    formControlName="contactEmail"/>
           </div>
         </div>
       </div>
 
       <div class="group">
         <div class="input-container">
-          <label for="invoiceId">Invoice Location ID <span class="required">*</span></label>
+          <label for="phoneNumber">Phone Number<span class="required">*</span></label>
           <div class="input-group">
-            <input id="invoiceId"
-                   class="e-input"
-                   type="text"
-                   maxlength="50"
-                   appValidateWithMessage
-                   placeholder="Invoice Location ID"
-                   formControlName="invoiceId"/>
+            <input id="phoneNumber"
+                    class="e-input"
+                    type="tel"
+                    pattern="^[0-9]*$"
+                    maxlength="10"
+                    appValidateWithMessage
+                    placeholder="Phone Number"
+                    formControlName="phoneNumber"/>
           </div>
         </div>
 
         <div class="input-container">
-          <label for="name">Location Name<span class="required">*</span></label>
-          <div class="input-group">
-            <input id="name"
-                   class="e-input"
-                   type="text"
-                   maxlength="50"
-                   appValidateWithMessage
-                   placeholder="Location Name"
-                   formControlName="name"/>
-          </div>
-        </div>
-      </div>
-
-      <div class="large-group">
-        <div class="input-container">
-          <label for="address1">Address 1<span class="required">*</span></label>
-          <div class="input-group">
-            <input id="address1"
-                   class="e-input"
-                   type="text"
-                   maxlength="100"
-                   appValidateWithMessage
-                   placeholder="Address 1"
-                   formControlName="address1"/>
-          </div>
-        </div>
-
-        <div class="input-container">
-          <label for="address2">Address 2</label>
-          <div class="input-group">
-            <input id="address2"
-                   class="e-input"
-                   type="text"
-                   maxlength="50"
-                   appValidateWithMessage
-                   placeholder="Address 2"
-                   formControlName="address2"/>
-          </div>
-        </div>
-      </div>
-
-      <div class="group">
-        <div class="input-container form-dropdown">
-          <label for="state">State <span class="required">*</span></label>
+          <label for="phoneType">Phone Type<span class="required">*</span></label>
             <div class="input-group dropdown">
               <ejs-dropdownlist
-                id="state"
+                id="phoneType"
                 appValidateWithMessage
-                placeholder="State"
-                [dataSource]="statesGeneral$ | async"
-                formControlName="state">
+                placeholder="Phone Type"
+                formControlName="phoneType"
+                [dataSource]="phoneTypes$ | async"
+              >
               </ejs-dropdownlist>
+            </div>
+        </div>
+
+        <div class="input-container">
+          <label for="ext">Ext</label>
+          <div class="input-group">
+            <input id="ext"
+                    class="e-input"
+                    type="text"
+                    maxlength="50"
+                    placeholder="Ext"
+                    formControlName="ext"/>
           </div>
         </div>
 
         <div class="input-container">
-          <label for="city">City <span class="required">*</span></label>
+          <label for="glNumber">GL Number</label>
           <div class="input-group">
-            <input
-              id="city"
-              class="e-input"
-              type="text"
-              maxlength="20"
-              appValidateWithMessage
-              placeholder="City"
-              formControlName="city"/>
+            <input id="glNumber"
+                    class="e-input"
+                    type="text"
+                    maxlength="50"
+                    placeholder="GL Number"
+                    formControlName="glNumber"/>
           </div>
         </div>
+      </div>
 
+      <div class="group">
         <div class="input-container">
-          <label for="zip">Zipcode <span class="required">*</span></label>
+          <label for="invoiceNote">Invoice Note</label>
           <div class="input-group">
-            <input id="zip"
-                   class="e-input"
-                   type="text"
-                   pattern="[0-9]*"
-                   maxlength="6"
-                   appValidateWithMessage
-                   placeholder="Zipcode"
-                   formControlName="zip"/>
+            <input id="invoiceNote"
+                    class="e-input"
+                    type="text"
+                    maxlength="50"
+                    placeholder="Invoice Note"
+                    formControlName="invoiceNote"/>
+          </div>
+        </div>
+
+        <div>
+          <div class="input-container calendar">
+            <label for="inactiveDate">Inactive Date</label>
+            <div class="input-group datepicker">
+              <ejs-datepicker
+                id="inactiveDate"
+                class="datepicker"
+                format="MM/dd/yyyy"
+                placeholder="MM/DD/YYYY"
+                [enableMask]="true"
+                [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                formControlName="inactiveDate"
+              >
+              </ejs-datepicker>
+            </div>
           </div>
         </div>
       </div>
 
-      <div>
-        <h3 class="title">Contacts</h3>
-
-        <div class="combined-group">
-          <div class="input-container">
-            <label for="contactPerson">Contact Person <span class="required">*</span></label>
-            <div class="input-group">
-              <input id="contactPerson"
-                     class="e-input"
-                     type="text"
-                     maxlength="50"
-                     appValidateWithMessage
-                     placeholder="Contact Person"
-                     formControlName="contactPerson"/>
-            </div>
-          </div>
-
-          <div class="input-container">
-            <label for="contactEmail">Contact Person Email<span class="required">*</span></label>
-            <div class="input-group">
-              <input id="contactEmail"
-                     class="e-input"
-                     type="email"
-                     appValidateWithMessage
-                     placeholder="Contact Person Email"
-                     formControlName="contactEmail"/>
-            </div>
-          </div>
-        </div>
-
-        <div class="group">
-          <div class="input-container">
-            <label for="phoneNumber">Phone Number<span class="required">*</span></label>
-            <div class="input-group">
-              <input id="phoneNumber"
-                     class="e-input"
-                     type="tel"
-                     pattern="^[0-9]*$"
-                     maxlength="10"
-                     appValidateWithMessage
-                     placeholder="Phone Number"
-                     formControlName="phoneNumber"/>
-            </div>
-          </div>
-
-          <div class="input-container">
-            <label for="phoneType">Phone Type<span class="required">*</span></label>
-              <div class="input-group dropdown">
-                <ejs-dropdownlist
-                  id="phoneType"
-                  appValidateWithMessage
-                  placeholder="Phone Type"
-                  formControlName="phoneType"
-                  [dataSource]="phoneTypes$ | async"
-                >
-                </ejs-dropdownlist>
-              </div>
-          </div>
-
-          <div class="input-container">
-            <label for="ext">Ext</label>
-            <div class="input-group">
-              <input id="ext"
-                     class="e-input"
-                     type="text"
-                     maxlength="50"
-                     placeholder="Ext"
-                     formControlName="ext"/>
-            </div>
-          </div>
-
-          <div class="input-container">
-            <label for="glNumber">GL Number</label>
-            <div class="input-group">
-              <input id="glNumber"
-                     class="e-input"
-                     type="text"
-                     maxlength="50"
-                     placeholder="GL Number"
-                     formControlName="glNumber"/>
-            </div>
-          </div>
-        </div>
-
-        <div class="group">
-          <div class="input-container">
-            <label for="invoiceNote">Invoice Note</label>
-            <div class="input-group">
-              <input id="invoiceNote"
-                     class="e-input"
-                     type="text"
-                     maxlength="50"
-                     placeholder="Invoice Note"
-                     formControlName="invoiceNote"/>
-            </div>
-          </div>
-
-          <div>
-            <div class="input-container calendar">
-              <label for="inactiveDate">Inactive Date</label>
-              <div class="input-group datepicker">
-                <ejs-datepicker
-                  id="inactiveDate"
-                  class="datepicker"
-                  format="MM/dd/yyyy"
-                  placeholder="MM/DD/YYYY"
-                  [enableMask]="true"
-                  [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
-                  formControlName="inactiveDate"
-                >
-                </ejs-datepicker>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bootstrap">
-          <ejs-checkbox
-            label="Allow deploy w/o credentials"
-            (change)="onAllowDeployWOCreadentialsCheck($event)"
-          ></ejs-checkbox>
-        </div>
+      <div class="bootstrap">
+        <ejs-checkbox
+          label="Allow deploy w/o credentials"
+          (change)="onAllowDeployWOCreadentialsCheck($event)"
+        ></ejs-checkbox>
       </div>
-    </form>
-  </app-side-dialog>
+    </div>
+  </form>
+</app-side-dialog>
 
 <ejs-dialog
   id="addRegionDialog"

@@ -1,0 +1,14 @@
+.toolbar-actions {
+  display: flex;
+  justify-content: end;
+  flex-grow: 1;
+
+  & > *:not(:last-child) {
+    margin-right: 12px;
+  }
+
+  .search {
+    flex-grow: 1;
+    max-width: 400px;
+  }
+}
