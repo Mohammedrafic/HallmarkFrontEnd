@@ -32,13 +32,13 @@ import { AgencyComponent } from './agency.component';
 import { AgencyRoutingModule } from './agency-routing.module';
 import { AgencyListComponent } from './agency-list/agency-list.component';
 import { AddEditAgencyComponent } from './agency-list/add-edit-agency/add-edit-agency.component';
-import { SharedModule } from '../shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 import { GeneralInfoGroupComponent } from './agency-list/add-edit-agency/general-info-group/general-info-group.component';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { BillingDetailsGroupComponent } from './agency-list/add-edit-agency/billing-details-group/billing-details-group.component';
 import { ContactDetailsGroupComponent } from './agency-list/add-edit-agency/contact-details-group/contact-details-group.component';
 import { PaymentDetailsGridComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-details-grid.component';
-import { GridAllModule, GridModule, PagerModule } from '@syncfusion/ej2-angular-grids';
+import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { CandidatesComponent } from './candidates/candidates.component';
 import { AddEditCandidateComponent } from './candidates/add-edit-candidate/add-edit-candidate.component';
@@ -66,6 +66,7 @@ import { TabNavigationComponent } from './order-management/tab-navigation/tab-na
 import { OrderManagementGridComponent } from './order-management/order-management-grid/order-management-grid.component';
 import { PreviewOrderDialogComponent } from './order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
 import { FileViewerComponent } from './candidates/add-edit-candidate/file-viewer/file-viewer.component';
+import { ProfileComponent } from './profile/profile.component';
 
 const sidebarIcons = {
   Sliders,
@@ -118,6 +119,7 @@ const sidebarIcons = {
     TabNavigationComponent,
     OrderManagementGridComponent,
     PreviewOrderDialogComponent,
+    ProfileComponent,
   ],
   imports: [
     CommonModule,

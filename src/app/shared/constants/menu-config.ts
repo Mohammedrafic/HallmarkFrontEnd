@@ -421,7 +421,7 @@ export const MENU_CONFIG: any = {
     },
     21: { // Associated Organizations
       icon: 'file-text',
-      route: 'agency/agency-list'
+      route: 'agency/profile'
     },
     22: { // Order Management
       icon: 'file-text',
