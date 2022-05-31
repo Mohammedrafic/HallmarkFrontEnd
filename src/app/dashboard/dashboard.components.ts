@@ -25,6 +25,63 @@ export class DashboardComponent implements OnInit, OnDestroy {
   cellSpacing = [15, 15];
   columns = 12;
 
+  widgets: Map<string, any> = new Map([
+    [
+      'chart_line_1',
+      {
+        name: 'Pending Orders',
+        progress: 1,
+        data: 4.53,
+        data2: 0.45,
+        chartData: [
+          { x: 1, y: 30 },
+          { x: 2, y: 28 },
+          { x: 3, y: 35 },
+          { x: 4, y: 28 },
+          { x: 5, y: 33 },
+          { x: 6, y: 32 },
+          { x: 7, y: 30 },
+        ],
+      },
+    ],
+    [
+      'chart_line_2',
+      {
+        name: 'Bill Rate Fluctoation',
+        progress: -1,
+        data: 4.53,
+        data2: 0.45,
+        chartData: [
+          { x: 1, y: 30 },
+          { x: 2, y: 28 },
+          { x: 3, y: 35 },
+          { x: 4, y: 28 },
+          { x: 5, y: 40 },
+          { x: 6, y: 32 },
+          { x: 7, y: 35 },
+        ],
+      },
+    ],
+    [
+      'chart_line_3',
+      {
+        name: 'Orders Starting in the Future',
+        progress: 1,
+        data: 14.53,
+        data2: 129,
+        chartData: [
+          { x: 1, y: 38 },
+          { x: 2, y: 40 },
+          { x: 3, y: 39 },
+          { x: 4, y: 42 },
+          { x: 5, y: 45 },
+          { x: 6, y: 43 },
+          { x: 7, y: 48 },
+        ],
+      },
+    ],
+  ]);
+
   constructor(private store: Store, private actions$: Actions) {}
 
   ngOnInit(): void {
@@ -37,16 +94,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.unsubsribe$.complete();
   }
 
-  private getDashboardPanels() {
+  private getDashboardPanels(): void {
     this.store.dispatch(new GetDashboardPanels());
     this.panels$.pipe(take(1)).subscribe((panels) => (this.panels = panels));
   }
 
   private refreshDashboard(): void {
     this.refreshGrid();
-    this.actions$.pipe(ofActionDispatched(ToggleSidebarState), takeUntil(this.unsubsribe$)).subscribe(() => {
-      this.refreshGrid();
-    });
+    this.actions$.pipe(ofActionDispatched(ToggleSidebarState), takeUntil(this.unsubsribe$)).subscribe((data) => this.refreshGrid());
   }
 
   private refreshGrid(): void {

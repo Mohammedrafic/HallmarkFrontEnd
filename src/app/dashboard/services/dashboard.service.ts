@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { Observable, of } from 'rxjs';
 
@@ -15,9 +16,9 @@ export class DashboardService {
     }
     return of([
       { id: 'candidate', sizeX: 3, sizeY: 4, row: 0, col: 0, content: '<div class="content">1</div>' },
-      { id: 'invoice', sizeX: 3, sizeY: 1, row: 0, col: 3, content: '<div class="content">2</div>' },
-      { id: 'simple', sizeX: 3, sizeY: 1, row: 0, col: 6, content: '<div class="content">3</div>' },
-      { id: 'layout_3', sizeX: 3, sizeY: 1, row: 0, col: 9, content: '<div class="content">4</div>' },
+      { id: 'chart_line_1', sizeX: 3, sizeY: 1, row: 0, col: 3, content: '<div class="content">2</div>' },
+      { id: 'chart_line_2', sizeX: 3, sizeY: 1, row: 0, col: 6, content: '<div class="content">3</div>' },
+      { id: 'chart_line_3', sizeX: 3, sizeY: 1, row: 0, col: 9, content: '<div class="content">4</div>' },
       { id: 'layout_4', sizeX: 3, sizeY: 3, row: 1, col: 3, content: '<div class="content">5</div>' },
       { id: 'layout_5', sizeX: 3, sizeY: 3, row: 1, col: 6, content: '<div class="content">6</div>' },
       { id: 'layout_6', sizeX: 3, sizeY: 6, row: 1, col: 9, content: '<div class="content">7</div>' },

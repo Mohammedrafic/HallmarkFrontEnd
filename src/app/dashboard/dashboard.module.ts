@@ -9,12 +9,10 @@ import { NgxsModule } from '@ngxs/store';
 import { DashboardState } from './store/dashboard.state';
 import { DashboardService } from './services/dashboard.service';
 import { DashboardComponent } from './dashboard.components';
-import { CandidateWidgetComponent } from './widgets/candidate-widget/candidate-widget.component';
-import { InvoiceWidgetComponent } from './widgets/invoice-widget/invoice-widget.component';
-import { SimpleChartWidgetComponent } from './widgets/simple-chart-widget/simple-chart-widget.component';
+import { ChartLineWidgetComponent } from './widgets/simple-chart-widget/chart-line-widget.component';
 
 @NgModule({
-  declarations: [DashboardComponent, CandidateWidgetComponent, InvoiceWidgetComponent, SimpleChartWidgetComponent],
+  declarations: [DashboardComponent, ChartLineWidgetComponent],
   imports: [
     CommonModule,
     DashboardLayoutModule,

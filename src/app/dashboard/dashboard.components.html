@@ -12,18 +12,16 @@
   >
     <e-panels>
       <e-panel
-        *ngFor="let panel of panels"
+        *ngFor="let panel of panels; let i = index"
         [sizeX]="panel.sizeX"
         [sizeY]="panel.sizeY"
         [row]="panel.row"
         [col]="panel.col"
         [id]="panel.id"
       >
-        <ng-template #content [ngSwitch]="panel.id" >
-            <app-candidate-widget *ngSwitchCase="'candidate'"></app-candidate-widget>
-            <app-invoice-widget *ngSwitchCase="'invoice'"></app-invoice-widget>
-            <app-simple-chart-widget *ngSwitchCase="'simple'"></app-simple-chart-widget>
-            <div *ngSwitchDefault >{{panel.id}}</div>
+        <ng-template #content [ngSwitch]="panel.id">
+          <app-chart-line-widget [widget]="widgets.get('chart_line_'+ i)" *ngSwitchCase="'chart_line_'+ i"></app-chart-line-widget>
+          <div *ngSwitchDefault>{{panel.id}}</div>
         </ng-template>
       </e-panel>
     </e-panels>
