@@ -155,7 +155,7 @@ export class UserListComponent implements OnInit, OnDestroy {
       this.isBusinessFormDisabled && this.businessForm.disable();
     }
     if (user?.businessUnitType === BusinessUnitType.MSP) {
-      const [...rest] = this.businessUnits;
+      const [Hallmark, ...rest] = this.businessUnits;
       this.businessUnits = rest;
     }
   }
