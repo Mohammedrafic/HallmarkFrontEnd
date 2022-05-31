@@ -1,9 +1,11 @@
 import { DeleteHoliday, DeleteHolidaySucceeded, FilterChanged, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded, SetYearFilter } from '@admin/store/holidays.actions';
 import { HolidaysState } from '@admin/store/holidays.state';
+import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { ExportColumn } from '@shared/models/export.model';
 import { Holiday } from '@shared/models/holiday.model';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
@@ -12,7 +14,7 @@ import { SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/adm
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-holidays',
@@ -40,12 +42,20 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
     type:'date', format: 'MM/dd/yyyy hh:mm a'
   };
   public showForm = true;
+  public columnsToExport: ExportColumn[] = [
+    { text:'Holiday Name', column: 'holidayName'},
+    { text:'Start Date & Time', column: 'startDateTime'},
+    { text:'End Date & Time', column: 'endDateTime'}
+  ];
+  public fileName: string;
 
   constructor(private store: Store,
               private actions$: Actions,
               private fb: FormBuilder,
-              private confirmService: ConfirmService) {
+              private confirmService: ConfirmService,
+              private datePipe: DatePipe) {
     super();
+    this.fileName = 'Master Holidays ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.today.setHours(0, 0, 0);
     this.HolidayFormGroup = this.fb.group({
       id: new FormControl(0, [ Validators.required ]),
@@ -89,6 +99,20 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public closeExport() {
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: any): void {
+    console.log(event);
+    this.store.dispatch(new ShowExportDialog(false));
+    this.clearSelection(this.grid);
+  }
+
+  public override customExport(): void {
+    this.store.dispatch(new ShowExportDialog(true));
   }
 
   public copyHoliday(data: any, event: any): void {

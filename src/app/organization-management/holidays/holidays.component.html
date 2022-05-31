@@ -34,9 +34,14 @@
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
     (actionBegin)="actionBegin($event)"
+    (rowSelected)="rowSelected($event, grid)"
+    (rowDeselected)="rowDeselected($event, grid)"
+    (dataBound)="gridDataBound(grid)"
+    [selectionSettings]="selectionSettings"
     class="grid-component"
   >
     <e-columns>
+      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column field="regionId" headerText="region" width=200>
         <ng-template #template let-data>
           <ng-container *ngIf="!data.regionId">

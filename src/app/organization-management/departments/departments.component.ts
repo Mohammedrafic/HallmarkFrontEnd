@@ -8,7 +8,7 @@ import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dro
 import { FreezeService, GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
-import { ShowSideDialog, ShowToast } from '../../store/app.actions';
+import { ShowExportDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { Department } from '../../shared/models/department.model';
 import {
   SaveDepartment,
@@ -18,6 +18,7 @@ import {
   UpdateDepartment,
   GetLocationsByRegionId,
   SetImportFileDialogState,
+  ExportDepartments,
 } from '../store/organization-management.actions';
 import { Region } from '../../shared/models/region.model';
 import { Location } from '../../shared/models/location.model';
@@ -32,6 +33,9 @@ import {
   RECORD_ADDED
 } from '../../shared/constants/messages';
 import { ConfirmService } from '../../shared/services/confirm.service';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { DatePipe } from '@angular/common';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 
@@ -66,6 +70,17 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   editedDepartmentId?: number;
   isEdit: boolean;
 
+  public columnsToExport: ExportColumn[] = [
+    { text:'Ext Department ID', column: 'ExtDepartmentId'},
+    { text:'Invoice Department ID', column: 'InvoiceDepartmentId'},
+    { text:'Department Name', column: 'DepartmentName'},
+    { text:'Facility Email', column: 'FacilityEmail'},
+    { text:'Facility Contact', column: 'FacilityContact'},
+    { text:'Facility Phone NO', column: 'FacilityPhoneNo'},
+    { text:'Inactivate Date', column: 'InactiveDate'}
+  ];
+  public fileName: string;
+
   invalidDate = '0001-01-01T00:00:00+00:00';
 
   get dialogHeader(): string {
@@ -78,8 +93,10 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
               private router: Router,
               private route: ActivatedRoute,
               @Inject(FormBuilder) private builder: FormBuilder,
-              private confirmService: ConfirmService) {
+              private confirmService: ConfirmService,
+              private datePipe: DatePipe) {
     super();
+    this.fileName = 'Organization Departments ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.formBuilder = builder;
     this.createDepartmentsForm();
   }
@@ -88,19 +105,45 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.store.dispatch(new GetRegions());
   }
 
+  public override customExport(): void {
+    this.store.dispatch(new ShowExportDialog(true));
+  }
+
+  public closeExport() {
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: ExportOptions): void {
+    this.store.dispatch(new ShowExportDialog(false));
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.store.dispatch(new ExportDepartments(new ExportPayload(
+      fileType, 
+      { locationId: this.selectedLocation.id }, 
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      this.selectedItems.length ? this.selectedItems.map(val => val.id) : null,
+      options?.fileName || this.fileName
+    )));
+    this.clearSelection(this.grid);
+  }
+
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion.id) {
       this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
       this.isLocationsDropDownEnabled = true;
+      this.clearSelection(this.grid);
     }
   }
 
   onLocationDropDownChanged(event: ChangeEventArgs): void {
     this.selectedLocation = event.itemData as Location;
-    if (this.selectedLocation.id) {
+    if (this.selectedLocation?.id) {
       this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocation.id));
       this.mapGridData();
+      this.clearSelection(this.grid);
     }
   }
 

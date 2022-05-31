@@ -5,7 +5,7 @@
   [dataSource]="userGridData$ | async"
   [allowSorting]="true"
   [allowResizing]="true"
-  [allowSelection]="true"
+  [allowSelection]="false"
   [resizeSettings]="resizeSettings"
   [allowPaging]="allowPaging"
   [pageSettings]="pageSettings"
@@ -40,9 +40,9 @@
     <e-column field="hasVisibility" headerText="Visibility" textAlign="Left" [valueAccessor]='hasVisibility'></e-column>
 
     <e-column textAlign="Right" width="80" freeze="Right">
-      <ng-template #template>
+      <ng-template #template let-data>
         <div class="row-tool-buttons">
-          <button ejs-button cssClass="e-flat primary-icon-button">
+          <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
             <span><i-feather name="edit" class="icon"></i-feather></span>
           </button>
         </div>

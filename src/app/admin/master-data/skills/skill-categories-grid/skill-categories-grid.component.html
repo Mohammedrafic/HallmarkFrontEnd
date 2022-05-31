@@ -8,9 +8,14 @@
   [resizeSettings]="resizeSettings"
   [allowSorting]="allowSorting"
   [allowResizing]="allowResizing"
+  (rowSelected)="rowSelected($event, grid)"
+  (rowDeselected)="rowDeselected($event, grid)"
+  (dataBound)="gridDataBound(grid)"
+  [selectionSettings]="selectionSettings"
 >
   <e-columns>
-    <e-column field="name" headerText="category name" width=400></e-column>
+    <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="40"></e-column>
+    <e-column field="name" headerText="category name" width=600></e-column>
     <e-column textAlign="Right" width=120>
       <ng-template #template let-data>
         <div class="row-tool-buttons">
@@ -67,6 +72,8 @@
     </div>
   </ng-template>
 </ejs-grid>
+
+<app-export-dialog *ngIf="isActive" [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
 <app-side-dialog *ngIf="isActive"
   (formCancelClicked)="closeDialog()"

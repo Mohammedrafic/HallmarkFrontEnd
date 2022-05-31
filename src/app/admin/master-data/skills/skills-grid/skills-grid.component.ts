@@ -1,7 +1,9 @@
+import { DatePipe } from '@angular/common';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { ExportColumn } from '@shared/models/export.model';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, delay, filter, Observable, Subject } from 'rxjs';
 import { GetMasterSkillsByPage, RemoveMasterSkill, RemoveMasterSkillSucceeded, SaveMasterSkill, SaveMasterSkillSucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
@@ -10,7 +12,7 @@ import { AbstractGridConfigurationComponent } from 'src/app/shared/components/ab
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { Skill } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-skills-grid',
@@ -36,12 +38,20 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
   allSkillsCategories$: Observable<any>;
 
   public SkillFormGroup: FormGroup;
+  public columnsToExport: ExportColumn[] = [
+    { text:'Skill Category', column: 'skillCategory.name'},
+    { text:'Skill ABBR', column: 'skillAbbr'},
+    { text:'Skill Description', column: 'skillDescription'}
+  ];
+  public fileName: string;
 
   constructor(private store: Store,
               private actions$: Actions,
               private fb: FormBuilder,
-              private confirmService: ConfirmService) {
+              private confirmService: ConfirmService,
+              private datePipe: DatePipe) {
     super();
+    this.fileName = 'Master Skills ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.SkillFormGroup = this.fb.group({
       id: new FormControl(0),
       isDefault: new FormControl(true),
@@ -65,6 +75,16 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
     this.actions$.pipe(ofActionSuccessful(RemoveMasterSkillSucceeded)).subscribe(() => {
       this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
     });
+  }
+
+  public closeExport() {
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: any): void {
+    console.log(event);
+    this.store.dispatch(new ShowExportDialog(false));
+    this.clearSelection(this.grid);
   }
 
   public editSkill(data: any, event: any): void {

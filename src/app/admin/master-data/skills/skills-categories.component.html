@@ -4,6 +4,12 @@
     id="filterButton"
     cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
   <button
+    ejs-dropdownbutton
+    [items]="exportOptions"
+    (select)="exportSelected($event)"
+    id="importButton"
+    cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+  <button
     ejs-button
     id="addDepartmentButton"
     (click)="addSkill()"

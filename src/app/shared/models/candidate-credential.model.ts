@@ -22,4 +22,10 @@ export type CredentialFile = {
   fileId: string;
 }
 
+export type PreviewFileData = {
+  credentials: CandidateCredential[];
+  selectedFileId: number;
+}
+
+
 export type CandidateCredentialPage = PageOfCollections<CandidateCredential>;

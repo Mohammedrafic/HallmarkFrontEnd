@@ -1,0 +1,4 @@
+export const ROW_HEIGHT = {
+  SCALE_UP_HEIGHT: 140,
+  SCALE_DOWN_HEIGHT: 64,
+};

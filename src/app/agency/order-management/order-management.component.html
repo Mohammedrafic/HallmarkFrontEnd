@@ -1,0 +1,20 @@
+<app-page-toolbar>
+  <ng-container left>
+    <app-tab-navigation (selectedTab)="onTabChanged($event)"></app-tab-navigation>
+  </ng-container>
+  <ng-container right>
+    <div class="toolbar-actions">
+      <app-search class="search"></app-search>
+      <button ejs-button cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+      <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+    </div>
+  </ng-container>
+</app-page-toolbar>
+
+<section class="last-content-section-padding">
+    <ng-container [ngSwitch]="selectedTab">
+        <app-order-management-grid *ngSwitchCase="selectedTabCases.MyAgency"></app-order-management-grid>
+        <div *ngSwitchCase="selectedTabCases.OtherAgencies">OtherAgencies</div>
+        <div *ngSwitchCase="selectedTabCases.AllAngencies">AllAngencies</div>
+    </ng-container>
+</section>

@@ -68,14 +68,14 @@
         color: $secondary-dark-blue-10;
       }
 
-      .input-group.e-disabled {
-        opacity: unset;
+      .input-group.input-readonly {
+        .e-input[readonly] {
+          background-color: $secondary-dark-blue-50;
+          color: $secondary-dark-blue-10;
 
-        .e-input[disabled] {
-
-          &::placeholder {
-            opacity: unset;
-            color: $secondary-dark-blue-10;
+          &:hover,
+          &:focus {
+            border: 1px solid $secondary-dark-blue-40 !important;
           }
         }
       }

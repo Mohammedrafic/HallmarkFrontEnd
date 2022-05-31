@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
-import { CredentialGroupMapping } from '@shared/models/credential-group-mapping.model';
+import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
 
 @Injectable({ providedIn: 'root' })
 export class SkillGroupService {
@@ -40,8 +40,8 @@ export class SkillGroupService {
    * Get all skill groups mapping
    * @return skill groups mapping
    */
-  public getSkillGroupsMapping(): Observable<CredentialGroupMapping[]> {
-    return this.http.get<CredentialGroupMapping[]>(`/api/SkillGroupsMapping`); // TODO: should be changed after BE implementation
+  public getSkillGroupsMapping(): Observable<SkillGroupMapping[]> {
+    return this.http.get<SkillGroupMapping[]>(`/api/SkillGroupsMapping`); // TODO: should be changed after BE implementation
   }
 
   /**
@@ -49,10 +49,10 @@ export class SkillGroupService {
    * @param skillGroupMapping object to save
    * @return Created/Updated skill group mapping
    */
-  public saveUpdateSkillGroupMapping(skillGroupMapping: CredentialGroupMapping): Observable<CredentialGroupMapping> {
-    return skillGroupMapping.id ?
-      this.http.put<CredentialGroupMapping>(`/api/SkillGroupsMapping`, skillGroupMapping) : // TODO: should be changed after BE implementation
-      this.http.post<CredentialGroupMapping>(`/api/SkillGroupsMapping`, skillGroupMapping); // TODO: should be changed after BE implementation
+  public saveUpdateSkillGroupMapping(skillGroupMapping: SkillGroupMapping): Observable<SkillGroupMapping> {
+    return skillGroupMapping.mappingId ?
+      this.http.put<SkillGroupMapping>(`/api/SkillGroupsMapping`, skillGroupMapping) : // TODO: should be changed after BE implementation
+      this.http.post<SkillGroupMapping>(`/api/SkillGroupsMapping`, skillGroupMapping); // TODO: should be changed after BE implementation
   }
 
   /**

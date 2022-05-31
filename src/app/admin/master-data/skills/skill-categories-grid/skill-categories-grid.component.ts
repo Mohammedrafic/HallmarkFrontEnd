@@ -1,7 +1,9 @@
+import { DatePipe } from '@angular/common';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { ExportColumn } from '@shared/models/export.model';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, delay, filter, Observable, Subject } from 'rxjs';
 import { GetSkillsCategoriesByPage, RemoveSkillsCategory, RemoveSkillsCategorySucceeded, SaveSkillsCategory, SaveSkillsCategorySucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
@@ -10,7 +12,7 @@ import { AbstractGridConfigurationComponent } from 'src/app/shared/components/ab
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-skill-categories-grid',
@@ -30,12 +32,18 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
   skillsCategories$: Observable<SkillCategoriesPage>;
 
   public CategoryFormGroup: FormGroup;
+  public columnsToExport: ExportColumn[] = [
+    { text:'Category Name', column: 'name'}
+  ];
+  public fileName: string;
 
   constructor(private store: Store,
               private actions$: Actions,
               private fb: FormBuilder,
-              private confirmService: ConfirmService) {
+              private confirmService: ConfirmService,
+              private datePipe: DatePipe) {
     super();
+    this.fileName = 'Skill Categories ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.CategoryFormGroup = this.fb.group({
       id: new FormControl(0),
       name: new FormControl('', [ Validators.required, Validators.minLength(3) ])
@@ -56,6 +64,16 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
       this.currentPage = page;
       this.store.dispatch(new GetSkillsCategoriesByPage(this.currentPage, this.pageSize));
     });
+  }
+  
+  public closeExport() {
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: any): void {
+    console.log(event);
+    this.store.dispatch(new ShowExportDialog(false));
+    this.clearSelection(this.grid);
   }
 
   public editCategory(data: SkillCategory, event: any): void {

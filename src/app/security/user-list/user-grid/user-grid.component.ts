@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { GridComponent, RowDataBoundEventArgs } from "@syncfusion/ej2-angular-grids";
 import { FormGroup } from "@angular/forms";
 import { Role } from "@shared/models/roles.model";
@@ -23,6 +23,7 @@ enum Visibility {
 })
 export class UserGridComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() filterForm: FormGroup;
+  @Output() editUserEvent = new EventEmitter();
 
   @ViewChild('usersGrid') grid: GridComponent;
 
@@ -56,6 +57,10 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
   ngOnDestroy(): void {
     this.isAlive = false;
+  }
+
+  public onEdit(data: unknown): void {
+    this.editUserEvent.emit(data);
   }
 
   public rowDataBound(args: RowDataBoundEventArgs): void {

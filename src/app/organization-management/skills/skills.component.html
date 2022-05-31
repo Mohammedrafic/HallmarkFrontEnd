@@ -7,6 +7,12 @@
       <button ejs-button id="importButton" cssClass="e-outline button-import" (click)="onImportDataClick()">
         Import <i-feather name="upload" class="icon"></i-feather>
       </button>
+      <button
+        ejs-dropdownbutton
+        [items]="exportOptions"
+        (select)="exportSelected($event)"
+        id="importButton"
+        cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
       <button ejs-button id="addDepartmentButton" [isPrimary]="true" (click)='addSkill()'>Add Skill</button>
     </section>
   </section>
@@ -20,8 +26,13 @@
     [resizeSettings]="resizeSettings"
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
+    (rowSelected)="rowSelected($event, grid)"
+    (rowDeselected)="rowDeselected($event, grid)"
+    (dataBound)="gridDataBound(grid)"
+    [selectionSettings]="selectionSettings"
   >
     <e-columns>
+      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column field="skillCategory.name" headerText="skill category" width=200></e-column>
       <e-column field="masterSkill.skillAbbr" headerText="skill abbr" width=200></e-column>
       <e-column field="masterSkill.skillDescription" headerText="skill description" width=200></e-column>
@@ -91,6 +102,8 @@
     </ng-template>
   </ejs-grid>
 </section>
+
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
 <app-side-dialog
   (formCancelClicked)="closeDialog()"

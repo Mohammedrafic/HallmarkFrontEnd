@@ -1,0 +1,31 @@
+@import "../variables/colors.scss";
+
+.e-pv-sidebar-toolbar,
+.e-pv-open-document-container,
+.e-pv-text-select-tool-container,
+.e-pv-pan-tool-container,
+.e-pv-undo-container,
+.e-pv-redo-container,
+.e-pv-comment-container,
+.e-pv-submit,
+.e-pv-annotation-container,
+.e-pv-formdesigner-container,
+.e-pv-print-document-container,
+.e-pv-download-document-container,
+.e-pv-sidebar-toolbar-splitter,
+.e-pv-text-search-container,
+.e-separator,
+.e-toolbar-center,
+.e-toolbar-right {
+  display: none !important;
+}
+
+#pdfViewer_toolbarContainer {
+  height: 65px;
+
+  .e-toolbar-left {
+    width: 100%;
+    background-color: $white;
+    padding: 6px;
+  }
+}

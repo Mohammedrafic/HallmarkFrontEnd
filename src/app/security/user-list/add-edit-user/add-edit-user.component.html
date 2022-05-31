@@ -1,5 +1,5 @@
 <div class="edit-user" [ngClass]="{'first-active': firstActive}">
-  <ejs-tab #editOrgTab (selecting)="onTabSelecting()">
+  <ejs-tab #editOrgTab (selecting)="onTabSelecting($event)">
     <e-tabitems>
       <e-tabitem>
         <ng-template #headerText> User Settings </ng-template>

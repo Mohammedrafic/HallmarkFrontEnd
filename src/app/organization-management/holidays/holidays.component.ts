@@ -61,6 +61,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   public locations: OrganizationLocation[] = [];
   public masterHolidays: Holiday[] = [];
   private isAllRegionsSelected = false;
+  private isAllLocationsSelected = false;
   public columnsToExport: ExportColumn[] = [
     { text:'Region', column: 'regionId'},
     { text:'Location', column: 'locationId'},
@@ -76,6 +77,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
     super();
+    this.idFieldName = 'foreignKey';
     this.fileName = 'Organization Holidays ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.today.setHours(0, 0, 0);
     this.HolidayFormGroup = this.fb.group({
@@ -128,6 +130,15 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
         }
       }
     });
+    this.HolidayFormGroup.get('locations')?.valueChanges.subscribe((val: number[]) => {
+      if (this.title === 'Add') {
+        if (val && val.length === this.locations.length) {
+          this.isAllLocationsSelected = true;
+        } else {
+          this.isAllLocationsSelected = false;
+        }
+      }
+    });
     this.HolidayFormGroup.get('holidayName')?.valueChanges.subscribe((val: string) => {
       const selectedHoliday = this.masterHolidays.find(holiday => holiday.holidayName === val);
       if (selectedHoliday) {
@@ -177,6 +188,8 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
 
   public export(event: any): void {
     console.log(event);
+    this.store.dispatch(new ShowExportDialog(false));
+    this.clearSelection(this.grid);
   }
 
   public onImportDataClick(): void {
@@ -301,7 +314,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     this.store.dispatch(new SaveHoliday(new OrganizationHoliday(
       this.HolidayFormGroup.getRawValue(), 
       this.title === 'Add' || this.title === 'Copy' ? this.selectedRegions : undefined,
-      this.isAllRegionsSelected,
+      this.isAllRegionsSelected && this.isAllLocationsSelected,
       isExist
     )));
     this.store.dispatch(new SetDirtyState(false));
@@ -313,7 +326,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
         this.store.dispatch(new CheckIfExist(new OrganizationHoliday(
           this.HolidayFormGroup.getRawValue(), 
           this.title === 'Add' ? this.selectedRegions : undefined,
-          this.isAllRegionsSelected
+          this.isAllRegionsSelected && this.isAllLocationsSelected
         ))).subscribe(val => {
           if (val.orgHolidays.isExist) {
             this.confirmService

@@ -1,0 +1,12 @@
+<app-bill-rates-grid
+  (add)="onAddBillRate()"
+  (edit)="onEditBillRate($event)"
+  (remove)="onRemoveBillRate($event)">
+</app-bill-rates-grid>
+
+<app-side-dialog
+  [header]="billRateFormHeader"
+  (formCancelClicked)="onDialogCancel()"
+  (formSaveClicked)="onDialogOk()">
+  <app-bill-rate-form></app-bill-rate-form>
+</app-side-dialog>

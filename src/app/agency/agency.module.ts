@@ -4,22 +4,42 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
-import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
 import { FeatherModule } from 'angular-feather';
-import { Sliders, Plus, Trash2, Edit, Copy, Download, AlertCircle } from 'angular-feather/icons';
-
+import {
+  Sliders,
+  Plus,
+  Trash2,
+  Edit,
+  Copy,
+  Download,
+  AlertCircle,
+  Search,
+  FileText,
+  MessageSquare,
+  Lock,
+  MoreVertical,
+  AlignJustify,
+  Menu,
+  X,
+  Filter,
+  Maximize2,
+  Minimize2
+} from 'angular-feather/icons';
+import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
+import { PdfViewerModule } from "@syncfusion/ej2-angular-pdfviewer";
+import { ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 import { AgencyComponent } from './agency.component';
 import { AgencyRoutingModule } from './agency-routing.module';
 import { AgencyListComponent } from './agency-list/agency-list.component';
 import { AddEditAgencyComponent } from './agency-list/add-edit-agency/add-edit-agency.component';
-import { SharedModule } from '../shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 import { GeneralInfoGroupComponent } from './agency-list/add-edit-agency/general-info-group/general-info-group.component';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { BillingDetailsGroupComponent } from './agency-list/add-edit-agency/billing-details-group/billing-details-group.component';
 import { ContactDetailsGroupComponent } from './agency-list/add-edit-agency/contact-details-group/contact-details-group.component';
 import { PaymentDetailsGridComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-details-grid.component';
-import { GridAllModule, GridModule, PagerModule } from '@syncfusion/ej2-angular-grids';
-import {MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule} from '@syncfusion/ej2-angular-inputs';
+import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
+import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { CandidatesComponent } from './candidates/candidates.component';
 import { AddEditCandidateComponent } from './candidates/add-edit-candidate/add-edit-candidate.component';
 import { CandidateGeneralInfoComponent } from './candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
@@ -41,6 +61,12 @@ import { AddNewFeeDialogComponent } from './agency-list/add-edit-agency/associat
 import { CredentialsGridComponent } from './candidates/add-edit-candidate/credentials-grid/credentials-grid.component';
 import { CandidateAgencyComponent } from './candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
 import { PartnershipSettingsComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/partnership-settings/partnership-settings.component';
+import { OrderManagementComponent } from './order-management/order-management.component';
+import { TabNavigationComponent } from './order-management/tab-navigation/tab-navigation.component';
+import { OrderManagementGridComponent } from './order-management/order-management-grid/order-management-grid.component';
+import { PreviewOrderDialogComponent } from './order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
+import { FileViewerComponent } from './candidates/add-edit-candidate/file-viewer/file-viewer.component';
+import { ProfileComponent } from './profile/profile.component';
 
 const sidebarIcons = {
   Sliders,
@@ -50,6 +76,17 @@ const sidebarIcons = {
   Edit,
   Copy,
   Download,
+  Search,
+  FileText,
+  MessageSquare,
+  Lock,
+  MoreVertical,
+  AlignJustify,
+  Menu,
+  X,
+  Filter,
+  Maximize2,
+  Minimize2,
 };
 
 @NgModule({
@@ -76,7 +113,13 @@ const sidebarIcons = {
     AddNewFeeDialogComponent,
     CredentialsGridComponent,
     CandidateAgencyComponent,
+    FileViewerComponent,
     PartnershipSettingsComponent,
+    OrderManagementComponent,
+    TabNavigationComponent,
+    OrderManagementGridComponent,
+    PreviewOrderDialogComponent,
+    ProfileComponent,
   ],
   imports: [
     CommonModule,
@@ -84,6 +127,8 @@ const sidebarIcons = {
     SharedModule,
     ReactiveFormsModule,
 
+    PdfViewerModule,
+    ListBoxModule,
     ButtonModule,
     AccordionModule,
     DropDownListModule,

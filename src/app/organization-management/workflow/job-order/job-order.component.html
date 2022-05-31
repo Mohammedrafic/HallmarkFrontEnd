@@ -1,5 +1,5 @@
 <section class="container">
-  <div class="toolbar-buttons">
+  <div class="toolbar-buttons" *ngIf="isJobOrderWorkflowTabActive">
     <button
       ejs-button
       cssClass="e-outline delete-button"
@@ -12,58 +12,79 @@
       [disabled]="workflowsWithDetails.length === 0"
       (click)="onUpdateWorkflowClick()">Save</button>
   </div>
-
-  <section class="workflows-container">
-    <app-card-menu
-      [cards]="workflowsWithDetails"
-      (addNewWorkflowClick)="onAddNewWorkflowClick()"
-      (cardClicked)="onCardSelected($event)"
-    ></app-card-menu>
-    <section class="workflow-details-container" [formGroup]="customStepFormGroup">
-      <app-workflow-steps
-        *ngIf="orderWorkflow"
-        class="workflow-steps"
-        [workflow]="orderWorkflow"
-        [customSteps]="customOrderSteps"
-        [customStepFormGroup]="customStepFormGroup"
-        (customStepAddClick)="onCustomStepClick($event)"
-        (customStepRemoveClick)="onCustomStepRemoveClick($event)"
-      ></app-workflow-steps>
-      <app-workflow-steps
-        *ngIf="applicationWorkflow"
-        class="workflow-steps"
-        [workflow]="applicationWorkflow"
-        [customSteps]="customApplicationSteps"
-        [customStepFormGroup]="customStepFormGroup"
-        (customStepAddClick)="onCustomStepClick($event)"
-        (customStepRemoveClick)="onCustomStepRemoveClick($event)"
-      ></app-workflow-steps>
-    </section>
-  </section>
-
-  <app-side-dialog
-    *ngIf="isActive"
-    (formCancelClicked)="onCancelFormClick()"
-    (formSaveClicked)="onSaveFormClick()"
-    header="Add Workflow"
+  <ejs-tab
+    id="navigationTabs"
+    (selected)="onTabSelected($event)"
   >
-    <form class="form-container bootstrap"
-          id="addWorkflow"
-          [formGroup]="workflowFormGroup">
-      <div>
-        <div class="input-container">
-          <label for="workflow">Workflow <span class="required">*</span></label>
-          <div class="input-group">
-            <input id="workflow"
-                   class="e-input"
-                   type="text"
-                   maxlength="50"
-                   appValidateWithMessage
-                   placeholder="Workflow"
-                   formControlName="workflow"/>
-          </div>
-        </div>
-      </div>
-    </form>
-  </app-side-dialog>
+    <e-tabitems>
+      <e-tabitem>
+        <ng-template #headerText><div>Job Order Workflow</div></ng-template>
+        <ng-template #content>
+          <section class="job-order-container">
+            <section class="workflows-container">
+              <app-card-menu
+                [cards]="workflowsWithDetails"
+                (addNewWorkflowClick)="onAddNewWorkflowClick()"
+                (cardClicked)="onCardSelected($event)"
+              ></app-card-menu>
+              <section class="workflow-details-container">
+                <app-workflow-steps
+                  [formGroup]="customStepOrderFormGroup"
+                  *ngIf="orderWorkflow"
+                  class="workflow-steps"
+                  [workflow]="orderWorkflow"
+                  [workflowSteps$]="customOrderSteps$"
+                  [customStepFormGroup]="customStepOrderFormGroup"
+                  (customStepAddClick)="onCustomStepAddClick($event)"
+                  (customStepRemoveClick)="onCustomStepRemoveClick($event)"
+                ></app-workflow-steps>
+                <app-workflow-steps
+                  [formGroup]="customStepApplicationFormGroup"
+                  *ngIf="applicationWorkflow"
+                  class="workflow-steps"
+                  [workflow]="applicationWorkflow"
+                  [workflowSteps$]="customApplicationSteps$"
+                  [customStepFormGroup]="customStepApplicationFormGroup"
+                  (customStepAddClick)="onCustomStepAddClick($event)"
+                  (customStepRemoveClick)="onCustomStepRemoveClick($event)"
+                ></app-workflow-steps>
+              </section>
+            </section>
+
+            <app-side-dialog
+              *ngIf="isActive"
+              (formCancelClicked)="onCancelFormClick()"
+              (formSaveClicked)="onSaveFormClick()"
+              header="Add Workflow"
+            >
+              <form class="form-container bootstrap"
+                    id="addWorkflow"
+                    [formGroup]="workflowFormGroup">
+                <div>
+                  <div class="input-container">
+                    <label for="workflow">Workflow <span class="required">*</span></label>
+                    <div class="input-group">
+                      <input id="workflow"
+                             class="e-input"
+                             type="text"
+                             maxlength="50"
+                             appValidateWithMessage
+                             placeholder="Workflow"
+                             formControlName="workflow"/>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </app-side-dialog>
+          </section>
+        </ng-template>
+      </e-tabitem>
+      <e-tabitem>
+        <ng-template #headerText><div>Workflow Mapping</div></ng-template>
+        <ng-template #content>
+          <app-workflow-mapping [isActive]="isWorkflowMappingTabActive"></app-workflow-mapping>
+        </ng-template>
+      </e-tabitem>
+    </e-tabitems>
+  </ejs-tab>
 </section>

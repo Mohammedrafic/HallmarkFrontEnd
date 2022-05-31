@@ -2,15 +2,16 @@ import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Titles } from '@shared/enums/title';
+import { User } from '@shared/models/user-managment-page.model';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
-import { RECORD_ADDED } from 'src/app/shared/constants/messages';
-import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { Country } from 'src/app/shared/enums/states';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { ContactDetails, Organization } from 'src/app/shared/models/organization.model';
-import { SetHeaderState, ShowToast } from 'src/app/store/app.actions';
+import { SetHeaderState } from 'src/app/store/app.actions';
+import { UserState } from 'src/app/store/user.state';
 import { SaveOrganization, GetBusinessUnitList, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry, UploadOrganizationLogo, SaveOrganizationSucceeded, GetOrganizationById, GetOrganizationByIdSucceeded, GetOrganizationLogo, GetOrganizationLogoSucceeded } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
 
@@ -37,6 +38,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
   public title = 'Add';
   public logo: Blob | null = null;
   public titles = Titles;
+  public businessUnitType = BusinessUnitType;
 
   public createUnderFields = {
     text: 'name', value: 'id'
@@ -68,6 +70,9 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
 
   @Select(AdminState.statuses)
   statuses$: Observable<[]>;
+
+  @Select(UserState.user)
+  user$: Observable<User>;
 
   constructor(private actions$: Actions, private store: Store, private router: Router, private route: ActivatedRoute, private fb: FormBuilder) {
     actions$.pipe(

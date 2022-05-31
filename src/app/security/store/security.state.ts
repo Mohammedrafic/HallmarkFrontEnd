@@ -233,7 +233,13 @@ export class SecurityState {
     const state = getState();
     return this.userService.saveUser(user).pipe(
       tap((payload) => {
-        if(state.usersPage) {
+        if(state.usersPage && user.metadata.id) {
+          const editedUser = state.usersPage.items.find(({ id }) => id === user.metadata.id) as User;
+          const items = [{ ...editedUser, ...payload },...state.usersPage.items.filter(({ id }) => id !== editedUser.id)];
+          const usersPage = { ...state.usersPage, items };
+          patchState({ usersPage });
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        } else if(state.usersPage) {
           const items = [payload,...state.usersPage?.items];
           const usersPage = { ...state.usersPage, items } as UsersPage;
           patchState({ usersPage });

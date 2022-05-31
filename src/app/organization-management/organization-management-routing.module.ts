@@ -11,7 +11,7 @@ import { ShiftsComponent } from './shifts/shifts.component';
 import { SkillsComponent } from './skills/skills.component';
 import { CredentialsListComponent } from './credentials/credentials-list/credentials-list.component';
 import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
-import { WorkflowComponent } from './workflow/workflow.component';
+import { JobOrderComponent } from './workflow/job-order/job-order.component';
 
 const routes: Routes = [
   {
@@ -88,7 +88,7 @@ const routes: Routes = [
       },
       {
         path: 'workflow',
-        component: WorkflowComponent,
+        component: JobOrderComponent,
         data: {
           isOrganizationArea: true
         }

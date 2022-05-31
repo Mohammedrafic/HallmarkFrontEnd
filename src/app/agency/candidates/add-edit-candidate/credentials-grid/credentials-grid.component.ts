@@ -1,7 +1,5 @@
 import {
   GetCandidatesCredentialByPage,
-  GetCredentialFiles,
-  GetCredentialFilesSucceeded,
   GetCredentialTypes,
   GetMasterCredentials,
   RemoveCandidatesCredential,
@@ -13,7 +11,7 @@ import {
   UploadCredentialFilesSucceeded,
 } from "@agency/store/candidate.actions";
 import { CandidateState } from "@agency/store/candidate.state";
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
@@ -25,7 +23,7 @@ import {
   DELETE_RECORD_TITLE
 } from "@shared/constants/messages";
 import { CredentialVerifiedStatus, STATUS_COLOR_GROUP } from "@shared/enums/status";
-import { CandidateCredential, CandidateCredentialPage, CredentialFile } from "@shared/models/candidate-credential.model";
+import { CandidateCredential, CandidateCredentialPage, CredentialFile, PreviewFileData } from "@shared/models/candidate-credential.model";
 import { CredentialType } from "@shared/models/credential-type.model";
 import { ConfirmService } from "@shared/services/confirm.service";
 import { valuesOnly } from "@shared/utils/enum.utils";
@@ -52,6 +50,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public addCredentialForm: FormGroup;
   public searchCredentialForm: FormGroup;
   public disabledCopy = false;
+  public candidateCredentialPage: CandidateCredentialPage;
+  public openFileViewerDialog = new EventEmitter<PreviewFileData>();
   public credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public optionFields = { text: 'text', value: 'id' };
   public verifiedStatuses = Object.values(CredentialVerifiedStatus)
@@ -64,7 +64,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private masterCredentialId: number | null;
   private credentialId: number | null;
   private filesDetails: Blob[] = []
-  private file: CredentialFile;
   private hasFiles = false;
   private removeFiles = false;
 
@@ -98,7 +97,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   }
 
   constructor(private store: Store,
-              private router: Router,
               private route: ActivatedRoute,
               private actions$: Actions,
               private fb: FormBuilder,
@@ -136,12 +134,10 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.actions$.pipe(ofActionSuccessful(RemoveCandidatesCredentialSucceeded)).subscribe(() => {
       this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
     });
-    this.actions$.pipe(ofActionSuccessful(GetCredentialFilesSucceeded)).subscribe((files: { payload: Blob }) => {
-       this.downloadFile(files.payload);
-    });
     this.createAddCredentialForm();
     this.createSearchCredentialForm();
     this.subscribeOnSearchUpdate();
+    this.subscribeOnCandidateCredential();
   }
 
   ngOnDestroy(): void {
@@ -213,10 +209,9 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.saveCredential(data);
   }
 
-  public onDownload(event: MouseEvent, file: CredentialFile) {
+  public onViewFiles(event: MouseEvent, files: CredentialFile[]) {
     event.stopPropagation();
-    this.file = file;
-    this.store.dispatch(new GetCredentialFiles(this.file.id));
+    this.openFileViewerDialog.emit({ credentials: this.candidateCredentialPage.items, selectedFileId: files[0].id });
   }
 
   public onEdit(event: MouseEvent,
@@ -358,16 +353,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     }
   }
 
-  private downloadFile(file: Blob): void {
-    const a = document.createElement('a');
-    const objectUrl = URL.createObjectURL(file);
-
-    a.href = objectUrl
-    a.download = this.file.name;
-    a.click();
-    URL.revokeObjectURL(objectUrl);
-  }
-
   private setDropElement(): void {
     this.dropElement = document.getElementById('files-droparea') as HTMLElement;
   }
@@ -381,5 +366,11 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
           : 'The file should be in Pdf, Doc, Docx format.';
       }
     });
+  }
+
+  private subscribeOnCandidateCredential(): void {
+    this.candidateCredential$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((page: CandidateCredentialPage) => this.candidateCredentialPage = page);
   }
 }

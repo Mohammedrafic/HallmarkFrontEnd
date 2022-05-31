@@ -1,12 +1,18 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, tap } from 'rxjs';
-import { GetWorkflows, GetWorkflowsSucceed, RemoveWorkflow, SaveWorkflow, UpdateWorkflow } from './workflow.actions';
+import {
+  GetWorkflows,
+  GetWorkflowsSucceed,
+  RemoveWorkflow,
+  SaveWorkflow,
+  UpdateWorkflow
+} from './workflow.actions';
 import { WorkflowService } from '@shared/services/workflow.service';
 import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
-import { WorkflowWithDetails } from '@shared/models/workflow.model';
+import { Step, WorkflowWithDetails } from '@shared/models/workflow.model';
 
 export interface WorkflowStateModel {
   workflows: WorkflowWithDetails[] | null;

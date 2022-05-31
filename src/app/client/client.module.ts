@@ -11,7 +11,11 @@ import {
   Sliders,
   Download,
   Search,
-  MoreVertical
+  MoreVertical,
+  Upload,
+  Plus,
+  Edit3,
+  Trash2
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -25,10 +29,12 @@ import {
   SortService,
   ToolbarService
 } from '@syncfusion/ej2-angular-grids';
-import { ButtonModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, ChipListModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
+import { SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
+import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 
 import { ClientRoutingModule } from './client-routing.module';
 import { DashboardContentComponent } from './dashboard/dashboard-content/dashboard-content.component';
@@ -40,6 +46,11 @@ import { ReportsContentComponent } from './reports/reports-content/reports-conte
 import { ClientComponent } from './client.component';
 import { TabNavigationComponent } from './order-management/order-management-content/tab-navigation/tab-navigation.component';
 import { SharedModule } from '../shared/shared.module';
+import { AddEditOrderComponent } from './order-management/add-edit-order/add-edit-order.component';
+import { OrderDetailsFormComponent } from './order-management/order-details-form/order-details-form.component';
+
+import { BillRatesModule } from '@bill-rates/bill-rates.module';
+import { OrderCredentialsModule } from '@order-credentials/order-credentials.module';
 
 const gridIcons = {
   MessageSquare,
@@ -50,7 +61,11 @@ const gridIcons = {
   Sliders,
   Download,
   Search,
-  MoreVertical
+  MoreVertical,
+  Upload,
+  Plus,
+  Edit3,
+  Trash2
 };
 
 @NgModule({
@@ -62,7 +77,9 @@ const gridIcons = {
     InvoicesContentComponent,
     TimesheetsContentComponent,
     ReportsContentComponent,
-    TabNavigationComponent
+    TabNavigationComponent,
+    AddEditOrderComponent,
+    OrderDetailsFormComponent
   ],
   imports: [
     CommonModule,
@@ -72,12 +89,18 @@ const gridIcons = {
     GridModule,
     ButtonModule,
     ChipListModule,
+    CheckBoxModule,
     TextBoxModule,
     DropDownListModule,
     PagerModule,
     NumericTextBoxModule,
     MenuModule,
-    TabAllModule
+    TabAllModule,
+    SplitButtonModule,
+    DatePickerModule,
+    TimePickerModule,
+    BillRatesModule,
+    OrderCredentialsModule
   ],
   providers: [
     ResizeService,

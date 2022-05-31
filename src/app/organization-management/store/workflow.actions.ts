@@ -25,3 +25,5 @@ export class RemoveWorkflow {
   static readonly type = '[workflow] Remove Workflow';
   constructor(public payload: WorkflowWithDetails) {}
 }
+
+

@@ -48,6 +48,6 @@ export class UsersService {
    * @return User
    */
   public saveUser(user: UserDTO): Observable<User> {
-    return this.http.post<User>(`/api/Users`, user);
+    return user.metadata.id ? this.http.put<User>(`/api/Users`, user) : this.http.post<User>(`/api/Users`, user);
   }
 }

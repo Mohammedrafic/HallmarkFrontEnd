@@ -1,0 +1,25 @@
+.controls-container {
+  padding: 20px 0;
+  display: flex;
+
+  h3 {
+    margin-left: 25px;
+  }
+
+  .controls-form {
+    button {
+      margin-left: 10px;
+      &.e-dropdown-btn {
+        margin-left: 1px;
+      }
+    }
+  }
+}
+
+ejs-tab {
+  padding-bottom: 40px;
+}
+
+.bill-rates-section {
+  margin-top: 24px;
+}

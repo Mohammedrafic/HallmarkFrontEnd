@@ -16,10 +16,11 @@
         (click)="onImportDataClick()">Import <i-feather name="upload" class="icon"></i-feather>
       </button>
       <button
-        ejs-button
+        ejs-dropdownbutton
+        [items]="exportOptions"
+        (select)="exportSelected($event)"
         id="importButton"
-        cssClass="e-outline button-import">Export <i-feather name="download" class="icon"></i-feather>
-      </button>
+        cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
       <button
         ejs-button
         id="addDepartmentButton"
@@ -38,8 +39,13 @@
     [resizeSettings]="resizeSettings"
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
+    (rowSelected)="rowSelected($event, grid)"
+    (rowDeselected)="rowDeselected($event, grid)"
+    (dataBound)="gridDataBound(grid)"
+    [selectionSettings]="selectionSettings"
   >
     <e-columns>
+      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="40"></e-column>
       <e-column field="holidayName" headerText="holiday name" width=200></e-column>
       <e-column field="startDateTime" type="date" [format]="format" headerText="start date & time" width=200></e-column>
       <e-column field="endDateTime" type="date" [format]="format" headerText="end date & time" width=200></e-column>
@@ -104,6 +110,8 @@
     </ng-template>
   </ejs-grid>
 </section>
+
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
 <app-side-dialog
   (formCancelClicked)="closeDialog()"

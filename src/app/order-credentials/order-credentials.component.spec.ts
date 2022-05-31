@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { WorkflowComponent } from './workflow.component';
+import { OrderCredentialsComponent } from './order-credentials.component';
 
-describe('WorkflowComponent', () => {
-  let component: WorkflowComponent;
-  let fixture: ComponentFixture<WorkflowComponent>;
+describe('OrderCredentialsComponent', () => {
+  let component: OrderCredentialsComponent;
+  let fixture: ComponentFixture<OrderCredentialsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ WorkflowComponent ]
+      declarations: [ OrderCredentialsComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(WorkflowComponent);
+    fixture = TestBed.createComponent(OrderCredentialsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

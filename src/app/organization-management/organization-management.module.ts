@@ -49,7 +49,6 @@ import { GroupMappingComponent } from './credentials/credentials-setup/group-map
 import { GroupComponent } from './credentials/credentials-setup/group/group.component';
 import { HolidaysState } from './store/holidays.state';
 import { HolidaysComponent } from './holidays/holidays.component';
-import { WorkflowComponent } from './workflow/workflow.component';
 import { JobOrderComponent } from './workflow/job-order/job-order.component';
 import { WorkflowMappingComponent } from './workflow/workflow-mapping/workflow-mapping.component';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
@@ -90,7 +89,6 @@ const sidebarIcons = {
     GroupMappingComponent,
     GroupComponent,
     HolidaysComponent,
-    WorkflowComponent,
     JobOrderComponent,
     WorkflowMappingComponent,
     CardMenuComponent,

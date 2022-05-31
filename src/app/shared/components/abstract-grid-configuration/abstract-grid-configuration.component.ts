@@ -1,4 +1,6 @@
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { SortingDirections } from '@shared/enums/sorting';
+import { FilteredItem } from '@shared/models/filter.model';
 import { PageEventArgs } from '@syncfusion/ej2-angular-grids';
 import { ResizeSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
@@ -50,10 +52,60 @@ export abstract class AbstractGridConfigurationComponent {
     { text: ExportType[2], id: 2 }
   ];
 
+  selectionSettings = {
+    persistSelection: true
+  };
+  selectedItems: any[] = [];
+  idFieldName = 'id'; // Override in child component in case different id property
+
+  filteredItems: FilteredItem[] = [];
+  filteredCount = 0;
+
   protected constructor() { }
+
+  rowSelected(event: any, grid: any): void {
+    if (!event.target) {
+      return;
+    }
+    if (event.data?.length === 0) {
+      this.selectedItems.push(...grid.dataSource);
+    } else {
+      this.selectedItems.push(event.data);
+    }
+    console.log(this.selectedItems);
+    console.log(event);
+  }
+
+  rowDeselected(event: any, grid: any): void {
+    const closest = event.target && event.target.closest('.e-pagercontainer');
+    if (closest) {
+      return;
+    }
+    if (event.data?.length === 0) {
+      grid.dataSource.forEach((element: any) => {
+        const index = this.selectedItems.map((e) => e[this.idFieldName]).indexOf(element[this.idFieldName]);
+        if (index > -1) {
+          this.selectedItems.splice(index, 1);
+        }
+      });
+    } else {
+      const index = this.selectedItems.map((e) => e[this.idFieldName]).indexOf(event.data[this.idFieldName]);
+      if (index > -1) {
+        this.selectedItems.splice(index, 1);
+      }
+    }
+    console.log(this.selectedItems);
+    console.log(event);
+  }
+
+  clearSelection(grid: any): void {
+    this.selectedItems = [];
+    grid.clearSelection();
+  }
 
   addActiveCssClass(event: any): void {
     if (event) {
+      event.stopPropagation();
       this.clickedElement = event.currentTarget;
       this.clickedElement.classList.add('e-active');
       this.clickedElement.focus();
@@ -70,9 +122,9 @@ export abstract class AbstractGridConfigurationComponent {
 
   exportSelected(event: any): void {
     if (event.item.properties.id === ExportType['Excel File']) {
-      console.log('Excel file selected');
+      this.defaultExport(ExportedFileType.excel);
     } else if (event.item.properties.id === ExportType['CSV File']) {
-      console.log('CSV file selected');
+      this.defaultExport(ExportedFileType.csv);
     } else if (event.item.properties.id === ExportType['Custom']) {
       this.customExport();
     }
@@ -81,6 +133,11 @@ export abstract class AbstractGridConfigurationComponent {
   customExport(): void {
     console.warn('Override customExport() method in child component:');
     console.warn('public override customExport(): void { }');
+  }
+
+  defaultExport(fileType: ExportedFileType): void {
+    console.warn('Override defaultExport(fileType) method in child component:');
+    console.warn('public override defaultExport(fileType): void { }');
   }
 
   updatePage(): void {
@@ -96,6 +153,18 @@ export abstract class AbstractGridConfigurationComponent {
       this.orderBy = '';
     }
     this.updatePage();
+  }
+
+  gridDataBound(grid: any): void {
+    if (this.selectedItems.length) {
+      const selectedIndexes: number[] = [];
+      grid.dataSource.map((item: any, i: number) => {
+        if (this.selectedItems.find((selectedItem: any) => selectedItem[this.idFieldName] === item[this.idFieldName])) {
+          selectedIndexes.push(i);
+        }
+      });
+      grid.selectRows(selectedIndexes);
+    }
   }
 
   actionBegin(args: PageEventArgs): void {

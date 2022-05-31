@@ -34,7 +34,7 @@
 </app-page-toolbar>
 
 <section class="last-content-section-padding">
-  <app-user-grid [filterForm]="businessForm"></app-user-grid>
+  <app-user-grid [filterForm]="businessForm" (editUserEvent)="onEdit($event)"></app-user-grid>
 </section>
 
 <app-side-dialog width="832" [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()">
