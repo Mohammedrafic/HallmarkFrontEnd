@@ -94,6 +94,16 @@ body {
         right: 30px;
       }
     }
+
+    &.workflow {
+      i-feather {
+        top: 35%;
+      }
+
+      span {
+        bottom: -25px;
+      }
+    }
   }
 
   h3 {

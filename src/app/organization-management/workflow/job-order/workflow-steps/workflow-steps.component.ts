@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Inject, Input, OnInit, OnDestroy, Output, SimpleChange } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Step, Workflow } from '@shared/models/workflow.model';
-import { BehaviorSubject, Observable, Subject, Subscription, takeUntil } from 'rxjs';
+import { BehaviorSubject, debounceTime, Observable, Subject, Subscription, takeUntil } from 'rxjs';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { WorkflowType } from '@shared/enums/workflow-type';
 import { filter } from 'rxjs/operators';
@@ -47,24 +47,27 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.setStepNameAndStatus(this.workflow);
     this.workflowSteps$.pipe(filter(Boolean),takeUntil(this.unsubscribe$)).subscribe((steps: Step[]) => {
-      if (steps.length > 0) {
-        this.customSteps = [];
-        this.removeAllFormControls(this.customStepName);
-        this.removeAllFormControls(this.customStepStatus);
+      this.customSteps = [];
+      this.customParentStatus.clear();
+      this.customStepName.clear();
+      this.customStepStatus.clear();
 
-        steps.forEach((item) => {
-          if ((item.type === WorkflowStepType.Incomplete && this.customParentStatus.length === 0)
-            || (item.type === WorkflowStepType.Shortlisted && this.customParentStatus.length === 0)) {
-            this.customParentStatus.push(this.formBuilder.control(item.status, [Validators.required, Validators.maxLength(50)]));
-          }
+      setTimeout(() => {
+        if (steps.length > 0) {
+          steps.forEach((item) => {
+            if ((item.type === WorkflowStepType.Incomplete && this.customParentStatus.length === 0)
+              || (item.type === WorkflowStepType.Shortlisted && this.customParentStatus.length === 0)) {
+              this.customParentStatus.push(this.formBuilder.control(item.status, [Validators.required, Validators.maxLength(50)]));
+            }
 
-          if (item.type !== WorkflowStepType.Incomplete && item.type !== WorkflowStepType.Shortlisted) {
-            this.customSteps.push(item);
-            this.customStepName.push(this.formBuilder.control(item.name, [Validators.required, Validators.maxLength(50)]));
-            this.customStepStatus.push(this.formBuilder.control(item.status, [Validators.required, Validators.maxLength(50)]));
-          }
-        });
-      }
+            if (item.type !== WorkflowStepType.Incomplete && item.type !== WorkflowStepType.Shortlisted) {
+              this.customSteps.push(item);
+              this.customStepName.push(this.formBuilder.control(item.name, [Validators.required, Validators.maxLength(50)]));
+              this.customStepStatus.push(this.formBuilder.control(item.status, [Validators.required, Validators.maxLength(50)]));
+            }
+          });
+        }
+      });
     });
   }
 
@@ -85,12 +88,6 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
       this.customParentStatus.removeAt(0); // parent status is always the one, so its index = 0
     }
     this.customStepRemoveClick.emit({ type: this.workflow.type, index: index + 1 });
-  }
-
-  private removeAllFormControls(formArray: FormArray): void {
-    while (formArray.length !== 0) {
-      formArray.removeAt(0)
-    }
   }
 
   private setStepNameAndStatus(workflow: Workflow): void {

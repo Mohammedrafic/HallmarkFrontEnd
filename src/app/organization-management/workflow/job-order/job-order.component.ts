@@ -19,6 +19,11 @@ import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 import { WorkflowType } from '@shared/enums/workflow-type';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 
+export enum WorkflowNavigationTabs {
+  JobOrderWorkflow,
+  WorkflowMapping
+}
+
 @Component({
   selector: 'app-job-order',
   templateUrl: './job-order.component.html',
@@ -30,6 +35,8 @@ export class JobOrderComponent implements OnInit, OnDestroy {
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
+  public isJobOrderWorkflowTabActive = true;
+  public isWorkflowMappingTabActive = false;
   public workflowsWithDetails: WorkflowWithDetails[] = [];
   public workflowFormGroup: FormGroup;
   public customStepOrderFormGroup: FormGroup;
@@ -80,6 +87,12 @@ export class JobOrderComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
+  onTabSelected(selectedTab: any): void {
+    this.isJobOrderWorkflowTabActive = WorkflowNavigationTabs['JobOrderWorkflow'] === selectedTab.selectedIndex;
+    this.isWorkflowMappingTabActive = WorkflowNavigationTabs['WorkflowMapping'] === selectedTab.selectedIndex;
+    this.store.dispatch(new ShowSideDialog(false));
+  }
+
   public onAddNewWorkflowClick(): void {
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -99,6 +112,10 @@ export class JobOrderComponent implements OnInit, OnDestroy {
       this.customApplicationSteps = filteredCustomApplicationSteps.length > 1 ? filteredCustomApplicationSteps : [];
       this.customOrderSteps$.next(this.customOrderSteps);
       this.customApplicationSteps$.next(this.customApplicationSteps);
+      setTimeout(() => {
+        this.customOrderSteps$.next(this.customOrderSteps);
+        this.customApplicationSteps$.next(this.customApplicationSteps);
+      }, 300)
     }
   }
 
