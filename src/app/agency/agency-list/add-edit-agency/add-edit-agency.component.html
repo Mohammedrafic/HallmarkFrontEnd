@@ -30,7 +30,7 @@
                 appValidateWithMessage
                 formControlName="parentBusinessUnitId"
                 [fields]="createUnderFields"
-                [dataSource]="createUnderValues"
+                [dataSource]="businessUnits$ | async"
                 placeholder="Create Under"
               ></ejs-dropdownlist>
             </div>

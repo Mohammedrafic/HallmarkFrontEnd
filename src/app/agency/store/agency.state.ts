@@ -1,6 +1,7 @@
 import { FeeExceptionsService } from '@agency/services/fee-exceptions.service';
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { BusinessUnit } from '@shared/models/business-unit.model';
 import { Observable, of, tap } from 'rxjs';
 import { RECORD_ADDED, RECORD_MODIFIED, RECORD_SAVED } from 'src/app/shared/constants/messages';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
@@ -48,6 +49,7 @@ import {
   UpdateAssociateOrganizationsPage,
   GetPartnershipSettings,
   SavePartnershipSettings,
+  GetBusinessUnitList,
 } from './agency.actions';
 
 export interface AgencyStateModel {
@@ -61,6 +63,7 @@ export interface AgencyStateModel {
   feeExceptionsInitialData: FeeExceptionsInitialData | null;
   jobDistributionInitialData: JobDistributionInitialData | null;
   partnershipSettings: PartnershipSettings | null;
+  businessUnits: BusinessUnit[],
 }
 
 @State<AgencyStateModel>({
@@ -74,6 +77,7 @@ export interface AgencyStateModel {
     associateOrganizationsPages: {
       items: [],
     },
+    businessUnits: [],
     feeSettings: null,
     feeExceptionsInitialData: null,
     jobDistributionInitialData: null,
@@ -86,9 +90,15 @@ export class AgencyState {
   static isAgencyCreated(state: AgencyStateModel): boolean {
     return !!state.agency?.agencyDetails.id;
   }
+  
   @Selector()
   static agencyName(state: AgencyStateModel): string | undefined {
     return state.agency?.agencyDetails.name;
+  }
+
+  @Selector()
+  static businessUnits(state: AgencyStateModel): BusinessUnit[] {
+    return state.businessUnits;
   }
 
   @Selector()
@@ -415,5 +425,13 @@ export class AgencyState {
         dispatch(new UpdateAssociateOrganizationsPage());
       })
     );
+  }
+
+  @Action(GetBusinessUnitList)
+  GetBusinessUnitList({ patchState }: StateContext<AgencyStateModel>, { }: GetBusinessUnitList): Observable<BusinessUnit[]> {
+    return this.organizationService.getBusinessUnit().pipe(tap((payload) => {
+      patchState({ businessUnits: payload});
+      return payload;
+    }));
   }
 }

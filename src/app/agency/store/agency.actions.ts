@@ -134,3 +134,8 @@ export class UpdateAssociateOrganizationsPage {
   static readonly type = '[agency] Update Associate Organizations Page';
   constructor() {}
 }
+
+export class GetBusinessUnitList {
+  static readonly type = '[agency] Get The List Of Business Units';
+  constructor() { }
+}
