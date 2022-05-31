@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { filter, Observable, Subscription, takeWhile } from 'rxjs';
@@ -21,6 +21,7 @@ import {
   GetAgencyByIdSucceeded,
   GetAgencyLogo,
   GetAgencyLogoSucceeded,
+  GetBusinessUnitList,
   SaveAgency,
   SaveAgencySucceeded,
   UploadAgencyLogo,
@@ -29,10 +30,11 @@ import { AgencyState } from '../../store/agency.state';
 import { BillingDetailsGroupComponent } from './billing-details-group/billing-details-group.component';
 import { ContactDetailsGroupComponent } from './contact-details-group/contact-details-group.component';
 import { GeneralInfoGroupComponent } from './general-info-group/general-info-group.component';
-import { CREATE_UNDER_VALUE, DISABLED_BUSINESS_TYPES, OPRION_FIELDS } from './add-edit-agency.constants';
+import { DISABLED_BUSINESS_TYPES, OPRION_FIELDS } from './add-edit-agency.constants';
 import { UserState } from 'src/app/store/user.state';
 import { User } from '@shared/models/user.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { BusinessUnit } from '@shared/models/business-unit.model';
 
 type AgencyFormValue = {
   parentBusinessUnitId: number;
@@ -53,7 +55,6 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   public agencyForm: FormGroup;
   public createUnderAvailable = false;
   public createUnderFields = OPRION_FIELDS;
-  public createUnderValues = CREATE_UNDER_VALUE;
   public title = 'Add';
 
 
@@ -80,6 +81,9 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   @Select(AgencyState.isAgencyCreated)
   public isAgencyCreated$: Observable<boolean>;
 
+  @Select(AgencyState.businessUnits)
+  businessUnits$: Observable<BusinessUnit[]>;
+
   public logo: Blob | null = null;
 
   private populatedSubscription: Subscription | undefined;
@@ -97,6 +101,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
     private confirmService: ConfirmService
   ) {
     this.store.dispatch(new SetHeaderState({ title: 'Agency', iconName: 'clock' }));
+    this.store.dispatch(new GetBusinessUnitList());
   }
 
   ngOnInit(): void {
@@ -274,12 +279,12 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
       agencyContactDetails,
       agencyPaymentDetails,
       agencyId: id,
-      parentBusinessUnitId: null, // TODO: Change it after we will get MSP from BE
+      parentBusinessUnitId: agencyFormValue.parentBusinessUnitId,
     };
   }
 
   private patchAgencyFormValue({ agencyDetails, agencyBillingDetails, agencyContactDetails, createUnder }: Agency) {
-    this.agencyForm.get('parentBusinessUnitId')?.patchValue(createUnder?.businessUnitType);
+    this.agencyForm.get('parentBusinessUnitId')?.patchValue(createUnder?.parentUnitId);
     this.agencyForm.get('isBillingPopulated')?.patchValue(agencyBillingDetails.sameAsAgency);
     this.agencyControl?.patchValue({ ...agencyDetails });
     this.billingControl?.patchValue({ ...agencyBillingDetails });
