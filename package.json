@@ -24,6 +24,7 @@
     "@ngxs/store": "^3.7.3",
     "@syncfusion/ej2-angular-buttons": "^20.1.47",
     "@syncfusion/ej2-angular-calendars": "^20.1.47",
+    "@syncfusion/ej2-angular-charts": "^20.1.47",
     "@syncfusion/ej2-angular-dropdowns": "^20.1.47",
     "@syncfusion/ej2-angular-grids": "^20.1.47",
     "@syncfusion/ej2-angular-inputs": "^20.1.47",
