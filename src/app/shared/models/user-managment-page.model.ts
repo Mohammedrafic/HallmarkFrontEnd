@@ -8,7 +8,7 @@ export type User = {
   isDeleted: boolean;
   address1?: string;
   address2?: string;
-  country?: boolean;
+  country?: number | string;
   state?: string;
   city?: string;
   zip?: string;
@@ -19,12 +19,14 @@ export type User = {
   businessUnitType?: number;
   businessUnitName?: string;
   assigned: boolean;
+  roles?: Array<number>;
 };
 
 export type UserDTO = {
   businessUnitId: number | null;
   metadata: User;
   roleIds: Array<number>;
+  userId?: string;
 }
 
 export type UsersPage = PageOfCollections<User>;

@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
 import { BUSSINES_DATA_FIELDS, UNIT_FIELDS } from "../../user-list.constants";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
@@ -12,6 +12,9 @@ import { ChangeEventArgs } from "@syncfusion/ej2-angular-dropdowns";
 import { CanadaStates, Country, UsaStates } from "@shared/enums/states";
 import { mustMatch } from "@shared/validators/must-match.validators";
 import { RolesPerUser } from "@shared/models/user-managment-page.model";
+import { INACTIVE_USER_TEXT, INACTIVE_USER_TITLE } from "@shared/constants";
+import { ConfirmService } from "@shared/services/confirm.service";
+import { SwitchComponent } from "@syncfusion/ej2-angular-buttons";
 
 @Component({
   selector: 'app-user-settings',
@@ -21,6 +24,9 @@ import { RolesPerUser } from "@shared/models/user-managment-page.model";
 export class UserSettingsComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
   @Input() businessUnits: { text: string | BusinessUnitType, id: number }[];
+
+  @ViewChild('swithActive')
+  public switcher: SwitchComponent;
 
   @Select(SecurityState.newRoleBussinesData)
   public newRoleBussinesData$: Observable<BusinessUnit[]>;
@@ -56,7 +62,10 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
 
   private isAlive = true;
 
-  constructor(private store: Store) { }
+  constructor(
+    private store: Store,
+    private confirmService: ConfirmService
+  ) { }
 
   ngOnInit(): void {
     this.onBusinessUnitControlChanged();
@@ -69,7 +78,27 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
 
   public toggleActive(): void {
     const activeControl = this.form.get('isDeleted');
-    activeControl?.patchValue(!activeControl.value);
+
+    if(activeControl?.value) {
+      this.switcher.toggle();
+
+      this.confirmService
+        .confirm(INACTIVE_USER_TEXT, {
+          title: INACTIVE_USER_TITLE,
+          okButtonLabel: 'Inactivate',
+          okButtonClass: 'delete-button',
+        })
+        .subscribe((confirm) => {
+          if (confirm && !!activeControl?.value) {
+            activeControl?.patchValue(false);
+            this.switcher.toggle();
+          } else {
+            this.switcher.toggle();
+          }
+        });
+      }else {
+          activeControl?.patchValue(false);
+    }
   }
 
   public onCountryChange(event: ChangeEventArgs): void {
@@ -100,6 +129,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
 
   static createForm(): FormGroup {
     return new FormGroup({
+        id: new FormControl(),
       businessUnitType: new FormControl('', [Validators.required]),
       businessUnitId: new FormControl('', [Validators.required]),
       firstName: new FormControl('', [Validators.required, Validators.maxLength(50)]),
@@ -111,7 +141,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
       country: new FormControl(''),
       state: new FormControl(''),
       city: new FormControl('', [Validators.maxLength(20)]),
-      zipCode: new FormControl('', [Validators.maxLength(5)]),
+      zip: new FormControl('', [Validators.maxLength(5)]),
       email: new FormControl('', [Validators.required, Validators.email,Validators.maxLength(100), Validators.pattern(/\S+@\S+\.com/) ]),
         emailConfirmation: new FormControl('', [Validators.required, Validators.maxLength(100)]),
       phoneNumber: new FormControl('', [Validators.maxLength(10)]),
