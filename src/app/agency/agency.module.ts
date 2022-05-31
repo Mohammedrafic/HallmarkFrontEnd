@@ -4,12 +4,30 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
+import { FeatherModule } from 'angular-feather';
+import {
+  Sliders,
+  Plus,
+  Trash2,
+  Edit,
+  Copy,
+  Download,
+  AlertCircle,
+  Search,
+  FileText,
+  MessageSquare,
+  Lock,
+  MoreVertical,
+  AlignJustify,
+  Menu,
+  X,
+  Filter,
+  Maximize2,
+  Minimize2
+} from 'angular-feather/icons';
 import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
 import { PdfViewerModule } from "@syncfusion/ej2-angular-pdfviewer";
 import { ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
-import { FeatherModule } from 'angular-feather';
-import { Sliders, Plus, Trash2, Edit, Copy, Download, AlertCircle, Maximize2, X, Minimize2 } from 'angular-feather/icons';
-
 import { AgencyComponent } from './agency.component';
 import { AgencyRoutingModule } from './agency-routing.module';
 import { AgencyListComponent } from './agency-list/agency-list.component';
@@ -21,7 +39,7 @@ import { BillingDetailsGroupComponent } from './agency-list/add-edit-agency/bill
 import { ContactDetailsGroupComponent } from './agency-list/add-edit-agency/contact-details-group/contact-details-group.component';
 import { PaymentDetailsGridComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-details-grid.component';
 import { GridAllModule, GridModule, PagerModule } from '@syncfusion/ej2-angular-grids';
-import {MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule} from '@syncfusion/ej2-angular-inputs';
+import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { CandidatesComponent } from './candidates/candidates.component';
 import { AddEditCandidateComponent } from './candidates/add-edit-candidate/add-edit-candidate.component';
 import { CandidateGeneralInfoComponent } from './candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
@@ -43,6 +61,10 @@ import { AddNewFeeDialogComponent } from './agency-list/add-edit-agency/associat
 import { CredentialsGridComponent } from './candidates/add-edit-candidate/credentials-grid/credentials-grid.component';
 import { CandidateAgencyComponent } from './candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
 import { PartnershipSettingsComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/partnership-settings/partnership-settings.component';
+import { OrderManagementComponent } from './order-management/order-management.component';
+import { TabNavigationComponent } from './order-management/tab-navigation/tab-navigation.component';
+import { OrderManagementGridComponent } from './order-management/order-management-grid/order-management-grid.component';
+import { PreviewOrderDialogComponent } from './order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
 import { FileViewerComponent } from './candidates/add-edit-candidate/file-viewer/file-viewer.component';
 
 const sidebarIcons = {
@@ -53,9 +75,17 @@ const sidebarIcons = {
   Edit,
   Copy,
   Download,
+  Search,
+  FileText,
+  MessageSquare,
+  Lock,
+  MoreVertical,
+  AlignJustify,
+  Menu,
+  X,
+  Filter,
   Maximize2,
   Minimize2,
-  X
 };
 
 @NgModule({
@@ -84,6 +114,10 @@ const sidebarIcons = {
     CandidateAgencyComponent,
     FileViewerComponent,
     PartnershipSettingsComponent,
+    OrderManagementComponent,
+    TabNavigationComponent,
+    OrderManagementGridComponent,
+    PreviewOrderDialogComponent,
   ],
   imports: [
     CommonModule,

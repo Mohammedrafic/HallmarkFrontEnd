@@ -5,6 +5,10 @@ $gap: 12px;
   display: flex;
   justify-content: space-between;
 
+  & > div {
+    width: 50%;
+  }
+
   .left-content {
     display: flex;
     & > *:not(:last-child) {
@@ -14,6 +18,9 @@ $gap: 12px;
 
   .right-content {
     display: flex;
+    justify-content: end;
+    flex-grow: 1;
+
     & > *:not(:first-child) {
       margin-left: $gap;
     }
