@@ -1,10 +1,12 @@
 import { Component, EventEmitter, Inject, Input, OnInit, OnDestroy, Output, SimpleChange } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Step, Workflow } from '@shared/models/workflow.model';
-import { BehaviorSubject, debounceTime, Observable, Subject, Subscription, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { WorkflowType } from '@shared/enums/workflow-type';
 import { filter } from 'rxjs/operators';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 @Component({
   selector: 'app-workflow-steps',
@@ -40,7 +42,8 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   private formBuilder: FormBuilder;
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(@Inject(FormBuilder) private builder: FormBuilder) {
+  constructor(@Inject(FormBuilder) private builder: FormBuilder,
+              private confirmService: ConfirmService) {
     this.formBuilder = builder;
   }
 
@@ -81,13 +84,21 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   }
 
   public onRemoveCustomStepButtonClick(index: number): void {
-    this.customSteps.splice(index, 1);
-    this.customStepName.removeAt(index);
-    this.customStepStatus.removeAt(index);
-    if (this.customStepStatus.length === 0 && this.customStepStatus.length === 0) {
-      this.customParentStatus.removeAt(0); // parent status is always the one, so its index = 0
-    }
-    this.customStepRemoveClick.emit({ type: this.workflow.type, index: index + 1 });
+    this.confirmService
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button'
+      }).pipe(filter(confirm => !!confirm))
+      .subscribe(() => {
+        this.customSteps.splice(index, 1);
+        this.customStepName.removeAt(index);
+        this.customStepStatus.removeAt(index);
+        if (this.customStepStatus.length === 0 && this.customStepStatus.length === 0) {
+          this.customParentStatus.removeAt(0); // parent status is always the one, so its index = 0
+        }
+        this.customStepRemoveClick.emit({ type: this.workflow.type, index: index + 1 });
+      });
   }
 
   private setStepNameAndStatus(workflow: Workflow): void {

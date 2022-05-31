@@ -1,11 +1,16 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, tap } from 'rxjs';
+import { catchError, Observable, of, tap } from 'rxjs';
 import {
+  GetWorkflowMappingPages,
   GetWorkflows,
   GetWorkflowsSucceed,
   RemoveWorkflow,
+  RemoveWorkflowMapping,
+  RemoveWorkflowDeclined,
+  RemoveWorkflowSucceed,
   SaveWorkflow,
+  SaveWorkflowMapping,
   UpdateWorkflow
 } from './workflow.actions';
 import { WorkflowService } from '@shared/services/workflow.service';
@@ -13,21 +18,27 @@ import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { Step, WorkflowWithDetails } from '@shared/models/workflow.model';
+import { WorkflowMappingPage, WorkflowMappingPost } from '@shared/models/workflow-mapping.model';
 
 export interface WorkflowStateModel {
-  workflows: WorkflowWithDetails[] | null;
+  workflows: WorkflowWithDetails[] | null,
+  workflowMappingPages: WorkflowMappingPage | null
 }
 
 @State<WorkflowStateModel>({
   name: 'workflow',
   defaults: {
-    workflows: []
+    workflows: [],
+    workflowMappingPages: null
   }
 })
 @Injectable()
 export class WorkflowState {
   @Selector()
   static workflows(state: WorkflowStateModel): WorkflowWithDetails[] | null { return state.workflows; }
+
+  @Selector()
+  static workflowMappingPages(state: WorkflowStateModel): WorkflowMappingPage | null { return state.workflowMappingPages; }
 
   constructor(private workflowService: WorkflowService) {}
 
@@ -53,14 +64,23 @@ export class WorkflowState {
   }
 
   @Action(UpdateWorkflow)
-  UpdateWorkflow({ patchState, dispatch }: StateContext<WorkflowStateModel>, { workflow, businessUnitId }: UpdateWorkflow): Observable<WorkflowWithDetails | void> {
+  UpdateWorkflow({ patchState, dispatch }: StateContext<WorkflowStateModel>, { workflow, businessUnitId, isRemoveStep }: UpdateWorkflow): Observable<WorkflowWithDetails | void> {
     return this.workflowService.updateWorkflow(workflow)
       .pipe(tap((payloadResponse) => {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED))
           dispatch(new GetWorkflows(businessUnitId));
+          if (isRemoveStep) {
+            dispatch(new RemoveWorkflowSucceed());
+          }
           return payloadResponse;
         }),
-        catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+        catchError((error: any) => {
+          dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
+          if (isRemoveStep) {
+            dispatch(new RemoveWorkflowDeclined());
+          }
+          return of(error);
+        })
       );
   }
 
@@ -72,5 +92,36 @@ export class WorkflowState {
           return payload;
         }),
         catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
+  }
+
+  @Action(GetWorkflowMappingPages)
+  GetWorkflowMappingPages({ patchState }: StateContext<WorkflowStateModel>, { }: GetWorkflowMappingPages): Observable<GetWorkflowMappingPages> {
+    return this.workflowService.getWorkflowMappingPages().pipe(tap((payload) => {
+      patchState({ workflowMappingPages: payload });
+      return payload;
+    }));
+  }
+
+  @Action(SaveWorkflowMapping)
+  SaveWorkflowMapping({ patchState, dispatch }: StateContext<WorkflowStateModel>, { payload }: SaveWorkflowMapping): Observable<WorkflowMappingPost | void> {
+    return this.workflowService.saveWorkflowMapping(payload)
+      .pipe(tap((payloadResponse) => {
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+          dispatch(new GetWorkflowMappingPages());
+          return payloadResponse;
+        }),
+        catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+      );
+  }
+
+  @Action(RemoveWorkflowMapping)
+  RemoveWorkflowMapping({ patchState, dispatch }: StateContext<WorkflowStateModel>, { payload }: RemoveWorkflowMapping): Observable<void> {
+    return this.workflowService.removeWorkflowMapping(payload)
+      .pipe(tap(() => {
+          dispatch(new GetWorkflowMappingPages());
+          return payload;
+        }),
+        catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+      );
   }
 }

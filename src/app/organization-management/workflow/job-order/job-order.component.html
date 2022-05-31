@@ -27,32 +27,36 @@
                 (addNewWorkflowClick)="onAddNewWorkflowClick()"
                 (cardClicked)="onCardSelected($event)"
               ></app-card-menu>
-              <section class="workflow-details-container">
-                <app-workflow-steps
-                  [formGroup]="customStepOrderFormGroup"
-                  *ngIf="orderWorkflow"
-                  class="workflow-steps"
-                  [workflow]="orderWorkflow"
-                  [workflowSteps$]="customOrderSteps$"
-                  [customStepFormGroup]="customStepOrderFormGroup"
-                  (customStepAddClick)="onCustomStepAddClick($event)"
-                  (customStepRemoveClick)="onCustomStepRemoveClick($event)"
-                ></app-workflow-steps>
-                <app-workflow-steps
-                  [formGroup]="customStepApplicationFormGroup"
-                  *ngIf="applicationWorkflow"
-                  class="workflow-steps"
-                  [workflow]="applicationWorkflow"
-                  [workflowSteps$]="customApplicationSteps$"
-                  [customStepFormGroup]="customStepApplicationFormGroup"
-                  (customStepAddClick)="onCustomStepAddClick($event)"
-                  (customStepRemoveClick)="onCustomStepRemoveClick($event)"
-                ></app-workflow-steps>
+              <section class="workflow-details-container" *ngIf="workflowsWithDetails.length > 0">
+                <div class="order-workflow">
+                  <app-workflow-steps
+                    [formGroup]="customStepOrderFormGroup"
+                    *ngIf="orderWorkflow"
+                    class="workflow-steps"
+                    [workflow]="orderWorkflow"
+                    [workflowSteps$]="customOrderSteps$"
+                    [customStepFormGroup]="customStepOrderFormGroup"
+                    (customStepAddClick)="onCustomStepAddClick($event)"
+                    (customStepRemoveClick)="onCustomStepRemoveClick($event)"
+                  ></app-workflow-steps>
+                </div>
+                <div class="application-workflow">
+                  <app-workflow-steps
+                    [formGroup]="customStepApplicationFormGroup"
+                    *ngIf="applicationWorkflow"
+                    class="workflow-steps"
+                    [workflow]="applicationWorkflow"
+                    [workflowSteps$]="customApplicationSteps$"
+                    [customStepFormGroup]="customStepApplicationFormGroup"
+                    (customStepAddClick)="onCustomStepAddClick($event)"
+                    (customStepRemoveClick)="onCustomStepRemoveClick($event)"
+                  ></app-workflow-steps>
+                </div>
               </section>
             </section>
 
             <app-side-dialog
-              *ngIf="isActive"
+              *ngIf="isJobOrderWorkflowTabActive"
               (formCancelClicked)="onCancelFormClick()"
               (formSaveClicked)="onSaveFormClick()"
               header="Add Workflow"
