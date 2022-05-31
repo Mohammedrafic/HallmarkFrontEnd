@@ -13,6 +13,7 @@ import { OrganizationManagementState } from '../store/organization-management.st
 import { Region } from '@shared/models/region.model';
 import {
   DeleteLocationById,
+  ExportLocations,
   GetLocationsByRegionId,
   GetOrganizationById,
   GetRegions,
@@ -20,7 +21,7 @@ import {
   SetImportFileDialogState,
   UpdateLocation
 } from '../store/organization-management.actions';
-import { ShowExportDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { Location } from '@shared/models/location.model';
 
@@ -36,8 +37,9 @@ import {
 import { Organization } from '@shared/models/organization.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { UserState } from '../../store/user.state';
-import { ExportColumn } from '@shared/models/export.model';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { DatePipe } from '@angular/common';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
 
@@ -86,15 +88,15 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   public columnsToExport: ExportColumn[] = [
-    { text:'Ext Location ID', column: 'externalId'},
-    { text:'Invoice Location ID', column: 'invoiceId'},
-    { text:'Location Name', column: 'name'},
-    { text:'Address 1', column: 'address1'},
-    { text:'Address 2', column: 'address2'},
-    { text:'City', column: 'city'},
-    { text:'State', column: 'state'},
-    { text:'Zip', column: 'zip'},
-    { text:'Contact Person', column: 'contactPerson'}
+    { text:'Ext Location ID', column: 'ExternalId'},
+    { text:'Invoice Location ID', column: 'InvoiceId'},
+    { text:'Location Name', column: 'Name'},
+    { text:'Address 1', column: 'Address1'},
+    { text:'Address 2', column: 'Address2'},
+    { text:'City', column: 'City'},
+    { text:'State', column: 'State'},
+    { text:'Zip', column: 'Zip'},
+    { text:'Contact Person', column: 'ContactPerson'}
   ];
   public fileName: string;
 
@@ -104,6 +106,13 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
     super();
+    /**
+     * TODO: pending filtering
+     *    this.filteredItems = [
+            { text: 'Some filter option', column: 'extLocationId', value: 'fdfsd' }
+          ];
+     */
+
     this.fileName = 'Organization Locations ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.formBuilder = builder;
     this.createLocationForm();
@@ -133,10 +142,24 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.store.dispatch(new ShowExportDialog(false));
   }
 
-  public export(event: any): void {
-    console.log(event);
+  public export(event: ExportOptions): void {
     this.store.dispatch(new ShowExportDialog(false));
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.store.dispatch(new ExportLocations(new ExportPayload(
+      fileType, 
+      { regionId: this.selectedRegion.id }, 
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      this.selectedItems.length ? this.selectedItems.map(val => val.id) : null,
+      options?.fileName || this.fileName
+    )));
     this.clearSelection(this.grid);
+  }
+
+  public showFilters(): void {
+    this.store.dispatch(new ShowFilterDialog(true));
   }
 
   onRegionDropDownChanged(event: ChangeEventArgs): void {

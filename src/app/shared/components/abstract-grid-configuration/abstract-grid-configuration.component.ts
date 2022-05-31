@@ -1,4 +1,6 @@
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { SortingDirections } from '@shared/enums/sorting';
+import { FilteredItem } from '@shared/models/filter.model';
 import { PageEventArgs } from '@syncfusion/ej2-angular-grids';
 import { ResizeSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
@@ -55,6 +57,9 @@ export abstract class AbstractGridConfigurationComponent {
   };
   selectedItems: any[] = [];
   idFieldName = 'id'; // Override in child component in case different id property
+
+  filteredItems: FilteredItem[] = [];
+  filteredCount = 0;
 
   protected constructor() { }
 
@@ -117,9 +122,9 @@ export abstract class AbstractGridConfigurationComponent {
 
   exportSelected(event: any): void {
     if (event.item.properties.id === ExportType['Excel File']) {
-      console.log('Excel file selected');
+      this.defaultExport(ExportedFileType.excel);
     } else if (event.item.properties.id === ExportType['CSV File']) {
-      console.log('CSV file selected');
+      this.defaultExport(ExportedFileType.csv);
     } else if (event.item.properties.id === ExportType['Custom']) {
       this.customExport();
     }
@@ -128,6 +133,11 @@ export abstract class AbstractGridConfigurationComponent {
   customExport(): void {
     console.warn('Override customExport() method in child component:');
     console.warn('public override customExport(): void { }');
+  }
+
+  defaultExport(fileType: ExportedFileType): void {
+    console.warn('Override defaultExport(fileType) method in child component:');
+    console.warn('public override defaultExport(fileType): void { }');
   }
 
   updatePage(): void {

@@ -69,7 +69,7 @@ import {
   SaveOrganizationSettings,
   ClearDepartmentList,
   ClearLocationList,
-  SaveCredentialSucceeded, SaveUpdateCredentialSetupSucceeded,
+  SaveCredentialSucceeded, SaveUpdateCredentialSetupSucceeded, ExportLocations, ExportDepartments,
 } from './organization-management.actions';
 import { Department } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
@@ -94,6 +94,7 @@ import { LocationService } from '@shared/services/location.service';
 import { CredentialsService } from '@shared/services/credentials.service';
 import { SkillGroupService } from '@shared/services/skill-group.service';
 import { OrganizationSettingsService } from '@shared/services/organization-settings.service';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 
 interface DropdownOption {
   id: number;
@@ -737,5 +738,21 @@ export class OrganizationManagementState {
   ClearLocationList({ patchState }: StateContext<OrganizationManagementStateModel>, { }: ClearLocationList): Observable<any> {
     patchState({locations: []});
     return of([]);
+  };
+
+  @Action(ExportLocations)
+  ExportLocations({ }: StateContext<OrganizationManagementStateModel>, { payload }: ExportLocations): Observable<any> {
+    return this.locationService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
+
+  @Action(ExportDepartments)
+  ExportDepartments({ }: StateContext<OrganizationManagementStateModel>, { payload }: ExportDepartments): Observable<any> {
+    return this.departmentService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
   };
 }

@@ -47,8 +47,8 @@
         </div>
       </div>
       <div class="inline-radio-container purchase-order-by">
-        <ejs-radiobutton label="Excel file" name="fileType" value="0" [(ngModel)]="fileType" ></ejs-radiobutton>
-        <ejs-radiobutton label="CSV file" name="fileType" value="1" [(ngModel)]="fileType" ></ejs-radiobutton>
+        <ejs-radiobutton label="Excel file" name="fileType" [value]="ExportedFileType.excel" [(ngModel)]="fileType" ></ejs-radiobutton>
+        <ejs-radiobutton label="CSV file" name="fileType" [value]="ExportedFileType.csv" [(ngModel)]="fileType" ></ejs-radiobutton>
       </div>
       <div class="exported-columns">
         <label>Exported Columns</label>

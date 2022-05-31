@@ -6,6 +6,12 @@
 
 .create-under-dropdown {
   margin-top: 3px;
+  margin-bottom: 10px;
+}
+
+.connection-string-dropdown {
+  margin-top: 3px;
+  width: 434px;
 }
 
 .controls-container {
@@ -31,9 +37,12 @@
   margin-bottom: 20px;
 }
 
+.organization-form {
+  padding-bottom: 40px;
+}
+
 .create-under-container, .organization-form {
   display: flex;
-  padding-bottom: 40px;
 
   .left-section {
     width: 70%;

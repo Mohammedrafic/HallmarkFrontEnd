@@ -5,6 +5,7 @@ import { ShowExportDialog } from '../../../store/app.actions';
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { Subject, takeUntil } from 'rxjs';
 import { ExportColumn } from '@shared/models/export.model';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 @Component({
   selector: 'app-export-dialog',
@@ -24,8 +25,9 @@ export class ExportDialogComponent implements OnInit, OnDestroy {
   @Output() cancel = new EventEmitter();
   @Output() export = new EventEmitter();
 
+  public ExportedFileType = ExportedFileType;
   public selectedColumns:string[] = [];
-  public fileType = '0';
+  public fileType = ExportedFileType.excel;
 
   constructor(private action$: Actions) { }
 
@@ -36,7 +38,7 @@ export class ExportDialogComponent implements OnInit, OnDestroy {
         this.exportDialog.show();
       } else {
         this.chipList.select(this.chipList.selectedChips);
-        this.fileType = '0';
+        this.fileType = ExportedFileType.excel;
         this.exportDialog.hide();
       }
     });
@@ -55,7 +57,7 @@ export class ExportDialogComponent implements OnInit, OnDestroy {
     this.export.emit({
       fileName: this.fileName,
       fileType: this.fileType,
-      columns: (this.chipList.selectedChips as []).map((val: string, i: number) => this.columns[i])
+      columns: (this.chipList.selectedChips as []).map((val: number) => this.columns[val])
     });
   }
 }

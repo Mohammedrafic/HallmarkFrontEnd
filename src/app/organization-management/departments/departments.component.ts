@@ -18,6 +18,7 @@ import {
   UpdateDepartment,
   GetLocationsByRegionId,
   SetImportFileDialogState,
+  ExportDepartments,
 } from '../store/organization-management.actions';
 import { Region } from '../../shared/models/region.model';
 import { Location } from '../../shared/models/location.model';
@@ -32,8 +33,9 @@ import {
   RECORD_ADDED
 } from '../../shared/constants/messages';
 import { ConfirmService } from '../../shared/services/confirm.service';
-import { ExportColumn } from '@shared/models/export.model';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { DatePipe } from '@angular/common';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 
@@ -69,13 +71,13 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   isEdit: boolean;
 
   public columnsToExport: ExportColumn[] = [
-    { text:'Ext Department ID', column: 'extDepartmentId'},
-    { text:'Invoice Department ID', column: 'invoiceDepartmentId'},
-    { text:'Department Name', column: 'departmentName'},
-    { text:'Facility Email', column: 'facilityEmail'},
-    { text:'Facility Contact', column: 'facilityContact'},
-    { text:'Facility Phone NO', column: 'facilityPhoneNo'},
-    { text:'Inactivate Date', column: 'inactiveDate'}
+    { text:'Ext Department ID', column: 'ExtDepartmentId'},
+    { text:'Invoice Department ID', column: 'InvoiceDepartmentId'},
+    { text:'Department Name', column: 'DepartmentName'},
+    { text:'Facility Email', column: 'FacilityEmail'},
+    { text:'Facility Contact', column: 'FacilityContact'},
+    { text:'Facility Phone NO', column: 'FacilityPhoneNo'},
+    { text:'Inactivate Date', column: 'InactiveDate'}
   ];
   public fileName: string;
 
@@ -111,9 +113,19 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.store.dispatch(new ShowExportDialog(false));
   }
 
-  public export(event: any): void {
-    console.log(event);
+  public export(event: ExportOptions): void {
     this.store.dispatch(new ShowExportDialog(false));
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.store.dispatch(new ExportDepartments(new ExportPayload(
+      fileType, 
+      { locationId: this.selectedLocation.id }, 
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      this.selectedItems.length ? this.selectedItems.map(val => val.id) : null,
+      options?.fileName || this.fileName
+    )));
     this.clearSelection(this.grid);
   }
 

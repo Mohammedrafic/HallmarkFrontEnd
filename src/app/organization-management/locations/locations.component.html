@@ -19,7 +19,8 @@
       <button
         ejs-button
         id="filterButton"
-        cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+        cssClass="e-outline button-filter"
+        (click)="showFilters()">Filters <i-feather name="sliders" class="icon"></i-feather></button>
       <button
         ejs-button
         id="importButton"
@@ -125,6 +126,10 @@
 </section>
 
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+
+<app-filter-dialog [items]="filteredItems" [count]="filteredCount">
+<!-- TODO: add controls -->
+</app-filter-dialog>
 
 <app-side-dialog
   (formCancelClicked)="onFormCancelClick()"

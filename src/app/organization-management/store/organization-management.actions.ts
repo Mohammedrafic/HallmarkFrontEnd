@@ -10,6 +10,7 @@ import { Credential } from '@shared/models/credential.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { CredentialSetup, CredentialSetupGetGroup } from '@shared/models/credential-setup.model';
 import { OrganizationSettingsPost } from '@shared/models/organization-settings.model';
+import { ExportPayload } from "@shared/models/export.model";
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[organizationManagement] Set General States By Country';
@@ -329,4 +330,14 @@ export class ClearDepartmentList {
 export class ClearLocationList {
   static readonly type = '[organizationManagement] Clear Location list';
   constructor() { }
+}
+
+export class ExportLocations {
+  static readonly type = '[organizationManagement] Export Location list';
+  constructor(public payload: ExportPayload) { }
+}
+
+export class ExportDepartments {
+  static readonly type = '[organizationManagement] Export Department list';
+  constructor(public payload: ExportPayload) { }
 }
