@@ -1,4 +1,5 @@
 import { WorkflowWithDetails, WorkflowWithDetailsPut } from "@shared/models/workflow.model";
+import { WorkflowMappingPost } from '@shared/models/workflow-mapping.model';
 
 export class GetWorkflows {
   static readonly type = '[workflow] Get Workflow list by businessUnitId';
@@ -18,7 +19,8 @@ export class SaveWorkflow {
 export class UpdateWorkflow {
   static readonly type = '[workflow] Update Workflow';
   constructor(public workflow: WorkflowWithDetailsPut,
-              public businessUnitId: number | null) {}
+              public businessUnitId: number | null,
+              public isRemoveStep: boolean) {}
 }
 
 export class RemoveWorkflow {
@@ -26,4 +28,28 @@ export class RemoveWorkflow {
   constructor(public payload: WorkflowWithDetails) {}
 }
 
+export class GetWorkflowMappingPages {
+  static readonly type = '[workflow] Get Workflow Mapping Page';
+  constructor() {}
+}
+
+export class SaveWorkflowMapping {
+  static readonly type = '[workflow] Save Workflow Mapping';
+  constructor(public payload: WorkflowMappingPost) {}
+}
+
+export class RemoveWorkflowMapping {
+  static readonly type = '[workflow] Remove Workflow Mapping';
+  constructor(public payload: number) {}
+}
+
+export class RemoveWorkflowSucceed {
+  static readonly type = '[workflow] Remove Workflow Succeed';
+  constructor() {}
+}
+
+export class RemoveWorkflowDeclined {
+  static readonly type = '[workflow] Remove Workflow Declined';
+  constructor() {}
+}
 

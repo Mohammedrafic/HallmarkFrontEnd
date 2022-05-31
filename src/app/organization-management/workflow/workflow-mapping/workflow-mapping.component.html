@@ -13,20 +13,20 @@
 
   <ejs-grid class="grid grid-component"
             #grid
-            [dataSource]="gridDataSource"
+            [dataSource]="(workflowMappings$ | async)?.items"
             [allowPaging]="allowPaging"
             [pageSettings]="pageSettings"
-            [height]="fullScreenGridHeight"
+            [height]="gridHeight"
             [rowHeight]="rowHeight"
             [resizeSettings]="resizeSettings"
             [allowSorting]="allowSorting"
             [allowResizing]="allowResizing"
   >
     <e-columns>
-      <e-column field="region" headerText="REGION" width=200></e-column>
-      <e-column field="location" headerText="LOCATION" width=200></e-column>
-      <e-column field="department" headerText="DEPARTMENT" width=200></e-column>
-      <e-column field="skill" headerText="SKILL" width=200></e-column>
+      <e-column field="regionId" headerText="REGION" width=200></e-column>
+      <e-column field="locationId" headerText="LOCATION" width=200></e-column>
+      <e-column field="departmentId" headerText="DEPARTMENT" width=200></e-column>
+      <e-column field="skills" headerText="SKILL" width=200></e-column>
       <e-column field="workflowType" headerText="WORKFLOW TYPE" width=200></e-column>
       <e-column field="workflowName" headerText="WORKFLOW NAME" width=200></e-column>
       <e-column textAlign="Right" width=120>
@@ -63,7 +63,7 @@
                 [decimals]="decimals"
                 placeholder="Go to:"
                 min="1"
-                [max]="lastAvailablePage"
+                [max]="(workflowMappings$ | async)?.totalPages"
                 [showSpinButton]="false"
                 (change)="onGoToClick($event)"
               >
@@ -73,10 +73,10 @@
               <ejs-pager
                 id="gridPager"
                 #gridPager
-                [pageSize]="pageSizePager"
-                [totalRecordsCount]="totalDataRecords"
+                [pageSize]="pageSize"
+                [totalRecordsCount]="(workflowMappings$ | async)?.totalCount"
                 [enablePagerMessage]="false"
-                [currentPage]="currentPagerPage"
+                [currentPage]="currentPage"
                 (click)="onGoToClick($event)"
               >
               </ejs-pager>
@@ -101,14 +101,20 @@
         <div class="input-container dropdown">
           <label for="region">Region <span class="required">*</span></label>
           <div class="input-group dropdown">
-            <ejs-dropdownlist
+            <ejs-multiselect
               id="region"
               appValidateWithMessage
               placeholder="Region"
+              selectAllText="Select All"
+              mode="CheckBox"
               [dataSource]="regions$ | async"
               [fields]="fields"
-              formControlName="regionId">
-            </ejs-dropdownlist>
+              [showSelectAll]="true"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              formControlName="regions"
+            >
+            </ejs-multiselect>
           </div>
         </div>
       </div>
@@ -117,14 +123,19 @@
         <div class="input-container dropdown">
           <label for="location">Location <span class="required">*</span></label>
           <div class="input-group dropdown">
-            <ejs-dropdownlist
+            <ejs-multiselect
               id="location"
               appValidateWithMessage
               placeholder="Location"
+              selectAllText="Select All"
+              mode="CheckBox"
               [dataSource]="locations$ | async"
               [fields]="fields"
-              formControlName="locationId">
-            </ejs-dropdownlist>
+              [showSelectAll]="true"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              formControlName="locations">
+            </ejs-multiselect>
           </div>
         </div>
       </div>
@@ -133,14 +144,19 @@
         <div class="input-container dropdown">
           <label for="department">Department <span class="required">*</span></label>
           <div class="input-group dropdown">
-            <ejs-dropdownlist
+            <ejs-multiselect
               id="department"
               appValidateWithMessage
               placeholder="Department"
+              selectAllText="Select All"
+              mode="CheckBox"
               [dataSource]="departments$ | async"
               [fields]="departmentFields"
-              formControlName="departmentId">
-            </ejs-dropdownlist>
+              [showSelectAll]="true"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              formControlName="departments">
+            </ejs-multiselect>
           </div>
         </div>
       </div>
@@ -149,14 +165,19 @@
         <div class="input-container dropdown">
           <label for="skill">Skill <span class="required">*</span></label>
           <div class="input-group dropdown">
-            <ejs-dropdownlist
+            <ejs-multiselect
               id="skill"
               appValidateWithMessage
               placeholder="Skill"
-              [dataSource]="skills$ | async"
+              selectAllText="Select All"
+              mode="CheckBox"
+              [dataSource]="(skills$ | async)?.items"
               [fields]="skillsFields"
-              formControlName="skillId">
-            </ejs-dropdownlist>
+              [showSelectAll]="true"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              formControlName="skills">
+            </ejs-multiselect>
           </div>
         </div>
       </div>
@@ -178,15 +199,17 @@
 
       <div>
         <div class="input-container">
-          <label for="workflow">Workflow <span class="required">*</span></label>
-          <div class="input-group">
-            <input id="workflow"
-                   class="e-input"
-                   type="text"
-                   maxlength="50"
-                   appValidateWithMessage
-                   placeholder="Workflow"
-                   formControlName="workflowName"/>
+          <label for="workflow">Workflow Name<span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist
+              id="workflowName"
+              appValidateWithMessage
+              placeholder="Workflow Name"
+              [dataSource]="workflowName$ | async"
+              [fields]="workflowNameFields"
+              formControlName="workflowName"
+            >
+            </ejs-dropdownlist>
           </div>
         </div>
       </div>

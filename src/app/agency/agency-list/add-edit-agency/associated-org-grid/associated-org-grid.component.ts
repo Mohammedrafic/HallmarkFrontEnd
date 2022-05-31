@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { DistributionLevels } from '@shared/enums/partnership-settings';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, takeWhile } from 'rxjs';
 
@@ -34,6 +35,9 @@ export class AssociatedOrgGridComponent extends AbstractGridConfigurationCompone
   public openAssosiateOrgDialog = new EventEmitter<boolean>();
   public openEditDialog = new EventEmitter<AssociateOrganizations>();
   public jobDistributionColumns = JOB_DISTRIBUTION_COLUMNS;
+  public tierValueAccess = (_: string, { tier }: AssociateOrganizations) => {
+    return DistributionLevels[tier];
+  };
 
   private isAlive = true;
 
@@ -93,10 +97,6 @@ export class AssociatedOrgGridComponent extends AbstractGridConfigurationCompone
           this.store.dispatch(new DeleteAssociateOrganizationsById(org.id));
         }
       });
-  }
-
-  public dataBound(): void {
-    this.grid.autoFitColumns(['organizationName', 'baseFee', 'tierTitle', 'exeptionFee', 'partnershipStatusTitle']);
   }
 
   public onGoToClick(event: any): void {
