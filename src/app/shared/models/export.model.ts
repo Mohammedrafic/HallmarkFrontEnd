@@ -18,7 +18,7 @@ export class ExportPayload {
   ids?: number[];
   filename?: string;
 
-  constructor(exportedFileType: ExportedFileType, filterQuery?: any, properties?: string[], ids?: number[] | null, fileName?: string) {
+  constructor(exportedFileType: ExportedFileType, filterQuery?: any, properties?: string[], ids?: any[] | null, fileName?: string) {
     this.exportFileType = exportedFileType;
     if (filterQuery) {
       this.filterQuery = filterQuery;

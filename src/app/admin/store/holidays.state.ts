@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Holiday, HolidaysPage } from '@shared/models/holiday.model';
 import { HolidaysService } from '@shared/services/holidays.service';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { catchError, Observable, of, tap } from "rxjs";
 
 import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages";
 import { MessageTypes } from "src/app/shared/enums/message-types";
 import { ShowToast } from "src/app/store/app.actions";
-import { DeleteHoliday, DeleteHolidaySucceeded, FilterChanged, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded, SetYearFilter } from './holidays.actions';
+import { DeleteHoliday, DeleteHolidaySucceeded, ExportHolidays, FilterChanged, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded, SetYearFilter } from './holidays.actions';
 
 export interface HolidaysStateModel {
   isHolidayLoading: boolean;
@@ -84,4 +85,12 @@ export class HolidaysState {
       }),
       catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Holiday cannot be deleted')))));
   }
+
+  @Action(ExportHolidays)
+  ExportHolidays({ }: StateContext<HolidaysStateModel>, { payload }: ExportHolidays): Observable<any> {
+    return this.holidaysService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
 }

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import { Skill, SkillsPage } from 'src/app/shared/models/skill.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
 export class SkillsService {
@@ -73,5 +74,25 @@ export class SkillsService {
    */
   public removeAssignedSkill(skill: Skill): Observable<any> {
     return this.http.delete<Skill>(`/api/AssignedSkills/${skill.id}`);
+  }
+
+  /**
+   * Export skills
+   */
+  public export(payload: ExportPayload): Observable<any> {
+    if (payload.ids) {
+      return this.http.post(`/api/masterSkills/export/byIds`, payload, { responseType: 'blob' });
+    }
+    return this.http.post(`/api/masterSkills/export`, payload, { responseType: 'blob' });
+  }
+
+  /**
+   * Export assigned skills
+   */
+  public exportAssignedSkills(payload: ExportPayload): Observable<any> {
+    if (payload.ids) {
+      return this.http.post(`/api/AssignedSkills/export/byIds`, payload, { responseType: 'blob' });
+    }
+    return this.http.post(`/api/AssignedSkills/export`, payload, { responseType: 'blob' });
   }
 }

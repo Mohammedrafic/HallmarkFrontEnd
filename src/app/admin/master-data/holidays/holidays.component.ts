@@ -1,11 +1,12 @@
-import { DeleteHoliday, DeleteHolidaySucceeded, FilterChanged, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded, SetYearFilter } from '@admin/store/holidays.actions';
+import { DeleteHoliday, DeleteHolidaySucceeded, ExportHolidays, FilterChanged, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded, SetYearFilter } from '@admin/store/holidays.actions';
 import { HolidaysState } from '@admin/store/holidays.state';
 import { DatePipe } from '@angular/common';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ExportColumn } from '@shared/models/export.model';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { Holiday } from '@shared/models/holiday.model';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
@@ -43,11 +44,13 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
   };
   public showForm = true;
   public columnsToExport: ExportColumn[] = [
-    { text:'Holiday Name', column: 'holidayName'},
-    { text:'Start Date & Time', column: 'startDateTime'},
-    { text:'End Date & Time', column: 'endDateTime'}
+    { text:'Holiday Name', column: 'HolidayName'},
+    { text:'Start Date & Time', column: 'StartDateTime'},
+    { text:'End Date & Time', column: 'EndDateTime'}
   ];
   public fileName: string;
+  public defaultFileName: string;
+  public yearFilter: number;
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -55,7 +58,7 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
     super();
-    this.fileName = 'Master Holidays ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
+    this.defaultFileName = 'Master Holidays ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.today.setHours(0, 0, 0);
     this.HolidayFormGroup = this.fb.group({
       id: new FormControl(0, [ Validators.required ]),
@@ -101,18 +104,30 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
     this.unsubscribe$.complete();
   }
 
-  public closeExport() {
-    this.store.dispatch(new ShowExportDialog(false));
-  }
-
-  public export(event: any): void {
-    console.log(event);
-    this.store.dispatch(new ShowExportDialog(false));
-    this.clearSelection(this.grid);
-  }
-
   public override customExport(): void {
+    this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
+  }
+
+  public closeExport() {
+    this.fileName = '';
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.store.dispatch(new ExportHolidays(new ExportPayload(
+      fileType, 
+      { year: this.yearFilter }, 
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
+      options?.fileName || this.defaultFileName
+    )));
+    this.clearSelection(this.grid);
   }
 
   public copyHoliday(data: any, event: any): void {
@@ -129,6 +144,7 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
   }
 
   public yearChanged(event: { value: number }): void {
+    this.yearFilter = event.value;
     this.store.dispatch(new SetYearFilter(event.value));
   }
 

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable, tap } from 'rxjs';
 import { Holiday, HolidaysPage, OrganizationHoliday, OrganizationHolidaysPage } from '@shared/models/holiday.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
 export class HolidaysService {
@@ -103,5 +104,25 @@ export class HolidaysService {
     return this.http.delete<any>(`/api/OrganizationHolidays`, { 
       body: { masterHolidayId: holiday.masterHolidayId || 0, orgHolidayId: holiday.id || 0 } 
     });
+  }
+
+  /**
+   * Export holidays
+   */
+  public export(payload: ExportPayload): Observable<any> {
+    if (payload.ids) {
+      return this.http.post(`/api/MasterHolidays/export/byIds`, payload, { responseType: 'blob' });
+    }
+    return this.http.post(`/api/MasterHolidays/export`, payload, { responseType: 'blob' });
+  }
+
+  /**
+   * Export org holidays
+   */
+  public exportOrganizationHolidays(payload: ExportPayload): Observable<any> {
+    if (payload.ids) {
+      return this.http.post(`/api/OrganizationHolidays/export/byIds`, payload, { responseType: 'blob' });
+    }
+    return this.http.post(`/api/OrganizationHolidays/export`, payload, { responseType: 'blob' });
   }
 }

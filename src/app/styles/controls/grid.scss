@@ -38,6 +38,25 @@ ejs-grid.e-control.e-grid {
     }
   }
 
+  .e-gridchkbox, .e-headercell {
+    .e-checkbox-wrapper {
+      vertical-align: middle;
+
+      .e-frame {
+        width: 16px;
+        height: 16px;
+        border-radius: 2px;
+        line-height: 14px;
+        font-size: 10px;
+  
+        &.e-check {
+          background-color: #fff;
+          color: $primary-active-blue-10;
+        }
+      }
+    }
+  }
+
   .e-gridheader {
     .e-stackedheadercelldiv {
       padding: 0;
@@ -96,10 +115,6 @@ ejs-grid.e-control.e-grid {
 
         .e-rowcell {
           font-size: 14px;
-
-          &.e-gridchkbox {
-            padding-top: 16px;
-          }
         }
 
         .e-emptyrow {

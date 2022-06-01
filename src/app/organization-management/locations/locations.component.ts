@@ -99,6 +99,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     { text:'Contact Person', column: 'ContactPerson'}
   ];
   public fileName: string;
+  public defaultFileName: string;
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -113,7 +114,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
           ];
      */
 
-    this.fileName = 'Organization Locations ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
+    this.defaultFileName = 'Organization Locations ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.formBuilder = builder;
     this.createLocationForm();
   }
@@ -135,15 +136,17 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   public override customExport(): void {
+    this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
 
   public closeExport() {
+    this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));
   }
 
   public export(event: ExportOptions): void {
-    this.store.dispatch(new ShowExportDialog(false));
+    this.closeExport();
     this.defaultExport(event.fileType, event);
   }
 
@@ -153,7 +156,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       { regionId: this.selectedRegion.id }, 
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val.id) : null,
-      options?.fileName || this.fileName
+      options?.fileName || this.defaultFileName
     )));
     this.clearSelection(this.grid);
   }

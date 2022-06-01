@@ -1,3 +1,4 @@
+import { ExportPayload } from "@shared/models/export.model";
 import { OrganizationHoliday } from "@shared/models/holiday.model";
 
 export class GetHolidaysByPage {
@@ -38,4 +39,9 @@ export class FilterChanged {
 export class CheckIfExist {
   static readonly type = '[orgHoliday] Check If Exist';
   constructor(public payload: OrganizationHoliday) { }
+}
+
+export class ExportHolidays {
+  static readonly type = '[orgHoliday] Export Holiday list';
+  constructor(public payload: ExportPayload) { }
 }

@@ -114,7 +114,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
 
   static createForm(): FormGroup {
     return new FormGroup({
-        id: new FormControl(),
+      id: new FormControl(),
       businessUnitType: new FormControl('', [Validators.required]),
       businessUnitId: new FormControl('', [Validators.required]),
       firstName: new FormControl('', [Validators.required, Validators.maxLength(50)]),
