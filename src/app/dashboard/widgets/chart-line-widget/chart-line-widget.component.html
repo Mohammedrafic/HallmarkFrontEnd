@@ -1,8 +1,8 @@
-<div class="widget">
+<div class="widget" *ngIf="widget">
   <div class="widget-indicators">
     <div class="widget-score">
       <span class="widget-score-number">{{ widget.score }}</span>
-      <span class="widget-score-percent" [ngClass]="{ 'indicator-grow': widget.progress > 0 }">{{ widget.data + "%" }}</span>
+      <span class="widget-score-percent" [ngClass]="{ 'indicator-grow': widget.progress > 0 }">{{ widget.value + "%" }}</span>
       <span
         class="e-icons e-arrow-right-up"
         [ngClass]="{
@@ -11,11 +11,11 @@
         }"
       ></span>
     </div>
-    <span class="widget-score-title">{{ widget.name }}</span>
+    <span class="widget-score-title">{{ widget?.name }}</span>
   </div>
   <div class="widget-chart">
     <ejs-chart
-      [id]="chartId"
+      [id]="widget.id"
       [chartArea]="chartArea"
       [primaryXAxis]="primaryXAxis"
       [primaryYAxis]="primaryYAxis"

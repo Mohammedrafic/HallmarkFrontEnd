@@ -7,8 +7,6 @@ import { Component, Input } from '@angular/core';
 })
 export class ChartLineWidgetComponent {
   @Input() widget: any;
-
-  chartId = Date.now().toString();
   
   primaryXAxis = {
     valueType: 'Category',

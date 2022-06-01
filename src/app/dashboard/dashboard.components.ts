@@ -5,6 +5,9 @@ import { DashboardLayoutComponent, PanelModel } from '@syncfusion/ej2-angular-la
 import { Observable, Subject, take, takeUntil } from 'rxjs';
 
 import { ToggleSidebarState } from '../store/app.actions';
+import { ChartAccumulationDataModel } from './models/chart-accumulation-widget.model';
+import { ChartLineDataModel } from './models/chart-line-widget.model';
+import { DashboardService } from './services/dashboard.service';
 import { AddDashboardPanel, DashboardPanelIsMoved, GetDashboardPanels } from './store/dashboard.actions';
 import { DashboardState } from './store/dashboard.state';
 
@@ -24,69 +27,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   panels: PanelModel[] = [];
   cellSpacing = [15, 15];
   columns = 12;
+  accumulationWidgets: ChartAccumulationDataModel;
+  widgets: ChartLineDataModel;
 
-  widgets: Map<string, any> = new Map([
-    [
-      'chart_line_1',
-      {
-        name: 'Pending Orders',
-        progress: 1,
-        data: 4.53,
-        data2: 0.45,
-        chartData: [
-          { x: 1, y: 30 },
-          { x: 2, y: 28 },
-          { x: 3, y: 35 },
-          { x: 4, y: 28 },
-          { x: 5, y: 33 },
-          { x: 6, y: 32 },
-          { x: 7, y: 30 },
-        ],
-      },
-    ],
-    [
-      'chart_line_2',
-      {
-        name: 'Bill Rate Fluctoation',
-        progress: -1,
-        data: 4.53,
-        data2: 0.45,
-        chartData: [
-          { x: 1, y: 30 },
-          { x: 2, y: 28 },
-          { x: 3, y: 35 },
-          { x: 4, y: 28 },
-          { x: 5, y: 40 },
-          { x: 6, y: 32 },
-          { x: 7, y: 35 },
-        ],
-      },
-    ],
-    [
-      'chart_line_3',
-      {
-        name: 'Orders Starting in the Future',
-        progress: 1,
-        data: 14.53,
-        data2: 129,
-        chartData: [
-          { x: 1, y: 38 },
-          { x: 2, y: 40 },
-          { x: 3, y: 39 },
-          { x: 4, y: 42 },
-          { x: 5, y: 45 },
-          { x: 6, y: 43 },
-          { x: 7, y: 48 },
-        ],
-      },
-    ],
-  ]);
 
-  constructor(private store: Store, private actions$: Actions) {}
+  constructor(private store: Store, private actions$: Actions, private dashboardService: DashboardService) {}
 
   ngOnInit(): void {
     this.getDashboardPanels();
     this.refreshDashboard();
+    this.accumulationWidgets = this.dashboardService.getAccumulationWidgets();
+    this.widgets = this.dashboardService.getChartLineWidgets()
   }
 
   ngOnDestroy(): void {
@@ -130,7 +81,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       sizeY: 3,
       row: 0,
       col: 0,
-      content: `<div class="content">${allPanels + 1}</div>`,
     };
     this.dashboard.addPanel(panel);
     this.store.dispatch(new AddDashboardPanel(this.dashboardPanels()));
