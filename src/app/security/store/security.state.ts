@@ -121,6 +121,13 @@ export class SecurityState {
     return [BUSINNESS_DATA_DEFAULT_VALUE, ...state.newRoleBussinesData] as BusinessUnit[];
   }
 
+  @Selector()
+  static newBusinessDataPerUser (state: SecurityStateModel): (type: number) => BusinessUnit[] {
+    return (type: number) => type === 1 ?
+      [BUSINNESS_DATA_DEFAULT_VALUE, ...state.newRoleBussinesData] as BusinessUnit[]:
+      state.newRoleBussinesData;
+  }
+
   constructor(
     private businessUnitService: BusinessUnitService,
     private roleService: RolesService,

@@ -46,7 +46,7 @@
               appValidateWithMessage
               formControlName="businessUnitId"
               [fields]="bussinesDataFields"
-              [dataSource]="newRoleBussinesData$ | async"
+              [dataSource]="updateBusinessDataPerUser$ | async"
               placeholder="Business"
             ></ejs-dropdownlist>
           </div>
@@ -85,8 +85,7 @@
             [fields]="unitFields"
             formControlName="country"
             [dataSource]="countries"
-            placeholder="Country"
-            (change)="onCountryChange($event)">
+            placeholder="Country">
           </ejs-dropdownlist>
         </div>
       </div>
