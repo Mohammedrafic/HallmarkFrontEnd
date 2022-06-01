@@ -15,7 +15,7 @@ export class WorkflowService {
    * @return workflows
    */
   public getWorkflows(businessUnitId: number | null): Observable<WorkflowWithDetails[]> {
-    return this.http.get<WorkflowWithDetails[]>(`/api/Workflows/byBusinessUnit/${businessUnitId}`)
+    return this.http.get<WorkflowWithDetails[]>(`/api/Workflows/byBusinessUnit/`)
   }
 
   /**
