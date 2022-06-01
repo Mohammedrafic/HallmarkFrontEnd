@@ -1,0 +1,61 @@
+<div class="chart-wrapper">
+  <header>
+    <h3>{{ chartData.title }}</h3>
+    <div class="chart-toolbar">
+      <div class="plus-icon">
+        <span class="e-icons plus"></span>
+        <span>Add</span>
+      </div>
+      <div class="week-icon">
+        <span class="e-icons e-day"></span>
+        <span>Week</span>
+      </div>
+      <span class="e-icons e-download"></span>
+      <span class="e-icons e-full-screen"></span>
+    </div>
+  </header>
+  <div class="control-section">
+    <div class="donut-chart">
+      <div class="chart-title">
+        <h3 class="title">{{chartData.candidates}}</h3>
+        <h4 class="sub-title">
+          Total
+          <span class="score" [ngClass]="{ 'indicator-drop': chartData.progress < 0 }">
+            <span class="e-icons e-plus" *ngIf="chartData.progress > 0"></span>
+            <span class="sign-minus" *ngIf="chartData.progress < 0">&#8722;</span>
+            <span>{{ chartData.score }}</span>
+            <span class="e-icons e-arrow-right-up"></span>
+          </span>
+        </h4>
+      </div>
+      <ejs-accumulationchart
+        [tooltip]="tooltip"
+        [id]="chartData.id"
+        #pie
+        class="chart"
+        [legendSettings]="legendSettings"
+        [height]="height"
+        (pointClick)="pointClick($event)"
+        (legendClick)="clickD($event)"
+        (chartMouseClick)='chartMouseClick($event)'
+        (legendRender)='legendRender($event)'
+        [enableAnimation]="false"
+      >
+        <e-accumulation-series-collection >
+          <e-accumulation-series
+            name="Revenue"
+            [dataSource]="chartData.chartData"
+            [dataLabel]="datalabel"
+            xName="x"
+            yName="y"
+            [palettes]="palette"
+            legendShape="Circle"
+            innerRadius="70%"
+            radius="80%"
+          >
+          </e-accumulation-series>
+        </e-accumulation-series-collection>
+      </ejs-accumulationchart>
+    </div>
+  </div>
+</div>
