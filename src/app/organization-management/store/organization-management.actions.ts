@@ -341,3 +341,8 @@ export class ExportDepartments {
   static readonly type = '[organizationManagement] Export Department list';
   constructor(public payload: ExportPayload) { }
 }
+
+export class ExportSkills {
+  static readonly type = '[organizationManagement] Export Skill list';
+  constructor(public payload: ExportPayload) { }
+}

@@ -20,7 +20,10 @@ export class ExportDialogComponent implements OnInit, OnDestroy {
   @ViewChild('chipList') chipList: ChipListComponent;
 
   @Input() width: string = '496px';
-  @Input() fileName: string = 'File name';
+  
+  @Input() set fileName(value: string) {
+    this._fileName = value;
+  }
   @Input() columns: ExportColumn[] = [];
   @Output() cancel = new EventEmitter();
   @Output() export = new EventEmitter();
@@ -28,6 +31,7 @@ export class ExportDialogComponent implements OnInit, OnDestroy {
   public ExportedFileType = ExportedFileType;
   public selectedColumns:string[] = [];
   public fileType = ExportedFileType.excel;
+  public _fileName: string;
 
   constructor(private action$: Actions) { }
 
@@ -55,7 +59,7 @@ export class ExportDialogComponent implements OnInit, OnDestroy {
 
   onExport(): void {
     this.export.emit({
-      fileName: this.fileName,
+      fileName: this._fileName,
       fileType: this.fileType,
       columns: (this.chipList.selectedChips as []).map((val: number) => this.columns[val])
     });

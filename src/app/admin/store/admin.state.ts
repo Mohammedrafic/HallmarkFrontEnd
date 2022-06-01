@@ -37,7 +37,9 @@ import {
   GetCredentialTypes,
   SaveCredentialType,
   UpdateCredentialType,
-  RemoveCredentialType
+  RemoveCredentialType,
+  ExportSkills,
+  ExportSkillCategories
 } from './admin.actions';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
@@ -47,10 +49,10 @@ import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
-import { CandidateStateModel } from '@agency/store/candidate.state';
 import { OrganizationManagementStateModel } from '../../organization-management/store/organization-management.state';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { CredentialsService } from '@shared/services/credentials.service';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 
 interface DropdownOption {
   id: number;
@@ -314,7 +316,7 @@ export class AdminState {
   }
 
   @Action(GetAllSkills)
-  GetAllSkills({ patchState }: StateContext<CandidateStateModel>, { }: GetAllSkills): Observable<SkillsPage> {
+  GetAllSkills({ patchState }: StateContext<AdminStateModel>, { }: GetAllSkills): Observable<SkillsPage> {
     return this.skillsService.getAllMasterSkills().pipe(
       tap((payload) => {
         patchState({ skills: payload });
@@ -324,7 +326,7 @@ export class AdminState {
   }
 
   @Action(GetCredentialTypes)
-  GetCredentialTypes({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetCredentialTypes): Observable<CredentialType[]> {
+  GetCredentialTypes({ patchState }: StateContext<AdminStateModel>, { }: GetCredentialTypes): Observable<CredentialType[]> {
     return this.credentialsService.getCredentialTypes().pipe(tap((payload) => {
       patchState({ credentialTypes: payload });
       return payload;
@@ -358,4 +360,20 @@ export class AdminState {
       }),
       catchError((error: any) =>  dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
   }
+
+  @Action(ExportSkills)
+  ExportSkills({ }: StateContext<AdminStateModel>, { payload }: ExportSkills): Observable<any> {
+    return this.skillsService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
+
+  @Action(ExportSkillCategories)
+  ExportSkillCategories({ }: StateContext<AdminStateModel>, { payload }: ExportSkillCategories): Observable<any> {
+    return this.categoriesService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
 }

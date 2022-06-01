@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import { Shift, ShiftsPage } from 'src/app/shared/models/shift.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
 export class ShiftsService {
@@ -36,5 +37,15 @@ export class ShiftsService {
    */
   public removeShift(shift: Shift): Observable<any> {
     return this.http.delete<any>(`/api/MasterShifts/${shift.id}`);
+  }
+
+  /**
+   * Export shifts
+   */
+  public export(payload: ExportPayload): Observable<any> {
+    if (payload.ids) {
+      return this.http.post(`/api/MasterShifts/export/byIds`, payload, { responseType: 'blob' });
+    }
+    return this.http.post(`/api/MasterShifts/export`, payload, { responseType: 'blob' });
   }
 }

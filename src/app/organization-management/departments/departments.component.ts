@@ -80,6 +80,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     { text:'Inactivate Date', column: 'InactiveDate'}
   ];
   public fileName: string;
+  public defaultFileName: string;
 
   invalidDate = '0001-01-01T00:00:00+00:00';
 
@@ -96,8 +97,9 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
     super();
-    this.fileName = 'Organization Departments ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
+    this.defaultFileName = 'Organization Departments ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.formBuilder = builder;
+    this.idFieldName = 'departmentId';
     this.createDepartmentsForm();
   }
 
@@ -106,15 +108,17 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   public override customExport(): void {
+    this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
 
   public closeExport() {
+    this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));
   }
 
   public export(event: ExportOptions): void {
-    this.store.dispatch(new ShowExportDialog(false));
+    this.closeExport();
     this.defaultExport(event.fileType, event);
   }
 
@@ -123,8 +127,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       fileType, 
       { locationId: this.selectedLocation.id }, 
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
-      this.selectedItems.length ? this.selectedItems.map(val => val.id) : null,
-      options?.fileName || this.fileName
+      this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
+      options?.fileName || this.defaultFileName
     )));
     this.clearSelection(this.grid);
   }

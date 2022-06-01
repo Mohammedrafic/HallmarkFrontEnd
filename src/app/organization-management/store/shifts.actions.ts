@@ -1,3 +1,4 @@
+import { ExportPayload } from "@shared/models/export.model";
 import { Shift } from "src/app/shared/models/shift.model";
 
 export class GetShiftsByPage {
@@ -23,4 +24,9 @@ export class DeleteShift {
 export class DeleteShiftSucceeded {
   static readonly type = '[shift] Remove Shift Succeeded';
   constructor(public payload: Shift) { }
+}
+
+export class ExportShifts {
+  static readonly type = '[organizationManagement] Export Shift list';
+  constructor(public payload: ExportPayload) { }
 }

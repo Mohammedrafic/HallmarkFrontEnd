@@ -3,7 +3,8 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ExportColumn } from '@shared/models/export.model';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { Holiday, OrganizationHoliday, OrganizationHolidaysPage } from '@shared/models/holiday.model';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
@@ -15,7 +16,7 @@ import { CANCEL_COFIRM_TEXT, DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE, DELETE_CON
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { CheckIfExist, DeleteHoliday, DeleteHolidaySucceeded, GetAllMasterHolidays, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded } from '../store/holidays.actions';
+import { CheckIfExist, DeleteHoliday, DeleteHolidaySucceeded, ExportHolidays, GetAllMasterHolidays, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded } from '../store/holidays.actions';
 import { HolidaysState } from '../store/holidays.state';
 
 @Component({
@@ -63,13 +64,14 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   private isAllRegionsSelected = false;
   private isAllLocationsSelected = false;
   public columnsToExport: ExportColumn[] = [
-    { text:'Region', column: 'regionId'},
-    { text:'Location', column: 'locationId'},
-    { text:'Holiday Name', column: 'holidayName'},
-    { text:'Start Date & Time', column: 'startDateTime'},
-    { text:'End Date & Time', column: 'endDateTime'}
+    { text:'Region', column: 'RegionId'},
+    { text:'Location', column: 'LocationId'},
+    { text:'Holiday Name', column: 'HolidayName'},
+    { text:'Start Date & Time', column: 'StartDateTime'},
+    { text:'End Date & Time', column: 'EndDateTime'}
   ];
   public fileName: string;
+  public defaultFileName: string;
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -78,7 +80,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
               private datePipe: DatePipe) {
     super();
     this.idFieldName = 'foreignKey';
-    this.fileName = 'Organization Holidays ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
+    this.defaultFileName = 'Organization Holidays ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.today.setHours(0, 0, 0);
     this.HolidayFormGroup = this.fb.group({
       id: new FormControl(0, [ Validators.required ]),
@@ -182,13 +184,34 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy));
   }
 
+  public override customExport(): void {
+    this.fileName = this.defaultFileName;
+    this.store.dispatch(new ShowExportDialog(true));
+  }
+
   public closeExport() {
+    this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));
   }
 
-  public export(event: any): void {
-    console.log(event);
-    this.store.dispatch(new ShowExportDialog(false));
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.store.dispatch(new ExportHolidays(new ExportPayload(
+      fileType, 
+      { 
+        orderBy: this.orderBy,
+        masterOrgIds: this.selectedItems.length ? this.selectedItems.map(val => {
+          return { item1: val.masterHolidayId, item2: val.id };
+        }) : null,
+      }, 
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
+      options?.fileName || this.defaultFileName
+    )));
     this.clearSelection(this.grid);
   }
 
@@ -218,6 +241,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
           departments: []
         }]
       }];
+      this.isAllRegionsSelected = this.isAllLocationsSelected = true;
     } else {
       this.regions = this.orgStructure.regions;
     }
@@ -228,10 +252,6 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
         departments: []
       }];
     }
-  }
-
-  public override customExport(): void {
-    this.store.dispatch(new ShowExportDialog(true));
   }
 
   public editHoliday(data: any, event: any): void {
@@ -313,7 +333,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   private saveHandler(isExist?: boolean): void {
     this.store.dispatch(new SaveHoliday(new OrganizationHoliday(
       this.HolidayFormGroup.getRawValue(), 
-      this.title === 'Add' || this.title === 'Copy' ? this.selectedRegions : undefined,
+      this.title === 'Add' || this.title === 'Copy' || (this.title === 'Edit' && this.HolidayFormGroup.controls['id'].value === 0) ? this.selectedRegions : undefined,
       this.isAllRegionsSelected && this.isAllLocationsSelected,
       isExist
     )));
