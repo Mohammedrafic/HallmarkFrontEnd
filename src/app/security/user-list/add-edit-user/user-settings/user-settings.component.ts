@@ -4,7 +4,7 @@ import { BUSSINES_DATA_FIELDS, UNIT_FIELDS } from "../../user-list.constants";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
 import { Select, Store } from "@ngxs/store";
 import { SecurityState } from "../../../store/security.state";
-import { filter, merge, Observable, Subject, takeWhile } from "rxjs";
+import { filter, map, merge, Observable, Subject, takeWhile } from "rxjs";
 import { BusinessUnit } from "@shared/models/business-unit.model";
 import { GetNewRoleBusinessByUnitType, GetRolePerUser } from "../../../store/security.actions";
 import { AdminState } from "@admin/store/admin.state";
@@ -25,9 +25,6 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   @ViewChild('swithActive')
   public switcher: SwitchComponent;
 
-  @Select(SecurityState.newRoleBussinesData)
-  public newRoleBussinesData$: Observable<BusinessUnit[]>;
-
   @Select(AdminState.statesGeneral)
   statesGeneral$: Observable<string[]>;
 
@@ -35,6 +32,10 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   rolesPerUsers$: Observable<RolesPerUser>;
 
   public countryState$ = new Subject();
+
+  @Select(SecurityState.newBusinessDataPerUser)
+  public newBusinessDataPerUser$:Observable<(type: number) => BusinessUnit[]>
+
   public unitFields = UNIT_FIELDS;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public roleFields = {
@@ -70,6 +71,10 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
     this.isAlive = false;
   }
 
+  get updateBusinessDataPerUser$(): Observable< BusinessUnit[]> {
+    return this.newBusinessDataPerUser$.pipe(map(fn => fn(this.businessUnitControl?.value)));
+  }
+
   public toggleActive(): void {
     const activeControl = this.form.get('isActive');
     activeControl?.patchValue(!activeControl.value);
@@ -103,7 +108,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
       .pipe(filter((value) => !!value),takeWhile(() => this.isAlive))
       .subscribe(() => {
         this.form.get('roles')?.reset();
-        this.store.dispatch(new GetRolePerUser(this.businessUnitIdControl?.value || '',this.businessUnitControl?.value || ''));
+        this.store.dispatch(new GetRolePerUser(this.businessUnitIdControl?.value || '',this.businessUnitControl?.value || 1));
       });
   }
 
