@@ -20,7 +20,7 @@ export class AddEditUserComponent {
     if (event.isSwiped) {
       event.cancel = true;
     }
-    
+
     this.firstActive = false;
   }
 }

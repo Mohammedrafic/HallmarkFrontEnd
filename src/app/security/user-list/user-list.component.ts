@@ -108,13 +108,16 @@ export class UserListComponent implements OnInit, OnDestroy {
       const value = this.userSettingForm.getRawValue();
       let userDTO : UserDTO = {
         businessUnitId: value.businessUnitId || null,
-        metadata: {...value},
+        metadata: {
+          ...value,
+          isDeleted: !value.isDeleted
+        },
         roleIds: value.roles
       }
       if(this.isEditRole) {
          userDTO = {
           ...userDTO,
-           userId: value.id
+           userId: value.id,
         }
       }
       this.store.dispatch(new SaveUser(userDTO));
@@ -130,14 +133,20 @@ export class UserListComponent implements OnInit, OnDestroy {
       const editedUser = {
         ...user,
         roles: [...user.roles],
+        isDeleted: !user.isDeleted,
         businessUnitId: user.businessUnitId || 0,
         emailConfirmation: user.email
       }
       this.userSettingForm.patchValue({
         ...editedUser,
-        roles: user.roles.map((role: any) => role.id)
+        roles: user.roles?.map((role:any) => role.id)
       });
     }
+
+    this.store.dispatch(new GetRolePerUser( this.businessControl?.value || '',this.businessUnitControl?.value || '')).subscribe((() => {
+      this.userSettingForm.get('roles')?.setValue(user.roles?.map((role:any) => role.id));
+    }));
+
     this.disableBussinesUnitForRole();
     this.store.dispatch(new ShowSideDialog(true));
   }

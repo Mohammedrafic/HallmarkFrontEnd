@@ -20,8 +20,8 @@
         <div>
           <ejs-chiplist>
             <e-chips>
-              <e-chip [text]="statusEnum[+data.isDeleted]"
-                      [cssClass]="getChipCssClass(statusEnum[+data.isDeleted])">
+              <e-chip [text]="statusEnum[+!data.isDeleted]"
+                      [cssClass]="getChipCssClass(statusEnum[+!data.isDeleted])">
               </e-chip>
             </e-chips>
           </ejs-chiplist>
