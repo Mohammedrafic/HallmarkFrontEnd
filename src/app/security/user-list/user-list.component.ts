@@ -134,7 +134,7 @@ export class UserListComponent implements OnInit, OnDestroy {
         ...user,
         roles: [...user.roles],
         isDeleted: !user.isDeleted,
-        businessUnitId: user.businessUnitId || 0,
+        businessUnitId: user.businessUnitId || '',
         emailConfirmation: user.email
       }
       this.userSettingForm.patchValue({
@@ -143,7 +143,7 @@ export class UserListComponent implements OnInit, OnDestroy {
       });
     }
 
-    this.store.dispatch(new GetRolePerUser( this.businessControl?.value || '',this.businessUnitControl?.value || 0)).subscribe((() => {
+    this.store.dispatch(new GetRolePerUser( this.businessControl?.value || '',this.businessUnitControl?.value || '')).subscribe((() => {
       this.userSettingForm.get('roles')?.setValue(user.roles?.map((role:any) => role.id));
     }));
 
@@ -189,7 +189,7 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      this.store.dispatch(new GetBusinessByUnitType(value));
+      value && this.store.dispatch(new GetBusinessByUnitType(value));
 
       if (!this.isBusinessFormDisabled) {
         this.businessControl.patchValue(0);
