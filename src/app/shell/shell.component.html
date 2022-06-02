@@ -9,7 +9,7 @@
       <app-organization-agency-selector></app-organization-agency-selector>
       <div class="devider"></div>
     </ng-container>
-    <div class="header-item">{{ (user$ | async)?.businessUnitName }}</div>
+    <div class="header-item">{{userLogin.firstName}} {{userLogin.lastName}}</div>
 
     <!-- Temporary solution to log out from the application -->
     <button class="logout-button" ejs-button cssClass="e-primary" (click)="logout()">Logout</button>

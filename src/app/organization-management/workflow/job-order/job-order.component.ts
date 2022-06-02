@@ -73,10 +73,14 @@ export class JobOrderComponent implements OnInit, OnDestroy {
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetWorkflowsSucceed))
       .subscribe((workflows) => {
-        this.workflowsWithDetails = workflows.payload;
-        this.customStepOrderFormGroup.reset();
-        this.customStepApplicationFormGroup.reset();
-        this.onCardSelected(this.workflowsWithDetails[0]);
+        if (this.isJobOrderWorkflowTabActive) {
+          if (!this.selectedCard || (this.workflowsWithDetails.length > 0 && this.workflowsWithDetails.length !== workflows.payload.length)) {
+            this.workflowsWithDetails = workflows.payload;
+            this.customStepOrderFormGroup.reset();
+            this.customStepApplicationFormGroup.reset();
+            this.onCardSelected(this.workflowsWithDetails[0]);
+          }
+        }
       });
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(RemoveWorkflowSucceed)).subscribe(() => {
@@ -109,6 +113,10 @@ export class JobOrderComponent implements OnInit, OnDestroy {
     this.isJobOrderWorkflowTabActive = WorkflowNavigationTabs['JobOrderWorkflow'] === selectedTab.selectedIndex;
     this.isWorkflowMappingTabActive = WorkflowNavigationTabs['WorkflowMapping'] === selectedTab.selectedIndex;
     this.store.dispatch(new ShowSideDialog(false));
+
+    if (this.isJobOrderWorkflowTabActive) {
+      this.store.dispatch(new GetWorkflows());
+    }
   }
 
   public onAddNewWorkflowClick(): void {
@@ -128,8 +136,6 @@ export class JobOrderComponent implements OnInit, OnDestroy {
       const filteredCustomApplicationSteps = card.workflows[1].steps.filter(item => item.type !== WorkflowStepType.Offered);
       this.customOrderSteps = filteredCustomOrderSteps.length > 1 ? filteredCustomOrderSteps : [];
       this.customApplicationSteps = filteredCustomApplicationSteps.length > 1 ? filteredCustomApplicationSteps : [];
-      this.customOrderSteps$.next(this.customOrderSteps);
-      this.customApplicationSteps$.next(this.customApplicationSteps);
 
       const isWorkflowUsedElseWhere = false;
       // TODO: the information should be provided by BE side

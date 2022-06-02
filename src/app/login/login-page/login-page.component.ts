@@ -22,7 +22,7 @@ interface IOptionField {
 export class LoginPageComponent implements OnInit, OnDestroy {
 
   public optionFields = {
-    text: 'businessUnitName',
+    text: 'fullName',
     value: 'id'
   };
 
@@ -51,8 +51,8 @@ export class LoginPageComponent implements OnInit, OnDestroy {
       tap(users => {
         this.users = users;
         this.usersDropDownData = users.map(user => {
-          const { id, businessUnitName } = user;
-          return { id, businessUnitName };
+          const { id, businessUnitName, firstName, lastName  } = user;
+          return { id, businessUnitName, fullName: `${firstName} ${lastName} - ${businessUnitName}` };
         });
         this.loginForm.controls['user'].setValue(users[0].id);
       })

@@ -36,6 +36,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   @Select(SecurityState.newBusinessDataPerUser)
   public newBusinessDataPerUser$:Observable<(type: number) => BusinessUnit[]>
 
+  public businessValue: BusinessUnit[];
   public unitFields = UNIT_FIELDS;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public roleFields = {
@@ -65,14 +66,15 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
     this.onCountryChange();
     this.onBusinessUnitControlChanged();
     this.subscribeOnBusinessUnits();
+    this.updateBusinessDataPerUser();
   }
 
   ngOnDestroy(): void {
     this.isAlive = false;
   }
 
-  get updateBusinessDataPerUser$(): Observable< BusinessUnit[]> {
-    return this.newBusinessDataPerUser$.pipe(map(fn => fn(this.businessUnitControl?.value)));
+  private updateBusinessDataPerUser(): void {
+    this.newBusinessDataPerUser$.pipe(map(fn => fn(this.businessUnitControl?.value)), takeWhile(() => this.isAlive)).subscribe((value) => this.businessValue = value);
   }
 
   public toggleActive(): void {
@@ -109,7 +111,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.form.get('roles')?.reset();
         this.businessUnitControl?.value &&
-        this.store.dispatch(new GetRolePerUser(this.businessUnitIdControl?.value || '',this.businessUnitControl?.value || ''));
+        this.store.dispatch(new GetRolePerUser(this.businessUnitIdControl?.value || 0,this.businessUnitControl?.value || ''));
       });
   }
 
@@ -127,11 +129,11 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
       country: new FormControl(''),
       state: new FormControl(''),
       city: new FormControl('', [Validators.maxLength(20)]),
-      zip: new FormControl('', [Validators.maxLength(5)]),
+      zip: new FormControl('', [Validators.maxLength(5), Validators.minLength(5)]),
       email: new FormControl('', [Validators.required, Validators.email,Validators.maxLength(100), Validators.pattern(/\S+@\S+\.com/) ]),
         emailConfirmation: new FormControl('', [Validators.required, Validators.maxLength(100)]),
-      phoneNumber: new FormControl('', [Validators.maxLength(10)]),
-      fax: new FormControl('', [Validators.maxLength(10)]),
+      phoneNumber: new FormControl('', [Validators.maxLength(10), Validators.minLength(10)]),
+      fax: new FormControl('', [Validators.maxLength(10), Validators.minLength(10)]),
     },
       mustMatch('email', 'emailConfirmation')
     );
