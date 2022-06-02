@@ -1,16 +1,14 @@
 import { Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { combineLatest, filter, Observable, of, Subject, takeUntil } from 'rxjs';
+import { combineLatest, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { ShowSideDialog } from '../../../store/app.actions';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OrganizationManagementState } from '../../store/organization-management.state';
 import { Region } from '@shared/models/region.model';
 import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { GetAllSkills, GetDepartmentsByLocationId, GetLocationsByRegionId, GetRegions } from '../../store/organization-management.actions';
-import { Location } from '@shared/models/location.model';
-import { Department } from '@shared/models/department.model';
+import { GetAllSkills } from '../../store/organization-management.actions';
 import { Skill, SkillsPage } from '@shared/models/skill.model';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -33,6 +31,7 @@ import { RoleWithUser, StepMapping, StepRoleUser, WorkflowMappingPage, WorkflowM
 import { WorkflowType } from '@shared/enums/workflow-type';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 
 @Component({
   selector: 'app-workflow-mapping',
@@ -48,18 +47,17 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
   @Input() isActive: boolean = false;
 
-  @Select(OrganizationManagementState.regions)
-  regions$: Observable<Region[]>;
+  @Select(UserState.organizationStructure)
+  organizationStructure$: Observable<OrganizationStructure>;
+  public orgStructure: OrganizationStructure;
+  public orgRegions: OrganizationRegion[] = [];
+
   public regions: Region[] = [];
-  public allRegions: Region[] = [];
+  public allRegions: OrganizationRegion[] = [];
 
-  @Select(OrganizationManagementState.locationsByRegionId)
-  locations$: Observable<Location[]>;
-  public locations: Location[] = [];
+  public locations: OrganizationLocation[] = [];
 
-  @Select(OrganizationManagementState.departments)
-  departments$: Observable<Department[]>;
-  public departments: Department[] = [];
+  public departments: OrganizationDepartment[] = [];
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
 
   @Select(OrganizationManagementState.skills)
@@ -121,7 +119,6 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetRegions());
     this.store.dispatch(new GetAllSkills());
     this.store.dispatch(new GetWorkflowMappingPages());
 
@@ -157,9 +154,13 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       if (regionIds && regionIds.length > 0) {
         this.locations = [];
         regionIds.forEach((id) => {
-          this.store.dispatch(new GetLocationsByRegionId(id));
+          const selectedRegion = this.orgRegions.find(region => region.id === id);
+          this.locations.push(...selectedRegion?.locations as any);
         });
         this.departments = [];
+        this.locations.forEach(location => {
+          this.departments.push(...location.departments);
+        });
       } else {
         this.locations = [];
         this.departments = [];
@@ -169,10 +170,10 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       this.workflowMappingFormGroup.controls['departments'].setValue(null);
     });
 
-    this.regions$.pipe(takeUntil(this.unsubscribe$)).subscribe(regions => {
-        if (regions && regions.length > 0) {
-          this.allRegions = regions;
-        }
+    this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
+      this.orgStructure = structure;
+      this.orgRegions = structure.regions;
+      this.allRegions = [...this.orgRegions];
     });
 
     this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe(skills => {
@@ -181,23 +182,12 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       }
     });
 
-    this.locations$.pipe(takeUntil(this.unsubscribe$)).subscribe(locations => {
-      if (locations && locations.length > 0) {
-        this.locations = this.locations.concat(locations);
-      }
-    });
-
-    this.departments$.pipe(takeUntil(this.unsubscribe$)).subscribe(departments => {
-      if (departments && departments.length > 0) {
-        this.departments = this.departments.concat(departments);
-      }
-    });
-
     this.workflowMappingFormGroup.get('locations')?.valueChanges.subscribe((locationIds: number[]) => {
       if (locationIds && locationIds.length > 0) {
         this.departments = [];
         locationIds.forEach(id => {
-          this.store.dispatch(new GetDepartmentsByLocationId(id));
+          const selectedLocation = this.locations.find(location => location.id === id);
+          this.departments.push(...selectedLocation?.departments as []);
         });
       } else {
         this.departments = [];
@@ -277,7 +267,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       }
   
       if (!data.departmentId) {
-        const departmentIds = this.departments.map(department => department.departmentId);
+        const departmentIds = this.departments.map(department => department.id);
         this.workflowMappingFormGroup.controls['departments'].setValue(departmentIds);
       } else {
         this.workflowMappingFormGroup.controls['departments'].setValue([data.departmentId]);

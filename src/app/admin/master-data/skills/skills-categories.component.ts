@@ -30,7 +30,7 @@ export class SkillsCategoriesComponent extends AbstractGridConfigurationComponen
   }
 
   ngOnInit() {
-
+    this.store.dispatch(new GetAllSkillsCategories());
   }
 
   public override customExport(): void {
@@ -47,7 +47,6 @@ export class SkillsCategoriesComponent extends AbstractGridConfigurationComponen
 
   public addSkill(): void {
     this.store.dispatch(new ShowSideDialog(true));
-    this.isSkillsActive && this.store.dispatch(new GetAllSkillsCategories());
   }
 
   public tabSelected(data: any): void {
