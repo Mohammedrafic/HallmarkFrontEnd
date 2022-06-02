@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
-import { GridComponent, PagerComponent, PageSettingsModel } from '@syncfusion/ej2-angular-grids';
+import { FreezeService, GridComponent, PagerComponent, PageSettingsModel } from '@syncfusion/ej2-angular-grids';
 import { Observable, of } from 'rxjs';
 
 // TODO: remove after BE implementation
@@ -21,7 +21,8 @@ export const ROW_HEIGHT = {
 @Component({
   selector: 'app-order-management-content',
   templateUrl: './order-management-content.component.html',
-  styleUrls: ['./order-management-content.component.scss']
+  styleUrls: ['./order-management-content.component.scss'],
+  providers: [FreezeService],
 })
 export class OrderManagementContentComponent implements OnInit {
 

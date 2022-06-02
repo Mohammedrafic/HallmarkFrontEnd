@@ -8,7 +8,7 @@ body.light, body.dark {
       padding: 0 15px;
 
       &::placeholder {
-        color: $secondary-dark-blue-30;
+        color: $secondary-dark-blue-30 !important;
       }
 
       &:focus {

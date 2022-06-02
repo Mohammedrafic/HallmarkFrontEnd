@@ -1,5 +1,13 @@
 @import '../../styles/variables/colors.scss';
 
+.status-cell {
+  ejs-chiplist.e-control.e-chip-list {
+    .e-chip {
+      cursor: default;
+    }
+  }
+}
+
 ejs-chiplist.e-control.e-chip-list {
   .e-chip {
     text-transform: lowercase;

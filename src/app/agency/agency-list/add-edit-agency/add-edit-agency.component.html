@@ -1,6 +1,6 @@
 <app-page-toolbar>
   <ng-container left>
-    <button ejs-button cssClass="e-outline" (click)="onBack()">Back</button>
+    <button *ngIf="!isAgencyUser" ejs-button cssClass="e-outline" (click)="onBack()">Back</button>
     <h3>{{ title }} Agency</h3>
   </ng-container>
   <ng-container right>
@@ -46,7 +46,7 @@
                 </div>
 
                 <div class="e-card-content">
-                  <app-general-info-group [formGroup]="$any(agencyControl)"></app-general-info-group>
+                  <app-general-info-group [isAgencyUser]="isAgencyUser" [formGroup]="$any(agencyControl)"></app-general-info-group>
 
                   <div class="e-card-title-wrapper">
                     <div class="e-card-title">Billing Details</div>

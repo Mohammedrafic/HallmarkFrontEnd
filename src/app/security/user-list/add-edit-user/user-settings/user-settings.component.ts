@@ -108,7 +108,8 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
       .pipe(filter((value) => !!value),takeWhile(() => this.isAlive))
       .subscribe(() => {
         this.form.get('roles')?.reset();
-        this.store.dispatch(new GetRolePerUser(this.businessUnitIdControl?.value || '',this.businessUnitControl?.value || 1));
+        this.businessUnitControl?.value &&
+        this.store.dispatch(new GetRolePerUser(this.businessUnitIdControl?.value || '',this.businessUnitControl?.value || ''));
       });
   }
 
