@@ -2,8 +2,13 @@
 
 .toolbar {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin-top: 20px;
+
+  h3 {
+    color: $title-black;
+    margin: 8px;
+  }
 
   &>section {
     display: flex;

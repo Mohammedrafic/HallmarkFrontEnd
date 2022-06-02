@@ -63,7 +63,6 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
     super();
-    this.defaultFileName = 'Organization Shifts ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.defaultMaxTime.setHours(23, 59, 59);
     this.defaultMinTime.setHours(0, 0, 0);
     this.ShiftFormGroup = this.fb.group({
@@ -108,6 +107,7 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public override customExport(): void {
+    this.defaultFileName = 'Organization Shifts ' + this.generateDateTime(this.datePipe);
     this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
@@ -123,6 +123,7 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = 'Organization Shifts ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportShifts(new ExportPayload(
       fileType, 
       { /** TODO: put filters here */ }, 

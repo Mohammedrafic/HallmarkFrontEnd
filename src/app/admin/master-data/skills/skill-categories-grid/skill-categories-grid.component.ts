@@ -47,7 +47,6 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
     super();
-    this.defaultFileName = 'Skill Categories ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.CategoryFormGroup = this.fb.group({
       id: new FormControl(0),
       name: new FormControl('', [ Validators.required, Validators.minLength(3) ])
@@ -65,6 +64,7 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
       if (val.isDialogShown) {
+        this.defaultFileName = 'Skills/Skill Categories ' + this.generateDateTime(this.datePipe);
         this.fileName = this.defaultFileName;
       }
     });
@@ -74,6 +74,7 @@ export class SkillCategoriesGridComponent extends AbstractGridConfigurationCompo
       this.store.dispatch(new GetSkillsCategoriesByPage(this.currentPage, this.pageSize));
     });
     this.export$.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
+      this.defaultFileName = 'Skills/Skill Categories ' + this.generateDateTime(this.datePipe);
       this.defaultExport(event);
     });
   }

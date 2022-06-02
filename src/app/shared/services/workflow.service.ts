@@ -11,11 +11,10 @@ export class WorkflowService {
 
   /**
    * Get all workflows by businessUnitId
-   * @param businessUnitId parameter to search by
    * @return workflows
    */
-  public getWorkflows(businessUnitId: number | null): Observable<WorkflowWithDetails[]> {
-    return this.http.get<WorkflowWithDetails[]>(`/api/Workflows/byBusinessUnit/`)
+  public getWorkflows(): Observable<WorkflowWithDetails[]> {
+    return this.http.get<WorkflowWithDetails[]>(`/api/Workflows/byBusinessUnit`)
   }
 
   /**
@@ -68,5 +67,19 @@ export class WorkflowService {
    */
   public removeWorkflowMapping(mappingId: number): Observable<void> {
     return this.http.delete<void>(`/api/WorkflowMapping/${mappingId}`);
+  }
+
+  /**
+   * Gets users for workflow mapping
+   */
+  public getUsersForWorkflowMapping(): Observable<any> {
+    return this.http.get<any>(`/api/Users/currentbu`)
+  }
+
+  /**
+   * Gets roles for workflow mapping
+   */
+  public getRolesForWorkflowMapping(): Observable<any> {
+    return this.http.get<any>(`/api/Roles/currentbu`)
   }
 }

@@ -1,18 +1,19 @@
 import { PageOfCollections } from '@shared/models/page.model';
+import { Step } from '@shared/models/workflow.model';
 
 export class WorkflowMappingGet {
   mappingId: number;
   workflowName: string;
   workflowGroupId: number;
-  regionId: number;
+  regionId?: number;
   regionName: string;
-  locationId: number;
+  locationId?: number;
   locationName: string;
-  departmentId: number;
+  departmentId?: number;
   departmentName: string;
   hasUnassignedSteps: boolean;
   skills: WorkflowSkill[];
-  stepMappings: StepMappings[];
+  stepMappings: StepMapping[];
 }
 
 export class WorkflowSkill {
@@ -20,22 +21,32 @@ export class WorkflowSkill {
   skillDescription: string;
 }
 
-export class StepMappings {
-  workflowStepId: number;
+export class StepMapping {
+  workflowStepId?: number;
   workflowType?: number;
-  roleId: number;
-  userId: string;
+  roleId?: number;
+  userId?: string;
 }
 
 export class WorkflowMappingPost {
-
   mappingId?: number;
-  workflowGroupId: number;
+  workflowGroupId?: number;
   regionIds: number[];
   locationIds: number[];
   departmentIds: number[];
   skillIds: number[];
-  stepMappings: StepMappings[];
+  stepMappings: StepMapping[];
+}
+
+export class RoleWithUser {
+  id?: string;
+  name: string;
+}
+
+
+export class StepRoleUser {
+  step: Step;
+  roleUser?: RoleWithUser;
 }
 
 export type WorkflowMappingPage = PageOfCollections<WorkflowMappingGet>;

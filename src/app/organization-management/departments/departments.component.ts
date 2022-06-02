@@ -97,7 +97,6 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
     super();
-    this.defaultFileName = 'Organization Departments ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.formBuilder = builder;
     this.idFieldName = 'departmentId';
     this.createDepartmentsForm();
@@ -123,6 +122,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = 'Organization Departments ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportDepartments(new ExportPayload(
       fileType, 
       { locationId: this.selectedLocation.id }, 

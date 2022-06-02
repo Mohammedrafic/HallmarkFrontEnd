@@ -110,11 +110,15 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     /**
      * TODO: pending filtering
      *    this.filteredItems = [
-            { text: 'Some filter option', column: 'extLocationId', value: 'fdfsd' }
+            { text: 'loc 1', column: 'locations', value: '1' }
+            { text: 'loc 2', column: 'locations', value: '2' }
+            { text: 'loc 3', column: 'locations', value: '3' }
           ];
+          filters = {
+            locations: [1,2,3]
+          }
      */
 
-    this.defaultFileName = 'Organization Locations ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.formBuilder = builder;
     this.createLocationForm();
   }
@@ -136,6 +140,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   public override customExport(): void {
+    this.defaultFileName = 'Organization Locations ' + this.generateDateTime(this.datePipe);
     this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
@@ -151,6 +156,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = 'Organization Locations ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportLocations(new ExportPayload(
       fileType, 
       { regionId: this.selectedRegion.id }, 

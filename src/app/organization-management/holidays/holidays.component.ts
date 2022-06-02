@@ -80,7 +80,6 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
               private datePipe: DatePipe) {
     super();
     this.idFieldName = 'foreignKey';
-    this.defaultFileName = 'Organization Holidays ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.today.setHours(0, 0, 0);
     this.HolidayFormGroup = this.fb.group({
       id: new FormControl(0, [ Validators.required ]),
@@ -185,6 +184,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   }
 
   public override customExport(): void {
+    this.defaultFileName = 'Organization Holidays ' + this.generateDateTime(this.datePipe);
     this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
@@ -200,6 +200,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = 'Organization Holidays ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportHolidays(new ExportPayload(
       fileType, 
       { 

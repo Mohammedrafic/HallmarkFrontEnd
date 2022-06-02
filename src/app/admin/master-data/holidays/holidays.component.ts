@@ -58,7 +58,6 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
     super();
-    this.defaultFileName = 'Master Holidays ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.today.setHours(0, 0, 0);
     this.HolidayFormGroup = this.fb.group({
       id: new FormControl(0, [ Validators.required ]),
@@ -120,6 +119,7 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = 'Master Holidays ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportHolidays(new ExportPayload(
       fileType, 
       { year: this.yearFilter }, 

@@ -33,9 +33,6 @@ export enum WorkflowNavigationTabs {
   styleUrls: ['./job-order.component.scss']
 })
 export class JobOrderComponent implements OnInit, OnDestroy {
-  @Select(UserState.lastSelectedOrganizationId)
-  organizationId$: Observable<number>;
-
   public isJobOrderWorkflowTabActive = true;
   public isWorkflowMappingTabActive = false;
   public workflowsWithDetails: WorkflowWithDetails[] = [];
@@ -72,10 +69,7 @@ export class JobOrderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.organizationId$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(id => {
-      this.currentBusinessUnitId = id;
-      this.store.dispatch(new GetWorkflows(this.currentBusinessUnitId));
-    });
+    this.store.dispatch(new GetWorkflows());
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetWorkflowsSucceed))
       .subscribe((workflows) => {
@@ -239,8 +233,7 @@ export class JobOrderComponent implements OnInit, OnDestroy {
     if (this.workflowFormGroup.valid){
       const  workflowWithDetails: WorkflowWithDetails = {
         name: this.workflowFormGroup.controls['workflow'].value,
-        type: WorkflowGroupType.Organization,
-        businessUnitId: this.currentBusinessUnitId
+        type: WorkflowGroupType.Organization
       }
 
       this.store.dispatch(new SaveWorkflow(workflowWithDetails));
@@ -297,7 +290,7 @@ export class JobOrderComponent implements OnInit, OnDestroy {
         customSteps: this.customOrderSteps.concat(this.customApplicationSteps)
       }
 
-      this.store.dispatch(new UpdateWorkflow(workflowWithDetailsPut, this.selectedCard.businessUnitId, isRemoveStep));
+      this.store.dispatch(new UpdateWorkflow(workflowWithDetailsPut, isRemoveStep));
     } else {
       this.customStepOrderFormGroup.markAllAsTouched();
       this.customStepApplicationFormGroup.markAllAsTouched();

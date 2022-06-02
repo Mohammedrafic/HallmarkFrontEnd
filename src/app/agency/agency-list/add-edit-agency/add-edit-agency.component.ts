@@ -35,6 +35,7 @@ import { UserState } from 'src/app/store/user.state';
 import { User } from '@shared/models/user.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
+import { PaymentDetailsGridComponent } from "@agency/agency-list/add-edit-agency/payment-details-grid/payment-details-grid.component";
 
 type AgencyFormValue = {
   parentBusinessUnitId: number;
@@ -68,6 +69,10 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   get agencyControl(): AbstractControl | null {
     return this.agencyForm.get('agencyDetails');
+  }
+
+  get paymentDetailsControl(): FormArray {
+    return this.agencyForm.get('agencyPaymentDetails') as FormArray;
   }
 
   get billingControl(): AbstractControl | null {
@@ -288,11 +293,14 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
     };
   }
 
-  private patchAgencyFormValue({ agencyDetails, agencyBillingDetails, agencyContactDetails, createUnder }: Agency) {
+  private patchAgencyFormValue({ agencyDetails, agencyBillingDetails, agencyContactDetails, agencyPaymentDetails, createUnder }: Agency) {
     this.agencyForm.get('parentBusinessUnitId')?.patchValue(createUnder?.parentUnitId);
     this.agencyForm.get('isBillingPopulated')?.patchValue(agencyBillingDetails.sameAsAgency);
     this.agencyControl?.patchValue({ ...agencyDetails });
     this.billingControl?.patchValue({ ...agencyBillingDetails });
+    agencyPaymentDetails.forEach((payment) => {
+      this.paymentDetailsControl?.push(PaymentDetailsGridComponent.generatePaymentForm(payment))
+    });
     this.contacts.clear();
     agencyContactDetails.forEach((contact) => this.addContact(contact));
   }

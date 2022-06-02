@@ -31,6 +31,7 @@ import { UsersService } from "../services/users.service";
 import { RolesPerUser, User, UsersPage } from "@shared/models/user-managment-page.model";
 
 const BUSINNESS_DATA_DEFAULT_VALUE = { id: 0, name: 'All' };
+const BUSINNESS_DATA_HALLMARK_VALUE = { id: 0, name: 'Hallmark' };
 
 interface SecurityStateModel {
   bussinesData: BusinessUnit[];
@@ -124,8 +125,15 @@ export class SecurityState {
   @Selector()
   static newBusinessDataPerUser (state: SecurityStateModel): (type: number) => BusinessUnit[] {
     return (type: number) => type === 1 ?
-      [BUSINNESS_DATA_DEFAULT_VALUE, ...state.newRoleBussinesData] as BusinessUnit[]:
+      [BUSINNESS_DATA_HALLMARK_VALUE, ...state.newRoleBussinesData] as BusinessUnit[]:
       state.newRoleBussinesData;
+  }
+
+  @Selector()
+  static businessUserData (state: SecurityStateModel): (type: number) => BusinessUnit[] {
+    return (type: number) => type === 1 ?
+      [BUSINNESS_DATA_HALLMARK_VALUE, ...state.newRoleBussinesData] as BusinessUnit[]:
+      [BUSINNESS_DATA_DEFAULT_VALUE, ...state.newRoleBussinesData] as BusinessUnit[];
   }
 
   constructor(

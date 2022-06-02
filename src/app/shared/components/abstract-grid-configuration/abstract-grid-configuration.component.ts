@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { SortingDirections } from '@shared/enums/sorting';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -63,6 +64,13 @@ export abstract class AbstractGridConfigurationComponent {
 
   protected constructor() { }
 
+  generateDateTime(datePipe: DatePipe): string {
+    if (datePipe) {
+      return datePipe.transform(Date.now(),'MM/dd/yyyy hh:mm a') as string;
+    }
+    return '';
+  }
+
   rowSelected(event: any, grid: any): void {
     if (!event.target) {
       return;
@@ -72,8 +80,6 @@ export abstract class AbstractGridConfigurationComponent {
     } else {
       this.selectedItems.push(event.data);
     }
-    console.log(this.selectedItems);
-    console.log(event);
   }
 
   rowDeselected(event: any, grid: any): void {
@@ -94,8 +100,6 @@ export abstract class AbstractGridConfigurationComponent {
         this.selectedItems.splice(index, 1);
       }
     }
-    console.log(this.selectedItems);
-    console.log(event);
   }
 
   clearSelection(grid: any): void {
