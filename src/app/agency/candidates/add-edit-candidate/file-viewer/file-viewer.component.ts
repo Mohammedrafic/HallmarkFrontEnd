@@ -1,5 +1,8 @@
+import { CandidateState } from "@agency/store/candidate.state";
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Actions, ofActionSuccessful, Store } from "@ngxs/store";
+import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
+import { downloadBlobFile } from "@shared/utils/file.utils";
+import { Observable, Subject, takeUntil } from "rxjs";
 
 import { ListBox, SelectionSettingsModel } from "@syncfusion/ej2-angular-dropdowns";
 import {
@@ -11,10 +14,14 @@ import {
 } from "@syncfusion/ej2-angular-pdfviewer";
 import { DialogComponent } from "@syncfusion/ej2-angular-popups";
 import { getInstance } from '@syncfusion/ej2-base';
-import { Subject, takeUntil } from "rxjs";
 
-import { PreviewFileData } from "@shared/models/candidate-credential.model";
-import { GetCredentialFiles, GetCredentialFilesSucceeded } from "@agency/store/candidate.actions";
+import { CredentialGroupedFiles } from "@shared/models/candidate-credential.model";
+import {
+  GetCredentialFiles,
+  GetCredentialFilesSucceeded,
+  GetCredentialPdfFiles,
+  GetCredentialPdfFilesSucceeded,
+} from "@agency/store/candidate.actions";
 
 interface ListBoxItem {
   name: string;
@@ -32,7 +39,7 @@ export class FileViewerComponent implements OnInit, OnDestroy {
   @ViewChild('pdfViewer') pdfViewerControl: PdfViewerComponent;
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
-  @Input() openEvent: Subject<PreviewFileData>;
+  @Input() openEvent: Subject<void>;
 
   public isFullScreen: boolean;
   public width = `${window.innerWidth * 0.6}px`;
@@ -51,11 +58,16 @@ export class FileViewerComponent implements OnInit, OnDestroy {
   private unsubscribe$: Subject<void> = new Subject();
   private file: Blob;
 
+  @Select(CandidateState.groupedCandidateCredentialsFiles)
+  public groupedCandidateCredentialsFiles$: Observable<CredentialGroupedFiles[]>;
+
   constructor(private store: Store, private actions$: Actions) {}
 
   ngOnInit(): void {
     this.subscribeOnOpenEvent();
     this.subscribeOnPdfFileLoaded();
+    this.subscribeOnFileLoaded();
+    this.subscribeOnGroupedCandidateCredentialsFiles();
   }
 
   ngOnDestroy(): void {
@@ -79,40 +91,31 @@ export class FileViewerComponent implements OnInit, OnDestroy {
   public selectFile(event: any): void {
     this.previewFile = event.items[0];
     this.pdfViewerControl.unload();
-    this.getFileById((this.previewFile as ListBoxItem).id);
+    this.getPdfFileById((this.previewFile as ListBoxItem).id);
   }
 
   downloadFile(): void {
-    const a = document.createElement('a');
-    const objectUrl = URL.createObjectURL(this.file);
-
-    a.href = objectUrl
-    a.download = (this.previewFile as ListBoxItem).name;
-    a.click();
-    URL.revokeObjectURL(objectUrl);
+    this.getOriginalFileById((this.previewFile as ListBoxItem).id);
   }
 
   public onListBoxCreated(): void {
     let listBoxObj: ListBox = getInstance(document.getElementById("listBox") as HTMLElement, ListBox) as ListBox;
 
     listBoxObj.selectItems([(this.previewFile as ListBoxItem).name]);
-    this.getFileById((this.previewFile as ListBoxItem).id);
+    this.getPdfFileById((this.previewFile as ListBoxItem).id);
   }
 
-  private getFileById(id: number): void {
+  private getPdfFileById(id: number): void {
+    this.store.dispatch(new GetCredentialPdfFiles(id));
+  }
+
+  private getOriginalFileById(id: number): void {
     this.store.dispatch(new GetCredentialFiles(id));
   }
 
   private subscribeOnOpenEvent(): void {
-    this.openEvent.pipe(takeUntil(this.unsubscribe$)).subscribe((data: PreviewFileData) => {
-      data.credentials.forEach(credential => {
-        const dataItems = credential.credentialFiles?.map(file => {
-          return { name: file.name, id: file.id, category: credential.masterName };
-        });
-
-        this.data = this.data.concat(dataItems as unknown  as ListBoxItem);
-      })
-      this.previewFile = this.data.find(item => item.id === data.selectedFileId) as ListBoxItem;
+    this.openEvent.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.previewFile = this.data[0] as ListBoxItem;
       this.sideDialog.show(this.isFullScreen);
     });
   }
@@ -120,15 +123,33 @@ export class FileViewerComponent implements OnInit, OnDestroy {
   private subscribeOnPdfFileLoaded(): void {
     this.actions$.pipe(
       takeUntil(this.unsubscribe$),
-      ofActionSuccessful(GetCredentialFilesSucceeded)
+      ofActionSuccessful(GetCredentialPdfFilesSucceeded)
     ).subscribe((file: { payload: Blob }) => {
       const reader = new FileReader();
 
-      this.file = file.payload;
       reader.readAsDataURL(file.payload);
       reader.onloadend = () => {
         this.pdfViewerControl.load(reader.result as string, '');
       }
     });
+  }
+
+  private subscribeOnFileLoaded(): void {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetCredentialFilesSucceeded))
+      .subscribe((file: { payload: Blob }) => downloadBlobFile(file.payload, (this.previewFile as ListBoxItem).name));
+  }
+
+  private subscribeOnGroupedCandidateCredentialsFiles(): void {
+    this.groupedCandidateCredentialsFiles$.pipe(takeUntil(this.unsubscribe$))
+      .subscribe((groupedFiles: CredentialGroupedFiles[]) => {
+        this.data = [];
+        groupedFiles.forEach(category => {
+          const dataItems = category.files.map(file => {
+            return { name: file.name, id: file.id, category: category.credentialTypeName };
+          });
+
+          this.data = this.data.concat(dataItems as unknown  as ListBoxItem);
+        })
+      });
   }
 }

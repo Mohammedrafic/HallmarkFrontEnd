@@ -23,7 +23,8 @@ import {
   X,
   Filter,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Eye
 } from 'angular-feather/icons';
 import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
 import { PdfViewerModule } from "@syncfusion/ej2-angular-pdfviewer";
@@ -87,6 +88,7 @@ const sidebarIcons = {
   Filter,
   Maximize2,
   Minimize2,
+  Eye
 };
 
 @NgModule({

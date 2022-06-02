@@ -154,9 +154,24 @@ export class GetCredentialFiles {
   constructor(public payload: number) { }
 }
 
+export class GetCredentialPdfFiles {
+  static readonly type = '[candidate] Get Credential PDF Files';
+  constructor(public payload: number) { }
+}
+
 export class GetCredentialFilesSucceeded {
   static readonly type = '[candidate] Get Credential Files Succeeded';
   constructor(public payload: Blob) { }
+}
+
+export class GetCredentialPdfFilesSucceeded {
+  static readonly type = '[candidate] Get Credential PDF Files Succeeded';
+  constructor(public payload: Blob) { }
+}
+
+export class GetGroupedCredentialsFiles {
+  static readonly type = '[candidate] Get Grouped Credentials Files';
+  constructor() { }
 }
 
 export class UploadCredentialFilesSucceeded {
