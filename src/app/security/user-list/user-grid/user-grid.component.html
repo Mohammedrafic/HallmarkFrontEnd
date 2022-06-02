@@ -41,7 +41,7 @@
         <span>{{data.businessUnitName}}</span>
       </ng-template>
     </e-column>
-    <e-column field="hasVisibility" headerText="Visibility" textAlign="Left" [valueAccessor]='hasVisibility'></e-column>
+    <e-column *ngIf="!isAgencyUser" field="hasVisibility" headerText="Visibility" textAlign="Left" [valueAccessor]='hasVisibility'></e-column>
     <e-column textAlign="Right" width="80" freeze="Right">
       <ng-template #template let-data>
         <div class="row-tool-buttons">

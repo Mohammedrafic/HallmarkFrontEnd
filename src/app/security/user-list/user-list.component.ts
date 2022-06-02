@@ -147,7 +147,7 @@ export class UserListComponent implements OnInit, OnDestroy {
       });
     }
 
-    this.store.dispatch(new GetRolePerUser( this.businessControl?.value || '',this.businessUnitControl?.value || '')).subscribe((() => {
+    this.store.dispatch(new GetRolePerUser(user.businessUnitId as BusinessUnitType || 0, user.businessUnitType as BusinessUnitType)).subscribe((() => {
       this.userSettingForm.get('roles')?.setValue(user.roles?.map((role:any) => role.id));
     }));
 
