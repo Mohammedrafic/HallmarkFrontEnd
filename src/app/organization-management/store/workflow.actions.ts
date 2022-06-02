@@ -3,7 +3,7 @@ import { WorkflowMappingPost } from '@shared/models/workflow-mapping.model';
 
 export class GetWorkflows {
   static readonly type = '[workflow] Get Workflow list by businessUnitId';
-  constructor(public businessUnitId: number | null) {}
+  constructor() {}
 }
 
 export class GetWorkflowsSucceed {
@@ -19,7 +19,6 @@ export class SaveWorkflow {
 export class UpdateWorkflow {
   static readonly type = '[workflow] Update Workflow';
   constructor(public workflow: WorkflowWithDetailsPut,
-              public businessUnitId: number | null,
               public isRemoveStep: boolean) {}
 }
 
@@ -38,6 +37,11 @@ export class SaveWorkflowMapping {
   constructor(public payload: WorkflowMappingPost) {}
 }
 
+export class SaveWorkflowMappingSucceed {
+  static readonly type = '[workflow] Save Workflow Mapping Succeed';
+  constructor() {}
+}
+
 export class RemoveWorkflowMapping {
   static readonly type = '[workflow] Remove Workflow Mapping';
   constructor(public payload: number) {}
@@ -53,3 +57,12 @@ export class RemoveWorkflowDeclined {
   constructor() {}
 }
 
+export class GetRolesForWorkflowMapping {
+  static readonly type = '[workflow] Get Roles For Workflow Mapping';
+  constructor() {}
+}
+
+export class GetUsersForWorkflowMapping {
+  static readonly type = '[workflow] Get Users For Workflow Mapping';
+  constructor() {}
+}

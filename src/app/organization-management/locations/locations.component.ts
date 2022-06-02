@@ -110,8 +110,13 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     /**
      * TODO: pending filtering
      *    this.filteredItems = [
-            { text: 'Some filter option', column: 'extLocationId', value: 'fdfsd' }
+            { text: 'loc 1', column: 'locations', value: '1' }
+            { text: 'loc 2', column: 'locations', value: '2' }
+            { text: 'loc 3', column: 'locations', value: '3' }
           ];
+          filters = {
+            locations: [1,2,3]
+          }
      */
 
     this.formBuilder = builder;
