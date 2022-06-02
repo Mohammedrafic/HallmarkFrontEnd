@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, UNIT_FIELDS, DISABLED_GROUP } from "./user-list.constants";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { SecurityState } from "../store/security.state";
-import { filter, Observable, takeWhile } from "rxjs";
+import { filter, map, Observable, takeWhile } from "rxjs";
 import { BusinessUnit } from "@shared/models/business-unit.model";
 import { AbstractControl, FormControl, FormGroup } from "@angular/forms";
 import { SetHeaderState, ShowSideDialog } from "../../store/app.actions";
@@ -23,8 +23,8 @@ const EDIT_DIALOG_TITLE = 'Edit User';
   styleUrls: ['./user-list.component.scss']
 })
 export class UserListComponent implements OnInit, OnDestroy {
-  @Select(SecurityState.bussinesData)
-  public bussinesUserData$: Observable<BusinessUnit[]>;
+  @Select(SecurityState.businessUserData)
+  public businessUserData$:Observable<(type: number) => BusinessUnit[]>
 
   public businessForm: FormGroup;
   public userSettingForm: FormGroup;
@@ -70,6 +70,10 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.isAlive = false;
+  }
+
+  get bussinesUserData$(): Observable< BusinessUnit[]> {
+    return  this.businessUserData$.pipe(map(fn => fn(this.businessUnitControl?.value)));
   }
 
   public onAddNewUser() {
@@ -134,7 +138,7 @@ export class UserListComponent implements OnInit, OnDestroy {
         ...user,
         roles: [...user.roles],
         isDeleted: !user.isDeleted,
-        businessUnitId: user.businessUnitId || '',
+        businessUnitId: user.businessUnitId || 0,
         emailConfirmation: user.email
       }
       this.userSettingForm.patchValue({
