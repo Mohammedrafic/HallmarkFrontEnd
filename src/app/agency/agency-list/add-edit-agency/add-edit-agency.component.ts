@@ -44,6 +44,9 @@ type AgencyFormValue = {
   agencyContactDetails: AgencyContactDetails[];
   agencyPaymentDetails: AgencyPaymentDetails[];
 };
+
+const AGENCY_USER = 'Agency';
+
 @Component({
   selector: 'app-add-edit-agency',
   templateUrl: './add-edit-agency.component.html',
@@ -56,6 +59,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   public createUnderAvailable = false;
   public createUnderFields = OPRION_FIELDS;
   public title = 'Add';
+  public isAgencyUser = false;
 
 
   get contacts(): FormArray {
@@ -106,6 +110,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.generateAgencyForm();
+    this.checkAgencyUser();
     this.onBillingPopulatedChange();
     this.enableCreateUnderControl();
 
@@ -294,5 +299,10 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   private navigateToAgencyList(): void {
     this.router.navigate(['/agency/agency-list']);
+  }
+
+  private checkAgencyUser(): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    this.isAgencyUser = user?.businessUnitName === AGENCY_USER;
   }
 }
