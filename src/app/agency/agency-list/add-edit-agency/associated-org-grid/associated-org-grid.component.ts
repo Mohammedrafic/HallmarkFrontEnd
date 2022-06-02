@@ -47,7 +47,6 @@ export class AssociatedOrgGridComponent extends AbstractGridConfigurationCompone
 
   ngOnInit(): void {
     this.dispatchNewPage();
-
     this.actions$
       .pipe(
         ofActionSuccessful(UpdateAssociateOrganizationsPage),
