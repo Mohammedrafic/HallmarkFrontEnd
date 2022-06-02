@@ -42,7 +42,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
 
   public SkillFormGroup: FormGroup;
   public columnsToExport: ExportColumn[] = [
-    { text:'Skill Category', column: 'SkillCategory.Name'},
+    { text:'Skill Category', column: 'SkillCategoryName'},
     { text:'Skill ABBR', column: 'SkillAbbr'},
     { text:'Skill Description', column: 'SkillDescription'}
   ];
@@ -55,7 +55,6 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
     super();
-    this.defaultFileName = 'Master Skills ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.SkillFormGroup = this.fb.group({
       id: new FormControl(0),
       isDefault: new FormControl(true),
@@ -78,6 +77,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
       if (val.isDialogShown) {
+        this.defaultFileName = 'Skills/Master Skills ' + this.generateDateTime(this.datePipe);
         this.fileName = this.defaultFileName;
       }
     });
@@ -85,6 +85,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
       this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
     });
     this.export$.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
+      this.defaultFileName = 'Skills/Master Skills ' + this.generateDateTime(this.datePipe);
       this.defaultExport(event);
     });
   }

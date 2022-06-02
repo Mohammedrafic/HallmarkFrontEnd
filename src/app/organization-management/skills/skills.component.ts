@@ -61,7 +61,6 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
               private datePipe: DatePipe) {
     super();
     this.idFieldName = 'foreignKey';
-    this.defaultFileName = 'Organization Skills ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.SkillFormGroup = this.fb.group({
       id: new FormControl(0),
       isDefault: new FormControl(false),
@@ -98,6 +97,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public override customExport(): void {
+    this.defaultFileName = 'Organization Skills ' + this.generateDateTime(this.datePipe);
     this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
@@ -113,6 +113,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = 'Organization Skills ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportSkills(new ExportPayload(
       fileType, 
       { orderBy: this.orderBy }, 
