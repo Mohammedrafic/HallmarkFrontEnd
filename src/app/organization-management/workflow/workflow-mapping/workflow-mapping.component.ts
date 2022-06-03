@@ -86,6 +86,9 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   @Select(WorkflowState.users)
   users$: Observable<User[]>;
 
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
+
   public fields: FieldSettingsModel = { text: 'name', value: 'id' };
   public isEdit = false;
   public workflowMappingFormGroup: FormGroup;
@@ -121,10 +124,11 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   ngOnInit(): void {
     this.store.dispatch(new GetAllSkills());
     this.store.dispatch(new GetWorkflowMappingPages());
-
     this.store.dispatch(new GetRolesForWorkflowMapping());
     this.store.dispatch(new GetUsersForWorkflowMapping());
     this.store.dispatch(new GetWorkflows());
+
+    this.getComponentDataIfOrganizationChanged();
 
     combineLatest([this.users$, this.rolesPerUsers$])
       .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
@@ -248,7 +252,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.isMappingSectionShown = true;
     this.isEdit = true;
     this.editedRecordId = data.mappingId;
-    
+
 
     setTimeout(() => {
       const foundWorkflow = this.workflows.find(w => w.name === data.workflowName);
@@ -258,35 +262,34 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       } else {
         this.workflowMappingFormGroup.controls['regions'].setValue([data.regionId]);
       }
-  
+
       if (!data.locationId) {
         const locationIds = this.locations.map(location => location.id);
         this.workflowMappingFormGroup.controls['locations'].setValue(locationIds);
       } else {
         this.workflowMappingFormGroup.controls['locations'].setValue([data.locationId]);
       }
-  
+
       if (!data.departmentId) {
         const departmentIds = this.departments.map(department => department.id);
         this.workflowMappingFormGroup.controls['departments'].setValue(departmentIds);
       } else {
         this.workflowMappingFormGroup.controls['departments'].setValue([data.departmentId]);
       }
-  
+
       if (!data.skills) {
         this.workflowMappingFormGroup.controls['skills'].setValue(this.allSkills.map((skill: Skill) => skill.id));
       } else {
         this.workflowMappingFormGroup.controls['skills'].setValue(data.skills.map((skill: any) => skill.skillId));
       }
-  
+
       this.workflowMappingFormGroup.controls['workflowType'].setValue(WorkflowGroupType.Organization);
       this.workflowMappingFormGroup.controls['workflowName'].setValue(foundWorkflow?.id);
       this.setFormArrayControls(data.stepMappings);
     })
-    
+
 
     this.store.dispatch(new ShowSideDialog(true));
-    // setTimeout(() => this.refreshComponents(), 250);
   }
 
   public onRemoveButtonClick(data: any, event: any): void {
@@ -363,8 +366,6 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     if(args.data.stepMappings.length === 0) {
       args.row.querySelector('td').innerHTML = ' ';
       args.row.querySelector('td').className = 'e-customized-expand-cell';
-    } else {
-      // TODO: add event to dynamically show Custom Step Name, Role/User columns
     }
   }
 
@@ -449,10 +450,14 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.isMappingSectionShown = false;
   }
 
-  private refreshComponents(): void {
-    this.regionDropdown.refresh();
-    this.locationDropdown.refresh();
-    this.departmentDropdown.refresh();
+  private getComponentDataIfOrganizationChanged(): void {
+    this.organizationId$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.store.dispatch(new GetAllSkills());
+      this.store.dispatch(new GetWorkflowMappingPages());
+      this.store.dispatch(new GetRolesForWorkflowMapping());
+      this.store.dispatch(new GetUsersForWorkflowMapping());
+      this.store.dispatch(new GetWorkflows());
+    });
   }
 }
 

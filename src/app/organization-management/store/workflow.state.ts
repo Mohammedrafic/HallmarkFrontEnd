@@ -8,7 +8,6 @@ import {
   RemoveWorkflow,
   RemoveWorkflowMapping,
   RemoveWorkflowDeclined,
-  RemoveWorkflowSucceed,
   SaveWorkflow,
   SaveWorkflowMapping,
   UpdateWorkflow, SaveWorkflowMappingSucceed, GetRolesForWorkflowMapping, GetUsersForWorkflowMapping
@@ -76,7 +75,7 @@ export class WorkflowState {
           dispatch(new GetWorkflows());
           return payloadResponse;
         }),
-        catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+        catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.errors.WorkflowName[0])))
       );
   }
 
@@ -86,9 +85,6 @@ export class WorkflowState {
       .pipe(tap((payloadResponse) => {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED))
           dispatch(new GetWorkflows());
-          if (isRemoveStep) {
-            dispatch(new RemoveWorkflowSucceed());
-          }
           return payloadResponse;
         }),
         catchError((error: any) => {

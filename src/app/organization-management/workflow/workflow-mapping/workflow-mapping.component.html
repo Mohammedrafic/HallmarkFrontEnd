@@ -32,8 +32,8 @@
           <col width="200">
           <col width="200">
           <col width="200">
-          <col width="200">
-          <col width="200">
+          <col width="270">
+          <col width="170">
           <col width="120">
         </colgroup>
         <thead>
@@ -59,12 +59,12 @@
             <td class="e-rowcell e-templatecell"></td>
             <td class="e-rowcell e-templatecell"></td>
             <td class="e-rowcell e-templatecell"></td>
-            <td class="e-rowcell e-templatecell">
+            <td class="e-rowcell e-templatecell workflow-type-content">
               <span>
                 {{stepDetails.step.name + ' > ' + stepDetails.step.status}}
               </span>
             </td>
-            <td class="e-rowcell e-templatecell">{{stepDetails.roleUser?.name}}</td>
+            <td class="e-rowcell e-templatecell user-roles-content">{{stepDetails.roleUser?.name}}</td>
             <td class="e-rowcell e-templatecell"></td>
           </tr>
         </tbody>
@@ -94,7 +94,7 @@
           <span *ngFor="let skill of data.skills; let i = index">{{skill.skillDescription}}
             <span *ngIf="i !== data.skills.length - 1">, </span>
           </span>
-          <span *ngIf="!data.skills">All</span>
+          <span *ngIf="data.skills.length === 0">All</span>
         </ng-template>
       </e-column>
       <e-column headerText="WORKFLOW TYPE" width=180>
@@ -103,7 +103,7 @@
         </ng-template>
       </e-column>
       <e-column field="workflowName" headerText="WORKFLOW NAME" width=180></e-column>
-      <e-column headerText="CUSTOM STEP NAME" width=200></e-column>
+      <e-column headerText="CUSTOM STEP NAME" width=270></e-column>
       <e-column headerText="ROLE/USER" width=170></e-column>
       <e-column textAlign="Right" width=120>
         <ng-template #template let-data>

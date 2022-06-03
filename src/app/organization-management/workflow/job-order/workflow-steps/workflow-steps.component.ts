@@ -7,6 +7,8 @@ import { WorkflowType } from '@shared/enums/workflow-type';
 import { filter } from 'rxjs/operators';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
+import { Actions, ofActionSuccessful } from '@ngxs/store';
+import { RemoveWorkflowDeclined } from '../../../store/workflow.actions';
 
 @Component({
   selector: 'app-workflow-steps',
@@ -16,12 +18,13 @@ import { ConfirmService } from '@shared/services/confirm.service';
 export class WorkflowStepsComponent implements OnInit, OnDestroy {
   @Input() workflow: Workflow;
   @Input() workflowSteps$: Subject<Step[]>;
-
   @Input() customStepFormGroup: FormGroup;
+
   @Output() customStepAddClick = new EventEmitter;
   @Output() customStepRemoveClick = new EventEmitter;
 
-  public customSteps: Step[];
+  public initialSteps: Step[];
+  public steps: Step[];
   public workflowTypeName = '';
   public incompleteShortlistedStepName: string;
   public publishedOfferedStepName: string;
@@ -43,6 +46,7 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(@Inject(FormBuilder) private builder: FormBuilder,
+              private actions$: Actions,
               private confirmService: ConfirmService) {
     this.formBuilder = builder;
   }
@@ -50,27 +54,36 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.setStepNameAndStatus(this.workflow);
     this.workflowSteps$.pipe(filter(Boolean),takeUntil(this.unsubscribe$)).subscribe((steps: Step[]) => {
-      this.customSteps = [];
+      this.initialSteps = steps.slice(); // make a copy of steps to use them in case update will fail
+      this.steps = steps;
+
+      // remove steps that were added but not saved during workflows switching
+      const emptyLeftOverStep = steps.find(s => s.status === '' && s.name === '');
+      if (emptyLeftOverStep) {
+        this.steps.splice(this.steps.indexOf(emptyLeftOverStep), 1);
+      }
+
       this.customParentStatus.clear();
       this.customStepName.clear();
       this.customStepStatus.clear();
 
-      setTimeout(() => {
-        if (steps.length > 0) {
-          steps.forEach((item) => {
-            if ((item.type === WorkflowStepType.Incomplete && this.customParentStatus.length === 0)
-              || (item.type === WorkflowStepType.Shortlisted && this.customParentStatus.length === 0)) {
-              this.customParentStatus.push(this.formBuilder.control(item.status, [Validators.required, Validators.maxLength(50)]));
-            }
+      if (this.steps.length > 2) {
+        this.steps.forEach((item) => {
+          if ((item.type === WorkflowStepType.Incomplete && this.customParentStatus.length === 0)
+            || (item.type === WorkflowStepType.Shortlisted && this.customParentStatus.length === 0)) {
+            this.customParentStatus.push(this.formBuilder.control(item.status, [Validators.required, Validators.maxLength(50)]));
+          }
 
-            if (item.type !== WorkflowStepType.Incomplete && item.type !== WorkflowStepType.Shortlisted) {
-              this.customSteps.push(item);
-              this.customStepName.push(this.formBuilder.control(item.name, [Validators.required, Validators.maxLength(50)]));
-              this.customStepStatus.push(this.formBuilder.control(item.status, [Validators.required, Validators.maxLength(50)]));
-            }
-          });
-        }
-      });
+          if (item.type === WorkflowStepType.Custom) {
+            this.customStepName.push(this.formBuilder.control(item.name, [Validators.required, Validators.maxLength(50)]));
+            this.customStepStatus.push(this.formBuilder.control(item.status, [Validators.required, Validators.maxLength(50)]));
+          }
+        });
+      }
+    });
+
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(RemoveWorkflowDeclined)).subscribe(() => {
+      this.steps = this.initialSteps;
     });
   }
 
@@ -80,7 +93,8 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   }
 
   public onAddCustomStepClick(): void {
-    this.customStepAddClick.emit(this.workflow.type);
+    this.addParentStepStatus();
+    this.addChildStepDetails();
   }
 
   public onRemoveCustomStepButtonClick(index: number): void {
@@ -91,14 +105,40 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
         okButtonClass: 'delete-button'
       }).pipe(filter(confirm => !!confirm))
       .subscribe(() => {
-        this.customSteps.splice(index, 1);
-        this.customStepName.removeAt(index);
-        this.customStepStatus.removeAt(index);
+        this.steps.splice(index, 1);
+
+        if (this.steps.length === 2) {
+          this.steps = []; // if no custom steps, overridden parent status also not need
+        }
+
+        this.customStepName.removeAt(index - 2);
+        this.customStepStatus.removeAt(index - 2);
         if (this.customStepStatus.length === 0 && this.customStepStatus.length === 0) {
           this.customParentStatus.removeAt(0); // parent status is always the one, so its index = 0
         }
-        this.customStepRemoveClick.emit({ type: this.workflow.type, index: index + 1 });
+
+        this.customStepRemoveClick.emit();
       });
+  }
+
+  private addParentStepStatus(): void {
+    if (this.steps.length === 2) {
+      // add element to override parent status
+      this.steps[0].status = '';
+      this.customParentStatus.push(this.formBuilder.control('', [Validators.required, Validators.maxLength(50)]));
+    }
+  }
+
+  private addChildStepDetails(): void {
+    const newCustomStep: Step = {
+      name: '',
+      status: '',
+      type: WorkflowStepType.Custom,
+      workflowId: this.workflow.steps[0].workflowId
+    }
+    this.steps.push(newCustomStep);
+    this.customStepName.push(this.formBuilder.control('', [Validators.required, Validators.maxLength(50)]));
+    this.customStepStatus.push(this.formBuilder.control('', [Validators.required, Validators.maxLength(50)]));
   }
 
   private setStepNameAndStatus(workflow: Workflow): void {

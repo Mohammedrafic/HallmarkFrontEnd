@@ -45,7 +45,7 @@
       <!-- Custom Steps -->
       <div
         class="custom-step-container"
-        *ngFor="let step of customSteps; let i = index"
+        *ngFor="let item of customStepStatus.controls; let i = index"
       >
         <div class="e-card group child">
           <div class="input-container">
@@ -79,7 +79,7 @@
             <button
               ejs-button
               cssClass="e-flat default-icon-button"
-              (click)="onRemoveCustomStepButtonClick(i)">
+              (click)="onRemoveCustomStepButtonClick(i + 2)">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
