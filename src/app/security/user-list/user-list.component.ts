@@ -13,6 +13,7 @@ import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
 import { UserSettingsComponent } from "./add-edit-user/user-settings/user-settings.component";
 import { ConfirmService } from "@shared/services/confirm.service";
 import { UserDTO, User } from "@shared/models/user-managment-page.model";
+import { take } from "rxjs/operators";
 
 const DEFAULT_DIALOG_TITLE = 'Add User';
 const EDIT_DIALOG_TITLE = 'Edit User';
@@ -25,6 +26,9 @@ const EDIT_DIALOG_TITLE = 'Edit User';
 export class UserListComponent implements OnInit, OnDestroy {
   @Select(SecurityState.businessUserData)
   public businessUserData$:Observable<(type: number) => BusinessUnit[]>
+
+  @Select(SecurityState.newBusinessDataPerUser)
+  public newBusinessDataPerUser$:Observable<(type: number) => BusinessUnit[]>
 
   public businessForm: FormGroup;
   public userSettingForm: FormGroup;
@@ -90,6 +94,8 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   public onAddCancel(): void {
+    this.userSettingForm.reset();
+    this.userSettingForm.enable();
     if (this.userSettingForm.dirty) {
       this.confirmService
         .confirm(DELETE_CONFIRM_TEXT, {
@@ -147,10 +153,7 @@ export class UserListComponent implements OnInit, OnDestroy {
       });
     }
 
-    this.store.dispatch(new GetRolePerUser(user.businessUnitId as BusinessUnitType || 0, user.businessUnitType as BusinessUnitType)).subscribe((() => {
-      this.userSettingForm.get('roles')?.setValue(user.roles?.map((role:any) => role.id));
-    }));
-
+    this.subscribeOnFieldsChanges(user);
     this.disableBussinesUnitForRole();
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -199,5 +202,17 @@ export class UserListComponent implements OnInit, OnDestroy {
         this.businessControl.patchValue(0);
       }
     });
+  }
+
+  private subscribeOnFieldsChanges(user: User) {
+    if(user.businessUnitType !== BusinessUnitType.Hallmark) {
+      this.newBusinessDataPerUser$.pipe(take(2)).subscribe(() => {
+        this.userSettingForm.get('businessUnitId')?.setValue(user.businessUnitId);
+      });
+    }
+
+    this.store.dispatch(new GetRolePerUser(user.businessUnitId as BusinessUnitType || 0, user.businessUnitType as BusinessUnitType)).subscribe((() => {
+      this.userSettingForm.get('roles')?.setValue(user.roles?.map((role:any) => role.id));
+    }));
   }
 }
