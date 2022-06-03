@@ -30,7 +30,7 @@
     <e-column field="zip" headerText="Zip" textAlign="left"></e-column>
     <e-column field="startDate" headerText="Start Date" textAlign="left">
       <ng-template #template let-data>
-        {{ data.startDate | date:'yyy-MM-ddTHH:mm:ss'}}
+        {{ data.startDate | date:'MM/dd/yyy'}}
       </ng-template>
     </e-column>
     <e-column textAlign="Right" width="120">

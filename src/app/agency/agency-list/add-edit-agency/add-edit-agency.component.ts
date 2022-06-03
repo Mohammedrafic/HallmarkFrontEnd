@@ -207,6 +207,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   }
 
   public onImageSelect(event: Blob | null) {
+    this.agencyForm.markAsDirty();
     if (event) {
       this.filesDetails = [event as Blob];
     } else {
