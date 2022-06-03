@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-edit-order-credential-form',
@@ -6,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./edit-order-credential-form.component.scss']
 })
 export class EditOrderCredentialFormComponent implements OnInit {
+
+  @Input() form: FormGroup;
 
   constructor() { }
 
