@@ -1,0 +1,15 @@
+<app-widget-header [title]="'Candidates by Region'"></app-widget-header>
+<div class="map-control">
+  <div [ngClass]="sidebarIsOpen ? 'sidebar-opened' : 'sidebar-closed'">
+    <ejs-maps
+      id="maps"
+      [height]="height"
+      [width]="'95%'"
+      #maps
+      style="display: block"
+      [layers]="layers"
+      [legendSettings]="legendSettings"
+    >
+    </ejs-maps>
+  </div>
+</div>

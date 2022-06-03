@@ -6,12 +6,9 @@
       border-radius: 12px;
 
       .e-panel-container {
-        .content {
-          vertical-align: middle;
-          font-weight: 500;
-          font-size: 20px;
-          text-align: center;
-          line-height: 45px;
+        .e-panel-content {
+          position: relative;
+          overflow: "hidden";
         }
       }
     }

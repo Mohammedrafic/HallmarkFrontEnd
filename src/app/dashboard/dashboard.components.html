@@ -23,6 +23,7 @@
           <app-chart-line-widget [widget]="widgets['chart_line_'+ i]" *ngSwitchCase="'chart_line_'+ i"></app-chart-line-widget>
           <app-accumulation-chart [chartData]="accumulationWidgets[panel.id!]" *ngSwitchCase="'candidates_1'"></app-accumulation-chart>
           <app-accumulation-chart [chartData]="accumulationWidgets[panel.id!]" *ngSwitchCase="'invoces_1'"></app-accumulation-chart>
+          <app-maps-widget *ngSwitchCase="'america_map_1'"></app-maps-widget>
           <div *ngSwitchDefault></div>
         </ng-template>
       </e-panel>
