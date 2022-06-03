@@ -35,7 +35,7 @@ import { UserState } from 'src/app/store/user.state';
 import { User } from '@shared/models/user.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { PaymentDetailsGridComponent } from "@agency/agency-list/add-edit-agency/payment-details-grid/payment-details-grid.component";
+import { PaymentDetailsGridComponent } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-details-grid.component';
 
 type AgencyFormValue = {
   parentBusinessUnitId: number;
@@ -59,7 +59,6 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   public createUnderFields = OPRION_FIELDS;
   public title = 'Add';
   public isAgencyUser = false;
-
 
   get contacts(): FormArray {
     return this.agencyForm.get('agencyContactDetails') as FormArray;
@@ -144,13 +143,11 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   public enableCreateUnderControl(): void {
     const user = this.store.selectSnapshot(UserState.user) as User;
+    const parentBusinessUnitIdControl = this.agencyForm.get('parentBusinessUnitId');
+    parentBusinessUnitIdControl?.patchValue(user.businessUnitId);
+
     if (!DISABLED_BUSINESS_TYPES.includes(user?.businessUnitType)) {
       this.createUnderAvailable = true;
-      if (user.businessUnitType === BusinessUnitType.MSP) {
-        const parentBusinessUnitIdControl = this.agencyForm.get('parentBusinessUnitId');
-        parentBusinessUnitIdControl?.patchValue(BusinessUnitType.MSP);
-        parentBusinessUnitIdControl?.disable();
-      }
     }
   }
 
@@ -297,7 +294,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
     this.agencyControl?.patchValue({ ...agencyDetails });
     this.billingControl?.patchValue({ ...agencyBillingDetails });
     agencyPaymentDetails.forEach((payment) => {
-      this.paymentDetailsControl?.push(PaymentDetailsGridComponent.generatePaymentForm(payment))
+      this.paymentDetailsControl?.push(PaymentDetailsGridComponent.generatePaymentForm(payment));
     });
     this.contacts.clear();
     agencyContactDetails.forEach((contact) => this.addContact(contact));

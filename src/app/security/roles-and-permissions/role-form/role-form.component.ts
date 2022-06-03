@@ -123,7 +123,7 @@ export class RoleFormComponent implements OnInit, OnDestroy {
         )
         .subscribe(([type, id]) => {
           this.copyRoleControl.reset();
-          this.store.dispatch(new GetRolesForCopy(type, id));
+          this.store.dispatch(new GetRolesForCopy(type, id || ''));
         });
     }
   }
