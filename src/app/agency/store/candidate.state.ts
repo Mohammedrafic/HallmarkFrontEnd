@@ -51,6 +51,7 @@ import {
   UploadCredentialFiles,
   UploadCredentialFilesSucceeded
 } from './candidate.actions';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export interface CandidateStateModel {
   isCandidateLoading: boolean;
@@ -124,12 +125,16 @@ export class CandidateState {
   constructor(private candidateService: CandidateService, private skillsService: SkillsService) {}
 
   @Action(GetCandidatesByPage)
-  GetCandidatesByPage({ patchState }: StateContext<CandidateStateModel>, { pageNumber, pageSize }: GetCandidatesByPage): Observable<CandidatePage> {
+  GetCandidatesByPage({ patchState, dispatch }: StateContext<CandidateStateModel>, { pageNumber, pageSize }: GetCandidatesByPage): Observable<CandidatePage | unknown> {
     patchState({ isCandidateLoading: true });
     return this.candidateService.getCandidates(pageNumber, pageSize).pipe(
       tap((payload) => {
         patchState({ isCandidateLoading: false, candidatePage: payload });
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        patchState({isCandidateLoading: false, candidatePage: null });
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
       })
     );
   }

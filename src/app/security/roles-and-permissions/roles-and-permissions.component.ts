@@ -149,7 +149,9 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
     if (role.isDefault) {
       this.roleFormGroup.disable();
     }
-    this.disableBussinesUnitForRole();
+    
+    this.roleFormGroup.get('businessUnitType')?.disable();
+    this.roleFormGroup.get('businessUnitId')?.disable();
     this.store.dispatch(new ShowSideDialog(true));
   }
 

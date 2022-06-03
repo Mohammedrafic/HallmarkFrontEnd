@@ -11,12 +11,12 @@ import { GetUsersPage } from "../../store/security.actions";
 import { CreateUserStatus, STATUS_COLOR_GROUP } from "@shared/enums/status";
 import { User, UsersPage } from "@shared/models/user-managment-page.model";
 import { UserState } from "../../../store/user.state";
+import { BusinessUnitType } from "@shared/enums/business-unit-type";
 
 enum Visibility {
   Unassigned,
   Assigned
 }
-const AGENCY_USER = 'Agency';
 
 @Component({
   selector: 'app-user-grid',
@@ -102,6 +102,6 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
   private checkAgencyUser(): void {
     const user = this.store.selectSnapshot(UserState.user);
-    this.isAgencyUser = user?.businessUnitName === AGENCY_USER;
+    this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
   }
 }
