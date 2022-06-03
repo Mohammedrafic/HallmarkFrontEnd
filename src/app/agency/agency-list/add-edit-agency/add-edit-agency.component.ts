@@ -6,7 +6,7 @@ import { filter, Observable, Subscription, takeWhile } from 'rxjs';
 
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
-import {DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT} from '@shared/constants/messages';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT } from '@shared/constants/messages';
 import {
   Agency,
   AgencyBillingDetails,
@@ -45,8 +45,6 @@ type AgencyFormValue = {
   agencyContactDetails: AgencyContactDetails[];
   agencyPaymentDetails: AgencyPaymentDetails[];
 };
-
-const AGENCY_USER = 'Agency';
 
 @Component({
   selector: 'app-add-edit-agency',
@@ -311,6 +309,6 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   private checkAgencyUser(): void {
     const user = this.store.selectSnapshot(UserState.user);
-    this.isAgencyUser = user?.businessUnitName === AGENCY_USER;
+    this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
   }
 }
