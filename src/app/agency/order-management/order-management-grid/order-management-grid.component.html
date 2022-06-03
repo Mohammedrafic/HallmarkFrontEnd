@@ -78,7 +78,7 @@
     <e-column field="location" headerText="LOCATION" textAlign="Left" width="200"></e-column>
     <e-column field="startDate" headerText="START DATE" width="150"></e-column>
 
-    <e-column headerTextAlign="Right" width="150" freeze="Right">
+    <e-column headerTextAlign="Right" width="120" freeze="Right">
       <ng-template #headerTemplate let-data>
         <div class="controls-header">
           <button ejs-button cssClass="e-flat icon-button">
@@ -96,9 +96,6 @@
           </button>
           <button ejs-button cssClass="e-flat secondary-icon-button">
             <span><i-feather name="lock" class="icon"></i-feather></span>
-          </button>
-          <button ejs-button cssClass="e-flat primary-icon-button">
-            <span><i-feather name="more-vertical" class="icon"></i-feather></span>
           </button>
         </div>
       </ng-template>

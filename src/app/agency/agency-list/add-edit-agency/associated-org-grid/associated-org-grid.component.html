@@ -26,7 +26,7 @@
       <e-column field="tier" headerText="Tier" width="150" textAlign="left" [valueAccessor]="tierValueAccess"></e-column>
       <e-column field="exeptionFee" headerText="Exception Fee" width="150" textAlign="left"></e-column>
       <e-column headerText="Job Distribution" [columns]="jobDistributionColumns" textAlign="left"></e-column>
-      <e-column field="partnershipStatusTitle" headerText="Partnership Status" textAlign="left"></e-column>
+      <e-column field="partnershipStatus" headerText="Partnership Status" textAlign="left" [valueAccessor]="partnershipStatusValueAccess"></e-column>
 
       <e-column textAlign="Right" width="120" freeze="Right">
         <ng-template #template let-data>

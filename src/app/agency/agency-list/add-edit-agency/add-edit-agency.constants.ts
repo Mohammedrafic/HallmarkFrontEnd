@@ -5,4 +5,4 @@ export const OPRION_FIELDS = {
   value: 'id',
 };
 
-export const DISABLED_BUSINESS_TYPES = [BusinessUnitType.Agency, BusinessUnitType.Organization];
+export const DISABLED_BUSINESS_TYPES = [BusinessUnitType.Agency, BusinessUnitType.Organization, BusinessUnitType.MSP];
