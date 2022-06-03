@@ -20,10 +20,10 @@
         [id]="panel.id"
       >
         <ng-template #content [ngSwitch]="panel.id">
-          <app-chart-line-widget [widget]="widgets['chart_line_'+ i]" *ngSwitchCase="'chart_line_'+ i"></app-chart-line-widget>
+          <app-line-chart [widget]="widgets['chart_line_'+ i]" *ngSwitchCase="'chart_line_'+ i"></app-line-chart>
           <app-accumulation-chart [chartData]="accumulationWidgets[panel.id!]" *ngSwitchCase="'candidates_1'"></app-accumulation-chart>
           <app-accumulation-chart [chartData]="accumulationWidgets[panel.id!]" *ngSwitchCase="'invoces_1'"></app-accumulation-chart>
-          <app-maps-widget *ngSwitchCase="'america_map_1'"></app-maps-widget>
+          <app-maps-chart *ngSwitchCase="'america_map_1'"></app-maps-chart>
           <div *ngSwitchDefault></div>
         </ng-template>
       </e-panel>

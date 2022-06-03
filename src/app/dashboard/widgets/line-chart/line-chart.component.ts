@@ -1,11 +1,11 @@
 import { Component, Input } from '@angular/core';
 
 @Component({
-  selector: 'app-chart-line-widget',
-  templateUrl: './chart-line-widget.component.html',
-  styleUrls: ['./chart-line-widget.component.scss'],
+  selector: 'app-line-chart',
+  templateUrl: './line-chart.component.html',
+  styleUrls: ['./line-chart.component.scss'],
 })
-export class ChartLineWidgetComponent {
+export class LineChartComponent {
   @Input() widget: any;
   
   primaryXAxis = {

@@ -18,11 +18,11 @@ import { DashboardState } from './store/dashboard.state';
 import { DashboardService } from './services/dashboard.service';
 import { DashboardComponent } from './dashboard.components';
 import { AccumulationChartComponent } from './widgets/accumulation-chart/accumulation-chart.component';
-import { ChartLineWidgetComponent } from './widgets/chart-line-widget/chart-line-widget.component';
-import { MapsWidgetComponent } from './widgets/maps-widget/maps-widget.component';
 import { WidgetHeaderComponent } from './widgets/widget-header/widget-header.component';
+import { LineChartComponent } from './widgets/line-chart/line-chart.component';
+import { MapsChartComponent } from './widgets/maps-chart/maps-chart.component';
 @NgModule({
-  declarations: [DashboardComponent, ChartLineWidgetComponent, AccumulationChartComponent, MapsWidgetComponent, WidgetHeaderComponent],
+  declarations: [DashboardComponent, LineChartComponent, AccumulationChartComponent, MapsChartComponent, WidgetHeaderComponent],
   imports: [
     CommonModule,
     DashboardLayoutModule,

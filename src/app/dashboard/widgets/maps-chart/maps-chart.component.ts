@@ -8,11 +8,11 @@ import { ToggleSidebarState } from 'src/app/store/app.actions';
 import { us_map } from './us-map';
 
 @Component({
-  selector: 'app-maps-widget',
-  templateUrl: './maps-widget.component.html',
-  styleUrls: ['./maps-widget.component.scss'],
+  selector: 'app-maps-chart',
+  templateUrl: './maps-chart.component.html',
+  styleUrls: ['./maps-chart.component.scss'],
 })
-export class MapsWidgetComponent implements OnInit {
+export class MapsChartComponent implements OnInit {
   @ViewChild('maps') maps: Maps;
   private unsubscribe$ = new Subject();
   public height = '290';
