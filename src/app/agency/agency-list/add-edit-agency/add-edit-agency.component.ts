@@ -289,7 +289,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   }
 
   private patchAgencyFormValue({ agencyDetails, agencyBillingDetails, agencyContactDetails, agencyPaymentDetails, createUnder }: Agency) {
-    this.agencyForm.get('parentBusinessUnitId')?.patchValue(createUnder?.parentUnitId);
+    this.agencyForm.get('parentBusinessUnitId')?.patchValue(createUnder?.parentUnitId || 0);
     this.agencyForm.get('isBillingPopulated')?.patchValue(agencyBillingDetails.sameAsAgency);
     this.agencyControl?.patchValue({ ...agencyDetails });
     this.billingControl?.patchValue({ ...agencyBillingDetails });

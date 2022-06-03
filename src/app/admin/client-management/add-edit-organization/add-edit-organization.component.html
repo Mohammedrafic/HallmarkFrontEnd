@@ -9,7 +9,7 @@
     <button ejs-button [isPrimary]="true" (click)="save()" class="save-button" id="saveButton">Save</button>
   </div>
 </section>
-<section class="create-under-container bootstrap">
+<section class="create-under-container bootstrap" *ngIf="!isMspUser">
   <div class="left-section">
     <form *ngIf="CreateUnderFormGroup" [formGroup]="CreateUnderFormGroup" id="createUnder">
       <label>Create Under<span class="required">*</span></label>
