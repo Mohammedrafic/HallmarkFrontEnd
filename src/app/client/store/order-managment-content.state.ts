@@ -9,7 +9,7 @@ export interface OrderManagementContentStateModel {
 }
 
 @State<OrderManagementContentStateModel>({
-  name: 'organizationManagement',
+  name: 'orderManagement',
   defaults: {
     orders: null
   }
