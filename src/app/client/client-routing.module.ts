@@ -36,6 +36,7 @@ const routes: Routes = [
         path: 'order-management/add',
         component: AddEditOrderComponent,
         data: {
+          isOrganizationArea: true,
           isEditing: false
         },
         canDeactivate: [UnsavedChangesGuard]

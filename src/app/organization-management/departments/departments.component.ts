@@ -107,6 +107,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   public override customExport(): void {
+    this.defaultFileName = 'Organization Departments ' + this.generateDateTime(this.datePipe);
     this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
@@ -125,7 +126,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.defaultFileName = 'Organization Departments ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportDepartments(new ExportPayload(
       fileType, 
-      { locationId: this.selectedLocation.id }, 
+      { locationId: this.selectedLocation.id, offset: Math.abs(new Date().getTimezoneOffset()) }, 
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
       options?.fileName || this.defaultFileName
