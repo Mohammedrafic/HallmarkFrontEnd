@@ -28,7 +28,11 @@
     <e-column field="address" headerText="Address" textAlign="left"></e-column>
     <e-column field="city" headerText="City" textAlign="left"></e-column>
     <e-column field="zip" headerText="Zip" textAlign="left"></e-column>
-    <e-column field="startDate" headerText="Start Date" textAlign="left" format="yMd"></e-column>
+    <e-column field="startDate" headerText="Start Date" textAlign="left">
+      <ng-template #template let-data>
+        {{ data.startDate | date:'yyy-MM-ddTHH:mm:ss'}}
+      </ng-template>
+    </e-column>
     <e-column textAlign="Right" width="120">
       <ng-template #template let-data>
         <div class="row-tool-buttons">
