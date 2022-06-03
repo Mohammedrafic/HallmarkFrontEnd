@@ -45,8 +45,8 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   public SkillFormGroup: FormGroup;
   public columnsToExport: ExportColumn[] = [
     { text:'Skill Category', column: 'SkillCategory_Name'},
-    { text:'Skill ABBR', column: 'MasterSkill_SkillAbbr'},
-    { text:'Skill Description', column: 'MasterSkill_SkillDescription'},
+    { text:'Skill ABBR', column: 'SkillAbbr'},
+    { text:'Skill Description', column: 'SkillDescription'},
     { text:'GL Number', column: 'GLNumber'},
     { text:'Allow Onboard', column: 'AllowOnboard'},
     { text:'Inactivate Date', column: 'InactiveDate'}

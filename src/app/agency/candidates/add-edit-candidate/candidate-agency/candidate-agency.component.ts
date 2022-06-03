@@ -36,7 +36,7 @@ export class CandidateAgencyComponent implements AfterViewInit {
 
   static createFormGroup(): FormGroup {
     return new FormGroup({
-      agencyId: new FormControl(null, [Validators.required]),
+      agencyId: new FormControl(null),
     });
   }
 }
