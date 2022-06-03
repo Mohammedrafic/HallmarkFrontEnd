@@ -1,49 +1,6 @@
 @import "colors";
 
 .chart-wrapper {
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    h3 {
-      margin: 16px 0 0 24px;
-      font-size: 16px;
-      font-weight: 700;
-      line-height: 28px;
-      color: #1a1b2e;
-    }
-
-    .chart-toolbar {
-      margin: 16px 24px 0 0;
-      display: flex;
-      color: $secondary-dark-blue-30;
-
-      .plus-icon {
-        margin-right: 8px;
-
-        .plus:before {
-          content: "\e963";
-          margin-right: 4px;
-        }
-      }
-
-      .week-icon {
-        margin-right: 8px;
-
-        .e-day {
-          margin-right: 4px;
-        }
-      }
-
-      .e-download:before {
-        content: "\e7a1";
-        margin-right: 8px;
-        font-weight: 700;
-      }
-    }
-  }
-
   .control-section {
     position: relative;
     .donut-chart {

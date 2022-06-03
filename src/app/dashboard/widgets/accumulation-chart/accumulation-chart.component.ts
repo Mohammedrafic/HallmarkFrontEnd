@@ -21,7 +21,7 @@ export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy 
   public datalabel = { visible: false };
   public legendSettings: Object = {
     visible: true,
-    toggleVisibility: false,
+    toggleVisibility: true,
     height: '55%',
     textWrap: 'Wrap',
     maximumLabelWidth: 400,
@@ -56,10 +56,5 @@ export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy 
   public chartMouseClick(args: IMouseEventArgs): void {
     console.log(args);
     console.log(this.pie);
-  }
-
-  legendRender(event: ILegendRenderEventArgs) {
-    console.log(event);
-    event.fill = '#FF5858';
   }
 }
