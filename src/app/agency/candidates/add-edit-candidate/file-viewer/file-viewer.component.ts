@@ -39,7 +39,7 @@ export class FileViewerComponent implements OnInit, OnDestroy {
   @ViewChild('pdfViewer') pdfViewerControl: PdfViewerComponent;
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
-  @Input() openEvent: Subject<void>;
+  @Input() openEvent: Subject<number>;
 
   public isFullScreen: boolean;
   public width = `${window.innerWidth * 0.6}px`;
@@ -114,8 +114,8 @@ export class FileViewerComponent implements OnInit, OnDestroy {
   }
 
   private subscribeOnOpenEvent(): void {
-    this.openEvent.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.previewFile = this.data[0] as ListBoxItem;
+    this.openEvent.pipe(takeUntil(this.unsubscribe$)).subscribe((fileId: number) => {
+      this.previewFile = this.data.find(item => item.id === fileId) as ListBoxItem;
       this.sideDialog.show(this.isFullScreen);
     });
   }
