@@ -1,0 +1,110 @@
+<ejs-dialog
+  #sideDialog
+  cssClass="dialog"
+  [width]="width"
+  [target]="targetElement"
+  [visible]="false"
+  [isModal]="true"
+  [animationSettings]="{ effect: 'SlideRight' }">
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">{{title}} Visibility</h3>
+          </div>
+          <div  class="e-card-content">
+            <button
+              ejs-button
+              cssClass="e-outline button-cancel"
+              id="cancelFormButton"
+              (click)="onFormCancelClick()">Cancel</button>
+            <button
+              ejs-button
+              id="addFormButton"
+              type="submit"
+              [isPrimary]="true"
+              (click)="onFormSaveClick()">Save</button>
+          </div>
+        </div>
+      </section>
+      <section class="form-container">
+        <form [formGroup]="form">
+          <div class="dropdown-container bootstrap">
+            <label>Organisation<span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist appValidateWithMessage
+                                formControlName="organisationIds"
+                                [fields]="organisationFields"
+                                [dataSource]="organisations"
+                                [enabled]="!isOrganisationUser"
+                                placeholder="Organisation">
+              </ejs-dropdownlist>
+            </div>
+          </div>
+          <div class="dropdown-container bootstrap">
+            <label>Region</label>
+            <div class="input-group">
+              <ejs-multiselect appValidateWithMessage
+                               mode="CheckBox"
+                               selectAllText="All"
+                               [showSelectAll]="true"
+                               [allowFiltering]="false"
+                               [showDropDownIcon]="true"
+                               [fields]="optionFields"
+                               [dataSource]="regions"
+                               formControlName="regionIds"
+                               placeholder="Region">
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div class="dropdown-container bootstrap">
+            <label>Location</label>
+            <div class="input-group">
+              <ejs-multiselect appValidateWithMessage
+                               mode="CheckBox"
+                               selectAllText="All"
+                               [showSelectAll]="true"
+                               [allowFiltering]="false"
+                               [showDropDownIcon]="true"
+                               [fields]="optionFields"
+                               [dataSource]="locations"
+                               formControlName="locationIds"
+                               placeholder="Location">
+                <ng-template #itemTemplate let-data>
+                  <div class="visibility-option-container">
+                    <span>{{data?.name}}</span>
+                    <span class="parent-option-name">{{data?.regionName}}</span>
+                  </div>
+                </ng-template>
+              </ejs-multiselect>
+            </div>
+          </div>
+          <div class="dropdown-container bootstrap">
+            <label>Department</label>
+            <div class="input-group">
+              <ejs-multiselect appValidateWithMessage
+                               mode="CheckBox"
+                               selectAllText="All"
+                               [showSelectAll]="true"
+                               [allowFiltering]="false"
+                               [showDropDownIcon]="true"
+                               [fields]="optionFields"
+                               [dataSource]="departments"
+                               formControlName="departmentIds"
+                               placeholder="Department">
+                <ng-template #itemTemplate let-data>
+                  <div class="visibility-option-container">
+                    <span>{{data?.name}}</span>
+                    <span class="parent-option-name">{{data?.locationName}}</span>
+                  </div>
+                </ng-template>
+              </ejs-multiselect>
+            </div>
+          </div>
+        </form>
+      </section>
+    </section>
+  </ng-template>
+</ejs-dialog>
+
