@@ -10,7 +10,6 @@ import {
   AccumulationChartAllModule,
   PieSeriesService,
   LegendService,
-  TooltipService
 } from '@syncfusion/ej2-angular-charts';
 import { NgxsModule } from '@ngxs/store';
 
@@ -34,6 +33,12 @@ import { WidgetHeaderModule } from './widgets/widget-header/widget-header.module
     RouterModule.forChild([{ path: '', component: DashboardComponent }]),
     NgxsModule.forFeature([DashboardState]),
   ],
-  providers: [DashboardService, CategoryService, SplineSeriesService, PieSeriesService, LegendService, TooltipService],
+  providers: [
+    DashboardService,
+    CategoryService,
+    SplineSeriesService,
+    PieSeriesService,
+    LegendService,
+  ],
 })
 export class DashboardModule {}
