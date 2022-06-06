@@ -67,6 +67,7 @@ import { OrderManagementGridComponent } from './order-management/order-managemen
 import { PreviewOrderDialogComponent } from './order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
 import { FileViewerComponent } from './candidates/add-edit-candidate/file-viewer/file-viewer.component';
 import { ProfileComponent } from './profile/profile.component';
+import { OrderCandidatesComponent } from "@agency/order-management/order-management-grid/preview-order-dialog/candidates/order-candidates.component";
 
 const sidebarIcons = {
   Sliders,
@@ -120,6 +121,7 @@ const sidebarIcons = {
     OrderManagementGridComponent,
     PreviewOrderDialogComponent,
     ProfileComponent,
+    OrderCandidatesComponent
   ],
   imports: [
     CommonModule,

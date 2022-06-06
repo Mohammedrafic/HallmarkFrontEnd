@@ -52,7 +52,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
    ngOnInit(): void {
      this.openPreview.pipe(filter((open) => !open)).subscribe(() => {
-       console.log('clear')
        this.grid.clearRowSelection();
      })
    }

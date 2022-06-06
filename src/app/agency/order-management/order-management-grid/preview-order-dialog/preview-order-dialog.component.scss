@@ -1,0 +1,14 @@
+.order-tabs {
+  margin-top: 24px;
+
+  span {
+    margin-left: 12px;
+  }
+
+  &.first-active {
+    .e-tab .e-tab-header:not(.e-vertical) .e-indicator {
+      left: 0px !important;
+      right: 235px !important;
+    }
+  }
+}
