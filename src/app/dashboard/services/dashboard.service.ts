@@ -63,10 +63,10 @@ export class DashboardService {
         candidates: 15,
         progress: -4,
         chartData: [
-          { x: 'Pending', y: 45, text: '45%' },
-          { x: 'Submitted', y: 15, text: '15%' },
-          { x: 'Approved', y: 9, text: '9%' },
-          { x: 'Paid', y: 31, text: '31%' },
+          { x: 'Pending', y: 4, text: '4%' },
+          { x: 'Submitted', y: 65, text: '65%' },
+          { x: 'Approved', y: 19, text: '19%' },
+          { x: 'Paid', y: 24, text: '24%' },
         ],
       },
     };

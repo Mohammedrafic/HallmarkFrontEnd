@@ -37,7 +37,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.getDashboardPanels();
     this.refreshDashboard();
     this.accumulationWidgets = this.dashboardService.getAccumulationWidgets();
-    this.widgets = this.dashboardService.getChartLineWidgets()
+    this.widgets = this.dashboardService.getChartLineWidgets();
   }
 
   ngOnDestroy(): void {

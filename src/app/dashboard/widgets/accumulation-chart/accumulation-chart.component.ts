@@ -1,35 +1,31 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Actions, ofActionDispatched } from '@ngxs/store';
-import { ILegendRenderEventArgs, IMouseEventArgs } from '@syncfusion/ej2-angular-charts';
+import { AccumulationChartComponent as Pie } from '@syncfusion/ej2-angular-charts';
 import { Subject, takeUntil } from 'rxjs';
 import { ToggleSidebarState } from 'src/app/store/app.actions';
+import { ChartAccumulation, DonutChartData } from '../../models/chart-accumulation-widget.model';
 
 @Component({
   selector: 'app-accumulation-chart',
   templateUrl: './accumulation-chart.component.html',
   styleUrls: ['./accumulation-chart.component.scss'],
-  encapsulation: ViewEncapsulation.None,
 })
 export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() chartData: any;
-  @ViewChild('pie')
-  public pie: AccumulationChartComponent;
-  sidebarIsOpened = false;
+  @Input('chartData') chart: ChartAccumulation;
+  @ViewChild('pie') pie: Pie;
+  public toggleLegend: number[] = [];
   public palette: string[];
-  public height = '65%';
+  public height = '30%';
   public tooltip = { enable: true };
   public datalabel = { visible: false };
+  public chartData: DonutChartData[];
   public legendSettings: Object = {
-    visible: true,
-    toggleVisibility: true,
-    height: '55%',
-    textWrap: 'Wrap',
-    maximumLabelWidth: 400,
-    position: 'Bottom',
-    alignment: 'Near',
+    visible: false,
   };
 
   private unsubscribe$ = new Subject();
+  private chartColors = ['#ECF2FF', '#C5D9FF', '#9EBFFF', '#6499FF'];
+
   constructor(private actions$: Actions) {}
 
   ngOnDestroy(): void {
@@ -37,24 +33,30 @@ export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy 
     this.unsubscribe$.complete();
   }
 
-  ngOnChanges(): void {}
-
-  pointClick(event: any) {
-    console.log('Click', event);
-  }
-
-  clickD(event: any) {
-    console.log('click', event);
+  ngOnChanges(): void {
+    this.chartData = [...this.chart.chartData];
   }
 
   ngOnInit(): void {
-    this.palette = ['#6499FF', '#9EBFFF', '#C5D9FF', '#ECF2FF'];
-    this.actions$.pipe(ofActionDispatched(ToggleSidebarState), takeUntil(this.unsubscribe$)).subscribe((data) => {
-      setTimeout(() => (this.pie.height = data.payload ? '53%' : '65%'), 500)});
+    this.palette = this.chartColors;
+    this.actions$.pipe(ofActionDispatched(ToggleSidebarState), takeUntil(this.unsubscribe$)).subscribe(() => {
+      setTimeout(() => {
+        this.pie.refreshChart();
+      }, 500);
+    });
   }
 
-  public chartMouseClick(args: IMouseEventArgs): void {
-    console.log(args);
-    console.log(this.pie);
+  onClickLegend(index: number): void {
+    if (this.toggleLegend.includes(index)) {
+      this.toggleLegend = this.toggleLegend.filter((item) => item !== index);
+    } else {
+      this.toggleLegend.push(index);
+    }
+    this.palette = this.chartColors.filter((_, idx) => !this.toggleLegend.includes(idx));
+    this.chartData = this.chart.chartData.filter((_, idx) => !this.toggleLegend.includes(idx));
+  }
+
+  onCheckboxChange(event: Event): void {
+    console.log((event.target as HTMLInputElement).value);
   }
 }
