@@ -21,6 +21,7 @@ import { OrganizationManagementState } from '../../store/organization-management
 import { CredentialType } from '@shared/models/credential-type.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { SortSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
+import { UserState } from '../../../store/user.state';
 
 @Component({
   selector: 'app-credentials-list',
@@ -64,6 +65,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new GetCredential());
     this.store.dispatch(new GetCredentialTypes());
     this.mapGridData();
+
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveCredentialSucceeded)).subscribe(() => {
       this.clearFormDetails();
       this.store.dispatch(new GetCredential());
@@ -129,15 +131,19 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   }
 
   public onFormCancelClick(): void {
-    this.confirmService
-      .confirm(CANCEL_COFIRM_TEXT, {
-        title: DELETE_CONFIRM_TITLE,
-        okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
-        this.clearFormDetails();
-      });
+    if (this.credentialsFormGroup.dirty) {
+      this.confirmService
+        .confirm(CANCEL_COFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => !!confirm))
+        .subscribe(() => {
+          this.clearFormDetails();
+        });
+    } else {
+      this.clearFormDetails();
+    }
   }
 
   public onFormSaveClick(): void {

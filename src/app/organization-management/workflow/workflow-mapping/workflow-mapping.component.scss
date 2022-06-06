@@ -83,7 +83,6 @@ table.detailtable {
         border-bottom: 1px solid $secondary-dark-blue-40;
 
         &.workflow-type {
-          padding-left: 0;
 
           span {
             font-style: normal;
@@ -103,24 +102,22 @@ table.detailtable {
 
       td {
         &.workflow-type-content {
-          padding-left: 0;
 
           p {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            width:245px;
+            width: 150px;
           }
         }
 
         &.user-roles-content {
-          padding-left: 0;
 
           p {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            width:140px;
+            width:120px;
           }
         }
       }

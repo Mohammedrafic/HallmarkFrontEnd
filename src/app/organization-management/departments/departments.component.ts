@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -220,19 +220,27 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   onDepartmentFormCancelClick(): void {
-    this.confirmService
-      .confirm(CANCEL_COFIRM_TEXT, {
-        title: DELETE_CONFIRM_TITLE,
-        okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false));
-        this.isEdit = false;
-        this.editedDepartmentId = undefined;
-        this.departmentsDetailsFormGroup.reset();
-        this.removeActiveCssClass();
-      });
+    if (this.departmentsDetailsFormGroup.dirty) {
+      this.confirmService
+        .confirm(CANCEL_COFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => !!confirm))
+        .subscribe(() => {
+          this.store.dispatch(new ShowSideDialog(false));
+          this.isEdit = false;
+          this.editedDepartmentId = undefined;
+          this.departmentsDetailsFormGroup.reset();
+          this.removeActiveCssClass();
+        });
+    } else {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.isEdit = false;
+      this.editedDepartmentId = undefined;
+      this.departmentsDetailsFormGroup.reset();
+      this.removeActiveCssClass();
+    }
   }
 
   onDepartmentFormSaveClick(): void {

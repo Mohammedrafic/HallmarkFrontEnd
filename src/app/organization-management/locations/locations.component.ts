@@ -272,19 +272,27 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   onFormCancelClick(): void {
-    this.confirmService
-      .confirm(CANCEL_COFIRM_TEXT, {
-        title: DELETE_CONFIRM_TITLE,
-        okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false));
-        this.isEdit = false;
-        this.editedLocationId = undefined;
-        this.locationDetailsFormGroup.reset();
-        this.removeActiveCssClass();
-      });
+    if (this.locationDetailsFormGroup.dirty) {
+      this.confirmService
+        .confirm(CANCEL_COFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => !!confirm))
+        .subscribe(() => {
+          this.store.dispatch(new ShowSideDialog(false));
+          this.isEdit = false;
+          this.editedLocationId = undefined;
+          this.locationDetailsFormGroup.reset();
+          this.removeActiveCssClass();
+        });
+    } else {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.isEdit = false;
+      this.editedLocationId = undefined;
+      this.locationDetailsFormGroup.reset();
+      this.removeActiveCssClass();
+    }
   }
 
   onFormSaveClick(): void {
