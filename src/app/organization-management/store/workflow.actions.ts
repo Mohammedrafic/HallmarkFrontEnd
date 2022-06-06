@@ -47,11 +47,6 @@ export class RemoveWorkflowMapping {
   constructor(public payload: number) {}
 }
 
-export class RemoveWorkflowSucceed {
-  static readonly type = '[workflow] Remove Workflow Succeed';
-  constructor() {}
-}
-
 export class RemoveWorkflowDeclined {
   static readonly type = '[workflow] Remove Workflow Declined';
   constructor() {}

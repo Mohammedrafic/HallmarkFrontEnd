@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { FreezeService, GridComponent, PagerComponent, PageSettingsModel } from '@syncfusion/ej2-angular-grids';
 import { Observable, of } from 'rxjs';
 
@@ -12,6 +12,9 @@ import { SetHeaderState } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { ResizeSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
+import { OrderManagemetTabs } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { GetIncompleteOrders } from '@client/store/order-managment-content.actions';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
@@ -26,7 +29,12 @@ export const ROW_HEIGHT = {
 })
 export class OrderManagementContentComponent implements OnInit {
 
+  @Select(OrderManagementContentState.orders)
+  orders$: Observable<any>;
+
   data: Observable<object[]> = of(data);
+  mockData: object[];
+
   pageSettings: PageSettingsModel = ORDERS_GRID_CONFIG.gridPageSettings;
   allowPaging = ORDERS_GRID_CONFIG.isPagingEnabled;
   gridHeight = ORDERS_GRID_CONFIG.gridHeight;
@@ -48,6 +56,7 @@ export class OrderManagementContentComponent implements OnInit {
   totalDataRecords: number;
   pageSizePager = ORDERS_GRID_CONFIG.initialRowsPerPage;
   currentPagerPage: number = 1;
+  isLockMenuButtonShown = true;
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
@@ -58,9 +67,43 @@ export class OrderManagementContentComponent implements OnInit {
 
   ngOnInit(): void {
     this.data.subscribe(data => {
+      this.mockData = data;
       this.lastAvailablePage = this.getLastPage(data);
       this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
       this.totalDataRecords = data.length;
+    });
+
+    this.orders$.subscribe(data => {
+      if (data) {
+        // const d = {
+        //   items: [
+        //     {
+        //       id: 1,
+        //       status: 1,
+        //       statusText: "Incomplete",
+        //       jobTitle: "Orders_Create_billrates",
+        //       skillId: 1,
+        //       skillName: "MasterSkill1InCategory1",
+        //       openPositions: 0,
+        //       orderType: 0,
+        //       regionId: 1,
+        //       regionName: "West",
+        //       locationId: 1,
+        //       locationName: "FirstLocation",
+        //       departmentId: 1,
+        //       departmentName: "First department",
+        //       billRate: 50.00,
+        //       startDate: "2022-06-02T21:12:40.075981+00:00"
+        //     }
+        //   ],
+        //   pageNumber: 1,
+        //   totalPages: 1,
+        //   totalCount: 1,
+        //   hasPreviousPage: false,
+        //   hasNextPage: false
+        // }
+        this.gridDataSource  = data.items;
+      }
     });
   }
 
@@ -113,4 +156,32 @@ export class OrderManagementContentComponent implements OnInit {
   getLastPage(data: object[]): number {
     return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
   }
+
+  public tabSelected(data: any): void {
+    if (data === OrderManagemetTabs.Incomplete) {
+      this.isLockMenuButtonShown = false;
+      this.store.dispatch(new GetIncompleteOrders({}));
+    } else {
+      this.isLockMenuButtonShown = true;
+      this.gridDataSource = this.mockData;
+    }
+  }
+
+  public getOrderTypeName(orderType: number): string {
+    return OrderTypeName[OrderType[orderType] as OrderTypeName];
+  }
+}
+
+export enum OrderTypeName {
+  ContractToPerm = 'ContractToPerm',
+  OpenPerDiem = 'OpenPerDiem',
+  PermPlacement = 'PermPlacement',
+  Traveler = 'Traveler'
+}
+
+export enum OrderType {
+  ContractToPerm = 0,
+  OpenPerDiem = 1,
+  PermPlacement = 2,
+  Traveler = 3
 }

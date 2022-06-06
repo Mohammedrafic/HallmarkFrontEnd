@@ -109,10 +109,14 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetOrganizationSettings());
-    this.store.dispatch(new GetRegions());
-    this.organizationId$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(id => {
-      this.organizationId = id;
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
+      if (id) {
+        this.organizationId = id;
+      } else {
+        this.organizationId = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
+      }
+      this.store.dispatch(new GetOrganizationSettings());
+      this.store.dispatch(new GetRegions());
     });
     this.mapGridData();
     this.isEditOverrideAccessible();

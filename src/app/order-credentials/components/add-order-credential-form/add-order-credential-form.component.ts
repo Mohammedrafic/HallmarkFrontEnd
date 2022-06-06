@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { GetAllCredentials, GetAllCredentialTypes } from '@order-credentials/store/credentials.actions';
@@ -45,7 +45,6 @@ export class AddOrderCredentialFormComponent implements OnInit {
   public selectCredential(event: any): void {
     this.form.get('credentialName')?.setValue(event.data.name);
     this.form.get('credentialType')?.setValue(event.data.credentialTypeName);
-    console.log(event);
   }
 
   public deselectCredential(event: any): void {

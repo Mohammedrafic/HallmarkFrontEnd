@@ -83,6 +83,8 @@ table.detailtable {
         border-bottom: 1px solid $secondary-dark-blue-40;
 
         &.workflow-type {
+          padding-left: 0;
+
           span {
             font-style: normal;
             font-weight: 600;
@@ -98,6 +100,16 @@ table.detailtable {
   tbody {
     tr {
       height: 64px !important;
+
+      td {
+        &.workflow-type-content {
+          padding-left: 0;
+        }
+
+        &.user-roles-content {
+          padding-left: 0;
+        }
+      }
     }
   }
 }

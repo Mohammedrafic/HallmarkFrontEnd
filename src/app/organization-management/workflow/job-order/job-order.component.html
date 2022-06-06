@@ -10,7 +10,7 @@
       cssClass="save-button"
       [isPrimary]="true"
       [disabled]="workflowsWithDetails.length === 0"
-      (click)="onUpdateWorkflowClick()">Save</button>
+      (click)="onUpdateWorkflowStepsClick()">Save</button>
   </div>
   <ejs-tab
     id="navigationTabs"
@@ -36,8 +36,7 @@
                     [workflow]="orderWorkflow"
                     [workflowSteps$]="customOrderSteps$"
                     [customStepFormGroup]="customStepOrderFormGroup"
-                    (customStepAddClick)="onCustomStepAddClick($event)"
-                    (customStepRemoveClick)="onCustomStepRemoveClick($event)"
+                    (customStepRemoveClick)="onCustomStepRemoveClick()"
                   ></app-workflow-steps>
                 </div>
                 <div class="application-workflow">
@@ -48,8 +47,7 @@
                     [workflow]="applicationWorkflow"
                     [workflowSteps$]="customApplicationSteps$"
                     [customStepFormGroup]="customStepApplicationFormGroup"
-                    (customStepAddClick)="onCustomStepAddClick($event)"
-                    (customStepRemoveClick)="onCustomStepRemoveClick($event)"
+                    (customStepRemoveClick)="onCustomStepRemoveClick()"
                   ></app-workflow-steps>
                 </div>
               </section>
@@ -58,7 +56,7 @@
             <app-side-dialog
               *ngIf="isJobOrderWorkflowTabActive"
               (formCancelClicked)="onCancelFormClick()"
-              (formSaveClicked)="onSaveFormClick()"
+              (formSaveClicked)="onCreateWorkflowClick()"
               header="Add Workflow"
             >
               <form class="form-container bootstrap"

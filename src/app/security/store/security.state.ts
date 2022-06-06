@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
+
 import { catchError, Observable, tap } from 'rxjs';
 import { Action, createSelector, Selector, State, StateContext } from '@ngxs/store';
 
+import { Organisation, UserVisibilitySettingsPage } from "@shared/models/visibility-settings.model";;
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { BusinessUnitService } from '@shared/services/business-unit.service';
 
@@ -17,7 +19,13 @@ import {
   SaveRole,
   SaveRoleSucceeded,
   SaveUser,
-  SaveUserSucceeded
+  SaveUserSucceeded,
+  GetUserVisibilitySettingsPage,
+  SaveUserVisibilitySettings,
+  SaveUserVisibilitySettingsSucceeded,
+  RemoveUserVisibilitySetting,
+  RemoveUserVisibilitySettingSucceeded,
+  GetOrganizationsStructureAll
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -41,7 +49,9 @@ interface SecurityStateModel {
   permissionsTree: PermissionsTree;
   isNewRoleDataLoading: boolean;
   newRoleBussinesData: BusinessUnit[];
-  copyRoleData: Role[]
+  userVisibilitySettingsPage: UserVisibilitySettingsPage | null;
+  copyRoleData: Role[];
+  organizations: Organisation[];
 }
 
 @State<SecurityStateModel>({
@@ -54,7 +64,9 @@ interface SecurityStateModel {
     permissionsTree: [],
     isNewRoleDataLoading: false,
     newRoleBussinesData: [],
-    copyRoleData: []
+    userVisibilitySettingsPage: null,
+    copyRoleData: [],
+    organizations: [],
   },
 })
 @Injectable()
@@ -87,6 +99,16 @@ export class SecurityState {
   @Selector()
   static usersPage(state: SecurityStateModel): UsersPage | null {
     return state.usersPage;
+  }
+
+  @Selector()
+  static userVisibilitySettingsPage(state: SecurityStateModel): UserVisibilitySettingsPage | null {
+    return state.userVisibilitySettingsPage;
+  }
+
+  @Selector()
+  static organisations(state: SecurityStateModel): Organisation[] {
+    return state.organizations;
   }
 
   @Selector()
@@ -288,5 +310,46 @@ export class SecurityState {
         patchState({ copyRoleData: payload })
       })
     );
+  }
+
+  @Action(GetUserVisibilitySettingsPage)
+  GetUserVisibilitySettingsPage({ patchState, dispatch }: StateContext<SecurityStateModel>, { userId }: GetUserVisibilitySettingsPage): Observable<UserVisibilitySettingsPage | void> {
+    return this.userService.getUserVisibilitySettingsPage(userId)
+      .pipe(
+        tap((payload) => {
+          patchState({ userVisibilitySettingsPage: payload });
+          return payload;
+        }),
+        catchError((error: HttpErrorResponse) => {
+          patchState({ userVisibilitySettingsPage: null });
+          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+        })
+      );
+  }
+
+  @Action(SaveUserVisibilitySettings)
+  SaveUserVisibilitySettings({ dispatch }: StateContext<SecurityStateModel>, { payload }: SaveUserVisibilitySettings): Observable<UserVisibilitySettingsPage> {
+    return this.userService.saveUserVisibilitySettings(payload).pipe(
+      tap((payload) => {
+        dispatch(new SaveUserVisibilitySettingsSucceeded());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        return payload;
+      })
+    );
+  }
+
+  @Action(RemoveUserVisibilitySetting)
+  RemoveUserVisibilitySetting({ dispatch }: StateContext<SecurityStateModel>, { id, userId }: RemoveUserVisibilitySetting): Observable<never> {
+    return this.userService.removeUserVisibilitySettings(id, userId).pipe(
+      tap(() => dispatch(new RemoveUserVisibilitySettingSucceeded()))
+    );
+  }
+
+  @Action(GetOrganizationsStructureAll)
+  GetOrganizationsStructureAll({ patchState }: StateContext<SecurityStateModel>, { userId }: GetOrganizationsStructureAll): Observable<Organisation[]> {
+    return this.userService.getUserVisibilitySettingsOrganisation(userId).pipe(tap((payload) => {
+      patchState({ organizations: payload });
+      return payload;
+    }));
   }
 }

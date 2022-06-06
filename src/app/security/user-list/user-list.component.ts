@@ -6,7 +6,12 @@ import { filter, map, Observable, takeWhile } from "rxjs";
 import { BusinessUnit } from "@shared/models/business-unit.model";
 import { AbstractControl, FormControl, FormGroup } from "@angular/forms";
 import { SetHeaderState, ShowSideDialog } from "../../store/app.actions";
-import { GetBusinessByUnitType, GetRolePerUser, SaveUser, SaveUserSucceeded } from "../store/security.actions";
+import {
+  GetBusinessByUnitType,
+  GetRolePerUser,
+  SaveUser,
+  SaveUserSucceeded
+} from "../store/security.actions";
 import { UserState } from "../../store/user.state";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
@@ -37,6 +42,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   public businessUnits = BUSINESS_UNITS_VALUES;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public isBusinessFormDisabled = false;
+  public createdUser: User | null;
 
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
@@ -74,6 +80,7 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.isAlive = false;
+    this.createdUser = null;
   }
 
   get bussinesUserData$(): Observable< BusinessUnit[]> {
@@ -106,9 +113,11 @@ export class UserListComponent implements OnInit, OnDestroy {
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
           this.store.dispatch(new ShowSideDialog(false));
+          this.createdUser = null;
         });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
+      this.createdUser = null;
     }
   }
 
@@ -136,6 +145,7 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   public onEdit(user: User): void {
     this.isEditRole = true;
+    this.createdUser = user;
     this.userSettingForm.reset();
     this.userSettingForm.enable();
 

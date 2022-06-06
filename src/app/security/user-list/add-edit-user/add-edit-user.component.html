@@ -1,5 +1,5 @@
 <div class="edit-user" [ngClass]="{'first-active': firstActive}">
-  <ejs-tab #editOrgTab (selecting)="onTabSelecting($event)">
+  <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
     <e-tabitems>
       <e-tabitem>
         <ng-template #headerText> User Settings </ng-template>
@@ -10,7 +10,7 @@
       <e-tabitem disabled="true">
         <ng-template #headerText> Visibility Settings </ng-template>
         <ng-template #content>
-          <app-visibility-settings></app-visibility-settings>
+          <app-visibility-settings [user]="createdUser"></app-visibility-settings>
         </ng-template>
       </e-tabitem>
     </e-tabitems>

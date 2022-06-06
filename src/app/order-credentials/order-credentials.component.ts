@@ -88,15 +88,27 @@ export class OrderCredentialsComponent implements OnInit {
   public onEdit(credential: IOrderCredentialItem): void {
     this.credentialFormHeader = 'Edit Credential';
     this.isEditMode = true;
+    this.CredentialForm.setValue({
+      id: 0, 
+      credentialType: '',
+      credentialName: credential.name,
+      comments: credential.comments,
+      reqForSubmission: credential.reqForSubmission,
+      reqForOnboard: credential.reqForOnboard,
+      optional: credential.optional
+    });
+    this.CredentialForm.get('credentialType')?.disable();
+    this.CredentialForm.get('credentialName')?.disable();
     this.store.dispatch(new ShowSideDialog(true));
   }
 
   public onDialogCancel(): void {
+    this.CredentialForm.reset();
     this.store.dispatch(new ShowSideDialog(false));
   }
 
   public onDialogOk(): void {
-    this.store.dispatch(new ShowSideDialog(false));
+    this.onDialogCancel();
   }
 
 }

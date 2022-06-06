@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 
 import { Store } from '@ngxs/store';
 import { SetHeaderState } from '../store/app.actions';
-import { GetOrganizationStructure } from '../store/user.actions';
 import { ORG_SETTINGS } from './organization-management-menu.config';
 
 @Component({
@@ -19,6 +18,5 @@ export class OrganizationManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetOrganizationStructure());
   }
 }

@@ -51,6 +51,8 @@ import { OrderDetailsFormComponent } from './order-management/order-details-form
 
 import { BillRatesModule } from '@bill-rates/bill-rates.module';
 import { OrderCredentialsModule } from '@order-credentials/order-credentials.module';
+import { NgxsModule } from '@ngxs/store';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
 const gridIcons = {
   MessageSquare,
@@ -100,7 +102,12 @@ const gridIcons = {
     DatePickerModule,
     TimePickerModule,
     BillRatesModule,
-    OrderCredentialsModule
+    OrderCredentialsModule,
+
+    //STORE
+    NgxsModule.forFeature([
+      OrderManagementContentState
+    ]),
   ],
   providers: [
     ResizeService,
