@@ -26,15 +26,15 @@
     <ng-template #detailTemplate let-data>
       <table class="detailtable" width="100%" *ngFor="let type of [workflowTypes.OrderWorkflow, workflowTypes.ApplicationWorkflow]">
         <colgroup>
-          <col width="200">
-          <col width="200">
-          <col width="200">
-          <col width="200">
-          <col width="200">
-          <col width="200">
-          <col width="270">
-          <col width="170">
-          <col width="120">
+          <col width="150">
+          <col width="180">
+          <col width="180">
+          <col width="180">
+          <col width="180">
+          <col width="160">
+          <col width="230">
+          <col width="150">
+          <col width="80">
         </colgroup>
         <thead>
           <tr>
@@ -60,18 +60,18 @@
             <td class="e-rowcell e-templatecell"></td>
             <td class="e-rowcell e-templatecell"></td>
             <td class="e-rowcell e-templatecell workflow-type-content">
-              <span>
-                {{stepDetails.step.name + ' > ' + stepDetails.step.status}}
-              </span>
+              <p>{{stepDetails.step.name + ' > ' + stepDetails.step.status}}</p>
             </td>
-            <td class="e-rowcell e-templatecell user-roles-content">{{stepDetails.roleUser?.name}}</td>
+            <td class="e-rowcell e-templatecell user-roles-content">
+              <p>{{stepDetails.roleUser?.name}}</p>
+            </td>
             <td class="e-rowcell e-templatecell"></td>
           </tr>
         </tbody>
       </table>
     </ng-template>
     <e-columns>
-      <e-column field="regionName" headerText="REGION" width=180>
+      <e-column field="regionName" headerText="REGION" width=150>
         <ng-template #template let-data>
           <span *ngIf="data.regionId">{{ data.regionName }}</span>
           <span *ngIf="!data.regionId">All</span>
@@ -103,9 +103,9 @@
         </ng-template>
       </e-column>
       <e-column field="workflowName" headerText="WORKFLOW NAME" width=180></e-column>
-      <e-column headerText="CUSTOM STEP NAME" width=270></e-column>
-      <e-column headerText="ROLE/USER" width=170></e-column>
-      <e-column textAlign="Right" width=120>
+      <e-column headerText="CUSTOM STEP NAME" width=230></e-column>
+      <e-column headerText="ROLE/USER" width=150></e-column>
+      <e-column textAlign="Right" width=100>
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditButtonClick(data, $event)">

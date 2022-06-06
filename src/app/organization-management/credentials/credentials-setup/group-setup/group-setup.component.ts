@@ -1,7 +1,7 @@
-import { Component, ElementRef, Inject, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GridComponent, SearchService } from '@syncfusion/ej2-angular-grids';
-import { filter, Observable, of } from 'rxjs';
+import { filter, Observable, of, Subject, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import {
   AbstractGridConfigurationComponent
@@ -23,6 +23,7 @@ import {
   SaveCredentialSkillGroup,
   UpdateCredentialSkillGroup
 } from '../../../store/organization-management.actions';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-group-setup',
@@ -30,12 +31,17 @@ import {
   styleUrls: ['./group-setup.component.scss'],
   providers: [SearchService]
 })
-export class GroupSetupComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class GroupSetupComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+  private unsubscribe$: Subject<void> = new Subject();
+
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('searchGrid') searchGrid: GridComponent;
   @ViewChild('searchInputWithIcon') search: ElementRef;
 
   @Input() isActive: boolean = false;
+
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
 
   @Select(OrganizationManagementState.skillGroups)
   skillGroups$: Observable<CredentialSkillGroup[]>;
@@ -71,9 +77,17 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   }
 
   ngOnInit(): void {
-    // this.store.dispatch(new GetCredentialSkillGroup()); // TODO: uncomment after BE fixed
-    this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize));
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
+      this.currentPage = 1;
+      // this.store.dispatch(new GetCredentialSkillGroup()); // TODO: uncomment after BE fixed
+      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize));
+    });
     this.mapGridData();
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   onEditButtonClick(skillGroup: CredentialSkillGroup, event: any): void {

@@ -15,6 +15,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { DatePipe } from '@angular/common';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-skills',
@@ -41,6 +42,9 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
 
   @Select(OrganizationManagementState.allSkillsCategories)
   allSkillsCategories$: Observable<any>;
+
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
 
   public SkillFormGroup: FormGroup;
   public columnsToExport: ExportColumn[] = [
@@ -75,8 +79,11 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   ngOnInit() {
-    this.store.dispatch(new GetAllSkillsCategories());
-    this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize));
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
+      this.currentPage = 1;
+      this.store.dispatch(new GetAllSkillsCategories());
+      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize));
+    });
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize));

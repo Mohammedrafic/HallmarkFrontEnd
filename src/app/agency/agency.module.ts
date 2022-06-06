@@ -24,7 +24,6 @@ import {
   Filter,
   Maximize2,
   Minimize2,
-  Eye
 } from 'angular-feather/icons';
 import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
 import { PdfViewerModule } from "@syncfusion/ej2-angular-pdfviewer";
@@ -68,6 +67,7 @@ import { OrderManagementGridComponent } from './order-management/order-managemen
 import { PreviewOrderDialogComponent } from './order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
 import { FileViewerComponent } from './candidates/add-edit-candidate/file-viewer/file-viewer.component';
 import { ProfileComponent } from './profile/profile.component';
+import { OrderCandidatesComponent } from "@agency/order-management/order-management-grid/preview-order-dialog/candidates/order-candidates.component";
 
 const sidebarIcons = {
   Sliders,
@@ -88,7 +88,6 @@ const sidebarIcons = {
   Filter,
   Maximize2,
   Minimize2,
-  Eye
 };
 
 @NgModule({
@@ -122,6 +121,7 @@ const sidebarIcons = {
     OrderManagementGridComponent,
     PreviewOrderDialogComponent,
     ProfileComponent,
+    OrderCandidatesComponent
   ],
   imports: [
     CommonModule,

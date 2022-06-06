@@ -75,33 +75,6 @@ export class OrderManagementContentComponent implements OnInit {
 
     this.orders$.subscribe(data => {
       if (data) {
-        // const d = {
-        //   items: [
-        //     {
-        //       id: 1,
-        //       status: 1,
-        //       statusText: "Incomplete",
-        //       jobTitle: "Orders_Create_billrates",
-        //       skillId: 1,
-        //       skillName: "MasterSkill1InCategory1",
-        //       openPositions: 0,
-        //       orderType: 0,
-        //       regionId: 1,
-        //       regionName: "West",
-        //       locationId: 1,
-        //       locationName: "FirstLocation",
-        //       departmentId: 1,
-        //       departmentName: "First department",
-        //       billRate: 50.00,
-        //       startDate: "2022-06-02T21:12:40.075981+00:00"
-        //     }
-        //   ],
-        //   pageNumber: 1,
-        //   totalPages: 1,
-        //   totalCount: 1,
-        //   hasPreviousPage: false,
-        //   hasNextPage: false
-        // }
         this.gridDataSource  = data.items;
       }
     });

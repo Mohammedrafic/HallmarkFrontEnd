@@ -40,6 +40,9 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
 
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
+
   public HolidayFormGroup: FormGroup;
   public title = '';
   public startTimeField: AbstractControl;
@@ -151,8 +154,11 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   }
 
   ngOnInit() {
-    this.store.dispatch(new GetAllMasterHolidays());
-    this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy));
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
+      this.currentPage = 1;
+      this.store.dispatch(new GetAllMasterHolidays());
+      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy));
+    });
     this.masterHolidays$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((holidays: Holiday[]) => {
       this.masterHolidays = holidays;
     });

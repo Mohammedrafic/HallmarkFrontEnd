@@ -21,6 +21,7 @@ import { OrganizationManagementState } from '../../store/organization-management
 import { CredentialType } from '@shared/models/credential-type.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { SortSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-credentials-list',
@@ -38,6 +39,9 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
   @Select(OrganizationManagementState.credentials)
   credentials$: Observable<Credential[]>;
+
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
 
   public credentialsFormGroup: FormGroup;
   public formBuilder: FormBuilder;
@@ -61,9 +65,12 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetCredential());
-    this.store.dispatch(new GetCredentialTypes());
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
+      this.store.dispatch(new GetCredential());
+      this.store.dispatch(new GetCredentialTypes());
+    });
     this.mapGridData();
+
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveCredentialSucceeded)).subscribe(() => {
       this.clearFormDetails();
       this.store.dispatch(new GetCredential());
@@ -129,15 +136,19 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   }
 
   public onFormCancelClick(): void {
-    this.confirmService
-      .confirm(CANCEL_COFIRM_TEXT, {
-        title: DELETE_CONFIRM_TITLE,
-        okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
-        this.clearFormDetails();
-      });
+    if (this.credentialsFormGroup.dirty) {
+      this.confirmService
+        .confirm(CANCEL_COFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => !!confirm))
+        .subscribe(() => {
+          this.clearFormDetails();
+        });
+    } else {
+      this.clearFormDetails();
+    }
   }
 
   public onFormSaveClick(): void {

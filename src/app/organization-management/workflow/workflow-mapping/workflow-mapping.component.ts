@@ -122,13 +122,13 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetAllSkills());
-    this.store.dispatch(new GetWorkflowMappingPages());
-    this.store.dispatch(new GetRolesForWorkflowMapping());
-    this.store.dispatch(new GetUsersForWorkflowMapping());
-    this.store.dispatch(new GetWorkflows());
-
-    this.getComponentDataIfOrganizationChanged();
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.store.dispatch(new GetAllSkills());
+      this.store.dispatch(new GetWorkflowMappingPages());
+      this.store.dispatch(new GetRolesForWorkflowMapping());
+      this.store.dispatch(new GetUsersForWorkflowMapping());
+      this.store.dispatch(new GetWorkflows());
+    });
 
     combineLatest([this.users$, this.rolesPerUsers$])
       .pipe(filter(Boolean), takeUntil(this.unsubscribe$))
@@ -277,7 +277,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
         this.workflowMappingFormGroup.controls['departments'].setValue([data.departmentId]);
       }
 
-      if (!data.skills) {
+      if (data.skills.length === 0) {
         this.workflowMappingFormGroup.controls['skills'].setValue(this.allSkills.map((skill: Skill) => skill.id));
       } else {
         this.workflowMappingFormGroup.controls['skills'].setValue(data.skills.map((skill: any) => skill.skillId));
@@ -448,16 +448,6 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.isEdit = false;
     this.editedRecordId = undefined;
     this.isMappingSectionShown = false;
-  }
-
-  private getComponentDataIfOrganizationChanged(): void {
-    this.organizationId$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.store.dispatch(new GetAllSkills());
-      this.store.dispatch(new GetWorkflowMappingPages());
-      this.store.dispatch(new GetRolesForWorkflowMapping());
-      this.store.dispatch(new GetUsersForWorkflowMapping());
-      this.store.dispatch(new GetWorkflows());
-    });
   }
 }
 

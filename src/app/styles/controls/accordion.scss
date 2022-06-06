@@ -1,54 +1,91 @@
 @import "../variables/colors.scss";
 
+@mixin textPrimary {
+  .e-acrdn-header-content {
+    color: $primary-active-blue-10;
+  }
+
+  .e-toggle-icon {
+    color: $primary-active-blue-10 !important;
+  }
+}
+
 body.light,
 body.dark {
   .e-accordion {
-    border: none;
-    background-color: unset;
+    border: unset;
 
-    .e-active {
-      background-color: unset;
-    }
-
-    .e-tgl-collapse-icon {
-      transform: none !important;
-      font-size: 1.5em;
-
-      &::before {
-        content: "+";
-      }
-      &.e-expand-icon {
-        &::before {
-          content: "-";
-        }
-      }
-    }
-
+    // Item
     .e-acrdn-item {
-      margin-bottom: 12px;
+      border: unset !important;
 
-      &.e-select > .e-acrdn-header {
-        background: $primary-active-blue-10;
-        border-radius: 4px;
+      &:not(:first-child) {
+        margin-top: 12px;
       }
 
-      &.e-expand-state.e-select {
-          border: none;
-      }
-
+      // Header
       .e-acrdn-header {
+        min-height: 40px;
+        line-height: 39px;
+        border: 1px solid $secondary-dark-blue-45 !important;
+        border-radius: 8px;
+
+        &:focus {
+          background: transparent !important;
+        }
+
+        &:hover {
+          background: $primary-active-blue-90 !important;
+          @include textPrimary;
+        }
+
+        .e-toggle-icon {
+          min-height: 40px;
+          line-height: 39px;
+        }
+
         .e-acrdn-header-content {
-          display: flex;
-          align-items: center;
+          font-size: 14px;
+          font-weight: 700;
+          color: $secondary-dark-blue-15;
         }
       }
+
+      // Content
       .e-acrdn-panel {
-          .e-acrdn-content {
-            padding: 0 0 12px;
-            margin-top: 12px;
+        .e-acrdn-content {
+          padding: 16px 0 0;
+        }
+      }
+
+      // Active state
+      &.e-active,
+      &.e-select.e-expand-state {
+        & > .e-acrdn-header {
+          border-color: $primary-active-blue-10 !important;
+          background: $primary-active-blue-90 !important;
+
+          &:hover {
+            background: $primary-active-blue-80 !important;
           }
+        }
+
+        @include textPrimary;
+      }
+
+      &.e-overlay {
+        .e-acrdn-header {
+          background: $secondary-dark-blue-50;
+        }
+
+        .e-acrdn-header-content {
+          color: $secondary-dark-blue-30;
+        }
+
+        .e-toggle-icon {
+          color: $secondary-dark-blue-30;
+        }
       }
     }
- 
   }
 }

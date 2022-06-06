@@ -15,7 +15,7 @@ import {
 import { WorkflowService } from '@shared/services/workflow.service';
 import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_CANNOT_BE_SAVED, RECORD_MODIFIED } from '@shared/constants';
 import {  WorkflowWithDetails } from '@shared/models/workflow.model';
 import { WorkflowMappingPage, WorkflowMappingPost } from '@shared/models/workflow-mapping.model';
 import { RolesPerUser, User } from '@shared/models/user-managment-page.model';
@@ -75,7 +75,13 @@ export class WorkflowState {
           dispatch(new GetWorkflows());
           return payloadResponse;
         }),
-        catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.errors.WorkflowName[0])))
+        catchError((error: any) => {
+          if (error.error && error.error.errors && error.error.errors.WorkflowName[0]) {
+            return dispatch(new ShowToast(MessageTypes.Error, error.error.errors.WorkflowName[0]));
+          } else {
+            return dispatch(new ShowToast(MessageTypes.Error, RECORD_CANNOT_BE_SAVED));
+          }
+        })
       );
   }
 
@@ -104,7 +110,7 @@ export class WorkflowState {
           dispatch(new GetWorkflows());
           return payload;
         }),
-        catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
+        catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, RECORD_CANNOT_BE_DELETED))));
   }
 
   @Action(GetWorkflowMappingPages)
@@ -124,7 +130,13 @@ export class WorkflowState {
           dispatch(new SaveWorkflowMappingSucceed());
           return payloadResponse;
         }),
-        catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+        catchError((error: any) => {
+          if (error.error && error.error.errors && error.error.errors.SkillIds[0]) {
+            return dispatch(new ShowToast(MessageTypes.Error, error.error.errors.SkillIds[0]));
+          } else {
+            return dispatch(new ShowToast(MessageTypes.Error, RECORD_CANNOT_BE_SAVED));
+          }
+        })
       );
   }
 
