@@ -2,21 +2,8 @@
   <app-widget-header [title]="chart.title"></app-widget-header>
 
   <div class="control-section">
-    <div class="chart-title">
-      <h3 class="title">{{ chart.candidates }}</h3>
-      <h4 class="sub-title">
-        Total
-        <span class="score" [ngClass]="{ 'indicator-drop': chart.progress < 0 }">
-          <span class="e-icons e-plus" *ngIf="chart.progress > 0"></span>
-          <span class="sign-minus" *ngIf="chart.progress < 0">&#8722;</span>
-          <span>{{ chart.score }}</span>
-          <span class="e-icons e-arrow-right-up"></span>
-        </span>
-      </h4>
-    </div>
     <ejs-accumulationchart
       #pie
-      class="chart"
       [tooltip]="tooltip"
       [id]="chart.id"
       [legendSettings]="legendSettings"
@@ -39,8 +26,8 @@
   </div>
   <div class="legend-container">
     <div *ngFor="let legend of chart.chartData; let idx = index" class="legend">
-      <div class="legend-point" (click)="onClickLegend(idx)">
-        <input type="checkbox" checked (click)="$event.stopPropagation()" (change)="onCheckboxChange($event)" />
+      <div class="legend-point">
+        <input type="checkbox" checked (change)="onCheckboxChange(idx)" />
         <div [ngClass]="['point', toggleLegend.includes(idx) ? 'toggle-legend' : 'point-' + idx]"></div>
         <div [ngClass]="['legend-text', toggleLegend.includes(idx) ? 'toggle-text-style' : '']">{{ legend.x }}</div>
       </div>
