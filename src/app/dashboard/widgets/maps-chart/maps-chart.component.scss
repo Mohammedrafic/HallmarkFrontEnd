@@ -1,7 +1,6 @@
-.map-control {
-  display: flex;
-  flex-direction: column;
-  padding: 8px;
-  height: 90%;
-  overflow: hidden;
+.app-maps-chart {
+  &__map {
+    aspect-ratio: 4/2.5;
+    display: block;
+  }
 }
