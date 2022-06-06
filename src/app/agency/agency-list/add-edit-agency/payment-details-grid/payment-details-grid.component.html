@@ -1,3 +1,12 @@
+<div class="e-gridcustomheader">
+  <div class="title">
+    <h3>Payment Details</h3>
+  </div>
+  <div class="actions">
+    <span class="action-link" (click)="onFilter()"><i-feather name="sliders" class="icon"></i-feather> Filters</span>
+    <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Payment Detail</span>
+  </div>
+</div>
 <ejs-grid
   #grid
   [dataSource]="data"
@@ -11,26 +20,19 @@
   [allowSorting]="allowSorting"
   [allowResizing]="allowResizing"
   (dataBound)="dataBound()"
-  class="e-gridwithtoolbar"
+  class="e-gridwithheader"
 >
-  <ng-template #toolbarTemplate let-data>
-    <div class="e-gridheader e-gridtoolbar">
-      <div class="title">
-        <h3>Payment Details</h3>
-      </div>
-      <div class="actions">
-        <span class="action-link" (click)="onFilter()"><i-feather name="sliders" class="icon"></i-feather> Filters</span>
-        <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Payment Detail</span>
-      </div>
-    </div>
-  </ng-template>
   <e-columns>
     <e-column field="mode" headerText="Mode" textAlign="Left" [valueAccessor]="modeAccessor"></e-column>
     <e-column field="payee" headerText="Payee" textAlign="left"></e-column>
     <e-column field="address" headerText="Address" textAlign="left"></e-column>
     <e-column field="city" headerText="City" textAlign="left"></e-column>
     <e-column field="zip" headerText="Zip" textAlign="left"></e-column>
-    <e-column field="startDate" headerText="Start Date" textAlign="left" format="yMd"></e-column>
+    <e-column field="startDate" headerText="Start Date" textAlign="left">
+      <ng-template #template let-data>
+        {{ data.startDate | date:'MM/dd/yyy'}}
+      </ng-template>
+    </e-column>
     <e-column textAlign="Right" width="120">
       <ng-template #template let-data>
         <div class="row-tool-buttons">
@@ -97,7 +99,7 @@
       <div class="input-container">
         <label for="payee">Payee<span class="required">*</span></label>
         <div class="input-group">
-          <input id="payee" class="e-input" type="text" appValidateWithMessage placeholder="Payee" formControlName="payee"  maxlength="50"/>
+          <input id="payee" class="e-input" type="text" appValidateWithMessage placeholder="Payee" formControlName="payee" maxlength="50" />
         </div>
       </div>
     </div>
@@ -106,7 +108,15 @@
       <div class="input-container">
         <label for="address">Address</label>
         <div class="input-group">
-          <input id="address" class="e-input" type="text" appValidateWithMessage placeholder="Address" formControlName="address" maxlength="500"/>
+          <input
+            id="address"
+            class="e-input"
+            type="text"
+            appValidateWithMessage
+            placeholder="Address"
+            formControlName="address"
+            maxlength="500"
+          />
         </div>
       </div>
     </div>
@@ -115,7 +125,7 @@
       <div class="input-container">
         <label for="city">City</label>
         <div class="input-group">
-          <input id="city" class="e-input" type="text" appValidateWithMessage placeholder="City" formControlName="city" maxlength="20"/>
+          <input id="city" class="e-input" type="text" appValidateWithMessage placeholder="City" formControlName="city" maxlength="20" />
         </div>
       </div>
     </div>
@@ -124,7 +134,15 @@
       <label>Zip</label>
       <div class="input-group dropdown">
         <div class="input-group">
-          <ejs-maskedtextbox id="Zip" promptChar="_" mask='00000' appValidateWithMessage formControlName="zip" class="e-input" placeholder="Zip"></ejs-maskedtextbox>
+          <ejs-maskedtextbox
+            id="Zip"
+            promptChar="_"
+            mask="00000"
+            appValidateWithMessage
+            formControlName="zip"
+            class="e-input"
+            placeholder="Zip"
+          ></ejs-maskedtextbox>
         </div>
       </div>
     </div>

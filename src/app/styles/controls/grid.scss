@@ -2,6 +2,7 @@
 @import "../../styles/variables/colors";
 
 $grid-border-radius: 10px;
+$grid-box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.05);
 
 .e-grid.e-resize-lines {
   .e-headercell .e-rhandler {
@@ -12,7 +13,7 @@ $grid-border-radius: 10px;
 
 ejs-grid.e-control.e-grid {
   border-radius: $grid-border-radius;
-  box-shadow: 0px 2px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: $grid-box-shadow;
 
   .checkbox-header {
     .e-headercelldiv {
@@ -38,44 +39,37 @@ ejs-grid.e-control.e-grid {
     }
   }
 
+  .e-gridchkbox, .e-headercell {
+    .e-checkbox-wrapper {
+      vertical-align: middle;
+
+      .e-frame {
+        width: 16px;
+        height: 16px;
+        border-radius: 2px;
+        line-height: 14px;
+        font-size: 10px;
+  
+        &.e-check {
+          background-color: #fff;
+          color: $primary-active-blue-10;
+        }
+      }
+    }
+  }
+
   .e-gridheader {
     .e-stackedheadercelldiv {
       padding: 0;
     }
   }
 
-  &.e-gridwithtoolbar {
+  &.e-gridwithheader {
+    border-top-left-radius: unset;
+    border-top-right-radius: unset;
     .e-gridheader:not(.e-gridtoolbar) {
       border-radius: unset;
       border-top: none;
-    }
-
-    .e-gridtoolbar {
-      font-feature-settings: "smcp" 0;
-      font-variant: none;
-      height: 67px;
-      padding: 0 21px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-
-      .title h3 {
-        color: $title-black;
-        font-weight: 700;
-        font-size: 16px;
-        margin: 0;
-      }
-      .actions {
-        display: flex;
-
-        .action-link {
-          &:not(:first-child) {
-            margin-left: 12px;
-          }
-          @include linkWithIcon;
-        }
-      }
     }
   }
 
@@ -96,10 +90,6 @@ ejs-grid.e-control.e-grid {
 
         .e-rowcell {
           font-size: 14px;
-
-          &.e-gridchkbox {
-            padding-top: 16px;
-          }
         }
 
         .e-emptyrow {
@@ -374,6 +364,37 @@ ejs-grid.e-control.e-grid {
     .e-lastrowcell,
     td {
       padding-left: 21px;
+    }
+  }
+}
+
+
+.e-gridcustomheader {
+  box-shadow: $grid-box-shadow;
+  background-color: $white;
+  border: 1px solid $grid-row-border;
+  border-radius: 10px 10px 0 0;
+  height: 67px;
+  padding: 0 21px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+
+  .title h3 {
+    color: $title-black;
+    font-weight: 700;
+    font-size: 16px;
+    margin: 0;
+  }
+  .actions {
+    display: flex;
+
+    .action-link {
+      &:not(:first-child) {
+        margin-left: 12px;
+      }
+      @include linkWithIcon;
     }
   }
 }

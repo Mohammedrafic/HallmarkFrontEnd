@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CandidateCredential, CandidateCredentialPage } from "@shared/models/candidate-credential.model";
+import { CandidateCredential, CandidateCredentialPage, CredentialGroupedFiles } from "@shared/models/candidate-credential.model";
 import { CredentialType } from "@shared/models/credential-type.model";
 import { Credential } from "@shared/models/credential.model";
 import { Observable } from 'rxjs';
@@ -182,6 +182,22 @@ export class CandidateService {
    * @return blob
    */
   public getCredentialFile(credentialFileId: number): Observable<any> {
-    return this.http.get(`/api/CandidateCredentials/${credentialFileId}/credentialFile`, { responseType: 'blob' });
+    return this.http.get(`/api/CandidateCredentials/credentialFile/${credentialFileId}`, { responseType: 'blob' });
+  }
+
+  /**
+   * Get credential files from blob storage in pdf format
+   * @return blob
+   */
+  public getCredentialPdfFile(credentialFileId: number): Observable<any> {
+    return this.http.get(`/api/CandidateCredentials/credentialPdfFile/${credentialFileId}`, { responseType: 'blob' });
+  }
+
+  /**
+   * Get Credential Grouped Files by candidate id
+   * @return CredentialGroupedFiles array
+   */
+  public getCredentialGroupedFiles(candidateId: number): Observable<CredentialGroupedFiles[]> {
+    return this.http.get<CredentialGroupedFiles[]>(`/api/CandidateCredentials/groupedCandidateCredentialsFiles/${candidateId}`);
   }
 }

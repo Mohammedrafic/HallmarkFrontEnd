@@ -2,17 +2,23 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, UNIT_FIELDS, DISABLED_GROUP } from "./user-list.constants";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { SecurityState } from "../store/security.state";
-import { filter, Observable, takeWhile } from "rxjs";
+import { filter, map, Observable, takeWhile } from "rxjs";
 import { BusinessUnit } from "@shared/models/business-unit.model";
 import { AbstractControl, FormControl, FormGroup } from "@angular/forms";
 import { SetHeaderState, ShowSideDialog } from "../../store/app.actions";
-import { GetBusinessByUnitType, GetRolePerUser, SaveUser, SaveUserSucceeded } from "../store/security.actions";
+import {
+  GetBusinessByUnitType,
+  GetRolePerUser,
+  SaveUser,
+  SaveUserSucceeded
+} from "../store/security.actions";
 import { UserState } from "../../store/user.state";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
 import { UserSettingsComponent } from "./add-edit-user/user-settings/user-settings.component";
 import { ConfirmService } from "@shared/services/confirm.service";
 import { UserDTO, User } from "@shared/models/user-managment-page.model";
+import { take } from "rxjs/operators";
 
 const DEFAULT_DIALOG_TITLE = 'Add User';
 const EDIT_DIALOG_TITLE = 'Edit User';
@@ -23,8 +29,11 @@ const EDIT_DIALOG_TITLE = 'Edit User';
   styleUrls: ['./user-list.component.scss']
 })
 export class UserListComponent implements OnInit, OnDestroy {
-  @Select(SecurityState.bussinesData)
-  public bussinesUserData$: Observable<BusinessUnit[]>;
+  @Select(SecurityState.businessUserData)
+  public businessUserData$:Observable<(type: number) => BusinessUnit[]>
+
+  @Select(SecurityState.newBusinessDataPerUser)
+  public newBusinessDataPerUser$:Observable<(type: number) => BusinessUnit[]>
 
   public businessForm: FormGroup;
   public userSettingForm: FormGroup;
@@ -33,6 +42,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   public businessUnits = BUSINESS_UNITS_VALUES;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public isBusinessFormDisabled = false;
+  public createdUser: User | null;
 
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
@@ -70,6 +80,11 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.isAlive = false;
+    this.createdUser = null;
+  }
+
+  get bussinesUserData$(): Observable< BusinessUnit[]> {
+    return  this.businessUserData$.pipe(map(fn => fn(this.businessUnitControl?.value)));
   }
 
   public onAddNewUser() {
@@ -86,6 +101,8 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   public onAddCancel(): void {
+    this.userSettingForm.reset();
+    this.userSettingForm.enable();
     if (this.userSettingForm.dirty) {
       this.confirmService
         .confirm(DELETE_CONFIRM_TEXT, {
@@ -96,9 +113,11 @@ export class UserListComponent implements OnInit, OnDestroy {
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
           this.store.dispatch(new ShowSideDialog(false));
+          this.createdUser = null;
         });
     } else {
       this.store.dispatch(new ShowSideDialog(false));
+      this.createdUser = null;
     }
   }
 
@@ -108,13 +127,16 @@ export class UserListComponent implements OnInit, OnDestroy {
       const value = this.userSettingForm.getRawValue();
       let userDTO : UserDTO = {
         businessUnitId: value.businessUnitId || null,
-        metadata: {...value},
+        metadata: {
+          ...value,
+          isDeleted: !value.isDeleted
+        },
         roleIds: value.roles
       }
       if(this.isEditRole) {
          userDTO = {
           ...userDTO,
-           userId: value.id
+           userId: value.id,
         }
       }
       this.store.dispatch(new SaveUser(userDTO));
@@ -123,6 +145,7 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   public onEdit(user: User): void {
     this.isEditRole = true;
+    this.createdUser = user;
     this.userSettingForm.reset();
     this.userSettingForm.enable();
 
@@ -130,14 +153,17 @@ export class UserListComponent implements OnInit, OnDestroy {
       const editedUser = {
         ...user,
         roles: [...user.roles],
+        isDeleted: !user.isDeleted,
         businessUnitId: user.businessUnitId || 0,
         emailConfirmation: user.email
       }
       this.userSettingForm.patchValue({
         ...editedUser,
-        roles: user.roles.map((role: any) => role.id)
+        roles: user.roles?.map((role:any) => role.id)
       });
     }
+
+    this.subscribeOnFieldsChanges(user);
     this.disableBussinesUnitForRole();
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -180,11 +206,23 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   private onBusinessUnitValueChanged(): void {
     this.businessUnitControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe((value) => {
-      this.store.dispatch(new GetBusinessByUnitType(value));
+      value && this.store.dispatch(new GetBusinessByUnitType(value));
 
       if (!this.isBusinessFormDisabled) {
         this.businessControl.patchValue(0);
       }
     });
+  }
+
+  private subscribeOnFieldsChanges(user: User) {
+    if(user.businessUnitType !== BusinessUnitType.Hallmark) {
+      this.newBusinessDataPerUser$.pipe(take(2)).subscribe(() => {
+        this.userSettingForm.get('businessUnitId')?.setValue(user.businessUnitId);
+      });
+    }
+
+    this.store.dispatch(new GetRolePerUser(user.businessUnitId as BusinessUnitType || 0, user.businessUnitType as BusinessUnitType)).subscribe((() => {
+      this.userSettingForm.get('roles')?.setValue(user.roles?.map((role:any) => role.id));
+    }));
   }
 }

@@ -8,7 +8,7 @@ import { Region } from '@shared/models/region.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
-import { CredentialSetup, CredentialSetupGetGroup } from '@shared/models/credential-setup.model';
+import { CredentialSetup } from '@shared/models/credential-setup.model';
 import { OrganizationSettingsPost } from '@shared/models/organization-settings.model';
 import { ExportPayload } from "@shared/models/export.model";
 
@@ -339,5 +339,10 @@ export class ExportLocations {
 
 export class ExportDepartments {
   static readonly type = '[organizationManagement] Export Department list';
+  constructor(public payload: ExportPayload) { }
+}
+
+export class ExportSkills {
+  static readonly type = '[organizationManagement] Export Skill list';
   constructor(public payload: ExportPayload) { }
 }

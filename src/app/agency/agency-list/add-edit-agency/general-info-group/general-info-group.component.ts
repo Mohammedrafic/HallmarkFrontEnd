@@ -15,6 +15,7 @@ import { valuesOnly } from 'src/app/shared/utils/enum.utils';
 })
 export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   @Input() formGroup: FormGroup;
+  @Input() isAgencyUser: boolean;
 
   public countries = [
     { id: Country.USA, text: Country[0] },
@@ -56,7 +57,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
   public isAgencyCreatedCahnge(): void {
     this.isAgencyCreated$.pipe(takeWhile(() => this.isAlive))
       .subscribe((isCreated) => {
-        isCreated ? this.formGroup.get('status')?.enable() : this.formGroup.get('status')?.disable();
+        isCreated && !this.isAgencyUser ? this.formGroup.get('status')?.enable() : this.formGroup.get('status')?.disable();
       });
   }
 

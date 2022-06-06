@@ -26,6 +26,7 @@ import {
 } from '../../store/candidate.actions';
 import { Candidate } from 'src/app/shared/models/candidate.model';
 import { ActivatedRoute, Router } from '@angular/router';
+import { UserState } from "src/app/store/user.state";
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -180,6 +181,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
       contactDetails: CandidateContactDetailsComponent.createFormGroup(),
       profSummary: CandidateProfessionalSummaryComponent.createFormGroup(),
     });
+
   }
 
   private uploadImages(businessUnitId: number): void {
@@ -211,10 +213,12 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   }
 
   private getCandidateRequestObj(formValue: any): Candidate {
+    const agencyId = this.store.selectSnapshot(UserState.lastSelectedAgencyId);
+
     return {
       id: this.fetchedCandidate?.id,
       ...formValue.generalInfo,
-      agencyId: formValue.agency.agencyId,
+      agencyId,
       email: formValue.contactDetails.email,
       professionalSummary: formValue.profSummary.professionalSummary,
       candidateProfileContactDetail: {

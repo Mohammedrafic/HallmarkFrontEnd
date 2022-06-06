@@ -20,7 +20,7 @@ import { AdminState } from '../../store/admin.state';
   templateUrl: './add-edit-organization.component.html',
   styleUrls: ['./add-edit-organization.component.scss']
 })
-export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   public allowExtensions: string = '.png, .jpg, .jpeg';
   public dropElement: HTMLElement;
   public filesDetails : Blob[] = [];
@@ -39,6 +39,7 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
   public logo: Blob | null = null;
   public titles = Titles;
   public businessUnitType = BusinessUnitType;
+  public isMspUser = false;
 
   public createUnderFields = {
     text: 'name', value: 'id'
@@ -114,10 +115,11 @@ export class AddEditOrganizationComponent implements OnInit, AfterViewInit, OnDe
 
   ngOnInit(): void {
     this.dropElement = document.getElementById('droparea') as HTMLElement;
-  }
-
-  ngAfterViewInit(): void {
-
+    const user = this.store.selectSnapshot(UserState.user);
+    if (user?.businessUnitType === BusinessUnitType.MSP) {
+      this.isMspUser = true;
+      this.CreateUnderFormGroup.patchValue({createUnder: user.businessUnitId});
+    }
   }
 
   ngOnDestroy(): void {

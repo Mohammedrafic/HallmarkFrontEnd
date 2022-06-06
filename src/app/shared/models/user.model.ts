@@ -2,6 +2,9 @@ import { BusinessUnitType } from '../enums/business-unit-type';
 
 export class User {
   id: string;
+  email:string;
+  firstName: string;
+  lastName:string;
   businessUnitId: number | null;
   businessUnitType: BusinessUnitType;
   businessUnitName: string;

@@ -21,7 +21,7 @@
             [allowResizing]="allowResizing"
             (dataBound)="dataBound()">
     <e-columns>
-      <e-column headerText="Candidate Name" width=200>
+      <e-column headerText="Name" width=200>
         <ng-template #template let-data>{{data.firstName}} {{data.lastName}}</ng-template>
       </e-column>
       <e-column field="profileStatus" headerText="Profile Status" width=200>

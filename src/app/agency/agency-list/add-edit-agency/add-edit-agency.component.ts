@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { filter, Observable, Subscription, takeWhile } from 'rxjs';
 
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
-import {DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT} from '@shared/constants/messages';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT } from '@shared/constants/messages';
 import {
   Agency,
   AgencyBillingDetails,
@@ -21,6 +21,7 @@ import {
   GetAgencyByIdSucceeded,
   GetAgencyLogo,
   GetAgencyLogoSucceeded,
+  GetBusinessUnitList,
   SaveAgency,
   SaveAgencySucceeded,
   UploadAgencyLogo,
@@ -29,10 +30,12 @@ import { AgencyState } from '../../store/agency.state';
 import { BillingDetailsGroupComponent } from './billing-details-group/billing-details-group.component';
 import { ContactDetailsGroupComponent } from './contact-details-group/contact-details-group.component';
 import { GeneralInfoGroupComponent } from './general-info-group/general-info-group.component';
-import { CREATE_UNDER_VALUE, DISABLED_BUSINESS_TYPES, OPRION_FIELDS } from './add-edit-agency.constants';
+import { DISABLED_BUSINESS_TYPES, OPRION_FIELDS } from './add-edit-agency.constants';
 import { UserState } from 'src/app/store/user.state';
 import { User } from '@shared/models/user.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { BusinessUnit } from '@shared/models/business-unit.model';
+import { PaymentDetailsGridComponent } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-details-grid.component';
 
 type AgencyFormValue = {
   parentBusinessUnitId: number;
@@ -42,6 +45,7 @@ type AgencyFormValue = {
   agencyContactDetails: AgencyContactDetails[];
   agencyPaymentDetails: AgencyPaymentDetails[];
 };
+
 @Component({
   selector: 'app-add-edit-agency',
   templateUrl: './add-edit-agency.component.html',
@@ -53,9 +57,8 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   public agencyForm: FormGroup;
   public createUnderAvailable = false;
   public createUnderFields = OPRION_FIELDS;
-  public createUnderValues = CREATE_UNDER_VALUE;
   public title = 'Add';
-
+  public isAgencyUser = false;
 
   get contacts(): FormArray {
     return this.agencyForm.get('agencyContactDetails') as FormArray;
@@ -63,6 +66,10 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   get agencyControl(): AbstractControl | null {
     return this.agencyForm.get('agencyDetails');
+  }
+
+  get paymentDetailsControl(): FormArray {
+    return this.agencyForm.get('agencyPaymentDetails') as FormArray;
   }
 
   get billingControl(): AbstractControl | null {
@@ -79,6 +86,9 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   @Select(AgencyState.isAgencyCreated)
   public isAgencyCreated$: Observable<boolean>;
+
+  @Select(AgencyState.businessUnits)
+  businessUnits$: Observable<BusinessUnit[]>;
 
   public logo: Blob | null = null;
 
@@ -97,10 +107,12 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
     private confirmService: ConfirmService
   ) {
     this.store.dispatch(new SetHeaderState({ title: 'Agency', iconName: 'clock' }));
+    this.store.dispatch(new GetBusinessUnitList());
   }
 
   ngOnInit(): void {
     this.generateAgencyForm();
+    this.checkAgencyUser();
     this.onBillingPopulatedChange();
     this.enableCreateUnderControl();
 
@@ -131,13 +143,11 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
 
   public enableCreateUnderControl(): void {
     const user = this.store.selectSnapshot(UserState.user) as User;
+    const parentBusinessUnitIdControl = this.agencyForm.get('parentBusinessUnitId');
+    parentBusinessUnitIdControl?.patchValue(user.businessUnitId);
+
     if (!DISABLED_BUSINESS_TYPES.includes(user?.businessUnitType)) {
       this.createUnderAvailable = true;
-      if (user.businessUnitType === BusinessUnitType.MSP) {
-        const parentBusinessUnitIdControl = this.agencyForm.get('parentBusinessUnitId');
-        parentBusinessUnitIdControl?.patchValue(BusinessUnitType.MSP);
-        parentBusinessUnitIdControl?.disable();
-      }
     }
   }
 
@@ -197,6 +207,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   }
 
   public onImageSelect(event: Blob | null) {
+    this.agencyForm.markAsDirty();
     if (event) {
       this.filesDetails = [event as Blob];
     } else {
@@ -274,20 +285,28 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
       agencyContactDetails,
       agencyPaymentDetails,
       agencyId: id,
-      parentBusinessUnitId: null, // TODO: Change it after we will get MSP from BE
+      parentBusinessUnitId: agencyFormValue.parentBusinessUnitId,
     };
   }
 
-  private patchAgencyFormValue({ agencyDetails, agencyBillingDetails, agencyContactDetails, createUnder }: Agency) {
-    this.agencyForm.get('parentBusinessUnitId')?.patchValue(createUnder?.businessUnitType);
+  private patchAgencyFormValue({ agencyDetails, agencyBillingDetails, agencyContactDetails, agencyPaymentDetails, createUnder }: Agency) {
+    this.agencyForm.get('parentBusinessUnitId')?.patchValue(createUnder?.parentUnitId || 0);
     this.agencyForm.get('isBillingPopulated')?.patchValue(agencyBillingDetails.sameAsAgency);
     this.agencyControl?.patchValue({ ...agencyDetails });
     this.billingControl?.patchValue({ ...agencyBillingDetails });
+    agencyPaymentDetails.forEach((payment) => {
+      this.paymentDetailsControl?.push(PaymentDetailsGridComponent.generatePaymentForm(payment));
+    });
     this.contacts.clear();
     agencyContactDetails.forEach((contact) => this.addContact(contact));
   }
 
   private navigateToAgencyList(): void {
     this.router.navigate(['/agency/agency-list']);
+  }
+
+  private checkAgencyUser(): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
   }
 }

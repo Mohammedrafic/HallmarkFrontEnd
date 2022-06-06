@@ -10,6 +10,8 @@ import { Observable, takeWhile } from "rxjs";
 import { GetUsersPage } from "../../store/security.actions";
 import { CreateUserStatus, STATUS_COLOR_GROUP } from "@shared/enums/status";
 import { User, UsersPage } from "@shared/models/user-managment-page.model";
+import { UserState } from "../../../store/user.state";
+import { BusinessUnitType } from "@shared/enums/business-unit-type";
 
 enum Visibility {
   Unassigned,
@@ -38,6 +40,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   };
 
   public readonly statusEnum = CreateUserStatus;
+  public isAgencyUser = false;
   private isAlive = true;
 
   constructor(
@@ -47,6 +50,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   }
 
   ngOnInit(): void {
+    this.checkAgencyUser();
     this.dispatchNewPage();
     this.subscribeForFilterFormChange();
   }
@@ -94,5 +98,10 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   private dispatchNewPage(): void {
     const { businessUnit, business } = this.filterForm.getRawValue();
     this.store.dispatch(new GetUsersPage(businessUnit, business || '', this.currentPage, this.pageSize));
+  }
+
+  private checkAgencyUser(): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    this.isAgencyUser = user?.businessUnitType === BusinessUnitType.Agency;
   }
 }

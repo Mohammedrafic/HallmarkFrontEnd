@@ -57,11 +57,11 @@ export enum FeeSettingsClassification {
 
 export enum JobDistributionOrderType {
   All = 0,
-  ContractToPerm = 1,
-  OpenPerDiem = 2,
-  PerDiem = 3,
-  PermPlacement = 4,
-  Traveler = 5,
+  "Contract to perm" = 1,
+  "Open per diem" = 2,
+  "Per diem" = 3,
+  "Perm placement" = 4,
+  "Traveler" = 5,
 }
 
 export type FeeExceptionsInitialData = {

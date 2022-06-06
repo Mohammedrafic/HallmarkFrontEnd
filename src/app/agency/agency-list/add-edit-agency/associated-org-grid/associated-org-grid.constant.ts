@@ -3,6 +3,7 @@ export const JOB_DISTRIBUTION_COLUMNS = [
         field: 'region',
         headerText: 'Region',
         textAlign: 'Left',
+        width: "160",
         customAttributes: {
           class: 'sub-header'
         }
@@ -11,6 +12,7 @@ export const JOB_DISTRIBUTION_COLUMNS = [
         field: 'classification',
         headerText: 'Classification',
         textAlign: 'Left',
+        width: "160",
         customAttributes: {
           class: 'sub-header'
         }
@@ -19,6 +21,7 @@ export const JOB_DISTRIBUTION_COLUMNS = [
         field: 'orderType',
         headerText: 'Order Type',
         textAlign: 'Left',
+        width: "160",
         customAttributes: {
           class: 'sub-header'
         }
@@ -27,6 +30,7 @@ export const JOB_DISTRIBUTION_COLUMNS = [
         field: 'skillCategory',
         headerText: 'Skill Category',
         textAlign: 'Left',
+        width: "160",
         customAttributes: {
           class: 'sub-header'
         }

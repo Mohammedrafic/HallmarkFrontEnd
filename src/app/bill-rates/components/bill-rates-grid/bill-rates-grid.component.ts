@@ -1,122 +1,33 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 
 import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { BillRate, BillRateCategory, BillRateType } from '@shared/models/bill-rate.model';
 
-interface IBillRate {
-  items: IBillRateItem[];
-  totalPages: number;
-  totalCount: number;
-}
-
-interface IBillRateItem {
-  title: string;
-  category: string;
-  payRateType: string;
-  ratesHours: string;
-  intervalMin: string;
-  intervalMax: string;
-  effectiveDate: string;
-}
+export type BillRatesGridEvent = BillRate & { index: string };
 
 @Component({
   selector: 'app-bill-rates-grid',
   templateUrl: './bill-rates-grid.component.html',
   styleUrls: ['./bill-rates-grid.component.scss'],
-  providers: [FreezeService]
+  providers: [FreezeService],
 })
 export class BillRatesGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
 
-  @Output() add: EventEmitter<void> = new EventEmitter();
-  @Output() edit: EventEmitter<IBillRateItem> = new EventEmitter();
-  @Output() remove: EventEmitter<IBillRateItem> = new EventEmitter();
+  @Input() billRatesData: BillRate[];
 
-  public billRates: IBillRate = {
-    items: [
-      {
-        title: 'On Call',
-        category: 'On Call',
-        payRateType: 'Fixed',
-        ratesHours: '14:00',
-        intervalMin: '00:00',
-        intervalMax: '00:00',
-        effectiveDate: '03/09/2022'
-      },
-      {
-        title: 'Charge',
-        category: 'Charge',
-        payRateType: 'Fixed',
-        ratesHours: '15:00',
-        intervalMin: '00:00',
-        intervalMax: '00:00',
-        effectiveDate: '03/09/2022'
-      },
-      {
-        title: 'Daily OT',
-        category: 'Daily OT',
-        payRateType: 'Times',
-        ratesHours: '00:00',
-        intervalMin: '00:00',
-        intervalMax: '00:00',
-        effectiveDate: '03/09/2022'
-      },
-      {
-        title: 'Daily Premium OT',
-        category: 'Daily Premium OT',
-        payRateType: 'Times',
-        ratesHours: '00:00',
-        intervalMin: '00:00',
-        intervalMax: '00:00',
-        effectiveDate: '03/09/2022'
-      },
-      {
-        title: '7th Con Reg. OT',
-        category: 'Daily Premium OT',
-        payRateType: 'Times',
-        ratesHours: '00:00',
-        intervalMin: '00:00',
-        intervalMax: '00:00',
-        effectiveDate: '03/09/2022'
-      },
-      {
-        title: '7th Con Premium OT',
-        category: 'Daily Premium OT',
-        payRateType: 'Times',
-        ratesHours: '00:00',
-        intervalMin: '00:00',
-        intervalMax: '00:00',
-        effectiveDate: '03/09/2022'
-      },
-      {
-        title: 'Callback',
-        category: 'Callback',
-        payRateType: 'Times',
-        ratesHours: '00:00',
-        intervalMin: '00:00',
-        intervalMax: '00:00',
-        effectiveDate: '03/09/2022'
-      },
-      {
-        title: 'OT',
-        category: 'OT',
-        payRateType: 'Times',
-        ratesHours: '13:00',
-        intervalMin: '00:00',
-        intervalMax: '00:00',
-        effectiveDate: '03/09/2022'
-      }
-    ],
-    totalPages: 1,
-    totalCount: 8
-  } ;
+  @Output() add: EventEmitter<void> = new EventEmitter();
+  @Output() edit: EventEmitter<BillRatesGridEvent> = new EventEmitter();
+  @Output() remove: EventEmitter<BillRatesGridEvent> = new EventEmitter();
+
+  public BillRateCategory = BillRateCategory;
+  public BillRateType = BillRateType;
 
   public initialSort = {
-    columns: [
-      { field: 'title', direction: 'Ascending' }
-    ]
+    columns: [{ field: 'title', direction: 'Ascending' }],
   };
 
   private pageSubject = new Subject<number>();
@@ -145,16 +56,16 @@ export class BillRatesGridComponent extends AbstractGridConfigurationComponent i
     this.add.emit();
   }
 
-  public onEdit(event: MouseEvent, data: IBillRateItem): void {
+  public onEdit(event: MouseEvent, data: BillRatesGridEvent): void {
     this.edit.emit(data);
   }
 
-  public onRemove(event: MouseEvent, data: IBillRateItem): void {
+  public onRemove(event: MouseEvent, data: BillRatesGridEvent): void {
     this.remove.emit(data);
   }
 
   public onRowsDropDownChanged(): void {
-    this.pageSize  = parseInt(this.activeRowsPerPageDropDown);
+    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
   }
 
@@ -163,5 +74,4 @@ export class BillRatesGridComponent extends AbstractGridConfigurationComponent i
       this.pageSubject.next(event.currentPage || event.value);
     }
   }
-
 }

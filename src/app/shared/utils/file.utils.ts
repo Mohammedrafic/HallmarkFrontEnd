@@ -6,3 +6,13 @@ export const saveSpreadSheetDocument = (url: string, name: string, ext: Exported
   anchor.href = url;
   anchor.click();
 }
+
+export const downloadBlobFile = (file: Blob, nameWithExt: string) => {
+  const anchor = document.createElement('a');
+  const objectUrl = URL.createObjectURL(file);
+
+  anchor.href = objectUrl
+  anchor.download = nameWithExt;
+  anchor.click();
+  URL.revokeObjectURL(objectUrl);
+}

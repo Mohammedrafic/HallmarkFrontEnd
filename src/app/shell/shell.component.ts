@@ -35,6 +35,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   sideBarMenu: MenuItem[];
   sideBarMenuField: Object;
   activeMenuItemData: MenuItem;
+  public userLogin:{firstName:string, lastName:string};
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -65,7 +66,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
 
   constructor(private store: Store,
               private router: Router) { }
-
+  
   ngOnInit(): void {
     this.store.dispatch(new SetHeaderState({ title: 'Dashboard', iconName: 'home' }));
     this.isDarkTheme$.pipe(takeUntil(this.unsubscribe$)).subscribe(isDark => {
@@ -75,6 +76,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     this.initSidebarFields();
     this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
       if (user) {
+        this.userLogin = user; 
         this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
       }
     });

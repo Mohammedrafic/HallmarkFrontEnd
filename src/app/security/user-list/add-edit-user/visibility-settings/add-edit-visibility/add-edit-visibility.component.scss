@@ -1,0 +1,65 @@
+@import '../../../../../styles/variables/colors';
+
+.dialog {
+  right: 0;
+  top: 60px !important;
+  left: auto !important;
+  height: calc(100% - 60px) !important;
+
+  .e-dlg-content {
+    padding: 0;
+  }
+
+  .container {
+    padding: 24px;
+
+    .header-container {
+
+      .e-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .e-card-title {
+          color: $black;
+          font-size: 24px;
+          font-weight: 700;
+        }
+
+        .e-card-content {
+          .button-cancel {
+            margin-right: 8px;
+          }
+        }
+      }
+    }
+
+    .form-container {
+      padding-top: 4px;
+
+      .dropdown-container {
+        padding-top: 20px;
+
+        label {
+          display: block;
+          margin-bottom: 5px;
+        }
+      }
+    }
+  }
+}
+
+.visibility-option-container {
+  display: inline-block;
+  position: relative;
+  height: 60px;
+  text-indent: 0;
+
+  .parent-option-name {
+    font-size: 12px;
+    color: $secondary-dark-blue-20;
+    position: absolute;
+    left: 0;
+    top: 20px;
+  }
+}

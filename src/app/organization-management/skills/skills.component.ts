@@ -4,7 +4,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
-import { GetAllSkillsCategories, GetAssignedSkillsByPage, RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded, SetDirtyState, SetImportFileDialogState } from '../store/organization-management.actions';
+import { ExportSkills, GetAllSkillsCategories, GetAssignedSkillsByPage, RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded, SetDirtyState, SetImportFileDialogState } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
@@ -12,8 +12,9 @@ import { Skill } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { ExportColumn } from '@shared/models/export.model';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { DatePipe } from '@angular/common';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 @Component({
   selector: 'app-skills',
@@ -43,14 +44,15 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
 
   public SkillFormGroup: FormGroup;
   public columnsToExport: ExportColumn[] = [
-    { text:'Skill Category', column: 'skillCategory.name'},
-    { text:'Skill ABBR', column: 'masterSkill.skillAbbr'},
-    { text:'Skill Description', column: 'masterSkill.skillDescription'},
-    { text:'GL Number', column: 'glNumber'},
-    { text:'Allow Onboard', column: 'allowOnboard'},
-    { text:'Inactivate Date', column: 'inactiveDate'}
+    { text:'Skill Category', column: 'SkillCategory_Name'},
+    { text:'Skill ABBR', column: 'SkillAbbr'},
+    { text:'Skill Description', column: 'SkillDescription'},
+    { text:'GL Number', column: 'GLNumber'},
+    { text:'Allow Onboard', column: 'AllowOnboard'},
+    { text:'Inactivate Date', column: 'InactiveDate'}
   ];
   public fileName: string;
+  public defaultFileName: string;
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -59,7 +61,6 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
               private datePipe: DatePipe) {
     super();
     this.idFieldName = 'foreignKey';
-    this.fileName = 'Organization Skills ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.SkillFormGroup = this.fb.group({
       id: new FormControl(0),
       isDefault: new FormControl(false),
@@ -96,16 +97,32 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public override customExport(): void {
+    this.defaultFileName = 'Organization Skills ' + this.generateDateTime(this.datePipe);
+    this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
 
   public closeExport() {
+    this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));
   }
 
-  public export(event: any): void {
-    console.log(event);
-    this.store.dispatch(new ShowExportDialog(false));
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = 'Organization Skills ' + this.generateDateTime(this.datePipe);
+    this.store.dispatch(new ExportSkills(new ExportPayload(
+      fileType, 
+      { orderBy: this.orderBy }, 
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      this.selectedItems.length ? this.selectedItems.map(val => {
+        return { aId: val.id, mId: val.masterSkill.id }
+      }) : null,
+      options?.fileName || this.defaultFileName
+    )));
     this.clearSelection(this.grid);
   }
 

@@ -2,10 +2,18 @@
   <div class="input-container bootstrap base-fee">
     <label>Base Fee %</label>
     <div class="input-group">
-      <input appValidateWithMessage formControlName="baseFee" min="0" class="e-input" placeholder="Base Fee %" maxlength="2"/>
+      <input appValidateWithMessage formControlName="baseFee" min="0" class="e-input" placeholder="Base Fee %" maxlength="2" />
     </div>
   </div>
 
+  <div class="e-gridcustomheader">
+    <div class="title">
+      <h3>Fee Exception</h3>
+    </div>
+    <div class="actions">
+      <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Fee Exception</span>
+    </div>
+  </div>
   <ejs-grid
     #grid
     [dataSource]="feeExceptions"
@@ -16,24 +24,14 @@
     [allowPaging]="allowPaging"
     [pageSettings]="pageSettings"
     [height]="gridHeight"
-    class="e-gridwithtoolbar"
+    class="e-gridwithheader"
   >
-    <ng-template #toolbarTemplate let-data>
-      <div class="e-gridheader e-gridtoolbar">
-        <div class="title">
-          <h3>Fee Exception</h3>
-        </div>
-        <div class="actions">
-          <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Fee Exception</span>
-        </div>
-      </div>
-    </ng-template>
     <e-columns>
       <e-column field="regionName" headerText="Region" textAlign="Left"></e-column>
-      <e-column field="classification" headerText="Classification" textAlign="left" [valueAccessor]='classificationValueAccess'></e-column>
+      <e-column field="classification" headerText="Classification" textAlign="left" [valueAccessor]="classificationValueAccess"></e-column>
       <e-column field="skillName" headerText="Skill" textAlign="left"></e-column>
       <e-column field="fee" headerText="Fee %" textAlign="left"></e-column>
-      
+
       <e-column textAlign="Right" width="120" freeze="Right">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
@@ -53,30 +51,36 @@
         <div class="control-section">
           <div class="content-wrapper">
             <section class="left-side-pager-controls">
-              <ejs-dropdownlist id="rowsPerPage"
-                                class="dropdown-no-border"
-                                [dataSource]="rowsPerPageDropDown"
-                                [(value)]="activeRowsPerPageDropDown"
-                                (change)="onRowsDropDownChanged()">
+              <ejs-dropdownlist
+                id="rowsPerPage"
+                class="dropdown-no-border"
+                [dataSource]="rowsPerPageDropDown"
+                [(value)]="activeRowsPerPageDropDown"
+                (change)="onRowsDropDownChanged()"
+              >
               </ejs-dropdownlist>
-              <ejs-numerictextbox id="goToPage"
-                                  class="numeric-input-no-border"
-                                  format="#"
-                                  placeholder="Go to:"
-                                  min="1"
-                                  [max]="(feeExceptionsPage$ | async)?.totalPages"
-                                  [showSpinButton]="false"
-                                  (change)="onGoToClick($event)">
+              <ejs-numerictextbox
+                id="goToPage"
+                class="numeric-input-no-border"
+                format="#"
+                placeholder="Go to:"
+                min="1"
+                [max]="(feeExceptionsPage$ | async)?.totalPages"
+                [showSpinButton]="false"
+                (change)="onGoToClick($event)"
+              >
               </ejs-numerictextbox>
             </section>
             <section class="right-side-pager-controls">
-              <ejs-pager id="gridPager"
-                         #gridPager
-                         [pageSize]="pageSize"
-                         [totalRecordsCount]="(feeExceptionsPage$ | async)?.totalCount"
-                         [enablePagerMessage]="false"
-                         [currentPage]="currentPage"
-                         (click)="onGoToClick($event)">
+              <ejs-pager
+                id="gridPager"
+                #gridPager
+                [pageSize]="pageSize"
+                [totalRecordsCount]="(feeExceptionsPage$ | async)?.totalCount"
+                [enablePagerMessage]="false"
+                [currentPage]="currentPage"
+                (click)="onGoToClick($event)"
+              >
               </ejs-pager>
             </section>
           </div>

@@ -1,6 +1,17 @@
 <section>
-  <ejs-grid #grid class="e-gridwithtoolbar"
-            [dataSource]="billRates.items"
+  <div class="e-gridcustomheader">
+    <div class="title">
+      <h3>Bill Rates</h3>
+    </div>
+    <div class="actions">
+      <span class="action-link" (click)="addNew()">
+        <i-feather name="plus" class="icon"></i-feather>
+        Add New Record
+      </span>
+    </div>
+  </div>
+  <ejs-grid #grid class="e-gridwithheader"
+            [dataSource]="billRatesData"
             [allowSelection]="false"
             [allowPaging]="allowPaging"
             [pageSettings]="pageSettings"
@@ -10,34 +21,21 @@
             [allowSorting]="allowSorting"
             [allowResizing]="allowResizing"
             (dataBound)="dataBound()">
-    <ng-template #toolbarTemplate let-data>
-      <div class="e-gridheader e-gridtoolbar">
-        <div class="title">
-          <h3>Bill Rates</h3>
-        </div>
-        <div class="actions">
-          <span class="action-link" (click)="addNew()">
-            <i-feather name="plus" class="icon"></i-feather>
-            Add New Record
-          </span>
-        </div>
-      </div>
-    </ng-template>
     <e-columns>
       <e-column headerText="Bill Rate Title">
-        <ng-template #template let-data>{{data.title}}</ng-template>
+        <ng-template #template let-data>{{data.billRateConfig.title}}</ng-template>
       </e-column>
 
       <e-column headerText="Bill Rate Category">
-        <ng-template #template let-data>{{data.category}}</ng-template>
+        <ng-template #template let-data>{{BillRateCategory[data.billRateConfig.category]}}</ng-template>
       </e-column>
 
       <e-column headerText="Pay Rate Type">
-        <ng-template #template let-data>{{data.payRateType}}</ng-template>
+        <ng-template #template let-data>{{BillRateType[data.billRateConfig.type]}}</ng-template>
       </e-column>
 
       <e-column headerText="Rates/Hours" textAlign="Right">
-        <ng-template #template let-data>{{data.ratesHours}}</ng-template>
+        <ng-template #template let-data>{{data.rateHour}}</ng-template>
       </e-column>
 
       <e-column headerText="Interval Min" textAlign="Right">
@@ -49,7 +47,7 @@
       </e-column>
 
       <e-column headerText="Effective Date" textAlign="Right">
-        <ng-template #template let-data>{{data.effectiveDate}}</ng-template>
+        <ng-template #template let-data>{{data.effectiveDate | date:'M/d/y'}}</ng-template>
       </e-column>
 
       <e-column textAlign="Right" width="120" freeze="Right">
@@ -81,7 +79,7 @@
                                   format="#"
                                   placeholder="Go to:"
                                   min="1"
-                                  [max]="billRates.totalPages"
+                                  [max]="0"
                                   [showSpinButton]="false"
                                   (change)="onGoToClick($event)">
               </ejs-numerictextbox>
@@ -90,7 +88,7 @@
               <ejs-pager id="gridPager"
                          #gridPager
                          [pageSize]="pageSize"
-                         [totalRecordsCount]="billRates.totalCount"
+                         [totalRecordsCount]="0"
                          [enablePagerMessage]="false"
                          [currentPage]="currentPage"
                          (click)="onGoToClick($event)">

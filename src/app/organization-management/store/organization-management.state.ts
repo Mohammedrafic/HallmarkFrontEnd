@@ -69,7 +69,7 @@ import {
   SaveOrganizationSettings,
   ClearDepartmentList,
   ClearLocationList,
-  SaveCredentialSucceeded, SaveUpdateCredentialSetupSucceeded, ExportLocations, ExportDepartments,
+  SaveCredentialSucceeded, SaveUpdateCredentialSetupSucceeded, ExportLocations, ExportDepartments, ExportSkills,
 } from './organization-management.actions';
 import { Department } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
@@ -751,6 +751,14 @@ export class OrganizationManagementState {
   @Action(ExportDepartments)
   ExportDepartments({ }: StateContext<OrganizationManagementStateModel>, { payload }: ExportDepartments): Observable<any> {
     return this.departmentService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
+
+  @Action(ExportSkills)
+  ExportSkills({ }: StateContext<OrganizationManagementStateModel>, { payload }: ExportSkills): Observable<any> {
+    return this.skillsService.exportAssignedSkills(payload).pipe(tap(file => {
       const url = window.URL.createObjectURL(file);
       saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
     }));
