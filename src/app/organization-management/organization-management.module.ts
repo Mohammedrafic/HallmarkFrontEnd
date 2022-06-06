@@ -55,6 +55,10 @@ import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { CardMenuComponent } from './workflow/job-order/card-menu/card-menu.component';
 import { WorkflowStepsComponent } from './workflow/job-order/workflow-steps/workflow-steps.component';
 import { WorkflowState } from './store/workflow.state';
+import { BillRatesComponent } from './bill-rates/bill-rates.component';
+import { BillRateSetupComponent } from './bill-rates/bill-rate-setup/bill-rate-setup.component';
+import { BillRateTypeComponent } from './bill-rates/bill-rate-type/bill-rate-type.component';
+import { BillRateTypeMappingComponent } from './bill-rates/bill-rate-type-mapping/bill-rate-type-mapping.component';
 
 const sidebarIcons = {
   Download,
@@ -92,7 +96,11 @@ const sidebarIcons = {
     JobOrderComponent,
     WorkflowMappingComponent,
     CardMenuComponent,
-    WorkflowStepsComponent
+    WorkflowStepsComponent,
+    BillRatesComponent,
+    BillRateSetupComponent,
+    BillRateTypeComponent,
+    BillRateTypeMappingComponent
   ],
   imports: [
     CommonModule,
