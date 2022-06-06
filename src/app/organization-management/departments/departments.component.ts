@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, Select, Store } from '@ngxs/store';
-import { filter, Observable } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { FreezeService, GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -19,6 +19,8 @@ import {
   GetLocationsByRegionId,
   SetImportFileDialogState,
   ExportDepartments,
+  ClearLocationList,
+  ClearDepartmentList,
 } from '../store/organization-management.actions';
 import { Region } from '../../shared/models/region.model';
 import { Location } from '../../shared/models/location.model';
@@ -36,6 +38,7 @@ import { ConfirmService } from '../../shared/services/confirm.service';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { DatePipe } from '@angular/common';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { UserState } from 'src/app/store/user.state';
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 
@@ -46,12 +49,17 @@ export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location wer
   providers: [MaskedDateTimeService, FreezeService],
 })
 export class DepartmentsComponent extends AbstractGridConfigurationComponent implements OnInit {
+  private unsubscribe$: Subject<void> = new Subject();
+
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
 
   // department form data
   departmentsDetailsFormGroup: FormGroup;
   formBuilder: FormBuilder;
+
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
 
   @Select(OrganizationManagementState.departments)
   departments$: Observable<Department[]>;
@@ -103,7 +111,14 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetRegions());
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
+      this.store.dispatch(new GetRegions());
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   public override customExport(): void {
@@ -136,11 +151,14 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
-    if (this.selectedRegion.id) {
+    if (this.selectedRegion?.id) {
       this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
       this.isLocationsDropDownEnabled = true;
-      this.clearSelection(this.grid);
+    } else {
+      this.store.dispatch(new ClearLocationList());
+      this.store.dispatch(new ClearDepartmentList());
     }
+    this.clearSelection(this.grid);
   }
 
   onLocationDropDownChanged(event: ChangeEventArgs): void {
