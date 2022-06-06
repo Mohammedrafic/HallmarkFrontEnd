@@ -104,10 +104,24 @@ table.detailtable {
       td {
         &.workflow-type-content {
           padding-left: 0;
+
+          p {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width:245px;
+          }
         }
 
         &.user-roles-content {
           padding-left: 0;
+
+          p {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            width:140px;
+          }
         }
       }
     }

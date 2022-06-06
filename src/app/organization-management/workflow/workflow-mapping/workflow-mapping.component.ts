@@ -277,7 +277,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
         this.workflowMappingFormGroup.controls['departments'].setValue([data.departmentId]);
       }
 
-      if (!data.skills) {
+      if (data.skills.length === 0) {
         this.workflowMappingFormGroup.controls['skills'].setValue(this.allSkills.map((skill: Skill) => skill.id));
       } else {
         this.workflowMappingFormGroup.controls['skills'].setValue(data.skills.map((skill: any) => skill.skillId));

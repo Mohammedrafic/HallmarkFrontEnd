@@ -60,11 +60,11 @@
             <td class="e-rowcell e-templatecell"></td>
             <td class="e-rowcell e-templatecell"></td>
             <td class="e-rowcell e-templatecell workflow-type-content">
-              <span>
-                {{stepDetails.step.name + ' > ' + stepDetails.step.status}}
-              </span>
+              <p>{{stepDetails.step.name + ' > ' + stepDetails.step.status}}</p>
             </td>
-            <td class="e-rowcell e-templatecell user-roles-content">{{stepDetails.roleUser?.name}}</td>
+            <td class="e-rowcell e-templatecell user-roles-content">
+              <p>{{stepDetails.roleUser?.name}}</p>
+            </td>
             <td class="e-rowcell e-templatecell"></td>
           </tr>
         </tbody>
