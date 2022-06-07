@@ -2,17 +2,20 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
-import { Observable, of, forkJoin } from 'rxjs';
+import { LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
+import { Observable, of, forkJoin, map, EMPTY, tap } from 'rxjs';
+
 import { ChartAccumulation } from '../models/chart-accumulation-widget.model';
 import { ChartLineDataModel } from '../models/chart-line-widget.model';
 import { WidgetDataDependenciesAggregatedModel } from '../models/widget-data-dependencies-aggregated.model';
 import { DashboardFiltersModel } from '../models/dashboard-filters.model';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
-import { LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
 import { USAMapDataLayerSettings } from '../constants/USA-map-data-layer-settings';
+import { DashboardStateDto } from '../models/dashboard-state-dto.model';
 
 @Injectable()
 export class DashboardService {
+  private readonly baseUrl = '/api/Dashboard';
   private readonly widgetTypeToDataMapper: Record<
     WidgetTypeEnum,
     (filters: DashboardFiltersModel) => Observable<unknown>
@@ -27,22 +30,23 @@ export class DashboardService {
   constructor(private http: HttpClient) {}
 
   getDashboardsPanels(): Observable<PanelModel[]> {
-    return of([
-      { id: WidgetTypeEnum.CANDIDATES, sizeX: 3, sizeY: 3, row: 0, col: 3 },
-      { id: WidgetTypeEnum.ORDERS_VS_CANDIDATES, sizeX: 3, sizeY: 3, row: 0, col: 6 },
-      { id: WidgetTypeEnum.CANDIDATES_BY_REGION, sizeX: 3, sizeY: 3, row: 0, col: 9 },
-      { id: WidgetTypeEnum.INVOICES, sizeX: 3, sizeY: 3, row: 1, col: 0 },
-    ]);
+    // return of([
+    //   { id: WidgetTypeEnum.CANDIDATES, sizeX: 3, sizeY: 3, row: 0, col: 3 },
+    //   { id: WidgetTypeEnum.ORDERS_VS_CANDIDATES, sizeX: 3, sizeY: 3, row: 0, col: 6 },
+    //   { id: WidgetTypeEnum.CANDIDATES_BY_REGION, sizeX: 3, sizeY: 3, row: 0, col: 9 },
+    //   { id: WidgetTypeEnum.INVOICES, sizeX: 3, sizeY: 3, row: 1, col: 0 },
+    // ]);
+    return this.http.get<DashboardStateDto>(`${this.baseUrl}/GetState`).pipe(map((panels) => JSON.parse(panels.state)));
   }
 
   addDashboardPanel(panel: PanelModel[]): Observable<PanelModel[]> {
     return of(panel);
   }
 
-  saveDashboard(dashboard: PanelModel[]): Observable<boolean> {
-    const panels = JSON.stringify(dashboard);
-    localStorage.setItem('dashboard', panels);
-    return of(true);
+  saveDashboard(dashboard: PanelModel[]): Observable<Object> {
+    const dasboardState = JSON.stringify(dashboard);
+    return this.http.post(`${this.baseUrl}/SaveState`, { dasboardState }).pipe(tap((data) => console.log(data)
+    ));
   }
 
   getChartLineWidgets(): ChartLineDataModel {
@@ -103,6 +107,7 @@ export class DashboardService {
   public getWidgetsAggregatedData([panels, filters]: WidgetDataDependenciesAggregatedModel): Observable<
     Record<WidgetTypeEnum, unknown>
   > {
+    if (!panels) return EMPTY;
     const data: Record<WidgetTypeEnum, Observable<unknown>> = panels.reduce(
       (accumulator: Record<WidgetTypeEnum, Observable<unknown>>, panel: PanelModel) => ({
         ...accumulator,
