@@ -1,2 +1,3 @@
-<app-widget-header [title]="'Candidates by Region'"></app-widget-header>
-<app-map class="app-maps-chart__map" [layers]="layers" [legendSettings]="legendSettings"></app-map>
+<app-widget-wrapper title="Candidates by Region">
+  <app-map class="app-maps-chart__map" [layers]="chartData" [legendSettings]="legendSettings"></app-map>
+</app-widget-wrapper>

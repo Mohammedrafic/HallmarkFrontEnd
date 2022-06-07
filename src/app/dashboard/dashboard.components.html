@@ -1,32 +1,44 @@
-<div class="control-section">
-  <div style="padding: 5px; text-align: right">
-    <button id="add" class="e-btn e-info" [disabled]="isLoading$ | async" (click)="addPanel()">Add Panel</button>
-  </div>
+<ng-container
+  [ngTemplateOutlet]="dashboardTemplate"
+  [ngTemplateOutletContext]="{ widgetsData: widgetsData$ | async }"
+></ng-container>
 
-  <ejs-dashboardlayout
-    id="dashboardLayout"
-    [columns]="columns"
-    [cellSpacing]="cellSpacing"
-    (dragStop)="moveDashboardPanel()"
-    #dashboardLayout
-  >
-    <e-panels>
-      <e-panel
-        *ngFor="let panel of panels; let i = index"
-        [sizeX]="panel.sizeX"
-        [sizeY]="panel.sizeY"
-        [row]="panel.row"
-        [col]="panel.col"
-        [id]="panel.id"
-      >
-        <ng-template #content [ngSwitch]="panel.id">
-          <app-line-chart [widget]="widgets['chart_line_'+ i]" *ngSwitchCase="'chart_line_'+ i"></app-line-chart>
-          <app-accumulation-chart [chartData]="accumulationWidgets[panel.id!]" *ngSwitchCase="'candidates_1'"></app-accumulation-chart>
-          <app-accumulation-chart [chartData]="accumulationWidgets[panel.id!]" *ngSwitchCase="'invoces_1'"></app-accumulation-chart>
-          <app-maps-chart *ngSwitchCase="'america_map_1'"></app-maps-chart>
-          <div *ngSwitchDefault></div>
-        </ng-template>
-      </e-panel>
-    </e-panels>
-  </ejs-dashboardlayout>
-</div>
+<ng-template #dashboardTemplate let-widgetsData="widgetsData">
+  <div class="control-section">
+    <div style="padding: 5px; text-align: right"></div>
+    <ejs-dashboardlayout
+      id="dashboardLayout"
+      [columns]="columns"
+      [cellSpacing]="cellSpacing"
+      (dragStop)="moveDashboardPanel()"
+      #dashboardLayout
+    >
+      <e-panels>
+        <e-panel
+          *ngFor="let panel of panels$ | async; let i = index; trackBy: trackByHandler"
+          [sizeX]="panel.sizeX"
+          [sizeY]="panel.sizeY"
+          [row]="panel.row"
+          [col]="panel.col"
+          [id]="panel.id"
+        >
+          <ng-template #content [ngSwitch]="panel.id">
+            <!--          <app-line-chart [widget]="widgets['chart_line_'+ i]" *ngSwitchCase="'chart_line_'+ i"></app-line-chart>-->
+            <app-accumulation-chart
+              [chartData]="widgetsData[widgetTypeEnum.CANDIDATES]"
+              *ngSwitchCase="widgetTypeEnum.CANDIDATES"
+            ></app-accumulation-chart>
+            <app-accumulation-chart
+              [chartData]="widgetsData[widgetTypeEnum.INVOICES]"
+              *ngSwitchCase="widgetTypeEnum.INVOICES"
+            ></app-accumulation-chart>
+            <app-maps-chart
+              *ngSwitchCase="widgetTypeEnum.CANDIDATES_BY_REGION"
+              [chartData]="widgetsData[widgetTypeEnum.CANDIDATES_BY_REGION]"
+            ></app-maps-chart>
+          </ng-template>
+        </e-panel>
+      </e-panels>
+    </ejs-dashboardlayout>
+  </div>
+</ng-template>

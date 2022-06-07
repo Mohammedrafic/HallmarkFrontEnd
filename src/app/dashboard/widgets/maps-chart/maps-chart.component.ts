@@ -1,6 +1,5 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
 import type { LegendSettingsModel, LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
-import { USAMapDataLayerSettings } from './USA-map-data-layer-settings';
 import { USAMapDataLegendSettings } from './USA-map-data-legend-settings';
 
 @Component({
@@ -10,6 +9,7 @@ import { USAMapDataLegendSettings } from './USA-map-data-legend-settings';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapsChartComponent {
+  @Input() public chartData: LayerSettingsModel[];
+
   public readonly legendSettings: LegendSettingsModel = USAMapDataLegendSettings;
-  public readonly layers: LayerSettingsModel[] = USAMapDataLayerSettings;
 }
