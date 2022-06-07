@@ -19,7 +19,7 @@
             [allowResizing]="allowResizing"
             (dataBound)="dataBound()">
     <e-columns>
-      <e-column headerText="Organisation" width=157>
+      <e-column headerText="Organization" width=157>
         <ng-template #template let-data>
           <span>{{data.organizationId === null ? 'All' : data.organizationName}}</span>
         </ng-template>

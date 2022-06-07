@@ -147,4 +147,5 @@
   </ng-template>
 </ejs-grid>
 
-<app-preview-order-dialog [order]="previewData" [openEvent]="openPreview"></app-preview-order-dialog>
+<app-preview-order-dialog [order]="previewData" [openEvent]="openPreview" (compareEvent)="onCompare()"></app-preview-order-dialog>
+<app-candidat-dialog [openEvent]="openCandidat"></app-candidat-dialog>

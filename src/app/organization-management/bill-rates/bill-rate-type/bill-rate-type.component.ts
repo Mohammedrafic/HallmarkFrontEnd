@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-bill-rate-type',
@@ -6,6 +6,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./bill-rate-type.component.scss']
 })
 export class BillRateTypeComponent implements OnInit {
+  @Input() isActive: boolean = false;
 
   constructor() { }
 

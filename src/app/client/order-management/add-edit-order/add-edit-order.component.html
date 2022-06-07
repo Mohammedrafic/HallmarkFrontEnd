@@ -9,7 +9,13 @@
       <i-feather name="upload" class="icon"></i-feather>
     </button>
 
-    <ejs-splitbutton content="Submit" cssClass="e-primary" [items]="submitMenuItems"></ejs-splitbutton>
+    <ejs-splitbutton
+      content="Submit"
+      cssClass="e-primary"
+      [items]="submitMenuItems"
+      (click)="save()"
+      (select)="onSplitButtonSelect($event)">
+    </ejs-splitbutton>
   </div>
 </section>
 
@@ -25,17 +31,21 @@
       <ng-template #content>
         <ng-container *ngIf="selectedTab === SelectedTab.OrderDetails">
           <section class="order-details-form-section">
-            <app-order-details-form></app-order-details-form>
+            <app-order-details-form #orderDetailsForm></app-order-details-form>
           </section>
 
-          <section class="bill-rates-section">
+          <!-- Bill Rates will be added soon -->
+
+          <!-- <section class="bill-rates-section">
             <app-bill-rates></app-bill-rates>
-          </section>
+          </section> -->
         </ng-container>
       </ng-template>
     </e-tabitem>
 
-    <e-tabitem>
+    <!-- Credentials Tab will be added soon -->
+
+    <!-- <e-tabitem>
       <ng-template #headerText>
         <div class="stepper-header">
           <div class="stepper-title">Credentials</div>
@@ -45,6 +55,6 @@
       <ng-template #content>
         <app-order-credentials *ngIf="selectedTab === SelectedTab.Credentials"></app-order-credentials>
       </ng-template>
-    </e-tabitem>
+    </e-tabitem> -->
   </e-tabitems>
 </ejs-tab>

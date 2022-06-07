@@ -76,7 +76,13 @@ export class UsersService {
    * @param userId
    */
   public removeUserVisibilitySettings(id: number, userId: string): Observable<never> {
-    return this.http.delete<never>(`/api/UserVisibilitySettings`, { params: { id, userId } });
+    const params: any = { userId };
+
+    if (id !== null) {
+      params.id = id;
+    }
+
+    return this.http.delete<never>(`/api/UserVisibilitySettings`, { params });
   }
 
   /**

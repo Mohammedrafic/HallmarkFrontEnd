@@ -19,7 +19,8 @@ import { DashboardComponent } from './dashboard.components';
 import { AccumulationChartComponent } from './widgets/accumulation-chart/accumulation-chart.component';
 import { LineChartComponent } from './widgets/line-chart/line-chart.component';
 import { MapsChartModule } from './widgets/maps-chart/maps-chart.module';
-import { WidgetHeaderModule } from './widgets/widget-header/widget-header.module';
+import { ReactiveFormsModule } from '@angular/forms';
+import { WidgetWrapperModule } from './widgets/widget-wrapper/widget-wrapper.module';
 
 @NgModule({
   declarations: [DashboardComponent, LineChartComponent, AccumulationChartComponent],
@@ -29,9 +30,10 @@ import { WidgetHeaderModule } from './widgets/widget-header/widget-header.module
     ChartModule,
     AccumulationChartAllModule,
     MapsChartModule,
-    WidgetHeaderModule,
     RouterModule.forChild([{ path: '', component: DashboardComponent }]),
     NgxsModule.forFeature([DashboardState]),
+    ReactiveFormsModule,
+    WidgetWrapperModule,
   ],
   providers: [
     DashboardService,

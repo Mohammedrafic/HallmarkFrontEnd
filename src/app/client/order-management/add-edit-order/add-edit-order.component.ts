@@ -2,6 +2,7 @@ import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
+import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 
 import { Store } from '@ngxs/store';
 
@@ -9,10 +10,19 @@ import { Subject, takeUntil } from 'rxjs';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { SetImportFileDialogState } from '@admin/store/admin.actions';
+import { SaveOrder } from '@organization-management/store/organization-management.actions';
+
+import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
+import { Order } from '@shared/models/organization.model';
 
 enum SelectedTab {
   OrderDetails,
   Credentials
+}
+
+enum SubmitButtonItem {
+  SaveForLater = '0',
+  SaveAsTemplate = '1'
 }
 
 @Component({
@@ -22,13 +32,14 @@ enum SelectedTab {
 })
 export class AddEditOrderComponent implements OnDestroy {
   @ViewChild('stepper') tab: TabComponent;
+  @ViewChild('orderDetailsForm') orderDetailsFormComponent: OrderDetailsFormComponent;
 
   public SelectedTab = SelectedTab;
 
   public title = 'Create';
   public submitMenuItems: ItemModel[] = [
-    { text: 'Save For Later' },
-    { text: 'Save as Template' }
+    { id: SubmitButtonItem.SaveForLater, text: 'Save For Later' },
+    { id: SubmitButtonItem.SaveAsTemplate, text: 'Save as Template' }
   ];
   public selectedTab: SelectedTab = SelectedTab.OrderDetails;
 
@@ -56,5 +67,168 @@ export class AddEditOrderComponent implements OnDestroy {
     this.tab.selected.pipe(takeUntil(this.unsubscribe$)).subscribe((event: SelectEventArgs) => {
       this.selectedTab = event.selectedIndex;
     });
+  }
+
+  public onSplitButtonSelect(args: MenuEventArgs): void {
+    switch (args.item.id) {
+      case SubmitButtonItem.SaveForLater:
+        this.saveForLater();
+        break;
+
+      case SubmitButtonItem.SaveForLater:
+        this.saveAsTemplate();
+        break;
+    }
+  }
+
+  public save(): void {
+    if (
+      this.orderDetailsFormComponent.orderTypeStatusForm.valid &&
+      this.orderDetailsFormComponent.generalInformationForm.valid &&
+      this.orderDetailsFormComponent.jobDistributionForm.valid &&
+      this.orderDetailsFormComponent.jobDescriptionForm.valid &&
+      this.orderDetailsFormComponent.contactDetailsForm.valid &&
+      this.orderDetailsFormComponent.workLocationForm.valid &&
+      this.orderDetailsFormComponent.workflowForm.valid
+    ) {
+      const order = this.collectOrderData(true);
+
+      this.store.dispatch(new SaveOrder(order));
+    } else {
+      this.orderDetailsFormComponent.orderTypeStatusForm.markAllAsTouched();
+      this.orderDetailsFormComponent.generalInformationForm.markAllAsTouched();
+      this.orderDetailsFormComponent.jobDistributionForm.markAllAsTouched();
+      this.orderDetailsFormComponent.jobDescriptionForm.markAllAsTouched();
+      this.orderDetailsFormComponent.contactDetailsForm.markAllAsTouched();
+      this.orderDetailsFormComponent.workLocationForm.markAllAsTouched();
+      this.orderDetailsFormComponent.workflowForm.markAllAsTouched();
+    }
+  }
+
+  private collectOrderData(isSubmit: boolean): Order {
+    const allValues = {
+      ...this.orderDetailsFormComponent.orderTypeStatusForm.value,
+      ...this.orderDetailsFormComponent.generalInformationForm.value,
+      ...this.orderDetailsFormComponent.jobDistributionForm.value,
+      ...this.orderDetailsFormComponent.jobDescriptionForm.value,
+      ...this.orderDetailsFormComponent.contactDetailsForm.value,
+      ...this.orderDetailsFormComponent.workLocationForm.value,
+      ...this.orderDetailsFormComponent.workflowForm.value,
+      ...{ credentials: [] }, // Will be added soon
+      ...{ billRates: [] } // Will be added soon
+    };
+
+    const {
+      orderType,
+      title,
+      regionId,
+      locationId,
+      departmentId,
+      skillId,
+      projectTypeId,
+      projectType,
+      projectNameId,
+      projectName,
+      hourlyRate,
+      openPositions,
+      minYrsRequired,
+      joiningBonus,
+      compBonus,
+      duration,
+      jobStartDate,
+      jobEndDate,
+      shiftRequirementId,
+      shiftStartTime,
+      shiftEndTime,
+      jobDistributions,
+      classification,
+      onCallRequired,
+      asapStart,
+      criticalOrder,
+      nO_OT,
+      jobDescription,
+      unitDescription,
+      reasonForRequisition,
+      contactDetails,
+      workLocations,
+      workflowId,
+      billRates,
+      credentials
+    } = allValues;
+
+    const order: Order = {
+      title,
+      regionId,
+      locationId,
+      departmentId,
+      skillId,
+      orderType,
+      projectTypeId,
+      projectNameId,
+      hourlyRate,
+      openPositions,
+      minYrsRequired,
+      joiningBonus,
+      compBonus,
+      duration,
+      jobStartDate,
+      jobEndDate,
+      shiftRequirementId,
+      shiftStartTime,
+      shiftEndTime,
+      classification,
+      onCallRequired,
+      asapStart,
+      criticalOrder,
+      nO_OT,
+      jobDescription,
+      unitDescription,
+      reasonForRequisition,
+      billRates,
+      jobDistributions,
+      contactDetails,
+      workLocations,
+      credentials,
+      workflowId,
+      isSubmit
+    };
+
+    if (!projectTypeId && projectType) {
+      order.projectType = projectType
+    }
+
+    if (!projectNameId && projectName) {
+      order.projectName = projectName;
+    }
+
+    return order;
+  }
+
+  private saveForLater(): void {
+    const titleControl = this.orderDetailsFormComponent.generalInformationForm.controls['title'];
+
+    const contactDetailsForm = this.orderDetailsFormComponent.contactDetailsForm;
+    const workLocationForm = this.orderDetailsFormComponent.workLocationForm;
+
+    if (titleControl.invalid) {
+      titleControl.markAsTouched();
+      return;
+    }
+
+    const order = this.collectOrderData(false);
+
+    if (contactDetailsForm.invalid) {
+      order.contactDetails = [];
+    }
+
+    if (workLocationForm.invalid) {
+      order.workLocations = [];
+    }
+
+    this.store.dispatch(new SaveOrder(order));
+  }
+
+  private saveAsTemplate(): void {
+
   }
 }

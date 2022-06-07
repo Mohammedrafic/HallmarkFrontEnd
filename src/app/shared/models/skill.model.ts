@@ -39,4 +39,8 @@ export class SkillsPage {
   totalCount: number;
   totalPages: number;
 }
-  
+
+export class MasterSkillByOrganization {
+  id: number;
+  name: string;
+}

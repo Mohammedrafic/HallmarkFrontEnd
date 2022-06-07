@@ -58,10 +58,6 @@ export class VisibilitySettingsComponent extends AbstractGridConfigurationCompon
       .subscribe(() => this.store.dispatch(new GetUserVisibilitySettingsPage(this.userId)));
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(RemoveUserVisibilitySettingSucceeded))
       .subscribe(() => this.store.dispatch(new GetUserVisibilitySettingsPage(this.userId)));
-
-    this.userVisibilitySettingsPage$.subscribe(data => {
-      console.log(data);
-    })
   }
 
   ngOnDestroy(): void {

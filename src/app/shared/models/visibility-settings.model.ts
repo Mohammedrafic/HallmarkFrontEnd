@@ -45,4 +45,5 @@ export type Region = {
   id: number;
   name: string;
   locations: Location[];
+  organisationName?: string;
 }

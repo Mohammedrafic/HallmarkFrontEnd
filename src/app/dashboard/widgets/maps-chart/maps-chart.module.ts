@@ -2,10 +2,10 @@ import { NgModule } from '@angular/core';
 
 import { MapsChartComponent } from './maps-chart.component';
 import { MapModule } from '@shared/components/map/map.module';
-import { WidgetHeaderModule } from '../widget-header/widget-header.module';
+import { WidgetWrapperModule } from '../widget-wrapper/widget-wrapper.module';
 
 @NgModule({
-  imports: [MapModule, WidgetHeaderModule],
+  imports: [MapModule, WidgetWrapperModule],
   exports: [MapsChartComponent],
   declarations: [MapsChartComponent],
 })

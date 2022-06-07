@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { WidgetHeaderComponent } from './widget-header.component';
+import { CandidatDialogComponent } from './candidat-dialog.component';
 
-describe('WidgetHeaderComponent', () => {
-  let component: WidgetHeaderComponent;
-  let fixture: ComponentFixture<WidgetHeaderComponent>;
+describe('CandidatDialogComponent', () => {
+  let component: CandidatDialogComponent;
+  let fixture: ComponentFixture<CandidatDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ WidgetHeaderComponent ]
+      declarations: [ CandidatDialogComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(WidgetHeaderComponent);
+    fixture = TestBed.createComponent(CandidatDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
