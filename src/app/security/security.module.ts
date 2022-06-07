@@ -4,8 +4,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { NgxsModule } from '@ngxs/store';
 
 import { SharedModule } from '@shared/shared.module';
-
-import { Sliders, Edit, Trash2 } from 'angular-feather/icons';
+import { DialogModule } from "@syncfusion/ej2-angular-popups";
+import { Sliders, Edit, Trash2, Plus } from 'angular-feather/icons';
 import {ButtonAllModule, ChipListModule, SwitchAllModule} from '@syncfusion/ej2-angular-buttons';
 import {TabAllModule, TreeViewAllModule} from '@syncfusion/ej2-angular-navigations';
 import {DropDownListModule, MultiSelectAllModule} from '@syncfusion/ej2-angular-dropdowns';
@@ -24,10 +24,12 @@ import { UserGridComponent } from './user-list/user-grid/user-grid.component';
 import { AddEditUserComponent } from './user-list/add-edit-user/add-edit-user.component';
 import { UserSettingsComponent } from './user-list/add-edit-user/user-settings/user-settings.component';
 import { VisibilitySettingsComponent } from './user-list/add-edit-user/visibility-settings/visibility-settings.component';
+import { AddEditVisibilityComponent } from './user-list/add-edit-user/visibility-settings/add-edit-visibility/add-edit-visibility.component';
 
 const scurityIcons = {
   Sliders,
   Edit,
+  Plus,
   Trash2
 };
 
@@ -41,7 +43,8 @@ const scurityIcons = {
     UserGridComponent,
     AddEditUserComponent,
     UserSettingsComponent,
-    VisibilitySettingsComponent
+    VisibilitySettingsComponent,
+    AddEditVisibilityComponent
   ],
   imports: [
     CommonModule,
@@ -49,6 +52,7 @@ const scurityIcons = {
     SecurityRoutingModule,
     ReactiveFormsModule,
 
+    DialogModule,
     ButtonAllModule,
     DropDownListModule,
     GridAllModule,

@@ -1,6 +1,9 @@
 import {
   GetCandidatesCredentialByPage,
+  GetCredentialFiles,
+  GetCredentialFilesSucceeded,
   GetCredentialTypes,
+  GetGroupedCredentialsFiles,
   GetMasterCredentials,
   RemoveCandidatesCredential,
   RemoveCandidatesCredentialSucceeded,
@@ -13,7 +16,7 @@ import {
 import { CandidateState } from "@agency/store/candidate.state";
 import { Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute } from "@angular/router";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
 import {
@@ -23,10 +26,11 @@ import {
   DELETE_RECORD_TITLE
 } from "@shared/constants/messages";
 import { CredentialVerifiedStatus, STATUS_COLOR_GROUP } from "@shared/enums/status";
-import { CandidateCredential, CandidateCredentialPage, CredentialFile, PreviewFileData } from "@shared/models/candidate-credential.model";
+import { CandidateCredential, CandidateCredentialPage, CredentialFile } from "@shared/models/candidate-credential.model";
 import { CredentialType } from "@shared/models/credential-type.model";
 import { ConfirmService } from "@shared/services/confirm.service";
 import { valuesOnly } from "@shared/utils/enum.utils";
+import { downloadBlobFile } from "@shared/utils/file.utils";
 import { FieldSettingsModel } from "@syncfusion/ej2-angular-dropdowns";
 import { GridComponent } from "@syncfusion/ej2-angular-grids";
 import { FileInfo, SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
@@ -51,7 +55,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public searchCredentialForm: FormGroup;
   public disabledCopy = false;
   public candidateCredentialPage: CandidateCredentialPage;
-  public openFileViewerDialog = new EventEmitter<PreviewFileData>();
+  public openFileViewerDialog = new EventEmitter<void>();
   public credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public optionFields = { text: 'text', value: 'id' };
   public verifiedStatuses = Object.values(CredentialVerifiedStatus)
@@ -66,6 +70,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   private filesDetails: Blob[] = []
   private hasFiles = false;
   private removeFiles = false;
+  private file: CredentialFile | null;
 
   @Select(CandidateState.candidateCredential)
   candidateCredential$: Observable<CandidateCredentialPage>;
@@ -133,6 +138,12 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     });
     this.actions$.pipe(ofActionSuccessful(RemoveCandidatesCredentialSucceeded)).subscribe(() => {
       this.store.dispatch(new GetCandidatesCredentialByPage(this.currentPage, this.pageSize));
+    });
+    this.actions$.pipe(ofActionSuccessful(GetCredentialFilesSucceeded)).subscribe((files: { payload: Blob }) => {
+      if (this.file) {
+        downloadBlobFile(files.payload, this.file.name);
+        this.file = null;
+      }
     });
     this.createAddCredentialForm();
     this.createSearchCredentialForm();
@@ -209,9 +220,14 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.saveCredential(data);
   }
 
-  public onViewFiles(event: MouseEvent, files: CredentialFile[]) {
+  public onViewFiles() {
+    this.store.dispatch(new GetGroupedCredentialsFiles()).subscribe(() => this.openFileViewerDialog.emit());
+  }
+
+  public onDownload(event: MouseEvent, file: CredentialFile) {
     event.stopPropagation();
-    this.openFileViewerDialog.emit({ credentials: this.candidateCredentialPage.items, selectedFileId: files[0].id });
+    this.file = file;
+    this.store.dispatch(new GetCredentialFiles(this.file.id));
   }
 
   public onEdit(event: MouseEvent,

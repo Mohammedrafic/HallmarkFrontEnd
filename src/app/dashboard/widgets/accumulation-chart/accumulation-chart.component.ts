@@ -15,7 +15,7 @@ export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy 
   @ViewChild('pie') pie: Pie;
   public toggleLegend: number[] = [];
   public palette: string[];
-  public height = '30%';
+  public height = '35%';
   public tooltip = { enable: true };
   public datalabel = { visible: false };
   public chartData: DonutChartData[];
@@ -56,7 +56,7 @@ export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy 
     this.chartData = this.chart.chartData.filter((_, idx) => !this.toggleLegend.includes(idx));
   }
 
-  onCheckboxChange(event: Event): void {
-    console.log((event.target as HTMLInputElement).value);
+  onCheckboxChange(idx: number): void {
+    this.onClickLegend(idx)
   }
 }

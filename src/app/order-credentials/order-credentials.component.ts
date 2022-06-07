@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Store } from '@ngxs/store';
 
@@ -60,9 +61,22 @@ export class OrderCredentialsComponent implements OnInit {
   public credentialFormHeader: string;
   public isEditMode: boolean;
 
-  constructor(private store: Store) { }
+  public CredentialForm: FormGroup;
+
+  constructor(private store: Store, private fb: FormBuilder) {
+    this.CredentialForm = this.fb.group({
+      id: new FormControl(0),
+      credentialType: new FormControl(0, [ Validators.required ]),
+      credentialName: new FormControl(0, [ Validators.required ]),
+      comments: new FormControl(''),
+      reqForSubmission: new FormControl(null),
+      reqForOnboard: new FormControl(null),
+      optional: new FormControl(null),
+    });
+  }
 
   ngOnInit(): void {
+
   }
 
   public addNew(): void {
@@ -74,15 +88,27 @@ export class OrderCredentialsComponent implements OnInit {
   public onEdit(credential: IOrderCredentialItem): void {
     this.credentialFormHeader = 'Edit Credential';
     this.isEditMode = true;
+    this.CredentialForm.setValue({
+      id: 0, 
+      credentialType: '',
+      credentialName: credential.name,
+      comments: credential.comments,
+      reqForSubmission: credential.reqForSubmission,
+      reqForOnboard: credential.reqForOnboard,
+      optional: credential.optional
+    });
+    this.CredentialForm.get('credentialType')?.disable();
+    this.CredentialForm.get('credentialName')?.disable();
     this.store.dispatch(new ShowSideDialog(true));
   }
 
   public onDialogCancel(): void {
+    this.CredentialForm.reset();
     this.store.dispatch(new ShowSideDialog(false));
   }
 
   public onDialogOk(): void {
-    this.store.dispatch(new ShowSideDialog(false));
+    this.onDialogCancel();
   }
 
 }

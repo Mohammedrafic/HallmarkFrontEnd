@@ -1,5 +1,14 @@
 <section>
-  <ejs-grid #grid class="e-gridwithtoolbar"
+  <div class="e-gridcustomheader">
+    <div class="title">
+      <h3>Education</h3>
+    </div>
+    <div class="actions">
+      <span class="action-link" (click)="onFilter()"><i-feather name="sliders" class="icon"></i-feather> Filters</span>
+      <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Education</span>
+    </div>
+  </div>
+  <ejs-grid #grid class="e-gridwithheader"
             [dataSource]="educations$ | async"
             [rowHeight]="rowHeight"
             [resizeSettings]="resizeSettings"
@@ -8,17 +17,6 @@
             [pageSettings]="pageSettings"
             [height]="gridHeight"
             (dataBound)="dataBound()">
-    <ng-template #toolbarTemplate let-data>
-      <div class="e-gridheader e-gridtoolbar">
-        <div class="title">
-          <h3>Education</h3>
-        </div>
-        <div class="actions">
-          <span class="action-link" (click)="onFilter()"><i-feather name="sliders" class="icon"></i-feather> Filters</span>
-          <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Education</span>
-        </div>
-      </div>
-    </ng-template>
     <e-columns>
       <e-column field="degree" headerText="Degree Type" width=300 [valueAccessor]="degreeAccessor"></e-column>
       <e-column field="schoolName" headerText="School Name" width=300></e-column>

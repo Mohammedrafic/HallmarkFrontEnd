@@ -22,7 +22,7 @@ import {
 } from '@syncfusion/ej2-angular-grids';
 
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
-import { NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
+import { MaskedTextBoxAllModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 
@@ -31,6 +31,9 @@ import { SharedModule } from '@shared/shared.module';
 import { BillRatesComponent } from './bill-rates.component';
 import { BillRateFormComponent } from './components/bill-rate-form/bill-rate-form.component';
 import { BillRatesGridComponent } from './components/bill-rates-grid/bill-rates-grid.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { NgxsModule } from '@ngxs/store';
+import { BillRateState } from './store/bill-rate.state';
 
 const icons = {
   Edit,
@@ -54,7 +57,10 @@ const icons = {
     NumericTextBoxModule,
     PagerModule,
     SharedModule,
-    TextBoxModule
+    TextBoxModule,
+    ReactiveFormsModule,
+    MaskedTextBoxAllModule,
+    NgxsModule.forFeature([BillRateState]),
   ],
   providers: [
     ColumnMenuService,

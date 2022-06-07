@@ -26,6 +26,9 @@ import { OrderCredentialsComponent } from './order-credentials.component';
 import { AddOrderCredentialFormComponent } from './components/add-order-credential-form/add-order-credential-form.component';
 import { EditOrderCredentialFormComponent } from './components/edit-order-credential-form/edit-order-credential-form.component';
 import { OrderCredentialsGridComponent } from './components/order-credentials-grid/order-credentials-grid.component';
+import { OrderCandidatesCredentialsState } from './store/credentials.state';
+import { NgxsModule } from '@ngxs/store';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 const icons = {
   Edit,
@@ -49,7 +52,13 @@ const icons = {
     NumericTextBoxModule,
     PagerModule,
     SharedModule,
-    TextBoxModule
+    TextBoxModule,
+    FormsModule, ReactiveFormsModule,
+
+    //STORE
+    NgxsModule.forFeature([
+      OrderCandidatesCredentialsState
+    ]),
   ],
   providers: [
     ColumnMenuService,

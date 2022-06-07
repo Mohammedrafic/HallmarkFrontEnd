@@ -1,4 +1,4 @@
-<section class="container">
+<section class="workflow-mapping-container">
   <app-page-toolbar>
     <ng-container left>
     </ng-container>
@@ -13,22 +13,98 @@
 
   <ejs-grid class="grid grid-component"
             #grid
-            [dataSource]="gridDataSource"
+            (rowDataBound)="rowDataBound($event)"
+            [dataSource]="(workflowMappings$ | async)?.items"
             [allowPaging]="allowPaging"
             [pageSettings]="pageSettings"
-            [height]="fullScreenGridHeight"
+            [height]="gridHeight"
             [rowHeight]="rowHeight"
             [resizeSettings]="resizeSettings"
             [allowSorting]="allowSorting"
             [allowResizing]="allowResizing"
   >
+    <ng-template #detailTemplate let-data>
+      <table class="detailtable" width="100%" *ngFor="let type of [workflowTypes.OrderWorkflow, workflowTypes.ApplicationWorkflow]">
+        <colgroup>
+          <col width="200">
+          <col width="200">
+          <col width="200">
+          <col width="200">
+          <col width="200">
+          <col width="200">
+          <col width="270">
+          <col width="170">
+          <col width="120">
+        </colgroup>
+        <thead>
+          <tr>
+            <td class="e-rowcell e-templatecell"></td>
+            <td class="e-rowcell e-templatecell"></td>
+            <td class="e-rowcell e-templatecell"></td>
+            <td class="e-rowcell e-templatecell"></td>
+            <td class="e-rowcell e-templatecell"></td>
+            <td class="e-rowcell e-templatecell"></td>
+            <td class="e-rowcell e-templatecell workflow-type">
+              <span>{{ type === workflowTypes.OrderWorkflow ? 'ORDER' : 'APPLICATION' }}</span>
+            </td>
+            <td class="e-rowcell e-templatecell"></td>
+            <td class="e-rowcell e-templatecell"></td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let stepDetails of getStepDetails(data.stepMappings, data.workflowName, type)">
+            <td class="e-rowcell e-templatecell"></td>
+            <td class="e-rowcell e-templatecell"></td>
+            <td class="e-rowcell e-templatecell"></td>
+            <td class="e-rowcell e-templatecell"></td>
+            <td class="e-rowcell e-templatecell"></td>
+            <td class="e-rowcell e-templatecell"></td>
+            <td class="e-rowcell e-templatecell workflow-type-content">
+              <p>{{stepDetails.step.name + ' > ' + stepDetails.step.status}}</p>
+            </td>
+            <td class="e-rowcell e-templatecell user-roles-content">
+              <p>{{stepDetails.roleUser?.name}}</p>
+            </td>
+            <td class="e-rowcell e-templatecell"></td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-template>
     <e-columns>
-      <e-column field="region" headerText="REGION" width=200></e-column>
-      <e-column field="location" headerText="LOCATION" width=200></e-column>
-      <e-column field="department" headerText="DEPARTMENT" width=200></e-column>
-      <e-column field="skill" headerText="SKILL" width=200></e-column>
-      <e-column field="workflowType" headerText="WORKFLOW TYPE" width=200></e-column>
-      <e-column field="workflowName" headerText="WORKFLOW NAME" width=200></e-column>
+      <e-column field="regionName" headerText="REGION" width=180>
+        <ng-template #template let-data>
+          <span *ngIf="data.regionId">{{ data.regionName }}</span>
+          <span *ngIf="!data.regionId">All</span>
+        </ng-template>
+      </e-column>
+      <e-column field="locationName" headerText="LOCATION" width=180>
+        <ng-template #template let-data>
+          <span *ngIf="data.locationId">{{ data.locationName }}</span>
+          <span *ngIf="!data.locationId">All</span>
+        </ng-template>
+      </e-column>
+      <e-column field="departmentName" headerText="DEPARTMENT" width=180>
+        <ng-template #template let-data>
+          <span *ngIf="data.departmentId">{{ data.departmentName }}</span>
+          <span *ngIf="!data.departmentId">All</span>
+        </ng-template>
+      </e-column>
+      <e-column field="skills" headerText="SKILL" width=170>
+        <ng-template #template let-data>
+          <span *ngFor="let skill of data.skills; let i = index">{{skill.skillDescription}}
+            <span *ngIf="i !== data.skills.length - 1">, </span>
+          </span>
+          <span *ngIf="data.skills.length === 0">All</span>
+        </ng-template>
+      </e-column>
+      <e-column headerText="WORKFLOW TYPE" width=180>
+        <ng-template #template let-data>
+          <span>Job Order Workflow</span>
+        </ng-template>
+      </e-column>
+      <e-column field="workflowName" headerText="WORKFLOW NAME" width=180></e-column>
+      <e-column headerText="CUSTOM STEP NAME" width=270></e-column>
+      <e-column headerText="ROLE/USER" width=170></e-column>
       <e-column textAlign="Right" width=120>
         <ng-template #template let-data>
           <div class="row-tool-buttons">
@@ -63,7 +139,7 @@
                 [decimals]="decimals"
                 placeholder="Go to:"
                 min="1"
-                [max]="lastAvailablePage"
+                [max]="(workflowMappings$ | async)?.totalPages"
                 [showSpinButton]="false"
                 (change)="onGoToClick($event)"
               >
@@ -73,10 +149,10 @@
               <ejs-pager
                 id="gridPager"
                 #gridPager
-                [pageSize]="pageSizePager"
-                [totalRecordsCount]="totalDataRecords"
+                [pageSize]="pageSize"
+                [totalRecordsCount]="(workflowMappings$ | async)?.totalCount"
                 [enablePagerMessage]="false"
-                [currentPage]="currentPagerPage"
+                [currentPage]="currentPage"
                 (click)="onGoToClick($event)"
               >
               </ejs-pager>
@@ -92,6 +168,7 @@
     (formCancelClicked)="onCancelFormClick()"
     (formSaveClicked)="onSaveFormClick()"
     [header]="dialogHeader + ' Workflow'"
+    [width]="'569'"
   >
     <form class="form-container bootstrap"
           id="addWorkflow"
@@ -101,14 +178,21 @@
         <div class="input-container dropdown">
           <label for="region">Region <span class="required">*</span></label>
           <div class="input-group dropdown">
-            <ejs-dropdownlist
+            <ejs-multiselect
               id="region"
+              #regionDropdown
               appValidateWithMessage
               placeholder="Region"
-              [dataSource]="regions$ | async"
+              selectAllText="Select All"
+              mode="CheckBox"
+              [dataSource]="orgRegions"
               [fields]="fields"
-              formControlName="regionId">
-            </ejs-dropdownlist>
+              [showSelectAll]="true"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              formControlName="regions"
+            >
+            </ejs-multiselect>
           </div>
         </div>
       </div>
@@ -117,14 +201,20 @@
         <div class="input-container dropdown">
           <label for="location">Location <span class="required">*</span></label>
           <div class="input-group dropdown">
-            <ejs-dropdownlist
+            <ejs-multiselect
               id="location"
+              #locationDropdown
               appValidateWithMessage
               placeholder="Location"
-              [dataSource]="locations$ | async"
+              selectAllText="Select All"
+              mode="CheckBox"
+              [dataSource]="locations"
               [fields]="fields"
-              formControlName="locationId">
-            </ejs-dropdownlist>
+              [showSelectAll]="true"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              formControlName="locations">
+            </ejs-multiselect>
           </div>
         </div>
       </div>
@@ -133,14 +223,20 @@
         <div class="input-container dropdown">
           <label for="department">Department <span class="required">*</span></label>
           <div class="input-group dropdown">
-            <ejs-dropdownlist
+            <ejs-multiselect
               id="department"
+              #departmentDropdown
               appValidateWithMessage
               placeholder="Department"
-              [dataSource]="departments$ | async"
-              [fields]="departmentFields"
-              formControlName="departmentId">
-            </ejs-dropdownlist>
+              selectAllText="Select All"
+              mode="CheckBox"
+              [dataSource]="departments"
+              [fields]="fields"
+              [showSelectAll]="true"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              formControlName="departments">
+            </ejs-multiselect>
           </div>
         </div>
       </div>
@@ -149,14 +245,19 @@
         <div class="input-container dropdown">
           <label for="skill">Skill <span class="required">*</span></label>
           <div class="input-group dropdown">
-            <ejs-dropdownlist
+            <ejs-multiselect
               id="skill"
               appValidateWithMessage
               placeholder="Skill"
-              [dataSource]="skills$ | async"
+              selectAllText="Select All"
+              mode="CheckBox"
+              [dataSource]="(skills$ | async)?.items"
               [fields]="skillsFields"
-              formControlName="skillId">
-            </ejs-dropdownlist>
+              [showSelectAll]="true"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              formControlName="skills">
+            </ejs-multiselect>
           </div>
         </div>
       </div>
@@ -169,7 +270,8 @@
               id="workflowType"
               appValidateWithMessage
               placeholder="Workflow Type"
-              [dataSource]="workflowTypes$ | async"
+              [dataSource]="workflowGroupTypesData"
+              [fields]="workflowGroupTypesFields"
               formControlName="workflowType">
             </ejs-dropdownlist>
           </div>
@@ -178,15 +280,89 @@
 
       <div>
         <div class="input-container">
-          <label for="workflow">Workflow <span class="required">*</span></label>
-          <div class="input-group">
-            <input id="workflow"
-                   class="e-input"
-                   type="text"
-                   maxlength="50"
-                   appValidateWithMessage
-                   placeholder="Workflow"
-                   formControlName="workflowName"/>
+          <label for="workflowName">Workflow Name<span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist
+              id="workflowName"
+              appValidateWithMessage
+              placeholder="Workflow Name"
+              [dataSource]="workflows$ | async"
+              [fields]="fields"
+              formControlName="workflowName"
+            >
+            </ejs-dropdownlist>
+          </div>
+        </div>
+      </div>
+
+      <div class="groups" *ngIf="isMappingSectionShown">
+        <div class="group-container" formArrayName="orderRoleUserFormArray">
+          <div class="group-name"><h3>Order</h3></div>
+          <div class="group-details-container">
+            <div class="group" *ngFor="let step of orderRoleUserFormArray.controls; let i = index">
+              <div class="input-container without-label step-details">
+                <div class="input-group input-readonly">
+                  <input
+                    class="e-input"
+                    type="text"
+                    readonly
+                    [value]="orderWorkflowSteps[i].name + ' > ' + orderWorkflowSteps[i].status"
+                  />
+                </div>
+              </div>
+
+              <div class="input-container role-user">
+                <label>Role/User <span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-multiselect
+                    selectAllText="Select All"
+                    mode="CheckBox"
+                    [allowFiltering]="false"
+                    [showDropDownIcon]="true"
+                    placeholder="Role/User"
+                    appValidateWithMessage
+                    [dataSource]="rolesWithUsers"
+                    [fields]="fields"
+                    [formControlName]="i"
+                  >
+                  </ejs-multiselect>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="group-container" formArrayName="applicationRoleUserFormArray">
+          <div class="group-name"><h3>Application</h3></div>
+          <div class="group" *ngFor="let step of applicationRoleUserFormArray.controls; let i = index">
+            <div class="input-container without-label step-details">
+              <div class="input-group input-readonly">
+                <input
+                  class="e-input"
+                  type="text"
+                  readonly
+                  [value]="applicationWorkflowSteps[i].name + ' > ' + applicationWorkflowSteps[i].status"
+                />
+              </div>
+            </div>
+
+            <div class="input-container role-user">
+              <label>Role/User <span class="required">*</span></label>
+              <div class="input-group dropdown">
+                <ejs-multiselect
+                  selectAllText="Select All"
+                  mode="CheckBox"
+                  [allowFiltering]="false"
+                  [showDropDownIcon]="true"
+                  placeholder="Role/User"
+                  appValidateWithMessage
+                  [dataSource]="rolesWithUsers"
+                  [fields]="fields"
+                  [formControlName]="i"
+                >
+                </ejs-multiselect>
+              </div>
+            </div>
           </div>
         </div>
       </div>

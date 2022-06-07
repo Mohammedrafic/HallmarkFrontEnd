@@ -6,7 +6,7 @@ import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { SetDirtyState } from '../store/organization-management.actions';
-import { DeleteShift, DeleteShiftSucceeded, GetShiftsByPage, SaveShift, SaveShiftSucceeded } from '../store/shifts.actions';
+import { DeleteShift, DeleteShiftSucceeded, ExportShifts, GetShiftsByPage, SaveShift, SaveShiftSucceeded } from '../store/shifts.actions';
 import { ShiftsState } from '../store/shifts.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
@@ -16,7 +16,8 @@ import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { endTimeValidator, startTimeValidator } from '@shared/validators/date.validator';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { DatePipe } from '@angular/common';
-import { ExportColumn } from '@shared/models/export.model';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 @Component({
   selector: 'app-shifts',
@@ -48,12 +49,13 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   public minTime = this.defaultMinTime;
   public maskPlaceholderValue: Object = { hour: 'HH', minute: 'MM' };
   public columnsToExport: ExportColumn[] = [
-    { text:'Shift Name', column: 'name'},
-    { text:'Shift Short Name', column: 'shortName'},
-    { text:'Start Time', column: 'startTime'},
-    { text:'End Time', column: 'endTime'}
+    { text:'Shift Name', column: 'Name'},
+    { text:'Shift Short Name', column: 'ShortName'},
+    { text:'Start Time', column: 'StartTime'},
+    { text:'End Time', column: 'EndTime'}
   ];
   public fileName: string;
+  public defaultFileName: string;
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -61,7 +63,6 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
     super();
-    this.fileName = 'Organization Shifts ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.defaultMaxTime.setHours(23, 59, 59);
     this.defaultMinTime.setHours(0, 0, 0);
     this.ShiftFormGroup = this.fb.group({
@@ -106,16 +107,30 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public override customExport(): void {
+    this.defaultFileName = 'Organization Shifts ' + this.generateDateTime(this.datePipe);
+    this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
 
   public closeExport() {
+    this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));
   }
 
-  public export(event: any): void {
-    console.log(event);
-    this.store.dispatch(new ShowExportDialog(false));
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = 'Organization Shifts ' + this.generateDateTime(this.datePipe);
+    this.store.dispatch(new ExportShifts(new ExportPayload(
+      fileType, 
+      { /** TODO: put filters here */ }, 
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      this.selectedItems.length ? this.selectedItems.map(val => val.id) : null,
+      options?.fileName || this.defaultFileName
+    )));
     this.clearSelection(this.grid);
   }
 

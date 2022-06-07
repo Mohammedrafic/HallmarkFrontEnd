@@ -22,7 +22,7 @@
         <div>Skills</div>
       </ng-template>
       <ng-template #content>
-        <app-skills-grid [isActive]="isSkillsActive"></app-skills-grid>
+        <app-skills-grid [export$]="exportSkills$" [isActive]="isSkillsActive"></app-skills-grid>
       </ng-template>
     </e-tabitem>
     <e-tabitem>
@@ -30,7 +30,7 @@
         <div>Categories</div>
       </ng-template>
       <ng-template #content>
-        <app-skill-categories-grid [isActive]="isCategoriesActive"></app-skill-categories-grid>
+        <app-skill-categories-grid [export$]="exportCategories$" [isActive]="isCategoriesActive"></app-skill-categories-grid>
       </ng-template>
     </e-tabitem>
   </e-tabitems>

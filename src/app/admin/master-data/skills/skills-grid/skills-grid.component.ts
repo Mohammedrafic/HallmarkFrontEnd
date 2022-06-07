@@ -1,12 +1,13 @@
 import { DatePipe } from '@angular/common';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ExportColumn } from '@shared/models/export.model';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, delay, filter, Observable, Subject } from 'rxjs';
-import { GetMasterSkillsByPage, RemoveMasterSkill, RemoveMasterSkillSucceeded, SaveMasterSkill, SaveMasterSkillSucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
+import { debounceTime, delay, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { ExportSkills, GetMasterSkillsByPage, RemoveMasterSkill, RemoveMasterSkillSucceeded, SaveMasterSkill, SaveMasterSkillSucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
@@ -20,13 +21,15 @@ import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
   styleUrls: ['./skills-grid.component.scss'],
   providers: [SortService, FreezeService]
 })
-export class SkillsGridComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class SkillsGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();
+  private unsubscribe$: Subject<void> = new Subject();
   public optionFields = {
     text: 'name', value: 'id'
   };
 
   @Input() isActive: boolean = false;
+  @Input() export$: Subject<ExportedFileType>;
 
   @ViewChild('grid')
   public grid: GridComponent;
@@ -39,11 +42,12 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
 
   public SkillFormGroup: FormGroup;
   public columnsToExport: ExportColumn[] = [
-    { text:'Skill Category', column: 'skillCategory.name'},
-    { text:'Skill ABBR', column: 'skillAbbr'},
-    { text:'Skill Description', column: 'skillDescription'}
+    { text:'Skill Category', column: 'SkillCategoryName'},
+    { text:'Skill ABBR', column: 'SkillAbbr'},
+    { text:'Skill Description', column: 'SkillDescription'}
   ];
   public fileName: string;
+  public defaultFileName: string;
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -51,7 +55,6 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
               private confirmService: ConfirmService,
               private datePipe: DatePipe) {
     super();
-    this.fileName = 'Master Skills ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     this.SkillFormGroup = this.fb.group({
       id: new FormControl(0),
       isDefault: new FormControl(true),
@@ -63,27 +66,53 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
 
   ngOnInit() {
     this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
-    this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
+    this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
     });
-    this.actions$.pipe(ofActionSuccessful(SaveMasterSkillSucceeded)).subscribe(() => {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveMasterSkillSucceeded)).subscribe(() => {
       this.SkillFormGroup.reset();
       this.closeDialog();
       this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
     });
-    this.actions$.pipe(ofActionSuccessful(RemoveMasterSkillSucceeded)).subscribe(() => {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
+      if (val.isDialogShown) {
+        this.defaultFileName = 'Skills/Master Skills ' + this.generateDateTime(this.datePipe);
+        this.fileName = this.defaultFileName;
+      }
+    });
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(RemoveMasterSkillSucceeded)).subscribe(() => {
       this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
+    });
+    this.export$.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
+      this.defaultFileName = 'Skills/Master Skills ' + this.generateDateTime(this.datePipe);
+      this.defaultExport(event);
     });
   }
 
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
   public closeExport() {
+    this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));
   }
 
-  public export(event: any): void {
-    console.log(event);
-    this.store.dispatch(new ShowExportDialog(false));
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.store.dispatch(new ExportSkills(new ExportPayload(
+      fileType, 
+      {  }, 
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
+      options?.fileName || this.defaultFileName
+    )));
     this.clearSelection(this.grid);
   }
 

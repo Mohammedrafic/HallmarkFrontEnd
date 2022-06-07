@@ -4,16 +4,13 @@ import { BUSSINES_DATA_FIELDS, UNIT_FIELDS } from "../../user-list.constants";
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
 import { Select, Store } from "@ngxs/store";
 import { SecurityState } from "../../../store/security.state";
-import { filter, merge, Observable, Subject, takeWhile } from "rxjs";
+import { filter, map, merge, Observable, Subject, takeWhile } from "rxjs";
 import { BusinessUnit } from "@shared/models/business-unit.model";
 import { GetNewRoleBusinessByUnitType, GetRolePerUser } from "../../../store/security.actions";
 import { AdminState } from "@admin/store/admin.state";
-import { ChangeEventArgs } from "@syncfusion/ej2-angular-dropdowns";
 import { CanadaStates, Country, UsaStates } from "@shared/enums/states";
 import { mustMatch } from "@shared/validators/must-match.validators";
 import { RolesPerUser } from "@shared/models/user-managment-page.model";
-import { INACTIVE_USER_TEXT, INACTIVE_USER_TITLE } from "@shared/constants";
-import { ConfirmService } from "@shared/services/confirm.service";
 import { SwitchComponent } from "@syncfusion/ej2-angular-buttons";
 
 @Component({
@@ -28,12 +25,6 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   @ViewChild('swithActive')
   public switcher: SwitchComponent;
 
-  @Select(SecurityState.newRoleBussinesData)
-  public newRoleBussinesData$: Observable<BusinessUnit[]>;
-
-  @Select(AdminState.countries)
-  countries$: Observable<string[]>;
-
   @Select(AdminState.statesGeneral)
   statesGeneral$: Observable<string[]>;
 
@@ -41,6 +32,11 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   rolesPerUsers$: Observable<RolesPerUser>;
 
   public countryState$ = new Subject();
+
+  @Select(SecurityState.newBusinessDataPerUser)
+  public newBusinessDataPerUser$:Observable<(type: number) => BusinessUnit[]>
+
+  public businessValue: BusinessUnit[];
   public unitFields = UNIT_FIELDS;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public roleFields = {
@@ -64,45 +60,35 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store,
-    private confirmService: ConfirmService
   ) { }
 
   ngOnInit(): void {
+    this.onCountryChange();
     this.onBusinessUnitControlChanged();
     this.subscribeOnBusinessUnits();
+    this.updateBusinessDataPerUser();
   }
 
   ngOnDestroy(): void {
     this.isAlive = false;
   }
 
-  public toggleActive(): void {
-    const activeControl = this.form.get('isDeleted');
-
-    if(activeControl?.value) {
-      this.switcher.toggle();
-
-      this.confirmService
-        .confirm(INACTIVE_USER_TEXT, {
-          title: INACTIVE_USER_TITLE,
-          okButtonLabel: 'Inactivate',
-          okButtonClass: 'delete-button',
-        })
-        .subscribe((confirm) => {
-          if (confirm && !!activeControl?.value) {
-            activeControl?.patchValue(false);
-            this.switcher.toggle();
-          } else {
-            this.switcher.toggle();
-          }
-        });
-      }else {
-          activeControl?.patchValue(false);
-    }
+  private updateBusinessDataPerUser(): void {
+    this.newBusinessDataPerUser$.pipe(map(fn => fn(this.businessUnitControl?.value)), takeWhile(() => this.isAlive)).subscribe((value) => this.businessValue = value);
   }
 
-  public onCountryChange(event: ChangeEventArgs): void {
-    this.countryState$.next(event.value === Country.USA ? UsaStates : CanadaStates);
+  public toggleActive(): void {
+    const activeControl = this.form.get('isActive');
+    activeControl?.patchValue(!activeControl.value);
+  }
+
+  public onCountryChange(): void {
+    this.form.get('country')?.valueChanges.pipe(
+      takeWhile(() => this.isAlive)
+    ).subscribe((value) => {
+      const statesValue = value === Country.USA ? UsaStates : CanadaStates;
+      this.countryState$.next(statesValue);
+    });
   }
 
   private onBusinessUnitControlChanged(): void {
@@ -123,13 +109,15 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
     )
       .pipe(filter((value) => !!value),takeWhile(() => this.isAlive))
       .subscribe(() => {
-        this.store.dispatch(new GetRolePerUser(this.businessUnitIdControl?.value || '',this.businessUnitControl?.value || ''));
+        this.form.get('roles')?.reset();
+        this.businessUnitControl?.value &&
+        this.store.dispatch(new GetRolePerUser(this.businessUnitIdControl?.value || 0,this.businessUnitControl?.value || ''));
       });
   }
 
   static createForm(): FormGroup {
     return new FormGroup({
-        id: new FormControl(),
+      id: new FormControl(),
       businessUnitType: new FormControl('', [Validators.required]),
       businessUnitId: new FormControl('', [Validators.required]),
       firstName: new FormControl('', [Validators.required, Validators.maxLength(50)]),
@@ -141,11 +129,11 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
       country: new FormControl(''),
       state: new FormControl(''),
       city: new FormControl('', [Validators.maxLength(20)]),
-      zip: new FormControl('', [Validators.maxLength(5)]),
+      zip: new FormControl('', [Validators.maxLength(5), Validators.minLength(5)]),
       email: new FormControl('', [Validators.required, Validators.email,Validators.maxLength(100), Validators.pattern(/\S+@\S+\.com/) ]),
         emailConfirmation: new FormControl('', [Validators.required, Validators.maxLength(100)]),
-      phoneNumber: new FormControl('', [Validators.maxLength(10)]),
-      fax: new FormControl('', [Validators.maxLength(10)]),
+      phoneNumber: new FormControl('', [Validators.maxLength(10), Validators.minLength(10)]),
+      fax: new FormControl('', [Validators.maxLength(10), Validators.minLength(10)]),
     },
       mustMatch('email', 'emailConfirmation')
     );

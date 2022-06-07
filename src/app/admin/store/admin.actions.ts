@@ -3,6 +3,7 @@ import { Organization } from 'src/app/shared/models/organization.model';
 import { SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { Skill } from 'src/app/shared/models/skill.model';
 import { CredentialType } from '@shared/models/credential-type.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 export class SetGeneralStatesByCountry {
   static readonly type = '[admin] Set General States By Country';
@@ -152,4 +153,14 @@ export class RemoveCredentialType {
 export class UpdateCredentialType {
   static readonly type = '[admin] Update Credential Type';
   constructor(public payload: CredentialType) { }
+}
+
+export class ExportSkills {
+  static readonly type = '[admin] Export Skill list';
+  constructor(public payload: ExportPayload) { }
+}
+
+export class ExportSkillCategories {
+  static readonly type = '[admin] Export Skill category list';
+  constructor(public payload: ExportPayload) { }
 }

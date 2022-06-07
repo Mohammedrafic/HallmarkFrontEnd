@@ -16,18 +16,21 @@
       background-color: $primary-active-blue-80;
     }
 
-    label {
+    h4 {
       padding: 4px;
       color: $black;
       font-weight: 600;
       font-size: 14px;
       line-height: 20px;
+      overflow: hidden;
+      margin: 0;
+      text-overflow: ellipsis;
     }
 
     &.active-card {
       background-color:$primary-active-blue;
 
-      label {
+      h4 {
         color: $white;
       }
     }

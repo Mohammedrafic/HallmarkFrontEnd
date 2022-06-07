@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
 export class CategoriesService {
@@ -46,4 +47,13 @@ export class CategoriesService {
     return this.http.delete<SkillCategory>(`/api/skillCategories/${skillCategory.id}`);
   }
 
+  /**
+   * Export skill categories
+   */
+  public export(payload: ExportPayload): Observable<any> {
+    if (payload.ids) {
+      return this.http.post(`/api/skillCategories/export/byIds`, payload, { responseType: 'blob' });
+    }
+    return this.http.post(`/api/skillCategories/export`, payload, { responseType: 'blob' });
+  }
 }

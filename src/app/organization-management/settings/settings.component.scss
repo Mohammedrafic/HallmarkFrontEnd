@@ -1,5 +1,16 @@
 @import '../../styles/variables/colors';
 
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+
+  h3 {
+    color: $title-black;
+    margin: 8px;
+  }
+}
+
 .form-container {
   padding-top: 28px;
 

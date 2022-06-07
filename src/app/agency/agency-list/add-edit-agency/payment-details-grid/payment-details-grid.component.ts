@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, Input, OnInit, ViewChild} from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 
@@ -8,6 +8,7 @@ import { GridComponent, ValueAccessor } from '@syncfusion/ej2-angular-grids';
 import { GRID_CONFIG } from 'src/app/shared/constants/grid-config';
 import { valuesOnly } from 'src/app/shared/utils/enum.utils';
 import { ShowSideDialog } from 'src/app/store/app.actions';
+import { AgencyPaymentDetails } from "@shared/models/agency.model";
 
 enum PaymentDetailMode {
   Manual,
@@ -53,12 +54,12 @@ export class PaymentDetailsGridComponent extends AbstractGridConfigurationCompon
 
   private isEditMode = false;
 
-  constructor(private store: Store, private fb: FormBuilder) {
+  constructor(private store: Store) {
     super();
   }
 
   ngOnInit(): void {
-    this.paymentDetailsForm = this.generatePaymentForm();
+    this.paymentDetailsForm = PaymentDetailsGridComponent.generatePaymentForm();
   }
 
   ngAfterViewInit(): void {
@@ -77,6 +78,7 @@ export class PaymentDetailsGridComponent extends AbstractGridConfigurationCompon
 
   public onRemove({ index }: { index: string }): void {
     this.paymentsFormArray.removeAt(Number(index));
+    this.paymentsFormArray.markAsDirty();
   }
 
   public onFilter(): void {
@@ -85,7 +87,7 @@ export class PaymentDetailsGridComponent extends AbstractGridConfigurationCompon
 
   public addNew(): void {
     this.isEditMode = false;
-    this.paymentDetailsForm = this.generatePaymentForm();
+    this.paymentDetailsForm = PaymentDetailsGridComponent.generatePaymentForm();
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -93,7 +95,7 @@ export class PaymentDetailsGridComponent extends AbstractGridConfigurationCompon
     this.paymentDetailsForm.markAllAsTouched();
     if (this.paymentDetailsForm.valid) {
       if (!this.isEditMode) {
-        const newPayment = this.generatePaymentForm();
+        const newPayment = PaymentDetailsGridComponent.generatePaymentForm();
         newPayment.patchValue(this.paymentDetailsForm.value);
 
         this.paymentsFormArray.push(newPayment);
@@ -107,14 +109,14 @@ export class PaymentDetailsGridComponent extends AbstractGridConfigurationCompon
     this.store.dispatch(new ShowSideDialog(false));
   }
 
-  private generatePaymentForm(): FormGroup {
-    return this.fb.group({
-      mode: new FormControl(PaymentDetailMode.Electronic, [Validators.required]),
-      payee: new FormControl('', [Validators.required, Validators.maxLength(50)]),
-      address: new FormControl('', [Validators.maxLength(500)]),
-      city: new FormControl('', [Validators.maxLength(20)]),
-      zip: new FormControl('', [Validators.minLength(5),]),
-      startDate: new FormControl('', [Validators.required]),
+  static generatePaymentForm(payment?: AgencyPaymentDetails): FormGroup {
+    return new FormGroup({
+      mode: new FormControl( payment ? payment.mode : PaymentDetailMode.Electronic, [Validators.required]),
+      payee: new FormControl(payment ? payment.payee : '', [Validators.required, Validators.maxLength(50)]),
+      address: new FormControl(payment ? payment.address : '', [Validators.maxLength(500)]),
+      city: new FormControl(payment ? payment.city : '', [Validators.maxLength(20)]),
+      zip: new FormControl(payment ? payment.zip : '', [Validators.minLength(5),]),
+      startDate: new FormControl(payment ? payment.startDate : '', [Validators.required]),
     });
   }
 }

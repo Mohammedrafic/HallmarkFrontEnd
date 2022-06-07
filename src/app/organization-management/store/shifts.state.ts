@@ -8,7 +8,8 @@ import { MessageTypes } from "src/app/shared/enums/message-types";
 import { Shift, ShiftsPage } from 'src/app/shared/models/shift.model';
 import { ShowToast } from "src/app/store/app.actions";
 import { ShiftsService } from '@shared/services/shift.service';
-import { DeleteShift, DeleteShiftSucceeded, GetShiftsByPage, SaveShift, SaveShiftSucceeded } from './shifts.actions';
+import { DeleteShift, DeleteShiftSucceeded, ExportShifts, GetShiftsByPage, SaveShift, SaveShiftSucceeded } from './shifts.actions';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 
 export interface ShiftsStateModel {
   isShiftLoading: boolean;
@@ -78,4 +79,12 @@ export class ShiftsState {
       }),
       catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Shift cannot be deleted')))));
   }
+
+  @Action(ExportShifts)
+  ExportShifts({ }: StateContext<ShiftsStateModel>, { payload }: ExportShifts): Observable<any> {
+    return this.shiftsService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
 }

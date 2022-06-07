@@ -1,3 +1,4 @@
+import { ExportPayload } from "@shared/models/export.model";
 import { Holiday } from "@shared/models/holiday.model";
 
 export class GetHolidaysByPage {
@@ -33,4 +34,9 @@ export class SetYearFilter {
 export class FilterChanged {
   static readonly type = '[holiday] Emit Filter Change';
   constructor() { }
+}
+
+export class ExportHolidays {
+  static readonly type = '[holiday] Export Holiday list';
+  constructor(public payload: ExportPayload) { }
 }

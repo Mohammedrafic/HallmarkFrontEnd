@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { WorkflowWithDetails, WorkflowWithDetailsPut } from '@shared/models/workflow.model';
+import { WorkflowMappingPage, WorkflowMappingPost } from '@shared/models/workflow-mapping.model';
 
 @Injectable({ providedIn: 'root' })
 export class WorkflowService {
@@ -10,11 +11,10 @@ export class WorkflowService {
 
   /**
    * Get all workflows by businessUnitId
-   * @param businessUnitId parameter to search by
    * @return workflows
    */
-  public getWorkflows(businessUnitId: number | null): Observable<WorkflowWithDetails[]> {
-    return this.http.get<WorkflowWithDetails[]>(`/api/Workflows/byBusinessUnit/${businessUnitId}`)
+  public getWorkflows(): Observable<WorkflowWithDetails[]> {
+    return this.http.get<WorkflowWithDetails[]>(`/api/Workflows/byBusinessUnit`)
   }
 
   /**
@@ -43,5 +43,43 @@ export class WorkflowService {
    */
   public removeWorkflow(workflow: WorkflowWithDetails): Observable<void> {
     return this.http.delete<void>(`/api/Workflows/${workflow.id}`);
+  }
+
+  /**
+   * Gets workflow mapping page
+   */
+  public getWorkflowMappingPages(): Observable<WorkflowMappingPage> {
+    return this.http.get<WorkflowMappingPage>(`/api/WorkflowMapping`)
+  }
+
+  /**
+   * Creates workflow mapping
+   * @param workflowMapping object to save
+   * @return Created workflow mapping
+   */
+  public saveWorkflowMapping(workflowMapping: WorkflowMappingPost): Observable<WorkflowMappingPost | void> {
+    return this.http.post<WorkflowMappingPost | void>(`/api/WorkflowMapping`, workflowMapping);
+  }
+
+  /**
+   * Remove workflow mapping by its mappingId
+   * @param mappingId
+   */
+  public removeWorkflowMapping(mappingId: number): Observable<void> {
+    return this.http.delete<void>(`/api/WorkflowMapping/${mappingId}`);
+  }
+
+  /**
+   * Gets users for workflow mapping
+   */
+  public getUsersForWorkflowMapping(): Observable<any> {
+    return this.http.get<any>(`/api/Users/currentbu`)
+  }
+
+  /**
+   * Gets roles for workflow mapping
+   */
+  public getRolesForWorkflowMapping(): Observable<any> {
+    return this.http.get<any>(`/api/Roles/currentbu`)
   }
 }

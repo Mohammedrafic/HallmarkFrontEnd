@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import {Observable} from "rxjs";
-import {RolesPerUser, User, UserDTO, UsersPage} from "@shared/models/user-managment-page.model";
+import { Organisation, UserVisibilitySettingBody, UserVisibilitySettingsPage } from "@shared/models/visibility-settings.model";
+import { Observable } from "rxjs";
+import { RolesPerUser, User, UserDTO, UsersPage } from "@shared/models/user-managment-page.model";
 
 @Injectable({
   providedIn: 'root'
@@ -49,5 +50,41 @@ export class UsersService {
    */
   public saveUser(user: UserDTO): Observable<User> {
     return user.metadata.id ? this.http.put<User>(`/api/Users`, user) : this.http.post<User>(`/api/Users`, user);
+  }
+
+  /**
+   * Get the list of User Visibility Settings
+   * @param userId
+   * @return UserVisibilitySettingsPage
+   */
+  public getUserVisibilitySettingsPage(userId: string): Observable<UserVisibilitySettingsPage> {
+    return this.http.get<UserVisibilitySettingsPage>(`/api/UserVisibilitySettings/${userId}`);
+  }
+
+  /**
+   * Create or update UserVisibilitySettings
+   * @param body object to save
+   * @return UserVisibilitySettingsPage
+   */
+  public saveUserVisibilitySettings(body: UserVisibilitySettingBody): Observable<UserVisibilitySettingsPage> {
+    return this.http.put<UserVisibilitySettingsPage>(`/api/UserVisibilitySettings`, body);
+  }
+
+  /**
+   * Remove UserVisibilitySettings
+   * @param id
+   * @param userId
+   */
+  public removeUserVisibilitySettings(id: number, userId: string): Observable<never> {
+    return this.http.delete<never>(`/api/UserVisibilitySettings`, { params: { id, userId } });
+  }
+
+  /**
+   * Get the list of Organisation
+   * @param userId
+   * @return UserVisibilitySettingsPage
+   */
+  public getUserVisibilitySettingsOrganisation(userId: string): Observable<Organisation[]> {
+    return this.http.get<Organisation[]>(`/api/Organizations/structure/All/${userId}`);
   }
 }

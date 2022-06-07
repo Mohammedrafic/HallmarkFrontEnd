@@ -25,11 +25,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private unsubsribe$ = new Subject();
   panels: PanelModel[] = [];
-  cellSpacing = [15, 15];
+  cellSpacing = [24, 24];
   columns = 12;
   accumulationWidgets: ChartAccumulationDataModel;
   widgets: ChartLineDataModel;
-
 
   constructor(private store: Store, private actions$: Actions, private dashboardService: DashboardService) {}
 

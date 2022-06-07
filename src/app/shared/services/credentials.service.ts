@@ -96,4 +96,12 @@ export class CredentialsService {
       return this.http.post<CredentialSetup>(`/api/CredentialSetup`, credentialSetup);
     }
   }
+
+  /**
+   * Get credential list
+   * @return list of credentials
+   */
+  public getAllCredentials(): Observable<Credential[]> {
+    return this.http.get<Credential[]>(`/api/MasterCredentials/allCreds`);
+  }
 }

@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { Store } from '@ngxs/store';
-import { GridComponent, PagerComponent, PageSettingsModel } from '@syncfusion/ej2-angular-grids';
+import { Select, Store } from '@ngxs/store';
+import { FreezeService, GridComponent, PagerComponent, PageSettingsModel } from '@syncfusion/ej2-angular-grids';
 import { Observable, of } from 'rxjs';
 
 // TODO: remove after BE implementation
@@ -12,6 +12,9 @@ import { SetHeaderState } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { ResizeSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
+import { OrderManagemetTabs } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { GetIncompleteOrders } from '@client/store/order-managment-content.actions';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
@@ -21,11 +24,17 @@ export const ROW_HEIGHT = {
 @Component({
   selector: 'app-order-management-content',
   templateUrl: './order-management-content.component.html',
-  styleUrls: ['./order-management-content.component.scss']
+  styleUrls: ['./order-management-content.component.scss'],
+  providers: [FreezeService],
 })
 export class OrderManagementContentComponent implements OnInit {
 
+  @Select(OrderManagementContentState.orders)
+  orders$: Observable<any>;
+
   data: Observable<object[]> = of(data);
+  mockData: object[];
+
   pageSettings: PageSettingsModel = ORDERS_GRID_CONFIG.gridPageSettings;
   allowPaging = ORDERS_GRID_CONFIG.isPagingEnabled;
   gridHeight = ORDERS_GRID_CONFIG.gridHeight;
@@ -47,6 +56,7 @@ export class OrderManagementContentComponent implements OnInit {
   totalDataRecords: number;
   pageSizePager = ORDERS_GRID_CONFIG.initialRowsPerPage;
   currentPagerPage: number = 1;
+  isLockMenuButtonShown = true;
 
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
@@ -57,9 +67,16 @@ export class OrderManagementContentComponent implements OnInit {
 
   ngOnInit(): void {
     this.data.subscribe(data => {
+      this.mockData = data;
       this.lastAvailablePage = this.getLastPage(data);
       this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
       this.totalDataRecords = data.length;
+    });
+
+    this.orders$.subscribe(data => {
+      if (data) {
+        this.gridDataSource  = data.items;
+      }
     });
   }
 
@@ -112,4 +129,32 @@ export class OrderManagementContentComponent implements OnInit {
   getLastPage(data: object[]): number {
     return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
   }
+
+  public tabSelected(data: any): void {
+    if (data === OrderManagemetTabs.Incomplete) {
+      this.isLockMenuButtonShown = false;
+      this.store.dispatch(new GetIncompleteOrders({}));
+    } else {
+      this.isLockMenuButtonShown = true;
+      this.gridDataSource = this.mockData;
+    }
+  }
+
+  public getOrderTypeName(orderType: number): string {
+    return OrderTypeName[OrderType[orderType] as OrderTypeName];
+  }
+}
+
+export enum OrderTypeName {
+  ContractToPerm = 'ContractToPerm',
+  OpenPerDiem = 'OpenPerDiem',
+  PermPlacement = 'PermPlacement',
+  Traveler = 'Traveler'
+}
+
+export enum OrderType {
+  ContractToPerm = 0,
+  OpenPerDiem = 1,
+  PermPlacement = 2,
+  Traveler = 3
 }

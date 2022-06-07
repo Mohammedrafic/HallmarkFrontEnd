@@ -10,68 +10,10 @@
   .control-section {
     position: relative;
     padding: 0;
-
-    .chart-title {
-      position: absolute;
-      width: 40%;
-      top: 10%;
-      right: 5%;
-      margin-left: auto;
-      margin-right: auto;
-      z-index: 1000;
-      text-align: center;
-
-      .title {
-        font-weight: 500;
-        font-size: 40px;
-        margin: 0;
-      }
-
-      .sub-title {
-        margin: 0;
-        font-size: 14px;
-        font-weight: 400;
-        line-height: 17px;
-
-        .score {
-          color: $supportive-green-10;
-
-          .e-plus:before {
-            content: "\e963";
-            font-size: 9px;
-          }
-
-          .e-arrow-right-up {
-            font-size: 12px;
-            position: relative;
-            top: 1px;
-            margin-left: 4px;
-          }
-
-          &.indicator-drop {
-            color: $supportive-red;
-
-            .e-arrow-right-up {
-              display: inline-block;
-              transform: rotate(180deg);
-            }
-
-            .sign-minus {
-              font-size: 12px;
-            }
-          }
-        }
-      }
-    }
-
-    .chart {
-      width: 50%;
-    }
   }
 
   .legend-container {
     border-top: 1px solid rgba($secondary-dark-blue-40, 0.32);
-
     padding: 3% 0;
 
     .legend {

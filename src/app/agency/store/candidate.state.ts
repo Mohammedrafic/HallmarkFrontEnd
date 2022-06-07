@@ -4,7 +4,7 @@ import { CredentialType } from "@shared/models/credential-type.model";
 import { Credential } from "@shared/models/credential.model";
 import { catchError, Observable, of, tap } from "rxjs";
 
-import { CandidateCredential, CandidateCredentialPage } from "@shared/models/candidate-credential.model";
+import { CandidateCredential, CandidateCredentialPage, CredentialGroupedFiles } from "@shared/models/candidate-credential.model";
 import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages";
 import { MessageTypes } from "src/app/shared/enums/message-types";
 import { Candidate, CandidatePage } from 'src/app/shared/models/candidate.model';
@@ -24,9 +24,12 @@ import {
   GetCandidatesCredentialByPage,
   GetCredentialFiles,
   GetCredentialFilesSucceeded,
+  GetCredentialPdfFiles,
+  GetCredentialPdfFilesSucceeded,
   GetCredentialTypes,
   GetEducationByCandidateId,
   GetExperienceByCandidateId,
+  GetGroupedCredentialsFiles,
   GetMasterCredentials,
   RemoveCandidateFromStore,
   RemoveCandidatesCredential,
@@ -48,6 +51,7 @@ import {
   UploadCredentialFiles,
   UploadCredentialFilesSucceeded
 } from './candidate.actions';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export interface CandidateStateModel {
   isCandidateLoading: boolean;
@@ -59,6 +63,7 @@ export interface CandidateStateModel {
   candidateCredentialPage: CandidateCredentialPage | null;
   credentialTypes: CredentialType[];
   masterCredentials: Credential[];
+  groupedCandidateCredentialsFiles: CredentialGroupedFiles[];
 }
 
 @State<CandidateStateModel>({
@@ -72,7 +77,8 @@ export interface CandidateStateModel {
     educations: [],
     candidateCredentialPage: null,
     credentialTypes: [],
-    masterCredentials: []
+    masterCredentials: [],
+    groupedCandidateCredentialsFiles: []
   },
 })
 @Injectable()
@@ -111,15 +117,24 @@ export class CandidateState {
     return state.masterCredentials;
   }
 
+  @Selector()
+  static groupedCandidateCredentialsFiles(state: CandidateStateModel): CredentialGroupedFiles[] {
+    return state.groupedCandidateCredentialsFiles;
+  }
+
   constructor(private candidateService: CandidateService, private skillsService: SkillsService) {}
 
   @Action(GetCandidatesByPage)
-  GetCandidatesByPage({ patchState }: StateContext<CandidateStateModel>, { pageNumber, pageSize }: GetCandidatesByPage): Observable<CandidatePage> {
+  GetCandidatesByPage({ patchState, dispatch }: StateContext<CandidateStateModel>, { pageNumber, pageSize }: GetCandidatesByPage): Observable<CandidatePage | unknown> {
     patchState({ isCandidateLoading: true });
     return this.candidateService.getCandidates(pageNumber, pageSize).pipe(
       tap((payload) => {
         patchState({ isCandidateLoading: false, candidatePage: payload });
         return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        patchState({isCandidateLoading: false, candidatePage: null });
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
       })
     );
   }
@@ -340,6 +355,28 @@ export class CandidateState {
         return payload;
       }),
       catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'No files found'))))
+    );
+  }
+
+  @Action(GetCredentialPdfFiles)
+  GetCredentialPdfFiles({ dispatch }: StateContext<CandidateStateModel>, { payload }: GetCredentialPdfFiles): Observable<any> {
+    return this.candidateService.getCredentialPdfFile(payload).pipe(
+      tap((payload) => {
+        dispatch(new GetCredentialPdfFilesSucceeded(payload));
+        return payload;
+      }),
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'No files found'))))
+    );
+  }
+
+  @Action(GetGroupedCredentialsFiles)
+  GetGroupedCredentialsFiles({ patchState, getState }: StateContext<CandidateStateModel>, { }: GetGroupedCredentialsFiles): Observable<CredentialGroupedFiles[]> {
+    const id = getState().candidate?.id as number;
+    return this.candidateService.getCredentialGroupedFiles(id).pipe(
+      tap((payload) => {
+        patchState({ groupedCandidateCredentialsFiles: payload });
+        return payload;
+      })
     );
   }
 }

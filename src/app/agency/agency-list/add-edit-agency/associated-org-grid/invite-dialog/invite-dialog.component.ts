@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, takeWhile } from 'rxjs';
@@ -7,7 +7,6 @@ import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { GetOrganizationsByPage, InvateOrganizations, InvateOrganizationsSucceeded } from 'src/app/agency/store/agency.actions';
 import { AgencyState } from 'src/app/agency/store/agency.state';
-
 import { Organization } from 'src/app/shared/models/organization.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';

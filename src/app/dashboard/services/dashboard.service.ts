@@ -17,16 +17,13 @@ export class DashboardService {
       return of(panels);
     }
     return of([
-      { id: 'candidates_1', sizeX: 3, sizeY: 3, row: 0, col: 0 },
-      { id: 'chart_line_1', sizeX: 3, sizeY: 1, row: 0, col: 3 },
-      { id: 'chart_line_2', sizeX: 3, sizeY: 1, row: 0, col: 6 },
-      { id: 'chart_line_3', sizeX: 3, sizeY: 1, row: 0, col: 9 },
-      { id: 'invoces_1', sizeX: 3, sizeY: 3, row: 1, col: 3 },
-      { id: 'america_map_1', sizeX: 3, sizeY: 3, row: 1, col: 6 },
-      { id: 'layout_6', sizeX: 3, sizeY: 6, row: 1, col: 9 },
-      { id: 'layout_7', sizeX: 3, sizeY: 3, row: 4, col: 0 },
-      { id: 'layout_8', sizeX: 3, sizeY: 3, row: 4, col: 3 },
-      { id: 'layout_9', sizeX: 3, sizeY: 3, row: 4, col: 6 },
+      { id: 'layout_1', sizeX: 1, sizeY: 1, row: 0, col: 0 },
+      { id: 'layout_2', sizeX: 1, sizeY: 1, row: 0, col: 1 },
+      { id: 'layout_3', sizeX: 1, sizeY: 1, row: 0, col: 2 },
+      { id: 'candidates_1', sizeX: 3, sizeY: 3, row: 0, col: 3 },
+      { id: 'invoces_1', sizeX: 3, sizeY: 3, row: 0, col: 6 },
+      { id: 'america_map_1', sizeX: 3, sizeY: 3, row: 0, col: 9 },
+      { id: 'layout_4', sizeX: 3, sizeY: 2, row: 1, col: 0 },
     ]);
   }
 
@@ -49,24 +46,24 @@ export class DashboardService {
         score: 14.53,
         progress: 4,
         chartData: [
-          { x: 'Open', y: 45, text: '45%' },
-          { x: 'In Progress', y: 15, text: '15%' },
-          { x: 'Interviewed', y: 9, text: '9%' },
-          { x: 'Scheduled Interviewers', y: 31, text: '31%' },
+          { x: 'Applied', y: 45, text: '45%' },
+          { x: 'Offered', y: 15, text: '15%' },
+          { x: 'Accepted', y:12, text: '9%' },
+          { x: 'Onboarded', y: 11, text: '31%' },
         ],
       },
 
       invoces_1: {
         id: 'invoces_1',
-        title: 'invoces',
+        title: 'Job Offers',
         score: 14.53,
         candidates: 15,
         progress: -4,
         chartData: [
-          { x: 'Pending', y: 4, text: '4%' },
-          { x: 'Submitted', y: 65, text: '65%' },
-          { x: 'Approved', y: 19, text: '19%' },
-          { x: 'Paid', y: 24, text: '24%' },
+          { x: 'Open', y: 4, text: '4%' },
+          { x: 'In Progress', y: 65, text: '65%' },
+          { x: 'In Progress (Offer Pending)', y: 19, text: '19%' },
+          { x: 'In Progress (Offer Accepted)', y: 24, text: '24%' },
         ],
       },
     };

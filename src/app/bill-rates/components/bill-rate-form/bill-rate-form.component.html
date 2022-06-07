@@ -1,10 +1,17 @@
-<form>
+<form [formGroup]="billRateForm">
   <div class="form-line">
     <!-- Bill Rate Title -->
-    <div class="input-container bootstrap">
+    <div class="dropdown-container bootstrap">
       <label>Bill Rate Title<span class="required">*</span></label>
-      <div class="input-group">
-        <input class="e-input" type="text" placeholder="Bill Rate Title" />
+      <div class="input-group dropdown">
+        <ejs-dropdownlist
+          #billRateOptions
+          [fields]="optionFields"
+          appValidateWithMessage
+          formControlName="billRateConfigId"
+          [dataSource]="billRateOptions$ | async"
+          placeholder="Bill Rate Title"
+        ></ejs-dropdownlist>
       </div>
     </div>
   </div>
@@ -14,7 +21,7 @@
     <div class="input-container bootstrap form-line-item-20">
       <label>Bill Rates Category<span class="required">*</span></label>
       <div class="input-group">
-        <input class="e-input" type="text" placeholder="Bill Rates Category" />
+        <input class="e-input" type="text" placeholder="Bill Rates Category" disabled [value]="categoryValue" />
       </div>
     </div>
 
@@ -22,19 +29,13 @@
     <div class="input-container bootstrap form-line-item-20">
       <label>Bill Rates Type<span class="required">*</span></label>
       <div class="input-group">
-        <input class="e-input" type="text" placeholder="Bill Rates Type" />
+        <input class="e-input" type="text" placeholder="Bill Rates Type" disabled [value]="typeValue" />
       </div>
     </div>
   </div>
 
   <div class="form-line">
     <!-- Rates/Hours -->
-    <div class="input-container bootstrap">
-      <label>Rates/Hours<span class="required">*</span></label>
-      <div class="input-group">
-        <input class="e-input" type="text" placeholder="Rates/Hours" />
-      </div>
-    </div>
 
     <!-- Effective Date -->
     <div class="datepicker-container bootstrap">
@@ -44,9 +45,28 @@
           class="datepicker"
           format="MM/dd/yyyy"
           placeholder="MM/DD/YYYY"
+          appValidateWithMessage
+          formControlName="effectiveDate"
           [enableMask]="true"
-          [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }">
+          [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+        >
         </ejs-datepicker>
+      </div>
+    </div>
+
+    <div class="input-container bootstrap">
+      <label>Rates/Hours<span class="required">*</span></label>
+      <div class="input-group">
+        <ejs-maskedtextbox
+        #rateHours
+        class="e-input"
+        promptChar="_"
+        mask="00.00"
+        appValidateWithMessage
+        formControlName="rateHour"
+        placeholder="Rates/Hours"
+        maxlength="10"
+      ></ejs-maskedtextbox>
       </div>
     </div>
   </div>
@@ -56,7 +76,16 @@
     <div class="input-container bootstrap">
       <label>Internal Min<span class="required">*</span></label>
       <div class="input-group">
-        <input class="e-input" type="text" placeholder="Internal Min" />
+        <ejs-maskedtextbox
+        #intervalMin
+        class="e-input"
+        promptChar="_"
+        mask="00.00"
+        appValidateWithMessage
+        formControlName="intervalMin"
+        placeholder="Internal Min" 
+        maxlength="10"
+      ></ejs-maskedtextbox>
       </div>
     </div>
 
@@ -64,7 +93,16 @@
     <div class="input-container bootstrap">
       <label>Internal Max<span class="required">*</span></label>
       <div class="input-group">
-        <input class="e-input" type="text" placeholder="Internal Max" />
+        <ejs-maskedtextbox
+        #intervalMax
+          class="e-input"
+          promptChar="_"
+          mask="00.00"
+          appValidateWithMessage
+          formControlName="intervalMax"
+          placeholder="Internal Max"
+          maxlength="10"
+        ></ejs-maskedtextbox>
       </div>
     </div>
   </div>

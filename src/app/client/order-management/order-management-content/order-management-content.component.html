@@ -1,6 +1,8 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tab-navigation [incompleteCount]="2" [pandingCount]="2"></app-tab-navigation>
+    <app-tab-navigation
+      (selectedTab)="tabSelected($event)"
+    ></app-tab-navigation>
   </ng-container>
   <ng-container right>
     <app-search></app-search>
@@ -27,34 +29,38 @@
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
-      <e-column field="orderId" headerText="ORDER ID" width="120">
+      <e-column field="id" headerText="ORDER ID" width="120">
         <ng-template #template let-data>
           <div>
-            <b>{{ data.orderId }}</b>
+            <b>{{ data.id }}</b>
           </div>
         </ng-template>
       </e-column>
-      <e-column field="status" headerText="STATUS" width="200">
+      <e-column field="statusText" headerText="STATUS" width="200">
         <ng-template #template let-data>
           <div class="status-cell">
             <ejs-chiplist>
               <e-chips>
-                <e-chip [text]="data.status" [cssClass]="getChipCssClass(data.status)"></e-chip>
+                <e-chip [text]="data.statusText" [cssClass]="getChipCssClass(data.statusText)"></e-chip>
               </e-chips>
             </ejs-chiplist>
           </div>
         </ng-template>
       </e-column>
       <e-column field="jobTitle" headerText="JOB TITLE" width="200"></e-column>
-      <e-column field="skill" headerText="SKILL" textAlign="Left" width="200"></e-column>
-      <e-column field="numberOfPosition" headerText="{{ '# of position' | uppercase }}" width="150">
+      <e-column field="skillName" headerText="SKILL" textAlign="Left" width="200"></e-column>
+      <e-column field="openPositions" headerText="{{ '# of position' | uppercase }}" width="150">
         <ng-template #template let-data>
-          <div class="align-right">{{ data.numberOfPosition }}</div>
+          <div class="align-right">{{ data.openPositions }}</div>
         </ng-template>
       </e-column>
-      <e-column field="location" headerText="LOCATION" textAlign="Left" width="200"></e-column>
-      <e-column field="department" headerText="DEPARTMENT" textAlign="Left" width="150"></e-column>
-      <e-column field="type" headerText="TYPE" width="100"></e-column>
+      <e-column field="locationName" headerText="LOCATION" textAlign="Left" width="200"></e-column>
+      <e-column field="departmentName" headerText="DEPARTMENT" textAlign="Left" width="150"></e-column>
+      <e-column field="orderType" headerText="TYPE" width="100">
+        <ng-template #template let-data>
+          <span>{{ getOrderTypeName(data.orderType) }}</span>
+        </ng-template>
+      </e-column>
       <e-column field="billRate" headerText="BILL RATE &dollar;" width="120">
         <ng-template #template let-data>
           <div class="align-right">{{ data.billRate }}</div>
@@ -65,8 +71,12 @@
           <div class="align-right">{{ data.candidates }}</div>
         </ng-template>
       </e-column>
-      <e-column field="startDate" headerText="START DATE" width="120"></e-column>
-      <e-column headerTextAlign="Right" width="130">
+      <e-column field="startDate" headerText="START DATE" width="130">
+        <ng-template #template let-data>
+          <span>{{ data.startDate | date:'MM/dd/yyyy' }}</span>
+        </ng-template>
+      </e-column>
+      <e-column headerTextAlign="Right" width="130" freeze="Right">
         <ng-template #headerTemplate let-data>
           <div class="controls-header">
             <button ejs-button cssClass="e-flat icon-button">
@@ -82,7 +92,7 @@
             <button ejs-button cssClass="e-flat default-icon-button">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button">
+            <button ejs-button cssClass="e-flat secondary-icon-button" *ngIf="isLockMenuButtonShown">
               <span><i-feather name="lock" class="icon"></i-feather></span>
             </button>
             <button ejs-button cssClass="e-flat primary-icon-button">
