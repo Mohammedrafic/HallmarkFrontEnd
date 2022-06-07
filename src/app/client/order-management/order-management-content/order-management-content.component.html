@@ -16,7 +16,7 @@
   <ejs-grid
     #grid
     (rowDataBound)="setRowHighlight($event)"
-    [dataSource]="gridDataSource"
+    [dataSource]="(ordersPage$ | async)?.items"
     [allowPaging]="allowPaging"
     [pageSettings]="pageSettings"
     [height]="gridHeight"
@@ -133,7 +133,7 @@
                 [decimals]="decimals"
                 placeholder="Go to:"
                 min="1"
-                [max]="lastAvailablePage"
+                [max]="(ordersPage$ | async)?.totalPages"
                 [showSpinButton]="false"
                 (change)="onGoToClick($event)"
               >
@@ -144,7 +144,7 @@
                 id="gridPager"
                 #gridPager
                 [pageSize]="pageSizePager"
-                [totalRecordsCount]="totalDataRecords"
+                [totalRecordsCount]="(ordersPage$ | async)?.totalCount"
                 [enablePagerMessage]="false"
                 [currentPage]="currentPagerPage"
                 (click)="onGoToClick($event)"

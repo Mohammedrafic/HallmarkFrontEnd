@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { OrderManagementPage } from '@shared/models/order-management.model';
+import { OrderManagementFilter, OrderManagementPage } from '@shared/models/order-management.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -9,19 +9,17 @@ export class OrderManagementContentService {
 
   /**
    * Get the incomplete order
-   @param order incomplete order
+   @param payload filter with details we need to get
    */
-  public getIncompleteOrders(order: any): Observable<void> {
-    return this.http.post<void>(`/api/Orders/Incomplete`, order);
+  public getIncompleteOrders(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
+    return this.http.post<OrderManagementPage>(`/api/Orders/Incomplete`, payload);
   }
 
   /**
    * Get the orders
-   @param orderBy
-   @param pageNumber
-   @param pageSize
+   @param payload filter with details we need to get
    */
-  public getOrders(orderBy: string, pageNumber: number, pageSize: number): Observable<OrderManagementPage> {
-    return this.http.get<OrderManagementPage>(`/api/Orders`, { params: { OrderBy: orderBy, PageNumber: pageNumber, PageSize: pageSize }});
+  public getOrders(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
+    return this.http.post<OrderManagementPage>(`/api/Orders/all`, payload);
   }
 }

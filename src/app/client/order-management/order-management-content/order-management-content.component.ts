@@ -25,9 +25,7 @@ export const ROW_HEIGHT = {
   providers: [FreezeService],
 })
 export class OrderManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
-
-  @Select(OrderManagementContentState.orders)
-  orders$: Observable<any>;
+  @ViewChild('grid') grid: GridComponent;
 
   @Select(OrderManagementContentState.ordersPage)
   ordersPage$: Observable<OrderManagementPage>;
@@ -35,9 +33,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
   public isAllRowButtonsShown = true;
-
-  @ViewChild('grid') grid: GridComponent;
-  @ViewChild('gridPager') pager: PagerComponent;
 
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
@@ -48,25 +43,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetOrders(this.orderBy, this.currentPage, this.pageSizePager));
-
-    this.ordersPage$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((data) => {
-      this.lastAvailablePage = this.getLastPage(data.items);
-      this.gridDataSource = this.getRowsPerPage(data.items, this.currentPagerPage);
-      this.totalDataRecords = data.items.length;
-    });
+    this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
 
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new GetOrders(this.orderBy, this.currentPage, this.pageSize));
-    });
-
-    this.orders$.subscribe(data => {
-      if (data) {
-        this.lastAvailablePage = this.getLastPage(data.items);
-        this.gridDataSource  = data.items;
-        this.totalDataRecords = data.items.length;
-      }
+      this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
     });
   }
 
@@ -94,7 +75,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onRowsDropDownChanged(): void {
-    this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
+    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+    this.grid.pageSettings.pageSize = this.pageSize;
   }
 
   public setRowHighlight(args: any): void {
@@ -104,25 +86,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
   }
 
-  public getActiveRowsPerPage(): number {
-    return parseInt(this.activeRowsPerPageDropDown);
-  }
-
-  public getRowsPerPage(data: object[], currentPage: number): object[] {
-    return data.slice((currentPage * this.getActiveRowsPerPage()) - this.getActiveRowsPerPage(),
-      (currentPage * this.getActiveRowsPerPage()));
-  }
-
-  public getLastPage(data: object[]): number {
-    return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
-  }
-
   public tabSelected(tabIndex: OrderManagemetTabs): void {
 
     switch (tabIndex) {
       case OrderManagemetTabs.AllOrders:
         this.isAllRowButtonsShown = true;
-        this.store.dispatch(new GetOrders(this.orderBy, this.currentPage, this.pageSizePager));
+        this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
         break;
       case OrderManagemetTabs.OrderTemplates:
         // TODO: pending implementation
