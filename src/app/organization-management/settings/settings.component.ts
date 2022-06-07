@@ -178,18 +178,29 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   }
 
   public onFormCancelClick(): void {
-    this.confirmService
-      .confirm(CANCEL_COFIRM_TEXT, {
-        title: DELETE_CONFIRM_TITLE,
-        okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false));
-        this.removeActiveCssClass();
-        this.clearFormDetails();
-        this.isFormShown = false;
-      });
+    if (this.organizationSettingsFormGroup.dirty
+      || this.regionFormGroup.dirty
+      || this.regionRequiredFormGroup.dirty
+      || this.locationFormGroup.dirty
+      || this.departmentFormGroup.dirty) {
+      this.confirmService
+        .confirm(CANCEL_COFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => !!confirm))
+        .subscribe(() => {
+          this.store.dispatch(new ShowSideDialog(false));
+          this.removeActiveCssClass();
+          this.clearFormDetails();
+          this.isFormShown = false;
+        });
+    } else {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.removeActiveCssClass();
+      this.clearFormDetails();
+      this.isFormShown = false;
+    }
   }
 
   public onFormSaveClick(): void {

@@ -55,7 +55,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public searchCredentialForm: FormGroup;
   public disabledCopy = false;
   public candidateCredentialPage: CandidateCredentialPage;
-  public openFileViewerDialog = new EventEmitter<void>();
+  public openFileViewerDialog = new EventEmitter<number>();
   public credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
   public optionFields = { text: 'text', value: 'id' };
   public verifiedStatuses = Object.values(CredentialVerifiedStatus)
@@ -220,8 +220,8 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     this.saveCredential(data);
   }
 
-  public onViewFiles() {
-    this.store.dispatch(new GetGroupedCredentialsFiles()).subscribe(() => this.openFileViewerDialog.emit());
+  public onViewFiles(id: number) {
+    this.store.dispatch(new GetGroupedCredentialsFiles()).subscribe(() => this.openFileViewerDialog.emit(id));
   }
 
   public onDownload(event: MouseEvent, file: CredentialFile) {

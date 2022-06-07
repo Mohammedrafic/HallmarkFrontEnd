@@ -12,6 +12,7 @@ import { SkillsComponent } from './skills/skills.component';
 import { CredentialsListComponent } from './credentials/credentials-list/credentials-list.component';
 import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
 import { JobOrderComponent } from './workflow/job-order/job-order.component';
+import { BillRatesComponent } from './bill-rates/bill-rates.component';
 
 const routes: Routes = [
   {
@@ -89,6 +90,13 @@ const routes: Routes = [
       {
         path: 'workflow',
         component: JobOrderComponent,
+        data: {
+          isOrganizationArea: true
+        }
+      },
+      {
+        path: 'bill-rates',
+        component: BillRatesComponent,
         data: {
           isOrganizationArea: true
         }

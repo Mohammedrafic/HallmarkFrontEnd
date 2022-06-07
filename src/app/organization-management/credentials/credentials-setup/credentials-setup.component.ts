@@ -35,6 +35,7 @@ import { CredentialsState } from '../../store/credentials.state';
 import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
 import { MockCredentialSetupList, MockCredentialSetupPage } from './mock-credential-setup-list';
 import { SetCredentialSetupFilter } from '../../store/credentials.actions';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-credentials-setup',
@@ -77,6 +78,9 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   @Select(CredentialsState.setupFilter)
   setupFilter$: Observable<CredentialSetupFilter>;
 
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
+
   public credentialsSetupFormGroup: FormGroup;
   public formBuilder: FormBuilder;
 
@@ -101,10 +105,12 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetRegions());
-    this.store.dispatch(new GetCredentialTypes());
-    this.store.dispatch(new GetCredential());
-    // this.store.dispatch(new GetCredentialSkillGroup()); // TODO: uncomment after BE fix
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
+      this.store.dispatch(new GetRegions());
+      this.store.dispatch(new GetCredentialTypes());
+      this.store.dispatch(new GetCredential());
+      // this.store.dispatch(new GetCredentialSkillGroup()); // TODO: uncomment after BE fix
+    });
 
     this.setupFilter$.pipe(takeUntil(this.unsubscribe$)).subscribe(setupFilter => {
       if (setupFilter) {

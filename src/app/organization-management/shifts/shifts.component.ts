@@ -18,6 +18,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { DatePipe } from '@angular/common';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-shifts',
@@ -34,6 +35,9 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
 
   @Select(ShiftsState.shiftsPage)
   shiftsPage$: Observable<any>;
+
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
 
   public ShiftFormGroup: FormGroup;
   public optionFields = {
@@ -86,7 +90,10 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   ngOnInit() {
-    this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
+      this.currentPage = 1;
+      this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));
+    });
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new GetShiftsByPage(this.currentPage, this.pageSize));

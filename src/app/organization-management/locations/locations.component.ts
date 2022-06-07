@@ -12,6 +12,7 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { Region } from '@shared/models/region.model';
 import {
+  ClearLocationList,
   DeleteLocationById,
   ExportLocations,
   GetLocationsByRegionId,
@@ -124,10 +125,13 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   ngOnInit(): void {
-    this.organizationId$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(id => {
-      this.store.dispatch(new GetOrganizationById(id));
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
+      if (id) {
+        this.store.dispatch(new GetOrganizationById(id));
+      } else {
+        this.store.dispatch(new GetOrganizationById(this.store.selectSnapshot(UserState.user)?.businessUnitId as number));
+      }
     });
-
     this.organization$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(parseInt(Country[organization.generalInformation.country])));
       this.store.dispatch(new GetRegions());
@@ -173,10 +177,12 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
-    if (this.selectedRegion.id) {
+    if (this.selectedRegion?.id) {
       this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
-      this.clearSelection(this.grid);
+    } else {
+      this.store.dispatch(new ClearLocationList());
     }
+    this.clearSelection(this.grid);
     this.mapGridData();
   }
 
@@ -272,19 +278,27 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   onFormCancelClick(): void {
-    this.confirmService
-      .confirm(CANCEL_COFIRM_TEXT, {
-        title: DELETE_CONFIRM_TITLE,
-        okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false));
-        this.isEdit = false;
-        this.editedLocationId = undefined;
-        this.locationDetailsFormGroup.reset();
-        this.removeActiveCssClass();
-      });
+    if (this.locationDetailsFormGroup.dirty) {
+      this.confirmService
+        .confirm(CANCEL_COFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => !!confirm))
+        .subscribe(() => {
+          this.store.dispatch(new ShowSideDialog(false));
+          this.isEdit = false;
+          this.editedLocationId = undefined;
+          this.locationDetailsFormGroup.reset();
+          this.removeActiveCssClass();
+        });
+    } else {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.isEdit = false;
+      this.editedLocationId = undefined;
+      this.locationDetailsFormGroup.reset();
+      this.removeActiveCssClass();
+    }
   }
 
   onFormSaveClick(): void {

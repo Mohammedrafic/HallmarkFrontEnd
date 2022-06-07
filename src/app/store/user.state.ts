@@ -37,8 +37,8 @@ export interface UserStateModel {
     menu: { menuItems: [] },
     agencies: null,
     organizations: null,
-    lastSelectedOrganizationId: parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string),
-    lastSelectedAgencyId: parseInt(window.localStorage.getItem(AGENCY_ID_STORAGE_KEY) as string),
+    lastSelectedOrganizationId: parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string) || null,
+    lastSelectedAgencyId: parseInt(window.localStorage.getItem(AGENCY_ID_STORAGE_KEY) as string) || null,
     organizationStructure: null,
   },
 })
@@ -144,8 +144,8 @@ export class UserState {
     window.localStorage.setItem(ORG_ID_STORAGE_KEY, payload.lastSelectedOrganizationId?.toString() as string);
     window.localStorage.setItem(AGENCY_ID_STORAGE_KEY, payload.lastSelectedAgencyId?.toString() as string);
     return patchState({
-      lastSelectedOrganizationId: payload.lastSelectedOrganizationId,
-      lastSelectedAgencyId: payload.lastSelectedAgencyId
+      lastSelectedOrganizationId: payload.lastSelectedOrganizationId || null,
+      lastSelectedAgencyId: payload.lastSelectedAgencyId || null
     });
   }
 

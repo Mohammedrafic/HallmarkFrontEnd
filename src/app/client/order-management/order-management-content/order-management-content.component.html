@@ -41,7 +41,7 @@
           <div class="status-cell">
             <ejs-chiplist>
               <e-chips>
-                <e-chip [text]="data.statusText" [cssClass]="getChipCssClass(data.statusText)"></e-chip>
+                <e-chip [text]="data.statusText" [cssClass]="(data.statusText | chipsCssClass)"></e-chip>
               </e-chips>
             </ejs-chiplist>
           </div>
@@ -61,7 +61,7 @@
           <span>{{ getOrderTypeName(data.orderType) }}</span>
         </ng-template>
       </e-column>
-      <e-column field="billRate" headerText="BILL RATE &dollar;" width="120">
+      <e-column field="billRate" headerText="BILL RATE" width="120">
         <ng-template #template let-data>
           <div class="align-right">{{ data.billRate }}</div>
         </ng-template>
@@ -88,12 +88,21 @@
           </div>
         </ng-template>
         <ng-template #template let-data>
-          <div class="row-tool-buttons">
+          <div class="row-tool-buttons" *ngIf="isAllRowButtonsShown">
             <button ejs-button cssClass="e-flat default-icon-button">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" *ngIf="isLockMenuButtonShown">
+            <button ejs-button cssClass="e-flat secondary-icon-button">
               <span><i-feather name="lock" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat primary-icon-button">
+              <span><i-feather name="more-vertical" class="icon"></i-feather></span>
+            </button>
+          </div>
+
+          <div class="row-tool-buttons" *ngIf="!isAllRowButtonsShown">
+            <button ejs-button cssClass="e-flat default-icon-button">
+              <span><i-feather name="message-square" class="icon"></i-feather></span>
             </button>
             <button ejs-button cssClass="e-flat primary-icon-button">
               <span><i-feather name="more-vertical" class="icon"></i-feather></span>
