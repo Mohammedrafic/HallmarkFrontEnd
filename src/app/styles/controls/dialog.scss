@@ -18,6 +18,17 @@ body.light, body.dark {
     left: auto !important;
     height: calc(100% - 80px) !important;
     position: fixed !important;
+
+    &.e-dialogleft {
+      right: auto;
+      left: 0 !important;
+     
+
+      &.e-dialogleftborder {
+        box-shadow: unset;
+        border-right: 1px solid $secondary-dark-blue-40;
+      }
+    }
   
     .e-dlg-content {
       padding: 0;
