@@ -24,12 +24,14 @@ import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
 import { FormsModule } from '@angular/forms';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 
 const icons = {AlertCircle, CheckCircle};
 
 const COMPONENTS = [
   PageToolbarComponent,
   ValidationErrorPipe,
+  ChipsCssClass,
   ValidateDirective,
   ImageUploaderComponent,
   DocumentUploaderComponent,
