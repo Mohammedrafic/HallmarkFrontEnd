@@ -1,37 +1,37 @@
-<div class="chart-wrapper">
-  <app-widget-header [title]="chart.title"></app-widget-header>
-
-  <div class="control-section">
-    <ejs-accumulationchart
-      #pie
-      [tooltip]="tooltip"
-      [id]="chart.id"
-      [legendSettings]="legendSettings"
-      [height]="height"
-      [enableAnimation]="false"
-    >
-      <e-accumulation-series-collection>
-        <e-accumulation-series
-          [dataSource]="chartData"
-          [dataLabel]="datalabel"
-          xName="x"
-          yName="y"
-          [palettes]="palette"
-          innerRadius="70%"
-          radius="80%"
-        >
-        </e-accumulation-series>
-      </e-accumulation-series-collection>
-    </ejs-accumulationchart>
-  </div>
-  <div class="legend-container">
-    <div *ngFor="let legend of chart.chartData; let idx = index" class="legend">
-      <div class="legend-point">
-        <input type="checkbox" checked (change)="onCheckboxChange(idx)" />
-        <div [ngClass]="['point', toggleLegend.includes(idx) ? 'toggle-legend' : 'point-' + idx]"></div>
-        <div [ngClass]="['legend-text', toggleLegend.includes(idx) ? 'toggle-text-style' : '']">{{ legend.x }}</div>
+<app-widget-wrapper [title]="chart.title">
+  <div class="chart-wrapper">
+    <div class="control-section">
+      <ejs-accumulationchart
+        #pie
+        [tooltip]="tooltip"
+        [id]="chart.id"
+        [legendSettings]="legendSettings"
+        [height]="height"
+        [enableAnimation]="false"
+      >
+        <e-accumulation-series-collection>
+          <e-accumulation-series
+            [dataSource]="chartData"
+            [dataLabel]="datalabel"
+            xName="x"
+            yName="y"
+            [palettes]="palette"
+            innerRadius="70%"
+            radius="80%"
+          >
+          </e-accumulation-series>
+        </e-accumulation-series-collection>
+      </ejs-accumulationchart>
+    </div>
+    <div class="legend-container">
+      <div *ngFor="let legend of chart.chartData; let idx = index" class="legend">
+        <div class="legend-point">
+          <input type="checkbox" checked (change)="onCheckboxChange(idx)" />
+          <div [ngClass]="['point', toggleLegend.includes(idx) ? 'toggle-legend' : 'point-' + idx]"></div>
+          <div [ngClass]="['legend-text', toggleLegend.includes(idx) ? 'toggle-text-style' : '']">{{ legend.x }}</div>
+        </div>
+        <div class="legend-score">{{ legend.y }}</div>
       </div>
-      <div class="legend-score">{{ legend.y }}</div>
     </div>
   </div>
-</div>
+</app-widget-wrapper>

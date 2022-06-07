@@ -1,0 +1,14 @@
+:host {
+  display: block;
+}
+
+.app-widget-wrapper {
+  padding: 24px;
+
+  &__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1b2e;
+  }
+}

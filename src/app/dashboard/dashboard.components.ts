@@ -1,15 +1,19 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import isEqual from 'lodash/fp/isEqual';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { DashboardLayoutComponent, PanelModel } from '@syncfusion/ej2-angular-layouts';
-import { Observable, Subject, take, takeUntil } from 'rxjs';
+import { Observable, takeUntil, startWith, distinctUntilChanged, switchMap } from 'rxjs';
 
 import { ToggleSidebarState } from '../store/app.actions';
-import { ChartAccumulationDataModel } from './models/chart-accumulation-widget.model';
-import { ChartLineDataModel } from './models/chart-line-widget.model';
 import { DashboardService } from './services/dashboard.service';
 import { AddDashboardPanel, DashboardPanelIsMoved, GetDashboardPanels } from './store/dashboard.actions';
 import { DashboardState } from './store/dashboard.state';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { FormGroup, FormBuilder } from '@angular/forms';
+import { combineLatest } from 'rxjs';
+import { WidgetDataDependenciesAggregatedModel } from './models/widget-data-dependencies-aggregated.model';
+import { WidgetTypeEnum } from './enums/widget-type.enum';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,41 +21,47 @@ import { DashboardState } from './store/dashboard.state';
   styleUrls: ['dashboard.components.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class DashboardComponent implements OnInit, OnDestroy {
-  @ViewChild('dashboardLayout', { static: true }) dashboard: DashboardLayoutComponent;
+export class DashboardComponent extends DestroyableDirective implements OnInit, OnDestroy {
+  @ViewChild('dashboardLayout', { static: false }) dashboard: DashboardLayoutComponent;
 
   @Select(DashboardState.dashboardPanels) panels$: Observable<PanelModel[]>;
   @Select(DashboardState.isDashboardLoading) isLoading$: Observable<boolean>;
 
-  private unsubsribe$ = new Subject();
-  panels: PanelModel[] = [];
-  cellSpacing = [24, 24];
-  columns = 12;
-  accumulationWidgets: ChartAccumulationDataModel;
-  widgets: ChartLineDataModel;
+  public widgetsData$: Observable<Record<WidgetTypeEnum, unknown>>;
 
-  constructor(private store: Store, private actions$: Actions, private dashboardService: DashboardService) {}
+  public readonly cellSpacing = [24, 24];
+  public readonly columns = 12;
+  public readonly filtersGroup: FormGroup = this.getFiltersGroup();
+  public readonly widgetTypeEnum: typeof WidgetTypeEnum = WidgetTypeEnum;
 
-  ngOnInit(): void {
-    this.getDashboardPanels();
-    this.refreshDashboard();
-    this.accumulationWidgets = this.dashboardService.getAccumulationWidgets();
-    this.widgets = this.dashboardService.getChartLineWidgets();
+  constructor(
+    private store: Store,
+    private actions$: Actions,
+    private dashboardService: DashboardService,
+    private readonly formBuilder: FormBuilder
+  ) {
+    super();
   }
 
-  ngOnDestroy(): void {
-    this.unsubsribe$.next(true);
-    this.unsubsribe$.complete();
+  public ngOnInit(): void {
+    this.setWidgetsData();
+    this.getDashboardPanels();
+    this.refreshDashboard();
+  }
+
+  public trackByHandler(_: number, panel: PanelModel): string {
+    return panel.id ?? '';
   }
 
   private getDashboardPanels(): void {
     this.store.dispatch(new GetDashboardPanels());
-    this.panels$.pipe(take(1)).subscribe((panels) => (this.panels = panels));
   }
 
   private refreshDashboard(): void {
     this.refreshGrid();
-    this.actions$.pipe(ofActionDispatched(ToggleSidebarState), takeUntil(this.unsubsribe$)).subscribe((data) => this.refreshGrid());
+    this.actions$
+      .pipe(ofActionDispatched(ToggleSidebarState), takeUntil(this.destroy$))
+      .subscribe((data) => this.refreshGrid());
   }
 
   private refreshGrid(): void {
@@ -83,5 +93,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     };
     this.dashboard.addPanel(panel);
     this.store.dispatch(new AddDashboardPanel(this.dashboardPanels()));
+  }
+
+  private getFiltersGroup(): FormGroup {
+    return this.formBuilder.group({ region: [null], location: [null], department: [null], skill: [null] });
+  }
+
+  private setWidgetsData(): void {
+    const formChanges$ = this.filtersGroup.valueChanges.pipe(startWith(this.filtersGroup.value));
+
+    this.widgetsData$ = combineLatest([this.panels$, formChanges$]).pipe(
+      distinctUntilChanged(
+        (previous: WidgetDataDependenciesAggregatedModel, current: WidgetDataDependenciesAggregatedModel) =>
+          isEqual(previous, current)
+      ),
+      switchMap((data: WidgetDataDependenciesAggregatedModel) => this.dashboardService.getWidgetsAggregatedData(data))
+    );
   }
 }
