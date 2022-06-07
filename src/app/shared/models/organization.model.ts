@@ -1,4 +1,9 @@
+import { Duration } from '@shared/enums/durations';
+import { JobClassification } from '@shared/enums/job-classification';
+import { OrderType } from '@shared/enums/order-type';
+import { ReasonForRequisition } from '@shared/enums/reason-for-requisition';
 import { SendDocumentAgency } from '../enums/send-document-agency';
+import { JobDistributionModel } from './job-distribution.model';
 
 export class Organization {
   createUnder?: {
@@ -85,6 +90,15 @@ export class ContactDetails {
   phoneNumberExt: string;
 }
 
+export class OrderContactDetails {
+  id?: number;
+  orderId?: number;
+  name: string;
+  title: string;
+  email: string;
+  mobilePhone: string;
+}
+
 export class Preferences {
   id?: number;
   organizationId?: number;
@@ -128,4 +142,51 @@ export class OrganizationRegion {
 export class OrganizationStructure {
   organizationId: number;
   regions: OrganizationRegion[];
+}
+
+export class OrderWorkLocation {
+  id: number;
+  address: string;
+  state: string;
+  city: string;
+  zipCode: string;
+}
+
+export class Order {
+  title: string;
+  regionId: number;
+  locationId: number;
+  departmentId: number;
+  skillId: number;
+  orderType: OrderType;
+  projectTypeId: number | null;
+  projectType?: string;
+  projectNameId: number | null;
+  projectName?: string;
+  hourlyRate: number;
+  openPositions: number;
+  minYrsRequired: number;
+  joiningBonus: number;
+  compBonus: number;
+  duration: Duration;
+  jobStartDate: Date;
+  jobEndDate: Date;
+  shiftRequirementId: number;
+  shiftStartTime: Date;
+  shiftEndTime: Date;
+  classification: JobClassification;
+  onCallRequired: boolean;
+  asapStart: boolean;
+  criticalOrder: boolean;
+  nO_OT: boolean;
+  jobDescription: string;
+  unitDescription: string;
+  reasonForRequisition: ReasonForRequisition;
+  billRates: any[]; // ToDo: Add interface
+  jobDistributions: JobDistributionModel[];
+  contactDetails: OrderContactDetails[];
+  workLocations: OrderWorkLocation[];
+  credentials: any[]; // ToDo: Add interface
+  workflowId?: number;
+  isSubmit: boolean;
 }

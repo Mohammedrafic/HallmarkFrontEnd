@@ -1,5 +1,5 @@
 import { Country } from "src/app/shared/enums/states";
-import { Organization } from "src/app/shared/models/organization.model";
+import { Order, Organization } from "src/app/shared/models/organization.model";
 import { SkillCategory } from "src/app/shared/models/skill-category.model";
 import { Skill } from "src/app/shared/models/skill.model";
 import { Department } from '@shared/models/department.model';
@@ -150,6 +150,11 @@ export class GetMasterSkillsByPage {
 export class GetSkillsCategoriesByPage {
   static readonly type = '[organizationManagement] Get Skills Categories by Page';
   constructor(public pageNumber: number, public pageSize: number) { }
+}
+
+export class GetMasterSkillsByOrganization {
+  static readonly type = '[organizationManagement] Get Master Skills by Organization';
+  constructor() { }
 }
 
 export class GetAllSkillsCategories {
@@ -345,4 +350,29 @@ export class ExportDepartments {
 export class ExportSkills {
   static readonly type = '[organizationManagement] Export Skill list';
   constructor(public payload: ExportPayload) { }
+}
+
+export class GetProjectTypes {
+  static readonly type = '[organizationManagement] Get Project Types';
+  constructor() { }
+}
+
+export class GetProjectNames {
+  static readonly type = '[organizationManagement] Get Project Names';
+  constructor() { }
+}
+
+export class GetMasterShifts {
+  static readonly type = '[organizationManagement] Get Master Shifts';
+  constructor() { }
+}
+
+export class GetAssociateAgencies {
+  static readonly type = '[organizationManagement] Get Associate Agencies';
+  constructor() { }
+}
+
+export class SaveOrder {
+  static readonly type = '[organizationManagement] Save Order';
+  constructor(public payload: Order) { }
 }

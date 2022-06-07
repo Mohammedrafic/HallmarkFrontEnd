@@ -1,17 +1,31 @@
 <section class="order-type-status-container bootstrap">
   <div class="left-section">
-    <form class="order-type-status-form">
+    <form [formGroup]="orderTypeStatusForm" class="order-type-status-form">
+      <!-- Order Type -->
       <div class="input-container order-type-container">
-        <label>Order Type</label>
-        <div class="input-group dropdown create-under-dropdown">
-          <ejs-dropdownlist placeholder="Order Type"></ejs-dropdownlist>
+        <label>Order Type<span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            placeholder="Order Type"
+            formControlName="orderType"
+            appValidateWithMessage
+            [dataSource]="orderTypes"
+            [fields]="orderTypeFields">
+          </ejs-dropdownlist>
         </div>
       </div>
 
+      <!-- Status -->
       <div class="input-container order-status-container">
         <label>Status</label>
-        <div class="input-group dropdown create-under-dropdown">
-          <ejs-dropdownlist placeholder="Order Status"></ejs-dropdownlist>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            placeholder="Order Status"
+            [dataSource]="orderStatuses"
+            [fields]="orderStatusFields"
+            [value]="orderStatuses[0].id"
+            [enabled]="false">
+          </ejs-dropdownlist>
         </div>
       </div>
     </form>
@@ -27,13 +41,18 @@
         <div class="general-information">
           <div class="title">General Information</div>
           <div class="general-information-form-container">
-            <form>
+            <form [formGroup]="generalInformationForm">
               <div class="form-line">
                 <!-- Job Title -->
                 <div class="input-container bootstrap form-line-item-20">
                   <label>Job Title<span class="required">*</span></label>
                   <div class="input-group">
-                    <input class="e-input" type="text" placeholder="Job Title" />
+                    <input
+                      class="e-input"
+                      type="text"
+                      appValidateWithMessage
+                      formControlName="title"
+                      placeholder="Job Title" />
                   </div>
                 </div>
 
@@ -41,7 +60,14 @@
                 <div class="input-container bootstrap form-line-item-20">
                   <label>Region<span class="required">*</span></label>
                   <div class="input-group dropdown">
-                    <ejs-dropdownlist placeholder="Region"></ejs-dropdownlist>
+                    <ejs-dropdownlist
+                      placeholder="Region"
+                      formControlName="regionId"
+                      appValidateWithMessage
+                      [dataSource]="regions$ | async"
+                      [fields]="regionFields"
+                      (change)="onRegionDropDownChanged($event)">
+                    </ejs-dropdownlist>
                   </div>
                 </div>
 
@@ -49,7 +75,15 @@
                 <div class="input-container bootstrap form-line-item-20">
                   <label>Location<span class="required">*</span></label>
                   <div class="input-group dropdown">
-                    <ejs-dropdownlist placeholder="Location"></ejs-dropdownlist>
+                    <ejs-dropdownlist
+                      placeholder="Location"
+                      formControlName="locationId"
+                      appValidateWithMessage
+                      [enabled]="isLocationsDropDownEnabled"
+                      [dataSource]="locations$ | async"
+                      [fields]="locationFields"
+                      (change)="onLocationDropDownChanged($event)">
+                    </ejs-dropdownlist>
                   </div>
                 </div>
 
@@ -57,7 +91,15 @@
                 <div class="input-container bootstrap form-line-item-20">
                   <label>Department<span class="required">*</span></label>
                   <div class="input-group dropdown">
-                    <ejs-dropdownlist placeholder="Department"></ejs-dropdownlist>
+                    <ejs-dropdownlist
+                      placeholder="Department"
+                      formControlName="departmentId"
+                      appValidateWithMessage
+                      [enabled]="isDepartmentsDropDownEnabled"
+                      [dataSource]="departments$ | async"
+                      [fields]="departmentFields"
+                      (change)="onDepartmentDropDownChanged($event)">
+                    </ejs-dropdownlist>
                   </div>
                 </div>
 
@@ -65,25 +107,93 @@
                 <div class="input-container bootstrap form-line-item-20">
                   <label>Skill<span class="required">*</span></label>
                   <div class="input-group dropdown">
-                    <ejs-dropdownlist placeholder="Skill"></ejs-dropdownlist>
+                    <ejs-dropdownlist
+                      placeholder="Skill"
+                      formControlName="skillId"
+                      appValidateWithMessage
+                      [dataSource]="(skills$ | async)"
+                      [fields]="skillFields">
+                    </ejs-dropdownlist>
                   </div>
                 </div>
               </div>
 
               <div class="form-line">
                 <!-- Project Type -->
-                <div class="input-container bootstrap form-line-item-20">
-                  <label>Project Type<span class="required">*</span></label>
-                  <div class="input-group dropdown">
-                    <ejs-dropdownlist placeholder="Project Type"></ejs-dropdownlist>
+                <div class="project-type-container form-line-item-20">
+                  <div *ngIf="!isEditProjectType" class="input-container bootstrap">
+                    <label>Project Type<span class="required">*</span></label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist
+                        placeholder="Project Type"
+                        formControlName="projectTypeId"
+                        appValidateWithMessage
+                        [dataSource]="projectTypes$ | async"
+                        [fields]="projectTypeFields">
+                      </ejs-dropdownlist>
+                    </div>
+                  </div>
+
+                  <div *ngIf="isEditProjectType" class="input-container bootstrap">
+                    <label>Project Type<span class="required">*</span></label>
+                    <div class="input-group">
+                      <input
+                        class="e-input"
+                        type="text"
+                        appValidateWithMessage
+                        formControlName="projectType"
+                        placeholder="Project Type" />
+                    </div>
+                  </div>
+
+                  <div class="input-container edit-button-container">
+                    <button
+                      ejs-button
+                      type="button"
+                      cssClass="e-outline"
+                      class="icon-button"
+                      (click)="editProjectTypeHandler()">
+                      <i-feather name="edit3" class="icon"></i-feather>
+                    </button>
                   </div>
                 </div>
 
                 <!-- Project Name -->
-                <div class="input-container bootstrap form-line-item-20">
-                  <label>Project Name<span class="required">*</span></label>
-                  <div class="input-group dropdown">
-                    <ejs-dropdownlist placeholder="Project Name"></ejs-dropdownlist>
+                <div class="project-name-container form-line-item-20">
+                  <div *ngIf="!isEditProjectName" class="input-container bootstrap">
+                    <label>Project Name<span class="required">*</span></label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist
+                        placeholder="Project Name"
+                        formControlName="projectNameId"
+                        appValidateWithMessage
+                        [dataSource]="projectNames$ | async"
+                        [fields]="projectNameFields">
+                      </ejs-dropdownlist>
+                    </div>
+                  </div>
+
+                  <div *ngIf="isEditProjectName" class="input-container bootstrap">
+                    <label>Project Name<span class="required">*</span></label>
+                    <div class="input-group">
+                      <input
+                        class="e-input"
+                        type="text"
+                        formControlName="projectName"
+                        appValidateWithMessage
+                        placeholder="Project Name" />
+                    </div>
+                  </div>
+
+                  <div class="input-container edit-button-container">
+                    <button
+                      ejs-button
+                      type="button"
+                      cssClass="e-outline"
+                      class="icon-button"
+                      (click)="editProjectNameHandler()">
+                      <i-feather name="edit3" class="icon"></i-feather>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -93,39 +203,69 @@
                 <div class="input-container bootstrap form-line-item-20">
                   <label>Hourly rate ($)<span class="required">*</span></label>
                   <div class="input-group">
-                    <input class="e-input" type="text" placeholder="Hourly rate ($)" />
+                    <input
+                      class="e-input"
+                      type="text"
+                      formControlName="hourlyRate"
+                      appValidateWithMessage
+                      placeholder="Hourly rate ($)"
+                      maxlength="10" />
                   </div>
                 </div>
 
-                <!-- # of Phisitions req. -->
+                <!-- # Open Positions -->
                 <div class="input-container bootstrap form-line-item-20">
-                  <label># of Phisitions req.<span class="required">*</span></label>
+                  <label># Open Positions<span class="required">*</span></label>
                   <div class="input-group">
-                    <input class="e-input" type="text" placeholder="# of Phisitions req." />
+                    <input
+                      class="e-input"
+                      type="text"
+                      placeholder="# Open Positions"
+                      formControlName="openPositions"
+                      appValidateWithMessage
+                      maxlength="10" />
                   </div>
                 </div>
 
                 <!-- Min Yrs. Req. -->
                 <div class="input-container bootstrap form-line-item-20">
-                  <label>Min Yrs. Req.<span class="required">*</span></label>
-                  <div class="input-group dropdown">
-                    <ejs-dropdownlist placeholder="Min Yrs. Req."></ejs-dropdownlist>
+                  <label>Min Yrs. Req.</label>
+                  <div class="input-group">
+                    <input
+                      class="e-input"
+                      type="text"
+                      placeholder="Min Yrs. Req."
+                      formControlName="minYrsRequired"
+                      appValidateWithMessage
+                      maxlength="10" />
                   </div>
                 </div>
 
                 <!-- Joining Bonus ($) -->
                 <div class="input-container bootstrap form-line-item-20">
-                  <label>Joining Bonus ($)<span class="required">*</span></label>
+                  <label>Joining Bonus ($)</label>
                   <div class="input-group">
-                    <input class="e-input" type="text" placeholder="Joining Bonus ($)" />
+                    <input
+                      class="e-input"
+                      type="text"
+                      placeholder="Joining Bonus ($)"
+                      formControlName="joiningBonus"
+                      appValidateWithMessage
+                      maxlength="10" />
                   </div>
                 </div>
 
                 <!-- Comp. Bonus ($) -->
                 <div class="input-container bootstrap form-line-item-20">
-                  <label>Comp. Bonus ($)<span class="required">*</span></label>
+                  <label>Comp. Bonus ($)</label>
                   <div class="input-group">
-                    <input class="e-input" type="text" placeholder="Comp. Bonus ($)" />
+                    <input
+                      class="e-input"
+                      type="text"
+                      placeholder="Comp. Bonus ($)"
+                      formControlName="compBonus"
+                      appValidateWithMessage
+                      maxlength="10" />
                   </div>
                 </div>
               </div>
@@ -135,23 +275,13 @@
                 <div class="input-container bootstrap form-line-item-20">
                   <label>Duration<span class="required">*</span></label>
                   <div class="input-group dropdown">
-                    <ejs-dropdownlist placeholder="Duration"></ejs-dropdownlist>
-                  </div>
-                </div>
-
-                <!-- Days -->
-                <div class="input-container bootstrap form-line-item-20">
-                  <label>Days<span class="required">*</span></label>
-                  <div class="input-group dropdown">
-                    <ejs-dropdownlist placeholder="Days"></ejs-dropdownlist>
-                  </div>
-                </div>
-
-                <!-- Days Q-ty -->
-                <div class="input-container bootstrap form-line-item-20">
-                  <label>Days Q-ty<span class="required">*</span></label>
-                  <div class="input-group">
-                    <input class="e-input" type="text" placeholder="Days Q-ty" />
+                    <ejs-dropdownlist
+                      placeholder="Duration"
+                      formControlName="duration"
+                      appValidateWithMessage
+                      [dataSource]="durations"
+                      [fields]="durationFields">
+                    </ejs-dropdownlist>
                   </div>
                 </div>
 
@@ -163,8 +293,12 @@
                       class="datepicker"
                       format="MM/dd/yyyy"
                       placeholder="MM/DD/YYYY"
+                      formControlName="jobStartDate"
+                      appValidateWithMessage
                       [enableMask]="true"
-                      [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }">
+                      [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                      [min]="today"
+                      [max]="generalInformationForm.controls['jobEndDate'].value">
                     </ejs-datepicker>
                   </div>
                 </div>
@@ -177,8 +311,12 @@
                       class="datepicker"
                       format="MM/dd/yyyy"
                       placeholder="MM/DD/YYYY"
+                      formControlName="jobEndDate"
+                      appValidateWithMessage
+                      [enabled]="isJobEndDateControlEnabled"
                       [enableMask]="true"
-                      [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }">
+                      [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                      [min]="generalInformationForm.controls['jobStartDate'].value">
                     </ejs-datepicker>
                   </div>
                 </div>
@@ -189,7 +327,13 @@
                 <div class="input-container bootstrap form-line-item-20">
                   <label>Shift Requirements<span class="required">*</span></label>
                   <div class="input-group dropdown">
-                    <ejs-dropdownlist placeholder="Shift Requirements"></ejs-dropdownlist>
+                    <ejs-dropdownlist
+                      placeholder="Shift Requirements"
+                      formControlName="shiftRequirementId"
+                      appValidateWithMessage
+                      [dataSource]="masterShifts$ | async"
+                      [fields]="masterShiftFields">
+                    </ejs-dropdownlist>
                   </div>
                 </div>
 
@@ -199,6 +343,8 @@
                   <div class="input-group datepicker bootstrap">
                     <ejs-timepicker
                       placeholder="HH:MM"
+                      formControlName="shiftStartTime"
+                      appValidateWithMessage
                       format="hh:mm a"
                       [enableMask]="true"
                       maskPlaceholder="HH:MM">
@@ -212,6 +358,8 @@
                   <div class="input-group datepicker bootstrap">
                     <ejs-timepicker
                       placeholder="HH:MM"
+                      formControlName="shiftEndTime"
+                      appValidateWithMessage
                       format="hh:mm a"
                       [enableMask]="true"
                       maskPlaceholder="HH:MM">
@@ -225,21 +373,39 @@
         <div class="job-distibution">
           <div class="title">Job Distibution</div>
           <div class="job-distribution-form-container">
-            <form>
+            <form [formGroup]="jobDistributionForm">
               <div class="form-line">
                 <!-- Job Distribution -->
                 <div class="input-container bootstrap form-line-item-40">
                   <label>Job Distribution<span class="required">*</span></label>
                   <div class="input-group dropdown">
-                    <ejs-dropdownlist placeholder="Job Distribution"></ejs-dropdownlist>
+                    <ejs-multiselect
+                      mode="CheckBox"
+                      placeholder="Job Distribution"
+                      formControlName="jobDistribution"
+                      appValidateWithMessage
+                      [dataSource]="jobDistributions"
+                      [fields]="jobDistributionFields">
+                    </ejs-multiselect>
                   </div>
                 </div>
 
                 <!-- Agency -->
                 <div class="input-container bootstrap form-line-item-40">
-                  <label>Agency<span class="required">*</span></label>
+                  <label>
+                    Agency
+                    <span *ngIf="agencyControlEnabled" class="required">*</span>
+                  </label>
                   <div class="input-group dropdown">
-                    <ejs-dropdownlist placeholder="Agency"></ejs-dropdownlist>
+                    <ejs-multiselect
+                      mode="CheckBox"
+                      placeholder="Agency"
+                      formControlName="agency"
+                      appValidateWithMessage
+                      [enabled]="agencyControlEnabled"
+                      [dataSource]="associateAgencies$ | async"
+                      [fields]="associateAgencyFields">
+                    </ejs-multiselect>
                   </div>
                 </div>
               </div>
@@ -250,21 +416,27 @@
         <div class="job-description">
           <div class="title">Job Description</div>
           <div class="job-description-form-container">
-            <form>
+            <form [formGroup]="jobDescriptionForm">
               <div class="form-line">
                 <!-- Classification -->
                 <div class="input-container bootstrap form-line-item-20">
                   <label>Classification<span class="required">*</span></label>
                   <div class="input-group dropdown">
-                    <ejs-dropdownlist placeholder="Classification"></ejs-dropdownlist>
+                    <ejs-dropdownlist
+                      placeholder="Classification"
+                      formControlName="classification"
+                      appValidateWithMessage
+                      [dataSource]="jobClassifications"
+                      [fields]="jobClassificationFields">
+                    </ejs-dropdownlist>
                   </div>
                 </div>
 
                 <div class="bootstrap job-description-checkboxes-container">
-                  <ejs-checkbox label="On Call Required"></ejs-checkbox>
-                  <ejs-checkbox label="ASAP Start"></ejs-checkbox>
-                  <ejs-checkbox label="Critical Order"></ejs-checkbox>
-                  <ejs-checkbox label="NO OT"></ejs-checkbox>
+                  <ejs-checkbox label="On Call Required" formControlName="onCallRequired"></ejs-checkbox>
+                  <ejs-checkbox label="ASAP Start" formControlName="asapStart"></ejs-checkbox>
+                  <ejs-checkbox label="Critical Order" formControlName="criticalOrder"></ejs-checkbox>
+                  <ejs-checkbox label="NO OT" formControlName="nO_OT"></ejs-checkbox>
                 </div>
               </div>
 
@@ -277,7 +449,9 @@
                       class="e-input"
                       type="text"
                       [multiline]="true"
-                      placeholder="Job Description...">
+                      appValidateWithMessage
+                      placeholder="Job Description..."
+                      formControlName="jobDescription">
                     </ejs-textbox>
                   </div>
                 </div>
@@ -290,7 +464,9 @@
                       class="e-input"
                       type="text"
                       [multiline]="true"
-                      placeholder="Unit Description...">
+                      appValidateWithMessage
+                      placeholder="Unit Description..."
+                      formControlName="unitDescription">
                     </ejs-textbox>
                   </div>
                 </div>
@@ -301,7 +477,13 @@
                 <div class="input-container bootstrap form-line-item-40">
                   <label>Reason of Requisition<span class="required">*</span></label>
                   <div class="input-group dropdown">
-                    <ejs-dropdownlist placeholder="Reason of Requisition"></ejs-dropdownlist>
+                    <ejs-dropdownlist
+                      placeholder="Reason of Requisition"
+                      formControlName="reasonForRequisition"
+                      appValidateWithMessage
+                      [dataSource]="reasonsForRequisition"
+                      [fields]="reasonForRequisitionFields">
+                    </ejs-dropdownlist>
                   </div>
                 </div>
               </div>
@@ -311,205 +493,205 @@
         <div class="contact-details">
           <div class="contact-header">
             <div class="title">Contact Details</div>
-            <div class="stick-right add-contact-link">
+            <div class="stick-right add-contact-link" (click)="addContact()">
               <i-feather name="plus" class="icon"></i-feather>
               Add Contact
             </div>
           </div>
           <div class="contact-details-form-container">
-            <form>
-              <div class="form-line">
-                <!-- Title -->
-                <div class="contact-details-title-container form-line-item-25">
-                  <div class="input-container bootstrap">
-                    <label>Title</label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist placeholder="Title"></ejs-dropdownlist>
+            <form [formGroup]="contactDetailsForm">
+              <ng-container formArrayName="contactDetails">
+                <div class="form-line" [formGroupName]="i" *ngFor="let contact of contactDetailsFormArray.controls; let i = index;">
+                  <!-- Title -->
+                  <div class="contact-details-title-container form-line-item-25">
+                    <div *ngIf="!isEditContactTitle[i]" class="input-container bootstrap">
+                      <label>Title<span class="required">*</span></label>
+                      <div class="input-group dropdown">
+                        <ejs-dropdownlist
+                          [dataSource]="contactDetailTitles"
+                          formControlName="title"
+                          placeholder="Title">
+                        </ejs-dropdownlist>
+                      </div>
+                    </div>
+
+                    <div *ngIf="isEditContactTitle[i]" class="input-container bootstrap">
+                      <label>Title<span class="required">*</span></label>
+                      <div class="input-group">
+                        <input
+                          class="e-input"
+                          type="text"
+                          appValidateWithMessage
+                          formControlName="title"
+                          placeholder="Title" />
+                      </div>
+                    </div>
+
+                    <div class="input-container edit-button-container">
+                      <button
+                        ejs-button
+                        type="button"
+                        cssClass="e-outline"
+                        class="icon-button"
+                        (click)="editContactTitleHandler(i)">
+                        <i-feather name="edit3" class="icon"></i-feather>
+                      </button>
                     </div>
                   </div>
-                  <div class="input-container edit-button-container">
-                    <button ejs-button type="button" cssClass="e-outline" class="icon-button">
-                      <i-feather name="edit3" class="icon"></i-feather>
+
+                  <!-- Contact Person -->
+                  <div class="input-container bootstrap form-line-item-25">
+                    <label>Contact Person<span class="required">*</span></label>
+                    <div class="input-group">
+                      <input
+                        class="e-input"
+                        type="text"
+                        appValidateWithMessage
+                        placeholder="Contact Person"
+                        formControlName="name" />
+                    </div>
+                  </div>
+
+                  <!-- Mobile Phone -->
+                  <div class="input-container bootstrap form-line-item-25">
+                    <label>Mobile Phone</label>
+                    <div class="input-group">
+                      <ejs-maskedtextbox
+                        promptChar="_"
+                        mask='000-000-0000'
+                        formControlName="mobilePhone"
+                        appValidateWithMessage
+                        placeholder="Mobile Phone"
+                        maxlength="10">
+                      </ejs-maskedtextbox>
+                    </div>
+                  </div>
+
+                  <!-- Email -->
+                  <div class="input-container bootstrap form-line-item-25">
+                    <label>Email<span class="required">*</span></label>
+                    <div class="input-group">
+                      <input
+                        class="e-input"
+                        type="email"
+                        appValidateWithMessage
+                        placeholder="Email"
+                        formControlName="email" />
+                    </div>
+                  </div>
+
+                  <!-- Remove button -->
+                  <div class="input-container remove-button-container">
+                    <button
+                      *ngIf="contactDetailsFormArray.controls.length > 1"
+                      ejs-button
+                      type="button"
+                      cssClass="e-outline"
+                      class="icon-button"
+                      (click)="removeContact(i)">
+                      <i-feather name="trash2" class="icon"></i-feather>
                     </button>
                   </div>
                 </div>
-
-                <!-- Contact Person -->
-                <div class="input-container bootstrap form-line-item-25">
-                  <label>Contact Person</label>
-                  <div class="input-group">
-                    <input class="e-input" type="text" placeholder="Contact Person" />
-                  </div>
-                </div>
-
-                <!-- Phone -->
-                <div class="input-container bootstrap form-line-item-25">
-                  <label>Phone</label>
-                  <div class="input-group">
-                    <input class="e-input" type="text" placeholder="Phone" />
-                  </div>
-                </div>
-
-                <!-- Email -->
-                <div class="input-container bootstrap form-line-item-25">
-                  <label>Email</label>
-                  <div class="input-group">
-                    <input class="e-input" type="email" placeholder="Email" />
-                  </div>
-                </div>
-
-                <!-- Remove button -->
-                <div class="input-container remove-button-container"></div>
-              </div>
-
-              <div class="form-line">
-                <!-- Title -->
-                <div class="contact-details-title-container form-line-item-25">
-                  <div class="input-container bootstrap">
-                    <label>Title</label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist placeholder="Title"></ejs-dropdownlist>
-                    </div>
-                  </div>
-                  <div class="input-container edit-button-container">
-                    <button ejs-button type="button" cssClass="e-outline" class="icon-button">
-                      <i-feather name="edit3" class="icon"></i-feather>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Contact Person -->
-                <div class="input-container bootstrap form-line-item-25">
-                  <label>Contact Person</label>
-                  <div class="input-group">
-                    <input class="e-input" type="text" placeholder="Contact Person" />
-                  </div>
-                </div>
-
-                <!-- Phone -->
-                <div class="input-container bootstrap form-line-item-25">
-                  <label>Phone</label>
-                  <div class="input-group">
-                    <input class="e-input" type="text" placeholder="Phone" />
-                  </div>
-                </div>
-
-                <!-- Email -->
-                <div class="input-container bootstrap form-line-item-25">
-                  <label>Email</label>
-                  <div class="input-group">
-                    <input class="e-input" type="email" placeholder="Email" />
-                  </div>
-                </div>
-
-                <!-- Remove button -->
-                <div class="input-container remove-button-container">
-                  <button ejs-button type="button" cssClass="e-outline" class="icon-button">
-                    <i-feather name="trash2" class="icon"></i-feather>
-                  </button>
-                </div>
-              </div>
+              </ng-container>
             </form>
           </div>
         </div>
         <div class="work-location">
           <div class="work-location-header">
             <div class="title">Work Location</div>
-            <div class="stick-right add-contact-link">
+            <div class="stick-right add-contact-link" (click)="addWorkLocation()">
               <i-feather name="plus" class="icon"></i-feather>
               Add More
             </div>
           </div>
 
-          <form>
-            <div class="form-line">
-              <!-- Address -->
-              <div class="input-container bootstrap form-line-item-40">
-                <label>Address<span class="required">*</span></label>
-                <div class="input-group">
-                  <input class="e-input" type="text" placeholder="Address" />
+          <form [formGroup]="workLocationForm">
+            <ng-container formArrayName="workLocations">
+              <div class="form-line" [formGroupName]="i" *ngFor="let workLocation of workLocationsFormArray.controls; let i = index;">
+                <!-- Address -->
+                <div class="input-container bootstrap form-line-item-40">
+                  <label>Address<span class="required">*</span></label>
+                  <div class="input-group">
+                    <input
+                      class="e-input"
+                      type="text"
+                      appValidateWithMessage
+                      placeholder="Address"
+                      formControlName="address" />
+                  </div>
+                </div>
+
+                <!-- State -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>State<span class="required">*</span></label>
+                  <div class="input-group">
+                    <input
+                      class="e-input"
+                      type="text"
+                      appValidateWithMessage
+                      formControlName="state"
+                      placeholder="State" />
+                  </div>
+                </div>
+
+                <!-- City -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>City<span class="required">*</span></label>
+                  <div class="input-group">
+                    <input
+                      class="e-input"
+                      type="text"
+                      appValidateWithMessage
+                      placeholder="City"
+                      formControlName="city" />
+                  </div>
+                </div>
+
+                <!-- Zip Code -->
+                <div class="input-container bootstrap form-line-item-20">
+                  <label>Zip Code<span class="required">*</span></label>
+                  <div class="input-group">
+                    <input
+                      class="e-input"
+                      type="text"
+                      appValidateWithMessage
+                      placeholder="Zip Code"
+                      formControlName="zipCode"
+                      maxlength="6"/>
+                  </div>
+                </div>
+
+                <!-- Remove button -->
+                <div class="input-container remove-button-container">
+                  <button
+                    *ngIf="workLocationsFormArray.controls.length > 1"
+                    ejs-button
+                    type="button"
+                    cssClass="e-outline"
+                    class="icon-button"
+                    (click)="removeWorkLocation(i)">
+                    <i-feather name="trash2" class="icon"></i-feather>
+                  </button>
                 </div>
               </div>
-
-              <!-- State -->
-              <div class="input-container bootstrap form-line-item-20">
-                <label>State<span class="required">*</span></label>
-                <div class="input-group dropdown">
-                  <ejs-dropdownlist placeholder="State"></ejs-dropdownlist>
-                </div>
-              </div>
-
-              <!-- City -->
-              <div class="input-container bootstrap form-line-item-20">
-                <label>City<span class="required">*</span></label>
-                <div class="input-group">
-                  <input class="e-input" type="text" placeholder="City" />
-                </div>
-              </div>
-
-              <!-- Zipcode -->
-              <div class="input-container bootstrap form-line-item-20">
-                <label>Zipcode<span class="required">*</span></label>
-                <div class="input-group">
-                  <input class="e-input" type="text" placeholder="Zipcode" />
-                </div>
-              </div>
-
-              <!-- Remove button -->
-              <div class="input-container remove-button-container"></div>
-            </div>
-
-            <div class="form-line">
-              <!-- Address -->
-              <div class="input-container bootstrap form-line-item-40">
-                <label>Address<span class="required">*</span></label>
-                <div class="input-group">
-                  <input class="e-input" type="text" placeholder="Address" />
-                </div>
-              </div>
-
-              <!-- State -->
-              <div class="input-container bootstrap form-line-item-20">
-                <label>State<span class="required">*</span></label>
-                <div class="input-group dropdown">
-                  <ejs-dropdownlist placeholder="State"></ejs-dropdownlist>
-                </div>
-              </div>
-
-              <!-- City -->
-              <div class="input-container bootstrap form-line-item-20">
-                <label>City<span class="required">*</span></label>
-                <div class="input-group">
-                  <input class="e-input" type="text" placeholder="City" />
-                </div>
-              </div>
-
-              <!-- Zipcode -->
-              <div class="input-container bootstrap form-line-item-20">
-                <label>Zipcode<span class="required">*</span></label>
-                <div class="input-group">
-                  <input class="e-input" type="text" placeholder="Zipcode" />
-                </div>
-              </div>
-
-              <!-- Remove button -->
-              <div class="input-container remove-button-container">
-                <button ejs-button type="button" cssClass="e-outline" class="icon-button">
-                  <i-feather name="trash2" class="icon"></i-feather>
-                </button>
-              </div>
-            </div>
+            </ng-container>
           </form>
         </div>
         <div class="workflow">
           <div class="title">Workflow</div>
-          <form>
+          <form [formGroup]="workflowForm">
             <div class="form-line">
               <!-- Workflow -->
-              <div class="input-container bootstrap form-line-item-60">
-                <label>Workflow<span class="required">*</span></label>
+              <div class="input-container bootstrap form-line-item-40">
+                <label>Workflow</label>
                 <div class="input-group dropdown">
-                  <ejs-dropdownlist placeholder="Workflow"></ejs-dropdownlist>
+                  <ejs-dropdownlist
+                    placeholder="Workflow"
+                    formControlName="workflowId"
+                    [dataSource]="workflows$ | async"
+                    [fields]="workflowFields">
+                  </ejs-dropdownlist>
                 </div>
               </div>
             </div>

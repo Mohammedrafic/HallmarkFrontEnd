@@ -26,6 +26,7 @@
       "@client/*": ["src/app/client/*"],
       "@login/*": ["src/app/login/*"],
       "@order-credentials/*": ["src/app/order-credentials/*"],
+      "@organization-management/*": ["src/app/organization-management/*"],
       "@shared/*": ["src/app/shared/*"],
       "@shell/*": ["src/app/shell/*"]
     },
