@@ -42,11 +42,11 @@ export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy 
     this.actions$.pipe(ofActionDispatched(ToggleSidebarState), takeUntil(this.unsubscribe$)).subscribe(() => {
       setTimeout(() => {
         this.pie.refreshChart();
-      }, 500);
+      }, 650);
     });
   }
 
-  onClickLegend(index: number): void {
+  private onClickLegend(index: number): void {
     if (this.toggleLegend.includes(index)) {
       this.toggleLegend = this.toggleLegend.filter((item) => item !== index);
     } else {
@@ -57,6 +57,6 @@ export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   onCheckboxChange(idx: number): void {
-    this.onClickLegend(idx)
+    this.onClickLegend(idx);
   }
 }

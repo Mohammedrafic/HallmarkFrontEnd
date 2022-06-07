@@ -8,10 +8,10 @@ export class ChartData {
   progress: number
   value: number
   score: number
-  chartData: ChartDaum[]
+  chartData: Chart[]
 }
 
-export class ChartDaum {
+export class Chart {
   x: number
   y: number
 }
