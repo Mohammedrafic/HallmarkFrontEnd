@@ -2,28 +2,36 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
-import { Observable, of } from 'rxjs';
-import { ChartAccumulationDataModel } from '../models/chart-accumulation-widget.model';
+import { Observable, of, forkJoin } from 'rxjs';
+import { ChartAccumulation } from '../models/chart-accumulation-widget.model';
 import { ChartLineDataModel } from '../models/chart-line-widget.model';
+import { WidgetDataDependenciesAggregatedModel } from '../models/widget-data-dependencies-aggregated.model';
+import { DashboardFiltersModel } from '../models/dashboard-filters.model';
+import { WidgetTypeEnum } from '../enums/widget-type.enum';
+import { LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
+import { USAMapDataLayerSettings } from '../constants/USA-map-data-layer-settings';
 
 @Injectable()
 export class DashboardService {
+  private readonly widgetTypeToDataMapper: Record<
+    WidgetTypeEnum,
+    (filters: DashboardFiltersModel) => Observable<unknown>
+  > = {
+    [WidgetTypeEnum.CANDIDATES]: (filters: DashboardFiltersModel) => this.getCandidatesWidgetData(filters),
+    [WidgetTypeEnum.CANDIDATES_BY_REGION]: (filters: DashboardFiltersModel) =>
+      this.getCandidatesByRegionWidgetData(filters),
+    [WidgetTypeEnum.INVOICES]: (filters: DashboardFiltersModel) => this.getInvoicesWidgetData(filters),
+    [WidgetTypeEnum.ORDERS_VS_CANDIDATES]: (filters: DashboardFiltersModel) => this.getCandidatesWidgetData(filters),
+  };
+
   constructor(private http: HttpClient) {}
 
   getDashboardsPanels(): Observable<PanelModel[]> {
-    const dashboardData = localStorage.getItem('dashboard');
-    if (dashboardData) {
-      const panels = JSON.parse(dashboardData);
-      return of(panels);
-    }
     return of([
-      { id: 'layout_1', sizeX: 1, sizeY: 1, row: 0, col: 0 },
-      { id: 'layout_2', sizeX: 1, sizeY: 1, row: 0, col: 1 },
-      { id: 'layout_3', sizeX: 1, sizeY: 1, row: 0, col: 2 },
-      { id: 'candidates_1', sizeX: 3, sizeY: 3, row: 0, col: 3 },
-      { id: 'invoces_1', sizeX: 3, sizeY: 3, row: 0, col: 6 },
-      { id: 'america_map_1', sizeX: 3, sizeY: 3, row: 0, col: 9 },
-      { id: 'layout_4', sizeX: 3, sizeY: 2, row: 1, col: 0 },
+      { id: WidgetTypeEnum.CANDIDATES, sizeX: 3, sizeY: 3, row: 0, col: 3 },
+      { id: WidgetTypeEnum.ORDERS_VS_CANDIDATES, sizeX: 3, sizeY: 3, row: 0, col: 6 },
+      { id: WidgetTypeEnum.CANDIDATES_BY_REGION, sizeX: 3, sizeY: 3, row: 0, col: 9 },
+      { id: WidgetTypeEnum.INVOICES, sizeX: 3, sizeY: 3, row: 1, col: 0 },
     ]);
   }
 
@@ -35,38 +43,6 @@ export class DashboardService {
     const panels = JSON.stringify(dashboard);
     localStorage.setItem('dashboard', panels);
     return of(true);
-  }
-
-  getAccumulationWidgets(): ChartAccumulationDataModel {
-    return {
-      candidates_1: {
-        id: 'candidates_1',
-        title: 'Candidates',
-        candidates: 35,
-        score: 14.53,
-        progress: 4,
-        chartData: [
-          { x: 'Applied', y: 45, text: '45%' },
-          { x: 'Offered', y: 15, text: '15%' },
-          { x: 'Accepted', y:12, text: '9%' },
-          { x: 'Onboarded', y: 11, text: '31%' },
-        ],
-      },
-
-      invoces_1: {
-        id: 'invoces_1',
-        title: 'Job Offers',
-        score: 14.53,
-        candidates: 15,
-        progress: -4,
-        chartData: [
-          { x: 'Open', y: 4, text: '4%' },
-          { x: 'In Progress', y: 65, text: '65%' },
-          { x: 'In Progress (Offer Pending)', y: 19, text: '19%' },
-          { x: 'In Progress (Offer Accepted)', y: 24, text: '24%' },
-        ],
-      },
-    };
   }
 
   getChartLineWidgets(): ChartLineDataModel {
@@ -122,5 +98,55 @@ export class DashboardService {
         ],
       },
     };
+  }
+
+  public getWidgetsAggregatedData([panels, filters]: WidgetDataDependenciesAggregatedModel): Observable<
+    Record<WidgetTypeEnum, unknown>
+  > {
+    const data: Record<WidgetTypeEnum, Observable<unknown>> = panels.reduce(
+      (accumulator: Record<WidgetTypeEnum, Observable<unknown>>, panel: PanelModel) => ({
+        ...accumulator,
+        [panel.id as WidgetTypeEnum]: this.widgetTypeToDataMapper[panel.id as WidgetTypeEnum]?.(filters) ?? of(null),
+      }),
+      {} as Record<WidgetTypeEnum, Observable<unknown>>
+    );
+
+    return forkJoin(data);
+  }
+
+  private getCandidatesWidgetData(filter: DashboardFiltersModel): Observable<ChartAccumulation> {
+    return of({
+      id: WidgetTypeEnum.CANDIDATES,
+      title: 'Candidates',
+      candidates: 35,
+      score: 14.53,
+      progress: 4,
+      chartData: [
+        { x: 'Applied', y: 45, text: '45%' },
+        { x: 'Offered', y: 15, text: '15%' },
+        { x: 'Accepted', y: 12, text: '9%' },
+        { x: 'Onboarded', y: 11, text: '31%' },
+      ],
+    });
+  }
+
+  private getCandidatesByRegionWidgetData(filters: DashboardFiltersModel): Observable<LayerSettingsModel[]> {
+    return of(USAMapDataLayerSettings);
+  }
+
+  private getInvoicesWidgetData(filter: DashboardFiltersModel): Observable<ChartAccumulation> {
+    return of({
+      id: WidgetTypeEnum.INVOICES,
+      title: 'Job Offers',
+      score: 14.53,
+      candidates: 15,
+      progress: -4,
+      chartData: [
+        { x: 'Open', y: 4, text: '4%' },
+        { x: 'In Progress', y: 65, text: '65%' },
+        { x: 'In Progress (Offer Pending)', y: 19, text: '19%' },
+        { x: 'In Progress (Offer Accepted)', y: 24, text: '24%' },
+      ],
+    });
   }
 }
