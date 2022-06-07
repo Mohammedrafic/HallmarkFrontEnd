@@ -42,8 +42,9 @@
           </div>
         </div>
         <div class="right">
-          <div class="pdf-viewer">
-            <ejs-pdfviewer id="pdfViewer" #pdfViewer [serviceUrl]="service" [enableTextSelection]="false"></ejs-pdfviewer>
+          <div class="file-viewer">
+            <ejs-pdfviewer *ngIf="!imageMode" id="pdfViewer" #pdfViewer [serviceUrl]="service" [enableTextSelection]="false"></ejs-pdfviewer>
+            <div *ngIf="imageMode" class="image-container"><img class="image" [src]="imageSrs"/></div>
           </div>
         </div>
       </section>
