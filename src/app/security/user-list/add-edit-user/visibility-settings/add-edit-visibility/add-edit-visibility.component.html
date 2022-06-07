@@ -31,14 +31,14 @@
       <section class="form-container">
         <form [formGroup]="form">
           <div class="dropdown-container bootstrap">
-            <label>Organisation<span class="required">*</span></label>
+            <label>Organization<span class="required">*</span></label>
             <div class="input-group dropdown">
               <ejs-dropdownlist appValidateWithMessage
                                 formControlName="organisationIds"
                                 [fields]="organisationFields"
                                 [dataSource]="organisations"
                                 [enabled]="!isOrganisationUser"
-                                placeholder="Organisation">
+                                placeholder="Organization">
               </ejs-dropdownlist>
             </div>
           </div>
@@ -55,6 +55,12 @@
                                [dataSource]="regions"
                                formControlName="regionIds"
                                placeholder="Region">
+                <ng-template #itemTemplate let-data>
+                  <div class="visibility-option-container">
+                    <span>{{data?.name}}</span>
+                    <span class="parent-option-name">{{data?.organisationName}}</span>
+                  </div>
+                </ng-template>
               </ejs-multiselect>
             </div>
           </div>

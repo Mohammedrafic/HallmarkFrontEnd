@@ -47,6 +47,7 @@ export class AddEditVisibilityComponent implements OnInit, OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
   private editVisibility: UserVisibilitySetting | null;
+  private readonly allOrganisationId = -1;
 
   @Select(SecurityState.organisations)
   organizations$: Observable<Organisation[]>;
@@ -75,7 +76,12 @@ export class AddEditVisibilityComponent implements OnInit, OnDestroy {
     this.subscribeOnOpenEvent();
     this.createVisibilityForm();
     this.subscribeOnFormValuesChanges();
-    this.organizations$.pipe(takeUntil(this.unsubscribe$)).subscribe(organisations => this.organisations = organisations);
+    this.organizations$.pipe(takeUntil(this.unsubscribe$))
+      .subscribe(organisations => {
+        this.organisations = this.isOrganisationUser
+          ? [...organisations]
+          : [{ name: 'All', organizationId: this.allOrganisationId, regions: [] }, ...organisations];
+      });
     this.actions$.pipe(ofActionSuccessful(SaveUserVisibilitySettingsSucceeded), takeUntil(this.unsubscribe$))
       .subscribe(() => this.closeDialog());
   }
@@ -92,7 +98,10 @@ export class AddEditVisibilityComponent implements OnInit, OnDestroy {
       const value = this.form.getRawValue();
       this.store.dispatch(new SaveUserVisibilitySettings({
         ...value,
-        organisationIds: [value.organisationIds],
+        regionIds: value.regionIds.length === this.regions.length ? [] : value.regionIds,
+        locationIds: value.locationIds.length === this.locations.length ? [] : value.locationIds,
+        departmentIds: value.departmentIds.length === this.departments.length ? [] : value.departmentIds,
+        organisationIds: value.organisationIds === this.allOrganisationId ? [] : [value.organisationIds],
         userId: this.createdUser?.id
       }));
     }
@@ -121,7 +130,11 @@ export class AddEditVisibilityComponent implements OnInit, OnDestroy {
         if (data) {
           this.title = 'Edit';
           this.editVisibility = { ...data };
-          this.organisationsControl?.setValue(this.editVisibility.organizationId);
+          this.organisationsControl?.setValue(
+            this.editVisibility.organizationId === null
+              ? this.allOrganisationId
+              : this.editVisibility.organizationId
+          );
         } else {
           this.title = 'Add';
           if (this.isOrganisationUser) {
@@ -145,9 +158,21 @@ export class AddEditVisibilityComponent implements OnInit, OnDestroy {
 
   private subscribeOnFormValuesChanges(): void {
     this.organisationsControl?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((value: number) => {
-      if (value) {
+      if (value || value === null) {
         const selectedOrganisation: Organisation = this.organisations.find(org => org.organizationId === value) as Organisation;
-        this.regions = [...selectedOrganisation.regions];
+        const regions: Region[] = [];
+
+        if (value === null || selectedOrganisation?.organizationId === this.allOrganisationId ) {
+          this.organisations.forEach(org => {
+            org.regions?.forEach(region => region.organisationName = org.name);
+            regions.push(...org.regions);
+          });
+        } else {
+          selectedOrganisation.regions?.forEach(region => region.organisationName = selectedOrganisation.name);
+          regions.push(...selectedOrganisation.regions);
+        }
+
+        this.regions = [...regions];
         this.setControlValue(this.regionsControl as FormControl, this.regions, this.editVisibility?.regionId);
       } else {
         this.regionsControl?.setValue([]);
