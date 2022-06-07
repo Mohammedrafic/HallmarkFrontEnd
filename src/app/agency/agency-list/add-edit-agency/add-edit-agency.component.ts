@@ -22,6 +22,7 @@ import {
   GetAgencyLogo,
   GetAgencyLogoSucceeded,
   GetBusinessUnitList,
+  RemoveAgencyLogo,
   SaveAgency,
   SaveAgencySucceeded,
   UploadAgencyLogo,
@@ -116,17 +117,17 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
     this.onBillingPopulatedChange();
     this.enableCreateUnderControl();
 
-    this.actions$.pipe(ofActionSuccessful(SaveAgencySucceeded)).subscribe((agency: { payload: Agency }) => {
+    this.actions$.pipe(takeWhile(() => this.isAlive), ofActionSuccessful(SaveAgencySucceeded)).subscribe((agency: { payload: Agency }) => {
       this.agencyId = agency.payload.agencyDetails.id as number;
       this.uploadImages(this.agencyId);
       this.agencyForm.markAsPristine();
     });
-    this.actions$.pipe(ofActionSuccessful(GetAgencyByIdSucceeded)).subscribe((agency: { payload: Agency }) => {
+    this.actions$.pipe(takeWhile(() => this.isAlive), ofActionSuccessful(GetAgencyByIdSucceeded)).subscribe((agency: { payload: Agency }) => {
       this.agencyId = agency.payload.agencyDetails.id as number;
       this.fetchedAgency = agency.payload;
       this.patchAgencyFormValue(this.fetchedAgency);
     });
-    this.actions$.pipe(ofActionSuccessful(GetAgencyLogoSucceeded)).subscribe((logo: { payload: Blob }) => {
+    this.actions$.pipe(takeWhile(() => this.isAlive), ofActionSuccessful(GetAgencyLogoSucceeded)).subscribe((logo: { payload: Blob }) => {
       this.logo = logo.payload;
     });
 
@@ -218,6 +219,8 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   private uploadImages(businessUnitId: number): void {
     if (this.filesDetails.length) {
       this.store.dispatch(new UploadAgencyLogo(this.filesDetails[0] as Blob, businessUnitId));
+    } else if (this.logo) {
+      this.store.dispatch(new RemoveAgencyLogo(businessUnitId));
     }
   }
 

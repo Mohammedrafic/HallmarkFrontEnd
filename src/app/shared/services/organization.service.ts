@@ -42,7 +42,7 @@ export class OrganizationService {
    * @return Created/Updated organization
    */
   public saveOrganization(organization: Organization): Observable<Organization> {
-    return organization.organizationId ? 
+    return organization.organizationId ?
       this.http.put<Organization>(`/api/Organizations`, organization) :
       this.http.post<Organization>(`/api/Organizations`, organization);
   }
@@ -67,6 +67,14 @@ export class OrganizationService {
 
   public getOrganizationLogo(businessUnitId: number): Observable<Blob> {
     return this.http.get(`/api/BusinessUnit/${businessUnitId}/logo`, { responseType: 'blob' });
+  }
+
+  /**
+   * Remove logo
+   * @param businessUnitId
+   */
+  public removeOrganizationLogo(businessUnitId: number): Observable<never> {
+    return this.http.delete<never>(`/api/BusinessUnit/${businessUnitId}/logo`);
   }
 
   /**

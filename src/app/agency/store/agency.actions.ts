@@ -75,6 +75,11 @@ export class GetAgencyLogo {
   constructor(public payload: number) { }
 }
 
+export class RemoveAgencyLogo  {
+  static readonly type = '[agency] Remove Agency Logo ';
+  constructor(public payload: number) { }
+}
+
 export class GetAgencyLogoSucceeded {
   static readonly type = '[agency] Get Agency Logo Succeeded';
   constructor(public payload: Blob) { }

@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -12,7 +12,20 @@ import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { ContactDetails, Organization } from 'src/app/shared/models/organization.model';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { SaveOrganization, GetBusinessUnitList, SetBillingStatesByCountry, SetDirtyState, SetGeneralStatesByCountry, UploadOrganizationLogo, SaveOrganizationSucceeded, GetOrganizationById, GetOrganizationByIdSucceeded, GetOrganizationLogo, GetOrganizationLogoSucceeded } from '../../store/admin.actions';
+import {
+  SaveOrganization,
+  GetBusinessUnitList,
+  SetBillingStatesByCountry,
+  SetDirtyState,
+  SetGeneralStatesByCountry,
+  UploadOrganizationLogo,
+  SaveOrganizationSucceeded,
+  GetOrganizationById,
+  GetOrganizationByIdSucceeded,
+  GetOrganizationLogo,
+  GetOrganizationLogoSucceeded,
+  RemoveOrganizationLogo
+} from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
 
 @Component({
@@ -321,6 +334,8 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   public uploadImages(businessUnitId: number): void {
     if (this.filesDetails.length) {
       this.store.dispatch(new UploadOrganizationLogo(this.filesDetails[0] as Blob, businessUnitId));
+    } else if (this.logo) {
+      this.store.dispatch(new RemoveOrganizationLogo(businessUnitId));
     }
   }
 

@@ -99,6 +99,11 @@ export class GetCandidatePhoto {
   constructor(public payload: number) { }
 }
 
+export class RemoveCandidatePhoto {
+  static readonly type = '[candidate] Remove Candidate Photo';
+  constructor(public payload: number) { }
+}
+
 export class GetCandidatePhotoSucceeded {
   static readonly type = '[candidate] Get Candidate Photo Succeeded';
   constructor(public payload: Blob) { }
