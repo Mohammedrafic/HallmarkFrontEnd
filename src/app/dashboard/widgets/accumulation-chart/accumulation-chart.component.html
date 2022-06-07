@@ -27,8 +27,8 @@
       <div *ngFor="let legend of chart.chartData; let idx = index" class="legend">
         <div class="legend-point">
           <input type="checkbox" checked (change)="onCheckboxChange(idx)" />
-          <div [ngClass]="['point', toggleLegend.includes(idx) ? 'toggle-legend' : 'point-' + idx]"></div>
-          <div [ngClass]="['legend-text', toggleLegend.includes(idx) ? 'toggle-text-style' : '']">{{ legend.x }}</div>
+          <div [ngClass]="['point', 'point-' + idx]"></div>
+          <div [ngClass]="['legend-text']">{{ legend.x }}</div>
         </div>
         <div class="legend-score">{{ legend.y }}</div>
       </div>

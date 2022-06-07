@@ -14,7 +14,7 @@ export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy 
   @Input('chartData') chart: ChartAccumulation;
   @ViewChild('pie') pie: Pie;
   public toggleLegend: number[] = [];
-  public palette: string[];
+  public palette: string[] = ['#ECF2FF', '#C5D9FF', '#9EBFFF', '#6499FF'];
   public height = '35%';
   public tooltip = { enable: true };
   public datalabel = { visible: false };
@@ -24,7 +24,6 @@ export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy 
   };
 
   private unsubscribe$ = new Subject();
-  private chartColors = ['#ECF2FF', '#C5D9FF', '#9EBFFF', '#6499FF'];
 
   constructor(private actions$: Actions) {}
 
@@ -38,7 +37,6 @@ export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   ngOnInit(): void {
-    this.palette = this.chartColors;
     this.actions$.pipe(ofActionDispatched(ToggleSidebarState), takeUntil(this.unsubscribe$)).subscribe(() => {
       setTimeout(() => {
         this.pie.refreshChart();
@@ -52,7 +50,6 @@ export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy 
     } else {
       this.toggleLegend.push(index);
     }
-    this.palette = this.chartColors.filter((_, idx) => !this.toggleLegend.includes(idx));
     this.chartData = this.chart.chartData.filter((_, idx) => !this.toggleLegend.includes(idx));
   }
 
