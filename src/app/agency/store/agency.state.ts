@@ -2,7 +2,7 @@ import { FeeExceptionsService } from '@agency/services/fee-exceptions.service';
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { BusinessUnit } from '@shared/models/business-unit.model';
-import { Observable, of, tap } from 'rxjs';
+import { catchError, Observable, of, tap } from 'rxjs';
 import { RECORD_ADDED, RECORD_MODIFIED, RECORD_SAVED } from 'src/app/shared/constants/messages';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 
@@ -50,6 +50,7 @@ import {
   GetPartnershipSettings,
   SavePartnershipSettings,
   GetBusinessUnitList,
+  RemoveAgencyLogo,
 } from './agency.actions';
 
 export interface AgencyStateModel {
@@ -90,7 +91,7 @@ export class AgencyState {
   static isAgencyCreated(state: AgencyStateModel): boolean {
     return !!state.agency?.agencyDetails.id;
   }
-  
+
   @Selector()
   static agencyName(state: AgencyStateModel): string | undefined {
     return state.agency?.agencyDetails.name;
@@ -280,6 +281,15 @@ export class AgencyState {
       })
     );
   }
+
+  @Action(RemoveAgencyLogo)
+  RemoveAgencyLogo({ dispatch }: StateContext<AgencyStateModel>, { payload }: RemoveAgencyLogo): Observable<any> {
+    return this.agencyService.removeAgencyLogo(payload).pipe(
+      tap((payload) => payload),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Logo cannot be deleted'))))
+    );
+  }
+
 
   @Action(ClearAgencyEditStore)
   ClearAgencyEditStore({ patchState }: StateContext<AgencyStateModel>): void {

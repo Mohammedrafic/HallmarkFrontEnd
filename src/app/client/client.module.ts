@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { FeatherModule } from 'angular-feather';
 import {
@@ -31,8 +32,8 @@ import {
 } from '@syncfusion/ej2-angular-grids';
 import { ButtonModule, ChipListModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
-import { NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
-import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
+import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
+import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 
@@ -53,6 +54,8 @@ import { BillRatesModule } from '@bill-rates/bill-rates.module';
 import { OrderCredentialsModule } from '@order-credentials/order-credentials.module';
 import { NgxsModule } from '@ngxs/store';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { WorkflowState } from '@organization-management/store/workflow.state';
 
 const gridIcons = {
   MessageSquare,
@@ -85,6 +88,7 @@ const gridIcons = {
   ],
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     SharedModule,
     FeatherModule.pick(gridIcons),
     ClientRoutingModule,
@@ -94,7 +98,9 @@ const gridIcons = {
     CheckBoxModule,
     TextBoxModule,
     DropDownListModule,
+    MultiSelectAllModule,
     PagerModule,
+    MaskedTextBoxModule,
     NumericTextBoxModule,
     MenuModule,
     TabAllModule,
@@ -106,8 +112,10 @@ const gridIcons = {
 
     //STORE
     NgxsModule.forFeature([
-      OrderManagementContentState
-    ]),
+      OrderManagementContentState,
+      OrganizationManagementState,
+      WorkflowState
+    ])
   ],
   providers: [
     ResizeService,

@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Organization, OrganizationPage, OrganizationStructure } from 'src/app/shared/models/organization.model';
+import { Observable, of } from 'rxjs';
+import { Order, Organization, OrganizationPage, OrganizationStructure } from 'src/app/shared/models/organization.model';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
+import { AssociateAgency } from '@shared/models/associate-agency.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrganizationService {
@@ -41,7 +42,7 @@ export class OrganizationService {
    * @return Created/Updated organization
    */
   public saveOrganization(organization: Organization): Observable<Organization> {
-    return organization.organizationId ? 
+    return organization.organizationId ?
       this.http.put<Organization>(`/api/Organizations`, organization) :
       this.http.post<Organization>(`/api/Organizations`, organization);
   }
@@ -66,5 +67,30 @@ export class OrganizationService {
 
   public getOrganizationLogo(businessUnitId: number): Observable<Blob> {
     return this.http.get(`/api/BusinessUnit/${businessUnitId}/logo`, { responseType: 'blob' });
+  }
+
+  /**
+   * Remove logo
+   * @param businessUnitId
+   */
+  public removeOrganizationLogo(businessUnitId: number): Observable<never> {
+    return this.http.delete<never>(`/api/BusinessUnit/${businessUnitId}/logo`);
+  }
+
+  /**
+   * Get the list of agencies for organization
+   * @return Array of associate agencies
+   */
+  public getAssociateAgencies(): Observable<AssociateAgency[]> {
+    return this.http.get<AssociateAgency[]>('/api/AssociateAgencies');
+  }
+
+  /**
+   * Create order
+   * @param order object to save
+   * @return saved order
+   */
+  public saveOrder(order: Order): Observable<Order> {
+    return this.http.post<Order>('/api/Orders', order);
   }
 }

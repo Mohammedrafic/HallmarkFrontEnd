@@ -32,6 +32,7 @@ import {
   GetGroupedCredentialsFiles,
   GetMasterCredentials,
   RemoveCandidateFromStore,
+  RemoveCandidatePhoto,
   RemoveCandidatesCredential,
   RemoveCandidatesCredentialSucceeded,
   RemoveEducation,
@@ -202,6 +203,14 @@ export class CandidateState {
       dispatch(new GetCandidatePhotoSucceeded(payload));
       return payload;
     }));
+  }
+
+  @Action(RemoveCandidatePhoto)
+  RemoveCandidatePhoto({ dispatch }: StateContext<CandidateStateModel>, { payload }: RemoveCandidatePhoto): Observable<any> {
+    return this.candidateService.removeCandidatePhoto(payload).pipe(
+      tap((payload) => payload),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Photo cannot be deleted'))))
+    );
   }
 
   @Action(GetExperienceByCandidateId)

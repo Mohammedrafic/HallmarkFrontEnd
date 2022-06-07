@@ -1,0 +1,41 @@
+<ejs-dialog
+  id="dialog"
+  #sideDialog
+  cssClass="dialog e-dialogleft e-dialogleftborder"
+  width="50%"
+  [target]="targetElement"
+  [visible]="false"
+  [animationSettings]="{ effect: 'SlideLeft' }"
+>
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">Sanders, Paul</h3>
+          </div>
+          <div class="e-card-content">
+            <button ejs-button cssClass="e-outline button-cancel edit-btn" (click)="onEdit()"><i-feather name="edit" class="icon"></i-feather></button>
+            <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
+              <i-feather name="x" class="icon"></i-feather>
+            </button>
+          </div>
+        </div>
+      </section>
+      <section class="candidat-tabs" [ngClass]="{ 'first-active': firstActive }">
+        <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
+          <e-tabitems>
+            <e-tabitem>
+              <ng-template #headerText>Candidat Details</ng-template>
+              <ng-template #content> </ng-template>
+            </e-tabitem>
+            <e-tabitem>
+              <ng-template #headerText>Assigments</ng-template>
+              <ng-template #content> </ng-template>
+            </e-tabitem>
+          </e-tabitems>
+        </ejs-tab>
+      </section>
+    </section>
+  </ng-template>
+</ejs-dialog>

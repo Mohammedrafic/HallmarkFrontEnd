@@ -1,4 +1,4 @@
-import { Component, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 
 import { CheckBoxChangeEventArgs, GridComponent, PagerComponent, SelectionSettingsModel, SortDirection, TextWrapSettingsModel } from '@syncfusion/ej2-angular-grids';
 
@@ -6,7 +6,7 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { GRID_CONFIG } from '@shared/constants';
 import { ROW_HEIGHT } from './order-management-grid.constants';
-import { filter, of, Subject } from 'rxjs';
+import { filter, of, Subject, takeWhile } from 'rxjs';
 import { data } from './datasource';
 import { CheckBoxComponent } from '@syncfusion/ej2-angular-buttons';
 import { Store } from '@ngxs/store';
@@ -22,7 +22,7 @@ enum AllCheckedStatus {
   templateUrl: './order-management-grid.component.html',
   styleUrls: ['./order-management-grid.component.scss']
 })
-export class OrderManagementGridComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class OrderManagementGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
 
@@ -35,7 +35,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public allCheckedStatus = AllCheckedStatus;
   public previewData: unknown;
   public openPreview = new Subject<boolean>();
-  private statusSortDerection: SortDirection = "Ascending";
+  public openCandidat = new Subject<boolean>();
 
   get checkedStatus(): AllCheckedStatus {
     const itemsLength = this.rowCheckboxes.length;
@@ -46,14 +46,19 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     return AllCheckedStatus.None;
   }
 
+  private statusSortDerection: SortDirection = "Ascending";
+  private isAlive = true;
+
   constructor(private store: Store) {
     super();
    }
 
    ngOnInit(): void {
-     this.openPreview.pipe(filter((open) => !open)).subscribe(() => {
-       this.grid.clearRowSelection();
-     })
+    this.onOrderPreviewChange();
+   }
+
+   ngOnDestroy(): void {
+     this.isAlive = false;
    }
 
   public onGoToClick(event: any): void {
@@ -63,6 +68,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       //   this.currentPagerPage = event.currentPage || event.value;
       // });
     }
+  }
+
+  public onCompare(): void {
+    this.openCandidat.next(true);
   }
 
   public onSortStatus(): void {
@@ -107,5 +116,15 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   private getActiveRowsPerPage(): number {
     return parseInt(this.activeRowsPerPageDropDown);
+  }
+
+  private onOrderPreviewChange(): void {
+    this.openPreview.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
+      if (isOpen) {
+        this.grid.clearRowSelection();
+      } else {
+        this.openCandidat.next(false);
+      }
+    })
   }
 }

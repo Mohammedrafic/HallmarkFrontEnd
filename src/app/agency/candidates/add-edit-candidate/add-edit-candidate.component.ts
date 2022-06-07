@@ -20,6 +20,7 @@ import {
   GetCandidatePhoto,
   GetCandidatePhotoSucceeded,
   RemoveCandidateFromStore,
+  RemoveCandidatePhoto,
   SaveCandidate,
   SaveCandidateSucceeded,
   UploadCandidatePhoto
@@ -60,16 +61,16 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.generateCandidateForm();
 
-    this.actions$.pipe(ofActionSuccessful(SaveCandidateSucceeded)).subscribe((candidate: { payload: Candidate }) => {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveCandidateSucceeded)).subscribe((candidate: { payload: Candidate }) => {
       this.fetchedCandidate = candidate.payload;
       this.uploadImages(this.fetchedCandidate.id as number);
       this.candidateForm.markAsPristine();
     });
-    this.actions$.pipe(ofActionSuccessful(GetCandidateByIdSucceeded)).subscribe((candidate: { payload: Candidate }) => {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetCandidateByIdSucceeded)).subscribe((candidate: { payload: Candidate }) => {
       this.fetchedCandidate = candidate.payload;
       this.patchAgencyFormValue(this.fetchedCandidate);
     })
-    this.actions$.pipe(ofActionSuccessful(GetCandidatePhotoSucceeded)).subscribe((photo: { payload: Blob }) => {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetCandidatePhotoSucceeded)).subscribe((photo: { payload: Blob }) => {
       this.photo = photo.payload;
     });
 
@@ -115,7 +116,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
         ...candidate,
         ssn: candidate.ssn ? +candidate.ssn : null
       };
-      
+
       if (!candidate.id) {
         candidate.candidateAgencyStatus = CreatedCandidateStatus.Active;
         candidate.profileStatus = CreatedCandidateStatus.Active;
@@ -187,6 +188,8 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   private uploadImages(businessUnitId: number): void {
     if (this.filesDetails.length) {
       this.store.dispatch(new UploadCandidatePhoto(this.filesDetails[0] as Blob, businessUnitId));
+    } else if (this.photo) {
+      this.store.dispatch(new RemoveCandidatePhoto(businessUnitId));
     }
   }
 

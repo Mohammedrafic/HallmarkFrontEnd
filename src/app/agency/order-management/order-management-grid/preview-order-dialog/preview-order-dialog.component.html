@@ -5,7 +5,6 @@
   width="50%"
   [target]="targetElement"
   [visible]="false"
-  [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
   <ng-template #content>
@@ -19,6 +18,7 @@
             <button
               ejs-button
               cssClass="e-outline button-cancel"
+              (click)="onCompare()"
               >Compare</button>
             <button
               ejs-button

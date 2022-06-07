@@ -52,11 +52,13 @@ export class FileViewerComponent implements OnInit, OnDestroy {
   }
   public selectionSettings: SelectionSettingsModel = { mode: 'Single' };
   public previewFile: ListBoxItem | null;
+  public imageSrs = '';
+  public imageMode = false;
 
   public service = 'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
 
   private unsubscribe$: Subject<void> = new Subject();
-  private file: Blob;
+  private isDownloading = false;
 
   @Select(CandidateState.groupedCandidateCredentialsFiles)
   public groupedCandidateCredentialsFiles$: Observable<CredentialGroupedFiles[]>;
@@ -78,7 +80,7 @@ export class FileViewerComponent implements OnInit, OnDestroy {
   public onCancel(): void {
     this.sideDialog.hide();
     this.isFullScreen = false;
-    this.pdfViewerControl.unload();
+    this.pdfViewerControl?.unload();
     this.previewFile = null;
     this.data = [];
   }
@@ -90,11 +92,17 @@ export class FileViewerComponent implements OnInit, OnDestroy {
 
   public selectFile(event: any): void {
     this.previewFile = event.items[0];
-    this.pdfViewerControl.unload();
-    this.getPdfFileById((this.previewFile as ListBoxItem).id);
+    this.setMode();
+    this.pdfViewerControl?.unload();
+    if (this.imageMode) {
+      this.getOriginalFileById((this.previewFile as ListBoxItem).id);
+    } else {
+      this.getPdfFileById((this.previewFile as ListBoxItem).id);
+    }
   }
 
-  downloadFile(): void {
+  public downloadFile(): void {
+    this.isDownloading = true;
     this.getOriginalFileById((this.previewFile as ListBoxItem).id);
   }
 
@@ -102,7 +110,11 @@ export class FileViewerComponent implements OnInit, OnDestroy {
     let listBoxObj: ListBox = getInstance(document.getElementById("listBox") as HTMLElement, ListBox) as ListBox;
 
     listBoxObj.selectItems([(this.previewFile as ListBoxItem).name]);
-    this.getPdfFileById((this.previewFile as ListBoxItem).id);
+    if (this.imageMode) {
+      this.getOriginalFileById((this.previewFile as ListBoxItem).id);
+    } else {
+      this.getPdfFileById((this.previewFile as ListBoxItem).id);
+    }
   }
 
   private getPdfFileById(id: number): void {
@@ -116,6 +128,7 @@ export class FileViewerComponent implements OnInit, OnDestroy {
   private subscribeOnOpenEvent(): void {
     this.openEvent.pipe(takeUntil(this.unsubscribe$)).subscribe((fileId: number) => {
       this.previewFile = this.data.find(item => item.id === fileId) as ListBoxItem;
+      this.setMode();
       this.sideDialog.show(this.isFullScreen);
     });
   }
@@ -129,14 +142,21 @@ export class FileViewerComponent implements OnInit, OnDestroy {
 
       reader.readAsDataURL(file.payload);
       reader.onloadend = () => {
-        this.pdfViewerControl.load(reader.result as string, '');
+        this.pdfViewerControl?.load(reader.result as string, '');
       }
     });
   }
 
   private subscribeOnFileLoaded(): void {
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetCredentialFilesSucceeded))
-      .subscribe((file: { payload: Blob }) => downloadBlobFile(file.payload, (this.previewFile as ListBoxItem).name));
+      .subscribe((file: { payload: Blob }) => {
+        if (this.isDownloading) {
+          this.isDownloading = false;
+          downloadBlobFile(file.payload, (this.previewFile as ListBoxItem).name);
+        } else {
+          this.setImage(file.payload);
+        }
+      });
   }
 
   private subscribeOnGroupedCandidateCredentialsFiles(): void {
@@ -151,5 +171,23 @@ export class FileViewerComponent implements OnInit, OnDestroy {
           this.data = this.data.concat(dataItems as unknown  as ListBoxItem);
         })
       });
+  }
+
+  private setMode(): void {
+    const imageExtensions = ['jpg', 'jpeg', 'png'];
+    const extension = this.getExtension(this.previewFile?.name as string);
+    this.imageMode = imageExtensions.includes(extension);
+  }
+
+  private getExtension(fileName: string): string {
+    return fileName.split('.').pop() || '';
+  }
+
+  private setImage(file: Blob): void {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      this.imageSrs = reader.result as string;
+    }
   }
 }
