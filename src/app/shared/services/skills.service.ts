@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
-import { Skill, SkillsPage } from 'src/app/shared/models/skill.model';
+import { MasterSkillByOrganization, Skill, SkillsPage } from '@shared/models/skill.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
@@ -26,6 +26,14 @@ export class SkillsService {
    */
   public getMasterSkills(pageNumber: number, pageSize: number): Observable<SkillsPage> {
     return this.http.get<any>(`/api/masterSkills`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+  }
+
+  /**
+   * Get all master skills by organization
+   * @return list of master skills by organization
+   */
+  public getMasterSkillsByOrganization(): Observable<MasterSkillByOrganization[]> {
+    return this.http.get<MasterSkillByOrganization[]>(`/api/masterSkills/listByOrganization`);
   }
 
   /**

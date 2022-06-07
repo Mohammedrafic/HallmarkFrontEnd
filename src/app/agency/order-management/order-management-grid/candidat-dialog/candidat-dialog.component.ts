@@ -1,27 +1,24 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Subject, takeWhile } from 'rxjs';
 
-import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 
-import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
+import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 
 @Component({
-  selector: 'app-preview-order-dialog',
-  templateUrl: './preview-order-dialog.component.html',
-  styleUrls: ['./preview-order-dialog.component.scss'],
+  selector: 'app-candidat-dialog',
+  templateUrl: './candidat-dialog.component.html',
+  styleUrls: ['./candidat-dialog.component.scss']
 })
-export class PreviewOrderDialogComponent implements OnInit, OnDestroy {
-  @Input() order: any;
+export class CandidatDialogComponent implements OnInit, OnDestroy {
   @Input() openEvent: Subject<boolean>;
-
-  @Output() compareEvent = new EventEmitter<never>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('tab') tab: TabComponent;
 
-  public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
+  public firstActive = true;
 
   private isAlive = true;
 
@@ -31,6 +28,15 @@ export class PreviewOrderDialogComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.isAlive = false;
+  }
+
+  public onEdit(): void {
+    //TBI
+  }
+
+  public onClose(): void {
+    this.sideDialog.hide();
+    this.openEvent.next(false);
   }
 
   public onTabSelecting(event: SelectEventArgs): void {
@@ -51,25 +57,13 @@ export class PreviewOrderDialogComponent implements OnInit, OnDestroy {
     });
   }
 
-  public onClose(): void {
-    this.sideDialog.hide();
-    this.openEvent.next(false);
-  }
-
-  public onCompare(): void {
-    disabledBodyOverflow(false);
-    this.compareEvent.emit();
-  }
-
   private onOpenEvent(): void {
     this.openEvent.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (isOpen) {
-        windowScrollTop();
         this.sideDialog.show();
         disabledBodyOverflow(true);
       } else {
         this.sideDialog.hide();
-        disabledBodyOverflow(false);
       }
     });
   }

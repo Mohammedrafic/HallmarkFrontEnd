@@ -1,1 +1,168 @@
-<p>bill-rate-setup works!</p>
+<section class="container">
+  <ejs-grid
+    class="grid grid-component"
+    #grid
+    [dataSource]="(billRates$ | async)?.items"
+    [allowPaging]="allowPaging"
+    [pageSettings]="pageSettings"
+    [height]="gridHeight"
+    [rowHeight]="rowHeight"
+    [resizeSettings]="resizeSettings"
+    [allowSorting]="allowSorting"
+    [allowResizing]="allowResizing"
+  >
+    <e-columns>
+      <e-column field="regionName" headerText="REGION" width=150>
+        <ng-template #template let-data>
+          <span *ngIf="data.regionId">{{ data.regionName }}</span>
+          <span *ngIf="!data.regionId">All</span>
+        </ng-template>
+      </e-column>
+      <e-column field="locationName" headerText="LOCATION" width=180>
+        <ng-template #template let-data>
+          <span *ngIf="data.locationId">{{ data.locationName }}</span>
+          <span *ngIf="!data.locationId">All</span>
+        </ng-template>
+      </e-column>
+      <e-column field="departmentName" headerText="DEPARTMENT" width=180>
+        <ng-template #template let-data>
+          <span *ngIf="data.departmentId">{{ data.departmentName }}</span>
+          <span *ngIf="!data.departmentId">All</span>
+        </ng-template>
+      </e-column>
+      <e-column field="skills" headerText="SKILL" width=170>
+        <ng-template #template let-data>
+          <span *ngFor="let skill of data.skills; let i = index">{{ skill.skillDescription }}
+            <span *ngIf="i !== data.skills.length - 1">, </span>
+          </span>
+          <span *ngIf="data.skills.length === 0">All</span>
+        </ng-template>
+      </e-column>
+      <e-column field="orderType" headerText="ORDER TYPE" width=180>
+        <ng-template #template let-data>
+          <span *ngFor="let type of data.orderTypes; let i = index">{{ type.orderTypeName }}
+            <span *ngIf="i !== data.orderTypes.length - 1">, </span>
+          </span>
+          <span *ngIf="data.type.length === 0">All</span>
+        </ng-template>
+      </e-column>
+      <e-column field="billRateTitle" headerText="BILL RATE TITLE" width=180></e-column>
+      <e-column field="billRateCategory" headerText="BILL RATE CATEGORY" width=180></e-column>
+      <e-column field="billRateType" headerText="BILL RATE TYPE" width=180></e-column>
+      <e-column field="effectiveDate" headerText="EFFECTIVE DATE" width=180>
+        <ng-template #template let-data>
+          <span>{{ data.effectiveDate | date: 'MM/dd/yyyy' }}</span>
+        </ng-template>
+      </e-column>
+      <e-column field="billRateValue" headerText="BILL RATE VALUE (RATE/TIMES)" width=180></e-column>
+      <e-column field="intervalMin" headerText="INTERVAL MIN" width=180></e-column>
+      <e-column field="intervalMax" headerText="INTERVAL MAX" width=180></e-column>
+      <e-column field="considerForWeeklyOt" headerText="CONSIDER FOR WEEKLY OT" width=180>
+        <ng-template #template let-data>
+          <div class="bootstrap">
+            <ejs-checkbox [checked]="data.considerForWeeklyOt" (change)="considerForWeeklyOtChange(data, $event)"></ejs-checkbox>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column field="considerForDailyOt" headerText="CONSIDER FOR DAILY OT" width=180>
+        <ng-template #template let-data>
+          <div class="bootstrap">
+            <ejs-checkbox [checked]="data.considerForDailyOt" (change)="considerForDailyOtChange(data, $event)"></ejs-checkbox>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column field="considerFor7thDayOt" headerText="CONSIDER FOR 7th DAY OT" width=180>
+        <ng-template #template let-data>
+          <div class="bootstrap">
+            <ejs-checkbox [checked]="data.considerFor7thDayOt" (change)="considerFor7thDayOtChange(data, $event)"></ejs-checkbox>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column field="regularLocal" headerText="REGULAR LOCAL" width=180>
+        <ng-template #template let-data>
+          <div class="bootstrap">
+            <ejs-checkbox [checked]="data.regularLocal" (change)="regularLocalChange(data, $event)"></ejs-checkbox>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column field="displayInTimeSheet" headerText="DISPLAY IN TIMESHEET" width=180>
+        <ng-template #template let-data>
+          <div class="bootstrap">
+            <ejs-checkbox [checked]="data.displayInTimeSheet" (change)="displayInTimeSheetChange(data, $event)"></ejs-checkbox>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column field="displayInJob" headerText="DISPLAY IN JOB" width=180>
+        <ng-template #template let-data>
+          <div class="bootstrap">
+            <ejs-checkbox [checked]="data.displayInJob" (change)="displayInJobChange(data, $event)"></ejs-checkbox>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column textAlign="Right" width=100>
+        <ng-template #template let-data>
+          <div class="row-tool-buttons">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditRecordButtonClick(data, $event)">
+              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemoveRecordButtonClick(data, $event)">
+              <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
+    </e-columns>
+    <ng-template #pagerTemplate let-data>
+      <div class="e-pagertemplate">
+        <div class="control-section">
+          <div class="content-wrapper">
+            <section class="left-side-pager-controls">
+              <ejs-dropdownlist
+                id="rowsPerPage"
+                class="dropdown-no-border"
+                [dataSource]="rowsPerPageDropDown"
+                [(value)]="activeRowsPerPageDropDown"
+                (change)="onRowsDropDownChanged()"
+              >
+              </ejs-dropdownlist>
+              <ejs-numerictextbox
+                id="goToPage"
+                class="numeric-input-no-border"
+                format="#"
+                [validateDecimalOnType]="validateDecimalOnType"
+                [decimals]="decimals"
+                placeholder="Go to:"
+                min="1"
+                [max]="(billRates$ | async)?.totalPages"
+                [showSpinButton]="false"
+                (change)="onGoToClick($event)"
+              >
+              </ejs-numerictextbox>
+            </section>
+            <section class="right-side-pager-controls">
+              <ejs-pager
+                id="gridPager"
+                #gridPager
+                [pageSize]="pageSize"
+                [totalRecordsCount]="(billRates$ | async)?.totalCount"
+                [enablePagerMessage]="false"
+                [currentPage]="currentPage"
+                (click)="onGoToClick($event)"
+              >
+              </ejs-pager>
+            </section>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ejs-grid>
+
+  <app-side-dialog
+    (formCancelClicked)="onFormCancelClick()"
+    (formSaveClicked)="onFormSaveClick()"
+    [header]="dialogHeader + ' Record'"
+    [width]="'436px'"
+  >
+<!-- TODO: need implementation -->
+  </app-side-dialog>
+</section>

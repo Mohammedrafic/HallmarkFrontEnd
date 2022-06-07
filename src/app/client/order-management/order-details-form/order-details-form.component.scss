@@ -89,6 +89,10 @@ label {
   width: 40%;
 }
 
+.form-line-item-50 {
+  width: 50%;
+}
+
 .form-line-item-60 {
   width: 60%;
 }
@@ -136,7 +140,9 @@ ejs-textbox.e-control {
   }
 }
 
-.contact-details-title-container {
+.contact-details-title-container,
+.project-type-container,
+.project-name-container {
   display: flex;
   .input-container:first-child {
     width: 100%;
