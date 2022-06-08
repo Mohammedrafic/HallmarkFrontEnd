@@ -8,7 +8,7 @@ import { ChartAccumulation, DonutChartData } from '../../models/chart-accumulati
 @Component({
   selector: 'app-accumulation-chart',
   templateUrl: './accumulation-chart.component.html',
-  styleUrls: ['./accumulation-chart.component.scss'],
+  styleUrls: ['../widget-legend.component.scss', './accumulation-chart.component.scss'],
 })
 export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy {
   @Input('chartData') chart: ChartAccumulation;
@@ -33,7 +33,7 @@ export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   ngOnChanges(): void {
-    this.chartData = [...this.chart.chartData];
+    this.chartData = [...(this.chart?.chartData ?? [])];
   }
 
   ngOnInit(): void {

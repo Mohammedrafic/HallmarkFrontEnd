@@ -25,16 +25,16 @@
           <ng-template #content [ngSwitch]="panel.id">
             <!--          <app-line-chart [widget]="widgets['chart_line_'+ i]" *ngSwitchCase="'chart_line_'+ i"></app-line-chart>-->
             <app-accumulation-chart
-              [chartData]="widgetsData[widgetTypeEnum.CANDIDATES]"
+              [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
               *ngSwitchCase="widgetTypeEnum.CANDIDATES"
             ></app-accumulation-chart>
             <app-accumulation-chart
-              [chartData]="widgetsData[widgetTypeEnum.INVOICES]"
+              [chartData]="widgetsData?.[widgetTypeEnum.INVOICES]"
               *ngSwitchCase="widgetTypeEnum.INVOICES"
             ></app-accumulation-chart>
             <app-maps-chart
-              *ngSwitchCase="widgetTypeEnum.CANDIDATES_BY_REGION"
-              [chartData]="widgetsData[widgetTypeEnum.CANDIDATES_BY_REGION]"
+              *ngSwitchCase="widgetTypeEnum.CANDIDATES_BY_STATE"
+              [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES_BY_STATE]"
             ></app-maps-chart>
           </ng-template>
         </e-panel>

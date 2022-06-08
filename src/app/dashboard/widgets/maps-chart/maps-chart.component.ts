@@ -1,15 +1,17 @@
 import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
-import type { LegendSettingsModel, LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
-import { USAMapDataLegendSettings } from './USA-map-data-legend-settings';
+import { LegendDataModel } from './models/legend-data.model';
+import { CandidatesByStateWidgetAggregatedDataModel } from '../../models/candidates-by-state-widget-aggregated-data.model';
 
 @Component({
   selector: 'app-maps-chart',
   templateUrl: './maps-chart.component.html',
-  styleUrls: ['./maps-chart.component.scss'],
+  styleUrls: ['../widget-legend.component.scss', './maps-chart.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapsChartComponent {
-  @Input() public chartData: LayerSettingsModel[];
+  @Input() public chartData: CandidatesByStateWidgetAggregatedDataModel;
 
-  public readonly legendSettings: LegendSettingsModel = USAMapDataLegendSettings;
+  public trackByHandler(_: number, legendDataItem: LegendDataModel): string {
+    return legendDataItem.label;
+  }
 }

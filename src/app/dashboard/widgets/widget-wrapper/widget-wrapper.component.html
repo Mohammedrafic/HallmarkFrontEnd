@@ -1,4 +1,8 @@
 <div class="app-widget-wrapper">
-  <h3 *ngIf="title" class="app-widget-wrapper__title">{{ title }}</h3>
-  <ng-content></ng-content>
+  <div class="app-widget-wrapper__content">
+    <h3 *ngIf="title" class="app-widget-wrapper__title">{{ title }}</h3>
+    <div class="app-widget-wrapper__projection-wrapper">
+      <ng-content></ng-content>
+    </div>
+  </div>
 </div>
