@@ -21,6 +21,7 @@ export class OrderManagement {
   openPositions: number;
   candidates: number;
   startDate: string;
+  isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
 }
 
 export class OrderManagementFilter {

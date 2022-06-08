@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
-import { FreezeService, GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
-import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
+import { Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
@@ -11,11 +11,20 @@ import { OrderManagemetTabs } from '@client/order-management/order-management-co
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { GetIncompleteOrders, GetOrders } from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { OrderManagementPage } from '@shared/models/order-management.model';
+import { OrderManagement, OrderManagementPage } from '@shared/models/order-management.model';
+import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
+import { UserState } from '../../../store/user.state';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
   SCALE_DOWN_HEIGHT: 64
+}
+
+export enum MoreMenuType {
+  'Edit',
+  'Duplicate',
+  'Close',
+  'Delete'
 }
 
 @Component({
@@ -30,10 +39,28 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   @Select(OrderManagementContentState.ordersPage)
   ordersPage$: Observable<OrderManagementPage>;
 
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
+
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
-  public isAllRowButtonsShown = true;
+  public isLockMenuButtonsShown = true;
+  public moreMenuWithDeleteButton: ItemModel[] = [
+    { text: MoreMenuType[0], id: '0' },
+    { text: MoreMenuType[1], id: '1' },
+    { text: MoreMenuType[3], id: '3' }
+  ];
+  public moreMenuWithCloseButton: ItemModel[] = [
+    { text: MoreMenuType[0], id: '0' },
+    { text: MoreMenuType[1], id: '1' },
+    { text: MoreMenuType[2], id: '2' }
+  ];
 
+  private openInProgressFilledStatuses = [
+    'open',
+    'in progress',
+    'filled'
+  ];
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
 
@@ -43,11 +70,21 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
+    this.organizationId$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize })));
 
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
+    });
+
+    this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
+      if (data && data.items) {
+        data.items.forEach(item => {
+          item.isMoreMenuWithDeleteButton = !this.openInProgressFilledStatuses.includes(item.statusText.toLowerCase());
+        });
+      }
     });
   }
 
@@ -90,14 +127,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     switch (tabIndex) {
       case OrderManagemetTabs.AllOrders:
-        this.isAllRowButtonsShown = true;
+        this.isLockMenuButtonsShown = true;
         this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
         break;
       case OrderManagemetTabs.OrderTemplates:
         // TODO: pending implementation
         break;
       case OrderManagemetTabs.Incomplete:
-        this.isAllRowButtonsShown = false;
+        this.isLockMenuButtonsShown = false;
         this.store.dispatch(new GetIncompleteOrders({}));
         break;
       case OrderManagemetTabs.PendingApproval:
@@ -108,6 +145,23 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public getOrderTypeName(orderType: number): string {
     return OrderTypeName[OrderType[orderType] as OrderTypeName];
+  }
+
+  public menuOptionSelected(event: any, data: OrderManagement): void {
+    switch (event.item.properties.id) {
+      case MoreMenuType['Edit']:
+        // TODO: pending implementation
+        break;
+      case MoreMenuType['Duplicate']:
+        // TODO: pending implementation
+        break;
+      case MoreMenuType['Close']:
+        // TODO: pending implementation
+        break;
+      case MoreMenuType['Delete']:
+        // TODO: pending implementation
+        break;
+    }
   }
 }
 

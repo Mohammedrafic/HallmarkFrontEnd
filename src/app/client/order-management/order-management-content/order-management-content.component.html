@@ -88,23 +88,19 @@
           </div>
         </ng-template>
         <ng-template #template let-data>
-          <div class="row-tool-buttons" *ngIf="isAllRowButtonsShown">
+          <div class="row-tool-buttons" (click)="stopPropagation($event)">
             <button ejs-button cssClass="e-flat default-icon-button">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button">
+            <button ejs-button cssClass="e-flat secondary-icon-button" *ngIf="isLockMenuButtonsShown">
               <span><i-feather name="lock" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat primary-icon-button">
-              <span><i-feather name="more-vertical" class="icon"></i-feather></span>
-            </button>
-          </div>
-
-          <div class="row-tool-buttons" *ngIf="!isAllRowButtonsShown">
-            <button ejs-button cssClass="e-flat default-icon-button">
-              <span><i-feather name="message-square" class="icon"></i-feather></span>
-            </button>
-            <button ejs-button cssClass="e-flat primary-icon-button">
+            <button
+              ejs-dropdownbutton
+              [items]="data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : moreMenuWithCloseButton"
+              (select)="menuOptionSelected($event, data)"
+              cssClass="e-flat primary-icon-button"
+            >
               <span><i-feather name="more-vertical" class="icon"></i-feather></span>
             </button>
           </div>
