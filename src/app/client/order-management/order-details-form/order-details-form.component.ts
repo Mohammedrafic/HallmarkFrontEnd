@@ -76,6 +76,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public maxTime = this.defaultMaxTime;
   public minTime = this.defaultMinTime;
 
+  public documents: Blob[] = [];
+
   public orderTypes = [
     { id: OrderType.ContractToPerm, name: 'Contract To Perm' },
     { id: OrderType.OpenPerDiem, name: 'Open Per Diem' },
@@ -483,6 +485,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   public removeWorkLocation(index: number): void {
     this.workLocationsFormArray.removeAt(index);
+  }
+
+  public onDocumentsSelected(documents: Blob[]): void {
+    this.documents = documents;
   }
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {

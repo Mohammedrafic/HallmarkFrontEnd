@@ -3,6 +3,7 @@ import { JobClassification } from '@shared/enums/job-classification';
 import { OrderType } from '@shared/enums/order-type';
 import { ReasonForRequisition } from '@shared/enums/reason-for-requisition';
 import { SendDocumentAgency } from '../enums/send-document-agency';
+import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
 
 export class Organization {
@@ -153,6 +154,7 @@ export class OrderWorkLocation {
 }
 
 export class Order {
+  id: number;
   title: string;
   regionId: number;
   locationId: number;
@@ -182,11 +184,15 @@ export class Order {
   jobDescription: string;
   unitDescription: string;
   reasonForRequisition: ReasonForRequisition;
-  billRates: any[]; // ToDo: Add interface
+  billRates: BillRate[];
   jobDistributions: JobDistributionModel[];
   contactDetails: OrderContactDetails[];
   workLocations: OrderWorkLocation[];
   credentials: any[]; // ToDo: Add interface
   workflowId?: number;
   isSubmit: boolean;
+}
+
+export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates'> {
+  billRates: OrderBillRateDto[];
 }

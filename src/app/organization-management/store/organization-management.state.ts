@@ -857,8 +857,8 @@ export class OrganizationManagementState {
   }
 
   @Action(SaveOrder)
-  SaveOrder({ dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveOrder): Observable<Order | void> {
-    return this.organizationService.saveOrder(payload).pipe(
+  SaveOrder({ dispatch }: StateContext<OrganizationManagementStateModel>, { order, documents }: SaveOrder): Observable<Order | void> {
+    return this.organizationService.saveOrder(order, documents).pipe(
       tap(order => {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         return order;

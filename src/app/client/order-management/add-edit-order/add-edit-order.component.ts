@@ -13,7 +13,7 @@ import { SetImportFileDialogState } from '@admin/store/admin.actions';
 import { SaveOrder } from '@organization-management/store/organization-management.actions';
 
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
-import { Order } from '@shared/models/organization.model';
+import { CreateOrderDto } from '@shared/models/organization.model';
 import { BillRatesComponent } from '@bill-rates/bill-rates.component';
 import { BillRate, OrderBillRateDto } from '@shared/models/bill-rate.model';
 
@@ -96,8 +96,9 @@ export class AddEditOrderComponent implements OnDestroy {
       this.billRatesComponent.billRatesControl.valid
     ) {
       const order = this.collectOrderData(true);
+      const documents = this.orderDetailsFormComponent.documents;
 
-      this.store.dispatch(new SaveOrder(order));
+      this.store.dispatch(new SaveOrder(order, documents));
     } else {
       this.orderDetailsFormComponent.orderTypeStatusForm.markAllAsTouched();
       this.orderDetailsFormComponent.generalInformationForm.markAllAsTouched();
@@ -109,7 +110,7 @@ export class AddEditOrderComponent implements OnDestroy {
     }
   }
 
-  private collectOrderData(isSubmit: boolean): Order {
+  private collectOrderData(isSubmit: boolean): CreateOrderDto {
     const allValues = {
       ...this.orderDetailsFormComponent.orderTypeStatusForm.value,
       ...this.orderDetailsFormComponent.generalInformationForm.value,
@@ -164,7 +165,7 @@ export class AddEditOrderComponent implements OnDestroy {
       return { id: 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate };
     });
 
-    const order: Order = {
+    const order: CreateOrderDto = {
       title,
       regionId,
       locationId,
@@ -224,6 +225,7 @@ export class AddEditOrderComponent implements OnDestroy {
     }
 
     const order = this.collectOrderData(false);
+    const documents = this.orderDetailsFormComponent.documents;
 
     if (contactDetailsForm.invalid) {
       order.contactDetails = [];
@@ -233,7 +235,7 @@ export class AddEditOrderComponent implements OnDestroy {
       order.workLocations = [];
     }
 
-    this.store.dispatch(new SaveOrder(order));
+    this.store.dispatch(new SaveOrder(order, documents));
   }
 
   private saveAsTemplate(): void {

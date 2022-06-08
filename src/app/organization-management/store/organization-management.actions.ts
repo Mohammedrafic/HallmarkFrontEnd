@@ -1,5 +1,5 @@
 import { Country } from "src/app/shared/enums/states";
-import { Order, Organization } from "src/app/shared/models/organization.model";
+import { CreateOrderDto, Organization } from "src/app/shared/models/organization.model";
 import { SkillCategory } from "src/app/shared/models/skill-category.model";
 import { Skill, SkillFilters } from "src/app/shared/models/skill.model";
 import { Department } from '@shared/models/department.model';
@@ -379,5 +379,5 @@ export class GetAssociateAgencies {
 
 export class SaveOrder {
   static readonly type = '[organizationManagement] Save Order';
-  constructor(public payload: Order) { }
+  constructor(public order: CreateOrderDto, public documents: Blob[]) { }
 }

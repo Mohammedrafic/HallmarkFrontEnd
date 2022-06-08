@@ -702,6 +702,9 @@
   </div>
 
   <div class="right-section">
-    <app-document-uploader uploaderTitle="Documents"></app-document-uploader>
+    <app-document-uploader
+      uploaderTitle="Documents"
+      (selectDocuments)="onDocumentsSelected($event)">
+    </app-document-uploader>
   </div>
 </section>

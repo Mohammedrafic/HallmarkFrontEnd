@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { Order, Organization, OrganizationPage, OrganizationStructure } from 'src/app/shared/models/organization.model';
+import { map, Observable, switchMap } from 'rxjs';
+import { CreateOrderDto, Order, Organization, OrganizationPage, OrganizationStructure } from 'src/app/shared/models/organization.model';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 
@@ -90,7 +90,11 @@ export class OrganizationService {
    * @param order object to save
    * @return saved order
    */
-  public saveOrder(order: Order): Observable<Order> {
-    return this.http.post<Order>('/api/Orders', order);
+  public saveOrder(order: CreateOrderDto, documents: Blob[]): Observable<Order> {
+    return this.http.post<Order>('/api/Orders', order).pipe(switchMap(order => {
+      const formData = new FormData();
+      documents.forEach(document => formData.append('documents', document));
+      return this.http.post(`/api/Orders/${order.id}/documents`, formData).pipe(map(() => order));
+    }));
   }
 }
