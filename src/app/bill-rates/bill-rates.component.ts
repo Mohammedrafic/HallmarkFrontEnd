@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormGroup } from '@angular/forms';
+import { FormArray, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { filter, take } from 'rxjs';
 
@@ -18,19 +18,16 @@ import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid
 })
 export class BillRatesComponent implements OnInit {
   public billRateFormHeader: string;
-  public orederForm: FormGroup;
+  public billRatesControl: FormArray;
   public billRateForm: FormGroup;
-
-  get billRatesControl(): FormArray {
-    return this.orederForm.get('billRates') as FormArray;
-  }
 
   private editBillRateIndex: string | null;
 
-  constructor(private confirmService: ConfirmService, private store: Store) {}
+  constructor(private confirmService: ConfirmService, private store: Store) {
+    this.billRatesControl = new FormArray([]);
+  }
 
   ngOnInit(): void {
-    this.orederForm = this.generateForm();
     this.billRateForm = BillRateFormComponent.createForm();
   }
 
@@ -45,6 +42,19 @@ export class BillRatesComponent implements OnInit {
     this.billRateFormHeader = 'Edit Bill Rate';
     this.editBillRateIndex = index;
     this.billRateForm.patchValue({ ...value }, { emitEvent: false });
+
+    if (!value.billRateConfig.intervalMin) {
+      this.billRateForm.controls['intervalMin'].removeValidators(Validators.required);
+      this.billRateForm.controls['intervalMin'].disable();
+      this.billRateForm.controls['intervalMin'].updateValueAndValidity();
+    }
+
+    if (!value.billRateConfig.intervalMax) {
+      this.billRateForm.controls['intervalMax'].removeValidators(Validators.required);
+      this.billRateForm.controls['intervalMax'].disable();
+      this.billRateForm.controls['intervalMax'].updateValueAndValidity();
+    }
+
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -120,11 +130,5 @@ export class BillRatesComponent implements OnInit {
     billRateConfig?.patchValue({ ...value.billRateConfig });
     billRateControl.patchValue({ ...value, billRateConfig });
     return billRateControl;
-  }
-
-  private generateForm(): FormGroup {
-    return new FormGroup({
-      billRates: new FormArray([]),
-    });
   }
 }

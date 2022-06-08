@@ -39,6 +39,9 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
   };
   public rateHourMack = false;
 
+  public isIntervalMinControlRequired = true;
+  public isIntervalMaxControlRequired = true;
+
   @Select(BillRateState.billRateOptions)
   public billRateOptions$: Observable<BillRateOption[]>;
 
@@ -60,6 +63,17 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.store.dispatch(new GetBillRateOptions());
+
+    const intervalMinControl = this.billRateForm.controls['intervalMin'];
+    const intervalMaxControl = this.billRateForm.controls['intervalMax'];
+
+    intervalMinControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
+      this.isIntervalMinControlRequired = intervalMinControl.hasValidator(Validators.required);
+    });
+
+    intervalMaxControl.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
+      this.isIntervalMaxControlRequired = intervalMaxControl.hasValidator(Validators.required);
+    });
   }
 
   ngAfterViewInit(): void {
@@ -84,18 +98,28 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
         const intervalMaxControl = this.billRateForm.get('intervalMax');
         intervalMaxControl?.enable();
         intervalMinControl?.enable();
+        intervalMaxControl?.addValidators(Validators.required);
+        intervalMinControl?.addValidators(Validators.required);
+        this.isIntervalMinControlRequired = true;
+        this.isIntervalMaxControlRequired = true;
         if (billRateConfig) {
           this.rateHoursInput.mask = billRateConfig.unit === BillRateUnit.Hours ? RateHourMask.hours : RateHourMask.desimal;
           this.rateHoursInput.refresh();
           if (!billRateConfig.intervalMin) {
             intervalMinControl?.reset();
             intervalMinControl?.disable();
+            intervalMinControl?.removeValidators(Validators.required);
+            this.isIntervalMinControlRequired = false;
           }
           if (!billRateConfig.intervalMax) {
             intervalMaxControl?.reset();
             intervalMaxControl?.disable();
+            intervalMaxControl?.removeValidators(Validators.required);
+            this.isIntervalMaxControlRequired = false;
           }
         }
+        intervalMaxControl?.updateValueAndValidity();
+        intervalMinControl?.updateValueAndValidity();
       });
   }
 
@@ -126,8 +150,8 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
       id: new FormControl(),
       billRateConfigId: new FormControl(null, [Validators.required]),
       rateHour: new FormControl(null, [Validators.required]),
-      intervalMin: new FormControl(null, [Validators.required]),
-      intervalMax: new FormControl(null, [Validators.required]),
+      intervalMin: new FormControl(null),
+      intervalMax: new FormControl(null),
       effectiveDate: new FormControl('', [Validators.required]),
       billRateConfig: new FormGroup({
         id: new FormControl(),

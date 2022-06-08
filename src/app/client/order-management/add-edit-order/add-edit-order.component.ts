@@ -14,6 +14,8 @@ import { SaveOrder } from '@organization-management/store/organization-managemen
 
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
 import { Order } from '@shared/models/organization.model';
+import { BillRatesComponent } from '@bill-rates/bill-rates.component';
+import { BillRate, OrderBillRateDto } from '@shared/models/bill-rate.model';
 
 enum SelectedTab {
   OrderDetails,
@@ -33,6 +35,7 @@ enum SubmitButtonItem {
 export class AddEditOrderComponent implements OnDestroy {
   @ViewChild('stepper') tab: TabComponent;
   @ViewChild('orderDetailsForm') orderDetailsFormComponent: OrderDetailsFormComponent;
+  @ViewChild('billRates') billRatesComponent: BillRatesComponent;
 
   public SelectedTab = SelectedTab;
 
@@ -89,7 +92,8 @@ export class AddEditOrderComponent implements OnDestroy {
       this.orderDetailsFormComponent.jobDescriptionForm.valid &&
       this.orderDetailsFormComponent.contactDetailsForm.valid &&
       this.orderDetailsFormComponent.workLocationForm.valid &&
-      this.orderDetailsFormComponent.workflowForm.valid
+      this.orderDetailsFormComponent.workflowForm.valid &&
+      this.billRatesComponent.billRatesControl.valid
     ) {
       const order = this.collectOrderData(true);
 
@@ -115,7 +119,7 @@ export class AddEditOrderComponent implements OnDestroy {
       ...this.orderDetailsFormComponent.workLocationForm.value,
       ...this.orderDetailsFormComponent.workflowForm.value,
       ...{ credentials: [] }, // Will be added soon
-      ...{ billRates: [] } // Will be added soon
+      ...{ billRates: this.billRatesComponent.billRatesControl.value }
     };
 
     const {
@@ -152,9 +156,13 @@ export class AddEditOrderComponent implements OnDestroy {
       contactDetails,
       workLocations,
       workflowId,
-      billRates,
       credentials
     } = allValues;
+
+    const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[]).map((billRate: BillRate) => {
+      const { billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate } = billRate;
+      return { id: 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate };
+    });
 
     const order: Order = {
       title,
