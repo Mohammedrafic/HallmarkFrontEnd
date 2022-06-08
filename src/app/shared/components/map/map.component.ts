@@ -11,7 +11,7 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapComponent extends DestroyableDirective implements AfterViewInit, OnDestroy {
-  @Input() public layers: LayerSettingsModel[];
+  @Input() public layers: LayerSettingsModel[] | undefined;
   @Input() public legendSettings: LegendSettingsModel;
 
   @ViewChild('maps', { static: true }) public maps: MapsComponent;

@@ -1,0 +1,38 @@
+@import 'colors';
+
+.widget-legend {
+  &__container {
+    border-top: 1px solid rgba($secondary-dark-blue-40, 0.32);
+    padding: 3% 0;
+  }
+
+  &__item,
+  &__item-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__point {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin: 0 10px;
+
+    &.point-0 {
+      background-color: $primary-active-blue-90;
+    }
+
+    &.point-1 {
+      background-color: $primary-active-blue-70;
+    }
+
+    &.point-2 {
+      background-color: $primary-active-blue-50;
+    }
+
+    &.point-3 {
+      background-color: $primary-active-blue-20;
+    }
+  }
+}

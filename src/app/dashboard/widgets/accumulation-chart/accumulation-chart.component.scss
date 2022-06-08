@@ -1,4 +1,4 @@
-@import "colors";
+@import 'colors';
 
 .chart-wrapper {
   display: flex;
@@ -11,59 +11,27 @@
     padding: 0;
   }
 
+  .legend-text {
+    font-size: 14px;
+    line-height: 17px;
+    color: $secondary-dark-blue-15;
+  }
+
+  .legend-score {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 28px;
+  }
+
+  .toggle-text-style {
+    color: $secondary-dark-blue-40;
+  }
+
   .legend-container {
-    border-top: 1px solid rgba($secondary-dark-blue-40, 0.32);
-    padding: 3% 0;
-
     .legend {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      .legend-point {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-
-        .point {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          margin: 0 10px;
-
-          &.point-0 {
-            background-color: $primary-active-blue-90;
-          }
-          &.point-1 {
-            background-color: $primary-active-blue-70;
-          }
-          &.point-2 {
-            background-color: $primary-active-blue-50;
-          }
-          &.point-3 {
-            background-color: $primary-active-blue-20;
-          }
-          &.toggle-legend {
-            color: $secondary-dark-blue-40;
-            background-color: $secondary-dark-blue-40;
-          }
-        }
-
-        .legend-text {
-          font-size: 14px;
-          line-height: 17px;
-          color: $secondary-dark-blue-15;
-        }
-
-        .toggle-text-style {
-          color: $secondary-dark-blue-40;
-        }
-      }
-
-      .legend-score {
-        font-size: 16px;
-        font-weight: 700;
-        line-height: 28px;
+      &.toggle-legend {
+        color: $secondary-dark-blue-40;
+        background-color: $secondary-dark-blue-40;
       }
     }
   }
