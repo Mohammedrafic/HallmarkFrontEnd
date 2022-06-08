@@ -38,10 +38,18 @@ body.light, body.dark {
         box-shadow: unset;
         border-right: 1px solid $secondary-dark-blue-40;
       }
+
+      .e-footer-content {
+        border-right: unset;
+      }
     }
   
     .e-dlg-content {
       padding: 0;
+    }
+
+    .e-footer-content {
+      border: 1px solid $secondary-dark-blue-45;
     }
   
     .container {

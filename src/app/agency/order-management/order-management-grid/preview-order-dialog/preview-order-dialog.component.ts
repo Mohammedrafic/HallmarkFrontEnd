@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { Subject, takeWhile } from 'rxjs';
+import { Observable, Subject, takeWhile } from 'rxjs';
+import { Select } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -9,6 +10,8 @@ import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.util
 import { AgencyOrderManagement } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { OrderManagementState } from '@agency/store/order-management.state';
+import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 
 @Component({
   selector: 'app-preview-order-dialog',
@@ -20,10 +23,14 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() openEvent: Subject<boolean>;
 
   @Output() compareEvent = new EventEmitter<never>();
+  @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
   @ViewChild('tab') tab: TabComponent;
+
+  @Select(OrderManagementState.orderDialogOptions)
+  public orderDialogOptions$: Observable<DialogNextPreviousOption>;
 
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
@@ -68,6 +75,10 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   public onClose(): void {
     this.sideDialog.hide();
     this.openEvent.next(false);
+  }
+
+  public onNextPreviousOrder(next: boolean): void {
+    this.nextPreviousOrderEvent.emit(next);
   }
 
   public onCompare(): void {

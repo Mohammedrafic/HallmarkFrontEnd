@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { OrderManagementFilter, OrderManagementPage, AgencyOrderManagementPage } from '@shared/models/order-management.model';
+import { Order } from '@shared/models/organization.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -30,5 +31,13 @@ export class OrderManagementContentService {
    */
   public getAgencyOrders(pageNumber: number, pageSize: number /** TODO: Add filter params */): Observable<AgencyOrderManagementPage> {
     return this.http.get<AgencyOrderManagementPage>(`/api/Orders/agencyOrders`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+  }
+
+  /**
+   * Get order by id
+   @param id
+   */
+  public getOrderById(id: number): Observable<Order> {
+    return this.http.get<Order>(`/api/Orders/${id}`);
   }
 }
