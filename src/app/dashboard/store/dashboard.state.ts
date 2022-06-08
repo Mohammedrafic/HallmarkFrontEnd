@@ -5,7 +5,13 @@ import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { Observable, tap } from 'rxjs';
 
 import { DashboardService } from '../services/dashboard.service';
-import { AddDashboardPanel, DashboardPanelIsMoved, DeleteDashboardPanels, GetDashboardPanels, SaveDashboard } from './dashboard.actions';
+import {
+  AddDashboardPanel,
+  DashboardPanelIsMoved,
+  GetDashboardPanels,
+  SetDashboardState,
+  SaveDashboard,
+} from './dashboard.actions';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
@@ -54,7 +60,10 @@ export class DashboardState {
   }
 
   @Action(DashboardPanelIsMoved)
-  dashboardPanelIsMoved({ patchState, dispatch }: StateContext<DashboardStateModel>, { payload }: DashboardPanelIsMoved) {
+  dashboardPanelIsMoved(
+    { patchState, dispatch }: StateContext<DashboardStateModel>,
+    { payload }: DashboardPanelIsMoved
+  ) {
     patchState({ panels: payload });
     dispatch(new SaveDashboard());
   }
@@ -70,9 +79,8 @@ export class DashboardState {
     );
   }
 
-  @Action(DeleteDashboardPanels)
-  deleteDashboardPanels({patchState}:StateContext<DashboardStateModel>) {
-    patchState({ panels: [] });
+  @Action(SetDashboardState)
+  mobileDashboard({ patchState }: StateContext<DashboardStateModel>, { payload }: SetDashboardState) {
+    patchState({ panels: payload });
   }
-
 }

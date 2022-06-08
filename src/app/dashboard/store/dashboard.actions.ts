@@ -1,9 +1,6 @@
 import { PanelModel } from "@syncfusion/ej2-angular-layouts";
 
 
-export class DeleteDashboardPanels {
-  static readonly type = '[dashboard] Delete Dashboard Panels';
-}
 export class GetDashboardPanels {
   static readonly type = '[dashboard] Get Dashboard Panel';
 }
@@ -20,4 +17,9 @@ export class DashboardPanelIsMoved {
 
 export class SaveDashboard {
   static readonly type = '[dashboard] Save Dashboard';
+}
+
+export class SetDashboardState {
+  static readonly type = '[dashboard] Set Dashboard State';
+  constructor(public payload: PanelModel[]) {}
 }
