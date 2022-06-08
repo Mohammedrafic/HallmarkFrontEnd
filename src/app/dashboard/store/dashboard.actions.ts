@@ -1,5 +1,9 @@
 import { PanelModel } from "@syncfusion/ej2-angular-layouts";
 
+
+export class DeleteDashboardPanels {
+  static readonly type = '[dashboard] Delete Dashboard Panels';
+}
 export class GetDashboardPanels {
   static readonly type = '[dashboard] Get Dashboard Panel';
 }

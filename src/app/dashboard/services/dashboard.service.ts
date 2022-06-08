@@ -52,7 +52,7 @@ export class DashboardService {
 
   saveDashboard(dashboard: PanelModel[]): Observable<Object> {
     const dasboardState = JSON.stringify(dashboard);
-    return this.httpClient.post(`${this.baseUrl}/SaveState`, { dasboardState }).pipe(tap((data) => console.log(data)));
+    return this.httpClient.post(`${this.baseUrl}/SaveState`, { dasboardState });
   }
 
   getChartLineWidgets(): ChartLineDataModel {
