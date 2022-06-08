@@ -12,6 +12,16 @@ body.light, body.dark {
     }
   }
 
+  .e-dialog.filter {
+    .e-dlg-header-content {
+      .e-dlg-closeicon-btn {
+        .e-btn-icon.e-icon-dlg-close::before {
+          color: $primary-active-blue-10 !important;
+        }
+      }
+    }
+  }
+
   .e-dialog.dialog {
     right: 0;
     top: 80px !important;

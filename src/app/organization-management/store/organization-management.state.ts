@@ -69,6 +69,7 @@ import {
   SaveOrganizationSettings,
   ClearDepartmentList,
   ClearLocationList,
+  GetSkillDataSources,
   SaveCredentialSucceeded,
   SaveUpdateCredentialSetupSucceeded,
   ExportLocations,
@@ -86,7 +87,7 @@ import { Region } from '@shared/models/region.model';
 import { Location } from '@shared/models/location.model';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
-import { MasterSkillByOrganization, Skill, SkillsPage } from 'src/app/shared/models/skill.model';
+import { MasterSkillByOrganization, Skill, SkillsPage, SkillDataSource } from 'src/app/shared/models/skill.model';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
@@ -152,6 +153,7 @@ export interface OrganizationManagementStateModel {
   isCredentialSetupLoading: boolean;
   isOrganizationSettingsLoading: boolean;
   organizationSettings: OrganizationSettingsGet[];
+  skillDataSource: SkillDataSource;
   projectTypes: ProjectType[];
   projectNames: ProjectName[];
   masterShifts: MasterShift[];
@@ -197,6 +199,7 @@ export interface OrganizationManagementStateModel {
     isCredentialSetupLoading: false,
     isOrganizationSettingsLoading: false,
     organizationSettings: [],
+    skillDataSource: { skillABBRs: [], skillDescriptions: [], glNumbers: [] },
     projectTypes: [],
     projectNames: [],
     masterShifts: [],
@@ -276,6 +279,9 @@ export class OrganizationManagementState {
 
   @Selector()
   static organizationSettings(state: OrganizationManagementStateModel): OrganizationSettingsGet[] { return state.organizationSettings }
+
+  @Selector()
+  static skillDataSource(state: OrganizationManagementStateModel): SkillDataSource { return state.skillDataSource; }
 
   @Selector()
   static projectTypes(state: OrganizationManagementStateModel): ProjectType[] { return state.projectTypes }
@@ -589,9 +595,9 @@ export class OrganizationManagementState {
   }
 
   @Action(GetAssignedSkillsByPage)
-  GetAssignedSkillsByPage({ patchState }: StateContext<OrganizationManagementStateModel>, { pageNumber, pageSize }: GetAssignedSkillsByPage): Observable<SkillsPage> {
+  GetAssignedSkillsByPage({ patchState }: StateContext<OrganizationManagementStateModel>, { pageNumber, pageSize, filters }: GetAssignedSkillsByPage): Observable<SkillsPage> {
     patchState({ isOrganizationLoading: true });
-    return this.skillsService.getAssignedSkills(pageNumber, pageSize).pipe(tap((payload) => {
+    return this.skillsService.getAssignedSkills(pageNumber, pageSize, filters).pipe(tap((payload) => {
       payload.items.forEach(item => {
         item.foreignKey = item.id + '-' + item.masterSkill?.id;
       });
@@ -811,6 +817,14 @@ export class OrganizationManagementState {
     return this.skillsService.exportAssignedSkills(payload).pipe(tap(file => {
       const url = window.URL.createObjectURL(file);
       saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
+
+  @Action(GetSkillDataSources)
+  GetSkillDataSources({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetSkillDataSources): Observable<SkillDataSource> {
+    return this.skillsService.getSkillsDataSources().pipe(tap(dataSource => {
+      patchState({ skillDataSource: dataSource });
+      return dataSource;
     }));
   };
 
