@@ -1,16 +1,17 @@
 @import 'colors';
 
 .widget-legend {
-  &__container {
-    border-top: 1px solid rgba($secondary-dark-blue-40, 0.32);
-    padding: 3% 0;
-  }
-
   &__item,
   &__item-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+
+  &__legend-text {
+    font-size: 14px;
+    line-height: 17px;
+    color: $secondary-dark-blue-15;
   }
 
   &__point {

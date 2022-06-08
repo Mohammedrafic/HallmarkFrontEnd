@@ -1,38 +1,13 @@
 @import 'colors';
 
-.chart-wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-
-  .control-section {
-    position: relative;
-    padding: 0;
+.app-accumulation-chart {
+  &__component {
+    aspect-ratio: 1.65;
   }
 
-  .legend-text {
-    font-size: 14px;
-    line-height: 17px;
-    color: $secondary-dark-blue-15;
-  }
-
-  .legend-score {
+  &__legend-score {
     font-size: 16px;
     font-weight: 700;
     line-height: 28px;
-  }
-
-  .toggle-text-style {
-    color: $secondary-dark-blue-40;
-  }
-
-  .legend-container {
-    .legend {
-      &.toggle-legend {
-        color: $secondary-dark-blue-40;
-        background-color: $secondary-dark-blue-40;
-      }
-    }
   }
 }
