@@ -3,16 +3,22 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { DashboardLayoutComponent, PanelModel } from '@syncfusion/ej2-angular-layouts';
-import { Observable, takeUntil, startWith, distinctUntilChanged, switchMap, combineLatest } from 'rxjs';
+import { Observable, takeUntil, startWith, distinctUntilChanged, switchMap, combineLatest, skip } from 'rxjs';
 import isEqual from 'lodash/fp/isEqual';
 
 import { ToggleSidebarState } from '../store/app.actions';
 import { DashboardService } from './services/dashboard.service';
-import { AddDashboardPanel, DashboardPanelIsMoved, GetDashboardPanels } from './store/dashboard.actions';
+import {
+  AddDashboardPanel,
+  DashboardPanelIsMoved,
+  DeleteDashboardPanels,
+  GetDashboardPanels,
+} from './store/dashboard.actions';
 import { DashboardState } from './store/dashboard.state';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { WidgetDataDependenciesAggregatedModel } from './models/widget-data-dependencies-aggregated.model';
 import { WidgetTypeEnum } from './enums/widget-type.enum';
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-dashboard',
@@ -25,9 +31,10 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   @Select(DashboardState.dashboardPanels) panels$: Observable<PanelModel[]>;
   @Select(DashboardState.isDashboardLoading) isLoading$: Observable<boolean>;
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
 
   public widgetsData$: Observable<Record<WidgetTypeEnum, unknown>>;
-
   public readonly cellSpacing = [24, 24];
   public readonly columns = 12;
   public readonly filtersGroup: FormGroup = this.getFiltersGroup();
@@ -46,6 +53,10 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     this.setWidgetsData();
     this.getDashboardPanels();
     this.refreshDashboard();
+    this.organizationId$.pipe(takeUntil(this.destroy$), skip(1)).subscribe(() => {
+      this.deleteDashboardPanels();
+      this.getDashboardPanels();
+    });
   }
 
   public trackByHandler(_: number, panel: PanelModel): string {
@@ -69,6 +80,10 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   private dashboardPanels(): PanelModel[] {
     return this.dashboard.serialize();
+  }
+
+  private deleteDashboardPanels(): void {
+    this.store.dispatch(new DeleteDashboardPanels());
   }
 
   moveDashboardPanel(): void {

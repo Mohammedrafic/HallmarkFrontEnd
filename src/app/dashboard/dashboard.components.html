@@ -15,7 +15,7 @@
     >
       <e-panels>
         <e-panel
-          *ngFor="let panel of panels$ | async; let i = index; trackBy: trackByHandler"
+          *ngFor="let panel of panels$ | async; trackBy: trackByHandler"
           [sizeX]="panel.sizeX"
           [sizeY]="panel.sizeY"
           [row]="panel.row"

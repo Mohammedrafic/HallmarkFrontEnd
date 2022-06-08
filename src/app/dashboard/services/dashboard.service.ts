@@ -36,7 +36,7 @@ export class DashboardService {
     //   { id: WidgetTypeEnum.CANDIDATES_BY_REGION, sizeX: 3, sizeY: 3, row: 0, col: 9 },
     //   { id: WidgetTypeEnum.INVOICES, sizeX: 3, sizeY: 3, row: 1, col: 0 },
     // ]);
-    return this.http.get<DashboardStateDto>(`${this.baseUrl}/GetState`).pipe(map((panels) => JSON.parse(panels.state)));
+    return this.http.get<DashboardStateDto>(`${this.baseUrl}/GetState`).pipe(map((panels) => panels? JSON.parse(panels.state): []));
   }
 
   addDashboardPanel(panel: PanelModel[]): Observable<PanelModel[]> {
@@ -45,8 +45,7 @@ export class DashboardService {
 
   saveDashboard(dashboard: PanelModel[]): Observable<Object> {
     const dasboardState = JSON.stringify(dashboard);
-    return this.http.post(`${this.baseUrl}/SaveState`, { dasboardState }).pipe(tap((data) => console.log(data)
-    ));
+    return this.http.post(`${this.baseUrl}/SaveState`, { dasboardState });
   }
 
   getChartLineWidgets(): ChartLineDataModel {
