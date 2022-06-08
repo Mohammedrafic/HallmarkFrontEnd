@@ -2,7 +2,7 @@
   <ejs-grid
     class="grid grid-component"
     #grid
-    [dataSource]="(billRates$ | async)?.items"
+    [dataSource]="(billRatesPage$ | async)?.items"
     [allowPaging]="allowPaging"
     [pageSettings]="pageSettings"
     [height]="gridHeight"
@@ -99,7 +99,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column textAlign="Right" width=100>
+      <e-column textAlign="Right" width=100 freeze="Right">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditRecordButtonClick(data, $event)">
@@ -133,7 +133,7 @@
                 [decimals]="decimals"
                 placeholder="Go to:"
                 min="1"
-                [max]="(billRates$ | async)?.totalPages"
+                [max]="(billRatesPage$ | async)?.totalPages"
                 [showSpinButton]="false"
                 (change)="onGoToClick($event)"
               >
@@ -144,7 +144,7 @@
                 id="gridPager"
                 #gridPager
                 [pageSize]="pageSize"
-                [totalRecordsCount]="(billRates$ | async)?.totalCount"
+                [totalRecordsCount]="(billRatesPage$ | async)?.totalCount"
                 [enablePagerMessage]="false"
                 [currentPage]="currentPage"
                 (click)="onGoToClick($event)"
@@ -163,6 +163,357 @@
     [header]="dialogHeader + ' Record'"
     [width]="'436px'"
   >
-<!-- TODO: need implementation -->
+    <form
+      *ngIf="isActive"
+      class="form-container bootstrap"
+      id="addEditRecordForm"
+      [formGroup]="billRatesFormGroup"
+    >
+      <div class="group">
+        <div class="input-container dropdown">
+          <label for="region">Region <span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-multiselect
+              id="region"
+              #regionDropdown
+              appValidateWithMessage
+              placeholder="Region"
+              selectAllText="Select All"
+              mode="CheckBox"
+              [dataSource]="orgRegions"
+              [fields]="fields"
+              [showSelectAll]="true"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              formControlName="regionIds"
+            >
+            </ejs-multiselect>
+          </div>
+        </div>
+
+        <div class="input-container dropdown">
+          <label for="location">Location <span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-multiselect
+              id="location"
+              #locationDropdown
+              appValidateWithMessage
+              placeholder="Location"
+              selectAllText="Select All"
+              mode="CheckBox"
+              [dataSource]="locations"
+              [fields]="fields"
+              [showSelectAll]="true"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              formControlName="locationIds">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="input-container dropdown">
+          <label for="department">Department <span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-multiselect
+              id="department"
+              #departmentDropdown
+              appValidateWithMessage
+              placeholder="Department"
+              selectAllText="Select All"
+              mode="CheckBox"
+              [dataSource]="departments"
+              [fields]="fields"
+              [showSelectAll]="true"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              formControlName="departmentIds">
+            </ejs-multiselect>
+          </div>
+        </div>
+
+        <div class="input-container dropdown">
+          <label for="skill">Skill <span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-multiselect
+              id="skill"
+              appValidateWithMessage
+              placeholder="Skill"
+              selectAllText="Select All"
+              mode="CheckBox"
+              [dataSource]="(skills$ | async)?.items"
+              [fields]="skillsFields"
+              [showSelectAll]="true"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              formControlName="skillIds">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="input-container form-dropdown">
+          <label for="billRatesTitle">Bill Rates Title <span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist
+              id="billRatesTitle"
+              appValidateWithMessage
+              placeholder="Bill Rates Title"
+              [dataSource]="billRatesTitle$ | async"
+              formControlName="billRateTitleId">
+            </ejs-dropdownlist>
+          </div>
+        </div>
+
+        <div class="input-container dropdown">
+          <label for="orderType">Order Type <span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-multiselect
+              id="orderType"
+              appValidateWithMessage
+              placeholder="Order Type"
+              selectAllText="Select All"
+              mode="CheckBox"
+              [dataSource]="orderTypes$ | async"
+              [fields]="skillsFields"
+              [showSelectAll]="true"
+              [allowFiltering]="false"
+              [showDropDownIcon]="true"
+              formControlName="orderTypeIds">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="input-container">
+          <label for="billRatesCategory">Bill Rates Category</label>
+          <div class="input-group">
+            <input
+              id="billRatesCategory"
+              class="e-input e-disabled"
+              type="text"
+              placeholder="Regular/Local"
+              formControlName="billRatesCategory"
+            />
+          </div>
+        </div>
+
+        <div class="input-container">
+          <label for="billRatesType">Bill Rates Type</label>
+          <div class="input-group">
+            <input
+              id="billRatesType"
+              class="e-input e-disabled"
+              type="text"
+              placeholder="Times"
+              formControlName="billRatesType"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="input-container bootstrap">
+          <label for="rateTimes">Rate/Times <span class="required">*</span></label>
+          <div class="input-group">
+            <ejs-maskedtextbox
+              *ngIf="isRateInHours"
+              #rateHours
+              class="e-input"
+              promptChar="_"
+              mask="00.00"
+              appValidateWithMessage
+              formControlName="billRateValueRateTimes"
+              placeholder="Rates/Hours"
+              maxlength="10"
+            ></ejs-maskedtextbox>
+
+            <ejs-numerictextbox
+              *ngIf="!isRateInHours"
+              id="rateTimes"
+              class="numeric-input"
+              appValidateWithMessage
+              min="0"
+              [maxlength]="10"
+              [validateDecimalOnType]="true"
+              [showSpinButton]="false"
+              placeholder="Rate/Times"
+              decimals='2'
+              format="#.##"
+              formControlName="billRateValueRateTimes"
+            >
+            </ejs-numerictextbox>
+          </div>
+        </div>
+
+        <div class="input-container calendar">
+          <label for="effectiveDate">Effective Date <span class="required">*</span></label>
+          <div class="input-group datepicker">
+            <ejs-datepicker
+              id="effectiveDate"
+              class="datepicker"
+              format="MM/dd/yyyy"
+              placeholder="MM/DD/YYYY"
+              [enableMask]="true"
+              [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+              appValidateWithMessage
+              formControlName="effectiveDate"
+            >
+            </ejs-datepicker>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div
+          *ngIf="isInternalMinEnabled"
+          [formGroup]="billRatesInternalMinRequiredFormGroup"
+          class="input-container bootstrap"
+        >
+          <label for="internalMin">Internal Min <span class="required">*</span></label>
+          <div class="input-group">
+            <ejs-numerictextbox
+              id="internalMin"
+              class="numeric-input"
+              appValidateWithMessage
+              min="0"
+              [maxlength]="10"
+              [validateDecimalOnType]="true"
+              [showSpinButton]="false"
+              placeholder="Internal Min"
+              decimals='0'
+              format="#"
+              formControlName="internalMin"
+            >
+            </ejs-numerictextbox>
+          </div>
+        </div>
+
+        <div
+          *ngIf="!isInternalMinEnabled"
+          class="input-container bootstrap"
+        >
+          <label for="internalMinDisabled">Internal Min </label>
+          <div class="input-group">
+            <ejs-numerictextbox
+              id="internalMinDisabled"
+              class="numeric-input"
+              [showSpinButton]="false"
+              [enabled]="false"
+              placeholder="Internal Min"
+            >
+            </ejs-numerictextbox>
+          </div>
+        </div>
+
+        <div
+          *ngIf="isInternalMaxEnabled"
+          [formGroup]="billRatesInternalMaxRequiredFormGroup"
+          class="input-container bootstrap"
+        >
+          <label for="internalMax">Internal Max <span class="required">*</span></label>
+          <div class="input-group">
+            <ejs-numerictextbox
+              id="internalMax"
+              class="numeric-input"
+              appValidateWithMessage
+              min="0"
+              [maxlength]="10"
+              [validateDecimalOnType]="true"
+              [showSpinButton]="false"
+              placeholder="Internal Max"
+              decimals='0'
+              format="#"
+              formControlName="internalMax"
+            >
+            </ejs-numerictextbox>
+          </div>
+        </div>
+
+        <div
+          *ngIf="!isInternalMaxEnabled"
+          class="input-container bootstrap"
+        >
+          <label for="internalMaxDisabled">Internal Max </label>
+          <div class="input-group">
+            <ejs-numerictextbox
+              id="internalMaxDisabled"
+              class="numeric-input"
+              [showSpinButton]="false"
+              [enabled]="false"
+              placeholder="Internal Max"
+            >
+            </ejs-numerictextbox>
+          </div>
+        </div>
+      </div>
+
+      <div class="checkbox-container">
+        <div class="overtime-container" *ngIf="isOvertimeAccessible">
+          <div class="input-container">
+            <div class="input-group">
+              <ejs-checkbox
+                id="considerForWeeklyOt"
+                label="Consider for Weekly OT"
+                formControlName="considerForWeeklyOt"
+              ></ejs-checkbox>
+            </div>
+          </div>
+
+          <div class="input-container">
+            <div class="input-group">
+              <ejs-checkbox
+                id="considerForDailyOt"
+                label="Consider for Daily OT"
+                formControlName="considerForDailyOt"
+              ></ejs-checkbox>
+            </div>
+          </div>
+
+          <div class="input-container">
+            <div class="input-group">
+              <ejs-checkbox
+                id="considerFor7thDayOt"
+                label="Consider for 7th Day OT"
+                formControlName="considerFor7thDayOt"
+              ></ejs-checkbox>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <div class="input-group">
+            <ejs-checkbox
+              id="regularLocal"
+              label="Regular/Local"
+              formControlName="regularLocal"
+            ></ejs-checkbox>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <div class="input-group">
+            <ejs-checkbox
+              id="displayInTimesheet"
+              label="Display in Timesheet"
+              formControlName="displayInTimesheet"
+            ></ejs-checkbox>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <div class="input-group">
+            <ejs-checkbox
+              id="displayInJob"
+              label="Display in Job"
+              formControlName="displayInJob"
+            ></ejs-checkbox>
+          </div>
+        </div>
+      </div>
+    </form>
   </app-side-dialog>
 </section>

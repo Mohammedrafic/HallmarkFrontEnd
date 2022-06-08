@@ -1,0 +1,36 @@
+@import 'colors.scss';
+
+.container {
+  padding-top: 24px;
+}
+
+.form-container {
+  padding-top: 24px;
+
+  .group {
+    display: flex;
+
+    .input-container:first-child {
+      padding-right: 13px;
+    }
+
+    .input-container {
+      width: 100%;
+      padding-bottom: 12px;
+
+      ejs-numerictextbox {
+        span.e-disabled {
+          background-color: $secondary-dark-blue-50;
+        }
+      }
+    }
+  }
+
+  .checkbox-container {
+    padding-top: 24px;
+
+    .input-container {
+      padding-bottom: 20px;
+    }
+  }
+}
