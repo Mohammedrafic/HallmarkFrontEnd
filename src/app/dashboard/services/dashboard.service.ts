@@ -1,17 +1,22 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import lodashMap from 'lodash/fp/map';
 
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
-import { LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
-import { Observable, of, forkJoin, map, EMPTY, tap } from 'rxjs';
+import { Observable, of, forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { tap } from 'rxjs';
 
 import { ChartAccumulation } from '../models/chart-accumulation-widget.model';
 import { ChartLineDataModel } from '../models/chart-line-widget.model';
 import { WidgetDataDependenciesAggregatedModel } from '../models/widget-data-dependencies-aggregated.model';
 import { DashboardFiltersModel } from '../models/dashboard-filters.model';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
-import { USAMapDataLayerSettings } from '../constants/USA-map-data-layer-settings';
+import { CandidatesByStatesResponseModel } from '../models/candidates-by-states-response.model';
+import { CandidatesByStateWidgetAggregatedDataModel } from '../models/candidates-by-state-widget-aggregated-data.model';
 import { DashboardStateDto } from '../models/dashboard-state-dto.model';
+import { USAMapCandidatesDataLayerSettings } from '../constants/USA-map-candidates-data-layer-settings';
+import reduce from 'lodash/reduce';
 
 @Injectable()
 export class DashboardService {
@@ -21,22 +26,24 @@ export class DashboardService {
     (filters: DashboardFiltersModel) => Observable<unknown>
   > = {
     [WidgetTypeEnum.CANDIDATES]: (filters: DashboardFiltersModel) => this.getCandidatesWidgetData(filters),
-    [WidgetTypeEnum.CANDIDATES_BY_REGION]: (filters: DashboardFiltersModel) =>
-      this.getCandidatesByRegionWidgetData(filters),
+    [WidgetTypeEnum.CANDIDATES_BY_STATE]: (filters: DashboardFiltersModel) =>
+      this.getCandidatesByStateWidgetData(filters),
     [WidgetTypeEnum.INVOICES]: (filters: DashboardFiltersModel) => this.getInvoicesWidgetData(filters),
     [WidgetTypeEnum.ORDERS_VS_CANDIDATES]: (filters: DashboardFiltersModel) => this.getCandidatesWidgetData(filters),
   };
 
-  constructor(private http: HttpClient) {}
+  constructor(private httpClient: HttpClient) {}
 
   getDashboardsPanels(): Observable<PanelModel[]> {
     // return of([
     //   { id: WidgetTypeEnum.CANDIDATES, sizeX: 3, sizeY: 3, row: 0, col: 3 },
     //   { id: WidgetTypeEnum.ORDERS_VS_CANDIDATES, sizeX: 3, sizeY: 3, row: 0, col: 6 },
-    //   { id: WidgetTypeEnum.CANDIDATES_BY_REGION, sizeX: 3, sizeY: 3, row: 0, col: 9 },
+    //   { id: WidgetTypeEnum.CANDIDATES_BY_STATE, sizeX: 3, sizeY: 3, row: 0, col: 9 },
     //   { id: WidgetTypeEnum.INVOICES, sizeX: 3, sizeY: 3, row: 1, col: 0 },
     // ]);
-    return this.http.get<DashboardStateDto>(`${this.baseUrl}/GetState`).pipe(map((panels) => JSON.parse(panels.state)));
+    return this.httpClient
+      .get<DashboardStateDto>(`${this.baseUrl}/GetState`)
+      .pipe(map((panels) => JSON.parse(panels.state)));
   }
 
   addDashboardPanel(panel: PanelModel[]): Observable<PanelModel[]> {
@@ -45,8 +52,7 @@ export class DashboardService {
 
   saveDashboard(dashboard: PanelModel[]): Observable<Object> {
     const dasboardState = JSON.stringify(dashboard);
-    return this.http.post(`${this.baseUrl}/SaveState`, { dasboardState }).pipe(tap((data) => console.log(data)
-    ));
+    return this.httpClient.post(`${this.baseUrl}/SaveState`, { dasboardState }).pipe(tap((data) => console.log(data)));
   }
 
   getChartLineWidgets(): ChartLineDataModel {
@@ -107,8 +113,8 @@ export class DashboardService {
   public getWidgetsAggregatedData([panels, filters]: WidgetDataDependenciesAggregatedModel): Observable<
     Record<WidgetTypeEnum, unknown>
   > {
-    if (!panels) return EMPTY;
-    const data: Record<WidgetTypeEnum, Observable<unknown>> = panels.reduce(
+    const data: Record<WidgetTypeEnum, Observable<unknown>> = reduce(
+      panels,
       (accumulator: Record<WidgetTypeEnum, Observable<unknown>>, panel: PanelModel) => ({
         ...accumulator,
         [panel.id as WidgetTypeEnum]: this.widgetTypeToDataMapper[panel.id as WidgetTypeEnum]?.(filters) ?? of(null),
@@ -135,8 +141,36 @@ export class DashboardService {
     });
   }
 
-  private getCandidatesByRegionWidgetData(filters: DashboardFiltersModel): Observable<LayerSettingsModel[]> {
-    return of(USAMapDataLayerSettings);
+  private getCandidatesByStateWidgetData(
+    filters: DashboardFiltersModel
+  ): Observable<CandidatesByStateWidgetAggregatedDataModel> {
+    return this.httpClient
+      .post<CandidatesByStatesResponseModel>('/api/Dashboard/GetCandidatesStatesAggregated', {})
+      .pipe(
+        map((candidatesByStates: CandidatesByStatesResponseModel) => {
+          return this.getFormattedCandidatesByStatesWidgetAggregatedData(candidatesByStates);
+        })
+      );
+  }
+
+  private getFormattedCandidatesByStatesWidgetAggregatedData(
+    candidatesByStates: CandidatesByStatesResponseModel
+  ): CandidatesByStateWidgetAggregatedDataModel {
+    return {
+      chartData: [
+        {
+          ...USAMapCandidatesDataLayerSettings,
+          dataSource: lodashMap(
+            (stateDefinition: Record<string, string>) => ({
+              ...stateDefinition,
+              candidates: candidatesByStates[stateDefinition['code']] ?? 0,
+            }),
+            USAMapCandidatesDataLayerSettings.dataSource
+          ),
+        },
+      ],
+      legendData: [{ label: '0 - 2' }, { label: '2 - 4' }, { label: '4 - 6' }, { label: '6+' }],
+    };
   }
 
   private getInvoicesWidgetData(filter: DashboardFiltersModel): Observable<ChartAccumulation> {

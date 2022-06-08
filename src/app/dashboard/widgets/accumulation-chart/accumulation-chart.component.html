@@ -1,10 +1,10 @@
-<app-widget-wrapper [title]="chart.title">
+<app-widget-wrapper [title]="chart?.title ?? ''">
   <div class="chart-wrapper">
     <div class="control-section">
       <ejs-accumulationchart
         #pie
         [tooltip]="tooltip"
-        [id]="chart.id"
+        [id]="chart?.id"
         [legendSettings]="legendSettings"
         [height]="height"
         [enableAnimation]="false"
@@ -23,11 +23,11 @@
         </e-accumulation-series-collection>
       </ejs-accumulationchart>
     </div>
-    <div class="legend-container">
-      <div *ngFor="let legend of chart.chartData; let idx = index" class="legend">
-        <div class="legend-point">
+    <div class="widget-legend__container">
+      <div *ngFor="let legend of chart?.chartData; let idx = index" class="widget-legend__item">
+        <div class="widget-legend__item-content">
           <input type="checkbox" checked (change)="onCheckboxChange(idx)" />
-          <div [ngClass]="['point', 'point-' + idx]"></div>
+          <div [ngClass]="['widget-legend__point', 'point-' + idx]"></div>
           <div [ngClass]="['legend-text']">{{ legend.x }}</div>
         </div>
         <div class="legend-score">{{ legend.y }}</div>
