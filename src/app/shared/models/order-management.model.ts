@@ -1,4 +1,6 @@
 import { PageOfCollections } from '@shared/models/page.model';
+import { OrderStatus } from '@shared/enums/order-management';
+import { OrderType } from '@shared/enums/order-type';
 
 export class OrderManagement {
   id: number;
@@ -34,3 +36,23 @@ export class OrderManagementFilter {
 }
 
 export type OrderManagementPage = PageOfCollections<OrderManagement>;
+
+export type AgencyOrderManagement = {
+  orderId: number;
+  statusText: string;
+  status: OrderStatus;
+  jobTitle: string;
+  skill: string;
+  location: string;
+  numberOfPositions: number;
+  department: string;
+  orderType: OrderType;
+  billRate: number;
+  candidates: number;
+  isLocked: boolean;
+  jobStartDate: string;
+  organizationId: number;
+  organizationName: string;
+};
+
+export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;

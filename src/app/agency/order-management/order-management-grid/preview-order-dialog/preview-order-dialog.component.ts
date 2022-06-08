@@ -1,32 +1,46 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Subject, takeWhile } from 'rxjs';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
+import { AgencyOrderManagement } from '@shared/models/order-management.model';
+import { OrderType } from '@shared/enums/order-type';
+import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 
 @Component({
   selector: 'app-preview-order-dialog',
   templateUrl: './preview-order-dialog.component.html',
   styleUrls: ['./preview-order-dialog.component.scss'],
 })
-export class PreviewOrderDialogComponent implements OnInit, OnDestroy {
-  @Input() order: any;
+export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
+  @Input() order: AgencyOrderManagement;
   @Input() openEvent: Subject<boolean>;
 
   @Output() compareEvent = new EventEmitter<never>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
+  @ViewChild('chipList') chipList: ChipListComponent;
   @ViewChild('tab') tab: TabComponent;
 
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
+  public orderType = OrderType;
 
   private isAlive = true;
 
+  constructor(private chipsCssClass: ChipsCssClass) {}
+
   ngOnInit(): void {
     this.onOpenEvent();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.chipList && changes['order'].currentValue) {
+      this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
+    }
   }
 
   ngOnDestroy(): void {

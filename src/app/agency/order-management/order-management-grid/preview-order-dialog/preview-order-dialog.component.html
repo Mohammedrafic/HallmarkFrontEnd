@@ -13,6 +13,18 @@
         <div class="e-card-header">
           <div class="e-card-header-caption">
             <h3 class="e-card-title">Order ID {{order?.orderId}}</h3>
+            <div class="order-statuses">
+            <ejs-chiplist #chipList>
+              <e-chips>
+                <e-chip [text]="order?.statusText"></e-chip>
+              </e-chips>
+            </ejs-chiplist>
+            <div class="vertical-divider"></div>
+            <div *ngIf="order" class="order-other-statuses">
+              <span class="custom-chip">{{orderType[order.orderType]}}</span>
+              <span class="custom-chip" *ngIf="order.isLocked">Locked</span>
+            </div>
+          </div>
           </div>
           <div  class="e-card-content">
             <button
