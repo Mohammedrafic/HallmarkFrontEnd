@@ -103,18 +103,25 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
   }
 
   onFormCancelClick(): void {
-    this.confirmService
-      .confirm(CANCEL_COFIRM_TEXT, {
-        title: DELETE_CONFIRM_TITLE,
-        okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false));
-        this.credentialTypeFormGroup.reset();
-        this.isEdit = false;
-        this.removeActiveCssClass();
-      });
+    if (this.credentialTypeFormGroup.dirty) {
+      this.confirmService
+        .confirm(CANCEL_COFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => !!confirm))
+        .subscribe(() => {
+          this.store.dispatch(new ShowSideDialog(false));
+          this.credentialTypeFormGroup.reset();
+          this.isEdit = false;
+          this.removeActiveCssClass();
+        });
+    } else {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.credentialTypeFormGroup.reset();
+      this.isEdit = false;
+      this.removeActiveCssClass();
+    }
   }
 
   onFormSaveClick(): void {

@@ -133,7 +133,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       }
     });
     this.organization$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(organization => {
-      this.store.dispatch(new SetGeneralStatesByCountry(parseInt(Country[organization.generalInformation.country])));
+      this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
       this.store.dispatch(new GetRegions());
     });
   }
@@ -162,8 +162,8 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.defaultFileName = 'Organization Locations ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportLocations(new ExportPayload(
-      fileType, 
-      { regionId: this.selectedRegion.id }, 
+      fileType,
+      { regionId: this.selectedRegion.id },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val.id) : null,
       options?.fileName || this.defaultFileName
