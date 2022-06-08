@@ -32,16 +32,16 @@
           margin: 0 10px;
 
           &.point-0 {
-            background-color: #ecf2ff;
+            background-color: $primary-active-blue-90;
           }
           &.point-1 {
-            background-color: #c5d9ff;
+            background-color: $primary-active-blue-70;
           }
           &.point-2 {
-            background-color: #9ebfff;
+            background-color: $primary-active-blue-50;
           }
           &.point-3 {
-            background-color: #6499ff;
+            background-color: $primary-active-blue-20;
           }
           &.toggle-legend {
             color: $secondary-dark-blue-40;

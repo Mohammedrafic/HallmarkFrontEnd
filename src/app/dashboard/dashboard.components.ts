@@ -1,17 +1,16 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import isEqual from 'lodash/fp/isEqual';
+import { FormGroup, FormBuilder } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { DashboardLayoutComponent, PanelModel } from '@syncfusion/ej2-angular-layouts';
-import { Observable, takeUntil, startWith, distinctUntilChanged, switchMap } from 'rxjs';
+import { Observable, takeUntil, startWith, distinctUntilChanged, switchMap, combineLatest } from 'rxjs';
+import isEqual from 'lodash/fp/isEqual';
 
 import { ToggleSidebarState } from '../store/app.actions';
 import { DashboardService } from './services/dashboard.service';
 import { AddDashboardPanel, DashboardPanelIsMoved, GetDashboardPanels } from './store/dashboard.actions';
 import { DashboardState } from './store/dashboard.state';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { FormGroup, FormBuilder } from '@angular/forms';
-import { combineLatest } from 'rxjs';
 import { WidgetDataDependenciesAggregatedModel } from './models/widget-data-dependencies-aggregated.model';
 import { WidgetTypeEnum } from './enums/widget-type.enum';
 
@@ -61,7 +60,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     this.refreshGrid();
     this.actions$
       .pipe(ofActionDispatched(ToggleSidebarState), takeUntil(this.destroy$))
-      .subscribe((data) => this.refreshGrid());
+      .subscribe(() => this.refreshGrid());
   }
 
   private refreshGrid(): void {
@@ -73,13 +72,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   moveDashboardPanel(): void {
-    const panels = this.dashboardPanels().map((panel, idx) => {
-      return {
-        ...panel,
-        content: `<div class='content'>${idx}</div>`,
-      };
-    });
-    this.store.dispatch(new DashboardPanelIsMoved(panels));
+    this.store.dispatch(new DashboardPanelIsMoved(this.dashboardPanels()));
   }
 
   addPanel(): void {
