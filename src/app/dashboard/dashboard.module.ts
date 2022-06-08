@@ -12,6 +12,7 @@ import {
   LegendService,
 } from '@syncfusion/ej2-angular-charts';
 import { NgxsModule } from '@ngxs/store';
+import { LayoutModule } from '@angular/cdk/layout';
 
 import { DashboardState } from './store/dashboard.state';
 import { DashboardService } from './services/dashboard.service';
@@ -30,6 +31,7 @@ import { WidgetWrapperModule } from './widgets/widget-wrapper/widget-wrapper.mod
     ChartModule,
     AccumulationChartAllModule,
     MapsChartModule,
+    LayoutModule,
     RouterModule.forChild([{ path: '', component: DashboardComponent }]),
     NgxsModule.forFeature([DashboardState]),
     ReactiveFormsModule,
