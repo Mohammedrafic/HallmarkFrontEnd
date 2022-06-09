@@ -25,7 +25,9 @@
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
     [allowTextWrap]="allowWrap"
+    [selectionSettings]="selectionOptions"
     [textWrapSettings]="wrapSettings"
+    (rowSelected)="onRowClick($event)"
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
@@ -153,3 +155,8 @@
     </ng-template>
   </ejs-grid>
 </section>
+
+<app-order-details-dialog
+  [order]="selectedOrder"
+  [openEvent]="openDetails"
+  (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"></app-order-details-dialog>

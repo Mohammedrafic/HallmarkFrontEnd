@@ -5,15 +5,16 @@ import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
-import { TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
+import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { OrderManagemetTabs } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { GetIncompleteOrders, GetOrders } from '@client/store/order-managment-content.actions';
+import { GetIncompleteOrders, GetOrderById, GetOrders } from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { OrderManagement, OrderManagementPage } from '@shared/models/order-management.model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { UserState } from '../../../store/user.state';
+import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
@@ -63,6 +64,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   ];
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
+  public selectedOrder: OrderManagement;
+  public openDetails = new Subject<boolean>();
+  public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
 
   constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
     super();
@@ -86,11 +90,40 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         });
       }
     });
+
+    this.openDetails.pipe(takeUntil(this.unsubscribe$)).subscribe((isOpen) => {
+      if (!isOpen) {
+        this.grid.clearRowSelection();
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public onNextPreviousOrderEvent(next: boolean): void {
+    const [index] = this.grid.getSelectedRowIndexes();
+    const nextIndex = next ? index + 1 : index - 1;
+    this.grid.selectRow(nextIndex);
+  }
+
+  public onRowClick({ data }: { data: OrderManagement }): void {
+    this.selectedOrder = data;
+    const options = this.getDialogNextPreviousOption(data);
+    this.store.dispatch(new GetOrderById(data.id, options));
+    this.openDetails.next(true);
+  }
+
+  private getDialogNextPreviousOption(selectedOrder: OrderManagement): DialogNextPreviousOption {
+    const gridData = this.grid.dataSource as OrderManagement[];
+    const first = gridData[0];
+    const last = gridData[gridData.length - 1];
+    return {
+      previous: first.id !== selectedOrder.id,
+      next: last.id !== selectedOrder.id,
+    };
   }
 
   public navigateToOrderForm(): void {

@@ -19,7 +19,8 @@ import {
   Trash2,
   Edit,
   Copy,
-  XCircle
+  XCircle,
+  X,
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -59,6 +60,9 @@ import { NgxsModule } from '@ngxs/store';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { WorkflowState } from '@organization-management/store/workflow.state';
+import { OrderDetailsDialogComponent } from './order-management/order-details-dialog/order-details-dialog.component';
+import { DialogModule } from '@syncfusion/ej2-angular-popups';
+import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 
 const gridIcons = {
   MessageSquare,
@@ -76,7 +80,8 @@ const gridIcons = {
   Copy,
   XCircle,
   Edit3,
-  Trash2
+  Trash2,
+  X
 };
 
 @NgModule({
@@ -90,7 +95,8 @@ const gridIcons = {
     ReportsContentComponent,
     TabNavigationComponent,
     AddEditOrderComponent,
-    OrderDetailsFormComponent
+    OrderDetailsFormComponent,
+    OrderDetailsDialogComponent
   ],
   imports: [
     CommonModule,
@@ -116,6 +122,7 @@ const gridIcons = {
     BillRatesModule,
     OrderCredentialsModule,
     DropDownButtonModule,
+    DialogModule,
 
     //STORE
     NgxsModule.forFeature([
@@ -132,7 +139,8 @@ const gridIcons = {
     SortService,
     GroupService,
     ColumnMenuService,
-    FilterService
+    FilterService,
+    ChipsCssClass
   ]
 })
 export class ClientModule {}

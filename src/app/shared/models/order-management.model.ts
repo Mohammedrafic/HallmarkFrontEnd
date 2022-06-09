@@ -21,6 +21,7 @@ export class OrderManagement {
   openPositions: number;
   candidates: number;
   startDate: string;
+  isLocked?: boolean;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
 }
 
