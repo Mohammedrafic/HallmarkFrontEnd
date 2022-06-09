@@ -30,6 +30,10 @@
               *ngSwitchCase="widgetTypeEnum.CANDIDATES"
             ></app-accumulation-chart>
             <app-accumulation-chart
+              [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
+              *ngSwitchCase="widgetTypeEnum.ORDERS_VS_CANDIDATES"
+            ></app-accumulation-chart>
+            <app-accumulation-chart
               [chartData]="widgetsData?.[widgetTypeEnum.INVOICES]"
               *ngSwitchCase="widgetTypeEnum.INVOICES"
             ></app-accumulation-chart>

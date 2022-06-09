@@ -38,15 +38,15 @@ export class DashboardService {
   constructor(private httpClient: HttpClient) {}
 
   getDashboardsPanels(): Observable<PanelModel[]> {
-    // return of([
-    //   { id: WidgetTypeEnum.CANDIDATES, sizeX: 3, sizeY: 3, row: 0, col: 3 },
-    //   { id: WidgetTypeEnum.ORDERS_VS_CANDIDATES, sizeX: 3, sizeY: 3, row: 0, col: 6 },
-    //   { id: WidgetTypeEnum.CANDIDATES_BY_STATE, sizeX: 3, sizeY: 3, row: 0, col: 9 },
-    //   { id: WidgetTypeEnum.INVOICES, sizeX: 3, sizeY: 3, row: 1, col: 0 },
-    // ]);
-    return this.httpClient
-      .get<DashboardStateDto>(`${this.baseUrl}/GetState`)
-      .pipe(map((panels) => JSON.parse(panels.state)));
+    return of([
+      { id: WidgetTypeEnum.CANDIDATES, sizeX: 3, sizeY: 3, row: 0, col: 3 },
+      { id: WidgetTypeEnum.ORDERS_VS_CANDIDATES, sizeX: 3, sizeY: 3, row: 0, col: 6 },
+      { id: WidgetTypeEnum.CANDIDATES_BY_STATE, sizeX: 3, sizeY: 3, row: 0, col: 9 },
+      { id: WidgetTypeEnum.INVOICES, sizeX: 3, sizeY: 3, row: 1, col: 0 },
+    ]);
+    // return this.httpClient
+    //   .get<DashboardStateDto>(`${this.baseUrl}/GetState`)
+    //   .pipe(map((panels) => JSON.parse(panels.state)));
   }
 
   addDashboardPanel(panel: PanelModel[]): Observable<PanelModel[]> {
