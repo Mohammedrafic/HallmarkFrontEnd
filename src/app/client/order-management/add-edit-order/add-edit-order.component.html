@@ -41,9 +41,7 @@
       </ng-template>
     </e-tabitem>
 
-    <!-- Credentials Tab will be added soon -->
-
-    <!-- <e-tabitem>
+    <e-tabitem>
       <ng-template #headerText>
         <div class="stepper-header">
           <div class="stepper-title">Credentials</div>
@@ -51,8 +49,11 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-order-credentials *ngIf="selectedTab === SelectedTab.Credentials"></app-order-credentials>
+        <app-order-credentials
+          *ngIf="selectedTab === SelectedTab.Credentials"
+          [credentials]="orderCredentials"
+          (credentialChanged)="onCredentialChanged($event)"></app-order-credentials>
       </ng-template>
-    </e-tabitem> -->
+    </e-tabitem>
   </e-tabitems>
 </ejs-tab>

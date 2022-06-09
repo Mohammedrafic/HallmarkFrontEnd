@@ -1,23 +1,26 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { GetAllCredentials, GetAllCredentialTypes } from '@order-credentials/store/credentials.actions';
 import { OrderCandidatesCredentialsState } from '@order-credentials/store/credentials.state';
+import { IOrderCredentialItem } from '@order-credentials/types';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { Observable } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-add-order-credential-form',
   templateUrl: './add-order-credential-form.component.html',
   styleUrls: ['./add-order-credential-form.component.scss']
 })
-export class AddOrderCredentialFormComponent implements OnInit {
+export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDestroy {
 
   @ViewChild('searchGrid') searchGrid: GridComponent;
 
   @Input() form: FormGroup;
+  @Input() addedCredentials: IOrderCredentialItem[] = [];
+  @Input() formSubmitted = false;
 
   @Select(OrderCandidatesCredentialsState.allCredentials)
   allCredentials$: Observable<Credential[]>;
@@ -27,11 +30,35 @@ export class AddOrderCredentialFormComponent implements OnInit {
 
   public selectedCredType: string;
   public credTypesFields = { text: 'name', value: 'name', };
+  public filteredCreds: Credential[] = [];
+  public credSelectionInvalid = false;
+  private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private store: Store) { }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    const { addedCredentials, formSubmitted } = changes;
+    if ( addedCredentials && !addedCredentials.firstChange) {
+      this.filterCredentials(this.filteredCreds);
+    }
+    if (formSubmitted) {
+      this.credSelectionInvalid = this.formSubmitted && !this.form.valid;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
   ngOnInit(): void {
     this.store.dispatch([new GetAllCredentials(), new GetAllCredentialTypes()]);
+    this.form.statusChanges.pipe(takeUntil(this.unsubscribe$)).subscribe(status => {
+      this.credSelectionInvalid = this.formSubmitted && (status === 'INVALID');
+    });
+    this.allCredentials$.pipe(takeUntil(this.unsubscribe$)).subscribe(allCredentials => {
+      this.filterCredentials(allCredentials);
+    });
   }
 
   public filterByType(): void {
@@ -43,17 +70,25 @@ export class AddOrderCredentialFormComponent implements OnInit {
   }
 
   public selectCredential(event: any): void {
+    this.form.get('credentialId')?.setValue(event.data.id);
     this.form.get('credentialName')?.setValue(event.data.name);
     this.form.get('credentialType')?.setValue(event.data.credentialTypeName);
   }
 
-  public deselectCredential(event: any): void {
+  public deselectCredential(): void {
+    this.form.get('credentialId')?.setValue(0);
     this.form.get('credentialName')?.setValue(null);
     this.form.get('credentialType')?.setValue(null);
   }
 
   public searchCredential(event: any): void {
     this.searchGrid.search((event.target as HTMLInputElement).value);
+  }
+
+  private filterCredentials(allCredentials: Credential[]): void {
+    this.filteredCreds = allCredentials.filter(credential => {
+      return !(this.addedCredentials.find(addedCred => addedCred.credentialId === credential.id));
+    });
   }
 
 }

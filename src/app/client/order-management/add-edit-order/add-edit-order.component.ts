@@ -16,6 +16,7 @@ import { OrderDetailsFormComponent } from '../order-details-form/order-details-f
 import { CreateOrderDto } from '@shared/models/organization.model';
 import { BillRatesComponent } from '@bill-rates/bill-rates.component';
 import { BillRate, OrderBillRateDto } from '@shared/models/bill-rate.model';
+import { IOrderCredentialItem } from '@order-credentials/types';
 
 enum SelectedTab {
   OrderDetails,
@@ -45,6 +46,8 @@ export class AddEditOrderComponent implements OnDestroy {
     { id: SubmitButtonItem.SaveAsTemplate, text: 'Save as Template' }
   ];
   public selectedTab: SelectedTab = SelectedTab.OrderDetails;
+  // todo: update/set credentials list in edit mode for order
+  public orderCredentials: IOrderCredentialItem[] = [];
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -84,6 +87,15 @@ export class AddEditOrderComponent implements OnDestroy {
     }
   }
 
+  public onCredentialChanged(cred: IOrderCredentialItem): void {
+    const isExist = this.orderCredentials.find(({credentialId}) => cred.credentialId === credentialId);
+    if (isExist) {
+      Object.assign(isExist, cred);
+    } else {
+      this.orderCredentials.push(cred);
+    }
+  }
+
   public save(): void {
     if (
       this.orderDetailsFormComponent.orderTypeStatusForm.valid &&
@@ -119,7 +131,7 @@ export class AddEditOrderComponent implements OnDestroy {
       ...this.orderDetailsFormComponent.contactDetailsForm.value,
       ...this.orderDetailsFormComponent.workLocationForm.value,
       ...this.orderDetailsFormComponent.workflowForm.value,
-      ...{ credentials: [] }, // Will be added soon
+      ...{ credentials: this.orderCredentials },
       ...{ billRates: this.billRatesComponent.billRatesControl.value }
     };
 
