@@ -1,7 +1,7 @@
 <div tabindex="0" class="e-card">
   <div class="e-card-header">
     <div class="e-card-header-caption">
-      <div class="e-card-title">{{uploaderTitle}}</div>
+      <div class="e-card-title">{{ uploaderTitle }}</div>
     </div>
   </div>
   <div id="image-uploader" class="e-card-content">
@@ -10,15 +10,25 @@
       <img class="logo medium" [src]="logoSrc" />
       <img class="logo small" [src]="logoSrc" />
     </div>
-    <div [class.hidden]="logoSrc" id="droparea" class="droparea" (click)="browse()">
+    <div [class.hidden]="logoSrc" id="droparea" class="droparea" [ngClass]="{'disabled': disabled}" (click)="browse()">
       <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
     </div>
-    <ejs-uploader #previewupload [dropArea]="dropElement" [allowedExtensions]="allowedExtensions"
-                  [autoUpload]="false" [multiple]="false"
-                  [maxFileSize]="maxFileSize"
-                  (selected)="onImageSelect($event)"
-                  (removing)="onImageRemove()">
+    <ejs-uploader
+      #previewupload
+      [dropArea]="dropElement"
+      [allowedExtensions]="allowedExtensions"
+      [autoUpload]="false"
+      [multiple]="false"
+      [enabled]="!disabled"
+      [maxFileSize]="maxFileSize"
+      (selected)="onImageSelect($event)"
+      (removing)="onImageRemove()"
+    >
     </ejs-uploader>
-    <button *ngIf="isImageSelected || logoSrc" ejs-button class="clear-logo-button" cssClass="e-outline" (click)="onImageRemove()">Clear</button>
+    <ng-container *ngIf="!disabled">
+      <button *ngIf="isImageSelected || logoSrc" ejs-button class="clear-logo-button" cssClass="e-outline" (click)="onImageRemove()">
+        Clear
+      </button>
+    </ng-container>
   </div>
 </div>

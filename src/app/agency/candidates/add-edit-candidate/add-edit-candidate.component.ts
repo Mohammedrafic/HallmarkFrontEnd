@@ -41,6 +41,8 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   public candidateForm: FormGroup;
   public title = 'Add';
   public photo: Blob | null = null;
+  // Used for disabling form and remove creation actions
+  public readonlyMode = false;
 
   private filesDetails : Blob[] = [];
   private unsubscribe$: Subject<void> = new Subject();
@@ -80,6 +82,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
       this.store.dispatch(new GetCandidatePhoto(parseInt(this.route.snapshot.paramMap.get('id') as string)));
     }
 
+    this.pagePermissions();
   }
 
   ngOnDestroy(): void {
@@ -238,6 +241,15 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
         phone2: formValue.contactDetails.phone2
       }
     };
+  }
+
+  private pagePermissions(): void {
+    this.route.data.subscribe((data) => {
+      if (data['readonly']) {
+        this.readonlyMode = true;
+        this.candidateForm.disable();
+      }
+    })
   }
 
   private navigateToCandidates(): void {

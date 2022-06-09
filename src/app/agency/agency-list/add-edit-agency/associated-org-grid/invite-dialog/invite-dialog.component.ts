@@ -40,7 +40,7 @@ export class InviteDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.onOpenEvent();
-    this.store.dispatch(new GetOrganizationsByPage(1, 30));
+    this.store.dispatch(new GetOrganizationsByPage(1, 1000));
 
     this.actions$
       .pipe(

@@ -37,7 +37,7 @@ export class OrderManagementContentService {
    * Get order by id
    @param id
    */
-  public getOrderById(id: number): Observable<Order> {
-    return this.http.get<Order>(`/api/Orders/${id}`);
+  public getAgencyOrderById(id: number, organizationId: number): Observable<Order> {
+    return this.http.get<Order>(`/api/Orders/${id}/organization/${organizationId}`);
   }
 }

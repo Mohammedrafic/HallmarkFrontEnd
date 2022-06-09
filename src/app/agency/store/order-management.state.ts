@@ -63,10 +63,10 @@ export class OrderManagementState {
   @Action(GetOrderById)
   GetOrderById(
     { patchState }: StateContext<OrderManagementModel>,
-    { id, options }: GetOrderById
+    { id, organizationId, options }: GetOrderById
   ): Observable<Order> {
     patchState({ orderDialogOptions: options});
-    return this.orderManagementContentService.getOrderById(id).pipe(
+    return this.orderManagementContentService.getAgencyOrderById(id, organizationId).pipe(
       tap((payload) => {
         patchState({ selectedOrder: payload});
         return payload;

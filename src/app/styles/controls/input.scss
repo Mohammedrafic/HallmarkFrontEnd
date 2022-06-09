@@ -71,6 +71,10 @@ body.light, body.dark {
           &::placeholder {
             color: $secondary-dark-blue-30;
           }
+
+          &.e-disabled {
+            background-color: $secondary-dark-blue-50 !important;
+          }
         }
 
         textarea::placeholder {

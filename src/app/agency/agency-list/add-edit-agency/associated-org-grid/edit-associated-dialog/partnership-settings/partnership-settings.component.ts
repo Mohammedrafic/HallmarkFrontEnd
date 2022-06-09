@@ -42,7 +42,7 @@ export class PartnershipSettingsComponent implements OnInit, OnDestroy {
     .map((name, id) => ({ name, id }));
   public agencyCategoryTier = Object.values(DistributionLevels)
     .filter(valuesOnly)
-    .map((name, id) => ({ name, id }));
+    .map((name, id) => ({ name, id: DistributionLevels[name as DistributionLevels] }));
   public submission = Object.values(SubmissionPercentageOverrideRestriction)
     .filter(valuesOnly)
     .map((name, id) => ({ name, id }));

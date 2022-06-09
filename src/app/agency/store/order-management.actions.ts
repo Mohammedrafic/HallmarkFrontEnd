@@ -6,5 +6,5 @@ export class GetAgencyOrdersPage {
 }
 export class GetOrderById {
   static readonly type = '[agency order management] Get Order By Id';
-  constructor(public id: number, public options: DialogNextPreviousOption) {}
+  constructor(public id: number, public organizationId: number, public options: DialogNextPreviousOption) {}
 }

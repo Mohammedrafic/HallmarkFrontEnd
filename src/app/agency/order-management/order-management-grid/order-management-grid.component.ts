@@ -107,7 +107,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onRowClick({ data }: { data: AgencyOrderManagement }): void {
     this.selectedOrder = data;
     const options = this.getDialogNextPreviousOption(data);
-    this.store.dispatch(new GetOrderById(data.orderId, options));
+    this.store.dispatch(new GetOrderById(data.orderId, data.organizationId, options));
     this.openPreview.next(true);
   }
 

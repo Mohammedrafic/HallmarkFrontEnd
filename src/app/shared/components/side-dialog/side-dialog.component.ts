@@ -16,6 +16,7 @@ export class SideDialogComponent implements OnInit {
 
   @Input() header: string;
   @Input() width: string = '434px';
+
   @Output() formCancelClicked = new EventEmitter();
   @Output() formSaveClicked = new EventEmitter();
 
