@@ -15,6 +15,20 @@
   }
 }
 
+.preview-dialog {
+  .preview-header {
+    align-items: start !important;
+  }
+
+  .preview-title {
+    margin: 0;
+  }
+
+  ejs-chiplist {
+    padding-left: 0;
+  }
+}
+
 .order-statuses {
   display: flex;
   align-items: center;

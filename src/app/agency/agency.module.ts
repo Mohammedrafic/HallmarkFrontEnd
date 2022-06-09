@@ -71,6 +71,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { OrderCandidatesComponent } from "@agency/order-management/order-management-grid/preview-order-dialog/candidates/order-candidates.component";
 import { CandidatDialogComponent } from './order-management/order-management-grid/candidat-dialog/candidat-dialog.component';
 import { OrderManagementState } from './store/order-management.state';
+import { CandidatDetailsComponent } from './order-management/order-management-grid/candidat-dialog/candidat-details/candidat-details.component';
 
 const sidebarIcons = {
   Sliders,
@@ -127,6 +128,7 @@ const sidebarIcons = {
     ProfileComponent,
     OrderCandidatesComponent,
     CandidatDialogComponent,
+    CandidatDetailsComponent,
   ],
   imports: [
     CommonModule,
