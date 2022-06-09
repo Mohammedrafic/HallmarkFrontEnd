@@ -1,6 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 @use "sass:meta";
 
+@use "root";
+
 @import "./variables/colors.scss";
 
 @font-face {
@@ -235,6 +237,8 @@ a, a:hover, a:focus, a:active {
   text-decoration: none;
   color: inherit;
 }
+
+@include meta.load-css( "../../node_modules/@syncfusion/ej2-angular-layouts/styles/material.css");
 
 .overflow-hide {
   overflow: hidden !important;

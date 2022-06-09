@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { DashboardContentComponent } from './dashboard/dashboard-content/dashboard-content.component';
 import { OrderManagementContentComponent } from './order-management/order-management-content/order-management-content.component';
 import { TimesheetsContentComponent } from './timesheets/timesheets-content/timesheets-content.component';
 import { InvoicesContentComponent } from './invoices/invoices-content/invoices-content.component';
@@ -19,7 +18,7 @@ const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        component: DashboardContentComponent,
+        loadChildren: () => import('../dashboard/dashboard.module').then((mod) => mod.DashboardModule),
         data: {
           isOrganizationArea: true,
           isAgencyArea: true

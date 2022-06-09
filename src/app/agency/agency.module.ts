@@ -50,7 +50,6 @@ import { DatePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { NgxsModule } from '@ngxs/store';
 import { AgencyState } from './store/agency.state';
 import { CandidateState } from './store/candidate.state';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { AssociatedOrgGridComponent } from './agency-list/add-edit-agency/associated-org-grid/associated-org-grid.component';
 import { InviteDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/invite-dialog/invite-dialog.component';
 import { DialogAllModule } from '@syncfusion/ej2-angular-popups';
@@ -109,7 +108,6 @@ const sidebarIcons = {
     CandidateGeneralInfoComponent,
     CandidateContactDetailsComponent,
     CandidateProfessionalSummaryComponent,
-    DashboardComponent,
     AssociatedOrgGridComponent,
     InviteDialogComponent,
     EditAssociatedDialogComponent,

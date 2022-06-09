@@ -1,0 +1,19 @@
+@import 'colors';
+
+.app-maps-chart {
+  &__map {
+    aspect-ratio: 4/2.5;
+    display: block;
+  }
+
+  &__range-line {
+    height: 16px;
+    border-radius: 4px;
+    background: linear-gradient(to right, $primary-active-blue-90, $primary-active-blue);
+  }
+
+  &__range-values {
+    text-align: center;
+    margin-top: 10px;
+  }
+}

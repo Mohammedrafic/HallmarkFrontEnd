@@ -1,0 +1,49 @@
+<ng-container
+  [ngTemplateOutlet]="dashboardTemplate"
+  [ngTemplateOutletContext]="{ widgetsData: widgetsData$ | async }"
+></ng-container>
+
+<ng-template #dashboardTemplate let-widgetsData="widgetsData">
+  <div class="control-section">
+    <div style="padding: 5px; text-align: right"></div>
+    <ejs-dashboardlayout
+      id="dashboardLayout"
+      [columns]="columns"
+      [cellSpacing]="cellSpacing"
+      (dragStop)="moveDashboardPanel()"
+      (created)="dashboardIsCreated()"
+      #dashboardLayout
+    >
+      <e-panels>
+        <e-panel
+          *ngFor="let panel of panels$ | async; trackBy: trackByHandler"
+          [sizeX]="panel.sizeX"
+          [sizeY]="panel.sizeY"
+          [maxSizeY]="panel.maxSizeY"
+          [row]="panel.row"
+          [col]="panel.col"
+          [id]="panel.id"
+        >
+          <ng-template #content [ngSwitch]="panel.id">
+            <app-accumulation-chart
+              [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
+              *ngSwitchCase="widgetTypeEnum.CANDIDATES"
+            ></app-accumulation-chart>
+            <app-accumulation-chart
+              [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
+              *ngSwitchCase="widgetTypeEnum.ORDERS_VS_CANDIDATES"
+            ></app-accumulation-chart>
+            <app-accumulation-chart
+              [chartData]="widgetsData?.[widgetTypeEnum.INVOICES]"
+              *ngSwitchCase="widgetTypeEnum.INVOICES"
+            ></app-accumulation-chart>
+            <app-maps-chart
+              *ngSwitchCase="widgetTypeEnum.CANDIDATES_BY_STATE"
+              [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES_BY_STATE]"
+            ></app-maps-chart>
+          </ng-template>
+        </e-panel>
+      </e-panels>
+    </ejs-dashboardlayout>
+  </div>
+</ng-template>

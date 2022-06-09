@@ -42,7 +42,6 @@ import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 
 import { ClientRoutingModule } from './client-routing.module';
-import { DashboardContentComponent } from './dashboard/dashboard-content/dashboard-content.component';
 import { OrderManagementContentComponent } from './order-management/order-management-content/order-management-content.component';
 import { CandidatesContentComponent } from './candidates/candidates-content/candidates-content.component';
 import { InvoicesContentComponent } from './invoices/invoices-content/invoices-content.component';
@@ -86,7 +85,6 @@ const gridIcons = {
 
 @NgModule({
   declarations: [
-    DashboardContentComponent,
     ClientComponent,
     OrderManagementContentComponent,
     CandidatesContentComponent,

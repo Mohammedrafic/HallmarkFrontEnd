@@ -1,0 +1,37 @@
+<app-widget-wrapper [title]="chartData?.title ?? ''">
+  <ejs-accumulationchart
+    chart
+    #sfComponent
+    [enableAnimation]="false"
+    [id]="chartData?.id"
+    [legendSettings]="legendSettings"
+    [tooltip]="tooltipSettings"
+    class="app-accumulation-chart__component"
+  >
+    <e-accumulation-series-collection>
+      <e-accumulation-series
+        [dataSource]="filteredChartData$ | async"
+        [palettes]="palette"
+        pointColorMapping="color"
+        innerRadius="70%"
+        radius="80%"
+        xName="label"
+        yName="value"
+      >
+      </e-accumulation-series>
+    </e-accumulation-series-collection>
+  </ejs-accumulationchart>
+  <div legend>
+    <div
+      *ngFor="let legend of chartData?.chartData; trackBy: trackByHandler; let idx = index"
+      class="widget-legend__item"
+    >
+      <div class="widget-legend__item-content">
+        <input type="checkbox" checked (change)="onClickLegend(legend.label)" />
+        <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"></div>
+        <div class="widget-legend__legend-text">{{ legend.label }}</div>
+      </div>
+      <div class="app-accumulation-chart__legend-score">{{ legend.value }}</div>
+    </div>
+  </div>
+</app-widget-wrapper>
