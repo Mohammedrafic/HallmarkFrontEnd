@@ -3,16 +3,17 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { DashboardLayoutComponent, PanelModel } from '@syncfusion/ej2-angular-layouts';
-import { Observable, takeUntil, startWith, distinctUntilChanged, switchMap, combineLatest, skip } from 'rxjs';
+import { Observable, takeUntil, startWith, distinctUntilChanged, switchMap, combineLatest, skip, take } from 'rxjs';
 import isEqual from 'lodash/fp/isEqual';
+import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
 import { ToggleSidebarState } from '../store/app.actions';
 import { DashboardService } from './services/dashboard.service';
 import {
   AddDashboardPanel,
   DashboardPanelIsMoved,
-  DeleteDashboardPanels,
   GetDashboardPanels,
+  SetDashboardState,
 } from './store/dashboard.actions';
 import { DashboardState } from './store/dashboard.state';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -40,31 +41,59 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   public readonly filtersGroup: FormGroup = this.getFiltersGroup();
   public readonly widgetTypeEnum: typeof WidgetTypeEnum = WidgetTypeEnum;
 
+  private isMobile: boolean;
+
   constructor(
     private store: Store,
     private actions$: Actions,
     private dashboardService: DashboardService,
-    private readonly formBuilder: FormBuilder
+    private readonly formBuilder: FormBuilder,
+    private breakpointObserver: BreakpointObserver
   ) {
     super();
   }
 
   public ngOnInit(): void {
     this.setWidgetsData();
-    this.getDashboardPanels();
     this.refreshDashboard();
     this.organizationId$.pipe(takeUntil(this.destroy$), skip(1)).subscribe(() => {
-      this.deleteDashboardPanels();
+      this.setDashboardState([]);
       this.getDashboardPanels();
     });
+  }
+
+  dashboardIsCreated() {
+    this.breakpointObserver
+      .observe([`(${this.dashboard.mediaQuery})`])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((state: BreakpointState) => {
+        this.isMobile = state.matches;
+
+        this.getDashboardPanels();
+      });
   }
 
   public trackByHandler(_: number, panel: PanelModel): string {
     return panel.id ?? '';
   }
 
+  private setDashboardState(state: PanelModel[]): void {
+    setTimeout(() => this.store.dispatch(new SetDashboardState(state)));
+  }
+
   private getDashboardPanels(): void {
-    this.store.dispatch(new GetDashboardPanels());
+    this.store
+      .dispatch(new GetDashboardPanels())
+      .pipe(take(1))
+      .subscribe((data) => {
+        this.setDashboardState([]);
+
+        const dashboardState = this.isMobile
+          ? data.dashboard.panels.map((panel: any) => ({ ...panel, maxSizeY: 1 }))
+          : data.dashboard.panels;
+
+        this.setDashboardState(dashboardState);
+      });
   }
 
   private refreshDashboard(): void {
@@ -78,20 +107,17 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     setTimeout(() => this.dashboard.refresh(), 500);
   }
 
-  private dashboardPanels(): PanelModel[] {
-    return this.dashboard.serialize();
-  }
-
-  private deleteDashboardPanels(): void {
-    this.store.dispatch(new DeleteDashboardPanels());
+  private getDashboardState(): PanelModel[] {
+    const panels = this.dashboard.serialize();
+    return this.isMobile ? panels.map((panel: any) => ({ ...panel, maxSizeY: null })) : panels;
   }
 
   moveDashboardPanel(): void {
-    this.store.dispatch(new DashboardPanelIsMoved(this.dashboardPanels()));
+    this.store.dispatch(new DashboardPanelIsMoved(this.getDashboardState()));
   }
 
   addPanel(): void {
-    const allPanels = this.dashboardPanels().length;
+    const allPanels = this.getDashboardState.length;
     const panel: PanelModel = {
       id: 'layout_' + allPanels,
       sizeX: 3,
@@ -100,7 +126,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
       col: 0,
     };
     this.dashboard.addPanel(panel);
-    this.store.dispatch(new AddDashboardPanel(this.dashboardPanels()));
+    this.store.dispatch(new AddDashboardPanel(this.getDashboardState()));
   }
 
   private getFiltersGroup(): FormGroup {

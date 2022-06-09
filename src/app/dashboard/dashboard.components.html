@@ -11,6 +11,7 @@
       [columns]="columns"
       [cellSpacing]="cellSpacing"
       (dragStop)="moveDashboardPanel()"
+      (created)="dashboardIsCreated()"
       #dashboardLayout
     >
       <e-panels>
@@ -18,12 +19,12 @@
           *ngFor="let panel of panels$ | async; trackBy: trackByHandler"
           [sizeX]="panel.sizeX"
           [sizeY]="panel.sizeY"
+          [maxSizeY]="panel.maxSizeY"
           [row]="panel.row"
           [col]="panel.col"
           [id]="panel.id"
         >
           <ng-template #content [ngSwitch]="panel.id">
-            <!--          <app-line-chart [widget]="widgets['chart_line_'+ i]" *ngSwitchCase="'chart_line_'+ i"></app-line-chart>-->
             <app-accumulation-chart
               [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
               *ngSwitchCase="widgetTypeEnum.CANDIDATES"
