@@ -16,7 +16,7 @@ export class FilterDialogComponent implements OnInit {
 
   @Input() width: string = '532px';
   @Input() items: FilteredItem[] = [];
-  @Input() count: number = 0;
+  @Input() count: number | undefined = 0;
   @Output() clearAllFiltersClicked = new EventEmitter();
   @Output() applyFilterClicked = new EventEmitter();
   @Output() deleteFilter = new EventEmitter();

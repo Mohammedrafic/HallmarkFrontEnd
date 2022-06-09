@@ -7,6 +7,7 @@
       <button
         ejs-button
         id="filterButton"
+        (click)="showFilters()"
         cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
       <button
         ejs-button
@@ -128,6 +129,62 @@
     </ng-template>
   </ejs-grid>
 </section>
+
+<app-filter-dialog [items]="filteredItems" [count]="(holidaysPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+  <form class="bootstrap" [formGroup]="HolidayFilterFormGroup">
+    <div class="input-container">
+      <label>Region</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="regionIds"
+                         placeholder="All"
+                         [fields]="optionFields"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="regions">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Location</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="locationIds"
+                         placeholder="All"
+                         [fields]="optionFields"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.locationIds.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Holiday Name</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="holidayNames"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.holidayNames.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Year</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="years"
+                         placeholder="All"
+                         [fields]="optionFields"
+                         [allowFiltering]="false"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.years.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+  </form>
+</app-filter-dialog>
 
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 

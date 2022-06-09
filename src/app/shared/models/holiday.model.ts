@@ -71,3 +71,14 @@ export class OrganizationHoliday {
 export type HolidaysPage = PageOfCollections<Holiday>;
 
 export type OrganizationHolidaysPage = PageOfCollections<OrganizationHoliday>;
+
+export class HolidayFilters {
+  holidayNames?: string[];
+  years?: number[];
+  pageNumber?: number;
+  pageSize?: number;
+  orderBy?: string;
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentsIds?: number[];
+}

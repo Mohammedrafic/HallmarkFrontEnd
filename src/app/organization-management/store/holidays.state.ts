@@ -9,13 +9,14 @@ import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages
 import { MessageTypes } from "src/app/shared/enums/message-types";
 import { ShowToast } from "src/app/store/app.actions";
 import { UserState } from 'src/app/store/user.state';
-import { CheckIfExist, DeleteHoliday, DeleteHolidaySucceeded, ExportHolidays, GetAllMasterHolidays, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded } from './holidays.actions';
+import { CheckIfExist, DeleteHoliday, DeleteHolidaySucceeded, ExportHolidays, GetAllMasterHolidays, GetHolidayDataSources, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded } from './holidays.actions';
 
 export interface HolidaysStateModel {
   isHolidayLoading: boolean;
   holidaysPage: OrganizationHolidaysPage | null;
   masterHolidays: Holiday[];
   isExist: boolean;
+  holidayDataSource: string[];
 }
 
 @State<HolidaysStateModel>({
@@ -25,6 +26,7 @@ export interface HolidaysStateModel {
     isHolidayLoading: false,
     masterHolidays: [],
     isExist: false,
+    holidayDataSource: [],
   },
 })
 @Injectable()
@@ -39,12 +41,15 @@ export class HolidaysState {
   @Selector()
   static masterHolidays(state: HolidaysStateModel): Holiday[] { return state.masterHolidays; }
 
+  @Selector()
+  static holidayDataSource(state: HolidaysStateModel): string[] { return state.holidayDataSource; }
+
   constructor(private holidaysService: HolidaysService, private store: Store) { }
 
   @Action(GetHolidaysByPage)
-  GetHolidaysByPage({ patchState }: StateContext<HolidaysStateModel>, { pageNumber, pageSize, orderBy }: GetHolidaysByPage): Observable<OrganizationHolidaysPage> {
+  GetHolidaysByPage({ patchState }: StateContext<HolidaysStateModel>, { pageNumber, pageSize, orderBy, filter }: GetHolidaysByPage): Observable<OrganizationHolidaysPage> {
     patchState({ isHolidayLoading: true });
-    return this.holidaysService.getOrganizationHolidays(pageNumber, pageSize, orderBy).pipe(
+    return this.holidaysService.getOrganizationHolidays(pageNumber, pageSize, orderBy, filter).pipe(
       tap((payload) => {
         const organizationStructure = this.store.selectSnapshot(UserState.organizationStructure);
         payload.items.forEach(item => {
@@ -117,6 +122,14 @@ export class HolidaysState {
     return this.holidaysService.exportOrganizationHolidays(payload).pipe(tap(file => {
       const url = window.URL.createObjectURL(file);
       saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
+
+  @Action(GetHolidayDataSources)
+  GetHolidayDataSources({ patchState }: StateContext<HolidaysStateModel>, { }: GetHolidayDataSources): Observable<string[]> {
+    return this.holidaysService.getHolidaysDataSources().pipe(tap(dataSource => {
+      patchState({ holidayDataSource: dataSource });
+      return dataSource;
     }));
   };
 }
