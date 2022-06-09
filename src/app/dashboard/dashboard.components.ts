@@ -57,7 +57,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     this.setWidgetsData();
     this.refreshDashboard();
     this.organizationId$.pipe(takeUntil(this.destroy$), skip(1)).subscribe(() => {
-      this.setDashboardState([]);
       this.getDashboardPanels();
     });
   }
