@@ -1,0 +1,20 @@
+<div class="dashboard-control">
+  <app-page-toolbar>
+    <ng-container left> </ng-container>
+    <ng-container right>
+      <ng-container *ngIf="true">
+        <button ejs-button cssClass="e-outline" (click)="addNew()">
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </button>
+        <button ejs-button [isPrimary]="true" [disabled]="false">Create Order</button>
+      </ng-container>
+    </ng-container>
+  </app-page-toolbar>
+
+  <app-widget-list
+    [availableWidgets]="widgets"
+    (formCancelClicked)="closeDialog()"
+    (formSaveClicked)="onSaveCredential()"
+  >
+  </app-widget-list>
+</div>

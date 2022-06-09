@@ -22,6 +22,8 @@ import { LineChartComponent } from './widgets/line-chart/line-chart.component';
 import { MapsChartModule } from './widgets/maps-chart/maps-chart.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { WidgetWrapperModule } from './widgets/widget-wrapper/widget-wrapper.module';
+import { DashboardControlModule } from './dashboard-controller/dashboard-controller.module';
+import { WidgetService } from './services/widget.service';
 
 @NgModule({
   declarations: [DashboardComponent, LineChartComponent, AccumulationChartComponent],
@@ -32,6 +34,7 @@ import { WidgetWrapperModule } from './widgets/widget-wrapper/widget-wrapper.mod
     AccumulationChartAllModule,
     MapsChartModule,
     LayoutModule,
+    DashboardControlModule,
     RouterModule.forChild([{ path: '', component: DashboardComponent }]),
     NgxsModule.forFeature([DashboardState]),
     ReactiveFormsModule,
@@ -39,6 +42,7 @@ import { WidgetWrapperModule } from './widgets/widget-wrapper/widget-wrapper.mod
   ],
   providers: [
     DashboardService,
+    WidgetService,
     CategoryService,
     SplineSeriesService,
     PieSeriesService,
