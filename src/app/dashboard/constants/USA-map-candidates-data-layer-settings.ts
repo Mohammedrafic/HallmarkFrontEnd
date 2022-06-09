@@ -6,12 +6,7 @@ export const USAMapCandidatesDataLayerSettings: LayerSettingsModel = {
   shapeSettings: {
     autofill: false,
     colorValuePath: 'candidates',
-    colorMapping: [
-      { from: 0, to: 2, color: '#ECF2FF' },
-      { from: 2, to: 4, color: '#C5D9FF' },
-      { from: 4, to: 6, color: '#9EBFFF' },
-      { color: '#6499FF' },
-    ],
+    border: { color: '#9198ac', width: 0.5 },
   },
   tooltipSettings: {
     visible: true,
