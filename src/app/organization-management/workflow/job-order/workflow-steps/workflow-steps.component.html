@@ -11,7 +11,7 @@
       class="form-container bootstrap"
     >
       <!-- Incomplete/Shortlisted Steps -->
-      <div class="e-card group">
+      <div class="e-card group" *ngIf="!shortlistedIsAgencyStep">
         <div class="input-container">
           <label class="initial-step-label">Step</label>
           <div class="input-group input-readonly">
@@ -79,7 +79,7 @@
             <button
               ejs-button
               cssClass="e-flat default-icon-button"
-              (click)="onRemoveCustomStepButtonClick(i + 2)">
+              (click)="onRemoveCustomStepButtonClick(i)">
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
@@ -87,7 +87,7 @@
       </div>
     </form>
 
-    <div class="button-container">
+    <div class="button-container" *ngIf="showAddCustomStep">
       <button
         ejs-button
         cssClass="e-flat button-with-icon"
@@ -96,7 +96,7 @@
     </div>
 
     <!-- Published/Offered Steps -->
-    <div class="e-card group">
+    <div class="e-card group" [ngClass]="{'card-with-top-margin': !showAddCustomStep}" *ngIf="!offeredIsAgencyStep">
       <div class="input-container bootstrap">
         <label for="publishedStep" class="initial-step-label">Step</label>
         <div class="input-group input-readonly">
@@ -117,6 +117,33 @@
             type="text"
             readonly
             [placeholder]="publishedOfferedStepStatus"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Onboarded Step -->
+    <div class="e-card group card-with-top-margin" *ngIf="onboardedStepName && !onboardedIsAgencyStep">
+      <div class="input-container bootstrap">
+        <label for="onboardedStep" class="initial-step-label">Step</label>
+        <div class="input-group input-readonly">
+          <input id="onboardedStep"
+                 class="e-input"
+                 type="text"
+                 readonly
+                 [value]="onboardedStepName"
+          />
+        </div>
+      </div>
+
+      <div class="input-container bootstrap with-padding" *ngIf="customParentStatus.controls.length > 0">
+        <label>Current Status</label>
+        <div class="input-group input-readonly">
+          <input
+            class="e-input"
+            type="text"
+            readonly
+            [placeholder]="onboardedStepStatus"
           />
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Inject, Input, OnInit, OnDestroy, Output, SimpleChange } from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnInit, OnDestroy, Output } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Step, Workflow } from '@shared/models/workflow.model';
 import { Subject, takeUntil } from 'rxjs';
@@ -29,6 +29,11 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   public incompleteShortlistedStepName: string;
   public publishedOfferedStepName: string;
   public publishedOfferedStepStatus: string;
+  public onboardedStepName: string;
+  public onboardedStepStatus: string;
+  public shortlistedIsAgencyStep: boolean;
+  public offeredIsAgencyStep: boolean;
+  public onboardedIsAgencyStep: boolean;
 
   get customParentStatus() {
     return this.customStepFormGroup.get('customParentStatus') as FormArray;
@@ -42,8 +47,14 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
     return this.customStepFormGroup.get('customStepName') as FormArray;
   }
 
+  get showAddCustomStep(): boolean {
+    return this.shortlistedCanBeFollowedByCustomStep || this.incompleteCanBeFollowedByCustomStep;
+  }
+
   private formBuilder: FormBuilder;
   private unsubscribe$: Subject<void> = new Subject();
+  private shortlistedCanBeFollowedByCustomStep: boolean;
+  private incompleteCanBeFollowedByCustomStep: boolean;
 
   constructor(@Inject(FormBuilder) private builder: FormBuilder,
               private actions$: Actions,
@@ -52,8 +63,8 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.setStepNameAndStatus(this.workflow);
     this.workflowSteps$.pipe(filter(Boolean),takeUntil(this.unsubscribe$)).subscribe((steps: Step[]) => {
+      this.setStepNameAndStatus(this.workflow);
       this.initialSteps = steps.slice(); // make a copy of steps to use them in case update will fail
       this.steps = steps;
 
@@ -67,7 +78,7 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
       this.customStepName.clear();
       this.customStepStatus.clear();
 
-      if (this.steps.length > 2) {
+      if (this.steps.filter(s => s.type === WorkflowStepType.Custom).length > 0) { // check if there are custom steps
         this.steps.forEach((item) => {
           if ((item.type === WorkflowStepType.Incomplete && this.customParentStatus.length === 0)
             || (item.type === WorkflowStepType.Shortlisted && this.customParentStatus.length === 0)) {
@@ -105,14 +116,19 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
         okButtonClass: 'delete-button'
       }).pipe(filter(confirm => !!confirm))
       .subscribe(() => {
-        this.steps.splice(index, 1);
+        const notCustomSteps = this.steps.filter(s => s.type !== WorkflowStepType.Custom); // preserve all non-custom steps
+        this.steps = this.steps.filter(s => s.type === WorkflowStepType.Custom);
+        this.steps.splice(index, 1); // remove custom step by its index
 
-        if (this.steps.length === 2) {
-          this.steps = []; // if no custom steps, overridden parent status also not need
+        if (this.steps.filter(s => s.type === WorkflowStepType.Custom).length === 0) {
+          this.steps = []; // if no custom steps, overridden parent status also not need so empty array at all
         }
 
-        this.customStepName.removeAt(index - 2);
-        this.customStepStatus.removeAt(index - 2);
+        this.steps = notCustomSteps.concat(this.steps);
+        this.workflow.steps = this.steps;
+
+        this.customStepName.removeAt(index);
+        this.customStepStatus.removeAt(index);
         if (this.customStepStatus.length === 0 && this.customStepStatus.length === 0) {
           this.customParentStatus.removeAt(0); // parent status is always the one, so its index = 0
         }
@@ -122,9 +138,10 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   }
 
   private addParentStepStatus(): void {
-    if (this.steps.length === 2) {
-      // add element to override parent status
-      this.steps[0].status = '';
+    // add element to override parent status
+    if (this.customParentStatus.length === 0) {
+      // @ts-ignore
+      this.steps.find(s => s.type === WorkflowStepType.Incomplete || s.type === WorkflowStepType.Shortlisted).status = '';
       this.customParentStatus.push(this.formBuilder.control('', [Validators.required, Validators.maxLength(50)]));
     }
   }
@@ -134,7 +151,7 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
       name: '',
       status: '',
       type: WorkflowStepType.Custom,
-      workflowId: this.workflow.steps[0].workflowId
+      workflowId: this.workflow.id
     }
     this.steps.push(newCustomStep);
     this.customStepName.push(this.formBuilder.control('', [Validators.required, Validators.maxLength(50)]));
@@ -148,6 +165,7 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
       const incompleteStep = workflow.steps.find(step => step.type === WorkflowStepType.Incomplete);
       if (incompleteStep) {
         this.incompleteShortlistedStepName = incompleteStep.name;
+        this.incompleteCanBeFollowedByCustomStep = incompleteStep.canBeFollowedByCustomStep as boolean;
       }
 
       const publishedStep = workflow.steps.find(step => step.type === WorkflowStepType.Published);
@@ -160,12 +178,22 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
       const shortlistedStep = workflow.steps.find(step => step.type === WorkflowStepType.Shortlisted);
       if (shortlistedStep) {
         this.incompleteShortlistedStepName = shortlistedStep.name;
+        this.shortlistedCanBeFollowedByCustomStep = shortlistedStep.canBeFollowedByCustomStep as boolean;
+        this.shortlistedIsAgencyStep = shortlistedStep.isAgencyStep as boolean;
       }
 
       const offeredStep = workflow.steps.find(step => step.type === WorkflowStepType.Offered);
       if (offeredStep) {
         this.publishedOfferedStepName = offeredStep.name;
         this.publishedOfferedStepStatus = offeredStep.status;
+        this.offeredIsAgencyStep = offeredStep.isAgencyStep as boolean;
+      }
+
+      const onboardedStep = workflow.steps.find(step => step.type === WorkflowStepType.Onboarded);
+      if (onboardedStep) {
+        this.onboardedStepName = onboardedStep.name;
+        this.onboardedStepStatus = onboardedStep.status;
+        this.onboardedIsAgencyStep = onboardedStep.isAgencyStep as boolean;
       }
     }
   }

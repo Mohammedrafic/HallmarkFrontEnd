@@ -179,9 +179,10 @@ export class JobOrderComponent implements OnInit, OnDestroy {
       let orderSteps: Step[] = [];
       let applicationSteps: Step[] = [];
 
-      if (this.orderWorkflow.steps.length > 2) {
+      if (this.orderWorkflow.steps.filter(s => s.type === WorkflowStepType.Custom).length > 0) {
         // map Order workflow custom steps and override parent status
-        this.orderWorkflow.steps[0].status = this.customStepOrderFormGroup.controls['customParentStatus'].value[0];
+        // @ts-ignore
+        this.orderWorkflow.steps.find(s => s.type = WorkflowStepType.Incomplete).status = this.customStepOrderFormGroup.controls['customParentStatus'].value[0];
         this.orderWorkflow.steps.filter(s => s.type === WorkflowStepType.Custom).forEach((customStep, i) => {
           customStep.name = this.customStepOrderFormGroup.controls['customStepName'].value[i];
           customStep.status = this.customStepOrderFormGroup.controls['customStepStatus'].value[i];
@@ -191,13 +192,14 @@ export class JobOrderComponent implements OnInit, OnDestroy {
         orderSteps = this.orderWorkflow.steps;
       }
 
-      if (this.applicationWorkflow.steps.length > 2) {
+      if (this.applicationWorkflow.steps.filter(s => s.type === WorkflowStepType.Custom).length > 0) {
         // map Application workflow custom steps and override parent status
-        this.applicationWorkflow.steps[0].status = this.customStepApplicationFormGroup.controls['customParentStatus'].value[0];
+        // @ts-ignore
+        this.applicationWorkflow.steps.find(s => s.type = WorkflowStepType.Shortlisted).status = this.customStepApplicationFormGroup.controls['customParentStatus'].value[0];
         this.applicationWorkflow.steps.filter(s => s.type === WorkflowStepType.Custom).forEach((customStep, i) => {
           customStep.name = this.customStepApplicationFormGroup.controls['customStepName'].value[i];
           customStep.status = this.customStepApplicationFormGroup.controls['customStepStatus'].value[i];
-          customStep.order = i + 1;
+          customStep.order = i + 2;
         });
 
         applicationSteps = this.applicationWorkflow.steps;

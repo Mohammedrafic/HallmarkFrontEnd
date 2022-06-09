@@ -3,5 +3,6 @@ export enum WorkflowStepType {
   Incomplete = 2,
   Published = 3,
   Shortlisted = 4,
-  Offered = 5
+  Offered = 5,
+  Onboarded = 8
 }
