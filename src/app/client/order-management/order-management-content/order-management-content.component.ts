@@ -118,7 +118,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public onRowClick({ data }: { data: OrderManagement }): void {
     const options = this.getDialogNextPreviousOption(data);
-    this.store.dispatch(new GetOrderById(data.id, options));
+    this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
     this.openDetails.next(true);
   }
 
