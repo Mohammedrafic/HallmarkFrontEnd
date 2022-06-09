@@ -81,11 +81,21 @@
     .right {
       width: 100%;
 
-      .pdf-viewer {
+      .file-viewer {
         height: 100%;
         border: 1px solid $secondary-dark-blue-45;
         box-shadow: 0px 3px 28px rgba(0, 0, 0, 0.04);
         border-radius: 12px;
+
+        .image-container {
+          display: flex;
+          justify-content: center;
+
+          img {
+            max-width: 100%;
+            max-height: 100%;
+          }
+        }
       }
     }
   }

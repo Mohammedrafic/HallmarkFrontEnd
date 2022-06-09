@@ -51,4 +51,12 @@ export class AgencyService {
   public getAgencyLogo(businessUnitId: number): Observable<Blob> {
     return this.http.get(`/api/BusinessUnit/${businessUnitId}/logo`, { responseType: 'blob' });
   }
+
+  /**
+   * Remove logo
+   * @param businessUnitId
+   */
+  public removeAgencyLogo(businessUnitId: number): Observable<never> {
+    return this.http.delete<never>(`/api/BusinessUnit/${businessUnitId}/logo`);
+  }
 }

@@ -39,7 +39,8 @@ import {
   UpdateCredentialType,
   RemoveCredentialType,
   ExportSkills,
-  ExportSkillCategories
+  ExportSkillCategories,
+  RemoveOrganizationLogo
 } from './admin.actions';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
@@ -228,6 +229,14 @@ export class AdminState {
       dispatch(new GetOrganizationLogoSucceeded(payload));
       return payload;
     }));
+  }
+
+  @Action(RemoveOrganizationLogo)
+  RemoveOrganizationLogo({ dispatch }: StateContext<AdminStateModel>, { payload }: RemoveOrganizationLogo): Observable<any> {
+    return this.organizationService.removeOrganizationLogo(payload).pipe(
+      tap((payload) => payload),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Logo cannot be deleted'))))
+    );
   }
 
   @Action(GetBusinessUnitList)

@@ -35,6 +35,11 @@ export class GetOrganizationLogo {
   constructor(public payload: number) { }
 }
 
+export class RemoveOrganizationLogo {
+  static readonly type = '[admin] Remove Organization Logo ';
+  constructor(public payload: number) { }
+}
+
 export class GetOrganizationLogoSucceeded {
   static readonly type = '[admin] Get Organization Logo Succeeded';
   constructor(public payload: Blob) { }

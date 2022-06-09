@@ -9,7 +9,7 @@ export class Skill {
   skillAbbr: string;
   skillDescription: string;
   skillCategory?: SkillCategory;
-  glNumber?: string;
+  glNumber?: string | null;
   allowOnboard?: boolean;
   inactiveDate?: string | null;
   isDefault?: boolean;
@@ -25,7 +25,7 @@ export class Skill {
     if (assigned) {
       this.inactiveDate = skill.inactiveDate || null;
       this.allowOnboard = skill.allowOnboard || false;
-      this.glNumber = skill.glNumber;
+      this.glNumber = skill.glNumber || null;
       this.masterSkillId = skill.masterSkillId;
     }
   }
@@ -38,6 +38,23 @@ export class SkillsPage {
   pageNumber: number;
   totalCount: number;
   totalPages: number;
+}
+
+export class SkillDataSource {
+  skillABBRs: string[];
+  skillDescriptions: string[];
+  glNumbers: string[];
+}
+
+export class SkillFilters {
+  skillCategories?: string[];
+  skillDescriptions?: string[];
+  skillAbbrs?: string[];
+  glNumbers?: any[];
+  allowOnboard?: boolean | null;
+  pageNumber?: number;
+  pageSize?: number;
+  orderBy?: string;
 }
 
 export class MasterSkillByOrganization {

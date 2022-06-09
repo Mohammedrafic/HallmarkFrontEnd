@@ -78,7 +78,7 @@ export class AddEditVisibilityComponent implements OnInit, OnDestroy {
     this.subscribeOnFormValuesChanges();
     this.organizations$.pipe(takeUntil(this.unsubscribe$))
       .subscribe(organisations => {
-        this.organisations = this.isOrganisationUser
+        this.organisations = this.isOrganisationUser || organisations.length < 2
           ? [...organisations]
           : [{ name: 'All', organizationId: this.allOrganisationId, regions: [] }, ...organisations];
       });

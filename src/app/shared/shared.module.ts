@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { FeatherModule } from 'angular-feather';
 
-import { AlertCircle, CheckCircle, allIcons } from 'angular-feather/icons';
+import { AlertCircle, CheckCircle, ArrowLeft, ArrowRight } from 'angular-feather/icons';
 import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
 import { ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -25,8 +25,9 @@ import { ExportDialogComponent } from './components/export-dialog/export-dialog.
 import { FormsModule } from '@angular/forms';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { DialogNextPreviousComponent } from './components/dialog-next-previous/dialog-next-previous.component';
 
-const icons = {AlertCircle, CheckCircle};
+const icons = {AlertCircle, CheckCircle, ArrowLeft, ArrowRight};
 
 const COMPONENTS = [
   PageToolbarComponent,
@@ -41,7 +42,8 @@ const COMPONENTS = [
   FileUploadDialogComponent,
   ExportDialogComponent,
   SideMenuComponent,
-  SearchComponent
+  SearchComponent,
+  DialogNextPreviousComponent
 ];
 
 @NgModule({

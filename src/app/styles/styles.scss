@@ -189,8 +189,8 @@ body {
   &.light,
   &.dark {
     .bootstrap {
-      .e-wrapper .e-label {
-        font-family: "SF Pro";
+      .e-wrapper .e-label, input {
+        font-family: "SF Pro" !important;
       }
     }
   }

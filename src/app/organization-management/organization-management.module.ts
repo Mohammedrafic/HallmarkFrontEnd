@@ -5,7 +5,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { GridModule, ResizeService, PagerModule, PageService } from '@syncfusion/ej2-angular-grids';
 import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownListModule, ListBoxModule, MultiSelectAllModule, AutoCompleteModule } from '@syncfusion/ej2-angular-dropdowns';
-import { UploaderModule, TextBoxModule, NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
+import {
+  UploaderModule,
+  TextBoxModule,
+  NumericTextBoxModule,
+  MaskedTextBoxModule
+} from '@syncfusion/ej2-angular-inputs';
 import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, TimePickerModule, DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
@@ -59,6 +64,7 @@ import { BillRatesComponent } from './bill-rates/bill-rates.component';
 import { BillRateSetupComponent } from './bill-rates/bill-rate-setup/bill-rate-setup.component';
 import { BillRateTypeComponent } from './bill-rates/bill-rate-type/bill-rate-type.component';
 import { BillRateTypeMappingComponent } from './bill-rates/bill-rate-type-mapping/bill-rate-type-mapping.component';
+import { BillRatesState } from '@organization-management/store/bill-rates.state';
 
 const sidebarIcons = {
   Download,
@@ -131,6 +137,7 @@ const sidebarIcons = {
     MultiSelectAllModule,
     AutoCompleteModule,
     DropDownButtonModule,
+    MaskedTextBoxModule,
 
     FeatherModule.pick(sidebarIcons),
 
@@ -140,7 +147,8 @@ const sidebarIcons = {
       WorkflowState,
       CredentialsState,
       ShiftsState,
-      HolidaysState
+      HolidaysState,
+      BillRatesState
     ]),
   ],
   providers: [

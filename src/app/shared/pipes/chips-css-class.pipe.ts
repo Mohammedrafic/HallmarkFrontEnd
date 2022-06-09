@@ -7,7 +7,7 @@ import { STATUS_COLOR_GROUP } from '@shared/enums/status';
 export class ChipsCssClass implements PipeTransform {
 
   transform(status: string): string {
-    const found = Object.entries(STATUS_COLOR_GROUP).find(item => item[1].includes(status));
+    const found = Object.entries(STATUS_COLOR_GROUP).find(([color, statuses]) => statuses.includes(status));
     return found ? found[0] : 'e-default';
   }
 }

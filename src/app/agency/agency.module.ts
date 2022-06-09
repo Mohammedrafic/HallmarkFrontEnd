@@ -24,6 +24,7 @@ import {
   Filter,
   Maximize2,
   Minimize2,
+  Unlock
 } from 'angular-feather/icons';
 import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
 import { PdfViewerModule } from "@syncfusion/ej2-angular-pdfviewer";
@@ -68,6 +69,8 @@ import { FileViewerComponent } from './candidates/add-edit-candidate/file-viewer
 import { ProfileComponent } from './profile/profile.component';
 import { OrderCandidatesComponent } from "@agency/order-management/order-management-grid/preview-order-dialog/candidates/order-candidates.component";
 import { CandidatDialogComponent } from './order-management/order-management-grid/candidat-dialog/candidat-dialog.component';
+import { OrderManagementState } from './store/order-management.state';
+import { CandidatDetailsComponent } from './order-management/order-management-grid/candidat-dialog/candidat-details/candidat-details.component';
 
 const sidebarIcons = {
   Sliders,
@@ -88,6 +91,7 @@ const sidebarIcons = {
   Filter,
   Maximize2,
   Minimize2,
+  Unlock
 };
 
 @NgModule({
@@ -122,6 +126,7 @@ const sidebarIcons = {
     ProfileComponent,
     OrderCandidatesComponent,
     CandidatDialogComponent,
+    CandidatDetailsComponent,
   ],
   imports: [
     CommonModule,
@@ -147,7 +152,7 @@ const sidebarIcons = {
     MultiSelectAllModule,
     MaskedTextBoxModule,
     FeatherModule.pick(sidebarIcons),
-    NgxsModule.forFeature([AgencyState, CandidateState]),
+    NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),
   ],
 })
 export class AgencyModule {}

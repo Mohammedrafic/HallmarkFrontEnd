@@ -6,6 +6,15 @@
   left: auto !important;
   height: calc(100% - 60px) !important;
 
+  .e-card-title {
+    display: flex;
+    align-items: center;
+
+    .e-badge {
+      margin-left: 18px;
+    }
+  }
+
   .e-dlg-content {
     padding: 0;
   }
@@ -52,6 +61,7 @@
           background-color: $secondary-dark-blue-50;
           color: $black;
           border: 1px solid $secondary-dark-blue-40;
+          line-height: 12px;
 
           .e-chip-delete.e-dlt-btn {
             color: $black;

@@ -8,11 +8,11 @@ export enum Status {
 export const STATUS_COLOR_GROUP = {
   'e-success': ['open', 'Active', 'Completed'],
   'e-warning': ['incomplete', 'Suspended', 'Incomplete'],
-  'e-default': ['closed', 'Inactive'],
+  'e-default': ['closed', 'Inactive', 'Closed'],
   'e-pending': ['pending', 'Pending'],
   'e-progress': ['in progress', 'In Progress', 'Verified'],
   'e-accepted': ['accepted'],
-  'e-filled': ['filled']
+  'e-filled': ['filled', 'Filled']
 }
 
 export enum AgencyStatus {

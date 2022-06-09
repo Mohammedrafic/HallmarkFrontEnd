@@ -1,7 +1,7 @@
 import { Country } from "src/app/shared/enums/states";
-import { Order, Organization } from "src/app/shared/models/organization.model";
+import { CreateOrderDto, Organization } from "src/app/shared/models/organization.model";
 import { SkillCategory } from "src/app/shared/models/skill-category.model";
-import { Skill } from "src/app/shared/models/skill.model";
+import { Skill, SkillFilters } from "src/app/shared/models/skill.model";
 import { Department } from '@shared/models/department.model';
 import { Location } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
@@ -204,7 +204,7 @@ export class RemoveSkillsCategorySucceeded {
 
 export class GetAssignedSkillsByPage {
   static readonly type = '[organizationManagement] Get Assigned Skills by Page';
-  constructor(public pageNumber: number, public pageSize: number) { }
+  constructor(public pageNumber: number, public pageSize: number, public filters: SkillFilters) { }
 }
 
 export class SaveAssignedSkill {
@@ -352,6 +352,11 @@ export class ExportSkills {
   constructor(public payload: ExportPayload) { }
 }
 
+export class GetSkillDataSources {
+  static readonly type = '[organizationManagement] Get Skill Data Sources';
+  constructor() { }
+}
+
 export class GetProjectTypes {
   static readonly type = '[organizationManagement] Get Project Types';
   constructor() { }
@@ -374,5 +379,5 @@ export class GetAssociateAgencies {
 
 export class SaveOrder {
   static readonly type = '[organizationManagement] Save Order';
-  constructor(public payload: Order) { }
+  constructor(public order: CreateOrderDto, public documents: Blob[]) { }
 }

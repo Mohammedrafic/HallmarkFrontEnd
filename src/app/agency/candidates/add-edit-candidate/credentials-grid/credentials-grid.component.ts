@@ -47,7 +47,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
 
   public readonly statusEnum = CredentialVerifiedStatus;
-  public readonly allowedExtensions: string = '.pdf, .doc, .docx';
+  public readonly allowedExtensions: string = '.pdf, .doc, .docx, .jpg, .jpeg, .png';
   public readonly maxFileSize = 10485760; // 10 mb
   public uploaderErrorMessageElement: HTMLElement;
   public dropElement: HTMLElement;
@@ -379,7 +379,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       if (this.uploaderErrorMessageElement) {
         this.uploaderErrorMessageElement.innerText = file.size > this.maxFileSize
           ? 'The file exceeds the limitation, max allowed 10 MB.'
-          : 'The file should be in Pdf, Doc, Docx format.';
+          : 'The file should be in pdf, doc, docx, jpg, jpeg, png format.';
       }
     });
   }

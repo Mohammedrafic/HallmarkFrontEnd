@@ -184,4 +184,8 @@ export abstract class AbstractGridConfigurationComponent {
       }
     }
   }
+
+  stopPropagation(event: Event): void {
+    event.stopPropagation();
+  }
 }

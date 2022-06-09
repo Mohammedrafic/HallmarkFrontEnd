@@ -61,6 +61,14 @@ export class CandidateService {
   }
 
   /**
+   * Remove photo
+   * @param candidateProfileId
+   */
+  public removeCandidatePhoto(candidateProfileId: number): Observable<never> {
+    return this.http.delete<never>(`/api/CandidateProfile/${candidateProfileId}/photo`);
+  }
+
+  /**
    * Get experiences by id
    * @param id
    * @return list experiences

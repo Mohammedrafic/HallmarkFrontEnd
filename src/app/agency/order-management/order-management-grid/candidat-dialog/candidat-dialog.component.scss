@@ -16,3 +16,25 @@
     margin: 0 !important;
   }
 }
+
+.candidat-dialog {
+  .candidat-header {
+    align-items: start !important;
+  }
+}
+
+.candidat-info {
+  display: flex;
+
+  .e-card-title {
+    margin: 0;
+  }
+
+  .info {
+    margin-left: 16px;
+
+    ejs-chiplist {
+      padding-left: 0 !important;
+    }
+  }
+}
