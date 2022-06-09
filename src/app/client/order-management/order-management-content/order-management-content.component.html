@@ -49,7 +49,7 @@
       </e-column>
       <e-column field="jobTitle" headerText="JOB TITLE" width="200"></e-column>
       <e-column field="skillName" headerText="SKILL" textAlign="Left" width="200"></e-column>
-      <e-column field="openPositions" headerText="{{ '# of position' | uppercase }}" width="150">
+      <e-column field="openPositions" headerText="# OF POSITION" width="180">
         <ng-template #template let-data>
           <div class="align-right">{{ data.openPositions }}</div>
         </ng-template>
@@ -61,17 +61,17 @@
           <span>{{ getOrderTypeName(data.orderType) }}</span>
         </ng-template>
       </e-column>
-      <e-column field="billRate" headerText="BILL RATE" width="120">
+      <e-column field="billRate" headerText="BILL RATE" width="150">
         <ng-template #template let-data>
           <div class="align-right">{{ data.billRate }}</div>
         </ng-template>
       </e-column>
-      <e-column field="candidates" headerText="CANDIDATES" width="130">
+      <e-column field="candidates" headerText="CANDIDATES" width="150">
         <ng-template #template let-data>
           <div class="align-right">{{ data.candidates }}</div>
         </ng-template>
       </e-column>
-      <e-column field="startDate" headerText="START DATE" width="130">
+      <e-column field="startDate" headerText="START DATE" width="150">
         <ng-template #template let-data>
           <span>{{ data.startDate | date:'MM/dd/yyyy' }}</span>
         </ng-template>
