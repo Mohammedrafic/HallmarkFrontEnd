@@ -7,7 +7,7 @@ import { Observable, takeUntil, startWith, distinctUntilChanged, switchMap, comb
 import isEqual from 'lodash/fp/isEqual';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
-import { ToggleSidebarState } from '../store/app.actions';
+import { SetHeaderState, ToggleSidebarState } from '../store/app.actions';
 import { DashboardService } from './services/dashboard.service';
 import {
   AddDashboardPanel,
@@ -62,6 +62,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   dashboardIsCreated() {
+    this.store.dispatch(new SetHeaderState({ title: 'Dashboard', iconName: 'home' }));
     this.breakpointObserver
       .observe([`(${this.dashboard.mediaQuery})`])
       .pipe(takeUntil(this.destroy$))
