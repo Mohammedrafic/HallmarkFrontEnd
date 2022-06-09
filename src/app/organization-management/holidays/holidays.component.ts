@@ -437,7 +437,6 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
           } else {
             this.saveHandler(false);
           }
-          console.log(val)
         });
       } else {
         this.saveHandler();

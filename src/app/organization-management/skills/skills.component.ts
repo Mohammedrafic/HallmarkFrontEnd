@@ -212,7 +212,6 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public allowOnBoardChange(data: Skill, event: any): void {
-    console.log(data);
     data.allowOnboard = event.checked;
     this.store.dispatch(new SaveAssignedSkill(new Skill(
       {

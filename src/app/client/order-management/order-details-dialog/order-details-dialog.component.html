@@ -44,7 +44,7 @@
             <e-tabitem>
               <ng-template #headerText>Order Details</ng-template>
               <ng-template #content>
-                <!--Order tab goes here-->
+                <app-order-details [currentOrder]="order"></app-order-details>
               </ng-template>
             </e-tabitem>
             <e-tabitem>

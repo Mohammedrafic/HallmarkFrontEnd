@@ -21,6 +21,11 @@ import {
   Copy,
   XCircle,
   X,
+  User,
+  MapPin,
+  Briefcase,
+  Calendar,
+  Folder
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -38,7 +43,7 @@ import { ButtonModule, ChipListModule, CheckBoxModule } from '@syncfusion/ej2-an
 import { DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
-import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
+import { AccordionModule, MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 
 import { ClientRoutingModule } from './client-routing.module';
@@ -62,6 +67,8 @@ import { WorkflowState } from '@organization-management/store/workflow.state';
 import { OrderDetailsDialogComponent } from './order-management/order-details-dialog/order-details-dialog.component';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { OrderDetailsComponent } from './order-management/order-details/order-details.component';
+import { JobDetailsComponent } from './order-management/job-details/job-details.component';
 
 const gridIcons = {
   MessageSquare,
@@ -80,7 +87,12 @@ const gridIcons = {
   XCircle,
   Edit3,
   Trash2,
-  X
+  X,
+  User,
+  MapPin,
+  Briefcase,
+  Calendar,
+  Folder
 };
 
 @NgModule({
@@ -94,7 +106,9 @@ const gridIcons = {
     TabNavigationComponent,
     AddEditOrderComponent,
     OrderDetailsFormComponent,
-    OrderDetailsDialogComponent
+    OrderDetailsDialogComponent,
+    OrderDetailsComponent,
+    JobDetailsComponent
   ],
   imports: [
     CommonModule,
@@ -121,6 +135,7 @@ const gridIcons = {
     OrderCredentialsModule,
     DropDownButtonModule,
     DialogModule,
+    AccordionModule,
 
     //STORE
     NgxsModule.forFeature([

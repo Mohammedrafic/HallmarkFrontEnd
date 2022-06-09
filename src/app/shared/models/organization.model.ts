@@ -190,6 +190,12 @@ export class Order {
   workLocations: OrderWorkLocation[];
   credentials: any[]; // ToDo: Add interface
   workflowId?: number;
+  statusText?: string;
+  status?: number;
+  locationName?: string;
+  departmentName?: string;
+  orderOpenDate?: Date;
+  isLocked?: boolean;
   isSubmit: boolean;
 }
 

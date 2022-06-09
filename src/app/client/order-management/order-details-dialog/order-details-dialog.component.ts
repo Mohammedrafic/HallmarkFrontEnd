@@ -12,6 +12,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { Order } from '@shared/models/organization.model';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -19,7 +20,7 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
   styleUrls: ['./order-details-dialog.component.scss'],
 })
 export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy {
-  @Input() order: OrderManagement;
+  @Input() order: Order;
   @Input() openEvent: Subject<boolean>;
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();

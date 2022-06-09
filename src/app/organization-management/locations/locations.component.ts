@@ -365,7 +365,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       contactEmail: ['', [Validators.required, Validators.email]],
       contactPerson: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       inactiveDate: [null],
-      phoneNumber: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(10), Validators.pattern('^[0-9]*$')]],
+      phoneNumber: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10), Validators.pattern('^[0-9]*$')]],
       phoneType: ['', Validators.required],
     });
   }

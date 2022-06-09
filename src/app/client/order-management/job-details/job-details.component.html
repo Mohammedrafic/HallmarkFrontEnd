@@ -1,0 +1,68 @@
+<section class="job-details" *ngIf="order">
+  <div>
+    <div class="top-container item-container">
+      <span class="value"><i-feather name="user" class="icon"></i-feather>{{ order.title }}</span>
+      <span class="title">Job Title</span>
+    </div>
+    <div class="item-container">
+      <span class="value"><i-feather name="map-pin" class="icon"></i-feather>{{ order.locationName }}</span>
+      <span class="title">Location</span>
+    </div>
+  </div>
+  <div>
+    <div class="top-container item-container">
+      <span class="value"><i-feather name="briefcase" class="icon"></i-feather>{{ reasonForRequisition[order.reasonForRequisition] }}</span>
+      <span class="title">Reason for Requisition</span>
+    </div>
+    <div class="item-container">
+      <span class="value"><i-feather name="calendar" class="icon"></i-feather>{{ order.jobStartDate | date:'MM/dd/yyyy' }}</span>
+      <span class="title">Start Date</span>
+    </div>
+  </div>
+  <div>
+    <div class="top-container item-container">
+      <span class="value"><i-feather name="Folder" class="icon"></i-feather>{{ order.departmentName }}</span>
+      <span class="title">Department</span>
+    </div>
+    <div class="item-container">
+      <span class="value"><i-feather name="calendar" class="icon"></i-feather>{{ order.jobEndDate | date:'MM/dd/yyyy' }}</span>
+      <span class="title">End Date</span>
+    </div>
+  </div>
+  <div>
+    <div class="item-container bill-rate">
+      <span class="bill-rate-value value">${{ order.hourlyRate }}</span>
+      <span class="bill-rate-title title">Bill Rate</span>
+    </div>
+  </div>
+</section>
+<section class="job-type" *ngIf="order">
+  <div class="item-container">
+    <span class="value">{{ orderType[order.orderType] }}</span>
+    <span class="title">Job Type</span>
+  </div>
+  <div class="item-container">
+    <span class="value">{{ order.openPositions }}</span>
+    <span class="title">Open Positions</span>
+  </div>
+  <div class="item-container">
+    <span class="value">{{ order.shiftStartTime | date: 'hh:mm' }} - {{ order.shiftEndTime | date: 'hh:mm' }}</span>
+    <span class="title">Shift</span>
+  </div>
+  <div class="item-container">
+    <span class="value">${{ order.joiningBonus || 0 }} - ${{ order.compBonus || 0 }}</span>
+    <span class="title">Start / End Bonus</span>
+  </div>
+  <div class="item-container">
+    <span class="value">{{ order.onCallRequired ? 'Yes' : 'No' }}</span>
+    <span class="title">Oncall</span>
+  </div>
+  <div class="item-container">
+    <span class="value">{{ order.nO_OT ? 'Yes' : 'No' }}</span>
+    <span class="title">Do Not Consider OT</span>
+  </div>
+  <div class="item-container">
+    <span class="value">{{ order.orderOpenDate | date:'MM/dd/yyyy' }}</span>
+    <span class="title">Distributed On</span>
+  </div>
+</section>

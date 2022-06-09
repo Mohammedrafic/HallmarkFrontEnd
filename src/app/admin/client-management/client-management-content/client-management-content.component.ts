@@ -76,7 +76,6 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
   }
 
   public export(event: any): void {
-    console.log(event);
     this.store.dispatch(new ShowExportDialog(false));
     this.clearSelection(this.grid);
   }

@@ -15,6 +15,7 @@ import { OrderManagement, OrderManagementPage } from '@shared/models/order-manag
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { UserState } from '../../../store/user.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { Order } from '@shared/models/organization.model';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
@@ -40,6 +41,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   @Select(OrderManagementContentState.ordersPage)
   ordersPage$: Observable<OrderManagementPage>;
 
+  @Select(OrderManagementContentState.selectedOrder)
+  selectedOrder$: Observable<Order>;
+
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
@@ -64,7 +68,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   ];
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
-  public selectedOrder: OrderManagement;
+  public selectedOrder: Order;
   public openDetails = new Subject<boolean>();
   public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
 
@@ -74,6 +78,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   ngOnInit(): void {
+    this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
+      this.selectedOrder = order;
+    });
     this.organizationId$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize })));
@@ -110,7 +117,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onRowClick({ data }: { data: OrderManagement }): void {
-    this.selectedOrder = data;
     const options = this.getDialogNextPreviousOption(data);
     this.store.dispatch(new GetOrderById(data.id, options));
     this.openDetails.next(true);

@@ -539,7 +539,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       id: new FormControl(0),
       name: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       title: new FormControl('', Validators.required),
-      email: new FormControl('', [Validators.required, Validators.pattern(/^\S+@\S+\.\S+$/)]),
+      email: new FormControl('', [Validators.required, Validators.email]),
       mobilePhone: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)])
     });
   }

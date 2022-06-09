@@ -1,0 +1,26 @@
+<section class="job-details">
+  <app-job-details [currentOrder]="order"></app-job-details>
+</section>
+<div class="separator"></div>
+<section class="order-content" *ngIf="order">
+  <div>
+    <ejs-accordion>
+      <e-accordionitems>
+        <e-accordionitem expanded='true'>
+          <ng-template #header>
+            <div>Job Description</div>
+          </ng-template>
+          <ng-template #content>
+            <div>{{ order.jobDescription }}</div>
+          </ng-template>
+        </e-accordionitem>
+      </e-accordionitems>
+    </ejs-accordion>
+  </div>
+  <div>
+    
+  </div>
+</section>
+<section class="bill-rates">
+
+</section>

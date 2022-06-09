@@ -31,6 +31,9 @@ export interface OrderManagementContentStateModel {
 export class OrderManagementContentState {
   @Selector()
   static ordersPage(state: OrderManagementContentStateModel): OrderManagementPage | null { return state.ordersPage; }
+
+  @Selector()
+  static selectedOrder(state: OrderManagementContentStateModel): Order | null { return state.selectedOrder; }
   
   @Selector()
   static orderDialogOptions(state: OrderManagementContentStateModel): DialogNextPreviousOption {
