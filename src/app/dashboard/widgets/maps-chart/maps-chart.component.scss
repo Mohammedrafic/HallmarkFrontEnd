@@ -7,8 +7,9 @@
   }
 
   &__range-line {
-    height: 5px;
-    background: linear-gradient(to right, $white, $primary-active-blue);
+    height: 16px;
+    border-radius: 4px;
+    background: linear-gradient(to right, $primary-active-blue-90, $primary-active-blue);
   }
 
   &__range-values {

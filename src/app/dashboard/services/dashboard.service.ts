@@ -171,7 +171,7 @@ export class DashboardService {
     );
     const shapeSettings = {
       ...USAMapCandidatesDataLayerSettings.shapeSettings,
-      colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ffffff', '#2368ee'] }],
+      colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
 
     return { chartData: [{ ...USAMapCandidatesDataLayerSettings, dataSource, shapeSettings }] };
