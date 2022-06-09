@@ -1,6 +1,7 @@
 @import 'mixins';
 
 $headerHeight: 19px;
+$chartHeight: 70%;
 
 :host {
   display: block;
@@ -8,6 +9,8 @@ $headerHeight: 19px;
 }
 
 .app-widget-wrapper {
+  display: flex;
+  flex-direction: column;
   height: 100%;
   padding: 24px;
   box-sizing: border-box;
@@ -30,5 +33,17 @@ $headerHeight: 19px;
   &__projection-wrapper {
     flex: 1;
     height: calc(100% - #{$headerHeight});
+  }
+
+  &__chart {
+    height: $chartHeight;
+    border-bottom: 1px solid rgba($secondary-dark-blue-40, 0.32);
+  }
+
+  &__legend {
+    height: calc(100% - #{$chartHeight});
+    overflow: auto;
+    padding: 12px 12px 0 0;
+    margin-right: -12px;
   }
 }

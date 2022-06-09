@@ -1,59 +1,72 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Actions, ofActionDispatched } from '@ngxs/store';
-import { AccumulationChartComponent as Pie } from '@syncfusion/ej2-angular-charts';
-import { Subject, takeUntil } from 'rxjs';
-import { ToggleSidebarState } from 'src/app/store/app.actions';
+import { Component, Input, OnInit, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { ChartAccumulation, DonutChartData } from '../../models/chart-accumulation-widget.model';
+import { TooltipSettingsModel } from '@syncfusion/ej2-charts/src/common/model/base-model';
+import { LegendSettingsModel } from '@syncfusion/ej2-charts/src/common/legend/legend-model';
+import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged } from 'rxjs';
+import { map } from 'rxjs/operators';
+import lodashFilter from 'lodash/fp/filter';
+import lodashMap from 'lodash/fp/map';
+import includes from 'lodash/fp/includes';
+import isEqual from 'lodash/fp/isEqual';
+import { legendPalette } from '../../constants/legend-palette';
+import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
 
 @Component({
   selector: 'app-accumulation-chart',
   templateUrl: './accumulation-chart.component.html',
   styleUrls: ['../widget-legend.component.scss', './accumulation-chart.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AccumulationChartComponent implements OnInit, OnChanges, OnDestroy {
-  @Input('chartData') chart: ChartAccumulation;
-  @ViewChild('pie') pie: Pie;
+export class AccumulationChartComponent extends AbstractSFComponentDirective implements OnInit {
+  @Input() public chartData: ChartAccumulation | undefined;
+
+  public formattedChartData: DonutChartData[];
   public toggleLegend: number[] = [];
-  public palette: string[] = ['#ECF2FF', '#C5D9FF', '#9EBFFF', '#6499FF'];
-  public height = '35%';
-  public tooltip = { enable: true };
-  public datalabel = { visible: false };
-  public chartData: DonutChartData[];
-  public legendSettings: Object = {
-    visible: false,
-  };
+  public filteredChartData$: Observable<DonutChartData[]>;
 
-  private unsubscribe$ = new Subject();
+  public readonly palette: string[] = legendPalette;
+  public readonly tooltipSettings: TooltipSettingsModel = { enable: true };
+  public readonly legendSettings: LegendSettingsModel = { visible: false };
 
-  constructor(private actions$: Actions) {}
+  private readonly chartData$: BehaviorSubject<ChartAccumulation | null> =
+    new BehaviorSubject<ChartAccumulation | null>(null);
 
-  ngOnDestroy(): void {
-    this.unsubscribe$.next(true);
-    this.unsubscribe$.complete();
+  private readonly selectedEntries$: BehaviorSubject<string[] | null> = new BehaviorSubject<string[] | null>(null);
+
+  public ngOnChanges(changes: SimpleChanges): void {
+    changes['chartData'] && this.handleChartDataChanges();
   }
 
-  ngOnChanges(): void {
-    this.chartData = [...(this.chart?.chartData ?? [])];
+  public ngOnInit(): void {
+    this.filteredChartData$ = this.getFilteredChartData();
   }
 
-  ngOnInit(): void {
-    this.actions$.pipe(ofActionDispatched(ToggleSidebarState), takeUntil(this.unsubscribe$)).subscribe(() => {
-      setTimeout(() => {
-        this.pie.refreshChart();
-      }, 650);
-    });
+  public onClickLegend(label: string): void {
+    const currentValue = this.selectedEntries$.value;
+    const nextValue = includes(label, currentValue)
+      ? lodashFilter((currentValueLabel: string) => currentValueLabel !== label, currentValue)
+      : [...(currentValue ?? []), label];
+
+    this.selectedEntries$.next(nextValue);
   }
 
-  private onClickLegend(index: number): void {
-    if (this.toggleLegend.includes(index)) {
-      this.toggleLegend = this.toggleLegend.filter((item) => item !== index);
-    } else {
-      this.toggleLegend.push(index);
-    }
-    this.chartData = this.chart.chartData.filter((_, idx) => !this.toggleLegend.includes(idx));
+  public trackByHandler(_: number, donutChartData: DonutChartData): string {
+    return donutChartData.label;
   }
 
-  onCheckboxChange(idx: number): void {
-    this.onClickLegend(idx);
+  private handleChartDataChanges(): void {
+    this.chartData$.next(this.chartData ?? null);
+    this.chartData?.chartData &&
+      !this.selectedEntries$.value &&
+      this.selectedEntries$.next(lodashMap((donut: DonutChartData) => donut.label, this.chartData.chartData));
+  }
+
+  private getFilteredChartData(): Observable<DonutChartData[]> {
+    return combineLatest([this.chartData$, this.selectedEntries$]).pipe(
+      map(([chartData, selectedEntries]: [ChartAccumulation | null, string[] | null]) =>
+        lodashFilter((donut: DonutChartData) => includes(donut.label, selectedEntries), chartData?.chartData)
+      ),
+      distinctUntilChanged((previous: DonutChartData[], current: DonutChartData[]) => isEqual(previous, current))
+    );
   }
 }

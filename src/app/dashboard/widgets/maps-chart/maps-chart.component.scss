@@ -4,19 +4,6 @@
     display: block;
   }
 
-  &__content {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-
-  &__legend {
-    display: flex;
-    flex-direction: column;
-    row-gap: 0.5rem;
-    overflow: auto;
-  }
-
   &__legend-item {
     display: flex;
   }

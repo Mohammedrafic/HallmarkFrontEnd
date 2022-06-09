@@ -2,7 +2,12 @@
   <div class="app-widget-wrapper__content">
     <h3 *ngIf="title" class="app-widget-wrapper__title">{{ title }}</h3>
     <div class="app-widget-wrapper__projection-wrapper">
-      <ng-content></ng-content>
+      <div class="app-widget-wrapper__chart">
+        <ng-content select="[chart]"></ng-content>
+      </div>
+      <div class="app-widget-wrapper__legend">
+        <ng-content select="[legend]"></ng-content>
+      </div>
     </div>
   </div>
 </div>

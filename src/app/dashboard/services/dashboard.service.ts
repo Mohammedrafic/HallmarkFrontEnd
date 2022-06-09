@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import lodashMap from 'lodash/fp/map';
+import lodashMapPlain from 'lodash/map';
 
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { Observable, of, forkJoin } from 'rxjs';
@@ -17,6 +18,8 @@ import { CandidatesByStateWidgetAggregatedDataModel } from '../models/candidates
 import { DashboardStateDto } from '../models/dashboard-state-dto.model';
 import { USAMapCandidatesDataLayerSettings } from '../constants/USA-map-candidates-data-layer-settings';
 import reduce from 'lodash/reduce';
+import { CandidateTypeInfoModel } from '../models/candidate-type-info.model';
+import { legendPalette } from '../constants/legend-palette';
 
 @Injectable()
 export class DashboardService {
@@ -126,19 +129,19 @@ export class DashboardService {
   }
 
   private getCandidatesWidgetData(filter: DashboardFiltersModel): Observable<ChartAccumulation> {
-    return of({
-      id: WidgetTypeEnum.CANDIDATES,
-      title: 'Candidates',
-      candidates: 35,
-      score: 14.53,
-      progress: 4,
-      chartData: [
-        { x: 'Applied', y: 45, text: '45%' },
-        { x: 'Offered', y: 15, text: '15%' },
-        { x: 'Accepted', y: 12, text: '9%' },
-        { x: 'Onboarded', y: 11, text: '31%' },
-      ],
-    });
+    return this.httpClient.post<CandidateTypeInfoModel[]>('/api/Dashboard/GetCandidatesByStatuses', {}).pipe(
+      map((candidatesInfo: CandidateTypeInfoModel[]) => {
+        return {
+          id: WidgetTypeEnum.CANDIDATES,
+          title: 'Candidates',
+          chartData: lodashMapPlain(candidatesInfo, ({ count, status }: CandidateTypeInfoModel, index: number) => ({
+            label: status,
+            value: count,
+            color: legendPalette[index % legendPalette.length],
+          })),
+        };
+      })
+    );
   }
 
   private getCandidatesByStateWidgetData(
@@ -169,7 +172,7 @@ export class DashboardService {
           ),
         },
       ],
-      legendData: [{ label: '0 - 2' }, { label: '2 - 4' }, { label: '4 - 6' }, { label: '6+' }],
+      legendData: [{ label: '0 - 2' }, { label: '2 - 4' }, { label: '4 - 6' }, { label: '6+' }]
     };
   }
 
@@ -181,10 +184,10 @@ export class DashboardService {
       candidates: 15,
       progress: -4,
       chartData: [
-        { x: 'Open', y: 4, text: '4%' },
-        { x: 'In Progress', y: 65, text: '65%' },
-        { x: 'In Progress (Offer Pending)', y: 19, text: '19%' },
-        { x: 'In Progress (Offer Accepted)', y: 24, text: '24%' },
+        { label: 'Open', value: 4, text: '4%' },
+        { label: 'In Progress', value: 65, text: '65%' },
+        { label: 'In Progress (Offer Pending)', value: 19, text: '19%' },
+        { label: 'In Progress (Offer Accepted)', value: 24, text: '24%' },
       ],
     });
   }
