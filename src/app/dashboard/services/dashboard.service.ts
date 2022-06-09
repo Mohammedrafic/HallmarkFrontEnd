@@ -6,7 +6,6 @@ import lodashMapPlain from 'lodash/map';
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { Observable, of, forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { tap } from 'rxjs';
 
 import { ChartAccumulation } from '../models/chart-accumulation-widget.model';
 import { ChartLineDataModel } from '../models/chart-line-widget.model';
@@ -20,6 +19,9 @@ import { USAMapCandidatesDataLayerSettings } from '../constants/USA-map-candidat
 import reduce from 'lodash/reduce';
 import { CandidateTypeInfoModel } from '../models/candidate-type-info.model';
 import { legendPalette } from '../constants/legend-palette';
+import flow from 'lodash/fp/flow';
+import values from 'lodash/fp/values';
+import max from 'lodash/fp/max';
 
 @Injectable()
 export class DashboardService {
@@ -159,21 +161,20 @@ export class DashboardService {
   private getFormattedCandidatesByStatesWidgetAggregatedData(
     candidatesByStates: CandidatesByStatesResponseModel
   ): CandidatesByStateWidgetAggregatedDataModel {
-    return {
-      chartData: [
-        {
-          ...USAMapCandidatesDataLayerSettings,
-          dataSource: lodashMap(
-            (stateDefinition: Record<string, string>) => ({
-              ...stateDefinition,
-              candidates: candidatesByStates[stateDefinition['code']] ?? 0,
-            }),
-            USAMapCandidatesDataLayerSettings.dataSource
-          ),
-        },
-      ],
-      legendData: [{ label: '0 - 2' }, { label: '2 - 4' }, { label: '4 - 6' }, { label: '6+' }]
+    const maxCandidatesValue = flow(values, max)(candidatesByStates);
+    const dataSource = lodashMap(
+      (stateDefinition: Record<string, string>) => ({
+        ...stateDefinition,
+        candidates: candidatesByStates[stateDefinition['code']] ?? 0,
+      }),
+      USAMapCandidatesDataLayerSettings.dataSource
+    );
+    const shapeSettings = {
+      ...USAMapCandidatesDataLayerSettings.shapeSettings,
+      colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ffffff', '#2368ee'] }],
     };
+
+    return { chartData: [{ ...USAMapCandidatesDataLayerSettings, dataSource, shapeSettings }] };
   }
 
   private getInvoicesWidgetData(filter: DashboardFiltersModel): Observable<ChartAccumulation> {

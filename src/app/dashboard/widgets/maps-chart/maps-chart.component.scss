@@ -1,10 +1,18 @@
+@import 'colors';
+
 .app-maps-chart {
   &__map {
     aspect-ratio: 4/2.5;
     display: block;
   }
 
-  &__legend-item {
-    display: flex;
+  &__range-line {
+    height: 5px;
+    background: linear-gradient(to right, $white, $primary-active-blue);
+  }
+
+  &__range-values {
+    text-align: center;
+    margin-top: 10px;
   }
 }

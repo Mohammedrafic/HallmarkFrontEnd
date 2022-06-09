@@ -1,12 +1,14 @@
 <app-widget-wrapper title="Candidates by State">
-  <app-map chart class="app-maps-chart__map" [layers]="chartData?.chartData"></app-map>
+  <app-map
+    chart
+    class="app-maps-chart__map"
+    [layers]="chartData?.chartData"
+  ></app-map>
   <div legend>
-    <div
-      *ngFor="let legendItem of chartData?.legendData; trackBy: trackByHandler; let index = index"
-      class="app-maps-chart__legend-item"
-    >
-      <div class="widget-legend__point" [ngClass]="['point-' + index]"></div>
-      <div class="widget-legend__legend-text">{{ legendItem.label }}</div>
+    <div class="app-maps-chart__range-line"></div>
+    <div class="app-maps-chart__range-values">
+      {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.from }} -
+      {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.to }}
     </div>
   </div>
 </app-widget-wrapper>
