@@ -1,25 +1,17 @@
-import { PanelModel } from "@syncfusion/ej2-angular-layouts";
+import type { PanelModel } from '@syncfusion/ej2-angular-layouts';
 
+const dashboardStatePrefix: string = '[dashboard]';
 
-export class GetDashboardPanels {
-  static readonly type = '[dashboard] Get Dashboard Panel';
-}
-
-export class AddDashboardPanel {
-  static readonly type = '[dashboard] Add Dashboard Panel';
-  constructor(public payload: PanelModel[]) {}
-}
-
-export class DashboardPanelIsMoved {
-  static readonly type = '[dashboard] Dashboard Panel Is Moved';
-  constructor(public payload: PanelModel[]) {}
+export class GetDashboardData {
+  static readonly type = `${dashboardStatePrefix} Get Dashboard Data`;
 }
 
 export class SaveDashboard {
-  static readonly type = '[dashboard] Save Dashboard';
+  static readonly type = `${dashboardStatePrefix} Save Dashboard`;
+  constructor(public payload: PanelModel[]) {}
 }
 
-export class SetDashboardState {
-  static readonly type = '[dashboard] Set Dashboard State';
+export class SetPanels {
+  static readonly type = `${dashboardStatePrefix} Set panels`;
   constructor(public payload: PanelModel[]) {}
 }

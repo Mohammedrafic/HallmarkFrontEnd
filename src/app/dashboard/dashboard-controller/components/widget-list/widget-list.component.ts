@@ -1,42 +1,99 @@
-import { Component, OnInit, Output, ViewChild, EventEmitter, Input } from '@angular/core';
-import { Actions, ofActionDispatched } from '@ngxs/store';
+import { SelectionSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { GridComponent } from '@syncfusion/ej2-angular-grids';
+
+import {
+  Component,
+  Output,
+  ViewChild,
+  EventEmitter,
+  ChangeDetectionStrategy,
+  Input,
+  OnChanges,
+  SimpleChanges,
+  OnInit,
+} from '@angular/core';
+
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { WidgetTypeEnum } from '../../../enums/widget-type.enum';
+import { WidgetOptionModel } from '../../../models/widget-option.model';
+import lodashMap from 'lodash/fp/map';
+import findIndex from 'lodash/fp/findIndex';
+import { BehaviorSubject, Subject, takeUntil, filter, startWith, distinctUntilChanged } from 'rxjs';
+import { combineLatest } from 'rxjs';
+import isEqual from 'lodash/fp/isEqual';
+import { WidgetToggleModel } from '../../../models/widget-toggle.model';
 
 @Component({
   selector: 'app-widget-list',
   templateUrl: './widget-list.component.html',
   styleUrls: ['./widget-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WidgetListComponent implements OnInit {
-  @ViewChild('sideDialog') sideDialog: DialogComponent;
-  @Input() availableWidgets: any[]
-  @Output() formCancelClicked = new EventEmitter();
+export class WidgetListComponent extends DestroyableDirective implements OnChanges, OnInit {
+  @Input() public isLoading: boolean | null;
+  @Input() public selectedWidgets: WidgetTypeEnum[] | null;
+  @Input() public widgets: WidgetOptionModel[] | null;
 
+  @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
+  @Output() public widgetToggleEmitter: EventEmitter<WidgetToggleModel> = new EventEmitter();
+
+  @ViewChild('sideDialog', { static: true }) public sideDialog: DialogComponent;
+  @ViewChild('gridComponent', { static: false }) public gridComponent: GridComponent;
+
+  public readonly selectionSettings: SelectionSettingsModel = { type: 'Multiple', enableSimpleMultiRowSelection: true };
   public readonly targetElement: HTMLElement = document.body;
 
-  constructor(private action$: Actions) {}
+  private readonly dataBoundTrigger$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private readonly widgetDataChange$: Subject<void> = new Subject();
 
-  ngOnInit(): void {
-    this.action$.pipe(ofActionDispatched(ShowSideDialog)).subscribe((payload) => {
-      if (payload.isDialogShown) {
-        this.sideDialog.show();
-      } else {
-        this.sideDialog.hide();
-      }
-    });
+  public constructor() {
+    super();
   }
 
-  closeWidgetModal(): void {
-    this.formCancelClicked.emit();
+  public ngOnChanges(changes: SimpleChanges): void {
+    (changes['selectedWidgets'] || changes['widgets']) && this.handleSelectedWidgets();
   }
 
-  selectWidgetId(event: any) {
-    //TODO implement this method in the task Add Widget to Dashboard (EIN-1226)
+  public ngOnInit(): void {
+    this.initDataChangesStream();
   }
 
-  clearWidgetId() {
-    //TODO implement this method in the task Add Widget to Dashboard (EIN-1226)
+  public dataBoundHandler(): void {
+    this.dataBoundTrigger$.next(true);
+  }
+
+  public rowSelectedHandler(event: any): void {
+    event.isInteracted && this.widgetToggleEmitter.emit({ widget: event.data, isSelected: true });
+  }
+
+  public rowDeselectedHandler(event: any): void {
+    event.isInteracted && this.widgetToggleEmitter.emit({ widget: event.data, isSelected: false });
+  }
+
+  private handleSelectedWidgets(): void {
+    this.widgetDataChange$.next();
+  }
+
+  private initDataChangesStream(): void {
+    combineLatest([this.widgetDataChange$.pipe(startWith(null)), this.dataBoundTrigger$])
+      .pipe(
+        filter(([, dataBound]: [unknown, boolean]) => dataBound),
+        distinctUntilChanged((previous, current) => isEqual(previous, current)),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.handleDataChange();
+      });
+  }
+
+  private handleDataChange(): void {
+    const selectedWidgetIndexes = lodashMap(
+      (selectedWidget: WidgetTypeEnum) =>
+        findIndex((widget: WidgetOptionModel) => widget.title === selectedWidget, this.widgets),
+      this.selectedWidgets
+    );
+
+    this.gridComponent.selectRows(selectedWidgetIndexes);
   }
 }
-

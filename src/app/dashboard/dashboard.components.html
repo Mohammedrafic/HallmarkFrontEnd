@@ -4,7 +4,12 @@
 ></ng-container>
 
 <ng-template #dashboardTemplate let-widgetsData="widgetsData">
-  <app-dashboard-control></app-dashboard-control>
+  <app-dashboard-control
+    (widgetToggleEmitter)="handleWidgetToggleEvent($event)"
+    [selectedWidgets]="selectedWidgets$ | async"
+    [widgets]="widgets$ | async"
+    [isLoading]="isLoading$ | async"
+  ></app-dashboard-control>
   <div class="control-section">
     <ejs-dashboardlayout
       id="dashboardLayout"
@@ -17,29 +22,24 @@
       <e-panels>
         <e-panel
           *ngFor="let panel of panels$ | async; trackBy: trackByHandler"
-          [sizeX]="panel.sizeX"
-          [sizeY]="panel.sizeY"
-          [maxSizeY]="panel.maxSizeY"
-          [row]="panel.row"
           [col]="panel.col"
           [id]="panel.id"
+          [maxSizeX]="panel.maxSizeX"
+          [maxSizeY]="panel.maxSizeY"
+          [minSizeX]="panel.minSizeX"
+          [minSizeY]="panel.minSizeY"
+          [row]="panel.row"
+          [sizeX]="panel.sizeX"
+          [sizeY]="panel.sizeY"
         >
           <ng-template #content [ngSwitch]="panel.id">
             <app-accumulation-chart
               [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
               *ngSwitchCase="widgetTypeEnum.CANDIDATES"
             ></app-accumulation-chart>
-            <app-accumulation-chart
-              [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
-              *ngSwitchCase="widgetTypeEnum.ORDERS_VS_CANDIDATES"
-            ></app-accumulation-chart>
-            <app-accumulation-chart
-              [chartData]="widgetsData?.[widgetTypeEnum.INVOICES]"
-              *ngSwitchCase="widgetTypeEnum.INVOICES"
-            ></app-accumulation-chart>
             <app-maps-chart
-              *ngSwitchCase="widgetTypeEnum.CANDIDATES_BY_STATE"
-              [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES_BY_STATE]"
+              *ngSwitchCase="widgetTypeEnum.APPLICANTS_BY_REGION"
+              [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_REGION]"
             ></app-maps-chart>
           </ng-template>
         </e-panel>

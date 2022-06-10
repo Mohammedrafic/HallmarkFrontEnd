@@ -1,19 +1,18 @@
 <div class="dashboard-control">
   <app-page-toolbar>
-    <ng-container left> </ng-container>
     <ng-container right>
-      <ng-container *ngIf="true">
-        <button ejs-button cssClass="e-outline" (click)="addNew()">
-          Filters <i-feather name="sliders" class="icon"></i-feather>
-        </button>
-        <button ejs-button [isPrimary]="true" [disabled]="false">Create Order</button>
-      </ng-container>
+      <button ejs-button cssClass="e-outline" (click)="toggleDialog(true)">
+        Manage Widgets <i-feather name="sliders" class="icon"></i-feather>
+      </button>
+      <button ejs-button [isPrimary]="true">Create Order</button>
     </ng-container>
   </app-page-toolbar>
-
   <app-widget-list
-    [availableWidgets]="widgets"
-    (formCancelClicked)="closeDialog()"
-  >
-  </app-widget-list>
+    *ngIf="isDialogOpened$ | async"
+    (closeDialogEmitter)="toggleDialog(false)"
+    (widgetToggleEmitter)="widgetToggleEmitter.emit($event)"
+    [selectedWidgets]="selectedWidgets"
+    [widgets]="widgets"
+    [isLoading]="isLoading"
+  ></app-widget-list>
 </div>
