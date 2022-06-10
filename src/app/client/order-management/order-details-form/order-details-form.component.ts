@@ -214,11 +214,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       projectType: [null, Validators.required],
       projectNameId: [null, Validators.required],
       projectName: [null, Validators.required],
-      hourlyRate: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
+      hourlyRate: [null, {validators: [Validators.required, Validators.maxLength(10), currencyValidator(1)], updateOn: 'blur'}],
       openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
       minYrsRequired: [null, [Validators.maxLength(10), integerValidator(1)]],
-      joiningBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
-      compBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
+      joiningBonus: [null, {validators: [Validators.maxLength(10), currencyValidator(1)], updateOn: 'blur'}],
+      compBonus: [null, {validators: [Validators.maxLength(10), currencyValidator(1)], updateOn: 'blur'}],
       duration: [null, Validators.required],
       jobStartDate: [null, Validators.required],
       jobEndDate: [null, Validators.required],
@@ -272,6 +272,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     const shiftRequirementIdControl = this.generalInformationForm.get('shiftRequirementId') as AbstractControl;
     const shiftStartTimeControl = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
     const shiftEndTimeControl = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
+    const hourlyRateControl = this.generalInformationForm.get('hourlyRate') as AbstractControl;
+    const joiningBonusControl = this.generalInformationForm.get('joiningBonus') as AbstractControl;
+    const compBonusControl = this.generalInformationForm.get('compBonus') as AbstractControl;
     const jobDistributionControl = this.jobDistributionForm.get('jobDistribution') as AbstractControl;
     const agencyControl = this.jobDistributionForm.get('agency') as AbstractControl;
     const jobDistributionsControl = this.jobDistributionForm.get('jobDistributions') as AbstractControl;
@@ -454,6 +457,18 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       }
 
       jobDistributionsControl.patchValue(jobDistributions, { emitEvent: false });
+    });
+
+    hourlyRateControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((price: string) => {
+      hourlyRateControl.patchValue(this.getTwoDecimalsValue(price), {emitEvent: false});
+    });
+
+    joiningBonusControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((price: string) => {
+      joiningBonusControl.patchValue(this.getTwoDecimalsValue(price), {emitEvent: false});
+    });
+
+    compBonusControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((price: string) => {
+      compBonusControl.patchValue(this.getTwoDecimalsValue(price), {emitEvent: false});
     });
 
     shiftStartTimeControl.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
@@ -710,5 +725,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       city: new FormControl(orderWorkLocation?.city || '', [Validators.required, Validators.maxLength(20)]),
       zipCode: new FormControl(orderWorkLocation?.zipCode || '', [Validators.required, Validators.minLength(5), Validators.pattern(/^[0-9]+$/)])
     });
+  }
+
+  private getTwoDecimalsValue(value: string): string {
+    return Number(value).toFixed(Math.max(value.split('.')[1]?.length, 2) || 2);
   }
 }

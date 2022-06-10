@@ -346,6 +346,7 @@
                       formControlName="shiftStartTime"
                       appValidateWithMessage
                       format="hh:mm a"
+                      [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                       [enableMask]="true"
                       maskPlaceholder="HH:MM">
                     </ejs-timepicker>
@@ -361,6 +362,7 @@
                       formControlName="shiftEndTime"
                       appValidateWithMessage
                       format="hh:mm a"
+                      [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                       [enableMask]="true"
                       maskPlaceholder="HH:MM">
                     </ejs-timepicker>
