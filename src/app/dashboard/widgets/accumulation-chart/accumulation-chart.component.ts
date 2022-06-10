@@ -28,7 +28,7 @@ export class AccumulationChartComponent extends AbstractSFComponentDirective imp
   public readonly tooltipSettings: TooltipSettingsModel = {
     enable: true,
     template:
-      '<div class="test" style="text-align: center; padding: 10px 20px; background-color: #fff; box-shadow: 0 3px 10px rgb(0 0 0 / 0.2); color: #4C5673;"><div>${x}</div><b>${y}</b></div>',
+      '<div class="test" style="text-align: center; padding: 10px 20px; background-color: #fff; box-shadow: 0 3px 15px rgb(0 0 0 / 0.2); color: #4C5673;"><div>${x}</div><b>${y}</b><div style="width: 15px; height: 15px; background: #fff; transform: rotate(45deg); position: absolute; left: 40%;"></div></div>',
   };
   public readonly legendSettings: LegendSettingsModel = { visible: false };
 
