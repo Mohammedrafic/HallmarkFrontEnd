@@ -6,6 +6,7 @@ import { debounceTime, Subject, takeUntil } from 'rxjs';
 
 import { IOrderCredential, IOrderCredentialItem } from '@order-credentials/types';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 @Component({
   selector: 'app-order-credentials-grid',
@@ -18,11 +19,12 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
   @Input() credential: IOrderCredential;
 
   @Output() edit: EventEmitter<IOrderCredentialItem> = new EventEmitter();
+  @Output() delete: EventEmitter<number> = new EventEmitter();
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor() {
+  constructor(private confirmService: ConfirmService) {
     super();
   }
 
@@ -54,6 +56,21 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
     if (event.currentPage || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
     }
+  }
+
+  public onRemoveButtonClick(credential: IOrderCredentialItem): void {
+    this.confirmService
+    .confirm('Are you sure want to delete?', {
+      title: 'Delete Record',
+      okButtonLabel: 'Delete',
+      okButtonClass: 'delete-button'
+    })
+    .pipe(takeUntil(this.unsubscribe$))
+    .subscribe((confirm) => {
+      if (confirm) {
+        this.delete.emit(credential.credentialId);
+      }
+    });
   }
 
 }

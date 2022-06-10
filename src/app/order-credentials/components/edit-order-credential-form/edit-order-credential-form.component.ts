@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 @Component({
@@ -6,13 +6,6 @@ import { FormGroup } from '@angular/forms';
   templateUrl: './edit-order-credential-form.component.html',
   styleUrls: ['./edit-order-credential-form.component.scss']
 })
-export class EditOrderCredentialFormComponent implements OnInit {
-
+export class EditOrderCredentialFormComponent {
   @Input() form: FormGroup;
-
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
 }

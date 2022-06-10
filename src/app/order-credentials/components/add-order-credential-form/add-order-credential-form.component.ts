@@ -33,13 +33,14 @@ export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDes
   public filteredCreds: Credential[] = [];
   public credSelectionInvalid = false;
   private unsubscribe$: Subject<void> = new Subject();
+  private allCredentialsOrigin: Credential[] = [];
 
   constructor(private store: Store) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     const { addedCredentials, formSubmitted } = changes;
     if ( addedCredentials && !addedCredentials.firstChange) {
-      this.filterCredentials(this.filteredCreds);
+      this.filterCredentials(this.allCredentialsOrigin);
     }
     if (formSubmitted) {
       this.credSelectionInvalid = this.formSubmitted && !this.form.valid;
@@ -57,6 +58,7 @@ export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDes
       this.credSelectionInvalid = this.formSubmitted && (status === 'INVALID');
     });
     this.allCredentials$.pipe(takeUntil(this.unsubscribe$)).subscribe(allCredentials => {
+      this.allCredentialsOrigin = allCredentials;
       this.filterCredentials(allCredentials);
     });
   }
@@ -83,6 +85,10 @@ export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDes
 
   public searchCredential(event: any): void {
     this.searchGrid.search((event.target as HTMLInputElement).value);
+  }
+
+  public clearGridSelection(): void {
+    this.searchGrid.selectionModule.clearSelection();
   }
 
   private filterCredentials(allCredentials: Credential[]): void {

@@ -1,22 +1,23 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 
-import { Subject, takeUntil } from 'rxjs';
+import { map, Observable, Subject, takeUntil } from 'rxjs';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { SetImportFileDialogState } from '@admin/store/admin.actions';
 import { SaveOrder, EditOrder, GetSelectedOrderById } from '@client/store/order-managment-content.actions';
 
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
-import { CreateOrderDto, EditOrderDto } from '@shared/models/order-management.model';
+import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-management.model';
 import { BillRatesComponent } from '@bill-rates/bill-rates.component';
 import { BillRate, OrderBillRateDto } from '@shared/models/bill-rate.model';
 import { IOrderCredentialItem } from '@order-credentials/types';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
 enum SelectedTab {
   OrderDetails,
@@ -33,10 +34,13 @@ enum SubmitButtonItem {
   templateUrl: './add-edit-order.component.html',
   styleUrls: ['./add-edit-order.component.scss']
 })
-export class AddEditOrderComponent implements OnDestroy {
+export class AddEditOrderComponent implements OnDestroy, OnInit {
   @ViewChild('stepper') tab: TabComponent;
   @ViewChild('orderDetailsForm') orderDetailsFormComponent: OrderDetailsFormComponent;
   @ViewChild('billRates') billRatesComponent: BillRatesComponent;
+
+  @Select(OrderManagementContentState.selectedOrder)
+  selectedOrder$: Observable<Order>;
 
   public SelectedTab = SelectedTab;
   public orderId: number;
@@ -63,6 +67,16 @@ export class AddEditOrderComponent implements OnDestroy {
     } else {
       this.title = 'Create';
     }
+  }
+
+  ngOnInit(): void {
+    this.selectedOrder$
+    .pipe(takeUntil(this.unsubscribe$), map(order => order?.credentials))
+    .subscribe(credentials => {
+      if (credentials) {
+        this.orderCredentials = [...credentials];
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -103,6 +117,14 @@ export class AddEditOrderComponent implements OnDestroy {
       Object.assign(isExist, cred);
     } else {
       this.orderCredentials.push(cred);
+    }
+  }
+
+  public onCredentialDeleted(cred: IOrderCredentialItem): void {
+    const credToDelete = this.orderCredentials.find(({credentialId}) => cred.credentialId === credentialId) as IOrderCredentialItem;
+    if (credToDelete) {
+      const index = this.orderCredentials.indexOf(credToDelete);
+      this.orderCredentials.splice(index, 1);
     }
   }
 

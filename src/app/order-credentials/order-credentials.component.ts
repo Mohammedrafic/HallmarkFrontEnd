@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { ShowSideDialog } from 'src/app/store/app.actions';
+import { AddOrderCredentialFormComponent } from './components/add-order-credential-form/add-order-credential-form.component';
 import { IOrderCredential, IOrderCredentialItem } from './types';
 
 @Component({
@@ -10,8 +11,10 @@ import { IOrderCredential, IOrderCredentialItem } from './types';
   styleUrls: ['./order-credentials.component.scss']
 })
 export class OrderCredentialsComponent implements OnInit {
+  @ViewChild('addCred') addCred: AddOrderCredentialFormComponent;
   @Input() credentials: IOrderCredentialItem[];
   @Output() credentialChanged: EventEmitter<IOrderCredentialItem> = new EventEmitter();
+  @Output() credentialDeleted: EventEmitter<IOrderCredentialItem> = new EventEmitter();
 
   public credentialsGroups: IOrderCredential[] = [];
   public credentialFormHeader: string;
@@ -71,6 +74,7 @@ export class OrderCredentialsComponent implements OnInit {
 
   public onDialogCancel(): void {
     this.CredentialForm.reset();
+    this.addCred && this.addCred.clearGridSelection();
     this.store.dispatch(new ShowSideDialog(false));
     this.formSubmitted = false;
   }
@@ -78,11 +82,42 @@ export class OrderCredentialsComponent implements OnInit {
   public onDialogOk(): void {
     this.formSubmitted = true;
     if (this.CredentialForm.valid) {
-      this.onSave();
+      if (this.isEditMode) {
+        this.editExistedCred();
+      } else {
+        this.addNewCred();
+      }
       this.resetToDefault();
       this.formSubmitted = false;
       this.store.dispatch(new ShowSideDialog(false));
     }
+  }
+
+  public onDelete(credentialId: number): void {
+    const credToDelete = this.credentials.find((cred) => cred.credentialId === credentialId) as IOrderCredentialItem;
+    if (credToDelete) {
+      const index = this.credentials.indexOf(credToDelete);
+      this.credentials.splice(index, 1);
+      this.credentialsGroups = [];
+      this.credentials.forEach(cred => {
+        this.updateGroups(cred);
+      });
+      this.credentialDeleted.emit(Object.assign({}, {...credToDelete}));
+    }
+  }
+
+  private editExistedCred(): void {
+    const cred = this.CredentialForm.getRawValue() as IOrderCredentialItem;
+    this.updateExistedCredInGrid(cred);
+    this.credentialChanged.emit(Object.assign({}, { ...cred }));
+    this.isEditMode = false;
+  }
+
+  private updateExistedCredInGrid(cred: IOrderCredentialItem): void {
+    const existedCredGroup = this.credentialsGroups.find(this.byType(cred)) as IOrderCredential;
+    const existedCred = existedCredGroup.items.find(this.byCredentilaId(cred)) as IOrderCredentialItem;
+    Object.assign(existedCred, cred);
+    existedCredGroup.items = [...existedCredGroup.items];
   }
 
   private resetToDefault(): void {
@@ -97,23 +132,23 @@ export class OrderCredentialsComponent implements OnInit {
     });
   }
 
-  private onSave(): void {
+  private addNewCred(): void {
     const { value } = this.CredentialForm;
     this.updateGroups(value);
     this.credentialChanged.emit(Object.assign({}, {...value}, { id: 0, orderId: 0 }));
     this.updateCredList(value);
   }
 
-  private updateCredList(value: IOrderCredentialItem): void {
-    const isExist = this.credentials.find(({ credentialId }) => value.credentialId === credentialId);
+  private updateCredList(cred: IOrderCredentialItem): void {
+    const isExist = this.credentials.find(this.byCredentilaId(cred));
     if (!isExist) {
-      this.credentials.push(value);
+      this.credentials.push(cred);
     }
     this.credentials = [...this.credentials];
   }
 
   private updateGroups(cred: IOrderCredentialItem): void {
-    const existedCredGroup = this.credentialsGroups.find(({ type }) => type === cred.credentialType) as IOrderCredential;
+    const existedCredGroup = this.credentialsGroups.find(this.byType(cred)) as IOrderCredential;
     if (existedCredGroup) {
       existedCredGroup.items.push(cred);
       existedCredGroup.items = [...existedCredGroup.items];
@@ -131,4 +166,14 @@ export class OrderCredentialsComponent implements OnInit {
       totalPages: 1
     };
   }
+
+  // helpers
+  private byType(target: IOrderCredentialItem) {
+    return (iter: IOrderCredential) => iter.type === target.credentialType;
+  }
+
+  private byCredentilaId(target: IOrderCredentialItem) {
+    return (iter: IOrderCredentialItem) => iter.credentialId === target.credentialId;
+  }
 }
+

@@ -52,7 +52,9 @@
         <app-order-credentials
           *ngIf="selectedTab === SelectedTab.Credentials"
           [credentials]="orderCredentials"
-          (credentialChanged)="onCredentialChanged($event)"></app-order-credentials>
+          (credentialChanged)="onCredentialChanged($event)"
+          (credentialDeleted)="onCredentialDeleted($event)"
+          ></app-order-credentials>
       </ng-template>
     </e-tabitem>
   </e-tabitems>
