@@ -3,7 +3,7 @@ import { Select } from "@ngxs/store";
 import { OrderManagementState } from "@agency/store/order-management.state";
 import { Observable, takeWhile } from "rxjs";
 import { AgencyOrder, OrderCandidatesListPage } from "@shared/models/order-management.model";
-import { Order } from "@shared/models/organization.model";
+import { Order } from "@shared/models/order-management.model";
 
 @Component({
   selector: 'app-candidates-order',

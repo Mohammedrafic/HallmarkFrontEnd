@@ -65,7 +65,6 @@ import { OrderCredentialsModule } from '@order-credentials/order-credentials.mod
 import { NgxsModule } from '@ngxs/store';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { WorkflowState } from '@organization-management/store/workflow.state';
 import { OrderDetailsDialogComponent } from './order-management/order-details-dialog/order-details-dialog.component';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
@@ -143,8 +142,7 @@ const gridIcons = {
     //STORE
     NgxsModule.forFeature([
       OrderManagementContentState,
-      OrganizationManagementState,
-      WorkflowState
+      OrganizationManagementState
     ])
   ],
   providers: [

@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
 import { OrderManagement } from '@shared/models/order-management.model';
-import { Order } from '@shared/models/organization.model';
+import { Order } from '@shared/models/order-management.model';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({

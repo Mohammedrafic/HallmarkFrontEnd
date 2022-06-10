@@ -15,7 +15,7 @@ import { OrderManagement, OrderManagementPage } from '@shared/models/order-manag
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { UserState } from '../../../store/user.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { Order } from '@shared/models/organization.model';
+import { Order } from '@shared/models/order-management.model';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
@@ -188,9 +188,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public menuOptionSelected(event: any, data: OrderManagement): void {
-    switch (event.item.properties.id) {
+    switch (Number(event.item.properties.id)) {
       case MoreMenuType['Edit']:
-        // TODO: pending implementation
+        this.router.navigate(['./edit', data.id], { relativeTo: this.route });
         break;
       case MoreMenuType['Duplicate']:
         // TODO: pending implementation

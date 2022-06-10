@@ -3,7 +3,7 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 
 import { Select, Store } from '@ngxs/store';
 import { OrderCandidatesListPage, OrderManagement } from '@shared/models/order-management.model';
-import { Order } from '@shared/models/organization.model';
+import { Order } from '@shared/models/order-management.model';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
 @Component({

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Order } from "@shared/models/organization.model";
+import { Order } from "@shared/models/order-management.model";
 
 enum Active {
   No,

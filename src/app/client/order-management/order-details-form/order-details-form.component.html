@@ -17,14 +17,14 @@
 
       <!-- Status -->
       <div class="input-container order-status-container">
-        <label>Status</label>
+        <label>Status<span *ngIf="isEditMode" class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-dropdownlist
             placeholder="Order Status"
+            formControlName="status"
             [dataSource]="orderStatuses"
             [fields]="orderStatusFields"
-            [value]="orderStatuses[0].id"
-            [enabled]="false">
+            [enabled]="isEditMode">
           </ejs-dropdownlist>
         </div>
       </div>
@@ -199,16 +199,16 @@
               </div>
 
               <div class="form-line">
-                <!-- Hourly rate ($) -->
+                <!-- Hourly rate -->
                 <div class="input-container bootstrap form-line-item-20">
-                  <label>Hourly rate ($)<span class="required">*</span></label>
+                  <label>Hourly rate<span class="required">*</span></label>
                   <div class="input-group">
                     <input
                       class="e-input"
                       type="text"
                       formControlName="hourlyRate"
                       appValidateWithMessage
-                      placeholder="Hourly rate ($)"
+                      placeholder="Hourly rate"
                       maxlength="10" />
                   </div>
                 </div>
@@ -241,28 +241,28 @@
                   </div>
                 </div>
 
-                <!-- Joining Bonus ($) -->
+                <!-- Joining Bonus -->
                 <div class="input-container bootstrap form-line-item-20">
-                  <label>Joining Bonus ($)</label>
+                  <label>Joining Bonus</label>
                   <div class="input-group">
                     <input
                       class="e-input"
                       type="text"
-                      placeholder="Joining Bonus ($)"
+                      placeholder="Joining Bonus"
                       formControlName="joiningBonus"
                       appValidateWithMessage
                       maxlength="10" />
                   </div>
                 </div>
 
-                <!-- Comp. Bonus ($) -->
+                <!-- Comp. Bonus -->
                 <div class="input-container bootstrap form-line-item-20">
-                  <label>Comp. Bonus ($)</label>
+                  <label>Comp. Bonus</label>
                   <div class="input-group">
                     <input
                       class="e-input"
                       type="text"
-                      placeholder="Comp. Bonus ($)"
+                      placeholder="Comp. Bonus"
                       formControlName="compBonus"
                       appValidateWithMessage
                       maxlength="10" />
@@ -371,7 +371,7 @@
           </div>
         </div>
         <div class="job-distibution">
-          <div class="title">Job Distibution</div>
+          <div class="title">Job Distribution</div>
           <div class="job-distribution-form-container">
             <form [formGroup]="jobDistributionForm">
               <div class="form-line">
@@ -436,7 +436,7 @@
                   <ejs-checkbox label="On Call Required" formControlName="onCallRequired"></ejs-checkbox>
                   <ejs-checkbox label="ASAP Start" formControlName="asapStart"></ejs-checkbox>
                   <ejs-checkbox label="Critical Order" formControlName="criticalOrder"></ejs-checkbox>
-                  <ejs-checkbox label="NO OT" formControlName="nO_OT"></ejs-checkbox>
+                  <ejs-checkbox label="No OT" formControlName="nO_OT"></ejs-checkbox>
                 </div>
               </div>
 
@@ -625,13 +625,14 @@
                 <!-- State -->
                 <div class="input-container bootstrap form-line-item-20">
                   <label>State<span class="required">*</span></label>
-                  <div class="input-group">
-                    <input
-                      class="e-input"
-                      type="text"
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist
+                      [dataSource]="organizationStatesWithKeyCode$ | async"
+                      [fields]="organizationStateWithKeyCodeFields"
                       appValidateWithMessage
                       formControlName="state"
-                      placeholder="State" />
+                      placeholder="State">
+                    </ejs-dropdownlist>
                   </div>
                 </div>
 
@@ -684,11 +685,12 @@
             <div class="form-line">
               <!-- Workflow -->
               <div class="input-container bootstrap form-line-item-40">
-                <label>Workflow</label>
+                <label>Workflow<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
                     placeholder="Workflow"
                     formControlName="workflowId"
+                    appValidateWithMessage
                     [dataSource]="workflows$ | async"
                     [fields]="workflowFields">
                   </ejs-dropdownlist>

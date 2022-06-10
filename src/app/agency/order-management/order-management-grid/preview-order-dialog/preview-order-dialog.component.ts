@@ -12,7 +12,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { Order } from '@shared/models/organization.model';
+import { Order } from '@shared/models/order-management.model';
 
 @Component({
   selector: 'app-preview-order-dialog',

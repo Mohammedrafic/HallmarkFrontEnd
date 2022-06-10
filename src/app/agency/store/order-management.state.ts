@@ -7,7 +7,7 @@ import {
   AgencyOrderManagementPage,
   OrderCandidatesListPage
 } from '@shared/models/order-management.model';
-import { Order } from '@shared/models/organization.model';
+import { Order } from '@shared/models/order-management.model';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { Observable, tap } from 'rxjs';

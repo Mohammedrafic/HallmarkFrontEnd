@@ -43,10 +43,3 @@ export enum CreateUserStatus {
   Inactive,
   Active,
 }
-
-export enum OrderStatus {
-  Open,
-  InProgress,
-  Filled,
-  Closed
-}
