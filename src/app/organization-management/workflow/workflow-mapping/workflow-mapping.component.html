@@ -13,6 +13,7 @@
 
   <ejs-grid class="grid grid-component"
             #grid
+            appAddBackgroundForEmptyGridDirective
             (rowDataBound)="rowDataBound($event)"
             [dataSource]="(workflowMappings$ | async)?.items"
             [allowPaging]="allowPaging"
@@ -24,7 +25,12 @@
             [allowResizing]="allowResizing"
   >
     <ng-template #detailTemplate let-data>
-      <table class="detailtable" width="100%" *ngFor="let type of [workflowTypes.OrderWorkflow, workflowTypes.ApplicationWorkflow]">
+      <table
+        [appHighlightGridRowDirective]="data.hasUnassignedSteps"
+        class="detailtable"
+        width="100%"
+        *ngFor="let type of [workflowTypes.OrderWorkflow, workflowTypes.ApplicationWorkflow]"
+      >
         <colgroup>
           <col width="150">
           <col width="180">
