@@ -177,9 +177,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.isLockMenuButtonsShown = false;
         this.store.dispatch(new GetIncompleteOrders({}));
         break;
-      case OrderManagemetTabs.PendingApproval:
-        // TODO: pending implementation
-        break;
     }
   }
 
