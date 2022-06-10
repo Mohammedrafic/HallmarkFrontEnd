@@ -60,7 +60,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   public ngOnInit(): void {
     this.setWidgetsData();
-    this.store.dispatch(new GetDashboardData());
+    this.initOrganizationChangeListener();
   }
 
   public dashboardIsCreated(): void {
@@ -102,6 +102,12 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   private getFiltersGroup(): FormGroup {
     return this.formBuilder.group({ region: [null], location: [null], department: [null], skill: [null] });
+  }
+
+  private initOrganizationChangeListener(): void {
+    this.organizationId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.store.dispatch(new GetDashboardData());
+    });
   }
 
   private setWidgetsData(): void {
