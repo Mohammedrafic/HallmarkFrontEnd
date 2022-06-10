@@ -101,8 +101,6 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   public onAddCancel(): void {
-    this.userSettingForm.reset();
-    this.userSettingForm.enable();
     if (this.userSettingForm.dirty) {
       this.confirmService
         .confirm(DELETE_CONFIRM_TEXT, {
@@ -112,10 +110,14 @@ export class UserListComponent implements OnInit, OnDestroy {
         })
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
+          this.userSettingForm.reset();
+          this.userSettingForm.enable();
           this.store.dispatch(new ShowSideDialog(false));
           this.createdUser = null;
         });
     } else {
+      this.userSettingForm.reset();
+      this.userSettingForm.enable();
       this.store.dispatch(new ShowSideDialog(false));
       this.createdUser = null;
     }

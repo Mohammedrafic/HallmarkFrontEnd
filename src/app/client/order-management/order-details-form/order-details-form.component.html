@@ -295,8 +295,6 @@
                       placeholder="MM/DD/YYYY"
                       formControlName="jobStartDate"
                       appValidateWithMessage
-                      [enableMask]="true"
-                      [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                       [min]="today"
                       [max]="generalInformationForm.controls['jobEndDate'].value">
                     </ejs-datepicker>
@@ -314,8 +312,6 @@
                       formControlName="jobEndDate"
                       appValidateWithMessage
                       [enabled]="isJobEndDateControlEnabled"
-                      [enableMask]="true"
-                      [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                       [min]="generalInformationForm.controls['jobStartDate'].value">
                     </ejs-datepicker>
                   </div>

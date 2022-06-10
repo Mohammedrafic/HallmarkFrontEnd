@@ -180,7 +180,10 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   }
 
   public onClear(): void {
+    const agencyFormValue = this.agencyForm.getRawValue();
+    const status = agencyFormValue.agencyDetails.status;
     this.agencyForm.reset();
+    this.agencyControl?.patchValue({ status });
   }
 
   public onDelete(): void {
