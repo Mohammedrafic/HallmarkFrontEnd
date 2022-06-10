@@ -244,3 +244,21 @@ a, a:hover, a:focus, a:active {
 .overflow-hide {
   overflow: hidden !important;
 }
+
+.widget-tooltip {
+  text-align: center;
+  padding: 10px 20px;
+  background-color: $white;
+  box-shadow: 0 3px 15px rgb(0 0 0 / 0.2);
+  color: $secondary-dark-blue-15;
+  &::after {
+    content: "";
+    display:block;
+    width:15px;
+    height:15px;
+    position:absolute;
+    left: 40%;
+    background-color: $white;
+    transform: rotate(45deg);
+  }
+}
