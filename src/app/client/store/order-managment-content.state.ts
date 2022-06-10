@@ -6,6 +6,7 @@ import { OrderManagementContentService } from '@shared/services/order-management
 import { OrderCandidatesListPage, OrderManagementPage } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/organization.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -72,10 +73,7 @@ export class OrderManagementContentState {
     patchState({ orderDialogOptions: options});
     return this.orderManagementService.getOrderById(id).pipe(
       tap((payload) => {
-        const groupedCredentials = payload.credentials.reduce((rv, x) => {
-          (rv[x['credentialType']] = rv[x['credentialTypeId']] || []).push(x);
-          return rv;
-        }, {});
+        const groupedCredentials = getGroupedCredentials(payload.credentials)
         payload.groupedCredentials = groupedCredentials;
         patchState({ selectedOrder: payload});
         return payload;

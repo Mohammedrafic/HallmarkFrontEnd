@@ -12,6 +12,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { Order } from '@shared/models/organization.model';
 
 @Component({
   selector: 'app-preview-order-dialog',
@@ -35,6 +36,9 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
 
   @Select(OrderManagementState.orderCandidatesLenght)
   public countOrderCandidates$: Observable<number>;
+
+  @Select(OrderManagementState.selectedOrder)
+  public selectedOrder$: Observable<Order>;
 
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
