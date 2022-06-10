@@ -32,76 +32,84 @@
       </e-column>
       <e-column field="skills" headerText="SKILL" width=170>
         <ng-template #template let-data>
-          <span *ngFor="let skill of data.skills; let i = index">{{ skill.skillDescription }}
+          <span *ngFor="let skill of data.skills; let i = index">{{ skill.name }}
             <span *ngIf="i !== data.skills.length - 1">, </span>
           </span>
           <span *ngIf="data.skills.length === 0">All</span>
         </ng-template>
       </e-column>
-      <e-column field="orderType" headerText="ORDER TYPE" width=180>
+      <e-column field="orderTypes" headerText="ORDER TYPE" width=180>
         <ng-template #template let-data>
-          <span *ngFor="let type of data.orderTypes; let i = index">{{ type.orderTypeName }}
+          <span *ngFor="let orderTypeId of data.orderTypes; let i = index">{{ orderTypeId | orderTypeName }}
             <span *ngIf="i !== data.orderTypes.length - 1">, </span>
           </span>
-          <span *ngIf="data.type.length === 0">All</span>
+          <span *ngIf="data.orderTypes.length === 0">All</span>
         </ng-template>
       </e-column>
       <e-column field="billRateTitle" headerText="BILL RATE TITLE" width=180></e-column>
-      <e-column field="billRateCategory" headerText="BILL RATE CATEGORY" width=180></e-column>
-      <e-column field="billRateType" headerText="BILL RATE TYPE" width=180></e-column>
+      <e-column field="billRateCategory" headerText="BILL RATE CATEGORY" width=200>
+        <ng-template #template let-data>
+          <span>{{ billRateCategory[data.billRateCategory] }}</span>
+        </ng-template>
+      </e-column>
+      <e-column field="billRateType" headerText="BILL RATE TYPE" width=200>
+        <ng-template #template let-data>
+          <span>{{ billRateType[data.billRateType] }}</span>
+        </ng-template>
+      </e-column>
       <e-column field="effectiveDate" headerText="EFFECTIVE DATE" width=180>
         <ng-template #template let-data>
           <span>{{ data.effectiveDate | date: 'MM/dd/yyyy' }}</span>
         </ng-template>
       </e-column>
-      <e-column field="billRateValue" headerText="BILL RATE VALUE (RATE/TIMES)" width=180></e-column>
+      <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" width=250></e-column>
       <e-column field="intervalMin" headerText="INTERVAL MIN" width=180></e-column>
       <e-column field="intervalMax" headerText="INTERVAL MAX" width=180></e-column>
-      <e-column field="considerForWeeklyOt" headerText="CONSIDER FOR WEEKLY OT" width=180>
+      <e-column field="considerForWeeklyOT" headerText="CONSIDER FOR WEEKLY OT" width=230>
         <ng-template #template let-data>
-          <div class="bootstrap">
-            <ejs-checkbox [checked]="data.considerForWeeklyOt" (change)="considerForWeeklyOtChange(data, $event)"></ejs-checkbox>
+          <div class="bootstrap" (click)="stopPropagation($event)">
+            <ejs-checkbox [checked]="data.considerForWeeklyOT" (change)="considerForWeeklyOtChange(data, $event)"></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
-      <e-column field="considerForDailyOt" headerText="CONSIDER FOR DAILY OT" width=180>
+      <e-column field="considerForDailyOT" headerText="CONSIDER FOR DAILY OT" width=230>
         <ng-template #template let-data>
-          <div class="bootstrap">
-            <ejs-checkbox [checked]="data.considerForDailyOt" (change)="considerForDailyOtChange(data, $event)"></ejs-checkbox>
+          <div class="bootstrap" (click)="stopPropagation($event)">
+            <ejs-checkbox [checked]="data.considerForDailyOT" (change)="considerForDailyOtChange(data, $event)"></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
-      <e-column field="considerFor7thDayOt" headerText="CONSIDER FOR 7th DAY OT" width=180>
+      <e-column field="considerFor7thDayOT" headerText="CONSIDER FOR 7th DAY OT" width=230>
         <ng-template #template let-data>
-          <div class="bootstrap">
-            <ejs-checkbox [checked]="data.considerFor7thDayOt" (change)="considerFor7thDayOtChange(data, $event)"></ejs-checkbox>
+          <div class="bootstrap" (click)="stopPropagation($event)">
+            <ejs-checkbox [checked]="data.considerFor7thDayOT" (change)="considerFor7thDayOtChange(data, $event)"></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
       <e-column field="regularLocal" headerText="REGULAR LOCAL" width=180>
         <ng-template #template let-data>
-          <div class="bootstrap">
+          <div class="bootstrap" (click)="stopPropagation($event)">
             <ejs-checkbox [checked]="data.regularLocal" (change)="regularLocalChange(data, $event)"></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
-      <e-column field="displayInTimeSheet" headerText="DISPLAY IN TIMESHEET" width=180>
+      <e-column field="displayInTimesheet" headerText="DISPLAY IN TIMESHEET" width=200>
         <ng-template #template let-data>
-          <div class="bootstrap">
-            <ejs-checkbox [checked]="data.displayInTimeSheet" (change)="displayInTimeSheetChange(data, $event)"></ejs-checkbox>
+          <div class="bootstrap" (click)="stopPropagation($event)">
+            <ejs-checkbox [checked]="data.displayInTimesheet" (change)="displayInTimeSheetChange(data, $event)"></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
-      <e-column field="displayInJob" headerText="DISPLAY IN JOB" width=180>
+      <e-column field="displayInJob" headerText="DISPLAY IN JOB" width=200>
         <ng-template #template let-data>
-          <div class="bootstrap">
+          <div class="bootstrap" (click)="stopPropagation($event)">
             <ejs-checkbox [checked]="data.displayInJob" (change)="displayInJobChange(data, $event)"></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
       <e-column textAlign="Right" width=100 freeze="Right">
         <ng-template #template let-data>
-          <div class="row-tool-buttons">
+          <div class="row-tool-buttons" (click)="stopPropagation($event)">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditRecordButtonClick(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
@@ -261,7 +269,8 @@
               id="billRatesTitle"
               appValidateWithMessage
               placeholder="Bill Rates Title"
-              [dataSource]="billRatesTitle$ | async"
+              [dataSource]="billRatesOptions$ | async"
+              [fields]="billRateTitleFields"
               formControlName="billRateTitleId">
             </ejs-dropdownlist>
           </div>
@@ -276,8 +285,8 @@
               placeholder="Order Type"
               selectAllText="Select All"
               mode="CheckBox"
-              [dataSource]="orderTypes$ | async"
-              [fields]="skillsFields"
+              [dataSource]="orderTypes"
+              [fields]="orderTypesFields"
               [showSelectAll]="true"
               [allowFiltering]="false"
               [showDropDownIcon]="true"
@@ -317,32 +326,48 @@
 
       <div class="group">
         <div class="input-container bootstrap">
-          <label for="rateTimes">Rate/Times <span class="required">*</span></label>
+          <label for="rateTimes">{{ BillRateUnitList[selectedBillRateUnit] }} <span class="required">*</span></label>
           <div class="input-group">
             <ejs-maskedtextbox
-              *ngIf="isRateInHours"
+              *ngIf="selectedBillRateUnit === BillRateUnitList.Hours"
               #rateHours
               class="e-input"
-              promptChar="_"
-              mask="00.00"
+              mask="0000000.[0-5][0-9]"
               appValidateWithMessage
               formControlName="billRateValueRateTimes"
-              placeholder="Rates/Hours"
+              placeholder="Hours"
               maxlength="10"
+              (blur)= "onMaskedTextboxBlur($event)"
+              (focus)="onMaskedTextboxFocus($event)"
             ></ejs-maskedtextbox>
 
             <ejs-numerictextbox
-              *ngIf="!isRateInHours"
+              *ngIf="selectedBillRateUnit === BillRateUnitList.Multiplier"
+              class="numeric-input"
+              appValidateWithMessage
+              min="0"
+              maxlength="7"
+              [validateDecimalOnType]="true"
+              [showSpinButton]="false"
+              placeholder="Multiplier"
+              decimals='2'
+              format="#.00"
+              formControlName="billRateValueRateTimes"
+            >
+            </ejs-numerictextbox>
+
+            <ejs-numerictextbox
+              *ngIf="selectedBillRateUnit === BillRateUnitList.Currency"
               id="rateTimes"
               class="numeric-input"
               appValidateWithMessage
               min="0"
-              [maxlength]="10"
+              maxlength="7"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
-              placeholder="Rate/Times"
+              placeholder="Money"
               decimals='2'
-              format="#.##"
+              format="c2"
               formControlName="billRateValueRateTimes"
             >
             </ejs-numerictextbox>
@@ -369,82 +394,82 @@
 
       <div class="group">
         <div
-          *ngIf="isInternalMinEnabled"
-          [formGroup]="billRatesInternalMinRequiredFormGroup"
+          *ngIf="isIntervalMinEnabled"
+          [formGroup]="billRatesIntervalMinRequiredFormGroup"
           class="input-container bootstrap"
         >
-          <label for="internalMin">Internal Min <span class="required">*</span></label>
+          <label for="intervalMin">Interval Min <span class="required">*</span></label>
           <div class="input-group">
             <ejs-numerictextbox
-              id="internalMin"
+              id="intervalMin"
               class="numeric-input"
               appValidateWithMessage
               min="0"
               [maxlength]="10"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
-              placeholder="Internal Min"
+              placeholder="Interval Min"
               decimals='0'
               format="#"
-              formControlName="internalMin"
+              formControlName="intervalMin"
             >
             </ejs-numerictextbox>
           </div>
         </div>
 
         <div
-          *ngIf="!isInternalMinEnabled"
+          *ngIf="!isIntervalMinEnabled"
           class="input-container bootstrap"
         >
-          <label for="internalMinDisabled">Internal Min </label>
+          <label for="intervalMinDisabled">Interval Min </label>
           <div class="input-group">
             <ejs-numerictextbox
-              id="internalMinDisabled"
+              id="intervalMinDisabled"
               class="numeric-input"
               [showSpinButton]="false"
               [enabled]="false"
-              placeholder="Internal Min"
+              placeholder="Interval Min"
             >
             </ejs-numerictextbox>
           </div>
         </div>
 
         <div
-          *ngIf="isInternalMaxEnabled"
-          [formGroup]="billRatesInternalMaxRequiredFormGroup"
+          *ngIf="isIntervalMaxEnabled"
+          [formGroup]="billRatesIntervalMaxRequiredFormGroup"
           class="input-container bootstrap"
         >
-          <label for="internalMax">Internal Max <span class="required">*</span></label>
+          <label for="intervalMax">Interval Max <span class="required">*</span></label>
           <div class="input-group">
             <ejs-numerictextbox
-              id="internalMax"
+              id="intervalMax"
               class="numeric-input"
               appValidateWithMessage
               min="0"
               [maxlength]="10"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
-              placeholder="Internal Max"
+              placeholder="Interval Max"
               decimals='0'
               format="#"
-              formControlName="internalMax"
+              formControlName="intervalMax"
             >
             </ejs-numerictextbox>
           </div>
         </div>
 
         <div
-          *ngIf="!isInternalMaxEnabled"
+          *ngIf="!isIntervalMaxEnabled"
           class="input-container bootstrap"
         >
-          <label for="internalMaxDisabled">Internal Max </label>
+          <label for="intervalMaxDisabled">Interval Max </label>
           <div class="input-group">
             <ejs-numerictextbox
-              id="internalMaxDisabled"
+              id="intervalMaxDisabled"
               class="numeric-input"
               [showSpinButton]="false"
               [enabled]="false"
-              placeholder="Internal Max"
+              placeholder="Interval Max"
             >
             </ejs-numerictextbox>
           </div>
@@ -452,35 +477,33 @@
       </div>
 
       <div class="checkbox-container">
-        <div class="overtime-container" *ngIf="isOvertimeAccessible">
-          <div class="input-container">
-            <div class="input-group">
-              <ejs-checkbox
-                id="considerForWeeklyOt"
-                label="Consider for Weekly OT"
-                formControlName="considerForWeeklyOt"
-              ></ejs-checkbox>
-            </div>
+        <div class="input-container">
+          <div class="input-group">
+            <ejs-checkbox
+              id="considerForWeeklyOt"
+              label="Consider for Weekly OT"
+              formControlName="considerForWeeklyOt"
+            ></ejs-checkbox>
           </div>
+        </div>
 
-          <div class="input-container">
-            <div class="input-group">
-              <ejs-checkbox
-                id="considerForDailyOt"
-                label="Consider for Daily OT"
-                formControlName="considerForDailyOt"
-              ></ejs-checkbox>
-            </div>
+        <div class="input-container">
+          <div class="input-group">
+            <ejs-checkbox
+              id="considerForDailyOt"
+              label="Consider for Daily OT"
+              formControlName="considerForDailyOt"
+            ></ejs-checkbox>
           </div>
+        </div>
 
-          <div class="input-container">
-            <div class="input-group">
-              <ejs-checkbox
-                id="considerFor7thDayOt"
-                label="Consider for 7th Day OT"
-                formControlName="considerFor7thDayOt"
-              ></ejs-checkbox>
-            </div>
+        <div class="input-container">
+          <div class="input-group">
+            <ejs-checkbox
+              id="considerFor7thDayOt"
+              label="Consider for 7th Day OT"
+              formControlName="considerFor7thDayOt"
+            ></ejs-checkbox>
           </div>
         </div>
 

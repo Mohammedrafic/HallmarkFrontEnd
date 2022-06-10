@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { BillRateOption, BillRateSetup, BillRateSetupPage, BillRateSetupPost } from '@shared/models/bill-rate.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +13,8 @@ export class BillRatesService {
    * Get the list of bill rates
    * @return Array of bill rates
    */
-  public getBillRates(): Observable<any> { // TODO: pending BE implementation
-    return this.http.get<any>(`/api/BillRates`);
+  public getBillRates(pageNumber: number, pageSize: number): Observable<BillRateSetupPage> {
+    return this.http.get<any>(`/api/BillRates/setup`, { params: { PageNumber: pageNumber, PageSize: pageSize } });
   }
 
   /**
@@ -21,10 +22,10 @@ export class BillRatesService {
    * @param billRate object to save/update
    * @return Created/Updated bill rate
    */
-  public saveUpdateBillRate(billRate: any): Observable<any> { // TODO: pending BE implementation
-    return billRate.id ?
-      this.http.put<any>(`/api/BillRates`, billRate) :
-      this.http.post<any>(`/api/BillRates`, billRate);
+  public saveUpdateBillRate(billRate: BillRateSetupPost): Observable<BillRateSetup[]> {
+    return billRate.billRateSetupId ?
+      this.http.put<BillRateSetup[]>(`/api/BillRates/setup`, billRate) :
+      this.http.post<BillRateSetup[]>(`/api/BillRates/setup`, billRate);
   }
 
     /**
@@ -32,6 +33,14 @@ export class BillRatesService {
    * @param id
    */
   public removeBillRateById(id: number): Observable<void> { // TODO: pending BE implementation
-    return this.http.delete<void>(`/api/BillRates/${id}`);
+    return this.http.delete<void>(`/api/BillRates/setup/${id}`);
+  }
+
+  /**
+   * Get Bill Rate Options
+   * @return list of Bill Rate eOptions
+   */
+  public getBillRateOptions(): Observable<BillRateOption[]> {
+    return this.http.get<BillRateOption[]>(`/api/BillRates/options`);
   }
 }

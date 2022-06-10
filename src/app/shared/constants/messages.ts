@@ -3,6 +3,7 @@ export const RECORD_MODIFIED = 'Record has been modified';
 export const RECORD_SAVED = 'Record has been saved';
 export const RECORD_CANNOT_BE_DELETED = 'Record cannot be deleted';
 export const RECORD_CANNOT_BE_SAVED = 'Record cannot be saved';
+export const RECORD_CANNOT_BE_UPDATED = 'Record cannot be updated';
 export const DELETE_RECORD_TEXT = 'Are you sure you want to delete?';
 export const DELETE_RECORD_TITLE = 'Delete Record';
 export const DELETE_CONFIRM_TEXT = 'Are you sure you want to leave this page without saving?';

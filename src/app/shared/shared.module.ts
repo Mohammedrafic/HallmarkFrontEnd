@@ -26,6 +26,7 @@ import { FormsModule } from '@angular/forms';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousComponent } from './components/dialog-next-previous/dialog-next-previous.component';
+import { OrderTypeName } from '@shared/pipes/order-type-name.pipe';
 import { GeneralOrderInfoComponent } from './components/general-order-info/general-order-info.component';
 import { GridAllModule, PagerAllModule } from "@syncfusion/ej2-angular-grids";
 import { OrderCandidatesListComponent } from './components/order-candidates-list/order-candidates-list.component';
@@ -47,6 +48,7 @@ const COMPONENTS = [
   PageToolbarComponent,
   ValidationErrorPipe,
   ChipsCssClass,
+  OrderTypeName,
   ValidateDirective,
   ImageUploaderComponent,
   DocumentUploaderComponent,

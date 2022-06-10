@@ -3,58 +3,84 @@ import { Injectable } from '@angular/core';
 import { catchError, Observable, tap } from 'rxjs';
 import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { DeleteBillRatesById, GetBillRates, SaveUpdateBillRate } from '@organization-management/store/bill-rates.actions';
+import {
+  DeleteBillRatesById,
+  GetBillRateOptions,
+  GetBillRates,
+  SaveUpdateBillRate, SaveUpdateBillRateSucceed
+} from '@organization-management/store/bill-rates.actions';
 import { BillRatesService } from '@shared/services/bill-rates.service';
-import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { RECORD_ADDED, RECORD_CANNOT_BE_SAVED, RECORD_CANNOT_BE_UPDATED, RECORD_MODIFIED } from '@shared/constants';
+import { BillRateOption, BillRateSetup, BillRateSetupPage } from '@shared/models/bill-rate.model';
 
 export interface BillRatesStateModel {
-  billRatesPage: any
+  billRatesPage: BillRateSetupPage | null,
+  billRateOptions: BillRateOption[]
 }
 
 @State<BillRatesStateModel>({
   name: 'billrates',
   defaults: {
-    billRatesPage: null
+    billRatesPage: null,
+    billRateOptions: []
   }
 })
 @Injectable()
 export class BillRatesState {
 
   @Selector()
-  static billRatesPage(state: BillRatesStateModel): any { return state.billRatesPage; }
+  static billRatesPage(state: BillRatesStateModel): BillRateSetupPage | null { return state.billRatesPage; }
+
+  @Selector()
+  static billRateOptions(state: BillRatesStateModel): any { return state.billRateOptions; }
 
   constructor(private billRatesService: BillRatesService) {}
 
   @Action(GetBillRates)
-  GetBillRates({ patchState }: StateContext<BillRatesStateModel>, { }: GetBillRates): Observable<any> {
-    return this.billRatesService.getBillRates().pipe(tap((payload) => {
+  GetBillRates({ patchState }: StateContext<BillRatesStateModel>, { pageNumber, pageSize }: GetBillRates): Observable<BillRateSetupPage> {
+    return this.billRatesService.getBillRates(pageNumber, pageSize).pipe(tap((payload) => {
       patchState({ billRatesPage: payload });
       return payload;
     }));
   }
 
   @Action(SaveUpdateBillRate)
-  SaveUpdateBillRate({ patchState, dispatch }: StateContext<BillRatesStateModel>, { payload }: SaveUpdateBillRate): Observable<any> {
+  SaveUpdateBillRate({ patchState, dispatch }: StateContext<BillRatesStateModel>, { payload, pageNumber, pageSize }: SaveUpdateBillRate): Observable<BillRateSetup[] | void> {
     return this.billRatesService.saveUpdateBillRate(payload)
       .pipe(tap((payloadResponse) => {
-          if (payload.id) {
+          if (payload.billRateSetupId) {
             dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
           } else {
             dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
           }
-          dispatch(new GetBillRates());
+          dispatch(new GetBillRates(pageNumber, pageSize));
+          dispatch(new SaveUpdateBillRateSucceed());
           return payloadResponse;
         }),
-        catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+        catchError((error: any) => {
+          if (payload.billRateSetupId) {
+            return dispatch(new ShowToast(MessageTypes.Error, error.error.detail ? error.error.detail : RECORD_CANNOT_BE_UPDATED));
+          } else {
+            return dispatch(new ShowToast(MessageTypes.Error, error.error.detail ? error.error.detail : RECORD_CANNOT_BE_SAVED))
+          }
+        })
       );
   }
 
   @Action(DeleteBillRatesById)
-  DeleteBillRatesById({ patchState, dispatch }: StateContext<BillRatesStateModel>, { payload }: DeleteBillRatesById): Observable<any> {
+  DeleteBillRatesById({ patchState, dispatch }: StateContext<BillRatesStateModel>, { payload, pageNumber, pageSize }: DeleteBillRatesById): Observable<void> {
     return this.billRatesService.removeBillRateById(payload).pipe(tap(() => {
-        dispatch(new GetBillRates());
+        dispatch(new GetBillRates(pageNumber, pageSize));
         return payload;
       }),
       catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
+  }
+
+  @Action(GetBillRateOptions)
+  GetBillRateOptions({ patchState }: StateContext<BillRatesStateModel>, { }: GetBillRateOptions): Observable<BillRateOption[]> {
+    return this.billRatesService.getBillRateOptions().pipe(tap((payload) => {
+      patchState({ billRateOptions: payload });
+      return payload;
+    }));
   }
 }
