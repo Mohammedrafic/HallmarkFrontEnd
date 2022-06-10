@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { FeatherModule } from 'angular-feather';
 
-import { AlertCircle, CheckCircle, allIcons, User, Briefcase, Folder, MapPin, Calendar, ArrowLeft, ArrowRight } from 'angular-feather/icons';
+import { AlertCircle, CheckCircle, allIcons, User, Briefcase, Folder, MapPin, Calendar, ArrowLeft, ArrowRight, Mail, Send } from 'angular-feather/icons';
 import { NumericTextBoxAllModule, UploaderModule } from "@syncfusion/ej2-angular-inputs";
 import { DropDownListModule, ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -15,7 +15,7 @@ import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 import { ImageUploaderComponent } from './components/image-uploader/image-uploader.component';
 import { DocumentUploaderComponent } from './components/document-uploader/document-uploader.component';
 import { FileUploadDialogComponent } from './components/file-upload-dialog/file-upload-dialog.component';
-import { DialogModule } from '@syncfusion/ej2-angular-popups';
+import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { ButtonModule, ChipListAllModule, RadioButtonAllModule } from '@syncfusion/ej2-angular-buttons';
 import { SideDialogComponent } from './components/side-dialog/side-dialog.component';
 import { SideMenuComponent } from './components/side-menu/side-menu.component';
@@ -26,11 +26,15 @@ import { FormsModule } from '@angular/forms';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousComponent } from './components/dialog-next-previous/dialog-next-previous.component';
+import { OrderDetailsComponent } from './components/order-details/order-details.component';
+import { AccordionModule } from '@syncfusion/ej2-angular-navigations';
 import { OrderTypeName } from '@shared/pipes/order-type-name.pipe';
 import { GeneralOrderInfoComponent } from './components/general-order-info/general-order-info.component';
 import { GridAllModule, PagerAllModule } from "@syncfusion/ej2-angular-grids";
 import { OrderCandidatesListComponent } from './components/order-candidates-list/order-candidates-list.component';
 import { CustomProgressBarComponent } from './components/custom-progress-bar/custom-progress-bar.component';
+import { BillRatesViewGridComponent } from './components/bill-rates-view-grid/bill-rates-view-grid.component';
+import { CommentsComponent } from './components/comments/comments.component';
 
 const icons = {
   AlertCircle,
@@ -41,7 +45,9 @@ const icons = {
   Briefcase,
   Folder,
   MapPin,
-  Calendar
+  Calendar,
+  Mail,
+  Send
 };
 
 const COMPONENTS = [
@@ -60,14 +66,33 @@ const COMPONENTS = [
   SideMenuComponent,
   SearchComponent,
   DialogNextPreviousComponent,
+  OrderDetailsComponent,
   SearchComponent,
   GeneralOrderInfoComponent,
   OrderCandidatesListComponent,
-  CustomProgressBarComponent
+  CustomProgressBarComponent,
+  BillRatesViewGridComponent,
+  CommentsComponent
 ];
 
 @NgModule({
-  imports: [FeatherModule.pick(icons), CommonModule, UploaderModule, ToastModule, DialogModule, ButtonModule, ListBoxModule, RadioButtonAllModule, ChipListAllModule, FormsModule, DropDownButtonModule, GridAllModule, DropDownListModule, NumericTextBoxAllModule, PagerAllModule],
+  imports: [FeatherModule.pick(icons), 
+    CommonModule, 
+    UploaderModule, 
+    ToastModule, 
+    DialogModule, 
+    ButtonModule, 
+    ListBoxModule, 
+    RadioButtonAllModule, 
+    ChipListAllModule, 
+    FormsModule, 
+    DropDownButtonModule, 
+    AccordionModule, 
+    TooltipModule,
+    NumericTextBoxAllModule,
+    GridAllModule, PagerAllModule,
+    DropDownListModule
+  ],
   exports: [...COMPONENTS],
   declarations: [...COMPONENTS, ErrorMessageComponent],
   providers: [DatePipe],

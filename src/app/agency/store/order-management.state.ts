@@ -3,6 +3,7 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 
 import {
+  AgencyOrderManagement,
   AgencyOrderManagementPage,
   OrderCandidatesListPage
 } from '@shared/models/order-management.model';
@@ -65,6 +66,18 @@ export class OrderManagementState {
   @Selector()
   static orderDialogOptions(state: OrderManagementModel): DialogNextPreviousOption {
     return state.orderDialogOptions;
+  }
+
+  @Selector()
+  static lastSelectedOrder(state: OrderManagementModel): (id: number) => [AgencyOrderManagement, number] | [] {
+    return (id: number) => {
+      let rowIndex;
+      const order = state.ordersPage?.items.find(({ orderId }, index) => {
+        rowIndex = index; 
+        return orderId === id;
+      });
+      return order && rowIndex ? [order, rowIndex] : [];
+    };
   }
 
   constructor(private orderManagementContentService: OrderManagementContentService) {}

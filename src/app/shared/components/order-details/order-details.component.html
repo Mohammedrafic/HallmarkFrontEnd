@@ -1,0 +1,67 @@
+<section class="order-content" *ngIf="order">
+  <div class="job-description-accordion">
+    <ejs-accordion>
+      <e-accordionitems>
+        <e-accordionitem expanded='true'>
+          <ng-template #header>
+            <div>Job Description</div>
+          </ng-template>
+          <ng-template #content>
+            <div>{{ order.jobDescription }}</div>
+          </ng-template>
+        </e-accordionitem>
+      </e-accordionitems>
+    </ejs-accordion>
+    <div class="comments">
+      <app-comments></app-comments>
+    </div>
+    <div class="contacts-container">
+      <div class="contacts">
+        <div class="contact-title">Supervisor Contacts</div>
+        <div class="contact-details">
+          <span>
+            <i-feather name="user" class="icon"></i-feather> {{ order.contactDetails[0].name }}
+          </span>
+          <span>
+            <i-feather name="mail" class="icon"></i-feather> {{ order.contactDetails[0].email }}
+          </span>
+          <span>
+            <i-feather name="map-pin" class="icon"></i-feather> 
+            {{ order.workLocations[0].address }}, {{ order.workLocations[0].city }}, {{ order.workLocations[0].state }}, {{ order.workLocations[0].zipCode }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="credentials">
+      <div class="credentials-title">Credentials</div>
+      <ejs-accordion>
+        <e-accordionitems>
+          <e-accordionitem expanded="true" *ngFor="let item of order.groupedCredentials | keyvalue">
+            <ng-template #header>
+              <div>{{ item.key }}</div>
+            </ng-template>
+            <ng-template #content>
+              <div>
+                <div class="credential-item" *ngFor="let cred of item.value | keyvalue">
+                  <div class="credential-title">{{ cred.value.credentialName }}</div>
+                  <div>
+                    <ejs-tooltip target=".icon" position="TopCenter" [windowCollision]="true">
+                      <i-feather title="Req. for Submission" [name]="cred.value.reqForSubmission ? 'check-circle' : 'alert-triangle'" [class.active]="cred.value.reqForSubmission" class="icon"></i-feather>
+                      <i-feather title="Req. for Onboard" [name]="cred.value.reqForOnboard ? 'check-circle' : 'alert-triangle'" [class.active]="cred.value.reqForOnboard" class="icon"></i-feather>
+                      <i-feather title="Optional" [name]="cred.value.optional ? 'check-circle' : 'alert-triangle'" [class.active]="cred.value.optional" class="icon"></i-feather>
+                    </ejs-tooltip>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </e-accordionitem>
+        </e-accordionitems>
+      </ejs-accordion>
+    </div>
+  </div>
+</section>
+<section class="bill-rates" *ngIf="order">
+  <app-bill-rates-view-grid [billRatesData]="order.billRates"></app-bill-rates-view-grid>
+</section>

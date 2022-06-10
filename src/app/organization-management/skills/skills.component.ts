@@ -163,7 +163,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     this.defaultFileName = 'Organization Skills ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportSkills(new ExportPayload(
       fileType, 
-      { orderBy: this.orderBy }, 
+      { orderBy: this.orderBy, offset: Math.abs(new Date().getTimezoneOffset()) }, 
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => {
         return { aId: val.id, mId: val.masterSkill.id }

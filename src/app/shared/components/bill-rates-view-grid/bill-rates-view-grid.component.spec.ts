@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OrderDetailsComponent } from './order-details.component';
+import { BillRatesViewGridComponent } from './bill-rates-view-grid.component';
 
-describe('OrderDetailsFormComponent', () => {
-  let component: OrderDetailsComponent;
-  let fixture: ComponentFixture<OrderDetailsComponent>;
+describe('BillRatesViewGridComponent', () => {
+  let component: BillRatesViewGridComponent;
+  let fixture: ComponentFixture<BillRatesViewGridComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ OrderDetailsComponent ]
+      declarations: [ BillRatesViewGridComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OrderDetailsComponent);
+    fixture = TestBed.createComponent(BillRatesViewGridComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -15,3 +15,13 @@ export class GetOrderById {
   static readonly type = '[order management] Get Order By Id';
   constructor(public id: number, public organizationId: number, public options: DialogNextPreviousOption) {}
 }
+
+export class GetAgencyOrderCandidatesList {
+  static readonly type = '[order management] Get Order Candidates Page';
+  constructor(
+    public orderId: number,
+    public organizationId: number,
+    public pageNumber: number,
+    public pageSize: number
+  ) {}
+}

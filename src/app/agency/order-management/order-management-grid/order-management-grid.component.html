@@ -13,6 +13,7 @@
   [selectionSettings]="selectionOptions"
   [textWrapSettings]="wrapSettings"
   (rowSelected)="onRowClick($event)"
+  (dataBound)="onDataBound()"
 >
   <e-columns>
     <e-column headerTextAlign="Right" width="48" [customAttributes]="{ class: 'checkbox-header' }">
@@ -154,6 +155,7 @@
 <app-preview-order-dialog
   [order]="selectedOrder"
   [openEvent]="openPreview"
+  [openCandidateTab]="!!previousSelectedOrderId"
   (compareEvent)="onCompare()"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-preview-order-dialog>

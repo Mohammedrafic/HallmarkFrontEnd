@@ -25,7 +25,9 @@ import {
   MapPin,
   Briefcase,
   Calendar,
-  Folder
+  Folder,
+  CheckCircle,
+  AlertTriangle
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -43,7 +45,7 @@ import { ButtonModule, ChipListModule, CheckBoxModule } from '@syncfusion/ej2-an
 import { DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
-import { AccordionModule, MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
+import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 
 import { ClientRoutingModule } from './client-routing.module';
@@ -67,8 +69,8 @@ import { WorkflowState } from '@organization-management/store/workflow.state';
 import { OrderDetailsDialogComponent } from './order-management/order-details-dialog/order-details-dialog.component';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import { OrderDetailsComponent } from './order-management/order-details/order-details.component';
-import { JobDetailsComponent } from './order-management/job-details/job-details.component';
+import { OrderDetailsContainerComponent } from './order-management/order-details-container/order-details-container.component';
+import { OrderCandidatesContainerComponent } from './order-management/order-candidates-container/order-candidates-container.component';
 
 const gridIcons = {
   MessageSquare,
@@ -92,7 +94,9 @@ const gridIcons = {
   MapPin,
   Briefcase,
   Calendar,
-  Folder
+  Folder,
+  CheckCircle,
+  AlertTriangle
 };
 
 @NgModule({
@@ -107,8 +111,8 @@ const gridIcons = {
     AddEditOrderComponent,
     OrderDetailsFormComponent,
     OrderDetailsDialogComponent,
-    OrderDetailsComponent,
-    JobDetailsComponent
+    OrderDetailsContainerComponent,
+    OrderCandidatesContainerComponent
   ],
   imports: [
     CommonModule,
@@ -135,7 +139,6 @@ const gridIcons = {
     OrderCredentialsModule,
     DropDownButtonModule,
     DialogModule,
-    AccordionModule,
 
     //STORE
     NgxsModule.forFeature([

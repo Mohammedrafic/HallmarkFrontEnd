@@ -196,6 +196,7 @@ export class Order {
   departmentName?: string;
   orderOpenDate?: Date;
   isLocked?: boolean;
+  groupedCredentials?: Object;
   isSubmit: boolean;
   organizationId?: number;
   totalPositions?: number;
