@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { combineLatest, forkJoin, Observable, Subject, takeWhile } from 'rxjs';
+import { takeWhile, Observable, Subject } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
 import {
@@ -17,10 +17,10 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { GRID_CONFIG } from '@shared/constants';
 import { ROW_HEIGHT, typeValueAccess } from './order-management-grid.constants';
-import { GetAgencyOrdersPage, GetOrderById } from '@agency/store/order-management.actions';
+import { GetAgencyOrdersPage, GetOrderById, GetAgencyOrderCandidatesList, GetAgencyOrderGeneralInformation } from '@agency/store/order-management.actions';
+import { OrderManagementState } from '@agency/store/order-management.state';
 import { AgencyOrderManagement, AgencyOrderManagementPage } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import { OrderManagementState } from '@agency/store/order-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 
 enum AllCheckedStatus {
@@ -109,6 +109,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     const options = this.getDialogNextPreviousOption(data);
     this.store.dispatch(new GetOrderById(data.orderId, data.organizationId, options));
     this.openPreview.next(true);
+    this.store.dispatch(new GetAgencyOrderCandidatesList(data.orderId, data.organizationId, this.currentPage, this.pageSize));
+    this.store.dispatch(new GetAgencyOrderGeneralInformation(data.orderId, data.organizationId))
   }
 
   public onCheckAll(event: CheckBoxChangeEventArgs): void {

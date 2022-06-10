@@ -32,6 +32,9 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   @Select(OrderManagementState.orderDialogOptions)
   public orderDialogOptions$: Observable<DialogNextPreviousOption>;
 
+  @Select(OrderManagementState.orderCandidatesLenght)
+  public countOrderCandidates$: Observable<number>;
+
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;

@@ -1,0 +1,85 @@
+<section class="candidates-info">
+  <div class="container-row">
+    <div class="column">
+      <div class="icon">
+        <i-feather name="user" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{orderInformation.title}}</div>
+        <div class="sup-title">Job title</div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="icon">
+        <i-feather name="folder" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{orderInformation.departmentName}}</div>
+        <div class="sup-title">Department</div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="icon">
+        <i-feather name="map-pin" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{orderInformation.locationName}}</div>
+        <div class="sup-title">Location</div>
+      </div>
+    </div>
+    <div class="column last-column">
+      <div class="cost">${{orderInformation.hourlyRate}}</div>
+      <div class="sup-title">Bill Rate</div>
+    </div>
+    <div class="column">
+      <div class="icon">
+        <i-feather name="calendar" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{orderInformation.jobStartDate | date: 'MM/dd/yyy'}}</div>
+        <div class="sup-title">Start Date</div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="icon">
+        <i-feather name="calendar" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{orderInformation.jobEndDate | date: 'MM/dd/yyy'}}</div>
+        <div class="sup-title">End Date</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="candidates-additional-info">
+  <div class="container-row">
+    <div class="column">
+      <div class="title">{{orderInformation.orderType}}</div>
+      <div class="sup-title">Job Type</div>
+    </div>
+    <div class="column">
+      <div class="title">{{orderInformation.totalPositions}} / {{orderInformation.openPositions}}</div>
+      <div class="sup-title">Initials Positions</div>
+    </div>
+    <div class="column">
+      <div class="title">{{orderInformation.shiftStartTime | date: 'hh:mm'}} - {{orderInformation.shiftEndTime | date: 'hh:mm'}}</div>
+      <div class="sup-title">Shift</div>
+    </div>
+    <div class="column">
+      <div class="title">${{orderInformation.joiningBonus}} / ${{orderInformation.compBonus}}</div>
+      <div class="sup-title">Start / End Bonus</div>
+    </div>
+    <div class="column">
+      <div class="title">{{activeValue(orderInformation.onCallRequired)}}</div>
+      <div class="sup-title">Oncall</div>
+    </div>
+    <div class="column">
+      <div class="title">{{activeValue(orderInformation.nO_OT)}}</div>
+      <div class="sup-title">Do Not Consider OT</div>
+    </div>
+    <div class="column">
+      <div class="title">{{orderInformation.orderOpenDate | date: 'MM/dd/yyy'}}</div>
+      <div class="sup-title">Distributed On</div>
+    </div>
+  </div>
+</section>

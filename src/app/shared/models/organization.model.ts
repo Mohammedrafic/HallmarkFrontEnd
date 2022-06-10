@@ -197,6 +197,8 @@ export class Order {
   orderOpenDate?: Date;
   isLocked?: boolean;
   isSubmit: boolean;
+  organizationId?: number;
+  totalPositions?: number;
 }
 
 export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates'> {

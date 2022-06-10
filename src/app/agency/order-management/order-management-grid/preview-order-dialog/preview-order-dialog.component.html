@@ -42,7 +42,7 @@
               <ng-template #content> </ng-template>
             </e-tabitem>
             <e-tabitem>
-              <ng-template #headerText>Candidates <span class="e-badge e-badge-success e-badge-circle">5</span></ng-template>
+              <ng-template #headerText>Candidates <span class="e-badge e-badge-success e-badge-circle">{{countOrderCandidates$ | async}}</span></ng-template>
               <ng-template #content>
                 <app-candidates-order></app-candidates-order>
               </ng-template>

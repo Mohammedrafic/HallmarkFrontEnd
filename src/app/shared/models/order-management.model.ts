@@ -57,4 +57,26 @@ export type AgencyOrderManagement = {
   organizationName: string;
 };
 
+export type AgencyOrderCandidates = {
+  candidateId: number;
+  firstName: string;
+  hourlyBillRate: number;
+  lastName: string;
+  middleName?: string;
+  onboardedPercentage: number;
+  skill: string;
+  status: number;
+  statusName: string;
+  submissionsPercentage: number;
+};
+
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;
+
+export type OrderCandidatesListPage = PageOfCollections<AgencyOrderCandidates>;
+
+export type AgencyOrder = {
+  orderId: number;
+  organizationId: number;
+};
+
+

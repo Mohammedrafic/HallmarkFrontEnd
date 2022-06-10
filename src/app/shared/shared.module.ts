@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { FeatherModule } from 'angular-feather';
 
-import { AlertCircle, CheckCircle, ArrowLeft, ArrowRight } from 'angular-feather/icons';
-import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
-import { ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
+import { AlertCircle, CheckCircle, allIcons, User, Briefcase, Folder, MapPin, Calendar, ArrowLeft, ArrowRight } from 'angular-feather/icons';
+import { NumericTextBoxAllModule, UploaderModule } from "@syncfusion/ej2-angular-inputs";
+import { DropDownListModule, ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 
 import { PageToolbarComponent } from './components/page-toolbar/page-toolbar.component';
 import { ValidateDirective } from './directives/validate.directive';
@@ -26,8 +26,22 @@ import { FormsModule } from '@angular/forms';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousComponent } from './components/dialog-next-previous/dialog-next-previous.component';
+import { GeneralOrderInfoComponent } from './components/general-order-info/general-order-info.component';
+import { GridAllModule, PagerAllModule } from "@syncfusion/ej2-angular-grids";
+import { OrderCandidatesListComponent } from './components/order-candidates-list/order-candidates-list.component';
+import { CustomProgressBarComponent } from './components/custom-progress-bar/custom-progress-bar.component';
 
-const icons = {AlertCircle, CheckCircle, ArrowLeft, ArrowRight};
+const icons = {
+  AlertCircle,
+  CheckCircle,
+  ArrowLeft,
+  ArrowRight,
+  User,
+  Briefcase,
+  Folder,
+  MapPin,
+  Calendar
+};
 
 const COMPONENTS = [
   PageToolbarComponent,
@@ -43,11 +57,15 @@ const COMPONENTS = [
   ExportDialogComponent,
   SideMenuComponent,
   SearchComponent,
-  DialogNextPreviousComponent
+  DialogNextPreviousComponent,
+  SearchComponent,
+  GeneralOrderInfoComponent,
+  OrderCandidatesListComponent,
+  CustomProgressBarComponent
 ];
 
 @NgModule({
-  imports: [FeatherModule.pick(icons), CommonModule, UploaderModule, ToastModule, DialogModule, ButtonModule, ListBoxModule, RadioButtonAllModule, ChipListAllModule, FormsModule, DropDownButtonModule],
+  imports: [FeatherModule.pick(icons), CommonModule, UploaderModule, ToastModule, DialogModule, ButtonModule, ListBoxModule, RadioButtonAllModule, ChipListAllModule, FormsModule, DropDownButtonModule, GridAllModule, DropDownListModule, NumericTextBoxAllModule, PagerAllModule],
   exports: [...COMPONENTS],
   declarations: [...COMPONENTS, ErrorMessageComponent],
   providers: [DatePipe],

@@ -1,1 +1,7 @@
-<p>candidates works!</p>
+<div class="general-info">
+  <app-general-order-info *ngIf="orderCandidateInformation" [orderInformation]="orderCandidateInformation"></app-general-order-info>
+</div>
+<div class="line"></div>
+<div class="candidates-list">
+  <app-order-candidates-list *ngIf="orderCandidatePage" [candidatesList]="orderCandidatePage" [order]="orderCandidates"></app-order-candidates-list>
+</div>
