@@ -28,4 +28,5 @@ export class Step {
   status: string;
   type: number;
   order?: number;
+  nextStepStatus?: string;
 }
