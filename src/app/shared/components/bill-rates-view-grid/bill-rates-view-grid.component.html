@@ -1,0 +1,46 @@
+<section>
+  <div class="e-gridcustomheader">
+    <div class="title">
+      <h3>Bill Rates</h3>
+    </div>
+  </div>
+  <ejs-grid #grid class="e-gridwithheader"
+            [dataSource]="billRatesData"
+            [allowSelection]="false"
+            [allowPaging]="false"
+            [height]="390"
+            [rowHeight]="rowHeight"
+            [resizeSettings]="resizeSettings"
+            [allowSorting]="allowSorting"
+            [allowResizing]="allowResizing">
+    <e-columns>
+      <e-column headerText="Bill Rate Title">
+        <ng-template #template let-data>{{data.billRateConfig.title}}</ng-template>
+      </e-column>
+
+      <e-column headerText="Bill Rate Category">
+        <ng-template #template let-data>{{BillRateCategory[data.billRateConfig.category]}}</ng-template>
+      </e-column>
+
+      <e-column headerText="Pay Rate Type">
+        <ng-template #template let-data>{{BillRateType[data.billRateConfig.type]}}</ng-template>
+      </e-column>
+
+      <e-column headerText="Rates/Hours" textAlign="Right">
+        <ng-template #template let-data>{{data.rateHour}}</ng-template>
+      </e-column>
+
+      <e-column headerText="Interval Min" textAlign="Right">
+        <ng-template #template let-data>{{data.intervalMin}}</ng-template>
+      </e-column>
+
+      <e-column headerText="Interval Max" textAlign="Right">
+        <ng-template #template let-data>{{data.intervalMax}}</ng-template>
+      </e-column>
+
+      <e-column headerText="Effective Date" textAlign="Right">
+        <ng-template #template let-data>{{data.effectiveDate | date:'M/d/y'}}</ng-template>
+      </e-column>
+    </e-columns>
+  </ejs-grid>
+</section>

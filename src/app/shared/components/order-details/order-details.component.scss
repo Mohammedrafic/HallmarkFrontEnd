@@ -22,6 +22,39 @@
   background-color: $secondary-dark-blue-45;
 }
 
+.bill-rates {
+  margin-top: 24px;
+}
+
+.comments {
+  height: 441px;
+  margin-top: 12px;
+}
+
+.contacts {
+  margin-top: 12px;
+  padding: 9px 23px 0;
+  border-radius: 8px;
+  background-color: $secondary-dark-blue-50;
+
+  .contact-details {
+    display: flex;
+    flex-direction: column;
+    color: $black;
+
+    i-feather {
+      width: 14px;
+      height: 14px;
+      margin-right: 10px;
+      color: $secondary-dark-blue-20;
+    }
+
+    >span {
+      margin-bottom: 12px;
+    }
+  }
+}
+
 .credentials {
   background-color: $secondary-dark-blue-50;
   border-radius: 8px;
@@ -49,10 +82,11 @@
   .e-accordion, .e-acrdn-item {
     background-color: $secondary-dark-blue-50;
   }
+}
 
-  .credentials-title {
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 10px;
-  }
+.credentials-title, .contact-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: $black;
 }
