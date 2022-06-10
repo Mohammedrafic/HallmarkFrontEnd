@@ -35,6 +35,8 @@ import { OrderCandidatesListComponent } from './components/order-candidates-list
 import { CustomProgressBarComponent } from './components/custom-progress-bar/custom-progress-bar.component';
 import { BillRatesViewGridComponent } from './components/bill-rates-view-grid/bill-rates-view-grid.component';
 import { CommentsComponent } from './components/comments/comments.component';
+import { HighlightGridRowDirective } from '@shared/directives/hightlight-grid-row.directive';
+import { AddBackgroundForEmptyGridDirective } from '@shared/directives/add-background-for-empty-grid.directive';
 
 const icons = {
   AlertCircle,
@@ -56,6 +58,8 @@ const COMPONENTS = [
   ChipsCssClass,
   OrderTypeName,
   ValidateDirective,
+  HighlightGridRowDirective,
+  AddBackgroundForEmptyGridDirective,
   ImageUploaderComponent,
   DocumentUploaderComponent,
   SideDialogComponent,
@@ -76,18 +80,18 @@ const COMPONENTS = [
 ];
 
 @NgModule({
-  imports: [FeatherModule.pick(icons), 
-    CommonModule, 
-    UploaderModule, 
-    ToastModule, 
-    DialogModule, 
-    ButtonModule, 
-    ListBoxModule, 
-    RadioButtonAllModule, 
-    ChipListAllModule, 
-    FormsModule, 
-    DropDownButtonModule, 
-    AccordionModule, 
+  imports: [FeatherModule.pick(icons),
+    CommonModule,
+    UploaderModule,
+    ToastModule,
+    DialogModule,
+    ButtonModule,
+    ListBoxModule,
+    RadioButtonAllModule,
+    ChipListAllModule,
+    FormsModule,
+    DropDownButtonModule,
+    AccordionModule,
     TooltipModule,
     NumericTextBoxAllModule,
     GridAllModule, PagerAllModule,

@@ -101,7 +101,10 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   }
 
   public clearForm(): void {
+    const { generalInfo: { profileStatus, candidateAgencyStatus } } = this.candidateForm.getRawValue();
     this.candidateForm.reset();
+    const generalInfoControl = this.candidateForm.get('generalInfo');
+    generalInfoControl?.patchValue({profileStatus, candidateAgencyStatus});
   }
 
   public navigateBack(): void {
