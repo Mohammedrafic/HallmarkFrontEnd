@@ -4,8 +4,8 @@
 ></ng-container>
 
 <ng-template #dashboardTemplate let-widgetsData="widgetsData">
+  <app-dashboard-control></app-dashboard-control>
   <div class="control-section">
-    <div style="padding: 5px; text-align: right"></div>
     <ejs-dashboardlayout
       id="dashboardLayout"
       [columns]="columns"
