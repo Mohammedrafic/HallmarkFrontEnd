@@ -306,7 +306,7 @@
                     class="e-input"
                     type="text"
                     readonly
-                    [value]="orderWorkflowSteps[i].name + ' > ' + orderWorkflowSteps[i].status"
+                    [value]="orderWorkflowSteps[i].status + ' > ' + orderWorkflowSteps[i].nextStepStatus"
                   />
                 </div>
               </div>
@@ -342,7 +342,7 @@
                     class="e-input"
                     type="text"
                     readonly
-                    [value]="applicationWorkflowSteps[i].name + ' > ' + applicationWorkflowSteps[i].status"
+                    [value]="applicationWorkflowSteps[i].status + ' > ' + applicationWorkflowSteps[i].nextStepStatus"
                   />
                 </div>
               </div>

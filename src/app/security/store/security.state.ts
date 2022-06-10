@@ -339,9 +339,10 @@ export class SecurityState {
   }
 
   @Action(RemoveUserVisibilitySetting)
-  RemoveUserVisibilitySetting({ dispatch }: StateContext<SecurityStateModel>, { id, userId }: RemoveUserVisibilitySetting): Observable<never> {
+  RemoveUserVisibilitySetting({ dispatch }: StateContext<SecurityStateModel>, { id, userId }: RemoveUserVisibilitySetting): Observable<void> {
     return this.userService.removeUserVisibilitySettings(id, userId).pipe(
-      tap(() => dispatch(new RemoveUserVisibilitySettingSucceeded()))
+      tap(() => dispatch(new RemoveUserVisibilitySettingSucceeded())),
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
     );
   }
 

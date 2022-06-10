@@ -46,7 +46,7 @@ import { DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
-import { DatePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
+import {DatePickerModule, MaskedDateTimeService, TimePickerModule} from '@syncfusion/ej2-angular-calendars';
 
 import { ClientRoutingModule } from './client-routing.module';
 import { OrderManagementContentComponent } from './order-management/order-management-content/order-management-content.component';
@@ -65,7 +65,6 @@ import { OrderCredentialsModule } from '@order-credentials/order-credentials.mod
 import { NgxsModule } from '@ngxs/store';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { WorkflowState } from '@organization-management/store/workflow.state';
 import { OrderDetailsDialogComponent } from './order-management/order-details-dialog/order-details-dialog.component';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
@@ -143,8 +142,7 @@ const gridIcons = {
     //STORE
     NgxsModule.forFeature([
       OrderManagementContentState,
-      OrganizationManagementState,
-      WorkflowState
+      OrganizationManagementState
     ])
   ],
   providers: [
@@ -156,7 +154,8 @@ const gridIcons = {
     GroupService,
     ColumnMenuService,
     FilterService,
-    ChipsCssClass
+    ChipsCssClass,
+    MaskedDateTimeService
   ]
 })
 export class ClientModule {}

@@ -20,6 +20,7 @@ export type UserVisibilitySettingBody = {
   regionIds: number[];
   locationIds: number[];
   departmentIds: number[];
+  id?: number | null;
 }
 
 export type Organisation = {

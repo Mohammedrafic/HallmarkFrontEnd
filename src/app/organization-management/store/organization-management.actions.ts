@@ -1,5 +1,5 @@
 import { Country } from "src/app/shared/enums/states";
-import { CreateOrderDto, Organization } from "src/app/shared/models/organization.model";
+import { Organization } from "src/app/shared/models/organization.model";
 import { SkillCategory } from "src/app/shared/models/skill-category.model";
 import { Skill, SkillFilters } from "src/app/shared/models/skill.model";
 import { Department } from '@shared/models/department.model';
@@ -355,29 +355,4 @@ export class ExportSkills {
 export class GetSkillDataSources {
   static readonly type = '[organizationManagement] Get Skill Data Sources';
   constructor() { }
-}
-
-export class GetProjectTypes {
-  static readonly type = '[organizationManagement] Get Project Types';
-  constructor() { }
-}
-
-export class GetProjectNames {
-  static readonly type = '[organizationManagement] Get Project Names';
-  constructor() { }
-}
-
-export class GetMasterShifts {
-  static readonly type = '[organizationManagement] Get Master Shifts';
-  constructor() { }
-}
-
-export class GetAssociateAgencies {
-  static readonly type = '[organizationManagement] Get Associate Agencies';
-  constructor() { }
-}
-
-export class SaveOrder {
-  static readonly type = '[organizationManagement] Save Order';
-  constructor(public order: CreateOrderDto, public documents: Blob[]) { }
 }

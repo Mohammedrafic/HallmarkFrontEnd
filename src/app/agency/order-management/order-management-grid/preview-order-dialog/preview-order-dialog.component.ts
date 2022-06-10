@@ -12,6 +12,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { Order } from '@shared/models/order-management.model';
 
 @Component({
   selector: 'app-preview-order-dialog',
@@ -21,6 +22,7 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() order: AgencyOrderManagement;
   @Input() openEvent: Subject<boolean>;
+  @Input() openCandidateTab: boolean;
 
   @Output() compareEvent = new EventEmitter<never>();
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
@@ -35,6 +37,9 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   @Select(OrderManagementState.orderCandidatesLenght)
   public countOrderCandidates$: Observable<number>;
 
+  @Select(OrderManagementState.selectedOrder)
+  public selectedOrder$: Observable<Order>;
+
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
@@ -48,7 +53,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.chipList && changes['order'].currentValue) {
+    if (this.chipList && changes['order']?.currentValue) {
       this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
     }
   }
@@ -73,9 +78,14 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
         this.firstActive = true;
       }
     });
+
+    if (this.openCandidateTab) {
+      this.tab.select(1);
+    }
   }
 
   public onClose(): void {
+    this.tab.select(0);
     this.sideDialog.hide();
     this.openEvent.next(false);
   }

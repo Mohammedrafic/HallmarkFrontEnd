@@ -1,5 +1,5 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
@@ -10,10 +10,10 @@ import { Subject, takeUntil } from 'rxjs';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { SetImportFileDialogState } from '@admin/store/admin.actions';
-import { SaveOrder } from '@organization-management/store/organization-management.actions';
+import { SaveOrder, EditOrder, GetSelectedOrderById } from '@client/store/order-managment-content.actions';
 
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
-import { CreateOrderDto } from '@shared/models/organization.model';
+import { CreateOrderDto, EditOrderDto } from '@shared/models/order-management.model';
 import { BillRatesComponent } from '@bill-rates/bill-rates.component';
 import { BillRate, OrderBillRateDto } from '@shared/models/bill-rate.model';
 import { IOrderCredentialItem } from '@order-credentials/types';
@@ -39,8 +39,9 @@ export class AddEditOrderComponent implements OnDestroy {
   @ViewChild('billRates') billRatesComponent: BillRatesComponent;
 
   public SelectedTab = SelectedTab;
+  public orderId: number;
 
-  public title = 'Create';
+  public title: string;
   public submitMenuItems: ItemModel[] = [
     { id: SubmitButtonItem.SaveForLater, text: 'Save For Later' },
     { id: SubmitButtonItem.SaveAsTemplate, text: 'Save as Template' }
@@ -51,8 +52,17 @@ export class AddEditOrderComponent implements OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store, private router: Router) {
+  constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
+
+    this.orderId = Number(this.route.snapshot.paramMap.get('orderId'));
+
+    if (this.orderId > 0) {
+      this.title = 'Edit';
+      store.dispatch(new GetSelectedOrderById(this.orderId));
+    } else {
+      this.title = 'Create';
+    }
   }
 
   ngOnDestroy(): void {
@@ -81,7 +91,7 @@ export class AddEditOrderComponent implements OnDestroy {
         this.saveForLater();
         break;
 
-      case SubmitButtonItem.SaveForLater:
+      case SubmitButtonItem.SaveAsTemplate:
         this.saveAsTemplate();
         break;
     }
@@ -110,7 +120,11 @@ export class AddEditOrderComponent implements OnDestroy {
       const order = this.collectOrderData(true);
       const documents = this.orderDetailsFormComponent.documents;
 
-      this.store.dispatch(new SaveOrder(order, documents));
+      if (this.orderId) {
+        this.store.dispatch(new EditOrder({...order, id: this.orderId }));
+      } else {
+        this.store.dispatch(new SaveOrder(order, documents));
+      }
     } else {
       this.orderDetailsFormComponent.orderTypeStatusForm.markAllAsTouched();
       this.orderDetailsFormComponent.generalInformationForm.markAllAsTouched();
@@ -137,6 +151,7 @@ export class AddEditOrderComponent implements OnDestroy {
 
     const {
       orderType,
+      status,
       title,
       regionId,
       locationId,
@@ -177,8 +192,9 @@ export class AddEditOrderComponent implements OnDestroy {
       return { id: 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate };
     });
 
-    const order: CreateOrderDto = {
+    const order: CreateOrderDto | EditOrderDto = {
       title,
+      status,
       regionId,
       locationId,
       departmentId,
@@ -247,7 +263,11 @@ export class AddEditOrderComponent implements OnDestroy {
       order.workLocations = [];
     }
 
-    this.store.dispatch(new SaveOrder(order, documents));
+    if (this.orderId) {
+      this.store.dispatch(new EditOrder({...order, id: this.orderId }));
+    } else {
+      this.store.dispatch(new SaveOrder(order, documents));
+    }
   }
 
   private saveAsTemplate(): void {

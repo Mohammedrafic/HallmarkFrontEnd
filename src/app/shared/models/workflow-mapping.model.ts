@@ -49,4 +49,9 @@ export class StepRoleUser {
   roleUser?: RoleWithUser;
 }
 
+export class WorkflowByDepartmentAndSkill {
+  workflowGroupId: number;
+  workflowGroupName: string;
+}
+
 export type WorkflowMappingPage = PageOfCollections<WorkflowMappingGet>;

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { FeatherModule } from 'angular-feather';
 
-import { AlertCircle, CheckCircle, allIcons, User, Briefcase, Folder, MapPin, Calendar, ArrowLeft, ArrowRight } from 'angular-feather/icons';
+import { AlertCircle, CheckCircle, allIcons, User, Briefcase, Folder, MapPin, Calendar, ArrowLeft, ArrowRight, Mail, Send } from 'angular-feather/icons';
 import { NumericTextBoxAllModule, UploaderModule } from "@syncfusion/ej2-angular-inputs";
 import { DropDownListModule, ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -33,6 +33,8 @@ import { GeneralOrderInfoComponent } from './components/general-order-info/gener
 import { GridAllModule, PagerAllModule } from "@syncfusion/ej2-angular-grids";
 import { OrderCandidatesListComponent } from './components/order-candidates-list/order-candidates-list.component';
 import { CustomProgressBarComponent } from './components/custom-progress-bar/custom-progress-bar.component';
+import { BillRatesViewGridComponent } from './components/bill-rates-view-grid/bill-rates-view-grid.component';
+import { CommentsComponent } from './components/comments/comments.component';
 
 const icons = {
   AlertCircle,
@@ -43,7 +45,9 @@ const icons = {
   Briefcase,
   Folder,
   MapPin,
-  Calendar
+  Calendar,
+  Mail,
+  Send
 };
 
 const COMPONENTS = [
@@ -66,7 +70,9 @@ const COMPONENTS = [
   SearchComponent,
   GeneralOrderInfoComponent,
   OrderCandidatesListComponent,
-  CustomProgressBarComponent
+  CustomProgressBarComponent,
+  BillRatesViewGridComponent,
+  CommentsComponent
 ];
 
 @NgModule({

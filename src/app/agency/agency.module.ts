@@ -24,7 +24,8 @@ import {
   Filter,
   Maximize2,
   Minimize2,
-  Unlock
+  Unlock,
+  AlertTriangle
 } from 'angular-feather/icons';
 import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
 import { PdfViewerModule } from "@syncfusion/ej2-angular-pdfviewer";
@@ -91,7 +92,8 @@ const sidebarIcons = {
   Filter,
   Maximize2,
   Minimize2,
-  Unlock
+  Unlock,
+  AlertTriangle
 };
 
 @NgModule({

@@ -13,12 +13,23 @@
       </e-accordionitems>
     </ejs-accordion>
     <div class="comments">
-      Comments go here
+      <app-comments></app-comments>
     </div>
-    <div class="contacts">
-      <div>Supervisor Contacts</div>
-      <div>
-        Contacts go here
+    <div class="contacts-container">
+      <div class="contacts">
+        <div class="contact-title">Supervisor Contacts</div>
+        <div class="contact-details">
+          <span>
+            <i-feather name="user" class="icon"></i-feather> {{ order.contactDetails[0].name }}
+          </span>
+          <span>
+            <i-feather name="mail" class="icon"></i-feather> {{ order.contactDetails[0].email }}
+          </span>
+          <span>
+            <i-feather name="map-pin" class="icon"></i-feather> 
+            {{ order.workLocations[0].address }}, {{ order.workLocations[0].city }}, {{ order.workLocations[0].state }}, {{ order.workLocations[0].zipCode }}
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -51,6 +62,6 @@
     </div>
   </div>
 </section>
-<section class="bill-rates">
-
+<section class="bill-rates" *ngIf="order">
+  <app-bill-rates-view-grid [billRatesData]="order.billRates"></app-bill-rates-view-grid>
 </section>

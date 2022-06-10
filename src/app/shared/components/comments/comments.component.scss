@@ -1,0 +1,60 @@
+@import 'colors';
+
+.comments-container {
+  background-color: $secondary-dark-blue-50;
+  border-radius: 8px;
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+
+  .comments-header {
+    margin-top: 16px;
+    padding: 0 16px;
+    display: flex;
+
+    .title {
+      margin-right: auto;
+      color: $black;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .dropdown-container {
+      color: $primary-active-blue-10;
+      font-size: 14px;
+    }
+  }
+
+  .comments-body {
+    height: 100%;
+    margin-top: 10px;
+    padding: 0 16px;
+  }
+
+  .comments-controls {
+    margin: 10px 0 12px 0;
+    padding: 0 16px;
+    position: relative;
+
+    .actions {
+      position: absolute;
+      top: 50%;
+      transform: translate(0, -50%);
+      right: 30px;
+
+      i-feather {
+        width: 13px;
+        height: 13px;
+      }
+
+      .lock {
+        color: $supportive-red;
+        margin-right: 10px;
+      }
+
+      .send {
+        color: $secondary-dark-blue-20;
+      }
+    }
+  }
+}

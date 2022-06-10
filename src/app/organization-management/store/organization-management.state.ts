@@ -6,7 +6,7 @@ import { SendDocumentAgency } from 'src/app/shared/enums/send-document-agency';
 import { Country, UsaStates, CanadaStates } from 'src/app/shared/enums/states';
 import { Status } from 'src/app/shared/enums/status';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
-import { Order, Organization } from 'src/app/shared/models/organization.model';
+import { Organization } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 
 import {
@@ -75,12 +75,7 @@ import {
   ExportLocations,
   ExportDepartments,
   ExportSkills,
-  GetMasterSkillsByOrganization,
-  GetProjectTypes,
-  GetProjectNames,
-  GetMasterShifts,
-  GetAssociateAgencies,
-  SaveOrder
+  GetMasterSkillsByOrganization
 } from './organization-management.actions';
 import { Department } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
@@ -106,11 +101,6 @@ import { CredentialsService } from '@shared/services/credentials.service';
 import { SkillGroupService } from '@shared/services/skill-group.service';
 import { OrganizationSettingsService } from '@shared/services/organization-settings.service';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
-import { ProjectName, ProjectType } from '@shared/models/project.model';
-import { ProjectsService } from '@shared/services/projects.service';
-import { MasterShift } from '@shared/models/master-shift.model';
-import { ShiftsService } from '@shared/services/shift.service';
-import { AssociateAgency } from '@shared/models/associate-agency.model';
 
 interface DropdownOption {
   id: number;
@@ -154,10 +144,6 @@ export interface OrganizationManagementStateModel {
   isOrganizationSettingsLoading: boolean;
   organizationSettings: OrganizationSettingsGet[];
   skillDataSource: SkillDataSource;
-  projectTypes: ProjectType[];
-  projectNames: ProjectName[];
-  masterShifts: MasterShift[];
-  associateAgencies: AssociateAgency[];
 }
 
 @State<OrganizationManagementStateModel>({
@@ -199,11 +185,7 @@ export interface OrganizationManagementStateModel {
     isCredentialSetupLoading: false,
     isOrganizationSettingsLoading: false,
     organizationSettings: [],
-    skillDataSource: { skillABBRs: [], skillDescriptions: [], glNumbers: [] },
-    projectTypes: [],
-    projectNames: [],
-    masterShifts: [],
-    associateAgencies: []
+    skillDataSource: { skillABBRs: [], skillDescriptions: [], glNumbers: [] }
   },
 })
 @Injectable()
@@ -283,18 +265,6 @@ export class OrganizationManagementState {
   @Selector()
   static skillDataSource(state: OrganizationManagementStateModel): SkillDataSource { return state.skillDataSource; }
 
-  @Selector()
-  static projectTypes(state: OrganizationManagementStateModel): ProjectType[] { return state.projectTypes }
-
-  @Selector()
-  static projectNames(state: OrganizationManagementStateModel): ProjectName[] { return state.projectNames }
-
-  @Selector()
-  static masterShifts(state: OrganizationManagementStateModel): MasterShift[] { return state.masterShifts }
-
-  @Selector()
-  static associateAgencies(state: OrganizationManagementStateModel): AssociateAgency[] { return state.associateAgencies }
-
   constructor(
     private organizationService: OrganizationService,
     private skillsService: SkillsService,
@@ -304,9 +274,7 @@ export class OrganizationManagementState {
     private locationService: LocationService,
     private credentialsService: CredentialsService,
     private skillGroupService: SkillGroupService,
-    private organizationSettingsService: OrganizationSettingsService,
-    private projectsService: ProjectsService,
-    private shiftsService: ShiftsService
+    private organizationSettingsService: OrganizationSettingsService
   ) { }
 
   @Action(SetGeneralStatesByCountry)
@@ -827,43 +795,4 @@ export class OrganizationManagementState {
       return dataSource;
     }));
   };
-
-  @Action(GetProjectTypes)
-  GetProjectTypes({ patchState }: StateContext<OrganizationManagementStateModel>): Observable<ProjectType[]> {
-    return this.projectsService.getProjectTypes().pipe(tap(payload => {
-      patchState({ projectTypes: payload });
-    }));
-  }
-
-  @Action(GetProjectNames)
-  GetProjectNames({ patchState }: StateContext<OrganizationManagementStateModel>): Observable<ProjectName[]> {
-    return this.projectsService.getProjectNames().pipe(tap(payload => {
-      patchState({ projectNames: payload });
-    }));
-  }
-
-  @Action(GetMasterShifts)
-  GetMasterShifts({ patchState }: StateContext<OrganizationManagementStateModel>): Observable<MasterShift[]> {
-    return this.shiftsService.getAllMasterShifts().pipe(tap(payload => {
-      patchState({ masterShifts: payload });
-    }));
-  }
-
-  @Action(GetAssociateAgencies)
-  GetAssociateAgencies({ patchState }: StateContext<OrganizationManagementStateModel>): Observable<AssociateAgency[]> {
-    return this.organizationService.getAssociateAgencies().pipe(tap(payload => {
-      patchState({ associateAgencies: payload });
-    }));
-  }
-
-  @Action(SaveOrder)
-  SaveOrder({ dispatch }: StateContext<OrganizationManagementStateModel>, { order, documents }: SaveOrder): Observable<Order | void> {
-    return this.organizationService.saveOrder(order, documents).pipe(
-      tap(order => {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-        return order;
-      }),
-      catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
-    );
-  }
 }

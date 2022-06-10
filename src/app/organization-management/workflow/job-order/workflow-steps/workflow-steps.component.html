@@ -24,19 +24,14 @@
           </div>
         </div>
 
-        <div
-          class="input-container with-padding"
-          *ngFor="let item of customParentStatus.controls; let i = index"
-        >
-          <label>Current Status <span class="required">*</span></label>
-          <div class="input-group workflow" formArrayName="customParentStatus">
+        <div class="input-container with-padding">
+          <label>Current Status</label>
+          <div class="input-group workflow input-readonly" formArrayName="customParentStatus">
             <input
               class="e-input"
               type="text"
-              maxlength="50"
-              appValidateWithMessage
-              placeholder="Current Status"
-              [formControlName]="i"
+              readonly
+              [placeholder]="incompleteShortlistedStepStatus"
             />
           </div>
         </div>
@@ -109,7 +104,7 @@
         </div>
       </div>
 
-      <div class="input-container bootstrap with-padding" *ngIf="customParentStatus.controls.length > 0">
+      <div class="input-container bootstrap with-padding">
         <label>Current Status</label>
         <div class="input-group input-readonly">
           <input
@@ -136,7 +131,7 @@
         </div>
       </div>
 
-      <div class="input-container bootstrap with-padding" *ngIf="customParentStatus.controls.length > 0">
+      <div class="input-container bootstrap with-padding">
         <label>Current Status</label>
         <div class="input-group input-readonly">
           <input

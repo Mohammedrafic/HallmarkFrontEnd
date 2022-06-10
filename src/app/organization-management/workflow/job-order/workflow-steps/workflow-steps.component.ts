@@ -27,6 +27,7 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   public steps: Step[];
   public workflowTypeName = '';
   public incompleteShortlistedStepName: string;
+  public incompleteShortlistedStepStatus: string;
   public publishedOfferedStepName: string;
   public publishedOfferedStepStatus: string;
   public onboardedStepName: string;
@@ -34,10 +35,6 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   public shortlistedIsAgencyStep: boolean;
   public offeredIsAgencyStep: boolean;
   public onboardedIsAgencyStep: boolean;
-
-  get customParentStatus() {
-    return this.customStepFormGroup.get('customParentStatus') as FormArray;
-  }
 
   get customStepStatus() {
     return this.customStepFormGroup.get('customStepStatus') as FormArray;
@@ -74,17 +71,11 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
         this.steps.splice(this.steps.indexOf(emptyLeftOverStep), 1);
       }
 
-      this.customParentStatus.clear();
       this.customStepName.clear();
       this.customStepStatus.clear();
 
       if (this.steps.filter(s => s.type === WorkflowStepType.Custom).length > 0) { // check if there are custom steps
         this.steps.forEach((item) => {
-          if ((item.type === WorkflowStepType.Incomplete && this.customParentStatus.length === 0)
-            || (item.type === WorkflowStepType.Shortlisted && this.customParentStatus.length === 0)) {
-            this.customParentStatus.push(this.formBuilder.control(item.status, [Validators.required, Validators.maxLength(50)]));
-          }
-
           if (item.type === WorkflowStepType.Custom) {
             this.customStepName.push(this.formBuilder.control(item.name, [Validators.required, Validators.maxLength(50)]));
             this.customStepStatus.push(this.formBuilder.control(item.status, [Validators.required, Validators.maxLength(50)]));
@@ -104,7 +95,6 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   }
 
   public onAddCustomStepClick(): void {
-    this.addParentStepStatus();
     this.addChildStepDetails();
   }
 
@@ -129,21 +119,9 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
 
         this.customStepName.removeAt(index);
         this.customStepStatus.removeAt(index);
-        if (this.customStepStatus.length === 0 && this.customStepStatus.length === 0) {
-          this.customParentStatus.removeAt(0); // parent status is always the one, so its index = 0
-        }
 
         this.customStepRemoveClick.emit();
       });
-  }
-
-  private addParentStepStatus(): void {
-    // add element to override parent status
-    if (this.customParentStatus.length === 0) {
-      // @ts-ignore
-      this.steps.find(s => s.type === WorkflowStepType.Incomplete || s.type === WorkflowStepType.Shortlisted).status = '';
-      this.customParentStatus.push(this.formBuilder.control('', [Validators.required, Validators.maxLength(50)]));
-    }
   }
 
   private addChildStepDetails(): void {
@@ -165,6 +143,7 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
       const incompleteStep = workflow.steps.find(step => step.type === WorkflowStepType.Incomplete);
       if (incompleteStep) {
         this.incompleteShortlistedStepName = incompleteStep.name;
+        this.incompleteShortlistedStepStatus = incompleteStep.status;
         this.incompleteCanBeFollowedByCustomStep = incompleteStep.canBeFollowedByCustomStep as boolean;
       }
 
@@ -178,6 +157,7 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
       const shortlistedStep = workflow.steps.find(step => step.type === WorkflowStepType.Shortlisted);
       if (shortlistedStep) {
         this.incompleteShortlistedStepName = shortlistedStep.name;
+        this.incompleteShortlistedStepStatus = shortlistedStep.status;
         this.shortlistedCanBeFollowedByCustomStep = shortlistedStep.canBeFollowedByCustomStep as boolean;
         this.shortlistedIsAgencyStep = shortlistedStep.isAgencyStep as boolean;
       }

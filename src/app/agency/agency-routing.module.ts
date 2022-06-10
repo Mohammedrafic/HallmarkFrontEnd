@@ -71,6 +71,14 @@ const routes: Routes = [
         }
       },
       {
+        path: 'candidates/:id',
+        component: AddEditCandidateComponent,
+        data: {
+          isAgencyArea: true,
+          readonly: true
+        }
+      },
+      {
         path: 'order-management',
         component: OrderManagementComponent,
         data: {
