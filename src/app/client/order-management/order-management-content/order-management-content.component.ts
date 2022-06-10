@@ -9,7 +9,7 @@ import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-g
 import { STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { OrderManagemetTabs } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { GetIncompleteOrders, GetOrderById, GetOrders } from '@client/store/order-managment-content.actions';
+import { GetAgencyOrderCandidatesList, GetIncompleteOrders, GetOrderById, GetOrders } from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { OrderManagement, OrderManagementPage } from '@shared/models/order-management.model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
@@ -119,6 +119,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public onRowClick({ data }: { data: OrderManagement }): void {
     const options = this.getDialogNextPreviousOption(data);
     this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
+    this.store.dispatch(new GetAgencyOrderCandidatesList(data.id, data.organizationId, this.currentPage, this.pageSize));
     this.openDetails.next(true);
   }
 

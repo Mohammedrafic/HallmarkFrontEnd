@@ -65,4 +65,23 @@ export class OrderManagementContentService {
   public getAgencyOrderById(id: number, organizationId: number): Observable<Order> {
     return this.http.get<Order>(`/api/Orders/${id}/organization/${organizationId}`);
   }
+
+  /**
+   * Get order by id
+   @param id
+   */
+   public getOrderById(id: number): Observable<Order> {
+    return this.http.get<Order>(`/api/Orders/${id}`);
+  }
+
+  /**
+   * Get the agency order candidates
+   @param orderId
+   @param organizationId
+   @param pageNumber
+   @param pageSize
+   */
+   public getOrderCandidatesList(orderId: number, organizationId: number, pageNumber: number, pageSize: number ): Observable<OrderCandidatesListPage> {
+    return this.http.get<OrderCandidatesListPage>(`/api/CandidateProfile/`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+  }
 }
