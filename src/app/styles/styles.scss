@@ -172,17 +172,17 @@ body {
       color: #fff;
     }
 
-    @include meta.load-css("./themes/material_d");
+    //@include meta.load-css("./themes/material_d");
 
     .bootstrap {
-      @include meta.load-css("../../../node_modules/@syncfusion/ej2-base/styles/bootstrap5-dark.css");
+      /*@include meta.load-css("../../../node_modules/@syncfusion/ej2-base/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-buttons/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-dropdowns/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-inputs/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-popups/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-lists/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-angular-dropdowns/styles/bootstrap5-dark.css");
-      @include meta.load-css("../../../node_modules/@syncfusion/ej2-angular-inputs/styles/bootstrap5-dark.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-angular-inputs/styles/bootstrap5-dark.css");*/
     }
   }
 

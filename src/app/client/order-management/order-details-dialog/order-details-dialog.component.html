@@ -21,7 +21,7 @@
               </ejs-chiplist>
               <div class="vertical-divider"></div>
               <div *ngIf="order" class="order-other-statuses">
-                <span class="custom-chip">{{ orderType[order.orderType] }}</span>
+                <span class="custom-chip">{{ order.orderType | orderTypeName }}</span>
                 <span class="custom-chip" *ngIf="order.isLocked">Locked</span>
               </div>
             </div>
