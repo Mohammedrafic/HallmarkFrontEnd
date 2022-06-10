@@ -12,6 +12,6 @@ export const USAMapCandidatesDataLayerSettings: LayerSettingsModel = {
     visible: true,
     valuePath: 'name',
     template:
-      '<div style="text-align: center; padding: 10px; background-color: #fff"><div>${name}</div><b>${candidates}</b></div>',
+      '<div style="text-align: center; padding: 10px 20px; background-color: #fff; box-shadow: 0 3px 10px rgb(0 0 0 / 0.2); color: #4C5673;"><div>${name}</div><b>${candidates}</b></div>',
   },
 };
