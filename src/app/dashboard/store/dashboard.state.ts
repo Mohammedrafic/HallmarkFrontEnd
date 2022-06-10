@@ -5,17 +5,16 @@ import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { Observable, tap } from 'rxjs';
 
 import { DashboardService } from '../services/dashboard.service';
-import {
-  AddDashboardPanel,
-  DashboardPanelIsMoved,
-  GetDashboardPanels,
-  SetDashboardState,
-  SaveDashboard,
-} from './dashboard.actions';
+import { GetDashboardData, SetPanels, SaveDashboard } from './dashboard.actions';
+import { WidgetOptionModel } from '../models/widget-option.model';
+import { WidgetTypeEnum } from '../enums/widget-type.enum';
+import lodashMap from 'lodash/fp/map';
+import { DashboardDataModel } from '../models/dashboard-data.model';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
   isDashboardLoading: boolean;
+  widgets: WidgetOptionModel[];
 }
 
 @State<DashboardStateModel>({
@@ -23,6 +22,7 @@ export interface DashboardStateModel {
   defaults: {
     panels: [],
     isDashboardLoading: false,
+    widgets: [],
   },
 })
 @Injectable()
@@ -31,56 +31,43 @@ export class DashboardState {
   static dashboardPanels(state: DashboardStateModel): PanelModel[] {
     return state.panels;
   }
+
+  @Selector([DashboardState.dashboardPanels])
+  static selectedWidgets(_: DashboardState, panels: DashboardStateModel['panels']): WidgetTypeEnum[] {
+    return lodashMap((panel: PanelModel) => panel.id as WidgetTypeEnum, panels);
+  }
+
   @Selector()
   static isDashboardLoading(state: DashboardStateModel): boolean {
     return state.isDashboardLoading;
   }
 
+  @Selector()
+  static widgets(state: DashboardStateModel): DashboardStateModel['widgets'] {
+    return state.widgets;
+  }
+
   constructor(private dashboardService: DashboardService) {}
 
-  @Action(GetDashboardPanels)
-  getDashboardPanels({ patchState }: StateContext<DashboardStateModel>): Observable<PanelModel[]> {
+  @Action(GetDashboardData)
+  getDashboardData({ patchState }: StateContext<DashboardStateModel>): Observable<any> {
     patchState({ isDashboardLoading: true });
-    return this.dashboardService.getDashboardsPanels().pipe(
-      tap((payload) => {
-        patchState({ panels: payload, isDashboardLoading: false });
+
+    return this.dashboardService.getDashboardsData().pipe(
+      tap(({ panels, widgets }: DashboardDataModel) => {
+        patchState({ panels, widgets, isDashboardLoading: false });
       })
     );
-  }
-
-  @Action(AddDashboardPanel)
-  addDashboardPanel({ patchState, dispatch }: StateContext<DashboardStateModel>, { payload }: AddDashboardPanel) {
-    patchState({ isDashboardLoading: true });
-    return this.dashboardService.addDashboardPanel(payload).pipe(
-      tap(() => {
-        patchState({ panels: payload, isDashboardLoading: false });
-        dispatch(new SaveDashboard());
-      })
-    );
-  }
-
-  @Action(DashboardPanelIsMoved)
-  dashboardPanelIsMoved(
-    { patchState, dispatch }: StateContext<DashboardStateModel>,
-    { payload }: DashboardPanelIsMoved
-  ) {
-    patchState({ panels: payload });
-    dispatch(new SaveDashboard());
   }
 
   @Action(SaveDashboard)
-  saveDashboard({ getState, patchState }: StateContext<DashboardStateModel>) {
-    patchState({ isDashboardLoading: true });
-    const state = getState();
-    return this.dashboardService.saveDashboard(state.panels).pipe(
-      tap(() => {
-        patchState({ isDashboardLoading: false });
-      })
-    );
+  private saveDashboard({ patchState }: StateContext<DashboardStateModel>, { payload }: SaveDashboard) {
+    patchState({ panels: payload });
+    return this.dashboardService.saveDashboard(payload);
   }
 
-  @Action(SetDashboardState)
-  mobileDashboard({ patchState }: StateContext<DashboardStateModel>, { payload }: SetDashboardState) {
+  @Action(SetPanels)
+  private setPanels({ patchState }: StateContext<DashboardStateModel>, { payload }: SetPanels) {
     patchState({ panels: payload });
   }
 }

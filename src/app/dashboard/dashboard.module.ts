@@ -23,7 +23,6 @@ import { MapsChartModule } from './widgets/maps-chart/maps-chart.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { WidgetWrapperModule } from './widgets/widget-wrapper/widget-wrapper.module';
 import { DashboardControlModule } from './dashboard-controller/dashboard-controller.module';
-import { WidgetService } from './services/widget.service';
 
 @NgModule({
   declarations: [DashboardComponent, LineChartComponent, AccumulationChartComponent],
@@ -42,7 +41,6 @@ import { WidgetService } from './services/widget.service';
   ],
   providers: [
     DashboardService,
-    WidgetService,
     CategoryService,
     SplineSeriesService,
     PieSeriesService,

@@ -1,12 +1,11 @@
 <ejs-dialog
-  id="dialog"
   #sideDialog
-  cssClass="dialog"
-  [width]="'28%'"
-  [target]="targetElement"
-  [visible]="false"
-  [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
+  [isModal]="true"
+  [target]="targetElement"
+  cssClass="dialog"
+  id="dialog"
+  width="444px"
 >
   <ng-template #content>
     <section class="container">
@@ -16,27 +15,30 @@
             <h3 class="e-card-title">Manage Widgets</h3>
           </div>
           <div class="e-card-content">
-            <span class="e-icons e-close-large" (click)="closeWidgetModal()"></span>
+            <span class="e-icons e-close-large" (click)="closeDialogEmitter.emit()"></span>
           </div>
         </div>
       </section>
       <section class="content">
         <div class="widget-container">
-          <ng-container *ngIf="availableWidgets">
-            <div class='e-mastertext'>Select widgets to view in the dashboard</div>
+          <app-inline-loader *ngIf="isLoading"></app-inline-loader>
+          <ng-container *ngIf="widgets?.length">
+            <div class="e-mastertext">Select widgets to view in the dashboard</div>
             <ejs-grid
-              class="widget-grid"
-              *ngIf="availableWidgets.length"
-              [dataSource]="availableWidgets"
-              (rowSelected)="selectWidgetId($event)"
-              (rowDeselected)="clearWidgetId()"
+              #gridComponent
+              (dataBound)="dataBoundHandler()"
+              (rowDeselected)="rowDeselectedHandler($event)"
+              (rowSelected)="rowSelectedHandler($event)"
+              [allowTextWrap]="true"
+              [dataSource]="widgets"
               [height]="'100%'"
               [rowHeight]="48"
-              [allowTextWrap]="true"
+              [selectionSettings]="selectionSettings"
+              class="widget-grid"
             >
               <e-columns>
-                <e-column field="name" [customAttributes]="{ class: 'widget-grid__name' }"></e-column>
-                <e-column field="description"  [customAttributes]="{ class: 'widget-grid__description' }" ></e-column>
+                <e-column field="title" [customAttributes]="{ class: 'widget-grid__name' }"></e-column>
+                <e-column field="description" [customAttributes]="{ class: 'widget-grid__description' }"></e-column>
               </e-columns>
             </ejs-grid>
           </ng-container>
@@ -45,4 +47,3 @@
     </section>
   </ng-template>
 </ejs-dialog>
-
