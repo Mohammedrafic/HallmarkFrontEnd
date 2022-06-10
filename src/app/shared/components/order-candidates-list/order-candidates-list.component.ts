@@ -1,10 +1,14 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { GridComponent } from "@syncfusion/ej2-angular-grids";
 import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
 import { Store } from "@ngxs/store";
 import { AgencyOrder, OrderCandidatesListPage } from "@shared/models/order-management.model";
 import { GetAgencyOrderCandidatesList } from "@agency/store/order-management.actions";
 import { debounceTime, Subject } from "rxjs";
+import { UserState } from 'src/app/store/user.state';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -19,7 +23,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
 
   private pageSubject = new Subject<number>();
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private router: Router) {
     super();
   }
 
@@ -41,7 +45,12 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
     }
   }
 
-  public onViewNavigation(id: number): void {}
+  public onViewNavigation(id: number): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    const url = user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
+    this.router.navigate([url, id], { state: { orderId: this.order.orderId }});
+    disabledBodyOverflow(false);
+  }
 
   public onEdit(data: unknown): void {}
 

@@ -17,11 +17,17 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { GRID_CONFIG } from '@shared/constants';
 import { ROW_HEIGHT, typeValueAccess } from './order-management-grid.constants';
-import { GetAgencyOrdersPage, GetOrderById, GetAgencyOrderCandidatesList, GetAgencyOrderGeneralInformation } from '@agency/store/order-management.actions';
+import {
+  GetAgencyOrdersPage,
+  GetOrderById,
+  GetAgencyOrderCandidatesList,
+  GetAgencyOrderGeneralInformation,
+} from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { AgencyOrderManagement, AgencyOrderManagementPage } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { Location } from '@angular/common';
 
 enum AllCheckedStatus {
   None,
@@ -52,6 +58,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public openPreview = new Subject<boolean>();
   public openCandidat = new Subject<boolean>();
   public typeValueAccess = typeValueAccess;
+  public previousSelectedOrderId: number | null;
 
   get checkedStatus(): AllCheckedStatus {
     const itemsLength = this.rowCheckboxes.length;
@@ -65,17 +72,33 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private statusSortDerection: SortDirection = 'Ascending';
   private isAlive = true;
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private location: Location) {
     super();
   }
 
   ngOnInit(): void {
     this.onOrderPreviewChange();
-    this.dispatchNewPage();
+    const locationState = this.location.getState() as { orderId: number };
+    this.previousSelectedOrderId = locationState.orderId;
+    if (!this.previousSelectedOrderId) {
+      this.dispatchNewPage();
+    }
   }
 
   ngOnDestroy(): void {
     this.isAlive = false;
+  }
+
+  public onDataBound(): void {
+    if (this.previousSelectedOrderId) {
+      const [data, index] = this.store.selectSnapshot(OrderManagementState.lastSelectedOrder)(
+        this.previousSelectedOrderId
+      );
+      if (data && index) {
+        this.grid.selectRow(index);
+        this.onRowClick({ data });
+      }
+    }
   }
 
   public onGoToClick(event: any): void {
@@ -109,8 +132,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     const options = this.getDialogNextPreviousOption(data);
     this.store.dispatch(new GetOrderById(data.orderId, data.organizationId, options));
     this.openPreview.next(true);
-    this.store.dispatch(new GetAgencyOrderCandidatesList(data.orderId, data.organizationId, this.currentPage, this.pageSize));
-    this.store.dispatch(new GetAgencyOrderGeneralInformation(data.orderId, data.organizationId))
+    this.store.dispatch(
+      new GetAgencyOrderCandidatesList(data.orderId, data.organizationId, this.currentPage, this.pageSize)
+    );
+    this.store.dispatch(new GetAgencyOrderGeneralInformation(data.orderId, data.organizationId));
   }
 
   public onCheckAll(event: CheckBoxChangeEventArgs): void {
@@ -145,6 +170,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       if (!isOpen) {
         this.openCandidat.next(false);
         this.grid.clearRowSelection();
+        this.previousSelectedOrderId = null;
       }
     });
   }
@@ -159,3 +185,4 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     };
   }
 }
+
