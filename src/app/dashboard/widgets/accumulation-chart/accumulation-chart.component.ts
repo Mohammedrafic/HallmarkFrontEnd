@@ -25,7 +25,11 @@ export class AccumulationChartComponent extends AbstractSFComponentDirective imp
   public filteredChartData$: Observable<DonutChartData[]>;
 
   public readonly palette: string[] = legendPalette;
-  public readonly tooltipSettings: TooltipSettingsModel = { enable: true };
+  public readonly tooltipSettings: TooltipSettingsModel = {
+    enable: true,
+    template:
+      '<div class="widget-tooltip"><div>${x}</div><b>${y}</b></div>',
+  };
   public readonly legendSettings: LegendSettingsModel = { visible: false };
 
   private readonly chartData$: BehaviorSubject<ChartAccumulation | null> =
