@@ -68,7 +68,6 @@ export class ShellPageComponent implements OnInit, OnDestroy {
               private router: Router) { }
   
   ngOnInit(): void {
-    this.store.dispatch(new SetHeaderState({ title: 'Dashboard', iconName: 'home' }));
     this.isDarkTheme$.pipe(takeUntil(this.unsubscribe$)).subscribe(isDark => {
       this.isDarkTheme = isDark;
       this.setTheme(isDark);

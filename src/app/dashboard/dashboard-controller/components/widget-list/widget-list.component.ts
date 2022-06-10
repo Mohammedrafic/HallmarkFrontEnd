@@ -32,10 +32,11 @@ export class WidgetListComponent implements OnInit {
   }
 
   selectWidgetId(event: any) {
-    console.log(event);
-    
+    //TODO implement this method in the task Add Widget to Dashboard (EIN-1226)
   }
 
-  clearWidgetId() {}
+  clearWidgetId() {
+    //TODO implement this method in the task Add Widget to Dashboard (EIN-1226)
+  }
 }
 

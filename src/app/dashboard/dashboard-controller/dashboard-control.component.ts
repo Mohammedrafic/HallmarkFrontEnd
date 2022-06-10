@@ -39,6 +39,6 @@ export class DashboardControlComponent implements OnInit {
     this.store.dispatch(new ShowSideDialog(false));
   }
   
-  onSaveCredential() {}
+
   
 }
