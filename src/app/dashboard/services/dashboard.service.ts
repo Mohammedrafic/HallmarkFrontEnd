@@ -5,7 +5,7 @@ import lodashMapPlain from 'lodash/map';
 
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { Observable, of, forkJoin, catchError } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, shareReplay } from 'rxjs/operators';
 
 import { ChartAccumulation } from '../models/chart-accumulation-widget.model';
 import { WidgetDataDependenciesAggregatedModel } from '../models/widget-data-dependencies-aggregated.model';
@@ -26,6 +26,8 @@ import find from 'lodash/fp/find';
 import lodashFilter from 'lodash/fp/filter';
 import identity from 'lodash/fp/identity';
 import { DashboardDataModel } from '../models/dashboard-data.model';
+import type { ApplicantsByRegionDataModel } from '../models/applicants-by-region-data.model';
+import type { LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
 
 @Injectable()
 export class DashboardService {
@@ -38,6 +40,8 @@ export class DashboardService {
     [WidgetTypeEnum.APPLICANTS_BY_REGION]: (filters: DashboardFiltersModel) =>
       this.getApplicantsByRegionWidgetData(filters),
   };
+
+  private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
 
   constructor(private httpClient: HttpClient) {}
 
@@ -100,32 +104,40 @@ export class DashboardService {
   private getApplicantsByRegionWidgetData(
     filters: DashboardFiltersModel
   ): Observable<CandidatesByStateWidgetAggregatedDataModel> {
-    return this.httpClient
-      .post<CandidatesByStatesResponseModel>('/api/Dashboard/GetCandidatesStatesAggregated', {})
-      .pipe(
-        map((candidatesByStates: CandidatesByStatesResponseModel) => {
-          return this.getFormattedCandidatesByStatesWidgetAggregatedData(candidatesByStates);
-        })
-      );
+    return forkJoin({ mapData: this.mapData$, applicantsByRegion: this.getApplicantsByRegion() }).pipe(
+      map((data: ApplicantsByRegionDataModel) => {
+        return this.getFormattedCandidatesByStatesWidgetAggregatedData(data);
+      })
+    );
   }
 
-  private getFormattedCandidatesByStatesWidgetAggregatedData(
-    candidatesByStates: CandidatesByStatesResponseModel
-  ): CandidatesByStateWidgetAggregatedDataModel {
-    const maxCandidatesValue = flow(values, max)(candidatesByStates);
+  private getApplicantsByRegion(): Observable<CandidatesByStatesResponseModel> {
+    return this.httpClient.post<CandidatesByStatesResponseModel>('/api/Dashboard/GetCandidatesStatesAggregated', {});
+  }
+
+  private getMapData(): Observable<LayerSettingsModel> {
+    return this.httpClient.get('assets/geoJSON/USA-states/USA-states-layer-settings.json').pipe(shareReplay(1));
+  }
+
+  private getFormattedCandidatesByStatesWidgetAggregatedData({
+    mapData,
+    applicantsByRegion,
+  }: ApplicantsByRegionDataModel): CandidatesByStateWidgetAggregatedDataModel {
+    const maxCandidatesValue = flow(values, max)(applicantsByRegion);
+    const combinedData = { ...mapData, ...USAMapCandidatesDataLayerSettings };
     const dataSource = lodashMap(
       (stateDefinition: Record<string, string>) => ({
         ...stateDefinition,
-        candidates: candidatesByStates[stateDefinition['code']] ?? 0,
+        candidates: applicantsByRegion[stateDefinition['code']] ?? 0,
       }),
-      USAMapCandidatesDataLayerSettings.dataSource
+      combinedData.dataSource
     );
     const shapeSettings = {
-      ...USAMapCandidatesDataLayerSettings.shapeSettings,
+      ...combinedData.shapeSettings,
       colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
 
-    return { chartData: [{ ...USAMapCandidatesDataLayerSettings, dataSource, shapeSettings }] };
+    return { chartData: [{ ...combinedData, dataSource, shapeSettings }] };
   }
 
   private getDashboardState(): Observable<PanelModel[]> {
