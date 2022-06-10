@@ -74,8 +74,8 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   private isAllRegionsSelected = false;
   private isAllLocationsSelected = false;
   public columnsToExport: ExportColumn[] = [
-    { text:'Region', column: 'RegionId'},
-    { text:'Location', column: 'LocationId'},
+    { text:'Region', column: 'Region'},
+    { text:'Location', column: 'Location'},
     { text:'Holiday Name', column: 'HolidayName'},
     { text:'Start Date & Time', column: 'StartDateTime'},
     { text:'End Date & Time', column: 'EndDateTime'}
@@ -261,6 +261,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
         masterOrgIds: this.selectedItems.length ? this.selectedItems.map(val => {
           return { item1: val.masterHolidayId, item2: val.id };
         }) : null,
+        offset: Math.abs(new Date().getTimezoneOffset())
       }, 
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
