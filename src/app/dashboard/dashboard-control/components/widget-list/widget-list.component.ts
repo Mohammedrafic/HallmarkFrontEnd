@@ -19,8 +19,7 @@ import { WidgetTypeEnum } from '../../../enums/widget-type.enum';
 import { WidgetOptionModel } from '../../../models/widget-option.model';
 import lodashMap from 'lodash/fp/map';
 import findIndex from 'lodash/fp/findIndex';
-import { BehaviorSubject, Subject, takeUntil, filter, startWith, distinctUntilChanged } from 'rxjs';
-import { combineLatest } from 'rxjs';
+import { BehaviorSubject, Subject, takeUntil, filter, startWith, distinctUntilChanged, combineLatest } from 'rxjs';
 import isEqual from 'lodash/fp/isEqual';
 import { WidgetToggleModel } from '../../../models/widget-toggle.model';
 
