@@ -47,6 +47,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
+  public activeTab: OrderManagemetTabs;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
   public isLockMenuButtonsShown = true;
@@ -87,7 +88,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
+      if (this.activeTab === OrderManagemetTabs.AllOrders) {
+        this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
+      } else if (this.activeTab === OrderManagemetTabs.Incomplete) {
+        this.store.dispatch(new GetIncompleteOrders({ pageNumber: this.currentPage, pageSize: this.pageSize }));
+      }
     });
 
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
@@ -164,9 +169,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public tabSelected(tabIndex: OrderManagemetTabs): void {
-
+    this.activeTab = tabIndex;
     switch (tabIndex) {
       case OrderManagemetTabs.AllOrders:
+        this.currentPage = 1;
         this.isLockMenuButtonsShown = true;
         this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
         break;
@@ -174,6 +180,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         // TODO: pending implementation
         break;
       case OrderManagemetTabs.Incomplete:
+        this.currentPage = 1;
         this.isLockMenuButtonsShown = false;
         this.store.dispatch(new GetIncompleteOrders({}));
         break;

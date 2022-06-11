@@ -371,9 +371,8 @@ ejs-grid.e-control.e-grid {
 
 .empty-grid {
   background-color: $secondary-dark-blue-45 !important;
-
-  &:hover {
-    background-color: $primary-active-blue-90 !important;
+  .e-emptyrow {
+    background-color: transparent !important;
   }
 }
 

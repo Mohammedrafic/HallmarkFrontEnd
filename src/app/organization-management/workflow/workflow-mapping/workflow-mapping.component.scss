@@ -157,14 +157,19 @@ tr.e-detailrow.highlight {
   }
 }
 
-.e-grid.e-gridhover tr[role='row']:hover {
-  &:not(.e-row[aria-selected='true']) {
-    background-color: $primary-active-blue-90;
+tr.e-detailrow {
+  &:hover {
+    background-color: $primary-active-blue-90 !important;
+  }
+}
 
-    .e-detailrowexpand,
-    .e-detailrowcollapse {
-      background-color: $primary-active-blue-90 !important;
-      color: $white !important;
+.e-row:hover {
+  .e-detailrowcollapse,
+  .e-detailrowexpand {
+    background-color: $primary-active-blue-90 !important;
+
+    &.e-active {
+      background-color: $primary-active-blue-10 !important;
     }
   }
 }

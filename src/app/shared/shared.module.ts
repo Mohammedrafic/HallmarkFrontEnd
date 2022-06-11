@@ -37,6 +37,7 @@ import { BillRatesViewGridComponent } from './components/bill-rates-view-grid/bi
 import { CommentsComponent } from './components/comments/comments.component';
 import { HighlightGridRowDirective } from '@shared/directives/hightlight-grid-row.directive';
 import { AddBackgroundForEmptyGridDirective } from '@shared/directives/add-background-for-empty-grid.directive';
+import { FormatPhoneNumberPipe } from '@shared/pipes/format-phone-number.pipe';
 
 const icons = {
   AlertCircle,
@@ -57,6 +58,7 @@ const COMPONENTS = [
   ValidationErrorPipe,
   ChipsCssClass,
   OrderTypeName,
+  FormatPhoneNumberPipe,
   ValidateDirective,
   HighlightGridRowDirective,
   AddBackgroundForEmptyGridDirective,
