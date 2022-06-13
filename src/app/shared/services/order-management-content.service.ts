@@ -73,7 +73,7 @@ export class OrderManagementContentService {
    * Get order by id
    @param id
    */
-   public getOrderById(id: number): Observable<Order> {
+  public getOrderById(id: number): Observable<Order> {
     return this.http.get<Order>(`/api/Orders/${id}`);
   }
 
@@ -84,17 +84,8 @@ export class OrderManagementContentService {
    @param pageNumber
    @param pageSize
    */
-   public getOrderCandidatesList(orderId: number, organizationId: number, pageNumber: number, pageSize: number ): Observable<OrderCandidatesListPage> {
+  public getOrderCandidatesList(orderId: number, organizationId: number, pageNumber: number, pageSize: number ): Observable<OrderCandidatesListPage> {
     return this.http.get<OrderCandidatesListPage>(`/api/CandidateProfile/order/${orderId}`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
-   }
-
-  /**
-   * Get selected order by id
-   * @param orderId: order id
-   * @returns selected order
-   */
-  public getSelectedOrderById(orderId: number): Observable<Order> {
-    return this.http.get<Order>(`/api/Orders/${orderId}`);
   }
 
   /**

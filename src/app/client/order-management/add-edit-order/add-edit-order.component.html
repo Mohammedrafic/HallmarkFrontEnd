@@ -29,13 +29,13 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <ng-container *ngIf="selectedTab === SelectedTab.OrderDetails">
+        <ng-container>
           <section class="order-details-form-section">
-            <app-order-details-form #orderDetailsForm></app-order-details-form>
+            <app-order-details-form #orderDetailsForm [isActive]="selectedTab === SelectedTab.OrderDetails"></app-order-details-form>
           </section>
 
           <section class="bill-rates-section">
-            <app-bill-rates #billRates></app-bill-rates>
+            <app-bill-rates #billRates [billRates]="orderBillRates" [isActive]="selectedTab === SelectedTab.OrderDetails"></app-bill-rates>
           </section>
         </ng-container>
       </ng-template>
@@ -50,7 +50,7 @@
       </ng-template>
       <ng-template #content>
         <app-order-credentials
-          *ngIf="selectedTab === SelectedTab.Credentials"
+          [isActive]="selectedTab === SelectedTab.Credentials"
           [credentials]="orderCredentials"
           (credentialChanged)="onCredentialChanged($event)"
           (credentialDeleted)="onCredentialDeleted($event)"

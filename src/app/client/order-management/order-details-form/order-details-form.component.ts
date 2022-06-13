@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
@@ -56,6 +56,7 @@ import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
   styleUrls: ['./order-details-form.component.scss']
 })
 export class OrderDetailsFormComponent implements OnInit, OnDestroy {
+  @Input() isActive = false;
   public orderTypeStatusForm: FormGroup;
   public generalInformationForm: FormGroup;
   public jobDistributionForm: FormGroup;
@@ -493,7 +494,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       } else {
         this.isEditMode = false;
         this.order = null;
-        this.resetForms();
+        //this.resetForms(); TODO: clarify
       }
     })
   }
@@ -728,6 +729,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private getTwoDecimalsValue(value: string): string {
+    if (!value) return '';
+    value = String(value);
     return Number(value).toFixed(Math.max(value.split('.')[1]?.length, 2) || 2);
   }
 }

@@ -13,6 +13,7 @@ import { IOrderCredential, IOrderCredentialItem } from './types';
 export class OrderCredentialsComponent implements OnInit {
   @ViewChild('addCred') addCred: AddOrderCredentialFormComponent;
   @Input() credentials: IOrderCredentialItem[];
+  @Input() isActive = false;
   @Output() credentialChanged: EventEmitter<IOrderCredentialItem> = new EventEmitter();
   @Output() credentialDeleted: EventEmitter<IOrderCredentialItem> = new EventEmitter();
 

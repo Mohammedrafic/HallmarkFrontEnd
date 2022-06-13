@@ -7,7 +7,7 @@ import { DropDownListComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
 
 import { BillRateState } from '@bill-rates/store/bill-rate.state';
-import { BillRateCategory, BillRateOption, BillRateType, BillRateUnit } from '@shared/models/bill-rate.model';
+import { BillRate, BillRateCategory, BillRateOption, BillRateType, BillRateUnit } from '@shared/models/bill-rate.model';
 import { GetBillRateOptions } from '@bill-rates/store/bill-rate.actions';
 
 const RateHourMask = {
@@ -145,7 +145,7 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
       .subscribe();
   }
 
-  static createForm(): FormGroup {
+  static createForm(billRates?: BillRate[]): FormGroup {
     return new FormGroup({
       id: new FormControl(),
       billRateConfigId: new FormControl(null, [Validators.required]),

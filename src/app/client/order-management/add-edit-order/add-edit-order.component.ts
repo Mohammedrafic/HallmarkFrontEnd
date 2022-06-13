@@ -53,6 +53,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public selectedTab: SelectedTab = SelectedTab.OrderDetails;
   // todo: update/set credentials list in edit mode for order
   public orderCredentials: IOrderCredentialItem[] = [];
+  public orderBillRates: BillRate[] = [];
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -70,13 +71,18 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
-    this.selectedOrder$
-    .pipe(takeUntil(this.unsubscribe$), map(order => order?.credentials))
-    .subscribe(credentials => {
-      if (credentials) {
-        this.orderCredentials = [...credentials];
-      }
-    });
+    if (this.orderId > 0) {
+      this.selectedOrder$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(order => {
+        if (order?.credentials) {
+          this.orderCredentials = [...order.credentials];
+        }
+        if (order?.billRates) {
+          this.orderBillRates = [...order.billRates];
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {
@@ -210,8 +216,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     } = allValues;
 
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[]).map((billRate: BillRate) => {
-      const { billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate } = billRate;
-      return { id: 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate };
+      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate } = billRate;
+      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate };
     });
 
     const order: CreateOrderDto | EditOrderDto = {

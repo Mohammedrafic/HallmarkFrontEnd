@@ -6,6 +6,7 @@
 </app-bill-rates-grid>
 
 <app-side-dialog
+  *ngIf="isActive"
   [header]="billRateFormHeader"
   [width]="'436px'"
   (formCancelClicked)="onDialogCancel()"

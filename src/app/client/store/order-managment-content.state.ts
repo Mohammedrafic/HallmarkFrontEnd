@@ -140,7 +140,7 @@ export class OrderManagementContentState {
 
   @Action(GetSelectedOrderById)
   GetSelectedOrderById({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }: GetSelectedOrderById): Observable<Order> {
-    return this.orderManagementService.getSelectedOrderById(payload).pipe(tap((payload) => {
+    return this.orderManagementService.getOrderById(payload).pipe(tap((payload) => {
       patchState({ selectedOrder: payload });
       return payload;
     }));
