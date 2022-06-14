@@ -61,14 +61,14 @@ export class BillRatesComponent implements OnInit {
     this.billRateFormHeader = 'Edit Bill Rate';
     this.editBillRateIndex = index;
 
-    this.billRateForm.patchValue({ 
+    this.billRateForm.patchValue({
       billRateConfig: value.billRateConfig,
       billRateConfigId: value.billRateConfigId,
       effectiveDate: value.effectiveDate,
       id: value.id,
       intervalMax: String(value.intervalMax),
       intervalMin: String(value.intervalMin),
-      rateHour: String(value.rateHour) 
+      rateHour: String(value.rateHour)
      }, { emitEvent: false });
 
     if (!value.billRateConfig.intervalMin) {
@@ -128,7 +128,7 @@ export class BillRatesComponent implements OnInit {
     if (this.billRateForm.valid) {
       const value: BillRate = this.billRateForm.getRawValue();
 
-      if (!value.id) {
+      if (!value.effectiveDate) {
         const existingDateAndConfig = (this.billRatesControl.value as BillRate[]).find(
           (rate) =>
             rate.billRateConfigId === value.billRateConfigId &&
