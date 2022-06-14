@@ -19,6 +19,7 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
   @Input() credential: IOrderCredential;
 
   @Output() edit: EventEmitter<IOrderCredentialItem> = new EventEmitter();
+  @Output() update: EventEmitter<IOrderCredentialItem> = new EventEmitter();
   @Output() delete: EventEmitter<number> = new EventEmitter();
 
   private pageSubject = new Subject<number>();
@@ -37,6 +38,11 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public updateCredential(data: IOrderCredentialItem): void {
+    this.update.emit(data);
+    this.grid.refresh();
   }
 
   public dataBound(): void {

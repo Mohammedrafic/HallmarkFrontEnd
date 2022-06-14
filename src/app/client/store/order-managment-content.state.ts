@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, tap } from 'rxjs';
-import { EditOrder, GetAgencyOrderCandidatesList, GetAssociateAgencies, GetIncompleteOrders, GetMasterShifts, GetOrderById, GetOrders, GetOrganizationStatesWithKeyCode, GetProjectNames, GetProjectTypes, GetSelectedOrderById, GetWorkflows, SaveOrder } from '@client/store/order-managment-content.actions';
+import { EditOrder, GetAgencyOrderCandidatesList, GetAssociateAgencies, GetIncompleteOrders, GetMasterShifts, GetOrderById, GetOrders, GetOrganizationStatesWithKeyCode, GetProjectNames, GetProjectTypes, GetSelectedOrderById, GetWorkflows, SaveOrder, SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { OrderCandidatesListPage, OrderManagementPage } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
@@ -194,7 +194,7 @@ export class OrderManagementContentState {
   SaveOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { order, documents }: SaveOrder): Observable<Order | void> {
     return this.orderManagementService.saveOrder(order, documents).pipe(
       tap(order => {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        dispatch([new ShowToast(MessageTypes.Success, RECORD_ADDED), new SaveOrderSucceeded()]);
         return order;
       }),
       catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))

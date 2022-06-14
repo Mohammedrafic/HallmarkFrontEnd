@@ -94,6 +94,10 @@ export class OrderCredentialsComponent implements OnInit {
     }
   }
 
+  public onUpdate(data: IOrderCredentialItem): void {
+    this.credentialChanged.emit(data);
+  }
+
   public onDelete(credentialId: number): void {
     const credToDelete = this.credentials.find((cred) => cred.credentialId === credentialId) as IOrderCredentialItem;
     if (credToDelete) {

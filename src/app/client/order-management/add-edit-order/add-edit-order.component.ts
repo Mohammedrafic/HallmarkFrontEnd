@@ -4,13 +4,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
 import { map, Observable, Subject, takeUntil } from 'rxjs';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { SetImportFileDialogState } from '@admin/store/admin.actions';
-import { SaveOrder, EditOrder, GetSelectedOrderById } from '@client/store/order-managment-content.actions';
+import { SaveOrder, EditOrder, GetSelectedOrderById, SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
 
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
 import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-management.model';
@@ -57,7 +57,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
+  constructor(private store: Store, private router: Router, private route: ActivatedRoute, private actions$: Actions) {
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
 
     this.orderId = Number(this.route.snapshot.paramMap.get('orderId'));
@@ -83,6 +83,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         }
       });
     }
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe(() => {
+      this.router.navigate(['/client/order-management']);
+    });
   }
 
   ngOnDestroy(): void {

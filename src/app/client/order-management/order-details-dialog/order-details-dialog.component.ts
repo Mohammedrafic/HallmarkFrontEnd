@@ -7,12 +7,12 @@ import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
-import { OrderManagement } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Order } from '@shared/models/order-management.model';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -38,7 +38,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public targetElement: HTMLElement = document.body;
   public orderType = OrderType;
 
-  constructor(private chipsCssClass: ChipsCssClass) {}
+  constructor(private chipsCssClass: ChipsCssClass, private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.onOpenEvent();
@@ -75,6 +75,11 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         this.firstActive = true;
       }
     });
+  }
+
+  public editOrder(data: Order) {
+    this.router.navigate(['./edit', data.id], { relativeTo: this.route });
+    this.onClose();
   }
 
   public onClose(): void {
