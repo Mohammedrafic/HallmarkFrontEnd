@@ -35,6 +35,7 @@ import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { ProjectName, ProjectType } from '@shared/models/project.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
+import { Document } from '@shared/models/document.model';
 
 import { OrderType } from '@shared/enums/order-type';
 import { Duration } from '@shared/enums/durations';
@@ -90,6 +91,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public minTime = this.defaultMinTime;
 
   public documents: Blob[] = [];
+  public deleteDocumentsGuids: string[] = [];
   public priceUtils = PriceUtils;
 
   public orderTypes = [
@@ -544,6 +546,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   public onDocumentsSelected(documents: Blob[]): void {
     this.documents = documents;
+  }
+
+  public onDocumentDeleted(document: Document): void {
+    this.deleteDocumentsGuids.push(document.documentId);
   }
 
   private populateForms(order: Order): void {

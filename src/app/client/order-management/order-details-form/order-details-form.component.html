@@ -725,7 +725,9 @@
   <div class="right-section">
     <app-document-uploader
       uploaderTitle="Documents"
-      (selectDocuments)="onDocumentsSelected($event)">
+      [documents]="order?.documents"
+      (selectDocuments)="onDocumentsSelected($event)"
+      (deleteDocument)="onDocumentDeleted($event)">
     </app-document-uploader>
   </div>
 </section>

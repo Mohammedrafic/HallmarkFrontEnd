@@ -153,7 +153,11 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       const documents = this.orderDetailsFormComponent.documents;
 
       if (this.orderId) {
-        this.store.dispatch(new EditOrder({...order, id: this.orderId }));
+        this.store.dispatch(new EditOrder({
+          ...order,
+          id: this.orderId,
+          deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids
+        }, documents));
       } else {
         this.store.dispatch(new SaveOrder(order, documents));
       }
@@ -316,7 +320,11 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
 
     if (this.orderId) {
-      this.store.dispatch(new EditOrder({...order, id: this.orderId }));
+      this.store.dispatch(new EditOrder({
+        ...order,
+        id: this.orderId,
+        deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids
+      }, documents));
     } else {
       this.store.dispatch(new SaveOrder(order, documents));
     }
