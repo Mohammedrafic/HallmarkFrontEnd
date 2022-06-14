@@ -257,7 +257,7 @@
               placeholder="Skill"
               selectAllText="Select All"
               mode="CheckBox"
-              [dataSource]="(skills$ | async)?.items"
+              [dataSource]="skills$ | async"
               [fields]="skillsFields"
               [showSelectAll]="true"
               [allowFiltering]="false"

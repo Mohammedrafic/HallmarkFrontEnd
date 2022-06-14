@@ -70,7 +70,7 @@ export class SkillsService {
         filters.glNumbers = filters.glNumbers.map((val: string) => val === 'blank' ? null : val) as [];
       }
       return this.http.post<SkillsPage>(`/api/AssignedSkills/filter`, filters);
-    } 
+    }
     return this.http.get<SkillsPage>(`/api/AssignedSkills`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
   }
 
@@ -119,5 +119,13 @@ export class SkillsService {
    */
   public getSkillsDataSources(): Observable<SkillDataSource> {
     return this.http.get<SkillDataSource>(`/api/AssignedSkills/getAvailableData`);
+  }
+
+  /**
+   * Get all organization skills
+   * @return list of master skills
+   */
+  public getAllOrganizationSkills(): Observable<SkillsPage> {
+    return this.http.get<any>(`/api/AssignedSkills/all`);
   }
 }
