@@ -23,9 +23,7 @@ export class BillRatesService {
    * @return Created/Updated bill rate
    */
   public saveUpdateBillRate(billRate: BillRateSetupPost): Observable<BillRateSetup[]> {
-    return billRate.billRateSetupId ?
-      this.http.put<BillRateSetup[]>(`/api/BillRates/setup`, billRate) :
-      this.http.post<BillRateSetup[]>(`/api/BillRates/setup`, billRate);
+    return this.http.post<BillRateSetup[]>(`/api/BillRates/setup`, billRate);
   }
 
     /**

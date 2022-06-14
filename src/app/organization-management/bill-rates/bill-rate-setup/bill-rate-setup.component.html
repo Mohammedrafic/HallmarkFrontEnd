@@ -11,6 +11,7 @@
     [resizeSettings]="resizeSettings"
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
+    [enableVirtualization]="true"
   >
     <e-columns>
       <e-column field="regionName" headerText="REGION" width=150>
@@ -251,7 +252,7 @@
               placeholder="Skill"
               selectAllText="Select All"
               mode="CheckBox"
-              [dataSource]="(skills$ | async)?.items"
+              [dataSource]="skills$ | async"
               [fields]="skillsFields"
               [showSelectAll]="true"
               [allowFiltering]="false"
@@ -347,7 +348,7 @@
               class="numeric-input"
               appValidateWithMessage
               min="0"
-              maxlength="7"
+              maxlength="10"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
               placeholder="Multiplier"
@@ -392,12 +393,8 @@
       </div>
 
       <div class="group">
-        <div
-          *ngIf="isIntervalMinEnabled"
-          [formGroup]="billRatesIntervalMinRequiredFormGroup"
-          class="input-container bootstrap"
-        >
-          <label for="intervalMin">Interval Min <span class="required">*</span></label>
+        <div class="input-container bootstrap">
+          <label for="intervalMin">Interval Min <span class="required" *ngIf="isIntervalMinEnabled">*</span></label>
           <div class="input-group">
             <ejs-numerictextbox
               id="intervalMin"
@@ -416,29 +413,8 @@
           </div>
         </div>
 
-        <div
-          *ngIf="!isIntervalMinEnabled"
-          class="input-container bootstrap"
-        >
-          <label for="intervalMinDisabled">Interval Min </label>
-          <div class="input-group">
-            <ejs-numerictextbox
-              id="intervalMinDisabled"
-              class="numeric-input"
-              [showSpinButton]="false"
-              [enabled]="false"
-              placeholder="Interval Min"
-            >
-            </ejs-numerictextbox>
-          </div>
-        </div>
-
-        <div
-          *ngIf="isIntervalMaxEnabled"
-          [formGroup]="billRatesIntervalMaxRequiredFormGroup"
-          class="input-container bootstrap"
-        >
-          <label for="intervalMax">Interval Max <span class="required">*</span></label>
+        <div class="input-container bootstrap">
+          <label for="intervalMax">Interval Max <span class="required" *ngIf="isIntervalMaxEnabled">*</span></label>
           <div class="input-group">
             <ejs-numerictextbox
               id="intervalMax"
@@ -452,23 +428,6 @@
               decimals='0'
               format="#"
               formControlName="intervalMax"
-            >
-            </ejs-numerictextbox>
-          </div>
-        </div>
-
-        <div
-          *ngIf="!isIntervalMaxEnabled"
-          class="input-container bootstrap"
-        >
-          <label for="intervalMaxDisabled">Interval Max </label>
-          <div class="input-group">
-            <ejs-numerictextbox
-              id="intervalMaxDisabled"
-              class="numeric-input"
-              [showSpinButton]="false"
-              [enabled]="false"
-              placeholder="Interval Max"
             >
             </ejs-numerictextbox>
           </div>

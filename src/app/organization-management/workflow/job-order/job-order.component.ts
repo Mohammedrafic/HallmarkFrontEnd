@@ -20,7 +20,7 @@ import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { UserState } from '../../../store/user.state';
-import { GetAllSkills } from '@organization-management/store/organization-management.actions';
+import { GetAllOrganizationSkills, GetAllSkills } from '@organization-management/store/organization-management.actions';
 
 export enum WorkflowNavigationTabs {
   JobOrderWorkflow,
@@ -101,7 +101,7 @@ export class JobOrderComponent implements OnInit, OnDestroy {
 
     // triggers refresh grid and other data if tab changed
     if (this.isWorkflowMappingTabActive) {
-      this.store.dispatch(new GetAllSkills());
+      this.store.dispatch(new GetAllOrganizationSkills());
       this.store.dispatch(new GetWorkflowMappingPages());
       this.store.dispatch(new GetRolesForWorkflowMapping());
       this.store.dispatch(new GetUsersForWorkflowMapping());
