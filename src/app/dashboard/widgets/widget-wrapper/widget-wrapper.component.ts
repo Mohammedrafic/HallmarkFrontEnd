@@ -7,5 +7,6 @@ import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WidgetWrapperComponent {
+  @Input() public isLoading: boolean;
   @Input() public title: string;
 }

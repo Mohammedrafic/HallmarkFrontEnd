@@ -15,3 +15,7 @@ export class SetPanels {
   static readonly type = `${dashboardStatePrefix} Set panels`;
   constructor(public payload: PanelModel[]) {}
 }
+
+export class ResetState {
+  static readonly type = `${dashboardStatePrefix} Reset state`;
+}

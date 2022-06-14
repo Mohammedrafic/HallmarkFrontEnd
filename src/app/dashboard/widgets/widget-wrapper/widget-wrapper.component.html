@@ -1,13 +1,21 @@
 <div class="app-widget-wrapper">
   <div class="app-widget-wrapper__content">
     <h3 *ngIf="title" class="app-widget-wrapper__title">{{ title }}</h3>
-    <div class="app-widget-wrapper__projection-wrapper">
-      <div class="app-widget-wrapper__chart">
-        <ng-content select="[chart]"></ng-content>
-      </div>
-      <div class="app-widget-wrapper__legend">
-        <ng-content select="[legend]"></ng-content>
-      </div>
-    </div>
+    <ng-container [ngTemplateOutlet]="isLoading ? loadingTemplate : regularWidgetTemplate"></ng-container>
   </div>
 </div>
+
+<ng-template #loadingTemplate>
+  <app-inline-loader class="app-widget-wrapper__loader"></app-inline-loader>
+</ng-template>
+
+<ng-template #regularWidgetTemplate>
+  <div class="app-widget-wrapper__projection-wrapper">
+    <div class="app-widget-wrapper__chart">
+      <ng-content select="[chart]"></ng-content>
+    </div>
+    <div class="app-widget-wrapper__legend">
+      <ng-content select="[legend]"></ng-content>
+    </div>
+  </div>
+</ng-template>

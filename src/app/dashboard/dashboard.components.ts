@@ -9,7 +9,7 @@ import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
 import { SetHeaderState } from '../store/app.actions';
 import { DashboardService } from './services/dashboard.service';
-import { GetDashboardData, SetPanels, SaveDashboard } from './store/dashboard.actions';
+import { GetDashboardData, SetPanels, SaveDashboard, ResetState } from './store/dashboard.actions';
 import { DashboardState, DashboardStateModel } from './store/dashboard.state';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { WidgetDataDependenciesAggregatedModel } from './models/widget-data-dependencies-aggregated.model';
@@ -61,6 +61,11 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   public ngOnInit(): void {
     this.setWidgetsData();
     this.initOrganizationChangeListener();
+  }
+
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
+    this.store.dispatch(new ResetState());
   }
 
   public dashboardIsCreated(): void {

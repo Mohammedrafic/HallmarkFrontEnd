@@ -9,4 +9,5 @@ import { CandidatesByStateWidgetAggregatedDataModel } from '../../models/candida
 })
 export class MapsChartComponent {
   @Input() public chartData: CandidatesByStateWidgetAggregatedDataModel;
+  @Input() public isLoading: boolean;
 }

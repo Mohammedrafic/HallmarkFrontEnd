@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges, ChangeDetectionStrategy, OnChanges } from '@angular/core';
 import { ChartAccumulation, DonutChartData } from '../../models/chart-accumulation-widget.model';
 import { TooltipSettingsModel } from '@syncfusion/ej2-charts/src/common/model/base-model';
 import { LegendSettingsModel } from '@syncfusion/ej2-charts/src/common/legend/legend-model';
@@ -17,8 +17,9 @@ import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-com
   styleUrls: ['../widget-legend.component.scss', './accumulation-chart.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AccumulationChartComponent extends AbstractSFComponentDirective implements OnInit {
+export class AccumulationChartComponent extends AbstractSFComponentDirective implements OnChanges, OnInit {
   @Input() public chartData: ChartAccumulation | undefined;
+  @Input() public isLoading: boolean;
 
   public formattedChartData: DonutChartData[];
   public toggleLegend: number[] = [];
@@ -27,8 +28,7 @@ export class AccumulationChartComponent extends AbstractSFComponentDirective imp
   public readonly palette: string[] = legendPalette;
   public readonly tooltipSettings: TooltipSettingsModel = {
     enable: true,
-    template:
-      '<div class="widget-tooltip"><div>${x}</div><b>${y}</b></div>',
+    template: '<div class="widget-tooltip"><div>${x}</div><b>${y}</b></div>',
   };
   public readonly legendSettings: LegendSettingsModel = { visible: false };
 
