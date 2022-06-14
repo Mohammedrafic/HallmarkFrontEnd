@@ -28,6 +28,7 @@ import { AgencyOrderManagement, AgencyOrderManagementPage } from '@shared/models
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { Location } from '@angular/common';
+import { UserState } from 'src/app/store/user.state';
 
 enum AllCheckedStatus {
   None,
@@ -49,6 +50,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   @Select(OrderManagementState.ordersPage)
   public ordersPage$: Observable<AgencyOrderManagementPage>;
+
+  @Select(UserState.lastSelectedAgencyId)
+  lastSelectedAgencyId$: Observable<number>;
 
   public wrapSettings: TextWrapSettingsModel = GRID_CONFIG.wordWrapSettings;
   public allowWrap = GRID_CONFIG.isWordWrappingEnabled;
@@ -78,6 +82,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   ngOnInit(): void {
     this.onOrderPreviewChange();
+    this.onAgencyChange();
     const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
     if (!this.previousSelectedOrderId) {
@@ -169,7 +174,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.openPreview.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (!isOpen) {
         this.openCandidat.next(false);
-        this.grid.clearRowSelection();
+        this.grid?.clearRowSelection();
         this.previousSelectedOrderId = null;
       }
     });
@@ -183,6 +188,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       previous: first.orderId !== selectedOrder.orderId,
       next: last.orderId !== selectedOrder.orderId,
     };
+  }
+
+  private onAgencyChange(): void {
+    this.lastSelectedAgencyId$.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
+      this.openPreview.next(false);
+      this.openCandidat.next(false);
+      this.dispatchNewPage();
+    });
   }
 }
 

@@ -61,4 +61,8 @@ ejs-chiplist.e-control.e-chip-list {
       color: $white;
     }
   }
+
+  &.events-off {
+    pointer-events: none;
+  }
 }

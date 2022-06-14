@@ -26,7 +26,7 @@
       <e-column field="agencyDetails.status" headerText="AGENCY STATUS" width=200>
         <ng-template #template let-data>
           <div>
-            <ejs-chiplist>
+            <ejs-chiplist class="events-off">
               <e-chips>
                 <e-chip [text]="statusEnum[data.agencyDetails.status]"
                         [cssClass]="getChipCssClass(statusEnum[data.agencyDetails.status])">
