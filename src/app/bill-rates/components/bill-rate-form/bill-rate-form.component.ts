@@ -25,10 +25,6 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
   public billRateOptionsDropdown: DropDownListComponent;
   @ViewChild('rateHours')
   public rateHoursInput: MaskedTextBoxComponent;
-  @ViewChild('intervalMin')
-  public intervalMinInput: MaskedTextBoxComponent;
-  @ViewChild('intervalMax')
-  public intervalMaxInput: MaskedTextBoxComponent;
 
   @Input() billRateForm: FormGroup;
 
@@ -78,7 +74,6 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.onBillRateConfigIdChanged();
-    this.getMackedValuesOnInputChange();
   }
 
   ngOnDestroy(): void {
@@ -121,28 +116,6 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
         intervalMaxControl?.updateValueAndValidity();
         intervalMinControl?.updateValueAndValidity();
       });
-  }
-
-  private getMackedValuesOnInputChange(): void {
-    const rateHourControl = this.billRateForm.get('rateHour');
-    const intervalMinControl = this.billRateForm.get('intervalMin');
-    const intervalMaxControl = this.billRateForm.get('intervalMax');
-    forkJoin([
-      rateHourControl?.valueChanges.pipe(
-        filter((value) => !!value),
-        tap(() => rateHourControl?.patchValue(this.rateHoursInput.getMaskedValue(), { emitEvent: false }))
-      ),
-      intervalMinControl?.valueChanges.pipe(
-        filter((value) => !!value),
-        tap(() => intervalMinControl?.patchValue(this.intervalMinInput.getMaskedValue(), { emitEvent: false }))
-      ),
-      intervalMaxControl?.valueChanges.pipe(
-        filter((value) => !!value),
-        tap(() => intervalMaxControl?.patchValue(this.intervalMaxInput.getMaskedValue(), { emitEvent: false }))
-      ),
-    ])
-      .pipe(takeWhile(() => this.isAlive))
-      .subscribe();
   }
 
   static createForm(billRates?: BillRate[]): FormGroup {

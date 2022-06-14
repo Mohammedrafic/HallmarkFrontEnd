@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormArray, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { filter, take } from 'rxjs';
 
@@ -10,6 +10,7 @@ import { BillRateFormComponent } from './components/bill-rate-form/bill-rate-for
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid.component';
+import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
 
 @Component({
   selector: 'app-bill-rates',
@@ -28,6 +29,8 @@ export class BillRatesComponent implements OnInit {
   public billRateFormHeader: string;
   public billRatesControl: FormArray;
   public billRateForm: FormGroup;
+  public intervalMinField: AbstractControl;
+  public intervalMaxField: AbstractControl;
 
   private editBillRateIndex: string | null;
 
@@ -37,6 +40,14 @@ export class BillRatesComponent implements OnInit {
 
   ngOnInit(): void {
     this.billRateForm = BillRateFormComponent.createForm();
+
+    this.intervalMinField = this.billRateForm.get('intervalMin') as AbstractControl;
+    this.intervalMinField.addValidators(intervalMinValidator(this.billRateForm, 'intervalMax'));
+    this.intervalMinField.valueChanges.subscribe(() => this.intervalMaxField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
+
+    this.intervalMaxField = this.billRateForm.get('intervalMax') as AbstractControl;
+    this.intervalMaxField.addValidators(intervalMaxValidator(this.billRateForm, 'intervalMin'));
+    this.intervalMaxField.valueChanges.subscribe(() => this.intervalMinField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
   }
 
   public onAddBillRate(): void {
