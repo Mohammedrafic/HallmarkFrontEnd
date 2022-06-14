@@ -113,11 +113,11 @@ export class Order {
   projectType?: string;
   projectNameId: number | null;
   projectName?: string;
-  hourlyRate: number;
-  openPositions: number;
-  minYrsRequired: number;
-  joiningBonus: number;
-  compBonus: number;
+  hourlyRate: number | null;
+  openPositions: number | null;
+  minYrsRequired: number | null;
+  joiningBonus: number | null;
+  compBonus: number | null;
   duration: Duration;
   jobStartDate: Date;
   jobEndDate: Date;

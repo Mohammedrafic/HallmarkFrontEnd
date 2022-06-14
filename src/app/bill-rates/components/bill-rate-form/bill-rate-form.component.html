@@ -45,6 +45,8 @@
           class="datepicker"
           format="MM/dd/yyyy"
           placeholder="MM/DD/YYYY"
+          [enableMask]="true"
+          [maskPlaceholder]="{  month: 'MM', day: 'DD', year: 'YYYY' }"
           appValidateWithMessage
           formControlName="effectiveDate"
         >
@@ -55,16 +57,16 @@
     <div class="input-container bootstrap">
       <label>Rates/Hours<span class="required">*</span></label>
       <div class="input-group">
-        <ejs-maskedtextbox
-        #rateHours
-        class="e-input"
-        promptChar="_"
-        mask="00.00"
-        appValidateWithMessage
-        formControlName="rateHour"
-        placeholder="Rates/Hours"
-        maxlength="10"
-      ></ejs-maskedtextbox>
+        <input
+          class="e-input"
+          type="text"
+          formControlName="rateHour"
+          placeholder="Rates/Hours"
+          appValidateWithMessage
+          maxlength="11"
+          (focus)="priceUtils.setPriceMask(billRateForm, 'rateHour', $event)"
+          (blur)="priceUtils.setTwoDecimals(billRateForm, 'rateHour', $event)"
+        />
       </div>
     </div>
   </div>

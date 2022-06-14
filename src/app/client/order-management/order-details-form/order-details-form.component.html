@@ -210,7 +210,10 @@
                       formControlName="hourlyRate"
                       appValidateWithMessage
                       placeholder="Hourly rate"
-                      maxlength="10" />
+                      maxlength="11"
+                      (focus)="priceUtils.setPriceMask(generalInformationForm,'hourlyRate', $event)"
+                      (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'hourlyRate', $event)"
+                    />
                   </div>
                 </div>
 
@@ -252,8 +255,11 @@
                       placeholder="Joining Bonus"
                       formControlName="joiningBonus"
                       appValidateWithMessage
-                      maxlength="10" />
-                  </div>
+                      maxlength="11"
+                      (focus)="priceUtils.setPriceMask(generalInformationForm, 'joiningBonus', $event)"
+                      (blur)="priceUtils.setTwoDecimals(generalInformationForm,'joiningBonus', $event)"
+                    />
+                  </div>`
                 </div>
 
                 <!-- Comp. Bonus -->
@@ -266,7 +272,10 @@
                       placeholder="Comp. Bonus"
                       formControlName="compBonus"
                       appValidateWithMessage
-                      maxlength="10" />
+                      maxlength="11"
+                      (focus)="priceUtils.setPriceMask(generalInformationForm, 'compBonus', $event)"
+                      (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'compBonus', $event)"
+                    />
                   </div>
                 </div>
               </div>
@@ -297,7 +306,7 @@
                       formControlName="jobStartDate"
                       appValidateWithMessage
                       [enableMask]="true"
-                      [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                      [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
                       [min]="today">
                     </ejs-datepicker>
                   </div>
@@ -313,9 +322,11 @@
                       placeholder="MM/DD/YYYY"
                       formControlName="jobEndDate"
                       appValidateWithMessage
+                      [enableMask]="true"
+                      [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
                       [enabled]="isJobEndDateControlEnabled"
                       [enableMask]="true"
-                      [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                      [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
                       [min]="generalInformationForm.controls['jobStartDate'].value">
                     </ejs-datepicker>
                   </div>

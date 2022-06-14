@@ -9,6 +9,7 @@ import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
 import { BillRateState } from '@bill-rates/store/bill-rate.state';
 import { BillRate, BillRateCategory, BillRateOption, BillRateType, BillRateUnit } from '@shared/models/bill-rate.model';
 import { GetBillRateOptions } from '@bill-rates/store/bill-rate.actions';
+import PriceUtils from "@shared/utils/price.utils";
 
 const RateHourMask = {
   desimal: '00.00',
@@ -34,6 +35,7 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
     value: 'id',
   };
   public rateHourMack = false;
+  public priceUtils = PriceUtils;
 
   public isIntervalMinControlRequired = true;
   public isIntervalMaxControlRequired = true;

@@ -270,6 +270,26 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       order.projectName = projectName;
     }
 
+    if (!order.hourlyRate) {
+      order.hourlyRate = null;
+    }
+
+    if (!order.openPositions) {
+      order.openPositions = null;
+    }
+
+    if (!order.minYrsRequired) {
+      order.minYrsRequired = null;
+    }
+
+    if (!order.joiningBonus) {
+      order.minYrsRequired = null;
+    }
+
+    if (!order.compBonus) {
+      order.minYrsRequired = null;
+    }
+
     return order;
   }
 
