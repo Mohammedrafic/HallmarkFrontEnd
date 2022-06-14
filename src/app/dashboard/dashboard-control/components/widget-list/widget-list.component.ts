@@ -22,6 +22,7 @@ import findIndex from 'lodash/fp/findIndex';
 import { BehaviorSubject, Subject, takeUntil, filter, startWith, distinctUntilChanged, combineLatest } from 'rxjs';
 import isEqual from 'lodash/fp/isEqual';
 import { WidgetToggleModel } from '../../../models/widget-toggle.model';
+import type { GridRowSelectEventModel, GridRowDeselectEventModel } from '@shared/models/grid-row-selection-event.model';
 
 @Component({
   selector: 'app-widget-list',
@@ -62,11 +63,11 @@ export class WidgetListComponent extends DestroyableDirective implements OnChang
     this.dataBoundTrigger$.next(true);
   }
 
-  public rowSelectedHandler(event: any): void {
+  public rowSelectedHandler(event: GridRowSelectEventModel<WidgetOptionModel>): void {
     event.isInteracted && this.widgetToggleEmitter.emit({ widget: event.data, isSelected: true });
   }
 
-  public rowDeselectedHandler(event: any): void {
+  public rowDeselectedHandler(event: GridRowDeselectEventModel<WidgetOptionModel>): void {
     event.isInteracted && this.widgetToggleEmitter.emit({ widget: event.data, isSelected: false });
   }
 
