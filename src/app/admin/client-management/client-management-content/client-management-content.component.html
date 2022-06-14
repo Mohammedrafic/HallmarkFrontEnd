@@ -41,7 +41,11 @@
         </e-column>
         <e-column field="generalInformation.city" headerText="City" textAlign="Left" width="90"></e-column>
         <e-column field="contactDetails.0.contactPerson" headerText="Contact" textAlign="Left" width="120"></e-column>
-        <e-column field="contactDetails.0.phoneNumberExt" headerText="Phone" textAlign="Left" width="90"></e-column>
+        <e-column field="contactDetails.0.phoneNumberExt" headerText="Phone" textAlign="Left" width="90">
+          <ng-template #template let-data>
+            <span>{{ data.contactDetails[0].phoneNumberExt | formatPhoneNumber }}</span>
+          </ng-template>
+        </e-column>
         <e-column field="" headerText="" textAlign="Right" width="90">
           <ng-template #headerTemplate let-data>
             <div class="controls-header"></div>
@@ -104,7 +108,7 @@
         </div>
       </ng-template>
     </ejs-grid>
-  </section>  
+  </section>
 </section>
 
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>

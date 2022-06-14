@@ -113,4 +113,11 @@ ejs-datepicker.datepicker, ejs-timepicker.e-timepicker, ejs-datetimepicker.e-dat
       display: block;
     }
   }
+
+  .e-input-group.e-control-wrapper {
+    &.e-disabled {
+      background-color: $secondary-dark-blue-50 !important;
+      color: $secondary-dark-blue-30 !important;
+    }
+  }
 }

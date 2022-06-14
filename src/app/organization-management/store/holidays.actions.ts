@@ -1,9 +1,9 @@
 import { ExportPayload } from "@shared/models/export.model";
-import { OrganizationHoliday } from "@shared/models/holiday.model";
+import { HolidayFilters, OrganizationHoliday } from "@shared/models/holiday.model";
 
 export class GetHolidaysByPage {
   static readonly type = '[orgHoliday] Get Holiday by Page';
-  constructor(public pageNumber: number, public pageSize: number, public orderBy: string) { }
+  constructor(public pageNumber: number, public pageSize: number, public orderBy: string, public filter: HolidayFilters) { }
 }
 
 export class GetAllMasterHolidays {
@@ -44,4 +44,9 @@ export class CheckIfExist {
 export class ExportHolidays {
   static readonly type = '[orgHoliday] Export Holiday list';
   constructor(public payload: ExportPayload) { }
+}
+
+export class GetHolidayDataSources {
+  static readonly type = '[organizationManagement] Get Holiday Data Sources';
+  constructor() { }
 }

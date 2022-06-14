@@ -1,0 +1,18 @@
+<div class="dashboard-control">
+  <app-page-toolbar>
+    <ng-container right>
+      <button ejs-button cssClass="e-outline" (click)="toggleDialog(true)">
+        Manage Widgets <i-feather name="sliders" class="icon"></i-feather>
+      </button>
+      <button ejs-button [isPrimary]="true">Create Order</button>
+    </ng-container>
+  </app-page-toolbar>
+  <app-widget-list
+    *ngIf="isDialogOpened$ | async"
+    (closeDialogEmitter)="toggleDialog(false)"
+    (widgetToggleEmitter)="widgetToggleEmitter.emit($event)"
+    [selectedWidgets]="selectedWidgets"
+    [widgets]="widgets"
+    [isLoading]="isLoading"
+  ></app-widget-list>
+</div>

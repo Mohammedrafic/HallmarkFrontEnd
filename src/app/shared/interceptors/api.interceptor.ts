@@ -6,7 +6,7 @@ import {
   HttpRequest,
   HttpClient,
   HttpHeaders,
-  HttpErrorResponse
+  HttpErrorResponse,
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, shareReplay, switchMap, take, catchError } from 'rxjs/operators';
@@ -22,15 +22,10 @@ interface IAppSettings {
 
 @Injectable()
 export class ApiInterceptor implements HttpInterceptor {
-
   private apiUrl$: Observable<string>;
   private appSettingsUrl = './assets/app.settings.json';
 
-  constructor(
-    private httpClient: HttpClient,
-    private router: Router,
-    private store: Store,
-  ) {}
+  constructor(private httpClient: HttpClient, private router: Router, private store: Store) {}
 
   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const userId = this.store.selectSnapshot(UserState.user)?.id;
@@ -39,10 +34,10 @@ export class ApiInterceptor implements HttpInterceptor {
 
     if (userId) {
       const currentPage = this.store.selectSnapshot(AppState.headerState)?.title || 'Login';
-      const headers: {[key: string]: string} = {
-        'Authorization': `UserId ${userId}`,
+      const headers: { [key: string]: string } = {
+        Authorization: `UserId ${userId}`,
         'Einstein-ScreenName': currentPage as string,
-        'Einstein-ScreenUrl': this.router.url
+        'Einstein-ScreenUrl': this.router.url,
       };
 
       const { isOrganizationArea, isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
@@ -86,7 +81,7 @@ export class ApiInterceptor implements HttpInterceptor {
       this.apiUrl$ = this.httpClient.get<IAppSettings>(this.appSettingsUrl).pipe(
         take(1),
         shareReplay(1), // prevent multiple requests
-        map(resp => {
+        map((resp) => {
           return resp.API_BASE_URL;
         })
       );
@@ -95,6 +90,6 @@ export class ApiInterceptor implements HttpInterceptor {
   }
 
   private setUrl(request: HttpRequest<any>, url: string): HttpRequest<any> {
-    return request.clone({ url: `${url}${request.url}` });
+    return request.url.startsWith('assets') ? request : request.clone({ url: `${url}${request.url}` });
   }
 }

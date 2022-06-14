@@ -29,23 +29,19 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <ng-container *ngIf="selectedTab === SelectedTab.OrderDetails">
+        <ng-container>
           <section class="order-details-form-section">
-            <app-order-details-form #orderDetailsForm></app-order-details-form>
+            <app-order-details-form #orderDetailsForm [isActive]="selectedTab === SelectedTab.OrderDetails"></app-order-details-form>
           </section>
 
-          <!-- Bill Rates will be added soon -->
-
-          <!-- <section class="bill-rates-section">
-            <app-bill-rates></app-bill-rates>
-          </section> -->
+          <section class="bill-rates-section">
+            <app-bill-rates #billRates [billRates]="orderBillRates" [isActive]="selectedTab === SelectedTab.OrderDetails"></app-bill-rates>
+          </section>
         </ng-container>
       </ng-template>
     </e-tabitem>
 
-    <!-- Credentials Tab will be added soon -->
-
-    <!-- <e-tabitem>
+    <e-tabitem>
       <ng-template #headerText>
         <div class="stepper-header">
           <div class="stepper-title">Credentials</div>
@@ -53,8 +49,13 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-order-credentials *ngIf="selectedTab === SelectedTab.Credentials"></app-order-credentials>
+        <app-order-credentials
+          [isActive]="selectedTab === SelectedTab.Credentials"
+          [credentials]="orderCredentials"
+          (credentialChanged)="onCredentialChanged($event)"
+          (credentialDeleted)="onCredentialDeleted($event)"
+          ></app-order-credentials>
       </ng-template>
-    </e-tabitem> -->
+    </e-tabitem>
   </e-tabitems>
 </ejs-tab>

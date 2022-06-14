@@ -1,0 +1,16 @@
+@import 'colors';
+
+.e-tooltip-wrap.e-popup.e-lib.e-control.e-popup-open {
+  background-color: $secondary-dark-blue-15;
+  border-radius: 4px;
+
+  .e-arrow-tip {
+    .e-arrow-tip-outer {
+      border-top-color: $secondary-dark-blue-15;
+    }
+
+    .e-arrow-tip-inner {
+      color: $secondary-dark-blue-15;
+    }
+  }
+}

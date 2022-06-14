@@ -5,7 +5,7 @@
     </div>
     <div class="actions">
       <span class="action-link" (click)="onFilter()"><i-feather name="sliders" class="icon"></i-feather> Filters</span>
-      <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Education</span>
+      <span *ngIf="!readonlyMode" class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Education</span>
     </div>
   </div>
   <ejs-grid #grid class="e-gridwithheader"
@@ -24,7 +24,7 @@
         <ng-template #template let-data>{{data.graduationDate | date:"MM/yyyy"}}</ng-template>
       </e-column>
       <e-column field="fieldOfStudy" headerText="Field Of Study" width=500></e-column>
-      <e-column textAlign="Right" minWidth="112" width="112" freeze="Right">
+      <e-column textAlign="Right" *ngIf="!readonlyMode" width="112" freeze="Right">
         <ng-template #template let-data>
           <div class="e-grid-tool-buttons">
             <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>
@@ -81,8 +81,6 @@
         <ejs-datepicker class="datepicker"
                         format="MM/dd/yyyy"
                         placeholder="MM/DD/YYYY"
-                        [enableMask]="true"
-                        [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                         formControlName="graduationDate">
         </ejs-datepicker>
       </div>

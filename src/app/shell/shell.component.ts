@@ -10,7 +10,7 @@ import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '../client/client.config';
 import { Menu, MenuItem } from '../shared/models/menu.model';
 import { User } from '../shared/models/user.model';
-import { SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
+import { SetHeaderState, SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
 import { GetUserMenuConfig, LogoutUser } from '../store/user.actions';
 import { UserState } from '../store/user.state';
 

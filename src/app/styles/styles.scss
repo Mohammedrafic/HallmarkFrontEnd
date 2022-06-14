@@ -1,6 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 @use "sass:meta";
 
+@use "root";
+
 @import "./variables/colors.scss";
 
 @font-face {
@@ -170,25 +172,25 @@ body {
       color: #fff;
     }
 
-    @include meta.load-css("./themes/material_d");
+    //@include meta.load-css("./themes/material_d");
 
     .bootstrap {
-      @include meta.load-css("../../../node_modules/@syncfusion/ej2-base/styles/bootstrap5-dark.css");
+      /*@include meta.load-css("../../../node_modules/@syncfusion/ej2-base/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-buttons/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-dropdowns/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-inputs/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-popups/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-lists/styles/bootstrap5-dark.css");
       @include meta.load-css("../../../node_modules/@syncfusion/ej2-angular-dropdowns/styles/bootstrap5-dark.css");
-      @include meta.load-css("../../../node_modules/@syncfusion/ej2-angular-inputs/styles/bootstrap5-dark.css");
+      @include meta.load-css("../../../node_modules/@syncfusion/ej2-angular-inputs/styles/bootstrap5-dark.css");*/
     }
   }
 
   &.light,
   &.dark {
     .bootstrap {
-      .e-wrapper .e-label {
-        font-family: "SF Pro";
+      .e-wrapper .e-label, input {
+        font-family: "SF Pro" !important;
       }
     }
   }
@@ -230,12 +232,37 @@ hr {
 @import './controls/treeview';
 @import './controls/numeric-textbox';
 @import './controls/pdf-viewer';
+@import './controls/tooltip';
 
 a, a:hover, a:focus, a:active {
   text-decoration: none;
   color: inherit;
 }
 
+@include meta.load-css( "../../node_modules/@syncfusion/ej2-angular-layouts/styles/material.css");
+
 .overflow-hide {
   overflow: hidden !important;
+}
+
+.widget-tooltip {
+  text-align: center;
+  padding: 10px 20px;
+  background-color: $white;
+  box-shadow: 0 3px 15px rgb(0 0 0 / 0.2);
+  color: $secondary-dark-blue-15;
+  &::after {
+    content: "";
+    display:block;
+    width:15px;
+    height:15px;
+    position:absolute;
+    left: 40%;
+    background-color: $white;
+    transform: rotate(45deg);
+  }
+}
+
+#Candidates_SeriesCollection {
+  cursor: default;
 }

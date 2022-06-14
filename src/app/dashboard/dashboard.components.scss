@@ -1,0 +1,28 @@
+@import "colors";
+
+.control-section {
+  padding-bottom: 20px;
+
+  #dashboardLayout {
+    .e-holder{
+      background-color: $primary-active-blue-90;
+      border: 2px dashed $primary-active-blue-20;
+      border-radius: 12px
+    }
+    
+    .e-panel {
+      border-radius: 12px;
+      transition: .3s;
+
+      .e-panel-container {
+        .e-panel-content {
+          position: relative;
+        }
+      }
+
+      &:hover {
+        box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+      }
+    }
+  }
+}

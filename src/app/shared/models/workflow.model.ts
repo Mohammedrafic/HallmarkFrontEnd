@@ -20,9 +20,13 @@ export class Workflow {
 
 export class Step {
   id?: number;
+  canBeFollowedByCustomStep?: boolean;
+  isAgencyStep?: boolean;
+  requirePermission?: boolean;
   workflowId?: number;
   name: string;
   status: string;
   type: number;
   order?: number;
+  nextStepStatus?: string;
 }

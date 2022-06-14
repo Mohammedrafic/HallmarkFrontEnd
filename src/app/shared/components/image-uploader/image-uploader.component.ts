@@ -10,6 +10,7 @@ import { FileInfo } from "@syncfusion/ej2-inputs/src/uploader/uploader";
 })
 export class ImageUploaderComponent implements OnInit {
   @Input() uploaderTitle: string;
+  @Input() disabled = false;
   @Input() set logo(value: Blob | null) {
     if (value) {
       const reader = new FileReader();

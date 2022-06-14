@@ -1,0 +1,14 @@
+<app-widget-wrapper [title]="'Applicants by Region'">
+  <app-map
+    chart
+    class="app-maps-chart__map"
+    [layers]="chartData?.chartData"
+  ></app-map>
+  <div legend>
+    <div class="app-maps-chart__range-line"></div>
+    <div class="app-maps-chart__range-values">
+      {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.from }} -
+      {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.to }}
+    </div>
+  </div>
+</app-widget-wrapper>

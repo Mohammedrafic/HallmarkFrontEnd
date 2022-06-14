@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormGroup } from '@angular/forms';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormArray, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { filter, take } from 'rxjs';
 
@@ -17,20 +17,25 @@ import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid
   styleUrls: ['./bill-rates.component.scss'],
 })
 export class BillRatesComponent implements OnInit {
-  public billRateFormHeader: string;
-  public orederForm: FormGroup;
-  public billRateForm: FormGroup;
-
-  get billRatesControl(): FormArray {
-    return this.orederForm.get('billRates') as FormArray;
+  @Input() isActive = false;
+  @Input() set billRates(values: BillRate[]) {
+    if (values) {
+      this.billRatesControl = new FormArray([]);
+      values.forEach(value => this.billRatesControl.push(this.fromValueToBillRate(value)));
+    }
   }
+
+  public billRateFormHeader: string;
+  public billRatesControl: FormArray;
+  public billRateForm: FormGroup;
 
   private editBillRateIndex: string | null;
 
-  constructor(private confirmService: ConfirmService, private store: Store) {}
+  constructor(private confirmService: ConfirmService, private store: Store) {
+    this.billRatesControl = new FormArray([]);
+  }
 
   ngOnInit(): void {
-    this.orederForm = this.generateForm();
     this.billRateForm = BillRateFormComponent.createForm();
   }
 
@@ -44,7 +49,29 @@ export class BillRatesComponent implements OnInit {
   public onEditBillRate({ index, ...value }: BillRatesGridEvent): void {
     this.billRateFormHeader = 'Edit Bill Rate';
     this.editBillRateIndex = index;
-    this.billRateForm.patchValue({ ...value }, { emitEvent: false });
+
+    this.billRateForm.patchValue({ 
+      billRateConfig: value.billRateConfig,
+      billRateConfigId: value.billRateConfigId,
+      effectiveDate: value.effectiveDate,
+      id: value.id,
+      intervalMax: String(value.intervalMax),
+      intervalMin: String(value.intervalMin),
+      rateHour: String(value.rateHour) 
+     }, { emitEvent: false });
+
+    if (!value.billRateConfig.intervalMin) {
+      this.billRateForm.controls['intervalMin'].removeValidators(Validators.required);
+      this.billRateForm.controls['intervalMin'].disable();
+      this.billRateForm.controls['intervalMin'].updateValueAndValidity();
+    }
+
+    if (!value.billRateConfig.intervalMax) {
+      this.billRateForm.controls['intervalMax'].removeValidators(Validators.required);
+      this.billRateForm.controls['intervalMax'].disable();
+      this.billRateForm.controls['intervalMax'].updateValueAndValidity();
+    }
+
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -90,16 +117,17 @@ export class BillRatesComponent implements OnInit {
     if (this.billRateForm.valid) {
       const value: BillRate = this.billRateForm.getRawValue();
 
-      const existingDateAndConfig = (this.billRatesControl.value as BillRate[]).find(
-        (rate) =>
-          rate.billRateConfigId === value.billRateConfigId &&
-          new Date(rate.effectiveDate).getTime() === new Date(value.effectiveDate).getTime()
-      );
+      if (!value.id) {
+        const existingDateAndConfig = (this.billRatesControl.value as BillRate[]).find(
+          (rate) =>
+            rate.billRateConfigId === value.billRateConfigId &&
+            new Date(rate.effectiveDate).getTime() === new Date(value.effectiveDate).getTime()
+        );
         if (existingDateAndConfig) {
           this.billRateForm.get( 'effectiveDate')?.setErrors({});
           return;
         }
-
+      }
 
       if (this.editBillRateIndex) {
         const editedControl = this.billRatesControl.at(Number(this.editBillRateIndex));
@@ -117,14 +145,9 @@ export class BillRatesComponent implements OnInit {
   private fromValueToBillRate(value: BillRate): FormGroup {
     const billRateControl = BillRateFormComponent.createForm();
     const billRateConfig = billRateControl.get('billRateConfig');
+    billRateControl.controls['id'].patchValue(value.id || 0);
     billRateConfig?.patchValue({ ...value.billRateConfig });
     billRateControl.patchValue({ ...value, billRateConfig });
     return billRateControl;
-  }
-
-  private generateForm(): FormGroup {
-    return new FormGroup({
-      billRates: new FormArray([]),
-    });
   }
 }

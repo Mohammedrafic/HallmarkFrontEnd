@@ -1,0 +1,4 @@
+<div class="dialog-footer-actions">
+  <span class="action-link" [ngClass]="{'disabled': !options?.previous}" (click)="onPrevious()"><i-feather name="arrow-left" class="icon"></i-feather>Previous {{title}}</span>
+  <span class="action-link" [ngClass]="{'disabled': !options?.next}" (click)="onNext()">Next {{title}}<i-feather name="arrow-right" class="icon"></i-feather></span>
+</div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { GridComponent } from "@syncfusion/ej2-angular-grids";
@@ -29,6 +29,8 @@ import { ShowSideDialog } from "src/app/store/app.actions";
   styleUrls: ['./experience-grid.component.scss']
 })
 export class ExperienceGridComponent extends AbstractGridConfigurationComponent implements OnInit {
+  @Input() readonlyMode = false;
+
   @ViewChild('grid') grid: GridComponent;
 
   @Select(CandidateState.experiences)
@@ -73,6 +75,9 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
       endDate: experience.endDate,
       comments: experience.comments
     });
+    if (this.readonlyMode) {
+      this.experienceForm.disable();
+    }
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -138,6 +143,8 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
   private closeSideDialog(): void {
     this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
       this.experienceForm.reset();
+      this.experienceForm.enable();
+      this.grid.clearRowSelection();
     });
   }
 }

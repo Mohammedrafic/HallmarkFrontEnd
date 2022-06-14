@@ -4,7 +4,7 @@
       <h3>Skills</h3>
     </section>
     <section>
-      <button ejs-button id="filterButton" cssClass="e-outline button-filter">
+      <button (click)="showFilters()" ejs-button id="filterButton" cssClass="e-outline button-filter">
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </button>
       <button ejs-button id="importButton" cssClass="e-outline button-import" (click)="onImportDataClick()">
@@ -27,6 +27,7 @@
     [height]="fullScreenGridHeight"
     [rowHeight]="rowHeight"
     [resizeSettings]="resizeSettings"
+    (actionBegin)="actionBegin($event)"
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
     (rowSelected)="rowSelected($event, grid)"
@@ -106,6 +107,59 @@
   </ejs-grid>
 </section>
 
+<app-filter-dialog [items]="filteredItems" [count]="(skills$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+  <form class="bootstrap" [formGroup]="SkillFilterFormGroup">
+    <div class="input-container">
+      <label for="skillCategoryId">Skill Category</label>
+      <div class="input-group dropdown">
+        <ejs-multiselect
+          mode="CheckBox"
+          [fields]="filterOptionFields"
+          [dataSource]="filterColumns.skillCategories.dataSource"
+          [showDropDownIcon]="true"
+          formControlName="skillCategories"
+          placeholder="All"></ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label for="skillAbbr">Skill ABBR</label>
+      <div class="input-group dropdown">
+        <ejs-multiselect
+          mode="CheckBox"
+          [dataSource]="filterColumns.skillAbbrs.dataSource"
+          [showDropDownIcon]="true"
+          formControlName="skillAbbrs"
+          placeholder="All"></ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label for="skillDescription">Skill Description</label>
+      <div class="input-group dropdown">
+        <ejs-multiselect
+          mode="CheckBox"
+          [dataSource]="filterColumns.skillDescriptions.dataSource"
+          [showDropDownIcon]="true"
+          formControlName="skillDescriptions"
+          placeholder="All"></ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label for="glNumber">GL Number</label>
+      <div class="input-group dropdown">
+        <ejs-multiselect
+          mode="CheckBox"
+          [dataSource]="filterColumns.glNumbers.dataSource"
+          [showDropDownIcon]="true"
+          formControlName="glNumbers"
+          placeholder="All"></ejs-multiselect>
+      </div>
+    </div>
+    <div>
+      <ejs-checkbox formControlName="allowOnboard" label="Allow Onboard"></ejs-checkbox>
+    </div>
+  </form>
+</app-filter-dialog>
+
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
 <app-side-dialog
@@ -179,8 +233,6 @@
             class="datepicker"
             format="MM/dd/yyyy"
             placeholder="MM/DD/YYYY"
-            [enableMask]="true"
-            [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
             formControlName="inactiveDate"
             [strictMode]='true'
           >

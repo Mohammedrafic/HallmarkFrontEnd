@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Observable, tap } from 'rxjs';
-import { Holiday, HolidaysPage, OrganizationHoliday, OrganizationHolidaysPage } from '@shared/models/holiday.model';
+import { Holiday, HolidayFilters, HolidaysPage, OrganizationHoliday, OrganizationHolidaysPage } from '@shared/models/holiday.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
@@ -74,17 +74,17 @@ export class HolidaysService {
    * @param pageSize
    * @return list of holidays
    */
-  public getOrganizationHolidays(pageNumber: number, pageSize: number, orderBy: string, filter?: any): Observable<OrganizationHolidaysPage> {
+  public getOrganizationHolidays(pageNumber: number, pageSize: number, orderBy: string, filters: HolidayFilters): Observable<OrganizationHolidaysPage> {
     let params;
-    let url;
-    if (filter?.year) {
-      params = { params: { PageNumber: pageNumber, PageSize: pageSize, Year: filter.year } };
-      url = '/api/OrganizationHolidays/filter'; // TODO: pending BE
+    if (Object.keys(filters).length) {
+      filters.pageNumber = pageNumber;
+      filters.pageSize = pageSize;
+      filters.orderBy = orderBy;
+      return this.http.post<OrganizationHolidaysPage>('/api/OrganizationHolidays/filter', filters);
     } else {
       params = { params: { PageNumber: pageNumber, PageSize: pageSize, OrderBy: orderBy } };
-      url = '/api/OrganizationHolidays';
+      return this.http.get<OrganizationHolidaysPage>('/api/OrganizationHolidays', params);
     }
-    return this.http.get<OrganizationHolidaysPage>(url, params);
   }
 
   /**
@@ -124,5 +124,13 @@ export class HolidaysService {
       return this.http.post(`/api/OrganizationHolidays/export/byIds`, payload, { responseType: 'blob' });
     }
     return this.http.post(`/api/OrganizationHolidays/export`, payload, { responseType: 'blob' });
+  }
+
+  /**
+   * Get the list of all available holiday names
+   * @return list of names
+   */
+  public getHolidaysDataSources(): Observable<string[]> {
+    return this.http.get<string[]>(`/api/OrganizationHolidays/availiableNames`);
   }
 }

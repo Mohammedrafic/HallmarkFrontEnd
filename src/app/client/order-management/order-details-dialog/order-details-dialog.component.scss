@@ -1,0 +1,59 @@
+@import 'colors';
+
+.order-tabs {
+  margin-top: 24px;
+
+  span {
+    margin-left: 12px;
+  }
+
+  &.first-active {
+    .e-tab .e-tab-header:not(.e-vertical) .e-indicator {
+      left: 0px !important;
+      right: 235px !important;
+    }
+  }
+}
+
+.order-statuses {
+  display: flex;
+  align-items: center;
+}
+
+.dialog-controls {
+  button {
+    margin-left: 12px;
+
+    &.edit-button {
+      padding-left: 11px;
+      padding-right: 11px;
+
+      i-feather {
+        margin-left: 0;
+      }
+    }
+  }
+}
+
+.vertical-divider {
+  border-left: 1px solid $secondary-dark-blue-40;
+  margin: 0 8px;
+  height: 20px;
+}
+
+.custom-chip {
+  border: 1px solid $secondary-dark-blue-40;
+  background: $secondary-dark-blue-50;
+  border-radius: 16px;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+.order-other-statuses {
+  display: flex;
+  align-items: center;
+
+  & > * {
+    margin-right: 8px;
+  }
+}

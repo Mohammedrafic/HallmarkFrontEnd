@@ -78,7 +78,7 @@ export class AddEditVisibilityComponent implements OnInit, OnDestroy {
     this.subscribeOnFormValuesChanges();
     this.organizations$.pipe(takeUntil(this.unsubscribe$))
       .subscribe(organisations => {
-        this.organisations = this.isOrganisationUser
+        this.organisations = this.isOrganisationUser || organisations.length < 2
           ? [...organisations]
           : [{ name: 'All', organizationId: this.allOrganisationId, regions: [] }, ...organisations];
       });
@@ -97,12 +97,12 @@ export class AddEditVisibilityComponent implements OnInit, OnDestroy {
     if (this.form.valid) {
       const value = this.form.getRawValue();
       this.store.dispatch(new SaveUserVisibilitySettings({
-        ...value,
         regionIds: value.regionIds.length === this.regions.length ? [] : value.regionIds,
         locationIds: value.locationIds.length === this.locations.length ? [] : value.locationIds,
         departmentIds: value.departmentIds.length === this.departments.length ? [] : value.departmentIds,
         organisationIds: value.organisationIds === this.allOrganisationId ? [] : [value.organisationIds],
-        userId: this.createdUser?.id
+        userId: this.createdUser?.id as string,
+        id: this.editVisibility?.id as number || null
       }));
     }
   }

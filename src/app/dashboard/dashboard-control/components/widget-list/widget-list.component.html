@@ -1,0 +1,49 @@
+<ejs-dialog
+  #sideDialog
+  [animationSettings]="{ effect: 'SlideRight' }"
+  [isModal]="true"
+  [target]="targetElement"
+  cssClass="dialog"
+  id="dialog"
+  width="444px"
+>
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">Manage Widgets</h3>
+          </div>
+          <div class="e-card-content">
+            <span class="e-icons e-close-large" (click)="closeDialogEmitter.emit()"></span>
+          </div>
+        </div>
+      </section>
+      <section class="content">
+        <div class="widget-container">
+          <app-inline-loader *ngIf="isLoading"></app-inline-loader>
+          <ng-container *ngIf="widgets?.length">
+            <div class="e-mastertext">Select widgets to view in the dashboard</div>
+            <ejs-grid
+              #gridComponent
+              (dataBound)="dataBoundHandler()"
+              (rowDeselected)="rowDeselectedHandler($event)"
+              (rowSelected)="rowSelectedHandler($event)"
+              [allowTextWrap]="true"
+              [dataSource]="widgets"
+              [height]="'100%'"
+              [rowHeight]="48"
+              [selectionSettings]="selectionSettings"
+              class="widget-grid"
+            >
+              <e-columns>
+                <e-column field="title" [customAttributes]="{ class: 'widget-grid__name' }"></e-column>
+                <e-column field="description" [customAttributes]="{ class: 'widget-grid__description' }"></e-column>
+              </e-columns>
+            </ejs-grid>
+          </ng-container>
+        </div>
+      </section>
+    </section>
+  </ng-template>
+</ejs-dialog>

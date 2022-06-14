@@ -8,11 +8,21 @@
   [animationSettings]="{ effect: 'SlideLeft' }"
 >
   <ng-template #content>
-    <section class="container">
+    <section class="container candidat-dialog">
       <section class="header-container">
-        <div class="e-card-header">
+        <div class="e-card-header candidat-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title">Sanders, Paul</h3>
+            <div class="candidat-info">
+              <div class="e-avatar e-avatar-xlarge"></div>
+              <div class="info">
+                <h3 class="e-card-title">Sanders, Paul</h3>
+                <ejs-chiplist #status>
+                  <e-chips>
+                    <e-chip text="Approved" [cssClass]="'open' | chipsCssClass"></e-chip>
+                  </e-chips>
+                </ejs-chiplist>
+              </div>
+            </div>
           </div>
           <div class="e-card-content">
             <button ejs-button cssClass="e-outline button-cancel edit-btn" (click)="onEdit()"><i-feather name="edit" class="icon"></i-feather></button>
@@ -27,7 +37,9 @@
           <e-tabitems>
             <e-tabitem>
               <ng-template #headerText>Candidat Details</ng-template>
-              <ng-template #content> </ng-template>
+              <ng-template #content>
+                <app-candidat-details></app-candidat-details>
+              </ng-template>
             </e-tabitem>
             <e-tabitem>
               <ng-template #headerText>Assigments</ng-template>
@@ -37,5 +49,8 @@
         </ejs-tab>
       </section>
     </section>
+  </ng-template>
+  <ng-template #footerTemplate>
+    <app-dialog-next-previous title="Candidat"></app-dialog-next-previous>
   </ng-template>
 </ejs-dialog>

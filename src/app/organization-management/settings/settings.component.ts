@@ -466,6 +466,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   }
 
   private clearFormDetails(): void {
+    this.organizationSettingsFormGroup.get('value')?.clearValidators();
     this.organizationSettingsFormGroup.reset();
     this.regionFormGroup.reset();
     this.regionRequiredFormGroup.reset();

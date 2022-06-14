@@ -1,0 +1,76 @@
+<ejs-dialog
+  id="dialog"
+  #sideDialog
+  cssClass="dialog"
+  width="50%"
+  [target]="targetElement"
+  [visible]="false"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">Order ID {{ order?.id }}</h3>
+            <div class="order-statuses">
+              <ejs-chiplist #chipList>
+                <e-chips>
+                  <e-chip [text]="order?.statusText"></e-chip>
+                </e-chips>
+              </ejs-chiplist>
+              <div class="vertical-divider"></div>
+              <div *ngIf="order" class="order-other-statuses">
+                <span class="custom-chip">{{ order.orderType | orderTypeName }}</span>
+                <span class="custom-chip" *ngIf="order.isLocked">Locked</span>
+              </div>
+            </div>
+          </div>
+          <div class="e-card-content dialog-controls">
+            <button ejs-button cssClass="e-outline edit-button"><i-feather name="edit" class="icon"></i-feather></button>
+            <button ejs-button cssClass="e-outline">Close Order</button>
+            <button ejs-button [isPrimary]="true" (click)="lockOrder()">
+              Lock <i-feather name="lock" class="icon"></i-feather>
+            </button>
+            <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
+              <i-feather name="x" class="icon"></i-feather>
+            </button>
+          </div>
+        </div>
+      </section>
+      <div class="order-tabs" [ngClass]="{ 'first-active': firstActive }">
+        <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
+          <e-tabitems>
+            <e-tabitem>
+              <ng-template #headerText>Order Details</ng-template>
+              <ng-template #content>
+                <app-order-details-container [currentOrder]="order"></app-order-details-container>
+              </ng-template>
+            </e-tabitem>
+            <e-tabitem>
+              <ng-template #headerText>Candidates <span class="e-badge e-badge-success e-badge-circle">5</span></ng-template>
+              <ng-template #content>
+                <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>
+              </ng-template>
+            </e-tabitem>
+            <e-tabitem>
+              <ng-template #headerText>Extensions</ng-template>
+              <ng-template #content>
+                <!--Extensions tab goes here-->
+              </ng-template>
+            </e-tabitem>
+          </e-tabitems>
+        </ejs-tab>
+      </div>
+    </section>
+  </ng-template>
+  <ng-template #footerTemplate>
+    <app-dialog-next-previous
+      *ngIf="orderDialogOptions$ | async as options"
+      title="Order"
+      [options]="options"
+      (nextEvent)="onNextPreviousOrder(true)"
+      (previousEvent)="onNextPreviousOrder(false)"
+    ></app-dialog-next-previous>
+  </ng-template>
+</ejs-dialog>

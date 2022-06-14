@@ -1,19 +1,23 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 
-import { Subject, takeUntil } from 'rxjs';
+import { map, Observable, Subject, takeUntil } from 'rxjs';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { SetImportFileDialogState } from '@admin/store/admin.actions';
-import { SaveOrder } from '@organization-management/store/organization-management.actions';
+import { SaveOrder, EditOrder, GetSelectedOrderById } from '@client/store/order-managment-content.actions';
 
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
-import { Order } from '@shared/models/organization.model';
+import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-management.model';
+import { BillRatesComponent } from '@bill-rates/bill-rates.component';
+import { BillRate, OrderBillRateDto } from '@shared/models/bill-rate.model';
+import { IOrderCredentialItem } from '@order-credentials/types';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
 enum SelectedTab {
   OrderDetails,
@@ -30,23 +34,55 @@ enum SubmitButtonItem {
   templateUrl: './add-edit-order.component.html',
   styleUrls: ['./add-edit-order.component.scss']
 })
-export class AddEditOrderComponent implements OnDestroy {
+export class AddEditOrderComponent implements OnDestroy, OnInit {
   @ViewChild('stepper') tab: TabComponent;
   @ViewChild('orderDetailsForm') orderDetailsFormComponent: OrderDetailsFormComponent;
+  @ViewChild('billRates') billRatesComponent: BillRatesComponent;
+
+  @Select(OrderManagementContentState.selectedOrder)
+  selectedOrder$: Observable<Order>;
 
   public SelectedTab = SelectedTab;
+  public orderId: number;
 
-  public title = 'Create';
+  public title: string;
   public submitMenuItems: ItemModel[] = [
     { id: SubmitButtonItem.SaveForLater, text: 'Save For Later' },
     { id: SubmitButtonItem.SaveAsTemplate, text: 'Save as Template' }
   ];
   public selectedTab: SelectedTab = SelectedTab.OrderDetails;
+  // todo: update/set credentials list in edit mode for order
+  public orderCredentials: IOrderCredentialItem[] = [];
+  public orderBillRates: BillRate[] = [];
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store, private router: Router) {
+  constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
+
+    this.orderId = Number(this.route.snapshot.paramMap.get('orderId'));
+
+    if (this.orderId > 0) {
+      this.title = 'Edit';
+      store.dispatch(new GetSelectedOrderById(this.orderId));
+    } else {
+      this.title = 'Create';
+    }
+  }
+
+  ngOnInit(): void {
+    if (this.orderId > 0) {
+      this.selectedOrder$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(order => {
+        if (order?.credentials) {
+          this.orderCredentials = [...order.credentials];
+        }
+        if (order?.billRates) {
+          this.orderBillRates = [...order.billRates];
+        }
+      });
+    }
   }
 
   ngOnDestroy(): void {
@@ -75,9 +111,26 @@ export class AddEditOrderComponent implements OnDestroy {
         this.saveForLater();
         break;
 
-      case SubmitButtonItem.SaveForLater:
+      case SubmitButtonItem.SaveAsTemplate:
         this.saveAsTemplate();
         break;
+    }
+  }
+
+  public onCredentialChanged(cred: IOrderCredentialItem): void {
+    const isExist = this.orderCredentials.find(({credentialId}) => cred.credentialId === credentialId);
+    if (isExist) {
+      Object.assign(isExist, cred);
+    } else {
+      this.orderCredentials.push(cred);
+    }
+  }
+
+  public onCredentialDeleted(cred: IOrderCredentialItem): void {
+    const credToDelete = this.orderCredentials.find(({credentialId}) => cred.credentialId === credentialId) as IOrderCredentialItem;
+    if (credToDelete) {
+      const index = this.orderCredentials.indexOf(credToDelete);
+      this.orderCredentials.splice(index, 1);
     }
   }
 
@@ -89,11 +142,17 @@ export class AddEditOrderComponent implements OnDestroy {
       this.orderDetailsFormComponent.jobDescriptionForm.valid &&
       this.orderDetailsFormComponent.contactDetailsForm.valid &&
       this.orderDetailsFormComponent.workLocationForm.valid &&
-      this.orderDetailsFormComponent.workflowForm.valid
+      this.orderDetailsFormComponent.workflowForm.valid &&
+      this.billRatesComponent.billRatesControl.valid
     ) {
       const order = this.collectOrderData(true);
+      const documents = this.orderDetailsFormComponent.documents;
 
-      this.store.dispatch(new SaveOrder(order));
+      if (this.orderId) {
+        this.store.dispatch(new EditOrder({...order, id: this.orderId }));
+      } else {
+        this.store.dispatch(new SaveOrder(order, documents));
+      }
     } else {
       this.orderDetailsFormComponent.orderTypeStatusForm.markAllAsTouched();
       this.orderDetailsFormComponent.generalInformationForm.markAllAsTouched();
@@ -105,7 +164,7 @@ export class AddEditOrderComponent implements OnDestroy {
     }
   }
 
-  private collectOrderData(isSubmit: boolean): Order {
+  private collectOrderData(isSubmit: boolean): CreateOrderDto {
     const allValues = {
       ...this.orderDetailsFormComponent.orderTypeStatusForm.value,
       ...this.orderDetailsFormComponent.generalInformationForm.value,
@@ -114,12 +173,13 @@ export class AddEditOrderComponent implements OnDestroy {
       ...this.orderDetailsFormComponent.contactDetailsForm.value,
       ...this.orderDetailsFormComponent.workLocationForm.value,
       ...this.orderDetailsFormComponent.workflowForm.value,
-      ...{ credentials: [] }, // Will be added soon
-      ...{ billRates: [] } // Will be added soon
+      ...{ credentials: this.orderCredentials },
+      ...{ billRates: this.billRatesComponent.billRatesControl.value }
     };
 
     const {
       orderType,
+      status,
       title,
       regionId,
       locationId,
@@ -152,12 +212,17 @@ export class AddEditOrderComponent implements OnDestroy {
       contactDetails,
       workLocations,
       workflowId,
-      billRates,
       credentials
     } = allValues;
 
-    const order: Order = {
+    const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[]).map((billRate: BillRate) => {
+      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate } = billRate;
+      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate };
+    });
+
+    const order: CreateOrderDto | EditOrderDto = {
       title,
+      status,
       regionId,
       locationId,
       departmentId,
@@ -216,6 +281,7 @@ export class AddEditOrderComponent implements OnDestroy {
     }
 
     const order = this.collectOrderData(false);
+    const documents = this.orderDetailsFormComponent.documents;
 
     if (contactDetailsForm.invalid) {
       order.contactDetails = [];
@@ -225,7 +291,11 @@ export class AddEditOrderComponent implements OnDestroy {
       order.workLocations = [];
     }
 
-    this.store.dispatch(new SaveOrder(order));
+    if (this.orderId) {
+      this.store.dispatch(new EditOrder({...order, id: this.orderId }));
+    } else {
+      this.store.dispatch(new SaveOrder(order, documents));
+    }
   }
 
   private saveAsTemplate(): void {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { GridComponent, ValueAccessor } from "@syncfusion/ej2-angular-grids";
@@ -31,6 +31,8 @@ import { ShowSideDialog } from "src/app/store/app.actions";
   styleUrls: ['./education-grid.component.scss']
 })
 export class EducationGridComponent extends AbstractGridConfigurationComponent implements OnInit {
+  @Input() readonlyMode = false;
+
   @ViewChild('grid') grid: GridComponent;
 
   @Select(CandidateState.educations)
@@ -146,6 +148,7 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
   private closeSideDialog(): void {
     this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
       this.educationForm.reset();
+      this.grid.clearRowSelection();
     });
   }
 }

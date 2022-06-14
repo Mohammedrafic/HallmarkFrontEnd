@@ -27,6 +27,11 @@ body.light, body.dark {
         &.e-disabled {
           background-color: $secondary-dark-blue-50 !important;
           border: 1px solid $secondary-dark-blue-40 !important;
+
+          .e-delim-values {
+            color: $secondary-dark-blue-30 !important;
+            -webkit-text-fill-color: $secondary-dark-blue-30 !important
+          }
         }
 
         input.e-input, input.e-dropdownbase {

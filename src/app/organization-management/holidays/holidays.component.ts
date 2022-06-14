@@ -3,10 +3,13 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
-import { Holiday, OrganizationHoliday, OrganizationHolidaysPage } from '@shared/models/holiday.model';
+import { FilteredItem } from '@shared/models/filter.model';
+import { Holiday, HolidayFilters, OrganizationHoliday, OrganizationHolidaysPage } from '@shared/models/holiday.model';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { FilterService } from '@shared/services/filter.service';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
@@ -14,9 +17,9 @@ import { SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/adm
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CANCEL_COFIRM_TEXT, DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { CheckIfExist, DeleteHoliday, DeleteHolidaySucceeded, ExportHolidays, GetAllMasterHolidays, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded } from '../store/holidays.actions';
+import { CheckIfExist, DeleteHoliday, DeleteHolidaySucceeded, ExportHolidays, GetAllMasterHolidays, GetHolidayDataSources, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded } from '../store/holidays.actions';
 import { HolidaysState } from '../store/holidays.state';
 
 @Component({
@@ -37,6 +40,9 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   @Select(HolidaysState.masterHolidays)
   masterHolidays$: Observable<Holiday[]>;
 
+  @Select(HolidaysState.holidayDataSource)
+  holidayDataSource$: Observable<string[]>;
+
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
 
@@ -44,6 +50,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   organizationId$: Observable<number>;
 
   public HolidayFormGroup: FormGroup;
+  public HolidayFilterFormGroup: FormGroup;
   public title = '';
   public startTimeField: AbstractControl;
   public endTimeField: AbstractControl;
@@ -67,23 +74,33 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   private isAllRegionsSelected = false;
   private isAllLocationsSelected = false;
   public columnsToExport: ExportColumn[] = [
-    { text:'Region', column: 'RegionId'},
-    { text:'Location', column: 'LocationId'},
+    { text:'Region', column: 'Region'},
+    { text:'Location', column: 'Location'},
     { text:'Holiday Name', column: 'HolidayName'},
     { text:'Start Date & Time', column: 'StartDateTime'},
     { text:'End Date & Time', column: 'EndDateTime'}
   ];
   public fileName: string;
   public defaultFileName: string;
+  public filters: HolidayFilters = {};
+  public filterColumns: any;
+  public yearsList: number[] = [];
 
   constructor(private store: Store,
               private actions$: Actions,
               private fb: FormBuilder,
               private confirmService: ConfirmService,
+              private filterService: FilterService,
               private datePipe: DatePipe) {
     super();
     this.idFieldName = 'foreignKey';
     this.today.setHours(0, 0, 0);
+    this.HolidayFilterFormGroup = this.fb.group({
+      holidayNames: new FormControl([]),
+      years: new FormControl([]),
+      regionIds: new FormControl([]),
+      locationIds: new FormControl([]),
+    });
     this.HolidayFormGroup = this.fb.group({
       id: new FormControl(0, [ Validators.required ]),
       masterHolidayId: new FormControl(0),
@@ -134,6 +151,21 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
         }
       }
     });
+    this.HolidayFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
+      if (val?.length) {
+        const selectedRegions: OrganizationRegion[] = [];
+        val.forEach(id => selectedRegions.push(this.regions.find(region => region.id === id) as OrganizationRegion));
+        this.filterColumns.locationIds.dataSource = [];
+        selectedRegions.forEach(region => {
+          region.locations?.forEach(location => location.regionName = region.name);
+          this.filterColumns.locationIds.dataSource.push(...region.locations as [])
+        });
+      } else {
+        this.filterColumns.locationIds.dataSource = [];
+        this.HolidayFilterFormGroup.get('locationIds')?.setValue([]);
+        this.filteredItems = this.filterService.generateChips(this.HolidayFilterFormGroup, this.filterColumns);
+      }
+    });
     this.HolidayFormGroup.get('locations')?.valueChanges.subscribe((val: number[]) => {
       if (this.title === 'Add') {
         if (val && val.length === this.locations.length) {
@@ -154,10 +186,21 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   }
 
   ngOnInit() {
+    this.filterColumns = {
+      holidayNames: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [], valueField: 'name' },
+      years: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      regionIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+    }
+    const prevYear = this.today.getFullYear() - 1;
+    for(let i = 0; i < 7; i++) {
+      this.yearsList.push(prevYear + i);
+    }
+    this.filterColumns.years.dataSource = this.yearsList;
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.currentPage = 1;
-      this.store.dispatch(new GetAllMasterHolidays());
-      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy));
+      this.store.dispatch([new GetAllMasterHolidays(), new GetHolidayDataSources()]);
+      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
     });
     this.masterHolidays$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((holidays: Holiday[]) => {
       this.masterHolidays = holidays;
@@ -165,18 +208,22 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
       this.orgStructure = structure;
       this.regions = structure.regions;
+      this.filterColumns.regionIds.dataSource = this.regions;
     });
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy));
+      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveHolidaySucceeded)).subscribe(() => {
       this.HolidayFormGroup.reset();
     this.closeDialog();
-      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy));
+      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(DeleteHolidaySucceeded)).subscribe(() => {
-      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy));
+      this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
+    });
+    this.holidayDataSource$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((dataSource) => {
+      this.filterColumns.holidayNames.dataSource = dataSource;
     });
   }
 
@@ -186,7 +233,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
   }
 
   public override updatePage(): void {
-    this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy));
+    this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
   }
 
   public override customExport(): void {
@@ -214,12 +261,35 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
         masterOrgIds: this.selectedItems.length ? this.selectedItems.map(val => {
           return { item1: val.masterHolidayId, item2: val.id };
         }) : null,
+        offset: Math.abs(new Date().getTimezoneOffset())
       }, 
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
       options?.fileName || this.defaultFileName
     )));
     this.clearSelection(this.grid);
+  }
+
+  public showFilters(): void {
+    this.store.dispatch(new ShowFilterDialog(true));
+  }
+
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.HolidayFilterFormGroup, this.filterColumns);
+  }
+
+  public onFilterClearAll(): void {
+    this.HolidayFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {};
+  }
+
+  public onFilterApply(): void {
+    this.filters = this.HolidayFilterFormGroup.getRawValue();
+    this.filteredItems = this.filterService.generateChips(this.HolidayFilterFormGroup, this.filterColumns);
+    this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
+    this.store.dispatch(new ShowFilterDialog(false));
   }
 
   public onImportDataClick(): void {
@@ -368,7 +438,6 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
           } else {
             this.saveHandler(false);
           }
-          console.log(val)
         });
       } else {
         this.saveHandler();

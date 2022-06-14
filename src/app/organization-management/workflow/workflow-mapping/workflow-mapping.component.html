@@ -13,6 +13,7 @@
 
   <ejs-grid class="grid grid-component"
             #grid
+            appAddBackgroundForEmptyGridDirective
             (rowDataBound)="rowDataBound($event)"
             [dataSource]="(workflowMappings$ | async)?.items"
             [allowPaging]="allowPaging"
@@ -24,7 +25,12 @@
             [allowResizing]="allowResizing"
   >
     <ng-template #detailTemplate let-data>
-      <table class="detailtable" width="100%" *ngFor="let type of [workflowTypes.OrderWorkflow, workflowTypes.ApplicationWorkflow]">
+      <table
+        [appHighlightGridRowDirective]="data.hasUnassignedSteps"
+        class="detailtable"
+        width="100%"
+        *ngFor="let type of [workflowTypes.OrderWorkflow, workflowTypes.ApplicationWorkflow]"
+      >
         <colgroup>
           <col width="150">
           <col width="180">
@@ -306,7 +312,7 @@
                     class="e-input"
                     type="text"
                     readonly
-                    [value]="orderWorkflowSteps[i].name + ' > ' + orderWorkflowSteps[i].status"
+                    [value]="orderWorkflowSteps[i].status + ' > ' + orderWorkflowSteps[i].nextStepStatus"
                   />
                 </div>
               </div>
@@ -334,36 +340,38 @@
 
         <div class="group-container" formArrayName="applicationRoleUserFormArray">
           <div class="group-name"><h3>Application</h3></div>
-          <div class="group" *ngFor="let step of applicationRoleUserFormArray.controls; let i = index">
-            <div class="input-container without-label step-details">
-              <div class="input-group input-readonly">
-                <input
-                  class="e-input"
-                  type="text"
-                  readonly
-                  [value]="applicationWorkflowSteps[i].name + ' > ' + applicationWorkflowSteps[i].status"
-                />
+          <ng-container *ngFor="let step of applicationRoleUserFormArray.controls; let i = index">
+            <div class="group" *ngIf="applicationWorkflowSteps[i].requirePermission">
+              <div class="input-container without-label step-details">
+                <div class="input-group input-readonly">
+                  <input
+                    class="e-input"
+                    type="text"
+                    readonly
+                    [value]="applicationWorkflowSteps[i].status + ' > ' + applicationWorkflowSteps[i].nextStepStatus"
+                  />
+                </div>
               </div>
-            </div>
 
-            <div class="input-container role-user">
-              <label>Role/User <span class="required">*</span></label>
-              <div class="input-group dropdown">
-                <ejs-multiselect
-                  selectAllText="Select All"
-                  mode="CheckBox"
-                  [allowFiltering]="false"
-                  [showDropDownIcon]="true"
-                  placeholder="Role/User"
-                  appValidateWithMessage
-                  [dataSource]="rolesWithUsers"
-                  [fields]="fields"
-                  [formControlName]="i"
-                >
-                </ejs-multiselect>
+              <div class="input-container role-user">
+                <label>Role/User <span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-multiselect
+                    selectAllText="Select All"
+                    mode="CheckBox"
+                    [allowFiltering]="false"
+                    [showDropDownIcon]="true"
+                    placeholder="Role/User"
+                    appValidateWithMessage
+                    [dataSource]="rolesWithUsers"
+                    [fields]="fields"
+                    [formControlName]="i"
+                  >
+                  </ejs-multiselect>
+                </div>
               </div>
             </div>
-          </div>
+          </ng-container>
         </div>
       </div>
     </form>

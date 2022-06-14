@@ -122,7 +122,7 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
     this.defaultFileName = 'Master Holidays ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportHolidays(new ExportPayload(
       fileType, 
-      { year: this.yearFilter }, 
+      { year: this.yearFilter, offset: Math.abs(new Date().getTimezoneOffset()) }, 
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
       options?.fileName || this.defaultFileName

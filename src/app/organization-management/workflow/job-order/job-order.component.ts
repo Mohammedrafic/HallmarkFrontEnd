@@ -6,6 +6,8 @@ import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import {
+  GetRolesForWorkflowMapping, GetUsersForWorkflowMapping,
+  GetWorkflowMappingPages,
   GetWorkflows,
   GetWorkflowsSucceed,
   RemoveWorkflow,
@@ -18,6 +20,7 @@ import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { UserState } from '../../../store/user.state';
+import { GetAllSkills } from '@organization-management/store/organization-management.actions';
 
 export enum WorkflowNavigationTabs {
   JobOrderWorkflow,
@@ -93,6 +96,15 @@ export class JobOrderComponent implements OnInit, OnDestroy {
     this.store.dispatch(new ShowSideDialog(false));
 
     if (this.isJobOrderWorkflowTabActive) {
+      this.store.dispatch(new GetWorkflows());
+    }
+
+    // triggers refresh grid and other data if tab changed
+    if (this.isWorkflowMappingTabActive) {
+      this.store.dispatch(new GetAllSkills());
+      this.store.dispatch(new GetWorkflowMappingPages());
+      this.store.dispatch(new GetRolesForWorkflowMapping());
+      this.store.dispatch(new GetUsersForWorkflowMapping());
       this.store.dispatch(new GetWorkflows());
     }
   }
@@ -179,9 +191,8 @@ export class JobOrderComponent implements OnInit, OnDestroy {
       let orderSteps: Step[] = [];
       let applicationSteps: Step[] = [];
 
-      if (this.orderWorkflow.steps.length > 2) {
-        // map Order workflow custom steps and override parent status
-        this.orderWorkflow.steps[0].status = this.customStepOrderFormGroup.controls['customParentStatus'].value[0];
+      if (this.orderWorkflow.steps.filter(s => s.type === WorkflowStepType.Custom).length > 0) {
+        // map Order workflow custom steps
         this.orderWorkflow.steps.filter(s => s.type === WorkflowStepType.Custom).forEach((customStep, i) => {
           customStep.name = this.customStepOrderFormGroup.controls['customStepName'].value[i];
           customStep.status = this.customStepOrderFormGroup.controls['customStepStatus'].value[i];
@@ -191,13 +202,12 @@ export class JobOrderComponent implements OnInit, OnDestroy {
         orderSteps = this.orderWorkflow.steps;
       }
 
-      if (this.applicationWorkflow.steps.length > 2) {
-        // map Application workflow custom steps and override parent status
-        this.applicationWorkflow.steps[0].status = this.customStepApplicationFormGroup.controls['customParentStatus'].value[0];
+      if (this.applicationWorkflow.steps.filter(s => s.type === WorkflowStepType.Custom).length > 0) {
+        // map Application workflow custom steps
         this.applicationWorkflow.steps.filter(s => s.type === WorkflowStepType.Custom).forEach((customStep, i) => {
           customStep.name = this.customStepApplicationFormGroup.controls['customStepName'].value[i];
           customStep.status = this.customStepApplicationFormGroup.controls['customStepStatus'].value[i];
-          customStep.order = i + 1;
+          customStep.order = i + 2;
         });
 
         applicationSteps = this.applicationWorkflow.steps;

@@ -47,8 +47,6 @@
           placeholder="MM/DD/YYYY"
           appValidateWithMessage
           formControlName="effectiveDate"
-          [enableMask]="true"
-          [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
         >
         </ejs-datepicker>
       </div>
@@ -74,7 +72,10 @@
   <div class="form-line">
     <!-- Internal Min -->
     <div class="input-container bootstrap">
-      <label>Internal Min<span class="required">*</span></label>
+      <label>
+        Internal Min
+        <span *ngIf="isIntervalMinControlRequired" class="required">*</span>
+      </label>
       <div class="input-group">
         <ejs-maskedtextbox
         #intervalMin
@@ -91,7 +92,10 @@
 
     <!-- Internal Max -->
     <div class="input-container bootstrap">
-      <label>Internal Max<span class="required">*</span></label>
+      <label>
+        Internal Max
+        <span *ngIf="isIntervalMaxControlRequired" class="required">*</span>
+      </label>
       <div class="input-group">
         <ejs-maskedtextbox
         #intervalMax

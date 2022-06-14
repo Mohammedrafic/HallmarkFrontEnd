@@ -1,7 +1,7 @@
 <ejs-grid
   #grid
   (rowDataBound)="setRowHighlight($event)"
-  [dataSource]="data$ | async"
+  [dataSource]="(ordersPage$ | async)?.items || []"
   [allowPaging]="allowPaging"
   [pageSettings]="pageSettings"
   [height]="gridHeight"
@@ -13,6 +13,7 @@
   [selectionSettings]="selectionOptions"
   [textWrapSettings]="wrapSettings"
   (rowSelected)="onRowClick($event)"
+  (dataBound)="onDataBound()"
 >
   <e-columns>
     <e-column headerTextAlign="Right" width="48" [customAttributes]="{ class: 'checkbox-header' }">
@@ -38,7 +39,7 @@
         </div>
       </ng-template>
     </e-column>
-    <e-column field="status" headerText="STATUS" width="152" >
+    <e-column field="status" headerText="STATUS" width="152">
       <ng-template #headerTemplate let-data>
         <div class="sort-header">
           <span class="e-headertext">STATUS</span>
@@ -49,17 +50,17 @@
         <div class="status-cell">
           <ejs-chiplist>
             <e-chips>
-              <e-chip [text]="data.status" [cssClass]="getChipCssClass(data.status)"></e-chip>
+              <e-chip [text]="data.statusText" [cssClass]="data.statusText | chipsCssClass"></e-chip>
             </e-chips>
           </ejs-chiplist>
         </div>
       </ng-template>
     </e-column>
     <e-column field="jobTitle" headerText="JOB TITLE" width="200"></e-column>
-    <e-column field="organization" headerText="Organization" width="200"></e-column>
-    <e-column field="numberOfPosition" headerText="{{ '# of position' | uppercase }}" width="150">
+    <e-column field="organizationName" headerText="Organization" width="200"></e-column>
+    <e-column field="numberOfPositions" headerText="{{ '# of position' | uppercase }}" width="150">
       <ng-template #template let-data>
-        <div class="align-right">{{ data.numberOfPosition }}</div>
+        <div class="align-right">{{ data.numberOfPositions }}</div>
       </ng-template>
     </e-column>
     <e-column field="candidates" headerText="CANDIDATES" width="150">
@@ -67,16 +68,20 @@
         <div class="align-right">{{ data.candidates }}</div>
       </ng-template>
     </e-column>
-    <e-column field="billRate" headerText="BILL RATE &dollar;" width="150">
+    <e-column field="billRate" headerText="BILL RATE" width="150">
       <ng-template #template let-data>
         <div class="align-right">{{ data.billRate }}</div>
       </ng-template>
     </e-column>
     <e-column field="skill" headerText="SKILL" textAlign="Left" width="200"></e-column>
     <e-column field="department" headerText="DEPARTMENT" textAlign="Left" width="150"></e-column>
-    <e-column field="type" headerText="TYPE" width="100"></e-column>
+    <e-column field="type" headerText="TYPE" width="100" [valueAccessor]="typeValueAccess"></e-column>
     <e-column field="location" headerText="LOCATION" textAlign="Left" width="200"></e-column>
-    <e-column field="startDate" headerText="START DATE" width="150"></e-column>
+    <e-column field="jobStartDate" headerText="START DATE" width="150">
+      <ng-template #template let-data>
+        {{ data.jobStartDate | date: "MM/dd/yyy" }}
+      </ng-template>
+    </e-column>
 
     <e-column headerTextAlign="Right" width="120" freeze="Right">
       <ng-template #headerTemplate let-data>
@@ -91,11 +96,11 @@
       </ng-template>
       <ng-template #template let-data>
         <div class="row-tool-buttons">
+          <button ejs-button cssClass="e-flat" [disabled]="true">
+            <span><i-feather [name]="data.isLocked ? 'lock' : 'unlock'" class="icon"></i-feather></span>
+          </button>
           <button ejs-button cssClass="e-flat default-icon-button">
             <span><i-feather name="message-square" class="icon"></i-feather></span>
-          </button>
-          <button ejs-button cssClass="e-flat secondary-icon-button">
-            <span><i-feather name="lock" class="icon"></i-feather></span>
           </button>
         </div>
       </ng-template>
@@ -123,7 +128,7 @@
               [decimals]="decimals"
               placeholder="Go to:"
               min="1"
-              [max]="lastAvailablePage"
+              [max]="(ordersPage$ | async)?.totalPages"
               [showSpinButton]="false"
               (change)="onGoToClick($event)"
             >
@@ -134,7 +139,7 @@
               id="gridPager"
               #gridPager
               [pageSize]="pageSizePager"
-              [totalRecordsCount]="totalDataRecords"
+              [totalRecordsCount]="(ordersPage$ | async)?.totalCount"
               [enablePagerMessage]="false"
               [currentPage]="currentPagerPage"
               (click)="onGoToClick($event)"
@@ -147,5 +152,11 @@
   </ng-template>
 </ejs-grid>
 
-<app-preview-order-dialog [order]="previewData" [openEvent]="openPreview" (compareEvent)="onCompare()"></app-preview-order-dialog>
+<app-preview-order-dialog
+  [order]="selectedOrder"
+  [openEvent]="openPreview"
+  [openCandidateTab]="!!previousSelectedOrderId"
+  (compareEvent)="onCompare()"
+  (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
+></app-preview-order-dialog>
 <app-candidat-dialog [openEvent]="openCandidat"></app-candidat-dialog>

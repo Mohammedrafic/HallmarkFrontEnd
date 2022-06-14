@@ -125,6 +125,14 @@ table.detailtable {
   }
 }
 
+tr.e-detailrow.highlight {
+  background-color: $error !important;
+
+  &:hover {
+    background-color: $primary-active-blue-90 !important;
+  }
+}
+
 .e-row {
   .e-customized-expand-cell {
     border-top: 1px solid $grid-row-border;
@@ -149,15 +157,19 @@ table.detailtable {
   }
 }
 
-.e-grid.e-gridhover tr[role='row']:hover {
-  &:not(.e-row[aria-selected='true']) {
-    background-color: $primary-active-blue-90;
-    color: $white !important;
+tr.e-detailrow {
+  &:hover {
+    background-color: $primary-active-blue-90 !important;
+  }
+}
 
-    .e-detailrowexpand,
-    .e-detailrowcollapse {
-      background-color: $primary-active-blue-90 !important;
-      color: $white !important;
+.e-row:hover {
+  .e-detailrowcollapse,
+  .e-detailrowexpand {
+    background-color: $primary-active-blue-90 !important;
+
+    &.e-active {
+      background-color: $primary-active-blue-10 !important;
     }
   }
 }

@@ -3,6 +3,7 @@ import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Actions, ofActionDispatched } from '@ngxs/store';
 import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
 import { FilteredItem } from '@shared/models/filter.model';
+import { DeleteEventArgs } from '@syncfusion/ej2-angular-buttons';
 
 @Component({
   selector: 'app-filter-dialog',
@@ -15,9 +16,10 @@ export class FilterDialogComponent implements OnInit {
 
   @Input() width: string = '532px';
   @Input() items: FilteredItem[] = [];
-  @Input() count: number = 0;
+  @Input() count: number | undefined = 0;
   @Output() clearAllFiltersClicked = new EventEmitter();
   @Output() applyFilterClicked = new EventEmitter();
+  @Output() deleteFilter = new EventEmitter();
   @Output() closeDialogClicked = new EventEmitter();
 
   constructor(private action$: Actions) { }
@@ -32,11 +34,15 @@ export class FilterDialogComponent implements OnInit {
     });
   }
 
-  onClearAllFilterClick(): void {
+  public onClearAllFilterClick(): void {
     this.clearAllFiltersClicked.emit();
   }
 
-  onFilterClick(): void {
+  public onFilterClick(): void {
     this.applyFilterClicked.emit();
+  }
+
+  public onChipDelete(event: DeleteEventArgs): void {
+    this.deleteFilter.emit(event.data);
   }
 }

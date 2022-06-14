@@ -14,7 +14,7 @@ import {
   UploadCredentialFilesSucceeded,
 } from "@agency/store/candidate.actions";
 import { CandidateState } from "@agency/store/candidate.state";
-import { Component, EventEmitter, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute } from "@angular/router";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
@@ -43,6 +43,8 @@ import { SetHeaderState, ShowSideDialog } from "src/app/store/app.actions";
   styleUrls: ['./credentials-grid.component.scss']
 })
 export class CredentialsGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+  @Input() readonlyMode = false;
+
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('filesUploader') uploadObj: UploaderComponent;
 

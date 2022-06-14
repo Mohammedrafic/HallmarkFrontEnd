@@ -104,16 +104,18 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
       });
   }
 
-  private inactivateAgency(agency: Agency) {
-    const inactiveAgency = {
-      agencyDetails: { ...agency.agencyDetails, status: AgencyStatus.Inactive },
-      agencyBillingDetails: agency.agencyBillingDetails,
-      agencyContactDetails: agency.agencyContactDetails,
-      agencyPaymentDetails: agency.agencyPaymentDetails,
-      agencyId: agency.agencyDetails.id,
-      parentBusinessUnitId: agency.parentBusinessUnitId
-    };
-
-    this.store.dispatch(new SaveAgency(inactiveAgency));
+  private inactivateAgency(agency: Agency): void {
+    if (agency.createUnder) {
+      const inactiveAgency = {
+        agencyDetails: { ...agency.agencyDetails, status: AgencyStatus.Inactive },
+        agencyBillingDetails: agency.agencyBillingDetails,
+        agencyContactDetails: agency.agencyContactDetails,
+        agencyPaymentDetails: agency.agencyPaymentDetails,
+        agencyId: agency.agencyDetails.id,
+        parentBusinessUnitId: agency.createUnder.parentUnitId
+      };
+  
+      this.store.dispatch(new SaveAgency(inactiveAgency));
+    }
   }
 }

@@ -10,10 +10,8 @@ export enum SubmissionPercentageOverrideRestriction {
 }
 
 export enum DistributionLevels {
-  All = 0,
   Internal = 1,
   "External tier 1" = 2,
   "External tier 2" = 3,
   "External tier 3" = 4,
-  Selected = 5,
 }

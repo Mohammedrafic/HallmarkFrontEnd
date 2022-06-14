@@ -4,18 +4,21 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
-import { ExportSkills, GetAllSkillsCategories, GetAssignedSkillsByPage, RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded, SetDirtyState, SetImportFileDialogState } from '../store/organization-management.actions';
+import { ExportSkills, GetAllSkillsCategories, GetAssignedSkillsByPage, GetSkillDataSources, RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded, SetDirtyState, SetImportFileDialogState } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
-import { Skill } from 'src/app/shared/models/skill.model';
+import { Skill, SkillDataSource, SkillFilters } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { DatePipe } from '@angular/common';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { UserState } from 'src/app/store/user.state';
+import { FilteredItem } from '@shared/models/filter.model';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { FilterService } from '@shared/services/filter.service';
 
 @Component({
   selector: 'app-skills',
@@ -28,6 +31,9 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   private unsubscribe$: Subject<void> = new Subject();
   public optionFields = {
     text: 'name', value: 'id'
+  };
+  public filterOptionFields = {
+    text: 'name', value: 'name'
   };
   public format = { 
     type:'date', format: 'MM/dd/yyyy'
@@ -43,10 +49,14 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   @Select(OrganizationManagementState.allSkillsCategories)
   allSkillsCategories$: Observable<any>;
 
+  @Select(OrganizationManagementState.skillDataSource)
+  skillDataSource$: Observable<SkillDataSource>;
+
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
   public SkillFormGroup: FormGroup;
+  public SkillFilterFormGroup: FormGroup;
   public columnsToExport: ExportColumn[] = [
     { text:'Skill Category', column: 'SkillCategory_Name'},
     { text:'Skill ABBR', column: 'SkillAbbr'},
@@ -55,13 +65,16 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     { text:'Allow Onboard', column: 'AllowOnboard'},
     { text:'Inactivate Date', column: 'InactiveDate'}
   ];
+  public filterColumns: any;
   public fileName: string;
   public defaultFileName: string;
+  public filters: SkillFilters = {};
 
   constructor(private store: Store,
               private actions$: Actions,
               private fb: FormBuilder,
               private confirmService: ConfirmService,
+              private filterService: FilterService,
               private datePipe: DatePipe) {
     super();
     this.idFieldName = 'foreignKey';
@@ -76,31 +89,58 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
       allowOnboard: new FormControl(false),
       inactiveDate: new FormControl('')
     });
+    this.SkillFilterFormGroup = this.fb.group({
+      skillCategories: new FormControl([]),
+      skillAbbrs: new FormControl([]),
+      skillDescriptions: new FormControl([]),
+      glNumbers: new FormControl([]),
+      allowOnboard: new FormControl(null),
+    });
   }
 
   ngOnInit() {
+    this.filterColumns = {
+      skillCategories: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [], valueField: 'name' },
+      skillAbbrs: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      skillDescriptions: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      glNumbers: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      allowOnboard: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Allow Onboard'},
+    }
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.currentPage = 1;
-      this.store.dispatch(new GetAllSkillsCategories());
-      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize));
+      this.store.dispatch([new GetAllSkillsCategories(), new GetSkillDataSources()]);
+      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
     });
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize));
+      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveAssignedSkillSucceeded)).subscribe(() => {
       this.SkillFormGroup.reset();
       this.closeDialog();
-      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize));
+      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(RemoveAssignedSkillSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize));
+      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
+    });
+    this.allSkillsCategories$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((dataSource) => {
+      this.filterColumns.skillCategories.dataSource = dataSource.items;
+    });
+    this.skillDataSource$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((dataSource) => {
+      this.filterColumns.skillAbbrs.dataSource = dataSource.skillABBRs;
+      this.filterColumns.skillDescriptions.dataSource = dataSource.skillDescriptions;
+      this.filterColumns.glNumbers.dataSource = ['blank', ...dataSource.glNumbers];
     });
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public override updatePage(): void {
+    this.filters.orderBy = this.orderBy;
+    this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
   }
 
   public override customExport(): void {
@@ -123,7 +163,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     this.defaultFileName = 'Organization Skills ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportSkills(new ExportPayload(
       fileType, 
-      { orderBy: this.orderBy }, 
+      { orderBy: this.orderBy, offset: Math.abs(new Date().getTimezoneOffset()) }, 
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => {
         return { aId: val.id, mId: val.masterSkill.id }
@@ -131,6 +171,31 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
       options?.fileName || this.defaultFileName
     )));
     this.clearSelection(this.grid);
+  }
+
+  public showFilters(): void {
+    this.store.dispatch(new ShowFilterDialog(true));
+  }
+
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.SkillFilterFormGroup, this.filterColumns);
+  }
+
+  public onFilterClearAll(): void {
+    this.SkillFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {
+      orderBy: this.orderBy
+    };
+    this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
+  }
+
+  public onFilterApply(): void {
+    this.filters = this.SkillFilterFormGroup.getRawValue();
+    this.filteredItems = this.filterService.generateChips(this.SkillFilterFormGroup, this.filterColumns);
+    this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
+    this.store.dispatch(new ShowFilterDialog(false));
   }
 
   public onImportDataClick(): void {
@@ -147,7 +212,6 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   }
 
   public allowOnBoardChange(data: Skill, event: any): void {
-    console.log(data);
     data.allowOnboard = event.checked;
     this.store.dispatch(new SaveAssignedSkill(new Skill(
       {

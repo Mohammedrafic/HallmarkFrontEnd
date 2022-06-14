@@ -1,0 +1,20 @@
+@import "../../../styles/variables/colors";
+
+.candidates-list {
+  .link {
+    cursor: pointer;
+    color: $primary-active-blue-10;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .progress-bar {
+    display: flex;
+    align-items: center;
+
+    span {
+      margin-right: 8px;
+      width: 26px;
+    }
+  }
+}

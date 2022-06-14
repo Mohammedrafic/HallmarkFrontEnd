@@ -13,7 +13,7 @@ import { Skill, SkillsPage } from '@shared/models/skill.model';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { WorkflowState } from '../../store/workflow.state';
-import { Step, WorkflowWithDetails } from '@shared/models/workflow.model';
+import { Step, Workflow, WorkflowWithDetails } from '@shared/models/workflow.model';
 import {
   GetRolesForWorkflowMapping,
   GetUsersForWorkflowMapping,
@@ -210,18 +210,32 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       }
 
       const foundWorkflow = this.workflows.find(item => item.id === id);
+      // sort steps by order
+      foundWorkflow?.workflows?.forEach((workflow: Workflow) => {
+        workflow.steps.sort((first: Step, second: Step) => (first.order as number) - (second.order as number));
+      })
+      // add nextStepStatus field
+      foundWorkflow?.workflows?.forEach((workflow: Workflow) => {
+        workflow.steps = workflow.steps.map((item: Step, index: number, array: Step[]) => {
+          return {
+            ...item,
+            nextStepStatus: array[index+1]?.status
+          };
+        })
+      })
+
       if (foundWorkflow && foundWorkflow.workflows) {
-        this.orderWorkflowSteps = foundWorkflow.workflows[0].steps.filter(step => step.type !== WorkflowStepType.Published); // excludes last Order step
-        this.applicationWorkflowSteps = foundWorkflow.workflows[1].steps.filter(step => step.type !== WorkflowStepType.Offered);  // excludes last App step
+        this.orderWorkflowSteps = foundWorkflow.workflows[0].steps.filter(step => step.type === WorkflowStepType.Incomplete || step.type === WorkflowStepType.Custom); // includes required Order step
+        this.applicationWorkflowSteps = foundWorkflow.workflows[1].steps.filter(step => step.requirePermission);  // excludes not required App step
       }
 
-      if (this.orderWorkflowSteps.length > 0 && !this.isEdit) {
+      if (this.orderWorkflowSteps.length > 0) {
         this.orderWorkflowSteps.forEach(() => {
           this.orderRoleUserFormArray.push(this.formBuilder.control(null, Validators.required));
         });
       }
 
-      if (this.applicationWorkflowSteps.length > 0 && !this.isEdit) {
+      if (this.applicationWorkflowSteps.length > 0) {
         this.applicationWorkflowSteps.forEach(() => {
           this.applicationRoleUserFormArray.push(this.formBuilder.control(null, Validators.required));
         });
@@ -256,6 +270,10 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
     setTimeout(() => {
       const foundWorkflow = this.workflows.find(w => w.name === data.workflowName);
+
+      this.workflowMappingFormGroup.controls['workflowType'].setValue(WorkflowGroupType.Organization);
+      this.workflowMappingFormGroup.controls['workflowName'].setValue(foundWorkflow?.id);
+
       if (!data.regionId) {
         const allRegionsIds = this.allRegions.map(region => region.id);
         this.workflowMappingFormGroup.controls['regions'].setValue(allRegionsIds);
@@ -283,8 +301,6 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
         this.workflowMappingFormGroup.controls['skills'].setValue(data.skills.map((skill: any) => skill.skillId));
       }
 
-      this.workflowMappingFormGroup.controls['workflowType'].setValue(WorkflowGroupType.Organization);
-      this.workflowMappingFormGroup.controls['workflowName'].setValue(foundWorkflow?.id);
       this.setFormArrayControls(data.stepMappings);
     })
 
@@ -388,14 +404,20 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     return stepDetails;
   }
 
-  public setFormArrayControls(stepMappings: StepMapping[]): void {
-    stepMappings.forEach((stepMap, i) => {
-      const foundUserRole = this.rolesWithUsers.find(r => r.id === stepMap.userId || r.id === stepMap.roleId?.toString());
+  private setFormArrayControls(stepMappings: StepMapping[]): void {
+    this.setUsersAndRolesForEdit(stepMappings.filter(s => s.workflowType === WorkflowType.OrderWorkflow), this.orderWorkflowSteps, this.orderRoleUserFormArray);
+    this.setUsersAndRolesForEdit(stepMappings.filter(s => s.workflowType === WorkflowType.ApplicationWorkflow), this.applicationWorkflowSteps, this.applicationRoleUserFormArray);
+  }
 
-      if (foundUserRole && stepMap.workflowType === WorkflowType.OrderWorkflow) {
-        this.orderRoleUserFormArray.push(this.formBuilder.control([foundUserRole.id], Validators.required));
-      } else if (foundUserRole && stepMap.workflowType === WorkflowType.ApplicationWorkflow) {
-        this.applicationRoleUserFormArray.push(this.formBuilder.control([foundUserRole.id], Validators.required));
+  private setUsersAndRolesForEdit(stepMappings: StepMapping[], workflowSteps: Step[], formArray: FormArray): void {
+    workflowSteps.forEach((step, i) => {
+      let foundMatchedStep = stepMappings.find(s => s.workflowStepId === step.id);
+
+      if (foundMatchedStep) {
+        const foundUserRole = this.rolesWithUsers.find(r => r.id === foundMatchedStep?.userId || r.id === foundMatchedStep?.roleId?.toString());
+        if (foundUserRole) {
+          formArray.controls[i].setValue([foundUserRole.id]);
+        }
       }
     });
   }

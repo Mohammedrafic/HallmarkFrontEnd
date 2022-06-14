@@ -1,0 +1,5 @@
+<section class="job-details">
+  <app-general-order-info *ngIf="order" [orderInformation]="order"></app-general-order-info>
+</section>
+<div class="separator"></div>
+<app-order-details [currentOrder]="order"></app-order-details>

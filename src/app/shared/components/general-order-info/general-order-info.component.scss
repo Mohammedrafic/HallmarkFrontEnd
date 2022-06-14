@@ -1,0 +1,68 @@
+@import "../../../styles/variables/colors";
+
+section {
+  .title {
+    font-weight: 700;
+    font-size: 12px;
+    color: $black;
+  }
+
+  .sup-title{
+    font-weight: 400;
+    font-size: 12px;
+    margin-top: 3px;
+    color: $secondary-dark-blue-30;
+  }
+}
+
+.candidates-info {
+  .container-row {
+    display: grid;
+    padding: 16px;
+    border-radius: 8px;
+    grid-template-columns: repeat(4, 1fr);
+    background-color: $secondary-dark-blue-50;
+    gap: 25px 38px;
+  }
+
+  .column {
+    display: flex;
+
+    .icon {
+      color: $secondary-dark-blue-40;
+      height: 16px;
+      width: 16px;
+      margin-right: 4px;
+    }
+
+    .cost {
+      font-weight: 700;
+      color: $black;
+      font-size: 24px;
+    }
+  }
+
+  .last-column {
+    flex-direction: column;
+    text-align: right;
+  }
+}
+
+.candidates-additional-info {
+  margin-top: 16px;
+
+  .container-row {
+    display: flex;
+    justify-content: space-between;
+
+    .column {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}
+
+
+
+
+

@@ -1,0 +1,13 @@
+@import 'colors';
+
+.app-accumulation-chart {
+  &__component {
+    aspect-ratio: 1.65;
+  }
+
+  &__legend-score {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 28px;
+  }
+}

@@ -6,13 +6,13 @@ export enum Status {
 }
 
 export const STATUS_COLOR_GROUP = {
-  'e-success': ['open', 'Active', 'Completed'],
-  'e-warning': ['incomplete', 'Suspended', 'Incomplete'],
-  'e-default': ['closed', 'Inactive'],
-  'e-pending': ['pending', 'Pending'],
-  'e-progress': ['in progress', 'In Progress', 'Verified'],
-  'e-accepted': ['accepted'],
-  'e-filled': ['filled']
+  'e-success': ['open', 'Active', 'Completed', 'active', 'completed','Applied'],
+  'e-warning': ['incomplete', 'suspended', 'Suspended', 'Incomplete', 'incomplete', 'Shortlisted'],
+  'e-default': ['closed', 'Inactive', 'inactive', 'Closed', 'Not applied'],
+  'e-pending': ['pending', 'Pending', 'Offered'],
+  'e-progress': ['in progress', 'In Progress', 'Verified', 'verified'],
+  'e-accepted': ['accepted','Accepted'],
+  'e-filled': ['filled', 'Filled', 'Onboarded']
 }
 
 export enum AgencyStatus {
@@ -42,11 +42,4 @@ export enum CredentialVerifiedStatus {
 export enum CreateUserStatus {
   Inactive,
   Active,
-}
-
-export enum OrderStatus {
-  Open,
-  InProgress,
-  Filled,
-  Closed
 }

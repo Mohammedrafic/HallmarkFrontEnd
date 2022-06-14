@@ -5,7 +5,6 @@ export enum OrderManagemetTabs {
   AllOrders = 'All Orders',
   OrderTemplates = 'Order Templates',
   Incomplete = 'Incomplete',
-  PendingApproval = 'Pending Approval',
 }
 
 @Component({
@@ -23,6 +22,5 @@ export class TabNavigationComponent {
   public onSelect(event: SelectingEventArgs): void {
     const tabsArray = Object.values(OrderManagemetTabs);
     this.selectedTab.emit(tabsArray[event.selectingIndex]);
-    console.log(tabsArray[event.selectingIndex]); // TODO: Remove this after integrate
   }
 }

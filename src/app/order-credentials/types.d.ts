@@ -1,9 +1,11 @@
 export interface IOrderCredentialItem {
-  name: string;
+  credentialId: number;
+  credentialName: string;
+  credentialType: string;
   reqForSubmission: boolean;
   reqForOnboard: boolean;
   optional: boolean;
-  comments: string;
+  comment: string;
 }
 
 export interface IOrderCredential {

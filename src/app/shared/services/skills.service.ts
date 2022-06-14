@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
-import { MasterSkillByOrganization, Skill, SkillsPage } from '@shared/models/skill.model';
+import { MasterSkillByOrganization, Skill, SkillDataSource, SkillFilters, SkillsPage } from '@shared/models/skill.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
@@ -61,8 +61,17 @@ export class SkillsService {
    * @param pageSize
    * @return list of Assigned skills
    */
-  public getAssignedSkills(pageNumber: number, pageSize: number): Observable<SkillsPage> {
-    return this.http.get<any>(`/api/AssignedSkills`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+  public getAssignedSkills(pageNumber: number, pageSize: number, filters: SkillFilters): Observable<SkillsPage> {
+    if (Object.keys(filters).length) {
+      filters.pageNumber = pageNumber;
+      filters.pageSize = pageSize;
+      filters.allowOnboard = filters.allowOnboard || null;
+      if (filters.glNumbers) {
+        filters.glNumbers = filters.glNumbers.map((val: string) => val === 'blank' ? null : val) as [];
+      }
+      return this.http.post<SkillsPage>(`/api/AssignedSkills/filter`, filters);
+    } 
+    return this.http.get<SkillsPage>(`/api/AssignedSkills`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
   }
 
   /**
@@ -102,5 +111,13 @@ export class SkillsService {
       return this.http.post(`/api/AssignedSkills/export/byIds`, payload, { responseType: 'blob' });
     }
     return this.http.post(`/api/AssignedSkills/export`, payload, { responseType: 'blob' });
+  }
+
+  /**
+   * Get Assigned skills data sources for filter dropdown
+   * @return list of skill descriptions, abbrs, GL numbers
+   */
+  public getSkillsDataSources(): Observable<SkillDataSource> {
+    return this.http.get<SkillDataSource>(`/api/AssignedSkills/getAvailableData`);
   }
 }
