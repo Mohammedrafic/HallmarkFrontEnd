@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
-import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { Action, Selector, State, StateContext, Actions, ofAction } from '@ngxs/store';
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, takeUntil } from 'rxjs';
 
 import { DashboardService } from '../services/dashboard.service';
 import { GetDashboardData, SetPanels, SaveDashboard, ResetState } from './dashboard.actions';
@@ -47,7 +47,7 @@ export class DashboardState {
     return state.widgets;
   }
 
-  constructor(private dashboardService: DashboardService) {}
+  public constructor(private readonly actions: Actions, private dashboardService: DashboardService) {}
 
   @Action(GetDashboardData)
   getDashboardData({ patchState }: StateContext<DashboardStateModel>): Observable<DashboardDataModel> {
@@ -56,7 +56,8 @@ export class DashboardState {
     return this.dashboardService.getDashboardsData().pipe(
       tap(({ panels, widgets }: DashboardDataModel) => {
         patchState({ panels, widgets, isDashboardLoading: false });
-      })
+      }),
+      takeUntil(this.actions.pipe(ofAction(ResetState)))
     );
   }
 
