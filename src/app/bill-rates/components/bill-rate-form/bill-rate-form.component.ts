@@ -11,11 +11,6 @@ import { BillRate, BillRateCategory, BillRateOption, BillRateType, BillRateUnit 
 import { GetBillRateOptions } from '@bill-rates/store/bill-rate.actions';
 import PriceUtils from "@shared/utils/price.utils";
 
-const RateHourMask = {
-  desimal: '00.00',
-  hours: '00.[0-5]0',
-};
-
 @Component({
   selector: 'app-bill-rate-form',
   templateUrl: './bill-rate-form.component.html',
@@ -100,8 +95,6 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isIntervalMinControlRequired = true;
         this.isIntervalMaxControlRequired = true;
         if (billRateConfig) {
-          this.rateHoursInput.mask = billRateConfig.unit === BillRateUnit.Hours ? RateHourMask.hours : RateHourMask.desimal;
-          this.rateHoursInput.refresh();
           if (!billRateConfig.intervalMin) {
             intervalMinControl?.reset();
             intervalMinControl?.disable();
