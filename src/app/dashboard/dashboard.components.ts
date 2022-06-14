@@ -19,6 +19,8 @@ import { WidgetOptionModel } from './models/widget-option.model';
 import { widgetTypeToConfigurationMapper } from './constants/widget-type-to-configuration-mapper';
 import lodashMap from 'lodash/fp/map';
 import { WidgetToggleModel } from './models/widget-toggle.model';
+import { User } from '@shared/models/user.model';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-dashboard',
@@ -41,7 +43,10 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     UserStateModel['lastSelectedOrganizationId']
   >;
 
+  @Select(UserState.user) private readonly user$: Observable<User>;
+
   public widgetsData$: Observable<Record<WidgetTypeEnum, unknown>>;
+  public isOrganization$: Observable<boolean>;
 
   public readonly cellSpacing = [24, 24];
   public readonly columns = 12;
@@ -61,6 +66,15 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   public ngOnInit(): void {
     this.setWidgetsData();
     this.initOrganizationChangeListener();
+    this.isUserOrganization();
+  }
+
+  private isUserOrganization(): void {
+    this.isOrganization$ = combineLatest([this.user$, this.organizationId$]).pipe(
+      map(([user, id]: [User, number | null]) => {
+        return user.businessUnitType !== BusinessUnitType.Agency && !!id;
+      })
+    );
   }
 
   public dashboardIsCreated(): void {
