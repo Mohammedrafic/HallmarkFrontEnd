@@ -11,7 +11,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Order } from '@shared/models/order-management.model';
+import { Order, OrderCandidatesListPage } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -31,6 +31,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   @Select(OrderManagementContentState.orderDialogOptions)
   public orderDialogOptions$: Observable<DialogNextPreviousOption>;
+
+  @Select(OrderManagementContentState.orderCandidatePage)
+  public orderCandidatePage$: Observable<OrderCandidatesListPage>;
 
   private unsubscribe$: Subject<void> = new Subject();
 

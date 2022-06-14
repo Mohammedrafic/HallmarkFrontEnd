@@ -205,7 +205,7 @@ export class OrderManagementContentState {
   EditOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { order }: EditOrder): Observable<Order | void> {
     return this.orderManagementService.editOrder(order).pipe(
       tap(order => {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        dispatch([new ShowToast(MessageTypes.Success, RECORD_MODIFIED), new SaveOrderSucceeded()]);
         return order;
       }),
       catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
