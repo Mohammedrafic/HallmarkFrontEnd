@@ -14,7 +14,7 @@
           <div class="e-card-header-caption">
             <h3 class="e-card-title preview-title">Order ID {{ order?.orderId }}</h3>
             <div class="order-statuses">
-              <ejs-chiplist #chipList>
+              <ejs-chiplist #chipList class="events-off">
                 <e-chips>
                   <e-chip [text]="order?.statusText"></e-chip>
                 </e-chips>
@@ -34,7 +34,7 @@
           </div>
         </div>
       </section>
-      <div class="order-tabs" [ngClass]="{ 'first-active': firstActive }">
+      <div class="order-tabs" >
         <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
           <e-tabitems>
             <e-tabitem>

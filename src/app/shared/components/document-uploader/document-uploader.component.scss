@@ -26,3 +26,19 @@
 .e-file-select-wrap, .e-upload-actions {
   display: none;
 }
+
+.uploaded-list {
+  .e-upload-file-list {
+    display: flex;
+    align-items: center;
+    min-height: 75px;
+  }
+
+  .e-file-container {
+    width: 100%;
+  }
+
+  .e-file-status {
+    margin-top: 5px;
+  }
+}

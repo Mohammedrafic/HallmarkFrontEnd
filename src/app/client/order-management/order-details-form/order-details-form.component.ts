@@ -35,6 +35,7 @@ import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { ProjectName, ProjectType } from '@shared/models/project.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
+import { Document } from '@shared/models/document.model';
 
 import { OrderType } from '@shared/enums/order-type';
 import { Duration } from '@shared/enums/durations';
@@ -49,11 +50,14 @@ import { currencyValidator } from '@shared/validators/currency.validator';
 
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
+import PriceUtils from "@shared/utils/price.utils";
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 @Component({
   selector: 'app-order-details-form',
   templateUrl: './order-details-form.component.html',
-  styleUrls: ['./order-details-form.component.scss']
+  styleUrls: ['./order-details-form.component.scss'],
+  providers: [MaskedDateTimeService]
 })
 export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Input() isActive = false;
@@ -87,6 +91,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public minTime = this.defaultMinTime;
 
   public documents: Blob[] = [];
+  public deleteDocumentsGuids: string[] = [];
+  public priceUtils = PriceUtils;
 
   public orderTypes = [
     { id: OrderType.ContractToPerm, name: 'Contract To Perm' },
@@ -215,11 +221,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       projectType: [null, Validators.required],
       projectNameId: [null, Validators.required],
       projectName: [null, Validators.required],
-      hourlyRate: [null, {validators: [Validators.required, Validators.maxLength(10), currencyValidator(1)], updateOn: 'blur'}],
+      hourlyRate: [null, [Validators.required, Validators.maxLength(11), currencyValidator(1)]],
       openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
       minYrsRequired: [null, [Validators.maxLength(10), integerValidator(1)]],
-      joiningBonus: [null, {validators: [Validators.maxLength(10), currencyValidator(1)], updateOn: 'blur'}],
-      compBonus: [null, {validators: [Validators.maxLength(10), currencyValidator(1)], updateOn: 'blur'}],
+      joiningBonus: [null, [Validators.maxLength(11), currencyValidator(1)]],
+      compBonus: [null, [Validators.maxLength(11), currencyValidator(1)]],
       duration: [null, Validators.required],
       jobStartDate: [null, Validators.required],
       jobEndDate: [null, Validators.required],
@@ -273,9 +279,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     const shiftRequirementIdControl = this.generalInformationForm.get('shiftRequirementId') as AbstractControl;
     const shiftStartTimeControl = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
     const shiftEndTimeControl = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
-    const hourlyRateControl = this.generalInformationForm.get('hourlyRate') as AbstractControl;
-    const joiningBonusControl = this.generalInformationForm.get('joiningBonus') as AbstractControl;
-    const compBonusControl = this.generalInformationForm.get('compBonus') as AbstractControl;
     const jobDistributionControl = this.jobDistributionForm.get('jobDistribution') as AbstractControl;
     const agencyControl = this.jobDistributionForm.get('agency') as AbstractControl;
     const jobDistributionsControl = this.jobDistributionForm.get('jobDistributions') as AbstractControl;
@@ -460,18 +463,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       jobDistributionsControl.patchValue(jobDistributions, { emitEvent: false });
     });
 
-    hourlyRateControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((price: string) => {
-      hourlyRateControl.patchValue(this.getTwoDecimalsValue(price), {emitEvent: false});
-    });
-
-    joiningBonusControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((price: string) => {
-      joiningBonusControl.patchValue(this.getTwoDecimalsValue(price), {emitEvent: false});
-    });
-
-    compBonusControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((price: string) => {
-      compBonusControl.patchValue(this.getTwoDecimalsValue(price), {emitEvent: false});
-    });
-
     shiftStartTimeControl.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
     shiftEndTimeControl.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
   }
@@ -555,6 +546,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   public onDocumentsSelected(documents: Blob[]): void {
     this.documents = documents;
+  }
+
+  public onDocumentDeleted(document: Document): void {
+    this.deleteDocumentsGuids.push(document.documentId);
   }
 
   private populateForms(order: Order): void {
@@ -728,9 +723,27 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getTwoDecimalsValue(value: string): string {
-    if (!value) return '';
-    value = String(value);
-    return Number(value).toFixed(Math.max(value.split('.')[1]?.length, 2) || 2);
+  setPriceMask(controlName: string, e: FocusEvent): void {
+    const input = e.target as HTMLInputElement;
+    if (!input.value.length) {
+      this.generalInformationForm.get(controlName)?.patchValue(`.00`,{emitEvent: false});
+      setTimeout(() => input.setSelectionRange(0,0));
+    }
+  }
+
+  setTwoDecimals(controlName: string, e: FocusEvent): void {
+    const input = e.target as HTMLInputElement;
+    const inputValue = input.value ? String(input.value) : '';
+    const integerLength = inputValue.split('.')[0].length;
+    let zerosCount = 2;
+
+    if (integerLength > 8 && integerLength < 10) {
+      zerosCount = 1;
+    } else if (integerLength > 9) {
+      zerosCount = 0;
+    }
+
+    const value = Number(inputValue).toFixed(Math.max(inputValue.split('.')[1]?.length, zerosCount) || zerosCount);
+    this.generalInformationForm.get(controlName)?.patchValue(value,{emitEvent: false});
   }
 }

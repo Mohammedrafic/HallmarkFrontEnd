@@ -64,6 +64,9 @@ export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDes
   }
 
   public filterByType(): void {
+    if (!this.searchGrid) {
+      return;
+    }
     if (this.selectedCredType) {
       this.searchGrid.filterByColumn('credentialTypeName', 'equal', this.selectedCredType );
     } else {
@@ -84,11 +87,15 @@ export class AddOrderCredentialFormComponent implements OnInit, OnChanges, OnDes
   }
 
   public searchCredential(event: any): void {
-    this.searchGrid.search((event.target as HTMLInputElement).value);
+    if (this.searchGrid) {
+      this.searchGrid.search((event.target as HTMLInputElement).value);
+    }
   }
 
   public clearGridSelection(): void {
-    this.searchGrid.selectionModule.clearSelection();
+    if (this.searchGrid) {
+      this.searchGrid.selectionModule.clearSelection();
+    }
   }
 
   private filterCredentials(allCredentials: Credential[]): void {

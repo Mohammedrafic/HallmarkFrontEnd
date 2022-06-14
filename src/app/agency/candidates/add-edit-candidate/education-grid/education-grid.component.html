@@ -16,6 +16,7 @@
             [allowResizing]="allowResizing"
             [pageSettings]="pageSettings"
             [height]="gridHeight"
+            [enableVirtualization]="true"
             (dataBound)="dataBound()">
     <e-columns>
       <e-column field="degree" headerText="Degree Type" width=300 [valueAccessor]="degreeAccessor"></e-column>

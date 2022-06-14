@@ -45,6 +45,8 @@
           class="datepicker"
           format="MM/dd/yyyy"
           placeholder="MM/DD/YYYY"
+          [enableMask]="true"
+          [maskPlaceholder]="{  month: 'MM', day: 'DD', year: 'YYYY' }"
           appValidateWithMessage
           formControlName="effectiveDate"
         >
@@ -55,16 +57,16 @@
     <div class="input-container bootstrap">
       <label>Rates/Hours<span class="required">*</span></label>
       <div class="input-group">
-        <ejs-maskedtextbox
-        #rateHours
-        class="e-input"
-        promptChar="_"
-        mask="00.00"
-        appValidateWithMessage
-        formControlName="rateHour"
-        placeholder="Rates/Hours"
-        maxlength="10"
-      ></ejs-maskedtextbox>
+        <input
+          class="e-input"
+          type="text"
+          formControlName="rateHour"
+          placeholder="Rates/Hours"
+          appValidateWithMessage
+          maxlength="11"
+          (focus)="priceUtils.setPriceMask(billRateForm, 'rateHour', $event)"
+          (blur)="priceUtils.setTwoDecimals(billRateForm, 'rateHour', $event)"
+        />
       </div>
     </div>
   </div>
@@ -73,40 +75,46 @@
     <!-- Internal Min -->
     <div class="input-container bootstrap">
       <label>
-        Internal Min
+        Interval Min
         <span *ngIf="isIntervalMinControlRequired" class="required">*</span>
       </label>
       <div class="input-group">
-        <ejs-maskedtextbox
-        #intervalMin
-        class="e-input"
-        promptChar="_"
-        mask="00.00"
-        appValidateWithMessage
-        formControlName="intervalMin"
-        placeholder="Internal Min" 
-        maxlength="10"
-      ></ejs-maskedtextbox>
+        <ejs-numerictextbox
+          id="intervalMin"
+          class="e-input"
+          appValidateWithMessage
+          min="0"
+          maxlength="10"
+          [validateDecimalOnType]="true"
+          [showSpinButton]="false"
+          placeholder="Interval Min"
+          decimals='0'
+          format="#"
+          formControlName="intervalMin"
+        ></ejs-numerictextbox>
       </div>
     </div>
 
     <!-- Internal Max -->
     <div class="input-container bootstrap">
       <label>
-        Internal Max
+        Interval Max
         <span *ngIf="isIntervalMaxControlRequired" class="required">*</span>
       </label>
       <div class="input-group">
-        <ejs-maskedtextbox
-        #intervalMax
+        <ejs-numerictextbox
+          id="intervalMax"
           class="e-input"
-          promptChar="_"
-          mask="00.00"
           appValidateWithMessage
-          formControlName="intervalMax"
-          placeholder="Internal Max"
+          min="0"
           maxlength="10"
-        ></ejs-maskedtextbox>
+          [validateDecimalOnType]="true"
+          [showSpinButton]="false"
+          placeholder="Interval Max"
+          decimals='0'
+          format="#"
+          formControlName="intervalMax"
+        ></ejs-numerictextbox>
       </div>
     </div>
   </div>

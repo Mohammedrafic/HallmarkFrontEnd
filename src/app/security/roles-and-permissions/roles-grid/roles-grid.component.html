@@ -4,12 +4,14 @@
   class="roles-grid"
   [dataSource]="roleGirdData$ | async"
   [allowSorting]="true"
+  [sortSettings]="sortOptions"
   [allowResizing]="true"
   [allowSelection]="true"
   [resizeSettings]="resizeSettings"
   [allowPaging]="allowPaging"
   [pageSettings]="pageSettings"
   [height]="gridHeight"
+  [enableVirtualization]="true"
   (rowDataBound)='rowDataBound($event)'
   (dataBound)="dataBound()"
 >

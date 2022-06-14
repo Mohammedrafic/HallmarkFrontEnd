@@ -2,14 +2,14 @@ import { Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserState } from '../../../store/user.state';
-import { GetAllSkills } from '@organization-management/store/organization-management.actions';
+import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
-import { Skill, SkillsPage } from '@shared/models/skill.model';
+import { Skill } from '@shared/models/skill.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { ShowSideDialog } from '../../../store/app.actions';
@@ -33,6 +33,7 @@ import {
 import { OrderTypeOptions } from '@shared/enums/order-type';
 import { GetOrganizationStructure } from '../../../store/user.actions';
 import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
+import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
 
 @Component({
   selector: 'app-bill-rate-setup',
@@ -58,8 +59,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public departments: OrganizationDepartment[] = [];
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
 
-  @Select(OrganizationManagementState.skills)
-  skills$: Observable<SkillsPage>;
+  @Select(OrganizationManagementState.allOrganizationSkills)
+  skills$: Observable<Skill[]>;
   skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
   public allSkills: Skill[] = [];
 
@@ -81,8 +82,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public isIntervalMinEnabled = true;
   public isIntervalMaxEnabled = true;
   public billRatesFormGroup: FormGroup;
-  public billRatesIntervalMinRequiredFormGroup: FormGroup;
-  public billRatesIntervalMaxRequiredFormGroup: FormGroup;
+  public intervalMinField: AbstractControl;
+  public intervalMaxField: AbstractControl;
   public billRateCategory = BillRateCategory;
   public billRateType = BillRateType;
 
@@ -106,7 +107,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   ngOnInit(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.store.dispatch(new GetAllSkills());
+      this.store.dispatch(new GetAllOrganizationSkills());
       this.store.dispatch(new GetBillRates(this.currentPage, this.pageSize));
       this.store.dispatch(new GetBillRateOptions());
       this.store.dispatch(new GetOrganizationStructure());
@@ -118,8 +119,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     });
 
     this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe(skills => {
-      if (skills && skills.items.length > 0) {
-        this.allSkills = skills.items;
+      if (skills && skills.length > 0) {
+        this.allSkills = skills;
       }
     });
 
@@ -128,6 +129,14 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         this.billRatesOptions = options;
       }
     });
+
+    this.intervalMinField = this.billRatesFormGroup.get('intervalMin') as AbstractControl;
+    this.intervalMinField.addValidators(intervalMinValidator(this.billRatesFormGroup, 'intervalMax'));
+    this.intervalMinField.valueChanges.subscribe(() => this.intervalMaxField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
+
+    this.intervalMaxField = this.billRatesFormGroup.get('intervalMax') as AbstractControl;
+    this.intervalMaxField.addValidators(intervalMaxValidator(this.billRatesFormGroup, 'intervalMin'));
+    this.intervalMaxField.valueChanges.subscribe(() => this.intervalMinField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
 
     this.regionChangedHandler();
     this.locationChangedHandler();
@@ -146,9 +155,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   }
 
   public onFormCancelClick(): void {
-    if (this.billRatesFormGroup.dirty
-      || this.billRatesIntervalMinRequiredFormGroup.dirty
-      || this.billRatesIntervalMaxRequiredFormGroup.dirty) {
+    if (this.billRatesFormGroup.dirty) {
       this.confirmService
         .confirm(CANCEL_COFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
@@ -169,54 +176,42 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public onFormSaveClick(): void {
     if (this.billRatesFormGroup.valid) {
-      if (this.isIntervalMinEnabled && !this.billRatesIntervalMinRequiredFormGroup.valid) {
-        this.billRatesIntervalMinRequiredFormGroup.markAllAsTouched();
-      } else if (this.isIntervalMaxEnabled && !this.billRatesIntervalMaxRequiredFormGroup.valid) {
-        this.billRatesIntervalMaxRequiredFormGroup.markAllAsTouched();
-      } else {
-        const foundBillRateOption = this.billRatesOptions.find(option => option.id === this.billRatesFormGroup.controls['billRateTitleId'].value);
-
-        if (foundBillRateOption) {
-          const billRate: BillRateSetupPost = {
-            billRateSetupId: this.editRecordId,
-            regionIds: this.billRatesFormGroup.controls['regionIds'].value.length === this.allRegions.length ? []
-              : this.billRatesFormGroup.controls['regionIds'].value, // [] means All on the BE side
-            locationIds: this.billRatesFormGroup.controls['locationIds'].value.length === this.locations.length ? []
-              : this.billRatesFormGroup.controls['locationIds'].value, // [] means All on the BE side
-            departmentIds: this.billRatesFormGroup.controls['departmentIds'].value.length === this.departments.length ? []
-              : this.billRatesFormGroup.controls['departmentIds'].value, // [] means All on the BE side
-            skillIds: this.billRatesFormGroup.controls['skillIds'].value.length === this.allSkills.length ? []
-              : this.billRatesFormGroup.controls['skillIds'].value, // [] means All on the BE side
-            billRateConfigId: foundBillRateOption.category,
-            orderTypes: this.billRatesFormGroup.controls['orderTypeIds'].value.length === this.orderTypes.length ? []
-              : this.billRatesFormGroup.controls['orderTypeIds'].value, // [] means All on the BE side
-            rateHour: this.selectedBillRateUnit === BillRateUnit.Hours ? this.rateHoursInput.getMaskedValue()
-              : parseFloat(this.billRatesFormGroup.controls['billRateValueRateTimes'].value).toFixed(2),
-            effectiveDate: this.billRatesFormGroup.controls['effectiveDate'].value,
-            intervalMin: this.isIntervalMinEnabled ? this.billRatesIntervalMinRequiredFormGroup.controls['intervalMin'].value : null,
-            intervalMax: this.isIntervalMaxEnabled ? this.billRatesIntervalMaxRequiredFormGroup.controls['intervalMax'].value : null,
-            considerForWeeklyOT: this.billRatesFormGroup.controls['considerForWeeklyOt'].value ? this.billRatesFormGroup.controls['considerForWeeklyOt'].value : false,
-            considerForDailyOT: this.billRatesFormGroup.controls['considerForDailyOt'].value ? this.billRatesFormGroup.controls['considerForDailyOt'].value : false,
-            considerFor7thDayOT: this.billRatesFormGroup.controls['considerFor7thDayOt'].value ? this.billRatesFormGroup.controls['considerFor7thDayOt'].value : false,
-            regularLocal: this.billRatesFormGroup.controls['regularLocal'].value ? this.billRatesFormGroup.controls['regularLocal'].value : false,
-            displayInTimesheet: this.billRatesFormGroup.controls['displayInTimesheet'].value ? this.billRatesFormGroup.controls['displayInTimesheet'].value : false,
-            displayInJob: this.billRatesFormGroup.controls['displayInJob'].value ? this.billRatesFormGroup.controls['displayInJob'].value : false,
-          }
-
-          this.store.dispatch(new SaveUpdateBillRate(billRate, this.currentPage, this.pageSize));
-        }
+      const billRate: BillRateSetupPost = {
+        billRateSettingId: this.editRecordId,
+        regionIds: this.billRatesFormGroup.controls['regionIds'].value.length === this.allRegions.length ? []
+          : this.billRatesFormGroup.controls['regionIds'].value, // [] means All on the BE side
+        locationIds: this.billRatesFormGroup.controls['locationIds'].value.length === this.locations.length ? []
+          : this.billRatesFormGroup.controls['locationIds'].value, // [] means All on the BE side
+        departmentIds: this.billRatesFormGroup.controls['departmentIds'].value.length === this.departments.length ? []
+          : this.billRatesFormGroup.controls['departmentIds'].value, // [] means All on the BE side
+        skillIds: this.billRatesFormGroup.controls['skillIds'].value.length === this.allSkills.length ? []
+          : this.billRatesFormGroup.controls['skillIds'].value, // [] means All on the BE side
+        billRateConfigId: this.billRatesFormGroup.controls['billRateTitleId'].value,
+        orderTypes: this.billRatesFormGroup.controls['orderTypeIds'].value.length === this.orderTypes.length ? []
+          : this.billRatesFormGroup.controls['orderTypeIds'].value, // [] means All on the BE side
+        rateHour: this.selectedBillRateUnit === BillRateUnit.Hours ? this.rateHoursInput.getMaskedValue()
+          : parseFloat(this.billRatesFormGroup.controls['billRateValueRateTimes'].value).toFixed(2),
+        effectiveDate: this.billRatesFormGroup.controls['effectiveDate'].value,
+        intervalMin: this.isIntervalMinEnabled ? this.billRatesFormGroup.controls['intervalMin'].value : null,
+        intervalMax: this.isIntervalMaxEnabled ? this.billRatesFormGroup.controls['intervalMax'].value : null,
+        considerForWeeklyOT: this.billRatesFormGroup.controls['considerForWeeklyOt'].value ? this.billRatesFormGroup.controls['considerForWeeklyOt'].value : false,
+        considerForDailyOT: this.billRatesFormGroup.controls['considerForDailyOt'].value ? this.billRatesFormGroup.controls['considerForDailyOt'].value : false,
+        considerFor7thDayOT: this.billRatesFormGroup.controls['considerFor7thDayOt'].value ? this.billRatesFormGroup.controls['considerFor7thDayOt'].value : false,
+        regularLocal: this.billRatesFormGroup.controls['regularLocal'].value ? this.billRatesFormGroup.controls['regularLocal'].value : false,
+        displayInTimesheet: this.billRatesFormGroup.controls['displayInTimesheet'].value ? this.billRatesFormGroup.controls['displayInTimesheet'].value : false,
+        displayInJob: this.billRatesFormGroup.controls['displayInJob'].value ? this.billRatesFormGroup.controls['displayInJob'].value : false,
       }
+
+      this.store.dispatch(new SaveUpdateBillRate(billRate, this.currentPage, this.pageSize));
     } else {
       this.billRatesFormGroup.markAllAsTouched();
-      this.billRatesIntervalMinRequiredFormGroup.markAllAsTouched();
-      this.billRatesIntervalMaxRequiredFormGroup.markAllAsTouched();
     }
   }
 
   public onEditRecordButtonClick(data: BillRateSetup, event: Event): void {
     this.addActiveCssClass(event);
     this.isEdit = true;
-    this.editRecordId = data.billRateSetupId;
+    this.editRecordId = data.billRateSettingId;
 
     setTimeout(() => this.setupFormValues(data));
 
@@ -233,14 +228,14 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       })
       .subscribe((confirm) => {
         if (confirm) {
-          this.store.dispatch(new DeleteBillRatesById(data.billRateSetupId, this.currentPage, this.pageSize));
+          this.store.dispatch(new DeleteBillRatesById(data.billRateSettingId, this.currentPage, this.pageSize));
         }
         this.removeActiveCssClass();
       });
   }
 
   public considerForWeeklyOtChange(data: any, event: any): void {
-    this.editRecordId = data.billRateSetupId;
+    this.editRecordId = data.billRateSettingId;
     this.setupFormValues(data);
     setTimeout(() => {
       this.billRatesFormGroup.controls['considerForWeeklyOt'].setValue(event.checked);
@@ -249,35 +244,35 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   }
 
   public considerForDailyOtChange(data: any, event: any): void {
-    this.editRecordId = data.billRateSetupId;
+    this.editRecordId = data.billRateSettingId;
     this.setupFormValues(data);
     this.billRatesFormGroup.controls['considerForDailyOt'].setValue(event.checked);
     this.onFormSaveClick();
   }
 
   public considerFor7thDayOtChange(data: any, event: any): void {
-    this.editRecordId = data.billRateSetupId;
+    this.editRecordId = data.billRateSettingId;
     this.setupFormValues(data);
     this.billRatesFormGroup.controls['considerFor7thDayOt'].setValue(event.checked);
     this.onFormSaveClick();
   }
 
   public regularLocalChange(data: any, event: any): void {
-    this.editRecordId = data.billRateSetupId;
+    this.editRecordId = data.billRateSettingId;
     this.setupFormValues(data);
     this.billRatesFormGroup.controls['regularLocal'].setValue(event.checked);
     this.onFormSaveClick();
   }
 
   public displayInTimeSheetChange(data: any, event: any): void {
-    this.editRecordId = data.billRateSetupId;
+    this.editRecordId = data.billRateSettingId;
     this.setupFormValues(data);
     this.billRatesFormGroup.controls['displayInTimesheet'].setValue(event.checked);
     this.onFormSaveClick();
   }
 
   public displayInJobChange(data: any, event: any): void {
-    this.editRecordId = data.billRateSetupId;
+    this.editRecordId = data.billRateSettingId;
     this.setupFormValues(data);
     setTimeout(() => {
       this.billRatesFormGroup.controls['displayInJob'].setValue(event.checked);
@@ -319,6 +314,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       billRatesType: [{ value: '', disabled: true }],
       billRateValueRateTimes: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(10)]],
       effectiveDate: [null, [Validators.required]],
+      intervalMin: [''],
+      intervalMax: [''],
       considerForWeeklyOt: [null],
       considerForDailyOt: [null],
       considerFor7thDayOt: [null],
@@ -326,20 +323,10 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       displayInTimesheet: [null],
       displayInJob: [null]
     });
-
-    this.billRatesIntervalMinRequiredFormGroup = this.formBuilder.group({
-      intervalMin: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(10)]]
-    });
-
-    this.billRatesIntervalMaxRequiredFormGroup = this.formBuilder.group({
-      intervalMax: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(10)]]
-    });
   }
 
   private clearFormDetails(): void {
     this.billRatesFormGroup.reset();
-    this.billRatesIntervalMinRequiredFormGroup.reset();
-    this.billRatesIntervalMaxRequiredFormGroup.reset();
     this.isEdit = false;
     this.editRecordId = undefined;
     this.removeActiveCssClass();
@@ -400,6 +387,26 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           this.billRatesFormGroup.get('billRatesCategory')?.setValue(BillRateCategory[foundBillRateOption.category]);
           this.billRatesFormGroup.get('billRatesType')?.setValue(BillRateType[foundBillRateOption.type]);
         }
+
+        if (this.isIntervalMinEnabled) {
+          this.billRatesFormGroup.get('intervalMin')?.reset();
+          this.billRatesFormGroup.get('intervalMin')?.enable();
+          this.billRatesFormGroup.get('intervalMin')?.addValidators([Validators.required, Validators.minLength(1), Validators.maxLength(10)]);
+        } else {
+          this.billRatesFormGroup.get('intervalMin')?.reset();
+          this.billRatesFormGroup.get('intervalMin')?.disable();
+          this.billRatesFormGroup.get('intervalMin')?.removeValidators([Validators.required, Validators.minLength(1), Validators.maxLength(10)]);
+        }
+
+        if (this.isIntervalMaxEnabled) {
+          this.billRatesFormGroup.get('intervalMax')?.reset();
+          this.billRatesFormGroup.get('intervalMax')?.enable();
+          this.billRatesFormGroup.get('intervalMax')?.addValidators([Validators.required, Validators.minLength(1), Validators.maxLength(10)]);
+        } else {
+          this.billRatesFormGroup.get('intervalMax')?.reset();
+          this.billRatesFormGroup.get('intervalMax')?.disable();
+          this.billRatesFormGroup.get('intervalMax')?.removeValidators([Validators.required, Validators.minLength(1), Validators.maxLength(10)]);
+        }
     });
   }
 
@@ -428,7 +435,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     if (data.skills.length === 0) {
       this.billRatesFormGroup.controls['skillIds'].setValue(this.allSkills.map((skill: Skill) => skill.id));
     } else {
-      this.billRatesFormGroup.controls['skillIds'].setValue(data.skills.map((skill: any) => skill.skillId));
+      this.billRatesFormGroup.controls['skillIds'].setValue(data.skills.map((skill: any) => skill.id));
     }
 
     const foundBillRateOption = this.billRatesOptions.find(option => option.title === data.billRateTitle && option.type === data.billRateType);
@@ -444,8 +451,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
     this.billRatesFormGroup.controls['billRateValueRateTimes'].setValue(data.rateHour);
     this.billRatesFormGroup.controls['effectiveDate'].setValue(data.effectiveDate);
-    this.billRatesIntervalMinRequiredFormGroup.controls['intervalMin'].setValue(data.intervalMin);
-    this.billRatesIntervalMaxRequiredFormGroup.controls['intervalMax'].setValue(data.intervalMax);
+    this.billRatesFormGroup.controls['intervalMin'].setValue(data.intervalMin);
+    this.billRatesFormGroup.controls['intervalMax'].setValue(data.intervalMax);
     this.billRatesFormGroup.controls['considerForWeeklyOt'].setValue(data.considerForWeeklyOT);
     this.billRatesFormGroup.controls['considerForDailyOt'].setValue(data.considerForDailyOT);
     this.billRatesFormGroup.controls['considerFor7thDayOt'].setValue(data.considerFor7thDayOT);

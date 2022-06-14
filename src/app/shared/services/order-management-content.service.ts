@@ -133,7 +133,11 @@ export class OrderManagementContentService {
    * @param order object to edit
    * @return edited order
    */
-  public editOrder(order: EditOrderDto): Observable<Order> {
-    return this.http.put<Order>('/api/Orders', order);
+  public editOrder(order: EditOrderDto, documents: Blob[]): Observable<Order> {
+    return this.http.put<Order>('/api/Orders', order).pipe(switchMap(editedOrder => {
+      const formData = new FormData();
+      documents.forEach(document => formData.append('documents', document));
+      return this.http.post(`/api/Orders/${editedOrder.id}/documents`, formData).pipe(map(() => editedOrder));
+    }));
   }
 }

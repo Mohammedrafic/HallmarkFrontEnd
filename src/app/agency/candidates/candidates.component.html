@@ -16,6 +16,7 @@
             [pageSettings]="pageSettings"
             [height]="gridHeight"
             [rowHeight]="rowHeight"
+            [enableVirtualization]="true"
             [resizeSettings]="resizeSettings"
             [allowSorting]="allowSorting"
             [allowResizing]="allowResizing"
@@ -27,7 +28,7 @@
       <e-column field="profileStatus" headerText="Profile Status" width=200>
         <ng-template #template let-data>
           <div>
-            <ejs-chiplist>
+            <ejs-chiplist class="events-off">
               <e-chips>
                 <e-chip [text]="statusEnum[data.profileStatus]"
                         [cssClass]="getChipCssClass(statusEnum[data.profileStatus])">

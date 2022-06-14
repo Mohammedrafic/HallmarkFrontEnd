@@ -9,11 +9,7 @@ import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
 import { BillRateState } from '@bill-rates/store/bill-rate.state';
 import { BillRate, BillRateCategory, BillRateOption, BillRateType, BillRateUnit } from '@shared/models/bill-rate.model';
 import { GetBillRateOptions } from '@bill-rates/store/bill-rate.actions';
-
-const RateHourMask = {
-  desimal: '00.00',
-  hours: '00.[0-5]0',
-};
+import PriceUtils from "@shared/utils/price.utils";
 
 @Component({
   selector: 'app-bill-rate-form',
@@ -25,10 +21,6 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
   public billRateOptionsDropdown: DropDownListComponent;
   @ViewChild('rateHours')
   public rateHoursInput: MaskedTextBoxComponent;
-  @ViewChild('intervalMin')
-  public intervalMinInput: MaskedTextBoxComponent;
-  @ViewChild('intervalMax')
-  public intervalMaxInput: MaskedTextBoxComponent;
 
   @Input() billRateForm: FormGroup;
 
@@ -38,6 +30,7 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
     value: 'id',
   };
   public rateHourMack = false;
+  public priceUtils = PriceUtils;
 
   public isIntervalMinControlRequired = true;
   public isIntervalMaxControlRequired = true;
@@ -78,7 +71,6 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.onBillRateConfigIdChanged();
-    this.getMackedValuesOnInputChange();
   }
 
   ngOnDestroy(): void {
@@ -103,8 +95,6 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isIntervalMinControlRequired = true;
         this.isIntervalMaxControlRequired = true;
         if (billRateConfig) {
-          this.rateHoursInput.mask = billRateConfig.unit === BillRateUnit.Hours ? RateHourMask.hours : RateHourMask.desimal;
-          this.rateHoursInput.refresh();
           if (!billRateConfig.intervalMin) {
             intervalMinControl?.reset();
             intervalMinControl?.disable();
@@ -121,28 +111,6 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
         intervalMaxControl?.updateValueAndValidity();
         intervalMinControl?.updateValueAndValidity();
       });
-  }
-
-  private getMackedValuesOnInputChange(): void {
-    const rateHourControl = this.billRateForm.get('rateHour');
-    const intervalMinControl = this.billRateForm.get('intervalMin');
-    const intervalMaxControl = this.billRateForm.get('intervalMax');
-    forkJoin([
-      rateHourControl?.valueChanges.pipe(
-        filter((value) => !!value),
-        tap(() => rateHourControl?.patchValue(this.rateHoursInput.getMaskedValue(), { emitEvent: false }))
-      ),
-      intervalMinControl?.valueChanges.pipe(
-        filter((value) => !!value),
-        tap(() => intervalMinControl?.patchValue(this.intervalMinInput.getMaskedValue(), { emitEvent: false }))
-      ),
-      intervalMaxControl?.valueChanges.pipe(
-        filter((value) => !!value),
-        tap(() => intervalMaxControl?.patchValue(this.intervalMaxInput.getMaskedValue(), { emitEvent: false }))
-      ),
-    ])
-      .pipe(takeWhile(() => this.isAlive))
-      .subscribe();
   }
 
   static createForm(billRates?: BillRate[]): FormGroup {

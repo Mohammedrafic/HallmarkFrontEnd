@@ -8,7 +8,7 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OrganizationManagementState } from '../../store/organization-management.state';
 import { Region } from '@shared/models/region.model';
 import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { GetAllSkills } from '../../store/organization-management.actions';
+import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
 import { Skill, SkillsPage } from '@shared/models/skill.model';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -60,8 +60,8 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   public departments: OrganizationDepartment[] = [];
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
 
-  @Select(OrganizationManagementState.skills)
-  skills$: Observable<SkillsPage>;
+  @Select(OrganizationManagementState.allOrganizationSkills)
+  skills$: Observable<Skill[]>;
   skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
   public allSkills: Skill[] = [];
 
@@ -123,7 +123,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
   ngOnInit(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.store.dispatch(new GetAllSkills());
+      this.store.dispatch(new GetAllOrganizationSkills());
       this.store.dispatch(new GetWorkflowMappingPages());
       this.store.dispatch(new GetRolesForWorkflowMapping());
       this.store.dispatch(new GetUsersForWorkflowMapping());
@@ -181,8 +181,8 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     });
 
     this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe(skills => {
-      if (skills && skills.items.length > 0) {
-        this.allSkills = skills.items;
+      if (skills && skills.length > 0) {
+        this.allSkills = skills;
       }
     });
 

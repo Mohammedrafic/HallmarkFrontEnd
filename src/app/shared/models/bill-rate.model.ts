@@ -46,7 +46,7 @@ export interface BillRate {
 export interface OrderBillRateDto extends Omit<BillRate, 'billRateConfig' | 'billRateGroupId'> { };
 
 export class BillRateSetup {
-  billRateSetupId: number;
+  billRateSettingId: number;
   regionId: number;
   regionName: string;
   locationId: number;
@@ -72,7 +72,7 @@ export class BillRateSetup {
 }
 
 export class BillRateSetupPost {
-  billRateSetupId?: number;
+  billRateSettingId?: number;
   regionIds: number[];
   locationIds: number[];
   departmentIds: number[];

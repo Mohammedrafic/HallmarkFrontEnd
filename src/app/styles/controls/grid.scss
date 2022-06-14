@@ -15,6 +15,10 @@ ejs-grid.e-control.e-grid {
   border-radius: $grid-border-radius;
   box-shadow: $grid-box-shadow;
 
+  &.e-default .e-row:last-child .e-rowcell {
+    border-bottom-width: 1px;
+  }
+
   .checkbox-header {
     .e-headercelldiv {
       padding: 0 !important;

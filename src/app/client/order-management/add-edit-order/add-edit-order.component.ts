@@ -18,6 +18,7 @@ import { BillRatesComponent } from '@bill-rates/bill-rates.component';
 import { BillRate, OrderBillRateDto } from '@shared/models/bill-rate.model';
 import { IOrderCredentialItem } from '@order-credentials/types';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 enum SelectedTab {
   OrderDetails,
@@ -152,7 +153,11 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       const documents = this.orderDetailsFormComponent.documents;
 
       if (this.orderId) {
-        this.store.dispatch(new EditOrder({...order, id: this.orderId }));
+        this.store.dispatch(new EditOrder({
+          ...order,
+          id: this.orderId,
+          deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids
+        }, documents));
       } else {
         this.store.dispatch(new SaveOrder(order, documents));
       }
@@ -269,6 +274,26 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       order.projectName = projectName;
     }
 
+    if (!order.hourlyRate) {
+      order.hourlyRate = null;
+    }
+
+    if (!order.openPositions) {
+      order.openPositions = null;
+    }
+
+    if (!order.minYrsRequired) {
+      order.minYrsRequired = null;
+    }
+
+    if (!order.joiningBonus) {
+      order.minYrsRequired = null;
+    }
+
+    if (!order.compBonus) {
+      order.minYrsRequired = null;
+    }
+
     return order;
   }
 
@@ -295,7 +320,11 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
 
     if (this.orderId) {
-      this.store.dispatch(new EditOrder({...order, id: this.orderId }));
+      this.store.dispatch(new EditOrder({
+        ...order,
+        id: this.orderId,
+        deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids
+      }, documents));
     } else {
       this.store.dispatch(new SaveOrder(order, documents));
     }

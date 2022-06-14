@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormArray, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { filter, take } from 'rxjs';
 
@@ -10,6 +10,7 @@ import { BillRateFormComponent } from './components/bill-rate-form/bill-rate-for
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid.component';
+import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
 
 @Component({
   selector: 'app-bill-rates',
@@ -28,6 +29,8 @@ export class BillRatesComponent implements OnInit {
   public billRateFormHeader: string;
   public billRatesControl: FormArray;
   public billRateForm: FormGroup;
+  public intervalMinField: AbstractControl;
+  public intervalMaxField: AbstractControl;
 
   private editBillRateIndex: string | null;
 
@@ -37,6 +40,14 @@ export class BillRatesComponent implements OnInit {
 
   ngOnInit(): void {
     this.billRateForm = BillRateFormComponent.createForm();
+
+    this.intervalMinField = this.billRateForm.get('intervalMin') as AbstractControl;
+    this.intervalMinField.addValidators(intervalMinValidator(this.billRateForm, 'intervalMax'));
+    this.intervalMinField.valueChanges.subscribe(() => this.intervalMaxField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
+
+    this.intervalMaxField = this.billRateForm.get('intervalMax') as AbstractControl;
+    this.intervalMaxField.addValidators(intervalMaxValidator(this.billRateForm, 'intervalMin'));
+    this.intervalMaxField.valueChanges.subscribe(() => this.intervalMinField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
   }
 
   public onAddBillRate(): void {
@@ -50,14 +61,14 @@ export class BillRatesComponent implements OnInit {
     this.billRateFormHeader = 'Edit Bill Rate';
     this.editBillRateIndex = index;
 
-    this.billRateForm.patchValue({ 
+    this.billRateForm.patchValue({
       billRateConfig: value.billRateConfig,
       billRateConfigId: value.billRateConfigId,
       effectiveDate: value.effectiveDate,
       id: value.id,
       intervalMax: String(value.intervalMax),
       intervalMin: String(value.intervalMin),
-      rateHour: String(value.rateHour) 
+      rateHour: String(value.rateHour)
      }, { emitEvent: false });
 
     if (!value.billRateConfig.intervalMin) {
@@ -78,9 +89,9 @@ export class BillRatesComponent implements OnInit {
   public onRemoveBillRate({ index }: BillRatesGridEvent): void {
     this.confirmService
       .confirm('Are You sure you want to delete it?', {
-        okButtonLabel: 'Remove',
+        okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-        title: 'Remove the Bill Rate',
+        title: 'Delete record',
       })
       .pipe(
         take(1),
@@ -117,7 +128,7 @@ export class BillRatesComponent implements OnInit {
     if (this.billRateForm.valid) {
       const value: BillRate = this.billRateForm.getRawValue();
 
-      if (!value.id) {
+      if (!value.effectiveDate) {
         const existingDateAndConfig = (this.billRatesControl.value as BillRate[]).find(
           (rate) =>
             rate.billRateConfigId === value.billRateConfigId &&

@@ -22,6 +22,7 @@ export class OrderCredentialsComponent implements OnInit {
   public isEditMode: boolean;
   public CredentialForm: FormGroup;
   public formSubmitted = false;
+  public showForm = false;
 
   constructor(private store: Store, private fb: FormBuilder) {
     this.CredentialForm = this.fb.group({
@@ -44,6 +45,7 @@ export class OrderCredentialsComponent implements OnInit {
   public addNew(): void {
     this.credentialFormHeader = 'Add Credential';
     this.isEditMode = false;
+    this.showForm = true;
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -70,12 +72,14 @@ export class OrderCredentialsComponent implements OnInit {
     });
     this.CredentialForm.get('credentialType')?.disable();
     this.CredentialForm.get('credentialName')?.disable();
+    this.showForm = true;
     this.store.dispatch(new ShowSideDialog(true));
   }
 
   public onDialogCancel(): void {
     this.CredentialForm.reset();
     this.addCred && this.addCred.clearGridSelection();
+    this.showForm = false;
     this.store.dispatch(new ShowSideDialog(false));
     this.formSubmitted = false;
   }
@@ -90,6 +94,7 @@ export class OrderCredentialsComponent implements OnInit {
       }
       this.resetToDefault();
       this.formSubmitted = false;
+      this.showForm = false;
       this.store.dispatch(new ShowSideDialog(false));
     }
   }
@@ -103,10 +108,13 @@ export class OrderCredentialsComponent implements OnInit {
     if (credToDelete) {
       const index = this.credentials.indexOf(credToDelete);
       this.credentials.splice(index, 1);
-      this.credentialsGroups = [];
+      this.credentialsGroups.forEach(element => {
+        element.items = [];
+      });
       this.credentials.forEach(cred => {
         this.updateGroups(cred);
       });
+      this.credentialsGroups = this.credentialsGroups.filter(element => element.items.length);
       this.credentialDeleted.emit(Object.assign({}, {...credToDelete}));
     }
   }

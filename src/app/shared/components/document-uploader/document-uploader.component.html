@@ -8,6 +8,19 @@
     <div id="droparea" class="droparea" (click)="browse()">
       <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
     </div>
+    <div *ngIf="documents?.length" class="e-upload uploaded-list">
+      <ul class="e-upload-files">
+        <li *ngFor="let document of documents" class="e-upload-file-list">
+          <span class="e-file-container">
+            <span class="e-file-name">{{document.documentName}}</span>
+            <span class="e-file-type"></span>
+            <span class="e-file-size"></span>
+            <span class="e-file-status">Uploaded</span>
+          </span>
+          <span class="e-icons e-file-remove-btn" title="Remove" (click)="onDelete(document)"></span>
+        </li>
+      </ul>
+    </div>
     <ejs-uploader #previewupload [dropArea]="dropElement" [allowedExtensions]="allowedExtensions"
                   [autoUpload]="false"
                   [maxFileSize]="maxFileSize"

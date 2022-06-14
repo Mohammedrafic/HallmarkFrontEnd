@@ -13,6 +13,7 @@
     [allowResizing]="true"
     [allowSelection]="false"
     [resizeSettings]="resizeSettings"
+    [enableVirtualization]="true"
     [allowPaging]="allowPaging"
     [pageSettings]="pageSettings"
     [height]="300"
@@ -113,3 +114,23 @@
     </ng-template>
   </ejs-grid>
 </section>
+
+<ejs-dialog
+  id="dialog"
+  #sideDialog
+  cssClass="dialog"
+  width="45%"
+  [target]="targetElement"
+  [visible]="false"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <app-apply-candidate (closeDialogEmitter)="onCloseDialog()"
+                         [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
+                         [candidate]="candidate">
+    </app-apply-candidate>
+  </ng-template>
+  <ng-template #footerTemplate>
+    <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>
+  </ng-template>
+</ejs-dialog>

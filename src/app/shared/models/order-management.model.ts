@@ -1,4 +1,5 @@
 import { PageOfCollections } from '@shared/models/page.model';
+import { Document } from '@shared/models/document.model';
 import { OrderStatus } from '@shared/enums/order-management';
 import { OrderType } from '@shared/enums/order-type';
 import { Duration } from '@shared/enums/durations';
@@ -113,11 +114,11 @@ export class Order {
   projectType?: string;
   projectNameId: number | null;
   projectName?: string;
-  hourlyRate: number;
-  openPositions: number;
-  minYrsRequired: number;
-  joiningBonus: number;
-  compBonus: number;
+  hourlyRate: number | null;
+  openPositions: number | null;
+  minYrsRequired: number | null;
+  joiningBonus: number | null;
+  compBonus: number | null;
   duration: Duration;
   jobStartDate: Date;
   jobEndDate: Date;
@@ -148,12 +149,14 @@ export class Order {
   status: OrderStatus;
   organizationId?: number;
   totalPositions?: number;
+  documents: Document[] | null;
 }
 
-export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates'> {
+export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'documents'> {
   billRates: OrderBillRateDto[];
 }
 
-export interface EditOrderDto extends Omit<Order, 'billRates' | 'status'> {
+export interface EditOrderDto extends Omit<Order, 'billRates' | 'status' | 'documents'> {
   billRates: OrderBillRateDto[];
+  deleteDocumentsGuids: string[];
 }

@@ -4,6 +4,7 @@ import { FeatherModule } from 'angular-feather';
 import { AlertCircle, CheckCircle, allIcons, User, Briefcase, Folder, MapPin, Calendar, ArrowLeft, ArrowRight, Mail, Send } from 'angular-feather/icons';
 import { NumericTextBoxAllModule, UploaderModule } from "@syncfusion/ej2-angular-inputs";
 import { DropDownListModule, ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
+import { DatePickerModule } from "@syncfusion/ej2-angular-calendars";
 
 import { PageToolbarComponent } from './components/page-toolbar/page-toolbar.component';
 import { ValidateDirective } from './directives/validate.directive';
@@ -22,7 +23,7 @@ import { SideMenuComponent } from './components/side-menu/side-menu.component';
 import { SearchComponent } from './components/search/search.component';
 import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.component';
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousComponent } from './components/dialog-next-previous/dialog-next-previous.component';
@@ -35,6 +36,7 @@ import { OrderCandidatesListComponent } from './components/order-candidates-list
 import { CustomProgressBarComponent } from './components/custom-progress-bar/custom-progress-bar.component';
 import { BillRatesViewGridComponent } from './components/bill-rates-view-grid/bill-rates-view-grid.component';
 import { CommentsComponent } from './components/comments/comments.component';
+import { ApplyCandidateComponent } from './components/order-candidates-list/apply-candidate/apply-candidate.component';
 import { HighlightGridRowDirective } from '@shared/directives/hightlight-grid-row.directive';
 import { AddBackgroundForEmptyGridDirective } from '@shared/directives/add-background-for-empty-grid.directive';
 import { FormatPhoneNumberPipe } from '@shared/pipes/format-phone-number.pipe';
@@ -92,6 +94,8 @@ const COMPONENTS = [
     RadioButtonAllModule,
     ChipListAllModule,
     FormsModule,
+    ReactiveFormsModule,
+    DatePickerModule,
     DropDownButtonModule,
     AccordionModule,
     TooltipModule,
@@ -100,7 +104,7 @@ const COMPONENTS = [
     DropDownListModule
   ],
   exports: [...COMPONENTS],
-  declarations: [...COMPONENTS, ErrorMessageComponent],
+  declarations: [...COMPONENTS, ErrorMessageComponent, ApplyCandidateComponent],
   providers: [DatePipe],
 })
 export class SharedModule {}
