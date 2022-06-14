@@ -1,8 +1,6 @@
 import type { LayerSettingsModel } from '@syncfusion/ej2-maps';
-import { USAStatesLayerSettings } from '@shared/constants/geoJSON/USA-states/USA-states-layer-settings';
 
 export const USAMapCandidatesDataLayerSettings: LayerSettingsModel = {
-  ...USAStatesLayerSettings,
   shapeSettings: {
     autofill: false,
     colorValuePath: 'candidates',
@@ -11,7 +9,6 @@ export const USAMapCandidatesDataLayerSettings: LayerSettingsModel = {
   tooltipSettings: {
     visible: true,
     valuePath: 'name',
-    template:
-      '<div class="widget-tooltip"><div>${name}</div><b>${candidates}</b></div>',
+    template: '<div class="widget-tooltip"><div>${name}</div><b>${candidates}</b></div>',
   },
 };
