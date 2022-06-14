@@ -49,11 +49,13 @@ import { currencyValidator } from '@shared/validators/currency.validator';
 
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 @Component({
   selector: 'app-order-details-form',
   templateUrl: './order-details-form.component.html',
-  styleUrls: ['./order-details-form.component.scss']
+  styleUrls: ['./order-details-form.component.scss'],
+  providers: [MaskedDateTimeService]
 })
 export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Input() isActive = false;

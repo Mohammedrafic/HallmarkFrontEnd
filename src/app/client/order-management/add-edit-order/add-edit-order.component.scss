@@ -1,3 +1,5 @@
+@import "colors";
+
 .controls-container {
   padding: 20px 0;
   display: flex;
@@ -9,7 +11,10 @@
   .controls-form {
     button {
       margin-left: 10px;
+
       &.e-dropdown-btn {
+        width: 40px;
+        background-color: $primary-active-blue;
         margin-left: 1px;
       }
     }

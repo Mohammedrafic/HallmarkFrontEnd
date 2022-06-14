@@ -1,0 +1,8 @@
+@import "colors";
+
+.bill-rates-grid {
+  &:hover {
+    box-shadow: 0 4px 8px 0 $bill-rates-grid-hover-shadow;
+    border-radius: 10px;
+  }
+}

@@ -78,9 +78,9 @@ export class BillRatesComponent implements OnInit {
   public onRemoveBillRate({ index }: BillRatesGridEvent): void {
     this.confirmService
       .confirm('Are You sure you want to delete it?', {
-        okButtonLabel: 'Remove',
+        okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-        title: 'Remove the Bill Rate',
+        title: 'Delete record',
       })
       .pipe(
         take(1),

@@ -295,8 +295,9 @@
                       placeholder="MM/DD/YYYY"
                       formControlName="jobStartDate"
                       appValidateWithMessage
-                      [min]="today"
-                      [max]="generalInformationForm.controls['jobEndDate'].value">
+                      [enableMask]="true"
+                      [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                      [min]="today">
                     </ejs-datepicker>
                   </div>
                 </div>
@@ -312,6 +313,8 @@
                       formControlName="jobEndDate"
                       appValidateWithMessage
                       [enabled]="isJobEndDateControlEnabled"
+                      [enableMask]="true"
+                      [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                       [min]="generalInformationForm.controls['jobStartDate'].value">
                     </ejs-datepicker>
                   </div>
@@ -321,10 +324,10 @@
               <div class="form-line">
                 <!-- Shift Requirements -->
                 <div class="input-container bootstrap form-line-item-20">
-                  <label>Shift Requirements<span class="required">*</span></label>
+                  <label>Shift Requirement<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
-                      placeholder="Shift Requirements"
+                      placeholder="Shift Requirement"
                       formControlName="shiftRequirementId"
                       appValidateWithMessage
                       [dataSource]="masterShifts$ | async"
@@ -473,10 +476,10 @@
               <div class="form-line">
                 <!-- Reason of Requisition -->
                 <div class="input-container bootstrap form-line-item-40">
-                  <label>Reason of Requisition<span class="required">*</span></label>
+                  <label>Reason for Requisition<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
-                      placeholder="Reason of Requisition"
+                      placeholder="Reason for Requisition"
                       formControlName="reasonForRequisition"
                       appValidateWithMessage
                       [dataSource]="reasonsForRequisition"
@@ -507,6 +510,7 @@
                       <div class="input-group dropdown">
                         <ejs-dropdownlist
                           [dataSource]="contactDetailTitles"
+                          appValidateWithMessage
                           formControlName="title"
                           placeholder="Title">
                         </ejs-dropdownlist>
@@ -686,7 +690,7 @@
                 <label>Workflow<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
-                    placeholder="Workflow"
+                    placeholder="Default"
                     formControlName="workflowId"
                     appValidateWithMessage
                     [dataSource]="workflows$ | async"
