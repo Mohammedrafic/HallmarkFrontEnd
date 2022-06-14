@@ -47,4 +47,10 @@ $chartHeight: 70%;
     margin-right: -12px;
     cursor: default;
   }
+
+  &__loader {
+    display: grid;
+    height: 100%;
+    place-items: center;
+  }
 }

@@ -1,9 +1,9 @@
 <ng-container
   [ngTemplateOutlet]="dashboardTemplate"
-  [ngTemplateOutletContext]="{ widgetsData: widgetsData$ | async }"
+  [ngTemplateOutletContext]="{ widgetsData: widgetsData$ | async, isLoading: isLoading$ | async }"
 ></ng-container>
 
-<ng-template #dashboardTemplate let-widgetsData="widgetsData">
+<ng-template #dashboardTemplate let-widgetsData="widgetsData" let-isLoading="isLoading">
   <app-dashboard-control
     (widgetToggleEmitter)="handleWidgetToggleEvent($event)"
     [selectedWidgets]="selectedWidgets$ | async"
@@ -34,12 +34,14 @@
         >
           <ng-template #content [ngSwitch]="panel.id">
             <app-accumulation-chart
-              [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
               *ngSwitchCase="widgetTypeEnum.CANDIDATES"
+              [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
+              [isLoading]="isLoading"
             ></app-accumulation-chart>
             <app-maps-chart
               *ngSwitchCase="widgetTypeEnum.APPLICANTS_BY_REGION"
               [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_REGION]"
+              [isLoading]="isLoading"
             ></app-maps-chart>
           </ng-template>
         </e-panel>
