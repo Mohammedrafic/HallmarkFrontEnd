@@ -66,11 +66,10 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   public onEdit(data: AgencyOrderCandidates): void {
     this.candidate = data;
 
-    if (this.order && this.candidate) {
+    if (this.order && this.candidate && this.candidate.statusName === 'Not Applied') { // TODO: add enum
       this.store.dispatch(new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId));
+      this.sideDialog.show();
     }
-
-    this.sideDialog.show();
   }
 
   public onCloseDialog(): void {

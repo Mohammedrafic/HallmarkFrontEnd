@@ -5,7 +5,7 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { Observable, Subject, takeUntil } from "rxjs";
 
-import { ApplyOrderApplicants, ApplyOrderApplicantsSucceeded } from "@agency/store/order-management.actions";
+import { ApplyOrderApplicants, ApplyOrderApplicantsSucceeded, ReloadOrderCandidatesLists } from "@agency/store/order-management.actions";
 import { OrderManagementState } from "@agency/store/order-management.state";
 import { BillRate } from "@shared/models/bill-rate.model";
 import { OrderApplicantsInitialData } from "@shared/models/order-applicants.model";
@@ -63,6 +63,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy {
         availableStartDate: value.availableStartDate,
         requestComment: value.requestComment
       }));
+      this.store.dispatch(new ReloadOrderCandidatesLists());
     }
   }
 
