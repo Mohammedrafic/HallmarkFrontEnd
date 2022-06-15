@@ -72,14 +72,14 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
     if (this.order && this.candidate && this.candidate.statusName === 'Not Applied') {
       this.store.dispatch(new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId));
       this.templateState.next(this.apply);
+      this.sideDialog.show();
     }
 
     if(this.order && this.order && this.candidate && (data.statusName === 'Offered'|| data.statusName === 'Accepted')) {
       this.store.dispatch(new GetAgencyCandidateJob(this.order.organizationId, data.candidateJobId));
       this.templateState.next(this.accept);
+      this.sideDialog.show();
     }
-
-    this.sideDialog.show();
   }
 
   public onCloseDialog(): void {
