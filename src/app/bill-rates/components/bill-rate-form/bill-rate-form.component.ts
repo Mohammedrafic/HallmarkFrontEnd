@@ -77,12 +77,16 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public onRateHourBlur(event: any): void {
-    if (event.value.toString().length <= 7 || (event.value.toString().length <= 7 && event.value.toString().includes('.'))) {
-      this.rateHourMask = '#.00';
-    } else if (event.value.toString().length === 8 || (event.value.toString().length === 10 && event.value.toString().includes('.'))) {
-      this.rateHourMask = '#.0';
-    } else {
-      this.rateHourMask = '#';
+    if (event.value) {
+      if (event.value.toString().length <= 7
+        || (event.value.toString().length <= 7 && event.value.toString().includes('.'))
+        || (event.value.toString().length === 10 && event.value.toString().includes('.'))) {
+        this.rateHourMask = '#.00';
+      } else if (event.value.toString().length === 8) {
+        this.rateHourMask = '#.0';
+      } else {
+        this.rateHourMask = '#';
+      }
     }
   }
 

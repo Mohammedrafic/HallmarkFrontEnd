@@ -64,7 +64,11 @@
           <span>{{ data.effectiveDate | date: 'MM/dd/yyyy' }}</span>
         </ng-template>
       </e-column>
-      <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" width=250></e-column>
+      <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" width=250>
+        <ng-template #template let-data>
+          <span>{{ data.rateHour | rateHourPipe: data.billRateTitle:data.billRateType:billRatesOptions }}</span>
+        </ng-template>
+      </e-column>
       <e-column field="intervalMin" headerText="INTERVAL MIN" width=180></e-column>
       <e-column field="intervalMax" headerText="INTERVAL MAX" width=180></e-column>
       <e-column field="considerForWeeklyOT" headerText="CONSIDER FOR WEEKLY OT" width=230>
@@ -357,7 +361,7 @@
               [showSpinButton]="false"
               [placeholder]="selectedBillRateUnit === BillRateUnitList.Multiplier ? 'Rate' : 'Money'"
               decimals='2'
-              format="#.00"
+              [format]="rateHourMask"
               formControlName="billRateValueRateTimes"
               (blur)="onRateHourBlur($event)"
             >
@@ -552,6 +556,7 @@
           <ejs-multiselect mode="CheckBox"
                            formControlName="billRateTitleIds"
                            placeholder="All"
+                           [fields]="billRateTitleFields"
                            [allowFiltering]="false"
                            [showDropDownIcon]="true"
                            [dataSource]="filterColumns.billRateTitleIds.dataSource">
@@ -564,6 +569,7 @@
           <ejs-multiselect mode="CheckBox"
                            formControlName="orderTypeIds"
                            placeholder="All"
+                           [fields]="orderTypesFields"
                            [allowFiltering]="false"
                            [showDropDownIcon]="true"
                            [dataSource]="filterColumns.orderTypeIds.dataSource">

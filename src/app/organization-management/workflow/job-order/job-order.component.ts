@@ -39,9 +39,8 @@ export class JobOrderComponent implements OnInit, OnDestroy {
   public workflowFormGroup: FormGroup;
   public customStepOrderFormGroup: FormGroup;
   public customStepApplicationFormGroup: FormGroup;
-  public currentBusinessUnitId: number | null = null;
 
-  public selectedCard: WorkflowWithDetails;
+  public selectedCard?: WorkflowWithDetails;
   public orderWorkflow: Workflow;
   public applicationWorkflow: Workflow;
 
@@ -68,6 +67,7 @@ export class JobOrderComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.organizationId$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(() => {
       this.store.dispatch(new GetWorkflows());
+      this.selectedCard = undefined;
     });
 
     this.store.dispatch(new GetWorkflows());
@@ -181,7 +181,7 @@ export class JobOrderComponent implements OnInit, OnDestroy {
       })
       .subscribe((confirm) => {
         if (confirm) {
-          this.store.dispatch(new RemoveWorkflow(this.selectedCard));
+          this.store.dispatch(new RemoveWorkflow(this.selectedCard as WorkflowWithDetails));
         }
       });
   }
@@ -214,8 +214,8 @@ export class JobOrderComponent implements OnInit, OnDestroy {
       }
 
       const workflowWithDetailsPut: WorkflowWithDetailsPut = {
-        id: this.selectedCard.id,
-        name: this.selectedCard.name,
+        id: (this.selectedCard as WorkflowWithDetails).id ,
+        name: (this.selectedCard as WorkflowWithDetails).name,
         customSteps: orderSteps.concat(applicationSteps)
       }
 

@@ -66,8 +66,8 @@ export class BillRatesComponent implements OnInit {
       billRateConfigId: value.billRateConfigId,
       effectiveDate: value.effectiveDate,
       id: value.id,
-      intervalMax: String(value.intervalMax),
-      intervalMin: String(value.intervalMin),
+      intervalMax: value.intervalMax && String(value.intervalMax),
+      intervalMin: value.intervalMin && String(value.intervalMin),
       rateHour: String(value.rateHour)
      }, { emitEvent: false });
 

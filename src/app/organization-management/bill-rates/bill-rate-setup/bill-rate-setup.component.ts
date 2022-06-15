@@ -126,8 +126,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       departmentIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       skillIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'skillDescription', valueId: 'id' },
-      billRateTitleIds:  { type: ControlTypes.Dropdown, valueType: ValueType.Id, dataSource: [], valueField: 'title', valueId: 'id' },
-      orderTypeIds:  { type: ControlTypes.Dropdown, valueType: ValueType.Id, dataSource: [], valueField: 'title', valueId: 'id' }
+      billRateTitleIds:  { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'title', valueId: 'id' },
+      orderTypeIds:  { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' }
     }
 
     this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
@@ -370,12 +370,16 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   }
 
   public onRateHourBlur(event: any): void {
-    if (event.value.toString().length <= 7 || (event.value.toString().length <= 7 && event.value.toString().includes('.'))) {
-      this.rateHourMask = '#.00';
-    } else if (event.value.toString().length === 8 || (event.value.toString().length === 10 && event.value.toString().includes('.'))) {
-      this.rateHourMask = '#.0';
-    } else {
-      this.rateHourMask = '#';
+    if (event.value) {
+      if (event.value.toString().length <= 7
+        || (event.value.toString().length <= 7 && event.value.toString().includes('.'))
+        || (event.value.toString().length === 10 && event.value.toString().includes('.'))) {
+        this.rateHourMask = '#.00';
+      } else if (event.value.toString().length === 8) {
+        this.rateHourMask = '#.0';
+      } else {
+        this.rateHourMask = '#';
+      }
     }
   }
 

@@ -42,6 +42,7 @@ import { CommentsComponent } from './components/comments/comments.component';
 import { HighlightGridRowDirective } from '@shared/directives/hightlight-grid-row.directive';
 import { AddBackgroundForEmptyGridDirective } from '@shared/directives/add-background-for-empty-grid.directive';
 import { FormatPhoneNumberPipe } from '@shared/pipes/format-phone-number.pipe';
+import { RateHourPipe } from '@shared/pipes/rate-hour.pipe';
 
 const icons = {
   AlertCircle,
@@ -63,6 +64,7 @@ const COMPONENTS = [
   ChipsCssClass,
   OrderTypeName,
   FormatPhoneNumberPipe,
+  RateHourPipe,
   ValidateDirective,
   HighlightGridRowDirective,
   AddBackgroundForEmptyGridDirective,
@@ -113,9 +115,7 @@ const COMPONENTS = [
     DateRangePickerModule,
     DatePickerModule,
     CheckBoxModule,
-    TooltipModule,
-    DateRangePickerModule,
-    DropDownListModule
+    TooltipModule
   ],
   exports: [...COMPONENTS],
   declarations: [...COMPONENTS, ErrorMessageComponent],
