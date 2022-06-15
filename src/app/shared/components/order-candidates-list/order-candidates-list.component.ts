@@ -5,8 +5,8 @@ import { Router } from '@angular/router';
 import { GridComponent } from "@syncfusion/ej2-angular-grids";
 import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
 import { Select, Store } from "@ngxs/store";
-import { AgencyOrder, AgencyOrderCandidates, Order, OrderCandidatesListPage } from "@shared/models/order-management.model";
-import { GetAgencyCandidateJob, GetAgencyOrderCandidatesList, GetOrderApplicantsData } from "@agency/store/order-management.actions";
+import { AgencyOrder, Order, OrderCandidatesList, OrderCandidatesListPage } from "@shared/models/order-management.model";
+import { GetAgencyOrderCandidatesList, GetCandidateJob, GetOrderApplicantsData } from "@agency/store/order-management.actions";
 import { DialogComponent } from "@syncfusion/ej2-angular-popups";
 import { debounceTime, Observable, Subject } from "rxjs";
 import { UserState } from 'src/app/store/user.state';
@@ -35,7 +35,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
 
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
-  public candidate: AgencyOrderCandidates;
+  public candidate: OrderCandidatesList;
 
   private pageSubject = new Subject<number>();
 
@@ -65,9 +65,8 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
     disabledBodyOverflow(false);
   }
 
-  public onEdit(data: AgencyOrderCandidates): void {
+  public onEdit(data: OrderCandidatesList): void {
     this.candidate = data;
-
     // TODO: add enum and refactor
     if (this.order && this.candidate && this.candidate.statusName === 'Not Applied') {
       this.store.dispatch(new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId));
@@ -76,11 +75,16 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
     }
 
     if(this.order && this.order && this.candidate && (data.statusName === 'Offered'|| data.statusName === 'Accepted')) {
-      this.store.dispatch(new GetAgencyCandidateJob(this.order.organizationId, data.candidateJobId));
+      this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
       this.templateState.next(this.accept);
       this.sideDialog.show();
     }
-  }
+
+    // TODO: it will be used for organisations
+    /*if(this.order && this.candidate) {
+      this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, data.candidateJobId));
+    }*/
+    }
 
   public onCloseDialog(): void {
     this.sideDialog.hide();

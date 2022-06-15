@@ -17,10 +17,10 @@ import { catchError, Observable, of, tap } from 'rxjs';
 import { ShowToast } from "src/app/store/app.actions";
 import {
   ApplyOrderApplicants,
-  ApplyOrderApplicantsSucceeded, GetAgencyCandidateJob,
+  ApplyOrderApplicantsSucceeded,
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
-  GetAgencyOrdersPage,
+  GetAgencyOrdersPage, GetCandidateJob,
   GetOrderApplicantsData,
   GetOrderById, UpdateAgencyCandidateJob, UpdateAgencyCandidateJobSucceeded
 } from './order-management.actions';
@@ -183,12 +183,12 @@ export class OrderManagementState {
     );
   }
 
-  @Action(GetAgencyCandidateJob)
-  GetAgencyCandidateJob(
+  @Action(GetCandidateJob)
+  GetCandidateJob(
     { patchState }: StateContext<OrderManagementModel>,
-    { organizationId, jobId }: GetAgencyCandidateJob
+    { organizationId, jobId }: GetCandidateJob
   ): Observable<OrderCandidateJob> {
-      return this.orderManagementContentService.getAgencyCandidateJob(organizationId, jobId).pipe(
+      return this.orderManagementContentService.getCandidateJob(organizationId, jobId).pipe(
         tap((payload) => {
           patchState({candidatesJob: payload});
           return payload;
@@ -201,7 +201,7 @@ export class OrderManagementState {
     { dispatch }: StateContext<OrderManagementModel>,
     { payload }: UpdateAgencyCandidateJob
   ): void {
-     this.orderManagementContentService.updateAgencyCandidateJob(payload).pipe(
+     this.orderManagementContentService.updateCandidateJob(payload).pipe(
       tap(() => {
         dispatch(new UpdateAgencyCandidateJobSucceeded());
         dispatch(new ShowToast(MessageTypes.Success, 'Action was executed'));

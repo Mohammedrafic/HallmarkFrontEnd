@@ -2,11 +2,18 @@
   <section class="header-container">
     <div class="e-card-header">
       <div class="e-card-header-caption">
-        <h3 class="e-card-title">Sanders, Paul 2</h3>
+        <h3 class="e-card-title">{{candidate?.lastName}}, {{candidate?.firstName}}</h3>
       </div>
-      <div class="e-card-content">
-        <button ejs-button cssClass="e-outline">Reject</button>
-        <button ejs-button [isPrimary]="true" class="apply-button">Onboarded</button>
+      <div class="e-card-content button-container">
+        <div class="input-group dropdown bootstrap">
+          <ejs-dropdownlist
+            [fields]="optionFields"
+            [dataSource]="jobStatus"
+            placeholder="Select Status"
+            (change)="onDropDownChanged($event)"
+          >
+          </ejs-dropdownlist>
+        </div>
         <button ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
@@ -22,94 +29,94 @@
               <div>Job Details</div>
             </ng-template>
             <ng-template #content>
-              <form>
+              <form [formGroup]="form">
                 <div class="form-container">
                   <div class="left-column">
                     <div class="input-container bootstrap">
                       <label class="input-group">Job ID</label>
-                      <div>
-                        <input appValidateWithMessage formControlName="jobId" class="e-input" type="text" placeholder="Job ID" />
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="jobId" class="e-input" type="text" placeholder="Job ID" readonly/>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Job Date</label>
-                      <div>
-                        <ejs-daterangepicker formControlName="date" placeholder="DD/MM/YYYY - DD/MM/YYYY"></ejs-daterangepicker>
+                      <div class="input-group input-readonly">
+                        <ejs-daterangepicker formControlName="date" placeholder="DD/MM/YYYY - DD/MM/YYYY" readonly="true"></ejs-daterangepicker>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Candidates</label>
-                      <div>
-                        <input appValidateWithMessage formControlName="candidates" class="e-input" type="text" placeholder="Candidates" />
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="candidates" class="e-input" type="text" placeholder="Candidates" readonly/>
                       </div>
                     </div>
-                    <div class="input-container bootstrap">
+                    <div class="input-container bootstrap" *ngIf="isOnboarded">
                       <label class="input-group">Guaranteed Work Week</label>
-                      <div>
-                        <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" placeholder="Guaranteed Work Week" />
+                      <div class="input-group">
+                        <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" placeholder="Guaranteed Work Week" (blur)="onChangeValue()"/>
                       </div>
                     </div>
                   </div>
                   <div class="right-column">
                     <div class="input-container bootstrap">
                       <label class="input-group">Bill Rate</label>
-                      <div>
-                        <input appValidateWithMessage formControlName="billRate" class="e-input" type="text" placeholder="Input text" />
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="billRates" class="e-input" type="text" placeholder="Input text" readonly/>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Location</label>
-                      <div>
-                        <input appValidateWithMessage formControlName="location" class="e-input" type="text" placeholder="Location" />
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="locationName" class="e-input" type="text" placeholder="Location" readonly/>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Candidate Bill Rate</label>
-                      <div>
-                        <input appValidateWithMessage formControlName="candidateBillRate" class="e-input" type="text" placeholder="Input text" />
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="candidateBillRate" class="e-input" type="text" placeholder="Input text" readonly/>
                       </div>
                     </div>
-                    <div class="input-container bootstrap">
+                    <div class="input-container bootstrap" *ngIf="isOnboarded">
                       <label class="input-group">Clock ID </label>
                       <div>
-                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" placeholder="Clock ID" />
+                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" placeholder="Clock ID" (blur)="onChangeValue()"/>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="input-container bootstrap">
                   <label class="input-group">Available Start Date</label>
-                  <div>
-                    <input appValidateWithMessage formControlName="avStartDate" class="e-input" type="text" placeholder="Input text" />
+                  <div class="input-group input-readonly">
+                    <input appValidateWithMessage formControlName="avStartDate" class="e-input" type="text" placeholder="Input text" readonly/>
                   </div>
                 </div>
                 <div class="form-container row">
                   <div class="input-container bootstrap">
                     <label class="input-group">Years of experience</label>
-                    <div>
-                      <input appValidateWithMessage formControlName="yearExp" class="e-input" type="text" placeholder="0" />
+                    <div class="input-group input-readonly">
+                      <input appValidateWithMessage formControlName="yearExp" class="e-input" type="text" placeholder="0" readonly/>
                     </div>
                   </div>
                   <div class="input-container bootstrap">
                     <label class="input-group">Exp. as Travelers</label>
-                    <div>
-                      <input appValidateWithMessage formControlName="travelExp" class="e-input" type="text" placeholder="0" />
+                    <div class="input-group input-readonly">
+                      <input appValidateWithMessage formControlName="travelExp" class="e-input" type="text" placeholder="0" readonly/>
                     </div>
                   </div>
-                  <div class="input-container bootstrap">
+                  <div class="input-container bootstrap" *ngIf="isOnboarded">
                     <label class="input-group">Offered Bill Rate</label>
-                    <div>
-                      <input appValidateWithMessage formControlName="offeredBillRate" class="e-input" type="text" placeholder="$ 0.00" />
+                    <div class="input-group">
+                      <input appValidateWithMessage formControlName="offeredBillRate" class="e-input" type="text" placeholder="$ 0.00" (blur)="onChangeValue()"/>
                     </div>
                   </div>
                 </div>
                 <div class="input-container bootstrap">
-                  <div>
-                    <ejs-checkbox label="Allow deploy w/o credentials"></ejs-checkbox>
+                  <div *ngIf="isOnboarded">
+                    <ejs-checkbox formControlName="allow" label="Allow deploy w/o credentials" (blur)="onChangeValue()"></ejs-checkbox>
                   </div>
                 </div>
                 <div class="form-container date-container">
-                  <div class="input-container bootstrap">
+                  <div class="input-container bootstrap" *ngIf="isOnboarded">
                     <label class="input-group">Actual Start Date</label>
                     <div class="input-group datepicker">
                       <ejs-datepicker
@@ -120,12 +127,13 @@
                         placeholder="MM/DD/YYYY"
                         [enableMask]="true"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                        (blur)="onChangeValue($event)"
                         formControlName="startDate"
                       >
                       </ejs-datepicker>
                     </div>
                   </div>
-                  <div class="input-container bootstrap">
+                  <div class="input-container bootstrap" *ngIf="isOnboarded">
                     <label class="input-group">Actual End Date</label>
                     <div class="input-group datepicker">
                       <ejs-datepicker
@@ -136,6 +144,7 @@
                         placeholder="MM/DD/YYYY"
                         [enableMask]="true"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+                        (blur)="onChangeValue($event)"
                         formControlName="endDate"
                       >
                       </ejs-datepicker>
@@ -144,8 +153,8 @@
                 </div>
                 <div class="input-container bootstrap">
                   <label class="input-group">Leave request comments</label>
-                  <div>
-                    <input appValidateWithMessage formControlName="comments" class="e-input" type="text" placeholder="Leava request comments" />
+                  <div class="input-group input-readonly">
+                    <input appValidateWithMessage formControlName="comments" class="e-input" type="text" placeholder="Leava request comments" readonly/>
                   </div>
                 </div>
               </form>
@@ -164,7 +173,11 @@
         </e-accordionitems>
       </ejs-accordion>
     </div>
-    <div class="comments"></div>
+    <div class="comments">
+      <app-comments></app-comments>
+    </div>
   </section>
-  <section></section>
+  <section>
+    <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
+  </section>
 </section>

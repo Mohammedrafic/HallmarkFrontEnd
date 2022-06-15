@@ -60,6 +60,12 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
       padding-left: 16px !important;
     }
 
+    .e-input[readonly],
+    .e-input[readonly] ~ span.e-input-group-icon {
+      background-color: $secondary-dark-blue-50;
+      color: $secondary-dark-blue-30;
+    }
+
     .e-input-group-icon:last-child {
       border: none;
 

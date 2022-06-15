@@ -125,7 +125,17 @@
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
-  <ng-container *ngTemplateOutlet="templateState | async"></ng-container>
+  <!--<ng-container *ngTemplateOutlet="templateState | async"></ng-container>-->
+
+  <ng-container *ngTemplateOutlet="onboarded"></ng-container>
+
+  <ng-template #onboarded>
+    <app-onboarded-candidate
+      (closeModalEvent)="onCloseDialog()"
+      [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
+      [candidate]="candidate"
+    ></app-onboarded-candidate>
+  </ng-template>
 
   <ng-template #accept>
     <app-accept-candidate

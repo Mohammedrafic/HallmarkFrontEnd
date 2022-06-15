@@ -3,7 +3,7 @@ import { Observable, Subject, takeUntil } from "rxjs";
 import { FormControl, FormGroup} from "@angular/forms";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { OrderManagementState } from "@agency/store/order-management.state";
-import { AgencyOrderCandidates, OrderCandidateJob } from "@shared/models/order-management.model";
+import { OrderCandidateJob, OrderCandidatesList } from "@shared/models/order-management.model";
 import { BillRate } from "@shared/models/bill-rate.model";
 import {
   ReloadOrderCandidatesLists,
@@ -20,7 +20,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
   @Output() closeModalEvent: EventEmitter<void> = new EventEmitter();
 
   @Input() billRatesData: BillRate[] = [];
-  @Input() candidate: AgencyOrderCandidates;
+  @Input() candidate: OrderCandidatesList;
 
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;

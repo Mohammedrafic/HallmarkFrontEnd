@@ -1,9 +1,28 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, of, tap } from 'rxjs';
-import { DeleteOrder, DeleteOrderSucceeded, EditOrder, GetAgencyOrderCandidatesList, GetAssociateAgencies, GetIncompleteOrders, GetMasterShifts, GetOrderById, GetOrders, GetOrganizationStatesWithKeyCode, GetPredefinedBillRates, GetProjectNames, GetProjectTypes, GetSelectedOrderById, GetWorkflows, SaveOrder, SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
+import {
+  DeleteOrder,
+  DeleteOrderSucceeded,
+  EditOrder,
+  GetAgencyOrderCandidatesList,
+  GetAssociateAgencies,
+  GetIncompleteOrders,
+  GetMasterShifts,
+  GetOrderById,
+  GetOrders,
+  GetOrganisationCandidateJob,
+  GetOrganizationStatesWithKeyCode,
+  GetPredefinedBillRates,
+  GetProjectNames,
+  GetProjectTypes,
+  GetSelectedOrderById,
+  GetWorkflows,
+  SaveOrder,
+  SaveOrderSucceeded, UpdateOrganisationCandidateJob
+} from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
-import { OrderCandidatesListPage, OrderManagementPage } from '@shared/models/order-management.model';
+import { OrderCandidateJob, OrderCandidatesListPage, OrderManagementPage } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -18,10 +37,12 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate } from '@shared/models/bill-rate.model';
+import { OrderManagementModel } from "@agency/store/order-management.state";
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
   selectedOrder: Order | null;
+  candidatesJob: OrderCandidateJob | null;
   orderCandidatesListPage: OrderCandidatesListPage | null;
   orderDialogOptions: {
     next: boolean,
@@ -42,6 +63,7 @@ export interface OrderManagementContentStateModel {
     ordersPage: null,
     selectedOrder: null,
     orderCandidatesListPage: null,
+    candidatesJob: null,
     orderDialogOptions: {
       next: false,
       previous: false
@@ -62,7 +84,7 @@ export class OrderManagementContentState {
 
   @Selector()
   static selectedOrder(state: OrderManagementContentStateModel): Order | null { return state.selectedOrder; }
-  
+
   @Selector()
   static orderDialogOptions(state: OrderManagementContentStateModel): DialogNextPreviousOption {
     return state.orderDialogOptions;
@@ -93,6 +115,11 @@ export class OrderManagementContentState {
 
   @Selector()
   static predefinedBillRates(state: OrderManagementContentStateModel): BillRate[] { return state.predefinedBillRates }
+
+  @Selector()
+  static candidatesJob(state: OrderManagementModel): OrderCandidateJob | null {
+    return state.candidatesJob;
+  }
 
   constructor(
     private orderManagementService: OrderManagementContentService,
@@ -158,6 +185,30 @@ export class OrderManagementContentState {
       patchState({ organizationStatesWithKeyCode: payload });
       return payload;
     }));
+  }
+
+  @Action(GetOrganisationCandidateJob)
+  GetCandidateJob(
+    { patchState }: StateContext<OrderManagementModel>,
+    { organizationId, jobId }: GetOrganisationCandidateJob
+  ): Observable<OrderCandidateJob> {
+    return this.orderManagementService.getCandidateJob(organizationId, jobId).pipe(
+      tap((payload) => {
+        patchState({candidatesJob: payload});
+        return payload;
+      })
+    );
+  }
+
+  @Action(UpdateOrganisationCandidateJob)
+  UpdateOrganisationCandidateJob(
+    { dispatch }: StateContext<OrderManagementModel>,
+    { payload }: UpdateOrganisationCandidateJob
+  ): Observable<unknown> {
+    return this.orderManagementService.updateCandidateJob(payload).pipe(
+      tap(dispatch(new ShowToast(MessageTypes.Success, 'Action was executed'))),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Candidate cannot be onboarded'))))
+    );
   }
 
   @Action(GetWorkflows)

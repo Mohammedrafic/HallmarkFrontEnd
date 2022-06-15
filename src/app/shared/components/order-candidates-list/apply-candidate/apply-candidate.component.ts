@@ -9,7 +9,7 @@ import { ApplyOrderApplicants, ApplyOrderApplicantsSucceeded, ReloadOrderCandida
 import { OrderManagementState } from "@agency/store/order-management.state";
 import { BillRate } from "@shared/models/bill-rate.model";
 import { OrderApplicantsInitialData } from "@shared/models/order-applicants.model";
-import { AgencyOrderCandidates } from "@shared/models/order-management.model";
+import { OrderCandidatesList } from "@shared/models/order-management.model";
 
 @Component({
   selector: 'app-apply-candidate',
@@ -19,7 +19,7 @@ import { AgencyOrderCandidates } from "@shared/models/order-management.model";
 export class ApplyCandidateComponent implements OnInit, OnDestroy {
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
 
-  @Input() candidate: AgencyOrderCandidates;
+  @Input() candidate: OrderCandidatesList;
   @Input() billRatesData: BillRate[] = [];
 
   public formGroup: FormGroup;

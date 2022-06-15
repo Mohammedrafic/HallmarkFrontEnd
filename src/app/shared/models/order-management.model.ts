@@ -63,7 +63,7 @@ export type AgencyOrderManagement = {
   organizationName: string;
 };
 
-export type AgencyOrderCandidates = {
+export type OrderCandidatesList = {
   candidateId: number;
   firstName: string;
   hourlyBillRate: number;
@@ -79,7 +79,7 @@ export type AgencyOrderCandidates = {
 
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;
 
-export type OrderCandidatesListPage = PageOfCollections<AgencyOrderCandidates>;
+export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
 
 export type AgencyOrder = {
   orderId: number;

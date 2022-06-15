@@ -1,5 +1,12 @@
 @import "colors";
 
+.header-container {
+  .button-container {
+    display: flex;
+    gap: 12px;
+  }
+}
+
 .container {
   .apply-button {
     margin: 0 8px 0 12px;
@@ -9,6 +16,21 @@
     display: flex;
     margin-top: 24px;
 
+    .input-group.input-readonly {
+      .e-input[readonly] {
+        background-color: $secondary-dark-blue-50;
+        color: $secondary-dark-blue-30;
+        border: 1px solid $secondary-dark-blue-40 !important;
+      }
+
+      ejs-daterangepicker{
+        .e-input-group {
+          background-color: $secondary-dark-blue-50;
+          color: $secondary-dark-blue-30;
+          border: 1px solid $secondary-dark-blue-40 !important;
+        }
+      }
+    }
     .candidate-info {
       width: 55%;
       margin-right: 12px;

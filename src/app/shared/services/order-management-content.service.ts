@@ -72,19 +72,19 @@ export class OrderManagementContentService {
   }
 
   /**
-   * Get order by id
+   * Get candidate job
    @param organizationId
    @param jobId
    */
-  public getAgencyCandidateJob(organizationId: number, jobId: number): Observable<OrderCandidateJob> {
+  public getCandidateJob(organizationId: number, jobId: number): Observable<OrderCandidateJob> {
     return this.http.get<OrderCandidateJob>(`/api/AppliedCandidates/candidateJob?OrganizationId=${organizationId}&JobId=${jobId}`);
   }
 
   /**
-   * Get order by id
+   * Update candidate job
    @param payload
    */
-  public updateAgencyCandidateJob(payload: AcceptJobDTO): Observable<void> {
+  public updateCandidateJob(payload: AcceptJobDTO): Observable<void> {
     return this.http.post<void>(`/api/AppliedCandidates/updateCandidateJob`, payload);
   }
 

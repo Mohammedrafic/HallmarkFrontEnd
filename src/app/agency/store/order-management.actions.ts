@@ -29,7 +29,7 @@ export class GetAgencyOrderGeneralInformation {
   ) {}
 }
 
-export class GetAgencyCandidateJob {
+export class GetCandidateJob {
   static readonly type = '[agency order management] Get Agency Candidate Job';
   constructor(
     public organizationId: number,

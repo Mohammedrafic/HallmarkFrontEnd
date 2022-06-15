@@ -1,6 +1,6 @@
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { AcceptJobDTO, OrderManagementFilter } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
-import { OrderManagementFilter } from '@shared/models/order-management.model';
 import { CreateOrderDto, EditOrderDto } from '@shared/models/order-management.model';
 
 export class GetIncompleteOrders {
@@ -46,6 +46,20 @@ export class GetWorkflows {
 export class GetProjectTypes {
   static readonly type = '[order management] Get Project Types';
   constructor() { }
+}
+export class GetOrganisationCandidateJob {
+  static readonly type = '[agency order management] Get Organisation Candidate Job';
+  constructor(
+    public organizationId: number,
+    public jobId: number
+  ) {}
+}
+
+export class UpdateOrganisationCandidateJob {
+  static readonly type = '[agency order management] Update Organisation Candidate Job';
+  constructor(
+    public payload: AcceptJobDTO
+  ) {}
 }
 
 export class GetProjectNames {
