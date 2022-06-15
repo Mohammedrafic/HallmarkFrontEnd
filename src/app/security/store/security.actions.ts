@@ -47,6 +47,11 @@ export class GetNewRoleBusinessByUnitType {
   constructor(public type: BusinessUnitType) {}
 }
 
+export class GetNewRoleBusinessByUnitTypeSucceeded {
+  static readonly type = '[security] Get New Role Business By Unit Type Succeeded';
+  constructor(public type: BusinessUnitType) {}
+}
+
 export class SaveRole {
   static readonly type = '[security] Save role';
   constructor(public role: RoleDTO) {}

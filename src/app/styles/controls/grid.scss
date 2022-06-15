@@ -79,6 +79,9 @@ ejs-grid.e-control.e-grid {
 
   .e-gridcontent {
     .e-content {
+      .e-virtualtrack {
+        height: 0 !important;
+      }
       .e-frozencontent {
         .e-emptyrow {
           display: none !important;
