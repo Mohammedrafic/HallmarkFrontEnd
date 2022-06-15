@@ -42,7 +42,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   private unsubscribe$: Subject<void> = new Subject();
 
   public firstActive = true;
-  public targetElement: HTMLElement = document.body;
+  public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
   public orderStatus  = OrderStatus;
 
