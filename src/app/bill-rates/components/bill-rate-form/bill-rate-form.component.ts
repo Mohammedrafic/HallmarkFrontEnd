@@ -1,15 +1,14 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
-import { filter, forkJoin, Observable, takeWhile, tap } from 'rxjs';
+import { Observable, takeWhile } from 'rxjs';
 
 import { DropDownListComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
+import { MaskedTextBoxComponent } from "@syncfusion/ej2-angular-inputs";
 
 import { BillRateState } from '@bill-rates/store/bill-rate.state';
 import { BillRate, BillRateCategory, BillRateOption, BillRateType, BillRateUnit } from '@shared/models/bill-rate.model';
 import { GetBillRateOptions } from '@bill-rates/store/bill-rate.actions';
-import PriceUtils from "@shared/utils/price.utils";
 
 @Component({
   selector: 'app-bill-rate-form',
@@ -21,7 +20,6 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
   public billRateOptionsDropdown: DropDownListComponent;
   @ViewChild('rateHours')
   public rateHoursInput: MaskedTextBoxComponent;
-
   @Input() billRateForm: FormGroup;
 
   public billRateConfig: BillRateOption;
@@ -29,8 +27,6 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
     text: 'title',
     value: 'id',
   };
-  public rateHourMack = false;
-  public priceUtils = PriceUtils;
 
   public isIntervalMinControlRequired = true;
   public isIntervalMaxControlRequired = true;
