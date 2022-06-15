@@ -56,7 +56,7 @@ export type AgencyOrderManagement = {
   department: string;
   orderType: OrderType;
   billRate: number;
-  candidates: number;
+  candidatesCount: number;
   isLocked: boolean;
   jobStartDate: string;
   organizationId: number;
