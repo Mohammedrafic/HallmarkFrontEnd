@@ -91,4 +91,15 @@ export class BillRateSetupPost {
   displayInJob: boolean;
 }
 
+export class BillRateFilters {
+  pageNumber?: number;
+  pageSize?: number;
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentIds?: number[];
+  skillIds?: number[];
+  orderTypes?: string[];
+  billRateConfigIds?: string[];
+}
+
 export type BillRateSetupPage = PageOfCollections<BillRateSetup>;

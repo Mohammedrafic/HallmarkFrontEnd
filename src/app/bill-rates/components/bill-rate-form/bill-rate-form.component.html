@@ -55,18 +55,40 @@
     </div>
 
     <div class="input-container bootstrap">
-      <label>Rates/Hours<span class="required">*</span></label>
+      <label *ngIf="selectedBillRateUnit === BillRateUnitList.Multiplier">Rate <span class="required">*</span></label>
+      <label *ngIf="selectedBillRateUnit === BillRateUnitList.Currency">Money <span class="required">*</span></label>
+      <label *ngIf="selectedBillRateUnit === BillRateUnitList.Hours">Hours <span class="required">*</span></label>
       <div class="input-group">
-        <input
-          class="e-input"
-          type="text"
-          formControlName="rateHour"
-          placeholder="Rates/Hours"
+        <ejs-numerictextbox
+          *ngIf="selectedBillRateUnit === BillRateUnitList.Hours"
+          class="numeric-input"
           appValidateWithMessage
-          maxlength="11"
-          (focus)="priceUtils.setPriceMask(billRateForm, 'rateHour', $event)"
-          (blur)="priceUtils.setTwoDecimals(billRateForm, 'rateHour', $event)"
-        />
+          min="0"
+          maxlength="10"
+          [validateDecimalOnType]="true"
+          [showSpinButton]="false"
+          placeholder="Hours"
+          decimals='0'
+          format="#"
+          formControlName="rateHour"
+        >
+        </ejs-numerictextbox>
+
+        <ejs-numerictextbox
+          *ngIf="selectedBillRateUnit === BillRateUnitList.Multiplier || selectedBillRateUnit === BillRateUnitList.Currency"
+          class="numeric-input"
+          appValidateWithMessage
+          min="0"
+          maxlength="10"
+          [validateDecimalOnType]="true"
+          [showSpinButton]="false"
+          [placeholder]="selectedBillRateUnit === BillRateUnitList.Multiplier ? 'Rate' : 'Money'"
+          decimals='2'
+          [format]="rateHourMask"
+          formControlName="rateHour"
+          (blur)="onRateHourBlur($event)"
+        >
+        </ejs-numerictextbox>
       </div>
     </div>
   </div>

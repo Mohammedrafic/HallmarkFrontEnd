@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { BillRateOption, BillRateSetup, BillRateSetupPage, BillRateSetupPost } from '@shared/models/bill-rate.model';
+import { BillRateFilters, BillRateOption, BillRateSetup, BillRateSetupPage, BillRateSetupPost } from '@shared/models/bill-rate.model';
 
 @Injectable({
   providedIn: 'root'
@@ -11,10 +11,11 @@ export class BillRatesService {
 
   /**
    * Get the list of bill rates
+   * @param filter filter parameters
    * @return Array of bill rates
    */
-  public getBillRates(pageNumber: number, pageSize: number): Observable<BillRateSetupPage> {
-    return this.http.get<any>(`/api/BillRates/setup`, { params: { PageNumber: pageNumber, PageSize: pageSize } });
+  public getBillRates(filter: BillRateFilters): Observable<BillRateSetupPage> {
+    return this.http.post<BillRateSetupPage>(`/api/BillRates/setup/getFiltered`, filter);
   }
 
   /**
