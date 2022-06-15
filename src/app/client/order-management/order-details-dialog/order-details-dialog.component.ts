@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { Select } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -13,6 +13,10 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Order, OrderCandidatesListPage } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
+import { OrderStatus } from '@shared/enums/order-status';
+import { DeleteOrder } from '@client/store/order-managment-content.actions';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -40,8 +44,13 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public firstActive = true;
   public targetElement: HTMLElement = document.body;
   public orderType = OrderType;
+  public orderStatus  = OrderStatus;
 
-  constructor(private chipsCssClass: ChipsCssClass, private router: Router, private route: ActivatedRoute) {}
+  constructor(private chipsCssClass: ChipsCssClass, 
+              private router: Router, 
+              private route: ActivatedRoute, 
+              private store: Store, 
+              private confirmService: ConfirmService) {}
 
   ngOnInit(): void {
     this.onOpenEvent();
@@ -76,6 +85,20 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         this.firstActive = false;
       } else {
         this.firstActive = true;
+      }
+    });
+  }
+
+  public deleteOrder(id: number): void {
+    this.confirmService
+    .confirm(DELETE_RECORD_TEXT, {
+      title: DELETE_RECORD_TITLE,
+      okButtonLabel: 'Delete',
+      okButtonClass: 'delete-button'
+    })
+    .subscribe((confirm) => {
+      if (confirm) {
+        this.store.dispatch(new DeleteOrder(id));
       }
     });
   }

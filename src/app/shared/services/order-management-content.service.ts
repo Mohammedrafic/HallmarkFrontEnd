@@ -168,4 +168,12 @@ export class OrderManagementContentService {
       return this.http.post(`/api/Orders/${editedOrder.id}/documents`, formData).pipe(map(() => editedOrder));
     }));
   }
+
+  /**
+   * Edit order
+   * @param id order id to delete
+   */
+  public deleteOrder(id: number): Observable<any> {
+    return this.http.delete<Order>('/api/Orders', { params: { orderId: id }});
+  }
 }

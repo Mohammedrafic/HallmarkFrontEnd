@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetHeaderState } from 'src/app/store/app.actions';
@@ -9,7 +9,7 @@ import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-g
 import { STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { OrderManagemetTabs } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { GetAgencyOrderCandidatesList, GetIncompleteOrders, GetOrderById, GetOrders } from '@client/store/order-managment-content.actions';
+import { DeleteOrderSucceeded, GetAgencyOrderCandidatesList, GetIncompleteOrders, GetOrderById, GetOrders } from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { OrderManagement, OrderManagementPage } from '@shared/models/order-management.model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
@@ -47,7 +47,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
-  public activeTab: OrderManagemetTabs;
+  public activeTab: OrderManagemetTabs = OrderManagemetTabs.AllOrders;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
   public isLockMenuButtonsShown = true;
@@ -73,12 +73,16 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public openDetails = new Subject<boolean>();
   public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
 
-  constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
+  constructor(private store: Store, private router: Router, private route: ActivatedRoute, private actions$: Actions) {
     super();
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
   }
 
   ngOnInit(): void {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(DeleteOrderSucceeded)).subscribe(() => {
+      this.grid.clearRowSelection();
+      this.openDetails.next(false);
+    });
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
       this.selectedOrder = order;
     });
@@ -121,11 +125,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.grid.selectRow(nextIndex);
   }
 
-  public onRowClick({ data }: { data: OrderManagement }): void {
-    const options = this.getDialogNextPreviousOption(data);
-    this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
-    this.store.dispatch(new GetAgencyOrderCandidatesList(data.id, data.organizationId, this.currentPage, this.pageSize));
-    this.openDetails.next(true);
+  public onRowClick(event: any): void {
+    if (!event.isInteracted) {
+      const data = event.data;
+      const options = this.getDialogNextPreviousOption(data);
+      this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
+      this.store.dispatch(new GetAgencyOrderCandidatesList(data.id, data.organizationId, this.currentPage, this.pageSize));
+      this.openDetails.next(true);
+    }
   }
 
   private getDialogNextPreviousOption(selectedOrder: OrderManagement): DialogNextPreviousOption {

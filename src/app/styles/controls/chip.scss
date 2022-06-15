@@ -23,42 +23,70 @@ ejs-chiplist.e-control.e-chip-list {
     &.e-success:hover {
       background-color: $supportive-green-10;
       color: $white;
+
+      &.e-focused {
+        background-color: $supportive-green-10;
+      }
     }
 
     &.e-warning,
     &.e-warning:hover {
       background-color: $supportive-orange;
       color: $white;
+
+      &.e-focused {
+        background-color: $supportive-orange;
+      }
     }
 
     &.e-default,
     &.e-default:hover {
       background-color: $secondary-dark-blue-20;
       color: $white;
+
+      &.e-focused {
+        background-color: $secondary-dark-blue-20;
+      }
     }
 
     &.e-pending,
     &.e-pending:hover {
       background-color: $supportive-red;
       color: $white;
+
+      &.e-focused {
+        background-color: $supportive-red;
+      }
     }
 
     &.e-progress,
     &.e-progress:hover {
       background-color: $primary-active-blue;
       color: $white;
+
+      &.e-focused {
+        background-color: $primary-active-blue;
+      }
     }
 
     &.e-accepted,
     &.e-accepted:hover {
       background-color: $supportive-purple;
       color: $white;
+
+      &.e-focused {
+        background-color: $supportive-purple;
+      }
     }
 
     &.e-filled,
     &.e-filled:hover {
       background-color: $primary-active-blue-30;
       color: $white;
+
+      &.e-focused {
+        background-color: $primary-active-blue-30;
+      }
     }
   }
 

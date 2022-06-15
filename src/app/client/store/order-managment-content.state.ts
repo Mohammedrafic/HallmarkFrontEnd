@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, tap } from 'rxjs';
-import { EditOrder, GetAgencyOrderCandidatesList, GetAssociateAgencies, GetIncompleteOrders, GetMasterShifts, GetOrderById, GetOrders, GetOrganizationStatesWithKeyCode, GetPredefinedBillRates, GetProjectNames, GetProjectTypes, GetSelectedOrderById, GetWorkflows, SaveOrder, SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
+import { catchError, Observable, of, tap } from 'rxjs';
+import { DeleteOrder, DeleteOrderSucceeded, EditOrder, GetAgencyOrderCandidatesList, GetAssociateAgencies, GetIncompleteOrders, GetMasterShifts, GetOrderById, GetOrders, GetOrganizationStatesWithKeyCode, GetPredefinedBillRates, GetProjectNames, GetProjectTypes, GetSelectedOrderById, GetWorkflows, SaveOrder, SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { OrderCandidatesListPage, OrderManagementPage } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
@@ -223,5 +223,13 @@ export class OrderManagementContentState {
       }),
       catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
     );
+  }
+
+  @Action(DeleteOrder)
+  DeleteOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { id }: DeleteOrder): Observable<any> {
+    return this.orderManagementService.deleteOrder(id).pipe(tap(() => {
+      dispatch(new DeleteOrderSucceeded());
+    }),
+    catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Order cannot be deleted')))));
   }
 }

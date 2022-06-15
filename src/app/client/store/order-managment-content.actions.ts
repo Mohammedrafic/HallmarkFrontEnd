@@ -82,3 +82,13 @@ export class EditOrder {
   static readonly type = '[order management] Edit Order';
   constructor(public order: EditOrderDto, public documents: Blob[]) { }
 }
+
+export class DeleteOrder {
+  static readonly type = '[order management] Delete Order';
+  constructor(public id: number) { }
+}
+
+export class DeleteOrderSucceeded {
+  static readonly type = '[order management] Delete Order Succeeded';
+  constructor() { }
+}
