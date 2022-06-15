@@ -107,18 +107,20 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
   private patchForm(): void {
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
       this.candidateJob = value;
-      this.form.patchValue({
-        jobId: value.orderId,
-        date: [value.order.jobStartDate, value.order.jobEndDate],
-        billRates: value.order.billRates,
-        candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
-        candidateBillRate: value.candidateBillRate,
-        locationName: value.order.locationName,
-        yearExp: value.yearsOfExperience,
-        travelExp: value.expAsTravelers,
-        offeredBillRate: value.offeredBillRate,
-        comments: value.requestComment
-      });
+      if(value) {
+        this.form.patchValue({
+          jobId: value.orderId,
+          date: [value.order.jobStartDate, value.order.jobEndDate],
+          billRates: value.order.billRates,
+          candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
+          candidateBillRate: value.candidateBillRate,
+          locationName: value.order.locationName,
+          yearExp: value.yearsOfExperience,
+          travelExp: value.expAsTravelers,
+          offeredBillRate: value.offeredBillRate,
+          comments: value.requestComment
+        });
+      }
     });
   }
 }

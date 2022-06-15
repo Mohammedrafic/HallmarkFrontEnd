@@ -44,10 +44,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   }
 
   ngOnInit() {
-    this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
-      this.currentPage = page;
-      this.store.dispatch(new GetAgencyOrderCandidatesList(this.order.orderId, this.order.organizationId, this.currentPage, this.pageSize));
-    });
+    this.subscribeOnPageChanges();
   }
 
   public onRowsDropDownChanged(): void {
@@ -89,7 +86,14 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
     this.sideDialog.hide();
   }
 
-  getBillRate(rate: number): string {
+  public getBillRate(rate: number): string {
     return rate ? `$10.00 - ${rate}` :' $10.00';
+  }
+
+  private subscribeOnPageChanges(): void {
+    this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
+      this.currentPage = page;
+      this.store.dispatch(new GetAgencyOrderCandidatesList(this.order.orderId, this.order.organizationId, this.currentPage, this.pageSize));
+    });
   }
 }
