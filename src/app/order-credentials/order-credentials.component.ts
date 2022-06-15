@@ -100,7 +100,7 @@ export class OrderCredentialsComponent implements OnInit {
   }
 
   public onUpdate(data: IOrderCredentialItem): void {
-    this.credentialChanged.emit(data);
+    this.editExistedCred(data);
   }
 
   public onDelete(credentialId: number): void {
@@ -119,8 +119,8 @@ export class OrderCredentialsComponent implements OnInit {
     }
   }
 
-  private editExistedCred(): void {
-    const cred = this.CredentialForm.getRawValue() as IOrderCredentialItem;
+  private editExistedCred(data?: IOrderCredentialItem): void {
+    const cred = data || this.CredentialForm.getRawValue() as IOrderCredentialItem;
     this.updateExistedCredInGrid(cred);
     this.credentialChanged.emit(Object.assign({}, { ...cred }));
     this.isEditMode = false;
@@ -146,7 +146,7 @@ export class OrderCredentialsComponent implements OnInit {
   }
 
   private addNewCred(): void {
-    const { value } = this.CredentialForm;
+    const value = this.CredentialForm.getRawValue();
     this.updateGroups(value);
     this.credentialChanged.emit(Object.assign({}, {...value}, { id: 0, orderId: 0 }));
     this.updateCredList(value);

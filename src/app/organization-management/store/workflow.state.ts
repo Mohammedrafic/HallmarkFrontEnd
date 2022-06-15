@@ -114,19 +114,19 @@ export class WorkflowState {
   }
 
   @Action(GetWorkflowMappingPages)
-  GetWorkflowMappingPages({ patchState }: StateContext<WorkflowStateModel>, { }: GetWorkflowMappingPages): Observable<GetWorkflowMappingPages> {
-    return this.workflowService.getWorkflowMappingPages().pipe(tap((payload) => {
+  GetWorkflowMappingPages({ patchState }: StateContext<WorkflowStateModel>, { filters }: GetWorkflowMappingPages): Observable<WorkflowMappingPage> {
+    return this.workflowService.getWorkflowMappingPages(filters).pipe(tap((payload) => {
       patchState({ workflowMappingPages: payload });
       return payload;
     }));
   }
 
   @Action(SaveWorkflowMapping)
-  SaveWorkflowMapping({ patchState, dispatch }: StateContext<WorkflowStateModel>, { payload }: SaveWorkflowMapping): Observable<WorkflowMappingPost | void> {
+  SaveWorkflowMapping({ dispatch }: StateContext<WorkflowStateModel>, { payload, filters }: SaveWorkflowMapping): Observable<WorkflowMappingPost | void> {
     return this.workflowService.saveWorkflowMapping(payload)
       .pipe(tap((payloadResponse) => {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-          dispatch(new GetWorkflowMappingPages());
+          dispatch(new GetWorkflowMappingPages(filters));
           dispatch(new SaveWorkflowMappingSucceed());
           return payloadResponse;
         }),
@@ -141,10 +141,10 @@ export class WorkflowState {
   }
 
   @Action(RemoveWorkflowMapping)
-  RemoveWorkflowMapping({ patchState, dispatch }: StateContext<WorkflowStateModel>, { payload }: RemoveWorkflowMapping): Observable<void> {
+  RemoveWorkflowMapping({ dispatch }: StateContext<WorkflowStateModel>, { payload, filters }: RemoveWorkflowMapping): Observable<void> {
     return this.workflowService.removeWorkflowMapping(payload)
       .pipe(tap(() => {
-          dispatch(new GetWorkflowMappingPages());
+          dispatch(new GetWorkflowMappingPages(filters));
           return payload;
         }),
         catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))

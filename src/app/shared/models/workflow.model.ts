@@ -30,3 +30,17 @@ export class Step {
   order?: number;
   nextStepStatus?: string;
 }
+
+
+export class WorkflowFilters {
+  holidayNames?: string[];
+  pageNumber?: number;
+  pageSize?: number;
+  orderBy?: string;
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentsIds?: number[];
+  skillIds?: number[];
+  types?: number[];
+  names?: string[];
+}

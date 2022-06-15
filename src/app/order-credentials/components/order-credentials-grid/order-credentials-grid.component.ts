@@ -41,8 +41,7 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
   }
 
   public updateCredential(data: IOrderCredentialItem): void {
-    this.update.emit(data);
-    this.grid.refresh();
+    this.update.emit(Object.assign({}, { ...data }));
   }
 
   public dataBound(): void {
