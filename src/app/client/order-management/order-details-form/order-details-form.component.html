@@ -67,7 +67,7 @@
                       appValidateWithMessage
                       [dataSource]="regions$ | async"
                       [fields]="regionFields"
-                      (change)="onRegionDropDownChanged($event)">
+                      (select)="onRegionDropDownChanged($event)">
                     </ejs-dropdownlist>
                   </div>
                 </div>
@@ -83,7 +83,7 @@
                       [enabled]="isLocationsDropDownEnabled"
                       [dataSource]="locations$ | async"
                       [fields]="locationFields"
-                      (change)="onLocationDropDownChanged($event)">
+                      (select)="onLocationDropDownChanged($event)">
                     </ejs-dropdownlist>
                   </div>
                 </div>
@@ -99,7 +99,7 @@
                       [enabled]="isDepartmentsDropDownEnabled"
                       [dataSource]="departments$ | async"
                       [fields]="departmentFields"
-                      (change)="onDepartmentDropDownChanged($event)">
+                      (select)="onDepartmentDropDownChanged($event)">
                     </ejs-dropdownlist>
                   </div>
                 </div>
@@ -114,7 +114,7 @@
                       appValidateWithMessage
                       [dataSource]="(skills$ | async)"
                       [fields]="skillFields"
-                      (change)="onSkillsDropDownChanged($event)"
+                      (select)="onSkillsDropDownChanged($event)"
                       >
                       
                     </ejs-dropdownlist>
