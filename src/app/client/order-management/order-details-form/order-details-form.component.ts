@@ -19,7 +19,8 @@ import {
   GetOrganizationStatesWithKeyCode,
   GetProjectNames,
   GetProjectTypes,
-  GetWorkflows
+  GetWorkflows,
+  GetPredefinedBillRates
 } from '@client/store/order-managment-content.actions';
 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -267,6 +268,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       workflowId: [null, Validators.required]
     });
 
+    const orderTypeControl = this.orderTypeStatusForm.get('orderType') as AbstractControl;
     const locationIdControl = this.generalInformationForm.get('locationId') as AbstractControl;
     const departmentIdControl = this.generalInformationForm.get('departmentId') as AbstractControl;
     const skillIdControl = this.generalInformationForm.get('skillId') as AbstractControl;
@@ -308,6 +310,18 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
 
     combineLatest([
+      orderTypeControl.valueChanges,
+      departmentIdControl.valueChanges,
+      skillIdControl.valueChanges
+    ]).pipe(takeUntil(this.unsubscribe$)).subscribe(([orderType, departmentId, skillId]) => {
+      if (!orderType || !departmentId || !skillId || this.isEditMode) {
+        return;
+      }
+
+      this.store.dispatch(new GetPredefinedBillRates(orderType, departmentId, skillId));
+    });
+
+    combineLatest([
       departmentIdControl.valueChanges,
       skillIdControl.valueChanges
     ]).pipe(takeUntil(this.unsubscribe$)).subscribe(([departmentId, skillId]) => {
@@ -316,7 +330,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       }
 
       this.store.dispatch(new GetWorkflows(departmentId, skillId));
-    })
+    });
 
     projectTypeIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((projectTypeId: number) => {
       const projectTypes = this.store.selectSnapshot(OrderManagementContentState.projectTypes);

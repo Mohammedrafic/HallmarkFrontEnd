@@ -1,4 +1,5 @@
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { OrderType } from '@shared/enums/order-type';
 import { OrderManagementFilter } from '@shared/models/order-management.model';
 import { CreateOrderDto, EditOrderDto } from '@shared/models/order-management.model';
 
@@ -60,6 +61,11 @@ export class GetMasterShifts {
 export class GetAssociateAgencies {
   static readonly type = '[order management] Get Associate Agencies';
   constructor() { }
+}
+
+export class GetPredefinedBillRates {
+  static readonly type = '[order management] Get Predefined Bill Rates';
+  constructor(public orderType: OrderType, public departmentId: number, public skillId: number) { }
 }
 
 export class SaveOrder {

@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, tap } from 'rxjs';
-import { EditOrder, GetAgencyOrderCandidatesList, GetAssociateAgencies, GetIncompleteOrders, GetMasterShifts, GetOrderById, GetOrders, GetOrganizationStatesWithKeyCode, GetProjectNames, GetProjectTypes, GetSelectedOrderById, GetWorkflows, SaveOrder, SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
+import { EditOrder, GetAgencyOrderCandidatesList, GetAssociateAgencies, GetIncompleteOrders, GetMasterShifts, GetOrderById, GetOrders, GetOrganizationStatesWithKeyCode, GetPredefinedBillRates, GetProjectNames, GetProjectTypes, GetSelectedOrderById, GetWorkflows, SaveOrder, SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { OrderCandidatesListPage, OrderManagementPage } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
@@ -17,6 +17,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
+import { BillRate } from '@shared/models/bill-rate.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -32,6 +33,7 @@ export interface OrderManagementContentStateModel {
   projectNames: ProjectName[];
   masterShifts: MasterShift[];
   associateAgencies: AssociateAgency[];
+  predefinedBillRates: BillRate[];
 }
 
 @State<OrderManagementContentStateModel>({
@@ -49,7 +51,8 @@ export interface OrderManagementContentStateModel {
     projectTypes: [],
     projectNames: [],
     masterShifts: [],
-    associateAgencies: []
+    associateAgencies: [],
+    predefinedBillRates: []
   }
 })
 @Injectable()
@@ -87,6 +90,9 @@ export class OrderManagementContentState {
 
   @Selector()
   static associateAgencies(state: OrderManagementContentStateModel): AssociateAgency[] { return state.associateAgencies }
+
+  @Selector()
+  static predefinedBillRates(state: OrderManagementContentStateModel): BillRate[] { return state.predefinedBillRates }
 
   constructor(
     private orderManagementService: OrderManagementContentService,
@@ -187,6 +193,13 @@ export class OrderManagementContentState {
   GetAssociateAgencies({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<AssociateAgency[]> {
     return this.orderManagementService.getAssociateAgencies().pipe(tap(payload => {
       patchState({ associateAgencies: payload });
+    }));
+  }
+
+  @Action(GetPredefinedBillRates)
+  GetPredefinedBillRates({ patchState }: StateContext<OrderManagementContentStateModel>, { orderType, departmentId, skillId }: GetPredefinedBillRates): Observable<BillRate[]> {
+    return this.orderManagementService.getPredefinedBillRates( orderType, departmentId, skillId).pipe(tap(payload => {
+      patchState({ predefinedBillRates: payload });
     }));
   }
 
