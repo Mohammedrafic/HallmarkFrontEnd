@@ -74,6 +74,7 @@ export type AgencyOrderCandidates = {
   status: number;
   statusName: string;
   submissionsPercentage: number;
+  candidateJobId: number;
 };
 
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;
@@ -159,4 +160,66 @@ export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'docume
 export interface EditOrderDto extends Omit<Order, 'billRates' | 'status' | 'documents'> {
   billRates: OrderBillRateDto[];
   deleteDocumentsGuids: string[];
+}
+
+export type AcceptJobDTO = {
+  actualEndDate: string;
+  actualStartDate: string;
+  allowDeplayWoCredentials: boolean;
+  candidateBillRate: number;
+  clockId: number;
+  guaranteedWorkWeek: string;
+  jobId: number;
+  nextApplicantStatus: {
+    applicantStatus: number;
+    statusText: string;
+  }
+  offeredBillRate: number;
+  organizationId: number;
+  requestComment: number;
+}
+
+export type CandidateProfile = {
+  agencyId: number;
+  candidateAgencyStatus: number;
+  candidateProfileContactDetail: string;
+  candidateProfileSkills: Array<string>;
+  classification: number;
+  createdAt: string;
+  createdBy: string;
+  dob: number;
+  email: string;
+  firstName: string;
+  id: number;
+  lastModifiedAt: string;
+  lastModifiedBy: string;
+  lastName: string;
+  middleName: string;
+  professionalSummary: string;
+  profileStatus: number;
+  ssn: number;
+}
+
+export type OrderCandidateJob = {
+  actualEndDate: string;
+  actualStartDate: string;
+  availableStartDate: string;
+  billRatesGroupId: number;
+  candidateBillRate: number;
+  candidateProfile: CandidateProfile;
+  candidateProfileId: number;
+  clockId: number;
+  expAsTravelers: string;
+  guaranteedWorkWeek: string;
+  jobId: number;
+  offeredBillRate: number;
+  order: Order;
+  orderId: number;
+  organizationId: number;
+  rejectBy: string;
+  rejectDate: string;
+  rejectReason: string;
+  requestComment: string;
+  workflowStepId: number;
+  yearsOfExperience: number;
 }

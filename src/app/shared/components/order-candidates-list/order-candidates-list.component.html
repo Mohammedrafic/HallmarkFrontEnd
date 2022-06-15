@@ -124,7 +124,17 @@
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
-  <ng-template #content>
+  <ng-container *ngTemplateOutlet="templateState | async"></ng-container>
+
+  <ng-template #accept>
+    <app-accept-candidate
+      (closeModalEvent)="onCloseDialog()"
+      [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
+      [candidate]="candidate"
+    ></app-accept-candidate>
+  </ng-template>
+
+  <ng-template #apply>
     <app-apply-candidate (closeDialogEmitter)="onCloseDialog()"
                          [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
                          [candidate]="candidate">

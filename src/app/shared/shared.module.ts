@@ -4,7 +4,6 @@ import { FeatherModule } from 'angular-feather';
 import { AlertCircle, CheckCircle, allIcons, User, Briefcase, Folder, MapPin, Calendar, ArrowLeft, ArrowRight, Mail, Send } from 'angular-feather/icons';
 import { NumericTextBoxAllModule, UploaderModule } from "@syncfusion/ej2-angular-inputs";
 import { DropDownListModule, ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
-import { DatePickerModule } from "@syncfusion/ej2-angular-calendars";
 
 import { PageToolbarComponent } from './components/page-toolbar/page-toolbar.component';
 import { ValidateDirective } from './directives/validate.directive';
@@ -16,8 +15,8 @@ import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 import { ImageUploaderComponent } from './components/image-uploader/image-uploader.component';
 import { DocumentUploaderComponent } from './components/document-uploader/document-uploader.component';
 import { FileUploadDialogComponent } from './components/file-upload-dialog/file-upload-dialog.component';
+import { ButtonModule, ChipListAllModule, RadioButtonAllModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
-import { ButtonModule, ChipListAllModule, RadioButtonAllModule } from '@syncfusion/ej2-angular-buttons';
 import { SideDialogComponent } from './components/side-dialog/side-dialog.component';
 import { SideMenuComponent } from './components/side-menu/side-menu.component';
 import { SearchComponent } from './components/search/search.component';
@@ -34,9 +33,12 @@ import { GeneralOrderInfoComponent } from './components/general-order-info/gener
 import { GridAllModule, PagerAllModule } from "@syncfusion/ej2-angular-grids";
 import { OrderCandidatesListComponent } from './components/order-candidates-list/order-candidates-list.component';
 import { CustomProgressBarComponent } from './components/custom-progress-bar/custom-progress-bar.component';
+import { ApplyCandidateComponent } from './components/order-candidates-list/apply-candidate/apply-candidate.component';
+import { AcceptCandidateComponent } from './components/order-candidates-list/accept-candidate/accept-candidate.component';
+import { DatePickerModule, DateRangePickerModule } from "@syncfusion/ej2-angular-calendars";
+import { OnboardedCandidateComponent } from './components/order-candidates-list/onboarded-candidate/onboarded-candidate.component';
 import { BillRatesViewGridComponent } from './components/bill-rates-view-grid/bill-rates-view-grid.component';
 import { CommentsComponent } from './components/comments/comments.component';
-import { ApplyCandidateComponent } from './components/order-candidates-list/apply-candidate/apply-candidate.component';
 import { HighlightGridRowDirective } from '@shared/directives/hightlight-grid-row.directive';
 import { AddBackgroundForEmptyGridDirective } from '@shared/directives/add-background-for-empty-grid.directive';
 import { FormatPhoneNumberPipe } from '@shared/pipes/format-phone-number.pipe';
@@ -79,12 +81,19 @@ const COMPONENTS = [
   GeneralOrderInfoComponent,
   OrderCandidatesListComponent,
   CustomProgressBarComponent,
+  ApplyCandidateComponent,
+  AcceptCandidateComponent,
+  CustomProgressBarComponent,
   BillRatesViewGridComponent,
-  CommentsComponent
+  CommentsComponent,
+  AcceptCandidateComponent,
+  OnboardedCandidateComponent,
+  ApplyCandidateComponent
 ];
 
 @NgModule({
-  imports: [FeatherModule.pick(icons),
+  imports: [
+    FeatherModule.pick(icons),
     CommonModule,
     UploaderModule,
     ToastModule,
@@ -94,17 +103,22 @@ const COMPONENTS = [
     RadioButtonAllModule,
     ChipListAllModule,
     FormsModule,
-    ReactiveFormsModule,
-    DatePickerModule,
     DropDownButtonModule,
-    AccordionModule,
-    TooltipModule,
+    GridAllModule,
+    DropDownListModule,
     NumericTextBoxAllModule,
-    GridAllModule, PagerAllModule,
+    PagerAllModule,
+    AccordionModule,
+    ReactiveFormsModule,
+    DateRangePickerModule,
+    DatePickerModule,
+    CheckBoxModule,
+    TooltipModule,
+    DateRangePickerModule,
     DropDownListModule
   ],
   exports: [...COMPONENTS],
-  declarations: [...COMPONENTS, ErrorMessageComponent, ApplyCandidateComponent],
+  declarations: [...COMPONENTS, ErrorMessageComponent],
   providers: [DatePipe],
 })
 export class SharedModule {}

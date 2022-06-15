@@ -6,12 +6,14 @@ import { GridComponent } from "@syncfusion/ej2-angular-grids";
 import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
 import { Select, Store } from "@ngxs/store";
 import { AgencyOrder, AgencyOrderCandidates, Order, OrderCandidatesListPage } from "@shared/models/order-management.model";
-import { GetAgencyOrderCandidatesList, GetOrderApplicantsData } from "@agency/store/order-management.actions";
+import { GetAgencyCandidateJob, GetAgencyOrderCandidatesList, GetOrderApplicantsData } from "@agency/store/order-management.actions";
 import { DialogComponent } from "@syncfusion/ej2-angular-popups";
 import { debounceTime, Observable, Subject } from "rxjs";
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
+import { AcceptCandidateComponent } from "@shared/components/order-candidates-list/accept-candidate/accept-candidate.component";
+import { ApplyCandidateComponent } from "@shared/components/order-candidates-list/apply-candidate/apply-candidate.component";
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -21,12 +23,15 @@ import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 export class OrderCandidatesListComponent extends AbstractGridConfigurationComponent implements OnInit{
   @ViewChild('orderCandidatesGrid') grid: GridComponent;
   @ViewChild('sideDialog') sideDialog: DialogComponent;
+  @ViewChild('accept') accept: AcceptCandidateComponent;
+  @ViewChild('apply') apply: ApplyCandidateComponent;
 
   @Input() candidatesList: OrderCandidatesListPage;
   @Input() order: AgencyOrder;
 
   @Select(OrderManagementState.selectedOrder)
   public selectedOrder$: Observable<Order>;
+  public templateState: Subject<any> = new Subject();
 
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
@@ -66,10 +71,18 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   public onEdit(data: AgencyOrderCandidates): void {
     this.candidate = data;
 
-    if (this.order && this.candidate && this.candidate.statusName === 'Not Applied') { // TODO: add enum
+    // TODO: add enum and refactor
+    if (this.order && this.candidate && this.candidate.statusName === 'Not Applied') {
       this.store.dispatch(new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId));
-      this.sideDialog.show();
+      this.templateState.next(this.apply);
     }
+
+    if(this.order && this.order && this.candidate && (data.statusName === 'Offered'|| data.statusName === 'Accepted')) {
+      this.store.dispatch(new GetAgencyCandidateJob(this.order.organizationId, data.candidateJobId));
+      this.templateState.next(this.accept);
+    }
+
+    this.sideDialog.show();
   }
 
   public onCloseDialog(): void {

@@ -1,0 +1,57 @@
+@import "colors";
+
+.container {
+  .apply-button {
+    margin: 0 8px 0 12px;
+  }
+
+  .content-container {
+    display: flex;
+    margin-top: 24px;
+
+    .candidate-info {
+      width: 55%;
+      margin-right: 12px;
+
+      ejs-accordion {
+        margin-bottom: 10px;
+
+        .form-container {
+          display: flex;
+          flex-direction: row;
+
+          .input-container {
+            margin-bottom: 12px;
+          }
+
+          .left-column {
+            width: 67%;
+            margin-right: 12px;
+          }
+
+          .right-column {
+            width: 33%;
+          }
+        }
+
+        .row {
+          margin-top: 12px;
+          justify-content: space-between;
+          gap: 10px;
+        }
+
+        .date-container {
+          margin-top: 12px;
+          gap: 10px;
+        }
+      }
+    }
+
+    .comments {
+      width: 45%;
+      height: 710px;
+      background-color: $secondary-dark-blue-50;
+      border-radius: 8px;
+    }
+  }
+}

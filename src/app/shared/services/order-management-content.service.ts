@@ -5,7 +5,7 @@ import {
   OrderManagementFilter,
   OrderManagementPage,
   AgencyOrderManagementPage,
-  OrderCandidatesListPage
+  OrderCandidatesListPage, OrderCandidateJob, AcceptJobDTO
 } from '@shared/models/order-management.model';
 import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-management.model';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -67,6 +67,23 @@ export class OrderManagementContentService {
    */
   public getAgencyOrderById(id: number, organizationId: number): Observable<Order> {
     return this.http.get<Order>(`/api/Orders/${id}/organization/${organizationId}`);
+  }
+
+  /**
+   * Get order by id
+   @param organizationId
+   @param jobId
+   */
+  public getAgencyCandidateJob(organizationId: number, jobId: number): Observable<OrderCandidateJob> {
+    return this.http.get<OrderCandidateJob>(`/api/AppliedCandidates/candidateJob?OrganizationId=${organizationId}&JobId=${jobId}`);
+  }
+
+  /**
+   * Get order by id
+   @param payload
+   */
+  public updateAgencyCandidateJob(payload: AcceptJobDTO): Observable<void> {
+    return this.http.post<void>(`/api/AppliedCandidates/updateCandidateJob`, payload);
   }
 
   /**
