@@ -9,3 +9,5 @@ export const OPTION_FIELDS = {
 export const JOB_STATUS = Object.values(CandidateJobStatus)
   .filter(valuesOnly)
   .map((text, id) => ({ text, id: id }));
+
+export const ONBOARDED_STATUS = 'Onboarded';

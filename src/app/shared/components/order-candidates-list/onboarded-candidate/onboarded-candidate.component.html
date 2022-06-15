@@ -50,10 +50,10 @@
                         <input appValidateWithMessage formControlName="candidates" class="e-input" type="text" placeholder="Candidates" readonly/>
                       </div>
                     </div>
-                    <div class="input-container bootstrap" *ngIf="isOnboarded">
+                    <div class="input-container bootstrap">
                       <label class="input-group">Guaranteed Work Week</label>
                       <div class="input-group">
-                        <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" placeholder="Guaranteed Work Week" (blur)="onChangeValue()"/>
+                        <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" placeholder="Guaranteed Work Week"/>
                       </div>
                     </div>
                   </div>
@@ -76,10 +76,10 @@
                         <input appValidateWithMessage formControlName="candidateBillRate" class="e-input" type="text" placeholder="Input text" readonly/>
                       </div>
                     </div>
-                    <div class="input-container bootstrap" *ngIf="isOnboarded">
+                    <div class="input-container bootstrap">
                       <label class="input-group">Clock ID </label>
                       <div>
-                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" placeholder="Clock ID" (blur)="onChangeValue()"/>
+                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" placeholder="Clock ID"/>
                       </div>
                     </div>
                   </div>
@@ -103,20 +103,20 @@
                       <input appValidateWithMessage formControlName="travelExp" class="e-input" type="text" placeholder="0" readonly/>
                     </div>
                   </div>
-                  <div class="input-container bootstrap" *ngIf="isOnboarded">
+                  <div class="input-container bootstrap">
                     <label class="input-group">Offered Bill Rate</label>
                     <div class="input-group">
-                      <input appValidateWithMessage formControlName="offeredBillRate" class="e-input" type="text" placeholder="$ 0.00" (blur)="onChangeValue()"/>
+                      <input appValidateWithMessage formControlName="offeredBillRate" class="e-input" type="text" placeholder="$ 0.00"/>
                     </div>
                   </div>
                 </div>
                 <div class="input-container bootstrap">
-                  <div *ngIf="isOnboarded">
-                    <ejs-checkbox formControlName="allow" label="Allow deploy w/o credentials" (blur)="onChangeValue()"></ejs-checkbox>
+                  <div>
+                    <ejs-checkbox formControlName="allow" label="Allow deploy w/o credentials"></ejs-checkbox>
                   </div>
                 </div>
                 <div class="form-container date-container">
-                  <div class="input-container bootstrap" *ngIf="isOnboarded">
+                  <div class="input-container bootstrap">
                     <label class="input-group">Actual Start Date</label>
                     <div class="input-group datepicker">
                       <ejs-datepicker
@@ -127,13 +127,12 @@
                         placeholder="MM/DD/YYYY"
                         [enableMask]="true"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
-                        (blur)="onChangeValue($event)"
                         formControlName="startDate"
                       >
                       </ejs-datepicker>
                     </div>
                   </div>
-                  <div class="input-container bootstrap" *ngIf="isOnboarded">
+                  <div class="input-container bootstrap">
                     <label class="input-group">Actual End Date</label>
                     <div class="input-group datepicker">
                       <ejs-datepicker
@@ -144,7 +143,6 @@
                         placeholder="MM/DD/YYYY"
                         [enableMask]="true"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
-                        (blur)="onChangeValue($event)"
                         formControlName="endDate"
                       >
                       </ejs-datepicker>

@@ -1,13 +1,17 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { Observable, Subject, takeUntil } from "rxjs";
-import { JOB_STATUS, OPTION_FIELDS } from "@shared/components/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst";
+import { filter, merge, Observable, Subject, takeUntil } from "rxjs";
+import {
+  JOB_STATUS,
+  ONBOARDED_STATUS,
+  OPTION_FIELDS
+} from "@shared/components/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst";
 import { BillRate } from "@shared/models/bill-rate.model";
 import { Select, Store } from "@ngxs/store";
 import { OrderCandidateJob, OrderCandidatesList } from "@shared/models/order-management.model";
-import { FormControl, FormGroup } from "@angular/forms";
+import { AbstractControl, FormControl, FormGroup } from "@angular/forms";
 import { DatePipe } from "@angular/common";
 import { OrderManagementContentState } from "@client/store/order-managment-content.state";
-import { UpdateOrganisationCandidateJob } from "@client/store/order-managment-content.actions";
+import { ReloadOrganisationOrderCandidatesLists, UpdateOrganisationCandidateJob } from "@client/store/order-managment-content.actions";
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -31,6 +35,14 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public candidateJob: OrderCandidateJob;
   public isOnboarded = false;
 
+  get startDateControl(): AbstractControl | null {
+    return this.form.get('startDate');
+  }
+
+  get endDateControl(): AbstractControl | null {
+    return this.form.get('endDate');
+  }
+
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(
@@ -41,6 +53,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.createForm();
     this.patchForm();
+    this.subscribeOnDate();
   }
 
   ngOnDestroy(): void {
@@ -48,21 +61,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
-  // TODO: remove any
-  public onChangeValue(event?: any): void {
-    console.log(event, 'event')
-    const value = this.form.getRawValue();
-    if(event) {
-      this.form.patchValue({ date: [value.startDate, value.endDate] });
-    }
-    this.onAccept();
-  }
-
-  // TODO: add enum and remove any
-  public onDropDownChanged(event: any): void {
-    if(event.itemData.text === 'Onboarded') {
+  public onDropDownChanged(event: {itemData: {text: string, id: number}}): void {
+    if(event.itemData.text === ONBOARDED_STATUS) {
       this.onAccept();
-      this.isOnboarded = true;
+      this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
     }
   }
 
@@ -121,6 +123,19 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   private  getAvailableStartDate(date: string): string | null {
     return this.datePipe.transform(date, 'MM/dd/yyyy');
+  }
+
+  private subscribeOnDate(): void {
+    merge(
+      (this.startDateControl as AbstractControl).valueChanges,
+      (this.endDateControl as AbstractControl).valueChanges
+    ).pipe(
+      filter((value) => !!value),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      const value = this.form.getRawValue()
+      this.form.patchValue({ date: [value.startDate, value.endDate] });
+    });
   }
 
   private createForm() : void {

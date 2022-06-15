@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetHeaderState } from 'src/app/store/app.actions';
@@ -9,7 +9,14 @@ import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-g
 import { STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { OrderManagemetTabs } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { DeleteOrderSucceeded, GetAgencyOrderCandidatesList, GetIncompleteOrders, GetOrderById, GetOrders } from '@client/store/order-managment-content.actions';
+import {
+  DeleteOrderSucceeded,
+  GetAgencyOrderCandidatesList,
+  GetIncompleteOrders,
+  GetOrderById,
+  GetOrders,
+  ReloadOrganisationOrderCandidatesLists
+} from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { OrderManagement, OrderManagementPage } from '@shared/models/order-management.model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
@@ -69,10 +76,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   ];
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
+  private selectedDataRow: Order;
   public selectedOrder: Order;
   public openDetails = new Subject<boolean>();
   public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
-
   constructor(private store: Store, private router: Router, private route: ActivatedRoute, private actions$: Actions) {
     super();
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
@@ -112,6 +119,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.grid.clearRowSelection();
       }
     });
+
+    this.onReloadOrderCandidatesLists();
   }
 
   ngOnDestroy(): void {
@@ -127,6 +136,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public onRowClick(event: any): void {
     if (!event.isInteracted) {
+      this.selectedDataRow = event.data;
       const data = event.data;
       const options = this.getDialogNextPreviousOption(data);
       this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
@@ -213,6 +223,15 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         // TODO: pending implementation
         break;
     }
+  }
+
+  private onReloadOrderCandidatesLists(): void {
+    this.actions$.pipe(
+      ofActionSuccessful(ReloadOrganisationOrderCandidatesLists),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.store.dispatch(new GetAgencyOrderCandidatesList(this.selectedDataRow.id, this.selectedDataRow.organizationId as number, this.currentPage, this.pageSize));
+    });
   }
 }
 

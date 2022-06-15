@@ -125,9 +125,7 @@
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
-  <!--<ng-container *ngTemplateOutlet="templateState | async"></ng-container>-->
-
-  <ng-container *ngTemplateOutlet="onboarded"></ng-container>
+  <ng-container *ngTemplateOutlet="templateState | async"></ng-container>
 
   <ng-template #onboarded>
     <app-onboarded-candidate

@@ -106,3 +106,8 @@ export class DeleteOrderSucceeded {
   static readonly type = '[order management] Delete Order Succeeded';
   constructor() { }
 }
+
+export class ReloadOrganisationOrderCandidatesLists {
+  static readonly type = '[agency order management] Reload Order and Candidates Lists on Organisation';
+  constructor() {}
+}
