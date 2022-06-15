@@ -39,13 +39,9 @@
         <ng-template #template let-data>{{data.rateHour}}</ng-template>
       </e-column>
 
-      <e-column headerText="Interval Min" textAlign="Right">
-        <ng-template #template let-data>{{data.intervalMin}}</ng-template>
-      </e-column>
+      <e-column field="intervalMin" headerText="Interval Min" textAlign="Right"></e-column>
 
-      <e-column headerText="Interval Max" textAlign="Right">
-        <ng-template #template let-data>{{data.intervalMax}}</ng-template>
-      </e-column>
+      <e-column field="intervalMax" headerText="Interval Max" textAlign="Right"></e-column>
 
       <e-column headerText="Effective Date" textAlign="Right">
         <ng-template #template let-data>{{data.effectiveDate | date:'M/d/y'}}</ng-template>

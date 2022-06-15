@@ -12,7 +12,7 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { Skill } from '@shared/models/skill.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
-import { ShowSideDialog } from '../../../store/app.actions';
+import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
 import {
   DeleteBillRatesById,
   GetBillRateOptions,
@@ -22,7 +22,7 @@ import {
 } from '@organization-management/store/bill-rates.actions';
 import { BillRatesState } from '@organization-management/store/bill-rates.state';
 import {
-  BillRateCategory,
+  BillRateCategory, BillRateFilters,
   BillRateOption,
   BillRateSetup,
   BillRateSetupPage,
@@ -34,6 +34,9 @@ import { OrderTypeOptions } from '@shared/enums/order-type';
 import { GetOrganizationStructure } from '../../../store/user.actions';
 import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
 import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
+import { FilteredItem } from '@shared/models/filter.model';
+import { FilterService } from '@shared/services/filter.service';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
 @Component({
   selector: 'app-bill-rate-setup',
@@ -82,10 +85,14 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public isIntervalMinEnabled = true;
   public isIntervalMaxEnabled = true;
   public billRatesFormGroup: FormGroup;
+  public billRateFilterFormGroup: FormGroup;
   public intervalMinField: AbstractControl;
   public intervalMaxField: AbstractControl;
   public billRateCategory = BillRateCategory;
   public billRateType = BillRateType;
+  public rateHourMask: string;
+  public filters: BillRateFilters = {};
+  public filterColumns: any;
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add New';
@@ -99,7 +106,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   constructor(private store: Store,
               private actions$: Actions,
               @Inject(FormBuilder) private builder: FormBuilder,
-              private confirmService: ConfirmService) {
+              private confirmService: ConfirmService,
+              private filterService: FilterService) {
     super();
     this.formBuilder = builder;
     this.createFormGroups();
@@ -108,27 +116,41 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   ngOnInit(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.store.dispatch(new GetAllOrganizationSkills());
-      this.store.dispatch(new GetBillRates(this.currentPage, this.pageSize));
+      this.store.dispatch(new GetBillRates({ pageNumber: this.currentPage, pageSize: this.pageSize }));
       this.store.dispatch(new GetBillRateOptions());
       this.store.dispatch(new GetOrganizationStructure());
     });
 
+    this.filterColumns = {
+      regionIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      departmentIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      skillIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'skillDescription', valueId: 'id' },
+      billRateTitleIds:  { type: ControlTypes.Dropdown, valueType: ValueType.Id, dataSource: [], valueField: 'title', valueId: 'id' },
+      orderTypeIds:  { type: ControlTypes.Dropdown, valueType: ValueType.Id, dataSource: [], valueField: 'title', valueId: 'id' }
+    }
+
     this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
       this.orgRegions = structure.regions;
       this.allRegions = [...this.orgRegions];
+      this.filterColumns.regionIds.dataSource = this.allRegions;
     });
 
     this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe(skills => {
       if (skills && skills.length > 0) {
         this.allSkills = skills;
+        this.filterColumns.skillIds.dataSource = skills;
       }
     });
 
     this.billRatesOptions$.pipe(takeUntil(this.unsubscribe$)).subscribe(options => {
       if (options && options.length > 0) {
         this.billRatesOptions = options;
+        this.filterColumns.billRateTitleIds.dataSource = options;
       }
     });
+
+    this.filterColumns.orderTypeIds.dataSource = OrderTypeOptions;
 
     this.intervalMinField = this.billRatesFormGroup.get('intervalMin') as AbstractControl;
     this.intervalMinField.addValidators(intervalMinValidator(this.billRatesFormGroup, 'intervalMax'));
@@ -141,6 +163,36 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.regionChangedHandler();
     this.locationChangedHandler();
     this.billRatesTitleChangedHandler();
+
+    this.billRateFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
+      if (val?.length) {
+        const selectedRegions: OrganizationRegion[] = [];
+        val.forEach(id => selectedRegions.push(this.orgRegions.find(region => region.id === id) as OrganizationRegion));
+        this.filterColumns.locationIds.dataSource = [];
+        selectedRegions.forEach(region => {
+          region.locations?.forEach(location => location.regionName = region.name);
+          this.filterColumns.locationIds.dataSource.push(...region.locations as []);
+        });
+      } else {
+        this.filterColumns.locationIds.dataSource = [];
+        this.billRateFilterFormGroup.get('locationIds')?.setValue([]);
+        this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns);
+      }
+    });
+
+    this.billRateFilterFormGroup.get('locationIds')?.valueChanges.subscribe((locationIds: number[]) => {
+        if (locationIds && locationIds.length > 0) {
+          this.filterColumns.departmentIds.dataSource = [];
+          locationIds.forEach(id => {
+            const selectedLocation = this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id);
+            this.filterColumns.departmentIds.dataSource.push(...selectedLocation?.departments as []);
+          });
+        } else {
+          this.filterColumns.departmentIds.dataSource = [];
+          this.billRateFilterFormGroup.get('departmentIds')?.setValue([]);
+          this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns);
+        }
+      });
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveUpdateBillRateSucceed))
       .subscribe(() => {
@@ -189,8 +241,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         billRateConfigId: this.billRatesFormGroup.controls['billRateTitleId'].value,
         orderTypes: this.billRatesFormGroup.controls['orderTypeIds'].value.length === this.orderTypes.length ? []
           : this.billRatesFormGroup.controls['orderTypeIds'].value, // [] means All on the BE side
-        rateHour: this.selectedBillRateUnit === BillRateUnit.Hours ? this.rateHoursInput.getMaskedValue()
-          : parseFloat(this.billRatesFormGroup.controls['billRateValueRateTimes'].value).toFixed(2),
+        rateHour: this.billRatesFormGroup.controls['billRateValueRateTimes'].value,
         effectiveDate: this.billRatesFormGroup.controls['effectiveDate'].value,
         intervalMin: this.isIntervalMinEnabled ? this.billRatesFormGroup.controls['intervalMin'].value : null,
         intervalMax: this.isIntervalMaxEnabled ? this.billRatesFormGroup.controls['intervalMax'].value : null,
@@ -291,15 +342,41 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     }
   }
 
-  public onMaskedTextboxBlur(args: any): void {
-    if (args.maskedValue.includes('_')) {
-      let refreshedValue = args.maskedValue.replace(/_/g, '0');
-      this.billRatesFormGroup.controls['billRateValueRateTimes'].setValue(refreshedValue);
-    }
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.billRateFilterFormGroup, this.filterColumns);
   }
 
-  public onMaskedTextboxFocus(args: any): void {
-    args.selectionStart = args.selectionEnd = args.maskedValue.length - 5;
+  public onFilterClearAll(): void {
+    this.billRateFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {};
+  }
+
+  public onFilterApply(): void {
+    this.filters = this.billRateFilterFormGroup.getRawValue();
+    this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns);
+    this.store.dispatch(new GetBillRates({
+      pageNumber: this.currentPage,
+      pageSize: this.pageSize,
+      billRateConfigIds: this.filters.billRateConfigIds,
+      regionIds: this.filters.regionIds,
+      locationIds: this.filters.locationIds,
+      departmentIds: this.filters.departmentIds,
+      skillIds: this.filters.skillIds,
+      orderTypes: this.filters.orderTypes
+    }));
+    this.store.dispatch(new ShowFilterDialog(false));
+  }
+
+  public onRateHourBlur(event: any): void {
+    if (event.value.toString().length <= 7 || (event.value.toString().length <= 7 && event.value.toString().includes('.'))) {
+      this.rateHourMask = '#.00';
+    } else if (event.value.toString().length === 8 || (event.value.toString().length === 10 && event.value.toString().includes('.'))) {
+      this.rateHourMask = '#.0';
+    } else {
+      this.rateHourMask = '#';
+    }
   }
 
   private createFormGroups(): void {
@@ -322,6 +399,15 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       regularLocal: [null],
       displayInTimesheet: [null],
       displayInJob: [null]
+    });
+
+    this.billRateFilterFormGroup = this.formBuilder.group({
+      regionIds: [''],
+      locationIds: [''],
+      departmentIds: [''],
+      skillIds: [''],
+      billRateTitleIds: [''],
+      orderTypeIds: ['']
     });
   }
 

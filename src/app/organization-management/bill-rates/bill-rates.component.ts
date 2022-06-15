@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ShowSideDialog } from '../../store/app.actions';
+import { ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
 import { Store } from '@ngxs/store';
+import { FilteredItem } from '@shared/models/filter.model';
 
 export enum BillRateNavigationTabs {
   BillRateSetup,
@@ -28,6 +29,11 @@ export class BillRatesComponent implements OnInit {
     this.isExternalBillRateType = BillRateNavigationTabs['ExternalBillRateType'] === selectedTab.selectedIndex;
     this.isExternalBillRateTypeMapping = BillRateNavigationTabs['ExternalBillRateTypeMapping'] === selectedTab.selectedIndex;
     this.store.dispatch(new ShowSideDialog(false));
+  }
+
+  public filter(): void {
+    // TODO: uncomment after implementation
+    // this.store.dispatch(new ShowFilterDialog(true));
   }
 
   public addBillRateSetupRecord(): void {

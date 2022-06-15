@@ -34,6 +34,9 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public isIntervalMinControlRequired = true;
   public isIntervalMaxControlRequired = true;
+  public selectedBillRateUnit: BillRateUnit = BillRateUnit.Multiplier;
+  public BillRateUnitList = BillRateUnit;
+  public rateHourMask: string;
 
   @Select(BillRateState.billRateOptions)
   public billRateOptions$: Observable<BillRateOption[]>;
@@ -77,6 +80,16 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isAlive = false;
   }
 
+  public onRateHourBlur(event: any): void {
+    if (event.value.toString().length <= 7 || (event.value.toString().length <= 7 && event.value.toString().includes('.'))) {
+      this.rateHourMask = '#.00';
+    } else if (event.value.toString().length === 8 || (event.value.toString().length === 10 && event.value.toString().includes('.'))) {
+      this.rateHourMask = '#.0';
+    } else {
+      this.rateHourMask = '#';
+    }
+  }
+
   private onBillRateConfigIdChanged(): void {
     this.billRateForm
       .get('billRateConfigId')
@@ -95,6 +108,8 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isIntervalMinControlRequired = true;
         this.isIntervalMaxControlRequired = true;
         if (billRateConfig) {
+          this.selectedBillRateUnit = billRateConfig.unit;
+          this.billRateForm.get('rateHour')?.setValue('');
           if (!billRateConfig.intervalMin) {
             intervalMinControl?.reset();
             intervalMinControl?.disable();

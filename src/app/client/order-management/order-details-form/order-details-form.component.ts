@@ -19,7 +19,8 @@ import {
   GetOrganizationStatesWithKeyCode,
   GetProjectNames,
   GetProjectTypes,
-  GetWorkflows
+  GetWorkflows,
+  GetPredefinedBillRates
 } from '@client/store/order-managment-content.actions';
 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -55,6 +56,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { SkillCategory } from '@shared/models/skill-category.model';
+import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 
 @Component({
   selector: 'app-order-details-form',
@@ -271,6 +273,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       workflowId: [null, Validators.required]
     });
 
+    const orderTypeControl = this.orderTypeStatusForm.get('orderType') as AbstractControl;
     const locationIdControl = this.generalInformationForm.get('locationId') as AbstractControl;
     const departmentIdControl = this.generalInformationForm.get('departmentId') as AbstractControl;
     const skillIdControl = this.generalInformationForm.get('skillId') as AbstractControl;
@@ -306,9 +309,21 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       const firstWorlLocationsControl = workLocationsFormArray.at(0) as FormGroup;
 
       firstWorlLocationsControl.controls['address'].patchValue(location.address1);
-      firstWorlLocationsControl.controls['state'].patchValue(location.state);
+      firstWorlLocationsControl.controls['state'].patchValue(this.findTargetState(location));
       firstWorlLocationsControl.controls['city'].patchValue(location.city);
       firstWorlLocationsControl.controls['zipCode'].patchValue(location.zip);
+    });
+
+    combineLatest([
+      orderTypeControl.valueChanges,
+      departmentIdControl.valueChanges,
+      skillIdControl.valueChanges
+    ]).pipe(takeUntil(this.unsubscribe$)).subscribe(([orderType, departmentId, skillId]) => {
+      if (!orderType || !departmentId || !skillId || this.isEditMode) {
+        return;
+      }
+
+      this.store.dispatch(new GetPredefinedBillRates(orderType, departmentId, skillId));
     });
 
     combineLatest([
@@ -320,7 +335,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       }
 
       this.store.dispatch(new GetWorkflows(departmentId, skillId));
-    })
+    });
 
     projectTypeIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((projectTypeId: number) => {
       const projectTypes = this.store.selectSnapshot(OrderManagementContentState.projectTypes);
@@ -471,7 +486,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     shiftEndTimeControl.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.store.dispatch(new GetRegions());
     this.store.dispatch(new GetMasterSkillsByOrganization());
     this.store.dispatch(new GetProjectNames());
@@ -494,7 +509,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     })
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
@@ -572,6 +587,30 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   public onDocumentDeleted(document: Document): void {
     this.deleteDocumentsGuids.push(document.documentId);
+  }
+
+  public setPriceMask(controlName: string, e: FocusEvent): void {
+    const input = e.target as HTMLInputElement;
+    if (!input.value.length) {
+      this.generalInformationForm.get(controlName)?.patchValue(`.00`, { emitEvent: false });
+      setTimeout(() => input.setSelectionRange(0, 0));
+    }
+  }
+
+  public setTwoDecimals(controlName: string, e: FocusEvent): void {
+    const input = e.target as HTMLInputElement;
+    const inputValue = input.value ? String(input.value) : '';
+    const integerLength = inputValue.split('.')[0].length;
+    let zerosCount = 2;
+
+    if (integerLength > 8 && integerLength < 10) {
+      zerosCount = 1;
+    } else if (integerLength > 9) {
+      zerosCount = 0;
+    }
+
+    const value = Number(inputValue).toFixed(Math.max(inputValue.split('.')[1]?.length, zerosCount) || zerosCount);
+    this.generalInformationForm.get(controlName)?.patchValue(value, { emitEvent: false });
   }
 
   private populateForms(order: Order): void {
@@ -745,27 +784,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  setPriceMask(controlName: string, e: FocusEvent): void {
-    const input = e.target as HTMLInputElement;
-    if (!input.value.length) {
-      this.generalInformationForm.get(controlName)?.patchValue(`.00`,{emitEvent: false});
-      setTimeout(() => input.setSelectionRange(0,0));
-    }
-  }
-
-  setTwoDecimals(controlName: string, e: FocusEvent): void {
-    const input = e.target as HTMLInputElement;
-    const inputValue = input.value ? String(input.value) : '';
-    const integerLength = inputValue.split('.')[0].length;
-    let zerosCount = 2;
-
-    if (integerLength > 8 && integerLength < 10) {
-      zerosCount = 1;
-    } else if (integerLength > 9) {
-      zerosCount = 0;
-    }
-
-    const value = Number(inputValue).toFixed(Math.max(inputValue.split('.')[1]?.length, zerosCount) || zerosCount);
-    this.generalInformationForm.get(controlName)?.patchValue(value,{emitEvent: false});
+  private findTargetState(location: Location): string | undefined {
+    const states = this.store.selectSnapshot(OrderManagementContentState.organizationStatesWithKeyCode);
+    return states.find(({ title }: OrganizationStateWithKeyCode) => title === location.state)?.keyCode;
   }
 }

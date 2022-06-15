@@ -43,6 +43,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order>;
 
+  @Select(OrderManagementContentState.predefinedBillRates)
+  predefinedBillRates$: Observable<BillRate[]>;
+
   public SelectedTab = SelectedTab;
   public orderId: number;
 
@@ -86,6 +89,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe(() => {
       this.router.navigate(['/client/order-management']);
+    });
+
+    this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe(predefinedBillRates => {
+      this.orderBillRates = predefinedBillRates;
     });
   }
 

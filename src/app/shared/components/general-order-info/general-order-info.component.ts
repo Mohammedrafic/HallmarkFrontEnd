@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { OrderType } from '@shared/enums/order-type';
 import { Order } from "@shared/models/order-management.model";
 
 enum Active {
@@ -14,8 +15,7 @@ enum Active {
 export class GeneralOrderInfoComponent {
   @Input() orderInformation: Order;
 
-  constructor() {
-  }
+  public orderType = OrderType;
 
   public activeValue(value: boolean): string {
     return Active[Number(value)];

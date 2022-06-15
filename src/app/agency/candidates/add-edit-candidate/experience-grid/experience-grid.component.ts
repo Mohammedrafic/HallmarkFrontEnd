@@ -132,11 +132,11 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
     this.experienceForm = this.fb.group({
       id: new FormControl(null),
       candidateProfileId: new FormControl(null),
-      employer: new FormControl(null, [ Validators.maxLength(100) ]),
-      jobTitle: new FormControl(null, [ Validators.maxLength(20) ]),
-      startDate: new FormControl(null),
-      endDate: new FormControl(null),
-      comments: new FormControl(null, [ Validators.maxLength(500) ])
+      employer: new FormControl(null, [Validators.required, Validators.maxLength(100)]),
+      jobTitle: new FormControl(null, [Validators.required, Validators.maxLength(20)]),
+      startDate: new FormControl(null, [Validators.required]),
+      endDate: new FormControl(null, [Validators.required]),
+      comments: new FormControl(null, [Validators.maxLength(500)])
     });
   }
 
@@ -144,7 +144,6 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
     this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
       this.experienceForm.reset();
       this.experienceForm.enable();
-      this.grid.clearRowSelection();
     });
   }
 }

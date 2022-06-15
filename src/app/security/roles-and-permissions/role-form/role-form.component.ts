@@ -1,14 +1,14 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { combineLatest, filter, map, Observable, takeWhile } from 'rxjs';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { DrawNodeEventArgs, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { PermissionsTree } from '@shared/models/permission.model';
 
-import { GetNewRoleBusinessByUnitType, GetPermissionsTree, GetRolesForCopy } from '../../store/security.actions';
+import { GetNewRoleBusinessByUnitType, GetNewRoleBusinessByUnitTypeSucceeded, GetPermissionsTree, GetRolesForCopy } from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
 import { BUSSINES_DATA_FIELDS, OPRION_FIELDS } from '../roles-and-permissions.constants';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
@@ -33,8 +33,8 @@ export class RoleFormComponent implements OnInit, OnDestroy {
 
   @ViewChild('tree') tree: TreeViewComponent;
 
-  @Select(SecurityState.newRoleBussinesData)
-  public newRoleBussinesData$: Observable<BusinessUnit[]>;
+
+  public newRoleBussinesData: BusinessUnit[];
 
   @Select(SecurityState.roleTreeField)
   public roleTreeField$: Observable<RoleTreeField>;
@@ -62,13 +62,14 @@ export class RoleFormComponent implements OnInit, OnDestroy {
   private isAlive = true;
   private notAssignableIds: number[];
 
-  constructor(private store: Store) {}
+  constructor(private store: Store, private actions$: Actions) {}
 
   ngOnInit(): void {
     this.onBusinessUnitControlChanged();
     this.onRoleTreeFieldChanged();
     this.onBusinessUnitOrIdChange();
     this.onFormChange();
+    this.onNewRoleBussinesDataFetched();
 
     this.copyRoleData$ = this.store.select(SecurityState.copyRoleData).pipe(
       map((roles) => {
@@ -77,6 +78,8 @@ export class RoleFormComponent implements OnInit, OnDestroy {
       })
     );
   }
+
+
 
   ngOnDestroy(): void {
     this.isAlive = false;
@@ -107,8 +110,8 @@ export class RoleFormComponent implements OnInit, OnDestroy {
 
   public onApply(): void {
     const permissions = this.store.selectSnapshot(SecurityState.getPermissionsForCopyById(this.copyRoleControl.value));
-    const merge = new Set([...(this.permissionsControl?.value || []), ...permissions]);
-    this.tree.checkAll([...merge.values()]);
+    this.tree.uncheckAll();
+    this.tree.checkAll(permissions);
     this.updatePermissionValue();
   }
 
@@ -168,6 +171,12 @@ export class RoleFormComponent implements OnInit, OnDestroy {
         .filter(({ isAssignable, isAvailable }) => !isAssignable || !isAvailable)
         .map(({ id }) => id);
     });
+  }
+
+  private onNewRoleBussinesDataFetched(): void {
+    this.actions$.pipe(ofActionSuccessful(GetNewRoleBusinessByUnitTypeSucceeded), takeWhile(() => this.isAlive)).subscribe(({ type }) => {
+      this.newRoleBussinesData = this.store.selectSnapshot(SecurityState.newRoleBussinesData)(type);
+    })
   }
 
   static createForm(): FormGroup {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { map, Observable, switchMap } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import {
   OrderManagementFilter,
   OrderManagementPage,
@@ -11,6 +11,8 @@ import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-manage
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
+import { OrderType } from '@shared/enums/order-type';
+import { BillRate } from '@shared/models/bill-rate.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -129,6 +131,15 @@ export class OrderManagementContentService {
    */
    public getAssociateAgencies(): Observable<AssociateAgency[]> {
     return this.http.get<AssociateAgency[]>('/api/AssociateAgencies');
+  }
+
+  public getPredefinedBillRates(orderType: OrderType, departmentId: number, skillId: number): Observable<BillRate[]> {
+    const params = new HttpParams()
+      .append('orderType', orderType)
+      .append('departmentId', departmentId)
+      .append('skillId', skillId);
+
+    return this.http.get<BillRate[]>('/api/BillRates/predefined/forOrder', { params });
   }
 
   /**
