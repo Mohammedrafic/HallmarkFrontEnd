@@ -88,10 +88,10 @@ export class BillRatesComponent implements OnInit {
 
   public onRemoveBillRate({ index }: BillRatesGridEvent): void {
     this.confirmService
-      .confirm('Are You sure you want to delete it?', {
+      .confirm('Are you sure you want to delete it?', {
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-        title: 'Delete record',
+        title: 'Delete record'
       })
       .pipe(
         take(1),

@@ -14,9 +14,9 @@ import {
   GetRegions
 } from '@organization-management/store/organization-management.actions';
 import {
-  GetOrganizationStatesWithKeyCode,
   GetAssociateAgencies,
   GetMasterShifts,
+  GetOrganizationStatesWithKeyCode,
   GetProjectNames,
   GetProjectTypes,
   GetWorkflows
@@ -50,7 +50,7 @@ import { currencyValidator } from '@shared/validators/currency.validator';
 
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
-import PriceUtils from "@shared/utils/price.utils";
+import PriceUtils from '@shared/utils/price.utils';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 @Component({
@@ -517,10 +517,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   public editProjectTypeHandler(): void {
     this.isEditProjectType = !this.isEditProjectType;
+    this.generalInformationForm.get('projectTypeId')?.updateValueAndValidity();
+    this.generalInformationForm.get('projectTypeId')?.markAllAsTouched();
   }
 
   public editProjectNameHandler(): void {
     this.isEditProjectName = !this.isEditProjectName;
+    this.generalInformationForm.get('projectNameId')?.updateValueAndValidity();
+    this.generalInformationForm.get('projectNameId')?.markAllAsTouched();
   }
 
   public addContact(): void {
