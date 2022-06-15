@@ -27,7 +27,6 @@
   >
     <ng-template #detailTemplate let-data>
       <table
-        [appHighlightGridRowDirective]="data.hasUnassignedSteps"
         class="detailtable"
         width="100%"
         *ngFor="let type of [workflowTypes.OrderWorkflow, workflowTypes.ApplicationWorkflow]"
@@ -80,8 +79,10 @@
     <e-columns>
       <e-column field="regionName" headerText="REGION" width=150>
         <ng-template #template let-data>
-          <span *ngIf="data.regionId">{{ data.regionName }}</span>
-          <span *ngIf="!data.regionId">All</span>
+          <div [appHighlightGridRowDirective]="data.hasUnassignedSteps">
+            <span *ngIf="data.regionId">{{ data.regionName }}</span>
+            <span *ngIf="!data.regionId">All</span>
+          </div>
         </ng-template>
       </e-column>
       <e-column field="locationName" headerText="LOCATION" width=180>

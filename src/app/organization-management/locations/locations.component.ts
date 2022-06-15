@@ -70,7 +70,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   locations$: Observable<Location[]>;
 
   locationDetailsFormGroup: FormGroup;
-  newRegionName: string;
+  regionFormGroup: FormGroup;
   formBuilder: FormBuilder;
 
   @Select(OrganizationManagementState.organization)
@@ -195,10 +195,13 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   onOkDialogClick(): void {
-    this.newRegionName.trim();
-    if (this.newRegionName) {
-      this.store.dispatch(new SaveRegion({ name: this.newRegionName }))
+    if (this.regionFormGroup.valid) {
+      let newRegionName = this.regionFormGroup.controls['newRegionName'].value.trim();
+      this.store.dispatch(new SaveRegion({ name: newRegionName }));
       this.addRegionDialog.hide();
+      this.regionFormGroup.reset();
+    } else {
+      this.regionFormGroup.markAsTouched();
     }
   }
 
@@ -367,6 +370,10 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       inactiveDate: [null],
       phoneNumber: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10), Validators.pattern('^[0-9]*$')]],
       phoneType: ['', Validators.required],
+    });
+
+    this.regionFormGroup = this.formBuilder.group({
+      newRegionName: ['', [Validators.required,  Validators.minLength(1),  Validators.maxLength(50)]]
     });
   }
 
