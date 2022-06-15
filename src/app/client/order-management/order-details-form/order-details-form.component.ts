@@ -49,9 +49,12 @@ import { integerValidator } from '@shared/validators/integer.validator';
 import { currencyValidator } from '@shared/validators/currency.validator';
 
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
-import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
+import { ORDER_CONTACT_DETAIL_TITLES, ORDER_EDITS } from '@shared/constants';
 import PriceUtils from '@shared/utils/price.utils';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { SkillCategory } from '@shared/models/skill-category.model';
 
 @Component({
   selector: 'app-order-details-form',
@@ -178,6 +181,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrganizationManagementState.masterSkillsByOrganization)
   skills$: Observable<MasterSkillByOrganization[]>;
   skillFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  selectedSkills: SkillCategory;
 
   @Select(OrderManagementContentState.projectTypes)
   projectTypes$: Observable<ProjectType[]>;
@@ -496,6 +500,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public onRegionDropDownChanged(event: ChangeEventArgs): void {
+    this.userEditsOrder(this.selectedRegion);
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion.id) {
       this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
@@ -504,6 +509,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public onLocationDropDownChanged(event: ChangeEventArgs): void {
+    this.userEditsOrder(this.selectedLocation);
     this.selectedLocation = event.itemData as Location;
     if (this.selectedLocation?.id) {
       this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocation.id));
@@ -512,7 +518,19 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public onDepartmentDropDownChanged(event: ChangeEventArgs): void {
+    this.userEditsOrder(this.selectedDepartment);
     this.selectedDepartment = event.itemData as Department;
+  }
+
+  onSkillsDropDownChanged(event: ChangeEventArgs) {
+    this.userEditsOrder(this.selectedSkills);
+    this.selectedSkills = event.itemData as SkillCategory;
+  }
+
+  private userEditsOrder(selectedItem: Object): void {
+    if(!selectedItem) {
+      this.store.dispatch(new ShowToast(MessageTypes.Success, ORDER_EDITS))
+    }
   }
 
   public editProjectTypeHandler(): void {

@@ -113,7 +113,10 @@
                       formControlName="skillId"
                       appValidateWithMessage
                       [dataSource]="(skills$ | async)"
-                      [fields]="skillFields">
+                      [fields]="skillFields"
+                      (change)="onSkillsDropDownChanged($event)"
+                      >
+                      
                     </ejs-dropdownlist>
                   </div>
                 </div>
