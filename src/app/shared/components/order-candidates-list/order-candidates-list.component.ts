@@ -19,7 +19,6 @@ import { AcceptCandidateComponent } from "./accept-candidate/accept-candidate.co
 import { ApplyCandidateComponent } from "./apply-candidate/apply-candidate.component";
 import { OfferDeploymentComponent } from "./offer-deployment/offer-deployment.component";
 import { SetLastSelectedOrganizationAgencyId } from "src/app/store/user.actions";
-import { AppState } from "src/app/store/app.state";
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -118,8 +117,8 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
     this.sideDialog.hide();
   }
 
-  public getBillRate(rate: number): string {
-    return rate ? `$10.00 - ${rate}` :' $10.00';
+  public getBillRate(rate: number, candidateRate: number):string {
+    return candidateRate ? `$${rate} - ${candidateRate}` : `$${rate} - ${rate}`;
   }
 
   private subscribeOnPageChanges(): void {

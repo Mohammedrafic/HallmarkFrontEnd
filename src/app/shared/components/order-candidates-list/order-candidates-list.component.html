@@ -41,7 +41,7 @@
       <e-column field="hourlyBillRate" textAlign="Right" headerText="Bill Rate &dollar;" width="200">
         <ng-template #template let-data>
           <div class="align-right">
-            {{getBillRate(data.hourlyBillRate)}}
+            {{getBillRate(data.hourlyBillRate, data.candidateBillRate)}}
           </div>
         </ng-template>
       </e-column>
