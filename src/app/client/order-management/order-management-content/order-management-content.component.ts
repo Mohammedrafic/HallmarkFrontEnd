@@ -10,6 +10,7 @@ import { STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { OrderManagemetTabs } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
+  DeleteOrder,
   DeleteOrderSucceeded,
   GetAgencyOrderCandidatesList,
   GetIncompleteOrders,
@@ -23,6 +24,8 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 import { UserState } from '../../../store/user.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { Order } from '@shared/models/order-management.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
@@ -80,7 +83,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public selectedOrder: Order;
   public openDetails = new Subject<boolean>();
   public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
-  constructor(private store: Store, private router: Router, private route: ActivatedRoute, private actions$: Actions) {
+  constructor(private store: Store, private router: Router, private route: ActivatedRoute, private actions$: Actions, private confirmService: ConfirmService) {
     super();
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
   }
@@ -208,6 +211,20 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     return OrderTypeName[OrderType[orderType] as OrderTypeName];
   }
 
+  private deleteOrder(id: number): void {
+    this.confirmService
+    .confirm(DELETE_RECORD_TEXT, {
+      title: DELETE_RECORD_TITLE,
+      okButtonLabel: 'Delete',
+      okButtonClass: 'delete-button'
+    })
+    .subscribe((confirm) => {
+      if (confirm) {
+        this.store.dispatch(new DeleteOrder(id));
+      }
+    });
+  }
+
   public menuOptionSelected(event: any, data: OrderManagement): void {
     switch (Number(event.item.properties.id)) {
       case MoreMenuType['Edit']:
@@ -220,7 +237,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         // TODO: pending implementation
         break;
       case MoreMenuType['Delete']:
-        // TODO: pending implementation
+        this.deleteOrder(data.id);
         break;
     }
   }
