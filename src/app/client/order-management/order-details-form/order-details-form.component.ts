@@ -554,7 +554,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   private userEditsOrder(fieldIsTouched: boolean): void {
     if (!fieldIsTouched && this.isEditMode) {
-      this.store.dispatch(new ShowToast(MessageTypes.Success, ORDER_EDITS));
+      this.store.dispatch(new ShowToast(MessageTypes.Warning, ORDER_EDITS));
     }
   }
 
