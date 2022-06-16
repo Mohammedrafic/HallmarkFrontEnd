@@ -14,6 +14,7 @@ import { OrderManagementContentState } from "@client/store/order-managment-conte
 import { ReloadOrganisationOrderCandidatesLists, UpdateOrganisationCandidateJob } from "@client/store/order-managment-content.actions";
 import { ShowToast } from "src/app/store/app.actions";
 import { MessageTypes } from "@shared/enums/message-types";
+import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -35,7 +36,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public optionFields = OPTION_FIELDS;
   public jobStatus = JOB_STATUS;
   public candidateJob: OrderCandidateJob | null;
-  public isOnboarded = false;
+  public isOnboarded = true;
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');
@@ -124,6 +125,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
           startDate: value.order.jobStartDate,
           endDate: value.order.jobEndDate,
         });
+
+        this.isFormDisabled(value.applicantStatus.applicantStatus);
       }
     });
   }
@@ -143,6 +146,13 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       const value = this.form.getRawValue()
       this.form.patchValue({ date: [value.startDate, value.endDate] });
     });
+  }
+
+  private isFormDisabled(status: number): void {
+    if(status === ApplicantStatus.OnBoarded) {
+      this.form.disable();
+      this.isOnboarded = false;
+    }
   }
 
   private createForm() : void {

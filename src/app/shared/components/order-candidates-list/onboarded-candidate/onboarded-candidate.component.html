@@ -5,8 +5,9 @@
         <h3 class="e-card-title">{{candidate?.lastName}}, {{candidate?.firstName}}</h3>
       </div>
       <div class="e-card-content button-container">
-        <div class="input-group dropdown bootstrap">
+        <div class="input-group dropdown bootstrap input-readonly">
           <ejs-dropdownlist
+            *ngIf="isOnboarded"
             [fields]="optionFields"
             [dataSource]="jobStatus"
             placeholder="Select Status"
@@ -92,7 +93,7 @@
                 </div>
                 <div class="form-container row">
                   <div class="input-container bootstrap">
-                    <label class="input-group">Years of experience</label>
+                    <label class="input-group">Yrs. of Exp.</label>
                     <div class="input-group input-readonly">
                       <input appValidateWithMessage formControlName="yearExp" class="e-input" type="text" placeholder="0" readonly/>
                     </div>

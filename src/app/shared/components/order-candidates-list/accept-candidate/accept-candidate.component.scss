@@ -1,5 +1,9 @@
 @import "colors";
 
+:host {
+  overflow-y: auto;
+}
+
 .container {
   .apply-button {
     margin: 0 8px 0 12px;
@@ -29,12 +33,12 @@
           }
 
           .left-column {
-            width: 67%;
+            width: 64%;
             margin-right: 12px;
           }
 
           .right-column {
-            width: 33%;
+            width: 36%;
           }
         }
 

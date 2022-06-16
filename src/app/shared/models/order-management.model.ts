@@ -225,6 +225,10 @@ export type OrderCandidateJob = {
   requestComment: string;
   workflowStepId: number;
   yearsOfExperience: number;
+  applicantStatus: {
+    applicantStatus: number;
+    statusText: string;
+  }
 }
 
 export type ApplicantStatus = {

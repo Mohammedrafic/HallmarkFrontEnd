@@ -105,7 +105,10 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
           this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
           this.openDialog(this.offerDeployment);
-        } else if (this.candidate.status === ApplicantStatus.Accepted) {
+        } else if (
+          this.candidate.status === ApplicantStatus.Accepted ||
+          this.candidate.status === ApplicantStatus.OnBoarded
+        ) {
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
           this.openDialog(this.onboarded);
         }
