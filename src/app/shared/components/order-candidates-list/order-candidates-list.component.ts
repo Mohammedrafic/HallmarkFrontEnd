@@ -2,6 +2,7 @@ import { OrderManagementState } from "@agency/store/order-management.state";
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { DialogNextPreviousOption } from "@shared/components/dialog-next-previous/dialog-next-previous.component";
 import { Router } from '@angular/router';
+import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 import { GridComponent } from "@syncfusion/ej2-angular-grids";
 import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
 import { Select, Store } from "@ngxs/store";
@@ -72,26 +73,30 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
 
   public onEdit(data: OrderCandidatesList): void {
     this.candidate = data;
-    // TODO: add enum for status
+
     if (this.order && this.candidate) {
       // TODO: find better approach
       const isAgency = this.router.url.includes('agency');
       const isOrganization = this.router.url.includes('client');
 
       if (isAgency) {
-        if (this.candidate.statusName === 'Not Applied') {
+        if (this.candidate.status === ApplicantStatus.NotApplied) {
           this.store.dispatch(new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId));
           this.openDialog(this.apply);
-        } else if (this.candidate.statusName === 'Offered'|| this.candidate.statusName === 'Accepted') {
+        } else if (
+          this.candidate.status === ApplicantStatus.Offered
+          || this.candidate.status === ApplicantStatus.Accepted
+          || this.candidate.status === ApplicantStatus.Rejected
+        ) {
           this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
           this.openDialog(this.accept);
         }
       } else if (isOrganization) {
-        if (this.candidate.statusName === 'Applied') {
+        if (this.candidate.status === ApplicantStatus.Applied) {
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
           this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
           this.openDialog(this.offerDeployment);
-        } else if (this.candidate.statusName === 'Accepted') {
+        } else if (this.candidate.status === ApplicantStatus.Accepted) {
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
           this.openDialog(this.onboarded);
         }

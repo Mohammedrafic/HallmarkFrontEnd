@@ -47,7 +47,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
   }
 
   public onAccept(): void {
-    this.form.markAsUntouched();
     const value = this.form.getRawValue();
     this.store.dispatch(new UpdateAgencyCandidateJob({
       organizationId: this.candidateJob.organizationId,

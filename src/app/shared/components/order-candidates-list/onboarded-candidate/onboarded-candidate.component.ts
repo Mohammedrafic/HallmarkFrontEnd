@@ -12,6 +12,8 @@ import { AbstractControl, FormControl, FormGroup } from "@angular/forms";
 import { DatePipe } from "@angular/common";
 import { OrderManagementContentState } from "@client/store/order-managment-content.state";
 import { ReloadOrganisationOrderCandidatesLists, UpdateOrganisationCandidateJob } from "@client/store/order-managment-content.actions";
+import { ShowToast } from "src/app/store/app.actions";
+import { MessageTypes } from "@shared/enums/message-types";
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -32,7 +34,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   public optionFields = OPTION_FIELDS;
   public jobStatus = JOB_STATUS;
-  public candidateJob: OrderCandidateJob;
+  public candidateJob: OrderCandidateJob | null;
   public isOnboarded = false;
 
   get startDateControl(): AbstractControl | null {
@@ -65,16 +67,19 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     if(event.itemData.text === ONBOARDED_STATUS) {
       this.onAccept();
       this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
+    } else {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'));
     }
   }
 
   public onClose() {
     this.closeModalEvent.emit();
+    this.candidateJob = null;
+    this.jobStatus = [];
   }
 
   private onAccept(): void {
-    this.form.markAsUntouched();
-    if (this.form.valid) {
+    if (this.form.valid && this.candidateJob) {
       const value = this.form.getRawValue();
       this.store.dispatch( new UpdateOrganisationCandidateJob({
         organizationId: this.candidateJob.organizationId,
