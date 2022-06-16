@@ -146,7 +146,7 @@ export class Order {
   workLocations: OrderWorkLocation[];
   credentials: any[]; // ToDo: Add interface
   workflowId?: number;
-  statusText?: string;
+  statusText: string;
   locationName?: string;
   departmentName?: string;
   orderOpenDate?: Date;
@@ -159,11 +159,11 @@ export class Order {
   documents: Document[] | null;
 }
 
-export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'documents'> {
+export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'status' | 'statusText' | 'documents'> {
   billRates: OrderBillRateDto[];
 }
 
-export interface EditOrderDto extends Omit<Order, 'billRates' | 'status' | 'documents'> {
+export interface EditOrderDto extends Omit<Order, 'billRates' | 'status' | 'statusText' | 'documents'> {
   billRates: OrderBillRateDto[];
   deleteDocumentsGuids: string[];
 }

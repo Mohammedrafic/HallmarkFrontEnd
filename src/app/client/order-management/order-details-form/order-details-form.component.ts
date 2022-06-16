@@ -3,7 +3,7 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { combineLatest, Observable, Subject, takeUntil, debounceTime } from 'rxjs';
+import { combineLatest, Observable, Subject, take, takeUntil, debounceTime } from 'rxjs';
 
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -42,7 +42,6 @@ import { Duration } from '@shared/enums/durations';
 import { JobDistribution } from '@shared/enums/job-distibution';
 import { JobClassification } from '@shared/enums/job-classification';
 import { ReasonForRequisition } from '@shared/enums/reason-for-requisition';
-import { OrderStatus } from '@shared/enums/order-status';
 
 import { endTimeValidator, startTimeValidator } from '@shared/validators/date.validator';
 import { integerValidator } from '@shared/validators/integer.validator';
@@ -66,7 +65,7 @@ import {ProjectSpecialData} from "@shared/models/project-special-data.model";
 })
 export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Input() isActive = false;
-  public orderTypeStatusForm: FormGroup;
+  public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
   public jobDistributionForm: FormGroup;
   public jobDescriptionForm: FormGroup;
@@ -84,7 +83,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public isJobEndDateControlEnabled = false;
   public agencyControlEnabled = false;
 
-  public isEditMode: boolean;
+  public orderStatus = 'Incomplete';
   public order: Order | null;
 
   public today = new Date();
@@ -105,18 +104,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     { id: OrderType.Traveler, name: 'Traveler' }
   ];
   public orderTypeFields: FieldSettingsModel = { text: 'name', value: 'id' };
-
-  public orderStatuses = [
-    { id: OrderStatus.Incomplete, name: 'Incomplete' },
-    { id: OrderStatus.PreOpen, name: 'Pre Open' },
-    { id: OrderStatus.Open, name: 'Open' },
-    { id: OrderStatus.InProgress, name: 'In Progress' },
-    { id: OrderStatus.InProgressOfferPending, name: 'In Progress Offer Pending' },
-    { id: OrderStatus.InProgressOfferAccepted, name: 'In Progress Offer Accepted' },
-    { id: OrderStatus.Filled, name: 'Filled' },
-    { id: OrderStatus.Closed, name: 'Closed' }
-  ];
-  public orderStatusFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public durations = [
     { id: Duration.TwelveWeeks, name: '12 Weeks' },
@@ -207,21 +194,22 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   workflows$: Observable<WorkflowByDepartmentAndSkill[]>;
   workflowFields: FieldSettingsModel = { text: 'workflowGroupName', value: 'workflowGroupId' };
 
+  private isEditMode: boolean;
+
   private touchedFields: Set<string> = new Set();
 
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private store: Store, private formBuilder: FormBuilder, private route: ActivatedRoute) {
-    this.orderTypeStatusForm = this.formBuilder.group({
-      orderType: [null, Validators.required],
-      status: [OrderStatus.Incomplete]
+    this.orderTypeForm = this.formBuilder.group({
+      orderType: [null, Validators.required]
     });
 
-    this.orderTypeStatusForm.valueChanges.pipe(
+    this.orderTypeForm.valueChanges.pipe(
       takeUntil(this.unsubscribe$),
       debounceTime(500)
     ).subscribe(() => {
-      this.store.dispatch(new SetIsDirtyOrderForm(this.orderTypeStatusForm.dirty));
+      this.store.dispatch(new SetIsDirtyOrderForm(this.orderTypeForm.dirty));
     });
 
     this.generalInformationForm = this.formBuilder.group({
@@ -346,7 +334,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.store.dispatch(new SetIsDirtyOrderForm(this.specialProject.dirty));
     });
 
-    const orderTypeControl = this.orderTypeStatusForm.get('orderType') as AbstractControl;
+    const orderTypeControl = this.orderTypeForm.get('orderType') as AbstractControl;
     const locationIdControl = this.generalInformationForm.get('locationId') as AbstractControl;
     const departmentIdControl = this.generalInformationForm.get('departmentId') as AbstractControl;
     const skillIdControl = this.generalInformationForm.get('skillId') as AbstractControl;
@@ -520,7 +508,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.store.dispatch(new GetRegions());
+    this.store.dispatch(new GetRegions()).pipe(take(1)).subscribe(() => {
+      if (this.isEditMode && this.order) {
+        this.generalInformationForm.controls['regionId'].patchValue(this.order.regionId);
+      }
+    });
     this.store.dispatch(new GetMasterSkillsByOrganization());
     this.store.dispatch(new GetProjectSpecialData());
     this.store.dispatch(new GetMasterShifts());
@@ -652,13 +644,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private populateForms(order: Order): void {
-    this.orderTypeStatusForm.controls['orderType'].patchValue(order.orderType);
-    this.orderTypeStatusForm.controls['status'].patchValue(order.status);
-
+    this.orderStatus = order.statusText;
+    this.orderTypeForm.controls['orderType'].patchValue(order.orderType);
     this.generalInformationForm.controls['title'].patchValue(order.title);
-    this.generalInformationForm.controls['regionId'].patchValue(order.regionId);
-    this.generalInformationForm.controls['locationId'].patchValue(order.locationId);
-    this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
     this.generalInformationForm.controls['skillId'].patchValue(order.skillId);
     this.generalInformationForm.controls['hourlyRate'].patchValue(order.hourlyRate);
     this.generalInformationForm.controls['openPositions'].patchValue(order.openPositions);
@@ -675,13 +663,17 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.specialProject.controls['poNumberId'].patchValue(order.poNumberId);
 
     if (order.regionId) {
-      this.store.dispatch(new GetLocationsByRegionId(order.regionId));
-      this.isLocationsDropDownEnabled = true;
+      this.store.dispatch(new GetLocationsByRegionId(order.regionId)).pipe(take(1)).subscribe(() => {
+        this.generalInformationForm.controls['locationId'].patchValue(order.locationId);
+        this.isLocationsDropDownEnabled = true;
+      });
     }
 
     if (order.locationId) {
-      this.store.dispatch(new GetDepartmentsByLocationId(order.locationId));
-      this.isDepartmentsDropDownEnabled = true;
+      this.store.dispatch(new GetDepartmentsByLocationId(order.locationId)).pipe(take(1)).subscribe(() => {
+        this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
+        this.isDepartmentsDropDownEnabled = true;
+      });
     }
 
     if (order.jobStartDate) {
@@ -734,29 +726,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     }
 
     this.workflowForm.controls['workflowId'].patchValue(order.workflowId);
-  }
-
-  private resetForms(): void {
-    this.orderTypeStatusForm.reset();
-    this.orderTypeStatusForm.controls['status'].patchValue(-1);
-
-    this.generalInformationForm.reset();
-    this.jobDescriptionForm.reset();
-
-    this.contactDetailsFormArray.clear();
-    this.workLocationsFormArray.clear();
-
-    this.contactDetailsFormArray.push(this.newContactDetailsFormGroup());
-    this.workLocationsFormArray.push(this.newWorkLocationFormGroup());
-
-    this.jobDistributionForm.controls['jobDistribution'].patchValue([]);
-    this.jobDistributionForm.controls['agency'].patchValue(null);
-    this.jobDistributionForm.controls['jobDistributions'].patchValue([]);
-
-    this.jobDescriptionForm.controls['onCallRequired'].patchValue(false);
-    this.jobDescriptionForm.controls['asapStart'].patchValue(false);
-    this.jobDescriptionForm.controls['criticalOrder'].patchValue(false);
-    this.jobDescriptionForm.controls['nO_OT'].patchValue(false);
   }
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {

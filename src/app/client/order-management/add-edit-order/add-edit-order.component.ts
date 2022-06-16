@@ -174,7 +174,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public save(): void {
     if (
-      this.orderDetailsFormComponent.orderTypeStatusForm.valid &&
+      this.orderDetailsFormComponent.orderTypeForm.valid &&
       this.orderDetailsFormComponent.generalInformationForm.valid &&
       this.orderDetailsFormComponent.jobDistributionForm.valid &&
       this.orderDetailsFormComponent.jobDescriptionForm.valid &&
@@ -197,7 +197,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         this.store.dispatch(new SaveOrder(order, documents));
       }
     } else {
-      this.orderDetailsFormComponent.orderTypeStatusForm.markAllAsTouched();
+      this.orderDetailsFormComponent.orderTypeForm.markAllAsTouched();
       this.orderDetailsFormComponent.generalInformationForm.markAllAsTouched();
       this.orderDetailsFormComponent.jobDistributionForm.markAllAsTouched();
       this.orderDetailsFormComponent.jobDescriptionForm.markAllAsTouched();
@@ -210,7 +210,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private collectOrderData(isSubmit: boolean): CreateOrderDto {
     const allValues = {
-      ...this.orderDetailsFormComponent.orderTypeStatusForm.value,
+      ...this.orderDetailsFormComponent.orderTypeForm.value,
       ...this.orderDetailsFormComponent.generalInformationForm.value,
       ...this.orderDetailsFormComponent.jobDistributionForm.value,
       ...this.orderDetailsFormComponent.jobDescriptionForm.value,
@@ -224,7 +224,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
     const {
       orderType,
-      status,
       title,
       regionId,
       locationId,
@@ -267,7 +266,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
     const order: CreateOrderDto | EditOrderDto = {
       title,
-      status,
       regionId,
       locationId,
       departmentId,
