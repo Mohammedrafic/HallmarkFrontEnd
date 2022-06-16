@@ -44,7 +44,7 @@ export class LocationService {
    * Update the location
    */
   public updateLocation(location: Location): Observable<void> {
-    return this.http.put<void>(`/api/Locations/`, { location: location });
+    return this.http.put<void>(`/api/Locations/`, { location });
   }
 
   /**

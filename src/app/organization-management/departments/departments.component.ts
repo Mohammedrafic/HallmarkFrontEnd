@@ -32,7 +32,8 @@ import {
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
-  RECORD_ADDED
+  RECORD_ADDED,
+  RECORD_MODIFIED
 } from '../../shared/constants/messages';
 import { ConfirmService } from '../../shared/services/confirm.service';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
@@ -140,8 +141,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.defaultFileName = 'Organization Departments ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportDepartments(new ExportPayload(
-      fileType, 
-      { locationId: this.selectedLocation.id, offset: Math.abs(new Date().getTimezoneOffset()) }, 
+      fileType,
+      { locationId: this.selectedLocation.id, offset: Math.abs(new Date().getTimezoneOffset()) },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
       options?.fileName || this.defaultFileName
@@ -275,20 +276,25 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
         facilityContact: this.departmentsDetailsFormGroup.controls['facilityContact'].value
       }
 
-      if (this.isEdit) {
-        this.store.dispatch(new UpdateDepartment(department));
-        this.isEdit = false;
-        this.editedDepartmentId = undefined;
-      } else {
-        this.store.dispatch(new SaveDepartment(department));
-        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-      }
+      this.saveOrUpdateDepartment(department);
 
       this.store.dispatch(new ShowSideDialog(false));
       this.removeActiveCssClass();
       this.departmentsDetailsFormGroup.reset();
     } else {
       this.departmentsDetailsFormGroup.markAllAsTouched();
+    }
+  }
+
+  private saveOrUpdateDepartment(department: Department): void {
+    if (this.isEdit) {
+      this.store.dispatch(new UpdateDepartment(department));
+      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      this.isEdit = false;
+      this.editedDepartmentId = undefined;
+    } else {
+      this.store.dispatch(new SaveDepartment(department));
+      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
     }
   }
 

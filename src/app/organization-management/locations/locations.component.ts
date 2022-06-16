@@ -33,7 +33,8 @@ import {
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
-  RECORD_ADDED
+  RECORD_ADDED,
+  RECORD_MODIFIED
 } from '@shared/constants';
 import { Organization } from '@shared/models/organization.model';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -327,24 +328,27 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         phoneType: parseInt(PhoneTypes[this.locationDetailsFormGroup.controls['phoneType'].value]),
       }
 
-      if (this.isEdit) {
-        if (this.selectedRegion.id) {
-          this.store.dispatch(new UpdateLocation(location, this.selectedRegion.id));
-          this.isEdit = false;
-          this.editedLocationId = undefined;
-        }
-      } else {
-        if (this.selectedRegion.id) {
-          this.store.dispatch(new SaveLocation(location, this.selectedRegion.id));
-          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED))
-        }
-      }
+      this.saveOrUpdateLocation(location);
 
       this.store.dispatch(new ShowSideDialog(false));
       this.locationDetailsFormGroup.reset();
       this.removeActiveCssClass();
     } else {
       this.locationDetailsFormGroup.markAllAsTouched();
+    }
+  }
+
+  private saveOrUpdateLocation(location: Location): void {
+    if (this.selectedRegion.id) {
+      if (this.isEdit) {
+        this.store.dispatch(new UpdateLocation(location, this.selectedRegion.id));
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        this.isEdit = false;
+        this.editedLocationId = undefined;
+        return;
+      }
+      this.store.dispatch(new SaveLocation(location, this.selectedRegion.id));
+      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
     }
   }
 
