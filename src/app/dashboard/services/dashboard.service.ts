@@ -28,6 +28,8 @@ import identity from 'lodash/fp/identity';
 import { DashboardDataModel } from '../models/dashboard-data.model';
 import type { ApplicantsByRegionDataModel } from '../models/applicants-by-region-data.model';
 import type { LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
+import { PositionTypeEnum } from '../enums/position-type.enum';
+import type { PositionsByTypeAggregatedModel } from '../models/positions-by-type-aggregated.model';
 
 @Injectable()
 export class DashboardService {
@@ -39,6 +41,7 @@ export class DashboardService {
     [WidgetTypeEnum.CANDIDATES]: (filters: DashboardFiltersModel) => this.getCandidatesWidgetData(filters),
     [WidgetTypeEnum.APPLICANTS_BY_REGION]: (filters: DashboardFiltersModel) =>
       this.getApplicantsByRegionWidgetData(filters),
+    [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboardFiltersModel) => this.getPositionsByTypes(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -82,7 +85,12 @@ export class DashboardService {
   private getWidgetList(): Observable<WidgetOptionModel[]> {
     return this.httpClient
       .get<AvailableWidgetsResponseModel>(`${this.baseUrl}/AvailableWidgets`)
-      .pipe(map((response: AvailableWidgetsResponseModel) => response.widgetTypes));
+      .pipe(
+        map((response: AvailableWidgetsResponseModel) => [
+          ...response.widgetTypes,
+          { widgetType: 9, title: WidgetTypeEnum.POSITIONS_BY_TYPES, description: 'sdf sdfd sgfd' },
+        ])
+      );
   }
 
   private getCandidatesWidgetData(filter: DashboardFiltersModel): Observable<ChartAccumulation> {
@@ -144,5 +152,34 @@ export class DashboardService {
     return this.httpClient
       .get<DashboardStateDto>(`${this.baseUrl}/GetState`)
       .pipe(map((panels) => JSON.parse(panels.state)));
+  }
+
+  private getPositionsByTypes(filters: DashboardFiltersModel): Observable<PositionsByTypeAggregatedModel> {
+    return of({
+      [PositionTypeEnum.OPEN]: [
+        { month: 'Feb', value: 3 },
+        { month: 'Mar', value: 10 },
+        { month: 'Apr', value: 20 },
+        { month: 'May', value: 15 },
+        { month: 'Jun', value: 12 },
+        { month: 'Jul', value: 10 },
+      ],
+      [PositionTypeEnum.ONBOARD]: [
+        { month: 'Feb', value: 10 },
+        { month: 'Mar', value: 16 },
+        { month: 'Apr', value: 5 },
+        { month: 'May', value: 3 },
+        { month: 'Jun', value: 20 },
+        { month: 'Jul', value: 6 },
+      ],
+      [PositionTypeEnum.CLOSED]: [
+        { month: 'Feb', value: 30 },
+        { month: 'Mar', value: 51 },
+        { month: 'Apr', value: 10 },
+        { month: 'May', value: 4 },
+        { month: 'Jun', value: 5 },
+        { month: 'Jul', value: 6 },
+      ],
+    });
   }
 }

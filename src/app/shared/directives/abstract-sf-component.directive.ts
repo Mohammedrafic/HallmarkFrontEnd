@@ -6,7 +6,7 @@ import { takeUntil } from 'rxjs';
 
 @Directive()
 export class AbstractSFComponentDirective extends DestroyableDirective implements AfterViewInit {
-  @ViewChild('sfComponent', { static: true }) public sfComponent: SFComponent<HTMLElement>;
+  @ViewChild('sfComponent') public sfComponent: SFComponent<HTMLElement>;
 
   private componentResizeObserver: ResizeObserverModel;
 
