@@ -90,12 +90,7 @@ export class DashboardService {
   private getWidgetList(): Observable<WidgetOptionModel[]> {
     return this.httpClient
       .get<AvailableWidgetsResponseModel>(`${this.baseUrl}/AvailableWidgets`)
-      .pipe(
-        map((response: AvailableWidgetsResponseModel) => [
-          ...response.widgetTypes,
-          { widgetType: 9, title: WidgetTypeEnum.POSITIONS_BY_TYPES, description: 'sdf sdfd sgfd' },
-        ])
-      );
+      .pipe(map((response: AvailableWidgetsResponseModel) => response.widgetTypes));
   }
 
   private getCandidatesWidgetData(filter: DashboardFiltersModel): Observable<ChartAccumulation> {
