@@ -1,4 +1,7 @@
-import { AccumulationChartModule as SFAccumulationChartModule, PieSeriesService } from '@syncfusion/ej2-angular-charts';
+import {
+  AccumulationChartModule as SFAccumulationChartModule,
+  AccumulationTooltipService,
+} from '@syncfusion/ej2-angular-charts';
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -10,6 +13,6 @@ import { WidgetWrapperModule } from '../widget-wrapper/widget-wrapper.module';
   imports: [CommonModule, SFAccumulationChartModule, WidgetWrapperModule],
   exports: [AccumulationChartComponent],
   declarations: [AccumulationChartComponent],
-  providers: [PieSeriesService]
+  providers: [AccumulationTooltipService],
 })
 export class AccumulationChartModule {}

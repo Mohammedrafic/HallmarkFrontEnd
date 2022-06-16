@@ -1,16 +1,21 @@
-import { Component, Input, OnInit, SimpleChanges, ChangeDetectionStrategy, OnChanges } from '@angular/core';
-import { ChartAccumulation, DonutChartData } from '../../models/chart-accumulation-widget.model';
-import { TooltipSettingsModel } from '@syncfusion/ej2-charts/src/common/model/base-model';
-import { LegendSettingsModel } from '@syncfusion/ej2-charts/src/common/legend/legend-model';
 import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged } from 'rxjs';
 import { map } from 'rxjs/operators';
 import lodashFilter from 'lodash/fp/filter';
 import lodashMap from 'lodash/fp/map';
 import includes from 'lodash/fp/includes';
 import isEqual from 'lodash/fp/isEqual';
+import type {
+  AccumulationChartComponent as SFAccumulationChartComponent,
+  TooltipSettingsModel,
+  LegendSettingsModel,
+} from '@syncfusion/ej2-angular-charts';
+
+import { Component, Input, OnInit, SimpleChanges, ChangeDetectionStrategy, OnChanges } from '@angular/core';
+
+import { ChartAccumulation, DonutChartData } from '../../models/chart-accumulation-widget.model';
+
 import { legendPalette } from '../../constants/legend-palette';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
-import type { ChartComponent } from '@syncfusion/ej2-angular-charts';
 
 @Component({
   selector: 'app-accumulation-chart',
@@ -18,7 +23,10 @@ import type { ChartComponent } from '@syncfusion/ej2-angular-charts';
   styleUrls: ['../widget-legend.component.scss', './accumulation-chart.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AccumulationChartComponent extends AbstractSFComponentDirective<ChartComponent> implements OnChanges, OnInit {
+export class AccumulationChartComponent
+  extends AbstractSFComponentDirective<SFAccumulationChartComponent>
+  implements OnChanges, OnInit
+{
   @Input() public chartData: ChartAccumulation | undefined;
   @Input() public isLoading: boolean;
 
