@@ -116,88 +116,7 @@
                       [fields]="skillFields"
                       (select)="onSkillsDropDownChanged($event)"
                       >
-                      
                     </ejs-dropdownlist>
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-line">
-                <!-- Project Type -->
-                <div class="project-type-container form-line-item-20">
-                  <div *ngIf="!isEditProjectType" class="input-container bootstrap">
-                    <label>Project Type<span class="required">*</span></label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        placeholder="Project Type"
-                        formControlName="projectTypeId"
-                        appValidateWithMessage
-                        [dataSource]="projectTypes$ | async"
-                        [fields]="projectTypeFields">
-                      </ejs-dropdownlist>
-                    </div>
-                  </div>
-
-                  <div *ngIf="isEditProjectType" class="input-container bootstrap">
-                    <label>Project Type<span class="required">*</span></label>
-                    <div class="input-group">
-                      <input
-                        class="e-input"
-                        type="text"
-                        appValidateWithMessage
-                        formControlName="projectType"
-                        placeholder="Project Type" />
-                    </div>
-                  </div>
-
-                  <div class="input-container edit-button-container">
-                    <button
-                      ejs-button
-                      type="button"
-                      cssClass="e-outline"
-                      class="icon-button"
-                      (click)="editProjectTypeHandler()">
-                      <i-feather name="edit3" class="icon"></i-feather>
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Project Name -->
-                <div class="project-name-container form-line-item-20">
-                  <div *ngIf="!isEditProjectName" class="input-container bootstrap">
-                    <label>Project Name<span class="required">*</span></label>
-                    <div class="input-group dropdown">
-                      <ejs-dropdownlist
-                        placeholder="Project Name"
-                        formControlName="projectNameId"
-                        appValidateWithMessage
-                        [dataSource]="projectNames$ | async"
-                        [fields]="projectNameFields">
-                      </ejs-dropdownlist>
-                    </div>
-                  </div>
-
-                  <div *ngIf="isEditProjectName" class="input-container bootstrap">
-                    <label>Project Name<span class="required">*</span></label>
-                    <div class="input-group">
-                      <input
-                        class="e-input"
-                        type="text"
-                        formControlName="projectName"
-                        appValidateWithMessage
-                        placeholder="Project Name" />
-                    </div>
-                  </div>
-
-                  <div class="input-container edit-button-container">
-                    <button
-                      ejs-button
-                      type="button"
-                      cssClass="e-outline"
-                      class="icon-button"
-                      (click)="editProjectNameHandler()">
-                      <i-feather name="edit3" class="icon"></i-feather>
-                    </button>
                   </div>
                 </div>
               </div>
@@ -213,7 +132,7 @@
                       formControlName="hourlyRate"
                       appValidateWithMessage
                       placeholder="Hourly rate"
-                      maxlength="11"
+                      maxlength="10"
                       (focus)="priceUtils.setPriceMask(generalInformationForm,'hourlyRate', $event)"
                       (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'hourlyRate', $event)"
                     />
@@ -258,7 +177,7 @@
                       placeholder="Joining Bonus"
                       formControlName="joiningBonus"
                       appValidateWithMessage
-                      maxlength="11"
+                      maxlength="10"
                       (focus)="priceUtils.setPriceMask(generalInformationForm, 'joiningBonus', $event)"
                       (blur)="priceUtils.setTwoDecimals(generalInformationForm,'joiningBonus', $event)"
                     />
@@ -275,7 +194,7 @@
                       placeholder="Comp. Bonus"
                       formControlName="compBonus"
                       appValidateWithMessage
-                      maxlength="11"
+                      maxlength="10"
                       (focus)="priceUtils.setPriceMask(generalInformationForm, 'compBonus', $event)"
                       (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'compBonus', $event)"
                     />
@@ -715,6 +634,65 @@
                     appValidateWithMessage
                     [dataSource]="workflows$ | async"
                     [fields]="workflowFields">
+                  </ejs-dropdownlist>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="special-project">
+          <div class="title">Special Project</div>
+          <form [formGroup]="specialProject">
+            <div class="form-line">
+              <!-- Reason for Request -->
+              <div class="input-container bootstrap form-line-item-40">
+                <label>Reason for Request<span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-dropdownlist
+                    placeholder="Reason for Request"
+                    formControlName="reasonForRequestId"
+                    appValidateWithMessage
+                    [dataSource]="(projectSpecialData$ | async)?.reasonsForRequest"
+                    [fields]="reasonsForRequestFields">
+                  </ejs-dropdownlist>
+                </div>
+              </div>
+              <!-- Special Project Category -->
+              <div class="input-container bootstrap form-line-item-20">
+                <label>Special Project Category<span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-dropdownlist
+                    placeholder="Project Type"
+                    formControlName="projectTypeId"
+                    appValidateWithMessage
+                    [dataSource]="(projectSpecialData$ | async)?.specialProjectCategories"
+                    [fields]="specialProjectCategoriesFields">
+                  </ejs-dropdownlist>
+                </div>
+              </div>
+              <!-- Project Name -->
+              <div class="input-container bootstrap form-line-item-20">
+                <label>Project Name<span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-dropdownlist
+                    placeholder="Project Name"
+                    formControlName="projectNameId"
+                    appValidateWithMessage
+                    [dataSource]="(projectSpecialData$ | async)?.projectNames"
+                    [fields]="projectNameFields">
+                  </ejs-dropdownlist>
+                </div>
+              </div>
+              <!-- PO# -->
+              <div class="input-container bootstrap form-line-item-20">
+                <label>PO#<span class="required">*</span></label>
+                <div class="input-group dropdown">
+                  <ejs-dropdownlist
+                    placeholder="PO#"
+                    formControlName="poNumberId"
+                    appValidateWithMessage
+                    [dataSource]="(projectSpecialData$ | async)?.poNumbers"
+                    [fields]="poNumberFields">
                   </ejs-dropdownlist>
                 </div>
               </div>

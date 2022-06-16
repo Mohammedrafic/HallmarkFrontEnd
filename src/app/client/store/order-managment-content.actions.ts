@@ -67,6 +67,11 @@ export class GetAvailableSteps {
   constructor(public organizationId: number, public jobId: number) {}
 }
 
+export class GetProjectSpecialData {
+  static readonly type = '[order management] Get Project Special Data';
+  constructor() { }
+}
+
 export class GetProjectNames {
   static readonly type = '[order management] Get Project Names';
   constructor() { }
