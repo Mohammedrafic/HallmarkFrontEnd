@@ -1,8 +1,12 @@
 <section class="container">
   <div class="toolbar-buttons" *ngIf="isBillRateSetupTabActive">
-    <button ejs-button cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+    <button ejs-button cssClass="e-outline button-filter" (click)="filter()">Filters <i-feather name="sliders" class="icon"></i-feather></button>
     <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
-    <button ejs-button [isPrimary]="true" (click)="addBillRateSetupRecord()">Add Record</button>
+    <button
+      *ngIf="!isReadOnly"
+      ejs-button
+      [isPrimary]="true"
+      (click)="addBillRateSetupRecord()">Add Record</button>
   </div>
 
   <ejs-tab

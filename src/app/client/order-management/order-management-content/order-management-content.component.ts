@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetHeaderState } from 'src/app/store/app.actions';
@@ -9,13 +9,24 @@ import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-g
 import { STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { OrderManagemetTabs } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { GetAgencyOrderCandidatesList, GetIncompleteOrders, GetOrderById, GetOrders } from '@client/store/order-managment-content.actions';
+import {
+  DeleteOrder,
+  DeleteOrderSucceeded,
+  GetAgencyOrderCandidatesList,
+  GetIncompleteOrders,
+  GetOrderById,
+  GetOrders,
+  ReloadOrganisationOrderCandidatesLists
+} from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { OrderManagement, OrderManagementPage } from '@shared/models/order-management.model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { UserState } from '../../../store/user.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { Order } from '@shared/models/order-management.model';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import { Location } from '@angular/common';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
@@ -47,7 +58,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
-  public activeTab: OrderManagemetTabs;
+  public activeTab: OrderManagemetTabs = OrderManagemetTabs.AllOrders;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
   public isLockMenuButtonsShown = true;
@@ -65,31 +76,46 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private openInProgressFilledStatuses = [
     'open',
     'in progress',
-    'filled'
+    'filled',
+    'custom step'
   ];
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
+  private selectedDataRow: Order;
   public selectedOrder: Order;
   public openDetails = new Subject<boolean>();
   public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
+  public previousSelectedOrderId: number | null;
 
-  constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
+  constructor(private store: Store, private router: Router, private route: ActivatedRoute, private actions$: Actions, private confirmService: ConfirmService, private location: Location) {
     super();
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
   }
 
   ngOnInit(): void {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(DeleteOrderSucceeded)).subscribe(() => {
+      this.grid.clearRowSelection();
+      this.openDetails.next(false);
+    });
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
       this.selectedOrder = order;
     });
+
+    const locationState = this.location.getState() as { orderId: number };
+    this.previousSelectedOrderId = locationState.orderId;
+
     this.organizationId$
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(() => this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize })));
+      .subscribe(() => {
+        if (!this.previousSelectedOrderId) {
+          this.getOrdersPage()
+        }
+      });
 
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
       if (this.activeTab === OrderManagemetTabs.AllOrders) {
-        this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
+        this.getOrdersPage();
       } else if (this.activeTab === OrderManagemetTabs.Incomplete) {
         this.store.dispatch(new GetIncompleteOrders({ pageNumber: this.currentPage, pageSize: this.pageSize }));
       }
@@ -108,11 +134,25 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.grid.clearRowSelection();
       }
     });
+
+    this.onReloadOrderCandidatesLists();
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public onDataBound(): void {
+    if (this.previousSelectedOrderId) {
+      const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
+        this.previousSelectedOrderId
+      );
+      if (data && index) {
+        this.grid.selectRow(index);
+        this.onRowClick({ data });
+      }
+    }
   }
 
   public onNextPreviousOrderEvent(next: boolean): void {
@@ -121,11 +161,15 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.grid.selectRow(nextIndex);
   }
 
-  public onRowClick({ data }: { data: OrderManagement }): void {
-    const options = this.getDialogNextPreviousOption(data);
-    this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
-    this.store.dispatch(new GetAgencyOrderCandidatesList(data.id, data.organizationId, this.currentPage, this.pageSize));
-    this.openDetails.next(true);
+  public onRowClick(event: any): void {
+    if (!event.isInteracted) {
+      this.selectedDataRow = event.data;
+      const data = event.data;
+      const options = this.getDialogNextPreviousOption(data);
+      this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
+      this.store.dispatch(new GetAgencyOrderCandidatesList(data.id, data.organizationId, this.currentPage, this.pageSize));
+      this.openDetails.next(true);
+    }
   }
 
   private getDialogNextPreviousOption(selectedOrder: OrderManagement): DialogNextPreviousOption {
@@ -174,7 +218,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       case OrderManagemetTabs.AllOrders:
         this.currentPage = 1;
         this.isLockMenuButtonsShown = true;
-        this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
+        this.getOrdersPage();
         break;
       case OrderManagemetTabs.OrderTemplates:
         // TODO: pending implementation
@@ -191,6 +235,20 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     return OrderTypeName[OrderType[orderType] as OrderTypeName];
   }
 
+  private deleteOrder(id: number): void {
+    this.confirmService
+    .confirm(DELETE_RECORD_TEXT, {
+      title: DELETE_RECORD_TITLE,
+      okButtonLabel: 'Delete',
+      okButtonClass: 'delete-button'
+    })
+    .subscribe((confirm) => {
+      if (confirm) {
+        this.store.dispatch(new DeleteOrder(id));
+      }
+    });
+  }
+
   public menuOptionSelected(event: any, data: OrderManagement): void {
     switch (Number(event.item.properties.id)) {
       case MoreMenuType['Edit']:
@@ -203,9 +261,24 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         // TODO: pending implementation
         break;
       case MoreMenuType['Delete']:
-        // TODO: pending implementation
+        this.deleteOrder(data.id);
         break;
     }
+  }
+
+  private onReloadOrderCandidatesLists(): void {
+    this.actions$.pipe(
+      ofActionSuccessful(ReloadOrganisationOrderCandidatesLists),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.store.dispatch(new GetAgencyOrderCandidatesList(this.selectedDataRow.id, this.selectedDataRow.organizationId as number, this.currentPage, this.pageSize));
+      this.getOrdersPage();
+      this.store.dispatch(new GetOrderById(this.selectedDataRow.id, this.selectedDataRow.organizationId as number, this.getDialogNextPreviousOption(this.selectedDataRow as any)));
+    });
+  }
+
+  private getOrdersPage(): void {
+    this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
   }
 }
 

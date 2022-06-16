@@ -1,4 +1,4 @@
-import { WorkflowWithDetails, WorkflowWithDetailsPut } from "@shared/models/workflow.model";
+import { WorkflowFilters, WorkflowWithDetails, WorkflowWithDetailsPut } from "@shared/models/workflow.model";
 import { WorkflowMappingPost } from '@shared/models/workflow-mapping.model';
 
 export class GetWorkflows {
@@ -29,12 +29,12 @@ export class RemoveWorkflow {
 
 export class GetWorkflowMappingPages {
   static readonly type = '[workflow] Get Workflow Mapping Page';
-  constructor() {}
+  constructor(public filters?: WorkflowFilters) {}
 }
 
 export class SaveWorkflowMapping {
   static readonly type = '[workflow] Save Workflow Mapping';
-  constructor(public payload: WorkflowMappingPost) {}
+  constructor(public payload: WorkflowMappingPost, public filters: WorkflowFilters) {}
 }
 
 export class SaveWorkflowMappingSucceed {
@@ -44,7 +44,7 @@ export class SaveWorkflowMappingSucceed {
 
 export class RemoveWorkflowMapping {
   static readonly type = '[workflow] Remove Workflow Mapping';
-  constructor(public payload: number) {}
+  constructor(public payload: number, public filters: WorkflowFilters) {}
 }
 
 export class RemoveWorkflowDeclined {

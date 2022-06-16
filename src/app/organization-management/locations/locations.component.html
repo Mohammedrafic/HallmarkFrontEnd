@@ -403,18 +403,17 @@
   </ng-template>
 
   <ng-template #content>
-    <div class="input-container bootstrap">
+    <div class="input-container bootstrap" [formGroup]="regionFormGroup">
       <label for="invoiceNote">Region</label>
       <div class="input-group">
         <input id="addRegion"
                class="e-input"
                type="text"
-               minlength="1"
                maxlength="50"
                required
                appValidateWithMessage
                placeholder="New Region"
-               [(ngModel)]="newRegionName"/>
+               formControlName="newRegionName"/>
       </div>
     </div>
   </ng-template>

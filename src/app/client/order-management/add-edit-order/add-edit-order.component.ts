@@ -6,19 +6,25 @@ import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
-import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil, switchMap, of } from 'rxjs';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { SetImportFileDialogState } from '@admin/store/admin.actions';
-import { SaveOrder, EditOrder, GetSelectedOrderById, SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
+import {
+  SaveOrder,
+  EditOrder,
+  GetSelectedOrderById,
+  SaveOrderSucceeded,
+  ClearPredefinedBillRates,
+  GetPredefinedBillRates
+} from '@client/store/order-managment-content.actions';
 
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
-import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-management.model';
+import { CreateOrderDto, EditOrderDto, GetPredefinedBillRatesData, Order } from '@shared/models/order-management.model';
 import { BillRatesComponent } from '@bill-rates/bill-rates.component';
 import { BillRate, OrderBillRateDto } from '@shared/models/bill-rate.model';
 import { IOrderCredentialItem } from '@order-credentials/types';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 enum SelectedTab {
   OrderDetails,
@@ -42,6 +48,12 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order>;
+
+  @Select(OrderManagementContentState.getPredefinedBillRatesData)
+  getPredefinedBillRatesData$: Observable<GetPredefinedBillRatesData | null>;
+
+  @Select(OrderManagementContentState.predefinedBillRates)
+  predefinedBillRates$: Observable<BillRate[]>;
 
   public SelectedTab = SelectedTab;
   public orderId: number;
@@ -87,11 +99,27 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe(() => {
       this.router.navigate(['/client/order-management']);
     });
+
+    this.getPredefinedBillRatesData$.pipe(
+      takeUntil(this.unsubscribe$),
+      switchMap(getPredefinedBillRatesData => {
+        if (getPredefinedBillRatesData && !this.billRatesComponent.billRatesControl.value.length) {
+          return this.store.dispatch(new GetPredefinedBillRates());
+        } else {
+          return of(null);
+        }
+      })
+    ).subscribe();
+
+    this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe(predefinedBillRates => {
+      this.orderBillRates = predefinedBillRates;
+    });
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.store.dispatch(new ClearPredefinedBillRates());
   }
 
   public navigateBack(): void {
@@ -147,13 +175,18 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.contactDetailsForm.valid &&
       this.orderDetailsFormComponent.workLocationForm.valid &&
       this.orderDetailsFormComponent.workflowForm.valid &&
+      this.orderDetailsFormComponent.specialProject.valid &&
       this.billRatesComponent.billRatesControl.valid
     ) {
       const order = this.collectOrderData(true);
       const documents = this.orderDetailsFormComponent.documents;
 
       if (this.orderId) {
-        this.store.dispatch(new EditOrder({...order, id: this.orderId }));
+        this.store.dispatch(new EditOrder({
+          ...order,
+          id: this.orderId,
+          deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids
+        }, documents));
       } else {
         this.store.dispatch(new SaveOrder(order, documents));
       }
@@ -165,6 +198,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.contactDetailsForm.markAllAsTouched();
       this.orderDetailsFormComponent.workLocationForm.markAllAsTouched();
       this.orderDetailsFormComponent.workflowForm.markAllAsTouched();
+      this.orderDetailsFormComponent.specialProject.markAllAsTouched();
     }
   }
 
@@ -177,6 +211,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       ...this.orderDetailsFormComponent.contactDetailsForm.value,
       ...this.orderDetailsFormComponent.workLocationForm.value,
       ...this.orderDetailsFormComponent.workflowForm.value,
+      ...this.orderDetailsFormComponent.specialProject.value,
       ...{ credentials: this.orderCredentials },
       ...{ billRates: this.billRatesComponent.billRatesControl.value }
     };
@@ -190,9 +225,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       departmentId,
       skillId,
       projectTypeId,
-      projectType,
       projectNameId,
-      projectName,
+      reasonForRequestId,
+      poNumberId,
       hourlyRate,
       openPositions,
       minYrsRequired,
@@ -234,6 +269,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       orderType,
       projectTypeId,
       projectNameId,
+      reasonForRequestId,
+      poNumberId,
       hourlyRate,
       openPositions,
       minYrsRequired,
@@ -261,14 +298,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       workflowId,
       isSubmit
     };
-
-    if (!projectTypeId && projectType) {
-      order.projectType = projectType
-    }
-
-    if (!projectNameId && projectName) {
-      order.projectName = projectName;
-    }
 
     if (!order.hourlyRate) {
       order.hourlyRate = null;
@@ -316,7 +345,11 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
 
     if (this.orderId) {
-      this.store.dispatch(new EditOrder({...order, id: this.orderId }));
+      this.store.dispatch(new EditOrder({
+        ...order,
+        id: this.orderId,
+        deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids
+      }, documents));
     } else {
       this.store.dispatch(new SaveOrder(order, documents));
     }

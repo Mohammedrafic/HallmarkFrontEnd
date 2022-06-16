@@ -15,7 +15,8 @@ import {
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
-  RECORD_ADDED
+  RECORD_ADDED,
+  RECORD_MODIFIED
 } from '@shared/constants/messages';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -133,11 +134,12 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
 
       if (this.isEdit) {
         this.store.dispatch(new UpdateCredentialType(type));
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       } else {
         this.store.dispatch(new SaveCredentialType(type));
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
       }
 
-      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
       this.store.dispatch(new ShowSideDialog(false));
       this.credentialTypeFormGroup.reset();
       this.isEdit = false;

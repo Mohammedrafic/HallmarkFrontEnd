@@ -3,6 +3,9 @@
     <ng-container left>
     </ng-container>
     <ng-container right>
+      <button (click)="showFilters()" ejs-button id="filterButton" cssClass="e-outline button-filter">
+        Filters <i-feather name="sliders" class="icon"></i-feather>
+      </button>
       <button
         ejs-button
         [isPrimary]="true"
@@ -22,12 +25,12 @@
             [enableVirtualization]="true"
             [rowHeight]="rowHeight"
             [resizeSettings]="resizeSettings"
+            (actionBegin)="actionBegin($event)"
             [allowSorting]="allowSorting"
             [allowResizing]="allowResizing"
   >
     <ng-template #detailTemplate let-data>
       <table
-        [appHighlightGridRowDirective]="data.hasUnassignedSteps"
         class="detailtable"
         width="100%"
         *ngFor="let type of [workflowTypes.OrderWorkflow, workflowTypes.ApplicationWorkflow]"
@@ -80,8 +83,10 @@
     <e-columns>
       <e-column field="regionName" headerText="REGION" width=150>
         <ng-template #template let-data>
-          <span *ngIf="data.regionId">{{ data.regionName }}</span>
-          <span *ngIf="!data.regionId">All</span>
+          <div [appHighlightGridRowDirective]="data.hasUnassignedSteps">
+            <span *ngIf="data.regionId">{{ data.regionName }}</span>
+            <span *ngIf="!data.regionId">All</span>
+          </div>
         </ng-template>
       </e-column>
       <e-column field="locationName" headerText="LOCATION" width=180>
@@ -169,6 +174,88 @@
       </div>
     </ng-template>
   </ejs-grid>
+
+  <app-filter-dialog [items]="filteredItems" [count]="(workflowMappings$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+    <form class="bootstrap" [formGroup]="WorkflowFilterFormGroup">
+      <div class="input-container">
+        <label>Region</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="regionIds"
+                           placeholder="All"
+                           [fields]="optionFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.regionIds.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Location</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="locationIds"
+                           placeholder="All"
+                           [fields]="optionFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.locationIds.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Department</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="departmentsIds"
+                           placeholder="All"
+                           [fields]="optionFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.departmentsIds.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Skill</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="skillIds"
+                           placeholder="All"
+                           [fields]="skillsFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.skillIds.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Workflow Type</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="types"
+                           placeholder="All"
+                           [fields]="optionFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.types.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Workflow Name</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="names"
+                           placeholder="All"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.names.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+    </form>
+  </app-filter-dialog>
 
   <app-side-dialog
     *ngIf="isActive"

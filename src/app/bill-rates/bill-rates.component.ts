@@ -61,14 +61,14 @@ export class BillRatesComponent implements OnInit {
     this.billRateFormHeader = 'Edit Bill Rate';
     this.editBillRateIndex = index;
 
-    this.billRateForm.patchValue({ 
+    this.billRateForm.patchValue({
       billRateConfig: value.billRateConfig,
       billRateConfigId: value.billRateConfigId,
       effectiveDate: value.effectiveDate,
       id: value.id,
-      intervalMax: String(value.intervalMax),
-      intervalMin: String(value.intervalMin),
-      rateHour: String(value.rateHour) 
+      intervalMax: value.intervalMax && String(value.intervalMax),
+      intervalMin: value.intervalMin && String(value.intervalMin),
+      rateHour: String(value.rateHour)
      }, { emitEvent: false });
 
     if (!value.billRateConfig.intervalMin) {
@@ -88,10 +88,10 @@ export class BillRatesComponent implements OnInit {
 
   public onRemoveBillRate({ index }: BillRatesGridEvent): void {
     this.confirmService
-      .confirm('Are You sure you want to delete it?', {
+      .confirm('Are you sure you want to delete it?', {
         okButtonLabel: 'Delete',
         okButtonClass: 'delete-button',
-        title: 'Delete record',
+        title: 'Delete record'
       })
       .pipe(
         take(1),
@@ -115,6 +115,10 @@ export class BillRatesComponent implements OnInit {
           this.billRateForm.reset();
           this.billRateForm.enable();
           this.store.dispatch(new ShowSideDialog(false));
+
+          // sets initial state of selected bill rate unit field in bill-rate-form component with initialization
+          setTimeout(() => this.isActive = false, 1);
+          setTimeout(() => this.isActive = true, 1);
         });
     } else {
       this.billRateForm.reset();
@@ -128,7 +132,7 @@ export class BillRatesComponent implements OnInit {
     if (this.billRateForm.valid) {
       const value: BillRate = this.billRateForm.getRawValue();
 
-      if (!value.id) {
+      if (!value.effectiveDate) {
         const existingDateAndConfig = (this.billRatesControl.value as BillRate[]).find(
           (rate) =>
             rate.billRateConfigId === value.billRateConfigId &&
@@ -150,6 +154,10 @@ export class BillRatesComponent implements OnInit {
       }
       this.billRateForm.reset();
       this.store.dispatch(new ShowSideDialog(false));
+
+      // sets initial state of selected bill rate unit field in bill-rate-form component with initialization
+      setTimeout(() => this.isActive = false, 1);
+      setTimeout(() => this.isActive = true, 1);
     }
   }
 

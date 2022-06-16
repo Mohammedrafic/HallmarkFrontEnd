@@ -140,13 +140,15 @@ export class UserState {
   SetLastSelectedOrganizationAgencyId(
     { patchState }: StateContext<UserStateModel>,
     { payload }: SaveLastSelectedOrganizationAgencyId
-  ): LasSelectedOrganizationAgency {
-    window.localStorage.setItem(ORG_ID_STORAGE_KEY, payload.lastSelectedOrganizationId?.toString() as string);
-    window.localStorage.setItem(AGENCY_ID_STORAGE_KEY, payload.lastSelectedAgencyId?.toString() as string);
-    return patchState({
-      lastSelectedOrganizationId: payload.lastSelectedOrganizationId || null,
-      lastSelectedAgencyId: payload.lastSelectedAgencyId || null
-    });
+  ): void {
+    if (payload.lastSelectedAgencyId) {
+      window.localStorage.setItem(AGENCY_ID_STORAGE_KEY, payload.lastSelectedAgencyId?.toString() as string);
+      patchState({ lastSelectedAgencyId: payload.lastSelectedAgencyId });
+    }
+    if (payload.lastSelectedOrganizationId) {
+      window.localStorage.setItem(ORG_ID_STORAGE_KEY, payload.lastSelectedOrganizationId?.toString() as string);
+      patchState({ lastSelectedOrganizationId: payload.lastSelectedOrganizationId });
+    }
   }
 
   @Action(SaveLastSelectedOrganizationAgencyId)

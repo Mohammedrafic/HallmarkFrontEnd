@@ -125,7 +125,7 @@ table.detailtable {
   }
 }
 
-tr.e-detailrow.highlight {
+tr.highlight {
   background-color: $error !important;
 
   &:hover {
@@ -172,4 +172,12 @@ tr.e-detailrow {
       background-color: $primary-active-blue-10 !important;
     }
   }
+}
+
+.input-group {
+  margin-top: 5px;
+}
+
+.input-container {
+  margin-bottom: 15px;
 }

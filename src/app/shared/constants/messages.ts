@@ -13,3 +13,4 @@ export const DATA_OVERRIDE_TITLE = 'Data Override';
 export const DATA_OVERRIDE_TEXT = 'Are you sure want to override existing data?';
 export const INACTIVE_USER_TITLE = 'Inactivate the User';
 export const INACTIVE_USER_TEXT = 'Are you sure to inactivate the User?';
+export const ORDER_EDITS = "The recent changes may affect the data previously defined for this order. Please make sure that the data is correct"

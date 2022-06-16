@@ -1,20 +1,16 @@
 import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
-import { filter, forkJoin, Observable, takeWhile, tap } from 'rxjs';
+import { Observable, takeWhile } from 'rxjs';
 
 import { DropDownListComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
+import { MaskedTextBoxComponent } from "@syncfusion/ej2-angular-inputs";
 
 import { BillRateState } from '@bill-rates/store/bill-rate.state';
 import { BillRate, BillRateCategory, BillRateOption, BillRateType, BillRateUnit } from '@shared/models/bill-rate.model';
 import { GetBillRateOptions } from '@bill-rates/store/bill-rate.actions';
-import PriceUtils from "@shared/utils/price.utils";
-
-const RateHourMask = {
-  desimal: '00.00',
-  hours: '00.[0-5]0',
-};
+import PriceUtils from '@shared/utils/price.utils';
+import { currencyValidator } from '@shared/validators/currency.validator';
 
 @Component({
   selector: 'app-bill-rate-form',
@@ -26,7 +22,6 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
   public billRateOptionsDropdown: DropDownListComponent;
   @ViewChild('rateHours')
   public rateHoursInput: MaskedTextBoxComponent;
-
   @Input() billRateForm: FormGroup;
 
   public billRateConfig: BillRateOption;
@@ -34,11 +29,12 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
     text: 'title',
     value: 'id',
   };
-  public rateHourMack = false;
-  public priceUtils = PriceUtils;
 
   public isIntervalMinControlRequired = true;
   public isIntervalMaxControlRequired = true;
+  public selectedBillRateUnit: BillRateUnit = BillRateUnit.Multiplier;
+  public BillRateUnitList = BillRateUnit;
+  public priceUtils = PriceUtils;
 
   @Select(BillRateState.billRateOptions)
   public billRateOptions$: Observable<BillRateOption[]>;
@@ -53,6 +49,10 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get typeValue(): string {
     return BillRateType[this.billRateConfigControl?.value?.type] || '';
+  }
+
+  get rateHourControl(): AbstractControl | null {
+    return this.billRateForm.get('rateHour');
   }
 
   private isAlive = true;
@@ -100,8 +100,8 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isIntervalMinControlRequired = true;
         this.isIntervalMaxControlRequired = true;
         if (billRateConfig) {
-          this.rateHoursInput.mask = billRateConfig.unit === BillRateUnit.Hours ? RateHourMask.hours : RateHourMask.desimal;
-          this.rateHoursInput.refresh();
+          this.selectedBillRateUnit = billRateConfig.unit;
+          this.billRateForm.get('rateHour')?.setValue('');
           if (!billRateConfig.intervalMin) {
             intervalMinControl?.reset();
             intervalMinControl?.disable();
@@ -124,7 +124,7 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
     return new FormGroup({
       id: new FormControl(),
       billRateConfigId: new FormControl(null, [Validators.required]),
-      rateHour: new FormControl(null, [Validators.required]),
+      rateHour: new FormControl(null, [Validators.required, currencyValidator(1)]),
       intervalMin: new FormControl(null),
       intervalMax: new FormControl(null),
       effectiveDate: new FormControl('', [Validators.required]),

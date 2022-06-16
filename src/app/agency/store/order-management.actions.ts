@@ -1,5 +1,6 @@
 import { DialogNextPreviousOption } from "@shared/components/dialog-next-previous/dialog-next-previous.component";
 import { OrderApplicantsApplyData } from "@shared/models/order-applicants.model";
+import { AcceptJobDTO } from "@shared/models/order-management.model";
 
 export class GetAgencyOrdersPage {
   static readonly type = '[agency order management] Get Agency Orders Page';
@@ -28,6 +29,21 @@ export class GetAgencyOrderGeneralInformation {
   ) {}
 }
 
+export class GetCandidateJob {
+  static readonly type = '[agency order management] Get Agency Candidate Job';
+  constructor(
+    public organizationId: number,
+    public jobId: number
+  ) {}
+}
+
+export class UpdateAgencyCandidateJob {
+  static readonly type = '[agency order management] Update Agency Candidate Job';
+  constructor(
+    public payload: AcceptJobDTO
+  ) {}
+}
+
 export class GetOrderApplicantsData {
   static readonly type = '[agency order management] Get Order Applicants Initial Data';
   constructor(
@@ -42,7 +58,8 @@ export class ApplyOrderApplicants {
   constructor(public payload: OrderApplicantsApplyData) {}
 }
 
-export class ApplyOrderApplicantsSucceeded {
-  static readonly type = '[agency order management] Apply Order Applicants Succeeded';
+export class ReloadOrderCandidatesLists {
+  static readonly type = '[agency order management] Reload Order and Candidates Lists';
   constructor() {}
 }
+

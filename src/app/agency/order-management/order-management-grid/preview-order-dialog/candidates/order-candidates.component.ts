@@ -31,8 +31,8 @@ export class OrderCandidatesComponent implements OnInit {
     this.orderCandidatesInformation$.pipe(takeWhile(() => this.isAlive)).subscribe((order) => {
       this.orderCandidateInformation = order;
       this.orderCandidates = {
-        orderId: order.id,
-        organizationId: order.organizationId as number
+        orderId: order?.id,
+        organizationId: order?.organizationId as number
       }
     });
 

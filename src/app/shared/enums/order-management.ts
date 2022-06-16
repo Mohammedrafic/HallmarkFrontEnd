@@ -7,3 +7,8 @@ export enum OrderStatus {
   Filled = 50,
   Closed = 60,
 }
+
+export enum CandidateJobStatus {
+  Onboarded = 1,
+  Rejected = 2
+}

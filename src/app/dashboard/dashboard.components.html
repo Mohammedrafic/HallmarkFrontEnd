@@ -1,56 +1,36 @@
 <ng-container
+  *ngIf="isOrganization$ | async"
   [ngTemplateOutlet]="dashboardTemplate"
-  [ngTemplateOutletContext]="{ widgetsData: widgetsData$ | async, isLoading: isLoading$ | async }"
+  [ngTemplateOutletContext]="{
+    isLoading: isLoading$ | async,
+    panels: panels$ | async,
+    selectedWidgets: selectedWidgets$ | async,
+    widgets: widgets$ | async,
+    widgetsData: widgetsData$ | async
+  }"
 ></ng-container>
 
-<ng-template #dashboardTemplate let-widgetsData="widgetsData" let-isLoading="isLoading">
+<ng-template
+  #dashboardTemplate
+  let-isLoading="isLoading"
+  let-panels="panels"
+  let-selectedWidgets="selectedWidgets"
+  let-widgets="widgets"
+  let-widgetsData="widgetsData"
+>
   <app-dashboard-control
     (widgetToggleEmitter)="handleWidgetToggleEvent($event)"
-    [selectedWidgets]="selectedWidgets$ | async"
-    [widgets]="widgets$ | async"
-    [isLoading]="isLoading$ | async"
+    [isLoading]="isLoading"
+    [selectedWidgets]="selectedWidgets"
+    [widgets]="widgets"
   ></app-dashboard-control>
   <div class="control-section">
-    <ejs-dashboardlayout
-      id="dashboardLayout"
-      [columns]="columns"
-      [cellSpacing]="cellSpacing"
-      (dragStop)="moveDashboardPanel()"
-      (created)="dashboardIsCreated()"
-      #dashboardLayout
-    >
-      <e-panels>
-        <e-panel
-          *ngFor="let panel of panels$ | async; trackBy: trackByHandler"
-          [col]="panel.col"
-          [id]="panel.id"
-          [maxSizeX]="panel.maxSizeX"
-          [maxSizeY]="panel.maxSizeY"
-          [minSizeX]="panel.minSizeX"
-          [minSizeY]="panel.minSizeY"
-          [row]="panel.row"
-          [sizeX]="panel.sizeX"
-          [sizeY]="panel.sizeY"
-        >
-          <ng-template #content [ngSwitch]="panel.id">
-            <app-accumulation-chart
-              *ngSwitchCase="widgetTypeEnum.CANDIDATES"
-              [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
-              [isLoading]="isLoading"
-            ></app-accumulation-chart>
-            <app-maps-chart
-              *ngSwitchCase="widgetTypeEnum.APPLICANTS_BY_REGION"
-              [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_REGION]"
-              [isLoading]="isLoading"
-            ></app-maps-chart>
-            <app-line-chart
-              *ngSwitchCase="widgetTypeEnum.POSITIONS_BY_TYPES"
-              [chartData]="widgetsData?.[widgetTypeEnum.POSITIONS_BY_TYPES]"
-              [isLoading]="isLoading"
-            ></app-line-chart>
-          </ng-template>
-        </e-panel>
-      </e-panels>
-    </ejs-dashboardlayout>
+    <app-dashboard-widgets
+      (dashboardCreatedEmitter)="dashboardCreatedHandler()"
+      (dragStopEmitter)="moveDashboardPanel()"
+      [isLoading]="isLoading"
+      [panels]="panels"
+      [widgetsData]="widgetsData"
+    ></app-dashboard-widgets>
   </div>
 </ng-template>

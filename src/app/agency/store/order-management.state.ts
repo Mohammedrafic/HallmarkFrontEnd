@@ -7,6 +7,7 @@ import { OrderApplicantsInitialData } from "@shared/models/order-applicants.mode
 import {
   AgencyOrderManagement,
   AgencyOrderManagementPage,
+  OrderCandidateJob,
   OrderCandidatesListPage
 } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
@@ -17,18 +18,20 @@ import { catchError, Observable, of, tap } from 'rxjs';
 import { ShowToast } from "src/app/store/app.actions";
 import {
   ApplyOrderApplicants,
-  ApplyOrderApplicantsSucceeded,
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
   GetAgencyOrdersPage,
+  GetCandidateJob,
   GetOrderApplicantsData,
-  GetOrderById
+  GetOrderById,
+  UpdateAgencyCandidateJob
 } from './order-management.actions';
 
 export interface OrderManagementModel {
   ordersPage: AgencyOrderManagementPage | null;
   orderCandidatesListPage: OrderCandidatesListPage | null;
   orderCandidatesInformation: Order | null;
+  candidatesJob: OrderCandidateJob | null;
   orderApplicantsInitialData: OrderApplicantsInitialData | null;
   selectedOrder: Order | null;
   orderDialogOptions: DialogNextPreviousOption;
@@ -42,6 +45,7 @@ export interface OrderManagementModel {
     orderCandidatesInformation: null,
     orderApplicantsInitialData: null,
     selectedOrder: null,
+    candidatesJob: null,
     orderDialogOptions: {
       next: false,
       previous: false
@@ -95,6 +99,11 @@ export class OrderManagementState {
       });
       return order && rowIndex ? [order, rowIndex] : [];
     };
+  }
+
+  @Selector()
+  static candidatesJob(state: OrderManagementModel): OrderCandidateJob | null {
+    return state.candidatesJob;
   }
 
   constructor(private orderManagementContentService: OrderManagementContentService,
@@ -171,8 +180,32 @@ export class OrderManagementState {
   @Action(ApplyOrderApplicants)
   ApplyOrderApplicants({ dispatch }: StateContext<OrderManagementModel>, { payload }: ApplyOrderApplicants): Observable<any> {
     return this.orderApplicantsService.applyOrderApplicants(payload).pipe(
-      tap(dispatch(new ApplyOrderApplicantsSucceeded())),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Candidate cannot be applied'))))
+      tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'))),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
+    );
+  }
+
+  @Action(GetCandidateJob)
+  GetCandidateJob(
+    { patchState }: StateContext<OrderManagementModel>,
+    { organizationId, jobId }: GetCandidateJob
+  ): Observable<OrderCandidateJob> {
+      return this.orderManagementContentService.getCandidateJob(organizationId, jobId).pipe(
+        tap((payload) => {
+          patchState({candidatesJob: payload});
+          return payload;
+        })
+      );
+  }
+
+  @Action(UpdateAgencyCandidateJob)
+  UpdateAgencyCandidateJob(
+    { dispatch }: StateContext<OrderManagementModel>,
+    { payload }: UpdateAgencyCandidateJob
+  ): Observable<any> {
+     return this.orderManagementContentService.updateCandidateJob(payload).pipe(
+       tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'))),
+       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
     );
   }
 }

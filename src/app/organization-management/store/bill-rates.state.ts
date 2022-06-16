@@ -37,8 +37,8 @@ export class BillRatesState {
   constructor(private billRatesService: BillRatesService) {}
 
   @Action(GetBillRates)
-  GetBillRates({ patchState }: StateContext<BillRatesStateModel>, { pageNumber, pageSize }: GetBillRates): Observable<BillRateSetupPage> {
-    return this.billRatesService.getBillRates(pageNumber, pageSize).pipe(tap((payload) => {
+  GetBillRates({ patchState }: StateContext<BillRatesStateModel>, { filter }: GetBillRates): Observable<BillRateSetupPage> {
+    return this.billRatesService.getBillRates(filter).pipe(tap((payload) => {
       patchState({ billRatesPage: payload });
       return payload;
     }));
@@ -48,20 +48,20 @@ export class BillRatesState {
   SaveUpdateBillRate({ patchState, dispatch }: StateContext<BillRatesStateModel>, { payload, pageNumber, pageSize }: SaveUpdateBillRate): Observable<BillRateSetup[] | void> {
     return this.billRatesService.saveUpdateBillRate(payload)
       .pipe(tap((payloadResponse) => {
-          if (payload.billRateSetupId) {
+          if (payload.billRateSettingId) {
             dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
           } else {
             dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
           }
-          dispatch(new GetBillRates(pageNumber, pageSize));
+          dispatch(new GetBillRates({ pageNumber: pageNumber, pageSize: pageSize }));
           dispatch(new SaveUpdateBillRateSucceed());
           return payloadResponse;
         }),
         catchError((error: any) => {
-          if (payload.billRateSetupId) {
-            return dispatch(new ShowToast(MessageTypes.Error, error.error.detail ? error.error.detail : RECORD_CANNOT_BE_UPDATED));
+          if (payload.billRateSettingId) {
+            return dispatch(new ShowToast(MessageTypes.Error, error && error.error && error.error.detail ? error.error.detail : RECORD_CANNOT_BE_UPDATED));
           } else {
-            return dispatch(new ShowToast(MessageTypes.Error, error.error.detail ? error.error.detail : RECORD_CANNOT_BE_SAVED))
+            return dispatch(new ShowToast(MessageTypes.Error, error && error.error && error.error.detail ? error.error.detail : RECORD_CANNOT_BE_SAVED))
           }
         })
       );
@@ -70,7 +70,7 @@ export class BillRatesState {
   @Action(DeleteBillRatesById)
   DeleteBillRatesById({ patchState, dispatch }: StateContext<BillRatesStateModel>, { payload, pageNumber, pageSize }: DeleteBillRatesById): Observable<void> {
     return this.billRatesService.removeBillRateById(payload).pipe(tap(() => {
-        dispatch(new GetBillRates(pageNumber, pageSize));
+        dispatch(new GetBillRates({ pageNumber: pageNumber, pageSize: pageSize }));
         return payload;
       }),
       catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));

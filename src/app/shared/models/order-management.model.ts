@@ -1,4 +1,5 @@
 import { PageOfCollections } from '@shared/models/page.model';
+import { Document } from '@shared/models/document.model';
 import { OrderStatus } from '@shared/enums/order-management';
 import { OrderType } from '@shared/enums/order-type';
 import { Duration } from '@shared/enums/durations';
@@ -55,14 +56,14 @@ export type AgencyOrderManagement = {
   department: string;
   orderType: OrderType;
   billRate: number;
-  candidates: number;
+  candidatesCount: number;
   isLocked: boolean;
   jobStartDate: string;
   organizationId: number;
   organizationName: string;
 };
 
-export type AgencyOrderCandidates = {
+export type OrderCandidatesList = {
   candidateId: number;
   firstName: string;
   hourlyBillRate: number;
@@ -73,11 +74,12 @@ export type AgencyOrderCandidates = {
   status: number;
   statusName: string;
   submissionsPercentage: number;
+  candidateJobId: number;
 };
 
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;
 
-export type OrderCandidatesListPage = PageOfCollections<AgencyOrderCandidates>;
+export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
 
 export type AgencyOrder = {
   orderId: number;
@@ -101,6 +103,12 @@ export class OrderWorkLocation {
   zipCode: string;
 }
 
+export class GetPredefinedBillRatesData {
+  orderType: OrderType;
+  departmentId: number;
+  skillId: number;
+}
+
 export class Order {
   id: number;
   title: string;
@@ -109,10 +117,10 @@ export class Order {
   departmentId: number;
   skillId: number;
   orderType: OrderType;
+  reasonForRequestId: number | null;
+  poNumberId: number | null;
   projectTypeId: number | null;
-  projectType?: string;
   projectNameId: number | null;
-  projectName?: string;
   hourlyRate: number | null;
   openPositions: number | null;
   minYrsRequired: number | null;
@@ -148,12 +156,78 @@ export class Order {
   status: OrderStatus;
   organizationId?: number;
   totalPositions?: number;
+  documents: Document[] | null;
 }
 
-export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates'> {
+export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'documents'> {
   billRates: OrderBillRateDto[];
 }
 
-export interface EditOrderDto extends Omit<Order, 'billRates' | 'status'> {
+export interface EditOrderDto extends Omit<Order, 'billRates' | 'status' | 'documents'> {
   billRates: OrderBillRateDto[];
+  deleteDocumentsGuids: string[];
+}
+
+export type AcceptJobDTO = {
+  actualEndDate: string;
+  actualStartDate: string;
+  allowDeplayWoCredentials: boolean;
+  candidateBillRate: number;
+  clockId: number;
+  guaranteedWorkWeek: string;
+  jobId: number;
+  nextApplicantStatus: ApplicantStatus,
+  offeredBillRate: number;
+  organizationId: number;
+  requestComment: string;
+}
+
+export type CandidateProfile = {
+  agencyId: number;
+  candidateAgencyStatus: number;
+  candidateProfileContactDetail: string;
+  candidateProfileSkills: Array<string>;
+  classification: number;
+  createdAt: string;
+  createdBy: string;
+  dob: number;
+  email: string;
+  firstName: string;
+  id: number;
+  lastModifiedAt: string;
+  lastModifiedBy: string;
+  lastName: string;
+  middleName: string;
+  professionalSummary: string;
+  profileStatus: number;
+  ssn: number;
+}
+
+export type OrderCandidateJob = {
+  actualEndDate: string;
+  actualStartDate: string;
+  availableStartDate: string;
+  billRatesGroupId: number;
+  candidateBillRate: number;
+  candidateProfile: CandidateProfile;
+  candidateProfileId: number;
+  clockId: number;
+  expAsTravelers: string;
+  guaranteedWorkWeek: string;
+  jobId: number;
+  offeredBillRate: number;
+  order: Order;
+  orderId: number;
+  organizationId: number;
+  rejectBy: string;
+  rejectDate: string;
+  rejectReason: string;
+  requestComment: string;
+  workflowStepId: number;
+  yearsOfExperience: number;
+}
+
+export type ApplicantStatus = {
+  applicantStatus: number;
+  statusText: string;
 }

@@ -15,6 +15,7 @@
             [allowSorting]="allowSorting"
             [allowResizing]="allowResizing"
             [pageSettings]="pageSettings"
+            [allowSelection]="false"
             [height]="gridHeight"
             [enableVirtualization]="true"
             (dataBound)="dataBound()">
@@ -44,18 +45,19 @@
         id="addEducationForm"
         [formGroup]="educationForm">
     <div class="dropdown-container">
-      <label>Degree Type</label>
+      <label>Degree Type<span class="required">*</span></label>
       <div class="input-group dropdown">
         <ejs-dropdownlist appValidateWithMessage
                           [fields]="optionFields"
                           formControlName="degree"
+                          appValidateWithMessage
                           [dataSource]="degreeTypes"
                           placeholder="Degree Type">
         </ejs-dropdownlist>
       </div>
     </div>
     <div class="input-container">
-      <label>School Name</label>
+      <label>School Name<span class="required">*</span></label>
       <div class="input-group">
         <input class="e-input"
                type="text"
@@ -66,7 +68,7 @@
       </div>
     </div>
     <div class="input-container">
-      <label>Field Of Study</label>
+      <label>Field Of Study<span class="required">*</span></label>
       <div class="input-group">
         <input class="e-input"
                type="text"
@@ -77,11 +79,12 @@
       </div>
     </div>
     <div class="input-container calendar">
-      <label>Graduation Month/Year</label>
+      <label>Graduation Month/Year<span class="required">*</span></label>
       <div class="input-group datepicker">
         <ejs-datepicker class="datepicker"
                         format="MM/dd/yyyy"
                         placeholder="MM/DD/YYYY"
+                        appValidateWithMessage
                         formControlName="graduationDate">
         </ejs-datepicker>
       </div>

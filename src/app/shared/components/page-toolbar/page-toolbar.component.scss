@@ -5,18 +5,17 @@ $gap: 12px;
   display: flex;
   justify-content: space-between;
 
-  & > div {
-    width: 50%;
-  }
-
   .left-content {
+    width: 50%;
     display: flex;
+
     & > *:not(:last-child) {
       margin-right: $gap;
     }
   }
 
   .right-content {
+    width: 50%;
     display: flex;
     justify-content: end;
     flex-grow: 1;

@@ -12,6 +12,7 @@ import { Candidate, CandidatePage } from "src/app/shared/models/candidate.model"
 import { ConfirmService } from "src/app/shared/services/confirm.service";
 
 import { SetHeaderState } from "src/app/store/app.actions";
+import { UserState } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-candidates',
@@ -29,6 +30,8 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
   @Select(CandidateState.candidates)
   candidates$: Observable<CandidatePage>;
 
+  @Select(UserState.lastSelectedAgencyId)
+  lastSelectedAgencyId$: Observable<number>;
 
   constructor(private store: Store,
               private router: Router,
@@ -40,7 +43,9 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetCandidatesByPage(this.currentPage, this.pageSize));
+    this.lastSelectedAgencyId$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => this.store.dispatch(new GetCandidatesByPage(this.currentPage, this.pageSize)));
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new GetCandidatesByPage(this.currentPage, this.pageSize));

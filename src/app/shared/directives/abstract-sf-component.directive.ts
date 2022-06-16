@@ -1,12 +1,17 @@
-import { Directive, ViewChild, AfterViewInit } from '@angular/core';
-import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { Component as SFComponent } from '@syncfusion/ej2-base';
-import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { takeUntil } from 'rxjs';
 
+import { Directive, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
+
 @Directive()
-export class AbstractSFComponentDirective extends DestroyableDirective implements AfterViewInit {
-  @ViewChild('sfComponent') public sfComponent: SFComponent<HTMLElement>;
+export class AbstractSFComponentDirective<ComponentType extends SFComponent<HTMLElement>>
+  extends DestroyableDirective
+  implements AfterViewInit, OnDestroy
+{
+  @ViewChild('sfComponent') public sfComponent: ComponentType;
 
   private componentResizeObserver: ResizeObserverModel;
 

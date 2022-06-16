@@ -1,7 +1,11 @@
 @import "../../../styles/variables/colors.scss";
 
+.page-title {
+  display: flex;
+  align-items: center;
+}
+
 .org-controls-container {
-  padding: 20px 0;
 
   &>div {
     display: flex;

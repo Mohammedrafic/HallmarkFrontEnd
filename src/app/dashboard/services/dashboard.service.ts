@@ -28,6 +28,7 @@ import identity from 'lodash/fp/identity';
 import { DashboardDataModel } from '../models/dashboard-data.model';
 import type { ApplicantsByRegionDataModel } from '../models/applicants-by-region-data.model';
 import type { LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
+import type { WidgetsDataModel } from '../models/widgets-data.model';
 import { PositionTypeEnum } from '../enums/position-type.enum';
 import type { PositionsByTypeAggregatedModel } from '../models/positions-by-type-aggregated.model';
 
@@ -67,19 +68,23 @@ export class DashboardService {
     return this.httpClient.post<void>(`${this.baseUrl}/SaveState`, { dasboardState });
   }
 
-  public getWidgetsAggregatedData([panels, filters]: WidgetDataDependenciesAggregatedModel): Observable<
-    Record<WidgetTypeEnum, unknown>
-  > {
-    const data: Record<WidgetTypeEnum, Observable<unknown>> = reduce(
+  public getWidgetsAggregatedData([
+    panels,
+    filters,
+  ]: WidgetDataDependenciesAggregatedModel): Observable<WidgetsDataModel> {
+    const data: Record<WidgetTypeEnum, Observable<WidgetsDataModel[keyof WidgetsDataModel]>> = reduce(
       panels,
-      (accumulator: Record<WidgetTypeEnum, Observable<unknown>>, panel: PanelModel) => ({
+      (
+        accumulator: Partial<Record<WidgetTypeEnum, Observable<WidgetsDataModel[keyof WidgetsDataModel]>>>,
+        panel: PanelModel
+      ) => ({
         ...accumulator,
         [panel.id as WidgetTypeEnum]: this.widgetTypeToDataMapper[panel.id as WidgetTypeEnum]?.(filters) ?? of(null),
       }),
-      {} as Record<WidgetTypeEnum, Observable<unknown>>
-    );
+      {}
+    ) as Record<WidgetTypeEnum, Observable<WidgetsDataModel[keyof WidgetsDataModel]>>;
 
-    return forkJoin(data);
+    return forkJoin(data) as Observable<WidgetsDataModel>;
   }
 
   private getWidgetList(): Observable<WidgetOptionModel[]> {

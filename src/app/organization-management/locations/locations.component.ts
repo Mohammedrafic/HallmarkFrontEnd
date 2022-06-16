@@ -33,7 +33,8 @@ import {
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
-  RECORD_ADDED
+  RECORD_ADDED,
+  RECORD_MODIFIED
 } from '@shared/constants';
 import { Organization } from '@shared/models/organization.model';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -70,7 +71,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   locations$: Observable<Location[]>;
 
   locationDetailsFormGroup: FormGroup;
-  newRegionName: string;
+  regionFormGroup: FormGroup;
   formBuilder: FormBuilder;
 
   @Select(OrganizationManagementState.organization)
@@ -195,10 +196,13 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   onOkDialogClick(): void {
-    this.newRegionName.trim();
-    if (this.newRegionName) {
-      this.store.dispatch(new SaveRegion({ name: this.newRegionName }))
+    if (this.regionFormGroup.valid) {
+      let newRegionName = this.regionFormGroup.controls['newRegionName'].value.trim();
+      this.store.dispatch(new SaveRegion({ name: newRegionName }));
       this.addRegionDialog.hide();
+      this.regionFormGroup.reset();
+    } else {
+      this.regionFormGroup.markAsTouched();
     }
   }
 
@@ -324,24 +328,27 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         phoneType: parseInt(PhoneTypes[this.locationDetailsFormGroup.controls['phoneType'].value]),
       }
 
-      if (this.isEdit) {
-        if (this.selectedRegion.id) {
-          this.store.dispatch(new UpdateLocation(location, this.selectedRegion.id));
-          this.isEdit = false;
-          this.editedLocationId = undefined;
-        }
-      } else {
-        if (this.selectedRegion.id) {
-          this.store.dispatch(new SaveLocation(location, this.selectedRegion.id));
-          this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED))
-        }
-      }
+      this.saveOrUpdateLocation(location);
 
       this.store.dispatch(new ShowSideDialog(false));
       this.locationDetailsFormGroup.reset();
       this.removeActiveCssClass();
     } else {
       this.locationDetailsFormGroup.markAllAsTouched();
+    }
+  }
+
+  private saveOrUpdateLocation(location: Location): void {
+    if (this.selectedRegion.id) {
+      if (this.isEdit) {
+        this.store.dispatch(new UpdateLocation(location, this.selectedRegion.id));
+        this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        this.isEdit = false;
+        this.editedLocationId = undefined;
+        return;
+      }
+      this.store.dispatch(new SaveLocation(location, this.selectedRegion.id));
+      this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
     }
   }
 
@@ -367,6 +374,10 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       inactiveDate: [null],
       phoneNumber: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(10), Validators.pattern('^[0-9]*$')]],
       phoneType: ['', Validators.required],
+    });
+
+    this.regionFormGroup = this.formBuilder.group({
+      newRegionName: ['', [Validators.required,  Validators.minLength(1),  Validators.maxLength(50)]]
     });
   }
 
