@@ -103,6 +103,12 @@ export class OrderWorkLocation {
   zipCode: string;
 }
 
+export class GetPredefinedBillRatesData {
+  orderType: OrderType;
+  departmentId: number;
+  skillId: number;
+}
+
 export class Order {
   id: number;
   title: string;

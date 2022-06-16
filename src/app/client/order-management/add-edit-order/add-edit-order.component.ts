@@ -6,19 +6,25 @@ import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
-import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil, switchMap, of } from 'rxjs';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { SetImportFileDialogState } from '@admin/store/admin.actions';
-import { SaveOrder, EditOrder, GetSelectedOrderById, SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
+import {
+  SaveOrder,
+  EditOrder,
+  GetSelectedOrderById,
+  SaveOrderSucceeded,
+  ClearPredefinedBillRates,
+  GetPredefinedBillRates
+} from '@client/store/order-managment-content.actions';
 
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
-import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-management.model';
+import { CreateOrderDto, EditOrderDto, GetPredefinedBillRatesData, Order } from '@shared/models/order-management.model';
 import { BillRatesComponent } from '@bill-rates/bill-rates.component';
 import { BillRate, OrderBillRateDto } from '@shared/models/bill-rate.model';
 import { IOrderCredentialItem } from '@order-credentials/types';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 enum SelectedTab {
   OrderDetails,
@@ -42,6 +48,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order>;
+
+  @Select(OrderManagementContentState.getPredefinedBillRatesData)
+  getPredefinedBillRatesData$: Observable<GetPredefinedBillRatesData | null>;
 
   @Select(OrderManagementContentState.predefinedBillRates)
   predefinedBillRates$: Observable<BillRate[]>;
@@ -91,6 +100,17 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.router.navigate(['/client/order-management']);
     });
 
+    this.getPredefinedBillRatesData$.pipe(
+      takeUntil(this.unsubscribe$),
+      switchMap(getPredefinedBillRatesData => {
+        if (getPredefinedBillRatesData && !this.billRatesComponent.billRatesControl.value.length) {
+          return this.store.dispatch(new GetPredefinedBillRates());
+        } else {
+          return of(null);
+        }
+      })
+    ).subscribe();
+
     this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe(predefinedBillRates => {
       this.orderBillRates = predefinedBillRates;
     });
@@ -99,6 +119,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.store.dispatch(new ClearPredefinedBillRates());
   }
 
   public navigateBack(): void {

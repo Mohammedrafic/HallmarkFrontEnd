@@ -2,6 +2,7 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, of, tap } from 'rxjs';
 import {
+  ClearPredefinedBillRates,
   DeleteOrder,
   DeleteOrderSucceeded,
   EditOrder,
@@ -21,10 +22,17 @@ import {
   GetWorkflows,
   SaveOrder,
   SaveOrderSucceeded,
+  SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
-import { ApplicantStatus, OrderCandidateJob, OrderCandidatesListPage, OrderManagementPage } from '@shared/models/order-management.model';
+import {
+  ApplicantStatus,
+  GetPredefinedBillRatesData,
+  OrderCandidateJob,
+  OrderCandidatesListPage,
+  OrderManagementPage
+} from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -50,7 +58,8 @@ export interface OrderManagementContentStateModel {
   orderDialogOptions: {
     next: boolean,
     previous: boolean
-  }
+  },
+  getPredefinedBillRatesData: GetPredefinedBillRatesData | null;
   organizationStatesWithKeyCode: OrganizationStateWithKeyCode[];
   workflows: WorkflowByDepartmentAndSkill[];
   projectTypes: ProjectType[];
@@ -72,6 +81,7 @@ export interface OrderManagementContentStateModel {
       next: false,
       previous: false
     },
+    getPredefinedBillRatesData: null,
     organizationStatesWithKeyCode: [],
     workflows: [],
     projectTypes: [],
@@ -116,6 +126,9 @@ export class OrderManagementContentState {
 
   @Selector()
   static associateAgencies(state: OrderManagementContentStateModel): AssociateAgency[] { return state.associateAgencies }
+
+  @Selector()
+  static getPredefinedBillRatesData(state: OrderManagementContentStateModel): GetPredefinedBillRatesData | null { return state.getPredefinedBillRatesData }
 
   @Selector()
   static predefinedBillRates(state: OrderManagementContentStateModel): BillRate[] { return state.predefinedBillRates }
@@ -266,11 +279,37 @@ export class OrderManagementContentState {
     }));
   }
 
+  @Action(SetPredefinedBillRatesData)
+  SetPredefinedBillRatesData(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { orderType, departmentId, skillId }: SetPredefinedBillRatesData
+  ): void {
+    patchState({ getPredefinedBillRatesData: { orderType, departmentId, skillId } });
+  }
+
   @Action(GetPredefinedBillRates)
-  GetPredefinedBillRates({ patchState }: StateContext<OrderManagementContentStateModel>, { orderType, departmentId, skillId }: GetPredefinedBillRates): Observable<BillRate[]> {
-    return this.orderManagementService.getPredefinedBillRates( orderType, departmentId, skillId).pipe(tap(payload => {
-      patchState({ predefinedBillRates: payload });
-    }));
+  GetPredefinedBillRates({ patchState, getState }: StateContext<OrderManagementContentStateModel>): Observable<BillRate[]> {
+    const state = getState();
+    const getPredefinedBillRatesData = state.getPredefinedBillRatesData;
+
+    if (getPredefinedBillRatesData) {
+      const { orderType, departmentId, skillId } = getPredefinedBillRatesData;
+      return this.orderManagementService.getPredefinedBillRates(orderType, departmentId, skillId).pipe(tap(payload => {
+        patchState({ predefinedBillRates: payload });
+        return payload;
+      }));
+    } else {
+      patchState({ predefinedBillRates: [] });
+      return of([]);
+    }
+  }
+
+  @Action(ClearPredefinedBillRates)
+  ClearPredefinedBillRates({ patchState }: StateContext<OrderManagementContentStateModel>): void {
+    patchState({
+      getPredefinedBillRatesData: null,
+      predefinedBillRates: []
+    });
   }
 
   @Action(SaveOrder)

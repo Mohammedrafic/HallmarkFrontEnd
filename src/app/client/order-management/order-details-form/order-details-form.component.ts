@@ -20,7 +20,7 @@ import {
   GetProjectNames,
   GetProjectTypes,
   GetWorkflows,
-  GetPredefinedBillRates
+  SetPredefinedBillRatesData
 } from '@client/store/order-managment-content.actions';
 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -319,11 +319,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       departmentIdControl.valueChanges,
       skillIdControl.valueChanges
     ]).pipe(takeUntil(this.unsubscribe$)).subscribe(([orderType, departmentId, skillId]) => {
-      if (!orderType || !departmentId || !skillId || this.isEditMode) {
+      if (isNaN(parseInt(orderType)) || !departmentId || !skillId) {
         return;
       }
 
-      this.store.dispatch(new GetPredefinedBillRates(orderType, departmentId, skillId));
+      this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
     });
 
     combineLatest([

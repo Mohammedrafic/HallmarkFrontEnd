@@ -82,9 +82,19 @@ export class GetAssociateAgencies {
   constructor() { }
 }
 
+export class SetPredefinedBillRatesData {
+  static readonly type = '[order management] Set Predefined Bill Rates Data';
+  constructor(public orderType: OrderType, public departmentId: number, public skillId: number) { }
+}
+
 export class GetPredefinedBillRates {
   static readonly type = '[order management] Get Predefined Bill Rates';
-  constructor(public orderType: OrderType, public departmentId: number, public skillId: number) { }
+  constructor() { }
+}
+
+export class ClearPredefinedBillRates {
+  static readonly type = '[order management] Clear Predefined Bill Rates';
+  constructor() { }
 }
 
 export class SaveOrder {
