@@ -255,7 +255,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
       inactiveDate: data.inactiveDate
     });
     this.store.dispatch(new ShowSideDialog(true));
-    this.skillFieldsHandler(data.id === -1);
+    this.skillFieldsHandler(data.masterSkill?.isDefault);
   }
 
   public deleteSkill(data: any, event: any): void {
