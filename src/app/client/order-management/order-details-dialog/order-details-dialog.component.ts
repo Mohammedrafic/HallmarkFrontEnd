@@ -17,6 +17,7 @@ import { OrderStatus } from '@shared/enums/order-status';
 import { DeleteOrder } from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -46,11 +47,14 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public orderType = OrderType;
   public orderStatus  = OrderStatus;
 
+  private secondHasOpendOnes = false;
+
   constructor(private chipsCssClass: ChipsCssClass, 
               private router: Router, 
               private route: ActivatedRoute, 
               private store: Store, 
-              private confirmService: ConfirmService) {}
+              private confirmService: ConfirmService,
+              private location: Location) {}
 
   ngOnInit(): void {
     this.onOpenEvent();
@@ -117,11 +121,20 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     this.nextPreviousOrderEvent.emit(next);
   }
 
+  private selectCandidateOnOrderId(): void {
+    const locationState = this.location.getState() as { orderId: number };
+    if (!this.secondHasOpendOnes && !!locationState.orderId) {
+      this.tab.select(1);
+      this.secondHasOpendOnes = true;
+    }
+  }
+
   private onOpenEvent(): void {
     this.openEvent.pipe(takeUntil(this.unsubscribe$)).subscribe((isOpen) => {
       if (isOpen) {
         windowScrollTop();
         this.sideDialog.show();
+        this.selectCandidateOnOrderId();
         disabledBodyOverflow(true);
       } else {
         this.sideDialog.hide();

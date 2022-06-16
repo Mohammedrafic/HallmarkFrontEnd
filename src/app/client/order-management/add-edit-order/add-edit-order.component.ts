@@ -175,6 +175,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.contactDetailsForm.valid &&
       this.orderDetailsFormComponent.workLocationForm.valid &&
       this.orderDetailsFormComponent.workflowForm.valid &&
+      this.orderDetailsFormComponent.specialProject.valid &&
       this.billRatesComponent.billRatesControl.valid
     ) {
       const order = this.collectOrderData(true);
@@ -197,6 +198,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.contactDetailsForm.markAllAsTouched();
       this.orderDetailsFormComponent.workLocationForm.markAllAsTouched();
       this.orderDetailsFormComponent.workflowForm.markAllAsTouched();
+      this.orderDetailsFormComponent.specialProject.markAllAsTouched();
     }
   }
 
@@ -209,6 +211,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       ...this.orderDetailsFormComponent.contactDetailsForm.value,
       ...this.orderDetailsFormComponent.workLocationForm.value,
       ...this.orderDetailsFormComponent.workflowForm.value,
+      ...this.orderDetailsFormComponent.specialProject.value,
       ...{ credentials: this.orderCredentials },
       ...{ billRates: this.billRatesComponent.billRatesControl.value }
     };
@@ -222,9 +225,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       departmentId,
       skillId,
       projectTypeId,
-      projectType,
       projectNameId,
-      projectName,
+      reasonForRequestId,
+      poNumberId,
       hourlyRate,
       openPositions,
       minYrsRequired,
@@ -266,6 +269,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       orderType,
       projectTypeId,
       projectNameId,
+      reasonForRequestId,
+      poNumberId,
       hourlyRate,
       openPositions,
       minYrsRequired,
@@ -293,14 +298,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       workflowId,
       isSubmit
     };
-
-    if (!projectTypeId && projectType) {
-      order.projectType = projectType
-    }
-
-    if (!projectNameId && projectName) {
-      order.projectName = projectName;
-    }
 
     if (!order.hourlyRate) {
       order.hourlyRate = null;

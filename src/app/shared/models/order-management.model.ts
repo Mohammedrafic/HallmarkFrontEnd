@@ -117,10 +117,10 @@ export class Order {
   departmentId: number;
   skillId: number;
   orderType: OrderType;
+  reasonForRequestId: number | null;
+  poNumberId: number | null;
   projectTypeId: number | null;
-  projectType?: string;
   projectNameId: number | null;
-  projectName?: string;
   hourlyRate: number | null;
   openPositions: number | null;
   minYrsRequired: number | null;
@@ -225,9 +225,31 @@ export type OrderCandidateJob = {
   requestComment: string;
   workflowStepId: number;
   yearsOfExperience: number;
+  applicantStatus: {
+    applicantStatus: number;
+    statusText: string;
+  }
 }
 
 export type ApplicantStatus = {
   applicantStatus: number;
   statusText: string;
+}
+
+export class OrderFilter {
+  orderBy?: string;
+  pageNumber?: number;
+  pageSize?: number;
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentsIds?: number[];
+  orderId?: number;
+  skillIds?: number[];
+  orderTypes?: number[];
+  jobTitle?: string;
+  billRateFrom?: number;
+  billRateTo?: number;
+  openPositions?: number;
+  jobStartDate?: Date;
+  jobEndDate?: Date;
 }

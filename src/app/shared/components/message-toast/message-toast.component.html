@@ -8,6 +8,9 @@
     width="330"
   >
     <ng-template #title>
+      <div *ngIf="type === messageType.Warning">
+        <div>Warning</div>
+      </div>
       <div *ngIf="type === messageType.Success">
         <i-feather name="check-circle" class="icon validation-icon"></i-feather>
         <div>Success</div>

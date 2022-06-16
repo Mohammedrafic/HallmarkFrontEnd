@@ -18,6 +18,7 @@ import { OnboardedCandidateComponent } from "./onboarded-candidate/onboarded-can
 import { AcceptCandidateComponent } from "./accept-candidate/accept-candidate.component";
 import { ApplyCandidateComponent } from "./apply-candidate/apply-candidate.component";
 import { OfferDeploymentComponent } from "./offer-deployment/offer-deployment.component";
+import { SetLastSelectedOrganizationAgencyId } from "src/app/store/user.actions";
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -64,10 +65,14 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
     }
   }
 
-  public onViewNavigation(id: number): void {
+  public onViewNavigation(data: any): void {
     const user = this.store.selectSnapshot(UserState.user);
     const url = user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
-    this.router.navigate([url, id], { state: { orderId: this.order.orderId }});
+    if (user?.businessUnitType === BusinessUnitType.Hallmark) {
+      this.store.dispatch(new SetLastSelectedOrganizationAgencyId({ lastSelectedAgencyId: data.agencyId, lastSelectedOrganizationId: null }))
+    }
+    const pageToBack = this.router.url;
+    this.router.navigate([url, data.candidateId], { state: { orderId: this.order.orderId, pageToBack }});
     disabledBodyOverflow(false);
   }
 
@@ -100,7 +105,10 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
           this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
           this.openDialog(this.offerDeployment);
-        } else if (this.candidate.status === ApplicantStatus.Accepted) {
+        } else if (
+          this.candidate.status === ApplicantStatus.Accepted ||
+          this.candidate.status === ApplicantStatus.OnBoarded
+        ) {
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
           this.openDialog(this.onboarded);
         }
@@ -112,8 +120,8 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
     this.sideDialog.hide();
   }
 
-  public getBillRate(rate: number): string {
-    return rate ? `$10.00 - ${rate}` :' $10.00';
+  public getBillRate(rate: number, candidateRate: number):string {
+    return candidateRate ? `$${rate} - ${candidateRate}` : `$${rate} - ${rate}`;
   }
 
   private subscribeOnPageChanges(): void {

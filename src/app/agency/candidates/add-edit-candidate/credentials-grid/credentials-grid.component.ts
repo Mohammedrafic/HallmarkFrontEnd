@@ -272,7 +272,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
       args.modifiedFilesData = args.filesData;
     }
     args.isModified = true;
-    allFiles.forEach((file, index) => this.addFilesValidationMessage(file, index));
+    allFiles.filter((file) => file.statusCode === '0').forEach((file, index) => this.addFilesValidationMessage(file, index));
   }
 
   public onRemove(event: MouseEvent, data: any) {

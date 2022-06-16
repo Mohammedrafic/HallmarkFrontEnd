@@ -1,8 +1,8 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { DashboardLayoutComponent, PanelModel } from '@syncfusion/ej2-angular-layouts';
+import { Select, Store } from '@ngxs/store';
+import type { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { Observable, takeUntil, startWith, distinctUntilChanged, switchMap, combineLatest, map } from 'rxjs';
 import isEqual from 'lodash/fp/isEqual';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
@@ -21,16 +21,19 @@ import lodashMap from 'lodash/fp/map';
 import { WidgetToggleModel } from './models/widget-toggle.model';
 import { User } from '@shared/models/user.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { LogoutUser } from '../store/user.actions';
+import { DashboardWidgetsComponent } from './dashboard-widgets/dashboard-widgets.component';
+import type { WidgetsDataModel } from './models/widgets-data.model';
+import type { DashboardLayoutComponent } from '@syncfusion/ej2-angular-layouts';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.components.html',
   styleUrls: ['dashboard.components.scss'],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent extends DestroyableDirective implements OnInit, OnDestroy {
-  @ViewChild('dashboardLayout', { static: false }) dashboard: DashboardLayoutComponent;
+  @ViewChild(DashboardWidgetsComponent, { static: false }) dashboardWidgetsComponent: DashboardWidgetsComponent;
 
   @Select(DashboardState.dashboardPanels) public readonly panels$: Observable<DashboardStateModel['panels']>;
   @Select(DashboardState.selectedWidgets) public readonly selectedWidgets$: Observable<WidgetTypeEnum[]>;
@@ -50,20 +53,16 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   @Select(UserState.user) private readonly user$: Observable<User>;
 
-  public widgetsData$: Observable<Record<WidgetTypeEnum, unknown>>;
+  public widgetsData$: Observable<WidgetsDataModel>;
   public isOrganization$: Observable<boolean>;
 
-  public readonly cellSpacing = [24, 24];
-  public readonly columns = 12;
   public readonly filtersGroup: FormGroup = this.getFiltersGroup();
-  public readonly widgetTypeEnum: typeof WidgetTypeEnum = WidgetTypeEnum;
 
   constructor(
     private readonly store: Store,
     private readonly dashboardService: DashboardService,
     private readonly formBuilder: FormBuilder,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly actions$: Actions
   ) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Dashboard', iconName: 'home' }));
@@ -73,7 +72,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     this.setWidgetsData();
     this.initOrganizationChangeListener();
     this.isUserOrganization();
-    this.userIsLoggedOut();
   }
 
   private isUserOrganization(): void {
@@ -84,31 +82,29 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     );
   }
 
-  private setPanels(panels: PanelModel[]): void {
-    this.store.dispatch(new SetPanels(panels));
-  }
-
-  private userIsLoggedOut(): void {
-    this.actions$.pipe(takeUntil(this.destroy$), ofActionSuccessful(LogoutUser)).subscribe(() => {
-      this.setPanels([]);
-    });
+  private resetDashboardState(): void {
+    this.store.dispatch(new ResetState());
   }
 
   public override ngOnDestroy(): void {
     super.ngOnDestroy();
-    this.store.dispatch(new ResetState());
+    this.resetDashboardState();
   }
 
-  public dashboardIsCreated(): void {
+  public dashboardCreatedHandler(): void {
     this.initViewChangesListener();
-  }
-
-  public trackByHandler(_: number, panel: PanelModel): string {
-    return panel.id ?? '';
   }
 
   public handleWidgetToggleEvent({ widget, isSelected }: WidgetToggleModel): void {
     isSelected ? this.addNewWidget(widget) : this.removeWidget(widget);
+  }
+
+  private get dashboardSFComponent(): DashboardLayoutComponent {
+    return this.dashboardWidgetsComponent.sfComponent;
+  }
+
+  private get dashboardSFComponentSerialized(): PanelModel[] {
+    return this.dashboardSFComponent.serialize();
   }
 
   private addNewWidget(widget: WidgetOptionModel): void {
@@ -117,13 +113,15 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     if (!widgetConfiguration) return;
 
     const newPanel = { ...widgetConfiguration, id: widget.title, row: 0, col: 0 };
-    const updatePanelsList = [...this.dashboard.serialize(), newPanel];
+    const updatePanelsList = [...this.dashboardSFComponentSerialized, newPanel];
 
     this.saveDashboard(updatePanelsList);
   }
 
   private removeWidget(widget: WidgetOptionModel): void {
-    const updatePanelsList = this.dashboard.serialize().filter((panel: PanelModel) => panel.id !== widget.title);
+    const updatePanelsList = this.dashboardSFComponentSerialized.filter(
+      (panel: PanelModel) => panel.id !== widget.title
+    );
 
     this.saveDashboard(updatePanelsList);
   }
@@ -133,7 +131,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   public moveDashboardPanel(): void {
-    this.saveDashboard(this.dashboard.serialize());
+    this.saveDashboard(this.dashboardSFComponentSerialized);
   }
 
   private getFiltersGroup(): FormGroup {
@@ -142,6 +140,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   private initOrganizationChangeListener(): void {
     this.organizationId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.resetDashboardState();
       this.store.dispatch(new GetDashboardData());
     });
   }
@@ -173,7 +172,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   private getIsDashboardMobileView(): Observable<boolean> {
     return this.breakpointObserver
-      .observe([`(${this.dashboard.mediaQuery})`])
+      .observe([`(${this.dashboardSFComponent.mediaQuery})`])
       .pipe(map((breakpointState: BreakpointState) => breakpointState.matches));
   }
 
@@ -186,7 +185,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
       .subscribe(([panels, isMobile]: [PanelModel[], boolean]) => {
         const updatedPanels = isMobile ? this.getUpdatePanelsForMobileView(panels) : panels;
 
-        this.setPanels(updatedPanels);
+        this.store.dispatch(new SetPanels(updatedPanels))
       });
   }
 

@@ -65,7 +65,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
       allowDeplayWoCredentials: false
     })).subscribe(() => {
       this.store.dispatch(new ReloadOrderCandidatesLists());
-      this.onCloseDialog();
     });
   }
 

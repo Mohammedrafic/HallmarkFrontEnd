@@ -282,9 +282,9 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   }
 
   private navigateToCandidates(): void {
-    const location = this.location.getState() as { orderId: number };
+    const location = this.location.getState() as { orderId: number, pageToBack: string };
     if (location.orderId) {
-      this.router.navigate(['/agency/order-management'], { state: { orderId: location.orderId }});
+      this.router.navigate([location.pageToBack], { state: { orderId: location.orderId }});
     } else {
       this.router.navigate(['/agency/candidates']);
     }

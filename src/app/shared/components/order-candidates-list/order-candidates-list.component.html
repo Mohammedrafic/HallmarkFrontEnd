@@ -22,7 +22,7 @@
     <e-columns>
       <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
         <ng-template #template let-data>
-          <div class="link" (click)="onViewNavigation(data.candidateId)">{{data.lastName}}, {{data.firstName}}</div>
+          <div class="link" (click)="onViewNavigation(data)">{{data.lastName}}, {{data.firstName}}</div>
         </ng-template>
       </e-column>
       <e-column field="statusName" headerText="Status" textAlign="Left" width="150">
@@ -41,7 +41,7 @@
       <e-column field="hourlyBillRate" textAlign="Right" headerText="Bill Rate &dollar;" width="200">
         <ng-template #template let-data>
           <div class="align-right">
-            {{getBillRate(data.hourlyBillRate)}}
+            {{getBillRate(data.hourlyBillRate, data.candidateBillRate)}}
           </div>
         </ng-template>
       </e-column>

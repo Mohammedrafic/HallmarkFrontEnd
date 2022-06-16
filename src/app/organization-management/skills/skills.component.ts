@@ -127,9 +127,9 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
       this.filterColumns.skillCategories.dataSource = dataSource.items;
     });
     this.skillDataSource$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((dataSource) => {
-      this.filterColumns.skillAbbrs.dataSource = dataSource.skillABBRs;
+      this.filterColumns.skillAbbrs.dataSource = dataSource.skillABBRs.filter(item => item);
       this.filterColumns.skillDescriptions.dataSource = dataSource.skillDescriptions;
-      this.filterColumns.glNumbers.dataSource = ['blank', ...dataSource.glNumbers];
+      this.filterColumns.glNumbers.dataSource = ['blank', ...dataSource.glNumbers.filter(item => item)];
     });
   }
 
@@ -255,7 +255,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
       inactiveDate: data.inactiveDate
     });
     this.store.dispatch(new ShowSideDialog(true));
-    this.skillFieldsHandler(data.id === -1);
+    this.skillFieldsHandler(data.masterSkill?.isDefault);
   }
 
   public deleteSkill(data: any, event: any): void {

@@ -10,6 +10,7 @@ import includes from 'lodash/fp/includes';
 import isEqual from 'lodash/fp/isEqual';
 import { legendPalette } from '../../constants/legend-palette';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
+import type { ChartComponent } from '@syncfusion/ej2-angular-charts';
 
 @Component({
   selector: 'app-accumulation-chart',
@@ -17,7 +18,7 @@ import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-com
   styleUrls: ['../widget-legend.component.scss', './accumulation-chart.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AccumulationChartComponent extends AbstractSFComponentDirective implements OnChanges, OnInit {
+export class AccumulationChartComponent extends AbstractSFComponentDirective<ChartComponent> implements OnChanges, OnInit {
   @Input() public chartData: ChartAccumulation | undefined;
   @Input() public isLoading: boolean;
 
