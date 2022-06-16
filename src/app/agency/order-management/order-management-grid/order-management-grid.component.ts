@@ -25,7 +25,7 @@ import {
   ReloadOrderCandidatesLists,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AgencyOrderManagement, AgencyOrderManagementPage } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, AgencyOrderManagementPage, Order } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { Location } from '@angular/common';
@@ -209,6 +209,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       );
       this.store.dispatch(new GetAgencyOrderGeneralInformation(this.selectedOrder.orderId, this.selectedOrder.organizationId));
       this.dispatchNewPage();
+      this.store.dispatch(new GetOrderById(this.selectedOrder.orderId, this.selectedOrder.organizationId, this.getDialogNextPreviousOption(this.selectedOrder)));
     });
   }
 }
