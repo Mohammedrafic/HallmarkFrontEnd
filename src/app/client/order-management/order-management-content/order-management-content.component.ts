@@ -75,7 +75,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private openInProgressFilledStatuses = [
     'open',
     'in progress',
-    'filled'
+    'filled',
+    'custom step'
   ];
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();

@@ -1,16 +1,26 @@
 <section class="flex-column">
-  <section class="org-controls-container">
-    <div>
-      <button ejs-button [isPrimary]="true" (click)="navigateToOrganizationForm()">Add Organization</button>
-      <button
-          ejs-dropdownbutton
-          [items]="exportOptions"
-          (select)="exportSelected($event)"
-          id="importButton"
-          cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
-      <button ejs-button cssClass="e-outline">Filters <i-feather name="sliders" class="icon"></i-feather></button>
-    </div>
-  </section>
+  <app-page-toolbar>
+    <ng-container left>
+      <section class="page-title">
+        <h3>Organization List</h3>
+      </section>
+    </ng-container>
+    <ng-container right>
+      <section class="org-controls-container">
+        <div>
+          <button ejs-button [isPrimary]="true" (click)="navigateToOrganizationForm()">Add Organization</button>
+          <button
+            ejs-dropdownbutton
+            [items]="exportOptions"
+            (select)="exportSelected($event)"
+            id="importButton"
+            cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+          <button ejs-button cssClass="e-outline">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+        </div>
+      </section>
+    </ng-container>
+  </app-page-toolbar>
+
   <section class="grid-component">
     <ejs-grid #grid
       [dataSource]="(organizations$ | async)?.items"
