@@ -209,6 +209,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   workflows$: Observable<WorkflowByDepartmentAndSkill[]>;
   workflowFields: FieldSettingsModel = { text: 'workflowGroupName', value: 'workflowGroupId' };
 
+  private touchedFields: Set<string> = new Set();
+
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private store: Store, private formBuilder: FormBuilder, private route: ActivatedRoute) {
@@ -515,37 +517,53 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public onRegionDropDownChanged(event: ChangeEventArgs): void {
-    this.userEditsOrder(this.selectedRegion);
+    const fieldName = 'region';
+    this.userEditsOrder(this.isFieldTouched(fieldName));
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion.id) {
+      this.markTouchedField(fieldName);
       this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
       this.isLocationsDropDownEnabled = true;
     }
   }
 
   public onLocationDropDownChanged(event: ChangeEventArgs): void {
-    this.userEditsOrder(this.selectedLocation);
+    const fieldName = 'location';
+    this.userEditsOrder(this.isFieldTouched(fieldName));
     this.selectedLocation = event.itemData as Location;
     if (this.selectedLocation?.id) {
+      this.markTouchedField(fieldName);
       this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocation.id));
       this.isDepartmentsDropDownEnabled = true;
     }
   }
 
   public onDepartmentDropDownChanged(event: ChangeEventArgs): void {
-    this.userEditsOrder(this.selectedDepartment);
+    const fieldName = 'department';
+    this.userEditsOrder(this.isFieldTouched(fieldName));
     this.selectedDepartment = event.itemData as Department;
+      this.markTouchedField(fieldName);
   }
 
   onSkillsDropDownChanged(event: ChangeEventArgs) {
-    this.userEditsOrder(this.selectedSkills);
+    const fieldName = 'skills';
+    this.userEditsOrder(this.isFieldTouched(fieldName));
     this.selectedSkills = event.itemData as SkillCategory;
+      this.markTouchedField(fieldName);
   }
 
-  private userEditsOrder(selectedItem: Object): void {
-    if(!selectedItem) {
-      this.store.dispatch(new ShowToast(MessageTypes.Success, ORDER_EDITS))
+  private userEditsOrder(fieldIsTouched: boolean): void {
+    if (!fieldIsTouched && this.isEditMode) {
+      this.store.dispatch(new ShowToast(MessageTypes.Warning, ORDER_EDITS));
     }
+  }
+
+  private isFieldTouched(field: string): boolean {
+    return this.touchedFields.has(field);
+  }
+
+  private markTouchedField(field: string) {
+    this.touchedFields.add(field);
   }
 
   public editProjectTypeHandler(): void {
