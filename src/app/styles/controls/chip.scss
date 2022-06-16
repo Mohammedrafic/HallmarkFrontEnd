@@ -79,6 +79,16 @@ ejs-chiplist.e-control.e-chip-list {
       }
     }
 
+    &.e-awaiting,
+    &.e-awaiting:hover {
+      background-color: $secondary-dark-blue-30;
+      color: $white;
+
+      &.e-focused {
+        background-color: $secondary-dark-blue-30;
+      }
+    }
+
     &.e-filled,
     &.e-filled:hover {
       background-color: $primary-active-blue-30;
