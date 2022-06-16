@@ -283,6 +283,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};
+    this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
   }
 
   public onFilterApply(): void {

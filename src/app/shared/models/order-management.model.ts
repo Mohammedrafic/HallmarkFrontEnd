@@ -235,3 +235,21 @@ export type ApplicantStatus = {
   applicantStatus: number;
   statusText: string;
 }
+
+export class OrderFilter {
+  orderBy?: string;
+  pageNumber?: number;
+  pageSize?: number;
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentsIds?: number[];
+  orderId?: number;
+  skillIds?: number[];
+  orderTypes?: number[];
+  jobTitle?: string;
+  billRateFrom?: number;
+  billRateTo?: number;
+  openPositions?: number;
+  jobStartDate?: Date;
+  jobEndDate?: Date;
+}
