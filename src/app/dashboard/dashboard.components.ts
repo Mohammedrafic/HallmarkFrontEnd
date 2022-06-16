@@ -1,11 +1,12 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
+import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
 import { Select, Store } from '@ngxs/store';
 import { DashboardLayoutComponent, PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { Observable, takeUntil, startWith, distinctUntilChanged, switchMap, combineLatest, map } from 'rxjs';
 import isEqual from 'lodash/fp/isEqual';
-import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
+import lodashMap from 'lodash/fp/map';
 
 import { SetHeaderState } from '../store/app.actions';
 import { DashboardService } from './services/dashboard.service';
@@ -17,9 +18,7 @@ import { WidgetTypeEnum } from './enums/widget-type.enum';
 import { UserState, UserStateModel } from 'src/app/store/user.state';
 import { WidgetOptionModel } from './models/widget-option.model';
 import { widgetTypeToConfigurationMapper } from './constants/widget-type-to-configuration-mapper';
-import lodashMap from 'lodash/fp/map';
 import { WidgetToggleModel } from './models/widget-toggle.model';
-import { User } from '@shared/models/user.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
@@ -43,11 +42,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     UserStateModel['lastSelectedOrganizationId']
   >;
 
-  @Select(UserState.lastSelectedAgencyId) private readonly agencyId$: Observable<
-    UserStateModel['lastSelectedAgencyId']
-  >;
-
-  @Select(UserState.user) private readonly user$: Observable<User>;
+  @Select(UserState.lastSelectedOrganizationAgency) private readonly lastSelectedOrganizationAgency$: Observable<string>;
 
   public widgetsData$: Observable<Record<WidgetTypeEnum, unknown>>;
   public isOrganization$: Observable<boolean>;
@@ -74,9 +69,9 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   private isUserOrganization(): void {
-    this.isOrganization$ = combineLatest([this.user$, this.organizationId$, this.agencyId$]).pipe(
-      map(([user, organizationId, agencyId]: [User, number | null, number | null]) => {
-        return !organizationId && !agencyId ? user?.businessUnitType !== BusinessUnitType.Agency : !!organizationId;
+    this.isOrganization$ = this.lastSelectedOrganizationAgency$.pipe(
+      map((businessUnitType: string): boolean => {
+        return businessUnitType !== BusinessUnitType[4];
       })
     );
   }
@@ -178,7 +173,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
       .subscribe(([panels, isMobile]: [PanelModel[], boolean]) => {
         const updatedPanels = isMobile ? this.getUpdatePanelsForMobileView(panels) : panels;
 
-        this.store.dispatch(new SetPanels(updatedPanels))
+        this.store.dispatch(new SetPanels(updatedPanels));
       });
   }
 

@@ -31,6 +31,8 @@ export class ApiInterceptor implements HttpInterceptor {
     const userId = this.store.selectSnapshot(UserState.user)?.id;
     const lastSelectedOrganizationId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId);
     const lastSelectedAgencyId = this.store.selectSnapshot(UserState.lastSelectedAgencyId);
+    const isAgency = this.store.selectSnapshot(UserState.lastSelectedOrganizationAgency) === 'Agency';
+    const isOrganization = this.store.selectSnapshot(UserState.lastSelectedOrganizationAgency) === 'Organization';
 
     if (userId) {
       const currentPage = this.store.selectSnapshot(AppState.headerState)?.title || 'Login';
@@ -42,11 +44,12 @@ export class ApiInterceptor implements HttpInterceptor {
 
       const { isOrganizationArea, isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
 
-      if (isOrganizationArea && lastSelectedOrganizationId) {
+      if (isOrganizationArea && lastSelectedOrganizationId && isOrganization) {
         headers['selected-businessunit-id'] = lastSelectedOrganizationId.toString();
       }
 
-      if (isAgencyArea && lastSelectedAgencyId) {
+      if (isAgencyArea && lastSelectedAgencyId && isAgency) {
+
         headers['selected-businessunit-id'] = lastSelectedAgencyId.toString();
       }
 
