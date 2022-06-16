@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
+
 import { CandidatesByStateWidgetAggregatedDataModel } from '../../models/candidates-by-state-widget-aggregated-data.model';
 
 @Component({
@@ -8,6 +9,6 @@ import { CandidatesByStateWidgetAggregatedDataModel } from '../../models/candida
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapsChartComponent {
-  @Input() public chartData: CandidatesByStateWidgetAggregatedDataModel;
+  @Input() public chartData: CandidatesByStateWidgetAggregatedDataModel | undefined;
   @Input() public isLoading: boolean;
 }

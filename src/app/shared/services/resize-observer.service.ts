@@ -1,4 +1,4 @@
-import { Subject, debounceTime, Observable } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 
 export interface ResizeObserverModel {
   resize$: Observable<ResizeObserverEntry[]>;
@@ -12,6 +12,6 @@ export class ResizeObserverService {
 
     observer.observe(element);
 
-    return { resize$: resizeEventEntries$.pipe(debounceTime(10)), detach: () => observer.disconnect() };
+    return { resize$: resizeEventEntries$, detach: () => observer.disconnect() };
   }
 }
