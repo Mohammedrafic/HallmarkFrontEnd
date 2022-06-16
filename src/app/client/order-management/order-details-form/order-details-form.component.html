@@ -320,7 +320,9 @@
                       formControlName="jobDistribution"
                       appValidateWithMessage
                       [dataSource]="jobDistributions"
-                      [fields]="jobDistributionFields">
+                      [fields]="jobDistributionFields"
+                      [allowFiltering]="false"
+                      [showDropDownIcon]="true">
                     </ejs-multiselect>
                   </div>
                 </div>
@@ -339,7 +341,10 @@
                       appValidateWithMessage
                       [enabled]="agencyControlEnabled"
                       [dataSource]="associateAgencies$ | async"
-                      [fields]="associateAgencyFields">
+                      [fields]="associateAgencyFields"
+                      [showSelectAll]="true"
+                      [allowFiltering]="false"
+                      [showDropDownIcon]="true">
                     </ejs-multiselect>
                   </div>
                 </div>

@@ -387,7 +387,19 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       shiftEndTimeControl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
     });
 
-    jobDistributionControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((jobDistributionIds: number[]) => {
+    jobDistributionControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((jobDistributionIds: JobDistribution[]) => {
+      if (jobDistributionIds.includes(JobDistribution.All)) {
+        jobDistributionIds = [
+          JobDistribution.All,
+          JobDistribution.Internal,
+          JobDistribution.ExternalTier1,
+          JobDistribution.ExternalTier2,
+          JobDistribution.ExternalTier3
+        ];
+
+        jobDistributionControl.patchValue(jobDistributionIds, { emitEvent: false });
+      }
+
       this.agencyControlEnabled = jobDistributionIds.includes(JobDistribution.Selected);
 
       if (this.agencyControlEnabled) {
