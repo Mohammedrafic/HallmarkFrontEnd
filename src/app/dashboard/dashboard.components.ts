@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { DashboardLayoutComponent, PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { Observable, takeUntil, startWith, distinctUntilChanged, switchMap, combineLatest, map } from 'rxjs';
 import isEqual from 'lodash/fp/isEqual';
@@ -21,7 +21,6 @@ import lodashMap from 'lodash/fp/map';
 import { WidgetToggleModel } from './models/widget-toggle.model';
 import { User } from '@shared/models/user.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { LogoutUser } from '../store/user.actions';
 
 @Component({
   selector: 'app-dashboard',
@@ -63,7 +62,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     private readonly dashboardService: DashboardService,
     private readonly formBuilder: FormBuilder,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly actions$: Actions
   ) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Dashboard', iconName: 'home' }));
@@ -73,7 +71,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     this.setWidgetsData();
     this.initOrganizationChangeListener();
     this.isUserOrganization();
-    this.userIsLoggedOut();
   }
 
   private isUserOrganization(): void {
@@ -84,19 +81,13 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     );
   }
 
-  private setPanels(panels: PanelModel[]): void {
-    this.store.dispatch(new SetPanels(panels));
-  }
-
-  private userIsLoggedOut(): void {
-    this.actions$.pipe(takeUntil(this.destroy$), ofActionSuccessful(LogoutUser)).subscribe(() => {
-      this.setPanels([]);
-    });
+  private resetDashboardState(): void {
+    this.store.dispatch(new ResetState());
   }
 
   public override ngOnDestroy(): void {
     super.ngOnDestroy();
-    this.store.dispatch(new ResetState());
+    this.resetDashboardState();
   }
 
   public dashboardIsCreated(): void {
@@ -142,6 +133,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   private initOrganizationChangeListener(): void {
     this.organizationId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.resetDashboardState();
       this.store.dispatch(new GetDashboardData());
     });
   }
@@ -186,7 +178,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
       .subscribe(([panels, isMobile]: [PanelModel[], boolean]) => {
         const updatedPanels = isMobile ? this.getUpdatePanelsForMobileView(panels) : panels;
 
-        this.setPanels(updatedPanels);
+        this.store.dispatch(new SetPanels(updatedPanels))
       });
   }
 
