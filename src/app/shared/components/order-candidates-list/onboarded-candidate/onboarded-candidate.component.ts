@@ -87,7 +87,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
         jobId: this.candidateJob.jobId,
         nextApplicantStatus: {
           applicantStatus: 60,
-          statusText: "OnBoarded"
+          statusText: "Onboard"
         },
         candidateBillRate: value.candidateBillRate,
         offeredBillRate: value.offeredBillRate,
