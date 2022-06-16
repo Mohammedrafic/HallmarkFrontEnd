@@ -1,27 +1,26 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of, tap } from 'rxjs';
+import { catchError, Observable, of,tap } from 'rxjs';
 import {
-  ClearPredefinedBillRates,
+ ClearPredefinedBillRates,
   DeleteOrder,
-  DeleteOrderSucceeded,
-  EditOrder,
+  DeleteOrderSucceeded, EditOrder,
   GetAgencyOrderCandidatesList,
   GetAssociateAgencies,
-  GetAvailableSteps,
-  GetIncompleteOrders,
+ GetAvailableSteps, GetIncompleteOrders,
   GetMasterShifts,
   GetOrderById,
   GetOrders,
-  GetOrganisationCandidateJob,
-  GetOrganizationStatesWithKeyCode,
+ GetOrganisationCandidateJob, GetOrganizationStatesWithKeyCode,
   GetPredefinedBillRates,
   GetProjectNames,
+  GetProjectSpecialData,
   GetProjectTypes,
   GetSelectedOrderById,
   GetWorkflows,
   SaveOrder,
-  SaveOrderSucceeded,
+  SaveOrderSucceeded
+,
   SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob
 } from '@client/store/order-managment-content.actions';
@@ -31,6 +30,7 @@ import {
   GetPredefinedBillRatesData,
   OrderCandidateJob,
   OrderCandidatesListPage,
+  OrderManagement,
   OrderManagementPage
 } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
@@ -48,6 +48,7 @@ import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { OrderManagementModel } from "@agency/store/order-management.state";
+import {ProjectSpecialData} from "@shared/models/project-special-data.model";
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -63,6 +64,7 @@ export interface OrderManagementContentStateModel {
   organizationStatesWithKeyCode: OrganizationStateWithKeyCode[];
   workflows: WorkflowByDepartmentAndSkill[];
   projectTypes: ProjectType[];
+  projectSpecialData: ProjectSpecialData | null;
   projectNames: ProjectName[];
   masterShifts: MasterShift[];
   associateAgencies: AssociateAgency[];
@@ -86,6 +88,7 @@ export interface OrderManagementContentStateModel {
     workflows: [],
     projectTypes: [],
     projectNames: [],
+    projectSpecialData: null,
     masterShifts: [],
     associateAgencies: [],
     predefinedBillRates: []
@@ -119,6 +122,9 @@ export class OrderManagementContentState {
   static projectTypes(state: OrderManagementContentStateModel): ProjectType[] { return state.projectTypes }
 
   @Selector()
+  static projectSpecialData(state: OrderManagementContentStateModel): ProjectSpecialData | null { return state.projectSpecialData }
+
+  @Selector()
   static projectNames(state: OrderManagementContentStateModel): ProjectName[] { return state.projectNames }
 
   @Selector()
@@ -141,6 +147,18 @@ export class OrderManagementContentState {
   @Selector()
   static applicantStatuses(state: OrderManagementContentStateModel): ApplicantStatus[] {
     return state.applicantStatuses;
+  }
+
+  @Selector()
+  static lastSelectedOrder(state: OrderManagementContentStateModel): (id: number) => [OrderManagement, number] | [] {
+    return (id: number) => {
+      let rowIndex;
+      const order = state.ordersPage?.items.find((order, index) => {
+        rowIndex = index;
+        return order.id === id;
+      });
+      return order && rowIndex ? [order, rowIndex] : [];
+    };
   }
 
   constructor(
@@ -255,6 +273,13 @@ export class OrderManagementContentState {
   GetProjectTypes({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<ProjectType[]> {
     return this.projectsService.getProjectTypes().pipe(tap(payload => {
       patchState({ projectTypes: payload });
+    }));
+  }
+
+  @Action(GetProjectSpecialData)
+  GetProjectSpecialData({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<ProjectSpecialData> {
+    return this.projectsService.getProjectSpecialData().pipe(tap(payload => {
+      patchState({ projectSpecialData: payload });
     }));
   }
 

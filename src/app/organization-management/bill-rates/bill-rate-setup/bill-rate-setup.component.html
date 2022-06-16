@@ -361,8 +361,8 @@
 
       <div class="group">
         <div class="input-container bootstrap">
-          <label *ngIf="selectedBillRateUnit === BillRateUnitList.Multiplier">Rate <span class="required">*</span></label>
-          <label *ngIf="selectedBillRateUnit === BillRateUnitList.Currency">Money <span class="required">*</span></label>
+          <label *ngIf="selectedBillRateUnit === BillRateUnitList.Multiplier">Multiplier <span class="required">*</span></label>
+          <label *ngIf="selectedBillRateUnit === BillRateUnitList.Currency">Amount <span class="required">*</span></label>
           <label *ngIf="selectedBillRateUnit === BillRateUnitList.Hours">Hours <span class="required">*</span></label>
           <div class="input-group">
             <ejs-numerictextbox
@@ -386,7 +386,7 @@
               type="text"
               formControlName="billRateValueRateTimes"
               appValidateWithMessage
-              [placeholder]="selectedBillRateUnit === BillRateUnitList.Multiplier ? 'Rate' : 'Money'"
+              [placeholder]="selectedBillRateUnit === BillRateUnitList.Multiplier ? 'Multiplier' : 'Amount'"
               maxlength="11"
               (keyup)="priceUtils.verifyDigitsAfterDot(billRatesFormGroup,'billRateValueRateTimes')"
               (keydown)="priceUtils.numbersOnly($event)"

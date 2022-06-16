@@ -117,10 +117,10 @@ export class Order {
   departmentId: number;
   skillId: number;
   orderType: OrderType;
+  reasonForRequestId: number | null;
+  poNumberId: number | null;
   projectTypeId: number | null;
-  projectType?: string;
   projectNameId: number | null;
-  projectName?: string;
   hourlyRate: number | null;
   openPositions: number | null;
   minYrsRequired: number | null;

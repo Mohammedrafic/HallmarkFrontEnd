@@ -39,6 +39,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { UsersService } from '../services/users.service';
 import { RolesPerUser, User, UsersPage } from '@shared/models/user-managment-page.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { getAllErrors } from '@shared/utils/error.utils';
 
 const BUSINNESS_DATA_DEFAULT_VALUE = { id: 0, name: 'All' };
 const BUSINNESS_DATA_HALLMARK_VALUE = { id: 0, name: 'Hallmark' };
@@ -281,7 +282,7 @@ export class SecurityState {
         dispatch(new SaveRoleSucceeded(payload));
         return payload;
       }),
-      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
   }
 
