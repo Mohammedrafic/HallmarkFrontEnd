@@ -1,11 +1,10 @@
-import { DatePipe } from "@angular/common";
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 
-import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { Observable, Subject, takeUntil } from "rxjs";
 
-import { ApplyOrderApplicants, ApplyOrderApplicantsSucceeded, ReloadOrderCandidatesLists } from "@agency/store/order-management.actions";
+import { ApplyOrderApplicants, ReloadOrderCandidatesLists } from "@agency/store/order-management.actions";
 import { OrderManagementState } from "@agency/store/order-management.state";
 import { BillRate } from "@shared/models/bill-rate.model";
 import { OrderApplicantsInitialData } from "@shared/models/order-applicants.model";
@@ -31,14 +30,11 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy {
   private organizationId: number;
   private candidateId: number;
 
-  constructor(private store: Store,
-              private actions$: Actions,
-              private datePipe: DatePipe) { }
+  constructor(private store: Store) { }
 
   ngOnInit(): void {
     this.createForm();
     this.subscribeOnInitialData();
-    this.subscribeOnSucceededApply();
   }
 
   ngOnDestroy(): void {
@@ -51,7 +47,6 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy {
   }
 
   applyOrderApplicants(): void {
-    this.formGroup.markAsUntouched();
     if (this.formGroup.valid) {
       const value = this.formGroup.getRawValue();
       this.store.dispatch(new ApplyOrderApplicants({
@@ -62,8 +57,10 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy {
         expAsTravelers: value.expAsTravelers,
         availableStartDate: value.availableStartDate,
         requestComment: value.requestComment
-      }));
-      this.store.dispatch(new ReloadOrderCandidatesLists());
+      })).subscribe(() => {
+        this.store.dispatch(new ReloadOrderCandidatesLists());
+        this.onCloseDialog();
+      });
     }
   }
 
@@ -84,7 +81,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy {
   private setFormValue(data: OrderApplicantsInitialData): void {
     this.formGroup.setValue({
       orderId: data.orderId,
-      jobDate: this.getJobDate(data.jobStartDate, data.jobEndDate),
+      jobDate: [data.jobStartDate, data.jobEndDate],
       orderBillRate: data.orderBillRate,
       locationName: data.locationName,
       availableStartDate: data.availableStartDate,
@@ -95,10 +92,6 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getJobDate(startDate: string, endDate: string): string {
-    return `${this.datePipe.transform(startDate, 'MM/dd/yyyy')} - ${this.datePipe.transform(endDate, 'MM/dd/yyyy')}`;
-  }
-
   private subscribeOnInitialData(): void {
     this.orderApplicantsInitialData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrderApplicantsInitialData) => {
       if (data) {
@@ -106,12 +99,6 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy {
         this.candidateId = data.candidateId;
         this.setFormValue(data);
       }
-    });
-  }
-
-  private subscribeOnSucceededApply(): void {
-    this.actions$.pipe(ofActionSuccessful(ApplyOrderApplicantsSucceeded), takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.onCloseDialog();
     });
   }
 }

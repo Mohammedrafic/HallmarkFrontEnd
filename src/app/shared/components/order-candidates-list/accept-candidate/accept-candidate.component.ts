@@ -1,14 +1,13 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { Observable, Subject, takeUntil } from "rxjs";
 import { FormControl, FormGroup} from "@angular/forms";
-import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { OrderManagementState } from "@agency/store/order-management.state";
 import { OrderCandidateJob, OrderCandidatesList } from "@shared/models/order-management.model";
 import { BillRate } from "@shared/models/bill-rate.model";
 import {
   ReloadOrderCandidatesLists,
-  UpdateAgencyCandidateJob,
-  UpdateAgencyCandidateJobSucceeded
+  UpdateAgencyCandidateJob
 } from "@agency/store/order-management.actions";
 
 @Component({
@@ -30,16 +29,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
   public candidateJob: OrderCandidateJob;
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(
-    private store: Store,
-    private actions$: Actions,
-  ) { }
+  constructor(private store: Store) { }
 
   ngOnInit(): void {
     this.createForm();
     this.form.disable();
-
-    this.subscribeOnSucceededAccept();
     this.patchForm();
   }
 
@@ -70,8 +64,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
       clockId: this.candidateJob.clockId,
       guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
       allowDeplayWoCredentials: false
-    }));
-    this.store.dispatch(new ReloadOrderCandidatesLists());
+    })).subscribe(() => {
+      this.store.dispatch(new ReloadOrderCandidatesLists());
+      this.onCloseDialog();
+    });
   }
 
   public onReject(): void {}
@@ -93,15 +89,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
 
   private onCloseDialog(): void {
     this.closeModalEvent.next();
-  }
-
-  private subscribeOnSucceededAccept(): void {
-    this.actions$.pipe(
-      ofActionSuccessful(UpdateAgencyCandidateJobSucceeded),
-      takeUntil(this.unsubscribe$)
-    ).subscribe(() => {
-      this.onCloseDialog();
-    });
   }
 
   private patchForm(): void {

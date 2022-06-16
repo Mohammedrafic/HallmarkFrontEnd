@@ -58,16 +58,6 @@ export class ApplyOrderApplicants {
   constructor(public payload: OrderApplicantsApplyData) {}
 }
 
-export class ApplyOrderApplicantsSucceeded {
-  static readonly type = '[agency order management] Apply Order Applicants Succeeded';
-  constructor() {}
-}
-
-export class UpdateAgencyCandidateJobSucceeded {
-  static readonly type = '[agency order management] Apply Order Candidate Job';
-  constructor() {}
-}
-
 export class ReloadOrderCandidatesLists {
   static readonly type = '[agency order management] Reload Order and Candidates Lists';
   constructor() {}

@@ -170,13 +170,10 @@ export type AcceptJobDTO = {
   clockId: number;
   guaranteedWorkWeek: string;
   jobId: number;
-  nextApplicantStatus: {
-    applicantStatus: number;
-    statusText: string;
-  }
+  nextApplicantStatus: ApplicantStatus,
   offeredBillRate: number;
   organizationId: number;
-  requestComment: number;
+  requestComment: string;
 }
 
 export type CandidateProfile = {
@@ -222,4 +219,9 @@ export type OrderCandidateJob = {
   requestComment: string;
   workflowStepId: number;
   yearsOfExperience: number;
+}
+
+export type ApplicantStatus = {
+  applicantStatus: number;
+  statusText: string;
 }

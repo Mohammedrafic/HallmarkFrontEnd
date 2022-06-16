@@ -12,10 +12,11 @@ import { debounceTime, Observable, Subject } from "rxjs";
 import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
-import { AcceptCandidateComponent } from "@shared/components/order-candidates-list/accept-candidate/accept-candidate.component";
-import { ApplyCandidateComponent } from "@shared/components/order-candidates-list/apply-candidate/apply-candidate.component";
-import { GetOrganisationCandidateJob } from "@client/store/order-managment-content.actions";
-import { OnboardedCandidateComponent } from "@shared/components/order-candidates-list/onboarded-candidate/onboarded-candidate.component";
+import { GetAvailableSteps, GetOrganisationCandidateJob } from "@client/store/order-managment-content.actions";
+import { OnboardedCandidateComponent } from "./onboarded-candidate/onboarded-candidate.component";
+import { AcceptCandidateComponent } from "./accept-candidate/accept-candidate.component";
+import { ApplyCandidateComponent } from "./apply-candidate/apply-candidate.component";
+import { OfferDeploymentComponent } from "./offer-deployment/offer-deployment.component";
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -28,6 +29,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   @ViewChild('accept') accept: AcceptCandidateComponent;
   @ViewChild('apply') apply: ApplyCandidateComponent;
   @ViewChild('onboarded') onboarded: OnboardedCandidateComponent;
+  @ViewChild('offerDeployment') offerDeployment: OfferDeploymentComponent;
 
   @Input() candidatesList: OrderCandidatesListPage;
   @Input() order: AgencyOrder;
@@ -70,26 +72,32 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
 
   public onEdit(data: OrderCandidatesList): void {
     this.candidate = data;
-    // TODO: add enum and refactor
-    /*if (this.order && this.candidate && this.candidate.statusName === 'Not Applied') {
-      this.store.dispatch(new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId));
-      this.templateState.next(this.apply);
-      this.sideDialog.show();
-    }
+    // TODO: add enum for status
+    if (this.order && this.candidate) {
+      // TODO: find better approach
+      const isAgency = this.router.url.includes('agency');
+      const isOrganization = this.router.url.includes('client');
 
-    if(this.order && this.order && this.candidate && (data.statusName === 'Offered'|| data.statusName === 'Accepted')) {
-      this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
-      this.templateState.next(this.accept);
-      this.sideDialog.show();
-    }*/
-
-    // TODO: it will be used for organisations(Accepted)
-    if(false) {
-      this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, data.candidateJobId));
-      this.templateState.next(this.onboarded);
-      this.sideDialog.show();
+      if (isAgency) {
+        if (this.candidate.statusName === 'Not Applied') {
+          this.store.dispatch(new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId));
+          this.openDialog(this.apply);
+        } else if (this.candidate.statusName === 'Offered'|| this.candidate.statusName === 'Accepted') {
+          this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
+          this.openDialog(this.accept);
+        }
+      } else if (isOrganization) {
+        if (this.candidate.statusName === 'Applied') {
+          this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
+          this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
+          this.openDialog(this.offerDeployment);
+        } else if (this.candidate.statusName === 'Accepted') {
+          this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
+          this.openDialog(this.onboarded);
+        }
+      }
     }
-    }
+  }
 
   public onCloseDialog(): void {
     this.sideDialog.hide();
@@ -104,5 +112,10 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
       this.currentPage = page;
       this.store.dispatch(new GetAgencyOrderCandidatesList(this.order.orderId, this.order.organizationId, this.currentPage, this.pageSize));
     });
+  }
+
+  private openDialog(template: any): void {
+    this.templateState.next(template);
+    this.sideDialog.show();
   }
 }

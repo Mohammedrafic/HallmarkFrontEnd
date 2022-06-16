@@ -4,8 +4,14 @@
       <div class="e-card-header-caption">
         <h3 class="e-card-title">{{candidate?.lastName}}, {{candidate?.firstName}}</h3>
       </div>
-      <div class="e-card-content">
-        <button ejs-button [isPrimary]="true" class="apply-button" (click)="applyOrderApplicants()">Apply</button>
+      <div class="e-card-content button-container">
+        <div class="input-group dropdown bootstrap">
+          <ejs-dropdownlist [fields]="optionFields"
+                            [dataSource]="nextApplicantStatuses"
+                            placeholder="Select Status"
+                            (change)="updateCandidateJob($event)">
+          </ejs-dropdownlist>
+        </div>
         <button ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
@@ -26,7 +32,7 @@
                   <div class="input-container f-grow-2">
                     <label>Job ID</label>
                     <div class="input-group input-readonly">
-                      <input formControlName="orderId" class="e-input" type="text" readonly/>
+                      <input formControlName="jobId" class="e-input" type="text" readonly/>
                     </div>
                   </div>
                   <div class="input-container">
@@ -37,16 +43,24 @@
                   </div>
                 </div>
                 <div class="d-flex bootstrap">
-                  <div class="input-container f-grow-2">
+                  <div class="input-container">
                     <label>Job Date</label>
                     <div class="input-group input-readonly">
                       <ejs-daterangepicker formControlName="jobDate" readonly="true"></ejs-daterangepicker>
                     </div>
                   </div>
+                </div>
+                <div class="d-flex bootstrap">
                   <div class="input-container">
-                    <label>Candidate Bill Rate<span class="required">*</span></label>
+                    <label>Candidate Bill Rate</label>
+                    <div class="input-group input-readonly">
+                      <input formControlName="candidateBillRate" class="e-input" type="number" readonly/>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>Offered Bill Rate<span class="required">*</span></label>
                     <div class="input-group">
-                      <input appValidateWithMessage formControlName="candidateBillRate" class="e-input" type="number" placeholder="Bill Rate"/>
+                      <input appValidateWithMessage formControlName="offeredBillRate" class="e-input" type="number" placeholder="Offered Bill Rate"/>
                     </div>
                   </div>
                 </div>
@@ -59,13 +73,13 @@
                   </div>
                 </div>
                 <div class="d-flex bootstrap">
-                  <div class="datepicker-container">
+                  <div class="input-container">
                     <label>Available Start Date</label>
-                    <div class="input-group datepicker">
+                    <div class="input-group input-readonly">
                       <ejs-datepicker appValidateWithMessage
                                       class="datepicker"
                                       format="MM/dd/yyyy"
-                                      placeholder="MM/DD/YYYY"
+                                      readonly="true"
                                       formControlName="availableStartDate">
                       </ejs-datepicker>
                     </div>
@@ -73,23 +87,9 @@
                 </div>
                 <div class="d-flex bootstrap">
                   <div class="input-container">
-                    <label>Yrs of Exp.</label>
-                    <div class="input-group input-readonly">
-                      <input formControlName="yearsOfExperience" class="e-input" type="text" readonly/>
-                    </div>
-                  </div>
-                  <div class="input-container">
-                    <label>Exp. as Travelers</label>
-                    <div class="input-group">
-                      <input formControlName="expAsTravelers" class="e-input" type="number" placeholder="Exp. as Travelers"/>
-                    </div>
-                  </div>
-                </div>
-                <div class="d-flex bootstrap">
-                  <div class="input-container">
                     <label>Leave request comments</label>
-                    <div class="input-group">
-                      <input formControlName="requestComment" class="e-input" type="text" placeholder="Leave request comments" maxlength="2000"/>
+                    <div class="input-group input-readonly">
+                      <input formControlName="requestComment" class="e-input" type="text" readonly/>
                     </div>
                   </div>
                 </div>

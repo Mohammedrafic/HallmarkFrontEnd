@@ -6,7 +6,8 @@ import { OrderApplicantsInitialData } from "@shared/models/order-applicants.mode
 
 import {
   AgencyOrderManagement,
-  AgencyOrderManagementPage, OrderCandidateJob,
+  AgencyOrderManagementPage,
+  OrderCandidateJob,
   OrderCandidatesListPage
 } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
@@ -17,12 +18,13 @@ import { catchError, Observable, of, tap } from 'rxjs';
 import { ShowToast } from "src/app/store/app.actions";
 import {
   ApplyOrderApplicants,
-  ApplyOrderApplicantsSucceeded,
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
-  GetAgencyOrdersPage, GetCandidateJob,
+  GetAgencyOrdersPage,
+  GetCandidateJob,
   GetOrderApplicantsData,
-  GetOrderById, UpdateAgencyCandidateJob, UpdateAgencyCandidateJobSucceeded
+  GetOrderById,
+  UpdateAgencyCandidateJob
 } from './order-management.actions';
 
 export interface OrderManagementModel {
@@ -178,8 +180,8 @@ export class OrderManagementState {
   @Action(ApplyOrderApplicants)
   ApplyOrderApplicants({ dispatch }: StateContext<OrderManagementModel>, { payload }: ApplyOrderApplicants): Observable<any> {
     return this.orderApplicantsService.applyOrderApplicants(payload).pipe(
-      tap(dispatch(new ApplyOrderApplicantsSucceeded())),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Candidate cannot be applied'))))
+      tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'))),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
     );
   }
 
@@ -200,13 +202,10 @@ export class OrderManagementState {
   UpdateAgencyCandidateJob(
     { dispatch }: StateContext<OrderManagementModel>,
     { payload }: UpdateAgencyCandidateJob
-  ): void {
-     this.orderManagementContentService.updateCandidateJob(payload).pipe(
-      tap(() => {
-        dispatch(new UpdateAgencyCandidateJobSucceeded());
-        dispatch(new ShowToast(MessageTypes.Success, 'Action was executed'));
-      }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Candidate cannot be accepted'))))
+  ): Observable<any> {
+     return this.orderManagementContentService.updateCandidateJob(payload).pipe(
+       tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'))),
+       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
     );
   }
 }

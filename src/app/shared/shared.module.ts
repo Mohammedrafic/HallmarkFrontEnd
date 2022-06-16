@@ -43,6 +43,7 @@ import { HighlightGridRowDirective } from '@shared/directives/hightlight-grid-ro
 import { AddBackgroundForEmptyGridDirective } from '@shared/directives/add-background-for-empty-grid.directive';
 import { FormatPhoneNumberPipe } from '@shared/pipes/format-phone-number.pipe';
 import { RateHourPipe } from '@shared/pipes/rate-hour.pipe';
+import { OfferDeploymentComponent } from './components/order-candidates-list/offer-deployment/offer-deployment.component';
 
 const icons = {
   AlertCircle,
@@ -90,7 +91,8 @@ const COMPONENTS = [
   CommentsComponent,
   AcceptCandidateComponent,
   OnboardedCandidateComponent,
-  ApplyCandidateComponent
+  ApplyCandidateComponent,
+  OfferDeploymentComponent
 ];
 
 @NgModule({

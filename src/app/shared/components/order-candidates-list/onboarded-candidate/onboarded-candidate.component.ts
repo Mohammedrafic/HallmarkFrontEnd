@@ -91,7 +91,9 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
         clockId: value.clockId,
         guaranteedWorkWeek: value.workWeek,
         allowDeplayWoCredentials: value.allow
-      }));
+      })).subscribe(() => {
+        this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+      });
     }
   }
 

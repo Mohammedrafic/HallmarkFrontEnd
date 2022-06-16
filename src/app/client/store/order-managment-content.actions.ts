@@ -48,7 +48,7 @@ export class GetProjectTypes {
   constructor() { }
 }
 export class GetOrganisationCandidateJob {
-  static readonly type = '[agency order management] Get Organisation Candidate Job';
+  static readonly type = '[order management] Get Organisation Candidate Job';
   constructor(
     public organizationId: number,
     public jobId: number
@@ -56,10 +56,15 @@ export class GetOrganisationCandidateJob {
 }
 
 export class UpdateOrganisationCandidateJob {
-  static readonly type = '[agency order management] Update Organisation Candidate Job';
+  static readonly type = '[order management] Update Organisation Candidate Job';
   constructor(
     public payload: AcceptJobDTO
   ) {}
+}
+
+export class GetAvailableSteps {
+  static readonly type = '[order management] Get AvailableSteps';
+  constructor(public organizationId: number, public jobId: number) {}
 }
 
 export class GetProjectNames {

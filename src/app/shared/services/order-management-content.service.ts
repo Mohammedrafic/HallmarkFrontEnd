@@ -5,7 +5,10 @@ import {
   OrderManagementFilter,
   OrderManagementPage,
   AgencyOrderManagementPage,
-  OrderCandidatesListPage, OrderCandidateJob, AcceptJobDTO
+  OrderCandidatesListPage,
+  OrderCandidateJob,
+  AcceptJobDTO,
+  ApplicantStatus
 } from '@shared/models/order-management.model';
 import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-management.model';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -86,6 +89,15 @@ export class OrderManagementContentService {
    */
   public updateCandidateJob(payload: AcceptJobDTO): Observable<void> {
     return this.http.post<void>(`/api/AppliedCandidates/updateCandidateJob`, payload);
+  }
+
+  /**
+   * Get available steps
+   @param organizationId
+   @param jobId
+   */
+  public getAvailableSteps(organizationId: number, jobId: number): Observable<ApplicantStatus[]> {
+    return this.http.get<ApplicantStatus[]>(`/api/AppliedCandidates/availableSteps?OrganizationId=${organizationId}&JobId=${jobId}`);
   }
 
   /**

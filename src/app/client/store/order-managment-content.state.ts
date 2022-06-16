@@ -7,6 +7,7 @@ import {
   EditOrder,
   GetAgencyOrderCandidatesList,
   GetAssociateAgencies,
+  GetAvailableSteps,
   GetIncompleteOrders,
   GetMasterShifts,
   GetOrderById,
@@ -19,10 +20,11 @@ import {
   GetSelectedOrderById,
   GetWorkflows,
   SaveOrder,
-  SaveOrderSucceeded, UpdateOrganisationCandidateJob
+  SaveOrderSucceeded,
+  UpdateOrganisationCandidateJob
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
-import { OrderCandidateJob, OrderCandidatesListPage, OrderManagementPage } from '@shared/models/order-management.model';
+import { ApplicantStatus, OrderCandidateJob, OrderCandidatesListPage, OrderManagementPage } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -43,6 +45,7 @@ export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
   selectedOrder: Order | null;
   candidatesJob: OrderCandidateJob | null;
+  applicantStatuses: ApplicantStatus[];
   orderCandidatesListPage: OrderCandidatesListPage | null;
   orderDialogOptions: {
     next: boolean,
@@ -64,6 +67,7 @@ export interface OrderManagementContentStateModel {
     selectedOrder: null,
     orderCandidatesListPage: null,
     candidatesJob: null,
+    applicantStatuses: [],
     orderDialogOptions: {
       next: false,
       previous: false
@@ -117,8 +121,13 @@ export class OrderManagementContentState {
   static predefinedBillRates(state: OrderManagementContentStateModel): BillRate[] { return state.predefinedBillRates }
 
   @Selector()
-  static candidatesJob(state: OrderManagementModel): OrderCandidateJob | null {
+  static candidatesJob(state: OrderManagementContentStateModel): OrderCandidateJob | null {
     return state.candidatesJob;
+  }
+
+  @Selector()
+  static applicantStatuses(state: OrderManagementContentStateModel): ApplicantStatus[] {
+    return state.applicantStatuses;
   }
 
   constructor(
@@ -188,8 +197,8 @@ export class OrderManagementContentState {
   }
 
   @Action(GetOrganisationCandidateJob)
-  GetCandidateJob(
-    { patchState }: StateContext<OrderManagementModel>,
+  GetOrganisationCandidateJob(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
     { organizationId, jobId }: GetOrganisationCandidateJob
   ): Observable<OrderCandidateJob> {
     return this.orderManagementService.getCandidateJob(organizationId, jobId).pipe(
@@ -200,14 +209,24 @@ export class OrderManagementContentState {
     );
   }
 
+  @Action(GetAvailableSteps)
+  GetAvailableSteps(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { organizationId, jobId }: GetAvailableSteps
+  ): Observable<ApplicantStatus[]> {
+    return this.orderManagementService.getAvailableSteps(organizationId, jobId).pipe(
+      tap((payload) => {
+        patchState({applicantStatuses: payload});
+        return payload;
+      })
+    );
+  }
+
   @Action(UpdateOrganisationCandidateJob)
-  UpdateOrganisationCandidateJob(
-    { dispatch }: StateContext<OrderManagementModel>,
-    { payload }: UpdateOrganisationCandidateJob
-  ): Observable<unknown> {
+  UpdateOrganisationCandidateJob({ dispatch }: StateContext<OrderManagementModel>, { payload }: UpdateOrganisationCandidateJob): Observable<any> {
     return this.orderManagementService.updateCandidateJob(payload).pipe(
-      tap(dispatch(new ShowToast(MessageTypes.Success, 'Action was executed'))),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Candidate cannot be onboarded'))))
+      tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'))),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
     );
   }
 
