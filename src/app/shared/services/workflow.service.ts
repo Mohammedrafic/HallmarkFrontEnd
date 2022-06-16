@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { WorkflowWithDetails, WorkflowWithDetailsPut } from '@shared/models/workflow.model';
+import { WorkflowFilters, WorkflowWithDetails, WorkflowWithDetailsPut } from '@shared/models/workflow.model';
 import { WorkflowMappingPage, WorkflowMappingPost } from '@shared/models/workflow-mapping.model';
 
 @Injectable({ providedIn: 'root' })
@@ -48,8 +48,11 @@ export class WorkflowService {
   /**
    * Gets workflow mapping page
    */
-  public getWorkflowMappingPages(): Observable<WorkflowMappingPage> {
-    return this.http.get<WorkflowMappingPage>(`/api/WorkflowMapping`)
+  public getWorkflowMappingPages(filters?: WorkflowFilters): Observable<WorkflowMappingPage> {
+    if (filters) {
+      return this.http.post<WorkflowMappingPage>(`/api/WorkflowMapping/filter`, filters);
+    }
+    return this.http.get<WorkflowMappingPage>(`/api/WorkflowMapping`);
   }
 
   /**

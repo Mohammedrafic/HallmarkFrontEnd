@@ -4,6 +4,10 @@
   padding-top: 24px;
 }
 
+.checkbox {
+  width: 25px;
+}
+
 .form-container {
   padding-top: 24px;
 
@@ -20,6 +24,7 @@
 
       ejs-numerictextbox {
         span.e-disabled {
+          border: 1px solid $grey;
           background-color: $secondary-dark-blue-50;
         }
       }

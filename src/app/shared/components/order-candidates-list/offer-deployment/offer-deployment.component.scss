@@ -1,0 +1,55 @@
+@import "colors";
+
+:host {
+  overflow-y: auto;
+}
+
+.container {
+  .header-container {
+    .button-container {
+      display: flex;
+      gap: 12px;
+    }
+  }
+
+  .content-container {
+    display: flex;
+    margin-top: 24px;
+
+    .job-details {
+      margin-right: 12px;
+      width: 55%;
+
+      .input-container, .dropdown-container, .datepicker-container {
+        margin-bottom: 12px;
+        flex: 1 1 0px;
+      }
+
+      .input-group.input-readonly {
+        .e-input[readonly], ejs-daterangepicker .e-input-group, ejs-datepicker .e-input-group {
+          background-color: $secondary-dark-blue-50;
+          color: $secondary-dark-blue-30;
+          border: 1px solid $secondary-dark-blue-40 !important;
+        }
+      }
+
+      .d-flex {
+        display: flex;
+        gap: 10px;
+
+        .f-grow-2 {
+          flex-grow: 2;
+        }
+      }
+    }
+
+    .comments {
+      width: 45%;
+      background-color: $secondary-dark-blue-50;
+    }
+  }
+
+  .bill-rates {
+    margin-top: 16px;
+  }
+}

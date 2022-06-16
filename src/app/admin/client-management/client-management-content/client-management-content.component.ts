@@ -25,7 +25,8 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
 
   public initialSort = {
     columns: [
-      { field: 'createUnder.name', direction: 'Ascending' }
+      { field: 'createUnder.name', direction: 'Ascending' },
+      { field: 'Phone', direction: 'none' }
     ]
   };
 

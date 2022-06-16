@@ -1,19 +1,19 @@
 import { Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { combineLatest, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { combineLatest, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { ShowSideDialog } from '../../../store/app.actions';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { OrganizationManagementState } from '../../store/organization-management.state';
 import { Region } from '@shared/models/region.model';
 import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
-import { GetAllSkills } from '../../store/organization-management.actions';
-import { Skill, SkillsPage } from '@shared/models/skill.model';
+import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
+import { Skill } from '@shared/models/skill.model';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { WorkflowState } from '../../store/workflow.state';
-import { Step, Workflow, WorkflowWithDetails } from '@shared/models/workflow.model';
+import { Step, Workflow, WorkflowFilters, WorkflowWithDetails } from '@shared/models/workflow.model';
 import {
   GetRolesForWorkflowMapping,
   GetUsersForWorkflowMapping,
@@ -32,6 +32,9 @@ import { WorkflowType } from '@shared/enums/workflow-type';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { FilteredItem } from '@shared/models/filter.model';
+import { FilterService } from '@shared/services/filter.service';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
 @Component({
   selector: 'app-workflow-mapping',
@@ -60,8 +63,8 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   public departments: OrganizationDepartment[] = [];
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
 
-  @Select(OrganizationManagementState.skills)
-  skills$: Observable<SkillsPage>;
+  @Select(OrganizationManagementState.allOrganizationSkills)
+  skills$: Observable<Skill[]>;
   skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
   public allSkills: Skill[] = [];
 
@@ -109,22 +112,59 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   }
 
   private formBuilder: FormBuilder;
+  public WorkflowFilterFormGroup: FormGroup;
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
 
+  public filters: WorkflowFilters = {
+    pageSize: this.pageSize, 
+    pageNumber: 1
+  };
+  public filterColumns: any;
+  public optionFields = {
+    text: 'name', value: 'id'
+  };
+
   constructor(private store: Store,
               private actions$: Actions,
+              private filterService: FilterService,
               @Inject(FormBuilder) private builder: FormBuilder,
               private confirmService: ConfirmService) {
     super();
     this.formBuilder = builder;
     this.createWorkflowMappingFormGroup();
+    this.WorkflowFilterFormGroup = this.formBuilder.group({
+      names: new FormControl([]),
+      regionIds: new FormControl([]),
+      locationIds: new FormControl([]),
+      departmentsIds: new FormControl([]),
+      skillIds: new FormControl([]),
+      types: new FormControl([]),
+    });
   }
 
   ngOnInit(): void {
+    this.filterColumns = {
+      regionIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      departmentsIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      skillIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'skillDescription', valueId: 'id' },
+      types: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      names: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [], valueField: 'name' },
+    }
+    this.filterColumns.types.dataSource = Object.keys(WorkflowType)
+      .map((type: any) => { return { name: type, id: WorkflowType[type] }})
+      .filter(item => isNaN(item.name));
+
+    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
+      this.currentPage = page;
+      this.filters.pageNumber = page;
+      this.store.dispatch(new GetWorkflowMappingPages(this.filters));
+    });
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.store.dispatch(new GetAllSkills());
-      this.store.dispatch(new GetWorkflowMappingPages());
+      this.currentPage = 1;
+      this.store.dispatch(new GetAllOrganizationSkills());
+      this.store.dispatch(new GetWorkflowMappingPages(this.filters));
       this.store.dispatch(new GetRolesForWorkflowMapping());
       this.store.dispatch(new GetUsersForWorkflowMapping());
       this.store.dispatch(new GetWorkflows());
@@ -152,6 +192,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetWorkflowsSucceed))
       .subscribe((workflows) => {
         this.workflows = workflows.payload;
+        this.filterColumns.names.dataSource = workflows.payload.map((item: WorkflowWithDetails) => item.name);
       });
 
     this.workflowMappingFormGroup.get('regions')?.valueChanges.subscribe((regionIds: number[]) => {
@@ -178,11 +219,43 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       this.orgStructure = structure;
       this.orgRegions = structure.regions;
       this.allRegions = [...this.orgRegions];
+      this.filterColumns.regionIds.dataSource = this.allRegions;
+    });
+
+    this.WorkflowFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
+      if (val?.length) {
+        const selectedRegions: OrganizationRegion[] = [];
+        val.forEach(id => selectedRegions.push(this.allRegions.find(region => region.id === id) as OrganizationRegion));
+        this.filterColumns.locationIds.dataSource = [];
+        selectedRegions.forEach(region => {
+          this.filterColumns.locationIds.dataSource.push(...region.locations as [])
+        });
+      } else {
+        this.filterColumns.locationIds.dataSource = [];
+        this.WorkflowFilterFormGroup.get('locationIds')?.setValue([]);
+        this.filteredItems = this.filterService.generateChips(this.WorkflowFilterFormGroup, this.filterColumns);
+      }
+    });
+
+    this.WorkflowFilterFormGroup.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
+      if (val?.length) {
+        const selectedLocations: OrganizationLocation[] = [];
+        val.forEach(id => selectedLocations.push(this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)));
+        this.filterColumns.departmentsIds.dataSource = [];
+        selectedLocations.forEach(location => {
+          this.filterColumns.departmentsIds.dataSource.push(...location.departments as [])
+        });
+      } else {
+        this.filterColumns.departmentsIds.dataSource = [];
+        this.WorkflowFilterFormGroup.get('departmentsIds')?.setValue([]);
+        this.filteredItems = this.filterService.generateChips(this.WorkflowFilterFormGroup, this.filterColumns);
+      }
     });
 
     this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe(skills => {
-      if (skills && skills.items.length > 0) {
-        this.allSkills = skills.items;
+      if (skills && skills.length > 0) {
+        this.allSkills = skills;
+        this.filterColumns.skillIds.dataSource = skills;
       }
     });
 
@@ -257,6 +330,35 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.unsubscribe$.complete();
   }
 
+  public override updatePage(): void {
+    this.filters.orderBy = this.orderBy;
+    this.store.dispatch(new GetWorkflowMappingPages(this.filters));
+  }
+
+  public showFilters(): void {
+    this.store.dispatch(new ShowFilterDialog(true));
+  }
+
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.WorkflowFilterFormGroup, this.filterColumns);
+  }
+
+  public onFilterClearAll(): void {
+    this.WorkflowFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {};
+  }
+
+  public onFilterApply(): void {
+    this.filters = this.WorkflowFilterFormGroup.getRawValue();
+    this.filteredItems = this.filterService.generateChips(this.WorkflowFilterFormGroup, this.filterColumns);
+    this.filters.pageNumber = this.currentPage;
+    this.filters.pageSize = this.pageSize;
+    this.store.dispatch(new GetWorkflowMappingPages(this.filters));
+    this.store.dispatch(new ShowFilterDialog(false));
+  }
+
   public onAddMappingClick(): void {
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -318,7 +420,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       })
       .subscribe((confirm) => {
         if (confirm) {
-          this.store.dispatch(new RemoveWorkflowMapping(data.mappingId));
+          this.store.dispatch(new RemoveWorkflowMapping(data.mappingId, this.filters));
         }
         this.removeActiveCssClass();
       });
@@ -360,7 +462,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
         stepMappings: this.getStepMappings()
       };
 
-      this.store.dispatch(new SaveWorkflowMapping(workflowMapping));
+      this.store.dispatch(new SaveWorkflowMapping(workflowMapping, this.filters));
     } else {
       this.workflowMappingFormGroup.markAllAsTouched();
     }
@@ -369,6 +471,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   public onRowsDropDownChanged(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
     this.grid.pageSettings.pageSize = this.pageSize;
+    this.filters.pageSize = this.pageSize;
   }
 
   public onGoToClick(event: any): void {

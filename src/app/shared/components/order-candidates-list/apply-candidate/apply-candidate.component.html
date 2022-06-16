@@ -1,0 +1,117 @@
+<section class="container">
+  <section class="header-container">
+    <div class="e-card-header">
+      <div class="e-card-header-caption">
+        <h3 class="e-card-title">{{candidate?.lastName}}, {{candidate?.firstName}}</h3>
+      </div>
+      <div class="e-card-content">
+        <button ejs-button [isPrimary]="true" class="apply-button" (click)="applyOrderApplicants()">Apply</button>
+        <button ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
+          <i-feather name="x" class="icon"></i-feather>
+        </button>
+      </div>
+    </div>
+  </section>
+  <section class="content-container">
+    <div class="job-details">
+      <ejs-accordion>
+        <e-accordionitems>
+          <e-accordionitem expanded="true">
+            <ng-template #header>
+              <div>Job Details</div>
+            </ng-template>
+            <ng-template #content>
+              <form [formGroup]="formGroup">
+                <div class="d-flex bootstrap">
+                  <div class="input-container f-grow-2">
+                    <label>Job ID</label>
+                    <div class="input-group input-readonly">
+                      <input formControlName="orderId" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>Bill Rate</label>
+                    <div class="input-group input-readonly">
+                      <input formControlName="orderBillRate" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex bootstrap">
+                  <div class="input-container f-grow-2">
+                    <label>Job Date</label>
+                    <div class="input-group input-readonly">
+                      <ejs-daterangepicker formControlName="jobDate" readonly="true"></ejs-daterangepicker>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>Candidate Bill Rate<span class="required">*</span></label>
+                    <div class="input-group">
+                      <input appValidateWithMessage formControlName="candidateBillRate" class="e-input" type="number" placeholder="Bill Rate"/>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex bootstrap">
+                  <div class="input-container">
+                    <label>Location</label>
+                    <div class="input-group input-readonly">
+                      <input formControlName="locationName" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex bootstrap">
+                  <div class="datepicker-container">
+                    <label>Available Start Date</label>
+                    <div class="input-group datepicker">
+                      <ejs-datepicker appValidateWithMessage
+                                      class="datepicker"
+                                      format="MM/dd/yyyy"
+                                      placeholder="MM/DD/YYYY"
+                                      formControlName="availableStartDate">
+                      </ejs-datepicker>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex bootstrap">
+                  <div class="input-container">
+                    <label>Yrs of Exp.</label>
+                    <div class="input-group input-readonly">
+                      <input formControlName="yearsOfExperience" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>Exp. as Travelers</label>
+                    <div class="input-group">
+                      <input formControlName="expAsTravelers" class="e-input" type="number" placeholder="Exp. as Travelers"/>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex bootstrap">
+                  <div class="input-container">
+                    <label>Leave request comments</label>
+                    <div class="input-group">
+                      <input formControlName="requestComment" class="e-input" type="text" placeholder="Leave request comments" maxlength="2000"/>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </ng-template>
+          </e-accordionitem>
+          <e-accordionitem>
+            <ng-template #header>
+              <div>Historical Events</div>
+            </ng-template>
+            <ng-template #content>
+              <div>Historical Events</div>
+            </ng-template>
+          </e-accordionitem>
+        </e-accordionitems>
+      </ejs-accordion>
+    </div>
+    <div class="comments">
+      <app-comments></app-comments>
+    </div>
+  </section>
+  <section class="bill-rates">
+    <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
+  </section>
+</section>

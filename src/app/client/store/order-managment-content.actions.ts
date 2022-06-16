@@ -1,5 +1,6 @@
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { OrderManagementFilter } from '@shared/models/order-management.model';
+import { AcceptJobDTO, OrderManagementFilter } from '@shared/models/order-management.model';
+import { OrderType } from '@shared/enums/order-type';
 import { CreateOrderDto, EditOrderDto } from '@shared/models/order-management.model';
 
 export class GetIncompleteOrders {
@@ -46,6 +47,25 @@ export class GetProjectTypes {
   static readonly type = '[order management] Get Project Types';
   constructor() { }
 }
+export class GetOrganisationCandidateJob {
+  static readonly type = '[order management] Get Organisation Candidate Job';
+  constructor(
+    public organizationId: number,
+    public jobId: number
+  ) {}
+}
+
+export class UpdateOrganisationCandidateJob {
+  static readonly type = '[order management] Update Organisation Candidate Job';
+  constructor(
+    public payload: AcceptJobDTO
+  ) {}
+}
+
+export class GetAvailableSteps {
+  static readonly type = '[order management] Get AvailableSteps';
+  constructor(public organizationId: number, public jobId: number) {}
+}
 
 export class GetProjectNames {
   static readonly type = '[order management] Get Project Names';
@@ -62,12 +82,47 @@ export class GetAssociateAgencies {
   constructor() { }
 }
 
+export class SetPredefinedBillRatesData {
+  static readonly type = '[order management] Set Predefined Bill Rates Data';
+  constructor(public orderType: OrderType, public departmentId: number, public skillId: number) { }
+}
+
+export class GetPredefinedBillRates {
+  static readonly type = '[order management] Get Predefined Bill Rates';
+  constructor() { }
+}
+
+export class ClearPredefinedBillRates {
+  static readonly type = '[order management] Clear Predefined Bill Rates';
+  constructor() { }
+}
+
 export class SaveOrder {
   static readonly type = '[order management] Save Order';
   constructor(public order: CreateOrderDto, public documents: Blob[]) { }
 }
 
+export class SaveOrderSucceeded {
+  static readonly type = '[order management] Save Order Succeeded';
+  constructor() { }
+}
+
 export class EditOrder {
   static readonly type = '[order management] Edit Order';
-  constructor(public order: EditOrderDto) { }
+  constructor(public order: EditOrderDto, public documents: Blob[]) { }
+}
+
+export class DeleteOrder {
+  static readonly type = '[order management] Delete Order';
+  constructor(public id: number) { }
+}
+
+export class DeleteOrderSucceeded {
+  static readonly type = '[order management] Delete Order Succeeded';
+  constructor() { }
+}
+
+export class ReloadOrganisationOrderCandidatesLists {
+  static readonly type = '[agency order management] Reload Order and Candidates Lists on Organisation';
+  constructor() {}
 }

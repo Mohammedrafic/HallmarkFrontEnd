@@ -14,12 +14,13 @@ import {
   GetRegions
 } from '@organization-management/store/organization-management.actions';
 import {
-  GetOrganizationStatesWithKeyCode,
   GetAssociateAgencies,
   GetMasterShifts,
+  GetOrganizationStatesWithKeyCode,
   GetProjectNames,
   GetProjectTypes,
-  GetWorkflows
+  GetWorkflows,
+  SetPredefinedBillRatesData
 } from '@client/store/order-managment-content.actions';
 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -35,6 +36,7 @@ import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { ProjectName, ProjectType } from '@shared/models/project.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
+import { Document } from '@shared/models/document.model';
 
 import { OrderType } from '@shared/enums/order-type';
 import { Duration } from '@shared/enums/durations';
@@ -48,12 +50,19 @@ import { integerValidator } from '@shared/validators/integer.validator';
 import { currencyValidator } from '@shared/validators/currency.validator';
 
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
-import { ORDER_CONTACT_DETAIL_TITLES } from '@shared/constants';
+import { ORDER_CONTACT_DETAIL_TITLES, ORDER_EDITS } from '@shared/constants';
+import PriceUtils from '@shared/utils/price.utils';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { SkillCategory } from '@shared/models/skill-category.model';
+import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 
 @Component({
   selector: 'app-order-details-form',
   templateUrl: './order-details-form.component.html',
-  styleUrls: ['./order-details-form.component.scss']
+  styleUrls: ['./order-details-form.component.scss'],
+  providers: [MaskedDateTimeService]
 })
 export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Input() isActive = false;
@@ -87,6 +96,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public minTime = this.defaultMinTime;
 
   public documents: Blob[] = [];
+  public deleteDocumentsGuids: string[] = [];
+  public priceUtils = PriceUtils;
 
   public orderTypes = [
     { id: OrderType.ContractToPerm, name: 'Contract To Perm' },
@@ -172,6 +183,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrganizationManagementState.masterSkillsByOrganization)
   skills$: Observable<MasterSkillByOrganization[]>;
   skillFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  selectedSkills: SkillCategory;
 
   @Select(OrderManagementContentState.projectTypes)
   projectTypes$: Observable<ProjectType[]>;
@@ -215,11 +227,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       projectType: [null, Validators.required],
       projectNameId: [null, Validators.required],
       projectName: [null, Validators.required],
-      hourlyRate: [null, {validators: [Validators.required, Validators.maxLength(10), currencyValidator(1)], updateOn: 'blur'}],
+      hourlyRate: [null, [Validators.required, Validators.maxLength(11), currencyValidator(1)]],
       openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
       minYrsRequired: [null, [Validators.maxLength(10), integerValidator(1)]],
-      joiningBonus: [null, {validators: [Validators.maxLength(10), currencyValidator(1)], updateOn: 'blur'}],
-      compBonus: [null, {validators: [Validators.maxLength(10), currencyValidator(1)], updateOn: 'blur'}],
+      joiningBonus: [null, [Validators.maxLength(11), currencyValidator(1)]],
+      compBonus: [null, [Validators.maxLength(11), currencyValidator(1)]],
       duration: [null, Validators.required],
       jobStartDate: [null, Validators.required],
       jobEndDate: [null, Validators.required],
@@ -261,6 +273,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       workflowId: [null, Validators.required]
     });
 
+    const orderTypeControl = this.orderTypeStatusForm.get('orderType') as AbstractControl;
     const locationIdControl = this.generalInformationForm.get('locationId') as AbstractControl;
     const departmentIdControl = this.generalInformationForm.get('departmentId') as AbstractControl;
     const skillIdControl = this.generalInformationForm.get('skillId') as AbstractControl;
@@ -273,9 +286,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     const shiftRequirementIdControl = this.generalInformationForm.get('shiftRequirementId') as AbstractControl;
     const shiftStartTimeControl = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
     const shiftEndTimeControl = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
-    const hourlyRateControl = this.generalInformationForm.get('hourlyRate') as AbstractControl;
-    const joiningBonusControl = this.generalInformationForm.get('joiningBonus') as AbstractControl;
-    const compBonusControl = this.generalInformationForm.get('compBonus') as AbstractControl;
     const jobDistributionControl = this.jobDistributionForm.get('jobDistribution') as AbstractControl;
     const agencyControl = this.jobDistributionForm.get('agency') as AbstractControl;
     const jobDistributionsControl = this.jobDistributionForm.get('jobDistributions') as AbstractControl;
@@ -299,9 +309,21 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       const firstWorlLocationsControl = workLocationsFormArray.at(0) as FormGroup;
 
       firstWorlLocationsControl.controls['address'].patchValue(location.address1);
-      firstWorlLocationsControl.controls['state'].patchValue(location.state);
+      firstWorlLocationsControl.controls['state'].patchValue(this.findTargetState(location));
       firstWorlLocationsControl.controls['city'].patchValue(location.city);
       firstWorlLocationsControl.controls['zipCode'].patchValue(location.zip);
+    });
+
+    combineLatest([
+      orderTypeControl.valueChanges,
+      departmentIdControl.valueChanges,
+      skillIdControl.valueChanges
+    ]).pipe(takeUntil(this.unsubscribe$)).subscribe(([orderType, departmentId, skillId]) => {
+      if (isNaN(parseInt(orderType)) || !departmentId || !skillId) {
+        return;
+      }
+
+      this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
     });
 
     combineLatest([
@@ -313,7 +335,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       }
 
       this.store.dispatch(new GetWorkflows(departmentId, skillId));
-    })
+    });
 
     projectTypeIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((projectTypeId: number) => {
       const projectTypes = this.store.selectSnapshot(OrderManagementContentState.projectTypes);
@@ -460,23 +482,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       jobDistributionsControl.patchValue(jobDistributions, { emitEvent: false });
     });
 
-    hourlyRateControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((price: string) => {
-      hourlyRateControl.patchValue(this.getTwoDecimalsValue(price), {emitEvent: false});
-    });
-
-    joiningBonusControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((price: string) => {
-      joiningBonusControl.patchValue(this.getTwoDecimalsValue(price), {emitEvent: false});
-    });
-
-    compBonusControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((price: string) => {
-      compBonusControl.patchValue(this.getTwoDecimalsValue(price), {emitEvent: false});
-    });
-
     shiftStartTimeControl.addValidators(startTimeValidator(this.generalInformationForm, 'shiftEndTime'));
     shiftEndTimeControl.addValidators(endTimeValidator(this.generalInformationForm, 'shiftStartTime'));
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.store.dispatch(new GetRegions());
     this.store.dispatch(new GetMasterSkillsByOrganization());
     this.store.dispatch(new GetProjectNames());
@@ -499,12 +509,13 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     })
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
 
   public onRegionDropDownChanged(event: ChangeEventArgs): void {
+    this.userEditsOrder(this.selectedRegion);
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion.id) {
       this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
@@ -513,6 +524,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public onLocationDropDownChanged(event: ChangeEventArgs): void {
+    this.userEditsOrder(this.selectedLocation);
     this.selectedLocation = event.itemData as Location;
     if (this.selectedLocation?.id) {
       this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocation.id));
@@ -521,15 +533,31 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public onDepartmentDropDownChanged(event: ChangeEventArgs): void {
+    this.userEditsOrder(this.selectedDepartment);
     this.selectedDepartment = event.itemData as Department;
+  }
+
+  onSkillsDropDownChanged(event: ChangeEventArgs) {
+    this.userEditsOrder(this.selectedSkills);
+    this.selectedSkills = event.itemData as SkillCategory;
+  }
+
+  private userEditsOrder(selectedItem: Object): void {
+    if(!selectedItem) {
+      this.store.dispatch(new ShowToast(MessageTypes.Success, ORDER_EDITS))
+    }
   }
 
   public editProjectTypeHandler(): void {
     this.isEditProjectType = !this.isEditProjectType;
+    this.generalInformationForm.get('projectTypeId')?.updateValueAndValidity();
+    this.generalInformationForm.get('projectTypeId')?.markAllAsTouched();
   }
 
   public editProjectNameHandler(): void {
     this.isEditProjectName = !this.isEditProjectName;
+    this.generalInformationForm.get('projectNameId')?.updateValueAndValidity();
+    this.generalInformationForm.get('projectNameId')?.markAllAsTouched();
   }
 
   public addContact(): void {
@@ -555,6 +583,34 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   public onDocumentsSelected(documents: Blob[]): void {
     this.documents = documents;
+  }
+
+  public onDocumentDeleted(document: Document): void {
+    this.deleteDocumentsGuids.push(document.documentId);
+  }
+
+  public setPriceMask(controlName: string, e: FocusEvent): void {
+    const input = e.target as HTMLInputElement;
+    if (!input.value.length) {
+      this.generalInformationForm.get(controlName)?.patchValue(`.00`, { emitEvent: false });
+      setTimeout(() => input.setSelectionRange(0, 0));
+    }
+  }
+
+  public setTwoDecimals(controlName: string, e: FocusEvent): void {
+    const input = e.target as HTMLInputElement;
+    const inputValue = input.value ? String(input.value) : '';
+    const integerLength = inputValue.split('.')[0].length;
+    let zerosCount = 2;
+
+    if (integerLength > 8 && integerLength < 10) {
+      zerosCount = 1;
+    } else if (integerLength > 9) {
+      zerosCount = 0;
+    }
+
+    const value = Number(inputValue).toFixed(Math.max(inputValue.split('.')[1]?.length, zerosCount) || zerosCount);
+    this.generalInformationForm.get(controlName)?.patchValue(value, { emitEvent: false });
   }
 
   private populateForms(order: Order): void {
@@ -728,9 +784,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getTwoDecimalsValue(value: string): string {
-    if (!value) return '';
-    value = String(value);
-    return Number(value).toFixed(Math.max(value.split('.')[1]?.length, 2) || 2);
+  private findTargetState(location: Location): string | undefined {
+    const states = this.store.selectSnapshot(OrderManagementContentState.organizationStatesWithKeyCode);
+    return states.find(({ title }: OrganizationStateWithKeyCode) => title === location.state)?.keyCode;
   }
 }

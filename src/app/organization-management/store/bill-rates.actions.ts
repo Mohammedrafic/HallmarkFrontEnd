@@ -1,8 +1,8 @@
-import { BillRateSetupPost } from '@shared/models/bill-rate.model';
+import { BillRateFilters, BillRateSetupPost } from '@shared/models/bill-rate.model';
 
 export class GetBillRates {
   static readonly type = '[billrates] Get Bill Rates Pages';
-  constructor(public pageNumber: number, public pageSize: number) {}
+  constructor(public filter: BillRateFilters) {}
 }
 
 export class SaveUpdateBillRate {

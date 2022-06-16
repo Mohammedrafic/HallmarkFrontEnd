@@ -8,6 +8,7 @@
   [allowSelection]="false"
   [resizeSettings]="resizeSettings"
   [allowPaging]="allowPaging"
+  [enableVirtualization]="true"
   [pageSettings]="pageSettings"
   [height]="gridHeight"
   (rowDataBound)='rowDataBound($event)'
@@ -15,10 +16,10 @@
   <e-columns>
     <e-column field="firstName" headerText="First Name" textAlign="Left" ></e-column>
     <e-column field="lastName" headerText="Last Name" textAlign="Left" ></e-column>
-    <e-column field="status" headerText="Status" width=200>
+    <e-column field="isDeleted" headerText="Status" width=200>
       <ng-template #template let-data>
         <div>
-          <ejs-chiplist>
+          <ejs-chiplist class="events-off">
             <e-chips>
               <e-chip [text]="statusEnum[+!data.isDeleted]"
                       [cssClass]="getChipCssClass(statusEnum[+!data.isDeleted])">

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { takeWhile, Observable, Subject } from 'rxjs';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
   CheckBoxChangeEventArgs,
@@ -22,12 +22,14 @@ import {
   GetOrderById,
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
+  ReloadOrderCandidatesLists,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AgencyOrderManagement, AgencyOrderManagementPage } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, AgencyOrderManagementPage, Order } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { Location } from '@angular/common';
+import { UserState } from 'src/app/store/user.state';
 
 enum AllCheckedStatus {
   None,
@@ -49,6 +51,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   @Select(OrderManagementState.ordersPage)
   public ordersPage$: Observable<AgencyOrderManagementPage>;
+
+  @Select(UserState.lastSelectedAgencyId)
+  lastSelectedAgencyId$: Observable<number>;
 
   public wrapSettings: TextWrapSettingsModel = GRID_CONFIG.wordWrapSettings;
   public allowWrap = GRID_CONFIG.isWordWrappingEnabled;
@@ -72,17 +77,21 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private statusSortDerection: SortDirection = 'Ascending';
   private isAlive = true;
 
-  constructor(private store: Store, private location: Location) {
+  constructor(private store: Store,
+              private location: Location,
+              private actions$: Actions) {
     super();
   }
 
   ngOnInit(): void {
     this.onOrderPreviewChange();
+    this.onAgencyChange();
     const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
     if (!this.previousSelectedOrderId) {
       this.dispatchNewPage();
     }
+    this.onReloadOrderCandidatesLists();
   }
 
   ngOnDestroy(): void {
@@ -169,7 +178,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.openPreview.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (!isOpen) {
         this.openCandidat.next(false);
-        this.grid.clearRowSelection();
+        this.grid?.clearRowSelection();
         this.previousSelectedOrderId = null;
       }
     });
@@ -183,6 +192,25 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       previous: first.orderId !== selectedOrder.orderId,
       next: last.orderId !== selectedOrder.orderId,
     };
+  }
+
+  private onAgencyChange(): void {
+    this.lastSelectedAgencyId$.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
+      this.openPreview.next(false);
+      this.openCandidat.next(false);
+      this.dispatchNewPage();
+    });
+  }
+
+  private onReloadOrderCandidatesLists(): void {
+    this.actions$.pipe(ofActionSuccessful(ReloadOrderCandidatesLists), takeWhile(() => this.isAlive)).subscribe(() => {
+      this.store.dispatch(
+        new GetAgencyOrderCandidatesList(this.selectedOrder.orderId, this.selectedOrder.organizationId, this.currentPage, this.pageSize)
+      );
+      this.store.dispatch(new GetAgencyOrderGeneralInformation(this.selectedOrder.orderId, this.selectedOrder.organizationId));
+      this.dispatchNewPage();
+      this.store.dispatch(new GetOrderById(this.selectedOrder.orderId, this.selectedOrder.organizationId, this.getDialogNextPreviousOption(this.selectedOrder)));
+    });
   }
 }
 

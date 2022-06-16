@@ -3,6 +3,8 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
 import { FileInfo } from "@syncfusion/ej2-inputs/src/uploader/uploader";
 
+import { Document } from '@shared/models/document.model';
+
 @Component({
   selector: 'app-document-uploader',
   templateUrl: './document-uploader.component.html',
@@ -11,9 +13,11 @@ import { FileInfo } from "@syncfusion/ej2-inputs/src/uploader/uploader";
 export class DocumentUploaderComponent implements OnInit {
   @Input() uploaderTitle: string;
   @Input() allowedExtensions: string = '.pdf, .doc, .docx, .xls, .xlsx, .jpg, .jpeg, .png';
-  @Input() maxFileSize: number = 10485760; // 10 mb
+  @Input() maxFileSize: number = 5242880; // 5 mb
+  @Input() documents:  Document[] | undefined | null;
 
   @Output() selectDocuments = new EventEmitter<Blob[]>();
+  @Output() deleteDocument = new EventEmitter<Document>();
 
   @ViewChild('previewupload')
   public uploadObj: UploaderComponent;
@@ -49,12 +53,28 @@ export class DocumentUploaderComponent implements OnInit {
     this.selectDocuments.emit([]);
   }
 
+  public onDelete(document: Document): void {
+    if (!Array.isArray(this.documents)) {
+      return;
+    }
+
+    const index = this.documents.findIndex(d => d.documentId === document.documentId);
+
+    if (index < 0) {
+      return;
+    }
+
+    this.documents.splice(index, 1);
+    this.documents = [...this.documents];
+    this.deleteDocument.emit(document);
+  }
+
   private addFilesValidationMessage(file: FileInfo, fileIndex: number) {
     requestAnimationFrame(() => {
       this.uploaderErrorMessageElement = document.getElementsByClassName('e-validation-fails')[fileIndex] as HTMLElement;
       if (this.uploaderErrorMessageElement) {
         this.uploaderErrorMessageElement.innerText = file.size > this.maxFileSize
-          ? 'The file exceeds the limitation, max allowed 10 MB.'
+          ? 'The file exceeds the limitation, max allowed 5 MB.'
           : 'The file should be in pdf, doc, docx, xls, xlsx, jpg, jpeg, png format.';
       }
     });

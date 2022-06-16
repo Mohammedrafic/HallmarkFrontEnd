@@ -356,3 +356,8 @@ export class GetSkillDataSources {
   static readonly type = '[organizationManagement] Get Skill Data Sources';
   constructor() { }
 }
+
+export class GetAllOrganizationSkills {
+  static readonly type = '[organizationManagement] Get All Organization Skills';
+  constructor() { }
+}

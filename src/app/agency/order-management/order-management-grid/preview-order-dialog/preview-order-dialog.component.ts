@@ -1,4 +1,14 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { Observable, Subject, takeWhile } from 'rxjs';
 import { Select } from '@ngxs/store';
 
@@ -78,10 +88,6 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
         this.firstActive = true;
       }
     });
-
-    if (this.openCandidateTab) {
-      this.tab.select(1);
-    }
   }
 
   public onClose(): void {
@@ -102,6 +108,8 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   private onOpenEvent(): void {
     this.openEvent.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (isOpen) {
+        this.tab.select(1);
+
         windowScrollTop();
         this.sideDialog.show();
         disabledBodyOverflow(true);
@@ -112,3 +120,4 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
     });
   }
 }
+

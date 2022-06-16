@@ -20,12 +20,17 @@ ejs-datetimepicker.e-datetimepicker {
 
 body.light, body.dark {
   .bootstrap {
-    ejs-datetimepicker.e-datetimepicker {
+    ejs-datetimepicker.e-datetimepicker,
+    ejs-daterangepicker.e-daterangepicker {
       .e-input-group-icon.e-icons {
         &.e-time-icon {
           margin-left: 0;
         }
-    
+
+        &.e-range-icon {
+          border: none !important;
+        }
+
         &.e-date-icon {
           margin-right: -5px;
           border: none !important;
@@ -40,10 +45,11 @@ body.light, body.dark {
   }
 }
 
-ejs-datepicker.datepicker, ejs-timepicker.e-timepicker, ejs-datetimepicker.e-datetimepicker {
+ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.e-timepicker, ejs-datetimepicker.e-datetimepicker {
   .e-input-group.e-control-wrapper.e-date-wrapper,
   .e-input-group.e-control-wrapper.e-time-wrapper,
-  .e-input-group.e-control-wrapper.e-datetime-wrapper {
+  .e-input-group.e-control-wrapper.e-datetime-wrapper,
+  .e-input-group.e-control-wrapper.e-date-range-wrapper {
     border-radius: 8px !important;
     border: 1px solid $secondary-dark-blue-40 !important;
     height: 40px;
@@ -52,6 +58,12 @@ ejs-datepicker.datepicker, ejs-timepicker.e-timepicker, ejs-datetimepicker.e-dat
     .e-input {
       color: $secondary-dark-blue-30 !important; // TODO: does not work
       padding-left: 16px !important;
+    }
+
+    .e-input[readonly],
+    .e-input[readonly] ~ span.e-input-group-icon {
+      background-color: $secondary-dark-blue-50;
+      color: $secondary-dark-blue-30;
     }
 
     .e-input-group-icon:last-child {
@@ -66,6 +78,8 @@ ejs-datepicker.datepicker, ejs-timepicker.e-timepicker, ejs-datetimepicker.e-dat
     &:hover {
       border: 1px solid $primary-active-blue-10 !important;
 
+      .e-input-group-icon.e-range-icon.e-icons::before,
+      .e-input-group-icon.e-range-icon.e-icons::after,
       .e-input-group-icon.e-date-icon.e-icons::before,
       .e-input-group-icon.e-date-icon.e-icons::after{
         background-color: transparent;
@@ -77,12 +91,19 @@ ejs-datepicker.datepicker, ejs-timepicker.e-timepicker, ejs-datetimepicker.e-dat
       border: 2px solid $primary-active-blue-10 !important;
       box-shadow: none !important;
 
+      .e-input-group-icon.e-range-icon.e-icons::before,
+      .e-input-group-icon.e-range-icon.e-icons::after,
       .e-input-group-icon.e-date-icon.e-icons::before,
       .e-input-group-icon.e-date-icon.e-icons::after{
         background-color: transparent;
         color: $primary-active-blue-10;
       }
     }
+  }
+
+  .e-input-group:not(.e-disabled) .e-input-group-icon:hover,
+  .e-input-group.e-control-wrapper:not(.e-disabled) .e-input-group-icon:hover {
+    background: transparent !important;
   }
 
   .e-input-group:not(.e-float-icon-left):not(.e-float-input)::after,

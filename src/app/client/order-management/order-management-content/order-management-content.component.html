@@ -25,6 +25,7 @@
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
     [allowTextWrap]="allowWrap"
+    [enableVirtualization]="true"
     [selectionSettings]="selectionOptions"
     [textWrapSettings]="wrapSettings"
     (rowSelected)="onRowClick($event)"
@@ -51,7 +52,7 @@
       </e-column>
       <e-column field="jobTitle" headerText="JOB TITLE" width="200"></e-column>
       <e-column field="skillName" headerText="SKILL" textAlign="Left" width="200"></e-column>
-      <e-column field="openPositions" headerText="# OF POSITION" width="180">
+      <e-column field="openPositions" headerText="# OF POSITIONS" width="180">
         <ng-template #template let-data>
           <div class="align-right">{{ data.openPositions }}</div>
         </ng-template>

@@ -1,22 +1,38 @@
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { MessageTypes } from "@shared/enums/message-types";
+import { OrderApplicantsInitialData } from "@shared/models/order-applicants.model";
 
 import {
   AgencyOrderManagement,
   AgencyOrderManagementPage,
+  OrderCandidateJob,
   OrderCandidatesListPage
 } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
+import { OrderApplicantsService } from "@shared/services/order-applicants.service";
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
-import { Observable, tap } from 'rxjs';
-import { GetAgencyOrderCandidatesList, GetAgencyOrderGeneralInformation, GetAgencyOrdersPage, GetOrderById } from './order-management.actions';
+import { catchError, Observable, of, tap } from 'rxjs';
+import { ShowToast } from "src/app/store/app.actions";
+import {
+  ApplyOrderApplicants,
+  GetAgencyOrderCandidatesList,
+  GetAgencyOrderGeneralInformation,
+  GetAgencyOrdersPage,
+  GetCandidateJob,
+  GetOrderApplicantsData,
+  GetOrderById,
+  UpdateAgencyCandidateJob
+} from './order-management.actions';
 
 export interface OrderManagementModel {
   ordersPage: AgencyOrderManagementPage | null;
   orderCandidatesListPage: OrderCandidatesListPage | null;
   orderCandidatesInformation: Order | null;
+  candidatesJob: OrderCandidateJob | null;
+  orderApplicantsInitialData: OrderApplicantsInitialData | null;
   selectedOrder: Order | null;
   orderDialogOptions: DialogNextPreviousOption;
 }
@@ -27,7 +43,9 @@ export interface OrderManagementModel {
     ordersPage: null,
     orderCandidatesListPage: null,
     orderCandidatesInformation: null,
+    orderApplicantsInitialData: null,
     selectedOrder: null,
+    candidatesJob: null,
     orderDialogOptions: {
       next: false,
       previous: false
@@ -62,6 +80,11 @@ export class OrderManagementState {
   }
 
   @Selector()
+  static orderApplicantsInitialData(state: OrderManagementModel): OrderApplicantsInitialData | null {
+    return state.orderApplicantsInitialData;
+  }
+
+  @Selector()
   static orderDialogOptions(state: OrderManagementModel): DialogNextPreviousOption {
     return state.orderDialogOptions;
   }
@@ -71,14 +94,20 @@ export class OrderManagementState {
     return (id: number) => {
       let rowIndex;
       const order = state.ordersPage?.items.find(({ orderId }, index) => {
-        rowIndex = index; 
+        rowIndex = index;
         return orderId === id;
       });
       return order && rowIndex ? [order, rowIndex] : [];
     };
   }
 
-  constructor(private orderManagementContentService: OrderManagementContentService) {}
+  @Selector()
+  static candidatesJob(state: OrderManagementModel): OrderCandidateJob | null {
+    return state.candidatesJob;
+  }
+
+  constructor(private orderManagementContentService: OrderManagementContentService,
+              private orderApplicantsService: OrderApplicantsService) {}
 
   @Action(GetAgencyOrdersPage)
   GetAgencyOrdersPage(
@@ -132,6 +161,51 @@ export class OrderManagementState {
         patchState({ selectedOrder: payload});
         return payload;
       })
+    );
+  }
+
+  @Action(GetOrderApplicantsData)
+  GetOrderApplicantsData(
+    { patchState }: StateContext<OrderManagementModel>,
+    { orderId, organizationId, candidateId }: GetOrderApplicantsData
+  ): Observable<OrderApplicantsInitialData> {
+    return this.orderApplicantsService.getOrderApplicantsData(orderId, organizationId, candidateId).pipe(
+      tap((payload) => {
+        patchState({orderApplicantsInitialData: payload});
+        return payload
+      })
+    );
+  }
+
+  @Action(ApplyOrderApplicants)
+  ApplyOrderApplicants({ dispatch }: StateContext<OrderManagementModel>, { payload }: ApplyOrderApplicants): Observable<any> {
+    return this.orderApplicantsService.applyOrderApplicants(payload).pipe(
+      tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'))),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
+    );
+  }
+
+  @Action(GetCandidateJob)
+  GetCandidateJob(
+    { patchState }: StateContext<OrderManagementModel>,
+    { organizationId, jobId }: GetCandidateJob
+  ): Observable<OrderCandidateJob> {
+      return this.orderManagementContentService.getCandidateJob(organizationId, jobId).pipe(
+        tap((payload) => {
+          patchState({candidatesJob: payload});
+          return payload;
+        })
+      );
+  }
+
+  @Action(UpdateAgencyCandidateJob)
+  UpdateAgencyCandidateJob(
+    { dispatch }: StateContext<OrderManagementModel>,
+    { payload }: UpdateAgencyCandidateJob
+  ): Observable<any> {
+     return this.orderManagementContentService.updateCandidateJob(payload).pipe(
+       tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'))),
+       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
     );
   }
 }

@@ -5,6 +5,7 @@ export const USAMapCandidatesDataLayerSettings: LayerSettingsModel = {
     autofill: false,
     colorValuePath: 'candidates',
     border: { color: '#9198ac', width: 0.5 },
+    fill: '#ecf2ff'
   },
   tooltipSettings: {
     visible: true,

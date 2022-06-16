@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { catchError, Observable, tap } from 'rxjs';
 import { Action, createSelector, Selector, State, StateContext } from '@ngxs/store';
 
-import { Organisation, UserVisibilitySettingsPage } from "@shared/models/visibility-settings.model";;
+import { Organisation, UserVisibilitySettingsPage } from '@shared/models/visibility-settings.model';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { BusinessUnitService } from '@shared/services/business-unit.service';
 
@@ -25,7 +25,8 @@ import {
   SaveUserVisibilitySettingsSucceeded,
   RemoveUserVisibilitySetting,
   RemoveUserVisibilitySettingSucceeded,
-  GetOrganizationsStructureAll
+  GetOrganizationsStructureAll,
+  GetNewRoleBusinessByUnitTypeSucceeded,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -35,8 +36,9 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants/messages';
 import { HttpErrorResponse } from '@angular/common/http';
-import { UsersService } from "../services/users.service";
-import { RolesPerUser, User, UsersPage } from "@shared/models/user-managment-page.model";
+import { UsersService } from '../services/users.service';
+import { RolesPerUser, User, UsersPage } from '@shared/models/user-managment-page.model';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 const BUSINNESS_DATA_DEFAULT_VALUE = { id: 0, name: 'All' };
 const BUSINNESS_DATA_HALLMARK_VALUE = { id: 0, name: 'Hallmark' };
@@ -140,22 +142,27 @@ export class SecurityState {
   }
 
   @Selector()
-  static newRoleBussinesData(state: SecurityStateModel): BusinessUnit[] {
-    return [BUSINNESS_DATA_DEFAULT_VALUE, ...state.newRoleBussinesData] as BusinessUnit[];
+  static newRoleBussinesData(state: SecurityStateModel): (type: BusinessUnitType) => BusinessUnit[] {
+    return (type: BusinessUnitType) =>
+      type === BusinessUnitType.Hallmark
+        ? ([BUSINNESS_DATA_DEFAULT_VALUE, ...state.newRoleBussinesData] as BusinessUnit[])
+        : (state.newRoleBussinesData as BusinessUnit[]);
   }
 
   @Selector()
-  static newBusinessDataPerUser (state: SecurityStateModel): (type: number) => BusinessUnit[] {
-    return (type: number) => type === 1 ?
-      [BUSINNESS_DATA_HALLMARK_VALUE, ...state.newRoleBussinesData] as BusinessUnit[]:
-      state.newRoleBussinesData;
+  static newBusinessDataPerUser(state: SecurityStateModel): (type: number) => BusinessUnit[] {
+    return (type: number) =>
+      type === 1
+        ? ([BUSINNESS_DATA_HALLMARK_VALUE, ...state.newRoleBussinesData] as BusinessUnit[])
+        : state.newRoleBussinesData;
   }
 
   @Selector()
-  static businessUserData (state: SecurityStateModel): (type: number) => BusinessUnit[] {
-    return (type: number) => type === 1 ?
-      [BUSINNESS_DATA_HALLMARK_VALUE, ...state.newRoleBussinesData] as BusinessUnit[]:
-      [BUSINNESS_DATA_DEFAULT_VALUE, ...state.newRoleBussinesData] as BusinessUnit[];
+  static businessUserData(state: SecurityStateModel): (type: number) => BusinessUnit[] {
+    return (type: number) =>
+      type === 1
+        ? ([BUSINNESS_DATA_HALLMARK_VALUE, ...state.newRoleBussinesData] as BusinessUnit[])
+        : ([BUSINNESS_DATA_DEFAULT_VALUE, ...state.newRoleBussinesData] as BusinessUnit[]);
   }
 
   constructor(
@@ -165,7 +172,10 @@ export class SecurityState {
   ) {}
 
   @Action(GetBusinessByUnitType)
-  GetBusinessByUnitType({ patchState }: StateContext<SecurityStateModel>, { type }: GetBusinessByUnitType): Observable<BusinessUnit[]> {
+  GetBusinessByUnitType(
+    { patchState }: StateContext<SecurityStateModel>,
+    { type }: GetBusinessByUnitType
+  ): Observable<BusinessUnit[]> {
     return this.businessUnitService.getBusinessByUnitType(type).pipe(
       tap((payload) => {
         patchState({ newRoleBussinesData: payload });
@@ -177,7 +187,7 @@ export class SecurityState {
 
   @Action(GetNewRoleBusinessByUnitType)
   GetNewRoleBusinessByUnitType(
-    { patchState }: StateContext<SecurityStateModel>,
+    { patchState, dispatch }: StateContext<SecurityStateModel>,
     { type }: GetNewRoleBusinessByUnitType
   ): Observable<BusinessUnit[]> {
     patchState({ isNewRoleDataLoading: true });
@@ -185,6 +195,7 @@ export class SecurityState {
       tap((payload) => {
         patchState({ isNewRoleDataLoading: false });
         patchState({ newRoleBussinesData: payload });
+        dispatch(new GetNewRoleBusinessByUnitTypeSucceeded(type));
         return payload;
       })
     );
@@ -207,7 +218,7 @@ export class SecurityState {
   GetRolesPerPage(
     { patchState }: StateContext<SecurityStateModel>,
     { businessUnitId, businessUnitType }: GetRolePerUser
-  ): Observable<RolesPerUser[]>{
+  ): Observable<RolesPerUser[]> {
     return this.userService.getRolesPerUser(businessUnitId, businessUnitType).pipe(
       tap((payload) => {
         patchState({ rolesPerUsers: payload });
@@ -223,14 +234,17 @@ export class SecurityState {
   ): Observable<UsersPage> {
     return this.userService.getUsersPage(businessUnitType, businessUnitId, pageNumber, pageSize).pipe(
       tap((payload) => {
-        patchState({usersPage : payload });
+        patchState({ usersPage: payload });
         return payload;
       })
     );
   }
 
   @Action(GetPermissionsTree)
-  GetPermissionsTree({ patchState }: StateContext<SecurityStateModel>, { type }: GetPermissionsTree): Observable<PermissionsTree> {
+  GetPermissionsTree(
+    { patchState }: StateContext<SecurityStateModel>,
+    { type }: GetPermissionsTree
+  ): Observable<PermissionsTree> {
     patchState({ isNewRoleDataLoading: true });
     return this.roleService.getPermissionsTree(type).pipe(
       tap((payload) => {
@@ -242,13 +256,19 @@ export class SecurityState {
   }
 
   @Action(SaveRole)
-  SaveRole({ patchState, getState, dispatch }: StateContext<SecurityStateModel>, { role }: SaveRole): Observable<Role | void> {
+  SaveRole(
+    { patchState, getState, dispatch }: StateContext<SecurityStateModel>,
+    { role }: SaveRole
+  ): Observable<Role | void> {
     const state = getState();
     return this.roleService.seveRoles(role).pipe(
       tap((payload) => {
         if (state.rolesPage && role.id) {
           const editedRole = state.rolesPage.items.find(({ id }) => id === role.id) as Role;
-          const items = [...state.rolesPage.items.filter(({ id }) => id !== editedRole.id), { ...editedRole, ...payload }];
+          const items = [
+            ...state.rolesPage.items.filter(({ id }) => id !== editedRole.id),
+            { ...editedRole, ...payload },
+          ];
           const rolesPage = { ...state.rolesPage, items };
           patchState({ rolesPage });
           dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
@@ -266,18 +286,24 @@ export class SecurityState {
   }
 
   @Action(SaveUser)
-  SaveUser({ patchState, getState, dispatch }: StateContext<SecurityStateModel>, { user }: SaveUser): Observable<User | void> {
+  SaveUser(
+    { patchState, getState, dispatch }: StateContext<SecurityStateModel>,
+    { user }: SaveUser
+  ): Observable<User | void> {
     const state = getState();
     return this.userService.saveUser(user).pipe(
       tap((payload) => {
-        if(state.usersPage && user.metadata.id) {
+        if (state.usersPage && user.metadata.id) {
           const editedUser = state.usersPage.items.find(({ id }) => id === user.metadata.id) as User;
-          const items = [{ ...editedUser, ...payload },...state.usersPage.items.filter(({ id }) => id !== editedUser.id)];
+          const items = [
+            { ...editedUser, ...payload },
+            ...state.usersPage.items.filter(({ id }) => id !== editedUser.id),
+          ];
           const usersPage = { ...state.usersPage, items };
           patchState({ usersPage });
           dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-        } else if(state.usersPage) {
-          const items = [payload,...state.usersPage?.items];
+        } else if (state.usersPage) {
+          const items = [payload, ...state.usersPage?.items];
           const usersPage = { ...state.usersPage, items } as UsersPage;
           patchState({ usersPage });
           dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
@@ -307,28 +333,33 @@ export class SecurityState {
   GetRolesForCopy({ patchState }: StateContext<SecurityStateModel>, { id, type }: GetRolesForCopy): Observable<Role[]> {
     return this.roleService.getRolesForCopy(type, id).pipe(
       tap((payload) => {
-        patchState({ copyRoleData: payload })
+        patchState({ copyRoleData: payload });
       })
     );
   }
 
   @Action(GetUserVisibilitySettingsPage)
-  GetUserVisibilitySettingsPage({ patchState, dispatch }: StateContext<SecurityStateModel>, { userId }: GetUserVisibilitySettingsPage): Observable<UserVisibilitySettingsPage | void> {
-    return this.userService.getUserVisibilitySettingsPage(userId)
-      .pipe(
-        tap((payload) => {
-          patchState({ userVisibilitySettingsPage: payload });
-          return payload;
-        }),
-        catchError((error: HttpErrorResponse) => {
-          patchState({ userVisibilitySettingsPage: null });
-          return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
-        })
-      );
+  GetUserVisibilitySettingsPage(
+    { patchState, dispatch }: StateContext<SecurityStateModel>,
+    { userId }: GetUserVisibilitySettingsPage
+  ): Observable<UserVisibilitySettingsPage | void> {
+    return this.userService.getUserVisibilitySettingsPage(userId).pipe(
+      tap((payload) => {
+        patchState({ userVisibilitySettingsPage: payload });
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        patchState({ userVisibilitySettingsPage: null });
+        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail));
+      })
+    );
   }
 
   @Action(SaveUserVisibilitySettings)
-  SaveUserVisibilitySettings({ dispatch }: StateContext<SecurityStateModel>, { payload }: SaveUserVisibilitySettings): Observable<UserVisibilitySettingsPage> {
+  SaveUserVisibilitySettings(
+    { dispatch }: StateContext<SecurityStateModel>,
+    { payload }: SaveUserVisibilitySettings
+  ): Observable<UserVisibilitySettingsPage> {
     return this.userService.saveUserVisibilitySettings(payload).pipe(
       tap((payload) => {
         dispatch(new SaveUserVisibilitySettingsSucceeded());
@@ -339,7 +370,10 @@ export class SecurityState {
   }
 
   @Action(RemoveUserVisibilitySetting)
-  RemoveUserVisibilitySetting({ dispatch }: StateContext<SecurityStateModel>, { id, userId }: RemoveUserVisibilitySetting): Observable<void> {
+  RemoveUserVisibilitySetting(
+    { dispatch }: StateContext<SecurityStateModel>,
+    { id, userId }: RemoveUserVisibilitySetting
+  ): Observable<void> {
     return this.userService.removeUserVisibilitySettings(id, userId).pipe(
       tap(() => dispatch(new RemoveUserVisibilitySettingSucceeded())),
       catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
@@ -347,10 +381,16 @@ export class SecurityState {
   }
 
   @Action(GetOrganizationsStructureAll)
-  GetOrganizationsStructureAll({ patchState }: StateContext<SecurityStateModel>, { userId }: GetOrganizationsStructureAll): Observable<Organisation[]> {
-    return this.userService.getUserVisibilitySettingsOrganisation(userId).pipe(tap((payload) => {
-      patchState({ organizations: payload });
-      return payload;
-    }));
+  GetOrganizationsStructureAll(
+    { patchState }: StateContext<SecurityStateModel>,
+    { userId }: GetOrganizationsStructureAll
+  ): Observable<Organisation[]> {
+    return this.userService.getUserVisibilitySettingsOrganisation(userId).pipe(
+      tap((payload) => {
+        patchState({ organizations: payload });
+        return payload;
+      })
+    );
   }
 }
+

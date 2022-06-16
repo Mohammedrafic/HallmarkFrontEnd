@@ -12,7 +12,9 @@
     [allowSorting]="false"
     [allowResizing]="true"
     [allowSelection]="false"
+    [rowHeight]="rowHeight"
     [resizeSettings]="resizeSettings"
+    [enableVirtualization]="true"
     [allowPaging]="allowPaging"
     [pageSettings]="pageSettings"
     [height]="300"
@@ -113,3 +115,48 @@
     </ng-template>
   </ejs-grid>
 </section>
+
+<ejs-dialog
+  id="dialog"
+  #sideDialog
+  cssClass="dialog"
+  width="45%"
+  [target]="targetElement"
+  [visible]="false"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-container *ngTemplateOutlet="templateState | async"></ng-container>
+
+  <ng-template #onboarded>
+    <app-onboarded-candidate
+      (closeModalEvent)="onCloseDialog()"
+      [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
+      [candidate]="candidate"
+    ></app-onboarded-candidate>
+  </ng-template>
+
+  <ng-template #accept>
+    <app-accept-candidate
+      (closeModalEvent)="onCloseDialog()"
+      [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
+      [candidate]="candidate"
+    ></app-accept-candidate>
+  </ng-template>
+
+  <ng-template #apply>
+    <app-apply-candidate (closeDialogEmitter)="onCloseDialog()"
+                         [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
+                         [candidate]="candidate">
+    </app-apply-candidate>
+  </ng-template>
+
+  <ng-template #offerDeployment>
+    <app-offer-deployment (closeDialogEmitter)="onCloseDialog()"
+                         [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
+                         [candidate]="candidate">
+    </app-offer-deployment>
+  </ng-template>
+  <ng-template #footerTemplate>
+    <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>
+  </ng-template>
+</ejs-dialog>

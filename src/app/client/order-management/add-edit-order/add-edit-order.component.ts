@@ -4,16 +4,23 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
-import { map, Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil, switchMap, of } from 'rxjs';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { SetImportFileDialogState } from '@admin/store/admin.actions';
-import { SaveOrder, EditOrder, GetSelectedOrderById } from '@client/store/order-managment-content.actions';
+import {
+  SaveOrder,
+  EditOrder,
+  GetSelectedOrderById,
+  SaveOrderSucceeded,
+  ClearPredefinedBillRates,
+  GetPredefinedBillRates
+} from '@client/store/order-managment-content.actions';
 
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
-import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-management.model';
+import { CreateOrderDto, EditOrderDto, GetPredefinedBillRatesData, Order } from '@shared/models/order-management.model';
 import { BillRatesComponent } from '@bill-rates/bill-rates.component';
 import { BillRate, OrderBillRateDto } from '@shared/models/bill-rate.model';
 import { IOrderCredentialItem } from '@order-credentials/types';
@@ -42,6 +49,12 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order>;
 
+  @Select(OrderManagementContentState.getPredefinedBillRatesData)
+  getPredefinedBillRatesData$: Observable<GetPredefinedBillRatesData | null>;
+
+  @Select(OrderManagementContentState.predefinedBillRates)
+  predefinedBillRates$: Observable<BillRate[]>;
+
   public SelectedTab = SelectedTab;
   public orderId: number;
 
@@ -57,7 +70,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store, private router: Router, private route: ActivatedRoute) {
+  constructor(private store: Store, private router: Router, private route: ActivatedRoute, private actions$: Actions) {
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
 
     this.orderId = Number(this.route.snapshot.paramMap.get('orderId'));
@@ -83,11 +96,30 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         }
       });
     }
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe(() => {
+      this.router.navigate(['/client/order-management']);
+    });
+
+    this.getPredefinedBillRatesData$.pipe(
+      takeUntil(this.unsubscribe$),
+      switchMap(getPredefinedBillRatesData => {
+        if (getPredefinedBillRatesData && !this.billRatesComponent.billRatesControl.value.length) {
+          return this.store.dispatch(new GetPredefinedBillRates());
+        } else {
+          return of(null);
+        }
+      })
+    ).subscribe();
+
+    this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe(predefinedBillRates => {
+      this.orderBillRates = predefinedBillRates;
+    });
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.store.dispatch(new ClearPredefinedBillRates());
   }
 
   public navigateBack(): void {
@@ -149,7 +181,11 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       const documents = this.orderDetailsFormComponent.documents;
 
       if (this.orderId) {
-        this.store.dispatch(new EditOrder({...order, id: this.orderId }));
+        this.store.dispatch(new EditOrder({
+          ...order,
+          id: this.orderId,
+          deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids
+        }, documents));
       } else {
         this.store.dispatch(new SaveOrder(order, documents));
       }
@@ -266,6 +302,26 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       order.projectName = projectName;
     }
 
+    if (!order.hourlyRate) {
+      order.hourlyRate = null;
+    }
+
+    if (!order.openPositions) {
+      order.openPositions = null;
+    }
+
+    if (!order.minYrsRequired) {
+      order.minYrsRequired = null;
+    }
+
+    if (!order.joiningBonus) {
+      order.minYrsRequired = null;
+    }
+
+    if (!order.compBonus) {
+      order.minYrsRequired = null;
+    }
+
     return order;
   }
 
@@ -292,7 +348,11 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
 
     if (this.orderId) {
-      this.store.dispatch(new EditOrder({...order, id: this.orderId }));
+      this.store.dispatch(new EditOrder({
+        ...order,
+        id: this.orderId,
+        deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids
+      }, documents));
     } else {
       this.store.dispatch(new SaveOrder(order, documents));
     }

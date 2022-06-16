@@ -75,7 +75,7 @@ import {
   ExportLocations,
   ExportDepartments,
   ExportSkills,
-  GetMasterSkillsByOrganization
+  GetMasterSkillsByOrganization, GetAllOrganizationSkills
 } from './organization-management.actions';
 import { Department } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
@@ -144,6 +144,7 @@ export interface OrganizationManagementStateModel {
   isOrganizationSettingsLoading: boolean;
   organizationSettings: OrganizationSettingsGet[];
   skillDataSource: SkillDataSource;
+  allOrganizationSkills: SkillsPage | null;
 }
 
 @State<OrganizationManagementStateModel>({
@@ -185,7 +186,8 @@ export interface OrganizationManagementStateModel {
     isCredentialSetupLoading: false,
     isOrganizationSettingsLoading: false,
     organizationSettings: [],
-    skillDataSource: { skillABBRs: [], skillDescriptions: [], glNumbers: [] }
+    skillDataSource: { skillABBRs: [], skillDescriptions: [], glNumbers: [] },
+    allOrganizationSkills: null
   },
 })
 @Injectable()
@@ -264,6 +266,9 @@ export class OrganizationManagementState {
 
   @Selector()
   static skillDataSource(state: OrganizationManagementStateModel): SkillDataSource { return state.skillDataSource; }
+
+  @Selector()
+  static allOrganizationSkills(state: OrganizationManagementStateModel): SkillsPage | null { return state.allOrganizationSkills; }
 
   constructor(
     private organizationService: OrganizationService,
@@ -793,6 +798,14 @@ export class OrganizationManagementState {
     return this.skillsService.getSkillsDataSources().pipe(tap(dataSource => {
       patchState({ skillDataSource: dataSource });
       return dataSource;
+    }));
+  };
+
+  @Action(GetAllOrganizationSkills)
+  GetAllOrganizationSkills({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetAllOrganizationSkills): Observable<SkillsPage> {
+    return this.skillsService.getAllOrganizationSkills().pipe(tap(skills => {
+      patchState({ allOrganizationSkills: skills });
+      return skills;
     }));
   };
 }

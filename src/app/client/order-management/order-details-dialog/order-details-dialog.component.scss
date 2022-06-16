@@ -18,6 +18,18 @@
 .order-statuses {
   display: flex;
   align-items: center;
+
+  ejs-chiplist {
+    .e-chip {
+      &:hover {
+        cursor: default;
+      }
+    }
+  }
+}
+
+.e-btn.e-primary.delete-button {
+  background-color: $supportive-red;
 }
 
 .dialog-controls {

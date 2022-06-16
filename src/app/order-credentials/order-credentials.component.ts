@@ -22,6 +22,7 @@ export class OrderCredentialsComponent implements OnInit {
   public isEditMode: boolean;
   public CredentialForm: FormGroup;
   public formSubmitted = false;
+  public showForm = false;
 
   constructor(private store: Store, private fb: FormBuilder) {
     this.CredentialForm = this.fb.group({
@@ -44,6 +45,7 @@ export class OrderCredentialsComponent implements OnInit {
   public addNew(): void {
     this.credentialFormHeader = 'Add Credential';
     this.isEditMode = false;
+    this.showForm = true;
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -70,12 +72,14 @@ export class OrderCredentialsComponent implements OnInit {
     });
     this.CredentialForm.get('credentialType')?.disable();
     this.CredentialForm.get('credentialName')?.disable();
+    this.showForm = true;
     this.store.dispatch(new ShowSideDialog(true));
   }
 
   public onDialogCancel(): void {
     this.CredentialForm.reset();
     this.addCred && this.addCred.clearGridSelection();
+    this.showForm = false;
     this.store.dispatch(new ShowSideDialog(false));
     this.formSubmitted = false;
   }
@@ -90,8 +94,13 @@ export class OrderCredentialsComponent implements OnInit {
       }
       this.resetToDefault();
       this.formSubmitted = false;
+      this.showForm = false;
       this.store.dispatch(new ShowSideDialog(false));
     }
+  }
+
+  public onUpdate(data: IOrderCredentialItem): void {
+    this.editExistedCred(data);
   }
 
   public onDelete(credentialId: number): void {
@@ -99,16 +108,19 @@ export class OrderCredentialsComponent implements OnInit {
     if (credToDelete) {
       const index = this.credentials.indexOf(credToDelete);
       this.credentials.splice(index, 1);
-      this.credentialsGroups = [];
+      this.credentialsGroups.forEach(element => {
+        element.items = [];
+      });
       this.credentials.forEach(cred => {
         this.updateGroups(cred);
       });
+      this.credentialsGroups = this.credentialsGroups.filter(element => element.items.length);
       this.credentialDeleted.emit(Object.assign({}, {...credToDelete}));
     }
   }
 
-  private editExistedCred(): void {
-    const cred = this.CredentialForm.getRawValue() as IOrderCredentialItem;
+  private editExistedCred(data?: IOrderCredentialItem): void {
+    const cred = data || this.CredentialForm.getRawValue() as IOrderCredentialItem;
     this.updateExistedCredInGrid(cred);
     this.credentialChanged.emit(Object.assign({}, { ...cred }));
     this.isEditMode = false;
@@ -134,7 +146,7 @@ export class OrderCredentialsComponent implements OnInit {
   }
 
   private addNewCred(): void {
-    const { value } = this.CredentialForm;
+    const value = this.CredentialForm.getRawValue();
     this.updateGroups(value);
     this.credentialChanged.emit(Object.assign({}, {...value}, { id: 0, orderId: 0 }));
     this.updateCredList(value);

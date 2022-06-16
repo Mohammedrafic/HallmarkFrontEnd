@@ -127,6 +127,7 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
   }
 
   public saveEducation(): void {
+    this.educationForm.markAllAsTouched();
     if (this.educationForm.valid) {
       this.store.dispatch(new SaveEducation(this.educationForm.getRawValue()));
     } else {
@@ -138,17 +139,16 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
     this.educationForm = this.fb.group({
       id: new FormControl(null),
       candidateProfileId: new FormControl(null),
-      fieldOfStudy: new FormControl(null, [ Validators.maxLength(50) ]),
-      schoolName: new FormControl(null, [ Validators.maxLength(50) ]),
-      degree: new FormControl(null),
-      graduationDate: new FormControl(null)
+      fieldOfStudy: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
+      schoolName: new FormControl(null, [Validators.required, Validators.maxLength(50)]),
+      degree: new FormControl(null, [Validators.required]),
+      graduationDate: new FormControl(null, [Validators.required])
     });
   }
 
   private closeSideDialog(): void {
     this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
       this.educationForm.reset();
-      this.grid.clearRowSelection();
     });
   }
 }

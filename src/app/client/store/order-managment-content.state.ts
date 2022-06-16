@@ -1,9 +1,38 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, tap } from 'rxjs';
-import { EditOrder, GetAgencyOrderCandidatesList, GetAssociateAgencies, GetIncompleteOrders, GetMasterShifts, GetOrderById, GetOrders, GetOrganizationStatesWithKeyCode, GetProjectNames, GetProjectTypes, GetSelectedOrderById, GetWorkflows, SaveOrder } from '@client/store/order-managment-content.actions';
+import { catchError, Observable, of, tap } from 'rxjs';
+import {
+  ClearPredefinedBillRates,
+  DeleteOrder,
+  DeleteOrderSucceeded,
+  EditOrder,
+  GetAgencyOrderCandidatesList,
+  GetAssociateAgencies,
+  GetAvailableSteps,
+  GetIncompleteOrders,
+  GetMasterShifts,
+  GetOrderById,
+  GetOrders,
+  GetOrganisationCandidateJob,
+  GetOrganizationStatesWithKeyCode,
+  GetPredefinedBillRates,
+  GetProjectNames,
+  GetProjectTypes,
+  GetSelectedOrderById,
+  GetWorkflows,
+  SaveOrder,
+  SaveOrderSucceeded,
+  SetPredefinedBillRatesData,
+  UpdateOrganisationCandidateJob
+} from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
-import { OrderCandidatesListPage, OrderManagementPage } from '@shared/models/order-management.model';
+import {
+  ApplicantStatus,
+  GetPredefinedBillRatesData,
+  OrderCandidateJob,
+  OrderCandidatesListPage,
+  OrderManagementPage
+} from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -17,21 +46,27 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
+import { BillRate } from '@shared/models/bill-rate.model';
+import { OrderManagementModel } from "@agency/store/order-management.state";
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
   selectedOrder: Order | null;
+  candidatesJob: OrderCandidateJob | null;
+  applicantStatuses: ApplicantStatus[];
   orderCandidatesListPage: OrderCandidatesListPage | null;
   orderDialogOptions: {
     next: boolean,
     previous: boolean
-  }
+  },
+  getPredefinedBillRatesData: GetPredefinedBillRatesData | null;
   organizationStatesWithKeyCode: OrganizationStateWithKeyCode[];
   workflows: WorkflowByDepartmentAndSkill[];
   projectTypes: ProjectType[];
   projectNames: ProjectName[];
   masterShifts: MasterShift[];
   associateAgencies: AssociateAgency[];
+  predefinedBillRates: BillRate[];
 }
 
 @State<OrderManagementContentStateModel>({
@@ -40,16 +75,20 @@ export interface OrderManagementContentStateModel {
     ordersPage: null,
     selectedOrder: null,
     orderCandidatesListPage: null,
+    candidatesJob: null,
+    applicantStatuses: [],
     orderDialogOptions: {
       next: false,
       previous: false
     },
+    getPredefinedBillRatesData: null,
     organizationStatesWithKeyCode: [],
     workflows: [],
     projectTypes: [],
     projectNames: [],
     masterShifts: [],
-    associateAgencies: []
+    associateAgencies: [],
+    predefinedBillRates: []
   }
 })
 @Injectable()
@@ -59,7 +98,7 @@ export class OrderManagementContentState {
 
   @Selector()
   static selectedOrder(state: OrderManagementContentStateModel): Order | null { return state.selectedOrder; }
-  
+
   @Selector()
   static orderDialogOptions(state: OrderManagementContentStateModel): DialogNextPreviousOption {
     return state.orderDialogOptions;
@@ -87,6 +126,22 @@ export class OrderManagementContentState {
 
   @Selector()
   static associateAgencies(state: OrderManagementContentStateModel): AssociateAgency[] { return state.associateAgencies }
+
+  @Selector()
+  static getPredefinedBillRatesData(state: OrderManagementContentStateModel): GetPredefinedBillRatesData | null { return state.getPredefinedBillRatesData }
+
+  @Selector()
+  static predefinedBillRates(state: OrderManagementContentStateModel): BillRate[] { return state.predefinedBillRates }
+
+  @Selector()
+  static candidatesJob(state: OrderManagementContentStateModel): OrderCandidateJob | null {
+    return state.candidatesJob;
+  }
+
+  @Selector()
+  static applicantStatuses(state: OrderManagementContentStateModel): ApplicantStatus[] {
+    return state.applicantStatuses;
+  }
 
   constructor(
     private orderManagementService: OrderManagementContentService,
@@ -154,6 +209,40 @@ export class OrderManagementContentState {
     }));
   }
 
+  @Action(GetOrganisationCandidateJob)
+  GetOrganisationCandidateJob(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { organizationId, jobId }: GetOrganisationCandidateJob
+  ): Observable<OrderCandidateJob> {
+    return this.orderManagementService.getCandidateJob(organizationId, jobId).pipe(
+      tap((payload) => {
+        patchState({candidatesJob: payload});
+        return payload;
+      })
+    );
+  }
+
+  @Action(GetAvailableSteps)
+  GetAvailableSteps(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { organizationId, jobId }: GetAvailableSteps
+  ): Observable<ApplicantStatus[]> {
+    return this.orderManagementService.getAvailableSteps(organizationId, jobId).pipe(
+      tap((payload) => {
+        patchState({applicantStatuses: payload});
+        return payload;
+      })
+    );
+  }
+
+  @Action(UpdateOrganisationCandidateJob)
+  UpdateOrganisationCandidateJob({ dispatch }: StateContext<OrderManagementModel>, { payload }: UpdateOrganisationCandidateJob): Observable<any> {
+    return this.orderManagementService.updateCandidateJob(payload).pipe(
+      tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'))),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
+    );
+  }
+
   @Action(GetWorkflows)
   GetWorkflows({ patchState }: StateContext<OrderManagementContentStateModel>, { departmentId, skillId }: GetWorkflows): Observable<WorkflowByDepartmentAndSkill[]> {
     return this.orderManagementService.getWorkflowsByDepartmentAndSkill(departmentId, skillId).pipe(tap((payload) => {
@@ -190,11 +279,44 @@ export class OrderManagementContentState {
     }));
   }
 
+  @Action(SetPredefinedBillRatesData)
+  SetPredefinedBillRatesData(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { orderType, departmentId, skillId }: SetPredefinedBillRatesData
+  ): void {
+    patchState({ getPredefinedBillRatesData: { orderType, departmentId, skillId } });
+  }
+
+  @Action(GetPredefinedBillRates)
+  GetPredefinedBillRates({ patchState, getState }: StateContext<OrderManagementContentStateModel>): Observable<BillRate[]> {
+    const state = getState();
+    const getPredefinedBillRatesData = state.getPredefinedBillRatesData;
+
+    if (getPredefinedBillRatesData) {
+      const { orderType, departmentId, skillId } = getPredefinedBillRatesData;
+      return this.orderManagementService.getPredefinedBillRates(orderType, departmentId, skillId).pipe(tap(payload => {
+        patchState({ predefinedBillRates: payload });
+        return payload;
+      }));
+    } else {
+      patchState({ predefinedBillRates: [] });
+      return of([]);
+    }
+  }
+
+  @Action(ClearPredefinedBillRates)
+  ClearPredefinedBillRates({ patchState }: StateContext<OrderManagementContentStateModel>): void {
+    patchState({
+      getPredefinedBillRatesData: null,
+      predefinedBillRates: []
+    });
+  }
+
   @Action(SaveOrder)
   SaveOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { order, documents }: SaveOrder): Observable<Order | void> {
     return this.orderManagementService.saveOrder(order, documents).pipe(
       tap(order => {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        dispatch([new ShowToast(MessageTypes.Success, RECORD_ADDED), new SaveOrderSucceeded()]);
         return order;
       }),
       catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
@@ -202,13 +324,21 @@ export class OrderManagementContentState {
   }
 
   @Action(EditOrder)
-  EditOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { order }: EditOrder): Observable<Order | void> {
-    return this.orderManagementService.editOrder(order).pipe(
+  EditOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { order, documents }: EditOrder): Observable<Order | void> {
+    return this.orderManagementService.editOrder(order, documents).pipe(
       tap(order => {
-        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        dispatch([new ShowToast(MessageTypes.Success, RECORD_MODIFIED), new SaveOrderSucceeded()]);
         return order;
       }),
       catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
     );
+  }
+
+  @Action(DeleteOrder)
+  DeleteOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { id }: DeleteOrder): Observable<any> {
+    return this.orderManagementService.deleteOrder(id).pipe(tap(() => {
+      dispatch(new DeleteOrderSucceeded());
+    }),
+    catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Order cannot be deleted')))));
   }
 }

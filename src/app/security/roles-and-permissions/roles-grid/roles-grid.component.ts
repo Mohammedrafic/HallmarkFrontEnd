@@ -44,6 +44,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     return businessUnitName || "All";
   };
   public selIndex: number[] = [];
+  public sortOptions = { columns: [{ field: 'businessUnitName', direction: 'Descending' }] };
 
   private isAlive = true;
 

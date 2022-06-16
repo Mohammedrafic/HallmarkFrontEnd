@@ -52,6 +52,7 @@
                       type="text"
                       appValidateWithMessage
                       formControlName="title"
+                      maxlength="50"
                       placeholder="Job Title" />
                   </div>
                 </div>
@@ -112,7 +113,10 @@
                       formControlName="skillId"
                       appValidateWithMessage
                       [dataSource]="(skills$ | async)"
-                      [fields]="skillFields">
+                      [fields]="skillFields"
+                      (change)="onSkillsDropDownChanged($event)"
+                      >
+                      
                     </ejs-dropdownlist>
                   </div>
                 </div>
@@ -209,7 +213,10 @@
                       formControlName="hourlyRate"
                       appValidateWithMessage
                       placeholder="Hourly rate"
-                      maxlength="10" />
+                      maxlength="11"
+                      (focus)="priceUtils.setPriceMask(generalInformationForm,'hourlyRate', $event)"
+                      (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'hourlyRate', $event)"
+                    />
                   </div>
                 </div>
 
@@ -251,8 +258,11 @@
                       placeholder="Joining Bonus"
                       formControlName="joiningBonus"
                       appValidateWithMessage
-                      maxlength="10" />
-                  </div>
+                      maxlength="11"
+                      (focus)="priceUtils.setPriceMask(generalInformationForm, 'joiningBonus', $event)"
+                      (blur)="priceUtils.setTwoDecimals(generalInformationForm,'joiningBonus', $event)"
+                    />
+                  </div>`
                 </div>
 
                 <!-- Comp. Bonus -->
@@ -265,7 +275,10 @@
                       placeholder="Comp. Bonus"
                       formControlName="compBonus"
                       appValidateWithMessage
-                      maxlength="10" />
+                      maxlength="11"
+                      (focus)="priceUtils.setPriceMask(generalInformationForm, 'compBonus', $event)"
+                      (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'compBonus', $event)"
+                    />
                   </div>
                 </div>
               </div>
@@ -295,8 +308,9 @@
                       placeholder="MM/DD/YYYY"
                       formControlName="jobStartDate"
                       appValidateWithMessage
-                      [min]="today"
-                      [max]="generalInformationForm.controls['jobEndDate'].value">
+                      [enableMask]="true"
+                      [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                      [min]="today">
                     </ejs-datepicker>
                   </div>
                 </div>
@@ -311,7 +325,11 @@
                       placeholder="MM/DD/YYYY"
                       formControlName="jobEndDate"
                       appValidateWithMessage
+                      [enableMask]="true"
+                      [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
                       [enabled]="isJobEndDateControlEnabled"
+                      [enableMask]="true"
+                      [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
                       [min]="generalInformationForm.controls['jobStartDate'].value">
                     </ejs-datepicker>
                   </div>
@@ -321,10 +339,10 @@
               <div class="form-line">
                 <!-- Shift Requirements -->
                 <div class="input-container bootstrap form-line-item-20">
-                  <label>Shift Requirements<span class="required">*</span></label>
+                  <label>Shift Requirement<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
-                      placeholder="Shift Requirements"
+                      placeholder="Shift Requirement"
                       formControlName="shiftRequirementId"
                       appValidateWithMessage
                       [dataSource]="masterShifts$ | async"
@@ -448,6 +466,7 @@
                       type="text"
                       [multiline]="true"
                       appValidateWithMessage
+                      maxlength="500"
                       placeholder="Job Description..."
                       formControlName="jobDescription">
                     </ejs-textbox>
@@ -463,6 +482,7 @@
                       type="text"
                       [multiline]="true"
                       appValidateWithMessage
+                      maxlength="500"
                       placeholder="Unit Description..."
                       formControlName="unitDescription">
                     </ejs-textbox>
@@ -473,10 +493,10 @@
               <div class="form-line">
                 <!-- Reason of Requisition -->
                 <div class="input-container bootstrap form-line-item-40">
-                  <label>Reason of Requisition<span class="required">*</span></label>
+                  <label>Reason for Requisition<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
-                      placeholder="Reason of Requisition"
+                      placeholder="Reason for Requisition"
                       formControlName="reasonForRequisition"
                       appValidateWithMessage
                       [dataSource]="reasonsForRequisition"
@@ -507,6 +527,7 @@
                       <div class="input-group dropdown">
                         <ejs-dropdownlist
                           [dataSource]="contactDetailTitles"
+                          appValidateWithMessage
                           formControlName="title"
                           placeholder="Title">
                         </ejs-dropdownlist>
@@ -545,6 +566,7 @@
                         class="e-input"
                         type="text"
                         appValidateWithMessage
+                        maxLength="50"
                         placeholder="Contact Person"
                         formControlName="name" />
                     </div>
@@ -615,6 +637,7 @@
                       class="e-input"
                       type="text"
                       appValidateWithMessage
+                      maxlength="100"
                       placeholder="Address"
                       formControlName="address" />
                   </div>
@@ -642,6 +665,7 @@
                       class="e-input"
                       type="text"
                       appValidateWithMessage
+                      maxlength="20"
                       placeholder="City"
                       formControlName="city" />
                   </div>
@@ -704,7 +728,9 @@
   <div class="right-section">
     <app-document-uploader
       uploaderTitle="Documents"
-      (selectDocuments)="onDocumentsSelected($event)">
+      [documents]="order?.documents"
+      (selectDocuments)="onDocumentsSelected($event)"
+      (deleteDocument)="onDocumentDeleted($event)">
     </app-document-uploader>
   </div>
 </section>

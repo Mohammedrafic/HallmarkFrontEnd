@@ -1,16 +1,21 @@
 import { Injectable } from '@angular/core';
 import { map, Observable, switchMap } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import {
   OrderManagementFilter,
   OrderManagementPage,
   AgencyOrderManagementPage,
-  OrderCandidatesListPage
+  OrderCandidatesListPage,
+  OrderCandidateJob,
+  AcceptJobDTO,
+  ApplicantStatus
 } from '@shared/models/order-management.model';
 import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-management.model';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
+import { OrderType } from '@shared/enums/order-type';
+import { BillRate } from '@shared/models/bill-rate.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -70,6 +75,32 @@ export class OrderManagementContentService {
   }
 
   /**
+   * Get candidate job
+   @param organizationId
+   @param jobId
+   */
+  public getCandidateJob(organizationId: number, jobId: number): Observable<OrderCandidateJob> {
+    return this.http.get<OrderCandidateJob>(`/api/AppliedCandidates/candidateJob?OrganizationId=${organizationId}&JobId=${jobId}`);
+  }
+
+  /**
+   * Update candidate job
+   @param payload
+   */
+  public updateCandidateJob(payload: AcceptJobDTO): Observable<void> {
+    return this.http.post<void>(`/api/AppliedCandidates/updateCandidateJob`, payload);
+  }
+
+  /**
+   * Get available steps
+   @param organizationId
+   @param jobId
+   */
+  public getAvailableSteps(organizationId: number, jobId: number): Observable<ApplicantStatus[]> {
+    return this.http.get<ApplicantStatus[]>(`/api/AppliedCandidates/availableSteps?OrganizationId=${organizationId}&JobId=${jobId}`);
+  }
+
+  /**
    * Get order by id
    @param id
    */
@@ -114,6 +145,15 @@ export class OrderManagementContentService {
     return this.http.get<AssociateAgency[]>('/api/AssociateAgencies');
   }
 
+  public getPredefinedBillRates(orderType: OrderType, departmentId: number, skillId: number): Observable<BillRate[]> {
+    const params = new HttpParams()
+      .append('orderType', orderType)
+      .append('departmentId', departmentId)
+      .append('skillId', skillId);
+
+    return this.http.get<BillRate[]>('/api/BillRates/predefined/forOrder', { params });
+  }
+
   /**
    * Create order
    * @param order object to save
@@ -133,7 +173,19 @@ export class OrderManagementContentService {
    * @param order object to edit
    * @return edited order
    */
-  public editOrder(order: EditOrderDto): Observable<Order> {
-    return this.http.put<Order>('/api/Orders', order);
+  public editOrder(order: EditOrderDto, documents: Blob[]): Observable<Order> {
+    return this.http.put<Order>('/api/Orders', order).pipe(switchMap(editedOrder => {
+      const formData = new FormData();
+      documents.forEach(document => formData.append('documents', document));
+      return this.http.post(`/api/Orders/${editedOrder.id}/documents`, formData).pipe(map(() => editedOrder));
+    }));
+  }
+
+  /**
+   * Edit order
+   * @param id order id to delete
+   */
+  public deleteOrder(id: number): Observable<any> {
+    return this.http.delete<Order>('/api/Orders', { params: { orderId: id }});
   }
 }

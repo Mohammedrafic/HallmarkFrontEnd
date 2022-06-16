@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 
-import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { Action, Selector, State, StateContext, Actions, ofAction } from '@ngxs/store';
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, takeUntil } from 'rxjs';
 
 import { DashboardService } from '../services/dashboard.service';
-import { GetDashboardData, SetPanels, SaveDashboard } from './dashboard.actions';
+import { GetDashboardData, SetPanels, SaveDashboard, ResetState } from './dashboard.actions';
 import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import lodashMap from 'lodash/fp/map';
@@ -38,7 +38,7 @@ export class DashboardState {
   }
 
   @Selector()
-  static isDashboardLoading(state: DashboardStateModel): boolean {
+  static isDashboardLoading(state: DashboardStateModel): DashboardStateModel['isDashboardLoading'] {
     return state.isDashboardLoading;
   }
 
@@ -47,27 +47,36 @@ export class DashboardState {
     return state.widgets;
   }
 
-  constructor(private dashboardService: DashboardService) {}
+  public constructor(private readonly actions: Actions, private dashboardService: DashboardService) {}
 
   @Action(GetDashboardData)
-  getDashboardData({ patchState }: StateContext<DashboardStateModel>): Observable<any> {
+  getDashboardData({ patchState }: StateContext<DashboardStateModel>): Observable<DashboardDataModel> {
     patchState({ isDashboardLoading: true });
 
     return this.dashboardService.getDashboardsData().pipe(
       tap(({ panels, widgets }: DashboardDataModel) => {
         patchState({ panels, widgets, isDashboardLoading: false });
-      })
+      }),
+      takeUntil(this.actions.pipe(ofAction(ResetState)))
     );
   }
 
   @Action(SaveDashboard)
-  private saveDashboard({ patchState }: StateContext<DashboardStateModel>, { payload }: SaveDashboard) {
+  private saveDashboard(
+    { patchState }: StateContext<DashboardStateModel>,
+    { payload }: SaveDashboard
+  ): Observable<void> {
     patchState({ panels: payload });
     return this.dashboardService.saveDashboard(payload);
   }
 
   @Action(SetPanels)
-  private setPanels({ patchState }: StateContext<DashboardStateModel>, { payload }: SetPanels) {
+  private setPanels({ patchState }: StateContext<DashboardStateModel>, { payload }: SetPanels): void {
     patchState({ panels: payload });
+  }
+
+  @Action(ResetState)
+  private resetState({ patchState }: StateContext<DashboardStateModel>): void {
+    patchState({ panels: [], widgets: [], isDashboardLoading: false });
   }
 }

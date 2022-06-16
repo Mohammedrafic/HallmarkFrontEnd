@@ -15,14 +15,14 @@ import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 import { ImageUploaderComponent } from './components/image-uploader/image-uploader.component';
 import { DocumentUploaderComponent } from './components/document-uploader/document-uploader.component';
 import { FileUploadDialogComponent } from './components/file-upload-dialog/file-upload-dialog.component';
+import { ButtonModule, ChipListAllModule, RadioButtonAllModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
-import { ButtonModule, ChipListAllModule, RadioButtonAllModule } from '@syncfusion/ej2-angular-buttons';
 import { SideDialogComponent } from './components/side-dialog/side-dialog.component';
 import { SideMenuComponent } from './components/side-menu/side-menu.component';
 import { SearchComponent } from './components/search/search.component';
 import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.component';
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousComponent } from './components/dialog-next-previous/dialog-next-previous.component';
@@ -33,11 +33,17 @@ import { GeneralOrderInfoComponent } from './components/general-order-info/gener
 import { GridAllModule, PagerAllModule } from "@syncfusion/ej2-angular-grids";
 import { OrderCandidatesListComponent } from './components/order-candidates-list/order-candidates-list.component';
 import { CustomProgressBarComponent } from './components/custom-progress-bar/custom-progress-bar.component';
+import { ApplyCandidateComponent } from './components/order-candidates-list/apply-candidate/apply-candidate.component';
+import { AcceptCandidateComponent } from './components/order-candidates-list/accept-candidate/accept-candidate.component';
+import { DatePickerModule, DateRangePickerModule } from "@syncfusion/ej2-angular-calendars";
+import { OnboardedCandidateComponent } from './components/order-candidates-list/onboarded-candidate/onboarded-candidate.component';
 import { BillRatesViewGridComponent } from './components/bill-rates-view-grid/bill-rates-view-grid.component';
 import { CommentsComponent } from './components/comments/comments.component';
 import { HighlightGridRowDirective } from '@shared/directives/hightlight-grid-row.directive';
 import { AddBackgroundForEmptyGridDirective } from '@shared/directives/add-background-for-empty-grid.directive';
 import { FormatPhoneNumberPipe } from '@shared/pipes/format-phone-number.pipe';
+import { RateHourPipe } from '@shared/pipes/rate-hour.pipe';
+import { OfferDeploymentComponent } from './components/order-candidates-list/offer-deployment/offer-deployment.component';
 
 const icons = {
   AlertCircle,
@@ -59,6 +65,7 @@ const COMPONENTS = [
   ChipsCssClass,
   OrderTypeName,
   FormatPhoneNumberPipe,
+  RateHourPipe,
   ValidateDirective,
   HighlightGridRowDirective,
   AddBackgroundForEmptyGridDirective,
@@ -77,12 +84,20 @@ const COMPONENTS = [
   GeneralOrderInfoComponent,
   OrderCandidatesListComponent,
   CustomProgressBarComponent,
+  ApplyCandidateComponent,
+  AcceptCandidateComponent,
+  CustomProgressBarComponent,
   BillRatesViewGridComponent,
-  CommentsComponent
+  CommentsComponent,
+  AcceptCandidateComponent,
+  OnboardedCandidateComponent,
+  ApplyCandidateComponent,
+  OfferDeploymentComponent
 ];
 
 @NgModule({
-  imports: [FeatherModule.pick(icons),
+  imports: [
+    FeatherModule.pick(icons),
     CommonModule,
     UploaderModule,
     ToastModule,
@@ -93,11 +108,16 @@ const COMPONENTS = [
     ChipListAllModule,
     FormsModule,
     DropDownButtonModule,
-    AccordionModule,
-    TooltipModule,
+    GridAllModule,
+    DropDownListModule,
     NumericTextBoxAllModule,
-    GridAllModule, PagerAllModule,
-    DropDownListModule
+    PagerAllModule,
+    AccordionModule,
+    ReactiveFormsModule,
+    DateRangePickerModule,
+    DatePickerModule,
+    CheckBoxModule,
+    TooltipModule
   ],
   exports: [...COMPONENTS],
   declarations: [...COMPONENTS, ErrorMessageComponent],

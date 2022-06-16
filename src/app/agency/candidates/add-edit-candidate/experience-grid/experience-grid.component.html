@@ -14,8 +14,10 @@
             [resizeSettings]="resizeSettings"
             [allowSorting]="allowSorting"
             [allowResizing]="allowResizing"
+            [allowSelection]="false"
             [pageSettings]="pageSettings"
             [height]="gridHeight"
+            [enableVirtualization]="true"
             (dataBound)="dataBound()">
     <e-columns>
       <e-column field="employer" headerText="Employer" width=300></e-column>
@@ -46,7 +48,7 @@
         id="addExperienceForm"
         [formGroup]="experienceForm">
     <div class="input-container">
-      <label>Employer</label>
+      <label>Employer<span class="required">*</span></label>
       <div class="input-group">
         <input class="e-input"
                type="text"
@@ -57,7 +59,7 @@
       </div>
     </div>
     <div class="input-container">
-      <label>Job Title</label>
+      <label>Job Title<span class="required">*</span></label>
       <div class="input-group">
         <input class="e-input"
                type="text"
@@ -68,21 +70,23 @@
       </div>
     </div>
     <div class="input-container calendar">
-      <label>Start Month/Year</label>
+      <label>Start Month/Year<span class="required">*</span></label>
       <div class="input-group datepicker">
         <ejs-datepicker class="datepicker"
                         format="MM/dd/yyyy"
                         placeholder="MM/DD/YYYY"
+                        appValidateWithMessage
                         formControlName="startDate">
         </ejs-datepicker>
       </div>
     </div>
     <div class="input-container calendar">
-      <label>End Month/Year</label>
+      <label>End Month/Year<span class="required">*</span></label>
       <div class="input-group datepicker">
         <ejs-datepicker class="datepicker"
                         format="MM/dd/yyyy"
                         placeholder="MM/DD/YYYY"
+                        appValidateWithMessage
                         formControlName="endDate">
         </ejs-datepicker>
       </div>
