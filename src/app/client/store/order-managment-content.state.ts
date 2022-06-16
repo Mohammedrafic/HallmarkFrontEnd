@@ -19,8 +19,8 @@ import {
   GetSelectedOrderById,
   GetWorkflows,
   SaveOrder,
-  SaveOrderSucceeded
-,
+  SaveOrderSucceeded,
+  SetIsDirtyOrderForm,
   SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob
 } from '@client/store/order-managment-content.actions';
@@ -69,6 +69,7 @@ export interface OrderManagementContentStateModel {
   masterShifts: MasterShift[];
   associateAgencies: AssociateAgency[];
   predefinedBillRates: BillRate[];
+  isDirtyOrderForm: boolean;
 }
 
 @State<OrderManagementContentStateModel>({
@@ -91,7 +92,8 @@ export interface OrderManagementContentStateModel {
     projectSpecialData: null,
     masterShifts: [],
     associateAgencies: [],
-    predefinedBillRates: []
+    predefinedBillRates: [],
+    isDirtyOrderForm: false
   }
 })
 @Injectable()
@@ -138,6 +140,9 @@ export class OrderManagementContentState {
 
   @Selector()
   static predefinedBillRates(state: OrderManagementContentStateModel): BillRate[] { return state.predefinedBillRates }
+
+  @Selector()
+  static isDirtyOrderForm(state: OrderManagementContentStateModel): boolean { return state.isDirtyOrderForm; }
 
   @Selector()
   static candidatesJob(state: OrderManagementContentStateModel): OrderCandidateJob | null {
@@ -335,6 +340,11 @@ export class OrderManagementContentState {
       getPredefinedBillRatesData: null,
       predefinedBillRates: []
     });
+  }
+
+  @Action(SetIsDirtyOrderForm)
+  SetIsDirtyOrderForm({ patchState }: StateContext<OrderManagementContentStateModel>, { isDirtyOrderForm }: SetIsDirtyOrderForm): void {
+    patchState({ isDirtyOrderForm });
   }
 
   @Action(SaveOrder)

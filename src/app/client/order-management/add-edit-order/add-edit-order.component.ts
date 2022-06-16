@@ -16,7 +16,8 @@ import {
   GetSelectedOrderById,
   SaveOrderSucceeded,
   ClearPredefinedBillRates,
-  GetPredefinedBillRates
+  GetPredefinedBillRates,
+  SetIsDirtyOrderForm
 } from '@client/store/order-managment-content.actions';
 
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
@@ -120,6 +121,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.store.dispatch(new ClearPredefinedBillRates());
+    this.store.dispatch(new SetIsDirtyOrderForm(false));
   }
 
   public navigateBack(): void {
@@ -156,6 +158,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     } else {
       this.orderCredentials.push(cred);
     }
+
+    this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
   public onCredentialDeleted(cred: IOrderCredentialItem): void {
@@ -164,6 +168,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       const index = this.orderCredentials.indexOf(credToDelete);
       this.orderCredentials.splice(index, 1);
     }
+
+    this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
   public save(): void {

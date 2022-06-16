@@ -3,7 +3,7 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { combineLatest, Observable, Subject, takeUntil } from 'rxjs';
+import { combineLatest, Observable, Subject, takeUntil, debounceTime } from 'rxjs';
 
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -18,8 +18,9 @@ import {
   GetMasterShifts,
   GetOrganizationStatesWithKeyCode,
   GetWorkflows,
-  GetProjectSpecialData,
-  SetPredefinedBillRatesData
+  SetPredefinedBillRatesData,
+  SetIsDirtyOrderForm,
+  GetProjectSpecialData
 } from '@client/store/order-managment-content.actions';
 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -216,6 +217,13 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       status: [OrderStatus.Incomplete]
     });
 
+    this.orderTypeStatusForm.valueChanges.pipe(
+      takeUntil(this.unsubscribe$),
+      debounceTime(500)
+    ).subscribe(() => {
+      this.store.dispatch(new SetIsDirtyOrderForm(this.orderTypeStatusForm.dirty));
+    });
+
     this.generalInformationForm = this.formBuilder.group({
       title: [null, [Validators.required, Validators.maxLength(50)]],
       regionId: [null, Validators.required],
@@ -235,10 +243,24 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       shiftEndTime: [null, Validators.required]
     });
 
+    this.generalInformationForm.valueChanges.pipe(
+      takeUntil(this.unsubscribe$),
+      debounceTime(500)
+    ).subscribe(() => {
+      this.store.dispatch(new SetIsDirtyOrderForm(this.generalInformationForm.dirty));
+    });
+
     this.jobDistributionForm = this.formBuilder.group({
       jobDistribution: [[], Validators.required],
       agency: [null],
       jobDistributions: [[]]
+    });
+
+    this.jobDistributionForm.valueChanges.pipe(
+      takeUntil(this.unsubscribe$),
+      debounceTime(500)
+    ).subscribe(() => {
+      this.store.dispatch(new SetIsDirtyOrderForm(this.jobDistributionForm.dirty));
     });
 
     this.jobDescriptionForm = this.formBuilder.group({
@@ -252,20 +274,62 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       reasonForRequisition: [null, Validators.required]
     });
 
+    this.jobDescriptionForm.valueChanges.pipe(
+      takeUntil(this.unsubscribe$),
+      debounceTime(500)
+    ).subscribe(() => {
+      this.store.dispatch(new SetIsDirtyOrderForm(this.jobDescriptionForm.dirty));
+    });
+
     this.contactDetailsForm = this.formBuilder.group({
       contactDetails: new FormArray([this.newContactDetailsFormGroup()])
     });
 
+    this.contactDetailsForm.valueChanges.pipe(
+      takeUntil(this.unsubscribe$),
+      debounceTime(500)
+    ).subscribe(() => {
+      this.store.dispatch(new SetIsDirtyOrderForm(this.contactDetailsForm.dirty));
+    });
+
     this.contactDetailsFormArray = this.contactDetailsForm.get('contactDetails') as FormArray;
+
+    this.contactDetailsFormArray.valueChanges.pipe(
+      takeUntil(this.unsubscribe$),
+      debounceTime(500)
+    ).subscribe(() => {
+      this.store.dispatch(new SetIsDirtyOrderForm(this.contactDetailsFormArray.dirty));
+    });
 
     this.workLocationForm = this.formBuilder.group({
       workLocations: new FormArray([this.newWorkLocationFormGroup()])
     });
 
+    this.workLocationForm.valueChanges.pipe(
+      takeUntil(this.unsubscribe$),
+      debounceTime(500)
+    ).subscribe(() => {
+      this.store.dispatch(new SetIsDirtyOrderForm(this.workLocationForm.dirty));
+    });
+
     this.workLocationsFormArray = this.workLocationForm.get('workLocations') as FormArray;
+
+    this.workLocationsFormArray.valueChanges.pipe(
+      takeUntil(this.unsubscribe$),
+      debounceTime(500)
+    ).subscribe(() => {
+      this.store.dispatch(new SetIsDirtyOrderForm(this.workLocationsFormArray.dirty));
+    });
 
     this.workflowForm = this.formBuilder.group({
       workflowId: [null, Validators.required]
+    });
+
+    this.workflowForm.valueChanges.pipe(
+      takeUntil(this.unsubscribe$),
+      debounceTime(500)
+    ).subscribe(() => {
+      this.store.dispatch(new SetIsDirtyOrderForm(this.workflowForm.dirty));
     });
 
     this.specialProject = this.formBuilder.group({
@@ -273,6 +337,13 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       projectTypeId: [null, Validators.required],
       projectNameId: [null, Validators.required],
       poNumberId: [null, Validators.required],
+    });
+
+    this.specialProject.valueChanges.pipe(
+      takeUntil(this.unsubscribe$),
+      debounceTime(500)
+    ).subscribe(() => {
+      this.store.dispatch(new SetIsDirtyOrderForm(this.specialProject.dirty));
     });
 
     const orderTypeControl = this.orderTypeStatusForm.get('orderType') as AbstractControl;
@@ -548,10 +619,12 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   public onDocumentsSelected(documents: Blob[]): void {
     this.documents = documents;
+    this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
   public onDocumentDeleted(document: Document): void {
     this.deleteDocumentsGuids.push(document.documentId);
+    this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
   public setPriceMask(controlName: string, e: FocusEvent): void {

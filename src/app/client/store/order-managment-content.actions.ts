@@ -102,6 +102,11 @@ export class ClearPredefinedBillRates {
   constructor() { }
 }
 
+export class SetIsDirtyOrderForm {
+  static readonly type = '[order management] Set Is Dirty Order Form';
+  constructor(public isDirtyOrderForm: boolean) {}
+}
+
 export class SaveOrder {
   static readonly type = '[order management] Save Order';
   constructor(public order: CreateOrderDto, public documents: Blob[]) { }
