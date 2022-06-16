@@ -236,16 +236,16 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     if (this.billRatesFormGroup.valid) {
       const billRate: BillRateSetupPost = {
         billRateSettingId: this.editRecordId,
-        regionIds: this.billRatesFormGroup.controls['regionIds'].value.length === this.allRegions.length ? []
+        regionIds: this.billRatesFormGroup.controls['regionIds'].value.length === this.allRegions.length && this.allRegions.length > 1 ? []
           : this.billRatesFormGroup.controls['regionIds'].value, // [] means All on the BE side
-        locationIds: this.billRatesFormGroup.controls['locationIds'].value.length === this.locations.length ? []
+        locationIds: this.billRatesFormGroup.controls['locationIds'].value.length === this.locations.length && this.locations.length > 1 ? []
           : this.billRatesFormGroup.controls['locationIds'].value, // [] means All on the BE side
-        departmentIds: this.billRatesFormGroup.controls['departmentIds'].value.length === this.departments.length ? []
+        departmentIds: this.billRatesFormGroup.controls['departmentIds'].value.length === this.departments.length && this.departments.length > 1 ? []
           : this.billRatesFormGroup.controls['departmentIds'].value, // [] means All on the BE side
-        skillIds: this.billRatesFormGroup.controls['skillIds'].value.length === this.allSkills.length ? []
+        skillIds: this.billRatesFormGroup.controls['skillIds'].value.length === this.allSkills.length && this.allSkills.length > 1 ? []
           : this.billRatesFormGroup.controls['skillIds'].value, // [] means All on the BE side
         billRateConfigId: this.billRatesFormGroup.controls['billRateTitleId'].value,
-        orderTypes: this.billRatesFormGroup.controls['orderTypeIds'].value.length === this.orderTypes.length ? []
+        orderTypes: this.billRatesFormGroup.controls['orderTypeIds'].value.length === this.orderTypes.length && this.orderTypes.length > 1 ? []
           : this.billRatesFormGroup.controls['orderTypeIds'].value, // [] means All on the BE side
         rateHour: this.billRatesFormGroup.controls['billRateValueRateTimes'].value,
         effectiveDate: this.billRatesFormGroup.controls['effectiveDate'].value,

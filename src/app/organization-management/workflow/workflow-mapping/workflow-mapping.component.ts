@@ -117,7 +117,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   private unsubscribe$: Subject<void> = new Subject();
 
   public filters: WorkflowFilters = {
-    pageSize: this.pageSize, 
+    pageSize: this.pageSize,
     pageNumber: 1
   };
   public filterColumns: any;
@@ -450,13 +450,13 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     if (this.workflowMappingFormGroup.valid) {
       const workflowMapping: WorkflowMappingPost = {
         mappingId: this.editedRecordId,
-        regionIds: this.workflowMappingFormGroup.controls['regions'].value.length === this.allRegions.length ? []
+        regionIds: this.workflowMappingFormGroup.controls['regions'].value.length === this.allRegions.length && this.allRegions.length > 1 ? []
           : this.workflowMappingFormGroup.controls['regions'].value, // [] means All on the BE side
-        locationIds: this.workflowMappingFormGroup.controls['locations'].value.length === this.locations.length ? []
+        locationIds: this.workflowMappingFormGroup.controls['locations'].value.length === this.locations.length && this.locations.length > 1 ? []
           : this.workflowMappingFormGroup.controls['locations'].value, // [] means All on the BE side
-        departmentIds: this.workflowMappingFormGroup.controls['departments'].value.length === this.departments.length ? []
+        departmentIds: this.workflowMappingFormGroup.controls['departments'].value.length === this.departments.length && this.departments.length > 1 ? []
           : this.workflowMappingFormGroup.controls['departments'].value, // [] means All on the BE side
-        skillIds: this.workflowMappingFormGroup.controls['skills'].value.length === this.allSkills.length ? []
+        skillIds: this.workflowMappingFormGroup.controls['skills'].value.length === this.allSkills.length && this.allSkills.length > 1 ? []
           : this.workflowMappingFormGroup.controls['skills'].value, // [] means All on the BE side
         workflowGroupId: this.workflowMappingFormGroup.controls['workflowName'].value, // workflowName contains selected workflow id, on the BE workflowGroupId is just workflowId
         stepMappings: this.getStepMappings()
