@@ -24,6 +24,7 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { LogoutUser } from '../store/user.actions';
 import { DashboardWidgetsComponent } from './dashboard-widgets/dashboard-widgets.component';
 import type { WidgetsDataModel } from './models/widgets-data.model';
+import type { DashboardLayoutComponent } from '@syncfusion/ej2-angular-layouts';
 
 @Component({
   selector: 'app-dashboard',
@@ -107,21 +108,29 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     isSelected ? this.addNewWidget(widget) : this.removeWidget(widget);
   }
 
+  private get dashboardSFComponent(): DashboardLayoutComponent {
+    return this.dashboardWidgetsComponent.sfComponent;
+  }
+
+  private get dashboardSFComponentSerialized(): PanelModel[] {
+    return this.dashboardSFComponent.serialize();
+  }
+
   private addNewWidget(widget: WidgetOptionModel): void {
     const widgetConfiguration = widgetTypeToConfigurationMapper[widget.title];
 
     if (!widgetConfiguration) return;
 
     const newPanel = { ...widgetConfiguration, id: widget.title, row: 0, col: 0 };
-    const updatePanelsList = [...this.dashboardWidgetsComponent.sfComponent.serialize(), newPanel];
+    const updatePanelsList = [...this.dashboardSFComponentSerialized, newPanel];
 
     this.saveDashboard(updatePanelsList);
   }
 
   private removeWidget(widget: WidgetOptionModel): void {
-    const updatePanelsList = this.dashboardWidgetsComponent.sfComponent
-      .serialize()
-      .filter((panel: PanelModel) => panel.id !== widget.title);
+    const updatePanelsList = this.dashboardSFComponentSerialized.filter(
+      (panel: PanelModel) => panel.id !== widget.title
+    );
 
     this.saveDashboard(updatePanelsList);
   }
@@ -131,7 +140,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   public moveDashboardPanel(): void {
-    this.saveDashboard(this.dashboardWidgetsComponent.sfComponent.serialize());
+    this.saveDashboard(this.dashboardSFComponentSerialized);
   }
 
   private getFiltersGroup(): FormGroup {
@@ -171,7 +180,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   private getIsDashboardMobileView(): Observable<boolean> {
     return this.breakpointObserver
-      .observe([`(${this.dashboardWidgetsComponent.sfComponent.mediaQuery})`])
+      .observe([`(${this.dashboardSFComponent.mediaQuery})`])
       .pipe(map((breakpointState: BreakpointState) => breakpointState.matches));
   }
 
