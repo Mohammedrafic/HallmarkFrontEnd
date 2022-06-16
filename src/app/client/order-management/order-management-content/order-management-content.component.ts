@@ -26,6 +26,7 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { Order } from '@shared/models/order-management.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import { Location } from '@angular/common';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
@@ -84,7 +85,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public selectedOrder: Order;
   public openDetails = new Subject<boolean>();
   public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
-  constructor(private store: Store, private router: Router, private route: ActivatedRoute, private actions$: Actions, private confirmService: ConfirmService) {
+  public previousSelectedOrderId: number | null;
+
+  constructor(private store: Store, private router: Router, private route: ActivatedRoute, private actions$: Actions, private confirmService: ConfirmService, private location: Location) {
     super();
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
   }
@@ -97,14 +100,22 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
       this.selectedOrder = order;
     });
+
+    const locationState = this.location.getState() as { orderId: number };
+    this.previousSelectedOrderId = locationState.orderId;
+
     this.organizationId$
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(() => this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize })));
+      .subscribe(() => {
+        if (!this.previousSelectedOrderId) {
+          this.getOrdersPage()
+        }
+      });
 
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
       if (this.activeTab === OrderManagemetTabs.AllOrders) {
-        this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
+        this.getOrdersPage();
       } else if (this.activeTab === OrderManagemetTabs.Incomplete) {
         this.store.dispatch(new GetIncompleteOrders({ pageNumber: this.currentPage, pageSize: this.pageSize }));
       }
@@ -130,6 +141,18 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public onDataBound(): void {
+    if (this.previousSelectedOrderId) {
+      const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
+        this.previousSelectedOrderId
+      );
+      if (data && index) {
+        this.grid.selectRow(index);
+        this.onRowClick({ data });
+      }
+    }
   }
 
   public onNextPreviousOrderEvent(next: boolean): void {
@@ -195,7 +218,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       case OrderManagemetTabs.AllOrders:
         this.currentPage = 1;
         this.isLockMenuButtonsShown = true;
-        this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
+        this.getOrdersPage();
         break;
       case OrderManagemetTabs.OrderTemplates:
         // TODO: pending implementation
@@ -249,9 +272,13 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       takeUntil(this.unsubscribe$)
     ).subscribe(() => {
       this.store.dispatch(new GetAgencyOrderCandidatesList(this.selectedDataRow.id, this.selectedDataRow.organizationId as number, this.currentPage, this.pageSize));
-      this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
+      this.getOrdersPage();
       this.store.dispatch(new GetOrderById(this.selectedDataRow.id, this.selectedDataRow.organizationId as number, this.getDialogNextPreviousOption(this.selectedDataRow as any)));
     });
+  }
+
+  private getOrdersPage(): void {
+    this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
   }
 }
 

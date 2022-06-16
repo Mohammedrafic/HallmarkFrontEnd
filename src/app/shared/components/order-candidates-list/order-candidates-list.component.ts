@@ -18,6 +18,8 @@ import { OnboardedCandidateComponent } from "./onboarded-candidate/onboarded-can
 import { AcceptCandidateComponent } from "./accept-candidate/accept-candidate.component";
 import { ApplyCandidateComponent } from "./apply-candidate/apply-candidate.component";
 import { OfferDeploymentComponent } from "./offer-deployment/offer-deployment.component";
+import { SetLastSelectedOrganizationAgencyId } from "src/app/store/user.actions";
+import { AppState } from "src/app/store/app.state";
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -64,10 +66,14 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
     }
   }
 
-  public onViewNavigation(id: number): void {
+  public onViewNavigation(data: any): void {
     const user = this.store.selectSnapshot(UserState.user);
     const url = user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
-    this.router.navigate([url, id], { state: { orderId: this.order.orderId }});
+    if (user?.businessUnitType === BusinessUnitType.Hallmark) {
+      this.store.dispatch(new SetLastSelectedOrganizationAgencyId({ lastSelectedAgencyId: data.agencyId, lastSelectedOrganizationId: null }))
+    }
+    const pageToBack = this.router.url;
+    this.router.navigate([url, data.candidateId], { state: { orderId: this.order.orderId, pageToBack }});
     disabledBodyOverflow(false);
   }
 

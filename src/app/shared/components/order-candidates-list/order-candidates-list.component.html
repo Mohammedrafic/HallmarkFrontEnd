@@ -22,7 +22,7 @@
     <e-columns>
       <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
         <ng-template #template let-data>
-          <div class="link" (click)="onViewNavigation(data.candidateId)">{{data.lastName}}, {{data.firstName}}</div>
+          <div class="link" (click)="onViewNavigation(data)">{{data.lastName}}, {{data.firstName}}</div>
         </ng-template>
       </e-column>
       <e-column field="statusName" headerText="Status" textAlign="Left" width="150">

@@ -30,6 +30,7 @@ import {
   GetPredefinedBillRatesData,
   OrderCandidateJob,
   OrderCandidatesListPage,
+  OrderManagement,
   OrderManagementPage
 } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
@@ -146,6 +147,18 @@ export class OrderManagementContentState {
   @Selector()
   static applicantStatuses(state: OrderManagementContentStateModel): ApplicantStatus[] {
     return state.applicantStatuses;
+  }
+
+  @Selector()
+  static lastSelectedOrder(state: OrderManagementContentStateModel): (id: number) => [OrderManagement, number] | [] {
+    return (id: number) => {
+      let rowIndex;
+      const order = state.ordersPage?.items.find((order, index) => {
+        rowIndex = index;
+        return order.id === id;
+      });
+      return order && rowIndex ? [order, rowIndex] : [];
+    };
   }
 
   constructor(
