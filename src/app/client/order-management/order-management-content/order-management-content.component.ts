@@ -248,6 +248,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       takeUntil(this.unsubscribe$)
     ).subscribe(() => {
       this.store.dispatch(new GetAgencyOrderCandidatesList(this.selectedDataRow.id, this.selectedDataRow.organizationId as number, this.currentPage, this.pageSize));
+      this.store.dispatch(new GetOrders({ orderBy: this.orderBy, pageNumber: this.currentPage, pageSize: this.pageSize }));
+      this.store.dispatch(new GetOrderById(this.selectedDataRow.id, this.selectedDataRow.organizationId as number, this.getDialogNextPreviousOption(this.selectedDataRow as any)));
     });
   }
 }

@@ -37,6 +37,9 @@ import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/i
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import PriceUtils from '@shared/utils/price.utils';
+import { currencyValidator } from '@shared/validators/currency.validator';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 
 @Component({
   selector: 'app-bill-rate-setup',
@@ -74,6 +77,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   billRatesOptions$: Observable<BillRateOption[]>;
   billRateTitleFields: FieldSettingsModel = { text: 'title', value: 'id' };
   public billRatesOptions: BillRateOption[];
+  public priceUtils = PriceUtils;
 
   public orderTypes = OrderTypeOptions;
   public orderTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
@@ -90,9 +94,9 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public intervalMaxField: AbstractControl;
   public billRateCategory = BillRateCategory;
   public billRateType = BillRateType;
-  public rateHourMask: string;
   public filters: BillRateFilters = {};
   public filterColumns: any;
+  public isReadOnly = false; // TODO: temporary solution, until specific service provided
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add New';
@@ -120,6 +124,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       this.store.dispatch(new GetBillRateOptions());
       this.store.dispatch(new GetOrganizationStructure());
     });
+
+    this.handlePagePermission();
 
     this.filterColumns = {
       regionIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
@@ -260,75 +266,57 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   }
 
   public onEditRecordButtonClick(data: BillRateSetup, event: Event): void {
-    this.addActiveCssClass(event);
-    this.isEdit = true;
-    this.editRecordId = data.billRateSettingId;
+    if (!this.isReadOnly) {
+      this.addActiveCssClass(event);
+      this.isEdit = true;
+      this.editRecordId = data.billRateSettingId;
 
-    setTimeout(() => this.setupFormValues(data));
+      setTimeout(() => this.setupFormValues(data));
 
-    this.store.dispatch(new ShowSideDialog(true));
+      this.store.dispatch(new ShowSideDialog(true));
+    }
   }
 
   public onRemoveRecordButtonClick(data: BillRateSetup, event: any): void {
-    this.addActiveCssClass(event);
-    this.confirmService
-      .confirm(DELETE_RECORD_TEXT, {
-        title: DELETE_RECORD_TITLE,
-        okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm) => {
-        if (confirm) {
-          this.store.dispatch(new DeleteBillRatesById(data.billRateSettingId, this.currentPage, this.pageSize));
-        }
-        this.removeActiveCssClass();
-      });
+    if (!this.isReadOnly) {
+      this.addActiveCssClass(event);
+      this.confirmService
+        .confirm(DELETE_RECORD_TEXT, {
+          title: DELETE_RECORD_TITLE,
+          okButtonLabel: 'Delete',
+          okButtonClass: 'delete-button'
+        })
+        .subscribe((confirm) => {
+          if (confirm) {
+            this.store.dispatch(new DeleteBillRatesById(data.billRateSettingId, this.currentPage, this.pageSize));
+          }
+          this.removeActiveCssClass();
+        });
+    }
   }
 
   public considerForWeeklyOtChange(data: any, event: any): void {
-    this.editRecordId = data.billRateSettingId;
-    this.setupFormValues(data);
-    setTimeout(() => {
-      this.billRatesFormGroup.controls['considerForWeeklyOt'].setValue(event.checked);
-      this.onFormSaveClick();
-    });
+    this.onClickedCheckboxHandler(data, 'considerForWeeklyOt', event.checked);
   }
 
   public considerForDailyOtChange(data: any, event: any): void {
-    this.editRecordId = data.billRateSettingId;
-    this.setupFormValues(data);
-    this.billRatesFormGroup.controls['considerForDailyOt'].setValue(event.checked);
-    this.onFormSaveClick();
+    this.onClickedCheckboxHandler(data, 'considerForDailyOt', event.checked);
   }
 
   public considerFor7thDayOtChange(data: any, event: any): void {
-    this.editRecordId = data.billRateSettingId;
-    this.setupFormValues(data);
-    this.billRatesFormGroup.controls['considerFor7thDayOt'].setValue(event.checked);
-    this.onFormSaveClick();
+    this.onClickedCheckboxHandler(data, 'considerFor7thDayOt', event.checked);
   }
 
   public regularLocalChange(data: any, event: any): void {
-    this.editRecordId = data.billRateSettingId;
-    this.setupFormValues(data);
-    this.billRatesFormGroup.controls['regularLocal'].setValue(event.checked);
-    this.onFormSaveClick();
+    this.onClickedCheckboxHandler(data, 'regularLocal', event.checked);
   }
 
   public displayInTimeSheetChange(data: any, event: any): void {
-    this.editRecordId = data.billRateSettingId;
-    this.setupFormValues(data);
-    this.billRatesFormGroup.controls['displayInTimesheet'].setValue(event.checked);
-    this.onFormSaveClick();
+    this.onClickedCheckboxHandler(data, 'displayInTimesheet', event.checked);
   }
 
   public displayInJobChange(data: any, event: any): void {
-    this.editRecordId = data.billRateSettingId;
-    this.setupFormValues(data);
-    setTimeout(() => {
-      this.billRatesFormGroup.controls['displayInJob'].setValue(event.checked);
-      this.onFormSaveClick();
-    });
+    this.onClickedCheckboxHandler(data, 'displayInJob', event.checked);
   }
 
   public onRowsDropDownChanged(): void {
@@ -369,20 +357,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  public onRateHourBlur(event: any): void {
-    if (event.value) {
-      if (event.value.toString().length <= 7
-        || (event.value.toString().length <= 7 && event.value.toString().includes('.'))
-        || (event.value.toString().length === 10 && event.value.toString().includes('.'))) {
-        this.rateHourMask = '#.00';
-      } else if (event.value.toString().length === 8) {
-        this.rateHourMask = '#.0';
-      } else {
-        this.rateHourMask = '#';
-      }
-    }
-  }
-
   private createFormGroups(): void {
     this.billRatesFormGroup = this.formBuilder.group({
       regionIds: ['', [Validators.required]],
@@ -393,7 +367,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       orderTypeIds: ['', [Validators.required]],
       billRatesCategory: [{ value: '', disabled: true }],
       billRatesType: [{ value: '', disabled: true }],
-      billRateValueRateTimes: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(10)]],
+      billRateValueRateTimes: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(11), currencyValidator(1)]],
       effectiveDate: [null, [Validators.required]],
       intervalMin: [''],
       intervalMax: [''],
@@ -420,6 +394,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.isEdit = false;
     this.editRecordId = undefined;
     this.removeActiveCssClass();
+    this.selectedBillRateUnit = BillRateUnit.Multiplier;
   }
 
   private regionChangedHandler(): void {
@@ -500,6 +475,17 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     });
   }
 
+  private onClickedCheckboxHandler(data: any, controlName: string, isChecked: boolean): void {
+    if (!this.isReadOnly) {
+      this.editRecordId = data.billRateSettingId;
+      this.setupFormValues(data);
+      setTimeout(() => {
+        this.billRatesFormGroup.controls[controlName].setValue(isChecked);
+        this.onFormSaveClick();
+      });
+    }
+  }
+
   private setupFormValues(data: BillRateSetup): void {
     if (!data.regionId) {
       const allRegionsIds = this.allRegions.map(region => region.id);
@@ -549,5 +535,11 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRatesFormGroup.controls['regularLocal'].setValue(data.regularLocal);
     this.billRatesFormGroup.controls['displayInTimesheet'].setValue(data.displayInTimesheet);
     this.billRatesFormGroup.controls['displayInJob'].setValue(data.displayInJob);
+  }
+
+  // TODO: temporary solution, until specific service provided
+  private handlePagePermission(): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    this.isReadOnly = user?.businessUnitType === BusinessUnitType.Organization;
   }
 }

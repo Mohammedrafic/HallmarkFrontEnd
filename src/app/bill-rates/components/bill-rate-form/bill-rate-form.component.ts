@@ -9,6 +9,8 @@ import { MaskedTextBoxComponent } from "@syncfusion/ej2-angular-inputs";
 import { BillRateState } from '@bill-rates/store/bill-rate.state';
 import { BillRate, BillRateCategory, BillRateOption, BillRateType, BillRateUnit } from '@shared/models/bill-rate.model';
 import { GetBillRateOptions } from '@bill-rates/store/bill-rate.actions';
+import PriceUtils from '@shared/utils/price.utils';
+import { currencyValidator } from '@shared/validators/currency.validator';
 
 @Component({
   selector: 'app-bill-rate-form',
@@ -32,7 +34,7 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
   public isIntervalMaxControlRequired = true;
   public selectedBillRateUnit: BillRateUnit = BillRateUnit.Multiplier;
   public BillRateUnitList = BillRateUnit;
-  public rateHourMask: string;
+  public priceUtils = PriceUtils;
 
   @Select(BillRateState.billRateOptions)
   public billRateOptions$: Observable<BillRateOption[]>;
@@ -47,6 +49,10 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get typeValue(): string {
     return BillRateType[this.billRateConfigControl?.value?.type] || '';
+  }
+
+  get rateHourControl(): AbstractControl | null {
+    return this.billRateForm.get('rateHour');
   }
 
   private isAlive = true;
@@ -74,20 +80,6 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.isAlive = false;
-  }
-
-  public onRateHourBlur(event: any): void {
-    if (event.value) {
-      if (event.value.toString().length <= 7
-        || (event.value.toString().length <= 7 && event.value.toString().includes('.'))
-        || (event.value.toString().length === 10 && event.value.toString().includes('.'))) {
-        this.rateHourMask = '#.00';
-      } else if (event.value.toString().length === 8) {
-        this.rateHourMask = '#.0';
-      } else {
-        this.rateHourMask = '#';
-      }
-    }
   }
 
   private onBillRateConfigIdChanged(): void {
@@ -132,7 +124,7 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
     return new FormGroup({
       id: new FormControl(),
       billRateConfigId: new FormControl(null, [Validators.required]),
-      rateHour: new FormControl(null, [Validators.required]),
+      rateHour: new FormControl(null, [Validators.required, currencyValidator(1)]),
       intervalMin: new FormControl(null),
       intervalMax: new FormControl(null),
       effectiveDate: new FormControl('', [Validators.required]),

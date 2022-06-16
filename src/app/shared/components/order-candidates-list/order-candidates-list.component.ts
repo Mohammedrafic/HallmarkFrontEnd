@@ -92,7 +92,11 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
           this.openDialog(this.accept);
         }
       } else if (isOrganization) {
-        if (this.candidate.status === ApplicantStatus.Applied) {
+        if (
+          this.candidate.status === ApplicantStatus.Applied
+          || this.candidate.status === ApplicantStatus.Shortlisted
+          || this.candidate.status === ApplicantStatus.PreOfferCustom
+        ) {
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
           this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
           this.openDialog(this.offerDeployment);
