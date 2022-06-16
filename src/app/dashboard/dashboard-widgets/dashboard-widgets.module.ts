@@ -7,6 +7,7 @@ import { AccumulationChartModule } from '../widgets/accumulation-chart/accumulat
 import { DashboardWidgetsComponent } from './dashboard-widgets.component';
 import { MapsChartModule } from '../widgets/maps-chart/maps-chart.module';
 import { WidgetWrapperModule } from '../widgets/widget-wrapper/widget-wrapper.module';
+import { LineChartModule } from '../widgets/line-chart/line-chart.module';
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -17,6 +18,7 @@ import { WidgetWrapperModule } from '../widgets/widget-wrapper/widget-wrapper.mo
     DashboardLayoutModule,
     MapsChartModule,
     WidgetWrapperModule,
+    LineChartModule,
   ]
 })
 export class DashboardWidgetsModule { }

@@ -11,6 +11,7 @@ import type {
   TooltipSettingsModel,
   CrosshairSettingsModel,
 } from '@syncfusion/ej2-charts';
+import type { ChartComponent } from '@syncfusion/ej2-angular-charts';
 
 import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
 import type { KeyValue } from '@angular/common';
@@ -26,8 +27,8 @@ import { PositionTypeEnum } from '../../enums/position-type.enum';
   styleUrls: ['./line-chart.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LineChartComponent extends AbstractSFComponentDirective implements OnChanges {
-  @Input() public chartData: PositionsByTypeAggregatedModel;
+export class LineChartComponent extends AbstractSFComponentDirective<ChartComponent> implements OnChanges {
+  @Input() public chartData: PositionsByTypeAggregatedModel | undefined;
   @Input() public isLoading: boolean;
 
   public primaryYAxis: AxisModel = {
