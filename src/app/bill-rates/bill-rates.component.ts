@@ -115,6 +115,10 @@ export class BillRatesComponent implements OnInit {
           this.billRateForm.reset();
           this.billRateForm.enable();
           this.store.dispatch(new ShowSideDialog(false));
+
+          // sets initial state of selected bill rate unit field in bill-rate-form component with initialization
+          setTimeout(() => this.isActive = false, 1);
+          setTimeout(() => this.isActive = true, 1);
         });
     } else {
       this.billRateForm.reset();
@@ -150,6 +154,10 @@ export class BillRatesComponent implements OnInit {
       }
       this.billRateForm.reset();
       this.store.dispatch(new ShowSideDialog(false));
+
+      // sets initial state of selected bill rate unit field in bill-rate-form component with initialization
+      setTimeout(() => this.isActive = false, 1);
+      setTimeout(() => this.isActive = true, 1);
     }
   }
 

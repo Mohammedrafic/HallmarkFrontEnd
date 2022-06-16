@@ -64,62 +64,91 @@
           <span>{{ data.effectiveDate | date: 'MM/dd/yyyy' }}</span>
         </ng-template>
       </e-column>
-      <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" width=250>
-        <ng-template #template let-data>
-          <span>{{ data.rateHour | rateHourPipe: data.billRateTitle:data.billRateType:billRatesOptions }}</span>
-        </ng-template>
-      </e-column>
-      <e-column field="intervalMin" headerText="INTERVAL MIN" width=180></e-column>
-      <e-column field="intervalMax" headerText="INTERVAL MAX" width=180></e-column>
+      <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" width=250 textAlign="Right"></e-column>
+      <e-column field="intervalMin" headerText="INTERVAL MIN" width=180 textAlign="Right"></e-column>
+      <e-column field="intervalMax" headerText="INTERVAL MAX" width=180 textAlign="Right"></e-column>
       <e-column field="considerForWeeklyOT" headerText="CONSIDER FOR WEEKLY OT" width=230>
         <ng-template #template let-data>
-          <div class="bootstrap" (click)="stopPropagation($event)">
-            <ejs-checkbox [checked]="data.considerForWeeklyOT" (change)="considerForWeeklyOtChange(data, $event)"></ejs-checkbox>
+          <div class="checkbox bootstrap" (click)="stopPropagation($event)">
+            <ejs-checkbox
+              [checked]="data.considerForWeeklyOT"
+              [disabled]="isReadOnly"
+              (change)="considerForWeeklyOtChange(data, $event)"
+            ></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
       <e-column field="considerForDailyOT" headerText="CONSIDER FOR DAILY OT" width=230>
         <ng-template #template let-data>
-          <div class="bootstrap" (click)="stopPropagation($event)">
-            <ejs-checkbox [checked]="data.considerForDailyOT" (change)="considerForDailyOtChange(data, $event)"></ejs-checkbox>
+          <div class="checkbox bootstrap" (click)="stopPropagation($event)">
+            <ejs-checkbox
+              [checked]="data.considerForDailyOT"
+              [disabled]="isReadOnly"
+              (change)="considerForDailyOtChange(data, $event)"
+            ></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
       <e-column field="considerFor7thDayOT" headerText="CONSIDER FOR 7th DAY OT" width=230>
         <ng-template #template let-data>
-          <div class="bootstrap" (click)="stopPropagation($event)">
-            <ejs-checkbox [checked]="data.considerFor7thDayOT" (change)="considerFor7thDayOtChange(data, $event)"></ejs-checkbox>
+          <div class="checkbox bootstrap" (click)="stopPropagation($event)">
+            <ejs-checkbox
+              [checked]="data.considerFor7thDayOT"
+              [disabled]="isReadOnly"
+              (change)="considerFor7thDayOtChange(data, $event)"
+            ></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
       <e-column field="regularLocal" headerText="REGULAR LOCAL" width=180>
         <ng-template #template let-data>
-          <div class="bootstrap" (click)="stopPropagation($event)">
-            <ejs-checkbox [checked]="data.regularLocal" (change)="regularLocalChange(data, $event)"></ejs-checkbox>
+          <div class="checkbox bootstrap" (click)="stopPropagation($event)">
+            <ejs-checkbox
+              [checked]="data.regularLocal"
+              [disabled]="isReadOnly"
+              (change)="regularLocalChange(data, $event)"
+            ></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
       <e-column field="displayInTimesheet" headerText="DISPLAY IN TIMESHEET" width=200>
         <ng-template #template let-data>
-          <div class="bootstrap" (click)="stopPropagation($event)">
-            <ejs-checkbox [checked]="data.displayInTimesheet" (change)="displayInTimeSheetChange(data, $event)"></ejs-checkbox>
+          <div class="checkbox bootstrap" (click)="stopPropagation($event)">
+            <ejs-checkbox
+              [checked]="data.displayInTimesheet"
+              [disabled]="isReadOnly"
+              (change)="displayInTimeSheetChange(data, $event)"
+            ></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
       <e-column field="displayInJob" headerText="DISPLAY IN JOB" width=200>
         <ng-template #template let-data>
-          <div class="bootstrap" (click)="stopPropagation($event)">
-            <ejs-checkbox [checked]="data.displayInJob" (change)="displayInJobChange(data, $event)"></ejs-checkbox>
+          <div class="checkbox bootstrap" (click)="stopPropagation($event)">
+            <ejs-checkbox
+              [checked]="data.displayInJob"
+              [disabled]="isReadOnly"
+              (change)="displayInJobChange(data, $event)"></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
       <e-column textAlign="Right" width=100 freeze="Right">
         <ng-template #template let-data>
           <div class="row-tool-buttons" (click)="stopPropagation($event)">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEditRecordButtonClick(data, $event)">
+            <button
+              ejs-button
+              cssClass="e-flat primary-icon-button"
+              [disabled]="isReadOnly"
+              (click)="onEditRecordButtonClick(data, $event)"
+            >
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemoveRecordButtonClick(data, $event)">
+            <button
+              ejs-button
+              cssClass="e-flat secondary-icon-button"
+              [disabled]="isReadOnly"
+              (click)="onRemoveRecordButtonClick(data, $event)"
+            >
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
@@ -351,21 +380,19 @@
             >
             </ejs-numerictextbox>
 
-            <ejs-numerictextbox
+            <input
               *ngIf="selectedBillRateUnit === BillRateUnitList.Multiplier || selectedBillRateUnit === BillRateUnitList.Currency"
-              class="numeric-input"
-              appValidateWithMessage
-              min="0"
-              maxlength="10"
-              [validateDecimalOnType]="true"
-              [showSpinButton]="false"
-              [placeholder]="selectedBillRateUnit === BillRateUnitList.Multiplier ? 'Rate' : 'Money'"
-              decimals='2'
-              [format]="rateHourMask"
+              class="e-input"
+              type="text"
               formControlName="billRateValueRateTimes"
-              (blur)="onRateHourBlur($event)"
-            >
-            </ejs-numerictextbox>
+              appValidateWithMessage
+              [placeholder]="selectedBillRateUnit === BillRateUnitList.Multiplier ? 'Rate' : 'Money'"
+              maxlength="11"
+              (keyup)="priceUtils.verifyDigitsAfterDot(billRatesFormGroup,'billRateValueRateTimes')"
+              (keydown)="priceUtils.numbersOnly($event)"
+              (focus)="priceUtils.setPriceMask(billRatesFormGroup,'billRateValueRateTimes', $event)"
+              (blur)="priceUtils.setTwoDecimals(billRatesFormGroup, 'billRateValueRateTimes', $event)"
+            />
           </div>
         </div>
 

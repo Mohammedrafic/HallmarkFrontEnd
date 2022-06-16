@@ -30,4 +30,16 @@ export default class PriceUtils {
       form.get(controlName)?.patchValue(value,{emitEvent: false});
     }
   }
+
+  static numbersOnly(event: KeyboardEvent): boolean {
+    const digitsOnly = /^\d*$/;
+    return digitsOnly.test(event.key) || event.key === 'Backspace' || event.key === 'ArrowLeft' || event.key === 'ArrowRight';
+  }
+
+  static verifyDigitsAfterDot(form: FormGroup, controlName: string): void {
+    const splitByDotNumbers = form.get(controlName)?.value.split('.');
+    if (splitByDotNumbers[1].length > 2) {
+      form.get(controlName)?.patchValue(parseFloat(form.get(controlName)?.value).toFixed(2),{emitEvent: false});
+    }
+  }
 }
