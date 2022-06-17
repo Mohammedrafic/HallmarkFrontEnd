@@ -55,7 +55,7 @@ export class BillingDetailsGroupComponent implements OnInit, OnDestroy {
       phone1: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       phone2: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
       fax: new FormControl('', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
-      ext: new FormControl('', [Validators.maxLength(5)]),
+      ext: new FormControl('', [Validators.maxLength(5),Validators.pattern("^[0-9]*$")]),
     });
   }
 }

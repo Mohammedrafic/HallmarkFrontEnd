@@ -51,6 +51,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateAgencyCandidateJob({
       organizationId: this.candidateJob.organizationId,
       jobId: this.candidateJob.jobId,
+      orderId: this.candidateJob.orderId,
       nextApplicantStatus: {
         applicantStatus: 50,
         statusText: "Accepted"

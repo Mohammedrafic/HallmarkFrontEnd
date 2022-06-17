@@ -68,6 +68,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       const value = this.formGroup.getRawValue();
       this.isOfferedStatus = event.itemData.applicantStatus === ApplicantStatusEnum.Offered;
       this.store.dispatch( new UpdateOrganisationCandidateJob({
+        orderId: this.candidateJob.orderId,
         organizationId: this.candidateJob.organizationId,
         jobId: this.candidateJob.jobId,
         nextApplicantStatus: event.itemData,

@@ -191,6 +191,7 @@ export type AcceptJobDTO = {
   clockId: number;
   guaranteedWorkWeek: string;
   jobId: number;
+  orderId: number;
   nextApplicantStatus: ApplicantStatus,
   offeredBillRate: number;
   organizationId: number;
