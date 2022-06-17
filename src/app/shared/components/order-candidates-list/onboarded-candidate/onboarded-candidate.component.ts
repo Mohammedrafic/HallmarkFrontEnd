@@ -118,12 +118,12 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
           yearExp: value.yearsOfExperience,
           travelExp: value.expAsTravelers,
           comments: value.requestComment,
-          workWeek: '',
-          clockId: '',
+          workWeek: value.guaranteedWorkWeek ? value.guaranteedWorkWeek : '',
+          clockId: value.clockId ? value.clockId : '',
           offeredBillRate: value.offeredBillRate,
           allow: false,
-          startDate: value.order.jobStartDate,
-          endDate: value.order.jobEndDate,
+          startDate: value.actualStartDate ? value.actualStartDate : value.order.jobStartDate,
+          endDate: value.actualEndDate ? value.actualEndDate : value.order.jobEndDate,
         });
 
         this.isFormDisabled(value.applicantStatus.applicantStatus);
