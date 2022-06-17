@@ -10,7 +10,7 @@ export class ResizeObserverService {
     const resizeEventEntries$ = new Subject<ResizeObserverEntry[]>();
     const observer = new ResizeObserver((entries: ResizeObserverEntry[]) => resizeEventEntries$.next(entries));
 
-    observer.observe(element);
+    observer.observe(element, { box: 'border-box' });
 
     return { resize$: resizeEventEntries$, detach: () => observer.disconnect() };
   }

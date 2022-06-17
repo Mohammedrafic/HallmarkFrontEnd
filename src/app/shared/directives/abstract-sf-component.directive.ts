@@ -1,5 +1,5 @@
 import { Component as SFComponent } from '@syncfusion/ej2-base';
-import { takeUntil } from 'rxjs';
+import { takeUntil, filter } from 'rxjs';
 
 import { Directive, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 
@@ -13,7 +13,9 @@ export class AbstractSFComponentDirective<ComponentType extends SFComponent<HTML
 {
   @ViewChild('sfComponent', { static: true }) public sfComponent: ComponentType;
 
-  private componentResizeObserver: ResizeObserverModel;
+  protected skipResizeObserverHandlerPredicate: boolean = false;
+
+  private componentResizeObserver: ResizeObserverModel | null;
 
   public ngAfterViewInit(): void {
     this.initSFComponentWrapperResizeObserver();
@@ -21,13 +23,18 @@ export class AbstractSFComponentDirective<ComponentType extends SFComponent<HTML
 
   public override ngOnDestroy() {
     super.ngOnDestroy();
-    this.componentResizeObserver.detach();
+    this.componentResizeObserver?.detach();
   }
 
   private initSFComponentWrapperResizeObserver(): void {
     this.componentResizeObserver = ResizeObserverService.init(this.sfComponent.getRootElement());
     this.componentResizeObserver.resize$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => requestAnimationFrame(() => this.sfComponent.refresh()));
+      .pipe(
+        filter(() => !this.skipResizeObserverHandlerPredicate),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        requestAnimationFrame(() => this.sfComponent.refresh());
+      });
   }
 }

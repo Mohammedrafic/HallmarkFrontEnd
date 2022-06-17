@@ -1,10 +1,11 @@
 <ejs-dashboardlayout
-  id="dashboardLayout"
-  [columns]="columns"
-  [cellSpacing]="cellSpacing"
-  (dragStop)="dragStopEmitter.emit()"
-  (created)="dashboardCreatedEmitter.emit()"
   #sfComponent
+  (created)="dashboardCreatedEmitter.emit()"
+  (dragStart)="dragStartHandler()"
+  (dragStop)="dragStopHandler()"
+  [cellSpacing]="cellSpacing"
+  [columns]="columns"
+  id="dashboardLayout"
 >
   <e-panels>
     <e-panel

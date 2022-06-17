@@ -28,4 +28,13 @@ export class DashboardWidgetsComponent extends AbstractSFComponentDirective<Dash
   public trackByHandler(_: number, panel: PanelModel): string {
     return panel.id ?? '';
   }
+
+  public dragStartHandler(): void {
+    this.skipResizeObserverHandlerPredicate = true;
+  }
+
+  public dragStopHandler(): void {
+    this.skipResizeObserverHandlerPredicate = false;
+    this.dragStopEmitter.emit();
+  }
 }
