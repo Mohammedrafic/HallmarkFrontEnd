@@ -1,4 +1,4 @@
-@import 'colors';
+@import "colors";
 
 .app-accumulation-chart {
   &__component {
@@ -9,5 +9,40 @@
     font-size: 16px;
     font-weight: 700;
     line-height: 28px;
+  }
+}
+
+.widget-legend {
+  &__checkbox-container {
+    position: relative;
+  }
+
+  &__checkbox {
+    height: 15px;
+    width: 15px;
+    appearance: none;
+    border: 1px solid $secondary-dark-blue-15;
+    border-radius: 2px;
+    outline: none;
+    transition-duration: 0.3s;
+    background-color: $white;
+
+    &:checked {
+      border: 1px solid $secondary-dark-blue-45;
+      background-color: $primary-active-blue-10;
+    }
+  }
+
+  &__checkmark {
+    &::before {
+      content: "\2713";
+      display: block;
+      position: absolute;
+      left: 7px;
+      top: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: $white;
+    }
   }
 }

@@ -7,11 +7,20 @@ import {
   DeleteBillRatesById,
   GetBillRateOptions,
   GetBillRates,
-  SaveUpdateBillRate, SaveUpdateBillRateSucceed
+  SaveUpdateBillRate,
+  ShowConfirmationPopUp,
+  SaveUpdateBillRateSucceed
 } from '@organization-management/store/bill-rates.actions';
 import { BillRatesService } from '@shared/services/bill-rates.service';
-import { RECORD_ADDED, RECORD_CANNOT_BE_SAVED, RECORD_CANNOT_BE_UPDATED, RECORD_MODIFIED } from '@shared/constants';
+import {
+  RECORD_ADDED,
+  RECORD_CANNOT_BE_DELETED,
+  RECORD_CANNOT_BE_SAVED,
+  RECORD_CANNOT_BE_UPDATED,
+  RECORD_MODIFIED
+} from '@shared/constants';
 import { BillRateOption, BillRateSetup, BillRateSetupPage } from '@shared/models/bill-rate.model';
+import { getAllErrors } from '@shared/utils/error.utils';
 
 export interface BillRatesStateModel {
   billRatesPage: BillRateSetupPage | null,
@@ -59,9 +68,17 @@ export class BillRatesState {
         }),
         catchError((error: any) => {
           if (payload.billRateSettingId) {
-            return dispatch(new ShowToast(MessageTypes.Error, error && error.error && error.error.detail ? error.error.detail : RECORD_CANNOT_BE_UPDATED));
+            if (error.error && error.error.errors && error.error.errors.ForceUpsert) {
+              return dispatch(new ShowConfirmationPopUp());
+            } else {
+              return dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : RECORD_CANNOT_BE_UPDATED));
+            }
           } else {
-            return dispatch(new ShowToast(MessageTypes.Error, error && error.error && error.error.detail ? error.error.detail : RECORD_CANNOT_BE_SAVED))
+            if (error.error && error.error.errors && error.error.errors.ForceUpsert) {
+              return dispatch(new ShowConfirmationPopUp());
+            } else {
+              return dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : RECORD_CANNOT_BE_SAVED));
+            }
           }
         })
       );
@@ -73,7 +90,7 @@ export class BillRatesState {
         dispatch(new GetBillRates({ pageNumber: pageNumber, pageSize: pageSize }));
         return payload;
       }),
-      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
+      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : RECORD_CANNOT_BE_DELETED))));
   }
 
   @Action(GetBillRateOptions)

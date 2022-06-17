@@ -3,7 +3,8 @@ export enum ControlTypes {
   Dropdown,
   Multiselect,
   Checkbox,
-  Radio
+  Radio,
+  Date
 }
 
 export enum ValueType {

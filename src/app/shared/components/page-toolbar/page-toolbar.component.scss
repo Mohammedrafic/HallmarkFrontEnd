@@ -17,7 +17,7 @@ $gap: 12px;
   .right-content {
     width: 50%;
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
     flex-grow: 1;
 
     & > *:not(:first-child) {

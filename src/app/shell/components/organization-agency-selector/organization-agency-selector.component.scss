@@ -6,6 +6,12 @@
   padding: 20px;
 }
 
+.organization-agency-dropdown-popup {
+  .e-ddl-hidden {
+    max-width: 0;
+  }
+}
+
 .logo-container {
   @include flex-center;
   img {
@@ -37,6 +43,7 @@
   display: flex;
   max-width: 231px;
   padding: 10px 14px 10px 10px;
+
   .logo-container {
     margin-right: 12px;
   }

@@ -8,7 +8,7 @@ import { CandidatesContentComponent } from './candidates/candidates-content/cand
 import { ReportsContentComponent } from './reports/reports-content/reports-content.component';
 import { ClientComponent } from './client.component';
 import { AddEditOrderComponent } from './order-management/add-edit-order/add-edit-order.component';
-import { UnsavedChangesGuard } from '@shared/guards';
+import { UnsavedOrderChangesGuard } from './guards/unsaved-order-changes.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -38,7 +38,7 @@ const routes: Routes = [
           isOrganizationArea: true,
           isEditing: false
         },
-        canDeactivate: [UnsavedChangesGuard]
+        canDeactivate: [UnsavedOrderChangesGuard]
       },
       {
         path: 'order-management/edit/:orderId',
@@ -47,7 +47,7 @@ const routes: Routes = [
           isOrganizationArea: true,
           isEditing: true
         },
-        canDeactivate: [UnsavedChangesGuard]
+        canDeactivate: [UnsavedOrderChangesGuard]
       },
       {
         path: 'time-sheets/:param',

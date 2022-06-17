@@ -80,11 +80,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   get isSeccondStepActive(): boolean {
     return this.tab?.selectedItem === 1;
   }
-
-  get isSaveDisabled(): boolean {
-    return !this.agencyForm.dirty;
-  }
-
+  
   @Select(AgencyState.isAgencyCreated)
   public isAgencyCreated$: Observable<boolean>;
 

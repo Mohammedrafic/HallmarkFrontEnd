@@ -36,7 +36,9 @@
       </e-column>
 
       <e-column headerText="Rates/Hours" textAlign="Right">
-        <ng-template #template let-data>{{data.rateHour}}</ng-template>
+        <ng-template #template let-data>
+          {{ data.rateHour | rateHourPipe: data.billRateConfig.title:data.billRateConfig.type:billRateOptions }}
+        </ng-template>
       </e-column>
 
       <e-column field="intervalMin" headerText="Interval Min" textAlign="Right"></e-column>

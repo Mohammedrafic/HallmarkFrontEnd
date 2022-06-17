@@ -6,7 +6,12 @@
   </ng-container>
   <ng-container right>
     <app-search></app-search>
-    <button ejs-button cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+    <button ejs-button cssClass="e-outline button-filter" (click)="showFilters()">
+      <div class="filter-button-content">
+        <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+        Filters <i-feather name="sliders" class="icon"></i-feather>
+      </div>
+    </button>
     <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
     <button ejs-button [isPrimary]="true" (click)="navigateToOrderForm()">Create Order</button>
   </ng-container>
@@ -25,6 +30,7 @@
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
     [allowTextWrap]="allowWrap"
+    (actionBegin)="actionBegin($event)"
     [enableVirtualization]="true"
     [selectionSettings]="selectionOptions"
     [textWrapSettings]="wrapSettings"
@@ -157,6 +163,166 @@
     </ng-template>
   </ejs-grid>
 </section>
+
+<app-filter-dialog [items]="filteredItems" [count]="(ordersPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
+  <form class="bootstrap" [formGroup]="OrderFilterFormGroup">
+    <div>
+      <div class="input-container">
+        <label for="externalId">Order ID</label>
+        <div class="input-group">
+          <input  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  placeholder="Order ID"
+                  formControlName="orderId"/>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-container">
+        <label>Region</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="regionIds"
+                           placeholder="All"
+                           [fields]="optionFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.regionIds.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Location</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="locationIds"
+                           placeholder="All"
+                           [fields]="optionFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.locationIds.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="input-container">
+        <label>Department</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="departmentsIds"
+                           placeholder="All"
+                           [fields]="optionFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.departmentsIds.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-container">
+        <label>Skill</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="skillIds"
+                           placeholder="All"
+                           [fields]="skillsFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.skillIds.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Order Type</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="orderTypes"
+                           placeholder="All"
+                           [fields]="optionFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.orderTypes.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="input-container">
+        <label>Job Title</label>
+        <div class="input-group">
+          <input  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  placeholder="Job Title"
+                  formControlName="jobTitle"/>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-container">
+        <label>Bill Rate From</label>
+        <div class="input-group">
+          <input  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  placeholder="Bill Rate From"
+                  formControlName="billRateFrom"/>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Bill Rate To</label>
+        <div class="input-group">
+          <input  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  placeholder="Bill Rate To"
+                  formControlName="billRateTo"/>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="input-container">
+        <label for="externalId"># of Positions</label>
+        <div class="input-group">
+          <input  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  placeholder="# of Positions"
+                  formControlName="openPositions"/>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-container calendar">
+        <label for="inactiveDate">Job Start Date</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            class="datepicker"
+            format="MM/dd/yyyy"
+            placeholder="MM/DD/YYYY"
+            formControlName="jobStartDate"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+      <div class="input-container calendar">
+        <label for="inactiveDate">Job End Date</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            class="datepicker"
+            format="MM/dd/yyyy"
+            placeholder="MM/DD/YYYY"
+            formControlName="jobEndDate"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+    </div>
+  </form>
+</app-filter-dialog>
 
 <app-order-details-dialog
   [order]="selectedOrder"

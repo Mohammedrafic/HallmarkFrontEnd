@@ -15,6 +15,11 @@ export class SaveUpdateBillRateSucceed {
   constructor() {}
 }
 
+export class ShowConfirmationPopUp {
+  static readonly type = '[billrates] Save/Update Bill Rate Failed';
+  constructor() {}
+}
+
 export class DeleteBillRatesById {
   static readonly type = '[billrates] Delete Bill Rate By Id';
   constructor(public payload: number, public pageNumber: number, public pageSize: number) {}

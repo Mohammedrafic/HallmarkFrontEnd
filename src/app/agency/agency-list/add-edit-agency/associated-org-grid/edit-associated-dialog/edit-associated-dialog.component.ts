@@ -54,12 +54,6 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
 
   public firstActive = true;
 
-  get isSaveActive(): boolean {
-    return this.editOrgTab?.selectedItem === 0
-      ? this.feeSettingsForm.touched && this.feeSettingsForm.dirty
-      : this.partnershipForm.touched && this.partnershipForm.dirty;
-  }
-
   private isAlive = true;
 
   constructor(private store: Store, private actions$: Actions, private confirmService: ConfirmService) {}

@@ -23,8 +23,7 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
   public readonly statusEnum = AgencyStatus;
   public initialSort = {
     columns: [
-      { field: 'agencyDetails.name', direction: 'Ascending' },
-      { field: 'PHONE', direction: 'none' },
+      { field: 'agencyDetails.name', direction: 'Ascending' }
     ]
   };
 

@@ -66,7 +66,7 @@ export class ImageUploaderComponent implements OnInit {
       if (this.uploaderErrorMessageElement) {
         this.uploaderErrorMessageElement.innerText = file.size > this.maxFileSize
           ? 'The file should not exceed 10MB.'
-          : 'The file should be in png, jpeg format.';
+          : 'The file should be in png, jpg format.';
       }
     });
   }

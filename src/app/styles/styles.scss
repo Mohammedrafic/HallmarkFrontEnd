@@ -130,6 +130,11 @@ body {
   i-feather.icon {
     width: 16px;
     height: 16px;
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   ejs-sidebar.e-control.e-sidebar.e-left {
@@ -224,6 +229,7 @@ hr {
 @import './controls/radio';
 @import './controls/tab';
 @import './controls/unsaved-changes-dialog';
+@import './controls/alert-dialog';
 @import './controls/accordion';
 @import './controls/datepicker';
 @import './controls/dialog';
@@ -261,6 +267,16 @@ a, a:hover, a:focus, a:active {
     left: 40%;
     background-color: var(--tooltip-background);
     transform: rotate(45deg);
+  }
+}
+
+.filter-button-content {
+  display: flex;
+
+  .e-badge.e-badge-circle.e-badge-success {
+    margin-right: 8px;
+    top: 0;
+    padding-right: 1px;
   }
 }
 

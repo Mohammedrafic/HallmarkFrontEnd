@@ -12,7 +12,7 @@ export const STATUS_COLOR_GROUP = {
   'e-pending': ['pending', 'Pending', 'offered'],
   'e-progress': ['in progress', 'In Progress', 'Verified', 'verified'],
   'e-accepted': ['accepted','Accepted'],
-  'e-filled': ['filled', 'Filled', 'onboarded'],
+  'e-filled': ['filled', 'Filled', 'onboard'],
   'e-awaiting': ['not applied', 'Not Applied']
 }
 

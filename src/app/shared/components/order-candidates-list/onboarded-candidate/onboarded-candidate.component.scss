@@ -1,5 +1,9 @@
 @import "colors";
 
+:host {
+  overflow-y: auto;
+}
+
 .header-container {
   .button-container {
     display: flex;
@@ -16,14 +20,14 @@
     display: flex;
     margin-top: 24px;
 
-    .input-group.input-readonly {
+    .input-group.input-readonly, {
       .e-input[readonly] {
         background-color: $secondary-dark-blue-50;
         color: $secondary-dark-blue-30;
         border: 1px solid $secondary-dark-blue-40 !important;
       }
 
-      ejs-daterangepicker{
+      ejs-daterangepicker {
         .e-input-group {
           background-color: $secondary-dark-blue-50;
           color: $secondary-dark-blue-30;
@@ -47,12 +51,12 @@
           }
 
           .left-column {
-            width: 67%;
+            width: 64%;
             margin-right: 12px;
           }
 
           .right-column {
-            width: 33%;
+            width: 36%;
           }
         }
 

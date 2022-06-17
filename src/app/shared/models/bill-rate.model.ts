@@ -89,6 +89,7 @@ export class BillRateSetupPost {
   regularLocal: boolean;
   displayInTimesheet: boolean;
   displayInJob: boolean;
+  forceUpsert?: boolean;
 }
 
 export class BillRateFilters {

@@ -1,7 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { AfterViewInit, Component, Input } from '@angular/core';
 import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { ChangeEventArgs } from "@syncfusion/ej2-angular-dropdowns";
 import { Subject } from "rxjs";
+
 import { CanadaStates, Country, UsaStates } from "src/app/shared/enums/states";
 
 @Component({
@@ -9,7 +9,7 @@ import { CanadaStates, Country, UsaStates } from "src/app/shared/enums/states";
   templateUrl: './candidate-contact-details.component.html',
   styleUrls: ['./candidate-contact-details.component.scss']
 })
-export class CandidateContactDetailsComponent {
+export class CandidateContactDetailsComponent implements AfterViewInit {
   @Input() formGroup: FormGroup;
 
   public optionFields = {
@@ -22,8 +22,10 @@ export class CandidateContactDetailsComponent {
   ];
   public states$ = new Subject();
 
-  public onCountryChange(event: ChangeEventArgs): void {
-    this.states$.next(event.value === Country.USA ? UsaStates : CanadaStates);
+  ngAfterViewInit(): void {
+    this.formGroup.get('country')?.valueChanges.subscribe(country => {
+      this.states$.next(country === Country.USA ? UsaStates : CanadaStates);
+    })
   }
 
   static createFormGroup(): FormGroup {

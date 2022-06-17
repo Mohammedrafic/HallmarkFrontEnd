@@ -86,6 +86,20 @@ export type AgencyOrder = {
   organizationId: number;
 };
 
+export class SuggesstedDetails {
+  workLocation: {
+    address: string;
+    state: string;
+    city: string;
+    zipCode: string;
+  };
+  contactDetails: {
+    name: string;
+    email: string;
+    mobilePhone: string;
+  };
+}
+
 export class OrderContactDetails {
   id?: number;
   orderId?: number;
@@ -146,7 +160,7 @@ export class Order {
   workLocations: OrderWorkLocation[];
   credentials: any[]; // ToDo: Add interface
   workflowId?: number;
-  statusText?: string;
+  statusText: string;
   locationName?: string;
   departmentName?: string;
   orderOpenDate?: Date;
@@ -156,14 +170,15 @@ export class Order {
   status: OrderStatus;
   organizationId?: number;
   totalPositions?: number;
+  acceptedPositions?: number;
   documents: Document[] | null;
 }
 
-export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'documents'> {
+export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'status' | 'statusText' | 'documents'> {
   billRates: OrderBillRateDto[];
 }
 
-export interface EditOrderDto extends Omit<Order, 'billRates' | 'status' | 'documents'> {
+export interface EditOrderDto extends Omit<Order, 'billRates' | 'status' | 'statusText' | 'documents'> {
   billRates: OrderBillRateDto[];
   deleteDocumentsGuids: string[];
 }
@@ -176,6 +191,7 @@ export type AcceptJobDTO = {
   clockId: number;
   guaranteedWorkWeek: string;
   jobId: number;
+  orderId: number;
   nextApplicantStatus: ApplicantStatus,
   offeredBillRate: number;
   organizationId: number;
@@ -225,9 +241,31 @@ export type OrderCandidateJob = {
   requestComment: string;
   workflowStepId: number;
   yearsOfExperience: number;
+  applicantStatus: {
+    applicantStatus: number;
+    statusText: string;
+  }
 }
 
 export type ApplicantStatus = {
   applicantStatus: number;
   statusText: string;
+}
+
+export class OrderFilter {
+  orderBy?: string;
+  pageNumber?: number;
+  pageSize?: number;
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentsIds?: number[];
+  orderId?: number;
+  skillIds?: number[];
+  orderTypes?: number[];
+  jobTitle?: string;
+  billRateFrom?: number;
+  billRateTo?: number;
+  openPositions?: number;
+  jobStartDate?: Date;
+  jobEndDate?: Date;
 }

@@ -64,7 +64,11 @@
           <span>{{ data.effectiveDate | date: 'MM/dd/yyyy' }}</span>
         </ng-template>
       </e-column>
-      <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" width=250 textAlign="Right"></e-column>
+      <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" width=250 textAlign="Right">
+        <ng-template #template let-data>
+          <span>{{ data.rateHour | rateHourPipe: data.billRateTitle:data.billRateType:billRatesOptions }}</span>
+        </ng-template>
+      </e-column>
       <e-column field="intervalMin" headerText="INTERVAL MIN" width=180 textAlign="Right"></e-column>
       <e-column field="intervalMax" headerText="INTERVAL MAX" width=180 textAlign="Right"></e-column>
       <e-column field="considerForWeeklyOT" headerText="CONSIDER FOR WEEKLY OT" width=230>

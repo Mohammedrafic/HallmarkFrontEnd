@@ -30,6 +30,7 @@ import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { Location } from '@angular/common';
 import { UserState } from 'src/app/store/user.state';
+import { isUndefined } from 'lodash';
 
 enum AllCheckedStatus {
   None,
@@ -102,8 +103,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     if (this.previousSelectedOrderId) {
       const [data, index] = this.store.selectSnapshot(OrderManagementState.lastSelectedOrder)(
         this.previousSelectedOrderId
-      );
-      if (data && index) {
+        );
+      if (data && !isUndefined(index)) {
         this.grid.selectRow(index);
         this.onRowClick({ data });
       }
@@ -204,12 +205,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   private onReloadOrderCandidatesLists(): void {
     this.actions$.pipe(ofActionSuccessful(ReloadOrderCandidatesLists), takeWhile(() => this.isAlive)).subscribe(() => {
-      this.store.dispatch(
-        new GetAgencyOrderCandidatesList(this.selectedOrder.orderId, this.selectedOrder.organizationId, this.currentPage, this.pageSize)
-      );
-      this.store.dispatch(new GetAgencyOrderGeneralInformation(this.selectedOrder.orderId, this.selectedOrder.organizationId));
-      this.dispatchNewPage();
-      this.store.dispatch(new GetOrderById(this.selectedOrder.orderId, this.selectedOrder.organizationId, this.getDialogNextPreviousOption(this.selectedOrder)));
+      this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize)).subscribe((data) => {
+        const order = data.agencyOrders.ordersPage.items.find((item: AgencyOrderManagement) => item.orderId === this.selectedOrder.orderId);
+        if (order) {
+          this.onRowClick({ data: order });
+        }
+      });
     });
   }
 }

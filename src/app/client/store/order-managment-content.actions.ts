@@ -1,7 +1,6 @@
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { AcceptJobDTO, OrderManagementFilter } from '@shared/models/order-management.model';
+import { AcceptJobDTO, CreateOrderDto, EditOrderDto, OrderManagementFilter } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
-import { CreateOrderDto, EditOrderDto } from '@shared/models/order-management.model';
 
 export class GetIncompleteOrders {
   static readonly type = '[order management] Get Incomplete Orders';
@@ -62,6 +61,11 @@ export class UpdateOrganisationCandidateJob {
   ) {}
 }
 
+export class UpdateOrganisationCandidateJobSucceed {
+  static readonly type = '[order management] Update Organisation Candidate Job Succeed';
+  constructor() {}
+}
+
 export class GetAvailableSteps {
   static readonly type = '[order management] Get AvailableSteps';
   constructor(public organizationId: number, public jobId: number) {}
@@ -70,6 +74,11 @@ export class GetAvailableSteps {
 export class GetProjectSpecialData {
   static readonly type = '[order management] Get Project Special Data';
   constructor() { }
+}
+
+export class GetSuggestedDetails {
+  static readonly type = '[order management] Get Suggested Details';
+  constructor(public locationId: number) { }
 }
 
 export class GetProjectNames {
@@ -102,6 +111,11 @@ export class ClearPredefinedBillRates {
   constructor() { }
 }
 
+export class SetIsDirtyOrderForm {
+  static readonly type = '[order management] Set Is Dirty Order Form';
+  constructor(public isDirtyOrderForm: boolean) {}
+}
+
 export class SaveOrder {
   static readonly type = '[order management] Save Order';
   constructor(public order: CreateOrderDto, public documents: Blob[]) { }
@@ -124,10 +138,21 @@ export class DeleteOrder {
 
 export class DeleteOrderSucceeded {
   static readonly type = '[order management] Delete Order Succeeded';
-  constructor() { }
+
+  constructor() {
+  }
 }
 
 export class ReloadOrganisationOrderCandidatesLists {
   static readonly type = '[agency order management] Reload Order and Candidates Lists on Organisation';
-  constructor() {}
+
+  constructor() {
+  }
+}
+
+export class ClearSelectedOrder {
+  static readonly type = '[order management] Clear selected order';
+
+  constructor() {
+  }
 }

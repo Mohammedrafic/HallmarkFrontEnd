@@ -1,3 +1,4 @@
+import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
@@ -33,7 +34,7 @@ export class FilterService {
    * @param form form group to update
    * @returns list of applied filters
    */
-  public generateChips(form: FormGroup, filterColumns: any): FilteredItem[] {
+  public generateChips(form: FormGroup, filterColumns: any, datePipe?: DatePipe): FilteredItem[] {
     let chips: any[] = [];
     Object.keys(form.controls).forEach(key => {
       const val = form.controls[key].value;
@@ -49,6 +50,8 @@ export class FilterService {
         });
       } else if (filterColumns[key].type === ControlTypes.Checkbox) {
         chips.push({ text: filterColumns[key].checkboxTitle, column: key, value: val });
+      } else if (filterColumns[key].type === ControlTypes.Date && datePipe) {
+        chips.push({ text: datePipe.transform(val,'MM/dd/yyyy'), column: key, value: val });
       } else {
         chips.push({ text: val, column: key, value: val });
       }

@@ -39,7 +39,7 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
   public today = new Date();
   public maxDate = new Date(2099, 11, 31);
   public yearsList: number[] = [];
-  public format = { 
+  public format = {
     type:'date', format: 'MM/dd/yyyy hh:mm a'
   };
   public showForm = true;
@@ -121,8 +121,12 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.defaultFileName = 'Master Holidays ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportHolidays(new ExportPayload(
-      fileType, 
-      { year: this.yearFilter, offset: Math.abs(new Date().getTimezoneOffset()) }, 
+      fileType,
+      {
+        year: this.yearFilter,
+        offset: Math.abs(new Date().getTimezoneOffset()),
+        ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
+      },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
       options?.fileName || this.defaultFileName

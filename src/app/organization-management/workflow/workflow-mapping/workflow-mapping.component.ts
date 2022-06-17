@@ -117,7 +117,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   private unsubscribe$: Subject<void> = new Subject();
 
   public filters: WorkflowFilters = {
-    pageSize: this.pageSize, 
+    pageSize: this.pageSize,
     pageNumber: 1
   };
   public filterColumns: any;
@@ -152,9 +152,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       types: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       names: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [], valueField: 'name' },
     }
-    this.filterColumns.types.dataSource = Object.keys(WorkflowType)
-      .map((type: any) => { return { name: type, id: WorkflowType[type] }})
-      .filter(item => isNaN(item.name));
+    this.filterColumns.types.dataSource = [{ id: WorkflowGroupType.Organization, name: this.jobOrderWorkflow }];
 
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
@@ -335,6 +333,18 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new GetWorkflowMappingPages(this.filters));
   }
 
+  public onFilterClose() {
+    this.WorkflowFilterFormGroup.setValue({
+      regionIds: this.filters.regionIds || [],
+      locationIds: this.filters.locationIds || [],
+      departmentsIds: this.filters.departmentsIds || [],
+      skillIds: this.filters.skillIds || [],
+      types: this.filters.types || [],
+      names: this.filters.names || [],
+    });
+    this.filteredItems = this.filterService.generateChips(this.WorkflowFilterFormGroup, this.filterColumns);
+  }
+
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }
@@ -348,6 +358,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};
+    this.store.dispatch(new GetWorkflowMappingPages(this.filters));
   }
 
   public onFilterApply(): void {
@@ -448,16 +459,16 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
   public onSaveFormClick(): void {
     if (this.workflowMappingFormGroup.valid) {
+      const isAllRegions = this.workflowMappingFormGroup.controls['regions'].value.length === this.allRegions.length;
       const workflowMapping: WorkflowMappingPost = {
         mappingId: this.editedRecordId,
-        regionIds: this.workflowMappingFormGroup.controls['regions'].value.length === this.allRegions.length ? []
-          : this.workflowMappingFormGroup.controls['regions'].value, // [] means All on the BE side
-        locationIds: this.workflowMappingFormGroup.controls['locations'].value.length === this.locations.length ? []
-          : this.workflowMappingFormGroup.controls['locations'].value, // [] means All on the BE side
-        departmentIds: this.workflowMappingFormGroup.controls['departments'].value.length === this.departments.length ? []
-          : this.workflowMappingFormGroup.controls['departments'].value, // [] means All on the BE side
-        skillIds: this.workflowMappingFormGroup.controls['skills'].value.length === this.allSkills.length ? []
-          : this.workflowMappingFormGroup.controls['skills'].value, // [] means All on the BE side
+        regionIds: isAllRegions ? [] : this.workflowMappingFormGroup.controls['regions'].value, // [] means All on the BE side
+        locationIds: isAllRegions && this.workflowMappingFormGroup.controls['locations'].value.length === this.locations.length
+          ? [] : this.workflowMappingFormGroup.controls['locations'].value, // [] means All on the BE side
+        departmentIds: isAllRegions && this.workflowMappingFormGroup.controls['departments'].value.length === this.departments.length
+          ? [] : this.workflowMappingFormGroup.controls['departments'].value, // [] means All on the BE side
+        skillIds: this.workflowMappingFormGroup.controls['skills'].value.length === this.allSkills.length
+          ? [] : this.workflowMappingFormGroup.controls['skills'].value, // [] means All on the BE side
         workflowGroupId: this.workflowMappingFormGroup.controls['workflowName'].value, // workflowName contains selected workflow id, on the BE workflowGroupId is just workflowId
         stepMappings: this.getStepMappings()
       };

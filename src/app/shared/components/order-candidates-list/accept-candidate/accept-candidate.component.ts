@@ -51,6 +51,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateAgencyCandidateJob({
       organizationId: this.candidateJob.organizationId,
       jobId: this.candidateJob.jobId,
+      orderId: this.candidateJob.orderId,
       nextApplicantStatus: {
         applicantStatus: 50,
         statusText: "Accepted"
@@ -65,7 +66,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
       allowDeplayWoCredentials: false
     })).subscribe(() => {
       this.store.dispatch(new ReloadOrderCandidatesLists());
-      this.onCloseDialog();
     });
   }
 
@@ -97,7 +97,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
         this.form.patchValue({
           jobId: value.orderId,
           date: [value.order.jobStartDate, value.order.jobEndDate],
-          billRates: value.order.billRates,
+          billRates: value.order.hourlyRate,
           candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
           candidateBillRate: value.candidateBillRate,
           locationName: value.order.locationName,

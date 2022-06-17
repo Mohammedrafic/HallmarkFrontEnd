@@ -17,8 +17,16 @@ export class ExportPayload {
   properties?: string[];
   ids?: number[];
   filename?: string;
+  offset?: number;
 
-  constructor(exportedFileType: ExportedFileType, filterQuery?: any, properties?: string[], ids?: any[] | null, fileName?: string) {
+  constructor(
+    exportedFileType: ExportedFileType,
+    filterQuery?: any,
+    properties?: string[],
+    ids?: any[] | null,
+    fileName?: string,
+    offset?: number,
+  ) {
     this.exportFileType = exportedFileType;
     if (filterQuery) {
       this.filterQuery = filterQuery;
@@ -31,6 +39,9 @@ export class ExportPayload {
     }
     if (fileName) {
       this.filename = fileName;
+    }
+    if(offset) {
+      this.offset = offset;
     }
   }
 }

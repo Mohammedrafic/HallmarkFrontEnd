@@ -52,7 +52,7 @@
         </e-column>
         <e-column field="generalInformation.city" headerText="City" textAlign="Left" width="90"></e-column>
         <e-column field="contactDetails.0.contactPerson" headerText="Contact" textAlign="Left" width="120"></e-column>
-        <e-column field="contactDetails.0.phoneNumberExt" headerText="Phone" textAlign="Left" width="90">
+        <e-column field="contactDetails.0.phoneNumberExt" headerText="Phone" textAlign="Left" width="90" [allowSorting]="false">
           <ng-template #template let-data>
             <span>{{ data.contactDetails[0].phoneNumberExt | formatPhoneNumber }}</span>
           </ng-template>

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { catchError, Observable, of, tap } from 'rxjs';
-import { RECORD_ADDED, RECORD_MODIFIED, RECORD_SAVED } from 'src/app/shared/constants/messages';
+import { AGENCY_ADDED, RECORD_ADDED, RECORD_MODIFIED, RECORD_SAVED } from 'src/app/shared/constants/messages';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 
 import { Agency, AgencyPage } from 'src/app/shared/models/agency.model';
@@ -159,13 +159,13 @@ export class AgencyState {
   SaveAgency({ patchState, dispatch }: StateContext<AgencyStateModel>, { payload }: SaveAgency): Observable<Agency> {
     patchState({ isAgencyLoading: true });
     return this.agencyService.saveAgency(payload).pipe(
-      tap((payload) => {
-        patchState({ isAgencyLoading: false, agency: payload });
-        dispatch(new SaveAgencySucceeded(payload));
+      tap((agency) => {
+        patchState({ isAgencyLoading: false, agency });
+        dispatch(new SaveAgencySucceeded(agency));
         if (payload.agencyDetails.id) {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
         } else {
-          dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+          dispatch(new ShowToast(MessageTypes.Success, AGENCY_ADDED));
         }
         return payload;
       })
@@ -201,6 +201,7 @@ export class AgencyState {
               items: [...state.associateOrganizationsPages.items, ...payload],
             };
             patchState({ associateOrganizationsPages });
+            dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
             dispatch(new InvateOrganizationsSucceeded(payload));
           })
         )

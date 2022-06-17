@@ -5,8 +5,9 @@
         <h3 class="e-card-title">{{candidate?.lastName}}, {{candidate?.firstName}}</h3>
       </div>
       <div class="e-card-content button-container">
-        <div class="input-group dropdown bootstrap">
+        <div class="input-group dropdown bootstrap input-readonly">
           <ejs-dropdownlist
+            *ngIf="isOnboarded"
             [fields]="optionFields"
             [dataSource]="jobStatus"
             placeholder="Select Status"
@@ -53,7 +54,7 @@
                     <div class="input-container bootstrap">
                       <label class="input-group">Guaranteed Work Week</label>
                       <div class="input-group">
-                        <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" placeholder="Guaranteed Work Week"/>
+                        <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" placeholder="Guaranteed Work Week" maxlength="50"/>
                       </div>
                     </div>
                   </div>
@@ -79,7 +80,7 @@
                     <div class="input-container bootstrap">
                       <label class="input-group">Clock ID </label>
                       <div>
-                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" placeholder="Clock ID"/>
+                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" placeholder="Clock ID" maxlength="50"/>
                       </div>
                     </div>
                   </div>
@@ -92,7 +93,7 @@
                 </div>
                 <div class="form-container row">
                   <div class="input-container bootstrap">
-                    <label class="input-group">Years of experience</label>
+                    <label class="input-group">Yrs. of Exp.</label>
                     <div class="input-group input-readonly">
                       <input appValidateWithMessage formControlName="yearExp" class="e-input" type="text" placeholder="0" readonly/>
                     </div>
