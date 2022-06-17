@@ -672,15 +672,19 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private populateForms(order: Order): void {
     const isStatusEditOrProgress = order.status === OrderStatus.Filled || order.status === OrderStatus.InProgress;
 
+    const hourlyRate = order.hourlyRate ? parseFloat(order.hourlyRate.toString()).toFixed(2) : '';
+    const joiningBonus = order.joiningBonus ? parseFloat(order.joiningBonus.toString()).toFixed(2) : '';
+    const compBonus = order.compBonus ? parseFloat(order.compBonus.toString()).toFixed(2) : '';
+
     this.orderStatus = order.statusText;
     this.orderTypeForm.controls['orderType'].patchValue(order.orderType);
     this.generalInformationForm.controls['title'].patchValue(order.title);
     this.generalInformationForm.controls['skillId'].patchValue(order.skillId);
-    this.generalInformationForm.controls['hourlyRate'].patchValue(order.hourlyRate);
+    this.generalInformationForm.controls['hourlyRate'].patchValue(hourlyRate);
     this.generalInformationForm.controls['openPositions'].patchValue(order.openPositions);
     this.generalInformationForm.controls['minYrsRequired'].patchValue(order.minYrsRequired);
-    this.generalInformationForm.controls['joiningBonus'].patchValue(order.joiningBonus);
-    this.generalInformationForm.controls['compBonus'].patchValue(order.compBonus);
+    this.generalInformationForm.controls['joiningBonus'].patchValue(joiningBonus);
+    this.generalInformationForm.controls['compBonus'].patchValue(compBonus);
     this.generalInformationForm.controls['duration'].patchValue(order.duration);
     this.generalInformationForm.controls['shiftRequirementId'].patchValue(order.shiftRequirementId);
     this.generalInformationForm.controls['shiftStartTime'].patchValue(order.shiftStartTime);
