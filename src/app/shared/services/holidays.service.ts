@@ -89,7 +89,7 @@ export class HolidaysService {
 
   /**
    * Checks if overriding to be performed
-   * @param holiday 
+   * @param holiday
    * @returns boolean
    */
   public checkIfExist(holiday: OrganizationHoliday): Observable<boolean> {
@@ -101,8 +101,8 @@ export class HolidaysService {
    * @param holiday
    */
   public removeOrganizationHoliday(holiday: OrganizationHoliday): Observable<any> {
-    return this.http.delete<any>(`/api/OrganizationHolidays`, { 
-      body: { masterHolidayId: holiday.masterHolidayId || 0, orgHolidayId: holiday.id || 0 } 
+    return this.http.delete<any>(`/api/OrganizationHolidays`, {
+      body: { masterHolidayId: holiday.masterHolidayId || 0, orgHolidayId: holiday.id || 0 }
     });
   }
 

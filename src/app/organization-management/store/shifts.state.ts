@@ -56,7 +56,7 @@ export class ShiftsState {
       tap((payloadResponse) => {
         patchState({ isShiftLoading: false });
         if (payload.id) {
-          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));``
+          dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
         } else {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         }
