@@ -156,6 +156,7 @@ export class Order {
   status: OrderStatus;
   organizationId?: number;
   totalPositions?: number;
+  acceptedPositions?: number;
   documents: Document[] | null;
 }
 
