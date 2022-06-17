@@ -114,11 +114,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   public onCloseDialog(): void {
     this.sideDialog.hide();
   }
-
-  public getBillRate(rate: number, candidateRate: number):string {
-    return candidateRate ? `$${rate} - ${candidateRate}` : `$${rate} - ${rate}`;
-  }
-
+  
   private subscribeOnPageChanges(): void {
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;

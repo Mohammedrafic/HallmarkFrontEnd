@@ -44,6 +44,7 @@ import { AddBackgroundForEmptyGridDirective } from '@shared/directives/add-backg
 import { FormatPhoneNumberPipe } from '@shared/pipes/format-phone-number.pipe';
 import { RateHourPipe } from '@shared/pipes/rate-hour.pipe';
 import { OfferDeploymentComponent } from './components/order-candidates-list/offer-deployment/offer-deployment.component';
+import { BillRatePipe } from "@shared/pipes/bill-rate.pipe";
 
 const icons = {
   AlertCircle,
@@ -66,6 +67,7 @@ const COMPONENTS = [
   OrderTypeName,
   FormatPhoneNumberPipe,
   RateHourPipe,
+  BillRatePipe,
   ValidateDirective,
   HighlightGridRowDirective,
   AddBackgroundForEmptyGridDirective,
