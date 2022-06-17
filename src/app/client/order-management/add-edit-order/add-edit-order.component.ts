@@ -6,7 +6,7 @@ import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
-import { Observable, Subject, takeUntil, switchMap, of } from 'rxjs';
+import { Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { SetImportFileDialogState } from '@admin/store/admin.actions';
@@ -107,7 +107,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.getPredefinedBillRatesData$.pipe(
       takeUntil(this.unsubscribe$),
       switchMap(getPredefinedBillRatesData => {
-        if (getPredefinedBillRatesData && !this.billRatesComponent.billRatesControl.value.length) {
+        if (getPredefinedBillRatesData && !this.billRatesComponent?.billRatesControl.value.length) {
           return this.store.dispatch(new GetPredefinedBillRates());
         } else {
           return of(null);

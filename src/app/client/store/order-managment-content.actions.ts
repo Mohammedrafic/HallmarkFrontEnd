@@ -1,7 +1,6 @@
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { AcceptJobDTO, OrderManagementFilter } from '@shared/models/order-management.model';
+import { AcceptJobDTO, CreateOrderDto, EditOrderDto, OrderManagementFilter } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
-import { CreateOrderDto, EditOrderDto } from '@shared/models/order-management.model';
 
 export class GetIncompleteOrders {
   static readonly type = '[order management] Get Incomplete Orders';
@@ -129,10 +128,21 @@ export class DeleteOrder {
 
 export class DeleteOrderSucceeded {
   static readonly type = '[order management] Delete Order Succeeded';
-  constructor() { }
+
+  constructor() {
+  }
 }
 
 export class ReloadOrganisationOrderCandidatesLists {
   static readonly type = '[agency order management] Reload Order and Candidates Lists on Organisation';
-  constructor() {}
+
+  constructor() {
+  }
+}
+
+export class ClearSelectedOrder {
+  static readonly type = '[order management] Clear selected order';
+
+  constructor() {
+  }
 }

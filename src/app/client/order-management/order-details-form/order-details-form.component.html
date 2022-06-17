@@ -167,15 +167,15 @@
                   <div class="input-group">
                     <input
                       class="e-input"
-                      type="text"
-                      placeholder="Joining Bonus"
                       formControlName="joiningBonus"
-                      appValidateWithMessage
                       maxlength="10"
+                      placeholder="Joining Bonus"
+                      appValidateWithMessage
+                      type="text"
                       (focus)="priceUtils.setPriceMask(generalInformationForm, 'joiningBonus', $event)"
                       (blur)="priceUtils.setTwoDecimals(generalInformationForm,'joiningBonus', $event)"
                     />
-                  </div>`
+                  </div>
                 </div>
 
                 <!-- Comp. Bonus -->
@@ -496,7 +496,7 @@
                     <div class="input-group">
                       <ejs-maskedtextbox
                         promptChar="_"
-                        mask='000-000-0000'
+                        mask="000-000-0000"
                         formControlName="mobilePhone"
                         appValidateWithMessage
                         placeholder="Mobile Phone"

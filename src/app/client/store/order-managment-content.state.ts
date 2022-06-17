@@ -1,17 +1,21 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of,tap } from 'rxjs';
+import { catchError, Observable, of, tap } from 'rxjs';
 import {
- ClearPredefinedBillRates,
+  ClearPredefinedBillRates,
+  ClearSelectedOrder,
   DeleteOrder,
-  DeleteOrderSucceeded, EditOrder,
+  DeleteOrderSucceeded,
+  EditOrder,
   GetAgencyOrderCandidatesList,
   GetAssociateAgencies,
- GetAvailableSteps, GetIncompleteOrders,
+  GetAvailableSteps,
+  GetIncompleteOrders,
   GetMasterShifts,
   GetOrderById,
   GetOrders,
- GetOrganisationCandidateJob, GetOrganizationStatesWithKeyCode,
+  GetOrganisationCandidateJob,
+  GetOrganizationStatesWithKeyCode,
   GetPredefinedBillRates,
   GetProjectNames,
   GetProjectSpecialData,
@@ -28,12 +32,12 @@ import { OrderManagementContentService } from '@shared/services/order-management
 import {
   ApplicantStatus,
   GetPredefinedBillRatesData,
+  Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
   OrderManagement,
   OrderManagementPage
 } from '@shared/models/order-management.model';
-import { Order } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
@@ -47,8 +51,8 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate } from '@shared/models/bill-rate.model';
-import { OrderManagementModel } from "@agency/store/order-management.state";
-import {ProjectSpecialData} from "@shared/models/project-special-data.model";
+import { OrderManagementModel } from '@agency/store/order-management.state';
+import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -222,6 +226,11 @@ export class OrderManagementContentState {
       patchState({ selectedOrder: payload });
       return payload;
     }));
+  }
+
+  @Action(ClearSelectedOrder)
+  ClearSelectedOrder({ patchState }: StateContext<OrderManagementContentStateModel>): void {
+    patchState({ selectedOrder: null });
   }
 
   @Action(GetOrganizationStatesWithKeyCode)

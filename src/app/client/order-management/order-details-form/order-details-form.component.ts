@@ -3,7 +3,7 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { combineLatest, Observable, Subject, take, takeUntil, debounceTime } from 'rxjs';
+import { combineLatest, debounceTime, filter, Observable, Subject, take, takeUntil } from 'rxjs';
 
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -14,13 +14,14 @@ import {
   GetRegions
 } from '@organization-management/store/organization-management.actions';
 import {
+  ClearSelectedOrder,
   GetAssociateAgencies,
   GetMasterShifts,
   GetOrganizationStatesWithKeyCode,
+  GetProjectSpecialData,
   GetWorkflows,
-  SetPredefinedBillRatesData,
   SetIsDirtyOrderForm,
-  GetProjectSpecialData
+  SetPredefinedBillRatesData
 } from '@client/store/order-managment-content.actions';
 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
@@ -55,7 +56,9 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { SkillCategory } from '@shared/models/skill-category.model';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
-import {ProjectSpecialData} from "@shared/models/project-special-data.model";
+import { ProjectSpecialData } from '@shared/models/project-special-data.model';
+import { OrderStatus } from '@shared/enums/order-management';
+import { disableControls } from '@shared/utils/form.utils';
 
 @Component({
   selector: 'app-order-details-form',
@@ -519,7 +522,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetAssociateAgencies());
     this.store.dispatch(new GetOrganizationStatesWithKeyCode());
 
-    this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe(order => {
+    this.selectedOrder$.pipe(
+      filter((order: Order | null) => !!order),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(order => {
       const isEditMode = !!this.route.snapshot.paramMap.get('orderId');
       if (order && isEditMode) {
         this.isEditMode = true;
@@ -530,12 +536,13 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         this.order = null;
         //this.resetForms(); TODO: clarify
       }
-    })
+    });
   }
 
   public ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.store.dispatch(new ClearSelectedOrder());
   }
 
   public onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -644,6 +651,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private populateForms(order: Order): void {
+    const isStatusEditOrProgress = order.status === OrderStatus.Filled || order.status === OrderStatus.InProgress;
+
     this.orderStatus = order.statusText;
     this.orderTypeForm.controls['orderType'].patchValue(order.orderType);
     this.generalInformationForm.controls['title'].patchValue(order.title);
@@ -665,14 +674,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     if (order.regionId) {
       this.store.dispatch(new GetLocationsByRegionId(order.regionId)).pipe(take(1)).subscribe(() => {
         this.generalInformationForm.controls['locationId'].patchValue(order.locationId);
-        this.isLocationsDropDownEnabled = true;
+        this.isLocationsDropDownEnabled = !isStatusEditOrProgress;
       });
     }
 
     if (order.locationId) {
       this.store.dispatch(new GetDepartmentsByLocationId(order.locationId)).pipe(take(1)).subscribe(() => {
         this.generalInformationForm.controls['departmentId'].patchValue(order.departmentId);
-        this.isDepartmentsDropDownEnabled = true;
+        this.isDepartmentsDropDownEnabled = !isStatusEditOrProgress;
       });
     }
 
@@ -726,6 +735,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     }
 
     this.workflowForm.controls['workflowId'].patchValue(order.workflowId);
+
+    this.disableFormControls(order);
   }
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
@@ -794,5 +805,13 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private findTargetState(location: Location): string | undefined {
     const states = this.store.selectSnapshot(OrderManagementContentState.organizationStatesWithKeyCode);
     return states.find(({ title }: OrganizationStateWithKeyCode) => title === location.state)?.keyCode;
+  }
+
+  /** During editing order (in progress or filled), some fields have to be disabled */
+  private disableFormControls(order: Order): void {
+    if (order.status === OrderStatus.InProgress || order.status === OrderStatus.Filled) {
+      this.generalInformationForm = disableControls(this.generalInformationForm, ['regionId', 'skillId']);
+      this.workflowForm.get('workflowId')?.disable();
+    }
   }
 }
