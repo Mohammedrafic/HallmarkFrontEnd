@@ -201,6 +201,7 @@ export class AgencyState {
               items: [...state.associateOrganizationsPages.items, ...payload],
             };
             patchState({ associateOrganizationsPages });
+            dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
             dispatch(new InvateOrganizationsSucceeded(payload));
           })
         )
