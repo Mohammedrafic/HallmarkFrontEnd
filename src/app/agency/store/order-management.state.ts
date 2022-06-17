@@ -18,6 +18,7 @@ import { catchError, Observable, of, tap } from 'rxjs';
 import { ShowToast } from "src/app/store/app.actions";
 import {
   ApplyOrderApplicants,
+  ApplyOrderApplicantsSucceed,
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
   GetAgencyOrdersPage,
@@ -181,7 +182,10 @@ export class OrderManagementState {
   @Action(ApplyOrderApplicants)
   ApplyOrderApplicants({ dispatch }: StateContext<OrderManagementModel>, { payload }: ApplyOrderApplicants): Observable<any> {
     return this.orderApplicantsService.applyOrderApplicants(payload).pipe(
-      tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'))),
+      tap(() => {
+        dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'));
+        dispatch(new ApplyOrderApplicantsSucceed());
+      }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
     );
   }

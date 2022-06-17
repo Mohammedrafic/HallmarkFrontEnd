@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 
-import { Select, Store } from "@ngxs/store";
+import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
+import { ApplicantStatus as ApplicantStatusEnum } from "@shared/enums/applicant-status.enum";
 import { Observable, Subject, takeUntil } from "rxjs";
 
-import { ApplyOrderApplicants, ReloadOrderCandidatesLists } from "@agency/store/order-management.actions";
+import { ApplyOrderApplicants, ApplyOrderApplicantsSucceed, ReloadOrderCandidatesLists } from "@agency/store/order-management.actions";
 import { OrderManagementState } from "@agency/store/order-management.state";
 import { BillRate } from "@shared/models/bill-rate.model";
 import { OrderApplicantsInitialData } from "@shared/models/order-applicants.model";
@@ -15,13 +16,14 @@ import { OrderCandidatesList } from "@shared/models/order-management.model";
   templateUrl: './apply-candidate.component.html',
   styleUrls: ['./apply-candidate.component.scss']
 })
-export class ApplyCandidateComponent implements OnInit, OnDestroy {
+export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
 
   @Input() candidate: OrderCandidatesList;
   @Input() billRatesData: BillRate[] = [];
 
   public formGroup: FormGroup;
+  public readOnlyMode: boolean;
 
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
@@ -30,7 +32,13 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy {
   private organizationId: number;
   private candidateId: number;
 
-  constructor(private store: Store) { }
+  constructor(private store: Store, private actions$: Actions) { }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['candidate']) {
+      this.readOnlyMode = changes['candidate'].currentValue.status !== ApplicantStatusEnum.NotApplied;
+    }
+  }
 
   ngOnInit(): void {
     this.createForm();
@@ -98,6 +106,9 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy {
         this.candidateId = data.candidateId;
         this.setFormValue(data);
       }
+    });
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ApplyOrderApplicantsSucceed)).subscribe(() => {
+      this.readOnlyMode = true;
     });
   }
 }

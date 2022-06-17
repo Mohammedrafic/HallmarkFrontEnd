@@ -1,13 +1,17 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 
-import { Select, Store } from "@ngxs/store";
+import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { Observable, Subject, takeUntil } from "rxjs";
 
 import { BillRate } from "@shared/models/bill-rate.model";
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from "@shared/models/order-management.model";
 import { OrderManagementContentState } from "@client/store/order-managment-content.state";
-import { ReloadOrganisationOrderCandidatesLists, UpdateOrganisationCandidateJob } from "@client/store/order-managment-content.actions";
+import {
+  ReloadOrganisationOrderCandidatesLists,
+  UpdateOrganisationCandidateJob,
+  UpdateOrganisationCandidateJobSucceed
+} from "@client/store/order-managment-content.actions";
 import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
 
 
@@ -34,8 +38,9 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   private unsubscribe$: Subject<void> = new Subject();
   private candidateJob: OrderCandidateJob | null;
+  private isOfferedStatus: boolean;
 
-  constructor(private store: Store) { }
+  constructor(private store: Store, private actions$: Actions) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.readOnlyMode = changes['candidate']?.currentValue.status === ApplicantStatusEnum.Offered;
@@ -55,11 +60,13 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.closeDialogEmitter.next();
     this.nextApplicantStatuses = [];
     this.candidateJob = null;
+    this.isOfferedStatus = false;
   }
 
   public updateCandidateJob(event: { itemData: ApplicantStatus }): void {
     if (this.formGroup.valid && this.candidateJob) {
       const value = this.formGroup.getRawValue();
+      this.isOfferedStatus = event.itemData.applicantStatus === ApplicantStatusEnum.Offered;
       this.store.dispatch( new UpdateOrganisationCandidateJob({
         organizationId: this.candidateJob.organizationId,
         jobId: this.candidateJob.jobId,
@@ -115,5 +122,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     });
     this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$))
       .subscribe((data: ApplicantStatus[]) => this.nextApplicantStatuses = data);
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).subscribe(() => {
+      this.readOnlyMode = this.isOfferedStatus;
+    });
   }
 }

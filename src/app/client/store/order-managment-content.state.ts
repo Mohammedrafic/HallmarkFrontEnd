@@ -26,7 +26,8 @@ import {
   SaveOrderSucceeded,
   SetIsDirtyOrderForm,
   SetPredefinedBillRatesData,
-  UpdateOrganisationCandidateJob
+  UpdateOrganisationCandidateJob,
+  UpdateOrganisationCandidateJobSucceed
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -270,7 +271,10 @@ export class OrderManagementContentState {
   @Action(UpdateOrganisationCandidateJob)
   UpdateOrganisationCandidateJob({ dispatch }: StateContext<OrderManagementModel>, { payload }: UpdateOrganisationCandidateJob): Observable<any> {
     return this.orderManagementService.updateCandidateJob(payload).pipe(
-      tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'))),
+      tap(() => {
+        dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'));
+        dispatch(new UpdateOrganisationCandidateJobSucceed());
+      }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
     );
   }

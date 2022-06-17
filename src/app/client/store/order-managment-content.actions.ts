@@ -61,6 +61,11 @@ export class UpdateOrganisationCandidateJob {
   ) {}
 }
 
+export class UpdateOrganisationCandidateJobSucceed {
+  static readonly type = '[order management] Update Organisation Candidate Job Succeed';
+  constructor() {}
+}
+
 export class GetAvailableSteps {
   static readonly type = '[order management] Get AvailableSteps';
   constructor(public organizationId: number, public jobId: number) {}
