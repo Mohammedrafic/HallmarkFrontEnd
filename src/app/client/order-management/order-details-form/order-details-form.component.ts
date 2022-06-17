@@ -844,7 +844,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private disableFormControls(order: Order): void {
     if (order.status === OrderStatus.InProgress || order.status === OrderStatus.Filled) {
       this.generalInformationForm = disableControls(this.generalInformationForm, ['regionId', 'skillId']);
-      this.workflowForm.get('workflowId')?.disable();
+      this.workflowForm.get('workflowId')?.disable({onlySelf: true});
     }
   }
 

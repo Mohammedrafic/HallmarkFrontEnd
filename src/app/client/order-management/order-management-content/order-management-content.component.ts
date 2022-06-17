@@ -99,9 +99,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     text: 'name',
     value: 'id',
   };
-  public skillsFields = { 
+  public skillsFields = {
     text: 'skillDescription',
-    value: 'id' 
+    value: 'id'
   };
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
@@ -116,10 +116,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public regions: OrganizationRegion[] = [];
   public previousSelectedOrderId: number | null;
 
-  constructor(private store: Store, 
-              private router: Router, 
-              private route: ActivatedRoute, 
-              private actions$: Actions, 
+  constructor(private store: Store,
+              private router: Router,
+              private route: ActivatedRoute,
+              private actions$: Actions,
               private confirmService: ConfirmService,
               private filterService: FilterService,
               private fb: FormBuilder,
