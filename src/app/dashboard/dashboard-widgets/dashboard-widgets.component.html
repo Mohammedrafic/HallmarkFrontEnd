@@ -32,6 +32,11 @@
             [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_REGION]"
             [isLoading]="isLoading"
           ></app-maps-chart>
+          <app-line-chart
+            *ngSwitchCase="widgetTypeEnum.POSITIONS_BY_TYPES"
+            [chartData]="widgetsData?.[widgetTypeEnum.POSITIONS_BY_TYPES]"
+            [isLoading]="isLoading"
+          ></app-line-chart>
         </ng-template>
       </e-panel>
     </e-panels>

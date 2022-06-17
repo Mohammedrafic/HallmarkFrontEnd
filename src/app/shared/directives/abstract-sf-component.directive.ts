@@ -11,7 +11,7 @@ export class AbstractSFComponentDirective<ComponentType extends SFComponent<HTML
   extends DestroyableDirective
   implements AfterViewInit, OnDestroy
 {
-  @ViewChild('sfComponent', { static: true }) public sfComponent: ComponentType;
+  @ViewChild('sfComponent') public sfComponent: ComponentType;
 
   protected skipResizeObserverHandlerPredicate: boolean = false;
 

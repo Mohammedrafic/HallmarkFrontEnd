@@ -254,9 +254,10 @@ a, a:hover, a:focus, a:active {
 .widget-tooltip {
   text-align: center;
   padding: 10px 20px;
-  background-color: $white;
+  background-color: var(--tooltip-background);
   box-shadow: 0 3px 15px rgb(0 0 0 / 0.2);
-  color: $secondary-dark-blue-15;
+  color: var(--tooltip-text);
+
   &::after {
     content: "";
     display:block;
@@ -264,7 +265,7 @@ a, a:hover, a:focus, a:active {
     height:15px;
     position:absolute;
     left: 40%;
-    background-color: $white;
+    background-color: var(--tooltip-background);
     transform: rotate(45deg);
   }
 }
