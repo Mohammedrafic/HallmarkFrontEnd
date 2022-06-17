@@ -129,7 +129,7 @@ export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
       regionIds: new FormControl([], [Validators.required]),
       classifications: new FormControl([], [Validators.required]),
       masterSkillIds: new FormControl([], [Validators.required]),
-      fee: new FormControl(null, [Validators.required, Validators.maxLength(2), Validators.pattern(/^[0-9]+$/)]),
+      fee: new FormControl(null),
     });
   }
 }

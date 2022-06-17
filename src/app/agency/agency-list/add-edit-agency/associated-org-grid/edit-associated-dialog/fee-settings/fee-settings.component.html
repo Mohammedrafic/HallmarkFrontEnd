@@ -2,7 +2,16 @@
   <div class="input-container bootstrap base-fee">
     <label>Base Fee %</label>
     <div class="input-group">
-      <input appValidateWithMessage formControlName="baseFee" min="0" class="e-input" placeholder="Base Fee %" maxlength="2" />
+      <input
+        appValidateWithMessage
+        mask="00.00"
+        [showMaskTyped]="true"
+        [dropSpecialCharacters]="false"
+        formControlName="baseFee"
+        type="text"
+        class="e-input"
+        placeholder="Base Fee %"
+      />
     </div>
   </div>
 
@@ -11,7 +20,9 @@
       <h3>Fee Exception</h3>
     </div>
     <div class="actions">
-      <span class="action-link" (click)="addNew()"><i-feather name="plus" class="icon"></i-feather> Add Fee Exception</span>
+      <span class="action-link" (click)="addNew()"
+        ><i-feather name="plus" class="icon"></i-feather> Add Fee Exception</span
+      >
     </div>
   </div>
   <ejs-grid
@@ -29,7 +40,12 @@
   >
     <e-columns>
       <e-column field="regionName" headerText="Region" textAlign="Left"></e-column>
-      <e-column field="classification" headerText="Classification" textAlign="left" [valueAccessor]="classificationValueAccess"></e-column>
+      <e-column
+        field="classification"
+        headerText="Classification"
+        textAlign="left"
+        [valueAccessor]="classificationValueAccess"
+      ></e-column>
       <e-column field="skillName" headerText="Skill" textAlign="left"></e-column>
       <e-column field="fee" headerText="Fee %" textAlign="left"></e-column>
 
@@ -92,3 +108,4 @@
 </section>
 
 <app-add-new-fee-dialog [openEvent]="openAddNewFeeDialog" [openEditEvent]="editFeeData"></app-add-new-fee-dialog>
+
