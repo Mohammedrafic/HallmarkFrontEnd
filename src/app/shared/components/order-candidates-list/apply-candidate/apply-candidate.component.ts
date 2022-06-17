@@ -59,7 +59,6 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy {
         requestComment: value.requestComment
       })).subscribe(() => {
         this.store.dispatch(new ReloadOrderCandidatesLists());
-        this.onCloseDialog();
       });
     }
   }
@@ -87,8 +86,8 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy {
       availableStartDate: data.availableStartDate,
       yearsOfExperience: data.yearsOfExperience,
       candidateBillRate: data.orderBillRate,
-      expAsTravelers: 0,
-      requestComment: ''
+      expAsTravelers: data.expAsTravelers || 0,
+      requestComment: data.requestComment || ''
     });
   }
 

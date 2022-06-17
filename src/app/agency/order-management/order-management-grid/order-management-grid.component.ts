@@ -204,12 +204,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   private onReloadOrderCandidatesLists(): void {
     this.actions$.pipe(ofActionSuccessful(ReloadOrderCandidatesLists), takeWhile(() => this.isAlive)).subscribe(() => {
-      this.store.dispatch(
-        new GetAgencyOrderCandidatesList(this.selectedOrder.orderId, this.selectedOrder.organizationId, this.currentPage, this.pageSize)
-      );
-      this.store.dispatch(new GetAgencyOrderGeneralInformation(this.selectedOrder.orderId, this.selectedOrder.organizationId));
-      this.dispatchNewPage();
-      this.store.dispatch(new GetOrderById(this.selectedOrder.orderId, this.selectedOrder.organizationId, this.getDialogNextPreviousOption(this.selectedOrder)));
+      this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize)).subscribe((data) => {
+        const order = data.agencyOrders.ordersPage.items.find((item: AgencyOrderManagement) => item.orderId === this.selectedOrder.orderId);
+        if (order) {
+          this.onRowClick({ data: order });
+        }
+      });
     });
   }
 }

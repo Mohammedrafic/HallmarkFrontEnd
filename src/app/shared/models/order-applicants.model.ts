@@ -9,6 +9,8 @@ export type OrderApplicantsInitialData = {
   locationName: string;
   availableStartDate: string;
   yearsOfExperience: number;
+  expAsTravelers?: number;
+  requestComment?: number;
 }
 
 export type OrderApplicantsApplyData = {

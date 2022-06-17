@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 
 import { Select, Store } from "@ngxs/store";
@@ -8,6 +8,7 @@ import { BillRate } from "@shared/models/bill-rate.model";
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from "@shared/models/order-management.model";
 import { OrderManagementContentState } from "@client/store/order-managment-content.state";
 import { ReloadOrganisationOrderCandidatesLists, UpdateOrganisationCandidateJob } from "@client/store/order-managment-content.actions";
+import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
 
 
 @Component({
@@ -15,7 +16,7 @@ import { ReloadOrganisationOrderCandidatesLists, UpdateOrganisationCandidateJob 
   templateUrl: './offer-deployment.component.html',
   styleUrls: ['./offer-deployment.component.scss']
 })
-export class OfferDeploymentComponent implements OnInit, OnDestroy {
+export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
 
   @Input() candidate: OrderCandidatesList;
@@ -24,6 +25,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy {
   public formGroup: FormGroup;
   public nextApplicantStatuses: ApplicantStatus[];
   public optionFields = { text: 'statusText', value: 'applicantStatus' };
+  public readOnlyMode: boolean;
 
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
@@ -35,6 +37,10 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy {
 
   constructor(private store: Store) { }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    this.readOnlyMode = changes['candidate']?.currentValue.status === ApplicantStatusEnum.Offered;
+  }
+
   ngOnInit(): void {
     this.createForm();
     this.subscribeOnInitialData();
@@ -45,7 +51,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
-  onCloseDialog(): void {
+  public onCloseDialog(): void {
     this.closeDialogEmitter.next();
     this.nextApplicantStatuses = [];
     this.candidateJob = null;
@@ -68,7 +74,6 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy {
         allowDeplayWoCredentials: true
       })).subscribe((data) => {
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-        this.onCloseDialog();
       });
 
     }
@@ -91,7 +96,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy {
     this.formGroup.setValue({
       jobId: data.jobId,
       jobDate: [data.order.jobStartDate, data.order.jobEndDate],
-      offeredBillRate: data.order.hourlyRate,
+      offeredBillRate: data.offeredBillRate || data.order.hourlyRate,
       orderBillRate: data.order.hourlyRate,
       locationName: data.order.locationName,
       availableStartDate: data.availableStartDate,
