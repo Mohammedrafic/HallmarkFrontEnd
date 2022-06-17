@@ -266,6 +266,24 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
   }
 
+  public onFilterClose() {
+    this.OrderFilterFormGroup.setValue({
+      orderId: this.filters.orderId || null,
+      regionIds: this.filters.regionIds || [],
+      locationIds: this.filters.locationIds || [],
+      departmentsIds: this.filters.departmentsIds || [],
+      skillIds: this.filters.skillIds || [],
+      orderTypes: this.filters.orderTypes || [],
+      jobTitle: this.filters.jobTitle || null,
+      billRateFrom: this.filters.billRateFrom || null,
+      billRateTo: this.filters.billRateTo || null,
+      openPositions: this.filters.openPositions || null,
+      jobStartDate: this.filters.jobStartDate || null,
+      jobEndDate: this.filters.jobEndDate || null,
+    });
+    this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+  }
+
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }

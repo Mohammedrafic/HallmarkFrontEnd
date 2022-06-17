@@ -333,6 +333,18 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.store.dispatch(new GetWorkflowMappingPages(this.filters));
   }
 
+  public onFilterClose() {
+    this.WorkflowFilterFormGroup.setValue({
+      regionIds: this.filters.regionIds || [],
+      locationIds: this.filters.locationIds || [],
+      departmentsIds: this.filters.departmentsIds || [],
+      skillIds: this.filters.skillIds || [],
+      types: this.filters.types || [],
+      names: this.filters.names || [],
+    });
+    this.filteredItems = this.filterService.generateChips(this.WorkflowFilterFormGroup, this.filterColumns);
+  }
+
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }
@@ -346,6 +358,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};
+    this.store.dispatch(new GetWorkflowMappingPages(this.filters));
   }
 
   public onFilterApply(): void {

@@ -269,6 +269,16 @@ a, a:hover, a:focus, a:active {
   }
 }
 
+.filter-button-content {
+  display: flex;
+
+  .e-badge.e-badge-circle.e-badge-success {
+    margin-right: 8px;
+    top: 0;
+    padding-right: 1px;
+  }
+}
+
 #Candidates_SeriesCollection {
   cursor: default;
 }

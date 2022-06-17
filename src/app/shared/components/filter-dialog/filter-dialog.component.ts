@@ -45,4 +45,8 @@ export class FilterDialogComponent implements OnInit {
   public onChipDelete(event: DeleteEventArgs): void {
     this.deleteFilter.emit(event.data);
   }
+
+  public onClose(): void {
+    this.closeDialogClicked.emit();
+  }
 }

@@ -8,6 +8,7 @@
   [isModal]="true"
   [showCloseIcon]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
+  (beforeClose)="onClose()"
 >
   <ng-template #header>
     <section class="container">

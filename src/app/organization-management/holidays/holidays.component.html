@@ -8,7 +8,12 @@
         ejs-button
         id="filterButton"
         (click)="showFilters()"
-        cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+        cssClass="e-outline button-filter">
+        <div class="filter-button-content">
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
       <button
         ejs-button
         id="importButton"
@@ -131,7 +136,7 @@
   </ejs-grid>
 </section>
 
-<app-filter-dialog [items]="filteredItems" [count]="(holidaysPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+<app-filter-dialog [items]="filteredItems" [count]="(holidaysPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
   <form class="bootstrap" [formGroup]="HolidayFilterFormGroup">
     <div class="input-container">
       <label>Region</label>

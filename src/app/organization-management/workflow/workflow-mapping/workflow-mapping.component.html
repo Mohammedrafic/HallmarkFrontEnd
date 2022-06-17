@@ -4,7 +4,10 @@
     </ng-container>
     <ng-container right>
       <button (click)="showFilters()" ejs-button id="filterButton" cssClass="e-outline button-filter">
-        Filters <i-feather name="sliders" class="icon"></i-feather>
+        <div class="filter-button-content">
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </div>
       </button>
       <button
         ejs-button
@@ -175,7 +178,7 @@
     </ng-template>
   </ejs-grid>
 
-  <app-filter-dialog [items]="filteredItems" [count]="(workflowMappings$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+  <app-filter-dialog [items]="filteredItems" [count]="(workflowMappings$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
     <form class="bootstrap" [formGroup]="WorkflowFilterFormGroup">
       <div class="input-container">
         <label>Region</label>

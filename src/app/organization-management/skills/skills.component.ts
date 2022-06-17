@@ -173,6 +173,17 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     this.clearSelection(this.grid);
   }
 
+  public onFilterClose() {
+    this.SkillFilterFormGroup.setValue({
+      skillCategories: this.filters.skillCategories || [],
+      skillAbbrs: this.filters.skillAbbrs || [],
+      skillDescriptions: this.filters.skillDescriptions || [],
+      glNumbers: this.filters.glNumbers || [],
+      allowOnboard: this.filters.allowOnboard || null,
+    });
+    this.filteredItems = this.filterService.generateChips(this.SkillFilterFormGroup, this.filterColumns);
+  }
+
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }

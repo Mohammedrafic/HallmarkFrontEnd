@@ -5,7 +5,10 @@
     </section>
     <section>
       <button (click)="showFilters()" ejs-button id="filterButton" cssClass="e-outline button-filter">
-        Filters <i-feather name="sliders" class="icon"></i-feather>
+        <div class="filter-button-content">
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </div>
       </button>
       <button ejs-button id="importButton" cssClass="e-outline button-import" (click)="onImportDataClick()">
         Import <i-feather name="upload" class="icon"></i-feather>
@@ -108,7 +111,7 @@
   </ejs-grid>
 </section>
 
-<app-filter-dialog [items]="filteredItems" [count]="(skills$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+<app-filter-dialog [items]="filteredItems" [count]="(skills$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
   <form class="bootstrap" [formGroup]="SkillFilterFormGroup">
     <div class="input-container">
       <label for="skillCategoryId">Skill Category</label>
