@@ -1,37 +1,39 @@
-<ejs-dashboardlayout
-  #sfComponent
-  (created)="dashboardCreatedEmitter.emit()"
-  (dragStart)="dragStartHandler()"
-  (dragStop)="dragStopHandler()"
-  [cellSpacing]="cellSpacing"
-  [columns]="columns"
-  id="dashboardLayout"
->
-  <e-panels>
-    <e-panel
-      *ngFor="let panel of panels; trackBy: trackByHandler"
-      [col]="panel.col"
-      [id]="panel.id"
-      [maxSizeX]="panel.maxSizeX"
-      [maxSizeY]="panel.maxSizeY"
-      [minSizeX]="panel.minSizeX"
-      [minSizeY]="panel.minSizeY"
-      [row]="panel.row"
-      [sizeX]="panel.sizeX"
-      [sizeY]="panel.sizeY"
-    >
-      <ng-template #content [ngSwitch]="panel.id">
-        <app-accumulation-chart
-          *ngSwitchCase="widgetTypeEnum.CANDIDATES"
-          [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
-          [isLoading]="isLoading"
-        ></app-accumulation-chart>
-        <app-maps-chart
-          *ngSwitchCase="widgetTypeEnum.APPLICANTS_BY_REGION"
-          [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_REGION]"
-          [isLoading]="isLoading"
-        ></app-maps-chart>
-      </ng-template>
-    </e-panel>
-  </e-panels>
-</ejs-dashboardlayout>
+<div>
+  <ejs-dashboardlayout
+    #sfComponent
+    (created)="dashboardCreatedEmitter.emit()"
+    (dragStart)="dragStartHandler()"
+    (dragStop)="dragStopHandler()"
+    [cellSpacing]="cellSpacing"
+    [columns]="columns"
+    id="dashboardLayout"
+  >
+    <e-panels>
+      <e-panel
+        *ngFor="let panel of panels; trackBy: trackByHandler"
+        [col]="panel.col"
+        [id]="panel.id"
+        [maxSizeX]="panel.maxSizeX"
+        [maxSizeY]="panel.maxSizeY"
+        [minSizeX]="panel.minSizeX"
+        [minSizeY]="panel.minSizeY"
+        [row]="panel.row"
+        [sizeX]="panel.sizeX"
+        [sizeY]="panel.sizeY"
+      >
+        <ng-template #content [ngSwitch]="panel.id">
+          <app-accumulation-chart
+            *ngSwitchCase="widgetTypeEnum.CANDIDATES"
+            [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
+            [isLoading]="isLoading"
+          ></app-accumulation-chart>
+          <app-maps-chart
+            *ngSwitchCase="widgetTypeEnum.APPLICANTS_BY_REGION"
+            [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_REGION]"
+            [isLoading]="isLoading"
+          ></app-maps-chart>
+        </ng-template>
+      </e-panel>
+    </e-panels>
+  </ejs-dashboardlayout>
+</div>
