@@ -152,9 +152,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
       types: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       names: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [], valueField: 'name' },
     }
-    this.filterColumns.types.dataSource = Object.keys(WorkflowType)
-      .map((type: any) => { return { name: type, id: WorkflowType[type] }})
-      .filter(item => isNaN(item.name));
+    this.filterColumns.types.dataSource = [{ id: WorkflowGroupType.Organization, name: this.jobOrderWorkflow }];
 
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
