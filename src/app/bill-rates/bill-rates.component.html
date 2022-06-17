@@ -1,5 +1,6 @@
 <app-bill-rates-grid
   [billRatesData]="billRatesControl.value"
+  [billRateOptions]="billRatesOptions"
   (add)="onAddBillRate()"
   (edit)="onEditBillRate($event)"
   (remove)="onRemoveBillRate($event)">
@@ -11,5 +12,5 @@
   [width]="'436px'"
   (formCancelClicked)="onDialogCancel()"
   (formSaveClicked)="onDialogOk()">
-  <app-bill-rate-form [billRateForm]="billRateForm"></app-bill-rate-form>
+  <app-bill-rate-form [billRateForm]="billRateForm" [selectedBillRateUnit]="selectedBillRateUnit"></app-bill-rate-form>
 </app-side-dialog>

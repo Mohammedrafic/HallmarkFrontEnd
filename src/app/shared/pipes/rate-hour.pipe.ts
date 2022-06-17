@@ -7,7 +7,7 @@ import { BillRateOption, BillRateType, BillRateUnit } from '@shared/models/bill-
 export class RateHourPipe implements PipeTransform {
 
   transform(value: string, billRateTitle: string, billRateType: BillRateType, billRateOptions: BillRateOption[]): string {
-    const foundBillRateOption = billRateOptions.find(option => option.title === billRateTitle && option.type === billRateType);
+    const foundBillRateOption = billRateOptions?.find(option => option.title === billRateTitle && option.type === billRateType);
 
     if (foundBillRateOption?.unit === BillRateUnit.Hours) {
       return value;

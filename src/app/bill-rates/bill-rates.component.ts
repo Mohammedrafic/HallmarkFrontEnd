@@ -1,23 +1,25 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
-import { Store } from '@ngxs/store';
-import { filter, take } from 'rxjs';
+import { Select, Store } from '@ngxs/store';
+import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
 
 import { ConfirmService } from '@shared/services/confirm.service';
 
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { BillRateFormComponent } from './components/bill-rate-form/bill-rate-form.component';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import { BillRate } from '@shared/models/bill-rate.model';
+import { BillRate, BillRateOption, BillRateUnit } from '@shared/models/bill-rate.model';
 import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid.component';
 import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
+import { GetBillRateOptions } from '@bill-rates/store/bill-rate.actions';
+import { BillRateState } from '@bill-rates/store/bill-rate.state';
 
 @Component({
   selector: 'app-bill-rates',
   templateUrl: './bill-rates.component.html',
   styleUrls: ['./bill-rates.component.scss'],
 })
-export class BillRatesComponent implements OnInit {
+export class BillRatesComponent implements OnInit, OnDestroy {
   @Input() isActive = false;
   @Input() set billRates(values: BillRate[]) {
     if (values) {
@@ -31,8 +33,14 @@ export class BillRatesComponent implements OnInit {
   public billRateForm: FormGroup;
   public intervalMinField: AbstractControl;
   public intervalMaxField: AbstractControl;
+  public billRatesOptions: BillRateOption[];
+  public selectedBillRateUnit: BillRateUnit = BillRateUnit.Multiplier;
+
+  @Select(BillRateState.billRateOptions)
+  billRatesOptions$: Observable<BillRateOption[]>;
 
   private editBillRateIndex: string | null;
+  private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private confirmService: ConfirmService, private store: Store) {
     this.billRatesControl = new FormArray([]);
@@ -48,12 +56,25 @@ export class BillRatesComponent implements OnInit {
     this.intervalMaxField = this.billRateForm.get('intervalMax') as AbstractControl;
     this.intervalMaxField.addValidators(intervalMaxValidator(this.billRateForm, 'intervalMin'));
     this.intervalMaxField.valueChanges.subscribe(() => this.intervalMinField.updateValueAndValidity({ onlySelf: true, emitEvent: false }));
+
+    this.store.dispatch(new GetBillRateOptions());
+    this.billRatesOptions$.pipe(takeUntil(this.unsubscribe$)).subscribe(options => {
+      if (options && options.length > 0) {
+        this.billRatesOptions = options;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   public onAddBillRate(): void {
     this.editBillRateIndex = null;
     this.billRateForm.reset();
     this.billRateFormHeader = 'Add Bill Rate';
+    this.selectedBillRateUnit = BillRateUnit.Multiplier;
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -61,6 +82,8 @@ export class BillRatesComponent implements OnInit {
     this.billRateFormHeader = 'Edit Bill Rate';
     this.editBillRateIndex = index;
 
+    const foundBillRateOption = this.billRatesOptions.find(option => option.title === value.billRateConfig.title && option.type === value.billRateConfig.type);
+    const rateHour = foundBillRateOption?.unit === BillRateUnit.Hours ? String(value.rateHour) : parseFloat(value.rateHour.toString()).toFixed(2);
     this.billRateForm.patchValue({
       billRateConfig: value.billRateConfig,
       billRateConfigId: value.billRateConfigId,
@@ -68,7 +91,7 @@ export class BillRatesComponent implements OnInit {
       id: value.id,
       intervalMax: value.intervalMax && String(value.intervalMax),
       intervalMin: value.intervalMin && String(value.intervalMin),
-      rateHour: String(value.rateHour)
+      rateHour: rateHour
      }, { emitEvent: false });
 
     if (!value.billRateConfig.intervalMin) {
@@ -82,6 +105,8 @@ export class BillRatesComponent implements OnInit {
       this.billRateForm.controls['intervalMax'].disable();
       this.billRateForm.controls['intervalMax'].updateValueAndValidity();
     }
+
+    this.selectedBillRateUnit = foundBillRateOption?.unit as BillRateUnit;
 
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -115,10 +140,6 @@ export class BillRatesComponent implements OnInit {
           this.billRateForm.reset();
           this.billRateForm.enable();
           this.store.dispatch(new ShowSideDialog(false));
-
-          // sets initial state of selected bill rate unit field in bill-rate-form component with initialization
-          setTimeout(() => this.isActive = false, 1);
-          setTimeout(() => this.isActive = true, 1);
         });
     } else {
       this.billRateForm.reset();
@@ -154,10 +175,6 @@ export class BillRatesComponent implements OnInit {
       }
       this.billRateForm.reset();
       this.store.dispatch(new ShowSideDialog(false));
-
-      // sets initial state of selected bill rate unit field in bill-rate-form component with initialization
-      setTimeout(() => this.isActive = false, 1);
-      setTimeout(() => this.isActive = true, 1);
     }
   }
 

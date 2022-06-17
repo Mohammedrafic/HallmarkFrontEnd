@@ -446,16 +446,16 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
   public onSaveFormClick(): void {
     if (this.workflowMappingFormGroup.valid) {
+      const isAllRegions = this.workflowMappingFormGroup.controls['regions'].value.length === this.allRegions.length;
       const workflowMapping: WorkflowMappingPost = {
         mappingId: this.editedRecordId,
-        regionIds: this.workflowMappingFormGroup.controls['regions'].value.length === this.allRegions.length && this.allRegions.length > 1 ? []
-          : this.workflowMappingFormGroup.controls['regions'].value, // [] means All on the BE side
-        locationIds: this.workflowMappingFormGroup.controls['locations'].value.length === this.locations.length && this.locations.length > 1 ? []
-          : this.workflowMappingFormGroup.controls['locations'].value, // [] means All on the BE side
-        departmentIds: this.workflowMappingFormGroup.controls['departments'].value.length === this.departments.length && this.departments.length > 1 ? []
-          : this.workflowMappingFormGroup.controls['departments'].value, // [] means All on the BE side
-        skillIds: this.workflowMappingFormGroup.controls['skills'].value.length === this.allSkills.length && this.allSkills.length > 1 ? []
-          : this.workflowMappingFormGroup.controls['skills'].value, // [] means All on the BE side
+        regionIds: isAllRegions ? [] : this.workflowMappingFormGroup.controls['regions'].value, // [] means All on the BE side
+        locationIds: isAllRegions && this.workflowMappingFormGroup.controls['locations'].value.length === this.locations.length
+          ? [] : this.workflowMappingFormGroup.controls['locations'].value, // [] means All on the BE side
+        departmentIds: isAllRegions && this.workflowMappingFormGroup.controls['departments'].value.length === this.departments.length
+          ? [] : this.workflowMappingFormGroup.controls['departments'].value, // [] means All on the BE side
+        skillIds: this.workflowMappingFormGroup.controls['skills'].value.length === this.allSkills.length
+          ? [] : this.workflowMappingFormGroup.controls['skills'].value, // [] means All on the BE side
         workflowGroupId: this.workflowMappingFormGroup.controls['workflowName'].value, // workflowName contains selected workflow id, on the BE workflowGroupId is just workflowId
         stepMappings: this.getStepMappings()
       };

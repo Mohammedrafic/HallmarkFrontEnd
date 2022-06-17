@@ -234,19 +234,19 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public onFormSaveClick(): void {
     if (this.billRatesFormGroup.valid) {
+      const isAllRegions = this.billRatesFormGroup.controls['regionIds'].value.length === this.allRegions.length;
       const billRate: BillRateSetupPost = {
         billRateSettingId: this.editRecordId,
-        regionIds: this.billRatesFormGroup.controls['regionIds'].value.length === this.allRegions.length && this.allRegions.length > 1 ? []
-          : this.billRatesFormGroup.controls['regionIds'].value, // [] means All on the BE side
-        locationIds: this.billRatesFormGroup.controls['locationIds'].value.length === this.locations.length && this.locations.length > 1 ? []
-          : this.billRatesFormGroup.controls['locationIds'].value, // [] means All on the BE side
-        departmentIds: this.billRatesFormGroup.controls['departmentIds'].value.length === this.departments.length && this.departments.length > 1 ? []
-          : this.billRatesFormGroup.controls['departmentIds'].value, // [] means All on the BE side
-        skillIds: this.billRatesFormGroup.controls['skillIds'].value.length === this.allSkills.length && this.allSkills.length > 1 ? []
-          : this.billRatesFormGroup.controls['skillIds'].value, // [] means All on the BE side
+        regionIds: isAllRegions ? [] : this.billRatesFormGroup.controls['regionIds'].value, // [] means All on the BE side
+        locationIds: isAllRegions && this.billRatesFormGroup.controls['locationIds'].value.length === this.locations.length
+          ? [] : this.billRatesFormGroup.controls['locationIds'].value, // [] means All on the BE side
+        departmentIds: isAllRegions && this.billRatesFormGroup.controls['departmentIds'].value.length === this.departments.length
+          ? [] : this.billRatesFormGroup.controls['departmentIds'].value, // [] means All on the BE side
+        skillIds: this.billRatesFormGroup.controls['skillIds'].value.length === this.allSkills.length ? [] // [] means All on the BE side
+          : this.billRatesFormGroup.controls['skillIds'].value,
         billRateConfigId: this.billRatesFormGroup.controls['billRateTitleId'].value,
-        orderTypes: this.billRatesFormGroup.controls['orderTypeIds'].value.length === this.orderTypes.length && this.orderTypes.length > 1 ? []
-          : this.billRatesFormGroup.controls['orderTypeIds'].value, // [] means All on the BE side
+        orderTypes: this.billRatesFormGroup.controls['orderTypeIds'].value.length === this.orderTypes.length ? [] // [] means All on the BE side
+          : this.billRatesFormGroup.controls['orderTypeIds'].value,
         rateHour: this.billRatesFormGroup.controls['billRateValueRateTimes'].value,
         effectiveDate: this.billRatesFormGroup.controls['effectiveDate'].value,
         intervalMin: this.isIntervalMinEnabled ? this.billRatesFormGroup.controls['intervalMin'].value : null,
@@ -525,7 +525,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       this.billRatesFormGroup.controls['orderTypeIds'].setValue(data.orderType);
     }
 
-    this.billRatesFormGroup.controls['billRateValueRateTimes'].setValue(data.rateHour);
+    const rateHour = foundBillRateOption?.unit === BillRateUnit.Hours ? data.rateHour : parseFloat(data.rateHour.toString()).toFixed(2);
+    this.billRatesFormGroup.controls['billRateValueRateTimes'].setValue(rateHour);
     this.billRatesFormGroup.controls['effectiveDate'].setValue(data.effectiveDate);
     this.billRatesFormGroup.controls['intervalMin'].setValue(data.intervalMin);
     this.billRatesFormGroup.controls['intervalMax'].setValue(data.intervalMax);
