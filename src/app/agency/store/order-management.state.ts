@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -14,6 +15,7 @@ import { Order } from '@shared/models/order-management.model';
 import { OrderApplicantsService } from "@shared/services/order-applicants.service";
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
+import { getAllErrors } from "@shared/utils/error.utils";
 import { catchError, Observable, of, tap } from 'rxjs';
 import { ShowToast } from "src/app/store/app.actions";
 import {
@@ -186,7 +188,7 @@ export class OrderManagementState {
         dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'));
         dispatch(new ApplyOrderApplicantsSucceed());
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
   }
 
