@@ -139,7 +139,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   private initOrganizationChangeListener(): void {
     combineLatest([this.organizationId$, this.isOrganization$])
       .pipe(
-        filter(([organizationId, isOrganization]) => !!organizationId && isOrganization),
+        filter(([organizationId, isOrganization]: [number | null, boolean]) => !!organizationId && isOrganization),
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
