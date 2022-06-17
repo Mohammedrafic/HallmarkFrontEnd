@@ -26,6 +26,7 @@ import { BillRatesComponent } from '@bill-rates/bill-rates.component';
 import { BillRate, OrderBillRateDto } from '@shared/models/bill-rate.model';
 import { IOrderCredentialItem } from '@order-credentials/types';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { OrderStatus } from '@shared/enums/order-management';
 
 enum SelectedTab {
   OrderDetails,
@@ -95,6 +96,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         if (order?.billRates) {
           this.orderBillRates = [...order.billRates];
         }
+
+        order?.status === OrderStatus.Incomplete ? this.addSaveForLaterMenuItem() : this.removeSaveForLaterMenuItem();
       });
     }
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe(() => {
@@ -205,6 +208,30 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.workLocationForm.markAllAsTouched();
       this.orderDetailsFormComponent.workflowForm.markAllAsTouched();
       this.orderDetailsFormComponent.specialProject.markAllAsTouched();
+    }
+  }
+
+  private getSaveForLaterMenuItemIndex(): number {
+    return this.submitMenuItems.findIndex(i => i.id === SubmitButtonItem.SaveForLater);
+  }
+
+  private addSaveForLaterMenuItem(): void {
+    const index = this.getSaveForLaterMenuItemIndex();
+
+    if (index < 0) {
+      this.submitMenuItems.unshift(
+        { id: SubmitButtonItem.SaveForLater, text: 'Save For Later' }
+      );
+      this.submitMenuItems = [...this.submitMenuItems];
+    }
+  }
+
+  private removeSaveForLaterMenuItem(): void {
+    const index = this.getSaveForLaterMenuItemIndex();
+
+    if (index >= 0) {
+      this.submitMenuItems.splice(index, 1);
+      this.submitMenuItems = [...this.submitMenuItems];
     }
   }
 
