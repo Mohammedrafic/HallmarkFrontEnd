@@ -1,4 +1,4 @@
-@import "../../../../styles/variables/colors.scss";
+@import "colors";
 
 .user-setting-section {
   .section-tittle {
@@ -15,6 +15,7 @@
     label {
       display: block;
       margin-bottom: 5px;
+      color: $secondary-dark-blue-15;
     }
 
     .dropdown-container,
