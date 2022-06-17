@@ -3,8 +3,8 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
 import { Select, Store } from '@ngxs/store';
-import type { PanelModel } from '@syncfusion/ej2-angular-layouts';
-import { Observable, takeUntil, startWith, distinctUntilChanged, switchMap, combineLatest, map } from 'rxjs';
+import type { PanelModel, DashboardLayoutComponent } from '@syncfusion/ej2-angular-layouts';
+import { Observable, takeUntil, startWith, distinctUntilChanged, switchMap, combineLatest, map, filter } from 'rxjs';
 import isEqual from 'lodash/fp/isEqual';
 import lodashMap from 'lodash/fp/map';
 
@@ -22,7 +22,6 @@ import { WidgetToggleModel } from './models/widget-toggle.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { DashboardWidgetsComponent } from './dashboard-widgets/dashboard-widgets.component';
 import type { WidgetsDataModel } from './models/widgets-data.model';
-import type { DashboardLayoutComponent } from '@syncfusion/ej2-angular-layouts';
 
 @Component({
   selector: 'app-dashboard',
@@ -45,8 +44,12 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   @Select(UserState.lastSelectedOrganizationId) private readonly organizationId$: Observable<
     UserStateModel['lastSelectedOrganizationId']
   >;
+  @Select(UserState.lastSelectedAgencyId) private readonly agencyId$: Observable<
+    UserStateModel['lastSelectedAgencyId']
+  >;
 
-  @Select(UserState.lastSelectedOrganizationAgency) private readonly lastSelectedOrganizationAgency$: Observable<string>;
+  @Select(UserState.lastSelectedOrganizationAgency)
+  private readonly lastSelectedOrganizationAgency$: Observable<string>;
 
   public widgetsData$: Observable<WidgetsDataModel>;
   public isOrganization$: Observable<boolean>;
@@ -57,7 +60,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     private readonly store: Store,
     private readonly dashboardService: DashboardService,
     private readonly formBuilder: FormBuilder,
-    private readonly breakpointObserver: BreakpointObserver,
+    private readonly breakpointObserver: BreakpointObserver
   ) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Dashboard', iconName: 'home' }));
@@ -65,8 +68,8 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   public ngOnInit(): void {
     this.setWidgetsData();
-    this.initOrganizationChangeListener();
     this.isUserOrganization();
+    this.initOrganizationChangeListener();
   }
 
   private isUserOrganization(): void {
@@ -134,10 +137,15 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   private initOrganizationChangeListener(): void {
-    this.organizationId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.resetDashboardState();
-      this.store.dispatch(new GetDashboardData());
-    });
+    combineLatest([this.organizationId$, this.isOrganization$])
+      .pipe(
+        filter(([organizationId, isOrganization]) => !!organizationId && isOrganization),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.resetDashboardState();
+        this.store.dispatch(new GetDashboardData());
+      });
   }
 
   private setWidgetsData(): void {
