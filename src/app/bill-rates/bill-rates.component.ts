@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormArray, FormGroup, Validators } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, take, takeUntil } from 'rxjs';
@@ -27,6 +27,8 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       values.forEach(value => this.billRatesControl.push(this.fromValueToBillRate(value)));
     }
   }
+
+  @Output() billRatesChanged: EventEmitter<void> = new EventEmitter();
 
   public billRateFormHeader: string;
   public billRatesControl: FormArray;
@@ -124,6 +126,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       )
       .subscribe(() => {
         this.billRatesControl.removeAt(Number(index));
+        this.billRatesChanged.emit();
       });
   }
 
@@ -172,6 +175,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         editedControl.patchValue({ ...value, billRateConfig });
       } else {
         this.billRatesControl.push(this.fromValueToBillRate(value));
+        this.billRatesChanged.emit();
       }
       this.billRateForm.reset();
       this.store.dispatch(new ShowSideDialog(false));

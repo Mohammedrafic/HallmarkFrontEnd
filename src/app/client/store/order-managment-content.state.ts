@@ -364,7 +364,11 @@ export class OrderManagementContentState {
   SaveOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { order, documents }: SaveOrder): Observable<Order | void> {
     return this.orderManagementService.saveOrder(order, documents).pipe(
       tap(order => {
-        dispatch([new ShowToast(MessageTypes.Success, RECORD_ADDED), new SaveOrderSucceeded()]);
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          new SaveOrderSucceeded(),
+          new SetIsDirtyOrderForm(false)
+        ]);
         return order;
       }),
       catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
@@ -375,7 +379,11 @@ export class OrderManagementContentState {
   EditOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { order, documents }: EditOrder): Observable<Order | void> {
     return this.orderManagementService.editOrder(order, documents).pipe(
       tap(order => {
-        dispatch([new ShowToast(MessageTypes.Success, RECORD_MODIFIED), new SaveOrderSucceeded()]);
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
+          new SaveOrderSucceeded(),
+          new SetIsDirtyOrderForm(false)
+        ]);
         return order;
       }),
       catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))

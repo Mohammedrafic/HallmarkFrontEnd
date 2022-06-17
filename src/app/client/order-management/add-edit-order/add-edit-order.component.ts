@@ -35,7 +35,8 @@ enum SelectedTab {
 
 enum SubmitButtonItem {
   SaveForLater = '0',
-  SaveAsTemplate = '1'
+  Save = '1',
+  SaveAsTemplate = '2'
 }
 
 @Component({
@@ -97,7 +98,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.orderBillRates = [...order.billRates];
         }
 
-        order?.status === OrderStatus.Incomplete ? this.addSaveForLaterMenuItem() : this.removeSaveForLaterMenuItem();
+        if (order?.status === OrderStatus.Incomplete) {
+          this.addMenuItem(SubmitButtonItem.SaveForLater, 'Save For Later');
+          this.removeMenuItem(SubmitButtonItem.Save);
+        } else {
+          this.addMenuItem(SubmitButtonItem.Save, 'Save');
+          this.removeMenuItem(SubmitButtonItem.SaveForLater);
+        }
       });
     }
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe(() => {
@@ -144,6 +151,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public onSplitButtonSelect(args: MenuEventArgs): void {
     switch (args.item.id) {
+      case SubmitButtonItem.Save:
+        this.saveForLater();
+        break;
+
       case SubmitButtonItem.SaveForLater:
         this.saveForLater();
         break;
@@ -152,6 +163,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         this.saveAsTemplate();
         break;
     }
+  }
+
+  public onBillRatesChanged(): void {
+    this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
   public onCredentialChanged(cred: IOrderCredentialItem): void {
@@ -211,23 +226,21 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
   }
 
-  private getSaveForLaterMenuItemIndex(): number {
-    return this.submitMenuItems.findIndex(i => i.id === SubmitButtonItem.SaveForLater);
+  private getMenuButtonIndex(menuItem: SubmitButtonItem): number {
+    return this.submitMenuItems.findIndex(i => i.id === menuItem);
   }
 
-  private addSaveForLaterMenuItem(): void {
-    const index = this.getSaveForLaterMenuItemIndex();
+  private addMenuItem(menuItem: SubmitButtonItem, text: string): void {
+    const index = this.getMenuButtonIndex(menuItem);
 
     if (index < 0) {
-      this.submitMenuItems.unshift(
-        { id: SubmitButtonItem.SaveForLater, text: 'Save For Later' }
-      );
+      this.submitMenuItems.unshift({ id: menuItem, text });
       this.submitMenuItems = [...this.submitMenuItems];
     }
   }
 
-  private removeSaveForLaterMenuItem(): void {
-    const index = this.getSaveForLaterMenuItemIndex();
+  private removeMenuItem(menuItem: SubmitButtonItem): void {
+    const index = this.getMenuButtonIndex(menuItem);
 
     if (index >= 0) {
       this.submitMenuItems.splice(index, 1);
