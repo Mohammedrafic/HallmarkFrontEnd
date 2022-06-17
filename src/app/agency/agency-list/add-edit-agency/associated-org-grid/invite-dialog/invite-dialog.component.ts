@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, takeWhile } from 'rxjs';
 
@@ -28,7 +28,7 @@ export class InviteDialogComponent implements OnInit {
   public agencyName$: Observable<string>;
 
   public targetElement: HTMLElement = document.body;
-  public control = new FormControl('');
+  public control = new FormControl('', Validators.required);
   public optionFields = {
     text: 'generalInformation.name',
     value: 'organizationId',
@@ -53,7 +53,11 @@ export class InviteDialogComponent implements OnInit {
   }
 
   public onInvite(): void {
-    this.store.dispatch(new InvateOrganizations(this.control.value));
+    if (this.control.dirty) {
+      this.store.dispatch(new InvateOrganizations(this.control.value));
+    } else {
+      this.control.markAsTouched()
+    }
   }
 
   public onCancel(): void {
