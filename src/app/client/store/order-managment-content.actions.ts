@@ -76,6 +76,11 @@ export class GetProjectSpecialData {
   constructor() { }
 }
 
+export class GetSuggestedDetails {
+  static readonly type = '[order management] Get Suggested Details';
+  constructor(public locationId: number) { }
+}
+
 export class GetProjectNames {
   static readonly type = '[order management] Get Project Names';
   constructor() { }

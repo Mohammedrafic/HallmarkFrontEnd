@@ -3,7 +3,7 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { combineLatest, debounceTime, filter, Observable, Subject, take, takeUntil } from 'rxjs';
+import { combineLatest, debounceTime, filter, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -19,6 +19,7 @@ import {
   GetMasterShifts,
   GetOrganizationStatesWithKeyCode,
   GetProjectSpecialData,
+  GetSuggestedDetails,
   GetWorkflows,
   SetIsDirtyOrderForm,
   SetPredefinedBillRatesData
@@ -35,7 +36,7 @@ import { MasterShift } from '@shared/models/master-shift.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
-import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
+import { Order, OrderContactDetails, OrderWorkLocation, SuggesstedDetails } from '@shared/models/order-management.model';
 import { Document } from '@shared/models/document.model';
 
 import { OrderType } from '@shared/enums/order-type';
@@ -195,6 +196,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.organizationStatesWithKeyCode)
   organizationStatesWithKeyCode$: Observable<AssociateAgency[]>;
   organizationStateWithKeyCodeFields: FieldSettingsModel = { text: 'title', value: 'keyCode' };
+
+  @Select(OrderManagementContentState.suggestedDetails)
+  suggestedDetails$: Observable<SuggesstedDetails | null>;
 
   @Select(OrderManagementContentState.workflows)
   workflows$: Observable<WorkflowByDepartmentAndSkill[]>;
@@ -360,29 +364,16 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     const agencyControl = this.jobDistributionForm.get('agency') as AbstractControl;
     const jobDistributionsControl = this.jobDistributionForm.get('jobDistributions') as AbstractControl;
 
-    this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((locationId: number) => {
-      const locations = this.store.selectSnapshot(OrganizationManagementState.locationsByRegionId);
-      const location = locations.find(i => i.id === locationId);
+    this.locationIdControl.valueChanges.pipe(
+      takeUntil(this.unsubscribe$),
+      switchMap((locationId: number) => {
+        if (!locationId || this.isEditMode) {
+          return of(null);
+        }
 
-      if (!location || this.isEditMode) {
-        return;
-      }
-
-      const contactDetailsFormArray = this.contactDetailsForm.controls['contactDetails'] as FormArray;
-      const firstContactDetailsControl = contactDetailsFormArray.at(0) as FormGroup;
-
-      firstContactDetailsControl.controls['name'].patchValue(location.contactPerson);
-      firstContactDetailsControl.controls['email'].patchValue(location.contactEmail);
-      firstContactDetailsControl.controls['mobilePhone'].patchValue(location.phoneNumber);
-
-      const workLocationsFormArray = this.workLocationForm.controls['workLocations'] as FormArray;
-      const firstWorlLocationsControl = workLocationsFormArray.at(0) as FormGroup;
-
-      firstWorlLocationsControl.controls['address'].patchValue(location.address1);
-      firstWorlLocationsControl.controls['state'].patchValue(this.findTargetState(location));
-      firstWorlLocationsControl.controls['city'].patchValue(location.city);
-      firstWorlLocationsControl.controls['zipCode'].patchValue(location.zip);
-    });
+        return this.store.dispatch(new GetSuggestedDetails(locationId));
+      })
+    ).subscribe();
 
     combineLatest([
       orderTypeControl.valueChanges,
@@ -546,6 +537,30 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         this.order = null;
         //this.resetForms(); TODO: clarify
       }
+    });
+
+    this.suggestedDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe(suggesstedDetails => {
+      if (!suggesstedDetails) {
+        return;
+      }
+
+      const contactDetailsFormArray = this.contactDetailsForm.controls['contactDetails'] as FormArray;
+      const firstContactDetailsControl = contactDetailsFormArray.at(0) as FormGroup;
+
+      const { name, email, mobilePhone } = suggesstedDetails.contactDetails;
+      const { address, state, city, zipCode } = suggesstedDetails.workLocation;
+
+      firstContactDetailsControl.controls['name'].patchValue(name);
+      firstContactDetailsControl.controls['email'].patchValue(email);
+      firstContactDetailsControl.controls['mobilePhone'].patchValue(mobilePhone);
+
+      const workLocationsFormArray = this.workLocationForm.controls['workLocations'] as FormArray;
+      const firstWorlLocationsControl = workLocationsFormArray.at(0) as FormGroup;
+
+      firstWorlLocationsControl.controls['address'].patchValue(address);
+      firstWorlLocationsControl.controls['state'].patchValue(state);
+      firstWorlLocationsControl.controls['city'].patchValue(city);
+      firstWorlLocationsControl.controls['zipCode'].patchValue(zipCode);
     });
   }
 
@@ -823,11 +838,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       city: new FormControl(orderWorkLocation?.city || '', [Validators.required, Validators.maxLength(20)]),
       zipCode: new FormControl(orderWorkLocation?.zipCode || '', [Validators.required, Validators.minLength(5), Validators.pattern(/^[0-9]+$/)])
     });
-  }
-
-  private findTargetState(location: Location): string | undefined {
-    const states = this.store.selectSnapshot(OrderManagementContentState.organizationStatesWithKeyCode);
-    return states.find(({ title }: OrganizationStateWithKeyCode) => title === location.state)?.keyCode;
   }
 
   /** During editing order (in progress or filled), some fields have to be disabled */

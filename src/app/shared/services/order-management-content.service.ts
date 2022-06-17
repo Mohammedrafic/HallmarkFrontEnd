@@ -8,7 +8,8 @@ import {
   OrderCandidatesListPage,
   OrderCandidateJob,
   AcceptJobDTO,
-  ApplicantStatus
+  ApplicantStatus,
+  SuggesstedDetails
 } from '@shared/models/order-management.model';
 import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-management.model';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -145,6 +146,13 @@ export class OrderManagementContentService {
     return this.http.get<AssociateAgency[]>('/api/AssociateAgencies');
   }
 
+  /**
+   * Get predefined bill rates for order by order type, department id and skill id
+   * @param orderType
+   * @param departmentId
+   * @param skillId
+   * @returns list of predefined bill rates
+   */
   public getPredefinedBillRates(orderType: OrderType, departmentId: number, skillId: number): Observable<BillRate[]> {
     const params = new HttpParams()
       .append('orderType', orderType)
@@ -152,6 +160,15 @@ export class OrderManagementContentService {
       .append('skillId', skillId);
 
     return this.http.get<BillRate[]>('/api/BillRates/predefined/forOrder', { params });
+  }
+
+  /**
+   * Get workLocation and contactDetails based on location
+   * @param locationId
+   * @returns suggessted details data
+   */
+  public getSuggestedDetails(locationId: number | string): Observable<SuggesstedDetails> {
+    return this.http.get<SuggesstedDetails>(`/api/Orders/suggestedDetails/${locationId}`);
   }
 
   /**

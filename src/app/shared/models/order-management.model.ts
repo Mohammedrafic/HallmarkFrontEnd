@@ -86,6 +86,20 @@ export type AgencyOrder = {
   organizationId: number;
 };
 
+export class SuggesstedDetails {
+  workLocation: {
+    address: string;
+    state: string;
+    city: string;
+    zipCode: string;
+  };
+  contactDetails: {
+    name: string;
+    email: string;
+    mobilePhone: string;
+  };
+}
+
 export class OrderContactDetails {
   id?: number;
   orderId?: number;
