@@ -8,7 +8,7 @@ import {
 import { BillRate } from "@shared/models/bill-rate.model";
 import { Select, Store } from "@ngxs/store";
 import { OrderCandidateJob, OrderCandidatesList } from "@shared/models/order-management.model";
-import { AbstractControl, FormControl, FormGroup } from "@angular/forms";
+import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
 import { DatePipe } from "@angular/common";
 import { OrderManagementContentState } from "@client/store/order-managment-content.state";
 import { ReloadOrganisationOrderCandidatesLists, UpdateOrganisationCandidateJob } from "@client/store/order-managment-content.actions";
@@ -120,7 +120,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
           comments: value.requestComment,
           workWeek: '',
           clockId: '',
-          offeredBillRate: value.order.billRates,
+          offeredBillRate: value.offeredBillRate,
           allow: false,
           startDate: value.order.jobStartDate,
           endDate: value.order.jobEndDate,
@@ -167,8 +167,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       yearExp: new FormControl(''),
       travelExp: new FormControl(''),
       comments: new FormControl(''),
-      workWeek: new FormControl(''),
-      clockId: new FormControl(''),
+      workWeek: new FormControl('', [Validators.maxLength(50)]),
+      clockId: new FormControl('', [Validators.maxLength(50)]),
       offeredBillRate: new FormControl(''),
       allow: new FormControl(false),
       startDate: new FormControl(''),
