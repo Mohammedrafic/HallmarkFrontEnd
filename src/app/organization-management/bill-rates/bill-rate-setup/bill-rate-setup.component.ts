@@ -11,18 +11,27 @@ import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { Skill } from '@shared/models/skill.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import {
+  CANCEL_COFIRM_TEXT,
+  DATA_OVERRIDE_TEXT,
+  DATA_OVERRIDE_TITLE,
+  DELETE_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE
+} from '@shared/constants';
 import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
 import {
   DeleteBillRatesById,
   GetBillRateOptions,
   GetBillRates,
   SaveUpdateBillRate,
+  ShowConfirmationPopUp,
   SaveUpdateBillRateSucceed
 } from '@organization-management/store/bill-rates.actions';
 import { BillRatesState } from '@organization-management/store/bill-rates.state';
 import {
-  BillRateCategory, BillRateFilters,
+  BillRateCategory,
+  BillRateFilters,
   BillRateOption,
   BillRateSetup,
   BillRateSetupPage,
@@ -96,6 +105,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public billRateType = BillRateType;
   public filters: BillRateFilters = {};
   public filterColumns: any;
+  public billRateToPost?: BillRateSetupPost;
   public isReadOnly = false; // TODO: temporary solution, until specific service provided
 
   get dialogHeader(): string {
@@ -205,6 +215,25 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         this.store.dispatch(new ShowSideDialog(false));
         this.clearFormDetails();
       });
+
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ShowConfirmationPopUp))
+      .subscribe(() => {
+        this.confirmService
+          .confirm(DATA_OVERRIDE_TEXT, {
+            title: DATA_OVERRIDE_TITLE,
+            okButtonLabel: 'Confirm',
+            okButtonClass: ''
+          }).pipe(filter(confirm => !!confirm))
+          .subscribe(() => {
+            if (this.billRateToPost) {
+              this.billRateToPost.forceUpsert = true; // set force override flag for BE
+              this.store.dispatch(new SaveUpdateBillRate(this.billRateToPost, this.currentPage, this.pageSize));
+            } else {
+              this.store.dispatch(new ShowSideDialog(false));
+              this.clearFormDetails();
+            }
+          });
+      });
   }
 
   ngOnDestroy(): void {
@@ -234,19 +263,19 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public onFormSaveClick(): void {
     if (this.billRatesFormGroup.valid) {
+      const isAllRegions = this.billRatesFormGroup.controls['regionIds'].value.length === this.allRegions.length;
       const billRate: BillRateSetupPost = {
         billRateSettingId: this.editRecordId,
-        regionIds: this.billRatesFormGroup.controls['regionIds'].value.length === this.allRegions.length ? []
-          : this.billRatesFormGroup.controls['regionIds'].value, // [] means All on the BE side
-        locationIds: this.billRatesFormGroup.controls['locationIds'].value.length === this.locations.length ? []
-          : this.billRatesFormGroup.controls['locationIds'].value, // [] means All on the BE side
-        departmentIds: this.billRatesFormGroup.controls['departmentIds'].value.length === this.departments.length ? []
-          : this.billRatesFormGroup.controls['departmentIds'].value, // [] means All on the BE side
-        skillIds: this.billRatesFormGroup.controls['skillIds'].value.length === this.allSkills.length ? []
-          : this.billRatesFormGroup.controls['skillIds'].value, // [] means All on the BE side
+        regionIds: isAllRegions ? [] : this.billRatesFormGroup.controls['regionIds'].value, // [] means All on the BE side
+        locationIds: isAllRegions && this.billRatesFormGroup.controls['locationIds'].value.length === this.locations.length
+          ? [] : this.billRatesFormGroup.controls['locationIds'].value, // [] means All on the BE side
+        departmentIds: isAllRegions && this.billRatesFormGroup.controls['departmentIds'].value.length === this.departments.length
+          ? [] : this.billRatesFormGroup.controls['departmentIds'].value, // [] means All on the BE side
+        skillIds: this.billRatesFormGroup.controls['skillIds'].value.length === this.allSkills.length ? [] // [] means All on the BE side
+          : this.billRatesFormGroup.controls['skillIds'].value,
         billRateConfigId: this.billRatesFormGroup.controls['billRateTitleId'].value,
-        orderTypes: this.billRatesFormGroup.controls['orderTypeIds'].value.length === this.orderTypes.length ? []
-          : this.billRatesFormGroup.controls['orderTypeIds'].value, // [] means All on the BE side
+        orderTypes: this.billRatesFormGroup.controls['orderTypeIds'].value.length === this.orderTypes.length ? [] // [] means All on the BE side
+          : this.billRatesFormGroup.controls['orderTypeIds'].value,
         rateHour: this.billRatesFormGroup.controls['billRateValueRateTimes'].value,
         effectiveDate: this.billRatesFormGroup.controls['effectiveDate'].value,
         intervalMin: this.isIntervalMinEnabled ? this.billRatesFormGroup.controls['intervalMin'].value : null,
@@ -259,6 +288,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         displayInJob: this.billRatesFormGroup.controls['displayInJob'].value ? this.billRatesFormGroup.controls['displayInJob'].value : false,
       }
 
+      this.billRateToPost = billRate;
       this.store.dispatch(new SaveUpdateBillRate(billRate, this.currentPage, this.pageSize));
     } else {
       this.billRatesFormGroup.markAllAsTouched();
@@ -393,6 +423,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRatesFormGroup.reset();
     this.isEdit = false;
     this.editRecordId = undefined;
+    this.billRateToPost = undefined;
     this.removeActiveCssClass();
     this.selectedBillRateUnit = BillRateUnit.Multiplier;
   }
@@ -525,7 +556,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       this.billRatesFormGroup.controls['orderTypeIds'].setValue(data.orderType);
     }
 
-    this.billRatesFormGroup.controls['billRateValueRateTimes'].setValue(data.rateHour);
+    const rateHour = foundBillRateOption?.unit === BillRateUnit.Hours ? data.rateHour : parseFloat(data.rateHour.toString()).toFixed(2);
+    this.billRatesFormGroup.controls['billRateValueRateTimes'].setValue(rateHour);
     this.billRatesFormGroup.controls['effectiveDate'].setValue(data.effectiveDate);
     this.billRatesFormGroup.controls['intervalMin'].setValue(data.intervalMin);
     this.billRatesFormGroup.controls['intervalMax'].setValue(data.intervalMax);

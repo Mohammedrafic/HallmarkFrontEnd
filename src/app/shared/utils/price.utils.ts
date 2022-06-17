@@ -37,8 +37,8 @@ export default class PriceUtils {
   }
 
   static verifyDigitsAfterDot(form: FormGroup, controlName: string): void {
-    const splitByDotNumbers = form.get(controlName)?.value.split('.');
-    if (splitByDotNumbers[1].length > 2) {
+    const splitByDotNumbers = form.get(controlName)?.value.toString().split('.');
+    if (splitByDotNumbers[1] && splitByDotNumbers[1].length > 2) {
       form.get(controlName)?.patchValue(parseFloat(form.get(controlName)?.value).toFixed(2),{emitEvent: false});
     }
   }

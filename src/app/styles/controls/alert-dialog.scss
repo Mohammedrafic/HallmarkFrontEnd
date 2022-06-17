@@ -1,0 +1,39 @@
+@import "../variables/colors.scss";
+
+body.light, body.dark {
+  .e-alert-dialog.e-control.e-dialog.e-popup.alert-dialog {
+    width: 448px;
+    border-radius: 8px;
+
+    div.e-dlg-header-content {
+      border-radius: 8px 8px 0 0;
+      border-bottom: 1px solid $secondary-dark-blue-40;
+      padding: 12px 18px;
+
+      .e-dlg-header {
+        font-weight: 700;
+        font-size: 24px;
+      }
+    }
+
+    div.e-dlg-content {
+      border-radius: 8px 8px 0 0;
+      padding: 25px 15px;
+      min-height: 90px;
+      font-size: 16px;
+    }
+
+    div.e-footer-content {
+      border-radius: 0 0 8px 8px;
+      border-top: 1px solid $secondary-dark-blue-40;
+      padding: 15px;
+      display: flex;
+      justify-content: end;
+      flex-direction: row-reverse;
+
+      .ok-button {
+        background-color: $supportive-red;
+      }
+    }
+  }
+}

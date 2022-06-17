@@ -99,9 +99,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     text: 'name',
     value: 'id',
   };
-  public skillsFields = { 
+  public skillsFields = {
     text: 'skillDescription',
-    value: 'id' 
+    value: 'id'
   };
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
@@ -116,10 +116,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public regions: OrganizationRegion[] = [];
   public previousSelectedOrderId: number | null;
 
-  constructor(private store: Store, 
-              private router: Router, 
-              private route: ActivatedRoute, 
-              private actions$: Actions, 
+  constructor(private store: Store,
+              private router: Router,
+              private route: ActivatedRoute,
+              private actions$: Actions,
               private confirmService: ConfirmService,
               private filterService: FilterService,
               private fb: FormBuilder,
@@ -264,6 +264,24 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     } else if (this.activeTab === OrderManagemetTabs.Incomplete) {
       this.store.dispatch(new GetIncompleteOrders({ pageNumber: this.currentPage, pageSize: this.pageSize }));
     }
+  }
+
+  public onFilterClose() {
+    this.OrderFilterFormGroup.setValue({
+      orderId: this.filters.orderId || null,
+      regionIds: this.filters.regionIds || [],
+      locationIds: this.filters.locationIds || [],
+      departmentsIds: this.filters.departmentsIds || [],
+      skillIds: this.filters.skillIds || [],
+      orderTypes: this.filters.orderTypes || [],
+      jobTitle: this.filters.jobTitle || null,
+      billRateFrom: this.filters.billRateFrom || null,
+      billRateTo: this.filters.billRateTo || null,
+      openPositions: this.filters.openPositions || null,
+      jobStartDate: this.filters.jobStartDate || null,
+      jobEndDate: this.filters.jobEndDate || null,
+    });
+    this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
   }
 
   public showFilters(): void {

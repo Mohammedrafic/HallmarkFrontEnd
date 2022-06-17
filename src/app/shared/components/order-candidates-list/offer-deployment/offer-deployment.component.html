@@ -58,9 +58,14 @@
                     </div>
                   </div>
                   <div class="input-container">
-                    <label>Offered Bill Rate<span class="required">*</span></label>
-                    <div class="input-group">
-                      <input appValidateWithMessage formControlName="offeredBillRate" class="e-input" type="number" placeholder="Offered Bill Rate"/>
+                    <label>Offered Bill Rate<span *ngIf="!readOnlyMode" class="required">*</span></label>
+                    <div class="input-group" [ngClass]="{'input-readonly': readOnlyMode}">
+                      <input appValidateWithMessage
+                             [readonly]="readOnlyMode"
+                             formControlName="offeredBillRate"
+                             class="e-input"
+                             type="number"
+                             placeholder="Offered Bill Rate"/>
                     </div>
                   </div>
                 </div>

@@ -22,7 +22,8 @@ const routes: Routes = [
         path: 'dashboard',
         loadChildren: () => import('../dashboard/dashboard.module').then((mod) => mod.DashboardModule),
         data: {
-          isOrganizationArea: true
+          isOrganizationArea: true,
+          isAgencyArea: true
         }
       },
       {

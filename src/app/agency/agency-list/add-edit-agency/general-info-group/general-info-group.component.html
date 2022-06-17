@@ -119,10 +119,12 @@
           <div class="input-container">
             <label>Zipcode</label>
             <div class="input-group">
-              <ejs-maskedtextbox promptChar="_" mask='00000' appValidateWithMessage formControlName="zipCode" class="e-input" placeholder="Zipcode" maxlength="6"></ejs-maskedtextbox>
-              <span class="error" *ngIf="!formGroup.controls['zipCode'].untouched">{{
-                formGroup.controls["zipCode"].errors | validationError
-              }}</span>
+              <input appValidateWithMessage
+              formControlName="zipCode"
+              mask="00000||000000"
+              class="e-input"
+              type="text"
+              placeholder="Zipcode"/>
             </div>
           </div>
           <div class="input-container"></div>

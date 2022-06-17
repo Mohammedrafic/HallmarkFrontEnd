@@ -6,7 +6,12 @@
   </ng-container>
   <ng-container right>
     <app-search></app-search>
-    <button ejs-button cssClass="e-outline button-filter" (click)="showFilters()">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+    <button ejs-button cssClass="e-outline button-filter" (click)="showFilters()">
+      <div class="filter-button-content">
+        <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+        Filters <i-feather name="sliders" class="icon"></i-feather>
+      </div>
+    </button>
     <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
     <button ejs-button [isPrimary]="true" (click)="navigateToOrderForm()">Create Order</button>
   </ng-container>
@@ -159,7 +164,7 @@
   </ejs-grid>
 </section>
 
-<app-filter-dialog [items]="filteredItems" [count]="(ordersPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+<app-filter-dialog [items]="filteredItems" [count]="(ordersPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
   <form class="bootstrap" [formGroup]="OrderFilterFormGroup">
     <div>
       <div class="input-container">
@@ -246,7 +251,7 @@
     </div>
     <div>
       <div class="input-container">
-        <label for="externalId">Job Title</label>
+        <label>Job Title</label>
         <div class="input-group">
           <input  class="e-input"
                   type="text"
@@ -258,7 +263,7 @@
     </div>
     <div class="row">
       <div class="input-container">
-        <label for="externalId">Bill Rate From</label>
+        <label>Bill Rate From</label>
         <div class="input-group">
           <input  class="e-input"
                   type="text"
@@ -268,7 +273,7 @@
         </div>
       </div>
       <div class="input-container">
-        <label for="externalId">Bill Rate To</label>
+        <label>Bill Rate To</label>
         <div class="input-group">
           <input  class="e-input"
                   type="text"
@@ -280,12 +285,12 @@
     </div>
     <div>
       <div class="input-container">
-        <label for="externalId">Open Positions</label>
+        <label for="externalId"># of Positions</label>
         <div class="input-group">
           <input  class="e-input"
                   type="text"
                   maxlength="50"
-                  placeholder="Open Positions"
+                  placeholder="# of Positions"
                   formControlName="openPositions"/>
         </div>
       </div>

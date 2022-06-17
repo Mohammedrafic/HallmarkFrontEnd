@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { BehaviorSubject, combineLatest, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 
-import { GetUserAgencies, GetUserOrganizations, SaveLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
+import { GetUserAgencies, GetUserOrganizations, SaveLastSelectedOrganizationAgencyId, LastSelectedOrganisationAgency } from 'src/app/store/user.actions';
 
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
@@ -83,19 +83,18 @@ export class OrganizationAgencySelectorComponent implements OnDestroy {
       }
 
       const selectedType = selectedOrganizationAgency.type;
-      const lastSelectedOrganizationId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId);
-      const lastSelectedAgencyId = this.store.selectSnapshot(UserState.lastSelectedAgencyId);
 
-      if (selectedType === 'Organization' && selectedOrganizationAgencyId !== lastSelectedOrganizationId) {
+      if (selectedType === 'Organization') {
+        this.store.dispatch(new LastSelectedOrganisationAgency(selectedType));
         this.store.dispatch(new SaveLastSelectedOrganizationAgencyId({
           lastSelectedOrganizationId: selectedOrganizationAgencyId,
-          lastSelectedAgencyId: null
+          lastSelectedAgencyId: this.store.selectSnapshot(UserState.lastSelectedAgencyId),
         }));
       }
-
-      if (selectedType === 'Agency' && selectedOrganizationAgencyId !== lastSelectedAgencyId) {
+      if (selectedType === 'Agency') {
+        this.store.dispatch(new LastSelectedOrganisationAgency(selectedType));
         this.store.dispatch(new SaveLastSelectedOrganizationAgencyId({
-          lastSelectedOrganizationId: null,
+          lastSelectedOrganizationId: this.store.selectSnapshot(UserState.lastSelectedOrganizationId),
           lastSelectedAgencyId: selectedOrganizationAgencyId
         }));
       }
@@ -123,10 +122,21 @@ export class OrganizationAgencySelectorComponent implements OnDestroy {
 
   private isOrganizationAgencyAreaChange(): void {
     this.isOrganizationAgencyArea$.pipe(takeUntil(this.unsubscribe$)).subscribe(area => {
-      const isOrganizationArea = area.isOrganizationArea;
-      const isAgencyArea = area.isAgencyArea;
+      let state = {
+        isOrganization: area.isOrganizationArea,
+        isAgency: area.isAgencyArea
+      }
 
-      this.applyOrganizationsAgencies(isOrganizationArea, isAgencyArea);
+      state.isOrganization ?
+        state = {
+          isOrganization: true,
+          isAgency: false
+        } :
+        state = {
+          isOrganization: false,
+          isAgency: true
+        }
+      this.applyOrganizationsAgencies(state.isOrganization, state.isAgency);
     });
   }
 
@@ -190,17 +200,18 @@ export class OrganizationAgencySelectorComponent implements OnDestroy {
 
     if (this.isAgencyOrOrganization) {
       this.organizationAgency = this.organizations[0] || this.agencies[0];
-      
+
     } else {
       this.organizationsAgencies$.next(organizationsAgencies);
     }
 
     const lastSelectedOrganizationId = this.store.selectSnapshot(UserState.lastSelectedOrganizationId);
     const lastSelectedAgencyId = this.store.selectSnapshot(UserState.lastSelectedAgencyId);
+    const isAgency = this.store.selectSnapshot(UserState.lastSelectedOrganizationAgency) === 'Agency';
 
     let newOrganizationAgencyControlValue: number | null;
 
-    if (isAgencyArea) {
+    if (isAgencyArea && isAgency) {
       newOrganizationAgencyControlValue = organizationsAgencies.find(i => i.id === lastSelectedAgencyId)
         ? lastSelectedAgencyId
         : organizationsAgencies[0]?.id || null;

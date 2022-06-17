@@ -32,7 +32,7 @@ export class BillRateFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public isIntervalMinControlRequired = true;
   public isIntervalMaxControlRequired = true;
-  public selectedBillRateUnit: BillRateUnit = BillRateUnit.Multiplier;
+  @Input() selectedBillRateUnit: BillRateUnit;
   public BillRateUnitList = BillRateUnit;
   public priceUtils = PriceUtils;
 

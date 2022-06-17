@@ -4,7 +4,7 @@ import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { BillRate, BillRateCategory, BillRateType } from '@shared/models/bill-rate.model';
+import { BillRate, BillRateCategory, BillRateOption, BillRateType } from '@shared/models/bill-rate.model';
 
 export type BillRatesGridEvent = BillRate & { index: string };
 
@@ -18,6 +18,7 @@ export class BillRatesGridComponent extends AbstractGridConfigurationComponent i
   @ViewChild('grid') grid: GridComponent;
 
   @Input() billRatesData: BillRate[];
+  @Input() billRateOptions: BillRateOption[];
 
   @Output() add: EventEmitter<void> = new EventEmitter();
   @Output() edit: EventEmitter<BillRatesGridEvent> = new EventEmitter();

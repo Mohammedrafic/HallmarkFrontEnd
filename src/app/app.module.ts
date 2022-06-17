@@ -13,6 +13,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ApiInterceptor } from './shared/interceptors/api.interceptor';
 import { UserState } from './store/user.state';
 import { LoginGuard, ShellGuard } from '@shared/guards';
+import { NgxMaskModule } from 'ngx-mask';
 
 @NgModule({
   declarations: [AppComponent],
@@ -32,6 +33,7 @@ import { LoginGuard, ShellGuard } from '@shared/guards';
     NgxsLoggerPluginModule.forRoot({
       disabled: environment.production
     }),
+    NgxMaskModule.forRoot(),
   ],
   providers: [
     {

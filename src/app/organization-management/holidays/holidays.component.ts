@@ -270,6 +270,16 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     this.clearSelection(this.grid);
   }
 
+  public onFilterClose() {
+    this.HolidayFilterFormGroup.setValue({
+      holidayNames: this.filters.holidayNames || [],
+      years: this.filters.years || [],
+      regionIds: this.filters.regionIds || [],
+      locationIds: this.filters.locationIds || [],
+    });
+    this.filteredItems = this.filterService.generateChips(this.HolidayFilterFormGroup, this.filterColumns);
+  }
+
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }

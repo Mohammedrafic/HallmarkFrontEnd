@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { State, Action, StateContext, Selector } from '@ngxs/store';
 import { map, Observable, tap } from 'rxjs';
 import { MENU_CONFIG } from '../shared/constants/menu-config';
-import { AUTH_STORAGE_KEY, USER_STORAGE_KEY, ORG_ID_STORAGE_KEY, AGENCY_ID_STORAGE_KEY } from '@shared/constants/local-storage-keys';
+import { AUTH_STORAGE_KEY, USER_STORAGE_KEY, ORG_ID_STORAGE_KEY, AGENCY_ID_STORAGE_KEY, LAST_SELECTED_BUSINESS_UNIT_TYPE } from '@shared/constants/local-storage-keys';
 import { ChildMenuItem, Menu, MenuItem } from '../shared/models/menu.model';
 
 import { User } from '../shared/models/user.model';
@@ -14,7 +14,8 @@ import {
   GetUserAgencies,
   SaveLastSelectedOrganizationAgencyId,
   SetLastSelectedOrganizationAgencyId,
-  GetOrganizationStructure
+  GetOrganizationStructure,
+  LastSelectedOrganisationAgency
 } from './user.actions';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 import { OrganizationStructure } from '@shared/models/organization.model';
@@ -25,6 +26,7 @@ export interface UserStateModel {
   menu: Menu;
   agencies: UserAgencyOrganization | null;
   organizations: UserAgencyOrganization | null;
+  lastSelectedOrganisationAgency: string | null;
   lastSelectedOrganizationId: number | null;
   lastSelectedAgencyId: number | null;
   organizationStructure: OrganizationStructure | null;
@@ -37,6 +39,7 @@ export interface UserStateModel {
     menu: { menuItems: [] },
     agencies: null,
     organizations: null,
+    lastSelectedOrganisationAgency: window.localStorage.getItem(LAST_SELECTED_BUSINESS_UNIT_TYPE) || null,
     lastSelectedOrganizationId: parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string) || null,
     lastSelectedAgencyId: parseInt(window.localStorage.getItem(AGENCY_ID_STORAGE_KEY) as string) || null,
     organizationStructure: null,
@@ -70,6 +73,9 @@ export class UserState {
 
   @Selector()
   static organizationStructure(state: UserStateModel): OrganizationStructure | null { return state.organizationStructure }
+
+  @Selector()
+  static lastSelectedOrganizationAgency(state: UserStateModel): string | null{return state.lastSelectedOrganisationAgency}
 
   @Action(SetCurrentUser)
   SetCurrentUser({ patchState }: StateContext<UserStateModel>, { payload }: SetCurrentUser): void {
@@ -168,5 +174,11 @@ export class UserState {
     return this.organizationService.getOrganizationStructure().pipe(tap((structure: OrganizationStructure) => {
       return patchState({ organizationStructure: structure });
     }));
+  }
+
+  @Action(LastSelectedOrganisationAgency)
+  SetLastSelectedOrganizationAgecy({ patchState }: StateContext<UserStateModel>, {payload}: LastSelectedOrganisationAgency) {
+    window.localStorage.setItem(LAST_SELECTED_BUSINESS_UNIT_TYPE, payload)
+    return patchState({lastSelectedOrganisationAgency: payload})
   }
 }

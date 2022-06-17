@@ -1,8 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { filter } from 'rxjs';
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { AddOrderCredentialFormComponent } from './components/add-order-credential-form/add-order-credential-form.component';
+import { EditOrderCredentialFormComponent } from './components/edit-order-credential-form/edit-order-credential-form.component';
 import { IOrderCredential, IOrderCredentialItem } from './types';
 
 @Component({
@@ -12,6 +16,7 @@ import { IOrderCredential, IOrderCredentialItem } from './types';
 })
 export class OrderCredentialsComponent implements OnInit {
   @ViewChild('addCred') addCred: AddOrderCredentialFormComponent;
+  @ViewChild('editCred') editCred: EditOrderCredentialFormComponent;
   @Input() credentials: IOrderCredentialItem[];
   @Input() isActive = false;
   @Output() credentialChanged: EventEmitter<IOrderCredentialItem> = new EventEmitter();
@@ -24,7 +29,7 @@ export class OrderCredentialsComponent implements OnInit {
   public formSubmitted = false;
   public showForm = false;
 
-  constructor(private store: Store, private fb: FormBuilder) {
+  constructor(private store: Store, private fb: FormBuilder, private confirmService: ConfirmService) {
     this.CredentialForm = this.fb.group({
       credentialId: new FormControl(0),
       credentialType: new FormControl('', [ Validators.required ]),
@@ -77,11 +82,20 @@ export class OrderCredentialsComponent implements OnInit {
   }
 
   public onDialogCancel(): void {
-    this.CredentialForm.reset();
-    this.addCred && this.addCred.clearGridSelection();
-    this.showForm = false;
-    this.store.dispatch(new ShowSideDialog(false));
-    this.formSubmitted = false;
+    if (!this.isEditMode && this.addCred?.form.dirty || this.isEditMode && this.editCred?.form.dirty) {
+      this.confirmService
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => !!confirm))
+        .subscribe(() => {
+         this.handleOnCancel();
+        });
+    } else {
+      this.handleOnCancel();
+    }
   }
 
   public onDialogOk(): void {
@@ -178,6 +192,14 @@ export class OrderCredentialsComponent implements OnInit {
       totalCount: 1,
       totalPages: 1
     };
+  }
+
+  private handleOnCancel(): void {
+    this.CredentialForm.reset();
+    this.addCred && this.addCred.clearGridSelection();
+    this.showForm = false;
+    this.store.dispatch(new ShowSideDialog(false));
+    this.formSubmitted = false;
   }
 
   // helpers

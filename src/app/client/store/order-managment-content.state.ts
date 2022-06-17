@@ -1,39 +1,46 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, of,tap } from 'rxjs';
+import { catchError, Observable, of, tap } from 'rxjs';
 import {
- ClearPredefinedBillRates,
+  ClearPredefinedBillRates,
+  ClearSelectedOrder,
   DeleteOrder,
-  DeleteOrderSucceeded, EditOrder,
+  DeleteOrderSucceeded,
+  EditOrder,
   GetAgencyOrderCandidatesList,
   GetAssociateAgencies,
- GetAvailableSteps, GetIncompleteOrders,
+  GetAvailableSteps,
+  GetIncompleteOrders,
   GetMasterShifts,
   GetOrderById,
   GetOrders,
- GetOrganisationCandidateJob, GetOrganizationStatesWithKeyCode,
+  GetOrganisationCandidateJob,
+  GetOrganizationStatesWithKeyCode,
   GetPredefinedBillRates,
   GetProjectNames,
   GetProjectSpecialData,
   GetProjectTypes,
   GetSelectedOrderById,
+  GetSuggestedDetails,
   GetWorkflows,
   SaveOrder,
-  SaveOrderSucceeded
-,
+  SaveOrderSucceeded,
+  SetIsDirtyOrderForm,
   SetPredefinedBillRatesData,
-  UpdateOrganisationCandidateJob
+  UpdateOrganisationCandidateJob,
+  UpdateOrganisationCandidateJobSucceed
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
   ApplicantStatus,
   GetPredefinedBillRatesData,
+  Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
   OrderManagement,
-  OrderManagementPage
+  OrderManagementPage,
+  SuggesstedDetails
 } from '@shared/models/order-management.model';
-import { Order } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
@@ -47,8 +54,8 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
 import { BillRate } from '@shared/models/bill-rate.model';
-import { OrderManagementModel } from "@agency/store/order-management.state";
-import {ProjectSpecialData} from "@shared/models/project-special-data.model";
+import { OrderManagementModel } from '@agency/store/order-management.state';
+import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -65,10 +72,12 @@ export interface OrderManagementContentStateModel {
   workflows: WorkflowByDepartmentAndSkill[];
   projectTypes: ProjectType[];
   projectSpecialData: ProjectSpecialData | null;
+  suggestedDetails: SuggesstedDetails | null;
   projectNames: ProjectName[];
   masterShifts: MasterShift[];
   associateAgencies: AssociateAgency[];
   predefinedBillRates: BillRate[];
+  isDirtyOrderForm: boolean;
 }
 
 @State<OrderManagementContentStateModel>({
@@ -89,9 +98,11 @@ export interface OrderManagementContentStateModel {
     projectTypes: [],
     projectNames: [],
     projectSpecialData: null,
+    suggestedDetails: null,
     masterShifts: [],
     associateAgencies: [],
-    predefinedBillRates: []
+    predefinedBillRates: [],
+    isDirtyOrderForm: false
   }
 })
 @Injectable()
@@ -125,6 +136,9 @@ export class OrderManagementContentState {
   static projectSpecialData(state: OrderManagementContentStateModel): ProjectSpecialData | null { return state.projectSpecialData }
 
   @Selector()
+  static suggestedDetails(state: OrderManagementContentStateModel): SuggesstedDetails | null { return state.suggestedDetails }
+
+  @Selector()
   static projectNames(state: OrderManagementContentStateModel): ProjectName[] { return state.projectNames }
 
   @Selector()
@@ -138,6 +152,9 @@ export class OrderManagementContentState {
 
   @Selector()
   static predefinedBillRates(state: OrderManagementContentStateModel): BillRate[] { return state.predefinedBillRates }
+
+  @Selector()
+  static isDirtyOrderForm(state: OrderManagementContentStateModel): boolean { return state.isDirtyOrderForm; }
 
   @Selector()
   static candidatesJob(state: OrderManagementContentStateModel): OrderCandidateJob | null {
@@ -219,6 +236,11 @@ export class OrderManagementContentState {
     }));
   }
 
+  @Action(ClearSelectedOrder)
+  ClearSelectedOrder({ patchState }: StateContext<OrderManagementContentStateModel>): void {
+    patchState({ selectedOrder: null });
+  }
+
   @Action(GetOrganizationStatesWithKeyCode)
   GetOrganizationStatesWithKeyCode({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<OrganizationStateWithKeyCode[]> {
     return this.orderManagementService.getOrganizationStatesWitKeyCode().pipe(tap((payload) => {
@@ -256,7 +278,10 @@ export class OrderManagementContentState {
   @Action(UpdateOrganisationCandidateJob)
   UpdateOrganisationCandidateJob({ dispatch }: StateContext<OrderManagementModel>, { payload }: UpdateOrganisationCandidateJob): Observable<any> {
     return this.orderManagementService.updateCandidateJob(payload).pipe(
-      tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'))),
+      tap(() => {
+        dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'));
+        dispatch(new UpdateOrganisationCandidateJobSucceed());
+      }),
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
     );
   }
@@ -280,6 +305,13 @@ export class OrderManagementContentState {
   GetProjectSpecialData({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<ProjectSpecialData> {
     return this.projectsService.getProjectSpecialData().pipe(tap(payload => {
       patchState({ projectSpecialData: payload });
+    }));
+  }
+
+  @Action(GetSuggestedDetails)
+  GetSuggestedDetails({ patchState }: StateContext<OrderManagementContentStateModel>, { locationId }: GetSuggestedDetails): Observable<SuggesstedDetails> {
+    return this.orderManagementService.getSuggestedDetails(locationId).pipe(tap(payload => {
+      patchState({ suggestedDetails: payload });
     }));
   }
 
@@ -337,11 +369,20 @@ export class OrderManagementContentState {
     });
   }
 
+  @Action(SetIsDirtyOrderForm)
+  SetIsDirtyOrderForm({ patchState }: StateContext<OrderManagementContentStateModel>, { isDirtyOrderForm }: SetIsDirtyOrderForm): void {
+    patchState({ isDirtyOrderForm });
+  }
+
   @Action(SaveOrder)
   SaveOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { order, documents }: SaveOrder): Observable<Order | void> {
     return this.orderManagementService.saveOrder(order, documents).pipe(
       tap(order => {
-        dispatch([new ShowToast(MessageTypes.Success, RECORD_ADDED), new SaveOrderSucceeded()]);
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          new SaveOrderSucceeded(),
+          new SetIsDirtyOrderForm(false)
+        ]);
         return order;
       }),
       catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
@@ -352,7 +393,11 @@ export class OrderManagementContentState {
   EditOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { order, documents }: EditOrder): Observable<Order | void> {
     return this.orderManagementService.editOrder(order, documents).pipe(
       tap(order => {
-        dispatch([new ShowToast(MessageTypes.Success, RECORD_MODIFIED), new SaveOrderSucceeded()]);
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
+          new SaveOrderSucceeded(),
+          new SetIsDirtyOrderForm(false)
+        ]);
         return order;
       }),
       catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))

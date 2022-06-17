@@ -72,6 +72,7 @@ import { OrderCandidatesComponent } from "@agency/order-management/order-managem
 import { CandidatDialogComponent } from './order-management/order-management-grid/candidat-dialog/candidat-dialog.component';
 import { OrderManagementState } from './store/order-management.state';
 import { CandidatDetailsComponent } from './order-management/order-management-grid/candidat-dialog/candidat-details/candidat-details.component';
+import { NgxMaskModule } from 'ngx-mask';
 
 const sidebarIcons = {
   Sliders,
@@ -154,6 +155,7 @@ const sidebarIcons = {
     MultiSelectAllModule,
     MaskedTextBoxModule,
     FeatherModule.pick(sidebarIcons),
+    NgxMaskModule.forChild(),
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),
   ],
 })

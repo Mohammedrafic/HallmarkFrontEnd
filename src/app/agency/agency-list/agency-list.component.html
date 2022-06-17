@@ -38,7 +38,7 @@
         </ng-template>
       </e-column>
       <e-column field="agencyContactDetails.0.contactPerson" headerText="CONTACT PERSON" width=200></e-column>
-      <e-column field="agencyContactDetails.0.phone1" headerText="PHONE" width=200></e-column>
+      <e-column field="agencyContactDetails.0.phone1" headerText="PHONE" width=200 [allowSorting]="false"></e-column>
       <e-column textAlign="Right" width="120" freeze="Right">
         <ng-template #template let-data>
           <div class="row-tool-buttons">

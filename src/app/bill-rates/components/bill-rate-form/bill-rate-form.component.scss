@@ -4,6 +4,7 @@ form {
 
 .form-line {
   display: flex;
+
   &:not(:last-child) {
     margin-bottom: 12px;
   }

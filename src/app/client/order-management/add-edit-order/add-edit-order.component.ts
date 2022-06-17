@@ -6,7 +6,7 @@ import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
-import { Observable, Subject, takeUntil, switchMap, of } from 'rxjs';
+import { Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { SetImportFileDialogState } from '@admin/store/admin.actions';
@@ -16,7 +16,8 @@ import {
   GetSelectedOrderById,
   SaveOrderSucceeded,
   ClearPredefinedBillRates,
-  GetPredefinedBillRates
+  GetPredefinedBillRates,
+  SetIsDirtyOrderForm
 } from '@client/store/order-managment-content.actions';
 
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
@@ -25,6 +26,7 @@ import { BillRatesComponent } from '@bill-rates/bill-rates.component';
 import { BillRate, OrderBillRateDto } from '@shared/models/bill-rate.model';
 import { IOrderCredentialItem } from '@order-credentials/types';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { OrderStatus } from '@shared/enums/order-management';
 
 enum SelectedTab {
   OrderDetails,
@@ -33,7 +35,8 @@ enum SelectedTab {
 
 enum SubmitButtonItem {
   SaveForLater = '0',
-  SaveAsTemplate = '1'
+  Save = '1',
+  SaveAsTemplate = '2'
 }
 
 @Component({
@@ -94,6 +97,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         if (order?.billRates) {
           this.orderBillRates = [...order.billRates];
         }
+
+        if (order?.status === OrderStatus.Incomplete) {
+          this.addMenuItem(SubmitButtonItem.SaveForLater, 'Save For Later');
+          this.removeMenuItem(SubmitButtonItem.Save);
+        } else {
+          this.addMenuItem(SubmitButtonItem.Save, 'Save');
+          this.removeMenuItem(SubmitButtonItem.SaveForLater);
+        }
       });
     }
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(SaveOrderSucceeded)).subscribe(() => {
@@ -103,7 +114,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.getPredefinedBillRatesData$.pipe(
       takeUntil(this.unsubscribe$),
       switchMap(getPredefinedBillRatesData => {
-        if (getPredefinedBillRatesData && !this.billRatesComponent.billRatesControl.value.length) {
+        if (getPredefinedBillRatesData && !this.billRatesComponent?.billRatesControl.value.length) {
           return this.store.dispatch(new GetPredefinedBillRates());
         } else {
           return of(null);
@@ -120,6 +131,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.store.dispatch(new ClearPredefinedBillRates());
+    this.store.dispatch(new SetIsDirtyOrderForm(false));
   }
 
   public navigateBack(): void {
@@ -139,6 +151,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public onSplitButtonSelect(args: MenuEventArgs): void {
     switch (args.item.id) {
+      case SubmitButtonItem.Save:
+        this.saveForLater();
+        break;
+
       case SubmitButtonItem.SaveForLater:
         this.saveForLater();
         break;
@@ -149,6 +165,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
   }
 
+  public onBillRatesChanged(): void {
+    this.store.dispatch(new SetIsDirtyOrderForm(true));
+  }
+
   public onCredentialChanged(cred: IOrderCredentialItem): void {
     const isExist = this.orderCredentials.find(({credentialId}) => cred.credentialId === credentialId);
     if (isExist) {
@@ -156,6 +176,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     } else {
       this.orderCredentials.push(cred);
     }
+
+    this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
   public onCredentialDeleted(cred: IOrderCredentialItem): void {
@@ -164,11 +186,13 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       const index = this.orderCredentials.indexOf(credToDelete);
       this.orderCredentials.splice(index, 1);
     }
+
+    this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
   public save(): void {
     if (
-      this.orderDetailsFormComponent.orderTypeStatusForm.valid &&
+      this.orderDetailsFormComponent.orderTypeForm.valid &&
       this.orderDetailsFormComponent.generalInformationForm.valid &&
       this.orderDetailsFormComponent.jobDistributionForm.valid &&
       this.orderDetailsFormComponent.jobDescriptionForm.valid &&
@@ -191,7 +215,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         this.store.dispatch(new SaveOrder(order, documents));
       }
     } else {
-      this.orderDetailsFormComponent.orderTypeStatusForm.markAllAsTouched();
+      this.orderDetailsFormComponent.orderTypeForm.markAllAsTouched();
       this.orderDetailsFormComponent.generalInformationForm.markAllAsTouched();
       this.orderDetailsFormComponent.jobDistributionForm.markAllAsTouched();
       this.orderDetailsFormComponent.jobDescriptionForm.markAllAsTouched();
@@ -202,9 +226,31 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
   }
 
+  private getMenuButtonIndex(menuItem: SubmitButtonItem): number {
+    return this.submitMenuItems.findIndex(i => i.id === menuItem);
+  }
+
+  private addMenuItem(menuItem: SubmitButtonItem, text: string): void {
+    const index = this.getMenuButtonIndex(menuItem);
+
+    if (index < 0) {
+      this.submitMenuItems.unshift({ id: menuItem, text });
+      this.submitMenuItems = [...this.submitMenuItems];
+    }
+  }
+
+  private removeMenuItem(menuItem: SubmitButtonItem): void {
+    const index = this.getMenuButtonIndex(menuItem);
+
+    if (index >= 0) {
+      this.submitMenuItems.splice(index, 1);
+      this.submitMenuItems = [...this.submitMenuItems];
+    }
+  }
+
   private collectOrderData(isSubmit: boolean): CreateOrderDto {
     const allValues = {
-      ...this.orderDetailsFormComponent.orderTypeStatusForm.value,
+      ...this.orderDetailsFormComponent.orderTypeForm.value,
       ...this.orderDetailsFormComponent.generalInformationForm.value,
       ...this.orderDetailsFormComponent.jobDistributionForm.value,
       ...this.orderDetailsFormComponent.jobDescriptionForm.value,
@@ -218,7 +264,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
     const {
       orderType,
-      status,
       title,
       regionId,
       locationId,
@@ -261,7 +306,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
     const order: CreateOrderDto | EditOrderDto = {
       title,
-      status,
       regionId,
       locationId,
       departmentId,

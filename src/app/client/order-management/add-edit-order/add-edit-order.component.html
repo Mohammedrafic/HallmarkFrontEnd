@@ -35,7 +35,12 @@
           </section>
 
           <section class="bill-rates-section">
-            <app-bill-rates #billRates [billRates]="orderBillRates" [isActive]="selectedTab === SelectedTab.OrderDetails"></app-bill-rates>
+            <app-bill-rates
+              #billRates
+              [billRates]="orderBillRates"
+              [isActive]="selectedTab === SelectedTab.OrderDetails"
+              (billRatesChanged)="onBillRatesChanged()">
+            </app-bill-rates>
           </section>
         </ng-container>
       </ng-template>

@@ -312,7 +312,7 @@ export class SecurityState {
         dispatch(new SaveUserSucceeded(payload));
         return payload;
       }),
-      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
     );
   }
 

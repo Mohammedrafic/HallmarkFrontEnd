@@ -1,24 +1,24 @@
+import { GetAgencyOrderCandidatesList, GetCandidateJob, GetOrderApplicantsData } from "@agency/store/order-management.actions";
 import { OrderManagementState } from "@agency/store/order-management.state";
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { DialogNextPreviousOption } from "@shared/components/dialog-next-previous/dialog-next-previous.component";
 import { Router } from '@angular/router';
-import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
-import { GridComponent } from "@syncfusion/ej2-angular-grids";
-import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
+import { GetAvailableSteps, GetOrganisationCandidateJob } from "@client/store/order-managment-content.actions";
 import { Select, Store } from "@ngxs/store";
+import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
+import { DialogNextPreviousOption } from "@shared/components/dialog-next-previous/dialog-next-previous.component";
+import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { AgencyOrder, Order, OrderCandidatesList, OrderCandidatesListPage } from "@shared/models/order-management.model";
-import { GetAgencyOrderCandidatesList, GetCandidateJob, GetOrderApplicantsData } from "@agency/store/order-management.actions";
+import { disabledBodyOverflow } from '@shared/utils/styles.utils';
+import { GridComponent } from "@syncfusion/ej2-angular-grids";
 import { DialogComponent } from "@syncfusion/ej2-angular-popups";
 import { debounceTime, Observable, Subject } from "rxjs";
+import { SetLastSelectedOrganizationAgencyId } from "src/app/store/user.actions";
 import { UserState } from 'src/app/store/user.state';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { disabledBodyOverflow } from '@shared/utils/styles.utils';
-import { GetAvailableSteps, GetOrganisationCandidateJob } from "@client/store/order-managment-content.actions";
-import { OnboardedCandidateComponent } from "./onboarded-candidate/onboarded-candidate.component";
 import { AcceptCandidateComponent } from "./accept-candidate/accept-candidate.component";
 import { ApplyCandidateComponent } from "./apply-candidate/apply-candidate.component";
 import { OfferDeploymentComponent } from "./offer-deployment/offer-deployment.component";
-import { SetLastSelectedOrganizationAgencyId } from "src/app/store/user.actions";
+import { OnboardedCandidateComponent } from "./onboarded-candidate/onboarded-candidate.component";
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -85,30 +85,25 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
       const isOrganization = this.router.url.includes('client');
 
       if (isAgency) {
-        if (this.candidate.status === ApplicantStatus.NotApplied) {
+        const allowedApplyStatuses = [ApplicantStatus.NotApplied, ApplicantStatus.Applied, ApplicantStatus.Shortlisted, ApplicantStatus.OnBoarded];
+        const allowedAcceptStatuses = [ApplicantStatus.Offered, ApplicantStatus.Accepted, ApplicantStatus.Rejected];
+
+        if (allowedApplyStatuses.includes(this.candidate.status)) {
           this.store.dispatch(new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId));
           this.openDialog(this.apply);
-        } else if (
-          this.candidate.status === ApplicantStatus.Offered
-          || this.candidate.status === ApplicantStatus.Accepted
-          || this.candidate.status === ApplicantStatus.Rejected
-        ) {
+        } else if (allowedAcceptStatuses.includes(this.candidate.status)) {
           this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
           this.openDialog(this.accept);
         }
       } else if (isOrganization) {
-        if (
-          this.candidate.status === ApplicantStatus.Applied
-          || this.candidate.status === ApplicantStatus.Shortlisted
-          || this.candidate.status === ApplicantStatus.PreOfferCustom
-        ) {
+        const allowedOfferDeploymentStatuses = [ApplicantStatus.Applied, ApplicantStatus.Shortlisted, ApplicantStatus.PreOfferCustom, ApplicantStatus.Offered];
+        const allowedOnboardedStatuses = [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded];
+
+        if (allowedOfferDeploymentStatuses.includes(this.candidate.status)) {
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
           this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
           this.openDialog(this.offerDeployment);
-        } else if (
-          this.candidate.status === ApplicantStatus.Accepted ||
-          this.candidate.status === ApplicantStatus.OnBoarded
-        ) {
+        } else if (allowedOnboardedStatuses.includes(this.candidate.status)) {
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
           this.openDialog(this.onboarded);
         }
@@ -119,11 +114,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   public onCloseDialog(): void {
     this.sideDialog.hide();
   }
-
-  public getBillRate(rate: number, candidateRate: number):string {
-    return candidateRate ? `$${rate} - ${candidateRate}` : `$${rate} - ${rate}`;
-  }
-
+  
   private subscribeOnPageChanges(): void {
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;

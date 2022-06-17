@@ -35,7 +35,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   public filterOptionFields = {
     text: 'name', value: 'name'
   };
-  public format = { 
+  public format = {
     type:'date', format: 'MM/dd/yyyy'
   };
   public title = '';
@@ -162,15 +162,27 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.defaultFileName = 'Organization Skills ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportSkills(new ExportPayload(
-      fileType, 
-      { orderBy: this.orderBy, offset: Math.abs(new Date().getTimezoneOffset()) }, 
+      fileType,
+      { orderBy: this.orderBy, offset: Math.abs(new Date().getTimezoneOffset()) },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => {
         return { aId: val.id, mId: val.masterSkill.id }
       }) : null,
-      options?.fileName || this.defaultFileName
-    )));
+      options?.fileName || this.defaultFileName,
+      Math.abs(new Date().getTimezoneOffset()),
+  )));
     this.clearSelection(this.grid);
+  }
+
+  public onFilterClose() {
+    this.SkillFilterFormGroup.setValue({
+      skillCategories: this.filters.skillCategories || [],
+      skillAbbrs: this.filters.skillAbbrs || [],
+      skillDescriptions: this.filters.skillDescriptions || [],
+      glNumbers: this.filters.glNumbers || [],
+      allowOnboard: this.filters.allowOnboard || null,
+    });
+    this.filteredItems = this.filterService.generateChips(this.SkillFilterFormGroup, this.filterColumns);
   }
 
   public showFilters(): void {

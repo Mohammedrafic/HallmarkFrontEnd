@@ -53,6 +53,7 @@ import {
   UploadCredentialFilesSucceeded
 } from './candidate.actions';
 import { HttpErrorResponse } from '@angular/common/http';
+import { getAllErrors } from '@shared/utils/error.utils';
 
 export interface CandidateStateModel {
   isCandidateLoading: boolean;
@@ -168,7 +169,7 @@ export class CandidateState {
         return payload;
       }),
       catchError((error: any) => {
-        return dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))
       })
     );
   }

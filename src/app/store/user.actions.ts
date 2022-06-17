@@ -41,3 +41,8 @@ export class GetOrganizationStructure {
   static readonly type = '[user] Get Organization Structure Of Current User';
   constructor() { }
 }
+
+export class LastSelectedOrganisationAgency {
+  static readonly type = '[user] Last Selected Organization Agency';
+  constructor(public payload: string) { }
+}
