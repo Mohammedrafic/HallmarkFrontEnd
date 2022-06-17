@@ -52,13 +52,13 @@ import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { ORDER_CONTACT_DETAIL_TITLES, ORDER_EDITS } from '@shared/constants';
 import PriceUtils from '@shared/utils/price.utils';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { ShowToast } from 'src/app/store/app.actions';
-import { MessageTypes } from '@shared/enums/message-types';
 import { SkillCategory } from '@shared/models/skill-category.model';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { OrderStatus } from '@shared/enums/order-management';
 import { disableControls } from '@shared/utils/form.utils';
+import {AlertService} from "@shared/services/alert.service";
+import {ConfirmService} from "@shared/services/confirm.service";
 
 @Component({
   selector: 'app-order-details-form',
@@ -99,6 +99,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public documents: Blob[] = [];
   public deleteDocumentsGuids: string[] = [];
   public priceUtils = PriceUtils;
+
+  public locationIdControl: AbstractControl;
+  public departmentIdControl: AbstractControl;
 
   public orderTypes = [
     { id: OrderType.ContractToPerm, name: 'Contract To Perm' },
@@ -200,10 +203,15 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private isEditMode: boolean;
 
   private touchedFields: Set<string> = new Set();
-
+  private alreadyShownDialog: boolean = false;
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store, private formBuilder: FormBuilder, private route: ActivatedRoute) {
+  constructor(
+    private store: Store,
+    private formBuilder: FormBuilder,
+    private route: ActivatedRoute,
+    private alertService: AlertService,
+  ) {
     this.orderTypeForm = this.formBuilder.group({
       orderType: [null, Validators.required]
     });
@@ -233,6 +241,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       shiftStartTime: [null, Validators.required],
       shiftEndTime: [null, Validators.required]
     });
+
+    this.locationIdControl = this.generalInformationForm.get('locationId') as AbstractControl;
+    this.departmentIdControl = this.generalInformationForm.get('departmentId') as AbstractControl;
 
     this.generalInformationForm.valueChanges.pipe(
       takeUntil(this.unsubscribe$),
@@ -338,7 +349,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
 
     const orderTypeControl = this.orderTypeForm.get('orderType') as AbstractControl;
-    const locationIdControl = this.generalInformationForm.get('locationId') as AbstractControl;
     const departmentIdControl = this.generalInformationForm.get('departmentId') as AbstractControl;
     const skillIdControl = this.generalInformationForm.get('skillId') as AbstractControl;
     const durationControl = this.generalInformationForm.get('duration') as AbstractControl;
@@ -350,7 +360,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     const agencyControl = this.jobDistributionForm.get('agency') as AbstractControl;
     const jobDistributionsControl = this.jobDistributionForm.get('jobDistributions') as AbstractControl;
 
-    locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((locationId: number) => {
+    this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((locationId: number) => {
       const locations = this.store.selectSnapshot(OrganizationManagementState.locationsByRegionId);
       const location = locations.find(i => i.id === locationId);
 
@@ -553,6 +563,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.markTouchedField(fieldName);
       this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
       this.isLocationsDropDownEnabled = true;
+      this.resetLocation();
+      this.resetDepartment();
     }
   }
 
@@ -564,6 +576,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.markTouchedField(fieldName);
       this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocation.id));
       this.isDepartmentsDropDownEnabled = true;
+      this.resetDepartment();
     }
   }
 
@@ -582,8 +595,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private userEditsOrder(fieldIsTouched: boolean): void {
-    if (!fieldIsTouched && this.isEditMode) {
-      this.store.dispatch(new ShowToast(MessageTypes.Warning, ORDER_EDITS));
+    if (!fieldIsTouched && this.isEditMode && !this.alreadyShownDialog) {
+      this.alreadyShownDialog = true;
+      this.alertService
+        .alert(ORDER_EDITS, {
+          title: 'Warning',
+          okButtonClass: 'ok-button'
+        }).pipe(takeUntil(this.unsubscribe$))
+        .subscribe();
     }
   }
 
@@ -813,5 +832,15 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.generalInformationForm = disableControls(this.generalInformationForm, ['regionId', 'skillId']);
       this.workflowForm.get('workflowId')?.disable();
     }
+  }
+
+  private resetLocation(): void {
+    this.locationIdControl.reset(null, {emitValue: false});
+    this.locationIdControl.markAsUntouched();
+  }
+
+  private resetDepartment(): void {
+    this.departmentIdControl.reset(null, {emitValue: false});
+    this.departmentIdControl.markAsUntouched();
   }
 }
