@@ -26,6 +26,7 @@ import {
   GetOrderById,
   UpdateAgencyCandidateJob
 } from './order-management.actions';
+import { isUndefined } from 'lodash';
 
 export interface OrderManagementModel {
   ordersPage: AgencyOrderManagementPage | null;
@@ -97,7 +98,7 @@ export class OrderManagementState {
         rowIndex = index;
         return orderId === id;
       });
-      return order && rowIndex ? [order, rowIndex] : [];
+      return order && !isUndefined(rowIndex) ? [order, rowIndex] : [];
     };
   }
 

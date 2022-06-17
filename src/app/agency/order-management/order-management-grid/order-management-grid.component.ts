@@ -30,6 +30,7 @@ import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { Location } from '@angular/common';
 import { UserState } from 'src/app/store/user.state';
+import { isUndefined } from 'lodash';
 
 enum AllCheckedStatus {
   None,
@@ -102,8 +103,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     if (this.previousSelectedOrderId) {
       const [data, index] = this.store.selectSnapshot(OrderManagementState.lastSelectedOrder)(
         this.previousSelectedOrderId
-      );
-      if (data && index) {
+        );
+      if (data && !isUndefined(index)) {
         this.grid.selectRow(index);
         this.onRowClick({ data });
       }
