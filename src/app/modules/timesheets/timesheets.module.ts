@@ -4,6 +4,9 @@ import { CommonModule } from '@angular/common';
 
 import { TimesheetsContainerComponent } from './containers/timesheets-container/timesheets-container.component';
 import { TimesheetsTableComponent } from './components/timesheets-table/timesheets-table.component';
+import { NgxsModule } from '@ngxs/store';
+import { TimesheetsState } from './store/state/timesheets.state';
+import { TimesheetsApiService } from './services/timesheets-api.service';
 
 
 
@@ -16,7 +19,9 @@ import { TimesheetsTableComponent } from './components/timesheets-table/timeshee
   imports: [
     CommonModule,
     TimesheetsRoutingModule,
+    NgxsModule.forFeature([TimesheetsState])
   ],
   exports: [TimesheetsContainerComponent],
+  providers: [TimesheetsApiService]
 })
 export class TimesheetsModule {}
