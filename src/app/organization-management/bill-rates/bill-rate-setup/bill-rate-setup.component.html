@@ -224,7 +224,6 @@
               id="region"
               #regionDropdown
               appValidateWithMessage
-              placeholder="Region"
               selectAllText="Select All"
               mode="CheckBox"
               [dataSource]="orgRegions"
@@ -245,7 +244,6 @@
               id="location"
               #locationDropdown
               appValidateWithMessage
-              placeholder="Location"
               selectAllText="Select All"
               mode="CheckBox"
               [dataSource]="locations"
@@ -267,7 +265,6 @@
               id="department"
               #departmentDropdown
               appValidateWithMessage
-              placeholder="Department"
               selectAllText="Select All"
               mode="CheckBox"
               [dataSource]="departments"
@@ -286,7 +283,6 @@
             <ejs-multiselect
               id="skill"
               appValidateWithMessage
-              placeholder="Skill"
               selectAllText="Select All"
               mode="CheckBox"
               [dataSource]="skills$ | async"
@@ -307,7 +303,6 @@
             <ejs-dropdownlist
               id="billRatesTitle"
               appValidateWithMessage
-              placeholder="Bill Rates Title"
               [dataSource]="billRatesOptions$ | async"
               [fields]="billRateTitleFields"
               formControlName="billRateTitleId">
@@ -321,7 +316,6 @@
             <ejs-multiselect
               id="orderType"
               appValidateWithMessage
-              placeholder="Order Type"
               selectAllText="Select All"
               mode="CheckBox"
               [dataSource]="orderTypes"
@@ -377,7 +371,6 @@
               maxlength="10"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
-              placeholder="Hours"
               decimals='0'
               format="#"
               formControlName="billRateValueRateTimes"
@@ -390,7 +383,6 @@
               type="text"
               formControlName="billRateValueRateTimes"
               appValidateWithMessage
-              [placeholder]="selectedBillRateUnit === BillRateUnitList.Multiplier ? 'Multiplier' : 'Amount'"
               maxlength="11"
               (keyup)="priceUtils.verifyDigitsAfterDot(billRatesFormGroup,'billRateValueRateTimes')"
               (keydown)="priceUtils.numbersOnly($event)"
@@ -428,7 +420,6 @@
               [maxlength]="10"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
-              placeholder="Interval Min"
               decimals='0'
               format="#"
               formControlName="intervalMin"
@@ -448,7 +439,6 @@
               [maxlength]="10"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
-              placeholder="Interval Max"
               decimals='0'
               format="#"
               formControlName="intervalMax"

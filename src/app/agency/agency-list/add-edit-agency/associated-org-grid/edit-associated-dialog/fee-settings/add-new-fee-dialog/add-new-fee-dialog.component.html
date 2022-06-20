@@ -38,7 +38,6 @@
               mode="CheckBox"
               [fields]="optionFields"
               [dataSource]="feeExceptionsInitialData.regions"
-              placeholder="Region"
             ></ejs-multiselect>
           </div>
         </div>
@@ -51,7 +50,6 @@
               formControlName="classifications"
               [fields]="optionFields"
               [dataSource]="classification"
-              placeholder="Classification"
             ></ejs-multiselect>
           </div>
         </div>
@@ -64,7 +62,6 @@
               formControlName="masterSkillIds"
               [fields]="masterSkillsFields"
               [dataSource]="feeExceptionsInitialData.masterSkills"
-              placeholder="Skill"
             ></ejs-multiselect>
           </div>
         </div>
@@ -75,7 +72,6 @@
               appValidateWithMessage
               formControlName="fee"
               class="e-input"
-              placeholder="% 5.00"
               mask="00.00"
               [showMaskTyped]="true"
               [dropSpecialCharacters]="false"

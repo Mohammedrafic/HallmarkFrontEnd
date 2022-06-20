@@ -279,7 +279,6 @@
               id="region"
               #regionDropdown
               appValidateWithMessage
-              placeholder="Region"
               selectAllText="Select All"
               mode="CheckBox"
               [dataSource]="orgRegions"
@@ -302,7 +301,6 @@
               id="location"
               #locationDropdown
               appValidateWithMessage
-              placeholder="Location"
               selectAllText="Select All"
               mode="CheckBox"
               [dataSource]="locations"
@@ -324,7 +322,6 @@
               id="department"
               #departmentDropdown
               appValidateWithMessage
-              placeholder="Department"
               selectAllText="Select All"
               mode="CheckBox"
               [dataSource]="departments"
@@ -345,7 +342,6 @@
             <ejs-multiselect
               id="skill"
               appValidateWithMessage
-              placeholder="Skill"
               selectAllText="Select All"
               mode="CheckBox"
               [dataSource]="skills$ | async"
@@ -366,7 +362,6 @@
             <ejs-dropdownlist
               id="workflowType"
               appValidateWithMessage
-              placeholder="Workflow Type"
               [dataSource]="workflowGroupTypesData"
               [fields]="workflowGroupTypesFields"
               formControlName="workflowType">
@@ -382,7 +377,6 @@
             <ejs-dropdownlist
               id="workflowName"
               appValidateWithMessage
-              placeholder="Workflow Name"
               [dataSource]="workflows$ | async"
               [fields]="fields"
               formControlName="workflowName"
@@ -416,7 +410,6 @@
                     mode="CheckBox"
                     [allowFiltering]="false"
                     [showDropDownIcon]="true"
-                    placeholder="Role/User"
                     appValidateWithMessage
                     [dataSource]="rolesWithUsers"
                     [fields]="fields"
@@ -452,7 +445,6 @@
                     mode="CheckBox"
                     [allowFiltering]="false"
                     [showDropDownIcon]="true"
-                    placeholder="Role/User"
                     appValidateWithMessage
                     [dataSource]="rolesWithUsers"
                     [fields]="fields"

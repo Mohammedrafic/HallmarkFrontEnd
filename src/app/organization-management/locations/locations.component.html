@@ -152,7 +152,6 @@
                   type="text"
                   maxlength="50"
                   appValidateWithMessage
-                  placeholder="Ext Location ID"
                   formControlName="externalId"/>
         </div>
       </div>
@@ -167,7 +166,6 @@
                   type="text"
                   maxlength="50"
                   appValidateWithMessage
-                  placeholder="Invoice Location ID"
                   formControlName="invoiceId"/>
         </div>
       </div>
@@ -180,7 +178,6 @@
                   type="text"
                   maxlength="50"
                   appValidateWithMessage
-                  placeholder="Location Name"
                   formControlName="name"/>
         </div>
       </div>
@@ -195,7 +192,6 @@
                   type="text"
                   maxlength="100"
                   appValidateWithMessage
-                  placeholder="Address 1"
                   formControlName="address1"/>
         </div>
       </div>
@@ -208,7 +204,6 @@
                   type="text"
                   maxlength="50"
                   appValidateWithMessage
-                  placeholder="Address 2"
                   formControlName="address2"/>
         </div>
       </div>
@@ -221,7 +216,6 @@
             <ejs-dropdownlist
               id="state"
               appValidateWithMessage
-              placeholder="State"
               [dataSource]="statesGeneral$ | async"
               formControlName="state">
             </ejs-dropdownlist>
@@ -237,7 +231,6 @@
             type="text"
             maxlength="20"
             appValidateWithMessage
-            placeholder="City"
             formControlName="city"/>
         </div>
       </div>
@@ -251,7 +244,6 @@
                   pattern="[0-9]*"
                   maxlength="6"
                   appValidateWithMessage
-                  placeholder="Zipcode"
                   formControlName="zip"/>
         </div>
       </div>
@@ -269,7 +261,6 @@
                     type="text"
                     maxlength="50"
                     appValidateWithMessage
-                    placeholder="Contact Person"
                     formControlName="contactPerson"/>
           </div>
         </div>
@@ -281,7 +272,6 @@
                     class="e-input"
                     type="email"
                     appValidateWithMessage
-                    placeholder="Contact Person Email"
                     formControlName="contactEmail"/>
           </div>
         </div>
@@ -297,7 +287,6 @@
                     pattern="^[0-9]*$"
                     maxlength="10"
                     appValidateWithMessage
-                    placeholder="Phone Number"
                     formControlName="phoneNumber"/>
           </div>
         </div>
@@ -308,7 +297,6 @@
               <ejs-dropdownlist
                 id="phoneType"
                 appValidateWithMessage
-                placeholder="Phone Type"
                 formControlName="phoneType"
                 [dataSource]="phoneTypes$ | async"
               >
@@ -323,7 +311,6 @@
                     class="e-input"
                     type="text"
                     maxlength="50"
-                    placeholder="Ext"
                     formControlName="ext"/>
           </div>
         </div>
@@ -335,7 +322,6 @@
                     class="e-input"
                     type="text"
                     maxlength="50"
-                    placeholder="GL Number"
                     formControlName="glNumber"/>
           </div>
         </div>
@@ -349,7 +335,6 @@
                     class="e-input"
                     type="text"
                     maxlength="50"
-                    placeholder="Invoice Note"
                     formControlName="invoiceNote"/>
           </div>
         </div>
@@ -412,7 +397,6 @@
                maxlength="50"
                required
                appValidateWithMessage
-               placeholder="New Region"
                formControlName="newRegionName"/>
       </div>
     </div>

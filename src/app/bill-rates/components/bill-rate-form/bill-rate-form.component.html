@@ -10,7 +10,6 @@
           appValidateWithMessage
           formControlName="billRateConfigId"
           [dataSource]="billRateOptions$ | async"
-          placeholder="Bill Rate Title"
         ></ejs-dropdownlist>
       </div>
     </div>
@@ -21,7 +20,7 @@
     <div class="input-container bootstrap form-line-item-20">
       <label>Bill Rates Category<span class="required">*</span></label>
       <div class="input-group">
-        <input class="e-input" type="text" placeholder="Bill Rates Category" disabled [value]="categoryValue" />
+        <input class="e-input" type="text" placeholder="Regular/Local" disabled [value]="categoryValue" />
       </div>
     </div>
 
@@ -29,7 +28,7 @@
     <div class="input-container bootstrap form-line-item-20">
       <label>Bill Rates Type<span class="required">*</span></label>
       <div class="input-group">
-        <input class="e-input" type="text" placeholder="Bill Rates Type" disabled [value]="typeValue" />
+        <input class="e-input" type="text" placeholder="Times" disabled [value]="typeValue" />
       </div>
     </div>
   </div>
@@ -67,7 +66,6 @@
           maxlength="10"
           [validateDecimalOnType]="true"
           [showSpinButton]="false"
-          placeholder="Hours"
           decimals='0'
           format="#"
           formControlName="rateHour"
@@ -81,7 +79,6 @@
           type="text"
           formControlName="rateHour"
           appValidateWithMessage
-          [placeholder]="selectedBillRateUnit === BillRateUnitList.Multiplier ? 'Multiplier' : 'Amount'"
           maxlength="11"
           (keyup)="priceUtils.verifyDigitsAfterDot(billRateForm,'rateHour')"
           (keydown)="priceUtils.numbersOnly($event)"
@@ -108,7 +105,6 @@
           maxlength="10"
           [validateDecimalOnType]="true"
           [showSpinButton]="false"
-          placeholder="Interval Min"
           decimals='0'
           format="#"
           formControlName="intervalMin"
@@ -131,7 +127,6 @@
           maxlength="10"
           [validateDecimalOnType]="true"
           [showSpinButton]="false"
-          placeholder="Interval Max"
           decimals='0'
           format="#"
           formControlName="intervalMax"

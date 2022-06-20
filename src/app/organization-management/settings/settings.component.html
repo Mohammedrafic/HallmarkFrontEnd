@@ -177,7 +177,6 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             id="region"
-            placeholder="Region"
             [dataSource]="regions$ | async"
             [fields]="regionLocationFields"
             (change)="onRegionChange($event)"
@@ -194,7 +193,6 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             id="regionRequired"
-            placeholder="Region"
             appValidateWithMessage
             [dataSource]="regions$ | async"
             [fields]="regionLocationFields"
@@ -211,7 +209,6 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             id="location"
-            placeholder="Location"
             [dataSource]="locations$ | async"
             [fields]="regionLocationFields"
             (change)="onLocationChange($event)"
@@ -228,7 +225,6 @@
         <div class="input-group dropdown">
           <ejs-dropdownlist
             id="department"
-            placeholder="Department"
             [dataSource]="departments$ | async"
             [fields]="departmentFields"
             (change)="onDepartmentChange($event)"
@@ -274,7 +270,6 @@
               id="email"
               class="e-input"
               type="email"
-              placeholder="Value"
               formControlName="value"
             />
             <i-feather
@@ -294,7 +289,6 @@
                 class="numeric-input"
                 min="0"
                 [maxlength]="maxFieldLength"
-                placeholder="Value"
                 [validateDecimalOnType]='true'
                 decimals='0'
                 format="#"
@@ -315,7 +309,6 @@
             [dataSource]="dropdownDataSource"
             [fields]="dropdownFields"
             appValidateWithMessage
-            placeholder="Value"
             formControlName="value"
           ></ejs-dropdownlist>
         </div>
@@ -333,7 +326,6 @@
             [fields]="dropdownFields"
             selectAllText="All"
             showSelectAll="true"
-            placeholder="Value"
             formControlName="value"
           >
           </ejs-multiselect>

@@ -13,7 +13,6 @@
                      formControlName="address1"
                      class="e-input"
                      type="text"
-                     placeholder="Address 1"
                      maxlength="100"/>
             </div>
           </div>
@@ -25,8 +24,7 @@
               <ejs-dropdownlist appValidateWithMessage
                                 [fields]="optionFields"
                                 formControlName="country"
-                                [dataSource]="countries"
-                                placeholder="Country">
+                                [dataSource]="countries">
               </ejs-dropdownlist>
             </div>
           </div>
@@ -35,8 +33,7 @@
             <div class="input-group dropdown">
               <ejs-dropdownlist appValidateWithMessage
                                 formControlName="state"
-                                [dataSource]="states$ | async"
-                                placeholder="State">
+                                [dataSource]="states$ | async">
 
               </ejs-dropdownlist>
             </div>
@@ -48,7 +45,6 @@
                      formControlName="city"
                      class="e-input"
                      type="text"
-                     placeholder="City"
                      maxlength="20"/>
             </div>
           </div>
@@ -61,7 +57,6 @@
                      formControlName="email"
                      class="e-input"
                      type="text"
-                     placeholder="Email"
                      maxlength="100"/>
             </div>
           </div>
@@ -72,8 +67,7 @@
               formControlName="phone1"
               mask="000-000-0000"
               class="e-input"
-              type="text"
-              placeholder="Phone 1"/>
+              type="text"/>
             </div>
           </div>
         </div>
@@ -87,7 +81,6 @@
                      formControlName="address2"
                      class="e-input"
                      type="text"
-                     placeholder="Address 2"
                      maxlength="100"/>
             </div>
           </div>
@@ -100,8 +93,7 @@
               formControlName="zip"
               mask="00000||000000"
               class="e-input"
-              type="text"
-              placeholder="Zipcode"/>
+              type="text"/>
             </div>
           </div>
           <div class="input-container"></div>
@@ -114,8 +106,7 @@
               formControlName="phone2"
               mask="000-000-0000"
               class="e-input"
-              type="text"
-              placeholder="Phone 2"/>
+              type="text"/>
             </div>
           </div>
           <div class="input-container"></div>

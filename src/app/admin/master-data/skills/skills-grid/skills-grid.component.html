@@ -90,7 +90,7 @@
       <div class="input-container">
         <label for="skillCategoryId">Skill Category <span class="required">*</span></label>
         <div class="input-group dropdown">
-          <ejs-dropdownlist name="skillCategoryId" [fields]="optionFields" appValidateWithMessage formControlName="skillCategoryId" [dataSource]="(allSkillsCategories$ | async)?.items" placeholder="Skill Category"></ejs-dropdownlist>
+          <ejs-dropdownlist name="skillCategoryId" [fields]="optionFields" appValidateWithMessage formControlName="skillCategoryId" [dataSource]="(allSkillsCategories$ | async)?.items"></ejs-dropdownlist>
         </div>
       </div>
     </div>
@@ -103,7 +103,6 @@
                  type="text"
                  maxlength="100"
                  appValidateWithMessage
-                 placeholder="Skill Abbr"
                  name="skillAbbr"
                  formControlName="skillAbbr"/>
         </div>
@@ -114,7 +113,7 @@
       <div class="input-container">
         <label for="skillDescription">Skill Description <span class="required">*</span></label>
         <div class="input-group">
-          <ejs-textbox name="skillDescription" appValidateWithMessage formControlName="skillDescription" [multiline]="true" placeholder="Skill Description" maxlength="100"></ejs-textbox>
+          <ejs-textbox name="skillDescription" appValidateWithMessage formControlName="skillDescription" [multiline]="true" maxlength="100"></ejs-textbox>
         </div>
       </div>
     </div>

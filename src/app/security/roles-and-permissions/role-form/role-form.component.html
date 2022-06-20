@@ -7,7 +7,6 @@
         formControlName="businessUnitType"
         [fields]="optionFields"
         [dataSource]="businessUnits"
-        placeholder="Business Unit"
       ></ejs-dropdownlist>
     </div>
   </div>
@@ -20,7 +19,6 @@
         formControlName="businessUnitId"
         [fields]="bussinesDataFields"
         [dataSource]="newRoleBussinesData"
-        placeholder="Business"
       ></ejs-dropdownlist>
     </div>
   </div>
@@ -28,7 +26,7 @@
   <div class="input-container bootstrap">
     <label>Role<span class="required">*</span></label>
     <div class="input-group">
-      <input appValidateWithMessage formControlName="name" class="e-input" type="text" placeholder="Role" />
+      <input appValidateWithMessage formControlName="name" class="e-input" type="text" />
     </div>
   </div>
 
@@ -41,7 +39,6 @@
           [formControl]="copyRoleControl"
           [dataSource]="copyRoleData$ | async"
           [fields]="copyRoleFields"
-          placeholder="Copy Role From"
         ></ejs-dropdownlist>
       </div>
     </div>

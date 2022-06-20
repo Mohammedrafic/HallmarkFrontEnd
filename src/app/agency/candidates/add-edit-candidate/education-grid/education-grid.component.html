@@ -51,8 +51,7 @@
                           [fields]="optionFields"
                           formControlName="degree"
                           appValidateWithMessage
-                          [dataSource]="degreeTypes"
-                          placeholder="Degree Type">
+                          [dataSource]="degreeTypes">
         </ejs-dropdownlist>
       </div>
     </div>
@@ -63,7 +62,6 @@
                type="text"
                maxlength="50"
                appValidateWithMessage
-               placeholder="School Name"
                formControlName="schoolName"/>
       </div>
     </div>
@@ -74,7 +72,6 @@
                type="text"
                maxlength="50"
                appValidateWithMessage
-               placeholder="Field Of Study"
                formControlName="fieldOfStudy"/>
       </div>
     </div>

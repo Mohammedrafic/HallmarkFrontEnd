@@ -14,13 +14,13 @@
     <form *ngIf="CreateUnderFormGroup" [formGroup]="CreateUnderFormGroup" id="createUnder">
       <label>Create Under<span class="required">*</span></label>
       <div class="input-group dropdown create-under-dropdown">
-        <ejs-dropdownlist appValidateWithMessage [fields]="createUnderFields" formControlName="createUnder" [dataSource]="businessUnits$ | async" placeholder="Create Under"></ejs-dropdownlist>
+        <ejs-dropdownlist appValidateWithMessage [fields]="createUnderFields" formControlName="createUnder" [dataSource]="businessUnits$ | async"></ejs-dropdownlist>
       </div>
     </form>
     <form id="connectionString" *ngIf="false && title === 'Add' && (user$ | async)?.businessUnitType === businessUnitType.Hallmark">
       <label>Data Base<span class="required">*</span></label>
       <div class="input-group dropdown connection-string-dropdown">
-        <ejs-dropdownlist [fields]="[]" [dataSource]="[]" placeholder="Data Base"></ejs-dropdownlist>
+        <ejs-dropdownlist [fields]="[]" [dataSource]="[]"></ejs-dropdownlist>
       </div>
     </form>
   </div>
@@ -45,7 +45,7 @@
                   <div class="input-container ">
                     <label>Name<span class="required">*</span></label>
                     <div class="input-group">
-                      <input appValidateWithMessage formControlName="name" class="e-input" type="text" placeholder="Enter Name" maxlength="50"/>
+                      <input appValidateWithMessage formControlName="name" class="e-input" type="text" maxlength="50"/>
                     </div>
                   </div>
                 </div>
@@ -53,12 +53,12 @@
                   <div class="id-container">
                     <div class="input-container">
                       <label>External ID</label>
-                      <input formControlName="externalId" class="e-input" type="text" placeholder="External ID"/>
+                      <input formControlName="externalId" class="e-input" type="text"/>
                     </div>
                     <div class="input-container">
                       <label>Tax ID<span class="required">*</span></label>
                       <div class="input-group">
-                        <input appValidateWithMessage formControlName="taxId" class="e-input" type="text" placeholder="Tax ID" maxlength="12"/>
+                        <input appValidateWithMessage formControlName="taxId" class="e-input" type="text" maxlength="12"/>
                       </div>
                     </div>
                   </div>
@@ -71,26 +71,26 @@
                 <div class="input-container">
                   <label>Address 1<span class="required">*</span></label>
                   <div class="input-group">
-                    <input appValidateWithMessage formControlName="addressLine1" class="e-input" type="text" placeholder="Address 1" maxlength="100"/>
+                    <input appValidateWithMessage formControlName="addressLine1" class="e-input" type="text" maxlength="100"/>
                   </div>
                 </div>
                 <div class="city-section">
                   <div class="dropdown-container">
                     <label>Country<span class="required">*</span></label>
                     <div class="input-group dropdown">
-                      <ejs-dropdownlist appValidateWithMessage [fields]="optionFields" formControlName="country" [dataSource]="countries$ | async" placeholder="Country" (change)="onGeneralCountryChange($event)"></ejs-dropdownlist>
+                      <ejs-dropdownlist appValidateWithMessage [fields]="optionFields" formControlName="country" [dataSource]="countries$ | async" (change)="onGeneralCountryChange($event)"></ejs-dropdownlist>
                     </div>
                   </div>
                   <div class="dropdown-container">
                     <label>State<span class="required">*</span></label>
                     <div class="input-group dropdown">
-                      <ejs-dropdownlist appValidateWithMessage formControlName="state" [dataSource]="statesGeneral$ | async" placeholder="State"></ejs-dropdownlist>
+                      <ejs-dropdownlist appValidateWithMessage formControlName="state" [dataSource]="statesGeneral$ | async"></ejs-dropdownlist>
                     </div>
                   </div>
                   <div class="input-container">
                     <label>City<span class="required">*</span></label>
                     <div class="input-group">
-                      <input appValidateWithMessage formControlName="city" class="e-input" type="text" placeholder="City" maxlength="20"/>
+                      <input appValidateWithMessage formControlName="city" class="e-input" type="text" maxlength="20"/>
                     </div>
                   </div>
                 </div>
@@ -98,19 +98,19 @@
                   <div class="input-container">
                     <label>Phone 1</label>
                     <div class="input-group">
-                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="phone1Ext" placeholder="Phone 1" maxlength="10"></ejs-maskedtextbox>
+                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="phone1Ext" placeholder=" " maxlength="10"></ejs-maskedtextbox>
                     </div>
                   </div>
                   <div class="input-container">
                     <label>Phone 2</label>
                     <div class="input-group">
-                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="phone2Ext" placeholder="Phone 2" maxlength="10"></ejs-maskedtextbox>
+                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="phone2Ext" placeholder=" " maxlength="10"></ejs-maskedtextbox>
                     </div>
                   </div>
                   <div class="input-container">
                     <label>Fax</label>
                     <div class="input-group">
-                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="fax" placeholder="Fax" maxlength="10"></ejs-maskedtextbox>
+                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="fax" placeholder=" " maxlength="10"></ejs-maskedtextbox>
                     </div>
                   </div>
                 </div>
@@ -118,13 +118,13 @@
               <div class="right-column">
                 <div class="input-container">
                   <label>Address 2</label>
-                  <input formControlName="addressLine2" class="e-input" type="text" placeholder="Address 2" maxlength="100"/>
+                  <input formControlName="addressLine2" class="e-input" type="text" maxlength="100"/>
                 </div>
                 <div class="zipcode-section">
                   <div class="input-container">
                     <label>Zipcode</label>
                     <div class="input-group">
-                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='00000' appValidateWithMessage formControlName="zipCode" placeholder="Zipcode" maxlength="6"></ejs-maskedtextbox>
+                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='00000' appValidateWithMessage formControlName="zipCode" placeholder=" " maxlength="6"></ejs-maskedtextbox>
                     </div>
                   </div>
                   <div class="input-container"></div>
@@ -133,12 +133,12 @@
                   <div class="dropdown-container">
                     <label>Status<span class="required">*</span></label>
                     <div class="input-group dropdown">
-                      <ejs-dropdownlist appValidateWithMessage formControlName="status" [fields]="optionFields" [dataSource]="statuses$ | async" placeholder="Status"></ejs-dropdownlist>
+                      <ejs-dropdownlist appValidateWithMessage formControlName="status" [fields]="optionFields" [dataSource]="statuses$ | async"></ejs-dropdownlist>
                     </div>
                   </div>
                   <div class="input-container">
                     <label>Website</label>
-                    <input formControlName="website" class="e-input" type="text" placeholder="Website"/>
+                    <input formControlName="website" class="e-input" type="text"/>
                   </div>
                 </div>
               </div>
@@ -157,37 +157,37 @@
                   <div class="input-container">
                     <label>Name<span class="required">*</span></label>
                     <div class="input-group">
-                      <input appValidateWithMessage formControlName="name" class="e-input" type="text" placeholder="Name"/>
+                      <input appValidateWithMessage formControlName="name" class="e-input" type="text"/>
                     </div>
                   </div>
                   <div class="input-container">
                     <label>Address</label>
-                    <input formControlName="address" class="e-input" type="text" placeholder="Address"/>
+                    <input formControlName="address" class="e-input" type="text"/>
                   </div>
                 </div>
                 <div class="billing-country-section">
                   <div class="dropdown-container">
                     <label>Country<span class="required">*</span></label>
                     <div class="input-group dropdown">
-                      <ejs-dropdownlist appValidateWithMessage [fields]="optionFields" formControlName="country" [dataSource]="countries$ | async" placeholder="Country" (change)="onBillingCountryChange($event)"></ejs-dropdownlist>
+                      <ejs-dropdownlist appValidateWithMessage [fields]="optionFields" formControlName="country" [dataSource]="countries$ | async" (change)="onBillingCountryChange($event)"></ejs-dropdownlist>
                     </div>
                   </div>
                   <div class="dropdown-container">
                     <label>State<span class="required">*</span></label>
                     <div class="input-group dropdown">
-                      <ejs-dropdownlist appValidateWithMessage formControlName="state" [dataSource]="statesBilling$ | async" placeholder="State"></ejs-dropdownlist>
+                      <ejs-dropdownlist appValidateWithMessage formControlName="state" [dataSource]="statesBilling$ | async"></ejs-dropdownlist>
                     </div>
                   </div>
                   <div class="input-container">
                     <label>City<span class="required">*</span></label>
                     <div class="input-group">
-                      <input appValidateWithMessage formControlName="city" class="e-input" type="text" placeholder="City" maxlength="20"/>
+                      <input appValidateWithMessage formControlName="city" class="e-input" type="text" maxlength="20"/>
                     </div>
                   </div>
                   <div class="input-container">
                     <label>Zipcode</label>
                     <div class="input-group">
-                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='00000' appValidateWithMessage formControlName="zipCode" placeholder="Zipcode" maxlength="6"></ejs-maskedtextbox>
+                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='00000' appValidateWithMessage formControlName="zipCode" placeholder=" " maxlength="6"></ejs-maskedtextbox>
                     </div>
                   </div>
                 </div>
@@ -195,25 +195,25 @@
                   <div class="input-container">
                     <label>Phone 1</label>
                     <div class="input-group">
-                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="phone1" placeholder="Phone 1" maxlength="10"></ejs-maskedtextbox>
+                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="phone1" placeholder=" " maxlength="10"></ejs-maskedtextbox>
                     </div>
                   </div>
                   <div class="input-container">
                     <label>Phone 2</label>
                     <div class="input-group">
-                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="phone2" placeholder="Phone 2" maxlength="10"></ejs-maskedtextbox>
+                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="phone2" placeholder=" " maxlength="10"></ejs-maskedtextbox>
                     </div>
                   </div>
                   <div class="input-container">
                     <label>Fax</label>
                     <div class="input-group">
-                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="fax" placeholder="Fax" maxlength="10"></ejs-maskedtextbox>
+                      <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="fax" placeholder=" " maxlength="10"></ejs-maskedtextbox>
                     </div>
                   </div>
                   <div class="input-container">
                     <label>Ext</label>
                     <div class="input-group">
-                      <input appValidateWithMessage formControlName="ext" class="e-input" type="text" placeholder="Ext" maxlength="5"/>
+                      <input appValidateWithMessage formControlName="ext" class="e-input" type="text" maxlength="5"/>
                     </div>
                   </div>
                 </div>
@@ -232,12 +232,12 @@
               <div [formGroupName]="i" class="contact-item" *ngFor="let contact of ContactFormArray.controls; let i = index;">
                 <div *ngIf="!isEditTitle[i]" class="dropdown-container bootstrap">
                   <label>Title</label>
-                  <ejs-dropdownlist formControlName="title" [dataSource]="titles" placeholder="Title"></ejs-dropdownlist>
+                  <ejs-dropdownlist formControlName="title" [dataSource]="titles"></ejs-dropdownlist>
                 </div>
                 <div *ngIf="isEditTitle[i]" class="input-container bootstrap">
                   <label>Title</label>
                   <div class="input-group">
-                    <input formControlName="title" class="e-input" type="text" placeholder="Title"/>
+                    <input formControlName="title" class="e-input" type="text"/>
                   </div>
                 </div>
                 <div class="input-container edit-button-container">
@@ -248,20 +248,20 @@
                 <div class="input-container bootstrap">
                   <label>Contact Person<span class="required">*</span></label>
                   <div class="input-group">
-                    <input appValidateWithMessage formControlName="contactPerson" class="e-input" type="text" placeholder="Contact Person"/>
+                    <input appValidateWithMessage formControlName="contactPerson" class="e-input" type="text"/>
                     <span class="error" *ngIf="!contact.get('contactPerson')?.untouched">{{ contact.get('contactPerson')?.errors | validationError }}</span>
                   </div>
                 </div>
                 <div class="input-container bootstrap">
                   <label>Phone 1</label>
                   <div class="input-group">
-                    <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="phoneNumberExt" placeholder="Phone 1" maxlength="10"></ejs-maskedtextbox>
+                    <ejs-maskedtextbox class="organization-input" promptChar="_" mask='000-000-0000' appValidateWithMessage formControlName="phoneNumberExt" placeholder=" " maxlength="10"></ejs-maskedtextbox>
                   </div>
                 </div>
                 <div class="input-container bootstrap">
                   <label>Email</label>
                   <div class="input-group">
-                    <input appValidateWithMessage formControlName="email" class="e-input" type="text" placeholder="Email"/>
+                    <input appValidateWithMessage formControlName="email" class="e-input" type="text"/>
                   </div>
                 </div>
                 <div class="input-container remove-button-container">
@@ -297,7 +297,7 @@
           <div class="dropdown-container bootstrap">
             <label>Send document to agency</label>
             <div class="input-group dropdown">
-              <ejs-dropdownlist formControlName="sendDocumentToAgency" [fields]="optionFields" [dataSource]="sendDocumentAgencies$ | async" placeholder="Send document to agency"></ejs-dropdownlist>
+              <ejs-dropdownlist formControlName="sendDocumentToAgency" [fields]="optionFields" [dataSource]="sendDocumentAgencies$ | async"></ejs-dropdownlist>
             </div>
           </div>
           <div class="column-radio-container submitted-by">
@@ -309,7 +309,7 @@
           <div class="dropdown-container bootstrap">
             <label>Week Starts On<span class="required">*</span></label>
             <div class="input-group dropdown">
-              <ejs-dropdownlist appValidateWithMessage formControlName="weekStartsOn" [fields]="optionFields" [dataSource]="days$ | async" placeholder="Week Starts On"></ejs-dropdownlist>
+              <ejs-dropdownlist appValidateWithMessage formControlName="weekStartsOn" [fields]="optionFields" [dataSource]="days$ | async"></ejs-dropdownlist>
             </div>
           </div>
           <div class="inline-radio-container">

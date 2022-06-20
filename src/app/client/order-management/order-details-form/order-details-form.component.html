@@ -6,7 +6,6 @@
         <label>Order Type<span class="required">*</span></label>
         <div class="input-group dropdown">
           <ejs-dropdownlist
-            placeholder="Order Type"
             formControlName="orderType"
             appValidateWithMessage
             [dataSource]="orderTypes"
@@ -46,8 +45,7 @@
                       type="text"
                       appValidateWithMessage
                       formControlName="title"
-                      maxlength="50"
-                      placeholder="Job Title" />
+                      maxlength="50" />
                   </div>
                 </div>
 
@@ -56,7 +54,6 @@
                   <label>Region<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
-                      placeholder="Region"
                       formControlName="regionId"
                       appValidateWithMessage
                       [dataSource]="regions$ | async"
@@ -71,7 +68,6 @@
                   <label>Location<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
-                      placeholder="Location"
                       formControlName="locationId"
                       appValidateWithMessage
                       [enabled]="isLocationsDropDownEnabled"
@@ -87,7 +83,6 @@
                   <label>Department<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
-                      placeholder="Department"
                       formControlName="departmentId"
                       appValidateWithMessage
                       [enabled]="isDepartmentsDropDownEnabled"
@@ -103,7 +98,6 @@
                   <label>Skill<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
-                      placeholder="Skill"
                       formControlName="skillId"
                       appValidateWithMessage
                       [dataSource]="(skills$ | async)"
@@ -125,7 +119,6 @@
                       type="text"
                       formControlName="hourlyRate"
                       appValidateWithMessage
-                      placeholder="Hourly rate"
                       maxlength="10"
                       (focus)="priceUtils.setPriceMask(generalInformationForm,'hourlyRate', $event)"
                       (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'hourlyRate', $event)"
@@ -140,7 +133,6 @@
                     <input
                       class="e-input"
                       type="text"
-                      placeholder="# Open Positions"
                       formControlName="openPositions"
                       appValidateWithMessage
                       maxlength="10" />
@@ -154,7 +146,6 @@
                     <input
                       class="e-input"
                       type="text"
-                      placeholder="Min Yrs. Req."
                       formControlName="minYrsRequired"
                       appValidateWithMessage
                       maxlength="10" />
@@ -169,7 +160,6 @@
                       class="e-input"
                       formControlName="joiningBonus"
                       maxlength="10"
-                      placeholder="Joining Bonus"
                       appValidateWithMessage
                       type="text"
                       (focus)="priceUtils.setPriceMask(generalInformationForm, 'joiningBonus', $event)"
@@ -185,7 +175,6 @@
                     <input
                       class="e-input"
                       type="text"
-                      placeholder="Comp. Bonus"
                       formControlName="compBonus"
                       appValidateWithMessage
                       maxlength="10"
@@ -202,7 +191,6 @@
                   <label>Duration<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
-                      placeholder="Duration"
                       formControlName="duration"
                       appValidateWithMessage
                       [dataSource]="durations"
@@ -255,7 +243,6 @@
                   <label>Shift Requirement<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
-                      placeholder="Shift Requirement"
                       formControlName="shiftRequirementId"
                       appValidateWithMessage
                       [dataSource]="masterShifts$ | async"
@@ -310,7 +297,6 @@
                   <div class="input-group dropdown">
                     <ejs-multiselect
                       mode="CheckBox"
-                      placeholder="Job Distribution"
                       formControlName="jobDistribution"
                       appValidateWithMessage
                       [dataSource]="jobDistributions"
@@ -330,7 +316,6 @@
                   <div class="input-group dropdown">
                     <ejs-multiselect
                       mode="CheckBox"
-                      placeholder="Agency"
                       formControlName="agency"
                       appValidateWithMessage
                       [enabled]="agencyControlEnabled"
@@ -357,7 +342,6 @@
                   <label>Classification<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
-                      placeholder="Classification"
                       formControlName="classification"
                       appValidateWithMessage
                       [dataSource]="jobClassifications"
@@ -385,7 +369,6 @@
                       [multiline]="true"
                       appValidateWithMessage
                       maxlength="500"
-                      placeholder="Job Description..."
                       formControlName="jobDescription">
                     </ejs-textbox>
                   </div>
@@ -401,7 +384,6 @@
                       [multiline]="true"
                       appValidateWithMessage
                       maxlength="500"
-                      placeholder="Unit Description..."
                       formControlName="unitDescription">
                     </ejs-textbox>
                   </div>
@@ -414,7 +396,6 @@
                   <label>Reason for Requisition<span class="required">*</span></label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
-                      placeholder="Reason for Requisition"
                       formControlName="reasonForRequisition"
                       appValidateWithMessage
                       [dataSource]="reasonsForRequisition"
@@ -446,8 +427,7 @@
                         <ejs-dropdownlist
                           [dataSource]="contactDetailTitles"
                           appValidateWithMessage
-                          formControlName="title"
-                          placeholder="Title">
+                          formControlName="title">
                         </ejs-dropdownlist>
                       </div>
                     </div>
@@ -459,8 +439,7 @@
                           class="e-input"
                           type="text"
                           appValidateWithMessage
-                          formControlName="title"
-                          placeholder="Title" />
+                          formControlName="title" />
                       </div>
                     </div>
 
@@ -485,7 +464,6 @@
                         type="text"
                         appValidateWithMessage
                         maxLength="50"
-                        placeholder="Contact Person"
                         formControlName="name" />
                     </div>
                   </div>
@@ -499,7 +477,7 @@
                         mask="000-000-0000"
                         formControlName="mobilePhone"
                         appValidateWithMessage
-                        placeholder="Mobile Phone"
+                        placeholder=" "
                         maxlength="10">
                       </ejs-maskedtextbox>
                     </div>
@@ -513,7 +491,6 @@
                         class="e-input"
                         type="email"
                         appValidateWithMessage
-                        placeholder="Email"
                         formControlName="email" />
                     </div>
                   </div>
@@ -556,7 +533,6 @@
                       type="text"
                       appValidateWithMessage
                       maxlength="100"
-                      placeholder="Address"
                       formControlName="address" />
                   </div>
                 </div>
@@ -569,8 +545,7 @@
                       [dataSource]="organizationStatesWithKeyCode$ | async"
                       [fields]="organizationStateWithKeyCodeFields"
                       appValidateWithMessage
-                      formControlName="state"
-                      placeholder="State">
+                      formControlName="state">
                     </ejs-dropdownlist>
                   </div>
                 </div>
@@ -584,7 +559,6 @@
                       type="text"
                       appValidateWithMessage
                       maxlength="20"
-                      placeholder="City"
                       formControlName="city" />
                   </div>
                 </div>
@@ -597,7 +571,6 @@
                       class="e-input"
                       type="text"
                       appValidateWithMessage
-                      placeholder="Zip Code"
                       formControlName="zipCode"
                       maxlength="6"/>
                   </div>
@@ -628,7 +601,6 @@
                 <label>Workflow<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
-                    placeholder="Workflow"
                     formControlName="workflowId"
                     appValidateWithMessage
                     [dataSource]="workflows$ | async"
@@ -648,7 +620,6 @@
                 <label>Reason for Request<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
-                    placeholder="Reason for Request"
                     formControlName="reasonForRequestId"
                     appValidateWithMessage
                     [dataSource]="(projectSpecialData$ | async)?.reasonsForRequest"
@@ -661,7 +632,6 @@
                 <label>Special Project Category<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
-                    placeholder="Project Type"
                     formControlName="projectTypeId"
                     appValidateWithMessage
                     [dataSource]="(projectSpecialData$ | async)?.specialProjectCategories"
@@ -674,7 +644,6 @@
                 <label>Project Name<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
-                    placeholder="Project Name"
                     formControlName="projectNameId"
                     appValidateWithMessage
                     [dataSource]="(projectSpecialData$ | async)?.projectNames"
@@ -687,7 +656,6 @@
                 <label>PO#<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
-                    placeholder="PO#"
                     formControlName="poNumberId"
                     appValidateWithMessage
                     [dataSource]="(projectSpecialData$ | async)?.poNumbers"
