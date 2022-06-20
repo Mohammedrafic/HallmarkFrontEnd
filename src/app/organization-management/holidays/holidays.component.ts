@@ -20,7 +20,7 @@ import { CANCEL_COFIRM_TEXT, DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE, DELETE_CON
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { CheckIfExist, DeleteHoliday, DeleteHolidaySucceeded, ExportHolidays, GetAllMasterHolidays, GetHolidayDataSources, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded } from '../store/holidays.actions';
+import { CheckIfExist, DeleteHoliday, DeleteHolidaySucceeded, EditHoliday, ExportHolidays, GetAllMasterHolidays, GetHolidayDataSources, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded } from '../store/holidays.actions';
 import { HolidaysState } from '../store/holidays.state';
 
 @Component({
@@ -470,6 +470,8 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     const holidayToUpdate = this.HolidayFormGroup.getRawValue() as OrganizationHoliday;
     if (this.isEditMode()) {
       holidayToUpdate.masterHolidayId = this.holidayIdUnderEdit;
+      this.dispatchEdit(holidayToUpdate);
+      return;
     }
     this.dispatchSave(holidayToUpdate, false);
   }
@@ -480,6 +482,17 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
       this.hasSelectedRegions() ? this.selectedRegions : undefined,
       this.isAllRegionsSelected && this.isAllLocationsSelected,
       isExist
+    )));
+    this.store.dispatch(new SetDirtyState(false));
+    this.holidayIdUnderEdit = 0;
+  }
+
+  private dispatchEdit(holiday: OrganizationHoliday): void {
+    this.store.dispatch(new EditHoliday(new OrganizationHoliday(
+      holiday,
+      this.hasSelectedRegions() ? this.selectedRegions : undefined,
+      this.isAllRegionsSelected && this.isAllLocationsSelected,
+      false
     )));
     this.store.dispatch(new SetDirtyState(false));
     this.holidayIdUnderEdit = 0;

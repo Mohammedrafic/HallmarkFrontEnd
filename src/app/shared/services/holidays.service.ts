@@ -69,6 +69,15 @@ export class HolidaysService {
   }
 
   /**
+   * Edit holiday record
+   * @param holiday object to save
+   * @return Updated holiday
+   */
+  public editOrganizationHoliday(holiday: OrganizationHoliday): Observable<OrganizationHoliday> {
+    return this.http.put<OrganizationHoliday>(`/api/OrganizationHolidays`, holiday);
+  }
+
+  /**
    * Get holidays by page number
    * @param pageNumber
    * @param pageSize

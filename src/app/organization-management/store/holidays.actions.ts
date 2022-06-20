@@ -16,6 +16,11 @@ export class SaveHoliday {
   constructor(public payload: OrganizationHoliday) {}
 }
 
+export class EditHoliday {
+  static readonly type = '[orgHoliday] Edit Holiday';
+  constructor(public payload: OrganizationHoliday) {}
+}
+
 export class SaveHolidaySucceeded {
   static readonly type = '[orgHoliday] Save Holiday Succeeded';
   constructor(public payload: OrganizationHoliday) {}

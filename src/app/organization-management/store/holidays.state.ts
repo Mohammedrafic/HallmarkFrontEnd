@@ -9,7 +9,7 @@ import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages
 import { MessageTypes } from "src/app/shared/enums/message-types";
 import { ShowToast } from "src/app/store/app.actions";
 import { UserState } from 'src/app/store/user.state';
-import { CheckIfExist, DeleteHoliday, DeleteHolidaySucceeded, ExportHolidays, GetAllMasterHolidays, GetHolidayDataSources, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded } from './holidays.actions';
+import { CheckIfExist, DeleteHoliday, DeleteHolidaySucceeded, EditHoliday, ExportHolidays, GetAllMasterHolidays, GetHolidayDataSources, GetHolidaysByPage, SaveHoliday, SaveHolidaySucceeded } from './holidays.actions';
 
 export interface HolidaysStateModel {
   isHolidayLoading: boolean;
@@ -93,6 +93,22 @@ export class HolidaysState {
         return payloadResponse;
       }),
       catchError((error: any) => {
+        return dispatch(new ShowToast(MessageTypes.Error, 'Record already exists, please update Dates'))
+      })
+    );
+  }
+
+  @Action(EditHoliday)
+  EditHoliday({ patchState, dispatch }: StateContext<HolidaysStateModel>, { payload }: SaveHoliday): Observable<OrganizationHoliday | void> {
+    patchState({ isHolidayLoading: true });
+    return this.holidaysService.editOrganizationHoliday(payload).pipe(
+      tap((payloadResponse) => {
+        patchState({ isHolidayLoading: false });
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+        dispatch(new SaveHolidaySucceeded(payloadResponse));
+        return payloadResponse;
+      }),
+      catchError(() => {
         return dispatch(new ShowToast(MessageTypes.Error, 'Record already exists, please update Dates'))
       })
     );
