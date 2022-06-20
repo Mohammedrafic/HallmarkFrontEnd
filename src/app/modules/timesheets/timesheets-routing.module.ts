@@ -6,7 +6,7 @@ import { TimesheetsContainerComponent } from './containers/timesheets-container/
 const routes: Routes = [
   {
     path: '',
-    component: TimesheetsContainerComponent,
+    component: TimesheetsContainerComponent
   },
 ];
 
