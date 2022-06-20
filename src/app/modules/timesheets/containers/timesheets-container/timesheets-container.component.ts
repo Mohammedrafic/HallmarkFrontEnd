@@ -1,4 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Store } from '@ngxs/store';
+import { SetHeaderState } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-timesheets-container.ts',
@@ -8,4 +10,7 @@ import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 })
 export class TimesheetsContainerComponent {
 
+  constructor(store: Store) {
+    store.dispatch(new SetHeaderState({iconName: 'clock', title: 'Timesheets'}));
+  }
 }

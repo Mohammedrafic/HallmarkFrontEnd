@@ -71,6 +71,10 @@ const routes: Routes = [
             component: RejectReasonMasterComponent
           }
         ]
+      },
+      {
+        path: 'timesheets',
+        loadChildren: () => import('../modules/timesheets/timesheets.module').then((m) => m.TimesheetsModule),
       }
     ],
   },

@@ -72,6 +72,10 @@ const routes: Routes = [
         //     canLoad: [ AdminGuard ],
         //     canActivate: [ AdminGuard ]
       },
+      {
+        path: 'timesheets',
+        loadChildren: () => import('../modules/timesheets/timesheets.module').then((m) => m.TimesheetsModule),
+      }
     ],
   },
 ];

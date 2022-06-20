@@ -1,3 +1,4 @@
+import { TimesheetsRoutingModule } from './timesheets-routing.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -14,6 +15,8 @@ import { TimesheetsTableComponent } from './components/timesheets-table/timeshee
   ],
   imports: [
     CommonModule,
+    TimesheetsRoutingModule,
   ],
+  exports: [TimesheetsContainerComponent],
 })
-export class TimesheetsModule { }
+export class TimesheetsModule {}

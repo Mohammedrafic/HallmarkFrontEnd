@@ -52,7 +52,7 @@ export const MENU_CONFIG: any = {
     },
     15: { // Timesheets
       icon: 'clock',
-      route: ''
+      route: 'timesheets'
     },
     16: { // Invoices
       icon: 'dollar-sign',
@@ -113,6 +113,9 @@ export const MENU_CONFIG: any = {
     31: { // User List
       icon: '',
       route: 'security/user-list'
+    },
+    32 : {
+
     }
   },
 
@@ -167,7 +170,7 @@ export const MENU_CONFIG: any = {
     },
     15: { // Timesheets
       icon: 'clock',
-      route: ''
+      route: 'agency/timesheets'
     },
     16: { // Invoices
       icon: 'dollar-sign',
@@ -282,7 +285,7 @@ export const MENU_CONFIG: any = {
     },
     15: { // Timesheets
       icon: 'clock',
-      route: ''
+      route: 'timesheets'
     },
     16: { // Invoices
       icon: 'dollar-sign',
@@ -397,7 +400,7 @@ export const MENU_CONFIG: any = {
     },
     15: { // Timesheets
       icon: 'clock',
-      route: ''
+      route: 'timesheets'
     },
     16: { // Invoices
       icon: 'dollar-sign',
@@ -433,7 +436,7 @@ export const MENU_CONFIG: any = {
     },
     24: { // Timesheets
       icon: 'clock',
-      route: ''
+      route: 'timesheets'
     },
     25: { // Invoices
       icon: 'dollar-sign',
