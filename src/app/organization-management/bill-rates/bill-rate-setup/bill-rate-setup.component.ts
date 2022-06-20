@@ -132,7 +132,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       this.store.dispatch(new GetAllOrganizationSkills());
       this.store.dispatch(new GetBillRates({ pageNumber: this.currentPage, pageSize: this.pageSize }));
       this.store.dispatch(new GetBillRateOptions());
-      this.store.dispatch(new GetOrganizationStructure());
     });
 
     this.handlePagePermission();

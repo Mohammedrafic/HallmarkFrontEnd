@@ -133,7 +133,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
         this.store.dispatch(new GetOrganizationById(this.store.selectSnapshot(UserState.user)?.businessUnitId as number));
       }
     });
-    this.organization$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(organization => {
+    this.organization$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
       this.store.dispatch(new GetRegions());
     });

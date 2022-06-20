@@ -5,10 +5,10 @@
   </div>
 
   <div class="stick-right header-content">
-    <ng-container *ngIf="(isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea">
+    <div class="switcher-container" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea)">
       <app-organization-agency-selector></app-organization-agency-selector>
       <div class="devider"></div>
-    </ng-container>
+    </div>
     <div class="header-item">{{userLogin.firstName}} {{userLogin.lastName}}</div>
 
     <!-- Temporary solution to log out from the application -->
