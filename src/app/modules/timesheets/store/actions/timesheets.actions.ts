@@ -8,4 +8,12 @@ export namespace Timesheets {
     constructor(public readonly payload: ITimesheetsFilter) {
     }
   }
+
+  export class GetProfileTimesheets {
+    static readonly type = TIMESHEETS_ACTIONS.GET_PROFILE_TIMESHEETS;
+  }
+
+  export class ToggleProfileDialog {
+    static readonly type = TIMESHEETS_ACTIONS.OPEN_PROFILE;
+  }
 }
