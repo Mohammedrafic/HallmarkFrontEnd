@@ -1,9 +1,12 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { DEFAULT_TIMESHEETS_STATE, ITimesheet, TimesheetsModel } from '../model/timesheets.model';
 import { Injectable } from '@angular/core';
+
 import { Observable, tap } from 'rxjs';
+
+import { TimesheetsModel, TimeSheetsPage } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
+import { DEFAULT_TIMESHEETS_STATE } from '../../constants/timesheet-default-state.constant';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -15,15 +18,13 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static timesheets(state: TimesheetsModel): ITimesheet[] {
+  static timesheets(state: TimesheetsModel): TimeSheetsPage | null {
     return state.timesheets;
   }
 
   @Action(Timesheets.GetAll)
-  GetTimesheets({ patchState }: StateContext<TimesheetsModel>, {}: Timesheets.GetAll): Observable<ITimesheet[]> {
-    const filters = {}; // pagination object
-
-    return this.timesheetsService.getTimesheets(filters).pipe(tap((res) => patchState({
+  GetTimesheets({ patchState }: StateContext<TimesheetsModel>, { payload }: Timesheets.GetAll): Observable<TimeSheetsPage> {
+    return this.timesheetsService.getTimesheets(payload).pipe(tap((res) => patchState({
       timesheets: res,
     })));
   }

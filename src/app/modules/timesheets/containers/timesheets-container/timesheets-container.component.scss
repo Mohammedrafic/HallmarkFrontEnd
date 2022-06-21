@@ -1,0 +1,14 @@
+@import '../../styles/variables/colors';
+
+.e-input-group.e-control-wrapper.e-date-wrapper {
+  background: $white;
+}
+
+.e-input-group.e-float-icon-left.search-with-icon {
+  height: 38px;
+}
+
+.search {
+  flex-grow: 1;
+  max-width: 400px;
+}
