@@ -2,9 +2,11 @@ import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import type { CandidatesByStateWidgetAggregatedDataModel } from './candidates-by-state-widget-aggregated-data.model';
 import type { ChartAccumulation } from './chart-accumulation-widget.model';
 import type { PositionsByTypeAggregatedModel } from './positions-by-type-aggregated.model';
+import { PositionInProgressDataModel } from './positions-in-progress.model';
 
 export interface WidgetsDataModel {
   [WidgetTypeEnum.APPLICANTS_BY_REGION]: CandidatesByStateWidgetAggregatedDataModel;
   [WidgetTypeEnum.CANDIDATES]: ChartAccumulation;
-  [WidgetTypeEnum.POSITIONS_BY_TYPES]: PositionsByTypeAggregatedModel
+  [WidgetTypeEnum.POSITIONS_BY_TYPES]: PositionsByTypeAggregatedModel;
+  [WidgetTypeEnum.IN_PROGRESS_POSITION]: PositionInProgressDataModel;
 }
