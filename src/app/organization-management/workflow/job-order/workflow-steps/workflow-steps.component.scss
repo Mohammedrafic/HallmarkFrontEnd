@@ -64,10 +64,6 @@
     }
 
     .input-container {
-      label.initial-step-label {
-        color: $secondary-dark-blue-10;
-      }
-
       .input-group.input-readonly {
         .e-input[readonly] {
           background-color: $secondary-dark-blue-50;

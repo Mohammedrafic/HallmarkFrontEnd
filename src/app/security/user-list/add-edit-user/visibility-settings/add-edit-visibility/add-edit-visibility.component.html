@@ -37,8 +37,7 @@
                                 formControlName="organisationIds"
                                 [fields]="organisationFields"
                                 [dataSource]="organisations"
-                                [enabled]="!isOrganisationUser"
-                                placeholder="Organization">
+                                [enabled]="!isOrganisationUser">
               </ejs-dropdownlist>
             </div>
           </div>
@@ -53,8 +52,7 @@
                                [showDropDownIcon]="true"
                                [fields]="optionFields"
                                [dataSource]="regions"
-                               formControlName="regionIds"
-                               placeholder="Region">
+                               formControlName="regionIds">
                 <ng-template #itemTemplate let-data>
                   <div class="visibility-option-container">
                     <span>{{data?.name}}</span>
@@ -75,8 +73,7 @@
                                [showDropDownIcon]="true"
                                [fields]="optionFields"
                                [dataSource]="locations"
-                               formControlName="locationIds"
-                               placeholder="Location">
+                               formControlName="locationIds">
                 <ng-template #itemTemplate let-data>
                   <div class="visibility-option-container">
                     <span>{{data?.name}}</span>
@@ -97,8 +94,7 @@
                                [showDropDownIcon]="true"
                                [fields]="optionFields"
                                [dataSource]="departments"
-                               formControlName="departmentIds"
-                               placeholder="Department">
+                               formControlName="departmentIds">
                 <ng-template #itemTemplate let-data>
                   <div class="visibility-option-container">
                     <span>{{data?.name}}</span>
