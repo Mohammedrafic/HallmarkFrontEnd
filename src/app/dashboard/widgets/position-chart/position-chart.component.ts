@@ -1,18 +1,15 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
-import { PositionInProgressDataModel } from '../../models/positions-in-progress.model';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+
+import { CandidatesPositionDataModel } from '../../models/candidates-positions.model';
 
 @Component({
   selector: 'app-position-chart',
   templateUrl: './position-chart.component.html',
   styleUrls: ['./position-chart.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PositionChartComponent implements OnInit {
+export class PositionChartComponent {
   @Input() public isLoading: boolean;
-  @Input() public chartData: PositionInProgressDataModel | undefined;
+  @Input() public chartData: CandidatesPositionDataModel | undefined;
 
-  constructor() { }
-
-  ngOnInit(): void {
-  }
 }

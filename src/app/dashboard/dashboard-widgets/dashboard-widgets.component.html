@@ -38,8 +38,8 @@
             [isLoading]="isLoading"
           ></app-line-chart>
           <app-position-chart
-            *ngSwitchCase="widgetTypeEnum.IN_PROGRESS_POSITION"
-            [chartData]="widgetsData?.[widgetTypeEnum.IN_PROGRESS_POSITION]"
+            *ngSwitchCase="widgetTypeEnum.IN_PROGRESS_POSITIONS"
+            [chartData]="widgetsData?.[widgetTypeEnum.IN_PROGRESS_POSITIONS]"
             [isLoading]="isLoading"
           ></app-position-chart>
         </ng-template>
