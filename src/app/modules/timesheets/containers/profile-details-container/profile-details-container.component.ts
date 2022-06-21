@@ -1,5 +1,5 @@
 import {
-  ChangeDetectionStrategy, Component, Inject, OnInit, ViewChildren, AfterViewInit, ViewChild
+  ChangeDetectionStrategy, Component, Inject, OnInit, ViewChildren, AfterViewInit, ViewChild, ChangeDetectorRef
 } from '@angular/core';
 
 import { filter, Observable, takeUntil } from 'rxjs';
@@ -31,6 +31,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   constructor(
     private store: Store,
+    private cd: ChangeDetectorRef,
     @Inject(GlobalWindow) private readonly globalWindow: WindowProxy & typeof globalThis,
     ) {
     super();
@@ -59,6 +60,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       } else {
         this.sideDialog.hide();
       }
+      this.cd.markForCheck();
     });
   }
 }

@@ -5,44 +5,45 @@
   [allowResizing]="true"
   [resizeSettings]="resizeSettings"
   [sortSettings]="initialSort"
-  [allowPaging]="allowPaging"
-  [pageSettings]="pageSettings"
+  [allowPaging]="false"
   [enableVirtualization]="true"
-  [height]="fullScreenGridHeight"
-  (rowSelected)="rowSelected($event, profileTable)"
-  (rowDeselected)="rowDeselected($event, profileTable)"
-  (dataBound)="gridDataBound(profileTable)"
-  [selectionSettings]="selectionSettings"
+  allowTextWrap="true"
+  [height]="tableHeight"
+  [editSettings]="{ allowEditing: true }"
   >
     <e-columns>
-      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="40"></e-column>
-      <e-column field="day" headerText="Day" textAlign="Left" width="120"></e-column>
-      <e-column field="timeIn" headerText="Time in" textAlign="Right" width="220">
+      <e-column field="day" headerText="Day" textAlign="Left" width="85"></e-column>
+      <e-column field="timeIn" type="date" headerText="Time in" textAlign="Right" width="120">
         <ng-template #template let-data>
           <span>{{ data.timeIn | date: 'M/d/yy, hh:mm' }}</span>
         </ng-template>
       </e-column>
-      <e-column field="timeout" headerText="Day" textAlign="Right" width="220">
+      <e-column field="timeOut" headerText="Time out" textAlign="Right" width="120">
         <ng-template #template let-data>
           <span>{{ data.timeOut | date: 'M/d/yy, hh:mm' }}</span>
         </ng-template>
       </e-column>
-      <e-column field="costCenter" headerText="Cost Center" textAlign="Right" width="220"></e-column>
-      <e-column field="department" headerText="Department" textAlign="Right" width="220"></e-column>
-      <e-column field="jobId" headerText="Job Id" textAlign="Right" width="220"></e-column>
-      <e-column field="category" headerText="Category" textAlign="Right" width="220"></e-column>
-      <e-column field="hours" headerText="Hours" textAlign="Right" width="220"></e-column>
-      <e-column field="" headerText="" textAlign="Right" width="90">
-        <ng-template #headerTemplate let-data>
-          <div class="controls-header"></div>
+      <e-column field="costCenter" headerText="Cost Center" textAlign="Right" width="130"></e-column>
+      <e-column field="category" headerText="Category" textAlign="Right" width="125"></e-column>
+      <e-column field="hours" headerText="Hours/Miles" textAlign="Right" width="110"></e-column>
+      <e-column field="rate" headerText="Bill rate" textAlign="Right" width="110">
+        <ng-template #template let-data>
+          <span>{{ data.rate | currency:'USD':'symbol':'1.0-2' }}</span>
         </ng-template>
+      </e-column>
+      <e-column field="total" headerText="Total" textAlign="Right" width="100">
+        <ng-template #template let-data>
+          <span>{{ data.total | currency:'USD':'symbol':'1.0-2' }}</span>
+        </ng-template>
+      </e-column>
+      <e-column field="" headerText="" textAlign="Right" width="120">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat default-icon-button">
-              <span><i-feather name="file-text" class="icon"></i-feather></span>
-            </button>
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="editTimesheet(data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat default-icon-button">
+              <span><i-feather name="trash2" class="icon fill-red"></i-feather></span>
             </button>
           </div>
         </ng-template>

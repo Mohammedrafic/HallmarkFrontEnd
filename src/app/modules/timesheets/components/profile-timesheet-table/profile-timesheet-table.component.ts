@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, ViewChild, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, ViewChild, OnInit, SimpleChanges } from '@angular/core';
 
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 
@@ -10,14 +10,16 @@ import { ProfileTimeSheetDetail } from '../../store/model/timesheets.model';
   selector: 'app-profile-timesheet-table',
   templateUrl: './profile-timesheet-table.component.html',
   styleUrls: ['./profile-timesheet-table.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+
 })
-export class ProfileTimesheetTableComponent extends AbstractGridConfigurationComponent implements OnChanges {
-  @ViewChild('profileTable') profileTable: GridComponent;
+export class ProfileTimesheetTableComponent extends AbstractGridConfigurationComponent {
+  @ViewChild('profileTable') readonly profileTable: GridComponent;
 
   @Input() timeSheetsProfile: ProfileTimeSheetDetail[];
 
   public override readonly allowPaging = false;
+
+  public readonly tableHeight = 360;
 
   public initialSort = {
     columns: [
@@ -29,8 +31,5 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
     super();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log(this.timeSheetsProfile)
-  }
   public editTimesheet(timesheet: ProfileTimeSheetDetail): void {}
 }

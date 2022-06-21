@@ -2,13 +2,13 @@
   id="dialog"
   #sideDialog
   cssClass="dialog"
-  [width]="'1080px'"
+  [width]="'1180px'"
   [target]="targetElement"
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
   <ng-template #content>
-    <section>
+    <section class="profile-table-container">
       <app-profile-timesheet-table
       *ngIf="timeSheetsProfile$ | async as timeSheetsProfile"
       [timeSheetsProfile]="timeSheetsProfile">

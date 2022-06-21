@@ -29,6 +29,7 @@ import { ProfileTimesheetTableComponent } from './components/profile-timesheet-t
 import { GridModule } from '@syncfusion/ej2-angular-grids';
 import { FeatherModule } from 'angular-feather';
 import { DialogAllModule } from '@syncfusion/ej2-angular-popups';
+import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 
 const gridIcons = {
   MessageSquare,
@@ -86,6 +87,7 @@ const gridIcons = {
     MultiSelectModule,
     GridModule,
     DialogAllModule,
+    ButtonModule,
     FeatherModule.pick({
       Download,
       Upload,
@@ -95,7 +97,7 @@ const gridIcons = {
       Plus,
       ChevronDown,
       ChevronRight,
-      Copy
+      Copy,
     }),
     NgxsModule.forFeature([TimesheetsState]),
   ],
