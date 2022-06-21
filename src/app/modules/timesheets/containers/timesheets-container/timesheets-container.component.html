@@ -1,1 +1,33 @@
-<p>timesheets-container.ts works!</p>
+<app-page-toolbar>
+  <ng-container left>
+    <app-tab-dynamic-navigation
+      [tabConfig]="tabConfig"
+      (changeTab)="handleChangeTab($event)">
+    </app-tab-dynamic-navigation>
+  </ng-container>
+  <ng-container right>
+    <app-search class="search"></app-search>
+    <ejs-datepicker
+      id="startDate"
+      class="datepicker"
+      format="dd/MM/yyyy"
+      placeholder="MM/DD/YYYY"
+      [enableMask]="true"
+      [maskPlaceholder]="{  month: 'MM', day: 'DD', year: 'YYYY' }"
+      [formControl]="formGroup.get('date') | controlConverter"
+    >
+    </ejs-datepicker>
+    <button ejs-button cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+    <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+  </ng-container>
+</app-page-toolbar>
+
+<section>
+  <app-timesheets-table
+    *ngIf="timesheets$ | async as timesheets"
+    [tableData]="timesheets"
+    (changePage)="handleChangePage($event)"
+    (changePerPage)="handleChangePerPage($event)"
+  >
+  </app-timesheets-table>
+</section>

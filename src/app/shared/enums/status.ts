@@ -9,12 +9,12 @@ export enum Status {
 
 export const STATUS_COLOR_GROUP = {
   'e-success': ['open', 'Active', 'Completed', 'active', 'completed','applied', TIMETHEETS_STATUSES.PENDING_APPROVE],
-  'e-warning': ['incomplete', 'suspended', 'Suspended', 'Incomplete', 'incomplete', 'shortlisted'],
+  'e-warning': ['incomplete', 'suspended', 'Suspended', 'Incomplete', 'incomplete', 'shortlisted', 'in progress (pending)'],
   'e-default': ['closed', 'Inactive', 'inactive', 'Closed', TIMETHEETS_STATUSES.REJECTED],
   'e-pending': ['pending', 'Pending', 'offered', TIMETHEETS_STATUSES.MISSING],
   'e-progress': ['in progress', 'In Progress', 'Verified', 'verified'],
-  'e-accepted': ['accepted','Accepted', TIMETHEETS_STATUSES.ORG_APPROVED],
-  'e-filled': ['filled', 'Filled', 'onboarded'],
+  'e-accepted': ['accepted','Accepted', 'in progress (accepted)', TIMETHEETS_STATUSES.ORG_APPROVED],
+  'e-filled': ['filled', 'Filled', 'onboarded', "onboarded"],
   'e-awaiting': ['not applied', 'Not Applied']
 }
 

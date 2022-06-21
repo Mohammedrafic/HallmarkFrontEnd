@@ -1,10 +1,6 @@
-import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
-
 import { ITabConfigInterface } from '../interface/i-tab-config.interface';
 import { ITimesheet } from '../interface/i-timesheet.interface';
-import { ExportType, TIMETHEETS_STATUSES } from '../enums/timesheets.enum';
-import { HourOccupationType } from "../enums/hour-occupation-type.enum";
-
+import { TIMETHEETS_STATUSES } from '../enums/timesheets.enum';
 
 export const TAB_ADMIN_TIMESHEETS: ITabConfigInterface[] = [
   {
@@ -24,12 +20,6 @@ export const TAB_ADMIN_TIMESHEETS: ITabConfigInterface[] = [
   }
 ];
 
-export const exportOptions: ItemModel[] = [
-  { text: ExportType.Excel_file, id: '0' },
-  { text: ExportType.CSV_file, id: '1' },
-  { text: ExportType.Custom, id: '2' }
-];
-
 export const MOK_TIMESHEETS: ITimesheet[] = [
   {
     id: 1,
@@ -41,7 +31,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 2,
@@ -53,7 +43,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 3,
@@ -65,7 +55,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 4,
@@ -77,7 +67,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 5,
@@ -89,7 +79,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 6,
@@ -101,7 +91,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 7,
@@ -113,7 +103,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 8,
@@ -125,7 +115,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 9,
@@ -137,7 +127,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 10,
@@ -149,7 +139,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 11,
@@ -161,7 +151,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 12,
@@ -173,7 +163,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 13,
@@ -185,7 +175,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 14,
@@ -197,7 +187,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 15,
@@ -209,7 +199,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 16,
@@ -221,7 +211,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 17,
@@ -233,7 +223,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 18,
@@ -245,7 +235,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 19,
@@ -257,7 +247,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 20,
@@ -269,7 +259,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 21,
@@ -281,7 +271,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 22,
@@ -293,7 +283,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 23,
@@ -305,7 +295,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 24,
@@ -317,7 +307,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 25,
@@ -329,7 +319,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 26,
@@ -341,7 +331,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 27,
@@ -353,7 +343,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 28,
@@ -365,7 +355,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 29,
@@ -377,7 +367,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 30,
@@ -389,7 +379,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 31,
@@ -401,7 +391,7 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
   {
     id: 32,
@@ -413,26 +403,6 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     departmentName: 'Emergency Department',
     billRate: 10.10,
     agencyName: 'AB Staffing',
-    totalHours: 32,
+    totalHours: '2022-06-21T15:40',
   },
 ];
-
-export const profileDetailsHoursChartColors = [
-  '#FFFFFF',
-  '#D8E5FF',
-  '#B2CCFF',
-  '#9EBFFF',
-  '#6499FF',
-  '#518CFF',
-  '#3E7FFF',
-];
-
-export const profileDetailsHoursChartColorsMap: Record<HourOccupationType, string> = {
-  [HourOccupationType.OnCall]: '#3E7FFF',
-  [HourOccupationType.Callback]: '#518CFF',
-  [HourOccupationType.Regular]: '#6499FF',
-  [HourOccupationType.Holiday]: '#9EBFFF',
-  [HourOccupationType.Charge]: '#B2CCFF',
-  [HourOccupationType.Preceptor]: '#D8E5FF',
-  [HourOccupationType.Orientation]: '#FFFFFF',
-};

@@ -1,15 +1,8 @@
+import { PageOfCollections } from '@shared/models/page.model';
+import { ITimesheet } from '../../interface/i-timesheet.interface';
+
 export interface TimesheetsModel {
-  timesheets: ITimesheet[];
+  timesheets: TimeSheetsPage | null;
 }
 
-export const DEFAULT_TIMESHEETS_STATE: TimesheetsModel = {
-  timesheets: [],
-}
-
-export enum TIMESHEETS_ACTIONS {
-  GET_TIMESHEETS = '[timesheets] GET TIMESHEETS'
-}
-
-export interface ITimesheet {
-  name: string;
-}
+export type TimeSheetsPage = PageOfCollections<ITimesheet>;
