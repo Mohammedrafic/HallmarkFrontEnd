@@ -30,9 +30,8 @@ export interface ProfileTimeSheetDetail {
   timeIn: string;
   timeOut: string;
   costCenter: string;
-  department: string;
-  skill: string;
-  jobId: string;
   category: string;
   hours: number;
+  rate: number;
+  total: number;
 }
