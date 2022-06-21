@@ -4,6 +4,7 @@ import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.mo
 import {
   DeleteCredentialGroupMappingById,
   GetCredentialGroupMapping,
+  GetFilteredCredentialSetupData,
   SaveCredentialGroupMapping,
   SetCredentialSetupFilter,
   SetNavigationTab
@@ -14,11 +15,14 @@ import { SkillGroupService } from '@shared/services/skill-group.service';
 import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { CredentialsService } from '@shared/services/credentials.service';
+import { CredentialSetupFilterData } from '@shared/models/credential-setup.model';
 
 export interface CredentialsStateModel {
   activeTab: number;
   setupFilter: CredentialSetupFilter | null;
-  groupMappings: SkillGroupMapping[]
+  groupMappings: SkillGroupMapping[],
+  filteredCredentialSetupData: CredentialSetupFilterData[]
 }
 
 @State<CredentialsStateModel>({
@@ -26,7 +30,8 @@ export interface CredentialsStateModel {
   defaults: {
     activeTab: 0,
     setupFilter: null,
-    groupMappings: []
+    groupMappings: [],
+    filteredCredentialSetupData: []
   }
 })
 @Injectable()
@@ -40,7 +45,11 @@ export class CredentialsState {
   @Selector()
   static groupMappings(state: CredentialsStateModel): SkillGroupMapping[] { return state.groupMappings; }
 
-  constructor(private skillGroupService: SkillGroupService) {}
+  @Selector()
+  static filteredCredentialSetupData(state: CredentialsStateModel): CredentialSetupFilterData[] { return state.filteredCredentialSetupData; }
+
+  constructor(private skillGroupService: SkillGroupService,
+              private credentialService: CredentialsService) {}
 
   @Action(SetNavigationTab)
   SetNavigationTab({ patchState }: StateContext<CredentialsStateModel>, { payload }: SetNavigationTab): void {
@@ -83,5 +92,13 @@ export class CredentialsState {
         return payload;
       }),
       catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
+  }
+
+  @Action(GetFilteredCredentialSetupData)
+  GetFilteredCredentialSetupData({ patchState }: StateContext<CredentialsStateModel>, { payload }: GetFilteredCredentialSetupData): Observable<CredentialSetupFilterData[]> {
+    return this.credentialService.getFilteredCredentialSetupData(payload).pipe(tap((responseData) => {
+      patchState({ filteredCredentialSetupData: responseData });
+      return responseData;
+    }));
   }
 }

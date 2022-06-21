@@ -1,7 +1,7 @@
 import { Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GridComponent, SearchService } from '@syncfusion/ej2-angular-grids';
-import { filter, Observable, of, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import {
   AbstractGridConfigurationComponent
@@ -15,7 +15,7 @@ import {
   DELETE_RECORD_TITLE
 } from '@shared/constants/messages';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
+import { CredentialSkillGroup, CredentialSkillGroupPage, CredentialSkillGroupPost } from '@shared/models/skill-group.model';
 import {
   GetAssignedSkillsByPage,
   GetCredentialSkillGroup,
@@ -88,7 +88,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.addActiveCssClass(event);
     this.skillGroupsFormGroup.setValue({
       name: skillGroup.name,
-      skillIds: skillGroup.skills.map((item: any) => item.id)
+      skillIds: skillGroup.skills?.map((item: any) => item.id)
     });
     this.isEdit = true;
     this.editedSkillGroupId = skillGroup.id;
@@ -134,17 +134,18 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   onFormSaveClick(): void {
     if (this.skillGroupsFormGroup.valid) {
       if (this.isEdit) {
-        const skillGroup = new CredentialSkillGroup({
+        const skillGroup: CredentialSkillGroupPost = {
           id: this.editedSkillGroupId,
+          name: this.skillGroupsFormGroup.controls['name'].value,
           skillIds: Array.from(this.skillsId)
-        });
+        };
         this.store.dispatch(new UpdateCredentialSkillGroup(skillGroup));
         this.isEdit = false;
       } else {
-        const skillGroup = new CredentialSkillGroup({
+        const skillGroup: CredentialSkillGroupPost = {
           name: this.skillGroupsFormGroup.controls['name'].value,
           skillIds: Array.from(this.skillsId)
-        });
+        };
 
         this.store.dispatch(new SaveCredentialSkillGroup(skillGroup));
         this.store.dispatch(new ShowSideDialog(false));
