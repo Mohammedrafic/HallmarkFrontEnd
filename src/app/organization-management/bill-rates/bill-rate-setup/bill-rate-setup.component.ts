@@ -549,10 +549,10 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       this.billRatesFormGroup.controls['billRateTitleId'].setValue(foundBillRateOption.id);
     }
 
-    if (!data.orderType) {
+    if (data.orderTypes.length === 0) {
       this.billRatesFormGroup.controls['orderTypeIds'].setValue(this.orderTypes.map((type) => type.id));
     } else {
-      this.billRatesFormGroup.controls['orderTypeIds'].setValue(data.orderType);
+      this.billRatesFormGroup.controls['orderTypeIds'].setValue(data.orderTypes);
     }
 
     const rateHour = foundBillRateOption?.unit === BillRateUnit.Hours ? data.rateHour : parseFloat(data.rateHour.toString()).toFixed(2);

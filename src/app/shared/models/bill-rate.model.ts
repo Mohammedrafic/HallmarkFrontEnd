@@ -55,7 +55,7 @@ export class BillRateSetup {
   departmentName: string;
   skills: MasterSkillByOrganization[];
   skillName: string;
-  orderType: number[];
+  orderTypes: number[];
   billRateTitle: string;
   billRateCategory: number;
   billRateType: number;
