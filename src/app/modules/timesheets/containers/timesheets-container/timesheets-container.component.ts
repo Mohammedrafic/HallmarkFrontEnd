@@ -60,7 +60,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     private filterService: FilterService
   ) {
     super();
-
     store.dispatch(new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }));
   }
 
@@ -262,5 +261,10 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   private capitalizeFirstLetter(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  clicker(): void {
+    this.show = true;
+    this.store.dispatch(new Timesheets.ToggleProfileDialog());
   }
 }

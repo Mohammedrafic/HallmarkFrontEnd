@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
+
 import { Observable, of } from 'rxjs';
 
 import { ITimesheet, ITimesheetsFilter } from '../interface/i-timesheet.interface';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
 import { MOK_TIMESHEETS } from '../constants/timesheets.constant';
 import { map } from 'rxjs/operators';
+import { mockProfileTableData } from '../components/profile-timesheet-table/mock-table-data';
+import { ProfileTimeSheetDetail } from '../store/model/timesheets.model';
 
 @Injectable()
 export class TimesheetsApiService {
@@ -34,5 +37,9 @@ export class TimesheetsApiService {
         idx < filters.pageSize * filters.pageNumber :
         idx >= filters.pageSize && idx < filters.pageSize * filters.pageNumber;
     });
+  }
+
+  public getProfileTimesheets(): Observable<ProfileTimeSheetDetail[]> {
+    return of(mockProfileTableData);
   }
 }

@@ -1,0 +1,53 @@
+<section class="table-container">
+  <ejs-grid #profileTable
+  [dataSource]="timeSheetsProfile"
+  [allowSorting]="true"
+  [allowResizing]="true"
+  [resizeSettings]="resizeSettings"
+  [sortSettings]="initialSort"
+  [allowPaging]="allowPaging"
+  [pageSettings]="pageSettings"
+  [enableVirtualization]="true"
+  [height]="fullScreenGridHeight"
+  (rowSelected)="rowSelected($event, profileTable)"
+  (rowDeselected)="rowDeselected($event, profileTable)"
+  (dataBound)="gridDataBound(profileTable)"
+  [selectionSettings]="selectionSettings"
+  >
+    <e-columns>
+      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="40"></e-column>
+      <e-column field="day" headerText="Day" textAlign="Left" width="120"></e-column>
+      <e-column field="timeIn" headerText="Time in" textAlign="Right" width="220">
+        <ng-template #template let-data>
+          <span>{{ data.timeIn | date: 'M/d/yy, hh:mm' }}</span>
+        </ng-template>
+      </e-column>
+      <e-column field="timeout" headerText="Day" textAlign="Right" width="220">
+        <ng-template #template let-data>
+          <span>{{ data.timeOut | date: 'M/d/yy, hh:mm' }}</span>
+        </ng-template>
+      </e-column>
+      <e-column field="costCenter" headerText="Cost Center" textAlign="Right" width="220"></e-column>
+      <e-column field="department" headerText="Department" textAlign="Right" width="220"></e-column>
+      <e-column field="jobId" headerText="Job Id" textAlign="Right" width="220"></e-column>
+      <e-column field="category" headerText="Category" textAlign="Right" width="220"></e-column>
+      <e-column field="hours" headerText="Hours" textAlign="Right" width="220"></e-column>
+      <e-column field="" headerText="" textAlign="Right" width="90">
+        <ng-template #headerTemplate let-data>
+          <div class="controls-header"></div>
+        </ng-template>
+        <ng-template #template let-data>
+          <div class="row-tool-buttons">
+            <button ejs-button cssClass="e-flat default-icon-button">
+              <span><i-feather name="file-text" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editTimesheet(data)">
+              <span><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
+    </e-columns>
+  </ejs-grid>
+</section>
+

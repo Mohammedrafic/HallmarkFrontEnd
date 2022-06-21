@@ -1,0 +1,18 @@
+<ejs-dialog
+  id="dialog"
+  #sideDialog
+  cssClass="dialog"
+  [width]="'1080px'"
+  [target]="targetElement"
+  [visible]="false"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <section>
+      <app-profile-timesheet-table
+      *ngIf="timeSheetsProfile$ | async as timeSheetsProfile"
+      [timeSheetsProfile]="timeSheetsProfile">
+    </app-profile-timesheet-table>
+    </section>
+  </ng-template>
+</ejs-dialog>
