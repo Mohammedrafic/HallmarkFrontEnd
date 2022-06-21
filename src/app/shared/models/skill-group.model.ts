@@ -1,3 +1,5 @@
+import { PageOfCollections } from '@shared/models/page.model';
+
 export class CredentialSkillGroup {
   id?: number;
   name?: string;
@@ -24,7 +26,4 @@ export class CredentialSkillGroup {
   }
 }
 
-export class CredentialSkillGroupMapping {
-  id: number;
-  name?: string;
-}
+export type CredentialSkillGroupPage = PageOfCollections<CredentialSkillGroup>;

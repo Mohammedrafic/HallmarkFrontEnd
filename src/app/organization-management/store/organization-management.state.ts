@@ -90,7 +90,7 @@ import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
 import { RECORD_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
 import { CandidateStateModel } from '@agency/store/candidate.state';
-import { CredentialSkillGroup } from '@shared/models/skill-group.model';
+import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { CredentialSetup, CredentialSetupPage } from '@shared/models/credential-setup.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { CategoriesService } from '@shared/services/categories.service';
@@ -137,7 +137,7 @@ export interface OrganizationManagementStateModel {
   credentials: Credential[];
   isCredentialTypesLoading: boolean;
   isCredentialLoading: boolean;
-  skillGroups: CredentialSkillGroup[] | null;
+  skillGroups: CredentialSkillGroupPage | null;
   isSkillGroupLoading: boolean;
   credentialSetupPage: CredentialSetupPage | null;
   isCredentialSetupLoading: boolean;
@@ -180,7 +180,7 @@ export interface OrganizationManagementStateModel {
     credentials: [],
     isCredentialTypesLoading: false,
     isCredentialLoading: false,
-    skillGroups: [],
+    skillGroups: null,
     isSkillGroupLoading: false,
     credentialSetupPage: null,
     isCredentialSetupLoading: false,
@@ -256,7 +256,7 @@ export class OrganizationManagementState {
   static credentials(state: OrganizationManagementStateModel): Credential[] { return state.credentials }
 
   @Selector()
-  static skillGroups(state: OrganizationManagementStateModel): CredentialSkillGroup[]  | null { return state.skillGroups }
+  static skillGroups(state: OrganizationManagementStateModel): CredentialSkillGroupPage  | null { return state.skillGroups }
 
   @Selector()
   static credentialSetups(state: OrganizationManagementStateModel): CredentialSetupPage | null { return state.credentialSetupPage }
@@ -675,7 +675,7 @@ export class OrganizationManagementState {
   }
 
   @Action(GetCredentialSkillGroup)
-  GetSkillGroups({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetCredentialSkillGroup): Observable<CredentialSkillGroup[]> {
+  GetSkillGroups({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetCredentialSkillGroup): Observable<CredentialSkillGroupPage> {
     return this.skillGroupService.getSkillGroups().pipe(tap((payload) => {
       patchState({ skillGroups: payload });
       return payload;

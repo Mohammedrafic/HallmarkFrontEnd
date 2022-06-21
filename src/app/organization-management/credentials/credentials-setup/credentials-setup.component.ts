@@ -22,7 +22,7 @@ import {
   ClearDepartmentList,
   ClearLocationList,
   GetCredentialSetupByPage,
-  SaveUpdateCredentialSetupSucceeded
+  SaveUpdateCredentialSetupSucceeded, GetAllOrganizationSkills
 } from '../../store/organization-management.actions';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
@@ -30,12 +30,9 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { CredentialSetup, CredentialSetupPage } from '@shared/models/credential-setup.model';
 import { Department } from '@shared/models/department.model';
 import { Credential } from '@shared/models/credential.model';
-import { FilterCredentialSetup } from '@shared/enums/credential-setup-filter';
-import { CredentialsState } from '../../store/credentials.state';
-import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
-import { MockCredentialSetupList, MockCredentialSetupPage } from './mock-credential-setup-list';
-import { SetCredentialSetupFilter } from '../../store/credentials.actions';
+import { MockCredentialSetupPage } from './mock-credential-setup-list';
 import { UserState } from 'src/app/store/user.state';
+import { Skill } from '@shared/models/skill.model';
 
 @Component({
   selector: 'app-credentials-setup',
@@ -45,10 +42,6 @@ import { UserState } from 'src/app/store/user.state';
 })
 export class CredentialsSetupComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
-
-  public isFilteredBySkill = false;
-  public credentials = [FilterCredentialSetup.ByOrganization, FilterCredentialSetup.BySkill];
-  public selectedFilterSetupBy: FilterCredentialSetup;
 
   @Select(OrganizationManagementState.credentialTypes)
   credentialType$: Observable<CredentialType[]>;
@@ -75,13 +68,16 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   groups$: Observable<CredentialSkillGroup[]>;
   public selectedSkillGroupId: number;
 
-  @Select(CredentialsState.setupFilter)
-  setupFilter$: Observable<CredentialSetupFilter>;
+  @Select(OrganizationManagementState.allOrganizationSkills)
+  skills$: Observable<Skill[]>;
+  skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
+  public selectedSkillId: number;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
   public credentialsSetupFormGroup: FormGroup;
+  public headerFilterFormGroup: FormGroup;
   public formBuilder: FormBuilder;
 
   public editedCredentialSetupId?: number;
@@ -89,7 +85,6 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   //@Select(OrganizationManagementState.credentialSetups) // TODO: uncomment after BE implementation
   credentialsData$: Observable<CredentialSetupPage> = of(MockCredentialSetupPage);
 
-  private invalidDate = '0001-01-01T00:00:00+00:00';
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -109,42 +104,8 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       this.store.dispatch(new GetRegions());
       this.store.dispatch(new GetCredentialTypes());
       this.store.dispatch(new GetCredential());
+      this.store.dispatch(new GetAllOrganizationSkills());
       // this.store.dispatch(new GetCredentialSkillGroup()); // TODO: uncomment after BE fix
-    });
-
-    this.setupFilter$.pipe(takeUntil(this.unsubscribe$)).subscribe(setupFilter => {
-      if (setupFilter) {
-        this.store.dispatch(new GetLocationsByRegionId(setupFilter.regionId));
-        this.store.dispatch(new GetDepartmentsByLocationId(setupFilter.locationId));
-
-        this.isFilteredBySkill = true;
-        this.selectedFilterSetupBy = FilterCredentialSetup.BySkill;
-        setTimeout(() => {
-          this.selectedRegionId = setupFilter.regionId;
-          this.selectedLocationId = setupFilter.locationId;
-          this.selectedDepartmentId = setupFilter.departmentId;
-          this.selectedSkillGroupId = setupFilter.skillGroupId;
-        }, 500);
-      } else {
-        this.selectedFilterSetupBy = FilterCredentialSetup.ByOrganization;
-          // this.store.dispatch(new GetCredentialSetupByPage(this.currentPage, this.pageSize)); // TODO: uncomment after BE implementation
-
-        combineLatest([this.credentialType$, this.credentials$, this.credentialsData$])
-          .pipe(filter(Boolean),takeUntil(this.unsubscribe$))
-          .subscribe(([credentialTypes, credentials, credentialSetups]) => {
-            credentialSetups?.items.map((setup: CredentialSetup) => {
-              let foundCredential = credentials.find((cred: Credential) => cred.id === setup.masterCredentialId);
-              let foundCredentialType = credentialTypes.find((type: CredentialType) => type.id === foundCredential?.credentialTypeId);
-              setup.credentialTypeName = foundCredentialType?.name;
-            });
-        });
-
-        this.groups$.pipe(filter(Boolean),takeUntil(this.unsubscribe$)).subscribe((groups) => {
-          if (groups && groups.length > 0 && groups[0].id) {
-            this.selectedSkillGroupId = groups[0].id;
-          }
-        });
-      }
     });
 
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
@@ -161,17 +122,6 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-    this.store.dispatch(new SetCredentialSetupFilter(null));
-    this.store.dispatch(new ClearLocationList());
-    this.store.dispatch(new ClearDepartmentList());
-  }
-
-  public onFilterDropDownChanged(data: any): void {
-    if (data.itemData.value === FilterCredentialSetup.ByOrganization) {
-      this.isFilteredBySkill = false;
-    } else if (data.itemData.value === FilterCredentialSetup.BySkill) {
-      this.isFilteredBySkill = true;
-    }
   }
 
   public onRegionDropDownChanged(event: any): void {
@@ -259,22 +209,26 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       reqSubmission: credentialSetup.reqSubmission,
       reqOnboard: credentialSetup.reqOnboard
     });
-
-    this.store.dispatch(new ShowSideDialog(true));
   }
 
   public onFormCancelClick(): void {
-    this.confirmService
-      .confirm(CANCEL_COFIRM_TEXT, {
-        title: DELETE_CONFIRM_TITLE,
-        okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false));
-        this.clearFormData();
-        this.removeActiveCssClass();
-      });
+    if (this.credentialsSetupFormGroup.dirty) {
+      this.confirmService
+        .confirm(CANCEL_COFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => !!confirm))
+        .subscribe(() => {
+          this.store.dispatch(new ShowSideDialog(false));
+          this.clearFormData();
+          this.removeActiveCssClass();
+        });
+    } else {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.clearFormData();
+      this.removeActiveCssClass();
+    }
   }
 
   public onFormSaveClick(): void {
@@ -308,10 +262,6 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
-      // this.credentialsData$.subscribe(data => {
-      //   this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
-      //   this.currentPagerPage = event.currentPage || event.value;
-      // });
     }
   }
 
@@ -331,6 +281,12 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       inactiveDate: [null],
       reqSubmission: [false],
       reqOnboard: [false]
+    });
+  }
+
+  private createHeaderFilterFormGroup(): void {
+    this.headerFilterFormGroup = this.formBuilder.group({
+
     });
   }
 }
