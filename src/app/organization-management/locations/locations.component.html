@@ -51,6 +51,7 @@
     [resizeSettings]="resizeSettings"
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
+    (actionBegin)="actionBegin($event)"
     (rowSelected)="rowSelected($event, grid)"
     (rowDeselected)="rowDeselected($event, grid)"
     (dataBound)="gridDataBound(grid)"
@@ -128,8 +129,105 @@
 
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
-<app-filter-dialog [items]="filteredItems" [count]="filteredCount">
-<!-- TODO: add controls -->
+<app-filter-dialog [items]="filteredItems" [count]="totalDataRecords" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+  <form class="bootstrap" [formGroup]="LocationFilterFormGroup">
+    <div class="input-container">
+      <label>Ext Location ID</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="externalId"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.externalId.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Invoice Location ID</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="invoiceId"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.invoiceId.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Location Name</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="name"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.name.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Address 1</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="address1"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.address1.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>City</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="city"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.city.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>State</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="state"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.state.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Zip</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="zip"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.zip.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Contact Person</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="contactPerson"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.contactPerson.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+  </form>
 </app-filter-dialog>
 
 <app-side-dialog

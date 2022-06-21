@@ -23,3 +23,18 @@ export class LocationMapping {
   id: number;
   name?: string;
 }
+
+export class LocationFilter {
+  regionId?: number;
+  externalId?: string[];
+  invoiceId?: string[];
+  name?: string[];
+  address1?: string[];
+  city?: string[];
+  state?: string[];
+  zip?: string[];
+  contactPerson?: string[];
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+}
