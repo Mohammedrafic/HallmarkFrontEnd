@@ -90,7 +90,7 @@ export class WidgetListComponent extends DestroyableDirective implements OnChang
   private handleDataChange(): void {
     const selectedWidgetIndexes = lodashMap(
       (selectedWidget: WidgetTypeEnum) =>
-        findIndex((widget: WidgetOptionModel) => widget.title === selectedWidget, this.widgets),
+        findIndex((widget: WidgetOptionModel) => widget.id === selectedWidget, this.widgets),
       this.selectedWidgets
     );
 
