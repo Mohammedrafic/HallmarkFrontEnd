@@ -4,9 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportColumn } from '@shared/models/export.model';
-import { FreezeService, GridComponent, PageSettingsModel, SortService } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, Observable, Subject } from 'rxjs';
-import { ORDERS_GRID_CONFIG } from 'src/app/client/client.config';
+import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
+import { Observable, Subject, throttleTime } from 'rxjs';
 import { Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { SetHeaderState, ShowExportDialog } from 'src/app/store/app.actions';
@@ -22,12 +21,6 @@ import { AdminState } from '../../store/admin.state';
 export class ClientManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit {
 
   private pageSubject = new Subject<number>();
-
-  public initialSort = {
-    columns: [
-      { field: 'createUnder.name', direction: 'Ascending' }
-    ]
-  };
 
   public columnsToExport: ExportColumn[] = [
     { text:'Organization Name', column: 'createUnder.name'},
@@ -56,8 +49,9 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
   }
 
   ngOnInit(): void {
+    this.idFieldName = 'organizationId';
     this.store.dispatch(new GetOrganizationsByPage(this.currentPage, this.pageSize));
-    this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
+    this.pageSubject.pipe(throttleTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(new GetOrganizationsByPage(this.currentPage, this.pageSize));
     });

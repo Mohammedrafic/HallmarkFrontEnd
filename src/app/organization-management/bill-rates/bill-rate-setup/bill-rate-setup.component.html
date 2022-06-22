@@ -12,8 +12,13 @@
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
     [enableVirtualization]="true"
+    (rowSelected)="rowSelected($event, grid)"
+    (rowDeselected)="rowDeselected($event, grid)"
+    (dataBound)="gridDataBound(grid)"
+    [selectionSettings]="selectionSettings"
   >
     <e-columns>
+      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column field="regionName" headerText="REGION" width=150>
         <ng-template #template let-data>
           <span *ngIf="data.regionId">{{ data.regionName }}</span>
@@ -203,6 +208,8 @@
       </div>
     </ng-template>
   </ejs-grid>
+
+  <app-export-dialog *ngIf="isActive" [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
   <app-side-dialog
     (formCancelClicked)="onFormCancelClick()"
