@@ -33,6 +33,7 @@ import { PositionTypeEnum } from '../enums/position-type.enum';
 import type { PositionsByTypeAggregatedModel } from '../models/positions-by-type-aggregated.model';
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
+import { OrderStatus } from '@shared/enums/order-status';
 
 @Injectable()
 export class DashboardService {
@@ -45,7 +46,9 @@ export class DashboardService {
     [WidgetTypeEnum.APPLICANTS_BY_REGION]: (filters: DashboardFiltersModel) =>
       this.getApplicantsByRegionWidgetData(filters),
     [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboardFiltersModel) => this.getPositionsByTypes(filters),
-    [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboardFiltersModel) => this.getInProgressPosition(filters),
+    [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPosition(filters, OrderStatus.InProgress),
+    [WidgetTypeEnum.OPEN_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPosition(filters, OrderStatus.Open),
+    [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPosition(filters, OrderStatus.Filled),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -186,9 +189,9 @@ export class DashboardService {
     });
   }
 
-  getInProgressPosition(filters: DashboardFiltersModel): Observable<CandidatesPositionDataModel> {
+  private getOrderPosition(filters: DashboardFiltersModel, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
     return this.httpClient
-      .post<CandidatesPositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { orderStatuses: [30] })
+      .post<CandidatesPositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { orderStatuses: [orderStatus] })
       .pipe(map((data) => data.orderStatusesDetails[0]));
   }
 }

@@ -42,6 +42,16 @@
             [chartData]="widgetsData?.[widgetTypeEnum.IN_PROGRESS_POSITIONS]"
             [isLoading]="isLoading"
           ></app-position-chart>
+          <app-position-chart
+            *ngSwitchCase="widgetTypeEnum.OPEN_POSITIONS"
+            [chartData]="widgetsData?.[widgetTypeEnum.OPEN_POSITIONS]"
+            [isLoading]="isLoading"
+          ></app-position-chart>
+          <app-position-chart
+            *ngSwitchCase="widgetTypeEnum.FILLED_POSITIONS"
+            [chartData]="widgetsData?.[widgetTypeEnum.FILLED_POSITIONS]"
+            [isLoading]="isLoading"
+          ></app-position-chart>
         </ng-template>
       </e-panel>
     </e-panels>

@@ -9,4 +9,6 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.CANDIDATES]: ChartAccumulation;
   [WidgetTypeEnum.POSITIONS_BY_TYPES]: PositionsByTypeAggregatedModel;
   [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: CandidatesPositionDataModel;
+  [WidgetTypeEnum.OPEN_POSITIONS]: CandidatesPositionDataModel;
+  [WidgetTypeEnum.FILLED_POSITIONS]: CandidatesPositionDataModel;
 }

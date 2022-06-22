@@ -16,8 +16,7 @@ import type { ChartComponent } from '@syncfusion/ej2-angular-charts';
 import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
 import type { KeyValue } from '@angular/common';
 
-import type { PositionByTypeDataModel } from '../../models/positions-by-type-aggregated.model';
-import type { PositionsByTypeAggregatedModel } from '../../models/positions-by-type-aggregated.model';
+import type { PositionByTypeDataModel, PositionsByTypeAggregatedModel } from '../../models/positions-by-type-aggregated.model';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
 import { PositionTypeEnum } from '../../enums/position-type.enum';
 
