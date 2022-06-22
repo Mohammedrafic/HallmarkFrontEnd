@@ -44,6 +44,7 @@ export class TimesheetsTableComponent extends AbstractGridConfigurationComponent
   @Output() changePage: EventEmitter<number> = new EventEmitter<number>();
   @Output() changePerPage: EventEmitter<number> = new EventEmitter<number>();
   @Output() sortHandler: EventEmitter<string> = new EventEmitter<string>();
+  @Output() timesheetRowSelected: EventEmitter<void> =  new EventEmitter();
 
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
   public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
@@ -67,7 +68,7 @@ export class TimesheetsTableComponent extends AbstractGridConfigurationComponent
 
   public onRowClick(event: any): void {
     if (!event.isInteracted) {
-      console.log(event.data, 'eventData');
+      this.timesheetRowSelected.emit();
     }
   }
 
