@@ -9,13 +9,15 @@ import {
 
 import { filter, Observable, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { Destroyable } from 'src/app/core/helpers/destroyable.helper';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { ProfileTimeSheetDetail } from '../../store/model/timesheets.model';
 import { GlobalWindow } from 'src/app/core/tokens/document.token';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { Status } from "@shared/enums/status";
+import { ONBOARDED_STATUS } from "@shared/components/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst";
 
 @Component({
   selector: 'app-profile-details-container',
@@ -24,6 +26,9 @@ import { GlobalWindow } from 'src/app/core/tokens/document.token';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileDetailsContainerComponent extends Destroyable implements OnInit {
+  public readonly status: typeof Status = Status;
+  public readonly onboardedStatus: string = ONBOARDED_STATUS;
+
   @ViewChild('sideDialog') sideDialog: DialogComponent;
 
   @Select(TimesheetsState.profileTimesheets)

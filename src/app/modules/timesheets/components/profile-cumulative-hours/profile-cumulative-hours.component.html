@@ -2,21 +2,22 @@
   <section class="cumulative-hours">
     <h3>Cumulative Hours</h3>
 
-    <ejs-accumulationchart style='display:block; top: -20px; left: -15px'
+    <ejs-accumulationchart width="180px"
+                           height="180px"
+                           background="transparent"
+                           style='display:block; top: -20px; left: -15px'
                            class="cumulative-hours-chart"
-                           [background]="chartSettings.background"
-                           [width]="chartSettings.donutChart.width"
-                           [height]="chartSettings.donutChart.height"
-                           [legendSettings]="chartSettings.legend"
-                           [tooltip]="chartSettings.tooltip"
+                           title=""
                            (pointRender)="onPointRender($event)"
+                           [legendSettings]="legendSettings"
+                           [tooltip]="tooltip"
     >
       <e-accumulation-annotations>
-        <e-accumulation-annotation [content]="weekChartAnnotation"
+        <e-accumulation-annotation [content]="chartAnnotation"
                                    region="Series"
                                    coordinateUnits="Pixel"
-                                   x="30"
-                                   y="38"
+                                   x="50%"
+                                   y="55%"
         ></e-accumulation-annotation>
       </e-accumulation-annotations>
 
@@ -25,8 +26,8 @@
                                yName='y'
                                innerRadius="70%"
                                radius="70%"
-                               [dataSource]='weekHoursChartData'
-                               [dataLabel]="chartSettings.dataLabel"
+                               [dataSource]='donutChartData'
+                               [dataLabel]="dataLabel"
                                [startAngle]="100"
         ></e-accumulation-series>
       </e-accumulation-series-collection>
@@ -35,81 +36,65 @@
 
   <section class="cumulative-hours-otd">
     <h3>Cumulative Hours OTD</h3>
-    <ejs-accumulationchart style='display:block; top: -20px; left: -15px'
-                           class="cumulative-hours-chart"
-                           selectionMode="Point"
-                           [enableAnimation]="true"
-                           [background]="chartSettings.background"
-                           [width]="chartSettings.donutChart.width"
-                           [height]="chartSettings.donutChart.height"
-                           [legendSettings]="chartSettings.legend"
-                           [tooltip]="chartSettings.tooltip"
-                           (pointRender)="onPointRender($event)"
-
+    <ejs-chart style='display:block; left: -10px;'
+               width='180px'
+               height="50px"
+               background="transparent"
+               [chartArea]="chartArea"
+               [primaryXAxis]="primaryXAxis"
+               [primaryYAxis]="primaryYAxis"
+               [legendSettings]="legendSettings"
+               [tooltip]="tooltip"
     >
-      <e-accumulation-annotations>
-        <e-accumulation-annotation [content]="cumulativeChartAnnotation"
-                                   region="Series"
-                                   coordinateUnits="Pixel"
-                                   x="30"
-                                   y="38"
-        ></e-accumulation-annotation>
-      </e-accumulation-annotations>
+      <e-series-collection>
+        <e-series *ngFor="let legendItem of chartsLegendData; let i = index"
+                  [dataSource]="barChartData"
+                  [fill]="legendItem.color"
+                  [yName]="'y' + i"
+                  [name]="legendItem.name"
+                  type="StackingBar100"
+                  xName="x"
+        ></e-series>
+      </e-series-collection>
+    </ejs-chart>
 
-      <e-accumulation-series-collection>
-        <e-accumulation-series xName='x'
-                               yName='y'
-                               innerRadius="70%"
-                               radius="70%"
+    <div class="work-time-title">
+      Work Time
+    </div>
+    <div class="work-time-value">
+      740 Hr
+    </div>
 
-                               [dataSource]='cumulativeHoursChartData'
-                               [dataLabel]="chartSettings.dataLabel"
-                               [startAngle]="100"
-        ></e-accumulation-series>
-      </e-accumulation-series-collection>
-    </ejs-accumulationchart>
+    <div class="work-time-title">
+      Total Work Time
+    </div>
+    <div class="work-time-value">
+      1000 Hr
+    </div>
   </section>
 
   <section class="charts-legend">
     <h3></h3>
-    <div>
-      <table>
-        <tr>
-          <th></th>
-          <th></th>
-          <th class="week-title">Week</th>
-          <th class="total-title">Cumulative</th>
-        </tr>
-        <tr *ngFor="let legendItem of hoursData; let i = index; trackBy: trackByName">
-          <td>
-            <div class="marker" [style.backgroundColor]="chartColorsMap[legendItem.type]"></div>
-          </td>
-          <td class="name">{{legendItem.type}}</td>
-          <td class="value1">{{legendItem.weekly ? (legendItem.weekly | number : '1.2-2') : '-'}}</td>
-          <td class="value2">{{legendItem.total ? (legendItem.total | number : '1.2-2') : '-'}}</td>
-          <td>
-            <ejs-checkbox [checked]="true"
-                          (change)="toggleChartCategoryVisibility($event, legendItem)"
-            ></ejs-checkbox>
-          </td>
-        </tr>
-      </table>
-    </div>
+    <table>
+      <tr *ngFor="let legendItem of chartsLegendData">
+        <td>
+          <div class="marker" [style.backgroundColor]="legendItem.color"></div>
+        </td>
+        <td class="name">{{legendItem.name}}</td>
+        <td class="value1">{{legendItem.value | number : '1.0-2'}}</td>
+        <td class="value2">{{legendItem.value2 | number : '1.0-2'}}</td>
+        <td>
+          <ejs-checkbox [checked]="false"></ejs-checkbox>
+        </td>
+      </tr>
+    </table>
   </section>
 
-  <ng-template #weekChartAnnotation>
-    <ng-container [ngTemplateOutlet]="chartAnnotation" [ngTemplateOutletContext]="{title: 'Week Working', value: totalWeekHours}"></ng-container>
-  </ng-template>
-
-  <ng-template #cumulativeChartAnnotation>
-    <ng-container [ngTemplateOutlet]="chartAnnotation" [ngTemplateOutletContext]="{title: 'Total Working', value: '740.4'}"></ng-container>
-  </ng-template>
-
-  <ng-template #chartAnnotation let-value="value" let-title="title">
+  <ng-template #chartAnnotation>
     <div class="chart-annotation">
-      <div class="work-time-value">{{value}}</div>
+      <div class="work-time-value">70.97</div>
       <div class="work-time-title">
-        {{title}}
+        Total working
         <div>hrs.</div>
       </div>
     </div>

@@ -1,9 +1,49 @@
 <div class="job-info-container">
-  <div class="job-info-section" *ngFor="let item of items; trackBy: trackByTitle">
-    <i-feather [name]="item.icon" class="icon"></i-feather>
+  <div class="job-info-section">
+    <i-feather name="user" class="icon"></i-feather>
     <div>
-      <div class="value">{{item.value}}</div>
-      <div class="title">{{item.title}}</div>
+      <div class="value">{{jobData?.jobTitle}}</div>
+      <div class="title">Job Title</div>
+    </div>
+  </div>
+
+  <div class="job-info-section">
+    <i-feather name="map-pin" class="icon"></i-feather>
+    <div>
+      <div class="value">{{jobData?.location}}</div>
+      <div class="title">Region / Location</div>
+    </div>
+  </div>
+
+  <div class="job-info-section">
+    <i-feather name="folder" class="icon"></i-feather>
+    <div>
+      <div class="value">{{jobData?.department}}</div>
+      <div class="title">Department</div>
+    </div>
+  </div>
+
+  <div class="job-info-section">
+    <i-feather name="folder" class="icon"></i-feather>
+    <div>
+      <div class="value">{{jobData?.skill}}</div>
+      <div class="title">Skill</div>
+    </div>
+  </div>
+
+  <div class="job-info-section">
+    <i-feather name="calendar" class="icon"></i-feather>
+    <div>
+      <div class="value">{{jobData?.startDate | date : 'MM/d/y'}} - {{jobData?.endDate | date : 'MM/d/y'}}</div>
+      <div class="title">Start - End Date</div>
+    </div>
+  </div>
+
+  <div class="job-info-section">
+    <i-feather name="briefcase" class="icon"></i-feather>
+    <div>
+      <div class="value">{{jobData?.agency}}</div>
+      <div class="title">Agency</div>
     </div>
   </div>
 </div>
