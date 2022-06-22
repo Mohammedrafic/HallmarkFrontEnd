@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { Actions, Select, Store } from '@ngxs/store';
+import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { Select, Store } from '@ngxs/store';
 
-import { BehaviorSubject, Observable, takeUntil, throttleTime } from 'rxjs';
+import { BehaviorSubject, debounceTime, distinctUntilChanged, Observable, of, takeUntil, throttleTime } from 'rxjs';
 
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ITabConfigInterface } from '../../interface/i-tab-config.interface';
@@ -16,9 +16,9 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { TIMETHEETS_STATUSES } from '../../enums/timesheets.enum';
 import { FilterService } from '@shared/services/filter.service';
-import { GetAssignedSkillsByPage } from '@organization-management/store/organization-management.actions';
-import { SkillFilters } from '@shared/models/skill.model';
 import { ITimesheetsFilter } from '../../interface/i-timesheet.interface';
+import { filter } from 'rxjs/operators';
+import { RenderDayCellEventArgs } from '@syncfusion/ej2-angular-calendars';
 
 enum ExportType {
   'Excel File',
@@ -31,6 +31,7 @@ enum ExportType {
   templateUrl: './timesheets-container.component.html',
   styleUrls: ['./timesheets-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None
 })
 export class TimesheetsContainerComponent extends Destroyable implements OnInit {
   @Select(TimesheetsState.timesheets)
@@ -67,6 +68,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.initFilterColumn();
     this.initFormGroup();
     this.startPageStateWatching();
+    this.startDatepickerWatching();
   }
 
   public handleChangeTab(tabIndex: number): void {
@@ -126,6 +128,50 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     this.initTimesheets();
     this.store.dispatch(new ShowFilterDialog(false));
+  }
+
+  public onRenderCell(args: RenderDayCellEventArgs): void {
+    if (this.formGroup.get('date')?.value) {
+      const from = this.getWeekDate(this.formGroup.get('date')?.value, true);
+      const to = this.getWeekDate(this.formGroup.get('date')?.value);
+
+      if ((args.date?.getTime() || 0) <= to.getTime() && (args.date?.getTime() || 0) >= from.getTime()) {
+        console.log(args.date, 'args.date');
+        args.element?.classList.add('e-highlightselectedrange');
+      }
+    }
+  }
+
+  private startDatepickerWatching(): void {
+    this.formGroup.get('date')?.valueChanges.pipe(
+      distinctUntilChanged(),
+      takeUntil(this.componentDestroy()),
+      filter(Boolean),
+      debounceTime(1),
+    ).subscribe(value => {
+      if (value) {
+        const startWeekDay = this.formattedDate(this.getWeekDate(value, true));
+        const endWeekDay = this.formattedDate(this.getWeekDate(value));
+
+        this.formGroup.get('date')?.setValue(`${startWeekDay} - ${endWeekDay}`, { emitEvent: false });
+      }
+    });
+  }
+
+  private getWeekDate(date: Date, isStart = false): Date {
+    const curr = new Date(date); // get current date
+    const first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
+    const last = first + 6; // last day is the first day + 6
+
+    return new Date(curr.setDate(isStart ? first : last));
+  }
+
+  private formattedDate(date: Date): string {
+    const dayDate = date.getDate() < 10 ? '0' + date.getDate() : date.getDate();
+    const monthDate = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
+    const yearDate = date.getFullYear();
+
+    return `${dayDate}/${monthDate}/${yearDate}`;
   }
 
   private startPageStateWatching(): void {
