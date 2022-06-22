@@ -135,7 +135,7 @@ export class DashboardService {
   }
 
   private getApplicantsByRegion(): Observable<CandidatesByStatesResponseModel> {
-    return this.httpClient.post<CandidatesByStatesResponseModel>('/api/Dashboard/GetCandidatesStatesAggregated', {});
+    return this.httpClient.post<CandidatesByStatesResponseModel>(`${this.baseUrl}/GetCandidatesStatesAggregated`, {});
   }
 
   private getMapData(): Observable<LayerSettingsModel> {
