@@ -28,7 +28,7 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
 
   public override readonly allowPaging = false;
 
-  public readonly tableHeight = 360;
+  public readonly tableHeight = 304;
 
   public initialSort = {
     columns: [
