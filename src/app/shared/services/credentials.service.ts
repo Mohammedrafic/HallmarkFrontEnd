@@ -11,6 +11,7 @@ import {
   CredentialSetupFilterDto,
   CredentialSetupPage
 } from '@shared/models/credential-setup.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
 export class CredentialsService {
@@ -108,6 +109,16 @@ export class CredentialsService {
    */
   public getAllCredentials(): Observable<Credential[]> {
     return this.http.get<Credential[]>(`/api/MasterCredentials/allCreds`);
+  }
+
+ /**
+  * Export credential types
+  */
+  public exportCredentialTypes(payload: ExportPayload): Observable<any> {
+    if (payload.ids) {
+      return this.http.post(`/api/CredentialTypes/export/byIds`, payload, { responseType: 'blob' });
+    }
+    return this.http.post(`/api/CredentialTypes/export`, payload, { responseType: 'blob' });
   }
 
   /**

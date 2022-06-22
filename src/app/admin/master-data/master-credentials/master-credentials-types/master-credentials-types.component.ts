@@ -8,7 +8,7 @@ import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import {
   AbstractGridConfigurationComponent
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { ShowSideDialog, ShowToast } from '../../../../store/app.actions';
+import { ShowExportDialog, ShowSideDialog, ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import {
   CANCEL_COFIRM_TEXT,
@@ -22,7 +22,10 @@ import { CredentialType } from '@shared/models/credential-type.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 
 import { AdminState } from '@admin/store/admin.state';
-import { GetCredentialTypes, RemoveCredentialType, SaveCredentialType, UpdateCredentialType } from '@admin/store/admin.actions';
+import { ExportCredentialTypes, GetCredentialTypes, RemoveCredentialType, SaveCredentialType, UpdateCredentialType } from '@admin/store/admin.actions';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { DatePipe } from '@angular/common';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 @Component({
   selector: 'app-master-credentials-types',
@@ -36,11 +39,18 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
   @Select(AdminState.credentialTypes)
   credentialType$: Observable<CredentialType[]>;
 
-  credentialTypeFormGroup: FormGroup;
-  formBuilder: FormBuilder;
+  public credentialTypeFormGroup: FormGroup;
+  public formBuilder: FormBuilder;
 
-  isEdit: boolean;
-  editedCredentialTypeId?: number;
+  public isEdit: boolean;
+  public editedCredentialTypeId?: number;
+
+  public fileName: string;
+  public defaultFileName: string;
+
+  public columnsToExport: ExportColumn[] = [
+    { text:'Types', column: 'Name'}
+  ];
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
@@ -48,7 +58,8 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
 
   constructor(private store: Store,
               @Inject(FormBuilder) private builder: FormBuilder,
-              private confirmService: ConfirmService) {
+              private confirmService: ConfirmService,
+              private datePipe: DatePipe) {
     super();
     this.formBuilder = builder;
     this.createTypeForm();
@@ -57,6 +68,34 @@ export class MasterCredentialsTypesComponent extends AbstractGridConfigurationCo
   ngOnInit(): void {
     this.store.dispatch(new GetCredentialTypes());
     this.mapGridData();
+  }
+
+  public override customExport(): void {
+    this.defaultFileName = 'Credential Types ' + this.generateDateTime(this.datePipe);
+    this.fileName = this.defaultFileName;
+    this.store.dispatch(new ShowExportDialog(true));
+  }
+
+  public closeExport() {
+    this.fileName = '';
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = 'Credential Types ' + this.generateDateTime(this.datePipe);
+    this.store.dispatch(new ExportCredentialTypes(new ExportPayload(
+      fileType,
+      { },
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
+      options?.fileName || this.defaultFileName
+    )));
+    this.clearSelection(this.grid);
   }
 
   onAddCredentialTypeClick(): void {

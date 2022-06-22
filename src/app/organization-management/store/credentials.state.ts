@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
 import {
   DeleteCredentialGroupMappingById,
+  ExportCredentialList,
   GetCredentialGroupMapping,
   GetFilteredCredentialSetupData,
   SaveCredentialGroupMapping,
@@ -15,6 +16,7 @@ import { SkillGroupService } from '@shared/services/skill-group.service';
 import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { CredentialsService } from '@shared/services/credentials.service';
 import { CredentialSetupFilterData } from '@shared/models/credential-setup.model';
 
@@ -70,7 +72,7 @@ export class CredentialsState {
   }
 
   @Action(SaveCredentialGroupMapping)
-  SaveCredentialGroupMapping({ patchState, dispatch }: StateContext<CredentialsStateModel>, { payload }: SaveCredentialGroupMapping): Observable<SkillGroupMapping | void> {
+  SaveCredentialGroupMapping({ dispatch }: StateContext<CredentialsStateModel>, { payload }: SaveCredentialGroupMapping): Observable<SkillGroupMapping | void> {
     return this.skillGroupService.saveUpdateSkillGroupMapping(payload)
       .pipe(tap((payloadResponse) => {
           if (payload.mappingId) {
@@ -86,13 +88,21 @@ export class CredentialsState {
   }
 
   @Action(DeleteCredentialGroupMappingById)
-  DeleteCredentialGroupMappingById({ patchState, dispatch }: StateContext<CredentialsStateModel>, { payload }: DeleteCredentialGroupMappingById): Observable<any> {
+  DeleteCredentialGroupMappingById({ dispatch }: StateContext<CredentialsStateModel>, { payload }: DeleteCredentialGroupMappingById): Observable<any> {
     return this.skillGroupService.removeSkillGroupMapping(payload).pipe(tap(() => {
         dispatch(new GetCredentialGroupMapping());
         return payload;
       }),
       catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
   }
+
+  @Action(ExportCredentialList)
+  ExportCredentialList({ }: StateContext<CredentialsStateModel>, { payload }: ExportCredentialList): Observable<any> {
+    return this.skillGroupService.exportCredentialTypes(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
 
   @Action(GetFilteredCredentialSetupData)
   GetFilteredCredentialSetupData({ patchState }: StateContext<CredentialsStateModel>, { payload }: GetFilteredCredentialSetupData): Observable<CredentialSetupFilterData[]> {

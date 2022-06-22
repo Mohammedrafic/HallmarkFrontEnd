@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
 export class SkillGroupService {
@@ -61,5 +62,12 @@ export class SkillGroupService {
    */
   public removeSkillGroupMapping(skillGroupMappingId: number): Observable<void> { // TODO: deprecated, can be removed after verification
     return this.http.delete<void>(`/api/SkillGroupsMapping/${skillGroupMappingId}`);
+  }
+
+  /**
+   * Export credential list
+   */
+  public exportCredentialTypes(payload: ExportPayload): Observable<any> {
+    return this.http.post(`/api/MasterCredentials/export`, payload, { responseType: 'blob' });
   }
 }
