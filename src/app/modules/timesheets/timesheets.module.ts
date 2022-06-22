@@ -1,4 +1,3 @@
-import { ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -72,6 +71,10 @@ import { SharedModule } from '@shared/shared.module';
     ProfileDetailsContainerComponent,
     ProfileTimesheetTableComponent,
     EditTimesheetComponent,
+    ProfileDetailsJobInfoComponent,
+    ProfileCumulativeHoursComponent,
+    ProfileUploadsComponent,
+    ProfileInvoicesComponent,
   ],
   imports: [
     CommonModule,
@@ -103,11 +106,27 @@ import { SharedModule } from '@shared/shared.module';
       ChevronDown,
       ChevronRight,
       Copy,
+      Star,
+      X,
+      User,
+      MapPin,
+      Folder,
+      Briefcase,
     }),
     ReactiveFormsModule,
     DateTimePickerModule,
     DropDownListModule,
     NgxsModule.forFeature([TimesheetsState]),
+    DialogModule,
+    ChartAllModule,
+    AccumulationChartAllModule,
+    ChipListModule,
+    SharedModule,
+    DatePickerModule,
+    ReactiveFormsModule,
+    FormsModule,
+    ButtonModule,
+    CheckBoxModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [TimesheetsApiService, EditTimesheetService, MaskedDateTimeService]

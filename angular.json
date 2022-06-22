@@ -124,6 +124,7 @@
   },
   "defaultProject": "einstein-ui",
   "cli": {
+    "analytics": false,
     "defaultCollection": "@angular-eslint/schematics"
   }
 }

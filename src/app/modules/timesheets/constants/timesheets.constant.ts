@@ -406,3 +406,24 @@ export const MOK_TIMESHEETS: ITimesheet[] = [
     totalHours: '2022-06-21T15:40',
   },
 ];
+import {HourOccupationType} from "../enums/hour-occupation-type.enum";
+
+export const profileDetailsHoursChartColors = [
+  '#FFFFFF',
+  '#D8E5FF',
+  '#B2CCFF',
+  '#9EBFFF',
+  '#6499FF',
+  '#518CFF',
+  '#3E7FFF',
+];
+
+export const profileDetailsHoursChartColorsMap: Record<HourOccupationType, string> = {
+  [HourOccupationType.OnCall]: '#3E7FFF',
+  [HourOccupationType.Callback]: '#518CFF',
+  [HourOccupationType.Regular]: '#6499FF',
+  [HourOccupationType.Holiday]: '#9EBFFF',
+  [HourOccupationType.Charge]: '#B2CCFF',
+  [HourOccupationType.Preceptor]: '#D8E5FF',
+  [HourOccupationType.Orientation]: '#FFFFFF',
+};

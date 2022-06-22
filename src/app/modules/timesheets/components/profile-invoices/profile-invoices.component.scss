@@ -1,0 +1,19 @@
+@import '../../../../styles/variables/colors';
+
+.invoices-container {
+  padding: 10px 25px 10px 14px;
+
+  h3 {
+    margin-bottom: 15px;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: 700;
+    font-size: 14px;
+    color: $black;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+

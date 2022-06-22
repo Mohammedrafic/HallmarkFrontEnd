@@ -1,0 +1,102 @@
+<div class="profile-hours-statistics-container">
+  <section class="cumulative-hours">
+    <h3>Cumulative Hours</h3>
+
+    <ejs-accumulationchart width="180px"
+                           height="180px"
+                           background="transparent"
+                           style='display:block; top: -20px; left: -15px'
+                           class="cumulative-hours-chart"
+                           title=""
+                           (pointRender)="onPointRender($event)"
+                           [legendSettings]="legendSettings"
+                           [tooltip]="tooltip"
+    >
+      <e-accumulation-annotations>
+        <e-accumulation-annotation [content]="chartAnnotation"
+                                   region="Series"
+                                   coordinateUnits="Pixel"
+                                   x="50%"
+                                   y="55%"
+        ></e-accumulation-annotation>
+      </e-accumulation-annotations>
+
+      <e-accumulation-series-collection>
+        <e-accumulation-series xName='x'
+                               yName='y'
+                               innerRadius="70%"
+                               radius="70%"
+                               [dataSource]='donutChartData'
+                               [dataLabel]="dataLabel"
+                               [startAngle]="100"
+        ></e-accumulation-series>
+      </e-accumulation-series-collection>
+    </ejs-accumulationchart>
+  </section>
+
+  <section class="cumulative-hours-otd">
+    <h3>Cumulative Hours OTD</h3>
+    <ejs-chart style='display:block; left: -10px;'
+               width='180px'
+               height="50px"
+               background="transparent"
+               [chartArea]="chartArea"
+               [primaryXAxis]="primaryXAxis"
+               [primaryYAxis]="primaryYAxis"
+               [legendSettings]="legendSettings"
+               [tooltip]="tooltip"
+    >
+      <e-series-collection>
+        <e-series *ngFor="let legendItem of chartsLegendData; let i = index"
+                  [dataSource]="barChartData"
+                  [fill]="legendItem.color"
+                  [yName]="'y' + i"
+                  [name]="legendItem.name"
+                  type="StackingBar100"
+                  xName="x"
+        ></e-series>
+      </e-series-collection>
+    </ejs-chart>
+
+    <div class="work-time-title">
+      Work Time
+    </div>
+    <div class="work-time-value">
+      740 Hr
+    </div>
+
+    <div class="work-time-title">
+      Total Work Time
+    </div>
+    <div class="work-time-value">
+      1000 Hr
+    </div>
+  </section>
+
+  <section class="charts-legend">
+    <h3></h3>
+    <table>
+      <tr *ngFor="let legendItem of chartsLegendData">
+        <td>
+          <div class="marker" [style.backgroundColor]="legendItem.color"></div>
+        </td>
+        <td class="name">{{legendItem.name}}</td>
+        <td class="value1">{{legendItem.value | number : '1.0-2'}}</td>
+        <td class="value2">{{legendItem.value2 | number : '1.0-2'}}</td>
+        <td>
+          <ejs-checkbox [checked]="false"></ejs-checkbox>
+        </td>
+      </tr>
+    </table>
+  </section>
+
+  <ng-template #chartAnnotation>
+    <div class="chart-annotation">
+      <div class="work-time-value">70.97</div>
+      <div class="work-time-title">
+        Total working
+        <div>hrs.</div>
+      </div>
+    </div>
+  </ng-template>
+</div>
