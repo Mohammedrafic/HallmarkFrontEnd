@@ -280,6 +280,9 @@ a, a:hover, a:focus, a:active {
   }
 }
 
-#Candidates_SeriesCollection {
-  cursor: default;
+#Active_Positions,
+#Candidates{
+  &_SeriesCollection {
+    cursor: default;
+  }
 }
