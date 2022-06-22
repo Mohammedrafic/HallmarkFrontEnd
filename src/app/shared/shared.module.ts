@@ -1,8 +1,30 @@
 import { NgModule } from '@angular/core';
+import { NgxsModule } from "@ngxs/store";
 import { FeatherModule } from 'angular-feather';
 
-import { AlertCircle, CheckCircle, allIcons, User, Briefcase, Folder, MapPin, Calendar, ArrowLeft, ArrowRight, Mail, Send } from 'angular-feather/icons';
-import { NumericTextBoxAllModule, UploaderModule } from "@syncfusion/ej2-angular-inputs";
+import {
+  AlertCircle,
+  CheckCircle,
+  User,
+  Briefcase,
+  Folder,
+  MapPin,
+  Calendar,
+  ArrowLeft,
+  ArrowRight,
+  Mail,
+  Send,
+  Edit,
+  Plus,
+  Trash2
+} from 'angular-feather/icons';
+import {
+  MaskedTextBoxAllModule,
+  NumericTextBoxAllModule,
+  NumericTextBoxModule,
+  TextBoxModule,
+  UploaderModule
+} from "@syncfusion/ej2-angular-inputs";
 import { DropDownListModule, ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 
 import { PageToolbarComponent } from './components/page-toolbar/page-toolbar.component';
@@ -30,7 +52,20 @@ import { OrderDetailsComponent } from './components/order-details/order-details.
 import { AccordionModule } from '@syncfusion/ej2-angular-navigations';
 import { OrderTypeName } from '@shared/pipes/order-type-name.pipe';
 import { GeneralOrderInfoComponent } from './components/general-order-info/general-order-info.component';
-import { GridAllModule, PagerAllModule } from "@syncfusion/ej2-angular-grids";
+import {
+  ColumnMenuService,
+  EditService,
+  FilterService,
+  GridAllModule,
+  GridModule,
+  GroupService,
+  PagerAllModule,
+  PagerModule,
+  PageService,
+  ResizeService,
+  SortService,
+  ToolbarService
+} from "@syncfusion/ej2-angular-grids";
 import { OrderCandidatesListComponent } from './components/order-candidates-list/order-candidates-list.component';
 import { CustomProgressBarComponent } from './components/custom-progress-bar/custom-progress-bar.component';
 import { ApplyCandidateComponent } from './components/order-candidates-list/apply-candidate/apply-candidate.component';
@@ -45,6 +80,10 @@ import { FormatPhoneNumberPipe } from '@shared/pipes/format-phone-number.pipe';
 import { RateHourPipe } from '@shared/pipes/rate-hour.pipe';
 import { OfferDeploymentComponent } from './components/order-candidates-list/offer-deployment/offer-deployment.component';
 import { BillRatePipe } from "@shared/pipes/bill-rate.pipe";
+import { BillRatesComponent } from "@shared/components/bill-rates/bill-rates.component";
+import { BillRateFormComponent } from "@shared/components/bill-rates/components/bill-rate-form/bill-rate-form.component";
+import { BillRatesGridComponent } from "@shared/components/bill-rates/components/bill-rates-grid/bill-rates-grid.component";
+import { BillRateState } from "@shared/components/bill-rates/store/bill-rate.state";
 
 const icons = {
   AlertCircle,
@@ -57,7 +96,10 @@ const icons = {
   MapPin,
   Calendar,
   Mail,
-  Send
+  Send,
+  Edit,
+  Plus,
+  Trash2
 };
 
 const COMPONENTS = [
@@ -94,7 +136,8 @@ const COMPONENTS = [
   AcceptCandidateComponent,
   OnboardedCandidateComponent,
   ApplyCandidateComponent,
-  OfferDeploymentComponent
+  OfferDeploymentComponent,
+  BillRatesComponent
 ];
 
 @NgModule({
@@ -119,10 +162,26 @@ const COMPONENTS = [
     DateRangePickerModule,
     DatePickerModule,
     CheckBoxModule,
-    TooltipModule
+    TooltipModule,
+    GridModule,
+    NumericTextBoxModule,
+    PagerModule,
+    TextBoxModule,
+    MaskedTextBoxAllModule,
+    NgxsModule.forFeature([BillRateState]),
   ],
   exports: [...COMPONENTS],
-  declarations: [...COMPONENTS, ErrorMessageComponent],
-  providers: [DatePipe],
+  declarations: [...COMPONENTS, ErrorMessageComponent, BillRateFormComponent, BillRatesGridComponent],
+  providers: [
+    DatePipe,
+    ColumnMenuService,
+    EditService,
+    FilterService,
+    GroupService,
+    PageService,
+    ResizeService,
+    SortService,
+    ToolbarService
+  ],
 })
 export class SharedModule {}

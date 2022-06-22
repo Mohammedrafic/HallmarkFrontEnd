@@ -23,7 +23,6 @@
     "paths": {
       "@admin/*": ["src/app/admin/*"],
       "@agency/*": ["src/app/agency/*"],
-      "@bill-rates/*": ["src/app/bill-rates/*"],
       "@client/*": ["src/app/client/*"],
       "@login/*": ["src/app/login/*"],
       "@order-credentials/*": ["src/app/order-credentials/*"],

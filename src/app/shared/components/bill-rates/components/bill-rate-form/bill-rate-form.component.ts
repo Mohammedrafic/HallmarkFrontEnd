@@ -6,9 +6,9 @@ import { Observable, takeWhile } from 'rxjs';
 import { DropDownListComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { MaskedTextBoxComponent } from "@syncfusion/ej2-angular-inputs";
 
-import { BillRateState } from '@bill-rates/store/bill-rate.state';
+import { BillRateState } from '@shared/components/bill-rates/store/bill-rate.state';
 import { BillRate, BillRateCategory, BillRateOption, BillRateType, BillRateUnit } from '@shared/models/bill-rate.model';
-import { GetBillRateOptions } from '@bill-rates/store/bill-rate.actions';
+import { GetBillRateOptions } from '@shared/components/bill-rates/store/bill-rate.actions';
 import PriceUtils from '@shared/utils/price.utils';
 import { currencyValidator } from '@shared/validators/currency.validator';
 
