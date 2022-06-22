@@ -37,6 +37,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public jobStatus = JOB_STATUS;
   public candidateJob: OrderCandidateJob | null;
   public isOnboarded = true;
+  public today = new Date();
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');
