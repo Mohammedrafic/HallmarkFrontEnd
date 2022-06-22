@@ -28,7 +28,7 @@ import {
 } from 'angular-feather/icons';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
-import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
+import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 import { NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DatePickerModule, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -84,7 +84,8 @@ const gridIcons = {
     NumericTextBoxModule,
     PagerModule,
     DatePickerModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MultiSelectModule
   ],
   exports: [TimesheetsContainerComponent],
   providers: [TimesheetsApiService, MaskedDateTimeService]
