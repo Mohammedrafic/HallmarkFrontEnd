@@ -1,7 +1,7 @@
 import { TIMESHEETS_ACTIONS } from '../../enums/timesheets.enum';
 import { ITimesheetsFilter } from '../../interface/i-timesheet.interface';
 import { ProfileTimeSheetActionType } from '../../enums/timesheets.enum';
-import { ProfileTimeSheetDetail, TIMESHEETS_ACTIONS } from '../model/timesheets.model';
+import { ProfileTimeSheetDetail } from '../model/timesheets.model';
 
 export namespace Timesheets {
   export class GetAll {

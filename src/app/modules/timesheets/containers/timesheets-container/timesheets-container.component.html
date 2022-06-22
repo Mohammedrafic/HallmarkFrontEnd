@@ -36,6 +36,7 @@
     [tableData]="timesheets"
     (changePage)="handleChangePage($event)"
     (changePerPage)="handleChangePerPage($event)"
+    (timesheetRowSelected)="rowSelected()"
   >
   </app-timesheets-table>
 </section>
@@ -136,5 +137,4 @@
     </div>
   </form>
 </app-filter-dialog>
-<button (click)="clicker()" style="height: 50px">Show</button>
 <app-profile-details-container></app-profile-details-container>

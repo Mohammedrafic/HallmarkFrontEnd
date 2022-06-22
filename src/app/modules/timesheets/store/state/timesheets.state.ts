@@ -4,7 +4,6 @@ import { Observable, tap } from 'rxjs';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 
 import {
-  DEFAULT_TIMESHEETS_STATE,
   TimeSheetsPage,
   ProfileTimeSheetDetail,
   TimesheetsModel,
@@ -12,6 +11,7 @@ import {
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
 import { ProfileTimeSheetActionType } from '../../enums/timesheets.enum';
+import { DEFAULT_TIMESHEETS_STATE } from '../../constants/timesheet-default-state.constant';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
