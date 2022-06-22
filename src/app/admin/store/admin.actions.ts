@@ -169,3 +169,8 @@ export class ExportSkillCategories {
   static readonly type = '[admin] Export Skill category list';
   constructor(public payload: ExportPayload) { }
 }
+
+export class ExportCredentialTypes {
+  static readonly type = '[admin] Export Credential Types list';
+  constructor(public payload: ExportPayload) { }
+}

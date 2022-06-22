@@ -1,13 +1,13 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { combineLatestWith, filter, Observable, Subject, takeUntil } from 'rxjs';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import {
   AbstractGridConfigurationComponent
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { ShowSideDialog } from '../../../store/app.actions';
+import { ShowExportDialog, ShowSideDialog } from '../../../store/app.actions';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import {
   GetCredential,
@@ -22,6 +22,10 @@ import { CredentialType } from '@shared/models/credential-type.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { SortSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { UserState } from 'src/app/store/user.state';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { ExportCredentialList, ShowExportCredentialListDialog } from '@organization-management/store/credentials.actions';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-credentials-list',
@@ -51,6 +55,15 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
   private unsubscribe$: Subject<void> = new Subject();
 
+  public columnsToExport: ExportColumn[] = [
+    { text:'Credential Type', column: 'CredentialType'},
+    { text:'Credential', column: 'Credential'},
+    { text:'Expire Date Applicable', column: 'ExpireDateApplicable'},
+    { text:'Comment', column: 'Comment'}
+  ];
+  public fileName: string;
+  public defaultFileName: string;
+
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
@@ -58,6 +71,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   constructor(private store: Store,
               private actions$: Actions,
               private confirmService: ConfirmService,
+              private datePipe: DatePipe,
               @Inject(FormBuilder) private builder: FormBuilder) {
     super();
     this.formBuilder = builder;
@@ -75,11 +89,44 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
       this.clearFormDetails();
       this.store.dispatch(new GetCredential());
     });
+
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
+      if (val.isDialogShown) {
+        this.defaultFileName = 'Credentials/Credentials List ' + this.generateDateTime(this.datePipe);
+        this.fileName = this.defaultFileName;
+      }
+    });
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportCredentialListDialog)).subscribe((event: { payload: ExportedFileType }) => {
+      this.defaultFileName = 'Credentials/Credentials List ' + this.generateDateTime(this.datePipe);
+      this.defaultExport(event.payload);
+    });
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public closeExport() {
+    this.fileName = '';
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    const ids = this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null;
+    this.store.dispatch(new ExportCredentialList(new ExportPayload(
+      fileType, 
+      { ids: ids }, 
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      null,
+      options?.fileName || this.defaultFileName
+    )));
+    this.clearSelection(this.grid);
   }
 
   public expireDateApplicableChange(data: Credential, event: any): void {

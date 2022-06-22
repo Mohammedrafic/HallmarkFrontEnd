@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { combineLatest, filter, Observable, of, Subject, takeUntil, throttleTime } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
   AbstractGridConfigurationComponent
@@ -11,28 +11,21 @@ import {
 import { ShowSideDialog } from '../../../store/app.actions';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import { OrganizationManagementState } from '../../store/organization-management.state';
-import { Region } from '@shared/models/region.model';
-import { Location }  from '@shared/models/location.model';
 import {
   GetCredential,
   GetCredentialTypes,
-  GetDepartmentsByLocationId,
-  GetLocationsByRegionId,
-  GetRegions,
-  ClearDepartmentList,
-  ClearLocationList,
-  GetCredentialSetupByPage,
-  SaveUpdateCredentialSetupSucceeded, GetAllOrganizationSkills
+  SaveUpdateCredentialSetupSucceeded,
+  GetAllOrganizationSkills, GetCredentialSkillGroup
 } from '../../store/organization-management.actions';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CredentialSetup, CredentialSetupPage } from '@shared/models/credential-setup.model';
-import { Department } from '@shared/models/department.model';
+import { CredentialSetup, CredentialSetupFilterDto, CredentialSetupPage } from '@shared/models/credential-setup.model';
 import { Credential } from '@shared/models/credential.model';
-import { MockCredentialSetupPage } from './mock-credential-setup-list';
 import { UserState } from 'src/app/store/user.state';
 import { Skill } from '@shared/models/skill.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { GetFilteredCredentialSetupData } from '@organization-management/store/credentials.actions';
 
 @Component({
   selector: 'app-credentials-setup',
@@ -49,20 +42,17 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   @Select(OrganizationManagementState.credentials)
   credentials$: Observable<Credential[]>;
 
-  public regionLocationSkillGroupDropDownFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  @Select(UserState.organizationStructure)
+  organizationStructure$: Observable<OrganizationStructure>;
+  public orgRegions: OrganizationRegion[] = [];
+  public allRegions: OrganizationRegion[] = [];
 
-  @Select(OrganizationManagementState.regions)
-  regions$: Observable<Region[]>;
-  public selectedRegionId: number;
+  public locations: OrganizationLocation[] = [];
 
-  @Select(OrganizationManagementState.locationsByRegionId)
-  locations$: Observable<Location[]>;
-  public selectedLocationId: number;
-
-  @Select(OrganizationManagementState.departments)
-  departments$: Observable<Department[]>;
+  public departments: OrganizationDepartment[] = [];
   public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
-  public selectedDepartmentId: number;
+
+  public fields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   @Select(OrganizationManagementState.skillGroups)
   groups$: Observable<CredentialSkillGroup[]>;
@@ -71,7 +61,6 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   @Select(OrganizationManagementState.allOrganizationSkills)
   skills$: Observable<Skill[]>;
   skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
-  public selectedSkillId: number;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
@@ -83,7 +72,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   public editedCredentialSetupId?: number;
 
   //@Select(OrganizationManagementState.credentialSetups) // TODO: uncomment after BE implementation
-  credentialsData$: Observable<CredentialSetupPage> = of(MockCredentialSetupPage);
+  credentialsData$: Observable<CredentialSetupPage>;
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
@@ -97,16 +86,32 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     super();
     this.formBuilder = builder;
     this.createCredentialsForm();
+    this.createHeaderFilterFormGroup();
   }
 
   ngOnInit(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
-      this.store.dispatch(new GetRegions());
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.store.dispatch(new GetCredentialTypes());
       this.store.dispatch(new GetCredential());
       this.store.dispatch(new GetAllOrganizationSkills());
-      // this.store.dispatch(new GetCredentialSkillGroup()); // TODO: uncomment after BE fix
+      this.store.dispatch(new GetCredentialSkillGroup());
+      this.store.dispatch(new GetFilteredCredentialSetupData({
+        regionId: null,
+        locationId: null,
+        departmentId: null,
+        skillGroupId: null,
+        skillId: null,
+        pageNumber: 1, // TODO: add pagination
+        pageSize: 100 // TODO: add pagination
+      }));
     });
+
+    this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
+      this.orgRegions = structure.regions;
+      this.allRegions = [...this.orgRegions];
+    });
+
+    this.headerFilterHandler();
 
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
@@ -124,33 +129,6 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     this.unsubscribe$.complete();
   }
 
-  public onRegionDropDownChanged(event: any): void {
-    if (event.itemData) {
-      this.selectedRegionId = event.itemData.id;
-      this.store.dispatch(new ClearDepartmentList());
-      this.store.dispatch(new GetLocationsByRegionId(this.selectedRegionId));
-    }
-  }
-
-  public onLocationDropDownChanged(event: any): void {
-    if (event.itemData) {
-      this.selectedLocationId = event.itemData.id;
-      this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocationId));
-    }
-  }
-
-  public onDepartmentDropDownChanged(event: any): void {
-    if (event.itemData) {
-      this.selectedDepartmentId = event.itemData.id;
-    }
-  }
-
-  public onGroupDropDownChanged(event: any): void {
-    if (event.itemData) {
-      this.selectedSkillGroupId = event.itemData.id;
-    }
-  }
-
   public onGroupsSetupClick(): void {
     this.router.navigateByUrl('admin/organization-management/credentials/groups-setup');
   }
@@ -166,7 +144,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       reqSubmission: credentialSetup.reqSubmission,
       reqOnboard: credentialSetup.reqOnboard
     });
-    this.onFormSaveClick();
+    this.onCredentialFormSaveClick();
   }
 
   public onReqForSubmissionChange(credentialSetup: any, event: any): void {
@@ -180,7 +158,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       reqSubmission: event.checked,
       reqOnboard: credentialSetup.reqOnboard
     });
-    this.onFormSaveClick();
+    this.onCredentialFormSaveClick();
   }
 
   public onReqForOnboardChange(credentialSetup: any, event: any): void {
@@ -194,10 +172,10 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       reqSubmission: credentialSetup.reqSubmission,
       reqOnboard: event.checked
     });
-    this.onFormSaveClick();
+    this.onCredentialFormSaveClick();
   }
 
-  public onEditButtonClick(credentialSetup: any, event: any): void {
+  public onEditCredentialClick(credentialSetup: any, event: any): void {
     this.addActiveCssClass(event);
     this.credentialsSetupFormGroup.setValue({
       id: credentialSetup.id,
@@ -211,7 +189,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     });
   }
 
-  public onFormCancelClick(): void {
+  public onCredentialFormCancelClick(): void {
     if (this.credentialsSetupFormGroup.dirty) {
       this.confirmService
         .confirm(CANCEL_COFIRM_TEXT, {
@@ -231,7 +209,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     }
   }
 
-  public onFormSaveClick(): void {
+  public onCredentialFormSaveClick(): void {
     if (this.credentialsSetupFormGroup.valid) {
       const credentialSetup: CredentialSetup = {
         id: this.credentialsSetupFormGroup.controls['id'].value,
@@ -265,6 +243,10 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     }
   }
 
+  public onMappingEditClick(): void {
+    // TODO: need implementation
+  }
+
   private clearFormData(): void {
     this.credentialsSetupFormGroup.reset();
     this.editedCredentialSetupId = undefined;
@@ -286,7 +268,99 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
 
   private createHeaderFilterFormGroup(): void {
     this.headerFilterFormGroup = this.formBuilder.group({
+      regionId: [null],
+      locationId: [null],
+      departmentId: [null],
+      groupId: [null],
+      skillId: [null]
+    });
+  }
 
+  private headerFilterHandler(): void {
+    this.headerFilterFormGroup.controls['regionId']?.valueChanges.subscribe((regionId: number) => {
+      this.locations = [];
+      this.departments = [];
+
+      if (regionId) {
+        const selectedRegion = this.orgRegions.find(region => region.id === regionId);
+        this.locations.push(...selectedRegion?.locations as any);
+        this.locations.forEach(location => this.departments.push(...location.departments));
+      }
+
+      this.headerFilterFormGroup.controls['locationId'].setValue(null);
+      this.headerFilterFormGroup.controls['departmentId'].setValue(null);
+
+      const filter: CredentialSetupFilterDto = {
+        regionId: regionId || null,
+        locationId: this.headerFilterFormGroup.controls['locationId'].value,
+        departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
+        skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
+        skillId: this.headerFilterFormGroup.controls['skillId'].value,
+        pageSize: 100, // TODO: add pagination
+        pageNumber: 1 // TODO: add pagination
+      };
+      this.store.dispatch(new GetFilteredCredentialSetupData(filter));
+    });
+
+    this.headerFilterFormGroup.get('locationId')?.valueChanges.subscribe((locationId: number) => {
+      this.departments = [];
+
+      if (locationId) {
+        const selectedLocation = this.locations.find(location => location.id === locationId);
+        this.departments.push(...selectedLocation?.departments as []);
+      }
+
+      this.headerFilterFormGroup.controls['departmentId'].setValue(null);
+
+      const filter: CredentialSetupFilterDto = {
+        regionId: this.headerFilterFormGroup.controls['regionId'].value,
+        locationId: locationId || null,
+        departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
+        skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
+        skillId: this.headerFilterFormGroup.controls['skillId'].value,
+        pageSize: 100, // TODO: add pagination
+        pageNumber: 1 // TODO: add pagination
+      };
+      this.store.dispatch(new GetFilteredCredentialSetupData(filter));
+    });
+
+    this.headerFilterFormGroup.get('departmentId')?.valueChanges.subscribe((departmentId: number) => {
+      const filter: CredentialSetupFilterDto = {
+        regionId: this.headerFilterFormGroup.controls['regionId'].value,
+        locationId: this.headerFilterFormGroup.controls['locationId'].value,
+        departmentId: departmentId || null,
+        skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
+        skillId: this.headerFilterFormGroup.controls['skillId'].value,
+        pageSize: 100, // TODO: add pagination
+        pageNumber: 1 // TODO: add pagination
+      };
+      this.store.dispatch(new GetFilteredCredentialSetupData(filter));
+    });
+
+    this.headerFilterFormGroup.get('groupId')?.valueChanges.subscribe((groupId: number) => {
+      const filter: CredentialSetupFilterDto = {
+        regionId: this.headerFilterFormGroup.controls['regionId'].value,
+        locationId: this.headerFilterFormGroup.controls['locationId'].value,
+        departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
+        skillGroupId: groupId || null,
+        skillId: this.headerFilterFormGroup.controls['skillId'].value,
+        pageSize: 100, // TODO: add pagination
+        pageNumber: 1 // TODO: add pagination
+      };
+      this.store.dispatch(new GetFilteredCredentialSetupData(filter));
+    });
+
+    this.headerFilterFormGroup.get('skillId')?.valueChanges.subscribe((skillId: number) => {
+      const filter: CredentialSetupFilterDto = {
+        regionId: this.headerFilterFormGroup.controls['regionId'].value,
+        locationId: this.headerFilterFormGroup.controls['locationId'].value,
+        departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
+        skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
+        skillId: skillId || null,
+        pageSize: 100, // TODO: add pagination
+        pageNumber: 1 // TODO: add pagination
+      };
+      this.store.dispatch(new GetFilteredCredentialSetupData(filter));
     });
   }
 }

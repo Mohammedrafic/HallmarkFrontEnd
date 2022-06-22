@@ -40,7 +40,8 @@ import {
   RemoveCredentialType,
   ExportSkills,
   ExportSkillCategories,
-  RemoveOrganizationLogo
+  RemoveOrganizationLogo,
+  ExportCredentialTypes
 } from './admin.actions';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
@@ -358,7 +359,7 @@ export class AdminState {
   }
 
   @Action(RemoveCredentialType)
-  RemoveCredentialTypes({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: RemoveCredentialType): Observable<any> {
+  RemoveCredentialTypes({ dispatch }: StateContext<AdminStateModel>, { payload }: RemoveCredentialType): Observable<any> {
     return this.credentialsService.removeCredentialType(payload).pipe(tap((payload) => {
         dispatch(new GetCredentialTypes());
         return payload;
@@ -377,6 +378,14 @@ export class AdminState {
   @Action(ExportSkillCategories)
   ExportSkillCategories({ }: StateContext<AdminStateModel>, { payload }: ExportSkillCategories): Observable<any> {
     return this.categoriesService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
+
+  @Action(ExportCredentialTypes)
+  ExportCredentialTypes({ }: StateContext<AdminStateModel>, { payload }: ExportCredentialTypes): Observable<any> {
+    return this.credentialsService.exportCredentialTypes(payload).pipe(tap(file => {
       const url = window.URL.createObjectURL(file);
       saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
     }));
