@@ -131,12 +131,12 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public onRenderCell(args: RenderDayCellEventArgs): void {
-    if (this.formGroup.get('date')?.value) {
-      const from = this.getWeekDate(this.formGroup.get('date')?.value, true);
-      const to = this.getWeekDate(this.formGroup.get('date')?.value);
+    if (this.formGroup.get('date')?.value && typeof this.formGroup.get('date')?.value === 'string') {
+      const splitValue = this.formGroup.get('date')?.value.split(' - ');
+      const from = this.getWeekDate(splitValue[0], true);
+      const to = this.getWeekDate(splitValue[1]);
 
       if ((args.date?.getTime() || 0) <= to.getTime() && (args.date?.getTime() || 0) >= from.getTime()) {
-        console.log(args.date, 'args.date');
         args.element?.classList.add('e-highlightselectedrange');
       }
     }
@@ -158,7 +158,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     });
   }
 
-  private getWeekDate(date: Date, isStart = false): Date {
+  private getWeekDate(date: string, isStart = false): Date {
     const curr = new Date(date); // get current date
     const first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
     const last = first + 6; // last day is the first day + 6
@@ -171,7 +171,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     const monthDate = date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1;
     const yearDate = date.getFullYear();
 
-    return `${dayDate}/${monthDate}/${yearDate}`;
+    return `${monthDate}/${dayDate}/${yearDate}`;
   }
 
   private startPageStateWatching(): void {
