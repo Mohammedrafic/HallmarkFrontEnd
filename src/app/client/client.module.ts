@@ -60,7 +60,6 @@ import { SharedModule } from '../shared/shared.module';
 import { AddEditOrderComponent } from './order-management/add-edit-order/add-edit-order.component';
 import { OrderDetailsFormComponent } from './order-management/order-details-form/order-details-form.component';
 
-import { BillRatesModule } from '@bill-rates/bill-rates.module';
 import { OrderCredentialsModule } from '@order-credentials/order-credentials.module';
 import { NgxsModule } from '@ngxs/store';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
@@ -134,7 +133,6 @@ const gridIcons = {
     SplitButtonModule,
     DatePickerModule,
     TimePickerModule,
-    BillRatesModule,
     OrderCredentialsModule,
     DropDownButtonModule,
     DialogModule,

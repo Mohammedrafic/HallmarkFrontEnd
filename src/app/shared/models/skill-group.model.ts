@@ -1,30 +1,17 @@
+import { PageOfCollections } from '@shared/models/page.model';
+import { MasterSkillByOrganization } from '@shared/models/skill.model';
+
 export class CredentialSkillGroup {
   id?: number;
   name?: string;
-  skills?: any; // TODO: add object model
+  organizationId?: number;
+  skills?: MasterSkillByOrganization[];
+}
+
+export class CredentialSkillGroupPost {
+  id?: number;
+  name: string;
   skillIds: number[];
-  skillNames?: string[];
-
-  constructor(skillGroup: CredentialSkillGroup) {
-    if (skillGroup.id) {
-      this.id = skillGroup.id;
-    }
-
-    if (skillGroup.name) {
-      this.name = skillGroup.name;
-    }
-
-    if (skillGroup.skills) {
-      this.skills = skillGroup.skills;
-    }
-
-    if (skillGroup.skillIds) {
-      this.skillIds = skillGroup.skillIds;
-    }
-  }
 }
 
-export class CredentialSkillGroupMapping {
-  id: number;
-  name?: string;
-}
+export type CredentialSkillGroupPage = PageOfCollections<CredentialSkillGroup>;

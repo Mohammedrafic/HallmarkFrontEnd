@@ -1,27 +1,29 @@
 <app-widget-wrapper [title]="chartData?.title ?? ''" [isLoading]="isLoading">
-  <ejs-accumulationchart
-    chart
-    #sfComponent
-    [enableAnimation]="false"
-    [id]="chartData?.id"
-    [legendSettings]="legendSettings"
-    [tooltip]="tooltipSettings"
-    class="app-accumulation-chart__component"
-  >
-    <e-accumulation-series-collection>
-      <e-accumulation-series
-        [dataSource]="filteredChartData$ | async"
-        [palettes]="palette"
-        pointColorMapping="color"
-        innerRadius="70%"
-        radius="80%"
-        xName="label"
-        yName="value"
-      >
-      </e-accumulation-series>
-    </e-accumulation-series-collection>
-  </ejs-accumulationchart>
-  <div legend>
+  <ng-template #chart>
+    <ejs-accumulationchart
+      #sfComponent
+      [enableAnimation]="false"
+      [id]="chartData?.id"
+      [legendSettings]="legendSettings"
+      [tooltip]="tooltipSettings"
+      class="app-accumulation-chart__component"
+    >
+      <e-accumulation-series-collection>
+        <e-accumulation-series
+          [dataSource]="filteredChartData$ | async"
+          [palettes]="palette"
+          pointColorMapping="color"
+          innerRadius="70%"
+          radius="80%"
+          xName="label"
+          yName="value"
+        >
+        </e-accumulation-series>
+      </e-accumulation-series-collection>
+    </ejs-accumulationchart>
+  </ng-template>
+
+  <ng-template #legend>
     <div
       *ngFor="let legend of chartData?.chartData; trackBy: trackByHandler; let idx = index"
       class="widget-legend__item"
@@ -36,5 +38,5 @@
       </div>
       <div class="app-accumulation-chart__legend-score">{{ legend.value }}</div>
     </div>
-  </div>
+  </ng-template>
 </app-widget-wrapper>

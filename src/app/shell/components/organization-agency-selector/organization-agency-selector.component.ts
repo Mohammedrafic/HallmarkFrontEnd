@@ -122,21 +122,10 @@ export class OrganizationAgencySelectorComponent implements OnDestroy {
 
   private isOrganizationAgencyAreaChange(): void {
     this.isOrganizationAgencyArea$.pipe(takeUntil(this.unsubscribe$)).subscribe(area => {
-      let state = {
-        isOrganization: area.isOrganizationArea,
-        isAgency: area.isAgencyArea
-      }
+      const isOrganizationArea = area.isOrganizationArea;
+      const isAgencyArea = area.isAgencyArea;
 
-      state.isOrganization ?
-        state = {
-          isOrganization: true,
-          isAgency: false
-        } :
-        state = {
-          isOrganization: false,
-          isAgency: true
-        }
-      this.applyOrganizationsAgencies(state.isOrganization, state.isAgency);
+      this.applyOrganizationsAgencies(isOrganizationArea, isAgencyArea);
     });
   }
 
@@ -200,7 +189,7 @@ export class OrganizationAgencySelectorComponent implements OnDestroy {
 
     if (this.isAgencyOrOrganization) {
       this.organizationAgency = this.organizations[0] || this.agencies[0];
-
+      
     } else {
       this.organizationsAgencies$.next(organizationsAgencies);
     }

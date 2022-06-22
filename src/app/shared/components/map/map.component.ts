@@ -1,7 +1,6 @@
-import type { MapsComponent } from '@syncfusion/ej2-angular-maps';
-import type { LegendSettingsModel, LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
-
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+
+import type { LegendSettingsModel, LayerSettingsModel, MapsComponent } from '@syncfusion/ej2-angular-maps';
 
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
 

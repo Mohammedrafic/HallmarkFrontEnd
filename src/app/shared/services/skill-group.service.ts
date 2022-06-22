@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CredentialSkillGroup } from '@shared/models/skill-group.model';
+import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
 export class SkillGroupService {
@@ -10,11 +11,11 @@ export class SkillGroupService {
   constructor(private http: HttpClient) {}
 
   /**
-   * Get all skill groups
-   * @return skill groups
+   * Get all skill group pages
+   * @return skill group pages
    */
-  public getSkillGroups(): Observable<CredentialSkillGroup[]> {
-    return this.http.get<CredentialSkillGroup[]>(`/api/SkillGroups`)
+  public getSkillGroups(): Observable<CredentialSkillGroupPage> {
+    return this.http.get<CredentialSkillGroupPage>(`/api/SkillGroups/organization`)
   }
 
   /**
@@ -40,8 +41,8 @@ export class SkillGroupService {
    * Get all skill groups mapping
    * @return skill groups mapping
    */
-  public getSkillGroupsMapping(): Observable<SkillGroupMapping[]> {
-    return this.http.get<SkillGroupMapping[]>(`/api/SkillGroupsMapping`); // TODO: should be changed after BE implementation
+  public getSkillGroupsMapping(): Observable<SkillGroupMapping[]> {  // TODO: deprecated, can be removed after verification
+    return this.http.get<SkillGroupMapping[]>(`/api/SkillGroupsMapping`);
   }
 
   /**
@@ -49,17 +50,24 @@ export class SkillGroupService {
    * @param skillGroupMapping object to save
    * @return Created/Updated skill group mapping
    */
-  public saveUpdateSkillGroupMapping(skillGroupMapping: SkillGroupMapping): Observable<SkillGroupMapping> {
+  public saveUpdateSkillGroupMapping(skillGroupMapping: SkillGroupMapping): Observable<SkillGroupMapping> { // TODO: deprecated, can be removed after verification
     return skillGroupMapping.mappingId ?
-      this.http.put<SkillGroupMapping>(`/api/SkillGroupsMapping`, skillGroupMapping) : // TODO: should be changed after BE implementation
-      this.http.post<SkillGroupMapping>(`/api/SkillGroupsMapping`, skillGroupMapping); // TODO: should be changed after BE implementation
+      this.http.put<SkillGroupMapping>(`/api/SkillGroupsMapping`, skillGroupMapping) :
+      this.http.post<SkillGroupMapping>(`/api/SkillGroupsMapping`, skillGroupMapping);
   }
 
   /**
    * Remove skill group mapping by its id
    * @param skillGroupMappingId
    */
-  public removeSkillGroupMapping(skillGroupMappingId: number): Observable<void> {
-    return this.http.delete<void>(`/api/SkillGroupsMapping/${skillGroupMappingId}`); // TODO: should be changed after BE implementation
+  public removeSkillGroupMapping(skillGroupMappingId: number): Observable<void> { // TODO: deprecated, can be removed after verification
+    return this.http.delete<void>(`/api/SkillGroupsMapping/${skillGroupMappingId}`);
+  }
+
+  /**
+   * Export credential list
+   */
+  public exportCredentialTypes(payload: ExportPayload): Observable<any> {
+    return this.http.post(`/api/MasterCredentials/export`, payload, { responseType: 'blob' });
   }
 }

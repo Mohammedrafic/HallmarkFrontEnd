@@ -1,5 +1,6 @@
 <ejs-grid
   #grid
+  class="e-gridwithchildrow"
   (rowDataBound)="setRowHighlight($event)"
   [dataSource]="(ordersPage$ | async)?.items || []"
   [allowPaging]="allowPaging"
@@ -35,9 +36,18 @@
     </e-column>
     <e-column field="orderId" headerText="ORDER ID" width="142">
       <ng-template #template let-data>
-        <div>
-          <b>{{ data.orderId }}</b>
-        </div>
+        <ng-container *ngIf="!data.children.length; else withToggle">
+          <div>
+            <b>{{ data.orderId }}</b>
+          </div>
+        </ng-container>
+
+        <ng-template #withToggle>
+          <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
+            <b>{{ data.orderId }}</b
+            ><i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
+          </div>
+        </ng-template>
       </ng-template>
     </e-column>
     <e-column field="status" headerText="STATUS" width="152">
@@ -61,7 +71,9 @@
     <e-column field="organizationName" headerText="Organization" width="200"></e-column>
     <e-column field="numberOfPositions" headerText="{{ '# of positions' | uppercase }}" width="160">
       <ng-template #template let-data>
-        <div class="align-right">{{ data.numberOfPositions }}</div>
+        <div class="align-right">
+          {{ data.numberOfPositions - data.candidatesCount }}/{{ data.numberOfPositions }}
+        </div>
       </ng-template>
     </e-column>
     <e-column field="candidatesCount" headerText="CANDIDATES" width="150">
@@ -69,7 +81,7 @@
         <div class="align-right">{{ data.candidatesCount }}</div>
       </ng-template>
     </e-column>
-    <e-column field="billRate" headerText="BILL RATE" width="150">
+    <e-column field="billRate" headerText="Bill Rate $" width="150">
       <ng-template #template let-data>
         <div class="align-right">{{ data.billRate }}</div>
       </ng-template>
@@ -80,11 +92,11 @@
     <e-column field="location" headerText="LOCATION" textAlign="Left" width="200"></e-column>
     <e-column field="jobStartDate" headerText="START DATE" width="150">
       <ng-template #template let-data>
-        {{ data.jobStartDate | date: "MM/dd/yyy" }}
+        {{ data.jobStartDate | date: 'MM/dd/yyy' }}
       </ng-template>
     </e-column>
 
-    <e-column headerTextAlign="Right" width="120" freeze="Right">
+    <e-column headerTextAlign="Right" width="120">
       <ng-template #headerTemplate let-data>
         <div class="controls-header">
           <button ejs-button cssClass="e-flat icon-button">
@@ -107,6 +119,18 @@
       </ng-template>
     </e-column>
   </e-columns>
+
+  <ng-template #detailTemplate let-data>
+    <div class="subrow-wrapper">
+      <app-grid-subrow-candidate
+        *ngFor="let child of data.children; let i = index;"
+        [candidat]="child"
+        [order]="data"
+        [candidatIndex]="i + 1"
+        (clickEvent)="onOpenCandidateDialog(data)"
+      ></app-grid-subrow-candidate>
+    </div>
+  </ng-template>
 
   <ng-template #pagerTemplate let-data>
     <div class="e-pagertemplate">
@@ -161,3 +185,4 @@
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-preview-order-dialog>
 <app-candidat-dialog [openEvent]="openCandidat"></app-candidat-dialog>
+

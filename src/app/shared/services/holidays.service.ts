@@ -69,6 +69,15 @@ export class HolidaysService {
   }
 
   /**
+   * Edit holiday record
+   * @param holiday object to save
+   * @return Updated holiday
+   */
+  public editOrganizationHoliday(holiday: OrganizationHoliday): Observable<OrganizationHoliday> {
+    return this.http.put<OrganizationHoliday>(`/api/OrganizationHolidays`, holiday);
+  }
+
+  /**
    * Get holidays by page number
    * @param pageNumber
    * @param pageSize
@@ -89,7 +98,7 @@ export class HolidaysService {
 
   /**
    * Checks if overriding to be performed
-   * @param holiday 
+   * @param holiday
    * @returns boolean
    */
   public checkIfExist(holiday: OrganizationHoliday): Observable<boolean> {
@@ -101,8 +110,8 @@ export class HolidaysService {
    * @param holiday
    */
   public removeOrganizationHoliday(holiday: OrganizationHoliday): Observable<any> {
-    return this.http.delete<any>(`/api/OrganizationHolidays`, { 
-      body: { masterHolidayId: holiday.masterHolidayId || 0, orgHolidayId: holiday.id || 0 } 
+    return this.http.delete<any>(`/api/OrganizationHolidays`, {
+      body: { masterHolidayId: holiday.masterHolidayId || 0, orgHolidayId: holiday.id || 0 }
     });
   }
 

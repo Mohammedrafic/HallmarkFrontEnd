@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GroupMappingComponent } from './group-mapping.component';
+import { PositionChartComponent } from './position-chart.component';
 
-describe('GroupMappingComponent', () => {
-  let component: GroupMappingComponent;
-  let fixture: ComponentFixture<GroupMappingComponent>;
+describe('PositionChartComponent', () => {
+  let component: PositionChartComponent;
+  let fixture: ComponentFixture<PositionChartComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ GroupMappingComponent ]
+      declarations: [ PositionChartComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(GroupMappingComponent);
+    fixture = TestBed.createComponent(PositionChartComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

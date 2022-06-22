@@ -41,9 +41,9 @@ export interface BillRate {
   intervalMin: number | null;
   intervalMax: number | null;
   effectiveDate: string;
-};
+}
 
-export interface OrderBillRateDto extends Omit<BillRate, 'billRateConfig' | 'billRateGroupId'> { };
+export interface OrderBillRateDto extends Omit<BillRate, 'billRateConfig' | 'billRateGroupId'> { }
 
 export class BillRateSetup {
   billRateSettingId: number;
@@ -55,7 +55,7 @@ export class BillRateSetup {
   departmentName: string;
   skills: MasterSkillByOrganization[];
   skillName: string;
-  orderType: number[];
+  orderTypes: number[];
   billRateTitle: string;
   billRateCategory: number;
   billRateType: number;

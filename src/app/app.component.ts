@@ -26,9 +26,6 @@ export class AppComponent {
       const isOrganizationArea = data?.['isOrganizationArea'] || false;
       const isAgencyArea = data?.['isAgencyArea'] || false;
       this.store.dispatch(new SetIsOrganizationAgencyArea({ isOrganizationArea, isAgencyArea }));
-      if (isOrganizationArea) {
-        this.store.dispatch(new GetOrganizationStructure());
-      }
     });
   }
 }

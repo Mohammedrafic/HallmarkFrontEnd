@@ -1,4 +1,5 @@
 import { PageOfCollections } from "./page.model";
+import { JobDistributionMasterSkills } from "@shared/models/associate-organizations.model";
 
 export class Candidate {
   id?: number;
@@ -14,7 +15,7 @@ export class Candidate {
   candidateProfileContactDetail: CandidateProfileContactDetail;
   profileStatus: number;
   candidateAgencyStatus: number;
-  candidateProfileSkills: any[];
+  candidateProfileSkills: JobDistributionMasterSkills[];
 
   constructor(candidateForm: any) {
     this.agencyId = candidateForm.generalInfo.agencyId;

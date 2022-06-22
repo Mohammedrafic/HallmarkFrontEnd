@@ -1,4 +1,5 @@
 import { BillRateFilters, BillRateSetupPost } from '@shared/models/bill-rate.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 export class GetBillRates {
   static readonly type = '[billrates] Get Bill Rates Pages';
@@ -28,4 +29,9 @@ export class DeleteBillRatesById {
 export class GetBillRateOptions {
   static readonly type = '[billrates] Get Bill Rate Options';
   constructor() {}
+}
+
+export class ExportBillRateSetup {
+  static readonly type = '[billrates] Export Bill Rate Setup';
+  constructor(public payload: ExportPayload) { }
 }

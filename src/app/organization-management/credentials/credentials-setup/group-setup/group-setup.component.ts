@@ -1,7 +1,7 @@
-import { Component, ElementRef, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { GridComponent, SearchService } from '@syncfusion/ej2-angular-grids';
-import { filter, Observable, of, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import {
   AbstractGridConfigurationComponent
@@ -15,7 +15,7 @@ import {
   DELETE_RECORD_TITLE
 } from '@shared/constants/messages';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CredentialSkillGroup } from '@shared/models/skill-group.model';
+import { CredentialSkillGroup, CredentialSkillGroupPage, CredentialSkillGroupPost } from '@shared/models/skill-group.model';
 import {
   GetAssignedSkillsByPage,
   GetCredentialSkillGroup,
@@ -32,19 +32,15 @@ import { UserState } from 'src/app/store/user.state';
   providers: [SearchService]
 })
 export class GroupSetupComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
-  private unsubscribe$: Subject<void> = new Subject();
-
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('searchGrid') searchGrid: GridComponent;
   @ViewChild('searchInputWithIcon') search: ElementRef;
-
-  @Input() isActive: boolean = false;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
   @Select(OrganizationManagementState.skillGroups)
-  skillGroups$: Observable<CredentialSkillGroup[]>;
+  skillGroups$: Observable<CredentialSkillGroupPage>;
 
   @Select(OrganizationManagementState.skills)
   skills$: Observable<any>;
@@ -60,12 +56,11 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   isEdit: boolean;
   editedSkillGroupId?: number;
 
+  private unsubscribe$: Subject<void> = new Subject();
+  private pageSubject = new Subject<number>();
+
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
-  }
-
-  get searchTermControl(): AbstractControl | null {
-    return this.skillGroupsFormGroup.get('skillIds');
   }
 
   constructor(private store: Store,
@@ -79,10 +74,9 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   ngOnInit(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.currentPage = 1;
-      // this.store.dispatch(new GetCredentialSkillGroup()); // TODO: uncomment after BE fixed
+      this.store.dispatch(new GetCredentialSkillGroup());
       this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, {}));
     });
-    this.mapGridData();
   }
 
   ngOnDestroy(): void {
@@ -94,7 +88,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.addActiveCssClass(event);
     this.skillGroupsFormGroup.setValue({
       name: skillGroup.name,
-      skillIds: skillGroup.skills.map((item: any) => item.id)
+      skillIds: skillGroup.skills?.map((item: any) => item.id)
     });
     this.isEdit = true;
     this.editedSkillGroupId = skillGroup.id;
@@ -118,33 +112,41 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   }
 
   onFormCancelClick(): void {
-    this.confirmService
-      .confirm(CANCEL_COFIRM_TEXT, {
-        title: DELETE_CONFIRM_TITLE,
-        okButtonLabel: 'Leave',
-        okButtonClass: 'delete-button'
-      }).pipe(filter(confirm => !!confirm))
-      .subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false));
-        this.clearFormDetails();
-        this.removeActiveCssClass();
-      });
+    if (this.skillGroupsFormGroup.dirty) {
+      this.confirmService
+        .confirm(CANCEL_COFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => !!confirm))
+        .subscribe(() => {
+          this.store.dispatch(new ShowSideDialog(false));
+          this.clearFormDetails();
+          this.removeActiveCssClass();
+        });
+    } else {
+      this.store.dispatch(new ShowSideDialog(false));
+      this.clearFormDetails();
+      this.removeActiveCssClass();
+    }
   }
 
   onFormSaveClick(): void {
     if (this.skillGroupsFormGroup.valid) {
       if (this.isEdit) {
-        const skillGroup = new CredentialSkillGroup({
+        const skillGroup: CredentialSkillGroupPost = {
           id: this.editedSkillGroupId,
-          skillIds: this.skillGroupsFormGroup.controls['skillIds'].value
-        });
+          name: this.skillGroupsFormGroup.controls['name'].value,
+          skillIds: Array.from(this.skillsId)
+        };
         this.store.dispatch(new UpdateCredentialSkillGroup(skillGroup));
         this.isEdit = false;
       } else {
-        const skillGroup = new CredentialSkillGroup({
+        const skillGroup: CredentialSkillGroupPost = {
           name: this.skillGroupsFormGroup.controls['name'].value,
-          skillIds: this.skillGroupsFormGroup.controls['skillIds'].value
-        });
+          skillIds: Array.from(this.skillsId)
+        };
+
         this.store.dispatch(new SaveCredentialSkillGroup(skillGroup));
         this.store.dispatch(new ShowSideDialog(false));
         this.skillGroupsFormGroup.reset();
@@ -156,30 +158,20 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   }
 
   onRowsDropDownChanged(): void {
-    this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
+    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+    this.grid.pageSettings.pageSize = this.pageSize;
   }
 
   onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.skillGroups$.subscribe(data => {
-        this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
-        this.currentPagerPage = event.currentPage || event.value;
-      });
+      this.pageSubject.next(event.currentPage || event.value);
     }
-  }
-
-  mapGridData(): void {
-    this.skillGroups$.subscribe(data => {
-      this.lastAvailablePage = this.getLastPage(data);
-      this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
-      this.totalDataRecords = data.length;
-    });
   }
 
   selectSkillId(event: any): void {
     if (event.data.length) {
       event.data.forEach((item: any) => {
-        if (item.data && item.data.masterSkill) {
+        if (item && item.masterSkill) {
           this.skillsId.add(item.masterSkill.id);
         }
       });
@@ -191,8 +183,8 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   removeSkillId(event: any): void {
     if (event.data.length) {
       event.data.forEach((item: any) => {
-        if (item.data && item.data.masterSkill) {
-          this.skillsId.delete(item.data.masterSkill.id);
+        if (item && item.masterSkill) {
+          this.skillsId.delete(item.masterSkill.id);
         }
       });
     } else if (event.data.masterSkill) {
@@ -215,18 +207,5 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
       name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       skillIds: ['']
     });
-  }
-
-  private getActiveRowsPerPage(): number {
-    return parseInt(this.activeRowsPerPageDropDown);
-  }
-
-  private getRowsPerPage(data: object[], currentPage: number): object[] {
-    return data.slice((currentPage * this.getActiveRowsPerPage()) - this.getActiveRowsPerPage(),
-      (currentPage * this.getActiveRowsPerPage()));
-  }
-
-  private getLastPage(data: object[]): number {
-    return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
   }
 }

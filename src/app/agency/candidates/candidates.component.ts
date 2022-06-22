@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { GridComponent } from "@syncfusion/ej2-angular-grids";
-import { debounceTime, filter, Observable, Subject, takeUntil } from "rxjs";
+import { debounceTime, filter, map, Observable, Subject, takeUntil } from "rxjs";
 import { GetCandidatesByPage, SaveCandidate, SaveCandidateSucceeded } from "src/app/agency/store/candidate.actions";
 import { CandidateState } from "src/app/agency/store/candidate.state";
 import { AbstractGridConfigurationComponent } from "src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
@@ -28,7 +28,9 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
   private unsubscribe$: Subject<void> = new Subject();
 
   @Select(CandidateState.candidates)
-  candidates$: Observable<CandidatePage>;
+  private _candidates$: Observable<CandidatePage>;
+  
+  public candidates$: Observable<CandidatePage>;
 
   @Select(UserState.lastSelectedAgencyId)
   lastSelectedAgencyId$: Observable<number>;
@@ -56,6 +58,33 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
     ).subscribe((agency: { payload: Candidate }) => {
       this.store.dispatch(new GetCandidatesByPage(this.currentPage, this.pageSize));
     });
+
+    this.updateCandidates();
+  }
+
+  private updateCandidates(): void {
+    this.candidates$ = this._candidates$.pipe(
+      map((value: CandidatePage) => {
+        return {
+          ...value,
+          items: this.addSkillEllipsis(value?.items)
+        };
+      })
+    )
+  }
+
+  private addSkillEllipsis(candidates: Candidate[]): any {
+      return candidates && candidates.map((candidate: Candidate) => {
+        if(candidate.candidateProfileSkills.length > 2) {
+          const [first, second] = candidate.candidateProfileSkills;
+          return {
+            ...candidate,
+            candidateProfileSkills: [first, second, {skillDescription: '...'}]
+          }
+        } else {
+          return candidate;
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -91,7 +120,6 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
     this.router.navigate(['./edit', data.id], { relativeTo: this.route });
   }
 
-
   public onRemove(data: any) {
     this.confirmService
       .confirm(
@@ -112,7 +140,7 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
       id, agencyId, ssn, firstName, middleName, lastName, email, dob, classification,
       candidateAgencyStatus, professionalSummary, candidateProfileContactDetail,
       profileStatus: CandidateStatus.Inactive,
-      candidateProfileSkills: candidateProfileSkills.map(skill => skill.id)
+      candidateProfileSkills: candidateProfileSkills.map((skill) => skill.id) as any
     }
 
     this.store.dispatch(new SaveCandidate(inactiveCandidate));

@@ -85,6 +85,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       this.store.dispatch( new UpdateOrganisationCandidateJob({
         organizationId: this.candidateJob.organizationId,
         jobId: this.candidateJob.jobId,
+        orderId: this.candidateJob.orderId,
         nextApplicantStatus: {
           applicantStatus: 60,
           statusText: "Onboard"

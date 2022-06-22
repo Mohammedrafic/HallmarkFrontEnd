@@ -4,7 +4,7 @@ import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { UserState } from '../../../store/user.state';
 import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
@@ -19,14 +19,15 @@ import {
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE
 } from '@shared/constants';
-import { ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
 import {
   DeleteBillRatesById,
   GetBillRateOptions,
   GetBillRates,
   SaveUpdateBillRate,
   ShowConfirmationPopUp,
-  SaveUpdateBillRateSucceed
+  SaveUpdateBillRateSucceed,
+  ExportBillRateSetup
 } from '@organization-management/store/bill-rates.actions';
 import { BillRatesState } from '@organization-management/store/bill-rates.state';
 import {
@@ -49,6 +50,9 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import PriceUtils from '@shared/utils/price.utils';
 import { currencyValidator } from '@shared/validators/currency.validator';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-bill-rate-setup',
@@ -60,6 +64,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('rateHours') rateHoursInput: MaskedTextBoxComponent;
   @Input() isActive: boolean = false;
+  @Input() export$: Subject<ExportedFileType>;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
@@ -117,22 +122,56 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   private unsubscribe$: Subject<void> = new Subject();
   private editRecordId?: number;
 
+  public columnsToExport: ExportColumn[] = [
+    { text:'Region', column: 'Region'},
+    { text:'Location', column: 'Location'},
+    { text:'Department', column: 'Department'},
+    { text:'Skill', column: 'Skill'},
+    { text:'Order Type', column: 'OrderType'},
+    { text:'Bill Rate Title', column: 'BillRateTitle'},
+    { text:'Bill Rate Category', column: 'BillRateCategory'},
+    { text:'Bill Rate Type', column: 'BillRateType'},
+    { text:'Effective Date', column: 'EffectiveDate'},
+    { text:'Bill Rate Value (Rate/Times)', column: 'BillRateValue'},
+    { text:'Interval Min', column: 'IntervalMin'},
+    { text:'Interval Max', column: 'IntervalMax'},
+    { text:'Consider For Weekly OT', column: 'ConsiderForWeeklyOT'},
+    { text:'Consider For Daily OT', column: 'ConsiderForDailyOT'},
+    { text:'Consider For 7th Day OT', column: 'ConsiderFor7thDayOT'},
+    { text:'Regular Local', column: 'RegRegularLocalon'},
+    { text:'Display In Timesheet', column: 'DisplayInTimesheet'},
+    { text:'Display In Job', column: 'DisplayInJob'}
+  ];
+  public fileName: string;
+  public defaultFileName: string;
+
   constructor(private store: Store,
               private actions$: Actions,
               @Inject(FormBuilder) private builder: FormBuilder,
               private confirmService: ConfirmService,
-              private filterService: FilterService) {
+              private filterService: FilterService,
+              private datePipe: DatePipe) {
     super();
     this.formBuilder = builder;
     this.createFormGroups();
   }
 
   ngOnInit(): void {
+    this.idFieldName = 'billRateSettingId';
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
+      if (val.isDialogShown) {
+        this.defaultFileName = 'Bill Rates/Bill Rate Setup ' + this.generateDateTime(this.datePipe);
+        this.fileName = this.defaultFileName;
+      }
+    });
+    this.export$.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
+      this.defaultFileName = 'Bill Rates/Bill Rate Setup ' + this.generateDateTime(this.datePipe);
+      this.defaultExport(event);
+    });
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.store.dispatch(new GetAllOrganizationSkills());
       this.store.dispatch(new GetBillRates({ pageNumber: this.currentPage, pageSize: this.pageSize }));
       this.store.dispatch(new GetBillRateOptions());
-      this.store.dispatch(new GetOrganizationStructure());
     });
 
     this.handlePagePermission();
@@ -239,6 +278,28 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  
+  public closeExport() {
+    this.fileName = '';
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.store.dispatch(new ExportBillRateSetup(new ExportPayload(
+      fileType, 
+      { ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null }, 
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      null,
+      options?.fileName || this.defaultFileName
+    )));
+    this.clearSelection(this.grid);
   }
 
   public onFormCancelClick(): void {
@@ -550,10 +611,10 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       this.billRatesFormGroup.controls['billRateTitleId'].setValue(foundBillRateOption.id);
     }
 
-    if (!data.orderType) {
+    if (data.orderTypes.length === 0) {
       this.billRatesFormGroup.controls['orderTypeIds'].setValue(this.orderTypes.map((type) => type.id));
     } else {
-      this.billRatesFormGroup.controls['orderTypeIds'].setValue(data.orderType);
+      this.billRatesFormGroup.controls['orderTypeIds'].setValue(data.orderTypes);
     }
 
     const rateHour = foundBillRateOption?.unit === BillRateUnit.Hours ? data.rateHour : parseFloat(data.rateHour.toString()).toFixed(2);

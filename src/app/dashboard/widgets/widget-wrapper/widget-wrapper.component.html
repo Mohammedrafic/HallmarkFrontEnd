@@ -1,4 +1,4 @@
-<div class="app-widget-wrapper">
+<div class="app-widget-wrapper" [ngClass]="{ 'with-legend': legend }">
   <div class="app-widget-wrapper__content">
     <h3 *ngIf="title" class="app-widget-wrapper__title">{{ title }}</h3>
     <ng-container [ngTemplateOutlet]="isLoading ? loadingTemplate : regularWidgetTemplate"></ng-container>
@@ -12,10 +12,10 @@
 <ng-template #regularWidgetTemplate>
   <div class="app-widget-wrapper__projection-wrapper">
     <div class="app-widget-wrapper__chart">
-      <ng-content select="[chart]"></ng-content>
+      <ng-container [ngTemplateOutlet]="chart"></ng-container>
     </div>
-    <div class="app-widget-wrapper__legend">
-      <ng-content select="[legend]"></ng-content>
+    <div *ngIf="legend" class="app-widget-wrapper__legend">
+      <ng-container [ngTemplateOutlet]="legend"></ng-container>
     </div>
   </div>
 </ng-template>

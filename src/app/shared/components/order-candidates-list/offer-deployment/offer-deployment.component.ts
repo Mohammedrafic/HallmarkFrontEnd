@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
@@ -13,7 +13,7 @@ import {
   UpdateOrganisationCandidateJobSucceed
 } from "@client/store/order-managment-content.actions";
 import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
-
+import { BillRatesComponent } from "@shared/components/bill-rates/bill-rates.component";
 
 @Component({
   selector: 'app-offer-deployment',
@@ -21,11 +21,13 @@ import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-
   styleUrls: ['./offer-deployment.component.scss']
 })
 export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
+  @ViewChild('billRates') billRatesComponent: BillRatesComponent;
+
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
 
   @Input() candidate: OrderCandidatesList;
-  @Input() billRatesData: BillRate[] = [];
 
+  public billRatesData: BillRate[] = [];
   public formGroup: FormGroup;
   public nextApplicantStatuses: ApplicantStatus[];
   public optionFields = { text: 'statusText', value: 'applicantStatus' };
@@ -68,6 +70,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       const value = this.formGroup.getRawValue();
       this.isOfferedStatus = event.itemData.applicantStatus === ApplicantStatusEnum.Offered;
       this.store.dispatch( new UpdateOrganisationCandidateJob({
+        orderId: this.candidateJob.orderId,
         organizationId: this.candidateJob.organizationId,
         jobId: this.candidateJob.jobId,
         nextApplicantStatus: event.itemData,
@@ -79,10 +82,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
         clockId: this.candidateJob.clockId,
         guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
         allowDeplayWoCredentials: true
-      })).subscribe((data) => {
-        this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-      });
-
+        // TODO: set bill rates
+      })).subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
     }
   }
 
@@ -109,6 +110,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       availableStartDate: data.availableStartDate,
       candidateBillRate: data.candidateBillRate,
       requestComment: data.requestComment
+      // TODO: set bill rates
     });
   }
 

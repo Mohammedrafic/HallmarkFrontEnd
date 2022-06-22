@@ -1,14 +1,15 @@
 <app-widget-wrapper [title]="'Applicants by Region'" [isLoading]="isLoading">
-  <app-map
-    chart
-    class="app-maps-chart__map"
-    [layers]="chartData?.chartData"
-  ></app-map>
-  <div legend>
-    <div class="app-maps-chart__range-line"></div>
-    <div class="app-maps-chart__range-values">
-      {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.from }} -
-      {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.to }}
+  <ng-template #chart>
+    <app-map class="app-maps-chart__map" [layers]="chartData?.chartData"></app-map>
+  </ng-template>
+
+  <ng-template #legend>
+    <div #legend>
+      <div class="app-maps-chart__range-line"></div>
+      <div class="app-maps-chart__range-values">
+        {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.from }} -
+        {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.to }}
+      </div>
     </div>
-  </div>
+  </ng-template>
 </app-widget-wrapper>

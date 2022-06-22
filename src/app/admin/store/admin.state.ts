@@ -40,7 +40,8 @@ import {
   RemoveCredentialType,
   ExportSkills,
   ExportSkillCategories,
-  RemoveOrganizationLogo
+  RemoveOrganizationLogo,
+  ExportCredentialTypes
 } from './admin.actions';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
@@ -50,7 +51,6 @@ import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
-import { OrganizationManagementStateModel } from '../../organization-management/store/organization-management.state';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { CredentialsService } from '@shared/services/credentials.service';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
@@ -161,7 +161,7 @@ export class AdminState {
   static allSkillsCategories(state: AdminStateModel): SkillCategoriesPage | null { return state.allSkillsCategories; }
 
   @Selector()
-  static credentialTypes(state: OrganizationManagementStateModel): CredentialType[] { return state.credentialTypes; }
+  static credentialTypes(state: AdminStateModel): CredentialType[] { return state.credentialTypes; }
 
   constructor(
     private organizationService: OrganizationService,
@@ -343,27 +343,24 @@ export class AdminState {
   }
 
   @Action(SaveCredentialType)
-  SaveCredentialTypes({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveCredentialType): Observable<CredentialType> {
+  SaveCredentialTypes({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveCredentialType): Observable<CredentialType> {
     return this.credentialsService.saveUpdateCredentialType(payload).pipe(tap((payload) => {
-      patchState({ isCredentialTypesLoading: false });
       dispatch(new GetCredentialTypes());
       return payload;
     }));
   }
 
   @Action(UpdateCredentialType)
-  UpdateCredentialTypes({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: UpdateCredentialType): Observable<CredentialType> {
+  UpdateCredentialTypes({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: UpdateCredentialType): Observable<CredentialType> {
     return this.credentialsService.saveUpdateCredentialType(payload).pipe(tap((payload) => {
-      patchState({ isCredentialLoading: false });
       dispatch(new GetCredentialTypes());
       return payload;
     }));
   }
 
   @Action(RemoveCredentialType)
-  RemoveCredentialTypes({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: RemoveCredentialType): Observable<any> {
+  RemoveCredentialTypes({ dispatch }: StateContext<AdminStateModel>, { payload }: RemoveCredentialType): Observable<any> {
     return this.credentialsService.removeCredentialType(payload).pipe(tap((payload) => {
-        patchState({ isCredentialTypesLoading: false });
         dispatch(new GetCredentialTypes());
         return payload;
       }),
@@ -381,6 +378,14 @@ export class AdminState {
   @Action(ExportSkillCategories)
   ExportSkillCategories({ }: StateContext<AdminStateModel>, { payload }: ExportSkillCategories): Observable<any> {
     return this.categoriesService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
+
+  @Action(ExportCredentialTypes)
+  ExportCredentialTypes({ }: StateContext<AdminStateModel>, { payload }: ExportCredentialTypes): Observable<any> {
+    return this.credentialsService.exportCredentialTypes(payload).pipe(tap(file => {
       const url = window.URL.createObjectURL(file);
       saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
     }));

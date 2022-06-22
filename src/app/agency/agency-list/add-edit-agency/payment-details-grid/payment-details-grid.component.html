@@ -91,7 +91,6 @@
           [fields]="optionFields"
           formControlName="mode"
           [dataSource]="paymentMode"
-          placeholder="Mode"
         ></ejs-dropdownlist>
       </div>
     </div>
@@ -100,7 +99,7 @@
       <div class="input-container">
         <label for="payee">Payee<span class="required">*</span></label>
         <div class="input-group">
-          <input id="payee" class="e-input" type="text" appValidateWithMessage placeholder="Payee" formControlName="payee" maxlength="50" />
+          <input id="payee" class="e-input" type="text" appValidateWithMessage formControlName="payee" maxlength="50" />
         </div>
       </div>
     </div>
@@ -114,7 +113,6 @@
             class="e-input"
             type="text"
             appValidateWithMessage
-            placeholder="Address"
             formControlName="address"
             maxlength="500"
           />
@@ -126,7 +124,7 @@
       <div class="input-container">
         <label for="city">City</label>
         <div class="input-group">
-          <input id="city" class="e-input" type="text" appValidateWithMessage placeholder="City" formControlName="city" maxlength="20" />
+          <input id="city" class="e-input" type="text" appValidateWithMessage formControlName="city" maxlength="20" />
         </div>
       </div>
     </div>
@@ -142,7 +140,7 @@
             appValidateWithMessage
             formControlName="zip"
             class="e-input"
-            placeholder="Zipcode"
+            placeholder=" "
           ></ejs-maskedtextbox>
         </div>
       </div>

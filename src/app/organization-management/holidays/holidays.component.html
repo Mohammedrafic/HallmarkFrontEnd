@@ -210,7 +210,6 @@
             <ejs-multiselect appValidateWithMessage
                              mode="CheckBox"
                              formControlName="regions"
-                             placeholder="Region"
                              selectAllText="Select All"
                              [fields]="optionFields"
                              [showSelectAll]="true"
@@ -221,7 +220,7 @@
           </div>
         </div>
       </div>
-  
+
       <div>
         <div class="input-container">
           <label>Location <span class="required">*</span></label>
@@ -229,7 +228,6 @@
             <ejs-multiselect appValidateWithMessage
                              mode="CheckBox"
                              formControlName="locations"
-                             placeholder="Location"
                              selectAllText="Select All"
                              [fields]="optionFields"
                              [showSelectAll]="true"
@@ -243,7 +241,7 @@
                   </div>
                   <ng-container *ngIf="!data.id">
                     <span class="location-name">{{data.name}}</span>
-                  </ng-container>         
+                  </ng-container>
               </ng-template>
             </ejs-multiselect>
           </div>
@@ -257,7 +255,6 @@
           <div class="input-group dropdown">
             <ejs-dropdownlist
               appValidateWithMessage
-              placeholder="Region"
               [dataSource]="regions"
               [fields]="optionFields"
               formControlName="regionId">
@@ -272,7 +269,6 @@
           <div class="input-group dropdown">
             <ejs-dropdownlist
               appValidateWithMessage
-              placeholder="Location"
               [dataSource]="locations"
               [fields]="optionFields"
               formControlName="locationId">
@@ -288,7 +284,6 @@
         <div class="input-group dropdown">
           <ejs-autocomplete [dataSource]="masterHolidays"
                             appValidateWithMessage
-                            placeholder="Holiday Name"
                             name="holidayName"
                             formControlName="holidayName"
                             [fields]="holidayOptionFields"

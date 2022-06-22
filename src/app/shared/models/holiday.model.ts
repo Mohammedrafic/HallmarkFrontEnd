@@ -30,6 +30,7 @@ export class OrganizationHoliday {
   organizationId?: number;
   toOverwrite?: boolean;
   foreignKey?: string;
+  isOrganizationHoliday: boolean;
 
   constructor(holiday: OrganizationHoliday, selectedRegions?: OrganizationRegion[], allRegionsAndLocations?: boolean, isExist?: boolean) {
     this.id = holiday.id;

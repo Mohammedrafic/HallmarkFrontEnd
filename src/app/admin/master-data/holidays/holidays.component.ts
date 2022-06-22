@@ -104,6 +104,7 @@ export class MasterHolidaysComponent extends AbstractGridConfigurationComponent 
   }
 
   public override customExport(): void {
+    this.defaultFileName = 'Master Holidays ' + this.generateDateTime(this.datePipe);
     this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }

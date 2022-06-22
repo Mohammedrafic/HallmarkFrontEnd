@@ -22,7 +22,7 @@ import {
 
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
 import { CreateOrderDto, EditOrderDto, GetPredefinedBillRatesData, Order } from '@shared/models/order-management.model';
-import { BillRatesComponent } from '@bill-rates/bill-rates.component';
+import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.component';
 import { BillRate, OrderBillRateDto } from '@shared/models/bill-rate.model';
 import { IOrderCredentialItem } from '@order-credentials/types';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';

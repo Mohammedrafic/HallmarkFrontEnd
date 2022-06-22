@@ -1,0 +1,12 @@
+<app-widget-wrapper [isLoading]="isLoading">
+  <ng-template #chart>
+    <div class="widget">
+      <span class="widget__title">{{ chartData?.count }}</span>
+      <span
+        class="widget__type"
+        (mousedown)="mouseDown($event)"
+        (click)="toSourceContent($event)"
+        >{{ chartData?.statusName | titlecase }} Positions</span>
+    </div>
+  </ng-template>
+</app-widget-wrapper>

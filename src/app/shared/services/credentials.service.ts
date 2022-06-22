@@ -5,7 +5,13 @@ import { Observable } from 'rxjs';
 
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
-import { CredentialSetup, CredentialSetupGetGroup, CredentialSetupPage } from '@shared/models/credential-setup.model';
+import {
+  CredentialSetup,
+  CredentialSetupFilterData,
+  CredentialSetupFilterDto,
+  CredentialSetupPage
+} from '@shared/models/credential-setup.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
 export class CredentialsService {
@@ -103,5 +109,34 @@ export class CredentialsService {
    */
   public getAllCredentials(): Observable<Credential[]> {
     return this.http.get<Credential[]>(`/api/MasterCredentials/allCreds`);
+  }
+
+ /**
+  * Export credential types
+  */
+  public exportCredentialTypes(payload: ExportPayload): Observable<any> {
+    if (payload.ids) {
+      return this.http.post(`/api/CredentialTypes/export/byIds`, payload, { responseType: 'blob' });
+    }
+    return this.http.post(`/api/CredentialTypes/export`, payload, { responseType: 'blob' });
+  }
+
+  /**
+   * Get Filtered Credential Setup Mapping Data
+   * @param filterData filter object
+   * @return list of Credential Setup Mapping Filter Data
+   */
+  public getFilteredCredentialSetupData(filterData: CredentialSetupFilterDto): Observable<CredentialSetupFilterData[]> {
+    let data = '?';
+    const keysValues: string[] = [];
+
+    Object.entries(filterData).forEach(([key, value]) => {
+      if (value) {
+        keysValues.push(`${key}=${value}`)
+      }
+    });
+
+    data += keysValues.join('&');
+    return this.http.get<CredentialSetupFilterData[]>(`/api/CredentialSetups/mappings${data}`);
   }
 }

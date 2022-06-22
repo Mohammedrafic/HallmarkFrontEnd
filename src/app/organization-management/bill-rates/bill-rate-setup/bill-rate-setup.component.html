@@ -12,8 +12,13 @@
     [allowSorting]="allowSorting"
     [allowResizing]="allowResizing"
     [enableVirtualization]="true"
+    (rowSelected)="rowSelected($event, grid)"
+    (rowDeselected)="rowDeselected($event, grid)"
+    (dataBound)="gridDataBound(grid)"
+    [selectionSettings]="selectionSettings"
   >
     <e-columns>
+      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column field="regionName" headerText="REGION" width=150>
         <ng-template #template let-data>
           <span *ngIf="data.regionId">{{ data.regionName }}</span>
@@ -204,6 +209,8 @@
     </ng-template>
   </ejs-grid>
 
+  <app-export-dialog *ngIf="isActive" [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+
   <app-side-dialog
     (formCancelClicked)="onFormCancelClick()"
     (formSaveClicked)="onFormSaveClick()"
@@ -224,7 +231,6 @@
               id="region"
               #regionDropdown
               appValidateWithMessage
-              placeholder="Region"
               selectAllText="Select All"
               mode="CheckBox"
               [dataSource]="orgRegions"
@@ -245,7 +251,6 @@
               id="location"
               #locationDropdown
               appValidateWithMessage
-              placeholder="Location"
               selectAllText="Select All"
               mode="CheckBox"
               [dataSource]="locations"
@@ -267,7 +272,6 @@
               id="department"
               #departmentDropdown
               appValidateWithMessage
-              placeholder="Department"
               selectAllText="Select All"
               mode="CheckBox"
               [dataSource]="departments"
@@ -286,7 +290,6 @@
             <ejs-multiselect
               id="skill"
               appValidateWithMessage
-              placeholder="Skill"
               selectAllText="Select All"
               mode="CheckBox"
               [dataSource]="skills$ | async"
@@ -307,7 +310,6 @@
             <ejs-dropdownlist
               id="billRatesTitle"
               appValidateWithMessage
-              placeholder="Bill Rates Title"
               [dataSource]="billRatesOptions$ | async"
               [fields]="billRateTitleFields"
               formControlName="billRateTitleId">
@@ -321,7 +323,6 @@
             <ejs-multiselect
               id="orderType"
               appValidateWithMessage
-              placeholder="Order Type"
               selectAllText="Select All"
               mode="CheckBox"
               [dataSource]="orderTypes"
@@ -377,7 +378,6 @@
               maxlength="10"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
-              placeholder="Hours"
               decimals='0'
               format="#"
               formControlName="billRateValueRateTimes"
@@ -390,7 +390,6 @@
               type="text"
               formControlName="billRateValueRateTimes"
               appValidateWithMessage
-              [placeholder]="selectedBillRateUnit === BillRateUnitList.Multiplier ? 'Multiplier' : 'Amount'"
               maxlength="11"
               (keyup)="priceUtils.verifyDigitsAfterDot(billRatesFormGroup,'billRateValueRateTimes')"
               (keydown)="priceUtils.numbersOnly($event)"
@@ -428,7 +427,6 @@
               [maxlength]="10"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
-              placeholder="Interval Min"
               decimals='0'
               format="#"
               formControlName="intervalMin"
@@ -448,7 +446,6 @@
               [maxlength]="10"
               [validateDecimalOnType]="true"
               [showSpinButton]="false"
-              placeholder="Interval Max"
               decimals='0'
               format="#"
               formControlName="intervalMax"

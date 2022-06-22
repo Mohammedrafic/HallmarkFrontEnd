@@ -24,7 +24,7 @@ import {
 } from '../store/organization-management.actions';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { Location } from '@shared/models/location.model';
+import { Location, LocationFilter } from '@shared/models/location.model';
 
 import { PhoneTypes } from '@shared/enums/phone-types';
 import { Country } from '@shared/enums/states';
@@ -42,6 +42,9 @@ import { UserState } from '../../store/user.state';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { DatePipe } from '@angular/common';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { FilteredItem } from '@shared/models/filter.model';
+import { FilterService } from '@shared/services/filter.service';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
 export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
 
@@ -102,38 +105,38 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   ];
   public fileName: string;
   public defaultFileName: string;
+  private businessUnitId: number;
+  public LocationFilterFormGroup: FormGroup;
+  public filters: LocationFilter = {};
+  public filterColumns: any;
 
   constructor(private store: Store,
-              private actions$: Actions,
               @Inject(FormBuilder) private builder: FormBuilder,
               private confirmService: ConfirmService,
-              private datePipe: DatePipe) {
+              private datePipe: DatePipe,
+              private filterService: FilterService) {
     super();
-    /**
-     * TODO: pending filtering
-     *    this.filteredItems = [
-            { text: 'loc 1', column: 'locations', value: '1' }
-            { text: 'loc 2', column: 'locations', value: '2' }
-            { text: 'loc 3', column: 'locations', value: '3' }
-          ];
-          filters = {
-            locations: [1,2,3]
-          }
-     */
 
     this.formBuilder = builder;
     this.createLocationForm();
   }
 
   ngOnInit(): void {
+    this.filterColumns = {
+      externalId: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      invoiceId: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      name: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      address1: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      city: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      state: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      zip: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      contactPerson: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+    }
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
-      if (id) {
-        this.store.dispatch(new GetOrganizationById(id));
-      } else {
-        this.store.dispatch(new GetOrganizationById(this.store.selectSnapshot(UserState.user)?.businessUnitId as number));
-      }
+      this.businessUnitId = id;
+      this.getOrganization();
     });
-    this.organization$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe(organization => {
+    this.organization$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
       this.store.dispatch(new GetRegions());
     });
@@ -142,6 +145,22 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private getOrganization() {
+    if (this.businessUnitId) {
+      this.store.dispatch(new GetOrganizationById(this.businessUnitId));
+    } else {
+      this.store.dispatch(new GetOrganizationById(this.store.selectSnapshot(UserState.user)?.businessUnitId as number));
+    }
+  }
+
+  private getLocations() {
+    this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id as number));
+  }
+
+  public override updatePage(): void {
+    this.getLocations();
   }
 
   public override customExport(): void {
@@ -174,6 +193,39 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
+  }
+
+  public onFilterClose() {
+    this.LocationFilterFormGroup.setValue({
+      externalId: this.filters.externalId || [],
+      invoiceId: this.filters.invoiceId || [],
+      name: this.filters.name || [],
+      address1: this.filters.address1 || [],
+      city: this.filters.city || [],
+      state: this.filters.state || [],
+      zip: this.filters.zip || [],
+      contactPerson: this.filters.contactPerson || [],
+    });
+    this.filteredItems = this.filterService.generateChips(this.LocationFilterFormGroup, this.filterColumns);
+  }
+
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.LocationFilterFormGroup, this.filterColumns);
+  }
+
+  public onFilterClearAll(): void {
+    this.LocationFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {};
+    this.getLocations();
+  }
+  
+  public onFilterApply(): void {
+    this.filters = this.LocationFilterFormGroup.getRawValue();
+    this.filteredItems = this.filterService.generateChips(this.LocationFilterFormGroup, this.filterColumns);
+    this.getLocations();
+    this.store.dispatch(new ShowFilterDialog(false));
   }
 
   onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -378,6 +430,17 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
     this.regionFormGroup = this.formBuilder.group({
       newRegionName: ['', [Validators.required,  Validators.minLength(1),  Validators.maxLength(50)]]
+    });
+
+    this.LocationFilterFormGroup = this.formBuilder.group({
+      externalId: [[]],
+      invoiceId: [[]],
+      name: [[]],
+      address1: [[]],
+      city: [[]],
+      state: [[]],
+      zip: [[]],
+      contactPerson: [[]]
     });
   }
 

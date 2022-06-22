@@ -1,7 +1,6 @@
-import type { PanelModel } from '@syncfusion/ej2-angular-layouts';
-import type { DashboardLayoutComponent } from '@syncfusion/ej2-angular-layouts';
-
 import { Component, ChangeDetectionStrategy, Output, EventEmitter, Input } from '@angular/core';
+
+import type { DashboardLayoutComponent, PanelModel } from '@syncfusion/ej2-angular-layouts';
 
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import type { WidgetsDataModel } from '../models/widgets-data.model';

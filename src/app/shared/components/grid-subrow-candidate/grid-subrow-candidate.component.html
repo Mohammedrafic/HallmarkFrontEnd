@@ -1,0 +1,50 @@
+<div class="candidate-row"  [ngClass]="{'selected': selected}" (click)="clickEvent.emit()">
+  <div class="info">
+    <div class="data">{{ order.orderId }}/{{ candidatIndex }}</div>
+    <div class="title">Position ID</div>
+  </div>
+  <div class="info status">
+    <ejs-chiplist>
+      <e-chips>
+        <e-chip [text]="orderStatus[candidat.status]" [cssClass]="orderStatus[candidat.status] | chipsCssClass"></e-chip>
+      </e-chips>
+    </ejs-chiplist>
+  </div>
+  <div class="info">
+    <div class="divider"></div>
+  </div>
+  <div class="info">
+    <div class="data">{{ candidat.candidateLastName }}, {{ candidat.candidateFirstName }}</div>
+    <div class="title">Candidate Name</div>
+  </div>
+  <div class="info">
+    <ejs-chiplist>
+      <e-chips>
+        <e-chip [text]="candidatSatus[candidat.candidateStatus]" [cssClass]="candidatSatus[candidat.candidateStatus] | chipsCssClass"></e-chip>
+      </e-chips>
+    </ejs-chiplist>
+  </div>
+  <div class="info">
+    <div class="data">{{ order.skill || '-' }}</div>
+    <div class="title">Skill</div>
+  </div>
+  <div class="info">
+    <div class="data"> {{order.billRate | billRate: candidat.candidateBillRate: candidat.status: candidat.candidateBillRate}}</div>
+    <div class="title">Bill Rate $</div>
+  </div>
+  <div class="info">
+    <div class="progress-bar">
+      <span class="data">{{ candidat.submissionsPercentage }}</span>
+      <app-custom-progress-bar [value]="candidat.submissionsPercentage"></app-custom-progress-bar>
+    </div>
+    <div class="title">Submission %</div>
+  </div>
+  <div class="info">
+    <div class="progress-bar">
+      <span class="data">{{ candidat.onboardedPercentage }}</span>
+      <app-custom-progress-bar [value]="candidat.onboardedPercentage"></app-custom-progress-bar>
+    </div>
+    <div class="title">Onboarded %</div>
+  </div>
+</div>
+
