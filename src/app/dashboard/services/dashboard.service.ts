@@ -50,7 +50,8 @@ export class DashboardService {
     [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboardFiltersModel) => this.getPositionsByTypes(filters),
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.InProgress),
     [WidgetTypeEnum.OPEN_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
-    [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),[WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
+    [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
+    [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -206,13 +207,12 @@ export class DashboardService {
 
   private getActivePositionWidgetData(filters: DashboardFiltersModel): Observable<AccumulationChartModel> {
     return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, {}).pipe(
-      map((data: ActivePositionsDto) => data.orderStatusesDetails),
-      map((activePositionsInfo: ActivePositionTypeInfo[]) => {
+      map(({orderStatusesDetails}: ActivePositionsDto) => {
         return {
           id: WidgetTypeEnum.ACTIVE_POSITIONS,
           title: 'Active Positions',
           chartData: lodashMapPlain(
-            activePositionsInfo,
+            orderStatusesDetails,
             ({ count, statusName }: ActivePositionTypeInfo, index: number) => ({
               label: statusName,
               value: count,
