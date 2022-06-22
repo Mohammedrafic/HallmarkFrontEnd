@@ -6,10 +6,10 @@ import { Observable } from 'rxjs';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
 import {
-  CredentialSetup,
-  CredentialSetupFilterData,
+  CredentialSetupFilterGet,
   CredentialSetupFilterDto,
-  CredentialSetupPage
+  CredentialSetupGet,
+  CredentialSetupPost
 } from '@shared/models/credential-setup.model';
 import { ExportPayload } from '@shared/models/export.model';
 
@@ -81,26 +81,29 @@ export class CredentialsService {
   }
 
   /**
-   * Get credential setup list pages
-   * @param pageNumber
-   * @param pageSize
-   * @return list of credential setup pages
+   * Get credential setup list by mappingId
+   * @param mappingId
+   * @return list of credential setup
    */
-  public getCredentialSetup(pageNumber: number, pageSize: number): Observable<CredentialSetupPage> {
-    return this.http.get<CredentialSetupPage>(`/api/CredentialSetups/`, { params: { PageNumber: pageNumber, PageSize: pageSize } });
+  public getCredentialSetupByMappingId(mappingId: number): Observable<CredentialSetupGet[]> {
+    return this.http.get<CredentialSetupGet[]>(`/api/CredentialSetups/${mappingId}`);
   }
 
   /**
-   * Create/Update credential setup
-   * @param credentialSetup object to save
-   * @return Created/Updated credential setup
+   * Remove credential setup record by its id
+   * @param mappingId
    */
-  public saveUpdateCredentialSetup(credentialSetup: CredentialSetup): Observable<CredentialSetup> {
-    if (credentialSetup.id) {
-      return this.http.put<CredentialSetup>(`/api/CredentialSetup`, credentialSetup);
-    } else {
-      return this.http.post<CredentialSetup>(`/api/CredentialSetup`, credentialSetup);
-    }
+  public removeCredentialSetups(mappingId: number): Observable<void> {
+    return this.http.delete<void>(`/api/CredentialSetups/${mappingId}`);
+  }
+
+  /**
+   * Update credential setup
+   * @param credentialSetup object to save
+   * @return Updated credential setup
+   */
+  public updateCredentialSetup(credentialSetup: CredentialSetupPost): Observable<CredentialSetupGet> {
+    return this.http.post<CredentialSetupGet>(`/api/CredentialSetup`, credentialSetup);
   }
 
   /**
@@ -126,7 +129,7 @@ export class CredentialsService {
    * @param filterData filter object
    * @return list of Credential Setup Mapping Filter Data
    */
-  public getFilteredCredentialSetupData(filterData: CredentialSetupFilterDto): Observable<CredentialSetupFilterData[]> {
+  public getFilteredCredentialSetupData(filterData: CredentialSetupFilterDto): Observable<CredentialSetupFilterGet[]> {
     let data = '?';
     const keysValues: string[] = [];
 
@@ -137,6 +140,6 @@ export class CredentialsService {
     });
 
     data += keysValues.join('&');
-    return this.http.get<CredentialSetupFilterData[]>(`/api/CredentialSetups/mappings${data}`);
+    return this.http.get<CredentialSetupFilterGet[]>(`/api/CredentialSetups/mappings${data}`);
   }
 }

@@ -64,6 +64,7 @@ import { BillRateSetupComponent } from './bill-rates/bill-rate-setup/bill-rate-s
 import { BillRateTypeComponent } from './bill-rates/bill-rate-type/bill-rate-type.component';
 import { BillRateTypeMappingComponent } from './bill-rates/bill-rate-type-mapping/bill-rate-type-mapping.component';
 import { BillRatesState } from '@organization-management/store/bill-rates.state';
+import { FilteredCredentialsComponent } from './credentials/credentials-setup/filtered-credentials/filtered-credentials.component';
 
 const sidebarIcons = {
   Download,
@@ -104,7 +105,8 @@ const sidebarIcons = {
     BillRatesComponent,
     BillRateSetupComponent,
     BillRateTypeComponent,
-    BillRateTypeMappingComponent
+    BillRateTypeMappingComponent,
+    FilteredCredentialsComponent
   ],
   imports: [
     CommonModule,

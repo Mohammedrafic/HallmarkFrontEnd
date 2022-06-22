@@ -5,26 +5,32 @@ import {
   DeleteCredentialGroupMappingById,
   ExportCredentialList,
   GetCredentialGroupMapping,
+  GetCredentialSetupByMappingId,
   GetFilteredCredentialSetupData,
+  RemoveCredentialSetupByMappingId,
   SaveCredentialGroupMapping,
+  UpdateCredentialSetup,
   SetCredentialSetupFilter,
-  SetNavigationTab
+  SetNavigationTab,
+  UpdateCredentialSetupSucceeded
 } from './credentials.actions';
 import { catchError, Observable, tap } from 'rxjs';
 import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
 import { SkillGroupService } from '@shared/services/skill-group.service';
 import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED } from '@shared/constants';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { CredentialsService } from '@shared/services/credentials.service';
-import { CredentialSetupFilterData } from '@shared/models/credential-setup.model';
+import { CredentialSetupFilterGet, CredentialSetupGet } from '@shared/models/credential-setup.model';
+import { getAllErrors } from '@shared/utils/error.utils';
 
 export interface CredentialsStateModel {
   activeTab: number;
   setupFilter: CredentialSetupFilter | null;
   groupMappings: SkillGroupMapping[],
-  filteredCredentialSetupData: CredentialSetupFilterData[]
+  filteredCredentialSetupData: CredentialSetupFilterGet[],
+  credentialSetupList: CredentialSetupGet[]
 }
 
 @State<CredentialsStateModel>({
@@ -33,7 +39,8 @@ export interface CredentialsStateModel {
     activeTab: 0,
     setupFilter: null,
     groupMappings: [],
-    filteredCredentialSetupData: []
+    filteredCredentialSetupData: [],
+    credentialSetupList: []
   }
 })
 @Injectable()
@@ -48,7 +55,10 @@ export class CredentialsState {
   static groupMappings(state: CredentialsStateModel): SkillGroupMapping[] { return state.groupMappings; }
 
   @Selector()
-  static filteredCredentialSetupData(state: CredentialsStateModel): CredentialSetupFilterData[] { return state.filteredCredentialSetupData; }
+  static filteredCredentialSetupData(state: CredentialsStateModel): CredentialSetupFilterGet[] { return state.filteredCredentialSetupData; }
+
+  @Selector()
+  static credentialSetupList(state: CredentialsStateModel): CredentialSetupGet[] { return state.credentialSetupList; }
 
   constructor(private skillGroupService: SkillGroupService,
               private credentialService: CredentialsService) {}
@@ -105,10 +115,36 @@ export class CredentialsState {
   };
 
   @Action(GetFilteredCredentialSetupData)
-  GetFilteredCredentialSetupData({ patchState }: StateContext<CredentialsStateModel>, { payload }: GetFilteredCredentialSetupData): Observable<CredentialSetupFilterData[]> {
+  GetFilteredCredentialSetupData({ patchState }: StateContext<CredentialsStateModel>, { payload }: GetFilteredCredentialSetupData): Observable<CredentialSetupFilterGet[]> {
     return this.credentialService.getFilteredCredentialSetupData(payload).pipe(tap((responseData) => {
       patchState({ filteredCredentialSetupData: responseData });
       return responseData;
+    }));
+  }
+
+  @Action(GetCredentialSetupByMappingId)
+  GetCredentialSetupByMappingId({ patchState, dispatch }: StateContext<CredentialsStateModel>, { mappingId }: GetCredentialSetupByMappingId): Observable<CredentialSetupGet[]> {
+    return this.credentialService.getCredentialSetupByMappingId(mappingId).pipe(tap((response) => {
+      patchState({ credentialSetupList: response });
+      return response;
+    }));
+  }
+
+  @Action(RemoveCredentialSetupByMappingId)
+  RemoveCredentialSetupByMappingId({ patchState, dispatch }: StateContext<CredentialsStateModel>, { mappingId, filter }: RemoveCredentialSetupByMappingId): Observable<void> {
+    return this.credentialService.removeCredentialSetups(mappingId).pipe(tap(() => {
+        dispatch(new GetFilteredCredentialSetupData(filter));
+        return mappingId;
+      }),
+      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : RECORD_CANNOT_BE_DELETED))));
+  }
+
+  @Action(UpdateCredentialSetup)
+  UpdateCredentialSetup({ patchState, dispatch }: StateContext<CredentialsStateModel>, { credentialSetup }: UpdateCredentialSetup): Observable<CredentialSetupGet> {
+    return this.credentialService.updateCredentialSetup(credentialSetup).pipe(tap((response) => {
+      dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED))
+      dispatch(new UpdateCredentialSetupSucceeded());
+      return response;
     }));
   }
 }
