@@ -3,18 +3,19 @@
 .widget {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: space-evenly;
   height: 100%;
 
   &__title {
     font-size: 24px;
     font-weight: 700;
+    padding-bottom: 20%;
   }
 
   &__type {
     font-size: 14px;
     color: $secondary-dark-blue-20;
-    margin-right: -8px;
+    margin-right: -16px;
     cursor: default;
   }
 }
