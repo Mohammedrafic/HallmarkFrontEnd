@@ -51,20 +51,9 @@
 .input-group {
   margin-top: 5px;
 }
+
 .input-container {
   margin-bottom: 15px;
-}
-.row {
-  display: flex;
-  justify-content: space-between;
-  
-  .input-container {
-    width: 100%;
-    
-    &:first-child {
-      margin-right: 12px;
-    }
-  }
 }
 
 .form-container {
