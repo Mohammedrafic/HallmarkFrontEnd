@@ -7,4 +7,7 @@ export enum TIMETHEETS_STATUSES {
   MISSING = 'missing',
   ORG_APPROVED = 'org. approved',
   REJECTED = 'rejected',
+export enum ProfileTimeSheetActionType {
+  Add = 'add',
+  Edit = 'edit',
 }

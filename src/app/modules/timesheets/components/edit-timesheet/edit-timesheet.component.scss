@@ -1,0 +1,41 @@
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+}
+
+.dialog-container {
+  padding: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #060715;
+  margin: 0;
+}
+
+.button-cancel {
+  margin-right: 8px;
+}
+
+.input-group {
+  margin-top: 5px;
+
+  &.short {
+    width: 150px;
+  }
+}
+
+.input-container {
+  padding-top: 20px;
+
+  label {
+    margin-bottom: 12px;
+  }
+}

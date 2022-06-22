@@ -1,0 +1,115 @@
+<ejs-dialog
+id="dialog"
+#sideEditDialog
+cssClass="dialog"
+[width]="'434px'"
+[target]="targetElement"
+[visible]="false"
+[animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <div class="dialog-container">
+      <div class="dialog-header">
+        <h3 class="title">{{ headerText }}</h3>
+        <div class="controls">
+          <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
+          <button ejs-button [isPrimary]="true">Save</button>
+        </div>
+      </div>
+      <div class="form">
+        <form [formGroup]="form" autocomplete="off" class="bootstrap">
+          <div class="input-container">
+            <label for="day">Day <span class="required">*</span></label>
+            <div class="input-group short">
+              <input
+                class="e-input"
+                type="text"
+                placeholder="Day of week"
+                name="day"
+                formControlName="day"
+              />
+            </div>
+          </div>
+
+          <div class="input-container">
+            <label for="timeIn">Time in <span class="required">*</span></label>
+            <div class="input-group">
+              <ejs-datetimepicker
+                name="timeIn"
+                formControlName="timeIn"
+                placeholder="Select Date and Time"
+                [min]="form.get('timeIn') || today"
+                [step]="30">
+              </ejs-datetimepicker>
+            </div>
+          </div>
+          <div class="input-container">
+            <label for="timeOut">Time out <span class="required">*</span></label>
+            <div class="input-group">
+              <ejs-datetimepicker
+                name="timeOut"
+                formControlName="timeOut"
+                placeholder="Select Date and Time"
+                [min]="form.get('timeIn') || today"
+                [step]="30">
+              </ejs-datetimepicker>
+            </div>
+          </div>
+          <div class="input-container">
+            <label for="costCenter">Cost Center <span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist
+                formControlName="costCenter"
+                [dataSource]="costCenter"
+                name="costCenter"
+              ></ejs-dropdownlist>
+            </div>
+          </div>
+          <div class="input-container">
+            <label for="category">Category <span class="required">*</span></label>
+            <div class="input-group dropdown">
+              <ejs-dropdownlist
+                formControlName="category"
+                [dataSource]="categories"
+                name="category"
+              ></ejs-dropdownlist>
+          </div>
+          </div>
+          <div class="input-container">
+            <label for="hours">Hours/Miles <span class="required">*</span></label>
+            <div class="input-group">
+              <input
+                class="e-input"
+                type="text"
+                name="hours"
+                formControlName="hours"
+              />
+            </div>
+          </div>
+          <div class="input-container">
+            <label for="rate">Rate <span class="required">*</span></label>
+            <div class="input-group">
+              <input
+                class="e-input"
+                type="text"
+                name="rate"
+                formControlName="rate"
+              />
+            </div>
+          </div>
+          <div class="input-container">
+            <label for="total">Total <span class="required">*</span></label>
+            <div class="input-group">
+              <input
+                class="e-input"
+                type="text"
+                name="total"
+                formControlName="total"
+              />
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </ng-template>
+</ejs-dialog>
