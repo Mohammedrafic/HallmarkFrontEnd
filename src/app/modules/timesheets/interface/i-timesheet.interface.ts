@@ -17,4 +17,13 @@ export interface ITimesheetsFilter {
   orderBy?: string;
   pageNumber: number;
   pageSize: number;
+  date?: string;
+  search?: string;
+  orderId?: string;
+  status?: string[];
+  skill?: string[];
+  department?: string[];
+  billRate?: number;
+  agencyName?: string[];
+  totalHours?: number;
 }
