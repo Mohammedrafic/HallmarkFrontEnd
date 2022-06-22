@@ -373,6 +373,29 @@ ejs-grid.e-control.e-grid {
       padding-left: 21px;
     }
   }
+
+  &.e-gridwithchildrow {
+    .e-detailrowcollapse, .e-detailrowexpand, .e-detailheadercell {
+      visibility: hidden;
+    }
+    .e-table {
+      margin-left: -30px;
+    }
+  }
+
+  .subrow-toggle {
+    color: $primary-active-blue-10;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  
+    i-feather {
+      margin-left: 4px;
+      width: 14px;
+      height: 14px;
+    }
+  }
 }
 
 

@@ -7,6 +7,7 @@ import { JobClassification } from '@shared/enums/job-classification';
 import { ReasonForRequisition } from '@shared/enums/reason-for-requisition';
 import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
+import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
 
 export class OrderManagement {
   id: number;
@@ -61,6 +62,22 @@ export type AgencyOrderManagement = {
   jobStartDate: string;
   organizationId: number;
   organizationName: string;
+  children: AgencyOrderManagementChild[];
+};
+
+export type AgencyOrderManagementChild = {
+  candidateBillRate: number;
+  candidateFirstName: string;
+  candidateId: number;
+  candidateLastName: string;
+  candidateMasterCredentialIds: number[];
+  candidateMiddleName: string;
+  candidateStatus: CandidateStatus;
+  jobId: number;
+  onboardedPercentage: number;
+  organizationId: number;
+  status: OrderStatus;
+  submissionsPercentage: number;
 };
 
 export type OrderCandidatesList = {
@@ -192,11 +209,11 @@ export type AcceptJobDTO = {
   guaranteedWorkWeek: string;
   jobId: number;
   orderId: number;
-  nextApplicantStatus: ApplicantStatus,
+  nextApplicantStatus: ApplicantStatus;
   offeredBillRate: number;
   organizationId: number;
   requestComment: string;
-}
+};
 
 export type CandidateProfile = {
   agencyId: number;
@@ -217,7 +234,7 @@ export type CandidateProfile = {
   professionalSummary: string;
   profileStatus: number;
   ssn: number;
-}
+};
 
 export type OrderCandidateJob = {
   actualEndDate: string;
@@ -244,13 +261,13 @@ export type OrderCandidateJob = {
   applicantStatus: {
     applicantStatus: number;
     statusText: string;
-  }
-}
+  };
+};
 
 export type ApplicantStatus = {
   applicantStatus: number;
   statusText: string;
-}
+};
 
 export class OrderFilter {
   orderBy?: string;
@@ -269,3 +286,4 @@ export class OrderFilter {
   jobStartDate?: Date;
   jobEndDate?: Date;
 }
+

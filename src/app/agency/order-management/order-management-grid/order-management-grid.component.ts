@@ -4,6 +4,7 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
   CheckBoxChangeEventArgs,
+  DetailRowService,
   GridComponent,
   PagerComponent,
   RowDataBoundEventArgs,
@@ -25,7 +26,7 @@ import {
   ReloadOrderCandidatesLists,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AgencyOrderManagement, AgencyOrderManagementPage, Order } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, AgencyOrderManagementPage } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { Location } from '@angular/common';
@@ -42,10 +43,10 @@ enum AllCheckedStatus {
   selector: 'app-order-management-grid',
   templateUrl: './order-management-grid.component.html',
   styleUrls: ['./order-management-grid.component.scss'],
-  providers: [ChipsCssClass],
+  providers: [ChipsCssClass, DetailRowService],
 })
 export class OrderManagementGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
-  @ViewChild('grid') grid: GridComponent;
+  @ViewChild('grid') override gridWithChildRow: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
 
   @ViewChildren('rowCheckbox') rowCheckboxes: QueryList<CheckBoxComponent>;
@@ -100,12 +101,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onDataBound(): void {
+    // this.gridWithChildRow.detailRowModule.expandAll();
     if (this.previousSelectedOrderId) {
       const [data, index] = this.store.selectSnapshot(OrderManagementState.lastSelectedOrder)(
         this.previousSelectedOrderId
         );
       if (data && !isUndefined(index)) {
-        this.grid.selectRow(index);
+        this.gridWithChildRow.selectRow(index);
         this.onRowClick({ data });
       }
     }
@@ -133,7 +135,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public onSortStatus(): void {
     const direction: SortDirection = this.statusSortDerection === 'Ascending' ? 'Descending' : 'Ascending';
-    this.grid.sortColumn('status', direction);
+    this.gridWithChildRow.sortColumn('status', direction);
     this.statusSortDerection = direction;
   }
 
@@ -170,23 +172,27 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onNextPreviousOrderEvent(next: boolean): void {
-    const [index] = this.grid.getSelectedRowIndexes();
+    const [index] = this.gridWithChildRow.getSelectedRowIndexes();
     const nextIndex = next ? index + 1 : index - 1;
-    this.grid.selectRow(nextIndex);
+    this.gridWithChildRow.selectRow(nextIndex);
+  }
+
+  public onOpenCandidateDialog(data: unknown): void {
+    console.log(data)
   }
 
   private onOrderPreviewChange(): void {
     this.openPreview.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (!isOpen) {
         this.openCandidat.next(false);
-        this.grid?.clearRowSelection();
+        this.gridWithChildRow?.clearRowSelection();
         this.previousSelectedOrderId = null;
       }
     });
   }
 
   private getDialogNextPreviousOption(selectedOrder: AgencyOrderManagement): DialogNextPreviousOption {
-    const gridData = this.grid.dataSource as AgencyOrderManagement[];
+    const gridData = this.gridWithChildRow.dataSource as AgencyOrderManagement[];
     const first = gridData[0];
     const last = gridData[gridData.length - 1];
     return {

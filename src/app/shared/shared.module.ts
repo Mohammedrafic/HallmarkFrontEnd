@@ -80,6 +80,7 @@ import { FormatPhoneNumberPipe } from '@shared/pipes/format-phone-number.pipe';
 import { RateHourPipe } from '@shared/pipes/rate-hour.pipe';
 import { OfferDeploymentComponent } from './components/order-candidates-list/offer-deployment/offer-deployment.component';
 import { BillRatePipe } from "@shared/pipes/bill-rate.pipe";
+import { GridSubrowCandidateComponent } from './components/grid-subrow-candidate/grid-subrow-candidate.component';
 import { BillRatesComponent } from "@shared/components/bill-rates/bill-rates.component";
 import { BillRateFormComponent } from "@shared/components/bill-rates/components/bill-rate-form/bill-rate-form.component";
 import { BillRatesGridComponent } from "@shared/components/bill-rates/components/bill-rates-grid/bill-rates-grid.component";
@@ -137,6 +138,7 @@ const COMPONENTS = [
   OnboardedCandidateComponent,
   ApplyCandidateComponent,
   OfferDeploymentComponent,
+  GridSubrowCandidateComponent,
   BillRatesComponent
 ];
 

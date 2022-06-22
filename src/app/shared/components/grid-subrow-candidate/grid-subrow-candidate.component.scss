@@ -1,0 +1,76 @@
+@import '../../../styles/variables/colors.scss';
+
+.candidate-row {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding-left: 103px;
+
+  &:hover {
+    background-color: $primary-active-blue-90;
+  }
+
+  .info {
+    font-size: 12px;
+
+    &:not(:last-child) {
+      margin-right: 26px;
+    }
+
+    .data {
+      font-weight: 700;
+      color: $black;
+    }
+
+    .title {
+      margin-top: 2px;
+      font-weight: 400;
+      color: $secondary-dark-blue-30;
+    }
+  }
+
+  .status {
+    min-width: 186px;
+    padding-left: 30px;
+  }
+
+  .divider {
+    width: 1px;
+    height: 34px;
+    background-color: $secondary-dark-blue-45;
+  }
+
+  .progress-bar {
+    display: flex;
+    align-items: center;
+
+    span {
+      margin-right: 8px;
+      width: 26px;
+    }
+
+    app-custom-progress-bar {
+      min-width: 70px
+    }
+  }
+
+  &.selected {
+    background-color: $primary-active-blue;
+
+    .info {
+      .data {
+        color: $white;
+      }
+
+      .title {
+        color: $secondary-dark-blue-40;
+      }
+    }
+  }
+}
+
+ejs-chiplist.e-control.e-chip-list .e-chip {
+  min-width: 112px;
+  width: auto;
+}
+
