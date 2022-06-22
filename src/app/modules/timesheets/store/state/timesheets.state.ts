@@ -11,7 +11,7 @@ import {
 } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
-import { DEFAULT_TIMESHEETS_STATE } from '../../constants/timesheet-default-state.constant';
+import { ProfileTimeSheetActionType } from '../../enums/timesheets.enum';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -37,6 +37,11 @@ export class TimesheetsState {
     return state.profileOpen;
   }
 
+  @Selector([TimesheetsState])
+  static timeSheetEditDialogOpen(state: TimesheetsModel): ProfileTimeSheetActionType | null {
+    return state.editDialogType;
+  }
+
   @Action(Timesheets.GetAll)
   GetTimesheets({ patchState }: StateContext<TimesheetsModel>, { payload }: Timesheets.GetAll): Observable<TimeSheetsPage> {
     return this.timesheetsService.getTimesheets(payload).pipe(tap((res) => patchState({
@@ -57,9 +62,32 @@ export class TimesheetsState {
   }
 
   @Action(Timesheets.ToggleProfileDialog)
-  toggleProfile({ patchState, getState }: StateContext<TimesheetsModel>): void {
+  ToggleProfile({ patchState, getState }: StateContext<TimesheetsModel>): void {
     patchState({
       profileOpen: !getState().profileOpen,
+    });
+  }
+
+  @Action(Timesheets.OpenProfileTimesheetEditDialog)
+  OpenTimeSheetEditDialog({ patchState }: StateContext<TimesheetsModel>,
+    type: ProfileTimeSheetActionType, timesheet: ProfileTimeSheetDetail): void {
+    patchState({
+      editDialogType: type,
+      profileDialogTimesheet: timesheet,
+    });
+  }
+
+  @Action(Timesheets.OpenProfileTimesheetAddDialog)
+  OpenTimesheetAddDialog({ patchState }: StateContext<TimesheetsModel>, type: ProfileTimeSheetActionType): void {
+      patchState({
+        editDialogType: type,
+      });
+    }
+
+  @Action(Timesheets.CloseProfileTimesheetEditDialog)
+  CloseTimeSheetEditDialog({ patchState }: StateContext<TimesheetsModel>): void {
+    patchState({
+      editDialogType: null,
     });
   }
 }

@@ -1,10 +1,14 @@
+import { ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { NgxsModule } from '@ngxs/store';
-import { SharedModule } from '@shared/shared.module';
-import { ButtonModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 
+import { GridModule } from '@syncfusion/ej2-angular-grids';
+import { FeatherModule } from 'angular-feather';
+import { DialogAllModule } from '@syncfusion/ej2-angular-popups';
+import { ButtonModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
+import { DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
 
 import { TimesheetsRoutingModule } from './timesheets-routing.module';
 import { TimesheetsContainerComponent } from './containers/timesheets-container/timesheets-container.component';
@@ -13,28 +17,25 @@ import { TimesheetsState } from './store/state/timesheets.state';
 import { TimesheetsApiService } from './services/timesheets-api.service';
 import { TabDynamicNavigationComponent } from './components/tab-dynamic-navigation/tab-dynamic-navigation.component';
 import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
-import { AlertTriangle, FileText, ChevronRight, AlignJustify, Briefcase, Calendar, CheckCircle, ChevronDown,
+import { FileText, ChevronRight, AlignJustify, Briefcase, Calendar, CheckCircle, ChevronDown,
   Copy, Download, Edit, Edit3, Folder, Lock, MapPin, Menu, MessageSquare, MoreVertical, Plus, Search, Sliders, Trash2,
-  Upload, User, X, XCircle
+  Upload, User, X, XCircle, AlertTriangle,
 } from 'angular-feather/icons';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 import { NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DatePickerModule, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
-import { ReactiveFormsModule } from '@angular/forms';
 import { ControlConverterPipe } from './pipes/control-converter.pipe';
 import { ProfileDetailsContainerComponent } from './containers/profile-details-container/profile-details-container.component';
 import { ProfileTimesheetTableComponent } from './components/profile-timesheet-table/profile-timesheet-table.component';
-import { GridModule } from '@syncfusion/ej2-angular-grids';
-import { FeatherModule } from 'angular-feather';
-import { DialogAllModule } from '@syncfusion/ej2-angular-popups';
-import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 
 const gridIcons = {
   MessageSquare,
   Lock,
+  FileText,
   ChevronDown,
+  ChevronRight,
   AlignJustify,
   Menu,
   Sliders,
@@ -55,9 +56,12 @@ const gridIcons = {
   Calendar,
   Folder,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
 };
 
+import { EditTimesheetComponent } from './components/edit-timesheet/edit-timesheet.component';
+import { EditTimesheetService } from './services/edit-timesheet.service';
+import { SharedModule } from '@shared/shared.module';
 
 @NgModule({
   declarations: [
@@ -67,6 +71,7 @@ const gridIcons = {
     ControlConverterPipe,
     ProfileDetailsContainerComponent,
     ProfileTimesheetTableComponent,
+    EditTimesheetComponent,
   ],
   imports: [
     CommonModule,
@@ -99,9 +104,12 @@ const gridIcons = {
       ChevronRight,
       Copy,
     }),
+    ReactiveFormsModule,
+    DateTimePickerModule,
+    DropDownListModule,
     NgxsModule.forFeature([TimesheetsState]),
   ],
   exports: [TimesheetsContainerComponent],
-  providers: [TimesheetsApiService, MaskedDateTimeService]
+  providers: [TimesheetsApiService, EditTimesheetService, MaskedDateTimeService]
 })
 export class TimesheetsModule {}

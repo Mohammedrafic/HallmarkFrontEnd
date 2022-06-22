@@ -1,16 +1,21 @@
 import {
-  ChangeDetectionStrategy, Component, Inject, OnInit, ViewChildren, AfterViewInit, ViewChild, ChangeDetectorRef
+  ChangeDetectionStrategy,
+  Component,
+  Inject,
+  OnInit,
+  ViewChild,
+  ChangeDetectorRef,
 } from '@angular/core';
 
 import { filter, Observable, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { Destroyable } from 'src/app/core/helpers/destroyable.helper';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { ProfileTimeSheetDetail } from '../../store/model/timesheets.model';
 import { GlobalWindow } from 'src/app/core/tokens/document.token';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 @Component({
   selector: 'app-profile-details-container',
