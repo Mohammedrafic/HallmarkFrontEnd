@@ -59,6 +59,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public candidateCredentialPage: CandidateCredentialPage;
   public openFileViewerDialog = new EventEmitter<number>();
   public credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  public today = new Date();
   public optionFields = { text: 'text', value: 'id' };
   public verifiedStatuses = Object.values(CredentialVerifiedStatus)
     .filter(valuesOnly)

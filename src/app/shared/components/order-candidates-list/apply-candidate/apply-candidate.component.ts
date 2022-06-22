@@ -24,6 +24,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   public formGroup: FormGroup;
   public readOnlyMode: boolean;
+  public today = new Date();
 
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;

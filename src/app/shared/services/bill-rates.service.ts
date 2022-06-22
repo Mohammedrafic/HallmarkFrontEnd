@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { BillRateFilters, BillRateOption, BillRateSetup, BillRateSetupPage, BillRateSetupPost } from '@shared/models/bill-rate.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({
   providedIn: 'root'
@@ -41,5 +42,12 @@ export class BillRatesService {
    */
   public getBillRateOptions(): Observable<BillRateOption[]> {
     return this.http.get<BillRateOption[]>(`/api/BillRates/options`);
+  }
+
+  /**
+   * Export bill rate setup
+   */
+  public exportBillRateSetup(payload: ExportPayload): Observable<any> {
+    return this.http.post(`/api/BillRates/export`, payload, { responseType: 'blob' });
   }
 }

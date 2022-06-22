@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Observable, tap } from 'rxjs';
 
-import { BillRateService } from '@bill-rates/services/bill-rate.service';
+import { BillRatesService } from "@shared/services/bill-rates.service";
 import { BillRateOption } from '@shared/models/bill-rate.model';
-import { GetBillRateOptions } from './bill-rate.actions';
+import { GetBillRateOptions } from '@shared/components/bill-rates/store/bill-rate.actions';
 
 export interface BillRateStateModel {
   billRateOptions: BillRateOption[];
@@ -23,7 +23,7 @@ export class BillRateState {
     return state.billRateOptions;
   }
 
-  constructor(private billRateService: BillRateService) {}
+  constructor(private billRateService: BillRatesService) {}
 
   @Action(GetBillRateOptions)
   GetBillRateOptions({ patchState }: StateContext<BillRateStateModel>): Observable<BillRateOption[]> {

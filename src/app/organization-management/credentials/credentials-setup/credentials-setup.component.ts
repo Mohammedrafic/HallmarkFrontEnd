@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import {
   AbstractGridConfigurationComponent
@@ -12,20 +12,21 @@ import { ShowSideDialog } from '../../../store/app.actions';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import { OrganizationManagementState } from '../../store/organization-management.state';
 import {
-  GetCredential,
-  GetCredentialTypes,
-  SaveUpdateCredentialSetupSucceeded,
-  GetAllOrganizationSkills, GetCredentialSkillGroup
+  GetCredentialSkillGroup
 } from '../../store/organization-management.actions';
-import { CredentialType } from '@shared/models/credential-type.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CredentialSetup, CredentialSetupFilterDto, CredentialSetupPage } from '@shared/models/credential-setup.model';
-import { Credential } from '@shared/models/credential.model';
+import {
+  CredentialSetupFilterDto,
+  CredentialSetupFilterGet,
+  CredentialSetupGet,
+  CredentialSetupPost
+} from '@shared/models/credential-setup.model';
 import { UserState } from 'src/app/store/user.state';
-import { Skill } from '@shared/models/skill.model';
+import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { GetFilteredCredentialSetupData } from '@organization-management/store/credentials.actions';
+import { CredentialsState } from '@organization-management/store/credentials.state';
+import { GetCredentialSetupByMappingId, UpdateCredentialSetupSucceeded } from '@organization-management/store/credentials.actions';
 
 @Component({
   selector: 'app-credentials-setup',
@@ -36,12 +37,6 @@ import { GetFilteredCredentialSetupData } from '@organization-management/store/c
 export class CredentialsSetupComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
 
-  @Select(OrganizationManagementState.credentialTypes)
-  credentialType$: Observable<CredentialType[]>;
-
-  @Select(OrganizationManagementState.credentials)
-  credentials$: Observable<Credential[]>;
-
   @Select(UserState.organizationStructure)
   organizationStructure$: Observable<OrganizationStructure>;
   public orgRegions: OrganizationRegion[] = [];
@@ -50,17 +45,15 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   public locations: OrganizationLocation[] = [];
 
   public departments: OrganizationDepartment[] = [];
-  public departmentFields: FieldSettingsModel = { text: 'departmentName', value: 'departmentId' };
 
   public fields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   @Select(OrganizationManagementState.skillGroups)
   groups$: Observable<CredentialSkillGroup[]>;
-  public selectedSkillGroupId: number;
+  groups: CredentialSkillGroup[];
 
-  @Select(OrganizationManagementState.allOrganizationSkills)
-  skills$: Observable<Skill[]>;
-  skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
+  public skills: MasterSkillByOrganization[];
+  public skillsFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
@@ -71,10 +64,11 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
 
   public editedCredentialSetupId?: number;
 
-  //@Select(OrganizationManagementState.credentialSetups) // TODO: uncomment after BE implementation
-  credentialsData$: Observable<CredentialSetupPage>;
+  public credentialSetupFilter = new Subject<CredentialSetupFilterDto>();
 
-  private pageSubject = new Subject<number>();
+  @Select(CredentialsState.credentialSetupList)
+  credentialSetupData$: Observable<CredentialSetupGet[]>;
+
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private store: Store,
@@ -90,38 +84,11 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   }
 
   ngOnInit(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.store.dispatch(new GetCredentialTypes());
-      this.store.dispatch(new GetCredential());
-      this.store.dispatch(new GetAllOrganizationSkills());
-      this.store.dispatch(new GetCredentialSkillGroup());
-      this.store.dispatch(new GetFilteredCredentialSetupData({
-        regionId: null,
-        locationId: null,
-        departmentId: null,
-        skillGroupId: null,
-        skillId: null,
-        pageNumber: 1, // TODO: add pagination
-        pageSize: 100 // TODO: add pagination
-      }));
-    });
-
-    this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
-      this.orgRegions = structure.regions;
-      this.allRegions = [...this.orgRegions];
-    });
-
+    this.organizationChangedHandler();
+    this.onRegionsDataLoaded();
+    this.onSkillGroupDataLoaded();
     this.headerFilterHandler();
-
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
-      this.currentPage = page;
-      // this.store.dispatch(new GetCredentialSetupByPage(this.currentPage, this.pageSize)); // TODO: uncomment after BE implementation
-    });
-
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveUpdateCredentialSetupSucceeded)).subscribe(() => {
-      this.clearFormData();
-      // this.store.dispatch(new GetCredentialSetupByPage(this.currentPage, this.pageSize)); // TODO: uncomment after BE implementation
-    });
+    this.credentialSetupUpdateHandler();
   }
 
   ngOnDestroy(): void {
@@ -133,9 +100,9 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     this.router.navigateByUrl('admin/organization-management/credentials/groups-setup');
   }
 
-  public onOptionChange(credentialSetup: any, event: any): void {
+  public onOptionChange(credentialSetup: CredentialSetupGet, event: any): void {
     this.credentialsSetupFormGroup.setValue({
-      id: credentialSetup.id,
+      mappingId: credentialSetup.mappingId,
       isActive: event.checked,
       masterCredentialId: credentialSetup.masterCredentialId,
       description: credentialSetup.description,
@@ -147,9 +114,9 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     this.onCredentialFormSaveClick();
   }
 
-  public onReqForSubmissionChange(credentialSetup: any, event: any): void {
+  public onReqForSubmissionChange(credentialSetup: CredentialSetupGet, event: any): void {
     this.credentialsSetupFormGroup.setValue({
-      id: credentialSetup.id,
+      mappingId: credentialSetup.mappingId,
       isActive: credentialSetup.isActive,
       masterCredentialId: credentialSetup.masterCredentialId,
       description: credentialSetup.description,
@@ -161,9 +128,9 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     this.onCredentialFormSaveClick();
   }
 
-  public onReqForOnboardChange(credentialSetup: any, event: any): void {
+  public onReqForOnboardChange(credentialSetup: CredentialSetupGet, event: any): void {
     this.credentialsSetupFormGroup.setValue({
-      id: credentialSetup.id,
+      mappingId: credentialSetup.mappingId,
       isActive: credentialSetup.isActive,
       masterCredentialId: credentialSetup.masterCredentialId,
       description: credentialSetup.description,
@@ -175,10 +142,10 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     this.onCredentialFormSaveClick();
   }
 
-  public onEditCredentialClick(credentialSetup: any, event: any): void {
+  public onEditCredentialClick(credentialSetup: CredentialSetupGet, event: any): void {
     this.addActiveCssClass(event);
     this.credentialsSetupFormGroup.setValue({
-      id: credentialSetup.id,
+      mappingId: credentialSetup.mappingId,
       isActive: credentialSetup.isActive,
       masterCredentialId: credentialSetup.masterCredentialId,
       description: credentialSetup.description,
@@ -211,19 +178,18 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
 
   public onCredentialFormSaveClick(): void {
     if (this.credentialsSetupFormGroup.valid) {
-      const credentialSetup: CredentialSetup = {
-        id: this.credentialsSetupFormGroup.controls['id'].value,
+      const credentialSetup: CredentialSetupPost = {
+        mappingId: this.credentialsSetupFormGroup.controls['mappingId'].value,
+        masterCredentialId: this.credentialsSetupFormGroup.controls['masterCredentialId'].value,
         isActive: this.credentialsSetupFormGroup.controls['isActive'].value,
-        masterCredentialId: this.credentialsSetupFormGroup.controls['masterCredentialId'].value, // TODO: clarify with BE
-        skillGroupId: this.selectedSkillGroupId,
-        comments: this.credentialsSetupFormGroup.controls['comments'].value,
-        inactiveDate: this.credentialsSetupFormGroup.controls['inactiveDate'].value,
         reqSubmission: this.credentialsSetupFormGroup.controls['reqSubmission'].value,
         reqOnboard: this.credentialsSetupFormGroup.controls['reqOnboard'].value,
+        comments: this.credentialsSetupFormGroup.controls['comments'].value,
+        inactiveDate: this.credentialsSetupFormGroup.controls['inactiveDate'].value,
       }
 
       console.log(credentialSetup); // TODO: remove after implementation
-      // this.store.dispatch(new SaveUpdateCredentialSetup(credentialSetup)); // TODO: uncomment after implementation
+      // this.store.dispatch(new UpdateCredentialSetup(credentialSetup)); // TODO: uncomment after implementation
       this.store.dispatch(new ShowSideDialog(false));
       this.clearFormData();
       this.removeActiveCssClass();
@@ -232,19 +198,39 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     }
   }
 
+  public mapGridData(): void {
+    this.credentialSetupData$.subscribe(data => {
+      if (data) {
+        this.lastAvailablePage = this.getLastPage(data);
+        this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
+        this.totalDataRecords = data.length;
+      }
+    });
+  }
+
   public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
-    this.grid.pageSettings.pageSize = this.pageSize;
+    this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
   }
 
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
+      this.credentialSetupData$.subscribe(data => {
+        this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
+        this.currentPagerPage = event.currentPage || event.value;
+      });
     }
   }
 
   public onMappingEditClick(): void {
     // TODO: need implementation
+  }
+
+  public onSelectedCredentialClick(data: CredentialSetupFilterGet): void {
+    // TODO: need implementation
+    if (data) {
+      console.log(data);
+      this.store.dispatch(new GetCredentialSetupByMappingId(data.mappingId));
+    }
   }
 
   private clearFormData(): void {
@@ -253,14 +239,13 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   }
 
   private createCredentialsForm(): void {
-    // TODO: pass SetupCredential model
     this.credentialsSetupFormGroup = this.formBuilder.group({
-      id: [null],
-      isActive: [false],
+      mappingId: [null],
       masterCredentialId: [null],
       description: [{ value: '', disabled: true }, Validators.required],
       comments: ['', Validators.maxLength(500)],
       inactiveDate: [null],
+      isActive: [false],
       reqSubmission: [false],
       reqOnboard: [false]
     });
@@ -276,6 +261,27 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     });
   }
 
+  private organizationChangedHandler(): void {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.store.dispatch(new GetCredentialSkillGroup());
+    });
+  }
+
+  private onRegionsDataLoaded(): void {
+    this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
+      this.orgRegions = structure.regions;
+      this.allRegions = [...this.orgRegions];
+    });
+  }
+
+  private onSkillGroupDataLoaded(): void {
+    this.groups$.subscribe(groups => {
+      if (groups) {
+        this.groups = groups;
+      }
+    });
+  }
+
   private headerFilterHandler(): void {
     this.headerFilterFormGroup.controls['regionId']?.valueChanges.subscribe((regionId: number) => {
       this.locations = [];
@@ -285,21 +291,19 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
         const selectedRegion = this.orgRegions.find(region => region.id === regionId);
         this.locations.push(...selectedRegion?.locations as any);
         this.locations.forEach(location => this.departments.push(...location.departments));
+
+        const filter: CredentialSetupFilterDto = {
+          regionId: regionId || null,
+          locationId: this.headerFilterFormGroup.controls['locationId'].value,
+          departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
+          skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
+          skillId: this.headerFilterFormGroup.controls['skillId'].value,
+        };
+        this.credentialSetupFilter.next(filter);
       }
 
       this.headerFilterFormGroup.controls['locationId'].setValue(null);
       this.headerFilterFormGroup.controls['departmentId'].setValue(null);
-
-      const filter: CredentialSetupFilterDto = {
-        regionId: regionId || null,
-        locationId: this.headerFilterFormGroup.controls['locationId'].value,
-        departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
-        skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
-        skillId: this.headerFilterFormGroup.controls['skillId'].value,
-        pageSize: 100, // TODO: add pagination
-        pageNumber: 1 // TODO: add pagination
-      };
-      this.store.dispatch(new GetFilteredCredentialSetupData(filter));
     });
 
     this.headerFilterFormGroup.get('locationId')?.valueChanges.subscribe((locationId: number) => {
@@ -308,59 +312,84 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       if (locationId) {
         const selectedLocation = this.locations.find(location => location.id === locationId);
         this.departments.push(...selectedLocation?.departments as []);
+
+        const filter: CredentialSetupFilterDto = {
+          regionId: this.headerFilterFormGroup.controls['regionId'].value,
+          locationId: locationId || null,
+          departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
+          skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
+          skillId: this.headerFilterFormGroup.controls['skillId'].value,
+        };
+        this.credentialSetupFilter.next(filter);
       }
 
       this.headerFilterFormGroup.controls['departmentId'].setValue(null);
-
-      const filter: CredentialSetupFilterDto = {
-        regionId: this.headerFilterFormGroup.controls['regionId'].value,
-        locationId: locationId || null,
-        departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
-        skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
-        skillId: this.headerFilterFormGroup.controls['skillId'].value,
-        pageSize: 100, // TODO: add pagination
-        pageNumber: 1 // TODO: add pagination
-      };
-      this.store.dispatch(new GetFilteredCredentialSetupData(filter));
     });
 
     this.headerFilterFormGroup.get('departmentId')?.valueChanges.subscribe((departmentId: number) => {
-      const filter: CredentialSetupFilterDto = {
-        regionId: this.headerFilterFormGroup.controls['regionId'].value,
-        locationId: this.headerFilterFormGroup.controls['locationId'].value,
-        departmentId: departmentId || null,
-        skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
-        skillId: this.headerFilterFormGroup.controls['skillId'].value,
-        pageSize: 100, // TODO: add pagination
-        pageNumber: 1 // TODO: add pagination
-      };
-      this.store.dispatch(new GetFilteredCredentialSetupData(filter));
+      if (departmentId) {
+        const filter: CredentialSetupFilterDto = {
+          regionId: this.headerFilterFormGroup.controls['regionId'].value,
+          locationId: this.headerFilterFormGroup.controls['locationId'].value,
+          departmentId: departmentId || null,
+          skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
+          skillId: this.headerFilterFormGroup.controls['skillId'].value,
+        };
+        this.credentialSetupFilter.next(filter);
+      }
     });
 
     this.headerFilterFormGroup.get('groupId')?.valueChanges.subscribe((groupId: number) => {
-      const filter: CredentialSetupFilterDto = {
-        regionId: this.headerFilterFormGroup.controls['regionId'].value,
-        locationId: this.headerFilterFormGroup.controls['locationId'].value,
-        departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
-        skillGroupId: groupId || null,
-        skillId: this.headerFilterFormGroup.controls['skillId'].value,
-        pageSize: 100, // TODO: add pagination
-        pageNumber: 1 // TODO: add pagination
-      };
-      this.store.dispatch(new GetFilteredCredentialSetupData(filter));
+      this.skills = [];
+
+      if (groupId) {
+        const selectedGroup = this.groups.find(group => group.id === groupId);
+        this.skills.push(...selectedGroup?.skills as []);
+
+        const filter: CredentialSetupFilterDto = {
+          regionId: this.headerFilterFormGroup.controls['regionId'].value,
+          locationId: this.headerFilterFormGroup.controls['locationId'].value,
+          departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
+          skillGroupId: groupId || null,
+          skillId: this.headerFilterFormGroup.controls['skillId'].value,
+        };
+        this.credentialSetupFilter.next(filter);
+      }
+
+      this.headerFilterFormGroup.controls['skillId'].setValue(null);
     });
 
     this.headerFilterFormGroup.get('skillId')?.valueChanges.subscribe((skillId: number) => {
-      const filter: CredentialSetupFilterDto = {
-        regionId: this.headerFilterFormGroup.controls['regionId'].value,
-        locationId: this.headerFilterFormGroup.controls['locationId'].value,
-        departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
-        skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
-        skillId: skillId || null,
-        pageSize: 100, // TODO: add pagination
-        pageNumber: 1 // TODO: add pagination
-      };
-      this.store.dispatch(new GetFilteredCredentialSetupData(filter));
+      if (skillId) {
+        const filter: CredentialSetupFilterDto = {
+          regionId: this.headerFilterFormGroup.controls['regionId'].value,
+          locationId: this.headerFilterFormGroup.controls['locationId'].value,
+          departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
+          skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
+          skillId: skillId || null,
+        };
+        this.credentialSetupFilter.next(filter);
+      }
     });
+  }
+
+  private credentialSetupUpdateHandler(): void {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateCredentialSetupSucceeded)).subscribe(() => {
+      this.clearFormData();
+      // this.store.dispatch(new GetCredentialSetupByMappingId(this.currentPage, this.pageSize)); // TODO: uncomment after BE implementation
+    });
+  }
+
+  private getActiveRowsPerPage(): number {
+    return parseInt(this.activeRowsPerPageDropDown);
+  }
+
+  private getRowsPerPage(data: object[], currentPage: number): object[] {
+    return data.slice((currentPage * this.getActiveRowsPerPage()) - this.getActiveRowsPerPage(),
+      (currentPage * this.getActiveRowsPerPage()));
+  }
+
+  private getLastPage(data: object[]): number {
+    return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
   }
 }

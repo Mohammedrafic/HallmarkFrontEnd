@@ -126,6 +126,7 @@
                         format="MM/dd/yyyy"
                         appValidateWithMessage
                         placeholder="MM/DD/YYYY"
+                        [min]="today"
                         [enableMask]="true"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                         formControlName="startDate"
@@ -142,6 +143,7 @@
                         format="MM/dd/yyyy"
                         appValidateWithMessage
                         placeholder="MM/DD/YYYY"
+                        [min]="today"
                         [enableMask]="true"
                         [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
                         formControlName="endDate"

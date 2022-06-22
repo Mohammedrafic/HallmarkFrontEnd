@@ -9,7 +9,8 @@ import {
   GetBillRates,
   SaveUpdateBillRate,
   ShowConfirmationPopUp,
-  SaveUpdateBillRateSucceed
+  SaveUpdateBillRateSucceed,
+  ExportBillRateSetup
 } from '@organization-management/store/bill-rates.actions';
 import { BillRatesService } from '@shared/services/bill-rates.service';
 import {
@@ -21,6 +22,7 @@ import {
 } from '@shared/constants';
 import { BillRateOption, BillRateSetup, BillRateSetupPage } from '@shared/models/bill-rate.model';
 import { getAllErrors } from '@shared/utils/error.utils';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 
 export interface BillRatesStateModel {
   billRatesPage: BillRateSetupPage | null,
@@ -100,4 +102,12 @@ export class BillRatesState {
       return payload;
     }));
   }
+
+  @Action(ExportBillRateSetup)
+  ExportBillRateSetup({ }: StateContext<BillRatesStateModel>, { payload }: ExportBillRateSetup): Observable<any> {
+    return this.billRatesService.exportBillRateSetup(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
 }

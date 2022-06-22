@@ -11,8 +11,8 @@ import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { BillRate, BillRateOption, BillRateUnit } from '@shared/models/bill-rate.model';
 import { BillRatesGridEvent } from './components/bill-rates-grid/bill-rates-grid.component';
 import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
-import { GetBillRateOptions } from '@bill-rates/store/bill-rate.actions';
-import { BillRateState } from '@bill-rates/store/bill-rate.state';
+import { GetBillRateOptions } from '@shared/components/bill-rates/store/bill-rate.actions';
+import { BillRateState } from '@shared/components/bill-rates/store/bill-rate.state';
 
 @Component({
   selector: 'app-bill-rates',

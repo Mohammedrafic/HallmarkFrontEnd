@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { SortingDirections } from '@shared/enums/sorting';
 import { FilteredItem } from '@shared/models/filter.model';
-import { PageEventArgs } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, PageEventArgs } from '@syncfusion/ej2-angular-grids';
 import { ResizeSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
 import { GRID_CONFIG } from '../../constants/grid-config';
@@ -14,6 +14,7 @@ enum ExportType {
 }
 
 export abstract class AbstractGridConfigurationComponent {
+  gridWithChildRow: GridComponent;
 // grid
   gridDataSource: object[] = [];
   allowPaging = GRID_CONFIG.isPagingEnabled;
@@ -46,6 +47,9 @@ export abstract class AbstractGridConfigurationComponent {
   refreshing = false;
 
   clickedElement: any;
+
+  // Subrow
+  subrowsState = new Set<number>()
 
   exportOptions = [
     { text: ExportType[0], id: 0 },
@@ -187,5 +191,17 @@ export abstract class AbstractGridConfigurationComponent {
 
   stopPropagation(event: Event): void {
     event.stopPropagation();
+  }
+
+  public onSubrowToggle(event: MouseEvent, data: { index: string}): void {
+    event.stopPropagation();
+    const index = Number(data.index);
+    if (this.subrowsState.has(index)) {
+      this.gridWithChildRow.detailRowModule.collapse(index);
+      this.subrowsState.delete(index);
+    } else {
+      this.gridWithChildRow.detailRowModule.expand(Number(data.index));
+      this.subrowsState.add(index);
+    }
   }
 }

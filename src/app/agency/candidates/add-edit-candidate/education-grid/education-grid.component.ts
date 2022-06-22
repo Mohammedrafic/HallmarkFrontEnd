@@ -38,6 +38,7 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
   @Select(CandidateState.educations)
   educations$: Observable<Education[]>;
 
+  public today = new Date();
   public title = '';
   public educationForm: FormGroup;
   public optionFields = {

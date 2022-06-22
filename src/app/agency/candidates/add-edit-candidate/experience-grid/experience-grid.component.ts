@@ -38,6 +38,7 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
 
   public title = '';
   public experienceForm: FormGroup;
+  public today = new Date();
 
   constructor(private store: Store,
               private fb: FormBuilder,
