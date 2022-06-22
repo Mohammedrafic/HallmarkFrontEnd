@@ -9,12 +9,12 @@
     <app-search class="search"></app-search>
     <ejs-datepicker
       id="startDate"
-      class="datepicker"
+      class="datepicker datepicker--custom"
       format="dd/MM/yyyy"
-      placeholder="MM/DD/YYYY"
-      [enableMask]="true"
-      [maskPlaceholder]="{  month: 'MM', day: 'DD', year: 'YYYY' }"
+      placeholder="From: DD/MM/YYYY - To: DD/MM/YYYY"
       [formControl]="formGroup.get('date') | controlConverter"
+      [allowEdit]="false"
+      (renderDayCell)="onRenderCell($event)"
     >
     </ejs-datepicker>
     <button

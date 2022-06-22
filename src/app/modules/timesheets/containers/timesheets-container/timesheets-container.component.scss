@@ -1,8 +1,26 @@
 @import '../../styles/variables/colors';
 
-.e-input-group.e-control-wrapper.e-date-wrapper {
+.datepicker--custom .e-input-group.e-control-wrapper.e-date-wrapper {
+  min-width: 285px;
   background: $white;
+
+  .e-input[readonly] {
+    background: transparent !important;
+
+    ~ span.e-input-group-icon {
+      background: transparent !important;
+    }
+  }
 }
+
+.e-highlightselectedrange {
+  background: $primary-active-blue-10 !important;
+
+  span {
+    color: $white !important;
+  }
+}
+
 
 .e-input-group.e-float-icon-left.search-with-icon {
   height: 38px;
