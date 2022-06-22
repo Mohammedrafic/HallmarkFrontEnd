@@ -356,11 +356,11 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
 
     if (!order.joiningBonus) {
-      order.minYrsRequired = null;
+      order.joiningBonus = null;
     }
 
     if (!order.compBonus) {
-      order.minYrsRequired = null;
+      order.compBonus = null;
     }
 
     return order;
