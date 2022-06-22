@@ -151,10 +151,7 @@
   </ng-template>
 
   <ng-template #offerDeployment>
-    <app-offer-deployment (closeDialogEmitter)="onCloseDialog()"
-                         [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
-                         [candidate]="candidate">
-    </app-offer-deployment>
+    <app-offer-deployment (closeDialogEmitter)="onCloseDialog()" [candidate]="candidate"></app-offer-deployment>
   </ng-template>
   <ng-template #footerTemplate>
     <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>

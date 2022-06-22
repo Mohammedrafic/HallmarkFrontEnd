@@ -41,9 +41,9 @@ export interface BillRate {
   intervalMin: number | null;
   intervalMax: number | null;
   effectiveDate: string;
-};
+}
 
-export interface OrderBillRateDto extends Omit<BillRate, 'billRateConfig' | 'billRateGroupId'> { };
+export interface OrderBillRateDto extends Omit<BillRate, 'billRateConfig' | 'billRateGroupId'> { }
 
 export class BillRateSetup {
   billRateSettingId: number;
