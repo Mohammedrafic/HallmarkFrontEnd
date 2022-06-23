@@ -216,6 +216,7 @@ export type AcceptJobDTO = {
   offeredBillRate: number;
   organizationId: number;
   requestComment: string;
+  billRates: BillRate[];
 };
 
 export type CandidateProfile = {
@@ -265,6 +266,7 @@ export type OrderCandidateJob = {
     applicantStatus: number;
     statusText: string;
   };
+  billRates: BillRate[]
 };
 
 export type ApplicantStatus = {

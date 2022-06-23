@@ -128,19 +128,11 @@
   <ng-container *ngTemplateOutlet="templateState | async"></ng-container>
 
   <ng-template #onboarded>
-    <app-onboarded-candidate
-      (closeModalEvent)="onCloseDialog()"
-      [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
-      [candidate]="candidate"
-    ></app-onboarded-candidate>
+    <app-onboarded-candidate (closeModalEvent)="onCloseDialog()" [candidate]="candidate"></app-onboarded-candidate>
   </ng-template>
 
   <ng-template #accept>
-    <app-accept-candidate
-      (closeModalEvent)="onCloseDialog()"
-      [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
-      [candidate]="candidate"
-    ></app-accept-candidate>
+    <app-accept-candidate (closeModalEvent)="onCloseDialog()" [candidate]="candidate"></app-accept-candidate>
   </ng-template>
 
   <ng-template #apply>

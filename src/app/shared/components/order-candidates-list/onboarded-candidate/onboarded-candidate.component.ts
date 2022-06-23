@@ -27,7 +27,6 @@ import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   @Output() closeModalEvent = new EventEmitter<never>();
 
-  @Input() billRatesData: BillRate[] = [];
   @Input() candidate: OrderCandidatesList;
   @Input() isTab: boolean = false;
 
@@ -41,6 +40,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public candidateJob: OrderCandidateJob | null;
   public isOnboarded = true;
   public today = new Date();
+  public billRatesData: BillRate[] = [];
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');
@@ -81,6 +81,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.closeModalEvent.emit();
     this.candidateJob = null;
     this.jobStatus = [];
+    this.billRatesData = [];
   }
 
   private onAccept(): void {
@@ -101,7 +102,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
         actualEndDate: value.endDate,
         clockId: value.clockId,
         guaranteedWorkWeek: value.workWeek,
-        allowDeplayWoCredentials: value.allow
+        allowDeplayWoCredentials: value.allow,
+        billRates: this.billRatesData
       })).subscribe(() => {
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
       });
@@ -112,6 +114,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
       this.candidateJob = value;
       if(value) {
+        this.billRatesData = [...value.billRates];
         this.form.patchValue({
           jobId: value.orderId,
           date: [value.order.jobStartDate, value.order.jobEndDate],

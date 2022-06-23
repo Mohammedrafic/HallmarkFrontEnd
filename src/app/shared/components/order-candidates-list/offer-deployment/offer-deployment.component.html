@@ -117,6 +117,10 @@
     </div>
   </section>
   <section class="bill-rates">
-    <app-bill-rates #billRates [billRates]="billRatesData" [isActive]="true"></app-bill-rates>
+    <app-bill-rates #billRates
+                    [billRates]="billRatesData"
+                    [isActive]="true"
+                    (billRatesChanged)="onBillRatesChanged()">
+    </app-bill-rates>
   </section>
 </section>
