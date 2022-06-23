@@ -37,7 +37,7 @@ import {
 import { NgxsModule } from '@ngxs/store';
 import { OrganizationManagementState } from './store/organization-management.state';
 import { CredentialsState } from './store/credentials.state';
-import { SharedModule } from '../shared/shared.module';
+import { SharedModule } from '@shared/shared.module';
 import { ShiftsState } from './store/shifts.state';
 import { OrganizationManagementComponent } from './organization-management.component';
 import { OrganizationManagementRoutingModule } from './organization-management-routing.module';
@@ -64,6 +64,9 @@ import { BillRateSetupComponent } from './bill-rates/bill-rate-setup/bill-rate-s
 import { BillRateTypeComponent } from './bill-rates/bill-rate-type/bill-rate-type.component';
 import { BillRateTypeMappingComponent } from './bill-rates/bill-rate-type-mapping/bill-rate-type-mapping.component';
 import { BillRatesState } from '@organization-management/store/bill-rates.state';
+import { RejectReasonComponent } from './reject-reason/reject-reason.component';
+import { RejectReasonState } from "@organization-management/store/reject-reason.state";
+import { FilteredCredentialsComponent } from './credentials/credentials-setup/filtered-credentials/filtered-credentials.component';
 
 const sidebarIcons = {
   Download,
@@ -104,7 +107,10 @@ const sidebarIcons = {
     BillRatesComponent,
     BillRateSetupComponent,
     BillRateTypeComponent,
-    BillRateTypeMappingComponent
+    BillRateTypeMappingComponent,
+    RejectReasonComponent,
+    BillRateTypeMappingComponent,
+    FilteredCredentialsComponent
   ],
   imports: [
     CommonModule,
@@ -146,7 +152,8 @@ const sidebarIcons = {
       CredentialsState,
       ShiftsState,
       HolidaysState,
-      BillRatesState
+      BillRatesState,
+      RejectReasonState
     ]),
   ],
   providers: [

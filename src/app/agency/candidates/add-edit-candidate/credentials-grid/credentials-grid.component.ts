@@ -31,6 +31,7 @@ import { CredentialType } from "@shared/models/credential-type.model";
 import { ConfirmService } from "@shared/services/confirm.service";
 import { valuesOnly } from "@shared/utils/enum.utils";
 import { downloadBlobFile } from "@shared/utils/file.utils";
+import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { FieldSettingsModel } from "@syncfusion/ej2-angular-dropdowns";
 import { GridComponent } from "@syncfusion/ej2-angular-grids";
 import { FileInfo, SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
@@ -40,7 +41,8 @@ import { SetHeaderState, ShowSideDialog } from "src/app/store/app.actions";
 @Component({
   selector: 'app-credentials-grid',
   templateUrl: './credentials-grid.component.html',
-  styleUrls: ['./credentials-grid.component.scss']
+  styleUrls: ['./credentials-grid.component.scss'],
+  providers: [MaskedDateTimeService]
 })
 export class CredentialsGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() readonlyMode = false;
@@ -59,6 +61,7 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
   public candidateCredentialPage: CandidateCredentialPage;
   public openFileViewerDialog = new EventEmitter<number>();
   public credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
+  public today = new Date();
   public optionFields = { text: 'text', value: 'id' };
   public verifiedStatuses = Object.values(CredentialVerifiedStatus)
     .filter(valuesOnly)

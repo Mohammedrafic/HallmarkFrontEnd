@@ -5,7 +5,8 @@ export interface AvailableWidgetsResponseModel {
 }
 
 export interface WidgetOptionModel {
+  id: WidgetTypeEnum;
   description: string;
   widgetType: number;
-  title: WidgetTypeEnum;
+  title: string;
 }

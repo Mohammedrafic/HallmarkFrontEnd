@@ -175,9 +175,10 @@ export abstract class AbstractGridConfigurationComponent {
     }
   }
 
-  actionBegin(args: PageEventArgs): void {
+  actionBegin(args: PageEventArgs, grid?: any): void {
     if (args.requestType === 'sorting') {
       this.sortingHandler(args);
+      grid && this.clearSelection(grid);
       this.refreshing = true;
     }
     if (args.requestType === 'refresh') {

@@ -1,8 +1,9 @@
 <section class="controls-wrapper">
   <button
+    *ngIf="isSkillsActive"
     ejs-button
     id="filterButton"
-    cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+    cssClass="e-outline button-filter" (click)="showFilters()">Filters <i-feather name="sliders" class="icon"></i-feather></button>
   <button
     ejs-dropdownbutton
     [items]="exportOptions"

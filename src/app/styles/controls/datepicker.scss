@@ -55,6 +55,10 @@ ejs-datepicker.datepicker,ejs-daterangepicker.e-daterangepicker, ejs-timepicker.
     height: 40px;
     align-items: center;
 
+    &.e-error {
+      border-color: $supportive-red!important;
+    }
+
     .e-input {
       color: $secondary-dark-blue-30 !important; // TODO: does not work
       padding-left: 16px !important;

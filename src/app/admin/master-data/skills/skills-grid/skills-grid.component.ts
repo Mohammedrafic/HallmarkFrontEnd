@@ -3,8 +3,11 @@ import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { FilteredItem } from '@shared/models/filter.model';
+import { FilterService } from '@shared/services/filter.service';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, delay, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ExportSkills, GetMasterSkillsByPage, RemoveMasterSkill, RemoveMasterSkillSucceeded, SaveMasterSkill, SaveMasterSkillSucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
@@ -13,7 +16,7 @@ import { AbstractGridConfigurationComponent } from 'src/app/shared/components/ab
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { Skill } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 
 @Component({
   selector: 'app-skills-grid',
@@ -48,12 +51,16 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
   ];
   public fileName: string;
   public defaultFileName: string;
+  public SkillFilterFormGroup: FormGroup;
+  public filters: any = {};
+  public filterColumns: any;
 
   constructor(private store: Store,
               private actions$: Actions,
               private fb: FormBuilder,
               private confirmService: ConfirmService,
-              private datePipe: DatePipe) {
+              private datePipe: DatePipe,
+              private filterService: FilterService) {
     super();
     this.SkillFormGroup = this.fb.group({
       id: new FormControl(0),
@@ -62,18 +69,28 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
       skillAbbr: new FormControl('', [ Validators.minLength(3) ]),
       skillDescription: new FormControl('', [ Validators.required, Validators.minLength(3) ]),
     });
+    this.SkillFilterFormGroup = this.fb.group({
+      skillCategoryId: new FormControl([]),
+      skillAbbr: new FormControl([]),
+      skillDescription: new FormControl([]),
+    });
   }
 
   ngOnInit() {
-    this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
+    this.filterColumns = {
+      skillCategoryId: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      skillAbbr: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      skillDescription: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+    }
+    this.getMasterSkills();
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
+      this.getMasterSkills();
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveMasterSkillSucceeded)).subscribe(() => {
       this.SkillFormGroup.reset();
       this.closeDialog();
-      this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
+      this.getMasterSkills();
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
       if (val.isDialogShown) {
@@ -82,7 +99,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
       }
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(RemoveMasterSkillSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
+      this.getMasterSkills();
     });
     this.export$.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
       this.defaultFileName = 'Skills/Master Skills ' + this.generateDateTime(this.datePipe);
@@ -93,6 +110,38 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private getMasterSkills(): void {
+    this.store.dispatch(new GetMasterSkillsByPage(this.currentPage, this.pageSize));
+  }
+
+  public onFilterClose() {
+    this.SkillFilterFormGroup.setValue({
+      skillCategoryId: this.filters.orderId || null,
+      skillAbbr: this.filters.regionIds || [],
+      skillDescription: this.filters.locationIds || [],
+    });
+    this.filteredItems = this.filterService.generateChips(this.SkillFilterFormGroup, this.filterColumns, this.datePipe);
+  }
+
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.SkillFilterFormGroup, this.filterColumns);
+  }
+
+  public onFilterClearAll(): void {
+    this.SkillFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {};
+    this.getMasterSkills();
+  }
+
+  public onFilterApply(): void {
+    this.filters = this.SkillFilterFormGroup.getRawValue();
+    this.filteredItems = this.filterService.generateChips(this.SkillFilterFormGroup, this.filterColumns);
+    this.getMasterSkills();
+    this.store.dispatch(new ShowFilterDialog(false));
   }
 
   public closeExport() {

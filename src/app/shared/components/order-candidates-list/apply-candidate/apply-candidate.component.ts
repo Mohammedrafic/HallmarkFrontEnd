@@ -2,7 +2,8 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, S
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
-import { ApplicantStatus as ApplicantStatusEnum } from "@shared/enums/applicant-status.enum";
+import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from "@shared/enums/applicant-status.enum";
+import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { Observable, Subject, takeUntil } from "rxjs";
 
 import { ApplyOrderApplicants, ApplyOrderApplicantsSucceed, ReloadOrderCandidatesLists } from "@agency/store/order-management.actions";
@@ -14,16 +15,20 @@ import { OrderCandidatesList } from "@shared/models/order-management.model";
 @Component({
   selector: 'app-apply-candidate',
   templateUrl: './apply-candidate.component.html',
-  styleUrls: ['./apply-candidate.component.scss']
+  styleUrls: ['./apply-candidate.component.scss'],
+  providers: [MaskedDateTimeService]
 })
 export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
 
   @Input() candidate: OrderCandidatesList;
   @Input() billRatesData: BillRate[] = [];
+  @Input() isTab: boolean = false;
 
   public formGroup: FormGroup;
   public readOnlyMode: boolean;
+  public candidatStatus = CandidatStatus;
+  public today = new Date();
 
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;

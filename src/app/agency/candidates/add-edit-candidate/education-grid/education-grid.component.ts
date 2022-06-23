@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
+import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { GridComponent, ValueAccessor } from "@syncfusion/ej2-angular-grids";
 import { delay, filter, Observable } from "rxjs";
 
@@ -28,7 +29,8 @@ import { ShowSideDialog } from "src/app/store/app.actions";
 @Component({
   selector: 'app-education-grid',
   templateUrl: './education-grid.component.html',
-  styleUrls: ['./education-grid.component.scss']
+  styleUrls: ['./education-grid.component.scss'],
+  providers: [MaskedDateTimeService]
 })
 export class EducationGridComponent extends AbstractGridConfigurationComponent implements OnInit {
   @Input() readonlyMode = false;
@@ -38,6 +40,7 @@ export class EducationGridComponent extends AbstractGridConfigurationComponent i
   @Select(CandidateState.educations)
   educations$: Observable<Education[]>;
 
+  public today = new Date();
   public title = '';
   public educationForm: FormGroup;
   public optionFields = {

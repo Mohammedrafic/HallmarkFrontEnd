@@ -9,6 +9,6 @@ export enum OrderStatus {
 }
 
 export enum CandidateJobStatus {
-  Onboarded = 1,
+  Onboard = 1,
   Rejected = 2
 }

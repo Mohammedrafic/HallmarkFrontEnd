@@ -27,6 +27,11 @@
             [chartData]="widgetsData?.[widgetTypeEnum.CANDIDATES]"
             [isLoading]="isLoading"
           ></app-accumulation-chart>
+          <app-accumulation-chart
+            *ngSwitchCase="widgetTypeEnum.ACTIVE_POSITIONS"
+            [chartData]="widgetsData?.[widgetTypeEnum.ACTIVE_POSITIONS]"
+            [isLoading]="isLoading"
+          ></app-accumulation-chart>
           <app-maps-chart
             *ngSwitchCase="widgetTypeEnum.APPLICANTS_BY_REGION"
             [chartData]="widgetsData?.[widgetTypeEnum.APPLICANTS_BY_REGION]"

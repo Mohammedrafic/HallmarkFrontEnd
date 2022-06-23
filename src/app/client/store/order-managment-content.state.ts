@@ -1,5 +1,6 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
+import { getAllErrors } from "@shared/utils/error.utils";
 import { catchError, Observable, of, tap } from 'rxjs';
 import {
   ClearPredefinedBillRates,
@@ -282,7 +283,9 @@ export class OrderManagementContentState {
         dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'));
         dispatch(new UpdateOrganisationCandidateJobSucceed());
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
+      catchError((error: any) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))
+      })
     );
   }
 

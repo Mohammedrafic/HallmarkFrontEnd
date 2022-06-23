@@ -129,7 +129,7 @@
 
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
-<app-filter-dialog [items]="filteredItems" [count]="totalDataRecords" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+<app-filter-dialog [items]="filteredItems" [count]="totalDataRecords" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
   <form class="bootstrap" [formGroup]="LocationFilterFormGroup">
     <div class="input-container">
       <label>Ext Location ID</label>

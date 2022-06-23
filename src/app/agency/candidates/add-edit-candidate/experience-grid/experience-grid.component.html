@@ -70,10 +70,13 @@
     <div class="input-container calendar">
       <label>Start Month/Year<span class="required">*</span></label>
       <div class="input-group datepicker">
-        <ejs-datepicker class="datepicker"
+        <ejs-datepicker class="datepicker" #startDate
                         format="MM/dd/yyyy"
                         placeholder="MM/DD/YYYY"
                         appValidateWithMessage
+                        [enableMask]="true"
+                        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                        (change)="onStartDateChange($event)"
                         formControlName="startDate">
         </ejs-datepicker>
       </div>
@@ -81,10 +84,13 @@
     <div class="input-container calendar">
       <label>End Month/Year<span class="required">*</span></label>
       <div class="input-group datepicker">
-        <ejs-datepicker class="datepicker"
+        <ejs-datepicker class="datepicker" #endDate
                         format="MM/dd/yyyy"
                         placeholder="MM/DD/YYYY"
                         appValidateWithMessage
+                        [enableMask]="true"
+                        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                        (change)="onEndDateChange($event)"
                         formControlName="endDate">
         </ejs-datepicker>
       </div>

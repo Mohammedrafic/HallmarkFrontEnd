@@ -26,6 +26,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
 
   @Input() candidate: OrderCandidatesList;
+  @Input() isTab: boolean = false;
 
   public billRatesData: BillRate[] = [];
   public formGroup: FormGroup;

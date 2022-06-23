@@ -29,7 +29,7 @@
         </div>
         <div class="d-flex">
           <div class="dropdown-container">
-            <label>Primary Skill<span class="required">*</span></label>
+            <label>Skills<span class="required">*</span></label>
             <div class="input-group">
               <ejs-multiselect appValidateWithMessage
                                mode="CheckBox"
@@ -102,6 +102,9 @@
                               class="datepicker"
                               format="MM/dd/yyyy"
                               placeholder="MM/DD/YYYY"
+                              [max]="limitDate"
+                              [enableMask]="true"
+                              [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
                               formControlName="dob">
               </ejs-datepicker>
             </div>

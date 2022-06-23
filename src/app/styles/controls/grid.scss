@@ -357,6 +357,9 @@ ejs-grid.e-control.e-grid {
   td.e-active {
     background-color: $primary-active-blue-10;
     color: $white !important;
+    .subrow-toggle {
+      color: $white !important;
+    }
   }
 
   .e-frozenheader.e-frozen-right-header > .e-table {

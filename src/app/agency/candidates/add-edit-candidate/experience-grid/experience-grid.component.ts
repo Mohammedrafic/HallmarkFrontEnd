@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
+import { ChangedEventArgs, DatePickerComponent, MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { GridComponent } from "@syncfusion/ej2-angular-grids";
 import { delay, filter, Observable } from "rxjs";
 
@@ -26,18 +27,23 @@ import { ShowSideDialog } from "src/app/store/app.actions";
 @Component({
   selector: 'app-experience-grid',
   templateUrl: './experience-grid.component.html',
-  styleUrls: ['./experience-grid.component.scss']
+  styleUrls: ['./experience-grid.component.scss'],
+  providers: [MaskedDateTimeService]
 })
 export class ExperienceGridComponent extends AbstractGridConfigurationComponent implements OnInit {
   @Input() readonlyMode = false;
 
   @ViewChild('grid') grid: GridComponent;
+  @ViewChild('endDate') endDate: DatePickerComponent;
+  @ViewChild('startDate') startDate: DatePickerComponent;
 
   @Select(CandidateState.experiences)
   experiences$: Observable<Experience[]>;
 
   public title = '';
   public experienceForm: FormGroup;
+
+  private today = new Date();
 
   constructor(private store: Store,
               private fb: FormBuilder,
@@ -64,6 +70,15 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
     this.grid.autoFitColumns();
   }
 
+  public onStartDateChange(event: ChangedEventArgs): void {
+    this.endDate.min = event.value || this.today;
+
+  }
+
+  public onEndDateChange(event: ChangedEventArgs): void {
+    this.startDate.max = event.value || this.today;
+  }
+
   public onEdit(experience: Experience) {
     this.title = 'Edit';
     this.experienceForm.setValue({
@@ -78,6 +93,7 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
     if (this.readonlyMode) {
       this.experienceForm.disable();
     }
+    this.setDateRanges(new Date(experience.endDate), new Date(experience.startDate));
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -96,6 +112,7 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
 
   public addNew(): void {
     this.title = 'Add';
+    this.setDateRanges();
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -145,5 +162,10 @@ export class ExperienceGridComponent extends AbstractGridConfigurationComponent 
       this.experienceForm.reset();
       this.experienceForm.enable();
     });
+  }
+
+  private setDateRanges(start: Date = this.today, end: Date = this.today): void {
+    this.startDate.max = start;
+    this.endDate.min = end;
   }
 }

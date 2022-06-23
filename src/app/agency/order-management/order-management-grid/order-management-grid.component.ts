@@ -26,7 +26,7 @@ import {
   ReloadOrderCandidatesLists,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AgencyOrderManagement, AgencyOrderManagementPage } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, AgencyOrderManagementChild, AgencyOrderManagementPage } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { Location } from '@angular/common';
@@ -64,8 +64,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
   public openCandidat = new Subject<boolean>();
+  public openChildDialog = new Subject<any>();
   public typeValueAccess = typeValueAccess;
   public previousSelectedOrderId: number | null;
+  public selectedCandidat: any | null;
 
   get checkedStatus(): AllCheckedStatus {
     const itemsLength = this.rowCheckboxes.length;
@@ -88,6 +90,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   ngOnInit(): void {
     this.onOrderPreviewChange();
     this.onAgencyChange();
+    this.onChildDialogChange();
     const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
     if (!this.previousSelectedOrderId) {
@@ -177,8 +180,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.gridWithChildRow.selectRow(nextIndex);
   }
 
-  public onOpenCandidateDialog(data: unknown): void {
-    console.log(data)
+  public onOpenCandidateDialog(candidat: AgencyOrderManagementChild, order: AgencyOrderManagement): void {
+    this.selectedCandidat = candidat;
+    this.selectedOrder = order;
+    const options = this.getDialogNextPreviousOption(order);
+    this.store.dispatch(new GetOrderById(order.orderId, order.organizationId, options));
+    this.openChildDialog.next([order, candidat]);
   }
 
   private onOrderPreviewChange(): void {
@@ -187,6 +194,20 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.openCandidat.next(false);
         this.gridWithChildRow?.clearRowSelection();
         this.previousSelectedOrderId = null;
+      } else {
+        this.openChildDialog.next(false);
+        this.selectedCandidat = null;
+      }
+    });
+  }
+
+  private onChildDialogChange(): void {
+    this.openChildDialog.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
+      if (!isOpen) {
+        this.selectedCandidat = null;
+      } else {
+        this.openPreview.next(false);
+        this.gridWithChildRow?.clearRowSelection();
       }
     });
   }

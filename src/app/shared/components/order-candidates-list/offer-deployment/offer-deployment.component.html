@@ -12,7 +12,7 @@
                             (change)="updateCandidateJob($event)">
           </ejs-dropdownlist>
         </div>
-        <button ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>

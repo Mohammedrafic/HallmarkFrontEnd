@@ -23,7 +23,7 @@
       <button
         ejs-button
         id="filterButton"
-        cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+        cssClass="e-outline button-filter" (click)="showFilters()">Filters <i-feather name="sliders" class="icon"></i-feather></button>
       <button
         ejs-button
         id="importButton"
@@ -58,6 +58,7 @@
     (rowDeselected)="rowDeselected($event, grid)"
     (dataBound)="gridDataBound(grid)"
     [selectionSettings]="selectionSettings"
+    (actionBegin)="actionBegin($event)"
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
@@ -128,6 +129,73 @@
 </section>
 
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+
+
+<app-filter-dialog [items]="filteredItems" [count]="totalDataRecords" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
+  <form class="bootstrap" [formGroup]="DepartmentFilterFormGroup">
+    <div class="input-container">
+      <label>Ext Department ID</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="externalId"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.externalId.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Invoice Department ID</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="invoiceDepartmentId"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.invoiceDepartmentId.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Department Name</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="name"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.name.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Facility Contact</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="facilityContact"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.facilityContact.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Facility Email</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="facilityEmail"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.facilityEmail.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+  </form>
+</app-filter-dialog>
+
 
 <app-side-dialog
   (formCancelClicked)="onDepartmentFormCancelClick()"

@@ -13,11 +13,26 @@ export class CredentialSetup {
   credentialTypeName?: string; // used only on UI
 }
 
-export class CredentialSetupGetGroupPage {
-  credentialTypeId: number;
-  skillGroupId: number;
-  pageNumber: number;
-  pageSize: number;
+export class CredentialSetupGet {
+  masterCredentialId: number;
+  mappingId: number;
+  credentialType: string;
+  description: string;
+  isActive: boolean;
+  reqSubmission: boolean;
+  reqOnboard: boolean;
+  inactiveDate: string;
+  comments: string;
+}
+
+export class CredentialSetupPost {
+  mappingId: number;
+  masterCredentialId: number;
+  isActive: boolean;
+  reqSubmission: boolean;
+  reqOnboard: boolean;
+  inactiveDate: string;
+  comments: string;
 }
 
 export class CredentialSetupMappingPost {
@@ -44,11 +59,11 @@ export class CredentialSetupFilterDto {
   departmentId: number | null;
   skillGroupId: number | null;
   skillId: number | null;
-  pageNumber: number;
-  pageSize: number;
+  pageNumber?: number;
+  pageSize?: number;
 }
 
-export class CredentialSetupFilterData {
+export class CredentialSetupFilterGet {
   mappingId: number;
   regionName: string;
   regionId: number;

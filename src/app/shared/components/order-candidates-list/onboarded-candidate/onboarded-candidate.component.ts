@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { filter, merge, Observable, Subject, takeUntil } from "rxjs";
 import {
   JOB_STATUS,
@@ -19,7 +20,8 @@ import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 @Component({
   selector: 'app-onboarded-candidate',
   templateUrl: './onboarded-candidate.component.html',
-  styleUrls: ['./onboarded-candidate.component.scss']
+  styleUrls: ['./onboarded-candidate.component.scss'],
+  providers: [MaskedDateTimeService]
 })
 
 export class OnboardedCandidateComponent implements OnInit, OnDestroy {
@@ -27,6 +29,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   @Input() billRatesData: BillRate[] = [];
   @Input() candidate: OrderCandidatesList;
+  @Input() isTab: boolean = false;
 
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
@@ -37,6 +40,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public jobStatus = JOB_STATUS;
   public candidateJob: OrderCandidateJob | null;
   public isOnboarded = true;
+  public today = new Date();
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');

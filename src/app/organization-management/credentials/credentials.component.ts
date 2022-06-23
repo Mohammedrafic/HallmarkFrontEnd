@@ -1,7 +1,7 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { Select, Store } from '@ngxs/store';
-import { ShowExportDialog, ShowSideDialog } from '../../store/app.actions';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
 import { Router } from '@angular/router';
 import { CredentialsState } from '../store/credentials.state';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -40,6 +40,10 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.store.dispatch(new SetNavigationTab(CredentialsNavigationTabs.CredentialsList));
+  }
+
+  public showFilters(): void {
+    this.store.dispatch(new ShowFilterDialog(true));
   }
 
   public override customExport(): void {

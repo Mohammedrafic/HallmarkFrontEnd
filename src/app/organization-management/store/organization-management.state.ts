@@ -63,15 +63,12 @@ import {
   SaveCredentialSkillGroup,
   UpdateCredentialSkillGroup,
   RemoveCredentialSkillGroup,
-  GetCredentialSetupByPage,
-  SaveUpdateCredentialSetup,
   GetOrganizationSettings,
   SaveOrganizationSettings,
   ClearDepartmentList,
   ClearLocationList,
   GetSkillDataSources,
   SaveCredentialSucceeded,
-  SaveUpdateCredentialSetupSucceeded,
   ExportLocations,
   ExportDepartments,
   ExportSkills,
@@ -88,10 +85,9 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
-import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_CANNOT_BE_UPDATED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
+import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
 import { CandidateStateModel } from '@agency/store/candidate.state';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
-import { CredentialSetup, CredentialSetupPage } from '@shared/models/credential-setup.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { CategoriesService } from '@shared/services/categories.service';
 import { DepartmentsService } from '@shared/services/departments.service';
@@ -140,7 +136,6 @@ export interface OrganizationManagementStateModel {
   isCredentialLoading: boolean;
   skillGroups: CredentialSkillGroupPage | null;
   isSkillGroupLoading: boolean;
-  credentialSetupPage: CredentialSetupPage | null;
   isCredentialSetupLoading: boolean;
   isOrganizationSettingsLoading: boolean;
   organizationSettings: OrganizationSettingsGet[];
@@ -183,7 +178,6 @@ export interface OrganizationManagementStateModel {
     isCredentialLoading: false,
     skillGroups: null,
     isSkillGroupLoading: false,
-    credentialSetupPage: null,
     isCredentialSetupLoading: false,
     isOrganizationSettingsLoading: false,
     organizationSettings: [],
@@ -258,9 +252,6 @@ export class OrganizationManagementState {
 
   @Selector()
   static skillGroups(state: OrganizationManagementStateModel): CredentialSkillGroupPage  | null { return state.skillGroups }
-
-  @Selector()
-  static credentialSetups(state: OrganizationManagementStateModel): CredentialSetupPage | null { return state.credentialSetupPage }
 
   @Selector()
   static organizationSettings(state: OrganizationManagementStateModel): OrganizationSettingsGet[] { return state.organizationSettings }
@@ -715,29 +706,6 @@ export class OrganizationManagementState {
         return dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : RECORD_CANNOT_BE_DELETED))
       })
     );
-  }
-
-  @Action(GetCredentialSetupByPage)
-  GetCredentialSetupByPage({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { pageNumber, pageSize }: GetCredentialSetupByPage): Observable<CredentialSetupPage> {
-    return this.credentialsService.getCredentialSetup(pageNumber, pageSize).pipe(tap((payload) => {
-      dispatch(new GetCredentialTypes());
-      const invalidDate = '0001-01-01T00:00:00+00:00';
-      payload?.items.forEach((item: any) => {
-        item.inactiveDate === invalidDate ? item.inactiveDate = '' : item.inactiveDate;
-      });
-      patchState({ credentialSetupPage: payload });
-      return payload;
-    }));
-  }
-
-  @Action(SaveUpdateCredentialSetup)
-  SaveUpdateCredentialSetup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { credentialSetup }: SaveUpdateCredentialSetup): Observable<CredentialSetup> {
-    return this.credentialsService.saveUpdateCredentialSetup(credentialSetup).pipe(tap((payload) => {
-      patchState({ isCredentialSetupLoading: false });
-      dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
-      dispatch(new SaveUpdateCredentialSetupSucceeded(payload));
-      return payload;
-    }));
   }
 
   @Action(GetOrganizationSettings)

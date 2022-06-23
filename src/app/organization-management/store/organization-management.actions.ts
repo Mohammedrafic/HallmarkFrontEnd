@@ -8,7 +8,6 @@ import { Region } from '@shared/models/region.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
-import { CredentialSetup } from '@shared/models/credential-setup.model';
 import { OrganizationSettingsPost } from '@shared/models/organization-settings.model';
 import { ExportPayload } from "@shared/models/export.model";
 
@@ -300,21 +299,6 @@ export class UpdateCredentialSkillGroup {
 export class RemoveCredentialSkillGroup {
   static readonly type = '[organizationManagement] Remove Credential Skill Group';
   constructor(public payload: CredentialSkillGroup) { }
-}
-
-export class GetCredentialSetupByPage {
-  static readonly type = '[organizationManagement] Get Credential Setup by Page';
-  constructor(public pageNumber: number, public pageSize: number) {}
-}
-
-export class SaveUpdateCredentialSetup {
-  static readonly type = '[organizationManagement] Save Credential Setup';
-  constructor(public credentialSetup: CredentialSetup) { }
-}
-
-export class SaveUpdateCredentialSetupSucceeded {
-  static readonly type = '[organizationManagement] Save/Update Credential Setup Succeeded';
-  constructor(public credentialSetup: CredentialSetup) { }
 }
 
 export class GetOrganizationSettings {
