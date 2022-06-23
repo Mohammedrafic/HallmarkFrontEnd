@@ -236,7 +236,9 @@ export class CandidateState {
         dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
         return payload;
       }),
-      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, 'Experience already exists')))
+      catchError((error: any) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))
+      })
     );
   }
 
@@ -273,7 +275,9 @@ export class CandidateState {
         dispatch(new ShowToast(MessageTypes.Success, isCreating ? RECORD_ADDED : RECORD_MODIFIED));
         return payload;
       }),
-      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, 'Education already exists')))
+      catchError((error: any) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))
+      })
     );
   }
 
@@ -323,7 +327,7 @@ export class CandidateState {
       }),
       catchError((error: any) => {
         dispatch(new SaveCandidatesCredentialFailed());
-        return dispatch(new ShowToast(MessageTypes.Error, 'Credential already exists'));
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );
   }

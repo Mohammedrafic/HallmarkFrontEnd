@@ -103,6 +103,8 @@
                               format="MM/dd/yyyy"
                               placeholder="MM/DD/YYYY"
                               [max]="limitDate"
+                              [enableMask]="true"
+                              [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
                               formControlName="dob">
               </ejs-datepicker>
             </div>

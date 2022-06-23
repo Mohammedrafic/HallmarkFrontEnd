@@ -66,6 +66,8 @@
                                       format="MM/dd/yyyy"
                                       placeholder="MM/DD/YYYY"
                                       [readonly]="readOnlyMode"
+                                      [enableMask]="true"
+                                      [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
                                       [min]="today"
                                       formControlName="availableStartDate">
                       </ejs-datepicker>

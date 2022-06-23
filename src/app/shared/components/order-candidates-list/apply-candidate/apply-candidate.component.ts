@@ -3,6 +3,7 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from "@shared/enums/applicant-status.enum";
+import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { Observable, Subject, takeUntil } from "rxjs";
 
 import { ApplyOrderApplicants, ApplyOrderApplicantsSucceed, ReloadOrderCandidatesLists } from "@agency/store/order-management.actions";
@@ -14,7 +15,8 @@ import { OrderCandidatesList } from "@shared/models/order-management.model";
 @Component({
   selector: 'app-apply-candidate',
   templateUrl: './apply-candidate.component.html',
-  styleUrls: ['./apply-candidate.component.scss']
+  styleUrls: ['./apply-candidate.component.scss'],
+  providers: [MaskedDateTimeService]
 })
 export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();

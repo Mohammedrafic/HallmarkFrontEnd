@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { filter, merge, Observable, Subject, takeUntil } from "rxjs";
 import {
   JOB_STATUS,
@@ -19,7 +20,8 @@ import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 @Component({
   selector: 'app-onboarded-candidate',
   templateUrl: './onboarded-candidate.component.html',
-  styleUrls: ['./onboarded-candidate.component.scss']
+  styleUrls: ['./onboarded-candidate.component.scss'],
+  providers: [MaskedDateTimeService]
 })
 
 export class OnboardedCandidateComponent implements OnInit, OnDestroy {
