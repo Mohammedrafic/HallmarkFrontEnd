@@ -31,11 +31,16 @@ import { DashboardDataModel } from '../models/dashboard-data.model';
 import type { ApplicantsByRegionDataModel } from '../models/applicants-by-region-data.model';
 import type { WidgetsDataModel } from '../models/widgets-data.model';
 import { PositionTypeEnum } from '../enums/position-type.enum';
-import type { PositionsByTypeAggregatedModel } from '../models/positions-by-type-aggregated.model';
+import type {
+  PositionByTypeDataModel,
+  PositionsByTypeAggregatedModel,
+} from '../models/positions-by-type-aggregated.model';
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
 import { OrderStatus } from '@shared/enums/order-status';
 import { ActivePositionsDto, ActivePositionTypeInfo } from '../models/active-positions-dto.model';
+import { MONTHS } from '../constants/months';
+import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 
 @Injectable()
 export class DashboardService {
@@ -171,32 +176,32 @@ export class DashboardService {
   }
 
   private getPositionsByTypes(filters: DashboardFiltersModel): Observable<PositionsByTypeAggregatedModel> {
-    return of({
-      [PositionTypeEnum.OPEN]: [
-        { month: 'Feb', value: 3 },
-        { month: 'Mar', value: 10 },
-        { month: 'Apr', value: 20 },
-        { month: 'May', value: 15 },
-        { month: 'Jun', value: 12 },
-        { month: 'Jul', value: 10 },
-      ],
-      [PositionTypeEnum.ONBOARD]: [
-        { month: 'Feb', value: 10 },
-        { month: 'Mar', value: 16 },
-        { month: 'Apr', value: 5 },
-        { month: 'May', value: 3 },
-        { month: 'Jun', value: 20 },
-        { month: 'Jul', value: 6 },
-      ],
-      [PositionTypeEnum.CLOSED]: [
-        { month: 'Feb', value: 30 },
-        { month: 'Mar', value: 51 },
-        { month: 'Apr', value: 10 },
-        { month: 'May', value: 4 },
-        { month: 'Jun', value: 5 },
-        { month: 'Jul', value: 6 },
-      ],
-    });
+    const timeRanges = this.calculateTimeRanges();
+    return this.httpClient
+      .post<PositionsByTypeResponseModel>(`${this.baseUrl}/getopenclosedonboardamount`, timeRanges)
+      .pipe(
+        map((positions: PositionsByTypeResponseModel) => {
+          return {
+            [PositionTypeEnum.OPEN]: this.convertDtoToPositionTypes(positions.openJobs),
+            [PositionTypeEnum.ONBOARD]: this.convertDtoToPositionTypes(positions.onboardCandidates),
+            [PositionTypeEnum.CLOSED]: this.convertDtoToPositionTypes(positions.closedJobs),
+          };
+        })
+      );
+  }
+
+  private calculateTimeRanges(): { startDate: string; endDate: string } {
+    const date = new Date();
+    const startDate = new Date(date.setMonth(date.getMonth() - 3)).toISOString();
+    const endDate = new Date(date.setMonth(date.getMonth() + 6)).toISOString();
+    return { startDate, endDate };
+  }
+
+  private convertDtoToPositionTypes(data: PositionByTypeDto[]): PositionByTypeDataModel[] {
+    return data.map(({ month, value }: PositionByTypeDto) => ({
+      month: MONTHS[month],
+      value,
+    }));
   }
 
   private getOrderPositionWidgetData(filters: DashboardFiltersModel, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
@@ -207,7 +212,7 @@ export class DashboardService {
 
   private getActivePositionWidgetData(filters: DashboardFiltersModel): Observable<AccumulationChartModel> {
     return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, {}).pipe(
-      map(({orderStatusesDetails}: ActivePositionsDto) => {
+      map(({ orderStatusesDetails }: ActivePositionsDto) => {
         return {
           id: WidgetTypeEnum.ACTIVE_POSITIONS,
           title: 'Active Positions',
