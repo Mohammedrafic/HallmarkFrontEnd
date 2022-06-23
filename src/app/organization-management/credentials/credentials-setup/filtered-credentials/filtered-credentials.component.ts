@@ -76,6 +76,20 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
     });
   }
 
+  public onRowSelected(event: any): void {
+    if (event.data) {
+      this.selectedRow.emit(event.data);
+    }
+  }
+
+  public onRowDeselected(event: any): void {
+    if (event.data) {
+      this.selectedRow.emit(event.data);
+    } else {
+      this.selectedRow.emit(undefined);
+    }
+  }
+
   public onRowsDropDownChanged(): void {
     this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
   }

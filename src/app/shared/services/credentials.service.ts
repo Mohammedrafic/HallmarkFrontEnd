@@ -9,7 +9,7 @@ import {
   CredentialSetupFilterGet,
   CredentialSetupFilterDto,
   CredentialSetupGet,
-  CredentialSetupPost
+  CredentialSetupPost, CredentialSetupMappingPost, SaveUpdatedCredentialSetupDetailIds
 } from '@shared/models/credential-setup.model';
 import { ExportPayload } from '@shared/models/export.model';
 
@@ -103,7 +103,7 @@ export class CredentialsService {
    * @return Updated credential setup
    */
   public updateCredentialSetup(credentialSetup: CredentialSetupPost): Observable<CredentialSetupGet> {
-    return this.http.post<CredentialSetupGet>(`/api/CredentialSetup`, credentialSetup);
+    return this.http.post<CredentialSetupGet>(`/api/CredentialSetups`, credentialSetup);
   }
 
   /**
@@ -141,5 +141,14 @@ export class CredentialsService {
 
     data += keysValues.join('&');
     return this.http.get<CredentialSetupFilterGet[]>(`/api/CredentialSetups/mappings${data}`);
+  }
+
+  /**
+   * Save/Update credential setup mapping
+   * @param credentialSetupMapping object to save
+   * @return Save/Updated credential setup mapping
+   */
+  public saveUpdateCredentialSetupMapping(credentialSetupMapping: CredentialSetupMappingPost): Observable<SaveUpdatedCredentialSetupDetailIds> {
+    return this.http.post<SaveUpdatedCredentialSetupDetailIds>(`/api/CredentialSetups/mappings`, credentialSetupMapping);
   }
 }

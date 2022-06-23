@@ -25,7 +25,7 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
   @Select(CredentialsState.setupFilter)
   setupFilter$: Observable<CredentialSetupFilter>;
 
-  public isToolButtonsShown = true;
+  public isCredentialListToolButtonsShown = true;
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -71,12 +71,16 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
       this.isCredentialListActive = true;
     }
 
-    this.isToolButtonsShown = selectedTab.selectedIndex !== CredentialsNavigationTabs.Setup;
+    this.isCredentialListToolButtonsShown = selectedTab.selectedIndex !== CredentialsNavigationTabs.Setup;
     this.store.dispatch(new ShowSideDialog(false));
   }
 
   public onTabsCreated(): void {
     this.activeTab$.pipe(takeUntil(this.unsubscribe$))
       .subscribe(activeTab => this.onTabSelected({ selectedIndex: activeTab }));
+  }
+
+  public onGroupsSetupClick(): void {
+    this.router.navigateByUrl('admin/organization-management/credentials/groups-setup');
   }
 }

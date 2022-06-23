@@ -5,13 +5,19 @@ export class CredentialSkillGroup {
   id?: number;
   name?: string;
   organizationId?: number;
-  skills?: MasterSkillByOrganization[];
+  skills?: CredentialSkillByOrganization[];
 }
 
 export class CredentialSkillGroupPost {
   id?: number;
   name: string;
   skillIds: number[];
+}
+
+export class CredentialSkillByOrganization {
+  id: number;
+  masterSkillId: number;
+  name: string;
 }
 
 export type CredentialSkillGroupPage = PageOfCollections<CredentialSkillGroup>;
