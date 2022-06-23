@@ -7,7 +7,7 @@ import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import {
   AbstractGridConfigurationComponent
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { ShowExportDialog, ShowSideDialog } from '../../../store/app.actions';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import {
   GetCredential,
@@ -26,6 +26,9 @@ import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/expor
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportCredentialList, ShowExportCredentialListDialog } from '@organization-management/store/credentials.actions';
 import { DatePipe } from '@angular/common';
+import { FilterService } from '@shared/services/filter.service';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { FilteredItem } from '@shared/models/filter.model';
 
 @Component({
   selector: 'app-credentials-list',
@@ -64,6 +67,10 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   public fileName: string;
   public defaultFileName: string;
 
+  public CredentialsFilterFormGroup: FormGroup;
+  public filters: any = {};
+  public filterColumns: any;
+
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
@@ -72,6 +79,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
               private actions$: Actions,
               private confirmService: ConfirmService,
               private datePipe: DatePipe,
+              private filterService: FilterService,
               @Inject(FormBuilder) private builder: FormBuilder) {
     super();
     this.formBuilder = builder;
@@ -79,9 +87,13 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   }
 
   ngOnInit(): void {
+    this.filterColumns = {
+      name: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      credentialTypeId: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      expireDateApplicable: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Expiry Date Applicable'},
+    }
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
-      this.store.dispatch(new GetCredential());
-      this.store.dispatch(new GetCredentialTypes());
+      this.getCredentials();
     });
     this.mapGridData();
 
@@ -105,6 +117,39 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private getCredentials(): void {
+    this.store.dispatch(new GetCredential());
+    this.store.dispatch(new GetCredentialTypes());
+  }
+
+  public onFilterClose() {
+    this.CredentialsFilterFormGroup.setValue({
+      name: this.filters.name || null,
+      credentialTypeId: this.filters.credentialTypeId || [],
+      expireDateApplicable: this.filters.expireDateApplicable || null,
+    });
+    this.filteredItems = this.filterService.generateChips(this.CredentialsFilterFormGroup, this.filterColumns, this.datePipe);
+  }
+
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.CredentialsFilterFormGroup, this.filterColumns);
+  }
+
+  public onFilterClearAll(): void {
+    this.CredentialsFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {};
+    this.getCredentials();
+  }
+
+  public onFilterApply(): void {
+    this.filters = this.CredentialsFilterFormGroup.getRawValue();
+    this.filteredItems = this.filterService.generateChips(this.CredentialsFilterFormGroup, this.filterColumns);
+    this.getCredentials();
+    this.store.dispatch(new ShowFilterDialog(false));
   }
 
   public closeExport() {
@@ -256,6 +301,11 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
       credentialTypeId: ['', Validators.required],
       expireDateApplicable: [false],
       comment: ['', Validators.maxLength(500)]
+    });
+    this.CredentialsFilterFormGroup = this.formBuilder.group({
+      name: [[]],
+      credentialTypeId: [[]],
+      expireDateApplicable: [false],
     });
   }
 
