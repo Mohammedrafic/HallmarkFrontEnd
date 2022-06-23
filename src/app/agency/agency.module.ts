@@ -75,6 +75,7 @@ import { CandidatDialogComponent } from './order-management/order-management-gri
 import { OrderManagementState } from './store/order-management.state';
 import { CandidatDetailsComponent } from './order-management/order-management-grid/candidat-dialog/candidat-details/candidat-details.component';
 import { NgxMaskModule } from 'ngx-mask';
+import { ChildOrderDialogComponent } from './order-management/order-management-grid/child-order-dialog/child-order-dialog.component';
 
 const sidebarIcons = {
   Sliders,
@@ -134,6 +135,7 @@ const sidebarIcons = {
     OrderCandidatesComponent,
     CandidatDialogComponent,
     CandidatDetailsComponent,
+    ChildOrderDialogComponent,
   ],
   imports: [
     CommonModule,

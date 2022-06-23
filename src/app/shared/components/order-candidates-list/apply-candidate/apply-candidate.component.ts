@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, S
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
-import { ApplicantStatus as ApplicantStatusEnum } from "@shared/enums/applicant-status.enum";
+import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from "@shared/enums/applicant-status.enum";
 import { Observable, Subject, takeUntil } from "rxjs";
 
 import { ApplyOrderApplicants, ApplyOrderApplicantsSucceed, ReloadOrderCandidatesLists } from "@agency/store/order-management.actions";
@@ -21,9 +21,11 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() candidate: OrderCandidatesList;
   @Input() billRatesData: BillRate[] = [];
+  @Input() isTab: boolean = false;
 
   public formGroup: FormGroup;
   public readOnlyMode: boolean;
+  public candidatStatus = CandidatStatus;
   public today = new Date();
 
   @Select(OrderManagementState.orderApplicantsInitialData)

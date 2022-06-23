@@ -1,13 +1,18 @@
 <section class="container">
   <section class="header-container">
     <div class="e-card-header">
-      <div class="e-card-header-caption">
+      <div class="e-card-header-caption candidat-status">
         <h3 class="e-card-title">{{candidate?.lastName}}, {{candidate?.firstName}}</h3>
+        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
+          <e-chips>
+            <e-chip [text]="candidatStatus[candidate.candidateStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
+          </e-chips>
+        </ejs-chiplist>
       </div>
       <div class="e-card-content">
         <button ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
         <button ejs-button [isPrimary]="true" *ngIf="candidate?.statusName !== 'Accepted'" class="apply-button" (click)="onAccept()">Accept</button>
-        <button ejs-button cssClass="e-flat close-button" (click)="onClose()">
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>

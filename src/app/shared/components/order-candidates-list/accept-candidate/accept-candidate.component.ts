@@ -9,6 +9,7 @@ import {
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob
 } from "@agency/store/order-management.actions";
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -20,6 +21,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
 
   @Input() billRatesData: BillRate[] = [];
   @Input() candidate: OrderCandidatesList;
+  @Input() isTab: boolean = false;
 
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
@@ -27,6 +29,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
   form: FormGroup;
 
   public candidateJob: OrderCandidateJob;
+  public candidatStatus = CandidatStatus;
+
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private store: Store) { }

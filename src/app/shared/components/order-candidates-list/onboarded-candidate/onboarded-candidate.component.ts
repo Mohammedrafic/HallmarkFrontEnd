@@ -27,6 +27,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   @Input() billRatesData: BillRate[] = [];
   @Input() candidate: OrderCandidatesList;
+  @Input() isTab: boolean = false;
 
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;

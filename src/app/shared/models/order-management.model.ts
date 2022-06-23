@@ -67,16 +67,18 @@ export type AgencyOrderManagement = {
 
 export type AgencyOrderManagementChild = {
   candidateBillRate: number;
-  candidateFirstName: string;
   candidateId: number;
-  candidateLastName: string;
   candidateMasterCredentialIds: number[];
-  candidateMiddleName: string;
   candidateStatus: CandidateStatus;
+  firstName: string;
   jobId: number;
+  lastName: string;
+  middleName: string;
   onboardedPercentage: number;
+  orderStatus: OrderStatus;
   organizationId: number;
-  status: OrderStatus;
+  positionId: number;
+  statusName: string;
   submissionsPercentage: number;
 };
 
@@ -92,6 +94,7 @@ export type OrderCandidatesList = {
   statusName: string;
   submissionsPercentage: number;
   candidateJobId: number;
+  candidateStatus?: CandidateStatus;
 };
 
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;

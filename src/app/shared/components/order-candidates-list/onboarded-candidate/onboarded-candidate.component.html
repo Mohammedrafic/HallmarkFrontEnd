@@ -15,7 +15,7 @@
           >
           </ejs-dropdownlist>
         </div>
-        <button ejs-button cssClass="e-flat close-button" (click)="onClose()">
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>

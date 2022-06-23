@@ -1,0 +1,68 @@
+@import '../../../../styles/variables/colors.scss';
+
+.order-tabs {
+  margin-top: 24px;
+
+  span {
+    margin-left: 12px;
+  }
+
+  &.first-active {
+    .e-tab .e-tab-header:not(.e-vertical) .e-indicator {
+      left: 114px !important;
+      right: 109px !important;
+    }
+  }
+}
+
+.preview-dialog {
+  .preview-header {
+    align-items: start !important;
+  }
+
+  .preview-title {
+    margin: 0;
+  }
+
+  ejs-chiplist {
+    padding-left: 0;
+  }
+}
+
+.order-statuses {
+  display: flex;
+  align-items: center;
+}
+
+.vertical-divider {
+  border-left: 1px solid $secondary-dark-blue-40;
+  margin: 0 8px;
+  height: 20px;
+}
+
+.custom-chip {
+  border: 1px solid $secondary-dark-blue-40;
+  background: $secondary-dark-blue-50;
+  border-radius: 16px;
+  padding: 0 8px;
+}
+
+.order-other-statuses {
+  display: flex;
+  align-items: center;
+
+  & > * {
+    margin-right: 8px;
+  }
+}
+
+.order-details {
+  margin-top: 24px;
+}
+
+.candidate {
+  margin-left: -20px;
+  margin-right: -20px;
+  margin-top: -20px;
+}
+

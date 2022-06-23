@@ -123,11 +123,11 @@
   <ng-template #detailTemplate let-data>
     <div class="subrow-wrapper">
       <app-grid-subrow-candidate
-        *ngFor="let child of data.children; let i = index;"
+        *ngFor="let child of data.children"
         [candidat]="child"
         [order]="data"
-        [candidatIndex]="i + 1"
-        (clickEvent)="onOpenCandidateDialog(data)"
+        [selected]="selectedCandidat?.candidateId === child.candidateId"
+        (clickEvent)="onOpenCandidateDialog($event, data)"
       ></app-grid-subrow-candidate>
     </div>
   </ng-template>
@@ -185,4 +185,5 @@
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-preview-order-dialog>
 <app-candidat-dialog [openEvent]="openCandidat"></app-candidat-dialog>
+<app-child-order-dialog [order]="selectedOrder" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>
 
