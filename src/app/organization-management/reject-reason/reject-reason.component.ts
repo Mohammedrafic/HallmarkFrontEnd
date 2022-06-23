@@ -19,6 +19,7 @@ import {
 } from "@organization-management/store/reject-reason.actions";
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { RejectReasonPage } from "@shared/models/reject-reason.model";
+import { DialogMode } from "@shared/enums/dialog-mode.enum";
 
 @Component({
   selector: 'app-reject-reason',
@@ -30,6 +31,7 @@ export class RejectReasonComponent extends AbstractGridConfigurationComponent im
   public rejectReasonPage$: Observable<RejectReasonPage>;
 
   public form: FormGroup;
+  public title: string = '';
 
   private isEdit = false;
   private isAlive = true;
@@ -55,6 +57,7 @@ export class RejectReasonComponent extends AbstractGridConfigurationComponent im
   }
 
   public addReason(): void {
+    this.title = DialogMode.Add;
     this.isEdit = false;
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -79,7 +82,8 @@ export class RejectReasonComponent extends AbstractGridConfigurationComponent im
 
   public onEdit(data: {reason: string, id: number}): void {
     this.isEdit = true;
-    this.form.patchValue({
+    this.title = DialogMode.Edit;
+      this.form.patchValue({
       id: data.id,
       reason: data.reason
     });
@@ -161,7 +165,7 @@ export class RejectReasonComponent extends AbstractGridConfigurationComponent im
     this.actions$.pipe(
       ofActionSuccessful(SaveRejectReasonsSuccess),
       takeWhile(() => this.isAlive)
-    ).subscribe(() => this.form.reset());
+    ).subscribe(() =>this.closeSideDialog());
   }
 
   private subscribeOnUpdateReasonSuccess(): void {

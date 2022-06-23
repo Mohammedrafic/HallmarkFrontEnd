@@ -13,6 +13,7 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { ShowToast } from "../../store/app.actions";
 import { MessageTypes } from "@shared/enums/message-types";
 import { getAllErrors } from "@shared/utils/error.utils";
+import { RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from "@shared/constants";
 
 export interface RejectReasonStateModel {
   rejectReasonsPage: RejectReasonPage | null;
@@ -41,7 +42,7 @@ export class RejectReasonState {
     { pageNumber, pageSize }: GetRejectReasonsByPage
   ): Observable<RejectReasonPage> {
     patchState({ isReasonLoading: true });
-    
+
     return this.rejectReasonService.getRejectReasonsByPage(pageNumber, pageSize).pipe(
       tap((payload) => {
         patchState({rejectReasonsPage: payload});
@@ -64,6 +65,7 @@ export class RejectReasonState {
           const rejectReasonsPage = { ...state.rejectReasonsPage, items };
           patchState({rejectReasonsPage});
         }
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
         dispatch(new SaveRejectReasonsSuccess());
 
         return payload;
@@ -83,6 +85,7 @@ export class RejectReasonState {
     return this.rejectReasonService.removeRejectReason(id).pipe(
       tap(() => {
         dispatch(new UpdateRejectReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
       })
     );
   }
@@ -95,6 +98,7 @@ export class RejectReasonState {
     return this.rejectReasonService.updateRejectReason(payload).pipe(
       tap(() => {
         dispatch(new UpdateRejectReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       }),
       catchError((error: HttpErrorResponse) => {
         dispatch(new SaveRejectReasonsError());
