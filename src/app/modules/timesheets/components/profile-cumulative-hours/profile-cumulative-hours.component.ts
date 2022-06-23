@@ -1,44 +1,32 @@
-import { Component } from '@angular/core';
-import { LegendSettingsModel } from "@syncfusion/ej2-charts/src/common/legend/legend-model";
-import { TooltipSettingsModel } from "@syncfusion/ej2-charts/src/common/model/base-model";
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { profileDetailsHoursChartColors, profileDetailsHoursChartColorsMap } from "../../constants/timesheets.constant";
-import { AxisModel, ChartAreaModel } from "@syncfusion/ej2-angular-charts";
 import { HourOccupationType } from "../../enums/hour-occupation-type.enum";
+import { profileDetailsHoursChartSettings } from "../../constants/profile-details-hours-chart-settings.constant";
+
+interface ChartLegendData {
+  name: HourOccupationType,
+  value: number;
+  value2: number;
+  color: string;
+}
+
+interface DonutChartData {
+  x: string;
+  y: number;
+}
+
+type BarChartData = {[key: string]: number | string};
 
 @Component({
   selector: 'app-profile-cumulative-hours',
   templateUrl: './profile-cumulative-hours.component.html',
-  styleUrls: ['./profile-cumulative-hours.component.scss']
+  styleUrls: ['./profile-cumulative-hours.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileCumulativeHoursComponent {
-  public readonly hourOccupationColors: string[] = profileDetailsHoursChartColors;
-  public readonly tooltip: TooltipSettingsModel = { enable: false };
-  public readonly center = {x: '50%', y: '50%'};
+  public readonly chartSettings = profileDetailsHoursChartSettings;
 
-  public readonly dataLabel: Object = {
-    visible: false,
-  };
-
-  public readonly legendSettings: LegendSettingsModel = {
-    visible: false,
-  };
-
-  public readonly primaryXAxis: AxisModel =  {
-    valueType: 'Category',
-    visible: false,
-  };
-
-  public readonly primaryYAxis: AxisModel = {
-    visible: false,
-  };
-
-  public readonly chartArea: ChartAreaModel = {
-    border: {
-      width: 0,
-    },
-  };
-
-  public readonly chartsLegendData: {name: HourOccupationType, value: number; value2: number; color: string;}[] = [
+  public readonly chartsLegendData: ChartLegendData[] = [
     {
       name: HourOccupationType.OnCall,
       color: profileDetailsHoursChartColorsMap[HourOccupationType.OnCall],
@@ -83,21 +71,34 @@ export class ProfileCumulativeHoursComponent {
     }
   ];
 
-  public donutChartData: Object[] = [
-    { x: 'OnCall', y: 32.47 },
-    { x: 'Callback', y: 2.5 },
-    { x: 'Regular', y: 36 },
-    { x: 'Holiday', y: 36},
-    { x: 'Charge', y: 0 },
-    { x: 'Preceptor', y: 36 },
-    { x: 'Orientation', y: 36 },
+  public donutChartData: DonutChartData[] = [
+    {x: 'OnCall', y: 32.47},
+    {x: 'Callback', y: 2.5},
+    {x: 'Regular', y: 36},
+    {x: 'Holiday', y: 36},
+    {x: 'Charge', y: 0},
+    {x: 'Preceptor', y: 36},
+    {x: 'Orientation', y: 36},
   ];
 
-  public barChartData: Object[] = [
-    { x: '-', y0: 32.47, y1: 2.50, y2: 36, y3: 36, y4: 0, y5: 36, y6: 36 },
+  public barChartData: BarChartData[] = [
+    {
+      x: '-',
+      y0: 32.47,
+      y1: 2.50,
+      y2: 36,
+      y3: 36,
+      y4: 0,
+      y5: 36,
+      y6: 36,
+    },
   ];
 
-  public onPointRender(event: {point: {index: number}; fill: string;}): void {
+  public trackByName(_: number, item: ChartLegendData): string {
+    return item.name;
+  }
+
+  public onPointRender(event: { point: { index: number }; fill: string; }): void {
     event.fill = profileDetailsHoursChartColors[event.point.index];
   }
 }
