@@ -5,9 +5,10 @@ import { CommonModule } from '@angular/common';
 
 import { AccumulationChartComponent } from './accumulation-chart.component';
 import { WidgetWrapperModule } from '../widget-wrapper/widget-wrapper.module';
+import { CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 
 @NgModule({
-  imports: [CommonModule, SFAccumulationChartModule, WidgetWrapperModule],
+  imports: [CommonModule, SFAccumulationChartModule, WidgetWrapperModule, CheckBoxModule],
   exports: [AccumulationChartComponent],
   declarations: [AccumulationChartComponent],
   providers: [AccumulationTooltipService]

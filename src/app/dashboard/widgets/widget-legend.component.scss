@@ -19,21 +19,5 @@
     height: 12px;
     border-radius: 50%;
     margin: 0 10px;
-
-    &.point-0 {
-      background-color: $primary-active-blue-90;
-    }
-
-    &.point-1 {
-      background-color: $primary-active-blue-70;
-    }
-
-    &.point-2 {
-      background-color: $primary-active-blue-50;
-    }
-
-    &.point-3 {
-      background-color: $primary-active-blue-20;
-    }
   }
 }

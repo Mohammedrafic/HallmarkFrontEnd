@@ -106,11 +106,11 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   private addNewWidget(widget: WidgetOptionModel): void {
-    const widgetConfiguration = widgetTypeToConfigurationMapper[widget.title];
+    const widgetConfiguration = widgetTypeToConfigurationMapper[widget.id];
 
     if (!widgetConfiguration) return;
 
-    const newPanel = { ...widgetConfiguration, id: widget.title, row: 0, col: 0 };
+    const newPanel = { ...widgetConfiguration, id: widget.id, row: 0, col: 0 };
     const updatePanelsList = [...this.dashboardSFComponentSerialized, newPanel];
 
     this.saveDashboard(updatePanelsList);
@@ -118,7 +118,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   private removeWidget(widget: WidgetOptionModel): void {
     const updatePanelsList = this.dashboardSFComponentSerialized.filter(
-      (panel: PanelModel) => panel.id !== widget.title
+      (panel: PanelModel) => panel.id !== widget.id
     );
 
     this.saveDashboard(updatePanelsList);
