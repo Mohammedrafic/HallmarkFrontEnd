@@ -8,3 +8,16 @@ export interface EditTimsheetForm {
   rate: number;
   total: number;
 }
+
+export interface TimsheetForm {
+  date: string;
+  search: string;
+  orderId: string;
+  status: string[];
+  skill: string[];
+  department: string[];
+  billRate: number;
+  agencyName: string[];
+  totalHours: number;
+}
+

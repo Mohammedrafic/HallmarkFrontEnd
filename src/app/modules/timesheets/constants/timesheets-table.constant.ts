@@ -3,10 +3,10 @@ import { SelectionSettingsModel } from '@syncfusion/ej2-angular-grids';
 
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { GRID_CONFIG } from '@shared/constants';
-
 import { SortingDirections } from '@client/client.config';
-import { MoreMenuType, TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../enums';
-import { IFilterColumns, IFilterDataSource, ITimesheetsColumnWidth } from '../interface';
+
+import { MoreMenuType, TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../enums/timesheets.enum';
+import { IFilterColumns, IFilterDataSource, ITimesheetsColumnWidth } from '../interface/i-timesheet.interface';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,

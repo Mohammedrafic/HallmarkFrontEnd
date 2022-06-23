@@ -13,7 +13,35 @@ export enum TIMETHEETS_STATUSES {
   ORG_APPROVED = 'org. approved',
   REJECTED = 'rejected',
 }
+
 export enum ProfileTimeSheetActionType {
   Add = 'add',
   Edit = 'edit',
+}
+
+export enum ExportType {
+  Excel_file = 'Excel File',
+  CSV_file = 'CSV File',
+  Custom = 'Custom'
+}
+
+export enum MoreMenuType {
+  Edit = 'Edit',
+  Duplicate = 'Duplicate',
+  Close = 'Close',
+  Delete = 'Delete'
+}
+
+export enum TimesheetsTableColumns {
+  Checkbox = 'checkbox',
+  Name = 'name',
+  StatusText = 'statusText',
+  OrderId = 'orderId',
+  SkillName = 'skillName',
+  WorkWeek = 'workWeek',
+  DepartmentName = 'departmentName',
+  BillRate = 'billRate',
+  AgencyName = 'agencyName',
+  TotalHours = 'totalHours',
+  Controls = 'controls',
 }

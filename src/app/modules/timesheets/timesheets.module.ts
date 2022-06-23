@@ -18,6 +18,12 @@ import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 import { NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DatePickerModule, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { AccumulationChartAllModule, ChartAllModule } from '@syncfusion/ej2-angular-charts';
+
+import { ControlConverterModule } from '@shared/pipes/control-converter/control-converter.module';
+import { CapitalizeFirstModule } from '@shared/pipes/capitalize-first/capitalize-first.module';
+import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
+import { SharedModule } from '@shared/shared.module';
 
 import { TimesheetsRoutingModule } from './timesheets-routing.module';
 import { TimesheetsContainerComponent } from './containers/timesheets-container/timesheets-container.component';
@@ -25,17 +31,16 @@ import { TimesheetsTableComponent } from './components/timesheets-table/timeshee
 import { TimesheetsState } from './store/state/timesheets.state';
 import { TimesheetsApiService } from './services/timesheets-api.service';
 import { TabDynamicNavigationComponent } from './components/tab-dynamic-navigation/tab-dynamic-navigation.component';
-import { ControlConverterPipe } from './pipes/control-converter.pipe';
 import { ProfileDetailsContainerComponent } from './containers/profile-details-container/profile-details-container.component';
 import { ProfileTimesheetTableComponent } from './components/profile-timesheet-table/profile-timesheet-table.component';
 import { EditTimesheetComponent } from './components/edit-timesheet/edit-timesheet.component';
 import { EditTimesheetService } from './services/edit-timesheet.service';
-import { SharedModule } from '@shared/shared.module';
-import { AccumulationChartAllModule, ChartAllModule } from '@syncfusion/ej2-angular-charts';
 import { ProfileDetailsJobInfoComponent } from './components/profile-details-job-info/profile-details-job-info.component';
 import { ProfileCumulativeHoursComponent } from './components/profile-cumulative-hours/profile-cumulative-hours.component';
 import { ProfileUploadsComponent } from './components/profile-uploads/profile-uploads.component';
 import { ProfileInvoicesComponent } from './components/profile-invoices/profile-invoices.component';
+import { TimesheetsService } from './services/timesheets.service';
+import { DateWeekPickerModule } from '@shared/components/date-week-picker/date-week-picker.module';
 
 const gridIcons = {
   MessageSquare,
@@ -72,7 +77,6 @@ const gridIcons = {
     TimesheetsContainerComponent,
     TimesheetsTableComponent,
     TabDynamicNavigationComponent,
-    ControlConverterPipe,
     ProfileDetailsContainerComponent,
     ProfileTimesheetTableComponent,
     EditTimesheetComponent,
@@ -84,7 +88,6 @@ const gridIcons = {
   imports: [
     CommonModule,
     TimesheetsRoutingModule,
-    SharedModule,
     FeatherModule.pick(gridIcons),
     ButtonModule,
     TabAllModule,
@@ -113,8 +116,17 @@ const gridIcons = {
     FormsModule,
     ButtonModule,
     CheckBoxModule,
+    ControlConverterModule,
+    CapitalizeFirstModule,
+    DateWeekPickerModule
   ],
   exports: [TimesheetsContainerComponent],
-  providers: [TimesheetsApiService, EditTimesheetService, MaskedDateTimeService]
+  providers: [
+    TimesheetsApiService,
+    EditTimesheetService,
+    MaskedDateTimeService,
+    TimesheetsService,
+    CapitalizeFirstPipe,
+  ]
 })
 export class TimesheetsModule {}

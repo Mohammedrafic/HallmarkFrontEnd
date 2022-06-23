@@ -7,26 +7,23 @@
   </ng-container>
   <ng-container right>
     <app-search class="search"></app-search>
-    <ejs-datepicker
-      id="startDate"
-      class="datepicker datepicker--custom"
-      format="dd/MM/yyyy"
-      placeholder="From: DD/MM/YYYY - To: DD/MM/YYYY"
-      [formControl]="formGroup.get('date') | controlConverter"
-      [allowEdit]="false"
-      (renderDayCell)="onRenderCell($event)"
-    >
-    </ejs-datepicker>
+    <app-date-week-picker
+      [dateControl]="formGroup.get('date') | controlConverter">
+    </app-date-week-picker>
     <button
       ejs-button
-      cssClass="e-outline button-filter"
-      (click)="showFilters()">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+      cssClass="e-outline button-filter button--no-wrap"
+      (click)="showFilters()">
+      Filters <i-feather name="sliders" class="icon"></i-feather>
+    </button>
     <button
       ejs-dropdownbutton
       [items]="exportOptions"
       (select)="exportSelected($event)"
       id="importButton"
-      cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+      cssClass="e-outline button-export button--no-wrap">
+      Export <i-feather name="download" class="icon"></i-feather>
+    </button>
   </ng-container>
 </app-page-toolbar>
 
@@ -66,7 +63,7 @@
           id="status"
           mode="CheckBox"
           [fields]="filterOptionFields"
-          [dataSource]="filterColumns.status.dataSource"
+          [dataSource]="filterColumns.statusText?.dataSource"
           [showDropDownIcon]="true"
           formControlName="status"
           placeholder=""></ejs-multiselect>
@@ -79,7 +76,7 @@
           id="department"
           mode="CheckBox"
           [fields]="filterOptionFields"
-          [dataSource]="filterColumns.department.dataSource"
+          [dataSource]="filterColumns.departmentName?.dataSource"
           [showDropDownIcon]="true"
           formControlName="department"
           placeholder=""></ejs-multiselect>
@@ -92,7 +89,7 @@
           id="agencyName"
           mode="CheckBox"
           [fields]="filterOptionFields"
-          [dataSource]="filterColumns.agencyName.dataSource"
+          [dataSource]="filterColumns.agencyName?.dataSource"
           [showDropDownIcon]="true"
           formControlName="agencyName"
           placeholder=""></ejs-multiselect>
@@ -129,7 +126,7 @@
           id="skill"
           mode="CheckBox"
           [fields]="filterOptionFields"
-          [dataSource]="filterColumns.skill.dataSource"
+          [dataSource]="filterColumns.skillName?.dataSource"
           [showDropDownIcon]="true"
           formControlName="skill"
           placeholder=""></ejs-multiselect>

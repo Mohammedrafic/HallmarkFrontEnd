@@ -12,6 +12,10 @@ export class TabDynamicNavigationComponent {
   @Input() tabConfig: ITabConfigInterface[];
   @Output() changeTab: EventEmitter<number> = new EventEmitter<number>();
 
+  public trackByFn(idx: number): number {
+    return idx;
+  }
+
   public onSelect(selectEvent: SelectingEventArgs): void {
     this.changeTab.emit(selectEvent.selectingIndex);
   }

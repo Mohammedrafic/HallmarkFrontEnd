@@ -12,23 +12,17 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { ORDERS_GRID_CONFIG } from '@client/client.config';
 
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
-import { TIMETHEETS_STATUSES } from '../../enums/timesheets.enum';
-import { ITimesheet } from '../../interface/i-timesheet.interface';
-
-const ROW_HEIGHT = {
-  SCALE_UP_HEIGHT: 140,
-  SCALE_DOWN_HEIGHT: 64
-}
-
-enum MoreMenuType {
-  'Edit',
-  'Duplicate',
-  'Close',
-  'Delete'
-}
+import { MoreMenuType, TIMETHEETS_STATUSES } from '../../enums/timesheets.enum';
+import { ITimesheet, ITimesheetsColumnWidth } from '../../interface/i-timesheet.interface';
+import {
+  moreMenuWithClose,
+  moreMenuWithDelete,
+  ROW_HEIGHT,
+  tableSelectionModel, TIMESHEETS_GRID_CONFIG,
+  timesheetsTableColumnWidth
+} from '../../constants/timesheets-table.constant';
 
 @Component({
   selector: 'app-timesheets-table',
@@ -46,20 +40,13 @@ export class TimesheetsTableComponent extends AbstractGridConfigurationComponent
   @Output() sortHandler: EventEmitter<string> = new EventEmitter<string>();
   @Output() timesheetRowSelected: EventEmitter<void> =  new EventEmitter();
 
-  public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
-  public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
-  public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
+  public allowWrap = TIMESHEETS_GRID_CONFIG.isWordWrappingEnabled;
+  public wrapSettings: TextWrapSettingsModel = TIMESHEETS_GRID_CONFIG.wordWrapSettings;
+  public selectionOptions: SelectionSettingsModel = tableSelectionModel;
   public isLockMenuButtonsShown = false;
-  public moreMenuWithDeleteButton: ItemModel[] = [
-    { text: MoreMenuType[0], id: '0' },
-    { text: MoreMenuType[1], id: '1' },
-    { text: MoreMenuType[3], id: '3' }
-  ];
-  public moreMenuWithCloseButton: ItemModel[] = [
-    { text: MoreMenuType[0], id: '0' },
-    { text: MoreMenuType[1], id: '1' },
-    { text: MoreMenuType[2], id: '2' }
-  ];
+  public moreMenuWithDeleteButton: ItemModel[] = moreMenuWithDelete;
+  public moreMenuWithCloseButton: ItemModel[] = moreMenuWithClose;
+  public timesheetsTableColumnWidth: ITimesheetsColumnWidth = timesheetsTableColumnWidth;
   public TIMESHEETS_STATUSES = TIMETHEETS_STATUSES;
 
   constructor() {
@@ -81,17 +68,17 @@ export class TimesheetsTableComponent extends AbstractGridConfigurationComponent
   }
 
   public menuOptionSelected(event: any, data: ITimesheet): void {
-    switch (Number(event.item.properties.id)) {
-      case MoreMenuType['Edit']: {
+    switch (event.item.properties.text) {
+      case MoreMenuType.Edit: {
         break;
       }
-      case MoreMenuType['Duplicate']: {
+      case MoreMenuType.Duplicate: {
         break;
       }
-      case MoreMenuType['Close']: {
+      case MoreMenuType.Close: {
         break;
       }
-      case MoreMenuType['Delete']: {
+      case MoreMenuType.Delete: {
         break;
       }
     }

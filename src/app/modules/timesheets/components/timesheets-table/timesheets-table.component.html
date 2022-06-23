@@ -14,79 +14,122 @@
   (rowSelected)="onRowClick($event)"
 >
   <e-columns>
-    <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
-    <e-column field="name" headerText="NAME" width="140">
-      <ng-template #template let-data>
-        <div [class.red-text]="data.statusText === TIMESHEETS_STATUSES.MISSING">
-          {{ data.name }}
-        </div>
-      </ng-template>
+    <e-column
+      type="checkbox"
+      [customAttributes]="{ class: 'bootstrap' }"
+      width="{{ timesheetsTableColumnWidth['checkbox'] }}">
     </e-column>
-    <e-column field="statusText" headerText="STATUS" width="148">
-      <ng-template #template let-data>
-        <div class="status-cell">
-          <ejs-chiplist>
-            <e-chips>
-              <e-chip [text]="data.statusText" [cssClass]="(data.statusText | chipsCssClass)"></e-chip>
-            </e-chips>
-          </ejs-chiplist>
-        </div>
-      </ng-template>
+    <e-column
+      field="name"
+      headerText="NAME"
+      width="{{ timesheetsTableColumnWidth['name'] }}">
+        <ng-template #template let-data>
+          <div [class.red-text]="data.statusText === TIMESHEETS_STATUSES.MISSING">
+            {{ data.name }}
+          </div>
+        </ng-template>
     </e-column>
-    <e-column field="orderId" headerText="ORDER ID" width="140">
-      <ng-template #template let-data>
-        <div>
-          <b>{{ data.orderId }}</b>
-        </div>
-      </ng-template>
+    <e-column
+      field="statusText"
+      headerText="STATUS"
+      width="{{ timesheetsTableColumnWidth['statusText'] }}">
+        <ng-template #template let-data>
+          <div class="status-cell">
+            <ejs-chiplist>
+              <e-chips>
+                <e-chip [text]="data.statusText" [cssClass]="(data.statusText | chipsCssClass)"></e-chip>
+              </e-chips>
+            </ejs-chiplist>
+          </div>
+        </ng-template>
     </e-column>
-    <e-column field="skillName" headerText="SKILL" textAlign="Left" width="270"></e-column>
-    <e-column field="workWeek" headerText="WORK WEEK" textAlign="Right" width="238">
-      <ng-template #template let-data>
-        <div class="align-right"><b>{{ data.workWeek }}</b></div>
-      </ng-template>
+    <e-column
+      field="orderId"
+      headerText="ORDER ID"
+      width="{{ timesheetsTableColumnWidth['orderId'] }}">
+        <ng-template #template let-data>
+          <div>
+            <b>{{ data.orderId }}</b>
+          </div>
+        </ng-template>
     </e-column>
-    <e-column field="departmentName" headerText="DEPARTMENT" textAlign="Left" width="264"></e-column>
-    <e-column field="billRate" headerText="BILL RATE $" textAlign="Right" width="140">
-      <ng-template #template let-data>
-        <div class="align-right">{{ data.billRate }}</div>
-      </ng-template>
+    <e-column
+      field="skillName"
+      headerText="SKILL"
+      textAlign="Left"
+      width="{{ timesheetsTableColumnWidth['skillName'] }}">
     </e-column>
-    <e-column field="agencyName" headerText="AGENCY NAME" textAlign="Left" width="160"></e-column>
-    <e-column field="totalHours" headerText="TOTAL HOURS" textAlign="Right" width="160">
-      <ng-template #template let-data>
-        <div class="align-right">{{ data.totalHours | date: "MM/dd/YYYY" }}</div>
-      </ng-template>
+    <e-column
+      field="workWeek"
+      headerText="WORK WEEK"
+      textAlign="Right"
+      width="{{ timesheetsTableColumnWidth['workWeek'] }}">
+        <ng-template #template let-data>
+          <div class="align-right"><b>{{ data.workWeek }}</b></div>
+        </ng-template>
     </e-column>
-    <e-column headerTextAlign="Right" width="112" freeze="Right">
-      <ng-template #headerTemplate let-data>
-        <div class="controls-header">
-          <button ejs-button cssClass="e-flat icon-button">
-            <span><i-feather name="menu" class="icon" (click)="onRowScaleUpClick()"></i-feather></span>
-          </button>
-          <button ejs-button cssClass="e-flat icon-button">
-            <span><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
-          </button>
-        </div>
-      </ng-template>
-      <ng-template #template let-data>
-        <div class="row-tool-buttons" (click)="stopPropagation($event)">
-          <button ejs-button cssClass="e-flat default-icon-button">
-            <span><i-feather name="message-square" class="icon"></i-feather></span>
-          </button>
-          <button ejs-button cssClass="e-flat secondary-icon-button" *ngIf="isLockMenuButtonsShown">
-            <span><i-feather name="lock" class="icon"></i-feather></span>
-          </button>
-          <button
-            ejs-dropdownbutton
-            [items]="data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : moreMenuWithCloseButton"
-            (select)="menuOptionSelected($event, data)"
-            cssClass="e-flat primary-icon-button"
-          >
-            <span><i-feather name="more-vertical" class="icon"></i-feather></span>
-          </button>
-        </div>
-      </ng-template>
+    <e-column
+      field="departmentName"
+      headerText="DEPARTMENT"
+      textAlign="Left"
+      width="{{ timesheetsTableColumnWidth['departmentName'] }}">
+    </e-column>
+    <e-column
+      field="billRate"
+      headerText="BILL RATE $"
+      textAlign="Right"
+      width="{{ timesheetsTableColumnWidth['billRate'] }}">
+        <ng-template #template let-data>
+          <div class="align-right">{{ data.billRate }}</div>
+        </ng-template>
+    </e-column>
+    <e-column
+      field="agencyName"
+      headerText="AGENCY NAME"
+      textAlign="Left"
+      width="{{ timesheetsTableColumnWidth['agencyName'] }}">
+    </e-column>
+    <e-column
+      field="totalHours"
+      headerText="TOTAL HOURS"
+      textAlign="Right"
+      width="{{ timesheetsTableColumnWidth['totalHours'] }}">
+        <ng-template #template let-data>
+          <div class="align-right">{{ data.totalHours | date: "MM/dd/YYYY" }}</div>
+        </ng-template>
+    </e-column>
+    <e-column
+      headerTextAlign="Right"
+      width="{{ timesheetsTableColumnWidth['controls'] }}"
+      freeze="Right">
+        <ng-template #headerTemplate let-data>
+          <div class="controls-header">
+            <button ejs-button cssClass="e-flat icon-button">
+              <span><i-feather name="menu" class="icon" (click)="onRowScaleUpClick()"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat icon-button">
+              <span><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+        <ng-template #template let-data>
+          <div class="row-tool-buttons" (click)="stopPropagation($event)">
+            <button ejs-button cssClass="e-flat default-icon-button">
+              <span><i-feather name="message-square" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat secondary-icon-button" *ngIf="isLockMenuButtonsShown">
+              <span><i-feather name="lock" class="icon"></i-feather></span>
+            </button>
+            <button
+              ejs-dropdownbutton
+              [items]="data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : moreMenuWithCloseButton"
+              (select)="menuOptionSelected($event, data)"
+              cssClass="e-flat primary-icon-button"
+            >
+              <span><i-feather name="more-vertical" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
     </e-column>
   </e-columns>
 
