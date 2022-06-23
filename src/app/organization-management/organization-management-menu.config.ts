@@ -7,5 +7,6 @@ export const ORG_SETTINGS: { [key: string]: Object }[] = [
   { text: 'Holidays', id: 7, route: './holidays' },
   { text: 'Workflow', id: 8, route: './workflow' },
   { text: 'Bill Rates', id: 9, route: './bill-rates' },
-  { text: 'Settings', id: 6, route: './settings' }
+  { text: 'Settings', id: 6, route: './settings' },
+  { text: 'Reasons for Rejection', id: 10, route: './reject-reason'},
 ];

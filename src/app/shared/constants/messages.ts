@@ -16,3 +16,4 @@ export const INACTIVE_USER_TEXT = 'Are you sure to inactivate the User?';
 export const AGENCY_ADDED = "Agency details saved successfully";
 export const ORDER_EDITS = "The recent changes may affect the data previously defined for this order." +
   "Please make sure that Workflows, Credentials, and Bill Rates are correct";
+export const CANCEL_REJECTION_REASON = "Are you sure you want to cancel? All data will be deleted"
