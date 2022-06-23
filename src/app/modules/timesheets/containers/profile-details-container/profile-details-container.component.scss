@@ -1,10 +1,9 @@
 @import '../../../../styles/variables/colors';
 
-$chip-width: 112px;
 $chip-margin: 8px;
 
 .profile-table-container {
-  padding: 21px 24px;
+  padding: 21px 0;
 }
 
 .d-flex {
@@ -36,7 +35,6 @@ $chip-margin: 8px;
   display: flex;
   align-items: center;
   padding-bottom: 20px;
-  padding-top: 20px;
   border-bottom: 1px solid $secondary-dark-blue-45;
 
   .e-avatar {
@@ -93,7 +91,7 @@ $chip-margin: 8px;
 .order-header {
   display: flex;
   justify-content: space-between;
-  margin: 15px 21px 10px;
+  margin: 15px 0 10px;
 
   .order-id {
     font-weight: 700;
@@ -104,10 +102,6 @@ $chip-margin: 8px;
     margin-right: 12px;
     margin-left: 12px;
   }
-}
-
-.profile-hours-statistics, .profile-details-header, .job-general-info {
-  margin: 0 21px;
 }
 
 .job-general-info {
@@ -127,4 +121,29 @@ $chip-margin: 8px;
     margin-left: 12px;
     flex-grow: 1;
   }
+}
+
+.timesheet-navigation {
+  display: flex;
+  align-items: center;
+  padding: 25px 20px;
+  border-top: 1px solid $secondary-dark-blue-45;
+
+  .prev, .next {
+    color: $primary-active-blue-10;
+    font-weight: 590;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .prev i-feather {
+    margin-right: 8px;
+  }
+
+  .next i-feather {
+    margin-left: 8px;
+  }
+
 }

@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
   selector: 'app-profile-uploads',
   templateUrl: './profile-uploads.component.html',
-  styleUrls: ['./profile-uploads.component.scss']
+  styleUrls: ['./profile-uploads.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileUploadsComponent {
   public readonly uploads: {name: string; type: string;}[] = [
