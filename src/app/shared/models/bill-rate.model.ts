@@ -99,8 +99,20 @@ export class BillRateFilters {
   locationIds?: number[];
   departmentIds?: number[];
   skillIds?: number[];
-  orderTypes?: string[];
+  orderTypeIds?: number[];
+  billRateTitleIds?: number[];
   billRateConfigIds?: string[];
+  billRatesCategory?: string[];
+  billRatesType?: string[];
+  effectiveDate?: Date | null;
+  intervalMin?: number | null;
+  intervalMax?: number | null;
+  considerForWeeklyOt?: boolean | null;
+  considerForDailyOt?: boolean | null;
+  considerFor7thDayOt?: boolean | null;
+  regularLocal?: boolean | null;
+  displayInTimesheet?: boolean | null;
+  displayInJob?: boolean | null;
 }
 
 export type BillRateSetupPage = PageOfCollections<BillRateSetup>;
