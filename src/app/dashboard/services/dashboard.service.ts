@@ -107,7 +107,7 @@ export class DashboardService {
         response.widgetTypes.map((widget) => {
           return {
             ...widget,
-            id: widget.title.split(' ').join('_') as WidgetTypeEnum,
+            id: widget.title.replace(/[ ,]+/g, "_") as WidgetTypeEnum,
           };
         })
       )
