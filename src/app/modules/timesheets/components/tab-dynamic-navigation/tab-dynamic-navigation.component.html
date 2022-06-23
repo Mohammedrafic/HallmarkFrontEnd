@@ -1,8 +1,12 @@
 <ejs-tab id="tab_default" heightAdjustMode="Auto" #tabNavigation (selecting)="onSelect($event)">
   <div class="e-tab-header">
-    <div *ngFor="let tab of tabConfig">
+    <div *ngFor="let tab of tabConfig; trackBy: trackByFn">
       {{ tab.title }}
-      <span *ngIf="tab.amount" class="tab-navigation e-badge e-badge-success e-badge-circle">{{ tab.amount }}</span>
+      <span
+        *ngIf="tab.amount"
+        class="tab-navigation e-badge e-badge-success e-badge-circle">
+        {{ tab.amount }}
+      </span>
     </div>
   </div>
   <div class="e-content"></div>

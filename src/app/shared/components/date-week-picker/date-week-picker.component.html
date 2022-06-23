@@ -1,0 +1,10 @@
+<ejs-datepicker
+  id="startDate"
+  class="datepicker datepicker--custom"
+  format="dd/MM/yyyy"
+  placeholder="From: DD/MM/YYYY - To: DD/MM/YYYY"
+  [formControl]="dateControl"
+  [allowEdit]="false"
+  (renderDayCell)="onRenderCell($event)"
+>
+</ejs-datepicker>
