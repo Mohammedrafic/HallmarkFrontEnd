@@ -10,6 +10,7 @@ import { STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { OrderManagemetTabs } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
+  ApproveOrder,
   DeleteOrder,
   DeleteOrderSucceeded,
   GetAgencyOrderCandidatesList,
@@ -19,11 +20,10 @@ import {
   ReloadOrganisationOrderCandidatesLists
 } from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { OrderFilter, OrderManagement, OrderManagementPage } from '@shared/models/order-management.model';
+import { Order, OrderFilter, OrderManagement, OrderManagementPage } from '@shared/models/order-management.model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { UserState } from '../../../store/user.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { Order } from '@shared/models/order-management.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
@@ -35,8 +35,7 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { Skill } from '@shared/models/skill.model';
 import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
 import { OrderTypeOptions } from '@shared/enums/order-type';
-import { DatePipe } from '@angular/common';
-import { Location } from '@angular/common';
+import { DatePipe, Location } from '@angular/common';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
@@ -115,6 +114,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public orgStructure: OrganizationStructure;
   public regions: OrganizationRegion[] = [];
   public previousSelectedOrderId: number | null;
+  private selectedIndex: number;
 
   constructor(private store: Store,
               private router: Router,
@@ -168,6 +168,13 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       this.getOrders();
       this.openDetails.next(false);
     });
+
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ApproveOrder)).subscribe(() => {
+      const [index] = this.grid.getSelectedRowIndexes();
+      this.selectedIndex = index;
+      this.getOrders();
+    });
+
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
       this.selectedOrder = order;
     });
@@ -316,6 +323,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.grid.selectRow(index);
         this.onRowClick({ data });
       }
+    }
+
+    if (this.selectedIndex) {
+      this.grid.selectRow(this.selectedIndex);
     }
   }
 

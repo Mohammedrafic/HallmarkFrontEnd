@@ -13,10 +13,10 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { Order, OrderCandidatesListPage } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { OrderStatus } from '@shared/enums/order-status';
-import { DeleteOrder } from '@client/store/order-managment-content.actions';
+import { OrderStatus } from '@shared/enums/order-management';
+import { ApproveOrder, DeleteOrder } from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import { CANCEL_ORDER_CONFIRM_TEXT, CANCEL_ORDER_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { Location } from '@angular/common';
 
 @Component({
@@ -49,10 +49,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   private secondHasOpendOnes = false;
 
-  constructor(private chipsCssClass: ChipsCssClass, 
-              private router: Router, 
-              private route: ActivatedRoute, 
-              private store: Store, 
+  constructor(private chipsCssClass: ChipsCssClass,
+              private router: Router,
+              private route: ActivatedRoute,
+              private store: Store,
               private confirmService: ConfirmService,
               private location: Location) {}
 
@@ -63,6 +63,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   ngOnChanges(changes: SimpleChanges): void {
     if (this.chipList && changes['order'].currentValue) {
       this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
+      this.chipList.text = changes['order'].currentValue.statusText.toUpperCase();
     }
   }
 
@@ -95,16 +96,38 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public deleteOrder(id: number): void {
     this.confirmService
-    .confirm(DELETE_RECORD_TEXT, {
-      title: DELETE_RECORD_TITLE,
-      okButtonLabel: 'Delete',
-      okButtonClass: 'delete-button'
-    })
-    .subscribe((confirm) => {
-      if (confirm) {
-        this.store.dispatch(new DeleteOrder(id));
-      }
-    });
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button'
+      })
+      .subscribe((isConfirm: boolean) => {
+        if (isConfirm) {
+          this.store.dispatch(new DeleteOrder(id));
+        }
+      });
+  }
+
+  /** Executes when user cancel the order with custom status*/
+  public cancelOrder(id: number): void {
+    const options = {
+      title: CANCEL_ORDER_CONFIRM_TITLE,
+      okButtonLabel: 'Yes',
+      okButtonClass: 'delete-button',
+      cancelButtonLabel: 'No'
+    };
+
+    this.confirmService
+      .confirm(CANCEL_ORDER_CONFIRM_TEXT, options)
+      .subscribe((isConfirm: boolean) => {
+        if (isConfirm) {
+          this.store.dispatch(new DeleteOrder(id));
+        }
+      });
+  }
+
+  public approveOrder(id: number): void {
+    this.store.dispatch(new ApproveOrder(id));
   }
 
   public editOrder(data: Order) {

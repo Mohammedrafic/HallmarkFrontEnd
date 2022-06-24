@@ -156,3 +156,10 @@ export class ClearSelectedOrder {
   constructor() {
   }
 }
+
+export class ApproveOrder {
+  static readonly type = '[order management] Approve Order';
+
+  constructor(public id: number) {
+  }
+}
