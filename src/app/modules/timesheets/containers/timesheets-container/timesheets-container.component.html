@@ -31,7 +31,7 @@
   <app-timesheets-table
     *ngIf="timesheets$ | async as timesheets"
     [tableData]="timesheets"
-    [changeTableItem]="changeTableItemSubj.getStream() | async"
+    [changeTableItem]="currentSelectedTableRowIndex | async"
     (changePage)="handleChangePage($event)"
     (changePerPage)="handleChangePerPage($event)"
     (timesheetRowSelected)="rowSelected($event)"
@@ -136,7 +136,7 @@
   </form>
 </app-filter-dialog>
 <app-profile-details-container
-  [currentSelectedRowIndex]="changeTableItemSubj.getStream() | async"
+  [currentSelectedRowIndex]="currentSelectedTableRowIndex | async"
   [maxRowIndex]="(timesheets$ | async)?.items?.length || 0"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)">
 </app-profile-details-container>

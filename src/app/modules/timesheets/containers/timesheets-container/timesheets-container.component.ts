@@ -37,7 +37,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public filterColumns: IFilterColumns;
   public filteredItems: FilteredItem[] = [];
   public filters: ITimesheetsFilter;
-  public changeTableItemSubj: BaseObservable<number> = new BaseObservable<number>(null as any);
+  public currentSelectedTableRowIndex: Observable<number>
+    = this.timesheetsService.getStream();
   public pageSize = 30;
 
   private pageNumberSubj: BaseObservable<number> = new BaseObservable<number>(1);
@@ -118,12 +119,12 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public rowSelected(rowIndex: number): void {
-    this.changeTableItemSubj.set(rowIndex);
+    this.timesheetsService.setCurrentSelectedIndexValue(rowIndex);
     this.store.dispatch(new Timesheets.ToggleProfileDialog(DialogAction.Open, 12));
   }
 
   public onNextPreviousOrderEvent(next: boolean): void {
-    this.changeTableItemSubj.set(next ? this.changeTableItemSubj.get() + 1 : this.changeTableItemSubj.get() - 1);
+    this.timesheetsService.setNextValue(next);
   }
 
   private startPageStateWatching(): void {

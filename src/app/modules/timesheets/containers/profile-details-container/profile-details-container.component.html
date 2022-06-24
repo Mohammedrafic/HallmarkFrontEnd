@@ -108,7 +108,7 @@
       <div class="spacer"></div>
 
       <div
-        [class.disabled]="currentSelectedRowIndex === (maxRowIndex - 1)"
+        [class.disabled]="isNextDisabled"
         (click)="onNextPreviousOrder(true)"
         class="next">
         Next Timesheet
