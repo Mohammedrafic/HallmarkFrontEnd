@@ -18,6 +18,7 @@ import { TimesheetsState } from '../../store/state/timesheets.state';
 import { ProfileTimeSheetDetail } from '../../store/model/timesheets.model';
 import { Status } from "@shared/enums/status";
 import { ONBOARDED_STATUS } from "@shared/components/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst";
+import { DialogActionPayload } from '../../interface';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -35,7 +36,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   timeSheetsProfile$: Observable<ProfileTimeSheetDetail[]>;
 
   @Select(TimesheetsState.isProfileOpen)
-  isProfileOpen$: Observable<boolean>;
+  isProfileOpen$: Observable<DialogActionPayload>;
 
   public targetElement: HTMLBodyElement;
 
@@ -50,7 +51,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   ngOnInit(): void {
     this.getProfileTimesheets();
-    this.getToggleState();
+    this.getDialogState();
   }
 
   private getProfileTimesheets(): void {
@@ -58,19 +59,18 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     .pipe(takeUntil(this.componentDestroy()));
   }
 
-  private getToggleState(): void {
+  private getDialogState(): void {
     this.isProfileOpen$
     .pipe(
       filter(() => !!this.sideDialog),
       takeUntil(this.componentDestroy())
       )
-    .subscribe((isOpen) => {
-      if (isOpen) {
+    .subscribe((payload) => {
+      if (payload.dialogState && payload.rowId) {
         this.sideDialog.show();
       } else {
         this.sideDialog.hide();
       }
-      this.cd.markForCheck();
     });
   }
 }

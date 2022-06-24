@@ -15,7 +15,7 @@ import { exportOptions, TAB_ADMIN_TIMESHEETS } from '../../constants/timesheets.
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
-import { ExportType, TimesheetsTableColumns } from '../../enums/timesheets.enum';
+import { DialogAction, ExportType, TimesheetsTableColumns } from '../../enums/timesheets.enum';
 import { IFilterColumns, ITimesheetsFilter } from '../../interface/i-timesheet.interface';
 import { TimesheetsService } from '../../services/timesheets.service';
 import { filterOptionFields } from '../../constants/timesheets-table.constant';
@@ -117,7 +117,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public rowSelected(): void {
-    this.store.dispatch(new Timesheets.ToggleProfileDialog());
+    this.store.dispatch(new Timesheets.ToggleProfileDialog(DialogAction.Open, 12));
   }
 
   private startPageStateWatching(): void {

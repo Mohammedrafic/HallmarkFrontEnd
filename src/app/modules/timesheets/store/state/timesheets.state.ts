@@ -10,8 +10,9 @@ import {
 } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
-import { ProfileTimeSheetActionType } from '../../enums';
+import { DialogAction, ProfileTimeSheetActionType } from '../../enums';
 import { DEFAULT_TIMESHEETS_STATE } from '../../constants';
+import { DialogActionPayload } from '../../interface';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -33,8 +34,8 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static isProfileOpen(state: TimesheetsModel): boolean {
-    return state.profileOpen;
+  static isProfileOpen(state: TimesheetsModel): DialogActionPayload {
+    return { dialogState: state.profileOpen, rowId: state.selectedTimeSheetId };
   }
 
   @Selector([TimesheetsState])
@@ -62,18 +63,11 @@ export class TimesheetsState {
   }
 
   @Action(Timesheets.ToggleProfileDialog)
-  ToggleProfile({ patchState, getState }: StateContext<TimesheetsModel>): void {
+  ToggleProfile({ patchState }: StateContext<TimesheetsModel>,
+    { action, id }: { action: DialogAction, id: number}): void {
     patchState({
-      profileOpen: !getState().profileOpen,
-    });
-  }
-
-  @Action(Timesheets.OpenProfileTimesheetEditDialog)
-  OpenTimeSheetEditDialog({ patchState }: StateContext<TimesheetsModel>,
-    type: ProfileTimeSheetActionType, timesheet: ProfileTimeSheetDetail): void {
-    patchState({
-      editDialogType: type,
-      profileDialogTimesheet: timesheet,
+      profileOpen: action === DialogAction.Open,
+      selectedTimeSheetId: id,
     });
   }
 
@@ -84,7 +78,7 @@ export class TimesheetsState {
       });
     }
 
-  @Action(Timesheets.CloseProfileTimesheetEditDialog)
+  @Action(Timesheets.CloseProfileTimesheetAddDialog)
   CloseTimeSheetEditDialog({ patchState }: StateContext<TimesheetsModel>): void {
     patchState({
       editDialogType: null,

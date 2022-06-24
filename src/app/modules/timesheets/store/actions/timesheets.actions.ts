@@ -1,6 +1,5 @@
-import { TIMESHEETS_ACTIONS, ProfileTimeSheetActionType } from '../../enums';
+import { TIMESHEETS_ACTIONS, DialogAction } from '../../enums';
 import { ITimesheetsFilter } from '../../interface';
-import { ProfileTimeSheetDetail } from '../model/timesheets.model';
 
 export namespace Timesheets {
   export class GetAll {
@@ -16,22 +15,16 @@ export namespace Timesheets {
 
   export class ToggleProfileDialog {
     static readonly type = TIMESHEETS_ACTIONS.OPEN_PROFILE;
-  }
 
-  export class OpenProfileTimesheetEditDialog {
-    static readonly type = TIMESHEETS_ACTIONS.OPEN_PROFILE_TIMESHEET_EDIT_DIALOG;
-
-    constructor(public dialogType: ProfileTimeSheetActionType, public timesheet: ProfileTimeSheetDetail) {}
+    constructor(public readonly action: DialogAction, public readonly id?: number) {}
   }
 
   export class OpenProfileTimesheetAddDialog {
-    static readonly type = TIMESHEETS_ACTIONS.OPEN_PROFILE_TIMESHEET_EDIT_DIALOG;
-
-    constructor(public dialogType: ProfileTimeSheetActionType) {}
+    static readonly type = TIMESHEETS_ACTIONS.OPEN_PROFILE_TIMESHEET_ADD_DIALOG;
   }
 
 
-  export class CloseProfileTimesheetEditDialog {
-    static readonly type = TIMESHEETS_ACTIONS.CLOSE_PROFILE_TIMESHEET_EDIT_DIALOG;
+  export class CloseProfileTimesheetAddDialog {
+    static readonly type = TIMESHEETS_ACTIONS.CLOSE_PROFILE_TIMESHEET_ADD_DIALOG;
   }
 }

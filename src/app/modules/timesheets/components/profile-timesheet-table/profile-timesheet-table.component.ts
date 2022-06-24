@@ -29,7 +29,7 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
 
   public override readonly allowPaging = false;
 
-  public readonly tableHeight = 304;
+  public readonly tableHeight = 260;
 
   public readonly tableConfig = ProfileTimesheetTableConfig;
 
@@ -45,12 +45,7 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
     super();
   }
 
-  public editTimesheet(timesheet: ProfileTimeSheetDetail): void {
-    this.store.dispatch(new Timesheets.OpenProfileTimesheetEditDialog(
-      ProfileTimeSheetActionType.Edit,
-      timesheet,
-      ));
-  }
+  public editTimesheet(timesheet: ProfileTimeSheetDetail): void {}
 
   public deleteTimesheet(timesheet: ProfileTimeSheetDetail): void {}
 }
