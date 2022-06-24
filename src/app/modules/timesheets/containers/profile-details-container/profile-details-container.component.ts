@@ -47,6 +47,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
 
+  @Input() currentSelectedRowIndex: number | null = null;
+  @Input() maxRowIndex: number = 30;
+
+  @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
+
   public targetElement: HTMLBodyElement;
   public uploadTargetElement: HTMLButtonElement;
 
