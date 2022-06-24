@@ -211,7 +211,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.defaultFileName = 'Organization Locations ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportLocations(new ExportPayload(
       fileType,
-      { regionId: this.selectedRegion.id },
+      { ...this.filters },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val.id) : null,
       options?.fileName || this.defaultFileName

@@ -305,7 +305,10 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.store.dispatch(new ExportBillRateSetup(new ExportPayload(
       fileType, 
-      { ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null }, 
+      { 
+        ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
+        offset: Math.abs(new Date().getTimezoneOffset()),
+      }, 
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       null,
       options?.fileName || this.defaultFileName

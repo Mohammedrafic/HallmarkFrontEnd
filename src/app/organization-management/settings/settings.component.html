@@ -3,6 +3,18 @@
     <section>
       <h3>Settings</h3>
     </section>
+    <section>
+      <button
+        ejs-button
+        id="filterButton"
+        cssClass="e-outline button-filter"
+        (click)="showFilters()">
+        <div class="filter-button-content">
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
+    </section>
   </section>
   <ejs-grid
     #grid
@@ -148,6 +160,62 @@
     </ng-template>
   </ejs-grid>
 </section>
+
+<app-filter-dialog [items]="filteredItems" [count]="0" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
+  <form class="bootstrap" [formGroup]="SettingsFilterFormGroup">
+    <div class="input-container">
+      <label>Region</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="regionIds"
+                         placeholder="All"
+                         [fields]="optionFields"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.regionIds.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Location</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="locationIds"
+                         placeholder="All"
+                         [fields]="optionFields"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.locationIds.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Department</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="departmentsIds"
+                         placeholder="All"
+                         [fields]="optionFields"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.departmentsIds.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Attributes</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="attributes"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.attributes.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+  </form>
+</app-filter-dialog>
 
 <app-side-dialog
   (formCancelClicked)="onFormCancelClick()"

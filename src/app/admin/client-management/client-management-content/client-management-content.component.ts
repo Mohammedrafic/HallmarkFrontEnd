@@ -23,11 +23,11 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
   private pageSubject = new Subject<number>();
 
   public columnsToExport: ExportColumn[] = [
-    { text:'Organization Name', column: 'createUnder.name'},
-    { text:'Organization Status', column: 'generalInformation.status'},
-    { text:'City', column: 'generalInformation.city'},
-    { text:'Contact', column: 'contactDetails.0.contactPerson'},
-    { text:'Phone', column: 'contactDetails.0.phoneNumberExt'}
+    { text:'Organization Name', column: 'OrganizationName'},
+    { text:'Organization Status', column: 'OrganizationStatus'},
+    { text:'City', column: 'City'},
+    { text:'Contact', column: 'Contact'},
+    { text:'Phone', column: 'Phone'} 
   ];
   public fileName: string;
 
