@@ -2,7 +2,7 @@ import { Country } from "src/app/shared/enums/states";
 import { Organization } from "src/app/shared/models/organization.model";
 import { SkillCategory } from "src/app/shared/models/skill-category.model";
 import { Skill, SkillFilters } from "src/app/shared/models/skill.model";
-import { Department } from '@shared/models/department.model';
+import { Department, DepartmentFIlter } from '@shared/models/department.model';
 import { Location, LocationFilter } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
 import { CredentialType } from '@shared/models/credential-type.model';
@@ -63,7 +63,7 @@ export class SaveDepartment {
 
 export class GetDepartmentsByLocationId {
   static readonly type = '[organizationManagement] Get The List Of Departments by locationId';
-  constructor(public locationId?: number) { }
+  constructor(public locationId?: number, public filters?: DepartmentFIlter) { }
 }
 
 export class UpdateDepartment {
@@ -343,5 +343,10 @@ export class GetAllOrganizationSkills {
 
 export class GetLocationFilterOptions {
   static readonly type = '[organizationManagement] Get Location Filter Options';
+  constructor(public payload: number) { }
+}
+
+export class GetDepartmentFilterOptions {
+  static readonly type = '[organizationManagement] Get Department Filter Options';
   constructor(public payload: number) { }
 }

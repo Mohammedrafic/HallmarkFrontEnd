@@ -71,9 +71,9 @@ import {
   ExportLocations,
   ExportDepartments,
   ExportSkills,
-  GetMasterSkillsByOrganization, GetAllOrganizationSkills, GetLocationFilterOptions
+  GetMasterSkillsByOrganization, GetAllOrganizationSkills, GetLocationFilterOptions, GetDepartmentFilterOptions
 } from './organization-management.actions';
-import { Department } from '@shared/models/department.model';
+import { Department, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
 import { Location, LocationFilterOptions, LocationsPage } from '@shared/models/location.model';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
@@ -118,7 +118,7 @@ export interface OrganizationManagementStateModel {
   isOrganizationLoading: boolean;
   isDepartmentLoading: boolean;
   isLocationLoading: boolean;
-  departments: Department[];
+  departments: Department[] | DepartmentsPage;
   regions: Region[];
   locations: Location[] | LocationsPage;
   location: Location | null;
@@ -141,6 +141,7 @@ export interface OrganizationManagementStateModel {
   skillDataSource: SkillDataSource;
   allOrganizationSkills: SkillsPage | null;
   locationFilterOptions: LocationFilterOptions | null;
+  departmentFilterOptions: DepartmentFilterOptions | null;
 }
 
 @State<OrganizationManagementStateModel>({
@@ -184,6 +185,7 @@ export interface OrganizationManagementStateModel {
     skillDataSource: { skillABBRs: [], skillDescriptions: [], glNumbers: [] },
     allOrganizationSkills: null,
     locationFilterOptions: null,
+    departmentFilterOptions: null
   },
 })
 @Injectable()
@@ -216,7 +218,7 @@ export class OrganizationManagementState {
   static isDirty(state: OrganizationManagementStateModel): boolean { return state.isDirty; }
 
   @Selector()
-  static departments(state: OrganizationManagementStateModel): Department[] { return state.departments; }
+  static departments(state: OrganizationManagementStateModel): Department[] | DepartmentsPage { return state.departments; }
 
   @Selector()
   static regions(state: OrganizationManagementStateModel): Region[] { return state.regions; }
@@ -265,6 +267,9 @@ export class OrganizationManagementState {
 
   @Selector()
   static locationFilterOptions(state: OrganizationManagementStateModel): LocationFilterOptions | null { return state.locationFilterOptions; }
+
+  @Selector()
+  static departmentFilterOptions(state: OrganizationManagementStateModel): DepartmentFilterOptions | null { return state.departmentFilterOptions; }
 
   constructor(
     private organizationService: OrganizationService,
@@ -354,8 +359,8 @@ export class OrganizationManagementState {
   }
 
   @Action(GetDepartmentsByLocationId)
-  GetDepartmentsByLocationId({ patchState }: StateContext<OrganizationManagementStateModel>, { locationId }: GetDepartmentsByLocationId): Observable<Department[]> {
-    return this.departmentService.getDepartmentsByLocationId(locationId).pipe(tap((payload) => {
+  GetDepartmentsByLocationId({ patchState }: StateContext<OrganizationManagementStateModel>, { locationId, filters }: GetDepartmentsByLocationId): Observable<Department[] | DepartmentsPage> {
+    return this.departmentService.getDepartmentsByLocationId(locationId, filters).pipe(tap((payload) => {
       patchState({ departments: payload});
       return payload;
     }));
@@ -780,6 +785,14 @@ export class OrganizationManagementState {
   GetLocationFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetLocationFilterOptions): Observable<LocationFilterOptions> {
     return this.locationService.getLocationFilterOptions(payload).pipe(tap(options => {
       patchState({ locationFilterOptions: options });
+      return options;
+    }));
+  };
+
+  @Action(GetDepartmentFilterOptions)
+  GetDepartmentFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetDepartmentFilterOptions): Observable<DepartmentFilterOptions> {
+    return this.departmentService.getDepartmentFilterOptions(payload).pipe(tap(options => {
+      patchState({ departmentFilterOptions: options });
       return options;
     }));
   };
