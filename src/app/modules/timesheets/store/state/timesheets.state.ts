@@ -10,8 +10,8 @@ import {
 } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
-import { ProfileTimeSheetActionType } from '../../enums/timesheets.enum';
-import { DEFAULT_TIMESHEETS_STATE } from '../../constants/timesheet-default-state.constant';
+import { ProfileTimeSheetActionType } from '../../enums';
+import { DEFAULT_TIMESHEETS_STATE } from '../../constants';
 
 @State<TimesheetsModel>({
   name: 'timesheets',

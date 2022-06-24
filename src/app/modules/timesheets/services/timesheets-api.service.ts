@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 
 import { Observable, of } from 'rxjs';
-
-import { ITimesheet, ITimesheetsFilter } from '../interface/i-timesheet.interface';
-import { TimeSheetsPage } from '../store/model/timesheets.model';
-import { MOK_TIMESHEETS } from '../constants/timesheets.constant';
 import { map } from 'rxjs/operators';
+
+import { ITimesheet, ITimesheetsFilter } from '../interface';
+import { TimeSheetsPage } from '../store/model/timesheets.model';
+import { MOK_TIMESHEETS } from '../constants';
 import { mockProfileTableData } from '../components/profile-timesheet-table/mock-table-data';
 import { ProfileTimeSheetDetail } from '../store/model/timesheets.model';
 

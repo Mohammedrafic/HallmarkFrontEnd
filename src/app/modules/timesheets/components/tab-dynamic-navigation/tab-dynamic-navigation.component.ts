@@ -1,6 +1,14 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { ITabConfigInterface } from '../../interface/i-tab-config.interface';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
+
 import { SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
+
+import { ITabConfigInterface } from '../../interface';
 
 @Component({
   selector: 'app-tab-dynamic-navigation',

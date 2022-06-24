@@ -1,6 +1,6 @@
 import { PageOfCollections } from '@shared/models/page.model';
-import { ITimesheet } from '../../interface/i-timesheet.interface';
-import { ProfileTimeSheetActionType } from "../../enums/timesheets.enum";
+import { ITimesheet } from '../../interface';
+import { ProfileTimeSheetActionType } from '../../enums';
 
 export type TimeSheetsPage = PageOfCollections<ITimesheet>;
 

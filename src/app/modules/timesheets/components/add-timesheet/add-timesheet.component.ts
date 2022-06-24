@@ -66,7 +66,7 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
   }
 
   public cancelChanges(): void {
-    this.store.dispatch(new Timesheets.CloseProfileTimesheetAddDialog());
+    this.store.dispatch(new Timesheets.CloseProfileTimesheetEditDialog());
   }
 
   public trackByField(index: number, item: DialogConfigField): string {
@@ -86,7 +86,9 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
       )
     .subscribe((event: { dialogType: ProfileTimeSheetActionType, timesheet: ProfileTimeSheetDetail}) => {
-      this.populateForm();
+      if (event.dialogType === ProfileTimeSheetActionType.Edit) {
+        this.populateForm(event.timesheet);
+      }
       this.sideEditDialog.show();
       this.cd.markForCheck();
     })
@@ -96,16 +98,16 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
     this.form = this.editTimsheetService.createForm();
   }
 
-  private populateForm(): void {
-    // this.form.patchValue({
-    //   day: timesheet.day,
-    //   timeIn: timesheet.timeIn,
-    //   timeOut: timesheet.timeOut,
-    //   costCenter: timesheet.costCenter,
-    //   category: timesheet.category,
-    //   hours: timesheet.hours,
-    //   rate: timesheet.rate,
-    //   total: timesheet.total,
-    // });
+  private populateForm(timesheet: ProfileTimeSheetDetail): void {
+    this.form.patchValue({
+      day: timesheet.day,
+      timeIn: timesheet.timeIn,
+      timeOut: timesheet.timeOut,
+      costCenter: timesheet.costCenter,
+      category: timesheet.category,
+      hours: timesheet.hours,
+      rate: timesheet.rate,
+      total: timesheet.total,
+    });
   }
 }

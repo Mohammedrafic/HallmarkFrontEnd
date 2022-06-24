@@ -2,7 +2,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { Injectable } from '@angular/core';
 
 import { CustomFormGroup } from '@core/interface';
-import { EditTimsheetForm } from '../interface/form.interface';
+import { EditTimsheetForm } from '../interface';
 
 @Injectable()
 export class EditTimesheetService {
@@ -13,7 +13,7 @@ export class EditTimesheetService {
   createForm(): CustomFormGroup<EditTimsheetForm> {
     return this.fb.group(
       {
-        day: [{ value: null, disabled: true }],
+        day: [null, Validators.required],
         timeIn: [null, Validators.required],
         timeOut: [null, Validators.required],
         costCenter: [null, Validators.required],

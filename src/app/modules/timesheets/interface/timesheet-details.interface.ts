@@ -17,8 +17,3 @@ export interface DetailsTableConfig {
   total: DetailsColumnConfig;
   actions: DetailsColumnConfig;
 }
-
-export interface DialogActionPayload {
-  dialogState: boolean;
-  rowId: number | null;
-}
