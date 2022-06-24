@@ -3,7 +3,7 @@ import { Organization } from "src/app/shared/models/organization.model";
 import { SkillCategory } from "src/app/shared/models/skill-category.model";
 import { Skill, SkillFilters } from "src/app/shared/models/skill.model";
 import { Department } from '@shared/models/department.model';
-import { Location } from '@shared/models/location.model';
+import { Location, LocationFilter } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
@@ -103,7 +103,7 @@ export class GetLocationsByOrganizationId {
 
 export class GetLocationsByRegionId {
   static readonly type = '[organizationManagement] Get The List Of Locations by regionId';
-  constructor(public regionId: number) { }
+  constructor(public regionId: number, public filters?: LocationFilter) { }
 }
 
 export class GetLocationById {
@@ -339,4 +339,9 @@ export class GetSkillDataSources {
 export class GetAllOrganizationSkills {
   static readonly type = '[organizationManagement] Get All Organization Skills';
   constructor() { }
+}
+
+export class GetLocationFilterOptions {
+  static readonly type = '[organizationManagement] Get Location Filter Options';
+  constructor(public payload: number) { }
 }

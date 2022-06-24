@@ -2,7 +2,7 @@ import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, Select, Store } from '@ngxs/store';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { FreezeService, GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -15,6 +15,7 @@ import {
   ClearLocationList,
   DeleteLocationById,
   ExportLocations,
+  GetLocationFilterOptions,
   GetLocationsByRegionId,
   GetOrganizationById,
   GetRegions,
@@ -24,10 +25,9 @@ import {
 } from '../store/organization-management.actions';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { Location, LocationFilter } from '@shared/models/location.model';
+import { Location, LocationFilter, LocationFilterOptions, LocationsPage } from '@shared/models/location.model';
 
 import { PhoneTypes } from '@shared/enums/phone-types';
-import { Country } from '@shared/enums/states';
 import {
   CANCEL_COFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
@@ -71,7 +71,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   selectedRegion: Region;
 
   @Select(OrganizationManagementState.locationsByRegionId)
-  locations$: Observable<Location[]>;
+  locations$: Observable<LocationsPage>;
 
   locationDetailsFormGroup: FormGroup;
   regionFormGroup: FormGroup;
@@ -83,10 +83,14 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
+  @Select(OrganizationManagementState.locationFilterOptions)
+  locationFilterOptions$: Observable<LocationFilterOptions>;
+
   isEdit: boolean;
   editedLocationId?: number;
 
   private unsubscribe$: Subject<void> = new Subject();
+  private pageSubject = new Subject<number>();
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
@@ -107,7 +111,10 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   public defaultFileName: string;
   private businessUnitId: number;
   public LocationFilterFormGroup: FormGroup;
-  public filters: LocationFilter = {};
+  public filters: LocationFilter = {
+    pageNumber: this.currentPage,
+    pageSize: this.pageSizePager
+  };
   public filterColumns: any;
 
   constructor(private store: Store,
@@ -122,16 +129,30 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   ngOnInit(): void {
+    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(1)).subscribe((page) => {
+      this.currentPage = page;
+      this.getLocations();
+    });
     this.filterColumns = {
-      externalId: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      invoiceId: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      name: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      address1: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      city: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      state: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      zip: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      contactPerson: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      externalIds: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      invoiceIds: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      names: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      addresses1: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      cities: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      states: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      zipCodes: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      contactPeople: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
     }
+    this.locationFilterOptions$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(options => {
+      this.filterColumns.externalIds.dataSource = options.externalIds;
+      this.filterColumns.invoiceIds.dataSource = options.ivnoiceIds;
+      this.filterColumns.names.dataSource = options.locationNames;
+      this.filterColumns.addresses1.dataSource = options.addresses1;
+      this.filterColumns.cities.dataSource = options.cities;
+      this.filterColumns.states.dataSource = options.states;
+      this.filterColumns.zipCodes.dataSource = options.zipCodes;
+      this.filterColumns.contactPeople.dataSource = options.contactPersons;
+    });
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.businessUnitId = id;
       this.getOrganization();
@@ -145,6 +166,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.store.dispatch(new ClearLocationList());
   }
 
   private getOrganization() {
@@ -156,7 +178,13 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   private getLocations() {
-    this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id as number));
+    this.filters.orderBy = this.orderBy;
+    this.filters.pageNumber = this.currentPage;
+    this.filters.pageSize = this.pageSize;
+    this.store.dispatch([
+      new GetLocationsByRegionId(this.selectedRegion.id as number, this.filters),
+      new GetLocationFilterOptions(this.selectedRegion.id as number)
+    ]);
   }
 
   public override updatePage(): void {
@@ -197,14 +225,14 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
 
   public onFilterClose() {
     this.LocationFilterFormGroup.setValue({
-      externalId: this.filters.externalId || [],
-      invoiceId: this.filters.invoiceId || [],
-      name: this.filters.name || [],
-      address1: this.filters.address1 || [],
-      city: this.filters.city || [],
-      state: this.filters.state || [],
-      zip: this.filters.zip || [],
-      contactPerson: this.filters.contactPerson || [],
+      externalIds: this.filters.externalIds || [],
+      invoiceIds: this.filters.invoiceIds || [],
+      names: this.filters.names || [],
+      addresses1: this.filters.addresses1 || [],
+      cities: this.filters.cities || [],
+      states: this.filters.states || [],
+      zipCodes: this.filters.zipCodes || [],
+      contactPeople: this.filters.contactPeople || [],
     });
     this.filteredItems = this.filterService.generateChips(this.LocationFilterFormGroup, this.filterColumns);
   }
@@ -217,12 +245,19 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.LocationFilterFormGroup.reset();
     this.filteredItems = [];
     this.currentPage = 1;
-    this.filters = {};
+    this.filters = {
+      regionId: this.selectedRegion.id,
+      pageNumber: this.currentPage,
+      pageSize: this.pageSizePager
+    };
     this.getLocations();
   }
   
   public onFilterApply(): void {
     this.filters = this.LocationFilterFormGroup.getRawValue();
+    this.filters.regionId = this.selectedRegion.id,
+    this.filters.pageNumber = this.currentPage,
+    this.filters.pageSize = this.pageSizePager
     this.filteredItems = this.filterService.generateChips(this.LocationFilterFormGroup, this.filterColumns);
     this.getLocations();
     this.store.dispatch(new ShowFilterDialog(false));
@@ -231,12 +266,11 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion?.id) {
-      this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
+      this.onFilterClearAll();
     } else {
       this.store.dispatch(new ClearLocationList());
     }
     this.clearSelection(this.grid);
-    this.mapGridData();
   }
 
   onAddRegionClick(): void {
@@ -271,24 +305,14 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     }
   }
 
-  mapGridData(): void {
-    this.locations$.subscribe(data => {
-      this.lastAvailablePage = this.getLastPage(data);
-      this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
-      this.totalDataRecords = data.length;
-    });
-  }
-
   onRowsDropDownChanged(): void {
-    this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
+    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+    this.grid.pageSettings.pageSize = this.pageSize;
   }
 
   onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.locations$.subscribe(data => {
-        this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
-        this.currentPagerPage = event.currentPage || event.value;
-      });
+      this.pageSubject.next(event.currentPage || event.value);
     }
   }
 
@@ -433,14 +457,14 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     });
 
     this.LocationFilterFormGroup = this.formBuilder.group({
-      externalId: [[]],
-      invoiceId: [[]],
-      name: [[]],
-      address1: [[]],
-      city: [[]],
-      state: [[]],
-      zip: [[]],
-      contactPerson: [[]]
+      externalIds: [[]],
+      invoiceIds: [[]],
+      names: [[]],
+      addresses1: [[]],
+      cities: [[]],
+      states: [[]],
+      zipCodes: [[]],
+      contactPeople: [[]]
     });
   }
 

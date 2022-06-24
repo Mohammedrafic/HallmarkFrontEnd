@@ -21,6 +21,10 @@ body.dark {
           .e-tab-text {
             font-weight: 700;
             color: $black;
+
+            &:hover {
+              text-shadow: none;
+            }
           }
         }
 
@@ -37,7 +41,7 @@ body.dark {
           font-weight: 400;
 
           &:hover {
-            font-weight: 700;
+            text-shadow: 1px 0 0 $primary-active-blue-10;
           }
         }
       }
