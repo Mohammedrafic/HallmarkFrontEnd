@@ -4,13 +4,21 @@ import { FormControl } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { BehaviorSubject, combineLatest, Observable, Subject, switchMap, takeUntil } from 'rxjs';
 
-import { GetUserAgencies, GetUserOrganizations, SaveLastSelectedOrganizationAgencyId, LastSelectedOrganisationAgency } from 'src/app/store/user.actions';
+import {
+  GetUserAgencies,
+  GetUserOrganizations,
+  SaveLastSelectedOrganizationAgencyId,
+  LastSelectedOrganisationAgency,
+} from 'src/app/store/user.actions';
 
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { UserAgencyOrganization, UserAgencyOrganizationBusinessUnit } from '@shared/models/user-agency-organization.model';
+import {
+  UserAgencyOrganization,
+  UserAgencyOrganizationBusinessUnit,
+} from '@shared/models/user-agency-organization.model';
 import { User } from '@shared/models/user.model';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 
@@ -70,10 +78,20 @@ export class OrganizationAgencySelectorComponent implements OnDestroy {
       switchMap(() => this.user$)
     ).subscribe(user => {
       const agencyOrganizations = [BusinessUnitType.Agency, BusinessUnitType.Organization];
+        if (!user) {
+          return;
+        }
 
-      if (!user || agencyOrganizations.includes(user.businessUnitType)) {
-        return;
-      }
+        if (agencyOrganizations.includes(user.businessUnitType)) {
+          this.store.dispatch(new LastSelectedOrganisationAgency(user.businessUnitName));
+          const isAgency = user.businessUnitType === BusinessUnitType.Agency;
+          this.store.dispatch(
+            new SaveLastSelectedOrganizationAgencyId({
+              lastSelectedOrganizationId: !isAgency ? user.businessUnitId : null,
+              lastSelectedAgencyId: isAgency ? user.businessUnitId : null,
+            })
+          );
+        }
 
       const selectedOrganizationAgencyId: number = this.organizationAgencyControl.value;
       const selectedOrganizationAgency = this.organizationsAgencies$.getValue().find(i => i.id === selectedOrganizationAgencyId);
