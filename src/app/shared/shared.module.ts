@@ -86,6 +86,7 @@ import { BillRateFormComponent } from "@shared/components/bill-rates/components/
 import { BillRatesGridComponent } from "@shared/components/bill-rates/components/bill-rates-grid/bill-rates-grid.component";
 import { BillRateState } from "@shared/components/bill-rates/store/bill-rate.state";
 import { ChildOrderDialogComponent } from "@shared/components/child-order-dialog/child-order-dialog.component";
+import { RejectReasonDialogComponent } from './components/reject-reason-dialog/reject-reason-dialog.component';
 
 const icons = {
   AlertCircle,
@@ -139,6 +140,8 @@ const COMPONENTS = [
   OnboardedCandidateComponent,
   ApplyCandidateComponent,
   OfferDeploymentComponent,
+  BillRatesComponent,
+  RejectReasonDialogComponent,
   GridSubrowCandidateComponent,
   BillRatesComponent,
   ChildOrderDialogComponent

@@ -19,6 +19,7 @@ import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.mo
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models/bill-rate.model';
+import { RejectReasonPayload } from "@shared/models/reject-reason.model";
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -201,7 +202,7 @@ export class OrderManagementContentService {
   }
 
   /**
-   * Edit order
+   * Delete order
    * @param id order id to delete
    */
   public deleteOrder(id: number): Observable<any> {
@@ -214,5 +215,13 @@ export class OrderManagementContentService {
    */
   public approveOrder(id: number): Observable<string> {
     return this.http.post(`/api/Order/approve`, { orderId: id }, { responseType: 'text' });
+  }
+
+  /**
+   * Reject Candidate Job
+   * @param payload
+   */
+  public rejectCandidateJob(payload: RejectReasonPayload): Observable<void> {
+    return this.http.post<void>('/api/AppliedCandidates/rejectCandidateJob', payload);
   }
 }

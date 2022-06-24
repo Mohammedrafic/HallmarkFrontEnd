@@ -6,4 +6,10 @@ export type RejectReason = {
   businessUnitId?: number;
 }
 
+export type RejectReasonPayload = {
+  organizationId: number;
+  jobId: number;
+  rejectReasonId: number;
+}
+
 export type RejectReasonPage = PageOfCollections<RejectReason>;

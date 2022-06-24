@@ -96,7 +96,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
           this.openDialog(this.accept);
         }
       } else if (isOrganization) {
-        const allowedOfferDeploymentStatuses = [ApplicantStatus.Applied, ApplicantStatus.Shortlisted, ApplicantStatus.PreOfferCustom, ApplicantStatus.Offered];
+        const allowedOfferDeploymentStatuses = [ApplicantStatus.Rejected, ApplicantStatus.Applied, ApplicantStatus.Shortlisted, ApplicantStatus.PreOfferCustom, ApplicantStatus.Offered];
         const allowedOnboardedStatuses = [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded];
 
         if (allowedOfferDeploymentStatuses.includes(this.candidate.status)) {
@@ -114,7 +114,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   public onCloseDialog(): void {
     this.sideDialog.hide();
   }
-  
+
   private subscribeOnPageChanges(): void {
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;

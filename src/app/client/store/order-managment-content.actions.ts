@@ -1,6 +1,7 @@
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { AcceptJobDTO, CreateOrderDto, EditOrderDto, OrderManagementFilter } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
+import { RejectReasonPayload } from "@shared/models/reject-reason.model";
 
 export class GetIncompleteOrders {
   static readonly type = '[order management] Get Incomplete Orders';
@@ -155,6 +156,23 @@ export class ClearSelectedOrder {
 
   constructor() {
   }
+}
+
+export class GetRejectReasonsForOrganisation {
+  static readonly type = '[organizationManagement] Get All Reject Reasons';
+  constructor() {}
+}
+
+export class RejectCandidateForOrganisationSuccess {
+  static readonly type = '[organizationManagement] Reject Candidate Success';
+  constructor() {}
+}
+
+export class RejectCandidateJob {
+  static readonly type = '[organizationManagement] Reject Candidate Job';
+  constructor(
+    public payload: RejectReasonPayload
+  ) {}
 }
 
 export class ApproveOrder {

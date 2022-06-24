@@ -71,7 +71,10 @@ import {
   ExportLocations,
   ExportDepartments,
   ExportSkills,
-  GetMasterSkillsByOrganization, GetAllOrganizationSkills, GetLocationFilterOptions, GetDepartmentFilterOptions
+  GetAllOrganizationSkills,
+  GetMasterSkillsByOrganization,
+  GetLocationFilterOptions,
+  GetDepartmentFilterOptions
 } from './organization-management.actions';
 import { Department, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
