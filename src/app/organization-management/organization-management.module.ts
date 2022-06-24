@@ -67,6 +67,7 @@ import { BillRatesState } from '@organization-management/store/bill-rates.state'
 import { RejectReasonComponent } from './reject-reason/reject-reason.component';
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { FilteredCredentialsComponent } from './credentials/credentials-setup/filtered-credentials/filtered-credentials.component';
+import { MapCredentialsFormComponent } from './credentials/credentials-setup/map-credentials-form/map-credentials-form.component';
 
 const sidebarIcons = {
   Download,
@@ -109,8 +110,8 @@ const sidebarIcons = {
     BillRateTypeComponent,
     BillRateTypeMappingComponent,
     RejectReasonComponent,
-    BillRateTypeMappingComponent,
-    FilteredCredentialsComponent
+    FilteredCredentialsComponent,
+    MapCredentialsFormComponent
   ],
   imports: [
     CommonModule,

@@ -52,8 +52,7 @@ export class BillRatesComponent extends AbstractGridConfigurationComponent imple
   }
 
   public filter(): void {
-    // TODO: uncomment after implementation
-    // this.store.dispatch(new ShowFilterDialog(true));
+    this.store.dispatch(new ShowFilterDialog(true));
   }
 
   public addBillRateSetupRecord(): void {

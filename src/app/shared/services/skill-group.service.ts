@@ -24,9 +24,7 @@ export class SkillGroupService {
    * @return Created/Updated skill group
    */
   public saveUpdateSkillGroup(skillGroup: CredentialSkillGroup): Observable<CredentialSkillGroup> {
-    return skillGroup.id ?
-      this.http.put<CredentialSkillGroup>(`/api/SkillGroups`, skillGroup) :
-      this.http.post<CredentialSkillGroup>(`/api/SkillGroups`, skillGroup);
+    return this.http.post<CredentialSkillGroup>(`/api/SkillGroups`, skillGroup);
   }
 
   /**

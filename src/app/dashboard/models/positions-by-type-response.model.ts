@@ -1,3 +1,10 @@
-import type { PositionTypeEnum } from '../enums/position-type.enum';
+export interface PositionsByTypeResponseModel {
+  openJobs: PositionByTypeDto[];
+  onboardCandidates: PositionByTypeDto[];
+  closedJobs: PositionByTypeDto[];
+}
 
-export type PositionsByTypeResponseModel = Record<PositionTypeEnum, number[]>;
+export interface PositionByTypeDto{
+  month: number;
+  value: number
+}

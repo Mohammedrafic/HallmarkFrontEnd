@@ -280,7 +280,7 @@ export class OrderManagementContentState {
   UpdateOrganisationCandidateJob({ dispatch }: StateContext<OrderManagementModel>, { payload }: UpdateOrganisationCandidateJob): Observable<any> {
     return this.orderManagementService.updateCandidateJob(payload).pipe(
       tap(() => {
-        dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'));
+        dispatch(new ShowToast(MessageTypes.Success, 'Candidate was updated'));
         dispatch(new UpdateOrganisationCandidateJobSucceed());
       }),
       catchError((error: any) => {

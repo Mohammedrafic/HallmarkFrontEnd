@@ -181,8 +181,19 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       departmentIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       skillIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'skillDescription', valueId: 'id' },
-      billRateTitleIds:  { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'title', valueId: 'id' },
-      orderTypeIds:  { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' }
+      billRateTitleIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'title', valueId: 'id' },
+      orderTypeIds:  { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      billRatesCategory: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      billRatesType: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      effectiveDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+      intervalMin: { type: ControlTypes.Text, valueType: ValueType.Text },
+      intervalMax: { type: ControlTypes.Text, valueType: ValueType.Text },
+      considerForWeeklyOt: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Consider for Weekly OT'},
+      considerForDailyOt: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Consider for Daily OT'},
+      considerFor7thDayOt: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Consider for 7th Day OT'},
+      regularLocal: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Regular/Local'},
+      displayInTimesheet: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Display in Timesheet'},
+      displayInJob: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Display in Job'},
     }
 
     this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
@@ -432,18 +443,36 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.filters = {};
   }
 
+  public onFilterClose() {
+    this.billRateFilterFormGroup.setValue({
+      regionIds: this.filters.regionIds || [],
+      locationIds: this.filters.locationIds || [],
+      departmentIds: this.filters.departmentIds || [],
+      skillIds: this.filters.skillIds || [],
+      billRateTitleIds: this.filters.billRateTitleIds || [],
+      orderTypeIds: this.filters.orderTypeIds || [],
+      billRatesCategory: this.filters.billRatesCategory || [],
+      billRatesType: this.filters.billRatesType || [],
+      effectiveDate: this.filters.effectiveDate || null,
+      intervalMin: this.filters.intervalMin || null,
+      intervalMax: this.filters.intervalMax || null,
+      considerForWeeklyOt: this.filters.considerForWeeklyOt || null,
+      considerForDailyOt: this.filters.considerForDailyOt || null,
+      considerFor7thDayOt: this.filters.considerFor7thDayOt || null,
+      regularLocal: this.filters.regularLocal || null,
+      displayInTimesheet: this.filters.displayInTimesheet || null,
+      displayInJob: this.filters.displayInJob || null,
+    });
+    this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns, this.datePipe);
+  }
+
   public onFilterApply(): void {
     this.filters = this.billRateFilterFormGroup.getRawValue();
-    this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns);
+    this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns, this.datePipe);
     this.store.dispatch(new GetBillRates({
       pageNumber: this.currentPage,
       pageSize: this.pageSize,
-      billRateConfigIds: this.filters.billRateConfigIds,
-      regionIds: this.filters.regionIds,
-      locationIds: this.filters.locationIds,
-      departmentIds: this.filters.departmentIds,
-      skillIds: this.filters.skillIds,
-      orderTypes: this.filters.orderTypes
+      ...this.filters
     }));
     this.store.dispatch(new ShowFilterDialog(false));
   }
@@ -471,12 +500,23 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     });
 
     this.billRateFilterFormGroup = this.formBuilder.group({
-      regionIds: [''],
-      locationIds: [''],
-      departmentIds: [''],
-      skillIds: [''],
-      billRateTitleIds: [''],
-      orderTypeIds: ['']
+      regionIds: [[]],
+      locationIds: [[]],
+      departmentIds: [[]],
+      skillIds: [[]],
+      billRateTitleIds: [[]],
+      orderTypeIds: [[]],
+      billRatesCategory: [[]],
+      billRatesType: [[]],
+      effectiveDate: [null],
+      intervalMin: [null],
+      intervalMax: [null],
+      considerForWeeklyOt: [null],
+      considerForDailyOt: [null],
+      considerFor7thDayOt: [null],
+      regularLocal: [null],
+      displayInTimesheet: [null],
+      displayInJob: [null],
     });
   }
 

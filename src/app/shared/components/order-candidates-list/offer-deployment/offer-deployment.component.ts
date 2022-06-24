@@ -42,6 +42,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private unsubscribe$: Subject<void> = new Subject();
   private candidateJob: OrderCandidateJob | null;
   private isOfferedStatus: boolean;
+  private currentApplicantStatus: ApplicantStatus;
 
   constructor(private store: Store, private actions$: Actions) { }
 
@@ -62,6 +63,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public onCloseDialog(): void {
     this.closeDialogEmitter.next();
     this.nextApplicantStatuses = [];
+    this.billRatesData = [];
     this.candidateJob = null;
     this.isOfferedStatus = false;
   }
@@ -82,10 +84,14 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
         actualEndDate: this.candidateJob.actualEndDate,
         clockId: this.candidateJob.clockId,
         guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
-        allowDeplayWoCredentials: true
-        // TODO: set bill rates
+        allowDeplayWoCredentials: true,
+        billRates: this.billRatesComponent.billRatesControl.value
       })).subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
     }
+  }
+
+  public onBillRatesChanged(): void {
+    this.updateCandidateJob({ itemData: this.currentApplicantStatus });
   }
 
   private createForm(): void {
@@ -111,7 +117,6 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       availableStartDate: data.availableStartDate,
       candidateBillRate: data.candidateBillRate,
       requestComment: data.requestComment
-      // TODO: set bill rates
     });
   }
 
@@ -120,6 +125,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       this.candidateJob = data;
 
       if (data) {
+        this.currentApplicantStatus = data.applicantStatus;
+        this.billRatesData = [...data.billRates];
         this.setFormValue(data);
       }
     });

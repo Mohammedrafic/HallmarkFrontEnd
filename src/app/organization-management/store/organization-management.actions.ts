@@ -286,13 +286,8 @@ export class GetCredentialSkillGroup {
   constructor() {}
 }
 
-export class SaveCredentialSkillGroup {
-  static readonly type = '[organizationManagement] Save Credential Skill Group';
-  constructor(public payload: CredentialSkillGroup) { }
-}
-
-export class UpdateCredentialSkillGroup {
-  static readonly type = '[organizationManagement] Update Credential Skill Group';
+export class SaveUpdateCredentialSkillGroup {
+  static readonly type = '[organizationManagement] Save/Update Credential Skill Group';
   constructor(public payload: CredentialSkillGroup) { }
 }
 

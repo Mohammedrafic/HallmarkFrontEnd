@@ -50,19 +50,11 @@
                 <section class="candidate">
                   <ng-container [ngSwitch]="selectedTemplate">
                     <ng-container *ngSwitchCase="template.onboarded">
-                      <app-onboarded-candidate
-                        [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
-                        [candidate]="$any(candidate)"
-                        [isTab]="true"
-                      ></app-onboarded-candidate>
+                      <app-onboarded-candidate [candidate]="$any(candidate)" [isTab]="true"></app-onboarded-candidate>
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.accept">
-                      <app-accept-candidate
-                        [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
-                        [candidate]="$any(candidate)"
-                        [isTab]="true"
-                      ></app-accept-candidate>
+                      <app-accept-candidate [candidate]="$any(candidate)" [isTab]="true"></app-accept-candidate>
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.apply">

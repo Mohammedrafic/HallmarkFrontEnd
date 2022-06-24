@@ -12,18 +12,26 @@ import {
   UpdateCredentialSetup,
   SetCredentialSetupFilter,
   SetNavigationTab,
-  UpdateCredentialSetupSucceeded
+  UpdateCredentialSetupSucceeded,
+  SaveUpdateCredentialSetupMappingData, SaveUpdateCredentialSetupMappingSucceeded
 } from './credentials.actions';
 import { catchError, Observable, tap } from 'rxjs';
 import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
 import { SkillGroupService } from '@shared/services/skill-group.service';
 import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED } from '@shared/constants';
+import {
+  RECORD_ADDED,
+  RECORD_CANNOT_BE_DELETED,
+  RECORD_CANNOT_BE_SAVED,
+  RECORD_CANNOT_BE_UPDATED,
+  RECORD_MODIFIED
+} from '@shared/constants';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { CredentialsService } from '@shared/services/credentials.service';
-import { CredentialSetupFilterGet, CredentialSetupGet } from '@shared/models/credential-setup.model';
+import { CredentialSetupFilterGet, CredentialSetupGet, SaveUpdatedCredentialSetupDetailIds } from '@shared/models/credential-setup.model';
 import { getAllErrors } from '@shared/utils/error.utils';
+import { ShowConfirmationPopUp } from '@organization-management/store/bill-rates.actions';
 
 export interface CredentialsStateModel {
   activeTab: number;
@@ -120,6 +128,20 @@ export class CredentialsState {
       patchState({ filteredCredentialSetupData: responseData });
       return responseData;
     }));
+  }
+
+  @Action(SaveUpdateCredentialSetupMappingData)
+  SaveUpdateCredentialSetupMappingData({ patchState, dispatch }: StateContext<CredentialsStateModel>, { credentialSetupMapping }: SaveUpdateCredentialSetupMappingData): Observable<SaveUpdatedCredentialSetupDetailIds | void> {
+    return this.credentialService.saveUpdateCredentialSetupMapping(credentialSetupMapping).pipe(tap((response) => {
+      if (credentialSetupMapping) {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+      } else {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      }
+      dispatch(new SaveUpdateCredentialSetupMappingSucceeded(true));
+      return response;
+    }),
+    catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : RECORD_CANNOT_BE_SAVED))));
   }
 
   @Action(GetCredentialSetupByMappingId)

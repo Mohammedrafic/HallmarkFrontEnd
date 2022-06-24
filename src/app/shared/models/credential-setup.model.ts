@@ -1,28 +1,13 @@
-import { PageOfCollections } from '@shared/models/page.model';
-
-export class CredentialSetup {
-  id: number;
-  masterCredentialId: number;
-  skillGroupId: number;
-  description?: string;
-  isActive: boolean;
-  reqSubmission: boolean;
-  reqOnboard: boolean;
-  inactiveDate: string;
-  comments: string;
-  credentialTypeName?: string; // used only on UI
-}
-
 export class CredentialSetupGet {
   masterCredentialId: number;
-  mappingId: number;
+  mappingId?: number;
   credentialType: string;
   description: string;
   isActive: boolean;
   reqSubmission: boolean;
   reqOnboard: boolean;
-  inactiveDate: string;
-  comments: string;
+  inactiveDate: string | null;
+  comments?: string;
 }
 
 export class CredentialSetupPost {
@@ -50,7 +35,11 @@ export class CredentialSetupDetails {
   reqSubmission: boolean;
   reqOnboard: boolean;
   inactiveDate: string;
-  comments: string;
+  comments?: string;
+}
+
+export class SaveUpdatedCredentialSetupDetailIds {
+  createdIds: number[];
 }
 
 export class CredentialSetupFilterDto {
@@ -74,5 +63,3 @@ export class CredentialSetupFilterGet {
   skillGroupName: string;
   skillGroupId: number;
 }
-
-export type CredentialSetupPage = PageOfCollections<CredentialSetup>;

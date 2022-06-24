@@ -524,71 +524,63 @@
     [count]="(billRatesPage$ | async)?.totalCount"
     (deleteFilter)="onFilterDelete($event)"
     (clearAllFiltersClicked)="onFilterClearAll()"
-    (applyFilterClicked)="onFilterApply()">
+    (applyFilterClicked)="onFilterApply()"
+    (closeDialogClicked)="onFilterClose()">
     <form class="bootstrap" [formGroup]="billRateFilterFormGroup">
-      <div class="input-container">
-        <label>Region</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="regionIds"
-                           placeholder="All"
-                           [fields]="fields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.regionIds.dataSource">
-          </ejs-multiselect>
+      <div class="row">
+        <div class="input-container">
+          <label>Region</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="regionIds"
+                             placeholder="All"
+                             [fields]="fields"
+                             [allowFiltering]="true"
+                             [showDropDownIcon]="true"
+                             [dataSource]="filterColumns.regionIds.dataSource">
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container">
+          <label>Location</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="locationIds"
+                             placeholder="All"
+                             [fields]="fields"
+                             [allowFiltering]="true"
+                             [showDropDownIcon]="true"
+                             [dataSource]="filterColumns.locationIds.dataSource">
+            </ejs-multiselect>
+          </div>
         </div>
       </div>
-      <div class="input-container">
-        <label>Location</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="locationIds"
-                           placeholder="All"
-                           [fields]="fields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.locationIds.dataSource">
-          </ejs-multiselect>
+      <div class="row">
+        <div class="input-container">
+          <label>Department</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="departmentIds"
+                             placeholder="All"
+                             [fields]="fields"
+                             [allowFiltering]="true"
+                             [showDropDownIcon]="true"
+                             [dataSource]="filterColumns.departmentIds.dataSource">
+            </ejs-multiselect>
+          </div>
         </div>
-      </div>
-      <div class="input-container">
-        <label>Department</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="departmentIds"
-                           placeholder="All"
-                           [fields]="fields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.departmentIds.dataSource">
-          </ejs-multiselect>
-        </div>
-      </div>
-      <div class="input-container">
-        <label>Skills</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="skillIds"
-                           placeholder="All"
-                           [fields]="skillsFields"
-                           [allowFiltering]="false"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.skillIds.dataSource">
-          </ejs-multiselect>
-        </div>
-      </div>
-      <div class="input-container">
-        <label>Bill Rate Title</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="billRateTitleIds"
-                           placeholder="All"
-                           [fields]="billRateTitleFields"
-                           [allowFiltering]="false"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.billRateTitleIds.dataSource">
-          </ejs-multiselect>
+        <div class="input-container">
+          <label>Skills</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="skillIds"
+                             placeholder="All"
+                             [fields]="skillsFields"
+                             [allowFiltering]="false"
+                             [showDropDownIcon]="true"
+                             [dataSource]="filterColumns.skillIds.dataSource">
+            </ejs-multiselect>
+          </div>
         </div>
       </div>
       <div class="input-container">
@@ -602,6 +594,149 @@
                            [showDropDownIcon]="true"
                            [dataSource]="filterColumns.orderTypeIds.dataSource">
           </ejs-multiselect>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-container">
+          <label>Bill Rates Category</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="billRatesCategory"
+                             placeholder="All"
+                             [fields]="orderTypesFields"
+                             [allowFiltering]="false"
+                             [showDropDownIcon]="true"
+                             [dataSource]="filterColumns.billRatesCategory.dataSource">
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container">
+          <label>Bill Rates Type</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="billRatesType"
+                             placeholder="All"
+                             [fields]="orderTypesFields"
+                             [allowFiltering]="false"
+                             [showDropDownIcon]="true"
+                             [dataSource]="filterColumns.billRatesType.dataSource">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-container">
+          <label>Bill Rates Title</label>
+          <div class="input-group multiselect">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="billRateTitleIds"
+                             placeholder="All"
+                             [fields]="billRateTitleFields"
+                             [allowFiltering]="false"
+                             [showDropDownIcon]="true"
+                             [dataSource]="filterColumns.billRateTitleIds.dataSource">
+            </ejs-multiselect>
+          </div>
+        </div>
+        <div class="input-container calendar">
+          <label for="effectiveDate">Effective Date</label>
+          <div class="input-group datepicker">
+            <ejs-datepicker
+              class="datepicker"
+              format="MM/dd/yyyy"
+              placeholder="MM/DD/YYYY"
+              formControlName="effectiveDate">
+            </ejs-datepicker>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="input-container bootstrap">
+          <label for="intervalMin">Interval Min</label>
+          <div class="input-group">
+            <ejs-numerictextbox
+              class="numeric-input"
+              min="0"
+              [maxlength]="10"
+              [validateDecimalOnType]="true"
+              [showSpinButton]="false"
+              decimals='0'
+              format="#"
+              formControlName="intervalMin"
+            >
+            </ejs-numerictextbox>
+          </div>
+        </div>
+        <div class="input-container bootstrap">
+          <label for="intervalMax">Interval Max</label>
+          <div class="input-group">
+            <ejs-numerictextbox
+              class="numeric-input"
+              min="0"
+              [maxlength]="10"
+              [validateDecimalOnType]="true"
+              [showSpinButton]="false"
+              decimals='0'
+              format="#"
+              formControlName="intervalMax"
+            >
+            </ejs-numerictextbox>
+          </div>
+        </div>
+      </div>
+      <div class="checkbox-container">
+        <div class="input-container">
+          <div class="input-group">
+            <ejs-checkbox
+              label="Consider for Weekly OT"
+              formControlName="considerForWeeklyOt"
+            ></ejs-checkbox>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <div class="input-group">
+            <ejs-checkbox
+              label="Consider for Daily OT"
+              formControlName="considerForDailyOt"
+            ></ejs-checkbox>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <div class="input-group">
+            <ejs-checkbox
+              label="Consider for 7th Day OT"
+              formControlName="considerFor7thDayOt"
+            ></ejs-checkbox>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <div class="input-group">
+            <ejs-checkbox
+              label="Regular/Local"
+              formControlName="regularLocal"
+            ></ejs-checkbox>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <div class="input-group">
+            <ejs-checkbox
+              label="Display in Timesheet"
+              formControlName="displayInTimesheet"
+            ></ejs-checkbox>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <div class="input-group">
+            <ejs-checkbox
+              label="Display in Job"
+              formControlName="displayInJob"
+            ></ejs-checkbox>
+          </div>
         </div>
       </div>
     </form>

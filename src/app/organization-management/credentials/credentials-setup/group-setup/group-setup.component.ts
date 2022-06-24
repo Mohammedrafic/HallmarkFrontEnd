@@ -20,10 +20,10 @@ import {
   GetAssignedSkillsByPage,
   GetCredentialSkillGroup,
   RemoveCredentialSkillGroup,
-  SaveCredentialSkillGroup,
-  UpdateCredentialSkillGroup
+  SaveUpdateCredentialSkillGroup
 } from '../../../store/organization-management.actions';
 import { UserState } from 'src/app/store/user.state';
+import { Skill } from '@shared/models/skill.model';
 
 @Component({
   selector: 'app-group-setup',
@@ -41,14 +41,12 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
 
   @Select(OrganizationManagementState.skillGroups)
   skillGroups$: Observable<CredentialSkillGroupPage>;
+  public skillGroups: CredentialSkillGroup[];
 
   @Select(OrganizationManagementState.skills)
-  skills$: Observable<any>;
-  skillsFields = {
-    text: 'masterSkill.skillDescription',
-    value: 'id',
-  };
-  skillsId = new Set<number>();
+  assignedSkills$: Observable<any>;
+  public assignedSkills: Skill[];
+  public skillsId = new Set<number>();
 
   skillGroupsFormGroup: FormGroup;
   formBuilder: FormBuilder;
@@ -72,11 +70,9 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   }
 
   ngOnInit(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
-      this.currentPage = 1;
-      this.store.dispatch(new GetCredentialSkillGroup());
-      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, {}));
-    });
+    this.organizationChangedHandler();
+    this.skillGroupDataLoadedHandler();
+    this.assignedSkillsDataLoadedHandler();
   }
 
   ngOnDestroy(): void {
@@ -84,14 +80,26 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.unsubscribe$.complete();
   }
 
-  onEditButtonClick(skillGroup: CredentialSkillGroup, event: any): void {
+  onEditButtonClick(saveSkillGroup: CredentialSkillGroup, event: any): void {
     this.addActiveCssClass(event);
-    this.skillGroupsFormGroup.setValue({
-      name: skillGroup.name,
-      skillIds: skillGroup.skills?.map((item: any) => item.id)
+    const savedSkillIds: number[] = [];
+    const savedSkillIdsIndexes: number[] = [];
+    saveSkillGroup.skills?.forEach(savedSkill => {
+      const foundAssignedSkill = this.assignedSkills.find(skill => skill.masterSkill?.id === savedSkill.masterSkillId);
+      if (foundAssignedSkill) {
+        savedSkillIds.push(foundAssignedSkill.id);
+        savedSkillIdsIndexes.push(this.assignedSkills.indexOf(foundAssignedSkill));
+      }
     });
+
+    this.skillGroupsFormGroup.setValue({
+      name: saveSkillGroup.name,
+      skillIds: savedSkillIds
+    });
+
+    this.searchGrid.selectRows(savedSkillIdsIndexes);
     this.isEdit = true;
-    this.editedSkillGroupId = skillGroup.id;
+    this.editedSkillGroupId = saveSkillGroup.id;
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -139,18 +147,20 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
           name: this.skillGroupsFormGroup.controls['name'].value,
           skillIds: Array.from(this.skillsId)
         };
-        this.store.dispatch(new UpdateCredentialSkillGroup(skillGroup));
-        this.isEdit = false;
+        this.store.dispatch(new SaveUpdateCredentialSkillGroup(skillGroup));
+        this.store.dispatch(new ShowSideDialog(false));
+        this.removeActiveCssClass();
+        this.clearFormDetails();
       } else {
         const skillGroup: CredentialSkillGroupPost = {
           name: this.skillGroupsFormGroup.controls['name'].value,
           skillIds: Array.from(this.skillsId)
         };
 
-        this.store.dispatch(new SaveCredentialSkillGroup(skillGroup));
+        this.store.dispatch(new SaveUpdateCredentialSkillGroup(skillGroup));
         this.store.dispatch(new ShowSideDialog(false));
-        this.skillGroupsFormGroup.reset();
         this.removeActiveCssClass();
+        this.clearFormDetails();
       }
     } else {
       this.skillGroupsFormGroup.markAllAsTouched();
@@ -171,24 +181,24 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   selectSkillId(event: any): void {
     if (event.data.length) {
       event.data.forEach((item: any) => {
-        if (item && item.masterSkill) {
-          this.skillsId.add(item.masterSkill.id);
+        if (item) {
+          this.skillsId.add(item.id);
         }
       });
-    } else if (event.data.masterSkill) {
-      this.skillsId.add(event.data.masterSkill.id);
+    } else if (event.data) {
+      this.skillsId.add(event.data.id);
     }
   }
 
   removeSkillId(event: any): void {
     if (event.data.length) {
       event.data.forEach((item: any) => {
-        if (item && item.masterSkill) {
-          this.skillsId.delete(item.masterSkill.id);
+        if (item) {
+          this.skillsId.delete(item.id);
         }
       });
-    } else if (event.data.masterSkill) {
-      this.skillsId.delete(event.data.masterSkill.id);
+    } else if (event.data) {
+      this.skillsId.delete(event.data.id);
     }
   }
 
@@ -200,12 +210,37 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.isEdit = false;
     this.editedSkillGroupId = undefined;
     this.skillGroupsFormGroup.reset();
+    this.clearSelection(this.searchGrid);
   }
 
   private createSkillGroupFormGroup(): void {
     this.skillGroupsFormGroup = this.formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       skillIds: ['']
+    });
+  }
+
+  private organizationChangedHandler(): void {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
+      this.currentPage = 1;
+      this.store.dispatch(new GetCredentialSkillGroup());
+      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, {}));
+    });
+  }
+
+  private skillGroupDataLoadedHandler(): void {
+    this.skillGroups$.pipe(takeUntil(this.unsubscribe$)).subscribe(savedSkillGroupsPages => {
+      if (savedSkillGroupsPages && savedSkillGroupsPages.items) {
+        this.skillGroups = savedSkillGroupsPages.items;
+      }
+    });
+  }
+
+  private assignedSkillsDataLoadedHandler(): void {
+    this.assignedSkills$.pipe(takeUntil(this.unsubscribe$)).subscribe(assignedSkills => {
+      if (assignedSkills && assignedSkills.items) {
+        this.assignedSkills = assignedSkills.items;
+      }
     });
   }
 }

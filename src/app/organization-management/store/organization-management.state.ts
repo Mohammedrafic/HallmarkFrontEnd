@@ -60,8 +60,7 @@ import {
   UpdateCredentialType,
   GetAllSkills,
   GetCredentialSkillGroup,
-  SaveCredentialSkillGroup,
-  UpdateCredentialSkillGroup,
+  SaveUpdateCredentialSkillGroup,
   RemoveCredentialSkillGroup,
   GetOrganizationSettings,
   SaveOrganizationSettings,
@@ -674,21 +673,15 @@ export class OrganizationManagementState {
     }));
   }
 
-  @Action(SaveCredentialSkillGroup)
-  SaveSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveCredentialSkillGroup): Observable<CredentialSkillGroup> {
+  @Action(SaveUpdateCredentialSkillGroup)
+  SaveUpdateSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveUpdateCredentialSkillGroup): Observable<CredentialSkillGroup> {
     return this.skillGroupService.saveUpdateSkillGroup(payload).pipe(tap((payload) => {
       patchState({ isSkillGroupLoading: false });
-      dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-      dispatch(new GetCredentialSkillGroup());
-      return payload;
-    }));
-  }
-
-  @Action(UpdateCredentialSkillGroup)
-  UpdateSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: UpdateCredentialSkillGroup): Observable<CredentialSkillGroup> {
-    return this.skillGroupService.saveUpdateSkillGroup(payload).pipe(tap((payload) => {
-      patchState({ isSkillGroupLoading: false });
-      dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      if (payload.id) {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      } else {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+      }
       dispatch(new GetCredentialSkillGroup());
       return payload;
     }));

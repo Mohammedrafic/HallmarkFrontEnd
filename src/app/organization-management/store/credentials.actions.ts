@@ -1,7 +1,7 @@
 import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
 import { SkillGroupMapping } from '@shared/models/credential-group-mapping.model';
 import { ExportPayload } from '@shared/models/export.model';
-import { CredentialSetup, CredentialSetupFilterDto, CredentialSetupPost } from '@shared/models/credential-setup.model';
+import { CredentialSetupFilterDto, CredentialSetupMappingPost, CredentialSetupPost } from '@shared/models/credential-setup.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 export class SetNavigationTab {
@@ -42,6 +42,16 @@ export class ShowExportCredentialListDialog {
 export class GetFilteredCredentialSetupData {
   static readonly type = '[credentials] Get Filtered Credential Setup Mapping Data';
   constructor(public payload: CredentialSetupFilterDto) {}
+}
+
+export class SaveUpdateCredentialSetupMappingData {
+  static readonly type = '[credentials] Save/Update Credential Setup Mapping';
+  constructor(public credentialSetupMapping: CredentialSetupMappingPost) { }
+}
+
+export class SaveUpdateCredentialSetupMappingSucceeded {
+  static readonly type = '[credentials] Save/Update Credential Setup Mapping Succeeded';
+  constructor(public isSucceed: boolean) { }
 }
 
 export class GetCredentialSetupByMappingId {
