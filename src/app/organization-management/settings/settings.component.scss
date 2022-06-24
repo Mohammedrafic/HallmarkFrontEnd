@@ -11,6 +11,14 @@
   }
 }
 
+.input-group {
+  margin-top: 5px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
 .form-container {
   padding-top: 28px;
 
@@ -46,7 +54,7 @@
 
 .e-row[aria-selected='true'] {
   .e-customized-expand-cell {
-    background-color: $primary-active-blue-10;
+    background-color: $primary-active-blue-70;
   }
 
   td.e-detailrowcollapse {

@@ -2,16 +2,18 @@ import { Injectable } from '@angular/core';
 import { map, Observable, switchMap } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import {
+  AcceptJobDTO,
+  AgencyOrderManagementPage,
+  ApplicantStatus,
+  CreateOrderDto,
+  EditOrderDto,
+  Order,
+  OrderCandidateJob,
+  OrderCandidatesListPage,
   OrderManagementFilter,
   OrderManagementPage,
-  AgencyOrderManagementPage,
-  OrderCandidatesListPage,
-  OrderCandidateJob,
-  AcceptJobDTO,
-  ApplicantStatus,
   SuggesstedDetails
 } from '@shared/models/order-management.model';
-import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-management.model';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
@@ -203,6 +205,14 @@ export class OrderManagementContentService {
    * @param id order id to delete
    */
   public deleteOrder(id: number): Observable<any> {
-    return this.http.delete<Order>('/api/Orders', { params: { orderId: id }});
+    return this.http.delete<Order>('/api/Orders', { params: { orderId: id } });
+  }
+
+  /**
+   * Approve order
+   * @param id order id to approve
+   */
+  public approveOrder(id: number): Observable<string> {
+    return this.http.post(`/api/Order/approve`, { orderId: id }, { responseType: 'text' });
   }
 }

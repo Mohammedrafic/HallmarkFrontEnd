@@ -65,7 +65,30 @@
   display: flex;
   align-items: center;
 
-  & > * {
+  & > span:not(:last-child) {
     margin-right: 8px;
+  }
+}
+
+.order-actions {
+  display: inline-flex;
+
+  .e-btn:first-child {
+    margin-left: 0;
+  }
+
+  .vertical-divider {
+    height: auto;
+    margin: 0 0 0 12px;
+  }
+
+  .e-primary {
+    &:focus {
+      background-color: $primary-active-blue-10;
+
+      &:hover {
+        background-color: $primary-btn-hover;
+      }
+    }
   }
 }

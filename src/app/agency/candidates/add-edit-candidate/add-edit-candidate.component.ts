@@ -229,7 +229,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
       classification,
       profileStatus,
       candidateAgencyStatus,
-      ssn: String(ssn),
+      ssn: ssn ? this.getStringSsn(ssn) : null,
       candidateProfileSkills: candidateProfileSkills.map((skill) => skill.id),
     });
     this.candidateForm.get('contactDetails')?.patchValue({
@@ -287,6 +287,15 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
       this.router.navigate([location.pageToBack], { state: { orderId: location.orderId }});
     } else {
       this.router.navigate(['/agency/candidates']);
+    }
+  }
+
+  private getStringSsn(ssn: any): string {
+    const stringSsn = String(ssn);
+    if (stringSsn.length >= 9) {
+      return stringSsn;
+    } else {
+      return this.getStringSsn(`0${ssn}`)
     }
   }
 }

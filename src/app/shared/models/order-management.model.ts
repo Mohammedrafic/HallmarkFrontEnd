@@ -192,6 +192,7 @@ export class Order {
   totalPositions?: number;
   acceptedPositions?: number;
   documents: Document[] | null;
+  canApprove: boolean;
 }
 
 export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'status' | 'statusText' | 'documents'> {

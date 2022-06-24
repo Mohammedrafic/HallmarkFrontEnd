@@ -25,7 +25,7 @@ import {
   GetRegions,
   SaveOrganizationSettings
 } from '../store/organization-management.actions';
-import { ShowSideDialog } from '../../store/app.actions';
+import { ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -36,6 +36,10 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { OrganizationManagementState } from '../store/organization-management.state';
 import { customEmailValidator } from '@shared/validators/email.validator';
 import { UserState } from '../../store/user.state';
+import { FilteredItem } from '@shared/models/filter.model';
+import { FilterService } from '@shared/services/filter.service';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 
 export enum TextFieldTypeControl {
   Email = 1,
@@ -76,6 +80,12 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
+  @Select(UserState.organizationStructure)
+  organizationStructure$: Observable<OrganizationStructure>;
+  public orgStructure: OrganizationStructure;
+  public orgRegions: OrganizationRegion[] = [];
+  public allRegions: OrganizationRegion[] = [];
+
   public isEdit: boolean;
   public isParentEdit = false;
   public hasAccess = false;
@@ -99,9 +109,21 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   }
   private unsubscribe$: Subject<void> = new Subject();
 
+  public SettingsFilterFormGroup: FormGroup;
+  public filters: any = {
+    pageNumber: this.currentPage,
+    pageSize: this.pageSizePager
+  };
+  public filterColumns: any;
+
+  public optionFields = {
+    text: 'name', value: 'id'
+  };
+
   constructor(private store: Store,
               @Inject(FormBuilder) private builder: FormBuilder,
-              private confirmService: ConfirmService) {
+              private confirmService: ConfirmService,
+              private filterService: FilterService) {
     super();
     this.formBuilder = builder;
     this.createSettingsForm();
@@ -109,22 +131,104 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   }
 
   ngOnInit(): void {
+    this.filterColumns = {
+      regionIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      departmentsIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      attributes: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+    }
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       if (id) {
         this.organizationId = id;
       } else {
         this.organizationId = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
       }
-      this.store.dispatch(new GetOrganizationSettings());
-      this.store.dispatch(new GetRegions());
+      this.getSettings();
     });
     this.mapGridData();
     this.isEditOverrideAccessible();
+
+    this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
+      this.orgStructure = structure;
+      this.orgRegions = structure.regions;
+      this.allRegions = [...this.orgRegions];
+      this.filterColumns.regionIds.dataSource = this.allRegions;
+    });
+
+    this.SettingsFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
+      if (val?.length) {
+        const selectedRegions: OrganizationRegion[] = [];
+        val.forEach(id => selectedRegions.push(this.allRegions.find(region => region.id === id) as OrganizationRegion));
+        this.filterColumns.locationIds.dataSource = [];
+        selectedRegions.forEach(region => {
+          this.filterColumns.locationIds.dataSource.push(...region.locations as [])
+        });
+      } else {
+        this.filterColumns.locationIds.dataSource = [];
+        this.SettingsFilterFormGroup.get('locationIds')?.setValue([]);
+        this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
+      }
+    });
+
+    this.SettingsFilterFormGroup.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
+      if (val?.length) {
+        const selectedLocations: OrganizationLocation[] = [];
+        val.forEach(id => selectedLocations.push(this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)));
+        this.filterColumns.departmentsIds.dataSource = [];
+        selectedLocations.forEach(location => {
+          this.filterColumns.departmentsIds.dataSource.push(...location.departments as [])
+        });
+      } else {
+        this.filterColumns.departmentsIds.dataSource = [];
+        this.SettingsFilterFormGroup.get('departmentsIds')?.setValue([]);
+        this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private getSettings(): void {
+    this.store.dispatch(new GetOrganizationSettings());
+    this.store.dispatch(new GetRegions());
+  }
+
+  public showFilters(): void {
+    this.store.dispatch(new ShowFilterDialog(true));
+  }
+
+  public onFilterClose() {
+    this.SettingsFilterFormGroup.setValue({
+      regionIds: this.filters.regionIds || [],
+      locationIds: this.filters.locationIds || [],
+      departmentsIds: this.filters.departmentsIds || [],
+      attributes: this.filters.attributes || [],
+    });
+    this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
+  }
+
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.SettingsFilterFormGroup, this.filterColumns);
+  }
+
+  public onFilterClearAll(): void {
+    this.SettingsFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = { };
+    this.getSettings();
+  }
+  
+  public onFilterApply(): void {
+    this.filters = this.SettingsFilterFormGroup.getRawValue();
+    this.filters.pageNumber = this.currentPage,
+    this.filters.pageSize = this.pageSizePager
+    this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
+    this.getSettings();
+    this.store.dispatch(new ShowFilterDialog(false));
   }
 
   public onOverrideButtonClick(data: any): void {
@@ -484,6 +588,12 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       controlType: [null],
       name: [{ value: '', disabled: true }],
       value: [null]
+    });
+    this.SettingsFilterFormGroup = this.formBuilder.group({
+      regionIds: [[]],
+      locationIds: [[]],
+      departmentsIds: [[]],
+      attributes: [[]],
     });
   }
 

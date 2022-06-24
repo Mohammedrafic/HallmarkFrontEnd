@@ -1,5 +1,6 @@
 export enum OrderStatus {
   Incomplete = 1,
+  PreOpen = 5,
   Open = 20,
   InProgress = 30,
   InProgressOfferPending = 31,

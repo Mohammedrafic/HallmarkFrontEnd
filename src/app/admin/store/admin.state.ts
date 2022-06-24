@@ -1,47 +1,48 @@
 import { Injectable } from '@angular/core';
-import { State, Action, StateContext, Selector } from '@ngxs/store';
+import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { Days } from 'src/app/shared/enums/days';
 import { SendDocumentAgency } from 'src/app/shared/enums/send-document-agency';
-import { Country, UsaStates, CanadaStates } from 'src/app/shared/enums/states';
+import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
 import { Status } from 'src/app/shared/enums/status';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
 import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 
 import {
+  ExportCredentialTypes,
+  ExportSkillCategories,
+  ExportSkills,
+  GetAllSkills,
+  GetAllSkillsCategories,
   GetBusinessUnitList,
-  SetBillingStatesByCountry,
-  GetOrganizationsByPage,
-  SetDirtyState,
-  SaveOrganization,
-  UploadOrganizationLogo,
-  SaveOrganizationSucceeded,
+  GetCredentialTypes,
+  GetDBConnections,
+  GetMasterSkillsByPage,
   GetOrganizationById,
   GetOrganizationByIdSucceeded,
-  SetGeneralStatesByCountry,
-  GetMasterSkillsByPage,
-  GetSkillsCategoriesByPage,
-  SaveSkillsCategory,
-  SaveSkillsCategorySucceeded,
-  RemoveSkillsCategory,
-  RemoveSkillsCategorySucceeded,
-  GetAllSkillsCategories,
-  SaveMasterSkill,
-  SaveMasterSkillSucceeded,
-  RemoveMasterSkill,
-  RemoveMasterSkillSucceeded,
   GetOrganizationLogo,
   GetOrganizationLogoSucceeded,
-  GetAllSkills,
-  GetCredentialTypes,
-  SaveCredentialType,
-  UpdateCredentialType,
+  GetOrganizationsByPage,
+  GetSkillsCategoriesByPage,
   RemoveCredentialType,
-  ExportSkills,
-  ExportSkillCategories,
+  RemoveMasterSkill,
+  RemoveMasterSkillSucceeded,
   RemoveOrganizationLogo,
-  ExportCredentialTypes
+  RemoveSkillsCategory,
+  RemoveSkillsCategorySucceeded,
+  SaveCredentialType,
+  SaveMasterSkill,
+  SaveMasterSkillSucceeded,
+  SaveOrganization,
+  SaveOrganizationSucceeded,
+  SaveSkillsCategory,
+  SaveSkillsCategorySucceeded,
+  SetBillingStatesByCountry,
+  SetDirtyState,
+  SetGeneralStatesByCountry,
+  UpdateCredentialType,
+  UploadOrganizationLogo
 } from './admin.actions';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
@@ -83,6 +84,7 @@ export interface AdminStateModel {
   allSkillsCategories: SkillCategoriesPage | null;
   credentialTypes: CredentialType[];
   isDirty: boolean;
+  dataBaseConnections: string[];
 }
 
 @State<AdminStateModel>({
@@ -110,7 +112,8 @@ export interface AdminStateModel {
     skillsCategories: null,
     allSkillsCategories: null,
     credentialTypes: [],
-    isDirty: false
+    isDirty: false,
+    dataBaseConnections: []
   },
 })
 @Injectable()
@@ -152,23 +155,37 @@ export class AdminState {
   static masterSkills(state: AdminStateModel): SkillsPage | null { return state.masterSkills; }
 
   @Selector()
-  static skills(state: AdminStateModel): SkillsPage | null { return state.skills; }
+  static skills(state: AdminStateModel): SkillsPage | null {
+    return state.skills;
+  }
 
   @Selector()
-  static skillsCategories(state: AdminStateModel): SkillCategoriesPage | null { return state.skillsCategories; }
+  static skillsCategories(state: AdminStateModel): SkillCategoriesPage | null {
+    return state.skillsCategories;
+  }
 
   @Selector()
-  static allSkillsCategories(state: AdminStateModel): SkillCategoriesPage | null { return state.allSkillsCategories; }
+  static allSkillsCategories(state: AdminStateModel): SkillCategoriesPage | null {
+    return state.allSkillsCategories;
+  }
 
   @Selector()
-  static credentialTypes(state: AdminStateModel): CredentialType[] { return state.credentialTypes; }
+  static credentialTypes(state: AdminStateModel): CredentialType[] {
+    return state.credentialTypes;
+  }
+
+  @Selector()
+  static dataBaseConnections(state: AdminStateModel): string[] {
+    return state.dataBaseConnections;
+  }
 
   constructor(
     private organizationService: OrganizationService,
     private skillsService: SkillsService,
     private categoriesService: CategoriesService,
     private credentialsService: CredentialsService
-  ) { }
+  ) {
+  }
 
   @Action(SetGeneralStatesByCountry)
   SetGeneralStatesByCountry({ patchState }: StateContext<AdminStateModel>, { payload }: SetGeneralStatesByCountry): void {
@@ -384,10 +401,17 @@ export class AdminState {
   };
 
   @Action(ExportCredentialTypes)
-  ExportCredentialTypes({ }: StateContext<AdminStateModel>, { payload }: ExportCredentialTypes): Observable<any> {
+  ExportCredentialTypes({}: StateContext<AdminStateModel>, { payload }: ExportCredentialTypes): Observable<any> {
     return this.credentialsService.exportCredentialTypes(payload).pipe(tap(file => {
       const url = window.URL.createObjectURL(file);
       saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
+
+  @Action(GetDBConnections)
+  GetDBConnections({ patchState }: StateContext<AdminStateModel>): Observable<any> {
+    return this.organizationService.getConnections().pipe(tap(connections => {
+      patchState({ dataBaseConnections: connections });
     }));
   };
 }

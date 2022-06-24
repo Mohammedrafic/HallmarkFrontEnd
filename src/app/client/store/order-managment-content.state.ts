@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { getAllErrors } from "@shared/utils/error.utils";
 import { catchError, Observable, of, tap } from 'rxjs';
 import {
+  ApproveOrder,
   ClearPredefinedBillRates,
   ClearSelectedOrder,
   DeleteOrder,
@@ -203,7 +204,7 @@ export class OrderManagementContentState {
   @Action(GetOrderById)
   GetOrderById(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { id, options, organizationId }: GetOrderById
+    { id, options }: GetOrderById
   ): Observable<Order> {
     patchState({ orderDialogOptions: options});
     return this.orderManagementService.getOrderById(id).pipe(
@@ -410,8 +411,19 @@ export class OrderManagementContentState {
   @Action(DeleteOrder)
   DeleteOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { id }: DeleteOrder): Observable<any> {
     return this.orderManagementService.deleteOrder(id).pipe(tap(() => {
-      dispatch(new DeleteOrderSucceeded());
-    }),
-    catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Order cannot be deleted')))));
+        dispatch(new DeleteOrderSucceeded());
+      }),
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Order cannot be deleted')))));
+  }
+
+  @Action(ApproveOrder)
+  ApproveOrder({
+                 patchState,
+                 dispatch,
+                 getState
+               }: StateContext<OrderManagementContentStateModel>, { id }: ApproveOrder): Observable<string | void> {
+    return this.orderManagementService.approveOrder(id).pipe(
+      catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error)))
+    );
   }
 }

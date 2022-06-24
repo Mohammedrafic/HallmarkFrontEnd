@@ -7,14 +7,14 @@ import { DialogUtility } from '@syncfusion/ej2-angular-popups';
   providedIn: 'root',
 })
 export class ConfirmService {
-  confirm(content: string, options?: { title: string, okButtonLabel: string, okButtonClass: string }): Observable<boolean> {
+  confirm(content: string, options?: { title: string, okButtonLabel: string, okButtonClass: string, cancelButtonLabel?: string }): Observable<boolean> {
     const isAllowed$ = new Subject<boolean>();
     const dialog = DialogUtility.confirm({
       title: options?.title ? options.title : '',
       content,
       okButton: {
-        text: options?.okButtonLabel ? options.okButtonLabel :'OK',
-        cssClass: options?.okButtonClass ? options.okButtonClass :'',
+        text: options?.okButtonLabel ? options.okButtonLabel : 'OK',
+        cssClass: options?.okButtonClass ? options.okButtonClass : '',
         click: () => {
           isAllowed$.next(true);
           dialog.close();
@@ -22,13 +22,13 @@ export class ConfirmService {
         },
       },
       cancelButton: {
-        text: 'Cancel',
+        text: options?.cancelButtonLabel ?? 'Cancel',
         cssClass: 'e-outline',
         click: () => {
           isAllowed$.next(false);
           dialog.close();
           isAllowed$.complete();
-        },
+        }
       },
       close: () => {
         isAllowed$.next(false);

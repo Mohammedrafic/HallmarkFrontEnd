@@ -14,13 +14,22 @@
     <form *ngIf="CreateUnderFormGroup" [formGroup]="CreateUnderFormGroup" id="createUnder">
       <label>Create Under<span class="required">*</span></label>
       <div class="input-group dropdown create-under-dropdown">
-        <ejs-dropdownlist appValidateWithMessage [fields]="createUnderFields" formControlName="createUnder" [dataSource]="businessUnits$ | async"></ejs-dropdownlist>
+        <ejs-dropdownlist appValidateWithMessage [fields]="createUnderFields" formControlName="createUnder"
+                          [dataSource]="businessUnits$ | async"></ejs-dropdownlist>
       </div>
     </form>
-    <form id="connectionString" *ngIf="false && title === 'Add' && (user$ | async)?.businessUnitType === businessUnitType.Hallmark">
+    <form
+      id="connectiodanString"
+      [formGroup]="dataBaseConnectionsFormGroup"
+      *ngIf="title === 'Add' && (user$ | async)?.businessUnitType === businessUnitType.Hallmark"
+    >
       <label>Data Base<span class="required">*</span></label>
       <div class="input-group dropdown connection-string-dropdown">
-        <ejs-dropdownlist [fields]="[]" [dataSource]="[]"></ejs-dropdownlist>
+        <ejs-dropdownlist
+          [dataSource]="dataBaseConnections$ | async"
+          formControlName="connectionName"
+          appValidateWithMessage
+        ></ejs-dropdownlist>
       </div>
     </form>
   </div>
