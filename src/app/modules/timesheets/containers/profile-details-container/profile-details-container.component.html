@@ -35,18 +35,17 @@
             placeholder="MM/DD/YYYY"
           ></ejs-datepicker>
 
-          <button ejs-button cssClass="e-outline" class="upload-button">
+          <button ejs-button cssClass="e-outline" class="upload-button" id="qwerty" (click)="browse()" #uplBtn>
             Upload
             <i-feather name="upload" class="icon"></i-feather>
           </button>
 
-<!--          <ejs-uploader #filesUploader-->
-<!--                        [dropArea]="dropElement"-->
-<!--                        [allowedExtensions]="allowedExtensions"-->
-<!--                        [maxFileSize]="maxFileSize"-->
-<!--                        [autoUpload]="false"-->
-<!--                        (selected)="onFileSelected($event)">-->
-<!--          </ejs-uploader>-->
+          <ejs-uploader style="display: none;"
+                        [dropArea]="uploadTargetElement"
+                        [allowedExtensions]="allowedExtensions"
+                        [maxFileSize]="maxFileSize"
+                        [autoUpload]="false"
+          ></ejs-uploader>
 
           <button ejs-button cssClass="e-outline" >
             Export

@@ -18,6 +18,7 @@ export const profileDetailsHoursChartSettings: ProfileDetailsHoursChartSettings 
   },
   dataLabel: {
     visible: false,
+    showZero: false,
   },
   tooltip: {
     enable: false
