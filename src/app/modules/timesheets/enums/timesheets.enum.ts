@@ -2,9 +2,8 @@ export enum TIMESHEETS_ACTIONS {
   GET_TIMESHEETS = '[timesheets] GET TIMESHEETS',
   GET_PROFILE_TIMESHEETS = '[timesheets] GET PROFILE TIMESHEETS',
   OPEN_PROFILE = '[timesheets] OPEN PROFILE',
-  OPEN_PROFILE_TIMESHEET_EDIT_DIALOG = '[timesheets] OPEN PROFILE TIMESHEET EDIT DIALOG',
   OPEN_PROFILE_TIMESHEET_ADD_DIALOG = '[timesheets] OPEN PROFILE TIMESHEETS ADD DIALOG',
-  CLOSE_PROFILE_TIMESHEET_EDIT_DIALOG = '[timesheets] CLOSE PROFILE TIMESHEET EDIT DIALOG',
+  CLOSE_PROFILE_TIMESHEET_ADD_DIALOG = '[timesheets] CLOSE PROFILE TIMESHEET ADD DIALOG',
 }
 
 export enum TIMETHEETS_STATUSES {
@@ -16,7 +15,6 @@ export enum TIMETHEETS_STATUSES {
 
 export enum ProfileTimeSheetActionType {
   Add = 'add',
-  Edit = 'edit',
 }
 
 export enum ExportType {
@@ -44,4 +42,9 @@ export enum TimesheetsTableColumns {
   AgencyName = 'agencyName',
   TotalHours = 'totalHours',
   Controls = 'controls',
+}
+
+export enum DialogAction {
+  Open = 'open',
+  Close = 'close',
 }

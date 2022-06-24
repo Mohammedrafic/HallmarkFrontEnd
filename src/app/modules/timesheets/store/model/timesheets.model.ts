@@ -8,7 +8,7 @@ export interface TimesheetsModel {
   timesheets: TimeSheetsPage | null;
   profileTimesheets: ProfileTimeSheetDetail[];
   profileOpen: boolean;
-  selectedTimeSheet: ProfileTimeSheetDetail | null;
+  selectedTimeSheetId: number | null;
   timeSheetDialogOpen: boolean;
   editDialogType: ProfileTimeSheetActionType | null;
   profileDialogTimesheet: ProfileTimeSheetDetail | null;

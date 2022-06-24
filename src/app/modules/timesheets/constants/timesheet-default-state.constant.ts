@@ -6,7 +6,7 @@ export const DEFAULT_TIMESHEETS_STATE: TimesheetsModel = {
   profileTimesheets: [],
   profileOpen: false,
   timeSheetDialogOpen: false,
-  selectedTimeSheet: null,
+  selectedTimeSheetId: null,
   editDialogType: ProfileTimeSheetActionType.Add,
   profileDialogTimesheet: null,
 }
