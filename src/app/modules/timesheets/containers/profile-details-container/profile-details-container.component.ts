@@ -5,7 +5,7 @@ import {
   Inject,
   OnInit,
   ViewChild,
-  ChangeDetectorRef,
+  ChangeDetectorRef, Output, EventEmitter, Input
 } from '@angular/core';
 
 import { filter, Observable, takeUntil } from 'rxjs';
@@ -44,6 +44,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @Select(TimesheetsState.isProfileOpen)
   isProfileOpen$: Observable<DialogActionPayload>;
 
+  @Input() currentSelectedRowIndex: number | null = null;
+  @Input() maxRowIndex: number = 30;
+
+  @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
+
   public targetElement: HTMLBodyElement;
   public uploadTargetElement: HTMLButtonElement;
 
@@ -63,6 +68,10 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   ngOnInit(): void {
     this.getProfileTimesheets();
     this.getDialogState();
+  }
+
+  public onNextPreviousOrder(next: boolean): void {
+    this.nextPreviousOrderEvent.emit(next);
   }
 
   private getProfileTimesheets(): void {

@@ -136,6 +136,11 @@ $chip-margin: 8px;
     display: flex;
     align-items: center;
     cursor: pointer;
+
+    &.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+    }
   }
 
   .prev i-feather {

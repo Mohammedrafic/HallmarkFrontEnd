@@ -96,15 +96,21 @@
         </app-profile-timesheet-table>
       </section>
     </section>
-    <div class="timesheet-navigation" *ngIf="false">
-      <div class="prev">
-        <i-feather name="arrow-left" class="icon"></i-feather>
-        Previous Timesheet
+    <div class="timesheet-navigation">
+      <div
+        [class.disabled]="currentSelectedRowIndex === 0"
+        (click)="onNextPreviousOrder(false)"
+        class="prev">
+          <i-feather name="arrow-left" class="icon"></i-feather>
+          Previous Timesheet
       </div>
 
       <div class="spacer"></div>
 
-      <div class="next">
+      <div
+        [class.disabled]="currentSelectedRowIndex === (maxRowIndex - 1)"
+        (click)="onNextPreviousOrder(true)"
+        class="next">
         Next Timesheet
         <i-feather name="arrow-right" class="icon"></i-feather>
       </div>

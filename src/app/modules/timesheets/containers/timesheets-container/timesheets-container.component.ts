@@ -10,15 +10,15 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
-import { ITabConfigInterface } from '../../interface/i-tab-config.interface';
-import { exportOptions, TAB_ADMIN_TIMESHEETS } from '../../constants/timesheets.constant';
+import { ITabConfigInterface } from '../../interface';
+import { exportOptions, TAB_ADMIN_TIMESHEETS } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
-import { DialogAction, ExportType, TimesheetsTableColumns } from '../../enums/timesheets.enum';
-import { IFilterColumns, ITimesheetsFilter } from '../../interface/i-timesheet.interface';
+import { DialogAction, ExportType, TimesheetsTableColumns } from '../../enums';
+import { IFilterColumns, ITimesheetsFilter } from '../../interface';
 import { TimesheetsService } from '../../services/timesheets.service';
-import { filterOptionFields } from '../../constants/timesheets-table.constant';
+import { filterOptionFields } from '../../constants';
+import { Timesheets } from '../../store/actions/timesheets.actions';
 
 @Component({
   selector: 'app-timesheets-container.ts',
@@ -37,9 +37,10 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public filterColumns: IFilterColumns;
   public filteredItems: FilteredItem[] = [];
   public filters: ITimesheetsFilter;
+  public changeTableItemSubj: BaseObservable<number> = new BaseObservable<number>(null as any);
+  public pageSize = 30;
 
   private pageNumberSubj: BaseObservable<number> = new BaseObservable<number>(1);
-  private pageSize = 30;
 
   constructor(
     private store: Store,
@@ -116,8 +117,13 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  public rowSelected(): void {
+  public rowSelected(rowIndex: number): void {
+    this.changeTableItemSubj.set(rowIndex);
     this.store.dispatch(new Timesheets.ToggleProfileDialog(DialogAction.Open, 12));
+  }
+
+  public onNextPreviousOrderEvent(next: boolean): void {
+    this.changeTableItemSubj.set(next ? this.changeTableItemSubj.get() + 1 : this.changeTableItemSubj.get() - 1);
   }
 
   private startPageStateWatching(): void {
