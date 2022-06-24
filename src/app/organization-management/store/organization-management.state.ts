@@ -71,11 +71,11 @@ import {
   ExportLocations,
   ExportDepartments,
   ExportSkills,
-  GetMasterSkillsByOrganization, GetAllOrganizationSkills
+  GetMasterSkillsByOrganization, GetAllOrganizationSkills, GetLocationFilterOptions
 } from './organization-management.actions';
 import { Department } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
-import { Location } from '@shared/models/location.model';
+import { Location, LocationFilterOptions, LocationsPage } from '@shared/models/location.model';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
 import { MasterSkillByOrganization, Skill, SkillsPage, SkillDataSource } from 'src/app/shared/models/skill.model';
@@ -120,7 +120,7 @@ export interface OrganizationManagementStateModel {
   isLocationLoading: boolean;
   departments: Department[];
   regions: Region[];
-  locations: Location[];
+  locations: Location[] | LocationsPage;
   location: Location | null;
   organization: Organization | null;
   masterSkills: SkillsPage | null;
@@ -140,6 +140,7 @@ export interface OrganizationManagementStateModel {
   organizationSettings: OrganizationSettingsGet[];
   skillDataSource: SkillDataSource;
   allOrganizationSkills: SkillsPage | null;
+  locationFilterOptions: LocationFilterOptions | null;
 }
 
 @State<OrganizationManagementStateModel>({
@@ -181,7 +182,8 @@ export interface OrganizationManagementStateModel {
     isOrganizationSettingsLoading: false,
     organizationSettings: [],
     skillDataSource: { skillABBRs: [], skillDescriptions: [], glNumbers: [] },
-    allOrganizationSkills: null
+    allOrganizationSkills: null,
+    locationFilterOptions: null,
   },
 })
 @Injectable()
@@ -220,7 +222,7 @@ export class OrganizationManagementState {
   static regions(state: OrganizationManagementStateModel): Region[] { return state.regions; }
 
   @Selector()
-  static locationsByRegionId(state: OrganizationManagementStateModel): Location[] { return state.locations; }
+  static locationsByRegionId(state: OrganizationManagementStateModel): Location[] | LocationsPage { return state.locations; }
 
   @Selector()
   static locationById(state: OrganizationManagementStateModel): Location | null { return state.location; }
@@ -260,6 +262,9 @@ export class OrganizationManagementState {
 
   @Selector()
   static allOrganizationSkills(state: OrganizationManagementStateModel): SkillsPage | null { return state.allOrganizationSkills; }
+
+  @Selector()
+  static locationFilterOptions(state: OrganizationManagementStateModel): LocationFilterOptions | null { return state.locationFilterOptions; }
 
   constructor(
     private organizationService: OrganizationService,
@@ -420,8 +425,8 @@ export class OrganizationManagementState {
   }
 
   @Action(GetLocationsByRegionId)
-  GetLocationsByRegionId({ patchState }: StateContext<OrganizationManagementStateModel>, { regionId }: GetLocationsByRegionId): Observable<Location[]> {
-    return this.locationService.getLocationsByRegionId(regionId).pipe(tap((payload) => {
+  GetLocationsByRegionId({ patchState }: StateContext<OrganizationManagementStateModel>, { regionId, filters }: GetLocationsByRegionId): Observable<Location[] | LocationsPage> {
+    return this.locationService.getLocationsByRegionId(regionId, filters).pipe(tap((payload) => {
       patchState({ locations: payload});
       return payload;
     }));
@@ -768,6 +773,14 @@ export class OrganizationManagementState {
     return this.skillsService.getAllOrganizationSkills().pipe(tap(skills => {
       patchState({ allOrganizationSkills: skills });
       return skills;
+    }));
+  };
+
+  @Action(GetLocationFilterOptions)
+  GetLocationFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetLocationFilterOptions): Observable<LocationFilterOptions> {
+    return this.locationService.getLocationFilterOptions(payload).pipe(tap(options => {
+      patchState({ locationFilterOptions: options });
+      return options;
     }));
   };
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Location } from '../../shared/models/location.model';
+import { Location, LocationFilter, LocationFilterOptions, LocationsPage } from '../../shared/models/location.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
@@ -21,7 +21,10 @@ export class LocationService {
    * Get the list of available locations by regionId
    * @return Array of locations
    */
-  public getLocationsByRegionId(regionId: number): Observable<Location[]> {
+  public getLocationsByRegionId(regionId: number, filters?: LocationFilter): Observable<Location[] | LocationsPage> {
+    if (filters) {
+      return this.http.post<LocationsPage>(`/api/Locations/filter`, filters);
+    }
     return this.http.get<Location[]>(`/api/Locations/region/${regionId}`);
   }
 
@@ -62,5 +65,12 @@ export class LocationService {
       return this.http.post(`/api/Locations/export/byIds`, payload, { responseType: 'blob' });
     }
     return this.http.post(`/api/Locations/export`, payload, { responseType: 'blob' });
+  }
+
+  /**
+   * Get Location Filtering Options
+   */
+  public getLocationFilterOptions(regionId: number): Observable<LocationFilterOptions> {
+    return this.http.get<LocationFilterOptions>(`/api/Locations/filteringoptions`, { params: { RegionId: regionId }});
   }
 }
