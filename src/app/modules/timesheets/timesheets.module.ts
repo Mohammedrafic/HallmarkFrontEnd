@@ -3,11 +3,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { NgxsModule } from '@ngxs/store';
-import { GridModule } from '@syncfusion/ej2-angular-grids';
 import { FeatherModule } from 'angular-feather';
-import { DialogAllModule, DialogModule } from '@syncfusion/ej2-angular-popups';
+import { DialogAllModule } from '@syncfusion/ej2-angular-popups';
 import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
-import { DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
+import { DateTimePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { FileText, ChevronRight, AlignJustify, Briefcase, Calendar, CheckCircle, ChevronDown,
   Copy, Download, Edit, Edit3, Folder, Lock, MapPin, Menu, MessageSquare, MoreVertical, Plus, Search, Sliders, Trash2,
@@ -16,7 +15,7 @@ import { FileText, ChevronRight, AlignJustify, Briefcase, Calendar, CheckCircle,
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
-import {NumericTextBoxModule, UploaderModule} from '@syncfusion/ej2-angular-inputs';
+import {NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DatePickerModule, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { AccumulationChartAllModule, ChartAllModule } from '@syncfusion/ej2-angular-charts';
 
@@ -24,7 +23,7 @@ import { ControlConverterModule } from '@shared/pipes/control-converter/control-
 import { CapitalizeFirstModule } from '@shared/pipes/capitalize-first/capitalize-first.module';
 import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
 import { SharedModule } from '@shared/shared.module';
-
+import { DateWeekPickerModule } from '@shared/components/date-week-picker/date-week-picker.module';
 import { TimesheetsRoutingModule } from './timesheets-routing.module';
 import { TimesheetsContainerComponent } from './containers/timesheets-container/timesheets-container.component';
 import { TimesheetsTableComponent } from './components/timesheets-table/timesheets-table.component';
@@ -33,14 +32,13 @@ import { TimesheetsApiService } from './services/timesheets-api.service';
 import { TabDynamicNavigationComponent } from './components/tab-dynamic-navigation/tab-dynamic-navigation.component';
 import { ProfileDetailsContainerComponent } from './containers/profile-details-container/profile-details-container.component';
 import { ProfileTimesheetTableComponent } from './components/profile-timesheet-table/profile-timesheet-table.component';
-import { EditTimesheetComponent } from './components/edit-timesheet/edit-timesheet.component';
+import { AddTimesheetComponent } from './components/add-timesheet/add-timesheet.component';
 import { EditTimesheetService } from './services/edit-timesheet.service';
 import { ProfileDetailsJobInfoComponent } from './components/profile-details-job-info/profile-details-job-info.component';
 import { ProfileCumulativeHoursComponent } from './components/profile-cumulative-hours/profile-cumulative-hours.component';
 import { ProfileUploadsComponent } from './components/profile-uploads/profile-uploads.component';
 import { ProfileInvoicesComponent } from './components/profile-invoices/profile-invoices.component';
 import { TimesheetsService } from './services/timesheets.service';
-import { DateWeekPickerModule } from '@shared/components/date-week-picker/date-week-picker.module';
 
 const gridIcons = {
   MessageSquare,
@@ -71,7 +69,6 @@ const gridIcons = {
   AlertTriangle,
 };
 
-
 @NgModule({
   declarations: [
     TimesheetsContainerComponent,
@@ -79,7 +76,7 @@ const gridIcons = {
     TabDynamicNavigationComponent,
     ProfileDetailsContainerComponent,
     ProfileTimesheetTableComponent,
-    EditTimesheetComponent,
+    AddTimesheetComponent,
     ProfileDetailsJobInfoComponent,
     ProfileCumulativeHoursComponent,
     ProfileUploadsComponent,
@@ -100,21 +97,14 @@ const gridIcons = {
     DatePickerModule,
     ReactiveFormsModule,
     MultiSelectModule,
-    GridModule,
+    TimePickerModule,
     DialogAllModule,
-    ButtonModule,
     DateTimePickerModule,
-    DropDownListModule,
     NgxsModule.forFeature([TimesheetsState]),
-    DialogModule,
     ChartAllModule,
     AccumulationChartAllModule,
-    ChipListModule,
     SharedModule,
-    DatePickerModule,
-    ReactiveFormsModule,
     FormsModule,
-    ButtonModule,
     CheckBoxModule,
     ControlConverterModule,
     CapitalizeFirstModule,

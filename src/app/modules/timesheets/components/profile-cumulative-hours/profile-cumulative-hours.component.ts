@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { profileDetailsHoursChartColors, profileDetailsHoursChartColorsMap } from "../../constants/timesheets.constant";
-import { HourOccupationType } from "../../enums/hour-occupation-type.enum";
-import { profileDetailsHoursChartSettings } from "../../constants/profile-details-hours-chart-settings.constant";
+
+import { profileDetailsHoursChartColors, profileDetailsHoursChartColorsMap } from '../../constants/timesheets.constant';
+import { HourOccupationType } from '../../enums/hour-occupation-type.enum';
+import { profileDetailsHoursChartSettings } from '../../constants/profile-details-hours-chart-settings.constant';
 
 interface ChartLegendData {
   name: HourOccupationType,

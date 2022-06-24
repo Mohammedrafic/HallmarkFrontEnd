@@ -14,8 +14,8 @@ import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
-import { MoreMenuType, TIMETHEETS_STATUSES } from '../../enums/timesheets.enum';
-import { ITimesheet, ITimesheetsColumnWidth } from '../../interface/i-timesheet.interface';
+import { MoreMenuType, TIMETHEETS_STATUSES } from '../../enums';
+import { ITimesheet, ITimesheetsColumnWidth } from '../../interface';
 import {
   moreMenuWithClose,
   moreMenuWithDelete,

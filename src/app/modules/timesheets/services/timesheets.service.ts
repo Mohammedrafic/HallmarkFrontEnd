@@ -3,11 +3,10 @@ import { FormBuilder } from '@angular/forms';
 
 import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
 import { CustomFormGroup } from '@core/interface';
-
-import { IDataSourceItem, IFilterColumns } from '../interface/i-timesheet.interface';
-import { defaultFilterColumns, filterColumnDataSource } from '../constants/timesheets-table.constant';
-import { TimesheetsTableColumns } from '../enums/timesheets.enum';
-import { TimsheetForm } from '../interface/form.interface';
+import { IDataSourceItem, IFilterColumns } from '../interface';
+import { defaultFilterColumns, filterColumnDataSource } from '../constants';
+import { TimesheetsTableColumns } from '../enums';
+import { TimsheetForm } from '../interface';
 
 @Injectable()
 export class TimesheetsService {

@@ -11,7 +11,8 @@ import { Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ProfileTimeSheetDetail } from '../../store/model/timesheets.model';
 import { Timesheets } from '../../store/actions/timesheets.actions';
-import { ProfileTimeSheetActionType } from '../../enums/timesheets.enum';
+import { ProfileTimeSheetActionType } from '../../enums';
+import { ProfileTimesheetTableConfig } from '../../constants';
 
 
 @Component({
@@ -29,6 +30,8 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
   public override readonly allowPaging = false;
 
   public readonly tableHeight = 304;
+
+  public readonly tableConfig = ProfileTimesheetTableConfig;
 
   public initialSort = {
     columns: [

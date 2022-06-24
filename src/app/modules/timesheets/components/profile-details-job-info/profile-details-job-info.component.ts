@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { DatePipe } from "@angular/common";
+import { DatePipe } from '@angular/common';
 
 interface JobData {
   jobTitle: string;
@@ -21,9 +21,6 @@ interface JobInfoUIItem {
   selector: 'app-profile-details-job-info',
   templateUrl: './profile-details-job-info.component.html',
   styleUrls: ['./profile-details-job-info.component.scss'],
-  providers: [
-    DatePipe,
-  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileDetailsJobInfoComponent {
