@@ -17,12 +17,12 @@
     <e-column
       type="checkbox"
       [customAttributes]="{ class: 'bootstrap' }"
-      width="{{ timesheetsTableColumnWidth['checkbox'] }}">
+      [width]="timesheetsTableColumnWidth['checkbox']">
     </e-column>
     <e-column
       field="name"
       headerText="NAME"
-      width="{{ timesheetsTableColumnWidth['name'] }}">
+      [width]="timesheetsTableColumnWidth['name']">
         <ng-template #template let-data>
           <div [class.red-text]="data.statusText === TIMESHEETS_STATUSES.MISSING">
             {{ data.name }}
@@ -32,7 +32,7 @@
     <e-column
       field="statusText"
       headerText="STATUS"
-      width="{{ timesheetsTableColumnWidth['statusText'] }}">
+      [width]="timesheetsTableColumnWidth['statusText']">
         <ng-template #template let-data>
           <div class="status-cell">
             <ejs-chiplist>
@@ -46,7 +46,7 @@
     <e-column
       field="orderId"
       headerText="ORDER ID"
-      width="{{ timesheetsTableColumnWidth['orderId'] }}">
+      [width]="timesheetsTableColumnWidth['orderId']">
         <ng-template #template let-data>
           <div>
             <b>{{ data.orderId }}</b>
@@ -57,13 +57,13 @@
       field="skillName"
       headerText="SKILL"
       textAlign="Left"
-      width="{{ timesheetsTableColumnWidth['skillName'] }}">
+      [width]="timesheetsTableColumnWidth['skillName']">
     </e-column>
     <e-column
       field="workWeek"
       headerText="WORK WEEK"
       textAlign="Right"
-      width="{{ timesheetsTableColumnWidth['workWeek'] }}">
+      [width]="timesheetsTableColumnWidth['workWeek']">
         <ng-template #template let-data>
           <div class="align-right"><b>{{ data.workWeek }}</b></div>
         </ng-template>
@@ -72,13 +72,13 @@
       field="departmentName"
       headerText="DEPARTMENT"
       textAlign="Left"
-      width="{{ timesheetsTableColumnWidth['departmentName'] }}">
+      [width]="timesheetsTableColumnWidth['departmentName']">
     </e-column>
     <e-column
       field="billRate"
       headerText="BILL RATE $"
       textAlign="Right"
-      width="{{ timesheetsTableColumnWidth['billRate'] }}">
+      [width]="timesheetsTableColumnWidth['billRate']">
         <ng-template #template let-data>
           <div class="align-right">{{ data.billRate }}</div>
         </ng-template>
@@ -87,20 +87,20 @@
       field="agencyName"
       headerText="AGENCY NAME"
       textAlign="Left"
-      width="{{ timesheetsTableColumnWidth['agencyName'] }}">
+      [width]="timesheetsTableColumnWidth['agencyName']">
     </e-column>
     <e-column
       field="totalHours"
       headerText="TOTAL HOURS"
       textAlign="Right"
-      width="{{ timesheetsTableColumnWidth['totalHours'] }}">
+      [width]="timesheetsTableColumnWidth['totalHours']">
         <ng-template #template let-data>
-          <div class="align-right">{{ data.totalHours | date: "MM/dd/YYYY" }}</div>
+          <div class="align-right">{{ data.totalHours }}</div>
         </ng-template>
     </e-column>
     <e-column
       headerTextAlign="Right"
-      width="{{ timesheetsTableColumnWidth['controls'] }}"
+      [width]="timesheetsTableColumnWidth['controls']"
       freeze="Right">
         <ng-template #headerTemplate let-data>
           <div class="controls-header">

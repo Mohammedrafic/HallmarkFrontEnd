@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { DatePipe } from '@angular/common';
 
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import { RenderDayCellEventArgs } from '@syncfusion/ej2-angular-calendars';
+import { DatePickerComponent } from '@syncfusion/ej2-angular-calendars/src/datepicker/datepicker.component';
+import { DateWeekPickerService } from '@shared/components/date-week-picker/date-week-picker.service';
 import { Destroyable } from '@core/helpers';
 
 @Component({
@@ -15,9 +16,15 @@ import { Destroyable } from '@core/helpers';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DateWeekPickerComponent extends Destroyable implements OnInit {
+  @ViewChild('datePicker') datePicker: DatePickerComponent;
+
   @Input() dateControl: FormControl = new FormControl('');
 
-  constructor(private datePipe: DatePipe) {
+  private previousRange = '';
+
+  constructor(
+    private dateWeekPickerService: DateWeekPickerService
+  ) {
     super();
   }
 
@@ -27,22 +34,20 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit {
 
   public onRenderCell(args: RenderDayCellEventArgs): void {
     if (this.dateControl.value && typeof this.dateControl.value === 'string') {
-      const splitValue = this.dateControl.value.split(' - ');
-      const from = this.getWeekDate(splitValue[0], true);
-      const to = this.getWeekDate(splitValue[1]);
+      const [from, to] = this.dateWeekPickerService.getWeekStartEnd(this.dateControl.value);
 
-      if ((args.date?.getTime() || 0) <= to.getTime() && (args.date?.getTime() || 0) >= from.getTime()) {
+      if (this.dateWeekPickerService.isDateBetween(args.date, from, to)) {
         args.element?.classList.add('e-highlightselectedrange');
       }
+    } else {
+      args.element?.classList.remove('e-highlightselectedrange');
     }
   }
 
-  private getWeekDate(date: string, isStart = false): Date {
-    const curr = new Date(date); // get current date
-    const first = curr.getDate() - curr.getDay(); // First day is the day of the month - the day of the week
-    const last = first + 6; // last day is the first day + 6
-
-    return new Date(curr.setDate(isStart ? first : last));
+  public clearControl(): void {
+    this.dateControl.reset('');
+    this.previousRange = '';
+    this.datePicker.hide();
   }
 
   private startDatepickerWatching(): void {
@@ -52,10 +57,12 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit {
       debounceTime(1),
       takeUntil(this.componentDestroy()),
     ).subscribe((value) => {
-      const startWeekDay = this.datePipe.transform(this.getWeekDate(value, true), 'MM/dd/YYYY');
-      const endWeekDay = this.datePipe.transform(this.getWeekDate(value), 'MM/dd/YYYY');
+      const dateRange = this.previousRange ?
+        this.dateWeekPickerService.getRange(value, this.previousRange) :
+        this.dateWeekPickerService.getRange(value);
 
-      this.dateControl.setValue(`${startWeekDay} - ${endWeekDay}`, { emitEvent: false });
+      this.dateControl.setValue(dateRange, { emitEvent: false });
+      this.previousRange = dateRange;
     });
   }
 }
