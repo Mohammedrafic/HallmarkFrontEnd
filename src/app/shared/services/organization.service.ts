@@ -75,4 +75,8 @@ export class OrganizationService {
   public removeOrganizationLogo(businessUnitId: number): Observable<never> {
     return this.http.delete<never>(`/api/BusinessUnit/${businessUnitId}/logo`);
   }
+
+  public getConnections(): Observable<string[]> {
+    return this.http.get<string[]>(`/api/ConnectionStrings`);
+  }
 }

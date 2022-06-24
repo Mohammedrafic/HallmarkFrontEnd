@@ -13,12 +13,13 @@ export class Organization {
   billingDetails: BillingDetails;
   contactDetails: ContactDetails[];
   preferences: Preferences;
+  dbConnectionStringName: string;
 
-  constructor(organizationId: number, businessUnitId: number, generalInformation: GeneralInformation, billingDetails: BillingDetails, contactDetails: ContactDetails[], preferences: Preferences, isSameAsOrg: boolean) {
+  constructor(organizationId: number, businessUnitId: number, generalInformation: GeneralInformation, billingDetails: BillingDetails, contactDetails: ContactDetails[], preferences: Preferences, isSameAsOrg: boolean, dataBaseConnection: string) {
     if (organizationId) {
       this.organizationId = organizationId;
     }
-    this.parentBusinessUnitId  = businessUnitId;
+    this.parentBusinessUnitId = businessUnitId;
     this.generalInformation = generalInformation;
     this.generalInformation.organizationId = organizationId || 0;
     if (this.generalInformation.externalId === '') {
@@ -37,6 +38,7 @@ export class Organization {
       this.preferences.timePeriodInMins = null;
     }
     this.preferences.organizationId = organizationId || 0;
+    this.dbConnectionStringName = dataBaseConnection;
   }
 }
 
