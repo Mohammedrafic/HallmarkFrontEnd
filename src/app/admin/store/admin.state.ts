@@ -11,6 +11,7 @@ import { OrganizationService } from '@shared/services/organization.service';
 
 import {
   ExportCredentialTypes,
+  ExportOrganizations,
   ExportSkillCategories,
   ExportSkills,
   GetAllSkills,
@@ -412,6 +413,14 @@ export class AdminState {
   GetDBConnections({ patchState }: StateContext<AdminStateModel>): Observable<any> {
     return this.organizationService.getConnections().pipe(tap(connections => {
       patchState({ dataBaseConnections: connections });
+    }));
+  };
+
+  @Action(ExportOrganizations)
+  ExportOrganizations({ }: StateContext<AdminStateModel>, { payload }: ExportOrganizations): Observable<any> {
+    return this.organizationService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
     }));
   };
 }

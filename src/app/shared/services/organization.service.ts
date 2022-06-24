@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Organization, OrganizationPage, OrganizationStructure } from 'src/app/shared/models/organization.model';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrganizationService {
@@ -78,5 +79,12 @@ export class OrganizationService {
 
   public getConnections(): Observable<string[]> {
     return this.http.get<string[]>(`/api/ConnectionStrings`);
+  }
+
+  /**
+   * Export organization list
+   */
+  public export(payload: ExportPayload): Observable<any> {
+    return this.http.post(`/api/Organizations/export`, payload, { responseType: 'blob' });
   }
 }
