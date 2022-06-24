@@ -98,6 +98,7 @@ export class RejectReasonState {
     return this.rejectReasonService.updateRejectReason(payload).pipe(
       tap(() => {
         dispatch(new UpdateRejectReasonsSuccess());
+        dispatch(new SaveRejectReasonsSuccess());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       }),
       catchError((error: HttpErrorResponse) => {
