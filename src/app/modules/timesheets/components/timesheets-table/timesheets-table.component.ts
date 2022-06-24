@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   EventEmitter,
-  Input,
+  Input, OnInit,
   Output,
   ViewChild
 } from '@angular/core';
@@ -23,6 +23,7 @@ import {
   tableSelectionModel, TIMESHEETS_GRID_CONFIG,
   timesheetsTableColumnWidth
 } from '../../constants/timesheets-table.constant';
+import { Actions } from '@ngxs/store';
 
 @Component({
   selector: 'app-timesheets-table',
@@ -34,11 +35,16 @@ export class TimesheetsTableComponent extends AbstractGridConfigurationComponent
   @ViewChild('grid') grid: GridComponent;
 
   @Input() tableData: TimeSheetsPage;
+  @Input() set changeTableItem(next: number | null) {
+    if (next !== null) {
+      this.grid.selectRow(next);
+    }
+  };
 
   @Output() changePage: EventEmitter<number> = new EventEmitter<number>();
   @Output() changePerPage: EventEmitter<number> = new EventEmitter<number>();
   @Output() sortHandler: EventEmitter<string> = new EventEmitter<string>();
-  @Output() timesheetRowSelected: EventEmitter<void> =  new EventEmitter();
+  @Output() timesheetRowSelected: EventEmitter<number> =  new EventEmitter<number>();
 
   public allowWrap = TIMESHEETS_GRID_CONFIG.isWordWrappingEnabled;
   public wrapSettings: TextWrapSettingsModel = TIMESHEETS_GRID_CONFIG.wordWrapSettings;
@@ -55,7 +61,7 @@ export class TimesheetsTableComponent extends AbstractGridConfigurationComponent
 
   public onRowClick(event: any): void {
     if (!event.isInteracted) {
-      this.timesheetRowSelected.emit();
+      this.timesheetRowSelected.emit(event.rowIndex);
     }
   }
 
