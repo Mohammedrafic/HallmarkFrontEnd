@@ -3,13 +3,14 @@ import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { ExportColumn } from '@shared/models/export.model';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { Observable, Subject, throttleTime } from 'rxjs';
 import { Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { SetHeaderState, ShowExportDialog } from 'src/app/store/app.actions';
-import { GetOrganizationsByPage } from '../../store/admin.actions';
+import { ExportOrganizations, GetOrganizationsByPage } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
 
 @Component({
@@ -30,6 +31,7 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
     { text:'Phone', column: 'Phone'} 
   ];
   public fileName: string;
+  public defaultFileName: string;
 
   public readonly statusEnum = Status;
 
@@ -62,15 +64,30 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
   }
 
   public override customExport(): void {
+    this.defaultFileName = 'Organization List ' + this.generateDateTime(this.datePipe);
+    this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
 
   public closeExport() {
+    this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));
   }
 
-  public export(event: any): void {
-    this.store.dispatch(new ShowExportDialog(false));
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = 'Organization List ' + this.generateDateTime(this.datePipe);
+    this.store.dispatch(new ExportOrganizations(new ExportPayload(
+      fileType,
+      { ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null },
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      null,
+      options?.fileName || this.defaultFileName
+    )));
     this.clearSelection(this.grid);
   }
 

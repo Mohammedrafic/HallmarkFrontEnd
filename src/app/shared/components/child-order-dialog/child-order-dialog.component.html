@@ -13,11 +13,11 @@
       <section class="header-container">
         <div class="e-card-header preview-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title preview-title">Possition ID {{ order?.orderId }}/{{ candidate?.positionId }}</h3>
+            <h3 class="e-card-title preview-title">Possition ID {{ order?.orderId || order?.id }}/{{ candidate?.positionId }}</h3>
             <div class="order-statuses">
               <ejs-chiplist #chipList class="events-off" *ngIf="candidate">
                 <e-chips>
-                  <e-chip [text]="candidate.statusName" [cssClass]="candidate.statusName | chipsCssClass"></e-chip>
+                  <e-chip [text]="orderStatusText[candidate.orderStatus]" [cssClass]="orderStatusText[candidate.orderStatus] | chipsCssClass"></e-chip>
                 </e-chips>
               </ejs-chiplist>
             </div>
@@ -33,14 +33,15 @@
         <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
           <e-tabitems>
             <e-tabitem>
-              <ng-template #headerText>Order</ng-template>
+              <ng-template #headerText>Order Details</ng-template>
               <ng-template #content>
-                <section class="order-details">
-                  <app-order-details
-                    *ngIf="selectedOrder$ | async as currentOrder"
-                    [currentOrder]="currentOrder"
-                  ></app-order-details>
-                </section>
+                  <section class="order-details"  *ngIf="selectedOrder$ | async as currentOrder">
+                    <section class="job-details">
+                      <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
+                    </section>
+                    <hr />
+                    <app-order-details [currentOrder]="currentOrder"></app-order-details>  
+                  </section>
               </ng-template>
             </e-tabitem>
             <e-tabitem>

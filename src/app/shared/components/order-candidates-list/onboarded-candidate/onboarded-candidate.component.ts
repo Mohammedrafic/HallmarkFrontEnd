@@ -15,7 +15,7 @@ import { OrderManagementContentState } from "@client/store/order-managment-conte
 import { ReloadOrganisationOrderCandidatesLists, UpdateOrganisationCandidateJob } from "@client/store/order-managment-content.actions";
 import { ShowToast } from "src/app/store/app.actions";
 import { MessageTypes } from "@shared/enums/message-types";
-import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
+import { ApplicantStatus, CandidatStatus } from "@shared/enums/applicant-status.enum";
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -40,6 +40,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public candidateJob: OrderCandidateJob | null;
   public isOnboarded = true;
   public today = new Date();
+  public candidatStatus = CandidatStatus;
   public billRatesData: BillRate[] = [];
 
   get startDateControl(): AbstractControl | null {
@@ -118,7 +119,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
         this.form.patchValue({
           jobId: value.orderId,
           date: [value.order.jobStartDate, value.order.jobEndDate],
-          billRates: value.order.billRates,
+          billRates: value.order.hourlyRate,
           candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
           candidateBillRate: value.candidateBillRate,
           locationName: value.order.locationName,
@@ -160,6 +161,9 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     if(status === ApplicantStatus.OnBoarded) {
       this.form.disable();
       this.isOnboarded = false;
+    } else {
+      this.form.enable();
+      this.isOnboarded = true;
     }
   }
 

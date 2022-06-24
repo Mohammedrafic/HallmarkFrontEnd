@@ -23,7 +23,13 @@
       <button
         ejs-button
         id="filterButton"
-        cssClass="e-outline button-filter" (click)="showFilters()">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+        cssClass="e-outline button-filter"
+        (click)="showFilters()">
+        <div class="filter-button-content">
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
       <button
         ejs-button
         id="importButton"
@@ -45,7 +51,7 @@
 
   <ejs-grid class="grid grid-component"
     #grid
-    [dataSource]="gridDataSource"
+    [dataSource]="(departments$ | async)?.items"
     [allowPaging]="allowPaging"
     [pageSettings]="pageSettings"
     [height]="fullScreenGridHeight"
@@ -103,7 +109,7 @@
                 [decimals]="decimals"
                 placeholder="Go to:"
                 min="1"
-                [max]="lastAvailablePage"
+                [max]="(departments$ | async)?.totalPages"
                 [showSpinButton]="false"
                 (change)="onGoToClick($event)"
               >
@@ -113,10 +119,10 @@
               <ejs-pager
                 id="gridPager"
                 #gridPager
-                [pageSize]="pageSizePager"
-                [totalRecordsCount]="totalDataRecords"
+                [pageSize]="pageSize"
+                [totalRecordsCount]="(departments$ | async)?.totalCount"
                 [enablePagerMessage]="false"
-                [currentPage]="currentPagerPage"
+                [currentPage]="currentPage"
                 (click)="onGoToClick($event)"
               >
               </ejs-pager>
@@ -137,11 +143,11 @@
       <label>Ext Department ID</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="externalId"
+                         formControlName="externalIds"
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.externalId.dataSource">
+                         [dataSource]="filterColumns.externalIds.dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -149,11 +155,11 @@
       <label>Invoice Department ID</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="invoiceDepartmentId"
+                         formControlName="invoiceIds"
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.invoiceDepartmentId.dataSource">
+                         [dataSource]="filterColumns.invoiceIds.dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -161,11 +167,11 @@
       <label>Department Name</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="name"
+                         formControlName="departmentNames"
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.name.dataSource">
+                         [dataSource]="filterColumns.departmentNames.dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -173,11 +179,11 @@
       <label>Facility Contact</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="facilityContact"
+                         formControlName="facilityContacts"
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.facilityContact.dataSource">
+                         [dataSource]="filterColumns.facilityContacts.dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -185,12 +191,24 @@
       <label>Facility Email</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="facilityEmail"
+                         formControlName="facilityEmails"
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.facilityEmail.dataSource">
+                         [dataSource]="filterColumns.facilityEmails.dataSource">
         </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container calendar">
+      <label for="inactiveDate">Inactive date</label>
+      <div class="input-group datepicker">
+        <ejs-datepicker
+          class="datepicker"
+          format="MM/dd/yyyy"
+          placeholder="MM/DD/YYYY"
+          formControlName="inactiveDate"
+        >
+        </ejs-datepicker>
       </div>
     </div>
   </form>

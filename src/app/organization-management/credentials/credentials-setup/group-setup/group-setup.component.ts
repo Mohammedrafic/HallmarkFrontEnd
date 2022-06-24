@@ -17,13 +17,14 @@ import {
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CredentialSkillGroup, CredentialSkillGroupPage, CredentialSkillGroupPost } from '@shared/models/skill-group.model';
 import {
+  GetAllOrganizationSkills,
   GetAssignedSkillsByPage,
   GetCredentialSkillGroup,
   RemoveCredentialSkillGroup,
   SaveUpdateCredentialSkillGroup
 } from '../../../store/organization-management.actions';
 import { UserState } from 'src/app/store/user.state';
-import { Skill } from '@shared/models/skill.model';
+import { Skill, SkillsPage } from '@shared/models/skill.model';
 
 @Component({
   selector: 'app-group-setup',
@@ -43,9 +44,11 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   skillGroups$: Observable<CredentialSkillGroupPage>;
   public skillGroups: CredentialSkillGroup[];
 
-  @Select(OrganizationManagementState.skills)
-  assignedSkills$: Observable<any>;
-  public assignedSkills: Skill[];
+  @Select(OrganizationManagementState.allOrganizationSkills)
+  allOrganizationSkills$: Observable<Skill[]>;
+  public filteredAssignedSkills: Skill[];
+  public allAssignedSkills: Skill[];
+  public searchDataSource: Skill[];
   public skillsId = new Set<number>();
 
   skillGroupsFormGroup: FormGroup;
@@ -54,6 +57,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   isEdit: boolean;
   editedSkillGroupId?: number;
 
+  private reservedMasterSkillIds: number[] = [];
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
 
@@ -82,22 +86,14 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
 
   onEditButtonClick(saveSkillGroup: CredentialSkillGroup, event: any): void {
     this.addActiveCssClass(event);
-    const savedSkillIds: number[] = [];
-    const savedSkillIdsIndexes: number[] = [];
-    saveSkillGroup.skills?.forEach(savedSkill => {
-      const foundAssignedSkill = this.assignedSkills.find(skill => skill.masterSkill?.id === savedSkill.masterSkillId);
-      if (foundAssignedSkill) {
-        savedSkillIds.push(foundAssignedSkill.id);
-        savedSkillIdsIndexes.push(this.assignedSkills.indexOf(foundAssignedSkill));
-      }
-    });
+    // reassign search grid data to allAssignedSkills in Edit mode
+    this.searchDataSource = this.allAssignedSkills;
 
     this.skillGroupsFormGroup.setValue({
       name: saveSkillGroup.name,
-      skillIds: savedSkillIds
+      skillIds: []
     });
 
-    this.searchGrid.selectRows(savedSkillIdsIndexes);
     this.isEdit = true;
     this.editedSkillGroupId = saveSkillGroup.id;
     this.store.dispatch(new ShowSideDialog(true));
@@ -211,6 +207,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.editedSkillGroupId = undefined;
     this.skillGroupsFormGroup.reset();
     this.clearSelection(this.searchGrid);
+    this.searchDataSource = this.filteredAssignedSkills;
   }
 
   private createSkillGroupFormGroup(): void {
@@ -224,22 +221,33 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.currentPage = 1;
       this.store.dispatch(new GetCredentialSkillGroup());
-      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, {}));
+      this.store.dispatch(new GetAllOrganizationSkills());
     });
   }
 
   private skillGroupDataLoadedHandler(): void {
     this.skillGroups$.pipe(takeUntil(this.unsubscribe$)).subscribe(savedSkillGroupsPages => {
       if (savedSkillGroupsPages && savedSkillGroupsPages.items) {
+        savedSkillGroupsPages.items.forEach(item => {
+          let masterSkillIds = item.skills?.map(s => s.masterSkillId);
+          this.reservedMasterSkillIds = masterSkillIds ? masterSkillIds : [];
+        });
         this.skillGroups = savedSkillGroupsPages.items;
       }
     });
   }
 
   private assignedSkillsDataLoadedHandler(): void {
-    this.assignedSkills$.pipe(takeUntil(this.unsubscribe$)).subscribe(assignedSkills => {
-      if (assignedSkills && assignedSkills.items) {
-        this.assignedSkills = assignedSkills.items;
+    this.allOrganizationSkills$.pipe(takeUntil(this.unsubscribe$)).subscribe(assignedSkills => {
+      if (assignedSkills) {
+        this.allAssignedSkills = assignedSkills;
+        this.filteredAssignedSkills = assignedSkills.filter(assignedSkill => {
+          if (!this.reservedMasterSkillIds.includes(assignedSkill.id)) {
+            return assignedSkill;
+          }
+          return null;
+        });
+        this.searchDataSource = this.filteredAssignedSkills;
       }
     });
   }

@@ -27,7 +27,8 @@ import {
   Calendar,
   Folder,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  ChevronRight
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -94,7 +95,8 @@ const gridIcons = {
   Calendar,
   Folder,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  ChevronRight
 };
 
 @NgModule({

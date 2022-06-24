@@ -11,7 +11,7 @@ export const STATUS_COLOR_GROUP = {
   'e-default': ['closed', 'Inactive', 'inactive', 'Closed'],
   'e-pending': ['pending', 'Pending', 'offered'],
   'e-progress': ['in progress', 'In Progress', 'Verified', 'verified'],
-  'e-accepted': ['accepted','Accepted'],
+  'e-accepted': ['accepted','Accepted', 'in progress (accepted)'],
   'e-filled': ['filled', 'Filled', 'onboard', "onboarded"],
   'e-awaiting': ['not applied', 'Not Applied']
 }
@@ -43,4 +43,15 @@ export enum CredentialVerifiedStatus {
 export enum CreateUserStatus {
   Inactive,
   Active,
+}
+
+export enum OrderStatusText {
+  Incomplete = 1,
+  PreOpen = 5,
+  Open = 20,
+  "In progress" = 30,
+  "In Progress (Pending)" = 31,
+  "In Progress (Accepted)" = 32,
+  Filled = 50,
+  Closed = 60
 }

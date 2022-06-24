@@ -26,7 +26,7 @@ import {
   ReloadOrderCandidatesLists,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AgencyOrderManagement, AgencyOrderManagementChild, AgencyOrderManagementPage } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, OrderManagementChild, AgencyOrderManagementPage } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { Location } from '@angular/common';
@@ -104,7 +104,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onDataBound(): void {
-    // this.gridWithChildRow.detailRowModule.expandAll();
+    this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
       const [data, index] = this.store.selectSnapshot(OrderManagementState.lastSelectedOrder)(
         this.previousSelectedOrderId
@@ -180,8 +180,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.gridWithChildRow.selectRow(nextIndex);
   }
 
-  public onOpenCandidateDialog(candidat: AgencyOrderManagementChild, order: AgencyOrderManagement): void {
+  public onOpenCandidateDialog(candidat: OrderManagementChild, order: AgencyOrderManagement): void {
     this.selectedCandidat = candidat;
+    this.selectedCandidat.selected = {
+      order: order.orderId,
+      positionId: candidat.positionId
+    };
     this.selectedOrder = order;
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.orderId, order.organizationId, options));

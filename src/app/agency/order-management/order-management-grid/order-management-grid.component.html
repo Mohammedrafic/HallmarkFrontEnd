@@ -72,7 +72,7 @@
     <e-column field="numberOfPositions" headerText="{{ '# of positions' | uppercase }}" width="160">
       <ng-template #template let-data>
         <div class="align-right">
-          {{ data.numberOfPositions - data.candidatesCount }}/{{ data.numberOfPositions }}
+          {{ data.numberOfOpenPositions }}/{{ data.numberOfPositions }}
         </div>
       </ng-template>
     </e-column>
@@ -126,7 +126,7 @@
         *ngFor="let child of data.children"
         [candidat]="child"
         [order]="data"
-        [selected]="selectedCandidat?.candidateId === child.candidateId"
+        [selected]="selectedCandidat?.selected.order === data.orderId && selectedCandidat?.selected.positionId === child.positionId"
         (clickEvent)="onOpenCandidateDialog($event, data)"
       ></app-grid-subrow-candidate>
     </div>
@@ -185,5 +185,5 @@
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-preview-order-dialog>
 <app-candidat-dialog [openEvent]="openCandidat"></app-candidat-dialog>
-<app-child-order-dialog [order]="selectedOrder" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>
+<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>
 

@@ -185,3 +185,8 @@ export class GetDBConnections {
   constructor() {
   }
 }
+
+export class ExportOrganizations {
+  static readonly type = '[admin] Export Organization list';
+  constructor(public payload: ExportPayload) { }
+}

@@ -40,8 +40,12 @@
             <e-tabitem>
               <ng-template #headerText>Order Details</ng-template>
               <ng-template #content>
-                <section class="order-details" >
-                  <app-order-details *ngIf="selectedOrder$ | async as currentOrder" [currentOrder]="currentOrder"></app-order-details>  
+                <section class="order-details"  *ngIf="selectedOrder$ | async as currentOrder">
+                  <section class="job-details">
+                    <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
+                  </section>
+                  <hr />
+                  <app-order-details [currentOrder]="currentOrder"></app-order-details>  
                 </section>
               </ng-template>
             </e-tabitem>

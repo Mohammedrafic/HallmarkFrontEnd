@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { Department } from '../../shared/models/department.model';
+import { Department, DepartmentFIlter, DepartmentFilterOptions, DepartmentsPage } from '../../shared/models/department.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
@@ -24,7 +24,11 @@ export class DepartmentsService {
    * Get the list of available departments by locationId
    * @return Array of departments
    */
-  public getDepartmentsByLocationId(locationId?: number): Observable<Department[]> {
+  public getDepartmentsByLocationId(locationId?: number, filters?: DepartmentFIlter): Observable<Department[] | DepartmentsPage> {
+    if (filters) {
+      filters.inactiveDate = filters.inactiveDate as Date || null;
+      return this.http.post<DepartmentsPage>(`/api/Departments/filter`, filters);
+    }
     return this.http.get<Department[]>(`/api/Departments/byLocation/${locationId}`);
   }
 
@@ -50,5 +54,12 @@ export class DepartmentsService {
       return this.http.post(`/api/Departments/export/byIds`, payload, { responseType: 'blob' });
     }
     return this.http.post(`/api/Departments/export`, payload, { responseType: 'blob' });
+  }
+
+  /**
+   * Get Department Filtering Options
+   */
+  public getDepartmentFilterOptions(locationId: number): Observable<DepartmentFilterOptions> {
+    return this.http.get<DepartmentFilterOptions>(`/api/Departments/filteringoptions`, { params: { LocationId: locationId }});
   }
 }
