@@ -1,22 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-
-import { profileDetailsHoursChartColors, profileDetailsHoursChartColorsMap } from '../../constants/timesheets.constant';
-import { HourOccupationType } from '../../enums/hour-occupation-type.enum';
-import { profileDetailsHoursChartSettings } from '../../constants/profile-details-hours-chart-settings.constant';
-
-interface ChartLegendData {
-  name: HourOccupationType,
-  value: number;
-  value2: number;
-  color: string;
-}
-
-interface DonutChartData {
-  x: string;
-  y: number;
-}
-
-type BarChartData = {[key: string]: number | string};
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { profileDetailsHoursChartColorsMap } from "../../constants/timesheets.constant";
+import { HourOccupationType } from "../../enums/hour-occupation-type.enum";
+import { profileDetailsHoursChartSettings } from "../../constants/profile-details-hours-chart-settings.constant";
+import { CheckBoxChangeEventArgs } from "@syncfusion/ej2-angular-grids";
+import { mockedHoursChartData, ProfileHoursChartData } from "../../constants/mocked-hours-charts-data.constant";
+import { DonutChartData } from "../../interface/donut-chart-data.interface";
+import { ChartPointRenderEvent } from "../../interface/chart-point-render-event.interface";
 
 @Component({
   selector: 'app-profile-cumulative-hours',
@@ -25,81 +14,82 @@ type BarChartData = {[key: string]: number | string};
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileCumulativeHoursComponent {
+  private _hoursData: ProfileHoursChartData[];
+
   public readonly chartSettings = profileDetailsHoursChartSettings;
+  public readonly chartColorsMap: Record<HourOccupationType, string> = profileDetailsHoursChartColorsMap;
 
-  public readonly chartsLegendData: ChartLegendData[] = [
-    {
-      name: HourOccupationType.OnCall,
-      color: profileDetailsHoursChartColorsMap[HourOccupationType.OnCall],
-      value: 32.47,
-      value2: 32.47,
-    },
-    {
-      name: HourOccupationType.Callback,
-      color: profileDetailsHoursChartColorsMap[HourOccupationType.Callback],
-      value: 2.5,
-      value2: 2.5,
-    },
-    {
-      name: HourOccupationType.Regular,
-      color: profileDetailsHoursChartColorsMap[HourOccupationType.Regular],
-      value: 36,
-      value2: 36,
-    },
-    {
-      name: HourOccupationType.Holiday,
-      color: profileDetailsHoursChartColorsMap[HourOccupationType.Holiday],
-      value: 36,
-      value2: 36,
-    },
-    {
-      name: HourOccupationType.Charge,
-      color: profileDetailsHoursChartColorsMap[HourOccupationType.Charge],
-      value: 0,
-      value2: 0,
-    },
-    {
-      name: HourOccupationType.Preceptor,
-      color: profileDetailsHoursChartColorsMap[HourOccupationType.Preceptor],
-      value: 36,
-      value2: 36,
-    },
-    {
-      name: HourOccupationType.Orientation,
-      color: profileDetailsHoursChartColorsMap[HourOccupationType.Orientation],
-      value: 36,
-      value2: 36,
-    }
-  ];
+  public weekHoursChartData: DonutChartData<HourOccupationType>[] = [];
+  public cumulativeHoursChartData: DonutChartData<HourOccupationType>[] = [];
+  public totalWeekHours: number = 0;
+  public totalCumulativeHours: number = 0;
 
-  public donutChartData: DonutChartData[] = [
-    {x: 'OnCall', y: 32.47},
-    {x: 'Callback', y: 2.5},
-    {x: 'Regular', y: 36},
-    {x: 'Holiday', y: 36},
-    {x: 'Charge', y: 0},
-    {x: 'Preceptor', y: 36},
-    {x: 'Orientation', y: 36},
-  ];
+  @Input()
+  public set hoursData(value: ProfileHoursChartData[]) {
+    this._hoursData = value;
 
-  public barChartData: BarChartData[] = [
-    {
-      x: '-',
-      y0: 32.47,
-      y1: 2.50,
-      y2: 36,
-      y3: 36,
-      y4: 0,
-      y5: 36,
-      y6: 36,
-    },
-  ];
-
-  public trackByName(_: number, item: ChartLegendData): string {
-    return item.name;
+    value = value.slice().reverse();
+    this.weekHoursChartData = value.map(toWeekHoursChartData);
+    this.cumulativeHoursChartData = value.map(toCumulativeHoursChartData);
+    this.updateTotalHoursData();
   }
 
-  public onPointRender(event: { point: { index: number }; fill: string; }): void {
-    event.fill = profileDetailsHoursChartColors[event.point.index];
+  public get hoursData() {
+    return this._hoursData;
   }
+
+  constructor() {
+    this.hoursData = mockedHoursChartData;
+  }
+
+  public trackByName(_: number, item: ProfileHoursChartData): string {
+    return item.type;
+  }
+
+  public onPointRender(event: ChartPointRenderEvent<HourOccupationType>): void {
+    event.fill = profileDetailsHoursChartColorsMap[event.point.x];
+  }
+
+  public toggleChartCategoryVisibility({checked}: CheckBoxChangeEventArgs, legendItem: ProfileHoursChartData): void {
+    const index = this.hoursData.findIndex((data: ProfileHoursChartData) => data.type === legendItem.type);
+
+    this.weekHoursChartData = this.weekHoursChartData.map(item => {
+      item.y = item.x === legendItem.type ? checked ? this.hoursData[index].weekly : 0 : item.y;
+      return item;
+    });
+
+    this.cumulativeHoursChartData = this.cumulativeHoursChartData.map(item => {
+      item.y = item.x === legendItem.type ? checked ? this.hoursData[index].total : 0 : item.y;
+      return item;
+    });
+
+    this.updateTotalHoursData();
+  }
+
+  private updateTotalHoursData(): void {
+    this.totalWeekHours = this.getTotalWeekHours();
+    this.totalCumulativeHours = this.getTotalCumulativeHours();
+  }
+
+  private getTotalWeekHours(): number {
+    return this.weekHoursChartData.reduce((acc, value) => acc + value.y, 0);
+  }
+
+  private getTotalCumulativeHours(): number {
+    return this.cumulativeHoursChartData.reduce((acc, value) => acc + value.y, 0);
+  }
+}
+
+function toWeekHoursChartData({type, weekly}: ProfileHoursChartData): DonutChartData<HourOccupationType> {
+  return {
+    x: type,
+    y: weekly,
+  };
+}
+
+function toCumulativeHoursChartData({type, total}: ProfileHoursChartData): DonutChartData<HourOccupationType> {
+  return {
+    x: type,
+    y: total,
+  };
 }

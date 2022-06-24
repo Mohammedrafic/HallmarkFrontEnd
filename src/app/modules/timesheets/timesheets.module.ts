@@ -15,7 +15,7 @@ import { FileText, ChevronRight, AlignJustify, Briefcase, Calendar, CheckCircle,
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
-import {NumericTextBoxModule } from '@syncfusion/ej2-angular-inputs';
+import { NumericTextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
 import { DatePickerModule, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { AccumulationChartAllModule, ChartAllModule } from '@syncfusion/ej2-angular-charts';
 
@@ -108,7 +108,8 @@ const gridIcons = {
     CheckBoxModule,
     ControlConverterModule,
     CapitalizeFirstModule,
-    DateWeekPickerModule
+    DateWeekPickerModule,
+    UploaderModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [
