@@ -1,12 +1,12 @@
 <div class="candidate-row"  [ngClass]="{'selected': selected}" (click)="clickEvent.emit(candidat)">
   <div class="info">
-    <div class="data">{{ order.orderId }}/{{ candidat.positionId }}</div>
+    <div class="data">{{ order.orderId || order.id }}/{{ candidat.positionId }}</div>
     <div class="title">Position ID</div>
   </div>
   <div class="info status">
     <ejs-chiplist>
       <e-chips>
-        <e-chip [text]="candidat.statusName" [cssClass]="candidat.statusName | chipsCssClass"></e-chip>
+        <e-chip [text]="orderStatusText[candidat.orderStatus]" [cssClass]="orderStatusText[candidat.orderStatus] | chipsCssClass"></e-chip>
       </e-chips>
     </ejs-chiplist>
   </div>

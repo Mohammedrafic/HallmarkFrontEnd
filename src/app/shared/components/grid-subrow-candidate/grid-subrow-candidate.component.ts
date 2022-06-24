@@ -1,7 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { OrderStatusText } from '@shared/enums/status';
 
-import { AgencyOrderManagement, AgencyOrderManagementChild } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, OrderManagementChild, OrderManagement } from '@shared/models/order-management.model';
+
+type MergedOrder = AgencyOrderManagement & OrderManagement;
 
 @Component({
   selector: 'app-grid-subrow-candidate',
@@ -10,11 +13,12 @@ import { AgencyOrderManagement, AgencyOrderManagementChild } from '@shared/model
 })
 export class GridSubrowCandidateComponent {
   @Input() selected: boolean;
-  @Input() order: AgencyOrderManagement;
-  @Input() candidat: AgencyOrderManagementChild;
+  @Input() order: MergedOrder;
+  @Input() candidat: OrderManagementChild;
 
-  @Output() clickEvent = new EventEmitter<AgencyOrderManagementChild>();
+  @Output() clickEvent = new EventEmitter<OrderManagementChild>();
 
+  public orderStatusText = OrderStatusText;
   public candidatStatus = CandidatStatus;
 }
 

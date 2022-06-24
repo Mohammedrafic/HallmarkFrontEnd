@@ -1,4 +1,4 @@
-@import '../../../../styles/variables/colors.scss';
+@import '../../../styles/variables/colors.scss';
 
 .order-tabs {
   margin-top: 24px;
@@ -66,3 +66,7 @@
   margin-top: -20px;
 }
 
+ejs-chiplist.e-control.e-chip-list .e-chip {
+  min-width: 112px;
+  width: auto;
+}

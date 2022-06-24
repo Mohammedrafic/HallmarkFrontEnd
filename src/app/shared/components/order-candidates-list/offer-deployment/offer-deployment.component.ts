@@ -12,7 +12,7 @@ import {
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed
 } from "@client/store/order-managment-content.actions";
-import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { BillRatesComponent } from "@shared/components/bill-rates/bill-rates.component";
 
 @Component({
@@ -33,6 +33,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public nextApplicantStatuses: ApplicantStatus[];
   public optionFields = { text: 'statusText', value: 'applicantStatus' };
   public readOnlyMode: boolean;
+  public candidatStatus = CandidatStatus;
 
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;

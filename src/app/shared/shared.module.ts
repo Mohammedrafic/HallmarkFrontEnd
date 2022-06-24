@@ -49,7 +49,7 @@ import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousComponent } from './components/dialog-next-previous/dialog-next-previous.component';
 import { OrderDetailsComponent } from './components/order-details/order-details.component';
-import { AccordionModule } from '@syncfusion/ej2-angular-navigations';
+import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { OrderTypeName } from '@shared/pipes/order-type-name.pipe';
 import { GeneralOrderInfoComponent } from './components/general-order-info/general-order-info.component';
 import {
@@ -85,6 +85,7 @@ import { BillRatesComponent } from "@shared/components/bill-rates/bill-rates.com
 import { BillRateFormComponent } from "@shared/components/bill-rates/components/bill-rate-form/bill-rate-form.component";
 import { BillRatesGridComponent } from "@shared/components/bill-rates/components/bill-rates-grid/bill-rates-grid.component";
 import { BillRateState } from "@shared/components/bill-rates/store/bill-rate.state";
+import { ChildOrderDialogComponent } from "@shared/components/child-order-dialog/child-order-dialog.component";
 
 const icons = {
   AlertCircle,
@@ -139,7 +140,8 @@ const COMPONENTS = [
   ApplyCandidateComponent,
   OfferDeploymentComponent,
   GridSubrowCandidateComponent,
-  BillRatesComponent
+  BillRatesComponent,
+  ChildOrderDialogComponent
 ];
 
 @NgModule({
@@ -170,6 +172,7 @@ const COMPONENTS = [
     PagerModule,
     TextBoxModule,
     MaskedTextBoxAllModule,
+    TabAllModule,
     NgxsModule.forFeature([BillRateState]),
   ],
   exports: [...COMPONENTS],

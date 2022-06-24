@@ -30,6 +30,7 @@ export class OrderManagement {
   startDate: string;
   isLocked?: boolean;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
+  children: OrderManagementChild[];
 }
 
 export class OrderManagementFilter {
@@ -62,10 +63,10 @@ export type AgencyOrderManagement = {
   jobStartDate: string;
   organizationId: number;
   organizationName: string;
-  children: AgencyOrderManagementChild[];
+  children: OrderManagementChild[];
 };
 
-export type AgencyOrderManagementChild = {
+export type OrderManagementChild = {
   candidateBillRate: number;
   candidateId: number;
   candidateMasterCredentialIds: number[];

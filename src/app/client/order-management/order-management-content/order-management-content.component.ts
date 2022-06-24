@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
+import { DetailRowService, FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
@@ -20,7 +20,8 @@ import {
   ReloadOrganisationOrderCandidatesLists
 } from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { Order, OrderFilter, OrderManagement, OrderManagementPage } from '@shared/models/order-management.model';
+import { OrderManagementChild, Order, OrderFilter, OrderManagement, OrderManagementPage } from '@shared/models/order-management.model';
+
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { UserState } from '../../../store/user.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -53,10 +54,10 @@ export enum MoreMenuType {
   selector: 'app-order-management-content',
   templateUrl: './order-management-content.component.html',
   styleUrls: ['./order-management-content.component.scss'],
-  providers: [FreezeService],
+  providers: [FreezeService, DetailRowService],
 })
 export class OrderManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
-  @ViewChild('grid') grid: GridComponent;
+  @ViewChild('grid') override gridWithChildRow: GridComponent;
 
   @Select(OrderManagementContentState.ordersPage)
   ordersPage$: Observable<OrderManagementPage>;
@@ -114,7 +115,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public orgStructure: OrganizationStructure;
   public regions: OrganizationRegion[] = [];
   public previousSelectedOrderId: number | null;
-  private selectedIndex: number;
+  public selectedCandidat: any | null;
+  public openChildDialog = new Subject<any>();
+  private selectedIndex: number | null;
 
   constructor(private store: Store,
               private router: Router,
@@ -164,13 +167,13 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       this.filterColumns.regionIds.dataSource = this.regions;
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(DeleteOrderSucceeded)).subscribe(() => {
-      this.grid.clearRowSelection();
+      this.gridWithChildRow.clearRowSelection();
       this.getOrders();
       this.openDetails.next(false);
     });
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ApproveOrder)).subscribe(() => {
-      const [index] = this.grid.getSelectedRowIndexes();
+      const [index] = this.gridWithChildRow.getSelectedRowIndexes();
       this.selectedIndex = index;
       this.getOrders();
     });
@@ -206,7 +209,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     this.openDetails.pipe(takeUntil(this.unsubscribe$)).subscribe((isOpen) => {
       if (!isOpen) {
-        this.grid.clearRowSelection();
+        this.gridWithChildRow.clearRowSelection();
       }
     });
 
@@ -246,6 +249,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     });
 
     this.onReloadOrderCandidatesLists();
+    this.onChildDialogChange();
   }
 
   ngOnDestroy(): void {
@@ -315,25 +319,26 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onDataBound(): void {
+    this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
       const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
         this.previousSelectedOrderId
       );
       if (data && index) {
-        this.grid.selectRow(index);
+        this.gridWithChildRow.selectRow(index);
         this.onRowClick({ data });
       }
     }
 
     if (this.selectedIndex) {
-      this.grid.selectRow(this.selectedIndex);
+      this.gridWithChildRow.selectRow(this.selectedIndex);
     }
   }
 
   public onNextPreviousOrderEvent(next: boolean): void {
-    const [index] = this.grid.getSelectedRowIndexes();
+    const [index] = this.gridWithChildRow.getSelectedRowIndexes();
     const nextIndex = next ? index + 1 : index - 1;
-    this.grid.selectRow(nextIndex);
+    this.gridWithChildRow.selectRow(nextIndex);
   }
 
   public onRowClick(event: any): void {
@@ -343,12 +348,25 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       const options = this.getDialogNextPreviousOption(data);
       this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
       this.store.dispatch(new GetAgencyOrderCandidatesList(data.id, data.organizationId, this.currentPage, this.pageSize));
+      this.selectedCandidat = null;
+      this.openChildDialog.next(false);
       this.openDetails.next(true);
     }
   }
 
+  private onChildDialogChange(): void {
+    this.openChildDialog.pipe(takeUntil(this.unsubscribe$)).subscribe((isOpen) => {
+      if (!isOpen) {
+        this.selectedCandidat = null;
+      } else {
+        this.openDetails.next(false);
+        this.gridWithChildRow?.clearRowSelection();
+      }
+    });
+  }
+
   private getDialogNextPreviousOption(selectedOrder: OrderManagement): DialogNextPreviousOption {
-    const gridData = this.grid.dataSource as OrderManagement[];
+    const gridData = this.gridWithChildRow.dataSource as OrderManagement[];
     const first = gridData[0];
     const last = gridData[gridData.length - 1];
     return {
@@ -377,7 +395,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public onRowsDropDownChanged(): void {
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
-    this.grid.pageSettings.pageSize = this.pageSize;
+    this.gridWithChildRow.pageSettings.pageSize = this.pageSize;
   }
 
   public setRowHighlight(args: any): void {
@@ -408,6 +426,18 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public getOrderTypeName(orderType: number): string {
     return OrderTypeName[OrderType[orderType] as OrderTypeName];
+  }
+
+  public onOpenCandidateDialog(candidat: OrderManagementChild, order: OrderManagement): void {
+    this.selectedCandidat = candidat;
+    this.selectedCandidat.selected = {
+      order: order.id,
+      positionId: candidat.positionId
+    };
+    const options = this.getDialogNextPreviousOption(order);
+    this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
+ 
+    this.openChildDialog.next([order, candidat]);
   }
 
   private deleteOrder(id: number): void {
