@@ -76,7 +76,6 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
   private getDialogState(): void {
     this.editDialogType$
     .pipe(
-      tap((event) => { console.log(event)}),
       filter(() => !!this.sideEditDialog),
       tap((event) => {
         if (!event) {

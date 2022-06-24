@@ -4,7 +4,10 @@ import {
   Inject,
   OnInit,
   ViewChild,
-  ChangeDetectorRef, Output, EventEmitter, Input
+  ChangeDetectorRef,
+  Output,
+  EventEmitter,
+  Input, OnChanges, SimpleChanges
 } from '@angular/core';
 
 import { filter, Observable, takeUntil } from 'rxjs';
@@ -26,7 +29,7 @@ import { Uploader } from "@syncfusion/ej2-angular-inputs";
   styleUrls: ['./profile-details-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileDetailsContainerComponent extends Destroyable implements OnInit {
+export class ProfileDetailsContainerComponent extends Destroyable implements OnInit, OnChanges {
   public readonly status: typeof Status = Status;
   public readonly onboardedStatus: string = ONBOARDED_STATUS;
   public readonly allowedExtensions: string = '.pdf, .doc, .docx, .jpg, .jpeg, .png';
@@ -54,6 +57,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public targetElement: HTMLBodyElement;
   public uploadTargetElement: HTMLButtonElement;
+  public isNextDisabled = false;
 
   constructor(
     private store: Store,
@@ -71,6 +75,12 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   ngOnInit(): void {
     this.getProfileTimesheets();
     this.getDialogState();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['currentSelectedRowIndex'] && !changes['currentSelectedRowIndex'].firstChange) {
+      this.isNextDisabled = this.currentSelectedRowIndex === (this.maxRowIndex - 1);
+    }
   }
 
   public onNextPreviousOrder(next: boolean): void {
