@@ -32,7 +32,7 @@ body.light, body.dark {
     &.e-dialogleft {
       right: auto;
       left: 0 !important;
-     
+
 
       &.e-dialogleftborder {
         box-shadow: unset;
@@ -43,7 +43,7 @@ body.light, body.dark {
         border-right: unset;
       }
     }
-  
+
     .e-dlg-content {
       padding: 0;
     }
@@ -51,23 +51,23 @@ body.light, body.dark {
     .e-footer-content {
       border: 1px solid $secondary-dark-blue-45;
     }
-  
+
     .container {
       padding: 24px;
-  
+
       .header-container {
-  
+
         .e-card-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-  
+
           .e-card-title {
             color: $black;
             font-size: 24px;
             font-weight: 700;
           }
-  
+
           .e-card-content {
             .button-cancel {
               margin-right: 8px;
@@ -77,5 +77,5 @@ body.light, body.dark {
       }
     }
   }
-  
+
 }

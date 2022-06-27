@@ -24,6 +24,7 @@ export class SkillsCategoriesComponent extends AbstractGridConfigurationComponen
   public isCategoriesActive = false;
   public exportSkills$ = new Subject<ExportedFileType>();
   public exportCategories$ = new Subject<ExportedFileType>();
+  public filteredItems$ = new Subject<number>();
 
   constructor(private store: Store) {
     super();

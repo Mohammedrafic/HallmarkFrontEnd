@@ -36,7 +36,7 @@
     </e-column>
     <e-column field="orderId" headerText="ORDER ID" width="142">
       <ng-template #template let-data>
-        <ng-container *ngIf="!data.children.length; else withToggle">
+        <ng-container *ngIf="!data.children?.length; else withToggle">
           <div>
             <b>{{ data.orderId }}</b>
           </div>

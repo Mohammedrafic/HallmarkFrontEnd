@@ -8,7 +8,7 @@ import { FreezeService, GridComponent, PagerComponent } from '@syncfusion/ej2-an
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
-import { Department, DepartmentFIlter, DepartmentFilterOptions, DepartmentsPage } from '../../shared/models/department.model';
+import { Department, DepartmentFilter, DepartmentFilterOptions, DepartmentsPage } from '../../shared/models/department.model';
 import {
   SaveDepartment,
   GetDepartmentsByLocationId,
@@ -103,7 +103,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   public DepartmentFilterFormGroup: FormGroup;
-  public filters: DepartmentFIlter = {
+  public filters: DepartmentFilter = {
     pageNumber: this.currentPage,
     pageSize: this.pageSizePager
   };
@@ -360,12 +360,12 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   private saveOrUpdateDepartment(department: Department): void {
     if (this.isEdit) {
-      this.store.dispatch(new UpdateDepartment(department));
+      this.store.dispatch(new UpdateDepartment(department, this.filters));
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       this.isEdit = false;
       this.editedDepartmentId = undefined;
     } else {
-      this.store.dispatch(new SaveDepartment(department));
+      this.store.dispatch(new SaveDepartment(department, this.filters));
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
     }
   }

@@ -156,7 +156,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     if (this.billRateForm.valid) {
       const value: BillRate = this.billRateForm.getRawValue();
 
-      value.id = 0;
+      value.id = value.id ? value.id : 0;
 
       if (!value.effectiveDate) {
         const existingDateAndConfig = (this.billRatesControl.value as BillRate[]).find(

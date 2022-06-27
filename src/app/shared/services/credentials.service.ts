@@ -86,7 +86,7 @@ export class CredentialsService {
    * @return list of credential setup
    */
   public getCredentialSetupByMappingId(mappingId: number): Observable<CredentialSetupGet[]> {
-    return this.http.get<CredentialSetupGet[]>(`/api/CredentialSetups/${mappingId}`);
+    return this.http.get<CredentialSetupGet[]>(`/api/CredentialSetups?MappingId=${mappingId}&HideUnusedCredentials=true`);
   }
 
   /**

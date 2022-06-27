@@ -1,3 +1,5 @@
+import { CredentialSkillGroup } from '@shared/models/skill-group.model';
+
 export class CredentialSetupGet {
   masterCredentialId: number;
   mappingId?: number;
@@ -21,12 +23,13 @@ export class CredentialSetupPost {
 }
 
 export class CredentialSetupMappingPost {
-  organizationId: number;
-  regionIds: number[];
-  locationIds: number[];
-  departmentIds: number[];
-  skillGroupIds: number[];
+  credentionSetupMappingId?: number;
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentIds?: number[];
+  skillGroupIds?: number[];
   credentials: CredentialSetupDetails[];
+  forceUpsert?: boolean;
 }
 
 export class CredentialSetupDetails {
@@ -34,7 +37,7 @@ export class CredentialSetupDetails {
   optional: boolean;
   reqSubmission: boolean;
   reqOnboard: boolean;
-  inactiveDate: string;
+  inactiveDate: string | null;
   comments?: string;
 }
 
@@ -43,23 +46,22 @@ export class SaveUpdatedCredentialSetupDetailIds {
 }
 
 export class CredentialSetupFilterDto {
-  regionId: number | null;
-  locationId: number | null;
-  departmentId: number | null;
-  skillGroupId: number | null;
-  skillId: number | null;
+  regionId?: number;
+  locationId?: number;
+  departmentId?: number;
+  skillGroupId?: number;
+  skillId?: number;
   pageNumber?: number;
   pageSize?: number;
 }
 
 export class CredentialSetupFilterGet {
   mappingId: number;
-  regionName: string;
-  regionId: number;
-  locationName: string;
-  locationId: number;
-  departmentName: string;
-  departmentId: number;
-  skillGroupName: string;
-  skillGroupId: number;
+  regionName?: string;
+  regionId?: number;
+  locationName?: string;
+  locationId?: number;
+  departmentName?: string;
+  departmentId?: number;
+  skillGroups?: CredentialSkillGroup[];
 }

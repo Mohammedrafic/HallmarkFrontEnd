@@ -417,13 +417,13 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   private saveOrUpdateLocation(location: Location): void {
     if (this.selectedRegion.id) {
       if (this.isEdit) {
-        this.store.dispatch(new UpdateLocation(location, this.selectedRegion.id));
+        this.store.dispatch(new UpdateLocation(location, this.selectedRegion.id, this.filters));
         this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
         this.isEdit = false;
         this.editedLocationId = undefined;
         return;
       }
-      this.store.dispatch(new SaveLocation(location, this.selectedRegion.id));
+      this.store.dispatch(new SaveLocation(location, this.selectedRegion.id, this.filters));
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
     }
   }

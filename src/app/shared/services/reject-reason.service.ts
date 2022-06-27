@@ -39,4 +39,12 @@ export class RejectReasonService {
   public updateRejectReason(payload: RejectReason): Observable<void> {
     return this.http.put<void>('/api/RejectReasons', payload);
   }
+
+  //TODO: change api , when backend will be implement it
+  /**
+   * Get all reject reasons
+   */
+  public getAllRejectReasons(): Observable<RejectReasonPage> {
+    return this.http.get<RejectReasonPage>(`/api/RejectReasons?PageNumber=1&PageSize=100`);
+  }
 }

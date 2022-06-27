@@ -108,8 +108,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     }
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.currentPage = 1;
-      this.store.dispatch([new GetAllSkillsCategories(), new GetSkillDataSources()]);
-      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
+      this.getSkills();
     });
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
@@ -118,10 +117,10 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveAssignedSkillSucceeded)).subscribe(() => {
       this.SkillFormGroup.reset();
       this.closeDialog();
-      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
+      this.getSkills();
     });
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(RemoveAssignedSkillSucceeded)).subscribe(() => {
-      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
+      this.getSkills();
     });
     this.allSkillsCategories$.pipe(filter(Boolean), takeUntil(this.unsubscribe$)).subscribe((dataSource) => {
       this.filterColumns.skillCategories.dataSource = dataSource.items;
@@ -136,6 +135,11 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private getSkills(): void {
+    this.store.dispatch([new GetAllSkillsCategories(), new GetSkillDataSources()]);
+    this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
   }
 
   public override updatePage(): void {
@@ -163,7 +167,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     this.defaultFileName = 'Organization Skills ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportSkills(new ExportPayload(
       fileType,
-      { orderBy: this.orderBy, offset: Math.abs(new Date().getTimezoneOffset()) },
+      { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => {
         return { aId: val.id, mId: val.masterSkill.id }

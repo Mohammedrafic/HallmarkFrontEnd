@@ -17,9 +17,10 @@ import {
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import {
+  CredentialSetupDetails,
   CredentialSetupFilterDto,
   CredentialSetupFilterGet,
-  CredentialSetupGet,
+  CredentialSetupGet, CredentialSetupMappingPost,
   CredentialSetupPost
 } from '@shared/models/credential-setup.model';
 import { UserState } from 'src/app/store/user.state';
@@ -27,7 +28,7 @@ import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { CredentialsState } from '@organization-management/store/credentials.state';
 import {
-  GetCredentialSetupByMappingId,
+  GetCredentialSetupByMappingId, GetFilteredCredentialSetupData,
   UpdateCredentialSetup,
   UpdateCredentialSetupSucceeded
 } from '@organization-management/store/credentials.actions';
@@ -64,6 +65,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   public credentialsSetupFormGroup: FormGroup;
   public headerFilterFormGroup: FormGroup;
   public formBuilder: FormBuilder;
+  public mappingDataForEditChanged$: Subject<CredentialSetupMappingPost> = new Subject();
 
   public editedCredentialSetupId?: number;
   public isCredentialSetupEdit = false;
@@ -71,6 +73,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
 
   @Select(CredentialsState.credentialSetupList)
   credentialSetupData$: Observable<CredentialSetupGet[]>;
+  public mappingData: CredentialSetupGet[];
 
   private unsubscribe$: Subject<void> = new Subject();
   private lastSelectedCredential?: CredentialSetupFilterGet;
@@ -93,6 +96,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     this.onSkillGroupDataLoaded();
     this.headerFilterHandler();
     this.credentialSetupUpdateHandler();
+    this.mapGridData();
   }
 
   ngOnDestroy(): void {
@@ -100,45 +104,32 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     this.unsubscribe$.complete();
   }
 
-  public onOptionChange(credentialSetup: CredentialSetupGet, event: any): void {
+  public onCredentialCheckboxChange(credentialSetup: CredentialSetupGet, checkboxName: string, event: any): void {
     this.credentialsSetupFormGroup.setValue({
       mappingId: credentialSetup.mappingId,
-      isActive: event.checked,
       masterCredentialId: credentialSetup.masterCredentialId,
-      description: credentialSetup.description,
       comments: credentialSetup.comments,
       inactiveDate: credentialSetup.inactiveDate,
-      reqSubmission: credentialSetup.reqSubmission,
-      reqOnboard: credentialSetup.reqOnboard
     });
-    this.onCredentialFormSaveClick();
-  }
 
-  public onReqForSubmissionChange(credentialSetup: CredentialSetupGet, event: any): void {
-    this.credentialsSetupFormGroup.setValue({
-      mappingId: credentialSetup.mappingId,
-      isActive: credentialSetup.isActive,
-      masterCredentialId: credentialSetup.masterCredentialId,
-      description: credentialSetup.description,
-      comments: credentialSetup.comments,
-      inactiveDate: credentialSetup.inactiveDate,
-      reqSubmission: event.checked,
-      reqOnboard: credentialSetup.reqOnboard
-    });
-    this.onCredentialFormSaveClick();
-  }
+    switch(checkboxName) {
+      case 'isActive':
+        this.credentialsSetupFormGroup.controls['isActive'].setValue(event.checked);
+        this.credentialsSetupFormGroup.controls['reqSubmission'].setValue(credentialSetup.reqSubmission);
+        this.credentialsSetupFormGroup.controls['reqOnboard'].setValue(credentialSetup.reqOnboard);
+        break;
+      case 'reqSubmission':
+        this.credentialsSetupFormGroup.controls['isActive'].setValue(credentialSetup.isActive);
+        this.credentialsSetupFormGroup.controls['reqSubmission'].setValue(event.checked);
+        this.credentialsSetupFormGroup.controls['reqOnboard'].setValue(credentialSetup.reqOnboard);
+        break;
+      case 'reqOnboard':
+        this.credentialsSetupFormGroup.controls['isActive'].setValue(credentialSetup.isActive);
+        this.credentialsSetupFormGroup.controls['reqSubmission'].setValue(credentialSetup.reqSubmission);
+        this.credentialsSetupFormGroup.controls['reqOnboard'].setValue(event.checked);
+        break;
+    }
 
-  public onReqForOnboardChange(credentialSetup: CredentialSetupGet, event: any): void {
-    this.credentialsSetupFormGroup.setValue({
-      mappingId: credentialSetup.mappingId,
-      isActive: credentialSetup.isActive,
-      masterCredentialId: credentialSetup.masterCredentialId,
-      description: credentialSetup.description,
-      comments: credentialSetup.comments,
-      inactiveDate: credentialSetup.inactiveDate,
-      reqSubmission: credentialSetup.reqSubmission,
-      reqOnboard: event.checked
-    });
     this.onCredentialFormSaveClick();
   }
 
@@ -147,11 +138,12 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     this.isCredentialSetupEdit = true;
     this.credentialsSetupFormGroup.setValue({
       mappingId: credentialSetup.mappingId,
-      isActive: credentialSetup.isActive,
       masterCredentialId: credentialSetup.masterCredentialId,
+      credentialType: credentialSetup.credentialType,
       description: credentialSetup.description,
       comments: credentialSetup.comments,
       inactiveDate: credentialSetup.inactiveDate,
+      isActive: credentialSetup.isActive,
       reqSubmission: credentialSetup.reqSubmission,
       reqOnboard: credentialSetup.reqOnboard
     });
@@ -199,6 +191,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   public mapGridData(): void {
     this.credentialSetupData$.subscribe(data => {
       if (data) {
+        this.mappingData = data;
         this.lastAvailablePage = this.getLastPage(data);
         this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
         this.totalDataRecords = data.length;
@@ -212,10 +205,8 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
 
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.credentialSetupData$.subscribe(data => {
-        this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
-        this.currentPagerPage = event.currentPage || event.value;
-      });
+      this.gridDataSource = this.getRowsPerPage(this.mappingData, event.currentPage || event.value);
+      this.currentPagerPage = event.currentPage || event.value;
     }
   }
 
@@ -224,10 +215,37 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   }
 
   public onMappingEditClick(): void {
+    // check if we have selected credential row in Credential grid, then proceed to Edit Mapping
     if (this.lastSelectedCredential) {
-      // TODO: need implementation for form data mapping
+      const savedCredentials: CredentialSetupDetails[] = [];
+      this.mappingData.forEach(credential => {
+        let data: CredentialSetupDetails = {
+          masterCredentialId: credential.masterCredentialId,
+          optional: credential.isActive,
+          reqSubmission: credential.reqSubmission,
+          reqOnboard: credential.reqOnboard,
+          comments: credential.comments,
+          inactiveDate: credential.inactiveDate
+        }
+        savedCredentials.push(data);
+      });
+
+      const mappingDataForEdit: CredentialSetupMappingPost = {
+        credentionSetupMappingId: this.lastSelectedCredential.mappingId,
+        regionIds: this.lastSelectedCredential.regionId ? [this.lastSelectedCredential.regionId] : undefined,
+        locationIds: this.lastSelectedCredential.locationId ? [this.lastSelectedCredential.locationId] : undefined,
+        departmentIds:  this.lastSelectedCredential.departmentId ? [this.lastSelectedCredential.departmentId] : undefined,
+        skillGroupIds: this.lastSelectedCredential.skillGroups?.length !== 0
+          ? this.lastSelectedCredential.skillGroups?.map(s => s.id) as number[] : undefined,
+        credentials: savedCredentials
+      };
       this.store.dispatch(new ShowSideDialog(true));
+      this.mappingDataForEditChanged$.next(mappingDataForEdit);
     }
+  }
+
+  public onMappingFormClosed(): void {
+    this.store.dispatch(new GetFilteredCredentialSetupData({ pageNumber: 1, pageSize: 9999 }));
   }
 
   public onSelectedCredentialClick(selectedCredential: CredentialSetupFilterGet): void {
@@ -252,7 +270,8 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
     this.credentialsSetupFormGroup = this.formBuilder.group({
       mappingId: [null],
       masterCredentialId: [null],
-      description: [{ value: '', disabled: true }, Validators.required],
+      credentialType: [{ value: '', disabled: true }],
+      description: [{ value: '', disabled: true }],
       comments: ['', Validators.maxLength(500)],
       inactiveDate: [null],
       isActive: [false],
@@ -273,9 +292,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
 
   private organizationChangedHandler(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((organizationId) => {
-      if (organizationId) {
-        this.store.dispatch(new GetCredentialSkillGroup());
-      }
+      this.store.dispatch(new GetCredentialSkillGroup());
     });
   }
 
@@ -305,7 +322,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
         this.locations.forEach(location => this.departments.push(...location.departments));
 
         const filter: CredentialSetupFilterDto = {
-          regionId: regionId || null,
+          regionId: regionId,
           locationId: this.headerFilterFormGroup.controls['locationId'].value,
           departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
           skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
@@ -327,7 +344,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
 
         const filter: CredentialSetupFilterDto = {
           regionId: this.headerFilterFormGroup.controls['regionId'].value,
-          locationId: locationId || null,
+          locationId: locationId,
           departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
           skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
           skillId: this.headerFilterFormGroup.controls['skillId'].value,
@@ -343,7 +360,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
         const filter: CredentialSetupFilterDto = {
           regionId: this.headerFilterFormGroup.controls['regionId'].value,
           locationId: this.headerFilterFormGroup.controls['locationId'].value,
-          departmentId: departmentId || null,
+          departmentId: departmentId,
           skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
           skillId: this.headerFilterFormGroup.controls['skillId'].value,
         };
@@ -362,7 +379,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
           regionId: this.headerFilterFormGroup.controls['regionId'].value,
           locationId: this.headerFilterFormGroup.controls['locationId'].value,
           departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
-          skillGroupId: groupId || null,
+          skillGroupId: groupId,
           skillId: this.headerFilterFormGroup.controls['skillId'].value,
         };
         this.credentialSetupFilter.next(filter);
@@ -378,7 +395,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
           locationId: this.headerFilterFormGroup.controls['locationId'].value,
           departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
           skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
-          skillId: skillId || null,
+          skillId: skillId,
         };
         this.credentialSetupFilter.next(filter);
       }

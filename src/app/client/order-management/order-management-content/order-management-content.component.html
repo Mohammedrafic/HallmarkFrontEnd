@@ -42,7 +42,7 @@
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column field="id" headerText="ORDER ID" width="120">
         <ng-template #template let-data>
-          <ng-container *ngIf="!data.children.length; else withToggle">
+          <ng-container *ngIf="!data.children?.length; else withToggle">
             <div>
               <b>{{ data.id }}</b>
             </div>
