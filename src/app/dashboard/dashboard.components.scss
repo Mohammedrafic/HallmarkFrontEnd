@@ -4,12 +4,12 @@
   padding-bottom: 20px;
 
   #dashboardLayout {
-    .e-holder{
+    .e-holder {
       background-color: $primary-active-blue-90;
       border: 2px dashed $primary-active-blue-20;
-      border-radius: 12px
+      border-radius: 12px;
     }
-    
+
     .e-panel {
       border-radius: 12px;
       transition: .3s;
@@ -24,5 +24,11 @@
         box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
       }
     }
+  }
+}
+
+#In_Progress_Positions {
+  @media screen and (max-width: 600px) {
+    
   }
 }
