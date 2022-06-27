@@ -270,6 +270,7 @@ export type OrderCandidateJob = {
   };
   billRates: BillRate[],
   allowDeployCredentials: boolean;
+  hasAllRequiredOnboardedCredentials: boolean;
 };
 
 export type ApplicantStatus = {
