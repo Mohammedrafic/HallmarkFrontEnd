@@ -77,7 +77,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   }
 
   public onEdit(data: OrderCandidatesList): void {
-    this.candidate = data;
+    this.candidate = {...data};
 
     if (this.order && this.candidate) {
       // TODO: find better approach
