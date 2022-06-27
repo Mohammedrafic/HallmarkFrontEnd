@@ -1,15 +1,19 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { FilteredItem } from '@shared/models/filter.model';
+import { FilterService } from '@shared/services/filter.service';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { Observable, Subject, throttleTime } from 'rxjs';
 import { Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
-import { SetHeaderState, ShowExportDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ExportOrganizations, GetOrganizationsByPage } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
 
@@ -43,24 +47,83 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
   @ViewChild('grid')
   public grid: GridComponent;
 
-  constructor(private store: Store, private router: Router, private route: ActivatedRoute, private datePipe: DatePipe) {
+  public OrganizationFilterFormGroup: FormGroup;
+  public filters: any = {};
+  public filterColumns: any;
+
+  constructor(private store: Store,
+              private router: Router,
+              private route: ActivatedRoute,
+              private datePipe: DatePipe,
+              private filterService: FilterService,
+              private fb: FormBuilder,
+              ) {
     super();
     this.idFieldName = 'organizationId';
     this.fileName = 'Organizations ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     store.dispatch(new SetHeaderState({ title: 'Organization List', iconName: 'file-text' }));
+    this.OrganizationFilterFormGroup = this.fb.group({
+      name: new FormControl([]),
+      status: new FormControl([]),
+      city: new FormControl([]),
+      contact: new FormControl([]),
+    });
   }
 
   ngOnInit(): void {
     this.idFieldName = 'organizationId';
-    this.store.dispatch(new GetOrganizationsByPage(this.currentPage, this.pageSize));
+    this.filterColumns = {
+      name: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      status: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      city: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      contact: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+    }
+    this.getOrganizationList();
     this.pageSubject.pipe(throttleTime(1)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(new GetOrganizationsByPage(this.currentPage, this.pageSize));
+      this.getOrganizationList();
     });
   }
 
   ngAfterViewInit(): void {
     this.grid.rowHeight = this.ROW_HEIGHT;
+  }
+
+  public showFilters(): void {
+    this.store.dispatch(new ShowFilterDialog(true));
+  }
+
+  private getOrganizationList(): void {
+    this.store.dispatch(new GetOrganizationsByPage(this.currentPage, this.pageSize));
+  }
+
+  public onFilterClose() {
+    this.OrganizationFilterFormGroup.setValue({
+      name: this.filters.name || [],
+      status: this.filters.status || [],
+      city: this.filters.city || [],
+      contact: this.filters.contact || [],
+    });
+    this.filteredItems = this.filterService.generateChips(this.OrganizationFilterFormGroup, this.filterColumns, this.datePipe);
+  }
+
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.OrganizationFilterFormGroup, this.filterColumns);
+  }
+
+  public onFilterClearAll(): void {
+    this.OrganizationFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {};
+    this.getOrganizationList();
+  }
+
+  public onFilterApply(): void {
+    this.filters = this.OrganizationFilterFormGroup.getRawValue();
+    this.filteredItems = this.filterService.generateChips(this.OrganizationFilterFormGroup, this.filterColumns);
+    this.getOrganizationList();
+    this.store.dispatch(new ShowFilterDialog(false));
   }
 
   public override customExport(): void {
@@ -83,7 +146,7 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
     this.defaultFileName = 'Organization List ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportOrganizations(new ExportPayload(
       fileType,
-      { ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null },
+      { ...this.filters, ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       null,
       options?.fileName || this.defaultFileName
