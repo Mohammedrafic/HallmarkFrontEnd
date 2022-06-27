@@ -2,7 +2,7 @@ import { Country } from "src/app/shared/enums/states";
 import { Organization } from "src/app/shared/models/organization.model";
 import { SkillCategory } from "src/app/shared/models/skill-category.model";
 import { Skill, SkillFilters } from "src/app/shared/models/skill.model";
-import { Department, DepartmentFIlter } from '@shared/models/department.model';
+import { Department, DepartmentFilter } from '@shared/models/department.model';
 import { Location, LocationFilter } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
 import { CredentialType } from '@shared/models/credential-type.model';
@@ -58,17 +58,17 @@ export class GetOrganizationByIdSucceeded {
 
 export class SaveDepartment {
   static readonly type = '[organizationManagement] Create Department';
-  constructor(public payload: Department) { }
+  constructor(public payload: Department, public filters?: DepartmentFilter) { }
 }
 
 export class GetDepartmentsByLocationId {
   static readonly type = '[organizationManagement] Get The List Of Departments by locationId';
-  constructor(public locationId?: number, public filters?: DepartmentFIlter) { }
+  constructor(public locationId?: number, public filters?: DepartmentFilter) { }
 }
 
 export class UpdateDepartment {
   static readonly type = '[organizationManagement] Update Department';
-  constructor(public department: Department) { }
+  constructor(public department: Department, public filters?: DepartmentFilter) { }
 }
 
 export class DeleteDepartmentById {
@@ -113,12 +113,12 @@ export class GetLocationById {
 
 export class SaveLocation {
   static readonly type = '[organizationManagement] Create Location';
-  constructor(public location: Location, public regionId: number) { }
+  constructor(public location: Location, public regionId: number, public filters?: LocationFilter) { }
 }
 
 export class UpdateLocation {
   static readonly type = '[organizationManagement] Update Location';
-  constructor(public location: Location, public regionId: number) { }
+  constructor(public location: Location, public regionId: number, public filters?: LocationFilter) { }
 }
 
 export class DeleteLocationById {

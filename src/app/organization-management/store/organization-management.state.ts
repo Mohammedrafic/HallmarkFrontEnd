@@ -352,11 +352,11 @@ export class OrganizationManagementState {
   }
 
   @Action(SaveDepartment)
-  SaveDepartment({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveDepartment): Observable<Department> {
+  SaveDepartment({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload, filters }: SaveDepartment): Observable<Department> {
     patchState({ isDepartmentLoading: true });
     return this.departmentService.saveDepartment(payload).pipe(tap((payload) => {
       patchState({ isDepartmentLoading: false});
-      dispatch(new GetDepartmentsByLocationId(payload.locationId));
+      dispatch(new GetDepartmentsByLocationId(payload.locationId, filters));
       return payload;
     }));
   }
@@ -370,10 +370,10 @@ export class OrganizationManagementState {
   }
 
   @Action(UpdateDepartment)
-  UpdateDepartments({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { department }: UpdateDepartment): Observable<void> {
+  UpdateDepartments({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { department, filters }: UpdateDepartment): Observable<void> {
     return this.departmentService.updateDepartment(department).pipe(tap((payload) => {
       patchState({ isDepartmentLoading: false });
-      dispatch(new GetDepartmentsByLocationId(department.locationId));
+      dispatch(new GetDepartmentsByLocationId(department.locationId, filters));
       return payload;
     }));
   }
@@ -449,20 +449,20 @@ export class OrganizationManagementState {
   }
 
   @Action(SaveLocation)
-  SaveLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { location, regionId }: SaveLocation): Observable<Location> {
+  SaveLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { location, regionId, filters }: SaveLocation): Observable<Location> {
     patchState({ isLocationLoading: true });
     return this.locationService.saveLocation(location).pipe(tap((payload) => {
       patchState({ isLocationLoading: false});
-      dispatch(new GetLocationsByRegionId(regionId));
+      dispatch(new GetLocationsByRegionId(regionId, filters));
       return payload;
     }));
   }
 
   @Action(UpdateLocation)
-  UpdateLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { location, regionId }: UpdateLocation): Observable<void> {
+  UpdateLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { location, regionId, filters}: UpdateLocation): Observable<void> {
     return this.locationService.updateLocation(location).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
-      dispatch(new GetLocationsByRegionId(regionId));
+      dispatch(new GetLocationsByRegionId(regionId, filters));
       return payload;
     }));
   }

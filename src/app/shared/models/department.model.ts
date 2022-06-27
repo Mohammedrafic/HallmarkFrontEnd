@@ -19,7 +19,7 @@ export class DepartmentMapping {
   departmentName?: string;
 }
 
-export class DepartmentFIlter {
+export class DepartmentFilter {
   locationId?: number;
   externalIds?: string[];
   invoiceIds?: string[];

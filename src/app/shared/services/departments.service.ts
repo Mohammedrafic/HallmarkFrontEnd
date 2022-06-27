@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 
-import { Department, DepartmentFIlter, DepartmentFilterOptions, DepartmentsPage } from '../../shared/models/department.model';
+import { Department, DepartmentFilter, DepartmentFilterOptions, DepartmentsPage } from '../../shared/models/department.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
@@ -24,7 +24,7 @@ export class DepartmentsService {
    * Get the list of available departments by locationId
    * @return Array of departments
    */
-  public getDepartmentsByLocationId(locationId?: number, filters?: DepartmentFIlter): Observable<Department[] | DepartmentsPage> {
+  public getDepartmentsByLocationId(locationId?: number, filters?: DepartmentFilter): Observable<Department[] | DepartmentsPage> {
     if (filters) {
       filters.inactiveDate = filters.inactiveDate as Date || null;
       return this.http.post<DepartmentsPage>(`/api/Departments/filter`, filters);
