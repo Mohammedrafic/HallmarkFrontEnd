@@ -16,24 +16,10 @@
   [enableVirtualization]="true"
   (rowSelected)="onRowClick($event)"
   (dataBound)="onDataBound()"
+  (actionBegin)="actionBegin($event)"
 >
   <e-columns>
-    <e-column headerTextAlign="Right" width="48" [customAttributes]="{ class: 'checkbox-header' }">
-      <ng-template #headerTemplate let-data>
-        <div class="bootstrap">
-          <ejs-checkbox
-            [indeterminate]="checkedStatus === allCheckedStatus.Indeterminate"
-            [checked]="checkedStatus === allCheckedStatus.All"
-            (change)="onCheckAll($event)"
-          ></ejs-checkbox>
-        </div>
-      </ng-template>
-      <ng-template #template let-data>
-        <div class="bootstrap">
-          <ejs-checkbox #rowCheckbox (click)="(false)"></ejs-checkbox>
-        </div>
-      </ng-template>
-    </e-column>
+    <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
     <e-column field="orderId" headerText="ORDER ID" width="142">
       <ng-template #template let-data>
         <ng-container *ngIf="!data.children?.length; else withToggle">

@@ -3,7 +3,6 @@ import { takeWhile, Observable, Subject } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
-  CheckBoxChangeEventArgs,
   DetailRowService,
   GridComponent,
   PagerComponent,
@@ -33,12 +32,6 @@ import { Location } from '@angular/common';
 import { UserState } from 'src/app/store/user.state';
 import { isUndefined } from 'lodash';
 
-enum AllCheckedStatus {
-  None,
-  Indeterminate,
-  All,
-}
-
 @Component({
   selector: 'app-order-management-grid',
   templateUrl: './order-management-grid.component.html',
@@ -59,8 +52,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public wrapSettings: TextWrapSettingsModel = GRID_CONFIG.wordWrapSettings;
   public allowWrap = GRID_CONFIG.isWordWrappingEnabled;
-  public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row' };
-  public allCheckedStatus = AllCheckedStatus;
+  public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
   public openCandidat = new Subject<boolean>();
@@ -68,15 +60,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public typeValueAccess = typeValueAccess;
   public previousSelectedOrderId: number | null;
   public selectedCandidat: any | null;
-
-  get checkedStatus(): AllCheckedStatus {
-    const itemsLength = this.rowCheckboxes.length;
-    const checked = this.rowCheckboxes.filter((item) => item.checked);
-    if (itemsLength > 0 && !!checked.length) {
-      return checked.length < itemsLength ? AllCheckedStatus.Indeterminate : AllCheckedStatus.All;
-    }
-    return AllCheckedStatus.None;
-  }
 
   private statusSortDerection: SortDirection = 'Ascending';
   private isAlive = true;
@@ -142,21 +125,17 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.statusSortDerection = direction;
   }
 
-  public onRowClick({ data }: { data: AgencyOrderManagement }): void {
-    this.selectedOrder = data;
-    const options = this.getDialogNextPreviousOption(data);
-    this.store.dispatch(new GetOrderById(data.orderId, data.organizationId, options));
-    this.openPreview.next(true);
-    this.store.dispatch(
-      new GetAgencyOrderCandidatesList(data.orderId, data.organizationId, this.currentPage, this.pageSize)
-    );
-    this.store.dispatch(new GetAgencyOrderGeneralInformation(data.orderId, data.organizationId));
-  }
-
-  public onCheckAll(event: CheckBoxChangeEventArgs): void {
-    this.rowCheckboxes.forEach((item) => {
-      item.writeValue(event.checked);
-    });
+  public onRowClick(event: any): void {
+    if (!event.isInteracted) {
+      this.selectedOrder = event.data;
+      const options = this.getDialogNextPreviousOption(event.data);
+      this.store.dispatch(new GetOrderById(event.data.orderId, event.data.organizationId, options));
+      this.openPreview.next(true);
+      this.store.dispatch(
+        new GetAgencyOrderCandidatesList(event.data.orderId, event.data.organizationId, this.currentPage, this.pageSize)
+      );
+      this.store.dispatch(new GetAgencyOrderGeneralInformation(event.data.orderId, event.data.organizationId));
+    }
   }
 
   public setRowHighlight(args: RowDataBoundEventArgs & { data: AgencyOrderManagement }): void {
