@@ -20,6 +20,7 @@ import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-man
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrderStatusText } from '@shared/enums/status';
+import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
 
 enum Template {
   accept,
@@ -72,8 +73,8 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.chipList && changes['order']?.currentValue) {
-      this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
+    if (this.chipList && changes['candidate']?.currentValue) {
+      this.chipList.cssClass = this.chipsCssClass.transform(this.orderStatusText[changes['candidate'].currentValue.orderStatus]);
     }
   }
 
@@ -157,10 +158,13 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
         this.order = order as MergedOrder;
         this.candidate = candidat;
         this.getTemplate();
+        windowScrollTop();
         this.sideDialog.show();
+        disabledBodyOverflow(true);
       } else {
         this.sideDialog.hide();
         this.selectedTemplate = null;
+        disabledBodyOverflow(false);
       }
     });
   }

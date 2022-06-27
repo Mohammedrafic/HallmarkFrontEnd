@@ -16,6 +16,6 @@ export enum CandidatStatus {
   'Pre Offer Custom' = 30,
   Offered = 40,
   Accepted = 50,
-  'OnBoarded' = 60,
+  'OnBoard' = 60,
   Rejected = 100,
 }

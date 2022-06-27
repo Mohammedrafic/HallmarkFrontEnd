@@ -333,6 +333,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     if (this.selectedIndex) {
       this.gridWithChildRow.selectRow(this.selectedIndex);
     }
+
+    if (this.selectedCandidat) {
+      const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
+        this.selectedDataRow.id
+      );
+      const updatedCandidat = data?.children.find((child) => child.candidateId === this.selectedCandidat.candidateId);
+      this.selectedCandidat = updatedCandidat;
+    }
   }
 
   public onNextPreviousOrderEvent(next: boolean): void {
@@ -361,6 +369,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       } else {
         this.openDetails.next(false);
         this.gridWithChildRow?.clearRowSelection();
+        this.selectedIndex = null;
       }
     });
   }
@@ -436,7 +445,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     };
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
- 
+    this.selectedDataRow = order as any;
     this.openChildDialog.next([order, candidat]);
   }
 
