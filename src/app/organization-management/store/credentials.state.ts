@@ -141,7 +141,13 @@ export class CredentialsState {
       dispatch(new SaveUpdateCredentialSetupMappingSucceeded(true));
       return response;
     }),
-    catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : RECORD_CANNOT_BE_SAVED))));
+    catchError((error: any) => {
+      if (error.error && error.error.errors && error.error.errors.ForceUpsert) {
+        return dispatch(new SaveUpdateCredentialSetupMappingSucceeded(false));
+      } else {
+        return dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : RECORD_CANNOT_BE_SAVED));
+      }
+    }));
   }
 
   @Action(GetCredentialSetupByMappingId)
