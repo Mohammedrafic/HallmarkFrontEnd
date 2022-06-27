@@ -1,9 +1,27 @@
 <ejs-dialog
+  cssClass="dnw-dialog"
+  #dnwDialog
+  [target]="profileDetailsDialogsTarget"
+  [width]="'350px'"
+  [visible]="false"
+>
+  <ng-template #content>
+    <div class="dnw-dialog-content-container">
+      <h2>You have selected DNW</h2>
+      <div class="content">Timesheet for the week will be deleted. Are you sure you want to proceed?</div>
+      <div class="actions">
+        <button ejs-button class="e-outline" (click)="dnwDialog.hide()">Cancel</button>
+        <button ejs-button class="e-danger">Proceed</button>
+      </div>
+    </div>
+  </ng-template>
+</ejs-dialog>
+
+<ejs-dialog
   id="dialog"
   #sideDialog
   cssClass="dialog"
   [width]="'1180px'"
-  [target]="targetElement"
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
@@ -47,9 +65,13 @@
                         [autoUpload]="false"
           ></ejs-uploader>
 
-          <button ejs-button cssClass="e-outline" >
-            Export
-            <i-feather name="download" class="icon"></i-feather>
+          <button
+            ejs-dropdownbutton
+            [items]="exportOptions"
+            (select)="export($event)"
+            id="importButton"
+            cssClass="e-outline button-export">
+            Export <i-feather name="download" class="icon"></i-feather>
           </button>
         </div>
 
@@ -60,9 +82,9 @@
         <h2 class="order-id">Order ID 24-25-345</h2>
 
         <div>
-          <ejs-checkbox [checked]="false" label="DNW"></ejs-checkbox>
+          <ejs-checkbox [checked]="false" (checkedChange)="onDWNCheckboxSelectedChange($event)" label="DNW"></ejs-checkbox>
 
-          <button ejs-button cssClass="e-outline" class="reject-button">
+          <button ejs-button cssClass="e-outline" class="reject-button" (click)="onRejectButtonClick()">
             Reject
           </button>
 
@@ -119,3 +141,4 @@
   </ng-template>
 </ejs-dialog>
 <app-add-timesheet (updateTable)="handleUpdateTable()"></app-add-timesheet>
+<app-reject-reason-dialog [(visible)]="rejectReasonDialogVisible" [container]="profileDetailsDialogsTarget"></app-reject-reason-dialog>

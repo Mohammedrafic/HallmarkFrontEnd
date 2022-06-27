@@ -9,4 +9,5 @@ export const DEFAULT_TIMESHEETS_STATE: TimesheetsModel = {
   selectedTimeSheetId: null,
   editDialogType: ProfileTimeSheetActionType.Add,
   profileDialogTimesheet: null,
+  timesheetDetails: null,
 }

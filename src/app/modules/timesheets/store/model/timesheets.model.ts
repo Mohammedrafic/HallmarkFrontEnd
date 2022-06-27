@@ -12,6 +12,7 @@ export interface TimesheetsModel {
   timeSheetDialogOpen: boolean;
   editDialogType: ProfileTimeSheetActionType | null;
   profileDialogTimesheet: ProfileTimeSheetDetail | null;
+  timesheetDetails: unknown | null;
 }
 
 export interface ProfileTimeSheetDetail {

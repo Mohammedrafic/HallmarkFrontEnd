@@ -17,14 +17,24 @@ import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { Destroyable } from '@core/helpers';
 import { GlobalWindow } from '@core/tokens';
-import { Status } from "@shared/enums/status";
-import { ONBOARDED_STATUS } from "@shared/components/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst";
-
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { ProfileTimeSheetDetail } from '../../store/model/timesheets.model';
-import { DialogAction } from '../../enums';
+import { Status } from "@shared/enums/status";
+import { ONBOARDED_STATUS } from "@shared/components/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst";
+import { TimesheetDetails } from "../../store/actions/timesheet-details.actions";
+import { ExportPayload } from "@shared/models/export.model";
+import { ExportedFileType } from "@shared/enums/exported-file-type";
+import { ItemModel } from "@syncfusion/ej2-splitbuttons/src/common/common-model";
+import { Uploader } from "@syncfusion/ej2-angular-inputs";
+
 import { DialogActionPayload } from '../../interface';
+import { DialogAction } from '../../enums';
+import { ExportType } from "../../enums";
+
+interface ExportOption extends ItemModel {
+  ext: string | null;
+}
 
 @Component({
   selector: 'app-profile-details-container',
@@ -37,9 +47,15 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public readonly onboardedStatus: string = ONBOARDED_STATUS;
   public readonly allowedExtensions: string = '.pdf, .doc, .docx, .jpg, .jpeg, .png';
   public readonly maxFileSize = 10485760;
+  public readonly  exportOptions: ExportOption[] = [
+    { text: ExportType.Excel_file, id: '0', ext: 'xlsx' },
+    { text: ExportType.CSV_file, id: '1', ext: 'csv' },
+    { text: ExportType.Custom, id: '2', ext: null },
+  ];
+  public rejectReasonDialogVisible: boolean = false;
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
-
+  @ViewChild('dnwDialog') dnwDialog: DialogComponent;
   @ViewChild('uploadButton') uploadBtn: HTMLButtonElement;
 
   @Select(TimesheetsState.profileTimesheets)
@@ -55,6 +71,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public targetElement: HTMLBodyElement;
   public uploadTargetElement: HTMLButtonElement;
+  public profileDetailsDialogsTarget: HTMLElement | null = null;
   public isNextDisabled = false;
 
   constructor(
@@ -67,6 +84,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
     this.isProfileOpen$.pipe(takeUntil(this.componentDestroy())).subscribe(() => {
       this.uploadTargetElement = document.getElementById('profile-details-file-upload-area') as HTMLButtonElement;
+      this.profileDetailsDialogsTarget = document.getElementById('dialog_dialog-content') as HTMLElement;
     })
   }
 
@@ -124,5 +142,24 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     ).subscribe(() => {
       this.sideDialog.hide();
     });
+  }
+
+  public onRejectButtonClick(): void {
+    this.rejectReasonDialogVisible = true;
+  }
+
+  public onDWNCheckboxSelectedChange(show: boolean): void {
+    this.isProfileOpen$.pipe(
+      filter(() => !!this.dnwDialog && show),
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => this.dnwDialog.show());
+  }
+
+  public export(event: {item: {properties: ExportOption}}): void {
+    const fileTypeId = event.item.properties.id as unknown as ExportedFileType;
+
+    this.store.dispatch(new TimesheetDetails.Export(
+      new ExportPayload(fileTypeId)
+    ));
   }
 }

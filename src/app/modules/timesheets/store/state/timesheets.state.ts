@@ -12,6 +12,10 @@ import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
 import { DialogAction, ProfileTimeSheetActionType } from '../../enums';
 import { DEFAULT_TIMESHEETS_STATE } from '../../constants';
+import { TimesheetDetails } from "../actions/timesheet-details.actions";
+import { ExportPayload } from "@shared/models/export.model";
+import { TimesheetDetailsService } from "../../services/timesheet-details.service";
+import { downloadBlobFile } from "@shared/utils/file.utils";
 import { DialogActionPayload } from '../../interface';
 
 @State<TimesheetsModel>({
@@ -20,7 +24,10 @@ import { DialogActionPayload } from '../../interface';
 })
 @Injectable()
 export class TimesheetsState {
-  constructor(private timesheetsService: TimesheetsApiService) {
+  constructor(
+    private timesheetsService: TimesheetsApiService,
+    private timesheetDetailsService: TimesheetDetailsService,
+  ) {
   }
 
   @Selector([TimesheetsState])
@@ -91,5 +98,15 @@ export class TimesheetsState {
     patchState({
       editDialogType: null,
     });
+  }
+
+  @Action(TimesheetDetails.Export)
+  ExportTimesheetDetails({patchState}: StateContext<TimesheetsModel>, payload: ExportPayload): Observable<Blob> {
+    return this.timesheetDetailsService.exportDetails(payload)
+      .pipe(
+        tap((file: Blob) => {
+          downloadBlobFile(file, 'empty.csv');
+        })
+      );
   }
 }

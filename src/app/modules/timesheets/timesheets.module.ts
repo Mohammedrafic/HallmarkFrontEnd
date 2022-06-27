@@ -15,7 +15,7 @@ import { FileText, ChevronRight, AlignJustify, Briefcase, Calendar, CheckCircle,
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
-import { NumericTextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
+import { NumericTextBoxModule, TextBoxModule, UploaderModule } from '@syncfusion/ej2-angular-inputs';
 import { DatePickerModule, MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { AccumulationChartAllModule, ChartAllModule } from '@syncfusion/ej2-angular-charts';
 
@@ -39,6 +39,8 @@ import { ProfileCumulativeHoursComponent } from './components/profile-cumulative
 import { ProfileUploadsComponent } from './components/profile-uploads/profile-uploads.component';
 import { ProfileInvoicesComponent } from './components/profile-invoices/profile-invoices.component';
 import { TimesheetsService } from './services/timesheets.service';
+import { RejectReasonDialogComponent } from './components/reject-reason-dialog/reject-reason-dialog.component';
+import { TimesheetDetailsService } from "./services/timesheet-details.service";
 
 const gridIcons = {
   MessageSquare,
@@ -81,6 +83,7 @@ const gridIcons = {
     ProfileCumulativeHoursComponent,
     ProfileUploadsComponent,
     ProfileInvoicesComponent,
+    RejectReasonDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -110,6 +113,7 @@ const gridIcons = {
     CapitalizeFirstModule,
     DateWeekPickerModule,
     UploaderModule,
+    TextBoxModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [
@@ -118,6 +122,7 @@ const gridIcons = {
     MaskedDateTimeService,
     TimesheetsService,
     CapitalizeFirstPipe,
+    TimesheetDetailsService,
   ]
 })
 export class TimesheetsModule {}
