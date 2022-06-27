@@ -83,15 +83,24 @@
 <app-filter-dialog *ngIf="isActive" [items]="filteredItems" [count]="(masterSkills$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
   <form class="bootstrap" [formGroup]="SkillFilterFormGroup">
     <div class="input-container">
+      <label for="externalId">Search</label>
+      <div class="input-group">
+        <input  class="e-input"
+                type="text"
+                maxlength="50"
+                formControlName="searchTerm"/>
+      </div>
+    </div>
+    <div class="input-container">
       <label>Skill Category</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="skillCategoryId"
+                         formControlName="skillCategoryIds"
                          placeholder="All"
                          [fields]="optionFields"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.skillCategoryId.dataSource">
+                         [dataSource]="filterColumns.skillCategoryIds.dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -99,12 +108,12 @@
       <label>Skill ABBR</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="skillAbbr"
+                         formControlName="skillAbbreviations"
                          placeholder="All"
                          [fields]="optionFields"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.skillAbbr.dataSource">
+                         [dataSource]="filterColumns.skillAbbreviations.dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -112,12 +121,12 @@
       <label>Skill Description</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="skillDescription"
+                         formControlName="skillDescriptions"
                          placeholder="All"
                          [fields]="optionFields"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.skillDescription.dataSource">
+                         [dataSource]="filterColumns.skillDescriptions.dataSource">
         </ejs-multiselect>
       </div>
     </div>

@@ -19,6 +19,7 @@ import {
   GetBusinessUnitList,
   GetCredentialTypes,
   GetDBConnections,
+  GetMasterSkillDataSources,
   GetMasterSkillsByPage,
   GetOrganizationById,
   GetOrganizationByIdSucceeded,
@@ -48,7 +49,7 @@ import {
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
 import { CategoriesService } from '@shared/services/categories.service';
-import { Skill, SkillsPage } from 'src/app/shared/models/skill.model';
+import { MasterSkillDataSources, Skill, SkillsPage } from 'src/app/shared/models/skill.model';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
@@ -86,6 +87,7 @@ export interface AdminStateModel {
   credentialTypes: CredentialType[];
   isDirty: boolean;
   dataBaseConnections: string[];
+  masterSkillDataSources: MasterSkillDataSources | null;
 }
 
 @State<AdminStateModel>({
@@ -114,7 +116,8 @@ export interface AdminStateModel {
     allSkillsCategories: null,
     credentialTypes: [],
     isDirty: false,
-    dataBaseConnections: []
+    dataBaseConnections: [],
+    masterSkillDataSources: null,
   },
 })
 @Injectable()
@@ -179,6 +182,9 @@ export class AdminState {
   static dataBaseConnections(state: AdminStateModel): string[] {
     return state.dataBaseConnections;
   }
+
+  @Selector()
+  static masterSkillDataSources(state: AdminStateModel): MasterSkillDataSources | null { return state.masterSkillDataSources; }
 
   constructor(
     private organizationService: OrganizationService,
@@ -271,9 +277,9 @@ export class AdminState {
   }
 
   @Action(GetMasterSkillsByPage)
-  GetMasterSkillsByPage({ patchState }: StateContext<AdminStateModel>, { pageNumber, pageSize }: GetMasterSkillsByPage): Observable<SkillsPage> {
+  GetMasterSkillsByPage({ patchState }: StateContext<AdminStateModel>, { pageNumber, pageSize, filters }: GetMasterSkillsByPage): Observable<SkillsPage> {
     patchState({ isOrganizationLoading: true });
-    return this.skillsService.getMasterSkills(pageNumber, pageSize).pipe(tap((payload) => {
+    return this.skillsService.getMasterSkills(pageNumber, pageSize, filters).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false, masterSkills: payload });
       return payload;
     }));
@@ -421,6 +427,13 @@ export class AdminState {
     return this.organizationService.export(payload).pipe(tap(file => {
       const url = window.URL.createObjectURL(file);
       saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
+
+  @Action(GetMasterSkillDataSources)
+  GetMasterSkillDataSources({ patchState }: StateContext<AdminStateModel>): Observable<MasterSkillDataSources> {
+    return this.skillsService.getMasterSkillsDataSources().pipe(tap(data => {
+      patchState({ masterSkillDataSources: data });
     }));
   };
 }

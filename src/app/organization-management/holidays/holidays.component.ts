@@ -259,6 +259,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     this.store.dispatch(new ExportHolidays(new ExportPayload(
       fileType,
       {
+        /*...this.filters, TODO: pendig BE*/
         orderBy: this.orderBy,
         masterOrgIds: this.selectedItems.length ? this.selectedItems.map(val => {
           return { item1: val.masterHolidayId, item2: val.id };

@@ -138,7 +138,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     { text:'Consider For Weekly OT', column: 'ConsiderForWeeklyOT'},
     { text:'Consider For Daily OT', column: 'ConsiderForDailyOT'},
     { text:'Consider For 7th Day OT', column: 'ConsiderFor7thDayOT'},
-    { text:'Regular Local', column: 'RegRegularLocalon'},
+    { text:'Regular Local', column: 'RegularLocal'},
     { text:'Display In Timesheet', column: 'DisplayInTimesheet'},
     { text:'Display In Job', column: 'DisplayInJob'}
   ];
@@ -291,7 +291,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.unsubscribe$.complete();
   }
 
-  
   public closeExport() {
     this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));
@@ -306,6 +305,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.store.dispatch(new ExportBillRateSetup(new ExportPayload(
       fileType, 
       { 
+        ...this.filters,
         ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
         offset: Math.abs(new Date().getTimezoneOffset()),
       }, 

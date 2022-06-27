@@ -357,6 +357,9 @@ export class OrganizationManagementState {
     return this.departmentService.saveDepartment(payload).pipe(tap((payload) => {
       patchState({ isDepartmentLoading: false});
       dispatch(new GetDepartmentsByLocationId(payload.locationId, filters));
+      if (filters) {
+        dispatch(new GetDepartmentFilterOptions(payload.locationId as number));
+      }
       return payload;
     }));
   }
@@ -374,6 +377,9 @@ export class OrganizationManagementState {
     return this.departmentService.updateDepartment(department).pipe(tap((payload) => {
       patchState({ isDepartmentLoading: false });
       dispatch(new GetDepartmentsByLocationId(department.locationId, filters));
+      if (filters) {
+        dispatch(new GetDepartmentFilterOptions(department.locationId as number));
+      }
       return payload;
     }));
   }
@@ -454,6 +460,9 @@ export class OrganizationManagementState {
     return this.locationService.saveLocation(location).pipe(tap((payload) => {
       patchState({ isLocationLoading: false});
       dispatch(new GetLocationsByRegionId(regionId, filters));
+      if (filters) {
+        dispatch(new GetLocationFilterOptions(regionId));
+      }
       return payload;
     }));
   }
@@ -463,6 +472,9 @@ export class OrganizationManagementState {
     return this.locationService.updateLocation(location).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
       dispatch(new GetLocationsByRegionId(regionId, filters));
+      if (filters) {
+        dispatch(new GetLocationFilterOptions(regionId));
+      }
       return payload;
     }));
   }

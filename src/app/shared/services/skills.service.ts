@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
-import { MasterSkillByOrganization, Skill, SkillDataSource, SkillFilters, SkillsPage } from '@shared/models/skill.model';
+import { MasterSkillByOrganization, MasterSkillDataSources, MasterSkillFilters, Skill, SkillDataSource, SkillFilters, SkillsPage } from '@shared/models/skill.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
@@ -24,8 +24,13 @@ export class SkillsService {
    * @param pageSize
    * @return list of master skills
    */
-  public getMasterSkills(pageNumber: number, pageSize: number): Observable<SkillsPage> {
-    return this.http.get<any>(`/api/masterSkills`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+  public getMasterSkills(pageNumber: number, pageSize: number, filters?: MasterSkillFilters): Observable<SkillsPage> {
+    if (filters) {
+      filters.pageSize = pageSize;
+      filters.pageNumber = pageNumber;
+      return this.http.post<SkillsPage>(`/api/masterSkills/filter`, filters);
+    }
+    return this.http.get<SkillsPage>(`/api/masterSkills`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
   }
 
   /**
@@ -126,6 +131,14 @@ export class SkillsService {
    * @return list of master skills
    */
   public getAllOrganizationSkills(): Observable<SkillsPage> {
-    return this.http.get<any>(`/api/AssignedSkills/all`);
+    return this.http.get<SkillsPage>(`/api/AssignedSkills/all`);
+  }
+
+  /**
+   * Get master skills filtering options
+   * @return list of master skills filtering options
+   */
+  public getMasterSkillsDataSources(): Observable<MasterSkillDataSources> {
+    return this.http.get<MasterSkillDataSources>(`/api/masterSkills/filteringOptions`);
   }
 }

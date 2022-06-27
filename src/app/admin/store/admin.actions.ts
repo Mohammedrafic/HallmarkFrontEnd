@@ -1,7 +1,7 @@
 import { Country } from 'src/app/shared/enums/states';
 import { Organization } from 'src/app/shared/models/organization.model';
 import { SkillCategory } from 'src/app/shared/models/skill-category.model';
-import { Skill } from 'src/app/shared/models/skill.model';
+import { MasterSkillFilters, Skill } from 'src/app/shared/models/skill.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { ExportPayload } from '@shared/models/export.model';
 
@@ -77,7 +77,7 @@ export class SetImportFileDialogState {
 
 export class GetMasterSkillsByPage {
   static readonly type = '[admin] Get Master Skills by Page';
-  constructor(public pageNumber: number, public pageSize: number) { }
+  constructor(public pageNumber: number, public pageSize: number, public filters: MasterSkillFilters) { }
 }
 
 export class GetSkillsCategoriesByPage {
@@ -189,4 +189,9 @@ export class GetDBConnections {
 export class ExportOrganizations {
   static readonly type = '[admin] Export Organization list';
   constructor(public payload: ExportPayload) { }
+}
+
+export class GetMasterSkillDataSources {
+  static readonly type = '[admin] Get Master Skills Filtering Options';
+  constructor() { }
 }
