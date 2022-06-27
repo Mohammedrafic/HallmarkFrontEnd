@@ -313,7 +313,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     });
 
     this.dataBaseConnectionsFormGroup = this.fb.group({
-      connectionName: new FormControl('', [Validators.required])
+      connectionName: new FormControl(organization?.createUnder?.dbConnectionName ?? '', [Validators.required])
     });
 
 

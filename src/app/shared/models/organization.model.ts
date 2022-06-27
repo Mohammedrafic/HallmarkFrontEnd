@@ -5,7 +5,8 @@ export class Organization {
     id: number,
     businessUnitType: number,
     name: string,
-    parentUnitId?: number
+    parentUnitId?: number;
+    dbConnectionName: string;
   };
   parentBusinessUnitId?: number;
   organizationId?: number | null;
