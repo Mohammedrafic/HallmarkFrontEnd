@@ -53,7 +53,7 @@
           </button>
         </div>
 
-        <i-feather name="x" class="icon close-button" (click)="sideDialog.hide()"></i-feather>
+        <i-feather name="x" class="icon close-button" (click)="handleProfileClose()"></i-feather>
       </div>
 
       <div class="order-header">
@@ -92,7 +92,8 @@
       <section class="profile-table-container">
         <app-profile-timesheet-table
           *ngIf="timeSheetsProfile$ | async as timeSheetsProfile"
-          [timeSheetsProfile]="timeSheetsProfile">
+          [timeSheetsProfile]="timeSheetsProfile"
+          (openAddSideDialog)="handleOpenSideDialog()">
         </app-profile-timesheet-table>
       </section>
     </section>
@@ -117,4 +118,4 @@
     </div>
   </ng-template>
 </ejs-dialog>
-<app-add-timesheet></app-add-timesheet>
+<app-add-timesheet (updateTable)="handleUpdateTable()"></app-add-timesheet>

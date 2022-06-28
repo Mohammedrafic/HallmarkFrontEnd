@@ -27,4 +27,11 @@ export namespace Timesheets {
   export class CloseProfileTimesheetAddDialog {
     static readonly type = TIMESHEETS_ACTIONS.CLOSE_PROFILE_TIMESHEET_ADD_DIALOG;
   }
+
+  export class PostProfileTimesheet {
+    static readonly type = TIMESHEETS_ACTIONS.POST_PROFILE_TIMESHEET;
+
+    constructor(public readonly payload: any) {
+    }
+  }
 }

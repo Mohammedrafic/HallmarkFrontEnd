@@ -50,16 +50,24 @@ export class TimesheetsState {
     })));
   }
 
+  @Action(Timesheets.PostProfileTimesheet)
+  PostProfileTimesheet(
+    ctx: StateContext<TimesheetsModel>,
+    { payload }: Timesheets.PostProfileTimesheet
+  ): Observable<null> {
+    return this.timesheetsService.postProfileTimesheets(payload);
+  }
+
   @Action(Timesheets.GetProfileTimesheets)
   GetProfileTimeSheets({ patchState }: StateContext<TimesheetsModel>): Observable<ProfileTimeSheetDetail[]> {
-      return this.timesheetsService.getProfileTimesheets()
-      .pipe(
-        tap((data) => {
-          patchState({
-            profileTimesheets: data,
-          });
-        }),
-      );
+    return this.timesheetsService.getProfileTimesheets()
+    .pipe(
+      tap((data) => {
+        patchState({
+          profileTimesheets: data,
+        });
+      }),
+    );
   }
 
   @Action(Timesheets.ToggleProfileDialog)
@@ -73,10 +81,10 @@ export class TimesheetsState {
 
   @Action(Timesheets.OpenProfileTimesheetAddDialog)
   OpenTimesheetAddDialog({ patchState }: StateContext<TimesheetsModel>, type: ProfileTimeSheetActionType): void {
-      patchState({
-        editDialogType: type,
-      });
-    }
+    patchState({
+      editDialogType: type,
+    });
+  }
 
   @Action(Timesheets.CloseProfileTimesheetAddDialog)
   CloseTimeSheetEditDialog({ patchState }: StateContext<TimesheetsModel>): void {

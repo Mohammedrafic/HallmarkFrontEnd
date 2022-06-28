@@ -13,6 +13,11 @@
       font-weight: 700;
       color: $supportive-red;
     }
+
+    .e-rowcell a {
+      font-weight: 700;
+      color: $primary-active-blue-10;
+    }
   }
 
   &.e-gridhover tr[role=row]:not(.e-editedrow):hover .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
@@ -20,8 +25,8 @@
   }
 
   & td.e-active {
-    background-color: $primary-active-blue-10;
-    color: #fff !important;
+    background-color: $primary-active-blue-70;
+    color: $black !important;
   }
 
   .e-success-row {

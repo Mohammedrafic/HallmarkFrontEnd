@@ -32,7 +32,17 @@
   }
 }
 
+.row {
+  width: 100%;
+  display: flex;
+
+  .input-container:nth-child(2) {
+    margin-left: 12px;
+  }
+}
+
 .input-container {
+  width: 100%;
   padding-top: 20px;
 
   label {

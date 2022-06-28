@@ -12,6 +12,7 @@ import { ProfileTimeSheetDetail } from '../store/model/timesheets.model';
 @Injectable()
 export class TimesheetsApiService {
   private MOK_TIME_SHEETS: ITimesheet[] = MOK_TIMESHEETS;
+  private MOK_PROFILES: ProfileTimeSheetDetail[] = mockProfileTableData;
 
   public getTimesheets(filters: ITimesheetsFilter): Observable<TimeSheetsPage> {
     return of({
@@ -29,9 +30,6 @@ export class TimesheetsApiService {
   }
 
   private filterArray(arr: any[], filters: ITimesheetsFilter): any[] {
-    console.log(arr, 'arr');
-    console.log(filters, 'filters');
-
     return arr.filter((el, idx) => {
       return filters.pageNumber === 1 ?
         idx < filters.pageSize * filters.pageNumber :
@@ -40,6 +38,12 @@ export class TimesheetsApiService {
   }
 
   public getProfileTimesheets(): Observable<ProfileTimeSheetDetail[]> {
-    return of(mockProfileTableData);
+    return of(this.MOK_PROFILES);
+  }
+
+  public postProfileTimesheets(body: ProfileTimeSheetDetail): Observable<null> {
+    this.MOK_PROFILES = [...this.MOK_PROFILES, Object.assign({}, body, { total: body.hours * body.rate })];
+
+    return of(null);
   }
 }

@@ -25,7 +25,7 @@
       [width]="timesheetsTableColumnWidth['name']">
         <ng-template #template let-data>
           <div [class.red-text]="data.statusText === TIMESHEETS_STATUSES.MISSING">
-            {{ data.name }}
+            <a href="#">{{ data.name }}</a>
           </div>
         </ng-template>
     </e-column>
@@ -49,7 +49,7 @@
       [width]="timesheetsTableColumnWidth['orderId']">
         <ng-template #template let-data>
           <div>
-            <b>{{ data.orderId }}</b>
+            <a href="#"><b>{{ data.orderId }}</b></a>
           </div>
         </ng-template>
     </e-column>

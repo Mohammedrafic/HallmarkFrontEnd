@@ -12,9 +12,10 @@ export interface DialogConfigField {
   disabled: boolean;
   required: boolean;
   options?: DropdownOption[];
+  valueType?: string;
 }
 
 export interface DialogConfig {
   title: string;
-  fields: DialogConfigField[];
+  fields: DialogConfigField[][];
 }

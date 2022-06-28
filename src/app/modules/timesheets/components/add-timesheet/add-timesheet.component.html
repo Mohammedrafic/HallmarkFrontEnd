@@ -13,61 +13,69 @@ cssClass="dialog"
         <h3 class="title">{{ dialogConfig.title }}</h3>
         <div class="controls">
           <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
-          <button ejs-button [isPrimary]="true">Save</button>
+          <button (click)="saveForm()" ejs-button [isPrimary]="true">Save</button>
         </div>
       </div>
       <div class="form">
         <form [formGroup]="form" autocomplete="off" class="bootstrap">
-          <ng-container *ngFor="let field of dialogConfig.fields; trackBy:trackByField">
-            <ng-container [ngSwitch]="field.type">
+          <ng-container *ngFor="let fieldGroup of dialogConfig.fields; trackBy:trackByIndex">
+            <div class="row">
+              <ng-container *ngFor="let field of fieldGroup; trackBy:trackByField">
+                <ng-container [ngSwitch]="field.type">
 
-              <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
-                <div class="input-container">
-                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
-                  </label>
-                  <div class="input-group dropdown">
-                    <ejs-dropdownlist
-                      [formControlName]="field.field"
-                      [dataSource]="field.options"
-                    ></ejs-dropdownlist>
-                  </div>
-                </div>
-              </ng-template>
+                  <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
+                    <div class="input-container">
+                      <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                      </label>
+                      <div class="input-group dropdown">
+                        <ejs-dropdownlist
+                          [formControlName]="field.field"
+                          [dataSource]="field.options"
+                          appValidateWithMessage
+                        ></ejs-dropdownlist>
+                      </div>
+                    </div>
+                  </ng-template>
 
-              <ng-template [ngSwitchCase]="FieldTypes.Time">
-                <div class="input-container">
-                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
-                  </label>
-                  <div class="input-group">
-                    <ejs-timepicker
-                    placeholder="HH:MM"
-                    [formControlName]="field.field"
-                    appValidateWithMessage
-                    format="hh:mm a"
-                    [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                    [enableMask]="true"
-                    maskPlaceholder="HH:MM">
-                  </ejs-timepicker>
-                  </div>
-                </div>
-              </ng-template>
+                  <ng-template [ngSwitchCase]="FieldTypes.Time">
+                    <div class="input-container">
+                      <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                      </label>
+                      <div class="input-group">
+                        <ejs-timepicker
+                          placeholder="HH:MM"
+                          [formControlName]="field.field"
+                          appValidateWithMessage
+                          format="hh:mm a"
+                          [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                          [enableMask]="true"
+                          [min]="field.field === 'timeOut' ? minTime : null"
+                          [max]="field.field === 'timeIn' ? maxTime : null"
+                          maskPlaceholder="HH:MM">
+                        </ejs-timepicker>
+                      </div>
+                    </div>
+                  </ng-template>
 
-              <ng-template [ngSwitchCase]="FieldTypes.Input">
-                <div class="input-container">
-                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
-                  </label>
-                  <div class="input-group">
-                    <input
-                    class="e-input"
-                    type="text"
-                    [name]="field.field"
-                    [formControlName]="field.field"
-                  />
-                  </div>
-                </div>
-              </ng-template>
+                  <ng-template [ngSwitchCase]="FieldTypes.Input">
+                    <div class="input-container">
+                      <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                      </label>
+                      <div class="input-group">
+                        <input
+                          class="e-input"
+                          [type]="field.valueType"
+                          [name]="field.field"
+                          appValidateWithMessage
+                          [formControlName]="field.field"
+                        />
+                      </div>
+                    </div>
+                  </ng-template>
 
-            </ng-container>
+                </ng-container>
+              </ng-container>
+            </div>
           </ng-container>
 
         </form>

@@ -2,7 +2,7 @@
   <div class="table-block">
     <div class="table-header">
       <h3>Timesheet</h3>
-      <button class="add-action">+ Add Rcord</button>
+      <button (click)="openAddSideDialog.emit()" class="add-action">+ Add Rcord</button>
     </div>
     <ejs-grid #profileTable
     [dataSource]="timeSheetsProfile"
@@ -21,6 +21,9 @@
           [headerText]="tableConfig.day.header"
           [textAlign]="tableConfig.day.align"
           [width]="tableConfig.day.width">
+          <ng-template #template let-data>
+            <span>{{ data.day | slice: 0: 3 }}</span>
+          </ng-template>
       </e-column>
         <e-column field="timeIn" type="date"
           [headerText]="tableConfig.timeIn.header"
