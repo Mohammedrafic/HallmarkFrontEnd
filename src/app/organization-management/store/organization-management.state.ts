@@ -88,7 +88,6 @@ import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialPage } from '@shared/models/credential.model';
 import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
-import { CandidateStateModel } from '@agency/store/candidate.state';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { CategoriesService } from '@shared/services/categories.service';
@@ -681,7 +680,7 @@ export class OrganizationManagementState {
   }
 
   @Action(GetAllSkills)
-  GetAllSkills({ patchState }: StateContext<CandidateStateModel>, { }: GetAllSkills): Observable<SkillsPage> {
+  GetAllSkills({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetAllSkills): Observable<SkillsPage> {
     return this.skillsService.getAllMasterSkills().pipe(
       tap((payload) => {
         patchState({ skills: payload });
