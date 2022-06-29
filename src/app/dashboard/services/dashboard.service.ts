@@ -25,7 +25,6 @@ import { CandidatesByStateWidgetAggregatedDataModel } from '../models/candidates
 import { DashboardStateDto } from '../models/dashboard-state-dto.model';
 import { USAMapCandidatesDataLayerSettings } from '../constants/USA-map-candidates-data-layer-settings';
 import { CandidateTypeInfoModel } from '../models/candidate-type-info.model';
-import { legendPalette } from '../constants/legend-palette';
 import { AvailableWidgetsResponseModel, WidgetOptionModel } from '../models/widget-option.model';
 import { DashboardDataModel } from '../models/dashboard-data.model';
 import type { ApplicantsByRegionDataModel } from '../models/applicants-by-region-data.model';
@@ -41,6 +40,10 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { ActivePositionsDto, ActivePositionTypeInfo } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
+import { activePositionsLegendPalette } from '../constants/active-positions-legend-palette';
+import { ActivePositionsChartStatuses } from '../enums/active-positions-legend-palette.enum';
+import { candidateLegendPalette } from '../constants/candidate-legend-palette';
+import { CandidateChartStatuses } from '../enums/candidate-legend-palette.enum';
 
 @Injectable()
 export class DashboardService {
@@ -123,7 +126,7 @@ export class DashboardService {
           chartData: lodashMapPlain(candidatesInfo, ({ count, status }: CandidateTypeInfoModel, index: number) => ({
             label: status,
             value: count,
-            color: legendPalette[index % legendPalette.length],
+            color: candidateLegendPalette[status as CandidateChartStatuses],
           })),
         };
       })
@@ -221,7 +224,7 @@ export class DashboardService {
             ({ count, statusName }: ActivePositionTypeInfo, index: number) => ({
               label: statusName,
               value: count,
-              color: legendPalette[index % legendPalette.length],
+              color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses],
             })
           ),
         };
