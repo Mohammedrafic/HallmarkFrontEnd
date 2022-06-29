@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ONLY_LETTERS } from "@shared/constants";
+import { ONLY_LETTERS, ONLY_NUMBER } from "@shared/constants";
 
 @Pipe({
   name: 'validationError',
@@ -20,6 +20,8 @@ export class ValidationErrorPipe implements PipeTransform {
       case 'pattern' in value:
         if(!(new RegExp(ONLY_LETTERS).test(value.pattern.actualValue))) {
           return 'Only letters are allowed';
+        } else if(!(new RegExp(ONLY_NUMBER)).test(value.pattern.actualValue)) {
+          return 'Only numbers are allowed';
         }
         return '';
       default:
