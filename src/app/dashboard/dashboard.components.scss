@@ -4,6 +4,14 @@
   padding-bottom: 20px;
 
   #dashboardLayout {
+    #In_Progress_Positions,
+    #Open_Positions,
+    #Filled_Positions {
+      @media screen and (max-width: 600px) {
+        height: calc(5% - 5px) !important;
+      }
+    }
+    
     .e-holder {
       background-color: $primary-active-blue-90;
       border: 2px dashed $primary-active-blue-20;
@@ -12,7 +20,7 @@
 
     .e-panel {
       border-radius: 12px;
-      transition: .3s;
+      transition: 0.3s;
 
       .e-panel-container {
         .e-panel-content {

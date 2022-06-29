@@ -190,7 +190,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
       .subscribe(([panels, isMobile]: [PanelModel[], boolean]) => {
         const updatedPanels = isMobile ? this.getUpdatePanelsForMobileView(panels) : panels;
         this.store.dispatch(new SetPanels(updatedPanels));
-        this.setPanelHeightForMobileView(isMobile);
       });
   }
 
@@ -206,19 +205,5 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
         return { ...panel, sizeX: 1, sizeY: 1, maxSizeY: 1, maxSizeX: 1, minSizeY: 1, minSizeX: 1 };
       }
     }, panels);
-  }
-
-  private setPanelHeightForMobileView(isMobile: boolean): void {
-    if (isMobile) {
-      setTimeout(() => {
-        const filled: NodeListOf<HTMLElement> = document.querySelectorAll(
-          '#In_Progress_Positions, #Open_Positions, #Filled_Positions'
-        );
-        if (filled.length) {
-          filled.forEach((item) => (item.style.maxHeight = parseInt(item.style.height) - 15 + 'px'));
-          this.dashboardSFComponent.refresh();
-        }
-      }, 200);
-    }
   }
 }
