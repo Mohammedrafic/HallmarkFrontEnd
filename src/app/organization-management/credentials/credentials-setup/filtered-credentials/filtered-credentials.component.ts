@@ -89,8 +89,10 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
   }
 
   public onGridDataBound(): void {
-    // select first item in the grid by its index
-    this.grid.selectRows([0])
+    if ((this.grid.dataSource as []).length) {
+      // select first item in the grid by its index
+      this.grid.selectRows([0]);
+    }
   }
 
   public onRowsDropDownChanged(): void {
