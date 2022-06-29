@@ -153,6 +153,7 @@ export class DashboardService {
     applicantsByRegion,
   }: ApplicantsByRegionDataModel): CandidatesByStateWidgetAggregatedDataModel {
     const maxCandidatesValue = flow(values, max)(applicantsByRegion);
+    const unknownStateCandidates = applicantsByRegion['Unknown'];
     const combinedData = { ...mapData, ...USAMapCandidatesDataLayerSettings };
     const dataSource = lodashMap(
       (stateDefinition: Record<string, string>) => ({
@@ -166,7 +167,7 @@ export class DashboardService {
       colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
 
-    return { chartData: [{ ...combinedData, dataSource, shapeSettings }] };
+    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates };
   }
 
   private getDashboardState(): Observable<PanelModel[]> {
