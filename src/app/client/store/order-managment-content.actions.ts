@@ -139,21 +139,18 @@ export class DeleteOrder {
 
 export class DeleteOrderSucceeded {
   static readonly type = '[order management] Delete Order Succeeded';
-
   constructor() {
   }
 }
 
 export class ReloadOrganisationOrderCandidatesLists {
   static readonly type = '[agency order management] Reload Order and Candidates Lists on Organisation';
-
   constructor() {
   }
 }
 
 export class ClearSelectedOrder {
   static readonly type = '[order management] Clear selected order';
-
   constructor() {
   }
 }
@@ -177,7 +174,12 @@ export class RejectCandidateJob {
 
 export class ApproveOrder {
   static readonly type = '[order management] Approve Order';
-
   constructor(public id: number) {
+  }
+}
+
+export class GetOrderFIlterDataSources {
+  static readonly type = '[order management] Get Order Filter Data Sources';
+  constructor() {
   }
 }

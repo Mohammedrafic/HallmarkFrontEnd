@@ -16,11 +16,12 @@ import {
   GetAgencyOrderCandidatesList,
   GetIncompleteOrders,
   GetOrderById,
+  GetOrderFIlterDataSources,
   GetOrders,
   ReloadOrganisationOrderCandidatesLists
 } from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { OrderManagementChild, Order, OrderFilter, OrderManagement, OrderManagementPage } from '@shared/models/order-management.model';
+import { OrderManagementChild, Order, OrderFilter, OrderManagement, OrderManagementPage, OrderFilterDataSource } from '@shared/models/order-management.model';
 
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { UserState } from '../../../store/user.state';
@@ -65,6 +66,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order>;
 
+  @Select(OrderManagementContentState.orderFilterDataSources)
+  orderFilterDataSources$: Observable<OrderFilterDataSource>;
+
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
@@ -102,6 +106,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public skillsFields = {
     text: 'skillDescription',
     value: 'id'
+  };
+  public statusFields = {
+    text: 'statusText',
+    value: 'status'
   };
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
@@ -142,7 +150,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       billRateTo: new FormControl(null),
       openPositions: new FormControl(null),
       jobStartDate: new FormControl(null),
-      jobEndDate: new FormControl(null)
+      jobEndDate: new FormControl(null),
+      orderStatuses: new FormControl([]),
+      candidatesCountFrom: new FormControl(null),
+      candidatesCountTo: new FormControl(null),
+      agencyIds: new FormControl([]),
+      agencyType: new FormControl('0'),
     });
   }
 
@@ -160,7 +173,16 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       openPositions: { type: ControlTypes.Text, valueType: ValueType.Text },
       jobStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       jobEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+      orderStatuses: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'statusText', valueId: 'status' },
+      candidatesCountFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
+      candidatesCountTo: { type: ControlTypes.Text, valueType: ValueType.Text },
+      agencyIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      agencyType: { type: ControlTypes.Radio, dataSource: { 1: 'Yes', 2: 'No' }, default: '0' },
     }
+    this.orderFilterDataSources$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data: OrderFilterDataSource) => {
+      this.filterColumns.orderStatuses.dataSource = data.orderStatus;
+      this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
+    });
     this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
       this.orgStructure = structure;
       this.regions = structure.regions;
@@ -269,9 +291,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filters.billRateFrom ? this.filters.billRateFrom : null;
     this.filters.billRateTo ? this.filters.billRateTo : null;
     this.filters.pageNumber = this.currentPage;
+    this.filters.agencyType = this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) : null;
     this.pageSize = this.pageSize;
     if (this.activeTab === OrderManagemetTabs.AllOrders) {
-      this.store.dispatch(new GetOrders(this.filters));
+      this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
     } else if (this.activeTab === OrderManagemetTabs.Incomplete) {
       this.store.dispatch(new GetIncompleteOrders({ pageNumber: this.currentPage, pageSize: this.pageSize }));
     }
@@ -291,6 +314,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       openPositions: this.filters.openPositions || null,
       jobStartDate: this.filters.jobStartDate || null,
       jobEndDate: this.filters.jobEndDate || null,
+      orderStatuses: this.filters.orderStatuses || [],
+      candidatesCountFrom: this.filters.candidatesCountFrom || null,
+      candidatesCountTo: this.filters.candidatesCountTo || null,
+      agencyIds: this.filters.agencyIds || [],
+      agencyType: this.filters.agencyType ? String(this.filters.agencyType) : '0',
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
   }

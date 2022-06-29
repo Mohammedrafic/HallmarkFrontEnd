@@ -10,6 +10,7 @@ import {
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
+  OrderFilterDataSource,
   OrderManagementFilter,
   OrderManagementPage,
   SuggesstedDetails
@@ -223,5 +224,12 @@ export class OrderManagementContentService {
    */
   public rejectCandidateJob(payload: RejectReasonPayload): Observable<void> {
     return this.http.post<void>('/api/AppliedCandidates/rejectCandidateJob', payload);
+  }
+
+  /**
+   * Get order filter data sources 
+   */
+  public getOrderFilterDataSources(): Observable<OrderFilterDataSource> {
+    return this.http.get<OrderFilterDataSource>('/api/OrdersFilteringOptions/organization');
   }
 }
