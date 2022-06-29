@@ -1,6 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { combineLatestWith, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { combineLatestWith, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
@@ -16,7 +16,7 @@ import {
   SaveCredential,
   SaveCredentialSucceeded,
 } from '../../store/organization-management.actions';
-import { Credential } from '@shared/models/credential.model';
+import { Credential, CredentialFilter, CredentialFilterDataSources, CredentialPage } from '@shared/models/credential.model';
 import { OrganizationManagementState } from '../../store/organization-management.state';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -24,11 +24,12 @@ import { SortSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-mode
 import { UserState } from 'src/app/store/user.state';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { ExportCredentialList, ShowExportCredentialListDialog } from '@organization-management/store/credentials.actions';
+import { ExportCredentialList, GetCredentialsDataSources, SetCredentialsFilterCount, ShowExportCredentialListDialog } from '@organization-management/store/credentials.actions';
 import { DatePipe } from '@angular/common';
 import { FilterService } from '@shared/services/filter.service';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
+import { CredentialsState } from '@organization-management/store/credentials.state';
 
 @Component({
   selector: 'app-credentials-list',
@@ -45,10 +46,15 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   public credentialTypesFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   @Select(OrganizationManagementState.credentials)
-  credentials$: Observable<Credential[]>;
+  credentials$: Observable<CredentialPage>;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
+  
+  @Select(CredentialsState.credentialDataSources)
+  credentialDataSources$: Observable<CredentialFilterDataSources>;
+
+  private pageSubject = new Subject<number>();
 
   public credentialsFormGroup: FormGroup;
   public formBuilder: FormBuilder;
@@ -68,12 +74,19 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   public defaultFileName: string;
 
   public CredentialsFilterFormGroup: FormGroup;
-  public filters: any = {};
+  public filters: CredentialFilter = {
+    pageSize: this.pageSize,
+    pageNumber: this.currentPage
+  };
   public filterColumns: any;
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
+
+  public optionFields = {
+    text: 'name', value: 'id'
+  };
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -88,13 +101,24 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
   ngOnInit(): void {
     this.filterColumns = {
-      name: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      credentialTypeId: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      searchTerm: { type: ControlTypes.Text, valueType: ValueType.Text },
+      credentialIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      credentialTypeIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       expireDateApplicable: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Expiry Date Applicable'},
     }
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.getCredentials();
     });
+    this.credentialDataSources$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(data => {
+      this.filterColumns.credentialIds.dataSource = data.credentials;
+      this.filterColumns.credentialTypeIds.dataSource = data.credentialTypes;
+    });
+
+    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(1)).subscribe((page) => {
+      this.currentPage = page;
+      this.getCredentials();
+    });
+
     this.mapGridData();
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveCredentialSucceeded)).subscribe(() => {
@@ -119,18 +143,26 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     this.unsubscribe$.complete();
   }
 
+  public override updatePage(): void {
+    this.getCredentials();
+  }
+
   private getCredentials(): void {
-    this.store.dispatch(new GetCredential());
-    this.store.dispatch(new GetCredentialTypes());
+    this.filters.pageNumber = this.currentPage;
+    this.filters.pageSize = this.pageSize;
+    this.filters.orderBy = this.orderBy;
+    this.store.dispatch([new GetCredential(this.filters), new GetCredentialTypes(), new GetCredentialsDataSources()]);
   }
 
   public onFilterClose() {
     this.CredentialsFilterFormGroup.setValue({
-      name: this.filters.name || null,
-      credentialTypeId: this.filters.credentialTypeId || [],
+      searchTerm: this.filters.searchTerm || '',
+      credentialIds: this.filters.credentialIds || null,
+      credentialTypeIds: this.filters.credentialTypeIds || [],
       expireDateApplicable: this.filters.expireDateApplicable || null,
     });
     this.filteredItems = this.filterService.generateChips(this.CredentialsFilterFormGroup, this.filterColumns, this.datePipe);
+    this.store.dispatch(new SetCredentialsFilterCount(this.filteredItems.length));
   }
 
   public onFilterDelete(event: FilteredItem): void {
@@ -140,6 +172,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   public onFilterClearAll(): void {
     this.CredentialsFilterFormGroup.reset();
     this.filteredItems = [];
+    this.store.dispatch(new SetCredentialsFilterCount(this.filteredItems.length));
     this.currentPage = 1;
     this.filters = {};
     this.getCredentials();
@@ -148,6 +181,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   public onFilterApply(): void {
     this.filters = this.CredentialsFilterFormGroup.getRawValue();
     this.filteredItems = this.filterService.generateChips(this.CredentialsFilterFormGroup, this.filterColumns);
+    this.store.dispatch(new SetCredentialsFilterCount(this.filteredItems.length));
     this.getCredentials();
     this.store.dispatch(new ShowFilterDialog(false));
   }
@@ -166,7 +200,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     const ids = this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null;
     this.store.dispatch(new ExportCredentialList(new ExportPayload(
       fileType, 
-      { ids: ids }, 
+      { ...this.filters, ids: ids }, 
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       null,
       options?.fileName || this.defaultFileName
@@ -215,15 +249,12 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   }
 
   public onRowsDropDownChanged(): void {
-    this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
+    this.grid.pageSettings.pageSize = this.pageSize = this.getActiveRowsPerPage();
   }
 
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.credentials$.subscribe(data => {
-        this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
-        this.currentPagerPage = event.currentPage || event.value;
-      });
+      this.pageSubject.next(event.currentPage || event.value);
     }
   }
 
@@ -273,17 +304,17 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
   private mapGridData(): void {
     this.credentials$.pipe(combineLatestWith(this.credentialTypes$),
-      filter(([credentials, credentialTypes]) => credentials?.length > 0 && credentialTypes.length > 0))
+      filter(([credentials, credentialTypes]) => credentials?.items?.length > 0 && credentialTypes.length > 0))
       .subscribe(([credentials, credentialTypes]) => {
-        this.lastAvailablePage = this.getLastPage(credentials);
+        this.lastAvailablePage = credentials.totalPages;
         if (credentialTypes) {
-          credentials.map(item => {
+          credentials.items.map(item => {
             let credentialType = credentialTypes.find(type => type.id === item.credentialTypeId);
             item.credentialTypeName = credentialType ? credentialType.name : '';
           });
         }
-        this.gridDataSource = this.getRowsPerPage(credentials, this.currentPagerPage);
-        this.totalDataRecords = credentials.length;
+        this.gridDataSource = this.getRowsPerPage(credentials.items, this.currentPagerPage);
+        this.totalDataRecords = credentials.totalCount;
     });
   }
 
@@ -303,8 +334,9 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
       comment: ['', Validators.maxLength(500)]
     });
     this.CredentialsFilterFormGroup = this.formBuilder.group({
-      name: [[]],
-      credentialTypeId: [[]],
+      searchTerm: [''],
+      credentialIds: [[]],
+      credentialTypeIds: [[]],
       expireDateApplicable: [false],
     });
   }
@@ -316,9 +348,5 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   private getRowsPerPage(data: object[], currentPage: number): object[] {
     return data.slice((currentPage * this.getActiveRowsPerPage()) - this.getActiveRowsPerPage(),
       (currentPage * this.getActiveRowsPerPage()));
-  }
-
-  private getLastPage(data: object[]): number {
-    return Math.round(data.length / this.getActiveRowsPerPage()) + 1;
   }
 }

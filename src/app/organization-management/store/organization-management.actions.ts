@@ -6,7 +6,7 @@ import { Department, DepartmentFilter } from '@shared/models/department.model';
 import { Location, LocationFilter } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
 import { CredentialType } from '@shared/models/credential-type.model';
-import { Credential } from '@shared/models/credential.model';
+import { Credential, CredentialFilter } from '@shared/models/credential.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { OrganizationSettingsPost } from '@shared/models/organization-settings.model';
 import { ExportPayload } from "@shared/models/export.model";
@@ -253,7 +253,7 @@ export class UpdateCredentialType {
 
 export class GetCredential {
   static readonly type = '[organizationManagement] Get Credential list';
-  constructor() { }
+  constructor(public payload?: CredentialFilter) { }
 }
 
 export class GetCredentialById {

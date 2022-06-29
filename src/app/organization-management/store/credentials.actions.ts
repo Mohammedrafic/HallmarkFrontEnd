@@ -73,3 +73,13 @@ export class UpdateCredentialSetupSucceeded {
   static readonly type = '[credentials] Update Credential Setup Succeeded';
   constructor() { }
 }
+
+export class GetCredentialsDataSources {
+  static readonly type = '[credentials] Get Credentials Data Sources';
+  constructor() { }
+}
+
+export class SetCredentialsFilterCount {
+  static readonly type = '[credentials] Set The Amount Of Applied Filters';
+  constructor(public payload: number) { }
+}
