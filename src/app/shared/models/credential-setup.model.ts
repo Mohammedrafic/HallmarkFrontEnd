@@ -5,10 +5,10 @@ export class CredentialSetupGet {
   mappingId?: number;
   credentialType: string;
   description: string;
-  isActive: boolean;
-  reqSubmission: boolean;
-  reqOnboard: boolean;
-  inactiveDate: string | null;
+  isActive?: boolean;
+  reqSubmission?: boolean;
+  reqOnboard?: boolean;
+  inactiveDate?: string;
   comments?: string;
 }
 
@@ -34,10 +34,10 @@ export class CredentialSetupMappingPost {
 
 export class CredentialSetupDetails {
   masterCredentialId: number;
-  optional: boolean;
-  reqSubmission: boolean;
-  reqOnboard: boolean;
-  inactiveDate: string | null;
+  optional?: boolean;
+  reqSubmission?: boolean;
+  reqOnboard?: boolean;
+  inactiveDate?: string;
   comments?: string;
 }
 

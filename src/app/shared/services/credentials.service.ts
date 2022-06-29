@@ -94,7 +94,7 @@ export class CredentialsService {
    * @param mappingId
    */
   public removeCredentialSetups(mappingId: number): Observable<void> {
-    return this.http.delete<void>(`/api/CredentialSetups/${mappingId}`);
+    return this.http.delete<void>(`/api/CredentialSetups?MappingId=${mappingId}`);
   }
 
   /**

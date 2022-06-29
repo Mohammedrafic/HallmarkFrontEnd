@@ -6,7 +6,7 @@ import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { CANCEL_COFIRM_TEXT, DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import { combineLatestWith, filter, Observable, Subject, takeUntil } from 'rxjs';
+import { combineLatestWith, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { ShowSideDialog } from '../../../../store/app.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import {
@@ -39,8 +39,6 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
 
   @Output() formClosed = new EventEmitter();
 
-  public credentialSetupList: CredentialSetupGet[] = [];
-
   public locations: OrganizationLocation[] = [];
   public departments: OrganizationDepartment[] = [];
 
@@ -59,12 +57,14 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   credentialTypes$: Observable<CredentialType[]>;
 
   public formHeaderLabel: string = 'Map Credentials';
-  public isDropdonEnabled = true;
+  public isDropdownEnabled = true;
 
   public credentialSetupMappingToPost?: CredentialSetupMappingPost;
   public isEdit: boolean;
 
+  private credentialSetupList: CredentialSetupGet[] = [];
   private unsubscribe$: Subject<void> = new Subject();
+  private pageSubject = new Subject<number>();
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -82,6 +82,7 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
     this.idFieldName = 'masterCredentialId';
     this.mappingDataSavedHandler();
     this.setFormForEditHandler();
+    this.pageChangedHandler();
   }
 
   ngOnDestroy(): void {
@@ -148,28 +149,28 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   }
 
   public onRowsDropDownChanged(): void {
-    this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
+    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
   }
 
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.gridDataSource = this.getRowsPerPage(this.credentialSetupList, event.currentPage || event.value);
-      this.currentPagerPage = event.currentPage || event.value;
+      this.pageSubject.next(event.currentPage || event.value);
     }
   }
 
   private organizationChangedHandler(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(organizationId => {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.store.dispatch(new GetCredential());
       this.store.dispatch(new GetCredentialTypes());
     });
   }
 
   private mapGridData(): void {
-    this.credentials$.pipe(combineLatestWith(this.credentialTypes$),
+    this.credentials$.pipe(combineLatestWith(this.credentialTypes$), takeUntil(this.unsubscribe$),
       filter(([credentials, credentialTypes]) => credentials?.length > 0 && credentialTypes.length > 0))
       .subscribe(([credentials, credentialTypes]) => {
         this.lastAvailablePage = this.getLastPage(credentials);
+        this.totalDataRecords = credentials.length;
         this.credentialSetupList = [];
 
         if (credentialTypes) {
@@ -179,17 +180,13 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
               masterCredentialId: item.id as number,
               credentialType: foundCredentialType ? foundCredentialType.name : '',
               description: item.name,
-              comments: item.comment,
-              inactiveDate: null,
-              isActive: false,
-              reqOnboard: false,
-              reqSubmission: false
+              comments: item.comment
             }
             this.credentialSetupList.push(credentialSetup);
           });
         }
-        this.gridDataSource = this.getRowsPerPage(this.credentialSetupList, this.currentPagerPage);
-        this.totalDataRecords = credentials.length;
+        this.gridDataSource = this.credentialSetupList;
+
         // reset grid invalid state
         this.isGridStateInvalid = false;
       });
@@ -201,6 +198,8 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
       if (credentialSetupMapping) {
         this.formHeaderLabel = 'Edit Mapping';
         this.isEdit = true;
+        // disable dropdowns in Edit mode
+        this.isDropdownEnabled = false;
 
         // setup form data
         this.mapCredentialsFormGroup.setValue({
@@ -211,25 +210,19 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
           groupIds: credentialSetupMapping.skillGroupIds ? credentialSetupMapping.skillGroupIds : this.groups.map(g => g.id),
         });
 
-        const selectedItemsIndexes: number[] = [];
         credentialSetupMapping.credentials.forEach(savedMapping => {
-          this.credentialSetupList.map((credential, index) => {
+          (this.gridDataSource as CredentialSetupGet[]).map((credential, index) => {
             if (credential.masterCredentialId === savedMapping.masterCredentialId) {
               credential.inactiveDate = savedMapping.inactiveDate;
               credential.isActive = savedMapping.optional;
               credential.reqSubmission = savedMapping.reqSubmission;
               credential.reqOnboard = savedMapping.reqOnboard;
-              selectedItemsIndexes.push(index);
+
+              this.selectedItems.push(this.gridDataSource[index]);
             }
           });
 
-          // disable dropdowns in Edit mode
-          this.isDropdonEnabled = false;
-
-          // reassign grid data with updated row values
-          this.gridDataSource = this.getRowsPerPage(this.credentialSetupList, this.currentPagerPage);
-          // highlight previously saved mapping rows
-          this.grid.selectRows(selectedItemsIndexes);
+          this.grid.refresh();
         });
       }
     });
@@ -363,25 +356,37 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
     this.removeActiveCssClass();
     this.mapCredentialsFormGroup.reset();
     this.formHeaderLabel = 'Map Credentials';
-    this.isDropdonEnabled = true;
+    this.isDropdownEnabled = true;
     this.credentialSetupMappingToPost = undefined;
     this.isEdit = false;
+    this.clearSelection(this.grid);
   }
 
   private cleanUp(): void {
     this.store.dispatch(new ShowSideDialog(false));
     this.clearFormDetails();
-    this.formClosed.emit();
-    this.store.dispatch(new GetCredential());
-    this.store.dispatch(new GetCredentialTypes());
+    this.credentialSetupList.map(s => {
+      s.isActive = false;
+      s.reqSubmission = false;
+      s.reqOnboard = false;
+    });
+    this.grid.refresh();
+    this.isGridStateInvalid = false;
+  }
+
+  private pageChangedHandler(): void {
+    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
+      this.currentPage = page;
+      this.gridDataSource = this.getRowsPerPage(page);
+    });
   }
 
   private getActiveRowsPerPage(): number {
     return parseInt(this.activeRowsPerPageDropDown);
   }
 
-  private getRowsPerPage(data: object[], currentPage: number): object[] {
-    return data.slice((currentPage * this.getActiveRowsPerPage()) - this.getActiveRowsPerPage(),
+  private getRowsPerPage(currentPage: number): object[] {
+    return this.credentialSetupList.slice((currentPage * this.getActiveRowsPerPage()) - this.getActiveRowsPerPage(),
       (currentPage * this.getActiveRowsPerPage()));
   }
 

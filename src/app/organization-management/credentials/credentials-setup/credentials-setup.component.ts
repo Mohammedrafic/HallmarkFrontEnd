@@ -147,7 +147,8 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       reqSubmission: credentialSetup.reqSubmission,
       reqOnboard: credentialSetup.reqOnboard
     });
-    this.store.dispatch(new ShowSideDialog(true));
+
+    setTimeout(() => this.store.dispatch(new ShowSideDialog(true)), 40);
   }
 
   public onCredentialFormCancelClick(): void {
@@ -249,7 +250,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   }
 
   public onSelectedCredentialClick(selectedCredential: CredentialSetupFilterGet): void {
-    if (selectedCredential) {
+    if (selectedCredential && selectedCredential.mappingId) {
       this.lastSelectedCredential = selectedCredential;
       // get mapping for selected credential
       this.store.dispatch(new GetCredentialSetupByMappingId(selectedCredential.mappingId));
@@ -329,6 +330,12 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
           skillId: this.headerFilterFormGroup.controls['skillId'].value,
         };
         this.credentialSetupFilter.next(filter);
+      } else {
+        const filter: CredentialSetupFilterDto = {
+          skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
+          skillId: this.headerFilterFormGroup.controls['skillId'].value,
+        };
+        this.credentialSetupFilter.next(filter);
       }
 
       this.headerFilterFormGroup.controls['locationId'].setValue(null);
@@ -350,6 +357,14 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
           skillId: this.headerFilterFormGroup.controls['skillId'].value,
         };
         this.credentialSetupFilter.next(filter);
+      } else {
+        const filter: CredentialSetupFilterDto = {
+          regionId: this.headerFilterFormGroup.controls['regionId'].value,
+          departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
+          skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
+          skillId: this.headerFilterFormGroup.controls['skillId'].value,
+        };
+        this.credentialSetupFilter.next(filter);
       }
 
       this.headerFilterFormGroup.controls['departmentId'].setValue(null);
@@ -361,6 +376,14 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
           regionId: this.headerFilterFormGroup.controls['regionId'].value,
           locationId: this.headerFilterFormGroup.controls['locationId'].value,
           departmentId: departmentId,
+          skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
+          skillId: this.headerFilterFormGroup.controls['skillId'].value,
+        };
+        this.credentialSetupFilter.next(filter);
+      } else {
+        const filter: CredentialSetupFilterDto = {
+          regionId: this.headerFilterFormGroup.controls['regionId'].value,
+          locationId: this.headerFilterFormGroup.controls['locationId'].value,
           skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
           skillId: this.headerFilterFormGroup.controls['skillId'].value,
         };
@@ -383,6 +406,14 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
           skillId: this.headerFilterFormGroup.controls['skillId'].value,
         };
         this.credentialSetupFilter.next(filter);
+      } else {
+        const filter: CredentialSetupFilterDto = {
+          regionId: this.headerFilterFormGroup.controls['regionId'].value,
+          locationId: this.headerFilterFormGroup.controls['locationId'].value,
+          departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
+          skillId: this.headerFilterFormGroup.controls['skillId'].value,
+        };
+        this.credentialSetupFilter.next(filter);
       }
 
       this.headerFilterFormGroup.controls['skillId'].setValue(null);
@@ -396,6 +427,14 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
           departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
           skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
           skillId: skillId,
+        };
+        this.credentialSetupFilter.next(filter);
+      } else {
+        const filter: CredentialSetupFilterDto = {
+          regionId: this.headerFilterFormGroup.controls['regionId'].value,
+          locationId: this.headerFilterFormGroup.controls['locationId'].value,
+          departmentId: this.headerFilterFormGroup.controls['departmentId'].value,
+          skillGroupId: this.headerFilterFormGroup.controls['groupId'].value,
         };
         this.credentialSetupFilter.next(filter);
       }

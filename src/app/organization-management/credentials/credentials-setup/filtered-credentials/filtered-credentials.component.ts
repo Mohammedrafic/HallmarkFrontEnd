@@ -79,6 +79,8 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
   public onRowSelected(event: any): void {
     if (event?.data?.length) {
       this.selectedRow.emit(event.data[0]);
+    } else {
+      this.selectedRow.emit(event?.data);
     }
   }
 
