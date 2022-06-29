@@ -18,6 +18,7 @@ import { TimesheetDetailsService } from "../../services/timesheet-details.servic
 import { downloadBlobFile } from "@shared/utils/file.utils";
 import { Invoice, ProfileUploadedFile } from "../../interface";
 import { DialogActionPayload } from '../../interface';
+import { Router } from '@angular/router';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -28,6 +29,7 @@ export class TimesheetsState {
   constructor(
     private timesheetsService: TimesheetsApiService,
     private timesheetDetailsService: TimesheetDetailsService,
+    private router: Router,
   ) {
   }
 
@@ -62,32 +64,58 @@ export class TimesheetsState {
   }
 
   @Action(Timesheets.GetAll)
-  GetTimesheets({ patchState }: StateContext<TimesheetsModel>, { payload }: Timesheets.GetAll): Observable<TimeSheetsPage> {
+  GetTimesheets({ patchState }: StateContext<TimesheetsModel>, { payload, isAgency }: Timesheets.GetAll): Observable<TimeSheetsPage> {
     let dataToStore: any;
 
     const local = localStorage.getItem('timesheets');
 
-    if (local) {
-      dataToStore = JSON.parse(local as string);
+    if (isAgency) {
+      if (local) {
+        dataToStore = JSON.parse(local as string);
 
-      patchState({
-        timesheets: dataToStore,
-      });
+        patchState({
+          timesheets: dataToStore,
+        });
 
-      return of(dataToStore);
+        return of(dataToStore);
+      } else {
+        return this.timesheetsService.getTimesheets(payload)
+        .pipe(
+          tap((res) => {
+            dataToStore = res;
+            localStorage.setItem('timesheets', JSON.stringify(dataToStore));
+            patchState({
+              timesheets: dataToStore,
+            });
+          }));
+      }
     } else {
-      return this.timesheetsService.getTimesheets(payload)
-      .pipe(
-        tap((res) => {
-          dataToStore = res;
-          localStorage.setItem('timesheets', JSON.stringify(dataToStore));
-          patchState({
-            timesheets: dataToStore,
-          });
-        }));
+      const data = localStorage.getItem('timesheets');
+      if (data) {
+        dataToStore = JSON.parse(data as string);
+        patchState({
+          timesheets: dataToStore,
+        });
+        return of(dataToStore);
+      } else {
+        const init = {
+          items: [],
+          pageNumber: 1,
+          totalPages: 1,
+          totalCount: 0,
+          hasPreviousPage: false,
+          hasNextPage: false,
+        };
 
+        patchState({
+          timesheets: init,
+        });
+        return of(init);
+      }
 
     }
+
+
   }
 
   @Action(Timesheets.PostProfileTimesheet)

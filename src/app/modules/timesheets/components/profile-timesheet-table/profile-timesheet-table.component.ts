@@ -61,7 +61,14 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
   public deleteTimesheet(timesheet: ProfileTimeSheetDetail): void {}
 
   private createTableData(): void {
-    const profile = JSON.parse(localStorage.getItem('profile') as string);
+    let profile;
+    const init = localStorage.getItem('profile');
+    if (init) {
+      profile = JSON.parse(init as string);
+    } else {
+      profile = {}
+    }
+
 
     this.profileId = profile.id;
     this.tempData = [];
@@ -71,6 +78,8 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
 
     if (data) {
       storageData = JSON.parse(data)
+    } else {
+      storageData = {}
     }
 
     if (storageData && storageData[profile.id]) {

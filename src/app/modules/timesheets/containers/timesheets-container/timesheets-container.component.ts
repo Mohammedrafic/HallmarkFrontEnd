@@ -25,6 +25,7 @@ import { Timesheets } from '../../store/actions/timesheets.actions';
 import { DemoService } from '../../services/demo.service';
 import { UserState } from 'src/app/store/user.state';
 import { User } from '@shared/models/user.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-timesheets-container.ts',
@@ -51,6 +52,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public pageSize = 30;
 
   private pageNumberSubj: BaseObservable<number> = new BaseObservable<number>(1);
+  isAgency: boolean;
 
   constructor(
     private store: Store,
@@ -58,9 +60,11 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     private timesheetsService: TimesheetsService,
     private demoService: DemoService,
     private cd: ChangeDetectorRef,
+    private router: Router,
   ) {
     super();
     store.dispatch(new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }));
+    this.isAgency = this.router.url.includes('agency');
   }
 
   ngOnInit(): void {
@@ -68,6 +72,10 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.initFilterColumnDataSources();
     this.initFormGroup();
     this.startPageStateWatching();
+
+    this.timesheets$.subscribe((data) => {
+      console.log(data)
+    })
   }
 
   public handleChangeTab(tabIndex: number): void {
@@ -151,7 +159,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.store.dispatch(new Timesheets.GetAll(Object.assign({}, this.filters, {
       pageNumber: this.pageNumberSubj.get(),
       pageSize: this.pageSize,
-    }))).pipe(takeUntil(this.componentDestroy()));
+    }), this.isAgency)).pipe(takeUntil(this.componentDestroy()));
   }
 
   private initFormGroup(): void {

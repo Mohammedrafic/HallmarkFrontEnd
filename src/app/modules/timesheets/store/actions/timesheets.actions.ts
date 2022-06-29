@@ -5,7 +5,7 @@ export namespace Timesheets {
   export class GetAll {
     static readonly type = TIMESHEETS_ACTIONS.GET_TIMESHEETS;
 
-    constructor(public readonly payload: ITimesheetsFilter) {
+    constructor(public readonly payload: ITimesheetsFilter, public readonly isAgency: boolean) {
     }
   }
 

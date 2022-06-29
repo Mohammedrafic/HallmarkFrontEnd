@@ -260,7 +260,10 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       );
 
       localStorage.setItem('submited-timsheets', JSON.stringify(submitted));
-      this.store.dispatch(Timesheets.GetAll);
+      this.store.dispatch(new Timesheets.GetAll({
+        pageNumber: 1,
+        pageSize: 20,
+      }, this.isAgency));
 
     }
   }

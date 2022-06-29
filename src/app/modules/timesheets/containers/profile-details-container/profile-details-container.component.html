@@ -108,8 +108,10 @@
       <div class="order-header">
         <h2 class="order-id">Order ID {{ profileData?.orderId}}</h2>
 
-        <div>
-          <ejs-checkbox [checked]="false" (checkedChange)="onDWNCheckboxSelectedChange($event)" label="DNW"></ejs-checkbox>
+        <div class="controls-block">
+          <div class="checkbox-block">
+            <ejs-checkbox [checked]="false" (checkedChange)="onDWNCheckboxSelectedChange($event)" label="DNW"></ejs-checkbox>
+          </div>
 
           <button *ngIf="!isAgency" ejs-button cssClass="e-outline" class="reject-button" (click)="onRejectButtonClick()">
             Reject
