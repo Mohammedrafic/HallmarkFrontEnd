@@ -8,7 +8,7 @@ export interface CandidateModel {
   city: string;
   email: string;
   name: string;
-  skills: string[];
+  skill: string;
   state: string;
   workPhoneNumber: string;
 }

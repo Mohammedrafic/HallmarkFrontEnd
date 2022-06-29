@@ -21,12 +21,12 @@ export class ReportsService {
     filterFormValue: ReportFilterFormValueModel
   ): ReportDataRequestPayloadModel {
     return {
-      agencies: filterFormValue.agencies,
-      applicantStatus: filterFormValue.statuses,
-      candidateName: filterFormValue.candidateName,
+      agencies: filterFormValue.agencies ?? [],
+      applicantStatus: filterFormValue.statuses ?? [],
+      candidateName: filterFormValue.candidateName ?? '',
       pageNumber: pageQueryParams.page,
       pageSize: pageQueryParams.pageSize,
-      skills: filterFormValue.skills,
+      skills: filterFormValue.skills ?? [],
     };
   }
 

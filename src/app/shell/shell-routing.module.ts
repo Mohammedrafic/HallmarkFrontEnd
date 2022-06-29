@@ -36,7 +36,8 @@ const shellRoutes: Routes = [
         path: 'reports',
         loadChildren: () =>
           import('../reports/reports.module').then((m: typeof import('../reports/reports.module')) => m.ReportsModule),
-      }
+        data: { isOrganizationArea: true },
+      },
     ],
   },
 ];

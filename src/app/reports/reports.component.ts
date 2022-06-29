@@ -1,6 +1,7 @@
 import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
 import { Observable, BehaviorSubject, finalize, takeUntil, forkJoin, switchMap } from 'rxjs';
 import { Store } from '@ngxs/store';
+import type { ValueFormatterParams } from '@ag-grid-community/core';
 
 import { Component, ChangeDetectionStrategy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
@@ -48,7 +49,16 @@ export class ReportsComponent extends DestroyableDirective implements OnInit {
     { field: 'address', headerName: 'Address' },
     { field: 'state', headerName: 'State' },
     { field: 'city', headerName: 'City' },
-    { field: 'applicantStatus', headerName: 'Applicant status' },
+    {
+      field: 'applicantStatus',
+      headerName: 'Applicant status',
+      valueFormatter: (valueFormatterParams: ValueFormatterParams): string => {
+        const targetApplicantStatus: ApplicantStatus | undefined = this.filterColumns['statuses'].dataSource?.find(
+          (applicantStatus: ApplicantStatus) => applicantStatus.applicantStatus === valueFormatterParams.value
+        );
+        return targetApplicantStatus?.statusText ?? '';
+      },
+    },
   ];
 
   public readonly filterColumns: FilterColumnsModel = {
