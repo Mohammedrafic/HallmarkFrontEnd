@@ -42,7 +42,7 @@ import { ActivePositionsDto, ActivePositionTypeInfo } from '../models/active-pos
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { widgetTypes } from '../constants/widget-types';
-import { widgetTitles } from '../constants/widget-titles';
+
 
 @Injectable()
 export class DashboardService {
@@ -107,11 +107,9 @@ export class DashboardService {
     return this.httpClient.get<AvailableWidgetsResponseModel>(`${this.baseUrl}/AvailableWidgets`).pipe(
       map((response: AvailableWidgetsResponseModel) =>
         response.widgetTypes.map((widget: WidgetOptionModel) => {
-          const widgetId = widgetTypes[widget.widgetType];
           return {
             ...widget,
-            title: widgetTitles[widgetId],
-            id: widgetTypes[widgetId],
+            id: widgetTypes[widget.widgetType],
           };
         })
       )
