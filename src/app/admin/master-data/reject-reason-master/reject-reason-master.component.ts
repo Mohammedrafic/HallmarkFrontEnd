@@ -4,7 +4,7 @@ import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/fo
 import { DialogMode } from "@shared/enums/dialog-mode.enum";
 import { ShowSideDialog } from "../../../store/app.actions";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
-import { CANCEL_REJECTION_REASON, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from "@shared/constants";
+import { CANCEL_REJECTION_REASON, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, ONLY_LETTERS } from "@shared/constants";
 import { delay, filter, Observable, takeWhile } from "rxjs";
 import { ConfirmService } from "@shared/services/confirm.service";
 import { RejectReasonPage } from "@shared/models/reject-reason.model";
@@ -138,7 +138,7 @@ export class RejectReasonMasterComponent extends AbstractGridConfigurationCompon
   private createForm(): void {
     this.form = new FormGroup({
       id: new FormControl(null),
-      reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(/^[a-zA-Z\s]*$/)])
+      reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ONLY_LETTERS)])
     })
   }
 

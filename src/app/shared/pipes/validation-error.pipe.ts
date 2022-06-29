@@ -1,30 +1,30 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { ONLY_LETTERS } from "@shared/constants";
 
 @Pipe({
   name: 'validationError',
 })
 export class ValidationErrorPipe implements PipeTransform {
   transform(value: any): string {
-    let error: string = '';
-
-    //TODO: refactor(use switch case)
-    if (value) {
-      if (!!value['required']) {
-        error = 'Required';
-      }
-      if (!!value['maxlength']) {
-        error = `The max length of ${value.maxlength.requiredLength} characters is reached, you typed in ${value.maxlength.actualLength}`;
-      }
-      if(!!value['minlength']) {
-        error = `Min symbols entered should be ${value.minlength.requiredLength}`;
-      }
-      if(!!value['pattern']) {
-        if(value.pattern.requiredPattern === '/^[a-zA-Z\\s]*$/') {
-          error = 'Only letters are allowed';
-        }
-      }
+    if(!value) {
+      return '';
     }
-    return error;
+
+    switch (true) {
+      case 'required' in value:
+        return 'Required';
+      case 'maxlength' in value:
+        return `The max length of ${value.maxlength.requiredLength} characters is reached, you typed in ${value.maxlength.actualLength}`;
+      case 'minlength' in value:
+        return `Min symbols entered should be ${value.minlength.requiredLength}`;
+      case 'pattern' in value:
+        if(!(new RegExp(ONLY_LETTERS).test(value.pattern.actualValue))) {
+          return 'Only letters are allowed';
+        }
+        return '';
+      default:
+        return '';
+    }
   }
 }
 
