@@ -28,6 +28,12 @@
             </div>
           </div>
           <div class="e-card-content dialog-controls">
+            <div class="order-actions" *ngIf="order?.canApprove && !order?.orderOpenDate && order?.status === orderStatus.PreOpen">
+              <button ejs-button cssClass="e-outline" (click)="cancelOrder(order.id)">Cancel</button>
+              <button ejs-button cssClass="e-primary" (click)="approveOrder(order.id)">Approve</button>
+              <div class="vertical-divider"></div>
+            </div>
+
             <button ejs-button cssClass="e-outline edit-button" (click)="editOrder(order)"><i-feather name="edit" class="icon"></i-feather></button>
             <button ejs-button cssClass="e-outline" *ngIf="orderStatus.Incomplete !== order?.status">Close Order</button>
             <button ejs-button cssClass="e-primary delete-button" (click)="deleteOrder(order.id)" *ngIf="orderStatus.Incomplete === order?.status">Delete</button>
@@ -50,7 +56,7 @@
               </ng-template>
             </e-tabitem>
             <e-tabitem>
-              <ng-template #headerText>Candidates <span class="e-badge e-badge-success e-badge-circle">{{ (orderCandidatePage$ | async)?.totalCount }}</span></ng-template>
+              <ng-template #headerText>Candidates <span class="e-badge e-badge-success e-badge-circle">{{ candidatesCounter }}</span></ng-template>
               <ng-template #content>
                 <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>
               </ng-template>

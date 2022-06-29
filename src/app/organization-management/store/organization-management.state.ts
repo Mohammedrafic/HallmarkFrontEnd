@@ -60,8 +60,7 @@ import {
   UpdateCredentialType,
   GetAllSkills,
   GetCredentialSkillGroup,
-  SaveCredentialSkillGroup,
-  UpdateCredentialSkillGroup,
+  SaveUpdateCredentialSkillGroup,
   RemoveCredentialSkillGroup,
   GetOrganizationSettings,
   SaveOrganizationSettings,
@@ -72,11 +71,14 @@ import {
   ExportLocations,
   ExportDepartments,
   ExportSkills,
-  GetMasterSkillsByOrganization, GetAllOrganizationSkills
+  GetAllOrganizationSkills,
+  GetMasterSkillsByOrganization,
+  GetLocationFilterOptions,
+  GetDepartmentFilterOptions
 } from './organization-management.actions';
-import { Department } from '@shared/models/department.model';
+import { Department, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
-import { Location } from '@shared/models/location.model';
+import { Location, LocationFilterOptions, LocationsPage } from '@shared/models/location.model';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
 import { MasterSkillByOrganization, Skill, SkillsPage, SkillDataSource } from 'src/app/shared/models/skill.model';
@@ -84,7 +86,7 @@ import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { CredentialType } from '@shared/models/credential-type.model';
-import { Credential } from '@shared/models/credential.model';
+import { Credential, CredentialPage } from '@shared/models/credential.model';
 import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
 import { CandidateStateModel } from '@agency/store/candidate.state';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
@@ -119,9 +121,9 @@ export interface OrganizationManagementStateModel {
   isOrganizationLoading: boolean;
   isDepartmentLoading: boolean;
   isLocationLoading: boolean;
-  departments: Department[];
+  departments: Department[] | DepartmentsPage;
   regions: Region[];
-  locations: Location[];
+  locations: Location[] | LocationsPage;
   location: Location | null;
   organization: Organization | null;
   masterSkills: SkillsPage | null;
@@ -131,7 +133,7 @@ export interface OrganizationManagementStateModel {
   allSkillsCategories: SkillCategoriesPage | null;
   isDirty: boolean;
   credentialTypes: CredentialType[];
-  credentials: Credential[];
+  credentials: Credential[] | CredentialPage;
   isCredentialTypesLoading: boolean;
   isCredentialLoading: boolean;
   skillGroups: CredentialSkillGroupPage | null;
@@ -141,6 +143,8 @@ export interface OrganizationManagementStateModel {
   organizationSettings: OrganizationSettingsGet[];
   skillDataSource: SkillDataSource;
   allOrganizationSkills: Skill[] | null;
+  locationFilterOptions: LocationFilterOptions | null;
+  departmentFilterOptions: DepartmentFilterOptions | null;
 }
 
 @State<OrganizationManagementStateModel>({
@@ -182,7 +186,9 @@ export interface OrganizationManagementStateModel {
     isOrganizationSettingsLoading: false,
     organizationSettings: [],
     skillDataSource: { skillABBRs: [], skillDescriptions: [], glNumbers: [] },
-    allOrganizationSkills: null
+    allOrganizationSkills: null,
+    locationFilterOptions: null,
+    departmentFilterOptions: null
   },
 })
 @Injectable()
@@ -215,13 +221,13 @@ export class OrganizationManagementState {
   static isDirty(state: OrganizationManagementStateModel): boolean { return state.isDirty; }
 
   @Selector()
-  static departments(state: OrganizationManagementStateModel): Department[] { return state.departments; }
+  static departments(state: OrganizationManagementStateModel): Department[] | DepartmentsPage { return state.departments; }
 
   @Selector()
   static regions(state: OrganizationManagementStateModel): Region[] { return state.regions; }
 
   @Selector()
-  static locationsByRegionId(state: OrganizationManagementStateModel): Location[] { return state.locations; }
+  static locationsByRegionId(state: OrganizationManagementStateModel): Location[] | LocationsPage { return state.locations; }
 
   @Selector()
   static locationById(state: OrganizationManagementStateModel): Location | null { return state.location; }
@@ -248,7 +254,7 @@ export class OrganizationManagementState {
   static credentialTypes(state: OrganizationManagementStateModel): CredentialType[] { return state.credentialTypes; }
 
   @Selector()
-  static credentials(state: OrganizationManagementStateModel): Credential[] { return state.credentials }
+  static credentials(state: OrganizationManagementStateModel): Credential[] | CredentialPage { return state.credentials }
 
   @Selector()
   static skillGroups(state: OrganizationManagementStateModel): CredentialSkillGroupPage  | null { return state.skillGroups }
@@ -261,6 +267,12 @@ export class OrganizationManagementState {
 
   @Selector()
   static allOrganizationSkills(state: OrganizationManagementStateModel): Skill[] | null { return state.allOrganizationSkills; }
+
+  @Selector()
+  static locationFilterOptions(state: OrganizationManagementStateModel): LocationFilterOptions | null { return state.locationFilterOptions; }
+
+  @Selector()
+  static departmentFilterOptions(state: OrganizationManagementStateModel): DepartmentFilterOptions | null { return state.departmentFilterOptions; }
 
   constructor(
     private organizationService: OrganizationService,
@@ -340,28 +352,34 @@ export class OrganizationManagementState {
   }
 
   @Action(SaveDepartment)
-  SaveDepartment({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveDepartment): Observable<Department> {
+  SaveDepartment({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload, filters }: SaveDepartment): Observable<Department> {
     patchState({ isDepartmentLoading: true });
     return this.departmentService.saveDepartment(payload).pipe(tap((payload) => {
       patchState({ isDepartmentLoading: false});
-      dispatch(new GetDepartmentsByLocationId(payload.locationId));
+      dispatch(new GetDepartmentsByLocationId(payload.locationId, filters));
+      if (filters) {
+        dispatch(new GetDepartmentFilterOptions(payload.locationId as number));
+      }
       return payload;
     }));
   }
 
   @Action(GetDepartmentsByLocationId)
-  GetDepartmentsByLocationId({ patchState }: StateContext<OrganizationManagementStateModel>, { locationId }: GetDepartmentsByLocationId): Observable<Department[]> {
-    return this.departmentService.getDepartmentsByLocationId(locationId).pipe(tap((payload) => {
+  GetDepartmentsByLocationId({ patchState }: StateContext<OrganizationManagementStateModel>, { locationId, filters }: GetDepartmentsByLocationId): Observable<Department[] | DepartmentsPage> {
+    return this.departmentService.getDepartmentsByLocationId(locationId, filters).pipe(tap((payload) => {
       patchState({ departments: payload});
       return payload;
     }));
   }
 
   @Action(UpdateDepartment)
-  UpdateDepartments({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { department }: UpdateDepartment): Observable<void> {
+  UpdateDepartments({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { department, filters }: UpdateDepartment): Observable<void> {
     return this.departmentService.updateDepartment(department).pipe(tap((payload) => {
       patchState({ isDepartmentLoading: false });
-      dispatch(new GetDepartmentsByLocationId(department.locationId));
+      dispatch(new GetDepartmentsByLocationId(department.locationId, filters));
+      if (filters) {
+        dispatch(new GetDepartmentFilterOptions(department.locationId as number));
+      }
       return payload;
     }));
   }
@@ -421,8 +439,8 @@ export class OrganizationManagementState {
   }
 
   @Action(GetLocationsByRegionId)
-  GetLocationsByRegionId({ patchState }: StateContext<OrganizationManagementStateModel>, { regionId }: GetLocationsByRegionId): Observable<Location[]> {
-    return this.locationService.getLocationsByRegionId(regionId).pipe(tap((payload) => {
+  GetLocationsByRegionId({ patchState }: StateContext<OrganizationManagementStateModel>, { regionId, filters }: GetLocationsByRegionId): Observable<Location[] | LocationsPage> {
+    return this.locationService.getLocationsByRegionId(regionId, filters).pipe(tap((payload) => {
       patchState({ locations: payload});
       return payload;
     }));
@@ -437,20 +455,26 @@ export class OrganizationManagementState {
   }
 
   @Action(SaveLocation)
-  SaveLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { location, regionId }: SaveLocation): Observable<Location> {
+  SaveLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { location, regionId, filters }: SaveLocation): Observable<Location> {
     patchState({ isLocationLoading: true });
     return this.locationService.saveLocation(location).pipe(tap((payload) => {
       patchState({ isLocationLoading: false});
-      dispatch(new GetLocationsByRegionId(regionId));
+      dispatch(new GetLocationsByRegionId(regionId, filters));
+      if (filters) {
+        dispatch(new GetLocationFilterOptions(regionId));
+      }
       return payload;
     }));
   }
 
   @Action(UpdateLocation)
-  UpdateLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { location, regionId }: UpdateLocation): Observable<void> {
+  UpdateLocation({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { location, regionId, filters}: UpdateLocation): Observable<void> {
     return this.locationService.updateLocation(location).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
-      dispatch(new GetLocationsByRegionId(regionId));
+      dispatch(new GetLocationsByRegionId(regionId, filters));
+      if (filters) {
+        dispatch(new GetLocationFilterOptions(regionId));
+      }
       return payload;
     }));
   }
@@ -619,8 +643,8 @@ export class OrganizationManagementState {
   }
 
   @Action(GetCredential)
-  GetCredential({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetCredential): Observable<Credential[]> {
-    return this.credentialsService.getCredential().pipe(tap((payload) => {
+  GetCredential({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetCredential): Observable<Credential[] | CredentialPage> {
+    return this.credentialsService.getCredential(payload).pipe(tap((payload) => {
       patchState({ credentials: payload });
       return payload;
     }));
@@ -674,21 +698,15 @@ export class OrganizationManagementState {
     }));
   }
 
-  @Action(SaveCredentialSkillGroup)
-  SaveSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveCredentialSkillGroup): Observable<CredentialSkillGroup> {
+  @Action(SaveUpdateCredentialSkillGroup)
+  SaveUpdateSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveUpdateCredentialSkillGroup): Observable<CredentialSkillGroup> {
     return this.skillGroupService.saveUpdateSkillGroup(payload).pipe(tap((payload) => {
       patchState({ isSkillGroupLoading: false });
-      dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
-      dispatch(new GetCredentialSkillGroup());
-      return payload;
-    }));
-  }
-
-  @Action(UpdateCredentialSkillGroup)
-  UpdateSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: UpdateCredentialSkillGroup): Observable<CredentialSkillGroup> {
-    return this.skillGroupService.saveUpdateSkillGroup(payload).pipe(tap((payload) => {
-      patchState({ isSkillGroupLoading: false });
-      dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      if (payload.id) {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
+      } else {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+      }
       dispatch(new GetCredentialSkillGroup());
       return payload;
     }));
@@ -775,6 +793,22 @@ export class OrganizationManagementState {
     return this.skillsService.getAllOrganizationSkills().pipe(tap(skills => {
       patchState({ allOrganizationSkills: skills });
       return skills;
+    }));
+  };
+
+  @Action(GetLocationFilterOptions)
+  GetLocationFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetLocationFilterOptions): Observable<LocationFilterOptions> {
+    return this.locationService.getLocationFilterOptions(payload).pipe(tap(options => {
+      patchState({ locationFilterOptions: options });
+      return options;
+    }));
+  };
+
+  @Action(GetDepartmentFilterOptions)
+  GetDepartmentFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetDepartmentFilterOptions): Observable<DepartmentFilterOptions> {
+    return this.departmentService.getDepartmentFilterOptions(payload).pipe(tap(options => {
+      patchState({ departmentFilterOptions: options });
+      return options;
     }));
   };
 }

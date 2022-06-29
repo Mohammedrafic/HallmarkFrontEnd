@@ -1,13 +1,18 @@
 <section class="container">
   <section class="header-container">
     <div class="e-card-header">
-      <div class="e-card-header-caption">
+      <div class="e-card-header-caption candidat-status">
         <h3 class="e-card-title">{{candidate?.lastName}}, {{candidate?.firstName}}</h3>
+        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
+          <e-chips>
+            <e-chip [text]="candidatStatus[candidate.candidateStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
+          </e-chips>
+        </ejs-chiplist>
       </div>
       <div class="e-card-content">
-        <button ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
-        <button ejs-button [isPrimary]="true" *ngIf="candidate?.statusName !== 'Accepted'" class="apply-button" (click)="onAccept()">Accept</button>
-        <button ejs-button cssClass="e-flat close-button" (click)="onClose()">
+        <button *ngIf="!isRejected" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
+        <button ejs-button [isPrimary]="true" *ngIf="candidate?.statusName !== 'Accepted' && !isRejected" class="apply-button" (click)="onAccept()">Accept</button>
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>
@@ -41,9 +46,9 @@
                       </div>
                     </div>
                     <div class="input-container bootstrap">
-                      <label class="input-group">Candidates</label>
-                      <div>
-                        <input appValidateWithMessage formControlName="candidates" class="e-input" type="text" placeholder="Candidates" />
+                      <label class="input-group">Available Start Date</label>
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="avStartDate" class="e-input" type="text" placeholder="Input text" readonly/>
                       </div>
                     </div>
                   </div>
@@ -94,10 +99,15 @@
                     <input appValidateWithMessage formControlName="comments" class="e-input" type="text" />
                   </div>
                 </div>
+                <div class="input-container bootstrap" *ngIf="isRejected">
+                  <label class="input-group">Reason</label>
+                  <div>
+                    <input appValidateWithMessage formControlName="rejectReason" class="e-input" type="text" />
+                  </div>
+                </div>
               </form>
             </ng-template>
           </e-accordionitem>
-        </e-accordionitems>
         <e-accordionitem>
           <ng-template #header>
             <div>Historical Events</div>
@@ -106,6 +116,7 @@
             <div>Historical Events</div>
           </ng-template>
         </e-accordionitem>
+      </e-accordionitems>
       </ejs-accordion>
     </div>
     <div class="comments">
@@ -116,3 +127,9 @@
     <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
   </section>
 </section>
+
+<app-reject-reason-dialog
+  [rejectReasonsList]="rejectReasons"
+  [openEvent]="openRejectDialog"
+  (applyReject)="rejectCandidateJob($event)"
+></app-reject-reason-dialog>

@@ -1,7 +1,7 @@
 import { Country } from 'src/app/shared/enums/states';
-import { Organization } from 'src/app/shared/models/organization.model';
+import { Organization, OrganizationFilter } from 'src/app/shared/models/organization.model';
 import { SkillCategory } from 'src/app/shared/models/skill-category.model';
-import { Skill } from 'src/app/shared/models/skill.model';
+import { MasterSkillFilters, Skill } from 'src/app/shared/models/skill.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { ExportPayload } from '@shared/models/export.model';
 
@@ -57,7 +57,7 @@ export class GetOrganizationByIdSucceeded {
 
 export class GetOrganizationsByPage {
   static readonly type = '[admin] Get Organizations by Page';
-  constructor(public pageNumber: number, public pageSize: number) { }
+  constructor(public pageNumber: number, public pageSize: number, public filters?: OrganizationFilter) { }
 }
 
 export class GetBusinessUnitList {
@@ -77,7 +77,7 @@ export class SetImportFileDialogState {
 
 export class GetMasterSkillsByPage {
   static readonly type = '[admin] Get Master Skills by Page';
-  constructor(public pageNumber: number, public pageSize: number) { }
+  constructor(public pageNumber: number, public pageSize: number, public filters: MasterSkillFilters) { }
 }
 
 export class GetSkillsCategoriesByPage {
@@ -167,10 +167,36 @@ export class ExportSkills {
 
 export class ExportSkillCategories {
   static readonly type = '[admin] Export Skill category list';
-  constructor(public payload: ExportPayload) { }
+
+  constructor(public payload: ExportPayload) {
+  }
 }
 
 export class ExportCredentialTypes {
   static readonly type = '[admin] Export Credential Types list';
+
+  constructor(public payload: ExportPayload) {
+  }
+}
+
+export class GetDBConnections {
+  static readonly type = '[admin] Get list of DB connections';
+
+  constructor() {
+  }
+}
+
+export class ExportOrganizations {
+  static readonly type = '[admin] Export Organization list';
   constructor(public payload: ExportPayload) { }
+}
+
+export class GetMasterSkillDataSources {
+  static readonly type = '[admin] Get Master Skills Filtering Options';
+  constructor() { }
+}
+
+export class GetOrganizationDataSources {
+  static readonly type = '[admin] Get Organization Filtering Options';
+  constructor() { }
 }

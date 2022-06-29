@@ -4,7 +4,7 @@ import { Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { Subject } from 'rxjs';
-import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { GetAllSkillsCategories } from '../../store/admin.actions';
 
 enum Tabs {
@@ -24,6 +24,7 @@ export class SkillsCategoriesComponent extends AbstractGridConfigurationComponen
   public isCategoriesActive = false;
   public exportSkills$ = new Subject<ExportedFileType>();
   public exportCategories$ = new Subject<ExportedFileType>();
+  public filteredItems$ = new Subject<number>();
 
   constructor(private store: Store) {
     super();
@@ -31,6 +32,10 @@ export class SkillsCategoriesComponent extends AbstractGridConfigurationComponen
 
   ngOnInit() {
     this.store.dispatch(new GetAllSkillsCategories());
+  }
+
+  public showFilters(): void {
+    this.store.dispatch(new ShowFilterDialog(true));
   }
 
   public override customExport(): void {

@@ -15,7 +15,16 @@
             (select)="exportSelected($event)"
             id="importButton"
             cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
-          <button ejs-button cssClass="e-outline">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+          <button
+            ejs-button
+            id="filterButton"
+            cssClass="e-outline button-filter"
+            (click)="showFilters()">
+            <div class="filter-button-content">
+              <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+              Filters <i-feather name="sliders" class="icon"></i-feather>
+            </div>
+          </button>
         </div>
       </section>
     </ng-container>
@@ -34,7 +43,8 @@
       (rowSelected)="rowSelected($event, grid)"
       (rowDeselected)="rowDeselected($event, grid)"
       (dataBound)="gridDataBound(grid)"
-      [selectionSettings]="selectionSettings">
+      [selectionSettings]="selectionSettings"
+      (actionBegin)="actionBegin($event)">
       <e-columns>
         <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="40"></e-column>
         <e-column field="createUnder.name" headerText="Organization Name" textAlign="Left" width="220"></e-column>
@@ -120,5 +130,67 @@
     </ejs-grid>
   </section>
 </section>
+
+<app-filter-dialog [items]="filteredItems" [count]="(organizations$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
+  <form class="bootstrap" [formGroup]="OrganizationFilterFormGroup">
+    <div class="input-container">
+      <label for="externalId">Search</label>
+      <div class="input-group">
+        <input  class="e-input"
+                type="text"
+                maxlength="50"
+                formControlName="searchTerm"/>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Organization Name</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="organizationNames"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.organizationNames.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Status</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="statuses"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.statuses.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>City</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="cities"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.cities.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Contact</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="contacts"
+                         placeholder="All"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.contacts.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+  </form>
+</app-filter-dialog>
 
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>

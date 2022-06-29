@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
+import { Router } from '@angular/router';
 import { Store, Actions, ofActionDispatched } from '@ngxs/store';
 import { Observable, map, distinctUntilChanged } from 'rxjs';
 import { ShowSideDialog } from 'src/app/store/app.actions';
@@ -21,7 +22,7 @@ export class DashboardControlComponent {
 
   public readonly isDialogOpened$: Observable<boolean> = this.isDialogOpened();
 
-  constructor(private readonly actions: Actions, private store: Store) {}
+  constructor(private readonly actions: Actions, private readonly store: Store, private readonly router: Router) {}
 
   public toggleDialog(isDialogShown: boolean): void {
     this.store.dispatch(new ShowSideDialog(isDialogShown));
@@ -32,5 +33,9 @@ export class DashboardControlComponent {
       map((payload: ShowSideDialog) => payload.isDialogShown),
       distinctUntilChanged()
     );
+  }
+
+  public onCreateOrder(): void {
+    this.router.navigateByUrl('/client/order-management/add');
   }
 }

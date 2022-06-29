@@ -4,8 +4,17 @@ import lodashMap from 'lodash/fp/map';
 import lodashMapPlain from 'lodash/map';
 
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
-import { Observable, of, forkJoin, catchError } from 'rxjs';
+import { AccumulationChartModel } from '@syncfusion/ej2-angular-charts';
+import type { LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
+import { catchError, forkJoin, Observable, of } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
+import flow from 'lodash/fp/flow';
+import values from 'lodash/fp/values';
+import max from 'lodash/fp/max';
+import find from 'lodash/fp/find';
+import lodashFilter from 'lodash/fp/filter';
+import identity from 'lodash/fp/identity';
+import reduce from 'lodash/reduce';
 
 import { ChartAccumulation } from '../models/chart-accumulation-widget.model';
 import { WidgetDataDependenciesAggregatedModel } from '../models/widget-data-dependencies-aggregated.model';
@@ -15,25 +24,23 @@ import { CandidatesByStatesResponseModel } from '../models/candidates-by-states-
 import { CandidatesByStateWidgetAggregatedDataModel } from '../models/candidates-by-state-widget-aggregated-data.model';
 import { DashboardStateDto } from '../models/dashboard-state-dto.model';
 import { USAMapCandidatesDataLayerSettings } from '../constants/USA-map-candidates-data-layer-settings';
-import reduce from 'lodash/reduce';
 import { CandidateTypeInfoModel } from '../models/candidate-type-info.model';
 import { legendPalette } from '../constants/legend-palette';
-import flow from 'lodash/fp/flow';
-import values from 'lodash/fp/values';
-import max from 'lodash/fp/max';
-import { WidgetOptionModel, AvailableWidgetsResponseModel } from '../models/widget-option.model';
-import find from 'lodash/fp/find';
-import lodashFilter from 'lodash/fp/filter';
-import identity from 'lodash/fp/identity';
+import { AvailableWidgetsResponseModel, WidgetOptionModel } from '../models/widget-option.model';
 import { DashboardDataModel } from '../models/dashboard-data.model';
 import type { ApplicantsByRegionDataModel } from '../models/applicants-by-region-data.model';
-import type { LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
 import type { WidgetsDataModel } from '../models/widgets-data.model';
 import { PositionTypeEnum } from '../enums/position-type.enum';
-import type { PositionsByTypeAggregatedModel } from '../models/positions-by-type-aggregated.model';
+import type {
+  PositionByTypeDataModel,
+  PositionsByTypeAggregatedModel,
+} from '../models/positions-by-type-aggregated.model';
 import { CandidatesPositionDataModel } from '../models/candidates-positions.model';
 import { CandidatesPositionsDto } from '../models/candidates-positions-dto.model';
-import { OrderStatus } from '@shared/enums/order-status';
+import { OrderStatus } from '@shared/enums/order-management';
+import { ActivePositionsDto, ActivePositionTypeInfo } from '../models/active-positions-dto.model';
+import { MONTHS } from '../constants/months';
+import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 
 @Injectable()
 export class DashboardService {
@@ -46,9 +53,10 @@ export class DashboardService {
     [WidgetTypeEnum.APPLICANTS_BY_REGION]: (filters: DashboardFiltersModel) =>
       this.getApplicantsByRegionWidgetData(filters),
     [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboardFiltersModel) => this.getPositionsByTypes(filters),
-    [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPosition(filters, OrderStatus.InProgress),
-    [WidgetTypeEnum.OPEN_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPosition(filters, OrderStatus.Open),
-    [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPosition(filters, OrderStatus.Filled),
+    [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.InProgress),
+    [WidgetTypeEnum.OPEN_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
+    [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
+    [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -59,7 +67,7 @@ export class DashboardService {
     return forkJoin({ panels: this.getDashboardState(), widgets: this.getWidgetList() }).pipe(
       map(({ panels, widgets }: DashboardDataModel) => {
         const availablePanels = flow(
-          lodashMap((widget: WidgetOptionModel) => find((panel: PanelModel) => panel.id === widget.title, panels)),
+          lodashMap((widget: WidgetOptionModel) => find((panel: PanelModel) => panel.id === widget.id, panels)),
           lodashFilter(identity)
         )(widgets) as PanelModel[];
 
@@ -94,9 +102,16 @@ export class DashboardService {
   }
 
   private getWidgetList(): Observable<WidgetOptionModel[]> {
-    return this.httpClient
-      .get<AvailableWidgetsResponseModel>(`${this.baseUrl}/AvailableWidgets`)
-      .pipe(map((response: AvailableWidgetsResponseModel) => response.widgetTypes));
+    return this.httpClient.get<AvailableWidgetsResponseModel>(`${this.baseUrl}/AvailableWidgets`).pipe(
+      map((response: AvailableWidgetsResponseModel) =>
+        response.widgetTypes.map((widget) => {
+          return {
+            ...widget,
+            id: widget.title.replace(/[ ,]+/g, "_") as WidgetTypeEnum,
+          };
+        })
+      )
+    );
   }
 
   private getCandidatesWidgetData(filter: DashboardFiltersModel): Observable<ChartAccumulation> {
@@ -126,7 +141,7 @@ export class DashboardService {
   }
 
   private getApplicantsByRegion(): Observable<CandidatesByStatesResponseModel> {
-    return this.httpClient.post<CandidatesByStatesResponseModel>('/api/Dashboard/GetCandidatesStatesAggregated', {});
+    return this.httpClient.post<CandidatesByStatesResponseModel>(`${this.baseUrl}/GetCandidatesStatesAggregated`, {});
   }
 
   private getMapData(): Observable<LayerSettingsModel> {
@@ -161,37 +176,56 @@ export class DashboardService {
   }
 
   private getPositionsByTypes(filters: DashboardFiltersModel): Observable<PositionsByTypeAggregatedModel> {
-    return of({
-      [PositionTypeEnum.OPEN]: [
-        { month: 'Feb', value: 3 },
-        { month: 'Mar', value: 10 },
-        { month: 'Apr', value: 20 },
-        { month: 'May', value: 15 },
-        { month: 'Jun', value: 12 },
-        { month: 'Jul', value: 10 },
-      ],
-      [PositionTypeEnum.ONBOARD]: [
-        { month: 'Feb', value: 10 },
-        { month: 'Mar', value: 16 },
-        { month: 'Apr', value: 5 },
-        { month: 'May', value: 3 },
-        { month: 'Jun', value: 20 },
-        { month: 'Jul', value: 6 },
-      ],
-      [PositionTypeEnum.CLOSED]: [
-        { month: 'Feb', value: 30 },
-        { month: 'Mar', value: 51 },
-        { month: 'Apr', value: 10 },
-        { month: 'May', value: 4 },
-        { month: 'Jun', value: 5 },
-        { month: 'Jul', value: 6 },
-      ],
-    });
+    const timeRanges = this.calculateTimeRanges();
+    return this.httpClient
+      .post<PositionsByTypeResponseModel>(`${this.baseUrl}/getopenclosedonboardamount`, timeRanges)
+      .pipe(
+        map((positions: PositionsByTypeResponseModel) => {
+          return {
+            [PositionTypeEnum.OPEN]: this.convertDtoToPositionTypes(positions.openJobs),
+            [PositionTypeEnum.ONBOARD]: this.convertDtoToPositionTypes(positions.onboardCandidates),
+            [PositionTypeEnum.CLOSED]: this.convertDtoToPositionTypes(positions.closedJobs),
+          };
+        })
+      );
   }
 
-  private getOrderPosition(filters: DashboardFiltersModel, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
+  private calculateTimeRanges(): { startDate: string; endDate: string } {
+    const date = new Date();
+    const startDate = new Date(date.setMonth(date.getMonth() - 3)).toISOString();
+    const endDate = new Date(date.setMonth(date.getMonth() + 6)).toISOString();
+    return { startDate, endDate };
+  }
+
+  private convertDtoToPositionTypes(data: PositionByTypeDto[]): PositionByTypeDataModel[] {
+    return data.map(({ month, value }: PositionByTypeDto) => ({
+      month: MONTHS[month],
+      value,
+    }));
+  }
+
+  private getOrderPositionWidgetData(filters: DashboardFiltersModel, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
     return this.httpClient
       .post<CandidatesPositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { orderStatuses: [orderStatus] })
       .pipe(map((data) => data.orderStatusesDetails[0]));
+  }
+
+  private getActivePositionWidgetData(filters: DashboardFiltersModel): Observable<AccumulationChartModel> {
+    return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, {}).pipe(
+      map(({ orderStatusesDetails }: ActivePositionsDto) => {
+        return {
+          id: WidgetTypeEnum.ACTIVE_POSITIONS,
+          title: 'Active Positions',
+          chartData: lodashMapPlain(
+            orderStatusesDetails,
+            ({ count, statusName }: ActivePositionTypeInfo, index: number) => ({
+              label: statusName,
+              value: count,
+              color: legendPalette[index % legendPalette.length],
+            })
+          ),
+        };
+      })
+    );
   }
 }

@@ -1,13 +1,13 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { Select, Store } from '@ngxs/store';
-import { ShowExportDialog, ShowSideDialog } from '../../store/app.actions';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
+import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
 import { Router } from '@angular/router';
 import { CredentialsState } from '../store/credentials.state';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
 import { CredentialsNavigationTabs } from '@shared/enums/credentials-navigation-tabs';
-import { SetNavigationTab, ShowExportCredentialListDialog } from '../store/credentials.actions';
+import { SetCredentialsFilterCount, SetNavigationTab, ShowExportCredentialListDialog } from '../store/credentials.actions';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 
@@ -25,21 +25,29 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
   @Select(CredentialsState.setupFilter)
   setupFilter$: Observable<CredentialSetupFilter>;
 
-  public isToolButtonsShown = true;
+  public isCredentialListToolButtonsShown = true;
 
   private unsubscribe$: Subject<void> = new Subject();
 
   public isCredentialListActive = true;
 
+  public filteredItemsCount = 0;
+
   constructor(private router: Router,
-              private store: Store) {
+              private store: Store,
+              private actions$: Actions) {
                 super();
+                actions$.pipe(ofActionDispatched(SetCredentialsFilterCount)).subscribe(count => this.filteredItemsCount = count.payload);
               }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.store.dispatch(new SetNavigationTab(CredentialsNavigationTabs.CredentialsList));
+  }
+
+  public showFilters(): void {
+    this.store.dispatch(new ShowFilterDialog(true));
   }
 
   public override customExport(): void {
@@ -67,12 +75,16 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
       this.isCredentialListActive = true;
     }
 
-    this.isToolButtonsShown = selectedTab.selectedIndex !== CredentialsNavigationTabs.Setup;
+    this.isCredentialListToolButtonsShown = selectedTab.selectedIndex !== CredentialsNavigationTabs.Setup;
     this.store.dispatch(new ShowSideDialog(false));
   }
 
   public onTabsCreated(): void {
     this.activeTab$.pipe(takeUntil(this.unsubscribe$))
       .subscribe(activeTab => this.onTabSelected({ selectedIndex: activeTab }));
+  }
+
+  public onGroupsSetupClick(): void {
+    this.router.navigateByUrl('admin/organization-management/credentials/groups-setup');
   }
 }

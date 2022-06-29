@@ -29,10 +29,7 @@
       class="widget-legend__item"
     >
       <div class="widget-legend__item-content">
-        <label class="widget-legend__checkbox-container">
-          <input class="widget-legend__checkbox" type="checkbox" checked (change)="onClickLegend(legend.label)" />
-          <span class="widget-legend__checkmark"></span>
-        </label>
+        <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onClickLegend(legend.label)"></ejs-checkbox>
         <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"></div>
         <div class="widget-legend__legend-text">{{ legend.label }}</div>
       </div>

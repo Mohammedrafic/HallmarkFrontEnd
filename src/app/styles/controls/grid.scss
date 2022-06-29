@@ -142,7 +142,7 @@ ejs-grid.e-control.e-grid {
 
   .e-headercelldiv,
   .e-stackedheadercelldiv {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 600;
 
     .controls-header {
@@ -268,8 +268,6 @@ ejs-grid.e-control.e-grid {
       .default-icon-button,
       .secondary-icon-button,
       .primary-icon-button {
-        color: $white;
-
         &:hover {
           background-color: $primary-active-blue-50;
         }
@@ -303,11 +301,10 @@ ejs-grid.e-control.e-grid {
   thead tr,
   .e-gridheader {
     border-radius: $grid-border-radius $grid-border-radius 0 0;
-    font-variant: small-caps;
 
     .e-headertext,
     .e-stackedheadercelldiv {
-      text-transform: lowercase;
+      text-transform: uppercase;
       font-weight: 600;
       color: $secondary-dark-blue-15;
     }
@@ -355,8 +352,10 @@ ejs-grid.e-control.e-grid {
   }
 
   td.e-active {
-    background-color: $primary-active-blue-10;
-    color: $white !important;
+    background-color: $primary-active-blue-70;
+    .subrow-toggle {
+      color: $white !important;
+    }
   }
 
   .e-frozenheader.e-frozen-right-header > .e-table {

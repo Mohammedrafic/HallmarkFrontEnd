@@ -1,3 +1,6 @@
+import { CredentialType } from "./credential-type.model";
+import { PageOfCollections } from "./page.model";
+
 export class Credential {
   id?: number;
   credentialTypeId: number;
@@ -16,4 +19,27 @@ export class Credential {
     this.comment = credential.comment;
     this.expireDateApplicable = credential.expireDateApplicable;
   }
+}
+
+export type CredentialPage = PageOfCollections<Credential>;
+
+export class CredentialFilter {
+  searchTerm?: string;
+  credentialTypeIds?: number[];
+  credentialIds?: number[];
+  expireDateApplicable?: boolean;
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+}
+
+export class CredentialDataSource {
+  id: number;
+  name: string;
+  expireDateApplicable: boolean;
+}
+
+export class CredentialFilterDataSources {
+  credentialTypes: CredentialType;
+  credentials: CredentialDataSource[];
 }

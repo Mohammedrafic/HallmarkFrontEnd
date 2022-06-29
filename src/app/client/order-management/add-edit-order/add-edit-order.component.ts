@@ -11,12 +11,12 @@ import { Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { SetImportFileDialogState } from '@admin/store/admin.actions';
 import {
-  SaveOrder,
-  EditOrder,
-  GetSelectedOrderById,
-  SaveOrderSucceeded,
   ClearPredefinedBillRates,
+  EditOrder,
   GetPredefinedBillRates,
+  GetSelectedOrderById,
+  SaveOrder,
+  SaveOrderSucceeded,
   SetIsDirtyOrderForm
 } from '@client/store/order-managment-content.actions';
 
@@ -296,7 +296,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       contactDetails,
       workLocations,
       workflowId,
-      credentials
+      credentials,
+      canApprove
     } = allValues;
 
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[]).map((billRate: BillRate) => {
@@ -340,7 +341,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       workLocations,
       credentials,
       workflowId,
-      isSubmit
+      isSubmit,
+      canApprove
     };
 
     if (!order.hourlyRate) {

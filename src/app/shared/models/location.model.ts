@@ -1,3 +1,5 @@
+import { PageOfCollections } from "./page.model";
+
 export class Location {
   id?: number;
   regionId?: number;
@@ -19,6 +21,8 @@ export class Location {
   inactiveDate?: string;
 }
 
+export type LocationsPage = PageOfCollections<Location>;
+
 export class LocationMapping {
   id: number;
   name?: string;
@@ -26,15 +30,26 @@ export class LocationMapping {
 
 export class LocationFilter {
   regionId?: number;
-  externalId?: string[];
-  invoiceId?: string[];
-  name?: string[];
-  address1?: string[];
-  city?: string[];
-  state?: string[];
-  zip?: string[];
-  contactPerson?: string[];
+  externalIds?: string[];
+  invoiceIds?: string[];
+  names?: string[];
+  addresses1?: string[];
+  cities?: string[];
+  states?: string[];
+  zipCodes?: string[];
+  contactPeople?: string[];
   orderBy?: string;
   pageSize?: number;
   pageNumber?: number;
+}
+
+export class LocationFilterOptions {
+  externalIds: string[];
+  ivnoiceIds: string[];
+  locationNames: string[];
+  addresses1: string[];
+  cities: string[];
+  states: string[];
+  zipCodes: string[];
+  contactPersons: string[];
 }

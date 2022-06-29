@@ -1,6 +1,7 @@
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { AcceptJobDTO, CreateOrderDto, EditOrderDto, OrderManagementFilter } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
+import { RejectReasonPayload } from "@shared/models/reject-reason.model";
 
 export class GetIncompleteOrders {
   static readonly type = '[order management] Get Incomplete Orders';
@@ -138,21 +139,47 @@ export class DeleteOrder {
 
 export class DeleteOrderSucceeded {
   static readonly type = '[order management] Delete Order Succeeded';
-
   constructor() {
   }
 }
 
 export class ReloadOrganisationOrderCandidatesLists {
   static readonly type = '[agency order management] Reload Order and Candidates Lists on Organisation';
-
   constructor() {
   }
 }
 
 export class ClearSelectedOrder {
   static readonly type = '[order management] Clear selected order';
+  constructor() {
+  }
+}
 
+export class GetRejectReasonsForOrganisation {
+  static readonly type = '[organizationManagement] Get All Reject Reasons';
+  constructor() {}
+}
+
+export class RejectCandidateForOrganisationSuccess {
+  static readonly type = '[organizationManagement] Reject Candidate Success';
+  constructor() {}
+}
+
+export class RejectCandidateJob {
+  static readonly type = '[organizationManagement] Reject Candidate Job';
+  constructor(
+    public payload: RejectReasonPayload
+  ) {}
+}
+
+export class ApproveOrder {
+  static readonly type = '[order management] Approve Order';
+  constructor(public id: number) {
+  }
+}
+
+export class GetOrderFIlterDataSources {
+  static readonly type = '[order management] Get Order Filter Data Sources';
   constructor() {
   }
 }

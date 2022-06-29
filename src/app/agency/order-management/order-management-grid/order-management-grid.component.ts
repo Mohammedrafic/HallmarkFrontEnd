@@ -3,7 +3,6 @@ import { takeWhile, Observable, Subject } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
-  CheckBoxChangeEventArgs,
   DetailRowService,
   GridComponent,
   PagerComponent,
@@ -26,18 +25,12 @@ import {
   ReloadOrderCandidatesLists,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AgencyOrderManagement, AgencyOrderManagementPage } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, OrderManagementChild, AgencyOrderManagementPage } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { Location } from '@angular/common';
 import { UserState } from 'src/app/store/user.state';
 import { isUndefined } from 'lodash';
-
-enum AllCheckedStatus {
-  None,
-  Indeterminate,
-  All,
-}
 
 @Component({
   selector: 'app-order-management-grid',
@@ -59,22 +52,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public wrapSettings: TextWrapSettingsModel = GRID_CONFIG.wordWrapSettings;
   public allowWrap = GRID_CONFIG.isWordWrappingEnabled;
-  public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row' };
-  public allCheckedStatus = AllCheckedStatus;
+  public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
   public openCandidat = new Subject<boolean>();
+  public openChildDialog = new Subject<any>();
   public typeValueAccess = typeValueAccess;
   public previousSelectedOrderId: number | null;
-
-  get checkedStatus(): AllCheckedStatus {
-    const itemsLength = this.rowCheckboxes.length;
-    const checked = this.rowCheckboxes.filter((item) => item.checked);
-    if (itemsLength > 0 && !!checked.length) {
-      return checked.length < itemsLength ? AllCheckedStatus.Indeterminate : AllCheckedStatus.All;
-    }
-    return AllCheckedStatus.None;
-  }
+  public selectedCandidat: any | null;
 
   private statusSortDerection: SortDirection = 'Ascending';
   private isAlive = true;
@@ -88,6 +73,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   ngOnInit(): void {
     this.onOrderPreviewChange();
     this.onAgencyChange();
+    this.onChildDialogChange();
     const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
     if (!this.previousSelectedOrderId) {
@@ -101,7 +87,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onDataBound(): void {
-    // this.gridWithChildRow.detailRowModule.expandAll();
+    this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
       const [data, index] = this.store.selectSnapshot(OrderManagementState.lastSelectedOrder)(
         this.previousSelectedOrderId
@@ -139,21 +125,17 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.statusSortDerection = direction;
   }
 
-  public onRowClick({ data }: { data: AgencyOrderManagement }): void {
-    this.selectedOrder = data;
-    const options = this.getDialogNextPreviousOption(data);
-    this.store.dispatch(new GetOrderById(data.orderId, data.organizationId, options));
-    this.openPreview.next(true);
-    this.store.dispatch(
-      new GetAgencyOrderCandidatesList(data.orderId, data.organizationId, this.currentPage, this.pageSize)
-    );
-    this.store.dispatch(new GetAgencyOrderGeneralInformation(data.orderId, data.organizationId));
-  }
-
-  public onCheckAll(event: CheckBoxChangeEventArgs): void {
-    this.rowCheckboxes.forEach((item) => {
-      item.writeValue(event.checked);
-    });
+  public onRowClick(event: any): void {
+    if (!event.isInteracted) {
+      this.selectedOrder = event.data;
+      const options = this.getDialogNextPreviousOption(event.data);
+      this.store.dispatch(new GetOrderById(event.data.orderId, event.data.organizationId, options));
+      this.openPreview.next(true);
+      this.store.dispatch(
+        new GetAgencyOrderCandidatesList(event.data.orderId, event.data.organizationId, this.currentPage, this.pageSize)
+      );
+      this.store.dispatch(new GetAgencyOrderGeneralInformation(event.data.orderId, event.data.organizationId));
+    }
   }
 
   public setRowHighlight(args: RowDataBoundEventArgs & { data: AgencyOrderManagement }): void {
@@ -177,8 +159,16 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.gridWithChildRow.selectRow(nextIndex);
   }
 
-  public onOpenCandidateDialog(data: unknown): void {
-    console.log(data)
+  public onOpenCandidateDialog(candidat: OrderManagementChild, order: AgencyOrderManagement): void {
+    this.selectedCandidat = candidat;
+    this.selectedCandidat.selected = {
+      order: order.orderId,
+      positionId: candidat.positionId
+    };
+    this.selectedOrder = order;
+    const options = this.getDialogNextPreviousOption(order);
+    this.store.dispatch(new GetOrderById(order.orderId, order.organizationId, options));
+    this.openChildDialog.next([order, candidat]);
   }
 
   private onOrderPreviewChange(): void {
@@ -187,6 +177,20 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.openCandidat.next(false);
         this.gridWithChildRow?.clearRowSelection();
         this.previousSelectedOrderId = null;
+      } else {
+        this.openChildDialog.next(false);
+        this.selectedCandidat = null;
+      }
+    });
+  }
+
+  private onChildDialogChange(): void {
+    this.openChildDialog.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
+      if (!isOpen) {
+        this.selectedCandidat = null;
+      } else {
+        this.openPreview.next(false);
+        this.gridWithChildRow?.clearRowSelection();
       }
     });
   }

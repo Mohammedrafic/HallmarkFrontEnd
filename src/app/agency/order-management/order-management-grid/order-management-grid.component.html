@@ -16,27 +16,13 @@
   [enableVirtualization]="true"
   (rowSelected)="onRowClick($event)"
   (dataBound)="onDataBound()"
+  (actionBegin)="actionBegin($event)"
 >
   <e-columns>
-    <e-column headerTextAlign="Right" width="48" [customAttributes]="{ class: 'checkbox-header' }">
-      <ng-template #headerTemplate let-data>
-        <div class="bootstrap">
-          <ejs-checkbox
-            [indeterminate]="checkedStatus === allCheckedStatus.Indeterminate"
-            [checked]="checkedStatus === allCheckedStatus.All"
-            (change)="onCheckAll($event)"
-          ></ejs-checkbox>
-        </div>
-      </ng-template>
-      <ng-template #template let-data>
-        <div class="bootstrap">
-          <ejs-checkbox #rowCheckbox (click)="(false)"></ejs-checkbox>
-        </div>
-      </ng-template>
-    </e-column>
+    <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
     <e-column field="orderId" headerText="ORDER ID" width="142">
       <ng-template #template let-data>
-        <ng-container *ngIf="!data.children.length; else withToggle">
+        <ng-container *ngIf="!data.children?.length; else withToggle">
           <div>
             <b>{{ data.orderId }}</b>
           </div>
@@ -72,7 +58,7 @@
     <e-column field="numberOfPositions" headerText="{{ '# of positions' | uppercase }}" width="160">
       <ng-template #template let-data>
         <div class="align-right">
-          {{ data.numberOfPositions - data.candidatesCount }}/{{ data.numberOfPositions }}
+          {{ data.numberOfOpenPositions }}/{{ data.numberOfPositions }}
         </div>
       </ng-template>
     </e-column>
@@ -123,11 +109,11 @@
   <ng-template #detailTemplate let-data>
     <div class="subrow-wrapper">
       <app-grid-subrow-candidate
-        *ngFor="let child of data.children; let i = index;"
+        *ngFor="let child of data.children"
         [candidat]="child"
         [order]="data"
-        [candidatIndex]="i + 1"
-        (clickEvent)="onOpenCandidateDialog(data)"
+        [selected]="selectedCandidat?.selected.order === data.orderId && selectedCandidat?.selected.positionId === child.positionId"
+        (clickEvent)="onOpenCandidateDialog($event, data)"
       ></app-grid-subrow-candidate>
     </div>
   </ng-template>
@@ -185,4 +171,5 @@
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-preview-order-dialog>
 <app-candidat-dialog [openEvent]="openCandidat"></app-candidat-dialog>
+<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>
 

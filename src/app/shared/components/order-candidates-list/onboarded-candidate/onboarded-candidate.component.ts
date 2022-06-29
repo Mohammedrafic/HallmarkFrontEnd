@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { filter, merge, Observable, Subject, takeUntil } from "rxjs";
 import {
   JOB_STATUS,
@@ -6,30 +7,40 @@ import {
   OPTION_FIELDS
 } from "@shared/components/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst";
 import { BillRate } from "@shared/models/bill-rate.model";
-import { Select, Store } from "@ngxs/store";
+import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { OrderCandidateJob, OrderCandidatesList } from "@shared/models/order-management.model";
 import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
 import { DatePipe } from "@angular/common";
 import { OrderManagementContentState } from "@client/store/order-managment-content.state";
-import { ReloadOrganisationOrderCandidatesLists, UpdateOrganisationCandidateJob } from "@client/store/order-managment-content.actions";
-import { ShowToast } from "src/app/store/app.actions";
-import { MessageTypes } from "@shared/enums/message-types";
-import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
+import { ApplicantStatus, CandidatStatus } from "@shared/enums/applicant-status.enum";
+import {
+  GetRejectReasonsForOrganisation,
+  RejectCandidateForOrganisationSuccess,
+  RejectCandidateJob,
+  ReloadOrganisationOrderCandidatesLists,
+  UpdateOrganisationCandidateJob
+} from "@client/store/order-managment-content.actions";
+import { ApplicantStatus as ApplicantStatusEnum, } from "@shared/enums/applicant-status.enum";
+import { RejectReason } from "@shared/models/reject-reason.model";
 
 @Component({
   selector: 'app-onboarded-candidate',
   templateUrl: './onboarded-candidate.component.html',
-  styleUrls: ['./onboarded-candidate.component.scss']
+  styleUrls: ['./onboarded-candidate.component.scss'],
+  providers: [MaskedDateTimeService]
 })
 
 export class OnboardedCandidateComponent implements OnInit, OnDestroy {
-  @Output() closeModalEvent = new EventEmitter<never>();
-
-  @Input() billRatesData: BillRate[] = [];
-  @Input() candidate: OrderCandidatesList;
+  @Select(OrderManagementContentState.rejectionReasonsList)
+  rejectionReasonsList$: Observable<RejectReason[]>;
 
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
+
+  @Output() closeModalEvent = new EventEmitter<never>();
+
+  @Input() candidate: OrderCandidatesList;
+  @Input() isTab: boolean = false;
 
   public form: FormGroup;
 
@@ -38,6 +49,11 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public candidateJob: OrderCandidateJob | null;
   public isOnboarded = true;
   public today = new Date();
+  public candidatStatus = CandidatStatus;
+  public billRatesData: BillRate[] = [];
+  public rejectReasons: RejectReason[] = [];
+  public openRejectDialog = new Subject<boolean>();
+  public isRejected = false;
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');
@@ -52,12 +68,16 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   constructor(
     private datePipe: DatePipe,
     private store: Store,
+    private actions$: Actions
   ) { }
 
   ngOnInit(): void {
     this.createForm();
     this.patchForm();
     this.subscribeOnDate();
+    this.subscribeOnReasonsList();
+    this.checkRejectReason();
+    this.subscribeOnSuccessRejection();
   }
 
   ngOnDestroy(): void {
@@ -70,7 +90,24 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       this.onAccept();
       this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
     } else {
-      this.store.dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'));
+      this.store.dispatch(new GetRejectReasonsForOrganisation());
+      this.openRejectDialog.next(true);
+    }
+  }
+
+  public onRejectCandidate(event: {rejectReason: number}): void {
+    this.isRejected = true;
+
+    if(this.candidateJob) {
+      const payload = {
+        organizationId: this.candidateJob.organizationId,
+        jobId: this.candidateJob.jobId,
+        rejectReasonId: event.rejectReason
+      };
+
+      const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
+      this.form.patchValue({rejectReason: value})
+      this.store.dispatch( new RejectCandidateJob(payload))
     }
   }
 
@@ -78,6 +115,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.closeModalEvent.emit();
     this.candidateJob = null;
     this.jobStatus = [];
+    this.billRatesData = [];
+    this.isRejected = false;
   }
 
   private onAccept(): void {
@@ -98,7 +137,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
         actualEndDate: value.endDate,
         clockId: value.clockId,
         guaranteedWorkWeek: value.workWeek,
-        allowDeplayWoCredentials: value.allow
+        allowDeplayWoCredentials: value.allow,
+        billRates: this.billRatesData
       })).subscribe(() => {
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
       });
@@ -109,10 +149,11 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
       this.candidateJob = value;
       if(value) {
+        this.billRatesData = [...value.billRates];
         this.form.patchValue({
           jobId: value.orderId,
           date: [value.order.jobStartDate, value.order.jobEndDate],
-          billRates: value.order.billRates,
+          billRates: value.order.hourlyRate,
           candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
           candidateBillRate: value.candidateBillRate,
           locationName: value.order.locationName,
@@ -123,9 +164,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
           workWeek: value.guaranteedWorkWeek ? value.guaranteedWorkWeek : '',
           clockId: value.clockId ? value.clockId : '',
           offeredBillRate: value.offeredBillRate,
-          allow: false,
+          allow: value.allowDeployCredentials,
           startDate: value.actualStartDate ? value.actualStartDate : value.order.jobStartDate,
           endDate: value.actualEndDate ? value.actualEndDate : value.order.jobEndDate,
+          rejectReason: value.rejectReason
         });
 
         this.isFormDisabled(value.applicantStatus.applicantStatus);
@@ -154,7 +196,33 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     if(status === ApplicantStatus.OnBoarded) {
       this.form.disable();
       this.isOnboarded = false;
+    } else {
+      this.form.enable();
+      this.isOnboarded = true;
     }
+  }
+
+  private subscribeOnReasonsList(): void {
+    this.rejectionReasonsList$.pipe(takeUntil(this.unsubscribe$)).subscribe(reasons => {
+      this.rejectReasons = reasons;
+    });
+  }
+
+  private checkRejectReason(): void {
+    if(this.candidate.status === ApplicantStatusEnum.Rejected) {
+      this.isRejected = true;
+      this.form.disable();
+    }
+  }
+
+  private subscribeOnSuccessRejection(): void {
+    this.actions$.pipe(
+      ofActionSuccessful(RejectCandidateForOrganisationSuccess),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.form.disable();
+      this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+    });
   }
 
   private createForm() : void {
@@ -175,6 +243,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       allow: new FormControl(false),
       startDate: new FormControl(''),
       endDate: new FormControl(''),
+      rejectReason: new FormControl('')
     });
   }
 }

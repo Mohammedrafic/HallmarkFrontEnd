@@ -16,7 +16,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
   styleUrls: ['./filtered-credentials.component.scss']
 })
 export class FilteredCredentialsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
-  @ViewChild('grid') grid: GridComponent;
+  @ViewChild('filterGrid') grid: GridComponent;
 
   @Input() credentialSetupFilter$: Subject<CredentialSetupFilterDto>;
 
@@ -68,12 +68,31 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
   public mapGridData(): void {
     this.filteredCredentials$.subscribe(data => {
       if (data) {
+        this.currentPagerPage = 1;
         this.lastAvailablePage = this.getLastPage(data);
         this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
         this.totalDataRecords = data.length;
-        this.selectedRow.emit(data[0]);
       }
     });
+  }
+
+  public onRowSelected(event: any): void {
+    if (event?.data?.length) {
+      this.selectedRow.emit(event.data[0]);
+    } else {
+      this.selectedRow.emit(event?.data);
+    }
+  }
+
+  public onRowDeselected(event: any): void {
+    this.selectedRow.emit(undefined);
+  }
+
+  public onGridDataBound(): void {
+    if ((this.grid.dataSource as []).length) {
+      // select first item in the grid by its index
+      this.grid.selectRows([0]);
+    }
   }
 
   public onRowsDropDownChanged(): void {
@@ -91,11 +110,6 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
 
   private initializeDefaultFilterState(): void {
     this.credentialSetupFilter = {
-      regionId: null,
-      locationId: null,
-      departmentId: null,
-      skillGroupId: null,
-      skillId: null,
       pageNumber: this.currentPagerPage,
       pageSize: this.MAX_PAGE_SIZE
     };
@@ -103,6 +117,7 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
 
   private organizationChangedHandler(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.currentPagerPage = 1;
       this.store.dispatch(new GetFilteredCredentialSetupData(this.credentialSetupFilter));
     });
   }
@@ -112,6 +127,7 @@ export class FilteredCredentialsComponent extends AbstractGridConfigurationCompo
       if (filter) {
         filter.pageNumber = this.currentPagerPage;
         filter.pageSize = this.MAX_PAGE_SIZE;
+        this.currentPagerPage = 1;
         this.credentialSetupFilter = filter;
         this.store.dispatch(new GetFilteredCredentialSetupData(filter));
       }

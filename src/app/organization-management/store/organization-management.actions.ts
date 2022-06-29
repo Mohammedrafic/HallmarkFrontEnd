@@ -2,11 +2,11 @@ import { Country } from "src/app/shared/enums/states";
 import { Organization } from "src/app/shared/models/organization.model";
 import { SkillCategory } from "src/app/shared/models/skill-category.model";
 import { Skill, SkillFilters } from "src/app/shared/models/skill.model";
-import { Department } from '@shared/models/department.model';
-import { Location } from '@shared/models/location.model';
+import { Department, DepartmentFilter } from '@shared/models/department.model';
+import { Location, LocationFilter } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
 import { CredentialType } from '@shared/models/credential-type.model';
-import { Credential } from '@shared/models/credential.model';
+import { Credential, CredentialFilter } from '@shared/models/credential.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { OrganizationSettingsPost } from '@shared/models/organization-settings.model';
 import { ExportPayload } from "@shared/models/export.model";
@@ -58,17 +58,17 @@ export class GetOrganizationByIdSucceeded {
 
 export class SaveDepartment {
   static readonly type = '[organizationManagement] Create Department';
-  constructor(public payload: Department) { }
+  constructor(public payload: Department, public filters?: DepartmentFilter) { }
 }
 
 export class GetDepartmentsByLocationId {
   static readonly type = '[organizationManagement] Get The List Of Departments by locationId';
-  constructor(public locationId?: number) { }
+  constructor(public locationId?: number, public filters?: DepartmentFilter) { }
 }
 
 export class UpdateDepartment {
   static readonly type = '[organizationManagement] Update Department';
-  constructor(public department: Department) { }
+  constructor(public department: Department, public filters?: DepartmentFilter) { }
 }
 
 export class DeleteDepartmentById {
@@ -103,7 +103,7 @@ export class GetLocationsByOrganizationId {
 
 export class GetLocationsByRegionId {
   static readonly type = '[organizationManagement] Get The List Of Locations by regionId';
-  constructor(public regionId: number) { }
+  constructor(public regionId: number, public filters?: LocationFilter) { }
 }
 
 export class GetLocationById {
@@ -113,12 +113,12 @@ export class GetLocationById {
 
 export class SaveLocation {
   static readonly type = '[organizationManagement] Create Location';
-  constructor(public location: Location, public regionId: number) { }
+  constructor(public location: Location, public regionId: number, public filters?: LocationFilter) { }
 }
 
 export class UpdateLocation {
   static readonly type = '[organizationManagement] Update Location';
-  constructor(public location: Location, public regionId: number) { }
+  constructor(public location: Location, public regionId: number, public filters?: LocationFilter) { }
 }
 
 export class DeleteLocationById {
@@ -253,7 +253,7 @@ export class UpdateCredentialType {
 
 export class GetCredential {
   static readonly type = '[organizationManagement] Get Credential list';
-  constructor() { }
+  constructor(public payload?: CredentialFilter) { }
 }
 
 export class GetCredentialById {
@@ -286,13 +286,8 @@ export class GetCredentialSkillGroup {
   constructor() {}
 }
 
-export class SaveCredentialSkillGroup {
-  static readonly type = '[organizationManagement] Save Credential Skill Group';
-  constructor(public payload: CredentialSkillGroup) { }
-}
-
-export class UpdateCredentialSkillGroup {
-  static readonly type = '[organizationManagement] Update Credential Skill Group';
+export class SaveUpdateCredentialSkillGroup {
+  static readonly type = '[organizationManagement] Save/Update Credential Skill Group';
   constructor(public payload: CredentialSkillGroup) { }
 }
 
@@ -344,4 +339,14 @@ export class GetSkillDataSources {
 export class GetAllOrganizationSkills {
   static readonly type = '[organizationManagement] Get All Organization Skills';
   constructor() { }
+}
+
+export class GetLocationFilterOptions {
+  static readonly type = '[organizationManagement] Get Location Filter Options';
+  constructor(public payload: number) { }
+}
+
+export class GetDepartmentFilterOptions {
+  static readonly type = '[organizationManagement] Get Department Filter Options';
+  constructor(public payload: number) { }
 }

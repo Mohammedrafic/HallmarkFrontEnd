@@ -9,6 +9,10 @@
     margin: 0 8px 0 12px;
   }
 
+  .close-button {
+    margin-left: 8px;
+  }
+
   .content-container {
     display: flex;
     margin-top: 24px;
@@ -59,4 +63,9 @@
   .bill-rates {
     margin-top: 16px;
   }
+}
+
+.candidat-status {
+  display: flex;
+  align-items: center;
 }

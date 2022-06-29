@@ -2,21 +2,25 @@ import { Injectable } from '@angular/core';
 import { map, Observable, switchMap } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import {
+  AcceptJobDTO,
+  AgencyOrderManagementPage,
+  ApplicantStatus,
+  CreateOrderDto,
+  EditOrderDto,
+  Order,
+  OrderCandidateJob,
+  OrderCandidatesListPage,
+  OrderFilterDataSource,
   OrderManagementFilter,
   OrderManagementPage,
-  AgencyOrderManagementPage,
-  OrderCandidatesListPage,
-  OrderCandidateJob,
-  AcceptJobDTO,
-  ApplicantStatus,
   SuggesstedDetails
 } from '@shared/models/order-management.model';
-import { CreateOrderDto, EditOrderDto, Order } from '@shared/models/order-management.model';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models/bill-rate.model';
+import { RejectReasonPayload } from "@shared/models/reject-reason.model";
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -199,10 +203,33 @@ export class OrderManagementContentService {
   }
 
   /**
-   * Edit order
+   * Delete order
    * @param id order id to delete
    */
   public deleteOrder(id: number): Observable<any> {
-    return this.http.delete<Order>('/api/Orders', { params: { orderId: id }});
+    return this.http.delete<Order>('/api/Orders', { params: { orderId: id } });
+  }
+
+  /**
+   * Approve order
+   * @param id order id to approve
+   */
+  public approveOrder(id: number): Observable<string> {
+    return this.http.post(`/api/Order/approve`, { orderId: id }, { responseType: 'text' });
+  }
+
+  /**
+   * Reject Candidate Job
+   * @param payload
+   */
+  public rejectCandidateJob(payload: RejectReasonPayload): Observable<void> {
+    return this.http.post<void>('/api/AppliedCandidates/rejectCandidateJob', payload);
+  }
+
+  /**
+   * Get order filter data sources 
+   */
+  public getOrderFilterDataSources(): Observable<OrderFilterDataSource> {
+    return this.http.get<OrderFilterDataSource>('/api/OrdersFilteringOptions/organization');
   }
 }

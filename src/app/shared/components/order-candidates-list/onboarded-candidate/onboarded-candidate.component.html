@@ -1,11 +1,16 @@
 <section class="container">
   <section class="header-container">
     <div class="e-card-header">
-      <div class="e-card-header-caption">
+      <div class="e-card-header-caption candidat-status">
         <h3 class="e-card-title">{{candidate?.lastName}}, {{candidate?.firstName}}</h3>
+        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
+          <e-chips>
+            <e-chip [text]="candidatStatus[candidate.candidateStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
+          </e-chips>
+        </ejs-chiplist>
       </div>
       <div class="e-card-content button-container">
-        <div class="input-group dropdown bootstrap input-readonly">
+        <div class="input-group dropdown bootstrap input-readonly" *ngIf="!isRejected">
           <ejs-dropdownlist
             *ngIf="isOnboarded"
             [fields]="optionFields"
@@ -15,7 +20,7 @@
           >
           </ejs-dropdownlist>
         </div>
-        <button ejs-button cssClass="e-flat close-button" (click)="onClose()">
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>
@@ -111,8 +116,8 @@
                     </div>
                   </div>
                 </div>
-                <div class="input-container bootstrap">
-                  <div>
+                <div class="input-container bootstrap" *ngIf="candidateJobState$ | async as candidateJobState">
+                  <div *ngIf="!candidateJobState.hasAllRequiredOnboardedCredentials">
                     <ejs-checkbox formControlName="allow" label="Allow deploy w/o credentials"></ejs-checkbox>
                   </div>
                 </div>
@@ -158,18 +163,22 @@
                     <input appValidateWithMessage formControlName="comments" class="e-input" type="text" readonly/>
                   </div>
                 </div>
+                  <div class="input-container bootstrap" *ngIf="isRejected">
+                    <label>Reason</label>
+                    <div class="input-group input-readonly">
+                      <input formControlName="rejectReason" class="e-input" type="text" readonly/>
+                    </div>
+                </div>
               </form>
             </ng-template>
           </e-accordionitem>
-        </e-accordionitems>
-      </ejs-accordion>
-      <ejs-accordion #historicalAcc>
-        <e-accordionitems>
           <e-accordionitem>
             <ng-template #header>
               <div>Historical Events</div>
             </ng-template>
-            <ng-template #content><div></div></ng-template>
+            <ng-template #content>
+              <div>Historical Events</div>
+            </ng-template>
           </e-accordionitem>
         </e-accordionitems>
       </ejs-accordion>
@@ -182,3 +191,9 @@
     <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
   </section>
 </section>
+
+<app-reject-reason-dialog
+  [rejectReasonsList]="rejectReasons"
+  [openEvent]="openRejectDialog"
+  (applyReject)="onRejectCandidate($event)"
+></app-reject-reason-dialog>

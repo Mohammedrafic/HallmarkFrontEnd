@@ -55,17 +55,7 @@
   }
 
   &.selected {
-    background-color: $primary-active-blue;
-
-    .info {
-      .data {
-        color: $white;
-      }
-
-      .title {
-        color: $secondary-dark-blue-40;
-      }
-    }
+    background-color: $primary-active-blue-70;
   }
 }
 

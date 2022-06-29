@@ -1,12 +1,17 @@
 <section class="container">
   <section class="header-container">
     <div class="e-card-header">
-      <div class="e-card-header-caption">
+      <div class="e-card-header-caption candidat-status">
         <h3 class="e-card-title">{{candidate?.lastName}}, {{candidate?.firstName}}</h3>
+        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
+          <e-chips>
+            <e-chip [text]="candidatStatus[candidate.candidateStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
+          </e-chips>
+        </ejs-chiplist>
       </div>
       <div class="e-card-content">
         <button *ngIf="!readOnlyMode" ejs-button [isPrimary]="true" class="apply-button" (click)="applyOrderApplicants()">Apply</button>
-        <button ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>
@@ -61,6 +66,8 @@
                                       format="MM/dd/yyyy"
                                       placeholder="MM/DD/YYYY"
                                       [readonly]="readOnlyMode"
+                                      [enableMask]="true"
+                                      [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
                                       [min]="today"
                                       formControlName="availableStartDate">
                       </ejs-datepicker>

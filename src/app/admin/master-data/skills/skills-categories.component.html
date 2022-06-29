@@ -1,8 +1,14 @@
 <section class="controls-wrapper">
   <button
+    *ngIf="isSkillsActive"
     ejs-button
     id="filterButton"
-    cssClass="e-outline button-filter">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+    cssClass="e-outline button-filter" (click)="showFilters()">
+    <div class="filter-button-content">
+      <span *ngIf="(filteredItems$ | async) as filteredItems" class="e-badge e-badge-success e-badge-circle">{{ filteredItems }}</span>
+      Filters <i-feather name="sliders" class="icon"></i-feather>
+    </div>
+  </button>
   <button
     ejs-dropdownbutton
     [items]="exportOptions"
@@ -22,7 +28,7 @@
         <div>Skills</div>
       </ng-template>
       <ng-template #content>
-        <app-skills-grid [export$]="exportSkills$" [isActive]="isSkillsActive"></app-skills-grid>
+        <app-skills-grid [filteredItems$]="filteredItems$" [export$]="exportSkills$" [isActive]="isSkillsActive"></app-skills-grid>
       </ng-template>
     </e-tabitem>
     <e-tabitem>

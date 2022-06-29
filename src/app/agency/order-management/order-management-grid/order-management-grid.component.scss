@@ -17,11 +17,6 @@
     background-color: $primary-active-blue-90 !important;
   }
 
-  & td.e-active {
-    background-color: $primary-active-blue-10;
-    color: #fff !important;
-  }
-
   .e-success-row {
     background-color: $supportive-green-50;
   }
@@ -67,5 +62,12 @@
       margin-left: 12px;
       color: $primary-active-blue;
     }
+  }
+}
+
+.subrow-wrapper {
+  app-grid-subrow-candidate:not(:last-child) {
+    display: block;
+    border-bottom: 1px solid  $secondary-dark-blue-45;
   }
 }

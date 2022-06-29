@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -13,18 +13,19 @@ import { ContactDetails, Organization } from 'src/app/shared/models/organization
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import {
-  SaveOrganization,
   GetBusinessUnitList,
-  SetBillingStatesByCountry,
-  SetDirtyState,
-  SetGeneralStatesByCountry,
-  UploadOrganizationLogo,
-  SaveOrganizationSucceeded,
+  GetDBConnections,
   GetOrganizationById,
   GetOrganizationByIdSucceeded,
   GetOrganizationLogo,
   GetOrganizationLogoSucceeded,
-  RemoveOrganizationLogo
+  RemoveOrganizationLogo,
+  SaveOrganization,
+  SaveOrganizationSucceeded,
+  SetBillingStatesByCountry,
+  SetDirtyState,
+  SetGeneralStatesByCountry,
+  UploadOrganizationLogo
 } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
 
@@ -41,6 +42,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   public filesList: HTMLElement[] = [];
   public ContactFormArray: FormArray;
   public CreateUnderFormGroup: FormGroup;
+  public dataBaseConnectionsFormGroup: FormGroup;
   public GeneralInformationFormGroup: FormGroup;
   public BillingDetailsFormGroup: FormGroup;
   public ContactFormGroup: FormGroup;
@@ -88,6 +90,9 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   @Select(UserState.user)
   user$: Observable<User>;
 
+  @Select(AdminState.dataBaseConnections)
+  dataBaseConnections$: Observable<string[]>;
+
   constructor(private actions$: Actions, private store: Store, private router: Router, private route: ActivatedRoute, private fb: FormBuilder) {
     actions$.pipe(
       takeUntil(this.unsubscribe$),
@@ -116,6 +121,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     });
     store.dispatch(new SetHeaderState({iconName: 'file-text', title: 'Organization List'}));
     store.dispatch(new GetBusinessUnitList());
+    store.dispatch(new GetDBConnections());
     if (route.snapshot.paramMap.get('organizationId')) {
       this.title = 'Edit';
       const businessUnitId = parseInt(route.snapshot.paramMap.get('organizationId') as string);
@@ -131,7 +137,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     const user = this.store.selectSnapshot(UserState.user);
     if (user?.businessUnitType === BusinessUnitType.MSP) {
       this.isMspUser = true;
-      this.CreateUnderFormGroup.patchValue({createUnder: user.businessUnitId});
+      this.CreateUnderFormGroup.patchValue({ createUnder: user.businessUnitId });
     }
   }
 
@@ -140,86 +146,33 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
-  private initForms(organization?: Organization): void {
-    let businessUnitId: string | number = '';
-    if (organization?.createUnder?.parentUnitId) {
-      businessUnitId = organization.createUnder.parentUnitId;
-    } else if (organization?.createUnder?.parentUnitId === null) {
-      businessUnitId = 0;
-    }
-    this.CreateUnderFormGroup = this.fb.group({
-      createUnder: new FormControl(businessUnitId, [ Validators.required ])
-    });
-    this.CreateUnderFormGroup.valueChanges.subscribe(() => {
-      this.store.dispatch(new SetDirtyState(this.CreateUnderFormGroup.dirty));
-    });
-    this.GeneralInformationFormGroup = this.fb.group({
-      id: new FormControl(organization ? organization.generalInformation.id : 0),
-      name: new FormControl(organization ? organization.generalInformation.name : '', [ Validators.required ]),
-      externalId: new FormControl(organization ? organization.generalInformation.externalId : ''),
-      taxId: new FormControl(organization ? organization.generalInformation.taxId : '', [ Validators.required, Validators.minLength(9), Validators.pattern(/^[0-9\s\-]+$/) ]),
-      addressLine1: new FormControl(organization ? organization.generalInformation.addressLine1 : '', [ Validators.required ]),
-      addressLine2: new FormControl(organization ? organization.generalInformation.addressLine2 : ''),
-      country: new FormControl(organization ? organization.generalInformation.country : 0, [ Validators.required ]),
-      state: new FormControl(organization ? organization.generalInformation.state : '', [ Validators.required ]),
-      city: new FormControl(organization ? organization.generalInformation.city : '', [ Validators.required ]),
-      zipCode: new FormControl(organization ? organization.generalInformation.zipCode : '', [ Validators.minLength(5), Validators.pattern(/^[0-9]+$/) ]),
-      phone1Ext: new FormControl(organization ? organization.generalInformation.phone1Ext : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/) ]),
-      phone2Ext: new FormControl(organization ? organization.generalInformation.phone2Ext : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/) ]),
-      fax: new FormControl(organization ? organization.generalInformation.fax : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/) ]),
-      status: new FormControl(organization ? organization.generalInformation.status : 0, [ Validators.required ]),
-      website: new FormControl(organization ? organization.generalInformation.website : '')
-    });
-    this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
-      this.store.dispatch(new SetDirtyState(this.GeneralInformationFormGroup.dirty));
-    });
-    this.BillingDetailsFormGroup = this.fb.group({
-      id: new FormControl(organization ? organization.billingDetails.id : 0),
-      name: new FormControl(organization ? organization.billingDetails.name : '', [ Validators.required ]),
-      address: new FormControl(organization ? organization.billingDetails.address : ''),
-      country: new FormControl(organization ? organization.billingDetails.country : 0, [ Validators.required ]),
-      state: new FormControl(organization ? organization.billingDetails.state : '', [ Validators.required ]),
-      city: new FormControl(organization ? organization.billingDetails.city : '', [ Validators.required ]),
-      zipCode: new FormControl(organization ? organization.billingDetails.zipCode : '', [ Validators.minLength(5), Validators.pattern(/^[0-9]+$/) ]),
-      phone1: new FormControl(organization ? organization.billingDetails.phone1 : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/) ]),
-      phone2: new FormControl(organization ? organization.billingDetails.phone2 : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/) ]),
-      fax: new FormControl(organization ? organization.billingDetails.fax : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/) ]),
-      ext: new FormControl(organization ? organization.billingDetails.ext : '', [ Validators.pattern(/^[0-9]{5}$/)]),
-    });
-    this.BillingDetailsFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
-      this.store.dispatch(new SetDirtyState(this.BillingDetailsFormGroup.dirty));
-    });
-    if (organization) {
-      this.ContactFormGroup = this.fb.group({
-        contacts: new FormArray(this.generateContactsFormArray(organization.contactDetails))
-      });
-    } else {
-      this.ContactFormGroup = this.fb.group({
-        contacts: new FormArray([this.newContactFormGroup()])
-      });
-    }
-    this.ContactFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
-      this.store.dispatch(new SetDirtyState(this.ContactFormGroup.dirty));
-    });
-    this.ContactFormArray = this.ContactFormGroup.get("contacts") as FormArray;
-    this.PreferencesFormGroup = this.fb.group({
-      id: new FormControl(organization ? organization.preferences.id : 0),
-      purchaseOrderBy: new FormControl(organization ? organization.preferences.purchaseOrderBy.toString() : '0', [ Validators.required ]),
-      sendDocumentToAgency: new FormControl(organization ? organization.preferences.sendDocumentToAgency : null),
-      timesheetSubmittedBy: new FormControl(organization ? organization.preferences.timesheetSubmittedBy.toString() : '0', [ Validators.required ]),
-      weekStartsOn: new FormControl(organization ? organization.preferences.weekStartsOn : '', [ Validators.required ]),
-      paymentOptions: new FormControl(organization ? organization.preferences.paymentOptions.toString() : '0', [ Validators.required ]),
-      timePeriodInMins: new FormControl(organization ? organization.preferences.timePeriodInMins : '', [ Validators.pattern(/^[0-9]+$/), Validators.min(1)] ),
-      paymentDescription: new FormControl(organization ? organization.preferences.paymentDescription : '', [ Validators.required ])
-    });
-    this.PreferencesFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
-      this.store.dispatch(new SetDirtyState(this.PreferencesFormGroup.dirty));
-    });
-    if (organization) {
-      //Populate state dropdown with values based on selected country
-      this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
-      this.store.dispatch(new SetBillingStatesByCountry(organization.billingDetails.country));
+  public save(): void {
+    if (
+      this.CreateUnderFormGroup.valid &&
+      this.GeneralInformationFormGroup.valid &&
+      (this.BillingDetailsFormGroup.valid) &&
+      this.ContactFormArray.valid &&
+      this.PreferencesFormGroup.valid &&
+      this.dataBaseConnectionsFormGroup.valid
+    ) {
+      this.store.dispatch(new SaveOrganization(new Organization(
+        this.currentBusinessUnitId as number,
+        this.CreateUnderFormGroup.controls['createUnder'].value,
+        this.GeneralInformationFormGroup.getRawValue(),
+        this.BillingDetailsFormGroup.getRawValue(),
+        this.ContactFormArray.getRawValue(),
+        this.PreferencesFormGroup.getRawValue(),
+        this.isSameAsOrg,
+        this.dataBaseConnectionsFormGroup.controls['connectionName'].value
+      )));
       this.store.dispatch(new SetDirtyState(false));
+    } else {
+      this.CreateUnderFormGroup.markAllAsTouched();
+      this.GeneralInformationFormGroup.markAllAsTouched();
+      this.BillingDetailsFormGroup.markAllAsTouched();
+      this.ContactFormArray.markAllAsTouched();
+      this.PreferencesFormGroup.markAllAsTouched();
+      this.dataBaseConnectionsFormGroup.markAllAsTouched();
     }
   }
 
@@ -320,6 +273,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     this.BillingDetailsFormGroup.reset();
     this.ContactFormArray.reset();
     this.PreferencesFormGroup.reset();
+    this.dataBaseConnectionsFormGroup.reset();
     this.store.dispatch(new SetDirtyState(false));
   }
 
@@ -347,30 +301,92 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     }
   }
 
-  public save(): void {
-    if (
-      this.CreateUnderFormGroup.valid &&
-      this.GeneralInformationFormGroup.valid &&
-      (this.BillingDetailsFormGroup.valid) &&
-      this.ContactFormArray.valid &&
-      this.PreferencesFormGroup.valid
-    ) {
-      this.store.dispatch(new SaveOrganization(new Organization(
-        this.currentBusinessUnitId as number,
-        this.CreateUnderFormGroup.controls['createUnder'].value,
-        this.GeneralInformationFormGroup.getRawValue(),
-        this.BillingDetailsFormGroup.getRawValue(),
-        this.ContactFormArray.getRawValue(),
-        this.PreferencesFormGroup.getRawValue(),
-        this.isSameAsOrg
-      )));
-      this.store.dispatch(new SetDirtyState(false));
+  private initForms(organization?: Organization): void {
+    let businessUnitId: string | number = '';
+    if (organization?.createUnder?.parentUnitId) {
+      businessUnitId = organization.createUnder.parentUnitId;
+    } else if (organization?.createUnder?.parentUnitId === null) {
+      businessUnitId = 0;
+    }
+    this.CreateUnderFormGroup = this.fb.group({
+      createUnder: new FormControl(businessUnitId, [Validators.required])
+    });
+
+    this.dataBaseConnectionsFormGroup = this.fb.group({
+      connectionName: new FormControl(organization?.createUnder?.dbConnectionName ?? '', [Validators.required])
+    });
+
+
+    this.CreateUnderFormGroup.valueChanges.subscribe(() => {
+      this.store.dispatch(new SetDirtyState(this.CreateUnderFormGroup.dirty));
+    });
+    this.GeneralInformationFormGroup = this.fb.group({
+      id: new FormControl(organization ? organization.generalInformation.id : 0),
+      name: new FormControl(organization ? organization.generalInformation.name : '', [Validators.required]),
+      externalId: new FormControl(organization ? organization.generalInformation.externalId : ''),
+      taxId: new FormControl(organization ? organization.generalInformation.taxId : '', [Validators.required, Validators.minLength(9), Validators.pattern(/^[0-9\s\-]+$/)]),
+      addressLine1: new FormControl(organization ? organization.generalInformation.addressLine1 : '', [Validators.required]),
+      addressLine2: new FormControl(organization ? organization.generalInformation.addressLine2 : ''),
+      country: new FormControl(organization ? organization.generalInformation.country : 0, [Validators.required]),
+      state: new FormControl(organization ? organization.generalInformation.state : '', [Validators.required]),
+      city: new FormControl(organization ? organization.generalInformation.city : '', [Validators.required]),
+      zipCode: new FormControl(organization ? organization.generalInformation.zipCode : '', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]),
+      phone1Ext: new FormControl(organization ? organization.generalInformation.phone1Ext : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
+      phone2Ext: new FormControl(organization ? organization.generalInformation.phone2Ext : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
+      fax: new FormControl(organization ? organization.generalInformation.fax : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
+      status: new FormControl(organization ? organization.generalInformation.status : 0, [Validators.required]),
+      website: new FormControl(organization ? organization.generalInformation.website : '')
+    });
+    this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      this.store.dispatch(new SetDirtyState(this.GeneralInformationFormGroup.dirty));
+    });
+    this.BillingDetailsFormGroup = this.fb.group({
+      id: new FormControl(organization ? organization.billingDetails.id : 0),
+      name: new FormControl(organization ? organization.billingDetails.name : '', [Validators.required]),
+      address: new FormControl(organization ? organization.billingDetails.address : ''),
+      country: new FormControl(organization ? organization.billingDetails.country : 0, [Validators.required]),
+      state: new FormControl(organization ? organization.billingDetails.state : '', [Validators.required]),
+      city: new FormControl(organization ? organization.billingDetails.city : '', [Validators.required]),
+      zipCode: new FormControl(organization ? organization.billingDetails.zipCode : '', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]),
+      phone1: new FormControl(organization ? organization.billingDetails.phone1 : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
+      phone2: new FormControl(organization ? organization.billingDetails.phone2 : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
+      fax: new FormControl(organization ? organization.billingDetails.fax : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
+      ext: new FormControl(organization ? organization.billingDetails.ext : '', [Validators.pattern(/^[0-9]{5}$/)])
+    });
+    this.BillingDetailsFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      this.store.dispatch(new SetDirtyState(this.BillingDetailsFormGroup.dirty));
+    });
+    if (organization) {
+      this.ContactFormGroup = this.fb.group({
+        contacts: new FormArray(this.generateContactsFormArray(organization.contactDetails))
+      });
     } else {
-      this.CreateUnderFormGroup.markAllAsTouched();
-      this.GeneralInformationFormGroup.markAllAsTouched();
-      this.BillingDetailsFormGroup.markAllAsTouched();
-      this.ContactFormArray.markAllAsTouched();
-      this.PreferencesFormGroup.markAllAsTouched();
+      this.ContactFormGroup = this.fb.group({
+        contacts: new FormArray([this.newContactFormGroup()])
+      });
+    }
+    this.ContactFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      this.store.dispatch(new SetDirtyState(this.ContactFormGroup.dirty));
+    });
+    this.ContactFormArray = this.ContactFormGroup.get('contacts') as FormArray;
+    this.PreferencesFormGroup = this.fb.group({
+      id: new FormControl(organization ? organization.preferences.id : 0),
+      purchaseOrderBy: new FormControl(organization ? organization.preferences.purchaseOrderBy.toString() : '0', [Validators.required]),
+      sendDocumentToAgency: new FormControl(organization ? organization.preferences.sendDocumentToAgency : null),
+      timesheetSubmittedBy: new FormControl(organization ? organization.preferences.timesheetSubmittedBy.toString() : '0', [Validators.required]),
+      weekStartsOn: new FormControl(organization ? organization.preferences.weekStartsOn : '', [Validators.required]),
+      paymentOptions: new FormControl(organization ? organization.preferences.paymentOptions.toString() : '0', [Validators.required]),
+      timePeriodInMins: new FormControl(organization ? organization.preferences.timePeriodInMins : '', [Validators.pattern(/^[0-9]+$/), Validators.min(1)]),
+      paymentDescription: new FormControl(organization ? organization.preferences.paymentDescription : '', [Validators.required])
+    });
+    this.PreferencesFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      this.store.dispatch(new SetDirtyState(this.PreferencesFormGroup.dirty));
+    });
+    if (organization) {
+      //Populate state dropdown with values based on selected country
+      this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
+      this.store.dispatch(new SetBillingStatesByCountry(organization.billingDetails.country));
+      this.store.dispatch(new SetDirtyState(false));
     }
   }
 }

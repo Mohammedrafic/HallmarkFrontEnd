@@ -1,6 +1,7 @@
 import { DialogNextPreviousOption } from "@shared/components/dialog-next-previous/dialog-next-previous.component";
 import { OrderApplicantsApplyData } from "@shared/models/order-applicants.model";
 import { AcceptJobDTO } from "@shared/models/order-management.model";
+import { RejectReasonPayload } from "@shared/models/reject-reason.model";
 
 export class GetAgencyOrdersPage {
   static readonly type = '[agency order management] Get Agency Orders Page';
@@ -42,6 +43,23 @@ export class UpdateAgencyCandidateJob {
   constructor(
     public payload: AcceptJobDTO
   ) {}
+}
+
+export class GetRejectReasonsForAgency {
+  static readonly type = '[agency order management] Get All Reject Reasons';
+  constructor() {}
+}
+
+export class RejectCandidateJob {
+  static readonly type = '[agency order management] Reject Candidate Job';
+  constructor(
+    public payload: RejectReasonPayload
+  ) {}
+}
+
+export class RejectCandidateForAgencySuccess {
+  static readonly type = '[agency order management] Reject Candidate Success';
+  constructor() {}
 }
 
 export class GetOrderApplicantsData {

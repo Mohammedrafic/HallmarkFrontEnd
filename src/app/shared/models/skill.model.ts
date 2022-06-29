@@ -57,7 +57,23 @@ export class SkillFilters {
   orderBy?: string;
 }
 
+export class MasterSkillFilters {
+  searchTerm?: string;
+  skillCategoryIds?: number[];
+  skillAbbreviations?: string[];
+  skillDescriptions?: string[];
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+}
+
 export class MasterSkillByOrganization {
   id: number;
   name: string;
+}
+
+export class MasterSkillDataSources {
+  skillCategories: SkillCategory[];
+  skillAbbreviations: string[];
+  skillDescriptions: string[];
 }

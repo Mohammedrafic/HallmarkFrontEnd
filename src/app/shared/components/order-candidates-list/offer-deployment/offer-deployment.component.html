@@ -1,18 +1,23 @@
 <section class="container">
   <section class="header-container">
     <div class="e-card-header">
-      <div class="e-card-header-caption">
+      <div class="e-card-header-caption candidat-status">
         <h3 class="e-card-title">{{candidate?.lastName}}, {{candidate?.firstName}}</h3>
+        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
+          <e-chips>
+            <e-chip [text]="candidatStatus[candidate.candidateStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
+          </e-chips>
+        </ejs-chiplist>
       </div>
       <div class="e-card-content button-container">
-        <div class="input-group dropdown bootstrap">
+        <div class="input-group dropdown bootstrap" *ngIf="!isRejected">
           <ejs-dropdownlist [fields]="optionFields"
                             [dataSource]="nextApplicantStatuses"
                             placeholder="Select Status"
                             (change)="updateCandidateJob($event)">
           </ejs-dropdownlist>
         </div>
-        <button ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>
@@ -98,6 +103,14 @@
                     </div>
                   </div>
                 </div>
+                <div class="d-flex bootstrap" *ngIf="isRejected">
+                  <div class="input-container">
+                    <label>Reason</label>
+                    <div class="input-group input-readonly">
+                      <input formControlName="rejectReason" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                </div>
               </form>
             </ng-template>
           </e-accordionitem>
@@ -117,6 +130,16 @@
     </div>
   </section>
   <section class="bill-rates">
-    <app-bill-rates #billRates [billRates]="billRatesData" [isActive]="true"></app-bill-rates>
+    <app-bill-rates #billRates
+                    [billRates]="billRatesData"
+                    [isActive]="true"
+                    (billRatesChanged)="onBillRatesChanged()">
+    </app-bill-rates>
   </section>
 </section>
+
+<app-reject-reason-dialog
+  [rejectReasonsList]="rejectReasons"
+  [openEvent]="openRejectDialog"
+  (applyReject)="onRejectCandidate($event)"
+></app-reject-reason-dialog>

@@ -30,6 +30,7 @@ export class OrderManagement {
   startDate: string;
   isLocked?: boolean;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
+  children: OrderManagementChild[];
 }
 
 export class OrderManagementFilter {
@@ -62,21 +63,23 @@ export type AgencyOrderManagement = {
   jobStartDate: string;
   organizationId: number;
   organizationName: string;
-  children: AgencyOrderManagementChild[];
+  children: OrderManagementChild[];
 };
 
-export type AgencyOrderManagementChild = {
+export type OrderManagementChild = {
   candidateBillRate: number;
-  candidateFirstName: string;
   candidateId: number;
-  candidateLastName: string;
   candidateMasterCredentialIds: number[];
-  candidateMiddleName: string;
   candidateStatus: CandidateStatus;
+  firstName: string;
   jobId: number;
+  lastName: string;
+  middleName: string;
   onboardedPercentage: number;
+  orderStatus: OrderStatus;
   organizationId: number;
-  status: OrderStatus;
+  positionId: number;
+  statusName: string;
   submissionsPercentage: number;
 };
 
@@ -92,6 +95,7 @@ export type OrderCandidatesList = {
   statusName: string;
   submissionsPercentage: number;
   candidateJobId: number;
+  candidateStatus?: CandidateStatus;
 };
 
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;
@@ -189,6 +193,7 @@ export class Order {
   totalPositions?: number;
   acceptedPositions?: number;
   documents: Document[] | null;
+  canApprove: boolean;
 }
 
 export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'status' | 'statusText' | 'documents'> {
@@ -213,6 +218,7 @@ export type AcceptJobDTO = {
   offeredBillRate: number;
   organizationId: number;
   requestComment: string;
+  billRates: BillRate[];
 };
 
 export type CandidateProfile = {
@@ -262,6 +268,9 @@ export type OrderCandidateJob = {
     applicantStatus: number;
     statusText: string;
   };
+  billRates: BillRate[],
+  allowDeployCredentials: boolean;
+  hasAllRequiredOnboardedCredentials: boolean;
 };
 
 export type ApplicantStatus = {
@@ -285,5 +294,24 @@ export class OrderFilter {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
+  orderStatuses?: number[];
+  candidatesCountFrom?: number;
+  candidatesCountTo?: number;
+  agencyIds?: number[];
+  agencyType?: string | number | null;
 }
 
+export class OrderPartnerAgency {
+  id: number;
+  name: string;
+}
+
+export class FilterOrderStatus {
+  status: number;
+  statusText: string;
+}
+
+export class OrderFilterDataSource {
+  partneredAgencies: OrderPartnerAgency[];
+  orderStatus: FilterOrderStatus[];
+}

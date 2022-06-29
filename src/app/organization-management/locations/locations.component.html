@@ -20,7 +20,12 @@
         ejs-button
         id="filterButton"
         cssClass="e-outline button-filter"
-        (click)="showFilters()">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+        (click)="showFilters()">
+        <div class="filter-button-content">
+          <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
       <button
         ejs-button
         id="importButton"
@@ -42,7 +47,7 @@
 
   <ejs-grid class="grid grid-component"
     #grid
-    [dataSource]="gridDataSource"
+    [dataSource]="(locations$ | async)?.items"
     [allowPaging]="allowPaging"
     [pageSettings]="pageSettings"
     [height]="fullScreenGridHeight"
@@ -102,7 +107,7 @@
                 [decimals]="decimals"
                 placeholder="Go to:"
                 min="1"
-                [max]="lastAvailablePage"
+                [max]="(locations$ | async)?.totalPages"
                 [showSpinButton]="false"
                 (change)="onGoToClick($event)"
               >
@@ -112,10 +117,10 @@
               <ejs-pager
                 id="gridPager"
                 #gridPager
-                [pageSize]="pageSizePager"
-                [totalRecordsCount]="totalDataRecords"
+                [pageSize]="pageSize"
+                [totalRecordsCount]="(locations$ | async)?.totalCount"
                 [enablePagerMessage]="false"
-                [currentPage]="currentPagerPage"
+                [currentPage]="currentPage"
                 (click)="onGoToClick($event)"
               >
               </ejs-pager>
@@ -129,17 +134,17 @@
 
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
-<app-filter-dialog [items]="filteredItems" [count]="totalDataRecords" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()">
+<app-filter-dialog [items]="filteredItems" [count]="(locations$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
   <form class="bootstrap" [formGroup]="LocationFilterFormGroup">
     <div class="input-container">
       <label>Ext Location ID</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="externalId"
+                         formControlName="externalIds"
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.externalId.dataSource">
+                         [dataSource]="filterColumns.externalIds.dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -147,11 +152,11 @@
       <label>Invoice Location ID</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="invoiceId"
+                         formControlName="invoiceIds"
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.invoiceId.dataSource">
+                         [dataSource]="filterColumns.invoiceIds.dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -159,11 +164,11 @@
       <label>Location Name</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="name"
+                         formControlName="names"
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.name.dataSource">
+                         [dataSource]="filterColumns.names.dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -171,11 +176,11 @@
       <label>Address 1</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="address1"
+                         formControlName="addresses1"
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.address1.dataSource">
+                         [dataSource]="filterColumns.addresses1.dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -183,11 +188,11 @@
       <label>City</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="city"
+                         formControlName="cities"
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.city.dataSource">
+                         [dataSource]="filterColumns.cities.dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -195,11 +200,11 @@
       <label>State</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="state"
+                         formControlName="states"
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.state.dataSource">
+                         [dataSource]="filterColumns.states.dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -207,11 +212,11 @@
       <label>Zip</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="zip"
+                         formControlName="zipCodes"
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.zip.dataSource">
+                         [dataSource]="filterColumns.zipCodes.dataSource">
         </ejs-multiselect>
       </div>
     </div>
@@ -219,11 +224,11 @@
       <label>Contact Person</label>
       <div class="input-group multiselect">
         <ejs-multiselect mode="CheckBox"
-                         formControlName="contactPerson"
+                         formControlName="contactPeople"
                          placeholder="All"
                          [allowFiltering]="true"
                          [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.contactPerson.dataSource">
+                         [dataSource]="filterColumns.contactPeople.dataSource">
         </ejs-multiselect>
       </div>
     </div>

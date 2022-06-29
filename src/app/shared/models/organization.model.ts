@@ -5,7 +5,8 @@ export class Organization {
     id: number,
     businessUnitType: number,
     name: string,
-    parentUnitId?: number
+    parentUnitId?: number;
+    dbConnectionName: string;
   };
   parentBusinessUnitId?: number;
   organizationId?: number | null;
@@ -13,12 +14,13 @@ export class Organization {
   billingDetails: BillingDetails;
   contactDetails: ContactDetails[];
   preferences: Preferences;
+  dbConnectionStringName: string;
 
-  constructor(organizationId: number, businessUnitId: number, generalInformation: GeneralInformation, billingDetails: BillingDetails, contactDetails: ContactDetails[], preferences: Preferences, isSameAsOrg: boolean) {
+  constructor(organizationId: number, businessUnitId: number, generalInformation: GeneralInformation, billingDetails: BillingDetails, contactDetails: ContactDetails[], preferences: Preferences, isSameAsOrg: boolean, dataBaseConnection: string) {
     if (organizationId) {
       this.organizationId = organizationId;
     }
-    this.parentBusinessUnitId  = businessUnitId;
+    this.parentBusinessUnitId = businessUnitId;
     this.generalInformation = generalInformation;
     this.generalInformation.organizationId = organizationId || 0;
     if (this.generalInformation.externalId === '') {
@@ -37,6 +39,7 @@ export class Organization {
       this.preferences.timePeriodInMins = null;
     }
     this.preferences.organizationId = organizationId || 0;
+    this.dbConnectionStringName = dataBaseConnection;
   }
 }
 
@@ -128,4 +131,22 @@ export class OrganizationRegion {
 export class OrganizationStructure {
   organizationId: number;
   regions: OrganizationRegion[];
+}
+
+export class OrganizationFilter {
+  searchTerm?: string;
+  organizationNames?: string[];
+  statuses?: string[];
+  cities?: string[];
+  contacts?: string[];
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+}
+
+export class OrganizationDataSource {
+  organizationNames: string[];
+  statuses: string[];
+  cities: string[];
+  contacts: string[];
 }

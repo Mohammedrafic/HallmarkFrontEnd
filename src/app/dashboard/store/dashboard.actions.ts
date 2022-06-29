@@ -19,3 +19,8 @@ export class SetPanels {
 export class ResetState {
   static readonly type = `${dashboardStatePrefix} Reset state`;
 }
+
+export class IsMobile {
+  static readonly type = `${dashboardStatePrefix} Is Mobile`;
+  constructor(public payload: boolean) {}
+}

@@ -13,6 +13,7 @@
   (rowDeselected)="rowDeselected($event, grid)"
   (dataBound)="gridDataBound(grid)"
   [selectionSettings]="selectionSettings"
+  (actionBegin)="actionBegin($event)"
 >
   <e-columns>
     <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="40"></e-column>
@@ -77,6 +78,60 @@
 </ejs-grid>
 
 <app-export-dialog *ngIf="isActive" [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+
+
+<app-filter-dialog *ngIf="isActive" [items]="filteredItems" [count]="(masterSkills$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
+  <form class="bootstrap" [formGroup]="SkillFilterFormGroup">
+    <div class="input-container">
+      <label for="externalId">Search</label>
+      <div class="input-group">
+        <input  class="e-input"
+                type="text"
+                maxlength="50"
+                formControlName="searchTerm"/>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Skill Category</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="skillCategoryIds"
+                         placeholder="All"
+                         [fields]="optionFields"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.skillCategoryIds.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Skill ABBR</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="skillAbbreviations"
+                         placeholder="All"
+                         [fields]="optionFields"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.skillAbbreviations.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Skill Description</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect mode="CheckBox"
+                         formControlName="skillDescriptions"
+                         placeholder="All"
+                         [fields]="optionFields"
+                         [allowFiltering]="true"
+                         [showDropDownIcon]="true"
+                         [dataSource]="filterColumns.skillDescriptions.dataSource">
+        </ejs-multiselect>
+      </div>
+    </div>
+  </form>
+</app-filter-dialog>
 
 <app-side-dialog *ngIf="isActive"
   (formCancelClicked)="closeDialog()"

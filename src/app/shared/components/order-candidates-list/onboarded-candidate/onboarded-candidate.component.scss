@@ -20,7 +20,7 @@
     display: flex;
     margin-top: 24px;
 
-    .input-group.input-readonly, {
+    .input-group.input-readonly {
       .e-input[readonly] {
         background-color: $secondary-dark-blue-50;
         color: $secondary-dark-blue-30;
@@ -80,4 +80,9 @@
       border-radius: 8px;
     }
   }
+}
+
+.candidat-status {
+  display: flex;
+  align-items: center;
 }

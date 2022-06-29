@@ -156,6 +156,8 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     if (this.billRateForm.valid) {
       const value: BillRate = this.billRateForm.getRawValue();
 
+      value.id = value.id ? value.id : 0;
+
       if (!value.effectiveDate) {
         const existingDateAndConfig = (this.billRatesControl.value as BillRate[]).find(
           (rate) =>
@@ -175,8 +177,8 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         editedControl.patchValue({ ...value, billRateConfig });
       } else {
         this.billRatesControl.push(this.fromValueToBillRate(value));
-        this.billRatesChanged.emit();
       }
+      this.billRatesChanged.emit();
       this.billRateForm.reset();
       this.store.dispatch(new ShowSideDialog(false));
     }

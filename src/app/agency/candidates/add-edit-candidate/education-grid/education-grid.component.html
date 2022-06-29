@@ -82,6 +82,8 @@
                         format="MM/dd/yyyy"
                         placeholder="MM/DD/YYYY"
                         appValidateWithMessage
+                        [enableMask]="true"
+                        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
                         [max]="today"
                         formControlName="graduationDate">
         </ejs-datepicker>

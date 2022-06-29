@@ -20,6 +20,7 @@
 <section>
   <ejs-grid
     #grid
+    class="e-gridwithchildrow"
     (rowDataBound)="setRowHighlight($event)"
     [dataSource]="(ordersPage$ | async)?.items"
     [allowPaging]="allowPaging"
@@ -41,9 +42,18 @@
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column field="id" headerText="ORDER ID" width="120">
         <ng-template #template let-data>
-          <div>
-            <b>{{ data.id }}</b>
-          </div>
+          <ng-container *ngIf="!data.children?.length; else withToggle">
+            <div>
+              <b>{{ data.id }}</b>
+            </div>
+          </ng-container>
+  
+          <ng-template #withToggle>
+            <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
+              <b>{{ data.id }}</b
+              ><i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
+            </div>
+          </ng-template>
         </ng-template>
       </e-column>
       <e-column field="statusText" headerText="STATUS" width="200">
@@ -86,7 +96,7 @@
           <span>{{ data.startDate | date:'MM/dd/yyyy' }}</span>
         </ng-template>
       </e-column>
-      <e-column headerTextAlign="Right" width="130" freeze="Right">
+      <e-column headerTextAlign="Right" width="130">
         <ng-template #headerTemplate let-data>
           <div class="controls-header">
             <button ejs-button cssClass="e-flat icon-button">
@@ -117,6 +127,19 @@
         </ng-template>
       </e-column>
     </e-columns>
+
+    <ng-template #detailTemplate let-data>
+
+      <div class="subrow-wrapper">
+        <app-grid-subrow-candidate
+          *ngFor="let child of data.children"
+          [candidat]="child"
+          [order]="data"
+          [selected]="selectedCandidat?.selected?.order === data.id && selectedCandidat?.selected.positionId === child.positionId"
+          (clickEvent)="onOpenCandidateDialog($event, data)"
+        ></app-grid-subrow-candidate>
+      </div>
+    </ng-template>
 
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">
@@ -165,8 +188,8 @@
 </section>
 
 <app-filter-dialog [items]="filteredItems" [count]="(ordersPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
-  <form class="bootstrap" [formGroup]="OrderFilterFormGroup">
-    <div>
+  <form [formGroup]="OrderFilterFormGroup">
+    <div class="bootstrap">
       <div class="input-container">
         <label for="externalId">Order ID</label>
         <div class="input-group">
@@ -177,7 +200,7 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row bootstrap">
       <div class="input-container">
         <label>Region</label>
         <div class="input-group multiselect">
@@ -205,7 +228,7 @@
         </div>
       </div>
     </div>
-    <div>
+    <div class="bootstrap">
       <div class="input-container">
         <label>Department</label>
         <div class="input-group multiselect">
@@ -220,7 +243,22 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Select Agency</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="agencyIds"
+                           placeholder="All"
+                           [fields]="optionFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.agencyIds.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="row bootstrap">
       <div class="input-container">
         <label>Skill</label>
         <div class="input-group multiselect">
@@ -248,7 +286,22 @@
         </div>
       </div>
     </div>
-    <div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Order Status</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="orderStatuses"
+                           placeholder="All"
+                           [fields]="statusFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.orderStatuses.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
       <div class="input-container">
         <label>Job Title</label>
         <div class="input-group">
@@ -259,7 +312,7 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row bootstrap">
       <div class="input-container">
         <label>Bill Rate From</label>
         <div class="input-group">
@@ -279,7 +332,27 @@
         </div>
       </div>
     </div>
-    <div>
+    <div class="row bootstrap">
+      <div class="input-container">
+        <label>Candidates Count From</label>
+        <div class="input-group">
+          <input  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  formControlName="candidatesCountFrom"/>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Candidates Count To</label>
+        <div class="input-group">
+          <input  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  formControlName="candidatesCountTo"/>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
       <div class="input-container">
         <label for="externalId"># of Positions</label>
         <div class="input-group">
@@ -290,7 +363,7 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row bootstrap">
       <div class="input-container calendar">
         <label for="inactiveDate">Job Start Date</label>
         <div class="input-group datepicker">
@@ -316,6 +389,14 @@
         </div>
       </div>
     </div>
+    <div>
+      <div class="radio-container">
+        <label class="radio-label">Internal Agency</label>
+        <ejs-radiobutton formControlName="agencyType" label="Yes" name="agencyType" value="1"></ejs-radiobutton>
+        <ejs-radiobutton formControlName="agencyType" label="No" name="agencyType" value="2"></ejs-radiobutton>
+        <ejs-radiobutton formControlName="agencyType" label="Both" name="agencyType" value="0"></ejs-radiobutton>
+      </div>
+    </div>
   </form>
 </app-filter-dialog>
 
@@ -323,3 +404,4 @@
   [order]="selectedOrder"
   [openEvent]="openDetails"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"></app-order-details-dialog>
+  <app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>

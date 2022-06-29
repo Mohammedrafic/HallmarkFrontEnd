@@ -6,8 +6,8 @@
 @import "./variables/colors.scss";
 
 @font-face {
-  font-family: "SF Pro";
-  src: url("../../assets/fonts/SF-Pro.ttf") format("truetype");
+  @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap");
+  font-family: "Open Sans", sans-serif;
 }
 
 html {
@@ -50,7 +50,7 @@ html {
 body {
   transition: background-color 0.5s ease;
   margin: 0;
-  font-family: "SF Pro";
+  font-family: "Open Sans";
   height: 100%;
 
   .flex-column {
@@ -195,7 +195,7 @@ body {
   &.dark {
     .bootstrap {
       .e-wrapper .e-label, input {
-        font-family: "SF Pro" !important;
+        font-family: "Open Sans" !important;
       }
     }
   }
@@ -280,6 +280,9 @@ a, a:hover, a:focus, a:active {
   }
 }
 
-#Candidates_SeriesCollection {
-  cursor: default;
+#Active_Positions,
+#Candidates{
+  &_SeriesCollection {
+    cursor: default;
+  }
 }

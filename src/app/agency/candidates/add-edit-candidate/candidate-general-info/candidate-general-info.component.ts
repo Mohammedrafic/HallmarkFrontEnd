@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Select, Store } from '@ngxs/store';
+import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { CheckBoxSelectionService } from '@syncfusion/ej2-angular-dropdowns';
 import { Observable } from 'rxjs';
 import { GetAllSkills } from 'src/app/agency/store/candidate.actions';
@@ -20,7 +21,7 @@ enum Classification {
   selector: 'app-candidate-general-info',
   templateUrl: './candidate-general-info.component.html',
   styleUrls: ['./candidate-general-info.component.scss'],
-  providers: [CheckBoxSelectionService]
+  providers: [CheckBoxSelectionService, MaskedDateTimeService]
 })
 export class CandidateGeneralInfoComponent {
   @Input() formGroup: FormGroup;
@@ -74,7 +75,7 @@ export class CandidateGeneralInfoComponent {
       candidateProfileSkills: new FormControl(null, [Validators.required]),
       profileStatus: new FormControl(2, [Validators.required]),
       candidateAgencyStatus: new FormControl(2, [Validators.required]),
-      ssn: new FormControl(null),
+      ssn: new FormControl(null, [Validators.minLength(9)]),
     });
   }
 }

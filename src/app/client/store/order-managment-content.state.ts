@@ -1,7 +1,9 @@
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
+import { getAllErrors } from "@shared/utils/error.utils";
 import { catchError, Observable, of, tap } from 'rxjs';
 import {
+  ApproveOrder,
   ClearPredefinedBillRates,
   ClearSelectedOrder,
   DeleteOrder,
@@ -13,6 +15,7 @@ import {
   GetIncompleteOrders,
   GetMasterShifts,
   GetOrderById,
+  GetOrderFIlterDataSources,
   GetOrders,
   GetOrganisationCandidateJob,
   GetOrganizationStatesWithKeyCode,
@@ -20,9 +23,12 @@ import {
   GetProjectNames,
   GetProjectSpecialData,
   GetProjectTypes,
+  GetRejectReasonsForOrganisation,
   GetSelectedOrderById,
   GetSuggestedDetails,
   GetWorkflows,
+  RejectCandidateForOrganisationSuccess,
+  RejectCandidateJob,
   SaveOrder,
   SaveOrderSucceeded,
   SetIsDirtyOrderForm,
@@ -37,6 +43,7 @@ import {
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
+  OrderFilterDataSource,
   OrderManagement,
   OrderManagementPage,
   SuggesstedDetails
@@ -56,6 +63,8 @@ import { getGroupedCredentials } from '@shared/components/order-details/order.ut
 import { BillRate } from '@shared/models/bill-rate.model';
 import { OrderManagementModel } from '@agency/store/order-management.state';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
+import { RejectReasonService } from "@shared/services/reject-reason.service";
+import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -78,6 +87,8 @@ export interface OrderManagementContentStateModel {
   associateAgencies: AssociateAgency[];
   predefinedBillRates: BillRate[];
   isDirtyOrderForm: boolean;
+  rejectionReasonsList: RejectReason[] | null;
+  orderFilterDataSources: OrderFilterDataSource | null;
 }
 
 @State<OrderManagementContentStateModel>({
@@ -102,16 +113,22 @@ export interface OrderManagementContentStateModel {
     masterShifts: [],
     associateAgencies: [],
     predefinedBillRates: [],
-    isDirtyOrderForm: false
+    isDirtyOrderForm: false,
+    rejectionReasonsList: null,
+    orderFilterDataSources: null
   }
 })
 @Injectable()
 export class OrderManagementContentState {
   @Selector()
-  static ordersPage(state: OrderManagementContentStateModel): OrderManagementPage | null { return state.ordersPage; }
+  static ordersPage(state: OrderManagementContentStateModel): OrderManagementPage | null {
+    return state.ordersPage;
+  }
 
   @Selector()
-  static selectedOrder(state: OrderManagementContentStateModel): Order | null { return state.selectedOrder; }
+  static selectedOrder(state: OrderManagementContentStateModel): Order | null {
+    return state.selectedOrder;
+  }
 
   @Selector()
   static orderDialogOptions(state: OrderManagementContentStateModel): DialogNextPreviousOption {
@@ -124,37 +141,59 @@ export class OrderManagementContentState {
   }
 
   @Selector()
-  static organizationStatesWithKeyCode(state: OrderManagementContentStateModel): OrganizationStateWithKeyCode[] { return state.organizationStatesWithKeyCode; }
+  static organizationStatesWithKeyCode(state: OrderManagementContentStateModel): OrganizationStateWithKeyCode[] {
+    return state.organizationStatesWithKeyCode;
+  }
 
   @Selector()
-  static workflows(state: OrderManagementContentStateModel): WorkflowByDepartmentAndSkill[] { return state.workflows; }
+  static workflows(state: OrderManagementContentStateModel): WorkflowByDepartmentAndSkill[] {
+    return state.workflows;
+  }
 
   @Selector()
-  static projectTypes(state: OrderManagementContentStateModel): ProjectType[] { return state.projectTypes }
+  static projectTypes(state: OrderManagementContentStateModel): ProjectType[] {
+    return state.projectTypes
+  }
 
   @Selector()
-  static projectSpecialData(state: OrderManagementContentStateModel): ProjectSpecialData | null { return state.projectSpecialData }
+  static projectSpecialData(state: OrderManagementContentStateModel): ProjectSpecialData | null {
+    return state.projectSpecialData
+  }
 
   @Selector()
-  static suggestedDetails(state: OrderManagementContentStateModel): SuggesstedDetails | null { return state.suggestedDetails }
+  static suggestedDetails(state: OrderManagementContentStateModel): SuggesstedDetails | null {
+    return state.suggestedDetails
+  }
 
   @Selector()
-  static projectNames(state: OrderManagementContentStateModel): ProjectName[] { return state.projectNames }
+  static projectNames(state: OrderManagementContentStateModel): ProjectName[] {
+    return state.projectNames
+  }
 
   @Selector()
-  static masterShifts(state: OrderManagementContentStateModel): MasterShift[] { return state.masterShifts }
+  static masterShifts(state: OrderManagementContentStateModel): MasterShift[] {
+    return state.masterShifts
+  }
 
   @Selector()
-  static associateAgencies(state: OrderManagementContentStateModel): AssociateAgency[] { return state.associateAgencies }
+  static associateAgencies(state: OrderManagementContentStateModel): AssociateAgency[] {
+    return state.associateAgencies
+  }
 
   @Selector()
-  static getPredefinedBillRatesData(state: OrderManagementContentStateModel): GetPredefinedBillRatesData | null { return state.getPredefinedBillRatesData }
+  static getPredefinedBillRatesData(state: OrderManagementContentStateModel): GetPredefinedBillRatesData | null {
+    return state.getPredefinedBillRatesData
+  }
 
   @Selector()
-  static predefinedBillRates(state: OrderManagementContentStateModel): BillRate[] { return state.predefinedBillRates }
+  static predefinedBillRates(state: OrderManagementContentStateModel): BillRate[] {
+    return state.predefinedBillRates
+  }
 
   @Selector()
-  static isDirtyOrderForm(state: OrderManagementContentStateModel): boolean { return state.isDirtyOrderForm; }
+  static isDirtyOrderForm(state: OrderManagementContentStateModel): boolean {
+    return state.isDirtyOrderForm;
+  }
 
   @Selector()
   static candidatesJob(state: OrderManagementContentStateModel): OrderCandidateJob | null {
@@ -178,11 +217,23 @@ export class OrderManagementContentState {
     };
   }
 
+  @Selector()
+  static rejectionReasonsList(state: OrderManagementContentStateModel): RejectReason[] | null {
+    return state.rejectionReasonsList
+  }
+
+  @Selector()
+  static orderFilterDataSources(state: OrderManagementContentStateModel): OrderFilterDataSource | null {
+    return state.orderFilterDataSources
+  }
+
   constructor(
     private orderManagementService: OrderManagementContentService,
     private projectsService: ProjectsService,
-    private shiftsService: ShiftsService
-  ) {}
+    private shiftsService: ShiftsService,
+    private rejectReasonService: RejectReasonService,
+  ) {
+  }
 
   @Action(GetIncompleteOrders)
   GetIncompleteOrders({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }: GetIncompleteOrders): Observable<OrderManagementPage> {
@@ -202,14 +253,14 @@ export class OrderManagementContentState {
   @Action(GetOrderById)
   GetOrderById(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { id, options, organizationId }: GetOrderById
+    { id, options }: GetOrderById
   ): Observable<Order> {
-    patchState({ orderDialogOptions: options});
+    patchState({ orderDialogOptions: options });
     return this.orderManagementService.getOrderById(id).pipe(
       tap((payload) => {
         const groupedCredentials = getGroupedCredentials(payload.credentials)
         payload.groupedCredentials = groupedCredentials;
-        patchState({ selectedOrder: payload});
+        patchState({ selectedOrder: payload });
         return payload;
       })
     );
@@ -220,9 +271,9 @@ export class OrderManagementContentState {
     { patchState }: StateContext<OrderManagementContentStateModel>,
     { orderId, organizationId, pageNumber, pageSize }: GetAgencyOrderCandidatesList
   ): Observable<OrderCandidatesListPage> {
-    return this.orderManagementService.getOrderCandidatesList(orderId,organizationId,pageNumber,pageSize).pipe(
+    return this.orderManagementService.getOrderCandidatesList(orderId, organizationId, pageNumber, pageSize).pipe(
       tap((payload) => {
-        patchState({orderCandidatesListPage: payload});
+        patchState({ orderCandidatesListPage: payload });
         return payload
       })
     )
@@ -256,7 +307,7 @@ export class OrderManagementContentState {
   ): Observable<OrderCandidateJob> {
     return this.orderManagementService.getCandidateJob(organizationId, jobId).pipe(
       tap((payload) => {
-        patchState({candidatesJob: payload});
+        patchState({ candidatesJob: payload });
         return payload;
       })
     );
@@ -269,7 +320,7 @@ export class OrderManagementContentState {
   ): Observable<ApplicantStatus[]> {
     return this.orderManagementService.getAvailableSteps(organizationId, jobId).pipe(
       tap((payload) => {
-        patchState({applicantStatuses: payload});
+        patchState({ applicantStatuses: payload });
         return payload;
       })
     );
@@ -279,15 +330,20 @@ export class OrderManagementContentState {
   UpdateOrganisationCandidateJob({ dispatch }: StateContext<OrderManagementModel>, { payload }: UpdateOrganisationCandidateJob): Observable<any> {
     return this.orderManagementService.updateCandidateJob(payload).pipe(
       tap(() => {
-        dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'));
+        dispatch(new ShowToast(MessageTypes.Success, 'Candidate was updated'));
         dispatch(new UpdateOrganisationCandidateJobSucceed());
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
+      catchError((error: any) => {
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)))
+      })
     );
   }
 
   @Action(GetWorkflows)
-  GetWorkflows({ patchState }: StateContext<OrderManagementContentStateModel>, { departmentId, skillId }: GetWorkflows): Observable<WorkflowByDepartmentAndSkill[]> {
+  GetWorkflows({ patchState }: StateContext<OrderManagementContentStateModel>, {
+    departmentId,
+    skillId
+  }: GetWorkflows): Observable<WorkflowByDepartmentAndSkill[]> {
     return this.orderManagementService.getWorkflowsByDepartmentAndSkill(departmentId, skillId).pipe(tap((payload) => {
       patchState({ workflows: payload });
       return payload;
@@ -407,8 +463,54 @@ export class OrderManagementContentState {
   @Action(DeleteOrder)
   DeleteOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { id }: DeleteOrder): Observable<any> {
     return this.orderManagementService.deleteOrder(id).pipe(tap(() => {
-      dispatch(new DeleteOrderSucceeded());
-    }),
-    catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Order cannot be deleted')))));
+        dispatch(new DeleteOrderSucceeded());
+      }),
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Order cannot be deleted')))));
+  }
+
+  @Action(GetRejectReasonsForOrganisation)
+  GetRejectReasonsForOrganisation(
+    { patchState }: StateContext<OrderManagementContentStateModel>
+  ): Observable<RejectReasonPage> {
+    return this.rejectReasonService.getAllRejectReasons().pipe(
+      tap(reasons => {
+        patchState({ rejectionReasonsList: reasons.items });
+        return reasons;
+      })
+    )
+  }
+
+  @Action(RejectCandidateJob)
+  RejectCandidateJob(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { payload }: RejectCandidateJob
+  ): Observable<void> {
+    return this.orderManagementService.rejectCandidateJob(payload).pipe(
+      tap(() => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
+          new RejectCandidateForOrganisationSuccess()
+        ]);
+      })
+    )
+  }
+
+  @Action(ApproveOrder)
+  ApproveOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { id }: ApproveOrder): Observable<string | void> {
+    return this.orderManagementService.approveOrder(id).pipe(
+      catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error)))
+    );
+  }
+
+  @Action(GetOrderFIlterDataSources)
+  GetOrderFIlterDataSources(
+    { patchState }: StateContext<OrderManagementContentStateModel>
+  ): Observable<OrderFilterDataSource> {
+    return this.orderManagementService.getOrderFilterDataSources().pipe(
+      tap(payload => {
+        patchState({ orderFilterDataSources: payload });
+        return payload;
+      })
+    )
   }
 }

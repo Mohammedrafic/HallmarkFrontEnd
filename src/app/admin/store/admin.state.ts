@@ -1,52 +1,56 @@
 import { Injectable } from '@angular/core';
-import { State, Action, StateContext, Selector } from '@ngxs/store';
+import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { Days } from 'src/app/shared/enums/days';
 import { SendDocumentAgency } from 'src/app/shared/enums/send-document-agency';
-import { Country, UsaStates, CanadaStates } from 'src/app/shared/enums/states';
+import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
 import { Status } from 'src/app/shared/enums/status';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
-import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
+import { Organization, OrganizationDataSource, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 
 import {
+  ExportCredentialTypes,
+  ExportOrganizations,
+  ExportSkillCategories,
+  ExportSkills,
+  GetAllSkills,
+  GetAllSkillsCategories,
   GetBusinessUnitList,
-  SetBillingStatesByCountry,
-  GetOrganizationsByPage,
-  SetDirtyState,
-  SaveOrganization,
-  UploadOrganizationLogo,
-  SaveOrganizationSucceeded,
+  GetCredentialTypes,
+  GetDBConnections,
+  GetMasterSkillDataSources,
+  GetMasterSkillsByPage,
   GetOrganizationById,
   GetOrganizationByIdSucceeded,
-  SetGeneralStatesByCountry,
-  GetMasterSkillsByPage,
-  GetSkillsCategoriesByPage,
-  SaveSkillsCategory,
-  SaveSkillsCategorySucceeded,
-  RemoveSkillsCategory,
-  RemoveSkillsCategorySucceeded,
-  GetAllSkillsCategories,
-  SaveMasterSkill,
-  SaveMasterSkillSucceeded,
-  RemoveMasterSkill,
-  RemoveMasterSkillSucceeded,
+  GetOrganizationDataSources,
   GetOrganizationLogo,
   GetOrganizationLogoSucceeded,
-  GetAllSkills,
-  GetCredentialTypes,
-  SaveCredentialType,
-  UpdateCredentialType,
+  GetOrganizationsByPage,
+  GetSkillsCategoriesByPage,
   RemoveCredentialType,
-  ExportSkills,
-  ExportSkillCategories,
+  RemoveMasterSkill,
+  RemoveMasterSkillSucceeded,
   RemoveOrganizationLogo,
-  ExportCredentialTypes
+  RemoveSkillsCategory,
+  RemoveSkillsCategorySucceeded,
+  SaveCredentialType,
+  SaveMasterSkill,
+  SaveMasterSkillSucceeded,
+  SaveOrganization,
+  SaveOrganizationSucceeded,
+  SaveSkillsCategory,
+  SaveSkillsCategorySucceeded,
+  SetBillingStatesByCountry,
+  SetDirtyState,
+  SetGeneralStatesByCountry,
+  UpdateCredentialType,
+  UploadOrganizationLogo
 } from './admin.actions';
 import { GeneralPhoneTypes } from '@shared/constants/general-phone-types';
 import { SkillsService } from '@shared/services/skills.service';
 import { CategoriesService } from '@shared/services/categories.service';
-import { Skill, SkillsPage } from 'src/app/shared/models/skill.model';
+import { MasterSkillDataSources, Skill, SkillsPage } from 'src/app/shared/models/skill.model';
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
@@ -83,6 +87,9 @@ export interface AdminStateModel {
   allSkillsCategories: SkillCategoriesPage | null;
   credentialTypes: CredentialType[];
   isDirty: boolean;
+  dataBaseConnections: string[];
+  masterSkillDataSources: MasterSkillDataSources | null;
+  organizationDataSources: OrganizationDataSource | null;
 }
 
 @State<AdminStateModel>({
@@ -110,7 +117,10 @@ export interface AdminStateModel {
     skillsCategories: null,
     allSkillsCategories: null,
     credentialTypes: [],
-    isDirty: false
+    isDirty: false,
+    dataBaseConnections: [],
+    masterSkillDataSources: null,
+    organizationDataSources: null,
   },
 })
 @Injectable()
@@ -152,23 +162,43 @@ export class AdminState {
   static masterSkills(state: AdminStateModel): SkillsPage | null { return state.masterSkills; }
 
   @Selector()
-  static skills(state: AdminStateModel): SkillsPage | null { return state.skills; }
+  static skills(state: AdminStateModel): SkillsPage | null {
+    return state.skills;
+  }
 
   @Selector()
-  static skillsCategories(state: AdminStateModel): SkillCategoriesPage | null { return state.skillsCategories; }
+  static skillsCategories(state: AdminStateModel): SkillCategoriesPage | null {
+    return state.skillsCategories;
+  }
 
   @Selector()
-  static allSkillsCategories(state: AdminStateModel): SkillCategoriesPage | null { return state.allSkillsCategories; }
+  static allSkillsCategories(state: AdminStateModel): SkillCategoriesPage | null {
+    return state.allSkillsCategories;
+  }
 
   @Selector()
-  static credentialTypes(state: AdminStateModel): CredentialType[] { return state.credentialTypes; }
+  static credentialTypes(state: AdminStateModel): CredentialType[] {
+    return state.credentialTypes;
+  }
+
+  @Selector()
+  static dataBaseConnections(state: AdminStateModel): string[] {
+    return state.dataBaseConnections;
+  }
+
+  @Selector()
+  static masterSkillDataSources(state: AdminStateModel): MasterSkillDataSources | null { return state.masterSkillDataSources; }
+
+  @Selector()
+  static organizationDataSources(state: AdminStateModel): OrganizationDataSource | null { return state.organizationDataSources; }
 
   constructor(
     private organizationService: OrganizationService,
     private skillsService: SkillsService,
     private categoriesService: CategoriesService,
     private credentialsService: CredentialsService
-  ) { }
+  ) {
+  }
 
   @Action(SetGeneralStatesByCountry)
   SetGeneralStatesByCountry({ patchState }: StateContext<AdminStateModel>, { payload }: SetGeneralStatesByCountry): void {
@@ -181,9 +211,9 @@ export class AdminState {
   }
 
   @Action(GetOrganizationsByPage)
-  GetOrganizationsByPage({ patchState }: StateContext<AdminStateModel>, { pageNumber, pageSize }: GetOrganizationsByPage): Observable<OrganizationPage> {
+  GetOrganizationsByPage({ patchState }: StateContext<AdminStateModel>, { pageNumber, pageSize, filters}: GetOrganizationsByPage): Observable<OrganizationPage> {
     patchState({ isOrganizationLoading: true });
-    return this.organizationService.getOrganizations(pageNumber, pageSize).pipe(tap((payload) => {
+    return this.organizationService.getOrganizations(pageNumber, pageSize, filters).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false, organizations: payload });
       return payload;
     }));
@@ -253,9 +283,9 @@ export class AdminState {
   }
 
   @Action(GetMasterSkillsByPage)
-  GetMasterSkillsByPage({ patchState }: StateContext<AdminStateModel>, { pageNumber, pageSize }: GetMasterSkillsByPage): Observable<SkillsPage> {
+  GetMasterSkillsByPage({ patchState }: StateContext<AdminStateModel>, { pageNumber, pageSize, filters }: GetMasterSkillsByPage): Observable<SkillsPage> {
     patchState({ isOrganizationLoading: true });
-    return this.skillsService.getMasterSkills(pageNumber, pageSize).pipe(tap((payload) => {
+    return this.skillsService.getMasterSkills(pageNumber, pageSize, filters).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false, masterSkills: payload });
       return payload;
     }));
@@ -384,10 +414,39 @@ export class AdminState {
   };
 
   @Action(ExportCredentialTypes)
-  ExportCredentialTypes({ }: StateContext<AdminStateModel>, { payload }: ExportCredentialTypes): Observable<any> {
+  ExportCredentialTypes({}: StateContext<AdminStateModel>, { payload }: ExportCredentialTypes): Observable<any> {
     return this.credentialsService.exportCredentialTypes(payload).pipe(tap(file => {
       const url = window.URL.createObjectURL(file);
       saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
+
+  @Action(GetDBConnections)
+  GetDBConnections({ patchState }: StateContext<AdminStateModel>): Observable<any> {
+    return this.organizationService.getConnections().pipe(tap(connections => {
+      patchState({ dataBaseConnections: connections });
+    }));
+  };
+
+  @Action(ExportOrganizations)
+  ExportOrganizations({ }: StateContext<AdminStateModel>, { payload }: ExportOrganizations): Observable<any> {
+    return this.organizationService.export(payload).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
+
+  @Action(GetMasterSkillDataSources)
+  GetMasterSkillDataSources({ patchState }: StateContext<AdminStateModel>): Observable<MasterSkillDataSources> {
+    return this.skillsService.getMasterSkillsDataSources().pipe(tap(data => {
+      patchState({ masterSkillDataSources: data });
+    }));
+  };
+
+  @Action(GetOrganizationDataSources)
+  GetOrganizationDataSources({ patchState }: StateContext<AdminStateModel>): Observable<OrganizationDataSource> {
+    return this.organizationService.getOrganizationDataSources().pipe(tap(data => {
+      patchState({ organizationDataSources: data });
     }));
   };
 }

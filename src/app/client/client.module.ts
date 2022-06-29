@@ -27,7 +27,8 @@ import {
   Calendar,
   Folder,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  ChevronRight
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -41,12 +42,12 @@ import {
   SortService,
   ToolbarService
 } from '@syncfusion/ej2-angular-grids';
-import { ButtonModule, ChipListModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { MenuModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
-import {DatePickerModule, MaskedDateTimeService, TimePickerModule} from '@syncfusion/ej2-angular-calendars';
+import { DatePickerModule, MaskedDateTimeService, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 
 import { ClientRoutingModule } from './client-routing.module';
 import { OrderManagementContentComponent } from './order-management/order-management-content/order-management-content.component';
@@ -94,7 +95,8 @@ const gridIcons = {
   Calendar,
   Folder,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  ChevronRight
 };
 
 @NgModule({
@@ -136,6 +138,7 @@ const gridIcons = {
     OrderCredentialsModule,
     DropDownButtonModule,
     DialogModule,
+    RadioButtonModule,
 
     //STORE
     NgxsModule.forFeature([

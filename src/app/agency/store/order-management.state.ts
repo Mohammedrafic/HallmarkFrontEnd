@@ -2,6 +2,7 @@ import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { RECORD_MODIFIED } from "@shared/constants";
 import { MessageTypes } from "@shared/enums/message-types";
 import { OrderApplicantsInitialData } from "@shared/models/order-applicants.model";
 
@@ -12,9 +13,11 @@ import {
   OrderCandidatesListPage
 } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
+import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
 import { OrderApplicantsService } from "@shared/services/order-applicants.service";
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { getGroupedCredentials } from '@shared/components/order-details/order.utils';
+import { RejectReasonService } from "@shared/services/reject-reason.service";
 import { getAllErrors } from "@shared/utils/error.utils";
 import { catchError, Observable, of, tap } from 'rxjs';
 import { ShowToast } from "src/app/store/app.actions";
@@ -27,9 +30,13 @@ import {
   GetCandidateJob,
   GetOrderApplicantsData,
   GetOrderById,
+  GetRejectReasonsForAgency,
+  RejectCandidateForAgencySuccess,
+  RejectCandidateJob,
   UpdateAgencyCandidateJob
 } from './order-management.actions';
 import { isUndefined } from 'lodash';
+import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 
 export interface OrderManagementModel {
   ordersPage: AgencyOrderManagementPage | null;
@@ -39,6 +46,7 @@ export interface OrderManagementModel {
   orderApplicantsInitialData: OrderApplicantsInitialData | null;
   selectedOrder: Order | null;
   orderDialogOptions: DialogNextPreviousOption;
+  rejectionReasonsList: RejectReason[];
 }
 
 @State<OrderManagementModel>({
@@ -50,6 +58,7 @@ export interface OrderManagementModel {
     orderApplicantsInitialData: null,
     selectedOrder: null,
     candidatesJob: null,
+    rejectionReasonsList: [],
     orderDialogOptions: {
       next: false,
       previous: false
@@ -70,7 +79,9 @@ export class OrderManagementState {
 
   @Selector()
   static orderCandidatesLenght(state: OrderManagementModel): number {
-    return state.orderCandidatesListPage?.items.length || 0;
+    return state.orderCandidatesListPage?.items.filter((candidate) =>
+      candidate.status !== ApplicantStatus.Rejected  && candidate.status !== ApplicantStatus.NotApplied
+    ).length || 0;
   }
 
   @Selector()
@@ -81,6 +92,11 @@ export class OrderManagementState {
   @Selector()
   static selectedOrder(state: OrderManagementModel): Order | null {
     return state.selectedOrder;
+  }
+
+  @Selector()
+  static rejectionReasonsList(state: OrderManagementModel): RejectReason[] {
+    return state.rejectionReasonsList;
   }
 
   @Selector()
@@ -111,6 +127,7 @@ export class OrderManagementState {
   }
 
   constructor(private orderManagementContentService: OrderManagementContentService,
+              private rejectReasonService: RejectReasonService,
               private orderApplicantsService: OrderApplicantsService) {}
 
   @Action(GetAgencyOrdersPage)
@@ -214,5 +231,32 @@ export class OrderManagementState {
        tap(() => dispatch(new ShowToast(MessageTypes.Success, 'Status was updated'))),
        catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Status cannot be updated'))))
     );
+  }
+
+  @Action(GetRejectReasonsForAgency)
+  GetRejectReasonsForAgency(
+    { patchState }: StateContext<OrderManagementModel>
+  ): Observable<RejectReasonPage> {
+    return this.rejectReasonService.getAllRejectReasons().pipe(
+      tap(reasons => {
+        patchState({ rejectionReasonsList: reasons.items });
+        return reasons;
+      })
+    )
+  }
+
+  @Action(RejectCandidateJob)
+  RejectCandidateJob(
+    { dispatch }: StateContext<OrderManagementModel>,
+    { payload }: RejectCandidateJob
+  ): Observable<void> {
+    return this.orderManagementContentService.rejectCandidateJob(payload).pipe(
+      tap(() => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
+          new RejectCandidateForAgencySuccess()
+        ]);
+      })
+    )
   }
 }

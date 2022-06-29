@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Organization, OrganizationPage, OrganizationStructure } from 'src/app/shared/models/organization.model';
+import { Organization, OrganizationDataSource, OrganizationFilter, OrganizationPage, OrganizationStructure } from 'src/app/shared/models/organization.model';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrganizationService {
@@ -15,7 +16,10 @@ export class OrganizationService {
    * @param pageSize
    * @return list of organizations
    */
-  public getOrganizations(pageNumber: number, pageSize: number): Observable<OrganizationPage> {
+  public getOrganizations(pageNumber: number, pageSize: number, filters?: OrganizationFilter): Observable<OrganizationPage> {
+    if (filters) {
+      return this.http.post<OrganizationPage>(`/api/Organizations/filter`, filters);
+    }
     return this.http.get<OrganizationPage>(`/api/Organizations`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
   }
 
@@ -74,5 +78,23 @@ export class OrganizationService {
    */
   public removeOrganizationLogo(businessUnitId: number): Observable<never> {
     return this.http.delete<never>(`/api/BusinessUnit/${businessUnitId}/logo`);
+  }
+
+  public getConnections(): Observable<string[]> {
+    return this.http.get<string[]>(`/api/ConnectionStrings`);
+  }
+
+  /**
+   * Export organization list
+   */
+  public export(payload: ExportPayload): Observable<Blob> {
+    return this.http.post(`/api/Organizations/export`, payload, { responseType: 'blob' });
+  }
+
+  /**
+   * Export organization list
+   */
+  public getOrganizationDataSources(): Observable<OrganizationDataSource> {
+    return this.http.get<OrganizationDataSource>(`/api/Organizations/filteringOptions`);
   }
 }

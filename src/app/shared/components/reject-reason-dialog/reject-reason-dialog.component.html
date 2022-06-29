@@ -1,0 +1,51 @@
+<ejs-dialog
+  #rejectDialog
+  cssClass="reject-dialog"
+  isModal="true"
+  [visible]="false"
+  showCloseIcon="true"
+  width="448px"
+  height="312"
+>
+  <ng-template #header>
+    <section class="header-container">
+      <div class="e-card-header">
+        <div class="e-card-header-caption">
+          <h3 class="e-card-title">Reason for Rejection</h3>
+        </div>
+      </div>
+    </section>
+  </ng-template>
+
+  <ng-template #content>
+    <div class="sup-title">Please specify reason for rejection</div>
+    <form [formGroup]="form">
+      <div class="dropdown-container bootstrap">
+        <label>Reason<span class="required">*</span></label>
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            appValidateWithMessage
+            formControlName="rejectReason"
+            [fields]="optionFields"
+            [dataSource]="rejectReasonsList"
+          ></ejs-dropdownlist>
+        </div>
+      </div>
+    </form>
+  </ng-template>
+
+  <ng-template #footerTemplate>
+    <div class="e-card-content">
+      <button
+        ejs-button
+        cssClass="e-outline"
+        (click)="onCancel()"
+      > Cancel </button>
+      <button
+        ejs-button
+        cssClass="e-outline delete-button"
+        (click)="onReject()"
+        >Reject</button>
+    </div>
+  </ng-template>
+</ejs-dialog>

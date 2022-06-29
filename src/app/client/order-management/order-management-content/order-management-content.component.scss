@@ -14,11 +14,6 @@
     background-color: $primary-active-blue-90 !important;
   }
 
-  & td.e-active {
-    background-color: $primary-active-blue-10;
-    color: #fff !important;
-  }
-
   .e-success-row {
     background-color: $supportive-green-50;
   }
@@ -68,6 +63,21 @@
   margin-bottom: 15px;
 }
 
+.radio-container {
+  label, ejs-radiobutton {
+    margin-right: 8px;
+  }
+
+  label, ejs-radiobutton label .e-label {
+    font-size: 12px;
+    color: $secondary-dark-blue-30;
+  }
+
+  ejs-radiobutton label .e-label {
+    padding-left: 21px;
+  }
+}
+
 .row {
   display: flex;
   justify-content: space-between;
@@ -78,5 +88,12 @@
     &:first-child {
       margin-right: 12px;
     }
+  }
+}
+
+.subrow-wrapper {
+  app-grid-subrow-candidate:not(:last-child) {
+    display: block;
+    border-bottom: 1px solid  $secondary-dark-blue-45;
   }
 }

@@ -17,13 +17,14 @@ import {
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CredentialSkillGroup, CredentialSkillGroupPage, CredentialSkillGroupPost } from '@shared/models/skill-group.model';
 import {
+  GetAllOrganizationSkills,
   GetAssignedSkillsByPage,
   GetCredentialSkillGroup,
   RemoveCredentialSkillGroup,
-  SaveCredentialSkillGroup,
-  UpdateCredentialSkillGroup
+  SaveUpdateCredentialSkillGroup
 } from '../../../store/organization-management.actions';
 import { UserState } from 'src/app/store/user.state';
+import { Skill, SkillsPage } from '@shared/models/skill.model';
 
 @Component({
   selector: 'app-group-setup',
@@ -41,21 +42,23 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
 
   @Select(OrganizationManagementState.skillGroups)
   skillGroups$: Observable<CredentialSkillGroupPage>;
+  public skillGroups: CredentialSkillGroup[];
 
-  @Select(OrganizationManagementState.skills)
-  skills$: Observable<any>;
-  skillsFields = {
-    text: 'masterSkill.skillDescription',
-    value: 'id',
-  };
-  skillsId = new Set<number>();
+  @Select(OrganizationManagementState.allOrganizationSkills)
+  allOrganizationSkills$: Observable<Skill[]>;
+  public filteredAssignedSkills: Skill[];
+  public allAssignedSkills: Skill[];
+  public searchDataSource: Skill[];
+  public skillsId = new Set<number>();
 
   skillGroupsFormGroup: FormGroup;
   formBuilder: FormBuilder;
 
+  isGridStateInvalid = false;
   isEdit: boolean;
   editedSkillGroupId?: number;
 
+  private reservedMasterSkillIds: number[] = [];
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
 
@@ -72,11 +75,9 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   }
 
   ngOnInit(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
-      this.currentPage = 1;
-      this.store.dispatch(new GetCredentialSkillGroup());
-      this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, {}));
-    });
+    this.organizationChangedHandler();
+    this.skillGroupDataLoadedHandler();
+    this.assignedSkillsDataLoadedHandler();
   }
 
   ngOnDestroy(): void {
@@ -84,14 +85,19 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.unsubscribe$.complete();
   }
 
-  onEditButtonClick(skillGroup: CredentialSkillGroup, event: any): void {
+  onEditButtonClick(saveSkillGroup: CredentialSkillGroup, event: any): void {
     this.addActiveCssClass(event);
+    // reassign search grid data to allAssignedSkills in Edit mode
+    this.searchDataSource = this.allAssignedSkills;
+
     this.skillGroupsFormGroup.setValue({
-      name: skillGroup.name,
-      skillIds: skillGroup.skills?.map((item: any) => item.id)
+      name: saveSkillGroup.name,
+      skillIds: []
     });
+
+    this.isGridStateInvalid = false;
     this.isEdit = true;
-    this.editedSkillGroupId = skillGroup.id;
+    this.editedSkillGroupId = saveSkillGroup.id;
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -132,27 +138,30 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   }
 
   onFormSaveClick(): void {
-    if (this.skillGroupsFormGroup.valid) {
+    if (this.skillGroupsFormGroup.valid && this.skillsId.size !== 0) {
       if (this.isEdit) {
         const skillGroup: CredentialSkillGroupPost = {
           id: this.editedSkillGroupId,
           name: this.skillGroupsFormGroup.controls['name'].value,
           skillIds: Array.from(this.skillsId)
         };
-        this.store.dispatch(new UpdateCredentialSkillGroup(skillGroup));
-        this.isEdit = false;
+        this.store.dispatch(new SaveUpdateCredentialSkillGroup(skillGroup));
+        this.store.dispatch(new ShowSideDialog(false));
+        this.removeActiveCssClass();
+        this.clearFormDetails();
       } else {
         const skillGroup: CredentialSkillGroupPost = {
           name: this.skillGroupsFormGroup.controls['name'].value,
           skillIds: Array.from(this.skillsId)
         };
 
-        this.store.dispatch(new SaveCredentialSkillGroup(skillGroup));
+        this.store.dispatch(new SaveUpdateCredentialSkillGroup(skillGroup));
         this.store.dispatch(new ShowSideDialog(false));
-        this.skillGroupsFormGroup.reset();
         this.removeActiveCssClass();
+        this.clearFormDetails();
       }
     } else {
+      this.isGridStateInvalid = this.skillsId.size === 0;
       this.skillGroupsFormGroup.markAllAsTouched();
     }
   }
@@ -171,25 +180,29 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   selectSkillId(event: any): void {
     if (event.data.length) {
       event.data.forEach((item: any) => {
-        if (item && item.masterSkill) {
-          this.skillsId.add(item.masterSkill.id);
+        if (item) {
+          this.skillsId.add(item.id);
         }
       });
-    } else if (event.data.masterSkill) {
-      this.skillsId.add(event.data.masterSkill.id);
+    } else if (event.data) {
+      this.skillsId.add(event.data.id);
     }
+
+    this.isGridStateInvalid = this.skillsId.size === 0;
   }
 
   removeSkillId(event: any): void {
     if (event.data.length) {
       event.data.forEach((item: any) => {
-        if (item && item.masterSkill) {
-          this.skillsId.delete(item.masterSkill.id);
+        if (item) {
+          this.skillsId.delete(item.id);
         }
       });
-    } else if (event.data.masterSkill) {
-      this.skillsId.delete(event.data.masterSkill.id);
+    } else if (event.data) {
+      this.skillsId.delete(event.data.id);
     }
+
+    this.isGridStateInvalid = this.skillsId.size === 0;
   }
 
   searchSkill(event: any): void {
@@ -200,12 +213,50 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.isEdit = false;
     this.editedSkillGroupId = undefined;
     this.skillGroupsFormGroup.reset();
+    this.clearSelection(this.searchGrid);
+    this.searchDataSource = this.filteredAssignedSkills;
+    this.isGridStateInvalid = false;
   }
 
   private createSkillGroupFormGroup(): void {
     this.skillGroupsFormGroup = this.formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]],
       skillIds: ['']
+    });
+  }
+
+  private organizationChangedHandler(): void {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.currentPage = 1;
+      this.store.dispatch(new GetCredentialSkillGroup());
+      this.store.dispatch(new GetAllOrganizationSkills());
+    });
+  }
+
+  private skillGroupDataLoadedHandler(): void {
+    this.skillGroups$.pipe(takeUntil(this.unsubscribe$)).subscribe(savedSkillGroupsPages => {
+      if (savedSkillGroupsPages && savedSkillGroupsPages.items) {
+        savedSkillGroupsPages.items.forEach(item => {
+          let masterSkillIds = item.skills?.map(s => s.id);
+          this.reservedMasterSkillIds = masterSkillIds ? masterSkillIds : [];
+        });
+        this.skillGroups = savedSkillGroupsPages.items;
+      }
+    });
+  }
+
+  private assignedSkillsDataLoadedHandler(): void {
+    this.allOrganizationSkills$.pipe(takeUntil(this.unsubscribe$)).subscribe(assignedSkills => {
+      if (assignedSkills) {
+        this.allAssignedSkills = assignedSkills;
+        this.filteredAssignedSkills = assignedSkills.filter(assignedSkill => {
+          if (!this.reservedMasterSkillIds.includes(assignedSkill.id)) {
+            return assignedSkill;
+          }
+          return null;
+        });
+        this.searchDataSource = this.filteredAssignedSkills;
+      }
     });
   }
 }

@@ -8,12 +8,17 @@ import { BillRate } from "@shared/models/bill-rate.model";
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from "@shared/models/order-management.model";
 import { OrderManagementContentState } from "@client/store/order-managment-content.state";
 import {
+  GetOrganisationCandidateJob,
+  GetRejectReasonsForOrganisation,
+  RejectCandidateForOrganisationSuccess,
+  RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed
 } from "@client/store/order-managment-content.actions";
-import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { BillRatesComponent } from "@shared/components/bill-rates/bill-rates.component";
+import { RejectReason } from "@shared/models/reject-reason.model";
 
 @Component({
   selector: 'app-offer-deployment',
@@ -21,17 +26,25 @@ import { BillRatesComponent } from "@shared/components/bill-rates/bill-rates.com
   styleUrls: ['./offer-deployment.component.scss']
 })
 export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
+  @Select(OrderManagementContentState.rejectionReasonsList)
+  rejectionReasonsList$: Observable<RejectReason[]>;
+
   @ViewChild('billRates') billRatesComponent: BillRatesComponent;
 
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
 
   @Input() candidate: OrderCandidatesList;
+  @Input() isTab: boolean = false;
 
+  public openRejectDialog = new Subject<boolean>();
   public billRatesData: BillRate[] = [];
   public formGroup: FormGroup;
   public nextApplicantStatuses: ApplicantStatus[];
   public optionFields = { text: 'statusText', value: 'applicantStatus' };
   public readOnlyMode: boolean;
+  public rejectReasons: RejectReason[] = [];
+  public isRejected = false;
+  public candidatStatus = CandidatStatus;
 
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
@@ -41,19 +54,27 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private unsubscribe$: Subject<void> = new Subject();
   private candidateJob: OrderCandidateJob | null;
   private isOfferedStatus: boolean;
+  private currentApplicantStatus: ApplicantStatus;
 
-  constructor(private store: Store, private actions$: Actions) { }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    this.readOnlyMode = changes['candidate']?.currentValue.status === ApplicantStatusEnum.Offered;
+  constructor(private store: Store, private actions$: Actions) {
   }
 
-  ngOnInit(): void {
+  public ngOnChanges(changes: SimpleChanges): void {
+    this.readOnlyMode =
+      changes['candidate']?.currentValue.status === ApplicantStatusEnum.Offered ||
+      changes['candidate']?.currentValue.status === ApplicantStatusEnum.Rejected;
+
+    this.checkRejectReason();
+  }
+
+  public ngOnInit(): void {
     this.createForm();
     this.subscribeOnInitialData();
+    this.subscribeOnSuccessRejection();
+    this.subscribeOnReasonsList();
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
@@ -61,30 +82,62 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public onCloseDialog(): void {
     this.closeDialogEmitter.next();
     this.nextApplicantStatuses = [];
+    this.billRatesData = [];
     this.candidateJob = null;
     this.isOfferedStatus = false;
+    this.isRejected = false;
   }
 
-  public updateCandidateJob(event: { itemData: ApplicantStatus }): void {
-    if (this.formGroup.valid && this.candidateJob) {
-      const value = this.formGroup.getRawValue();
-      this.isOfferedStatus = event.itemData.applicantStatus === ApplicantStatusEnum.Offered;
-      this.store.dispatch( new UpdateOrganisationCandidateJob({
-        orderId: this.candidateJob.orderId,
+  public onRejectCandidate(event: {rejectReason: number}): void {
+    this.isRejected = true;
+
+    if(this.candidateJob) {
+      const payload = {
         organizationId: this.candidateJob.organizationId,
         jobId: this.candidateJob.jobId,
-        nextApplicantStatus: event.itemData,
-        candidateBillRate: this.candidateJob.candidateBillRate,
-        offeredBillRate: value.offeredBillRate,
-        requestComment: this.candidateJob.requestComment,
-        actualStartDate: this.candidateJob.actualStartDate,
-        actualEndDate: this.candidateJob.actualEndDate,
-        clockId: this.candidateJob.clockId,
-        guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
-        allowDeplayWoCredentials: true
-        // TODO: set bill rates
-      })).subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
+        rejectReasonId: event.rejectReason
+      };
+
+      const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
+      this.formGroup.patchValue({rejectReason: value})
+      this.store.dispatch( new RejectCandidateJob(payload))
     }
+  }
+
+  public updateCandidateJob(event: { itemData: ApplicantStatus }, reloadJob = false): void {
+    if (event.itemData.applicantStatus === ApplicantStatusEnum.Rejected) {
+      this.store.dispatch(new GetRejectReasonsForOrganisation());
+      this.openRejectDialog.next(true);
+    } else {
+      if (this.formGroup.valid && this.candidateJob) {
+        const value = this.formGroup.getRawValue();
+        this.isOfferedStatus = event.itemData.applicantStatus === ApplicantStatusEnum.Offered;
+        this.store.dispatch(new UpdateOrganisationCandidateJob({
+          orderId: this.candidateJob.orderId,
+          organizationId: this.candidateJob.organizationId,
+          jobId: this.candidateJob.jobId,
+          nextApplicantStatus: event.itemData,
+          candidateBillRate: this.candidateJob.candidateBillRate,
+          offeredBillRate: value.offeredBillRate,
+          requestComment: this.candidateJob.requestComment,
+          actualStartDate: this.candidateJob.actualStartDate,
+          actualEndDate: this.candidateJob.actualEndDate,
+          clockId: this.candidateJob.clockId,
+          guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
+          allowDeplayWoCredentials: true,
+          billRates: this.billRatesComponent.billRatesControl.value
+        })).subscribe(() => {
+          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+          if (reloadJob) {
+            this.store.dispatch(new GetOrganisationCandidateJob(this.candidateJob?.organizationId as number, this.candidate.candidateJobId));
+          }
+        });
+      }
+    }
+  }
+
+  public onBillRatesChanged(): void {
+    this.updateCandidateJob({ itemData: this.currentApplicantStatus }, true);
   }
 
   private createForm(): void {
@@ -97,6 +150,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       availableStartDate: new FormControl(''),
       candidateBillRate: new FormControl(null),
       requestComment: new FormControl(''),
+      rejectReason: new FormControl('')
     });
   }
 
@@ -109,8 +163,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       locationName: data.order.locationName,
       availableStartDate: data.availableStartDate,
       candidateBillRate: data.candidateBillRate,
-      requestComment: data.requestComment
-      // TODO: set bill rates
+      requestComment: data.requestComment,
+      rejectReason: data.rejectReason
     });
   }
 
@@ -119,6 +173,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       this.candidateJob = data;
 
       if (data) {
+        this.currentApplicantStatus = data.applicantStatus;
+        this.billRatesData = [...data.billRates];
         this.setFormValue(data);
       }
     });
@@ -127,5 +183,27 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).subscribe(() => {
       this.readOnlyMode = this.isOfferedStatus;
     });
+  }
+
+  private subscribeOnSuccessRejection(): void {
+    this.actions$.pipe(
+      ofActionSuccessful(RejectCandidateForOrganisationSuccess),
+      takeUntil(this.unsubscribe$)
+    ).subscribe(() => {
+      this.formGroup.disable();
+      this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+    });
+  }
+
+  private subscribeOnReasonsList(): void {
+    this.rejectionReasonsList$.pipe(takeUntil(this.unsubscribe$)).subscribe(reasons => {
+      this.rejectReasons = reasons;
+    });
+  }
+
+  private checkRejectReason(): void {
+    if(this.candidate.status === ApplicantStatusEnum.Rejected) {
+      this.isRejected = true;
+    }
   }
 }

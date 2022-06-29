@@ -137,7 +137,7 @@ body.light, body.dark {
     ejs-numerictextbox {
       .e-input-group.e-control-wrapper:not(.e-success):not(.e-warning):not(.e-error):not(.e-float-icon-left).e-disabled {
         background-color: $secondary-dark-blue-50;
-        border-bottom-color: $input-border;
+        border-bottom-color: $grey;
       }
     }
   }

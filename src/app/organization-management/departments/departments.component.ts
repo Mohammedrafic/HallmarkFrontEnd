@@ -2,13 +2,13 @@ import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { FreezeService, GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
-import { Department } from '../../shared/models/department.model';
+import { Department, DepartmentFilter, DepartmentFilterOptions, DepartmentsPage } from '../../shared/models/department.model';
 import {
   SaveDepartment,
   GetDepartmentsByLocationId,
@@ -20,6 +20,7 @@ import {
   ExportDepartments,
   ClearLocationList,
   ClearDepartmentList,
+  GetDepartmentFilterOptions,
 } from '../store/organization-management.actions';
 import { Region } from '../../shared/models/region.model';
 import { Location } from '../../shared/models/location.model';
@@ -66,7 +67,10 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   organizationId$: Observable<number>;
 
   @Select(OrganizationManagementState.departments)
-  departments$: Observable<Department[]>;
+  departments$: Observable<DepartmentsPage>;
+
+  @Select(OrganizationManagementState.departmentFilterOptions)
+  departmentFilterOptions$: Observable<DepartmentFilterOptions>;
 
   @Select(OrganizationManagementState.regions)
   regions$: Observable<Region[]>;
@@ -94,17 +98,20 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   public fileName: string;
   public defaultFileName: string;
 
-  private invalidDate = '0001-01-01T00:00:00+00:00';
-
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
   }
 
   public DepartmentFilterFormGroup: FormGroup;
-  public filters: any = {};
+  public filters: DepartmentFilter = {
+    pageNumber: this.currentPage,
+    pageSize: this.pageSizePager
+  };
   public filterColumns: any;
   public orgStructure: OrganizationStructure;
   public regions: OrganizationRegion[] = [];
+
+  private pageSubject = new Subject<number>();
 
   constructor(private store: Store,
               @Inject(FormBuilder) private builder: FormBuilder,
@@ -119,12 +126,24 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   ngOnInit(): void {
     this.filterColumns = {
-      externalId: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      invoiceDepartmentId: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      name: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      facilityContact: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'skillDescription', valueId: 'id' },
-      facilityEmail: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' }
+      externalIds: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      invoiceIds: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      departmentNames: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: []},
+      facilityContacts: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      facilityEmails: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      inactiveDate: { type: ControlTypes.Date, valueType: ValueType.Text },
     }
+    this.departmentFilterOptions$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(options => {
+      this.filterColumns.externalIds.dataSource = options.externalIds;
+      this.filterColumns.invoiceIds.dataSource = options.ivnoiceIds;
+      this.filterColumns.departmentNames.dataSource = options.departmentNames;
+      this.filterColumns.facilityContacts.dataSource = options.facilityContacts;
+      this.filterColumns.facilityEmails.dataSource = options.facilityEmails;
+    });
+    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(1)).subscribe((page) => {
+      this.currentPage = page;
+      this.getDepartments();
+    });
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.store.dispatch(new GetRegions());
     });
@@ -133,21 +152,35 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.store.dispatch(new ClearLocationList());
+    this.store.dispatch(new ClearDepartmentList());
+  }
+
+  public override updatePage(): void {
+    this.getDepartments();
   }
 
   private getDepartments(): void {
-    this.store.dispatch(new GetDepartmentsByLocationId(this.selectedLocation.id));
+    this.filters.locationId = this.selectedLocation.id;
+    this.filters.pageNumber = this.currentPage;
+    this.filters.pageSize = this.pageSize;
+    this.filters.orderBy = this.orderBy;
+    this.store.dispatch([
+      new GetDepartmentsByLocationId(this.selectedLocation.id, this.filters),
+      new GetDepartmentFilterOptions(this.selectedLocation.id as number)
+    ]);
   }
 
   public onFilterClose() {
     this.DepartmentFilterFormGroup.setValue({
-      externalId: this.filters.externalId || [],
-      invoiceDepartmentId: this.filters.invoiceDepartmentId || [],
-      name: this.filters.name || [],
-      facilityContact: this.filters.facilityContact || [],
-      facilityEmail: this.filters.facilityEmail || [],
+      externalIds: this.filters.externalIds || [],
+      invoiceIds: this.filters.invoiceIds || [],
+      departmentNames: this.filters.departmentNames || [],
+      facilityContacts: this.filters.facilityContacts || [],
+      facilityEmails: this.filters.facilityEmails || [],
+      inactiveDate: this.filters.inactiveDate || null,
     });
-    this.filteredItems = this.filterService.generateChips(this.DepartmentFilterFormGroup, this.filterColumns);
+    this.filteredItems = this.filterService.generateChips(this.DepartmentFilterFormGroup, this.filterColumns, this.datePipe);
   }
 
   public showFilters(): void {
@@ -193,7 +226,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.defaultFileName = 'Organization Departments ' + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportDepartments(new ExportPayload(
       fileType,
-      { locationId: this.selectedLocation.id, offset: Math.abs(new Date().getTimezoneOffset()) },
+      { ...this.filters, offset: Math.abs(new Date().getTimezoneOffset()) },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
       options?.fileName || this.defaultFileName
@@ -217,18 +250,8 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.selectedLocation = event.itemData as Location;
     if (this.selectedLocation?.id) {
       this.getDepartments();
-      this.mapGridData();
       this.clearSelection(this.grid);
     }
-  }
-
-  mapGridData(): void {
-    this.departments$.subscribe(data => {
-      this.lastAvailablePage = this.getLastPage(data);
-      data.forEach(item => item.inactiveDate === this.invalidDate ? item.inactiveDate = '' : item.inactiveDate);
-      this.gridDataSource = this.getRowsPerPage(data, this.currentPagerPage);
-      this.totalDataRecords = data.length;
-    });
   }
 
   formatPhoneNumber(field: string, department: Department): string {
@@ -237,15 +260,13 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   }
 
   onRowsDropDownChanged(): void {
-    this.grid.pageSettings.pageSize = this.pageSizePager = this.getActiveRowsPerPage();
+    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
+    this.grid.pageSettings.pageSize = this.pageSize;
   }
 
   onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.departments$.subscribe(data => {
-        this.gridDataSource = this.getRowsPerPage(data, event.currentPage || event.value);
-        this.currentPagerPage = event.currentPage || event.value;
-      });
+      this.pageSubject.next(event.currentPage || event.value);
     }
   }
 
@@ -339,12 +360,12 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
 
   private saveOrUpdateDepartment(department: Department): void {
     if (this.isEdit) {
-      this.store.dispatch(new UpdateDepartment(department));
+      this.store.dispatch(new UpdateDepartment(department, this.filters));
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       this.isEdit = false;
       this.editedDepartmentId = undefined;
     } else {
-      this.store.dispatch(new SaveDepartment(department));
+      this.store.dispatch(new SaveDepartment(department, this.filters));
       this.store.dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
     }
   }
@@ -364,13 +385,13 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       facilityPhoneNo: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(10), Validators.pattern(/^\d+$/i)]],
       inactiveDate: [null]
     });
-
     this.DepartmentFilterFormGroup = this.formBuilder.group({
-      externalId: new FormControl([]),
-      invoiceDepartmentId: new FormControl([]),
-      name: new FormControl([]),
-      facilityContact: new FormControl([]),
-      facilityEmail: new FormControl([]),
+      externalIds: new FormControl([]),
+      invoiceIds: new FormControl([]),
+      departmentNames: new FormControl([]),
+      facilityContacts: new FormControl([]),
+      facilityEmails: new FormControl([]),
+      inactiveDate: new FormControl(null),
     });
   }
 

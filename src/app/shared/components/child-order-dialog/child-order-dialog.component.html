@@ -1,0 +1,84 @@
+<ejs-dialog
+  id="dialog"
+  #sideDialog
+  cssClass="dialog"
+  width="50%"
+  [target]="targetElement"
+  [visible]="false"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <section class="container preview-dialog">
+      <section class="header-container">
+        <div class="e-card-header preview-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title preview-title">Possition ID {{ order?.orderId || order?.id }}/{{ candidate?.positionId }}</h3>
+            <div class="order-statuses">
+              <ejs-chiplist #chipList class="events-off" *ngIf="candidate">
+                <e-chips>
+                  <e-chip [text]="orderStatusText[candidate.orderStatus]" [cssClass]="orderStatusText[candidate.orderStatus] | chipsCssClass"></e-chip>
+                </e-chips>
+              </ejs-chiplist>
+            </div>
+          </div>
+          <div class="e-card-content">
+            <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
+              <i-feather name="x" class="icon"></i-feather>
+            </button>
+          </div>
+        </div>
+      </section>
+      <div class="order-tabs">
+        <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
+          <e-tabitems>
+            <e-tabitem>
+              <ng-template #headerText>Order Details</ng-template>
+              <ng-template #content>
+                  <section class="order-details"  *ngIf="selectedOrder$ | async as currentOrder">
+                    <section class="job-details">
+                      <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
+                    </section>
+                    <hr />
+                    <app-order-details [currentOrder]="currentOrder"></app-order-details>  
+                  </section>
+              </ng-template>
+            </e-tabitem>
+            <e-tabitem>
+              <ng-template #headerText>Candidate</ng-template>
+              <ng-template #content>
+                <hr />
+                <section class="candidate">
+                  <ng-container [ngSwitch]="selectedTemplate">
+                    <ng-container *ngSwitchCase="template.onboarded">
+                      <app-onboarded-candidate [candidate]="$any(candidate)" [isTab]="true"></app-onboarded-candidate>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="template.accept">
+                      <app-accept-candidate [candidate]="$any(candidate)" [isTab]="true"></app-accept-candidate>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="template.apply">
+                      <app-apply-candidate
+                        [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
+                        [candidate]="$any(candidate)"
+                        [isTab]="true"
+                      >
+                      </app-apply-candidate>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="template.offerDeployment">
+                      <app-offer-deployment [candidate]="$any(candidate)" [isTab]="true"></app-offer-deployment>
+                    </ng-container>
+
+                    <div *ngSwitchDefault></div>
+                  </ng-container>
+                </section>
+              </ng-template>
+            </e-tabitem>
+          </e-tabitems>
+        </ejs-tab>
+      </div>
+    </section>
+  </ng-template>
+</ejs-dialog>
+
