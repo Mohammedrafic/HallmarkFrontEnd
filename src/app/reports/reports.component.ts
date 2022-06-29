@@ -5,6 +5,7 @@ import { Store } from '@ngxs/store';
 import { Component, ChangeDetectionStrategy, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
+import { ApplicantStatus } from '@shared/models/order-management.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 import { CandidateModel } from './models/candidate.model';
@@ -33,7 +34,7 @@ export class ReportsComponent extends DestroyableDirective implements OnInit {
   public readonly isLoading$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public readonly skillOptionFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
   public readonly agenciesOptionFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
-  public readonly statusesOptionFields: FieldSettingsModel = { text: 'description', value: 'id' };
+  public readonly statusesOptionFields: FieldSettingsModel = { text: 'statusText', value: 'applicantStatus' };
   public readonly reportsFilterForm: FormGroup = this.getReportsFilterForm();
   public readonly pageQueryParams$: Observable<PageQueryParams> = this.pageQueryFilterParamsService.pageQueryParams$;
 
@@ -69,8 +70,8 @@ export class ReportsComponent extends DestroyableDirective implements OnInit {
     statuses: {
       dataSource: [],
       type: ControlTypes.Multiselect,
-      valueField: this.skillOptionFields.text,
-      valueId: this.skillOptionFields.value,
+      valueField: this.statusesOptionFields.text,
+      valueId: this.statusesOptionFields.value,
       valueType: ValueType.Id,
     },
   };
@@ -150,11 +151,15 @@ export class ReportsComponent extends DestroyableDirective implements OnInit {
   }
 
   private getFiltersData(): void {
-    forkJoin([this.reportsService.getAssignedSkills(), this.reportsService.getAssociateAgencies()])
+    forkJoin([
+      this.reportsService.getAssignedSkills(),
+      this.reportsService.getApplicantsStatuses(),
+      this.reportsService.getAssociateAgencies(),
+    ])
       .pipe(takeUntil(this.destroy$))
-      .subscribe(([skills, agencies]: [Skill[], AssociateAgency[]]) => {
+      .subscribe(([skills, statuses, agencies]: [Skill[], ApplicantStatus[], AssociateAgency[]]) => {
         this.filterColumns['skills'].dataSource = skills;
-        this.filterColumns['statuses'].dataSource = skills;
+        this.filterColumns['statuses'].dataSource = statuses;
         this.filterColumns['agencies'].dataSource = agencies;
         this.changeDetectorRef.markForCheck();
       });

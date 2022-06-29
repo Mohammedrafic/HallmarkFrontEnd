@@ -1,17 +1,18 @@
 @import '@ag-grid-community/core/dist/styles/ag-grid.scss';
 @import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
 
-:host {
-  display: block;
-  height: 100%;
+app-grid {
+  flex: 1;
 }
 
 .app-grid {
+  display: flex;
+  flex-direction: column;
   height: 100%;
 
   &__component {
-    height: 100%;
     width: 100%;
+    flex: 1;
   }
 
   .ag-header {

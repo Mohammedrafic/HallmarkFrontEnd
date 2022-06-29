@@ -1,8 +1,9 @@
-import { Observable, of, delay } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
-import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus } from '@shared/models/order-management.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { CandidateModel } from './models/candidate.model';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
@@ -31,7 +32,8 @@ export class ReportsService {
 
   public constructor(
     private readonly skillsService: SkillsService,
-    private readonly orderManagementContentService: OrderManagementContentService
+    private readonly orderManagementContentService: OrderManagementContentService,
+    private readonly httpClient: HttpClient
   ) {}
 
   public getAssignedSkills(): Observable<Skill[]> {
@@ -40,6 +42,10 @@ export class ReportsService {
 
   public getAssociateAgencies(): Observable<AssociateAgency[]> {
     return this.orderManagementContentService.getAssociateAgencies();
+  }
+
+  public getApplicantsStatuses(): Observable<ApplicantStatus[]> {
+    return this.httpClient.get<ApplicantStatus[]>('/api/Applicants/filterstatuses');
   }
 
   public getReportData(
@@ -51,26 +57,8 @@ export class ReportsService {
       filterFormValue
     );
 
-    return of({
-      items: Array(100)
-        .fill(0)
-        .map(() => ({
-          agency: 'Agency',
-          name: 'John Doe',
-          skills: ['Skill'],
-          email: 'john.do@mail.com',
-          workPhoneNumber: '3435435345',
-          cellPhoneNumber: 'gfdgfd',
-          address: 'hgfhgf',
-          state: 'IL',
-          city: 'DFSf',
-          applicantStatus: ApplicantStatus.Applied,
-        })),
-      pageNumber: 1,
-      totalPages: 4,
-      totalCount: 100,
-      hasPreviousPage: false,
-      hasNextPage: true,
-    }).pipe(delay(1000));
+    return this.httpClient.get<PageOfCollections<CandidateModel>>('/api/Reports/candidates', {
+      params: { ...payload },
+    });
   }
 }

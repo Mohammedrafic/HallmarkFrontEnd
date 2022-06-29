@@ -1,6 +1,6 @@
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import type { Module } from '@ag-grid-community/core';
-import { BehaviorSubject, combineLatest, filter, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, takeUntil, delay } from 'rxjs';
 
 import {
   Component,
@@ -64,10 +64,11 @@ export class GridComponent<Data> extends DestroyableDirective implements OnChang
     combineLatest([this.gridInstance$, this.isLoading$])
       .pipe(
         filter(([gridInstance]: [GridReadyEventModel | null, boolean]) => !!gridInstance),
+        delay(0), // https://github.com/ag-grid/ag-grid/issues/1665 issue fix
         takeUntil(this.destroy$)
       )
       .subscribe(([grid, isLoading]: [GridReadyEventModel | null, boolean]) => {
-        isLoading ? grid?.api.showLoadingOverlay() : grid?.api.hideOverlay();
+        isLoading ? grid?.api.showLoadingOverlay() : this.rowData?.length && grid?.api.hideOverlay();
       });
   }
 }
