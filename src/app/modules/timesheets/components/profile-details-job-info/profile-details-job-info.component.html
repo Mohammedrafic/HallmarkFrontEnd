@@ -1,5 +1,5 @@
 <div class="job-info-container">
-  <div class="job-info-section" *ngFor="let item of items | async; trackBy: trackByTitle">
+  <div class="job-info-section" *ngFor="let item of items; trackBy: trackByTitle">
     <i-feather [name]="item.icon" class="icon"></i-feather>
     <div>
       <div class="value">{{item.value}}</div>

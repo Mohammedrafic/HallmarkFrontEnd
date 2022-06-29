@@ -4,8 +4,11 @@ import {
   Component,
   EventEmitter,
   Inject,
+  Input,
+  OnChanges,
   OnInit,
   Output,
+  SimpleChanges,
   ViewChild
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
@@ -33,7 +36,7 @@ import { ProfileTimeSheetDetail } from '../../store/model/timesheets.model';
 import { EditTimesheetService } from '../../services/edit-timesheet.service';
 import { EditTimsheetForm } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
-import { TimesheetEditDialogConfig } from '../../constants';
+import { TimesheetEditDialogConfig, WeekDaysOptions } from '../../constants';
 import { DialogConfigField } from '../../interface';
 import { FieldType } from '../../enums';
 
@@ -43,8 +46,10 @@ import { FieldType } from '../../enums';
   styleUrls: ['./add-timesheet.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddTimesheetComponent extends Destroyable implements OnInit {
+export class AddTimesheetComponent extends Destroyable implements OnInit, OnChanges {
   @ViewChild('sideEditDialog') protected sideEditDialog: DialogComponent;
+
+  @Input() profileId: number;
 
   @Select(TimesheetsState.timeSheetEditDialogOpen)
   readonly editDialogType$: Observable<{ dialogType: ProfileTimeSheetActionType, timesheet: ProfileTimeSheetDetail}>;
@@ -58,9 +63,7 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
   public startTimeField: AbstractControl;
   public endTimeField: AbstractControl;
   public maxTime: Date;
-  public minTime: Date;
-
-  public readonly today = Date.now();
+  public minTime: Date = new Date(0);
 
   public readonly FieldTypes = FieldType;
 
@@ -68,6 +71,9 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
    * TODO: remove mock data after back-end changes
    */
   public dialogConfig = TimesheetEditDialogConfig;
+
+  private profile: any;
+  private timsheets: any;
 
   constructor(
     private confirmService: ConfirmService,
@@ -79,11 +85,18 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
     super();
     this.targetElement = this.globalWindow.document.body as HTMLBodyElement;
     this.createForm();
+    this.startTimeValidation();
   }
 
   ngOnInit(): void {
     this.getDialogState();
-    this.startTimeValidation();
+  }
+
+  ngOnChanges(): void {
+    if (this.profileId) {
+      this.profile = JSON.parse(localStorage.getItem('profile') as string);
+      this.timsheets = JSON.parse(localStorage.getItem('timesheet-details-tables') as string);
+    }
   }
 
   public cancelChanges(): void {
@@ -116,6 +129,21 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
 
   public saveForm(): void {
     if (this.form.valid) {
+      const values = this.form.value;
+      const item = {
+        category: values.category,
+        costCenter: values.costCenter,
+        day: this.setDayDate(values.day),
+        hours: Number(values.hours),
+        id: 700 + Math.random() * 8,
+        rate: values.rate,
+        timeIn: this.setTimeDate(values.timeIn, values.day),
+        timeOut: this.setTimeDate(values.timeOut, values.day),
+        total: values.rate * values.hours,
+      };
+      this.timsheets[this.profileId].push(item);
+      localStorage.setItem('timesheet-details-tables', JSON.stringify(this.timsheets));
+
       this.store.dispatch(new Timesheets.PostProfileTimesheet(this.form.getRawValue())).pipe(
         concatMap(() => this.store.dispatch(new Timesheets.CloseProfileTimesheetAddDialog())),
         takeUntil(this.componentDestroy()),
@@ -124,6 +152,7 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
         this.form.reset();
         this.cd.detectChanges();
       });
+
     } else {
       this.form.markAllAsTouched();
     }
@@ -142,27 +171,15 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
       takeUntil(this.componentDestroy())
       )
     .subscribe((event: { dialogType: ProfileTimeSheetActionType, timesheet: ProfileTimeSheetDetail}) => {
-      this.populateForm();
+      this.resetForm();
       this.sideEditDialog.show();
+
       this.cd.markForCheck();
     })
   }
 
   private createForm(): void {
     this.form = this.editTimsheetService.createForm();
-  }
-
-  private populateForm(): void {
-    // this.form.patchValue({
-    //   day: timesheet.day,
-    //   timeIn: timesheet.timeIn,
-    //   timeOut: timesheet.timeOut,
-    //   costCenter: timesheet.costCenter,
-    //   category: timesheet.category,
-    //   hours: timesheet.hours,
-    //   rate: timesheet.rate,
-    //   total: timesheet.total,
-    // });
   }
 
   private startTimeValidation(): void {
@@ -173,19 +190,42 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
     this.endTimeField.addValidators(endTimeValidator(this.form, 'timeIn'));
 
     this.startTimeField.valueChanges.pipe(
+      filter((value) => !!value),
       takeUntil(this.componentDestroy())
     ).subscribe((value) => {
+
       this.minTime = value;
       this.endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-      this.cd.detectChanges();
+      this.cd.markForCheck();
     });
 
     this.endTimeField.valueChanges.pipe(
+      filter((value) => !!value),
       takeUntil(this.componentDestroy())
-    ).subscribe((value) => {
+    ).subscribe((value: Date) => {
       this.maxTime = value;
       this.startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-      this.cd.detectChanges();
+      this.cd.markForCheck();
     });
+  }
+
+  private resetForm(): void {
+    this.form.reset();
+  }
+
+  private setDayDate(value: string): Date {
+    const dayValue: number = WeekDaysOptions.find((option) => option.text === value)?.value as number;
+    const profileDate = new Date(this.profile.startDate);
+    const diff = dayValue - profileDate.getDay();
+
+    return new Date(profileDate.setDate(profileDate.getDate() + diff));
+  }
+
+  private setTimeDate(time: Date, day: string): Date {
+    const weekDayDate = this.setDayDate(day);
+    weekDayDate.setHours(time.getHours());
+    weekDayDate.setMinutes(time.getMinutes());
+
+    return weekDayDate;
   }
 }

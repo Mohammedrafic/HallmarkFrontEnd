@@ -38,6 +38,7 @@ export enum TimesheetsTableColumns {
   StatusText = 'statusText',
   OrderId = 'orderId',
   SkillName = 'skillName',
+  Location = 'location',
   WorkWeek = 'workWeek',
   DepartmentName = 'departmentName',
   BillRate = 'billRate',

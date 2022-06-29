@@ -30,9 +30,9 @@ import { NgxMaskModule } from 'ngx-mask';
     NgxsReduxDevtoolsPluginModule.forRoot({
       disabled: environment.production
     }),
-    NgxsLoggerPluginModule.forRoot({
-      disabled: environment.production
-    }),
+    // NgxsLoggerPluginModule.forRoot({
+    //   disabled: environment.production
+    // }),
     NgxMaskModule.forRoot(),
   ],
   providers: [

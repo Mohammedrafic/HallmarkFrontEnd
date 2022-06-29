@@ -36,6 +36,7 @@ export const timesheetsTableColumnWidth: ITimesheetsColumnWidth = {
   name: 158,
   statusText: 152,
   orderId: 140,
+  location: 120,
   skillName: 270,
   workWeek: 240,
   departmentName: 264,

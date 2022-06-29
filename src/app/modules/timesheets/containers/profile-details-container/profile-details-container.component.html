@@ -33,10 +33,14 @@
       ></span>
 
         <div class="flex flex-column">
-          <h3 class="username">Sanders, Paul</h3>
-          <ejs-chiplist>
+          <h3 class="username">{{ profileData?.firstName }}, {{profileData?.lastName}}</h3>
+          <ejs-chiplist #chipList class="events-off">
             <e-chips>
-              <e-chip text="org. approved" [cssClass]="'accepted' | chipsCssClass"></e-chip>
+              <e-chip
+                *ngIf="profileData"
+                [text]="profileData?.status"
+                [cssClass]="profileData?.status | chipsCssClass">
+              </e-chip>
               <e-chip [text]="onboardedStatus" [cssClass]="onboardedStatus | chipsCssClass"></e-chip>
             </e-chips>
           </ejs-chiplist>
@@ -102,23 +106,24 @@
       </div>
 
       <div class="order-header">
-        <h2 class="order-id">Order ID 24-25-345</h2>
+        <h2 class="order-id">Order ID {{ profileData?.orderId}}</h2>
 
         <div>
           <ejs-checkbox [checked]="false" (checkedChange)="onDWNCheckboxSelectedChange($event)" label="DNW"></ejs-checkbox>
 
-          <button ejs-button cssClass="e-outline" class="reject-button" (click)="onRejectButtonClick()">
+          <button *ngIf="!isAgency" ejs-button cssClass="e-outline" class="reject-button" (click)="onRejectButtonClick()">
             Reject
           </button>
 
-          <button ejs-button cssClass="e-primary">
-            Approve
+          <button ejs-button cssClass="e-primary" (click)="handleApprove()">
+            {{submitText}}
           </button>
         </div>
       </div>
 
       <div class="job-general-info tile-dark-blue">
-        <app-profile-details-job-info></app-profile-details-job-info>
+        <app-profile-details-job-info
+        [jobData]="profileData"></app-profile-details-job-info>
       </div>
 
       <div class="profile-hours-statistics">
@@ -142,33 +147,34 @@
         <app-profile-timesheet-table
           *ngIf="timeSheetsProfile$ | async as timeSheetsProfile"
           [timeSheetsProfile]="timeSheetsProfile"
-          (openAddSideDialog)="handleOpenSideDialog()">
+          [tempProfile]="profileData"
+          (openAddSideDialog)="handleOpenSideDialog($event)">
         </app-profile-timesheet-table>
       </section>
+      <div class="timesheet-navigation">
+        <div
+          [class.disabled]="currentSelectedRowIndex === 0"
+          (click)="onNextPreviousOrder(false)"
+          class="prev">
+            <i-feather name="arrow-left" class="icon"></i-feather>
+            Previous Timesheet
+        </div>
+
+        <div class="spacer"></div>
+
+        <div
+          [class.disabled]="isNextDisabled"
+          (click)="onNextPreviousOrder(true)"
+          class="next">
+          Next Timesheet
+          <i-feather name="arrow-right" class="icon"></i-feather>
+        </div>
+      </div>
     </section>
-    <div class="timesheet-navigation">
-      <div
-        [class.disabled]="currentSelectedRowIndex === 0"
-        (click)="onNextPreviousOrder(false)"
-        class="prev">
-          <i-feather name="arrow-left" class="icon"></i-feather>
-          Previous Timesheet
-      </div>
-
-      <div class="spacer"></div>
-
-      <div
-        [class.disabled]="isNextDisabled"
-        (click)="onNextPreviousOrder(true)"
-        class="next">
-        Next Timesheet
-        <i-feather name="arrow-right" class="icon"></i-feather>
-      </div>
-    </div>
   </ng-template>
 </ejs-dialog>
 
-<app-add-timesheet (updateTable)="handleUpdateTable()"></app-add-timesheet>
 <app-timesheet-reject-reason-dialog [(visible)]="rejectReasonDialogVisible"
                                     [container]="profileDetailsDialogsTarget"
 ></app-timesheet-reject-reason-dialog>
+<app-add-timesheet [profileId]="profileId" (updateTable)="handleUpdateTable()"></app-add-timesheet>

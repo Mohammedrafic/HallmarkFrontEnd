@@ -6,6 +6,10 @@ $chip-margin: 8px;
   padding-bottom: 21px;
 }
 
+.container {
+  padding: 12px 24px;
+}
+
 .d-flex {
   display: flex;
 }
@@ -141,7 +145,7 @@ $chip-margin: 8px;
 .order-header {
   display: flex;
   justify-content: space-between;
-  margin: 15px 0 10px;
+  margin-top: 15px;
 
   .order-id {
     font-weight: 700;
@@ -150,7 +154,6 @@ $chip-margin: 8px;
 
   .reject-button {
     margin-right: 12px;
-    margin-left: 12px;
   }
 }
 
@@ -161,7 +164,7 @@ $chip-margin: 8px;
 .profile-hours-statistics {
   display: flex;
   margin-top: 15px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 
   .profile-uploads {
     margin-left: 12px;
@@ -176,7 +179,8 @@ $chip-margin: 8px;
 .timesheet-navigation {
   display: flex;
   align-items: center;
-  padding: 25px 20px;
+  padding: 15px 20px 0 20px;
+  padding-bottom: 0;
   border-top: 1px solid $secondary-dark-blue-45;
 
   .prev, .next {
@@ -241,4 +245,14 @@ $chip-margin: 8px;
       padding: 0 !important;
     }
   }
+}
+
+.checkbox-block {
+  margin-right: 12px;
+}
+
+.controls-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

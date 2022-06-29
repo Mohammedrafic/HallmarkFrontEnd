@@ -6,27 +6,43 @@ import { map } from 'rxjs/operators';
 import { ITimesheet, ITimesheetsFilter } from '../interface';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
 import { MOK_TIMESHEETS } from '../constants';
-import { mockProfileTableData } from '../components/profile-timesheet-table/mock-table-data';
+// import { mockProfileTableData } from '../components/profile-timesheet-table/mock-table-data';
 import { ProfileTimeSheetDetail } from '../store/model/timesheets.model';
+import { DemoService } from './demo.service';
 
 @Injectable()
 export class TimesheetsApiService {
   private MOK_TIME_SHEETS: ITimesheet[] = MOK_TIMESHEETS;
-  private MOK_PROFILES: ProfileTimeSheetDetail[] = mockProfileTableData;
+  // private MOK_PROFILES: ProfileTimeSheetDetail[] = mockProfileTableData;
+
+  constructor(
+    private demoService: DemoService,
+  ) {}
 
   public getTimesheets(filters: ITimesheetsFilter): Observable<TimeSheetsPage> {
-    return of({
-      items: this.MOK_TIME_SHEETS,
-      totalPages: 2,
-      pageNumber: filters.pageNumber,
-      totalCount: 32,
-      hasNextPage: true,
-      hasPreviousPage: false
-    }).pipe(map(res => ({
-      ...res,
-      items: this.filterArray(res.items, Object.assign({}, filters, { pageNumber: res.totalCount <= filters.pageSize ? 1 : res.pageNumber })),
-      pageNumber: res.totalCount <= filters.pageSize ? 1 : res.pageNumber
-    })));
+    return this.demoService.getAgencyOrders(1, 30)
+    .pipe(
+      map((res) => {
+        return {
+          ...res,
+          items: this.demoService.createTimeSheets(res.items),
+        }
+      }),
+      map((res) => {
+        return {
+          ...res,
+          totalCount: res.items.length,
+          hasNextPage: false,
+          hasPreviousPage: false,
+          pageNumber: 1,
+        }
+      }),
+      map(res => ({
+        ...res,
+        items: this.filterArray(res.items, Object.assign({}, filters, { pageNumber: res.totalCount <= filters.pageSize ? 1 : res.pageNumber })),
+        pageNumber: res.totalCount <= filters.pageSize ? 1 : res.pageNumber
+      })
+    ))
   }
 
   private filterArray(arr: any[], filters: ITimesheetsFilter): any[] {
@@ -38,11 +54,11 @@ export class TimesheetsApiService {
   }
 
   public getProfileTimesheets(): Observable<ProfileTimeSheetDetail[]> {
-    return of(this.MOK_PROFILES);
+    return of([]);
   }
 
   public postProfileTimesheets(body: ProfileTimeSheetDetail): Observable<null> {
-    this.MOK_PROFILES = [...this.MOK_PROFILES, Object.assign({}, body, { total: body.hours * body.rate })];
+    // this.MOK_PROFILES = [...this.MOK_PROFILES, Object.assign({}, body, { total: body.hours * body.rate })];
 
     return of(null);
   }

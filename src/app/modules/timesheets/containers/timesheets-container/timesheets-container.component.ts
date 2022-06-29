@@ -1,8 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ORG_ID_STORAGE_KEY, AGENCY_ID_STORAGE_KEY } from './../../../../shared/constants/local-storage-keys';
+import { BusinessUnitType } from './../../../../shared/enums/business-unit-type';
+import { map, switchMap } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 
-import { Observable, takeUntil, throttleTime } from 'rxjs';
+import { Observable, takeUntil, tap, throttleTime } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { BaseObservable, Destroyable } from '@core/helpers';
@@ -19,6 +22,9 @@ import { IFilterColumns, ITimesheetsFilter } from '../../interface';
 import { TimesheetsService } from '../../services/timesheets.service';
 import { filterOptionFields } from '../../constants';
 import { Timesheets } from '../../store/actions/timesheets.actions';
+import { DemoService } from '../../services/demo.service';
+import { UserState } from 'src/app/store/user.state';
+import { User } from '@shared/models/user.model';
 
 @Component({
   selector: 'app-timesheets-container.ts',
@@ -29,6 +35,9 @@ import { Timesheets } from '../../store/actions/timesheets.actions';
 export class TimesheetsContainerComponent extends Destroyable implements OnInit {
   @Select(TimesheetsState.timesheets)
   timesheets$: Observable<TimeSheetsPage>;
+
+  @Select(UserState.user)
+  user$: Observable<User>;
 
   public tabConfig: ITabConfigInterface[] = TAB_ADMIN_TIMESHEETS;
   public formGroup: FormGroup;
@@ -47,6 +56,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     private store: Store,
     private filterService: FilterService,
     private timesheetsService: TimesheetsService,
+    private demoService: DemoService,
+    private cd: ChangeDetectorRef,
   ) {
     super();
     store.dispatch(new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }));
@@ -121,10 +132,12 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public rowSelected(rowIndex: number): void {
     this.timesheetsService.setCurrentSelectedIndexValue(rowIndex);
     this.store.dispatch(new Timesheets.ToggleProfileDialog(DialogAction.Open, 12));
+    this.cd.markForCheck();
   }
 
   public onNextPreviousOrderEvent(next: boolean): void {
     this.timesheetsService.setNextValue(next);
+    this.cd.markForCheck();
   }
 
   private startPageStateWatching(): void {

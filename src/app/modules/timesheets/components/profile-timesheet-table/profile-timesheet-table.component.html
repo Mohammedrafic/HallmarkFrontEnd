@@ -2,10 +2,10 @@
   <div class="table-block">
     <div class="table-header">
       <h3>Timesheet</h3>
-      <button (click)="openAddSideDialog.emit()" class="add-action">+ Add Rcord</button>
+      <button (click)="openAddSideDialog.emit(profileId)" class="add-action">+ Add Rcord</button>
     </div>
     <ejs-grid #profileTable
-    [dataSource]="timeSheetsProfile"
+    [dataSource]="tempData"
     [allowSorting]="true"
     [allowResizing]="true"
     [resizeSettings]="resizeSettings"
@@ -22,15 +22,16 @@
           [textAlign]="tableConfig.day.align"
           [width]="tableConfig.day.width">
           <ng-template #template let-data>
-            <span>{{ data.day | slice: 0: 3 }}</span>
+
+            <span>{{ data.day | date:'E' }}</span>
           </ng-template>
-      </e-column>
+        </e-column>
         <e-column field="timeIn" type="date"
           [headerText]="tableConfig.timeIn.header"
           [textAlign]="tableConfig.timeIn.align"
           [width]="tableConfig.timeIn.width">
           <ng-template #template let-data>
-            <span>{{ data.timeIn | date: 'M/d/yy, hh:mm' }}</span>
+            <span>{{ data.timeIn | date: 'MM/dd/yy, HH:mm' }}</span>
           </ng-template>
         </e-column>
         <e-column field="timeOut"
@@ -38,7 +39,7 @@
           [textAlign]="tableConfig.timeOut.align"
           [width]="tableConfig.timeOut.width">
           <ng-template #template let-data>
-            <span>{{ data.timeOut | date: 'M/d/yy, hh:mm' }}</span>
+            <span>{{ data.timeOut | date: 'MM/dd/yy, HH:mm' }}</span>
           </ng-template>
         </e-column>
         <e-column field="costCenter"

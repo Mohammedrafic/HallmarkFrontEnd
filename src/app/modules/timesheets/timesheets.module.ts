@@ -1,3 +1,4 @@
+import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -41,6 +42,7 @@ import { ProfileInvoicesComponent } from './components/profile-invoices/profile-
 import { TimesheetsService } from './services/timesheets.service';
 import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
 import { TimesheetDetailsService } from "./services/timesheet-details.service";
+import { DemoService } from './services/demo.service';
 
 const gridIcons = {
   MessageSquare,
@@ -124,6 +126,8 @@ const gridIcons = {
     TimesheetsService,
     CapitalizeFirstPipe,
     TimesheetDetailsService,
+    DemoService,
+    ChipsCssClass,
   ]
 })
 export class TimesheetsModule {}

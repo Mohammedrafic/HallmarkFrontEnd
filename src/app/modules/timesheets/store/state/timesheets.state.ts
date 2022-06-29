@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Observable, tap } from 'rxjs';
+import { Observable, of, tap } from 'rxjs';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 
 import {
@@ -63,9 +63,31 @@ export class TimesheetsState {
 
   @Action(Timesheets.GetAll)
   GetTimesheets({ patchState }: StateContext<TimesheetsModel>, { payload }: Timesheets.GetAll): Observable<TimeSheetsPage> {
-    return this.timesheetsService.getTimesheets(payload).pipe(tap((res) => patchState({
-      timesheets: res,
-    })));
+    let dataToStore: any;
+
+    const local = localStorage.getItem('timesheets');
+
+    if (local) {
+      dataToStore = JSON.parse(local as string);
+
+      patchState({
+        timesheets: dataToStore,
+      });
+
+      return of(dataToStore);
+    } else {
+      return this.timesheetsService.getTimesheets(payload)
+      .pipe(
+        tap((res) => {
+          dataToStore = res;
+          localStorage.setItem('timesheets', JSON.stringify(dataToStore));
+          patchState({
+            timesheets: dataToStore,
+          });
+        }));
+
+
+    }
   }
 
   @Action(Timesheets.PostProfileTimesheet)

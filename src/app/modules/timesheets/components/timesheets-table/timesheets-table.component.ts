@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -54,13 +55,18 @@ export class TimesheetsTableComponent extends AbstractGridConfigurationComponent
   public moreMenuWithCloseButton: ItemModel[] = moreMenuWithClose;
   public timesheetsTableColumnWidth: ITimesheetsColumnWidth = timesheetsTableColumnWidth;
   public TIMESHEETS_STATUSES = TIMETHEETS_STATUSES;
+  isAgency: boolean;
 
-  constructor() {
+  constructor(
+    private router: Router,
+  ) {
     super();
+    this.isAgency = this.router.url.includes('agency');
   }
 
   public onRowClick(event: any): void {
     if (!event.isInteracted) {
+      localStorage.setItem('profile', JSON.stringify(event.data))
       this.timesheetRowSelected.emit(event.rowIndex);
     }
   }

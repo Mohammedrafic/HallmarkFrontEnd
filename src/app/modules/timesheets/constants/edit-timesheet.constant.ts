@@ -1,6 +1,17 @@
 import { FieldType, TableColumnAlign } from '../enums';
 import { DetailsTableConfig, DialogConfig } from '../interface';
 
+
+export const WeekDaysOptions = [
+  { text: 'Monday', value: 1 },
+  { text: 'Tuesday', value: 2 },
+  { text: 'Wednesday', value: 3 },
+  { text: 'Thursday', value: 4 },
+  { text: 'Friday', value: 5 },
+  { text: 'Saturday', value: 6 },
+  { text: 'Sunday', value: 0 },
+];
+
 export const TimesheetEditDialogConfig: DialogConfig = {
   title: 'Add Record',
   fields: [
@@ -10,15 +21,7 @@ export const TimesheetEditDialogConfig: DialogConfig = {
       type: FieldType.Dropdown,
       disabled: false,
       required: true,
-      options: [
-        { text: 'Monday', value: 1 },
-        { text: 'Tuesday', value: 2 },
-        { text: 'Wednesday', value: 3 },
-        { text: 'Thursday', value: 4 },
-        { text: 'Friday', value: 5 },
-        { text: 'Saturday', value: 6 },
-        { text: 'Sunday', value: 7 },
-      ],
+      options: WeekDaysOptions,
     }],
     [
       {
@@ -99,7 +102,7 @@ export const ProfileTimesheetTableConfig: DetailsTableConfig = {
   category: {
     align: TableColumnAlign.Right,
     width: 130,
-    header: 'Cost Center',
+    header: 'Category',
   },
   hours: {
     align: TableColumnAlign.Right,

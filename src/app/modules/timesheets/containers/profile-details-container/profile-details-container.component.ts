@@ -1,4 +1,6 @@
-
+import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { TIMETHEETS_STATUSES } from './../../enums/timesheets.enum';
+import { Router } from '@angular/router';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -11,7 +13,7 @@ import {
   Input, OnChanges, SimpleChanges
 } from '@angular/core';
 
-import { filter, Observable, takeUntil, throttleTime } from 'rxjs';
+import { filter, Observable, takeUntil, throttleTime, debounceTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 
@@ -33,6 +35,7 @@ import { DialogAction } from '../../enums';
 import { ExportType } from "../../enums";
 import { Invoice, ProfileUploadedFile } from "../../interface";
 import { UploaderComponent } from "@syncfusion/ej2-angular-inputs";
+import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 
 interface ExportOption extends ItemModel {
   ext: string | null;
@@ -62,6 +65,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @ViewChild('uploader')
   public uploader: UploaderComponent;
 
+  @ViewChild('chipList') chipList: ChipListComponent;
+
   @Select(TimesheetsState.profileTimesheets)
   timeSheetsProfile$: Observable<ProfileTimeSheetDetail[]>;
 
@@ -85,19 +90,31 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public dropAreaVisible: boolean = false;
   public rejectReasonDialogVisible: boolean = false;
   public isNextDisabled = false;
+  isAgency: boolean;
+  submitText: string;
+  profileData: any;
+  profileId: number;
 
   constructor(
     private store: Store,
+    private router: Router,
     private cd: ChangeDetectorRef,
+    private chipPipe: ChipsCssClass,
     @Inject(GlobalWindow) private readonly globalWindow: WindowProxy & typeof globalThis,
     ) {
     super();
     this.targetElement = this.globalWindow.document.body as HTMLBodyElement;
 
+    /**
+     * TODO: remove this in a method, get rid of getElementById
+     */
     this.isProfileOpen$.pipe(takeUntil(this.componentDestroy())).subscribe(() => {
       this.profileDetailsDialogsTarget = document.getElementById('dialog_dialog-content') as HTMLElement;
       this.dropElement = document.getElementById('timesheet-details-files-droparea') as HTMLElement;
     });
+
+    this.isAgency = this.router.url.includes('agency');
+    this.submitText = this.isAgency ? 'Submit' : 'Approve';
   }
 
   public ngOnInit(): void {
@@ -113,6 +130,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public onNextPreviousOrder(next: boolean): void {
     this.nextPreviousOrderEvent.emit(next);
+    this.cd.detectChanges();
   }
 
   public handleUpdateTable(): void {
@@ -132,11 +150,15 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       takeUntil(this.componentDestroy())
       )
     .subscribe((payload) => {
+      this.profileData = JSON.parse(localStorage.getItem('profile') as string);
+      this.chipList.cssClass = this.chipPipe.transform(this.profileData.status);
+
       if (payload.dialogState && payload.rowId) {
         this.sideDialog.show();
       } else {
         this.sideDialog.hide();
       }
+      this.cd.detectChanges();
     });
   }
 
@@ -144,7 +166,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     document.getElementsByClassName('e-file-select-wrap')[0]?.querySelector('button')?.click();
   }
 
-  public handleOpenSideDialog(): void {
+  public handleOpenSideDialog(id: number): void {
+    this.profileId = id;
     this.store.dispatch(new Timesheets.OpenProfileTimesheetAddDialog());
   }
 
@@ -194,6 +217,51 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     } else {
       this.dropAreaVisible = true;
       this.uploadTooltip.open(container);
+    }
+  }
+
+  handleApprove(): void {
+    if (this.isAgency) {
+      const profile = JSON.parse(localStorage.getItem('profile') as string);
+      profile.status = TIMETHEETS_STATUSES.PENDING_APPROVE;
+      localStorage.setItem('profile', JSON.stringify(profile));
+
+      const timesheets = JSON.parse(localStorage.getItem('timesheets') as string);
+
+      const updatedTimesheets = timesheets.items.map((item: any) => {
+        if (item.id === profile.id) {
+          item.status = TIMETHEETS_STATUSES.PENDING_APPROVE;
+        }
+        return item;
+      });
+
+      localStorage.setItem('timesheets', JSON.stringify(
+        {
+          ...timesheets,
+          items: updatedTimesheets,
+        }
+      ));
+
+      const timesheet = JSON.parse(localStorage.getItem('timesheet-details-tables') as string);
+      const temp = localStorage.getItem('submited-timsheets');
+      let submitted: any[];
+
+      if (temp) {
+        submitted = JSON.parse(temp);
+      } else {
+        submitted = [];
+      }
+
+      submitted.push(
+        {
+          ...profile,
+          timesheets: timesheet,
+        },
+      );
+
+      localStorage.setItem('submited-timsheets', JSON.stringify(submitted));
+      this.store.dispatch(Timesheets.GetAll);
+
     }
   }
 }

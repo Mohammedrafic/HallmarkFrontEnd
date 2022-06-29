@@ -25,19 +25,19 @@
       [width]="timesheetsTableColumnWidth['name']">
         <ng-template #template let-data>
           <div [class.red-text]="data.statusText === TIMESHEETS_STATUSES.MISSING">
-            <a href="#">{{ data.name }}</a>
+            <a href="#">{{ data.firstName }} {{ data.lastName }}</a>
           </div>
         </ng-template>
     </e-column>
     <e-column
-      field="statusText"
+      field="status"
       headerText="STATUS"
       [width]="timesheetsTableColumnWidth['statusText']">
         <ng-template #template let-data>
           <div class="status-cell">
             <ejs-chiplist>
               <e-chips>
-                <e-chip [text]="data.statusText" [cssClass]="(data.statusText | chipsCssClass)"></e-chip>
+                <e-chip [text]="data.status" [cssClass]="(data.status | chipsCssClass)"></e-chip>
               </e-chips>
             </ejs-chiplist>
           </div>
@@ -54,10 +54,16 @@
         </ng-template>
     </e-column>
     <e-column
-      field="skillName"
+      field="skill"
       headerText="SKILL"
       textAlign="Left"
       [width]="timesheetsTableColumnWidth['skillName']">
+    </e-column>
+    <e-column
+      field="location"
+      headerText="Location"
+      textAlign="Left"
+      [width]="timesheetsTableColumnWidth['location']">
     </e-column>
     <e-column
       field="workWeek"
@@ -65,11 +71,15 @@
       textAlign="Right"
       [width]="timesheetsTableColumnWidth['workWeek']">
         <ng-template #template let-data>
-          <div class="align-right"><b>{{ data.workWeek }}</b></div>
+          <div class="align-right">
+            <b>
+             {{data.startDate | date:'W - ccc M/d/yy'}}
+            </b>
+          </div>
         </ng-template>
     </e-column>
     <e-column
-      field="departmentName"
+      field="department"
       headerText="DEPARTMENT"
       textAlign="Left"
       [width]="timesheetsTableColumnWidth['departmentName']">
@@ -84,8 +94,8 @@
         </ng-template>
     </e-column>
     <e-column
-      field="agencyName"
-      headerText="AGENCY NAME"
+      [field]="isAgency ? 'orgName' : 'agencyName'"
+      [headerText]="isAgency ? 'Org NAME' : 'Agency Name' "
       textAlign="Left"
       [width]="timesheetsTableColumnWidth['agencyName']">
     </e-column>
@@ -95,7 +105,7 @@
       textAlign="Right"
       [width]="timesheetsTableColumnWidth['totalHours']">
         <ng-template #template let-data>
-          <div class="align-right">{{ data.totalHours }}</div>
+          <div class="align-right">{{ data.totalDays * 8 }}</div>
         </ng-template>
     </e-column>
     <e-column

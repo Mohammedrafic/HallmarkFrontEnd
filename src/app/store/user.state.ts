@@ -118,9 +118,9 @@ export class UserState {
       const education = 9;
       const faq = 10;
       const businessUnitType = payload;
-
       if (businessUnitType) {
-        menu.menuItems = menu.menuItems.filter((menuItem: MenuItem) => menuItem.id !== education && menuItem.id !== faq).map((menuItem: MenuItem) => {
+        menu.menuItems = menu.menuItems.filter((menuItem: MenuItem) => menuItem.id !== education && menuItem.id !== faq)
+        .map((menuItem: MenuItem) => {
           menuItem.icon = MENU_CONFIG[businessUnitType][menuItem.id].icon;
           menuItem.route = MENU_CONFIG[businessUnitType][menuItem.id].route;
           if (menuItem.children) {
@@ -136,14 +136,6 @@ export class UserState {
           }
           return menuItem;
         });
-        /**
-         * TODO remove after back-end changes
-         */
-          menu.menuItems.push({
-            title: 'Timesheets',
-            route: 'admin/timesheets',
-            icon: 'clock',
-          } as MenuItem)
       }
       return patchState({ menu: menu });
     }));

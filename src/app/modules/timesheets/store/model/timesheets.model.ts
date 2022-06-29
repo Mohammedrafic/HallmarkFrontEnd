@@ -17,7 +17,7 @@ export interface TimesheetsModel {
 
 export interface ProfileTimeSheetDetail {
   id?: number;
-  day: string;
+  day: Date;
   timeIn: string;
   timeOut: string;
   costCenter: string;
