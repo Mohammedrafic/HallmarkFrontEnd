@@ -216,9 +216,9 @@
     (formSaveClicked)="onFormSaveClick()"
     [header]="dialogHeader + ' Record'"
     [width]="'436px'"
+    *ngIf="isActive"
   >
     <form
-      *ngIf="isActive"
       class="form-container bootstrap"
       id="addEditRecordForm"
       [formGroup]="billRatesFormGroup"

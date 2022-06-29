@@ -63,7 +63,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('rateHours') rateHoursInput: MaskedTextBoxComponent;
   @Input() isActive: boolean = false;
-  @Input() export$: Subject<ExportedFileType>;
+  @Input() export$: Subject<ExportedFileType> | undefined;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
@@ -163,7 +163,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         this.fileName = this.defaultFileName;
       }
     });
-    this.export$.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
+    this.export$?.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
       this.defaultFileName = 'Bill Rates/Bill Rate Setup ' + this.generateDateTime(this.datePipe);
       this.defaultExport(event);
     });

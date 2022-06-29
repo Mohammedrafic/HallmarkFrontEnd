@@ -7,9 +7,14 @@
     float: right;
     position: relative;
     z-index: 99;
+    display: flex;
 
     .button-filter,
     .button-export {
+      margin-right: 12px;
+    }
+
+    .search {
       margin-right: 12px;
     }
   }

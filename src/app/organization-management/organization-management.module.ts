@@ -61,7 +61,7 @@ import { WorkflowStepsComponent } from './workflow/job-order/workflow-steps/work
 import { WorkflowState } from './store/workflow.state';
 import { BillRatesComponent } from './bill-rates/bill-rates.component';
 import { BillRateSetupComponent } from './bill-rates/bill-rate-setup/bill-rate-setup.component';
-import { BillRateTypeComponent } from './bill-rates/bill-rate-type/bill-rate-type.component';
+import { ExternalBillRateComponent } from './bill-rates/external-bill-rate/external-bill-rate.component';
 import { BillRateTypeMappingComponent } from './bill-rates/bill-rate-type-mapping/bill-rate-type-mapping.component';
 import { BillRatesState } from '@organization-management/store/bill-rates.state';
 import { RejectReasonComponent } from './reject-reason/reject-reason.component';
@@ -107,7 +107,7 @@ const sidebarIcons = {
     WorkflowStepsComponent,
     BillRatesComponent,
     BillRateSetupComponent,
-    BillRateTypeComponent,
+    ExternalBillRateComponent,
     BillRateTypeMappingComponent,
     RejectReasonComponent,
     FilteredCredentialsComponent,

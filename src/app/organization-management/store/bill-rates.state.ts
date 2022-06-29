@@ -4,13 +4,12 @@ import { catchError, Observable, tap } from 'rxjs';
 import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import {
-  DeleteBillRatesById,
+  DeleteBillRatesById, DeleteBillRatesTypeById,
   GetBillRateOptions,
-  GetBillRates,
-  SaveUpdateBillRate,
   ShowConfirmationPopUp,
-  SaveUpdateBillRateSucceed,
-  ExportBillRateSetup
+  ExportBillRateSetup,
+  GetBillRates, GetExternalBillRateType,
+  SaveUpdateBillRate, SaveUpdateBillRateSucceed, SaveBillRateType, UpdateBillRateType
 } from '@organization-management/store/bill-rates.actions';
 import { BillRatesService } from '@shared/services/bill-rates.service';
 import {
@@ -20,12 +19,13 @@ import {
   RECORD_CANNOT_BE_UPDATED,
   RECORD_MODIFIED
 } from '@shared/constants';
-import { BillRateOption, BillRateSetup, BillRateSetupPage } from '@shared/models/bill-rate.model';
+import {BillRateOption, BillRateSetup, BillRateSetupPage, ExternalBillRateTypePage, ExternalBillRateType} from '@shared/models/bill-rate.model';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 
 export interface BillRatesStateModel {
   billRatesPage: BillRateSetupPage | null,
+  externalBillRateTypePage: ExternalBillRateTypePage | null,
   billRateOptions: BillRateOption[]
 }
 
@@ -33,6 +33,7 @@ export interface BillRatesStateModel {
   name: 'billrates',
   defaults: {
     billRatesPage: null,
+    externalBillRateTypePage: null,
     billRateOptions: []
   }
 })
@@ -43,6 +44,9 @@ export class BillRatesState {
   static billRatesPage(state: BillRatesStateModel): BillRateSetupPage | null { return state.billRatesPage; }
 
   @Selector()
+  static externalBillRateType(state: BillRatesStateModel): ExternalBillRateTypePage | null { return state.externalBillRateTypePage; }
+
+  @Selector()
   static billRateOptions(state: BillRatesStateModel): any { return state.billRateOptions; }
 
   constructor(private billRatesService: BillRatesService) {}
@@ -51,6 +55,14 @@ export class BillRatesState {
   GetBillRates({ patchState }: StateContext<BillRatesStateModel>, { filter }: GetBillRates): Observable<BillRateSetupPage> {
     return this.billRatesService.getBillRates(filter).pipe(tap((payload) => {
       patchState({ billRatesPage: payload });
+      return payload;
+    }));
+  }
+
+  @Action(GetExternalBillRateType)
+  GetBillRatesTypes({ patchState }: StateContext<BillRatesStateModel>, { filter }: GetBillRates): Observable<ExternalBillRateTypePage> {
+    return this.billRatesService.getExternalBillRates(filter).pipe(tap((payload) => {
+      patchState({ externalBillRateTypePage: payload });
       return payload;
     }));
   }
@@ -86,6 +98,42 @@ export class BillRatesState {
       );
   }
 
+  @Action(SaveBillRateType)
+  SaveBillRateType(
+    { patchState, dispatch }: StateContext<BillRatesStateModel>,
+    { payload, pageNumber, pageSize }: SaveBillRateType,
+  ): Observable<ExternalBillRateType | void> {
+    return this.billRatesService.saveExternalBillRateType(payload)
+      .pipe(
+        tap(() => dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED))),
+        tap((payloadResponse) => {
+          dispatch(new GetExternalBillRateType({ pageNumber: pageNumber, pageSize: pageSize }));
+          dispatch(new SaveUpdateBillRateSucceed());
+          return payloadResponse;
+        }),
+        catchError((error: any) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error && error.error && error.error.detail ? error.error.detail : RECORD_CANNOT_BE_SAVED))
+        }));
+  }
+
+  @Action(UpdateBillRateType)
+  UpdateBillRateType(
+    { patchState, dispatch }: StateContext<BillRatesStateModel>,
+    { id, payload, pageNumber, pageSize }: UpdateBillRateType,
+  ): Observable<ExternalBillRateType | void> {
+    return this.billRatesService.updateExternalBillRateType(id, payload)
+      .pipe(
+        tap(() => dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED))),
+        tap((payloadResponse) => {
+          dispatch(new GetExternalBillRateType({ pageNumber: pageNumber, pageSize: pageSize }));
+          dispatch(new SaveUpdateBillRateSucceed());
+          return payloadResponse;
+        }),
+        catchError((error: any) => {
+          return dispatch(new ShowToast(MessageTypes.Error, error && error.error && error.error.detail ? error.error.detail : RECORD_CANNOT_BE_UPDATED));
+        }));
+  }
+
   @Action(DeleteBillRatesById)
   DeleteBillRatesById({ patchState, dispatch }: StateContext<BillRatesStateModel>, { payload, pageNumber, pageSize }: DeleteBillRatesById): Observable<void> {
     return this.billRatesService.removeBillRateById(payload).pipe(tap(() => {
@@ -93,6 +141,15 @@ export class BillRatesState {
         return payload;
       }),
       catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : RECORD_CANNOT_BE_DELETED))));
+  }
+
+  @Action(DeleteBillRatesTypeById)
+  DeleteBillRatesTypeById({ patchState, dispatch }: StateContext<BillRatesStateModel>, { payload, pageNumber, pageSize }: DeleteBillRatesById): Observable<void> {
+    return this.billRatesService.removeExternalBillRateById(payload).pipe(tap(() => {
+        dispatch(new GetExternalBillRateType({ pageNumber: pageNumber, pageSize: pageSize }));
+        return payload;
+      }),
+      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
   }
 
   @Action(GetBillRateOptions)
