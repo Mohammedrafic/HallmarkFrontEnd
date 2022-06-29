@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { combineLatest, filter, map, Observable, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -6,7 +6,10 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DrawNodeEventArgs, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { BusinessUnit } from '@shared/models/business-unit.model';
+import { UsersAssignedToRole } from "@shared/models/user.model";
 import { PermissionsTree } from '@shared/models/permission.model';
+import { GetUsersAssignedToRole } from "src/app/store/user.actions";
+import { UserState } from "src/app/store/user.state";
 
 import { GetNewRoleBusinessByUnitType, GetNewRoleBusinessByUnitTypeSucceeded, GetPermissionsTree, GetRolesForCopy } from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
@@ -27,8 +30,9 @@ export type RoleTreeField = {
   templateUrl: './role-form.component.html',
   styleUrls: ['./role-form.component.scss'],
 })
-export class RoleFormComponent implements OnInit, OnDestroy {
+export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   @Input() form: FormGroup;
+  @Input() roleId: number;
   @Input() businessUnits: { text: string | BusinessUnitType; id: number }[];
 
   @ViewChild('tree') tree: TreeViewComponent;
@@ -42,6 +46,10 @@ export class RoleFormComponent implements OnInit, OnDestroy {
   @Select(SecurityState.isNewRoleDataLoading)
   public isNewRoleDataLoading$: Observable<boolean>;
 
+  @Select(UserState.usersAssignedToRole)
+  usersAssignedToRole$: Observable<UsersAssignedToRole>;
+
+  public usersAssignedToRole: UsersAssignedToRole;
   public copyRoleData$: Observable<Role[]>;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public optionFields = OPRION_FIELDS;
@@ -59,6 +67,11 @@ export class RoleFormComponent implements OnInit, OnDestroy {
     return this.form.get('permissions');
   }
 
+  get showActiveError(): boolean {
+    return this.form.get('isActive')?.value === false
+      && (!!this.usersAssignedToRole.userNames.length || this.usersAssignedToRole.hasUsersOutsideVisibility);
+  }
+
   private isAlive = true;
   private notAssignableIds: number[];
 
@@ -70,6 +83,7 @@ export class RoleFormComponent implements OnInit, OnDestroy {
     this.onBusinessUnitOrIdChange();
     this.onFormChange();
     this.onNewRoleBussinesDataFetched();
+    this.onUsersAssignedToRoleFetched();
 
     this.copyRoleData$ = this.store.select(SecurityState.copyRoleData).pipe(
       map((roles) => {
@@ -79,7 +93,11 @@ export class RoleFormComponent implements OnInit, OnDestroy {
     );
   }
 
-
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['roleId']?.currentValue) {
+      this.usersAssignedToRole = { userNames:[], hasUsersOutsideVisibility: false };
+    }
+  }
 
   ngOnDestroy(): void {
     this.isAlive = false;
@@ -88,6 +106,9 @@ export class RoleFormComponent implements OnInit, OnDestroy {
   public toggleActive(): void {
     const activeControl = this.form.get('isActive');
     activeControl?.patchValue(!activeControl.value);
+    if (!activeControl?.value) {
+      this.store.dispatch(new GetUsersAssignedToRole(this.roleId));
+    }
   }
 
   public onSelecting(): void {
@@ -177,6 +198,11 @@ export class RoleFormComponent implements OnInit, OnDestroy {
     this.actions$.pipe(ofActionSuccessful(GetNewRoleBusinessByUnitTypeSucceeded), takeWhile(() => this.isAlive)).subscribe(({ type }) => {
       this.newRoleBussinesData = this.store.selectSnapshot(SecurityState.newRoleBussinesData)(type);
     })
+  }
+
+  private onUsersAssignedToRoleFetched(): void {
+    this.usersAssignedToRole$.pipe(takeWhile(() => this.isAlive))
+      .subscribe((usersAssignedToRole: UsersAssignedToRole) => this.usersAssignedToRole = usersAssignedToRole);
   }
 
   static createForm(): FormGroup {

@@ -19,3 +19,8 @@ export class UsersPage {
   totalCount: number;
   totalPages: number;
 }
+
+export type UsersAssignedToRole = {
+  userNames: Partial<User>[];
+  hasUsersOutsideVisibility: boolean;
+}
