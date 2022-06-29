@@ -63,6 +63,21 @@
   margin-bottom: 15px;
 }
 
+.radio-container {
+  label, ejs-radiobutton {
+    margin-right: 8px;
+  }
+
+  label, ejs-radiobutton label .e-label {
+    font-size: 12px;
+    color: $secondary-dark-blue-30;
+  }
+
+  ejs-radiobutton label .e-label {
+    padding-left: 21px;
+  }
+}
+
 .row {
   display: flex;
   justify-content: space-between;

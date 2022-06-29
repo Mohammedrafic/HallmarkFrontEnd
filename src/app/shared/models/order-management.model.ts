@@ -294,5 +294,24 @@ export class OrderFilter {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
+  orderStatuses?: number[];
+  candidatesCountFrom?: number;
+  candidatesCountTo?: number;
+  agencyIds?: number[];
+  agencyType?: string | number | null;
 }
 
+export class OrderPartnerAgency {
+  id: number;
+  name: string;
+}
+
+export class FilterOrderStatus {
+  status: number;
+  statusText: string;
+}
+
+export class OrderFilterDataSource {
+  partneredAgencies: OrderPartnerAgency[];
+  orderStatus: FilterOrderStatus[];
+}

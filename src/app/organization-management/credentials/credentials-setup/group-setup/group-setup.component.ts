@@ -54,6 +54,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   skillGroupsFormGroup: FormGroup;
   formBuilder: FormBuilder;
 
+  isGridStateInvalid = false;
   isEdit: boolean;
   editedSkillGroupId?: number;
 
@@ -94,6 +95,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
       skillIds: []
     });
 
+    this.isGridStateInvalid = false;
     this.isEdit = true;
     this.editedSkillGroupId = saveSkillGroup.id;
     this.store.dispatch(new ShowSideDialog(true));
@@ -136,7 +138,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   }
 
   onFormSaveClick(): void {
-    if (this.skillGroupsFormGroup.valid) {
+    if (this.skillGroupsFormGroup.valid && this.skillsId.size !== 0) {
       if (this.isEdit) {
         const skillGroup: CredentialSkillGroupPost = {
           id: this.editedSkillGroupId,
@@ -159,6 +161,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
         this.clearFormDetails();
       }
     } else {
+      this.isGridStateInvalid = this.skillsId.size === 0;
       this.skillGroupsFormGroup.markAllAsTouched();
     }
   }
@@ -184,6 +187,8 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     } else if (event.data) {
       this.skillsId.add(event.data.id);
     }
+
+    this.isGridStateInvalid = this.skillsId.size === 0;
   }
 
   removeSkillId(event: any): void {
@@ -196,6 +201,8 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     } else if (event.data) {
       this.skillsId.delete(event.data.id);
     }
+
+    this.isGridStateInvalid = this.skillsId.size === 0;
   }
 
   searchSkill(event: any): void {
@@ -208,6 +215,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.skillGroupsFormGroup.reset();
     this.clearSelection(this.searchGrid);
     this.searchDataSource = this.filteredAssignedSkills;
+    this.isGridStateInvalid = false;
   }
 
   private createSkillGroupFormGroup(): void {
@@ -218,7 +226,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
   }
 
   private organizationChangedHandler(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.currentPage = 1;
       this.store.dispatch(new GetCredentialSkillGroup());
       this.store.dispatch(new GetAllOrganizationSkills());
@@ -229,7 +237,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     this.skillGroups$.pipe(takeUntil(this.unsubscribe$)).subscribe(savedSkillGroupsPages => {
       if (savedSkillGroupsPages && savedSkillGroupsPages.items) {
         savedSkillGroupsPages.items.forEach(item => {
-          let masterSkillIds = item.skills?.map(s => s.masterSkillId);
+          let masterSkillIds = item.skills?.map(s => s.id);
           this.reservedMasterSkillIds = masterSkillIds ? masterSkillIds : [];
         });
         this.skillGroups = savedSkillGroupsPages.items;

@@ -39,7 +39,7 @@
             <div class="input-container">
               <label>City<span class="required">*</span></label>
               <div class="input-group">
-                <input appValidateWithMessage formControlName="city" class="e-input" type="text" maxlength="100"/>
+                <input appValidateWithMessage formControlName="city" class="e-input" type="text" maxlength="20"/>
               </div>
             </div>
             <div class="input-container">
@@ -86,7 +86,7 @@
             </div>
             <div class="input-container">
               <label>Ext</label>
-              <input formControlName="ext" class="e-input" type="text" maxlength="5" />
+              <input formControlName="ext" class="e-input" mask="00000" type="text" maxlength="5" />
             </div>
           </div>
         </form>

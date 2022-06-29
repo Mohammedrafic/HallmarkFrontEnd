@@ -525,13 +525,16 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
 
   private setUsersAndRolesForEdit(stepMappings: StepMapping[], workflowSteps: Step[], formArray: FormArray): void {
     workflowSteps.forEach((step, i) => {
-      let foundMatchedStep = stepMappings.find(s => s.workflowStepId === step.id);
+      let foundMatchedSteps = stepMappings.filter(s => s.workflowStepId === step.id);
 
-      if (foundMatchedStep) {
-        const foundUserRole = this.rolesWithUsers.find(r => r.id === foundMatchedStep?.userId || r.id === foundMatchedStep?.roleId?.toString());
-        if (foundUserRole) {
-          formArray.controls[i].setValue([foundUserRole.id]);
-        }
+      if (foundMatchedSteps.length) {
+        foundMatchedSteps.forEach((foundMatchedStep: StepMapping) => {
+          const foundUserRole = this.rolesWithUsers.find(r => r.id === foundMatchedStep?.userId || r.id === foundMatchedStep?.roleId?.toString());
+          if (foundUserRole) {
+            const value = formArray.controls[i].value ? [...formArray.controls[i].value, foundUserRole.id] : [foundUserRole.id];
+            formArray.controls[i].setValue(value);
+          }
+        });
       }
     });
   }

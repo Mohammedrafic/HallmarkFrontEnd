@@ -10,7 +10,7 @@ import { MessageTypes } from "src/app/shared/enums/message-types";
 import { Candidate, CandidatePage } from 'src/app/shared/models/candidate.model';
 import { Education } from "src/app/shared/models/education.model";
 import { Experience } from "src/app/shared/models/experience.model";
-import { SkillsPage } from 'src/app/shared/models/skill.model';
+import { Skill } from 'src/app/shared/models/skill.model';
 import { SkillsService } from 'src/app/shared/services/skills.service';
 import { ShowToast } from "src/app/store/app.actions";
 import { CandidateService } from '../services/candidates.service';
@@ -58,7 +58,7 @@ import { getAllErrors } from '@shared/utils/error.utils';
 export interface CandidateStateModel {
   isCandidateLoading: boolean;
   candidate: Candidate | null;
-  skills: SkillsPage | null;
+  skills: Skill[];
   experiences: Experience[];
   educations: Education[];
   candidatePage: CandidatePage | null;
@@ -74,7 +74,7 @@ export interface CandidateStateModel {
     candidatePage: null,
     candidate: null,
     isCandidateLoading: false,
-    skills: null,
+    skills: [],
     experiences: [],
     educations: [],
     candidateCredentialPage: null,
@@ -91,7 +91,7 @@ export class CandidateState {
   }
 
   @Selector()
-  static skills(state: CandidateStateModel): any { return state.skills; }
+  static skills(state: CandidateStateModel): Skill[] { return state.skills; }
 
   @Selector()
   static experiences(state: CandidateStateModel): Experience[] | null { return state.experiences; }
@@ -180,8 +180,8 @@ export class CandidateState {
   }
 
   @Action(GetAllSkills)
-  GetAllSkills({ patchState }: StateContext<CandidateStateModel>, { }: GetAllSkills): Observable<SkillsPage> {
-    return this.skillsService.getAllMasterSkills().pipe(
+  GetAllSkills({ patchState }: StateContext<CandidateStateModel>, { }: GetAllSkills): Observable<Skill[]> {
+    return this.skillsService.getAllMasterSkillsArray().pipe(
       tap((payload) => {
         patchState({ skills: payload });
         return payload;

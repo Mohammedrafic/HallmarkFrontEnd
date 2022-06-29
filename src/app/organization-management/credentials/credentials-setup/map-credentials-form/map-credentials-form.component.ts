@@ -292,8 +292,8 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   }
 
   private mappingDataSavedHandler(): void {
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveUpdateCredentialSetupMappingSucceeded)).subscribe((isSucceed) => {
-      if (isSucceed) {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveUpdateCredentialSetupMappingSucceeded)).subscribe((response) => {
+      if (response.isSucceed) {
         this.store.dispatch(new ShowSideDialog(false));
         this.formClosed.emit();
         this.store.dispatch(new GetCredential());

@@ -132,3 +132,21 @@ export class OrganizationStructure {
   organizationId: number;
   regions: OrganizationRegion[];
 }
+
+export class OrganizationFilter {
+  searchTerm?: string;
+  organizationNames?: string[];
+  statuses?: string[];
+  cities?: string[];
+  contacts?: string[];
+  orderBy?: string;
+  pageSize?: number;
+  pageNumber?: number;
+}
+
+export class OrganizationDataSource {
+  organizationNames: string[];
+  statuses: string[];
+  cities: string[];
+  contacts: string[];
+}

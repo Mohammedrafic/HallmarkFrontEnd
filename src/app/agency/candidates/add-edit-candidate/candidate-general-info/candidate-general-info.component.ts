@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Select, Store } from '@ngxs/store';
+import { Skill } from "@shared/models/skill.model";
 import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { CheckBoxSelectionService } from '@syncfusion/ej2-angular-dropdowns';
 import { Observable } from 'rxjs';
@@ -34,7 +35,7 @@ export class CandidateGeneralInfoComponent {
   }
 
   @Select(CandidateState.skills)
-  skills$: Observable<any>;
+  skills$: Observable<Skill[]>;
 
   public readonly limitDate: Date = new Date();
 

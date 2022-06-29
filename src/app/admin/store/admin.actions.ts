@@ -1,5 +1,5 @@
 import { Country } from 'src/app/shared/enums/states';
-import { Organization } from 'src/app/shared/models/organization.model';
+import { Organization, OrganizationFilter } from 'src/app/shared/models/organization.model';
 import { SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { MasterSkillFilters, Skill } from 'src/app/shared/models/skill.model';
 import { CredentialType } from '@shared/models/credential-type.model';
@@ -57,7 +57,7 @@ export class GetOrganizationByIdSucceeded {
 
 export class GetOrganizationsByPage {
   static readonly type = '[admin] Get Organizations by Page';
-  constructor(public pageNumber: number, public pageSize: number) { }
+  constructor(public pageNumber: number, public pageSize: number, public filters?: OrganizationFilter) { }
 }
 
 export class GetBusinessUnitList {
@@ -193,5 +193,10 @@ export class ExportOrganizations {
 
 export class GetMasterSkillDataSources {
   static readonly type = '[admin] Get Master Skills Filtering Options';
+  constructor() { }
+}
+
+export class GetOrganizationDataSources {
+  static readonly type = '[admin] Get Organization Filtering Options';
   constructor() { }
 }

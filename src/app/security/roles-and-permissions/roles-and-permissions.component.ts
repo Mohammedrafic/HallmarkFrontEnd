@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
@@ -24,6 +24,8 @@ const EDIT_DIALOG_TITLE = 'Edit Role';
   styleUrls: ['./roles-and-permissions.component.scss'],
 })
 export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
+  @ViewChild('roleForm') roleForm: RoleFormComponent;
+
   @Select(SecurityState.bussinesData)
   public bussinesData$: Observable<BusinessUnit[]>;
 
@@ -34,6 +36,7 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
   public businessUnits = BUSINESS_UNITS_VALUES;
   public optionFields = OPRION_FIELDS;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
+  public roleId: number;
 
   get dialogTitle(): string {
     return this.isEditRole ? EDIT_DIALOG_TITLE : DEFAULT_DIALOG_TITLE;
@@ -122,7 +125,7 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
 
   public onSave(): void {
     this.roleFormGroup.markAllAsTouched();
-    if (this.roleFormGroup.valid) {
+    if (this.roleFormGroup.valid && !this.roleForm.showActiveError) {
       const value = this.roleFormGroup.getRawValue();
       const roleDTO: RoleDTO = {
         ...value,
@@ -133,8 +136,9 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
     }
   }
 
-  public onEdit({ index, column, foreignKeyData, ...role }: Role & { index: string; column: unknown; foreignKeyData: unknown }): void {
+  public onEdit({ index, column, foreignKeyData, id, ...role }: Role & { index: string; column: unknown; foreignKeyData: unknown }): void {
     this.isEditRole = true;
+    this.roleId = id as number;
     this.roleFormGroup.reset();
     this.roleFormGroup.enable();
 
@@ -149,7 +153,7 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
     if (role.isDefault) {
       this.roleFormGroup.disable();
     }
-    
+
     this.roleFormGroup.get('businessUnitType')?.disable();
     this.roleFormGroup.get('businessUnitId')?.disable();
     this.store.dispatch(new ShowSideDialog(true));

@@ -46,3 +46,8 @@ export class LastSelectedOrganisationAgency {
   static readonly type = '[user] Last Selected Organization Agency';
   constructor(public payload: string) { }
 }
+
+export class GetUsersAssignedToRole {
+  static readonly type = '[user] Get Users Assigned To Role';
+  constructor(public payload: number) { }
+}

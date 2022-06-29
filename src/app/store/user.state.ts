@@ -1,11 +1,15 @@
+import { HttpErrorResponse } from "@angular/common/http";
 import { Injectable } from '@angular/core';
 import { State, Action, StateContext, Selector } from '@ngxs/store';
-import { map, Observable, tap } from 'rxjs';
+import { MessageTypes } from "@shared/enums/message-types";
+import { getAllErrors } from "@shared/utils/error.utils";
+import { catchError, map, Observable, tap } from 'rxjs';
+import { ShowToast } from "src/app/store/app.actions";
 import { MENU_CONFIG } from '../shared/constants/menu-config';
 import { AUTH_STORAGE_KEY, USER_STORAGE_KEY, ORG_ID_STORAGE_KEY, AGENCY_ID_STORAGE_KEY, LAST_SELECTED_BUSINESS_UNIT_TYPE } from '@shared/constants/local-storage-keys';
 import { ChildMenuItem, Menu, MenuItem } from '../shared/models/menu.model';
 
-import { User } from '../shared/models/user.model';
+import { User, UsersAssignedToRole } from '../shared/models/user.model';
 import { UserService } from '../shared/services/user.service';
 import {
   GetUserMenuConfig,
@@ -15,7 +19,8 @@ import {
   SaveLastSelectedOrganizationAgencyId,
   SetLastSelectedOrganizationAgencyId,
   GetOrganizationStructure,
-  LastSelectedOrganisationAgency
+  LastSelectedOrganisationAgency,
+  GetUsersAssignedToRole
 } from './user.actions';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 import { OrganizationStructure } from '@shared/models/organization.model';
@@ -30,6 +35,7 @@ export interface UserStateModel {
   lastSelectedOrganizationId: number | null;
   lastSelectedAgencyId: number | null;
   organizationStructure: OrganizationStructure | null;
+  usersAssignedToRole: UsersAssignedToRole | null;
 }
 
 @State<UserStateModel>({
@@ -43,6 +49,7 @@ export interface UserStateModel {
     lastSelectedOrganizationId: parseInt(window.localStorage.getItem(ORG_ID_STORAGE_KEY) as string) || null,
     lastSelectedAgencyId: parseInt(window.localStorage.getItem(AGENCY_ID_STORAGE_KEY) as string) || null,
     organizationStructure: null,
+    usersAssignedToRole: null,
   },
 })
 @Injectable()
@@ -76,6 +83,11 @@ export class UserState {
 
   @Selector()
   static lastSelectedOrganizationAgency(state: UserStateModel): string | null{return state.lastSelectedOrganisationAgency}
+
+  @Selector()
+  static usersAssignedToRole(state: UserStateModel): UsersAssignedToRole | null {
+    return state.usersAssignedToRole;
+  }
 
   @Action(SetCurrentUser)
   SetCurrentUser({ patchState }: StateContext<UserStateModel>, { payload }: SetCurrentUser): void {
@@ -180,5 +192,13 @@ export class UserState {
   SetLastSelectedOrganizationAgecy({ patchState }: StateContext<UserStateModel>, {payload}: LastSelectedOrganisationAgency) {
     window.localStorage.setItem(LAST_SELECTED_BUSINESS_UNIT_TYPE, payload)
     return patchState({lastSelectedOrganisationAgency: payload})
+  }
+
+  @Action(GetUsersAssignedToRole)
+  GetUsersAssignedToRole({ patchState, dispatch }: StateContext<UserStateModel>, { payload }: GetUsersAssignedToRole): Observable<any> {
+    return this.userService.getUsersAssignedToRole(payload).pipe(
+      tap((usersAssignedToRole: UsersAssignedToRole) => patchState({ usersAssignedToRole })),
+      catchError((error: HttpErrorResponse) => dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error))))
+    );
   }
 }

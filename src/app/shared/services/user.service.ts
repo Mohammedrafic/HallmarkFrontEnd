@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { UsersPage } from 'src/app/shared/models/user.model';
+import { UsersAssignedToRole, UsersPage } from 'src/app/shared/models/user.model';
 import { BusinessUnitType } from '../enums/business-unit-type';
 import { Menu } from '../models/menu.model';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
@@ -51,5 +51,14 @@ export class UserService {
   public saveLastSelectedOrganizationAgencyId(lasSelectedOrganizationAgency: LasSelectedOrganizationAgency): Observable<void> {
     const { lastSelectedOrganizationId, lastSelectedAgencyId } = lasSelectedOrganizationAgency;
     return this.http.post<void>('/api/Users/savestate', { lastSelectedOrganizationId, lastSelectedAgencyId });
+  }
+
+  /**
+   * Get Users Assigned To Role
+   * @param roleId
+   * @returns list of UsersAssignedToRole
+   */
+  public getUsersAssignedToRole(roleId: number): Observable<UsersAssignedToRole> {
+    return this.http.get<UsersAssignedToRole>(`/api/Users/GetByRoleId/${roleId}`);
   }
 }

@@ -145,7 +145,7 @@ export class CandidateService {
    * @return list of candidates credential
    */
   public getMasterCredentials(searchTerm: string, credentialTypeId: number | string): Observable<Credential[]> {
-    return this.http.get<Credential[]>(`/api/MasterCredentials`, { params: { SearchTerm: searchTerm, CredentialTypeId: credentialTypeId }});
+    return this.http.get<Credential[]>(`/api/MasterCredentials/forAgency`, { params: { SearchTerm: searchTerm, CredentialTypeId: credentialTypeId }});
   }
 
   /**
