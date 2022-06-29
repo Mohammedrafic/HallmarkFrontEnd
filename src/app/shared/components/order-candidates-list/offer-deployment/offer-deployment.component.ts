@@ -8,6 +8,7 @@ import { BillRate } from "@shared/models/bill-rate.model";
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from "@shared/models/order-management.model";
 import { OrderManagementContentState } from "@client/store/order-managment-content.state";
 import {
+  GetOrganisationCandidateJob,
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
@@ -103,7 +104,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  public updateCandidateJob(event: { itemData: ApplicantStatus }): void {
+  public updateCandidateJob(event: { itemData: ApplicantStatus }, reloadJob = false): void {
     if (event.itemData.applicantStatus === ApplicantStatusEnum.Rejected) {
       this.store.dispatch(new GetRejectReasonsForOrganisation());
       this.openRejectDialog.next(true);
@@ -125,13 +126,18 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
           guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
           allowDeplayWoCredentials: true,
           billRates: this.billRatesComponent.billRatesControl.value
-        })).subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
+        })).subscribe(() => {
+          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+          if (reloadJob) {
+            this.store.dispatch(new GetOrganisationCandidateJob(this.candidateJob?.organizationId as number, this.candidate.candidateJobId));
+          }
+        });
       }
     }
   }
 
   public onBillRatesChanged(): void {
-    this.updateCandidateJob({ itemData: this.currentApplicantStatus });
+    this.updateCandidateJob({ itemData: this.currentApplicantStatus }, true);
   }
 
   private createForm(): void {
