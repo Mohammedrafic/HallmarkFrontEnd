@@ -1,0 +1,86 @@
+<ng-container
+  [ngTemplateOutlet]="reportsTemplate"
+  [ngTemplateOutletContext]="{
+    pageQueryParams: pageQueryParams$ | async,
+    candidatesListData: reportListData$ | async,
+    filters: filters$ | async,
+    isLoading: isLoading$ | async
+  }"
+></ng-container>
+
+<ng-template
+  #reportsTemplate
+  let-candidatesListData="candidatesListData"
+  let-filters="filters"
+  let-isLoading="isLoading"
+  let-pageQueryParams="pageQueryParams"
+>
+  <div style="height: 500px">
+    <app-page-toolbar>
+      <div right>
+        <app-button
+          (clickEmitter)="showFilters()"
+          [type]="buttonTypeEnum.OUTLINED"
+          [badgeText]="filters?.length"
+          iconName="sliders"
+          text="Filters"
+        ></app-button>
+      </div>
+    </app-page-toolbar>
+    <app-grid
+      (navigateToPageEmitter)="handlePageChange($event)"
+      (pageSizeChangeEmitter)="handlePageSizeChange($event)"
+      [columnDefinitions]="columnDefinitions"
+      [currentPage]="pageQueryParams.page"
+      [isLoading]="isLoading"
+      [pageSize]="pageQueryParams.pageSize"
+      [rowData]="candidatesListData?.items"
+      [totalRecordsCount]="candidatesListData?.totalCount"
+    ></app-grid>
+  </div>
+
+  <app-filter-dialog
+    (applyFilterClicked)="applyFilters()"
+    (clearAllFiltersClicked)="clearFilters()"
+    (deleteFilter)="deleteFilter($event)"
+    [count]="candidatesListData?.totalCount"
+    [items]="filters"
+  >
+    <div class="app-reports__filters-form">
+      <app-input
+        [formGroupInstance]="reportsFilterForm"
+        controlName="candidateName"
+        id="candidateName"
+        label="Candidate name"
+        placeholder="Candidate name"
+      ></app-input>
+      <app-multiselect-dropdown
+        [dataSource]="filterColumns['skills'].dataSource"
+        [formGroupInstance]="reportsFilterForm"
+        [fields]="skillOptionFields"
+        controlName="skills"
+        id="skills"
+        label="Skill"
+        placeholder="All"
+      ></app-multiselect-dropdown>
+      <app-multiselect-dropdown
+        [dataSource]="filterColumns['agencies'].dataSource"
+        [formGroupInstance]="reportsFilterForm"
+        [fields]="agenciesOptionFields"
+        controlName="agencies"
+        id="agencies"
+        label="Agencies"
+        placeholder="All"
+      ></app-multiselect-dropdown>
+      <app-multiselect-dropdown
+        [dataSource]="filterColumns['statuses'].dataSource"
+        [formGroupInstance]="reportsFilterForm"
+        [fields]="statusesOptionFields"
+        controlName="statuses"
+        id="statuses"
+        label="Statuses"
+        placeholder="All"
+      ></app-multiselect-dropdown>
+    </div>
+  </app-filter-dialog>
+</ng-template>

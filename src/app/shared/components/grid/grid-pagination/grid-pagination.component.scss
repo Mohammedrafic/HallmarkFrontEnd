@@ -1,0 +1,30 @@
+.app-grid-pagination {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  padding: 5px 0 5px 16px;
+  border-bottom-left-radius: var(--grid-border-radius);
+  border-bottom-right-radius: var(--grid-border-radius);
+
+  &__rows-options,
+  &__navigate-to-control {
+    width: 140px;
+  }
+
+  &__controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 15px;
+  }
+
+  &__left-side-controls {
+    display: flex;
+    align-items: center;
+    column-gap: 15px;
+  }
+
+  &__pager.e-pager {
+    border-width: 0;
+    border-bottom-right-radius: var(--grid-border-radius);
+  }
+}

@@ -125,7 +125,7 @@ export class SkillsService {
    * Get all organization skills
    * @return list of master skills
    */
-  public getAllOrganizationSkills(): Observable<SkillsPage> {
-    return this.http.get<any>(`/api/AssignedSkills/all`);
+  public getAllOrganizationSkills(): Observable<Skill[]> {
+    return this.http.get<Skill[]>(`/api/AssignedSkills/all`);
   }
 }

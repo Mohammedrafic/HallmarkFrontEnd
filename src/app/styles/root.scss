@@ -15,4 +15,12 @@
 
   --tooltip-background: #{$white};
   --tooltip-text: #{$black};
+
+  --form-control-gap-y: 15px;
+  --form-control-gap-x: 12px;
+
+  --grid-background-color: #{$white};
+  --grid-border-color: #{$grid-row-border};
+  --grid-border-radius: 12px;
+  --grid-row-background-color-hover: #{$primary-active-blue-90}
 }

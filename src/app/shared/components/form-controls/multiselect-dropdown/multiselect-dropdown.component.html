@@ -1,0 +1,13 @@
+<app-form-control-wrapper [formGroup]="formGroupInstance" [label]="label" [id]="id">
+  <ejs-multiselect
+    [allowFiltering]="true"
+    [attr.id]="id"
+    [dataSource]="dataSource"
+    [fields]="fields"
+    [formControlName]="controlName"
+    [placeholder]="placeholder"
+    [showDropDownIcon]="true"
+    [tabindex]="id"
+    mode="CheckBox"
+  ></ejs-multiselect>
+</app-form-control-wrapper>

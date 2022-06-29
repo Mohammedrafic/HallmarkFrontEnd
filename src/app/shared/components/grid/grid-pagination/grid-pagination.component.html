@@ -1,0 +1,33 @@
+<div class="app-grid-pagination">
+  <div class="app-grid-pagination__controls">
+    <section class="app-grid-pagination__left-side-controls">
+      <app-dropdown
+        [dataSource]="gridConfig.rowsPerPageDropDownObject"
+        [fields]="perPageFieldsSettings"
+        [formGroupInstance]="paginationFormGroup"
+        class="app-grid-pagination__rows-options"
+        controlName="pageSize"
+      ></app-dropdown>
+      <app-numeric-textbox
+        (changeValueEmitter)="navigateToPageEmitter.emit($event)"
+        [formGroupInstance]="paginationFormGroup"
+        [max]="pagerComponent.totalPages || 1"
+        [min]="1"
+        controlName="navigateTo"
+        class="app-grid-pagination__navigate-to-control"
+        placeholder="Go to:"
+      ></app-numeric-textbox>
+    </section>
+    <section class="right-side-pager-controls">
+      <ejs-pager
+        #pagerComponent
+        (click)="handlePagerClickEvent($event)"
+        [currentPage]="currentPage"
+        [enablePagerMessage]="false"
+        [pageSize]="paginationFormGroup.value.pageSize"
+        [totalRecordsCount]="totalRecordsCount"
+        class="app-grid-pagination__pager"
+      ></ejs-pager>
+    </section>
+  </div>
+</div>

@@ -2,6 +2,25 @@
 # yarn lockfile v1
 
 
+"@ag-grid-community/angular@27.3.0":
+  version "27.3.0"
+  resolved "https://registry.yarnpkg.com/@ag-grid-community/angular/-/angular-27.3.0.tgz#a8e8003bda7cfe461b364e5310d96f773d355d34"
+  integrity sha512-ICXcWCVyiTlFQvO4qj3LQPGdElba7Y4Fvzlv9KQZUOW/qwD7LTu6hprBCXOCGOyediEv3HZvU+TgXBMswVxmaA==
+  dependencies:
+    tslib "^1.10.0"
+
+"@ag-grid-community/client-side-row-model@27.3.0":
+  version "27.3.0"
+  resolved "https://registry.yarnpkg.com/@ag-grid-community/client-side-row-model/-/client-side-row-model-27.3.0.tgz#5dec1f59d85e9682c46a3b695d31ecd7a4df5cbd"
+  integrity sha512-t6ggg/SvESsGEC75z62rD/zFeo2DZCKFxw5e0qKweHR106CjBUNMlnfXIIG81qOSXUWGnbbWlrijBbKbyt8aTA==
+  dependencies:
+    "@ag-grid-community/core" "~27.3.0"
+
+"@ag-grid-community/core@27.3.0", "@ag-grid-community/core@~27.3.0":
+  version "27.3.0"
+  resolved "https://registry.yarnpkg.com/@ag-grid-community/core/-/core-27.3.0.tgz#04599cff5c35d26b970153ec3db66b945f053e57"
+  integrity sha512-77/bE2KdFlFI/ywEP46aSspXtgBteY/OPQyzU/lWqYrG2wC6cLfPSUB60t9e0FiqElwM/Vdcjz0TAjRwhZOPkw==
+
 "@ampproject/remapping@2.2.0", "@ampproject/remapping@^2.1.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.2.0.tgz#56c133824780de3174aed5ab6834f3026790154d"
@@ -7336,7 +7355,7 @@ tslib@2.3.1:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
   integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
 
-tslib@^1.8.1, tslib@^1.9.0:
+tslib@^1.10.0, tslib@^1.8.1, tslib@^1.9.0:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==

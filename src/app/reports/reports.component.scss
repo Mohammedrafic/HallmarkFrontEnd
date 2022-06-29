@@ -1,0 +1,7 @@
+.app-reports {
+  &__filters-form {
+    display: flex;
+    flex-direction: column;
+    row-gap: var(--form-control-gap-y);
+  }
+}

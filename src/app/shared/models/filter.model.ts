@@ -1,4 +1,4 @@
-import { ControlTypes, ValueType } from "@shared/enums/control-types.enum";
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
 export class FilteredItem {
   text: string;
@@ -11,6 +11,8 @@ export class FilterColumn {
   valueType: ValueType;
   dataSource?: any[];
   valueField?: string;
-  valueId?: number;
+  valueId?: string;
   checkBoxTitle?: string;
 }
+
+export type FilterColumnsModel = Record<string, FilterColumn>;

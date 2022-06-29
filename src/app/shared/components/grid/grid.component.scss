@@ -1,0 +1,49 @@
+@import '@ag-grid-community/core/dist/styles/ag-grid.scss';
+@import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.app-grid {
+  height: 100%;
+
+  &__component {
+    height: 100%;
+    width: 100%;
+  }
+
+  .ag-header {
+    background-color: var(--grid-background-color);
+  }
+
+  .ag-root-wrapper {
+    border-top-left-radius: var(--grid-border-radius);
+    border-top-right-radius: var(--grid-border-radius);
+  }
+
+  .ag-root-wrapper,
+  .ag-row,
+  .ag-header {
+    border-color: var(--grid-border-color);
+  }
+
+  .ag-cell {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .ag-row {
+    background-color: inherit;
+  }
+
+  .ag-row-hover {
+    background-color: var(--grid-row-background-color-hover);
+  }
+
+  .ag-header-cell-text {
+    text-transform: uppercase;
+    font-size: 12px;
+  }
+}
