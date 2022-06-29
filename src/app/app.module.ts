@@ -31,7 +31,7 @@ import { NgxMaskModule } from 'ngx-mask';
       disabled: environment.production
     }),
     NgxsLoggerPluginModule.forRoot({
-      disabled: true
+      disabled: environment.production
     }),
     NgxMaskModule.forRoot(),
   ],
