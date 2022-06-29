@@ -14,9 +14,10 @@
           <ejs-dropdownlist
             *ngIf="isOnboarded"
             [fields]="optionFields"
+            [formControl]="jobStatusControl"
             [dataSource]="jobStatus"
             placeholder="Select Status"
-            (change)="onDropDownChanged($event)"
+            (select)="onDropDownChanged($event)"
           >
           </ejs-dropdownlist>
         </div>
