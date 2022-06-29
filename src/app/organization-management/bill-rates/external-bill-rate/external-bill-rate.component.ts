@@ -85,8 +85,8 @@ export class ExternalBillRateComponent extends AbstractGridConfigurationComponen
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['searchQuery']?.currentValue) {
-      this.store.dispatch(new GetExternalBillRateType({ pageNumber: this.currentPage, pageSize: this.pageSize }));
+    if (changes['searchQuery']?.currentValue || changes['searchQuery']?.currentValue === "") {
+      this.store.dispatch(new GetExternalBillRateType({ pageNumber: this.currentPage, pageSize: this.pageSize, name: this.searchQuery }));
     }
   }
 

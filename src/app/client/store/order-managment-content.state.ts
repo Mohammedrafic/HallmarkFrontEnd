@@ -15,6 +15,7 @@ import {
   GetIncompleteOrders,
   GetMasterShifts,
   GetOrderById,
+  GetOrderFIlterDataSources,
   GetOrders,
   GetOrganisationCandidateJob,
   GetOrganizationStatesWithKeyCode,
@@ -42,6 +43,7 @@ import {
   Order,
   OrderCandidateJob,
   OrderCandidatesListPage,
+  OrderFilterDataSource,
   OrderManagement,
   OrderManagementPage,
   SuggesstedDetails
@@ -86,6 +88,7 @@ export interface OrderManagementContentStateModel {
   predefinedBillRates: BillRate[];
   isDirtyOrderForm: boolean;
   rejectionReasonsList: RejectReason[] | null;
+  orderFilterDataSources: OrderFilterDataSource | null;
 }
 
 @State<OrderManagementContentStateModel>({
@@ -111,7 +114,8 @@ export interface OrderManagementContentStateModel {
     associateAgencies: [],
     predefinedBillRates: [],
     isDirtyOrderForm: false,
-    rejectionReasonsList: null
+    rejectionReasonsList: null,
+    orderFilterDataSources: null
   }
 })
 @Injectable()
@@ -216,6 +220,11 @@ export class OrderManagementContentState {
   @Selector()
   static rejectionReasonsList(state: OrderManagementContentStateModel): RejectReason[] | null {
     return state.rejectionReasonsList
+  }
+
+  @Selector()
+  static orderFilterDataSources(state: OrderManagementContentStateModel): OrderFilterDataSource | null {
+    return state.orderFilterDataSources
   }
 
   constructor(
@@ -487,9 +496,21 @@ export class OrderManagementContentState {
   }
 
   @Action(ApproveOrder)
-  ApproveOrder({ patchState, dispatch, getState }: StateContext<OrderManagementContentStateModel>, { id }: ApproveOrder): Observable<string | void> {
+  ApproveOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { id }: ApproveOrder): Observable<string | void> {
     return this.orderManagementService.approveOrder(id).pipe(
       catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error)))
     );
+  }
+
+  @Action(GetOrderFIlterDataSources)
+  GetOrderFIlterDataSources(
+    { patchState }: StateContext<OrderManagementContentStateModel>
+  ): Observable<OrderFilterDataSource> {
+    return this.orderManagementService.getOrderFilterDataSources().pipe(
+      tap(payload => {
+        patchState({ orderFilterDataSources: payload });
+        return payload;
+      })
+    )
   }
 }

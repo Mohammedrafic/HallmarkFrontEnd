@@ -15,6 +15,19 @@
 
   .active-toggle {
     margin-top: 24px;
+
+    .active-error {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+      color: $supportive-red;
+      font-size: 12px;
+      font-weight: 400;
+
+      .user-names, .user-error-message {
+        margin-bottom: 8px;
+      }
+    }
   }
 
   .divider {

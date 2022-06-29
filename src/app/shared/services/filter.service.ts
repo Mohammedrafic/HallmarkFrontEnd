@@ -23,6 +23,8 @@ export class FilterService {
       form.controls[event.column].setValue(val);
     } else if (filterColumns[event.column].type === ControlTypes.Checkbox) {
       form.controls[event.column].setValue(false);
+    } if (filterColumns[event.column].type === ControlTypes.Radio) {
+      form.controls[event.column].setValue(filterColumns[event.column].default);
     } else {
       form.controls[event.column].setValue('');
     }
@@ -52,6 +54,10 @@ export class FilterService {
         chips.push({ text: filterColumns[key].checkboxTitle, column: key, value: val });
       } else if (filterColumns[key].type === ControlTypes.Date && datePipe) {
         chips.push({ text: datePipe.transform(val,'MM/dd/yyyy'), column: key, value: val });
+      } else if (filterColumns[key].type === ControlTypes.Radio) {
+        if (filterColumns[key].dataSource[val]) {
+          chips.push({ text: filterColumns[key].dataSource[val], column: key, value: val });
+        }
       } else {
         chips.push({ text: val, column: key, value: val });
       }

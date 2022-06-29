@@ -125,6 +125,7 @@ export class BillRateFilters {
   regularLocal?: boolean | null;
   displayInTimesheet?: boolean | null;
   displayInJob?: boolean | null;
+  name?: string;
 }
 
 export type BillRateSetupPage = PageOfCollections<BillRateSetup>;

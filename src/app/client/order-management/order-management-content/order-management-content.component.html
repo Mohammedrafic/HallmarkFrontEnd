@@ -188,8 +188,8 @@
 </section>
 
 <app-filter-dialog [items]="filteredItems" [count]="(ordersPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
-  <form class="bootstrap" [formGroup]="OrderFilterFormGroup">
-    <div>
+  <form [formGroup]="OrderFilterFormGroup">
+    <div class="bootstrap">
       <div class="input-container">
         <label for="externalId">Order ID</label>
         <div class="input-group">
@@ -200,7 +200,7 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row bootstrap">
       <div class="input-container">
         <label>Region</label>
         <div class="input-group multiselect">
@@ -228,7 +228,7 @@
         </div>
       </div>
     </div>
-    <div>
+    <div class="bootstrap">
       <div class="input-container">
         <label>Department</label>
         <div class="input-group multiselect">
@@ -243,7 +243,22 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Select Agency</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="agencyIds"
+                           placeholder="All"
+                           [fields]="optionFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.agencyIds.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="row bootstrap">
       <div class="input-container">
         <label>Skill</label>
         <div class="input-group multiselect">
@@ -271,7 +286,22 @@
         </div>
       </div>
     </div>
-    <div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Order Status</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="orderStatuses"
+                           placeholder="All"
+                           [fields]="statusFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.orderStatuses.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
       <div class="input-container">
         <label>Job Title</label>
         <div class="input-group">
@@ -282,7 +312,7 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row bootstrap">
       <div class="input-container">
         <label>Bill Rate From</label>
         <div class="input-group">
@@ -302,7 +332,27 @@
         </div>
       </div>
     </div>
-    <div>
+    <div class="row bootstrap">
+      <div class="input-container">
+        <label>Candidates Count From</label>
+        <div class="input-group">
+          <input  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  formControlName="candidatesCountFrom"/>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Candidates Count To</label>
+        <div class="input-group">
+          <input  class="e-input"
+                  type="text"
+                  maxlength="50"
+                  formControlName="candidatesCountTo"/>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
       <div class="input-container">
         <label for="externalId"># of Positions</label>
         <div class="input-group">
@@ -313,7 +363,7 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row bootstrap">
       <div class="input-container calendar">
         <label for="inactiveDate">Job Start Date</label>
         <div class="input-group datepicker">
@@ -337,6 +387,14 @@
           >
           </ejs-datepicker>
         </div>
+      </div>
+    </div>
+    <div>
+      <div class="radio-container">
+        <label class="radio-label">Internal Agency</label>
+        <ejs-radiobutton formControlName="agencyType" label="Yes" name="agencyType" value="1"></ejs-radiobutton>
+        <ejs-radiobutton formControlName="agencyType" label="No" name="agencyType" value="2"></ejs-radiobutton>
+        <ejs-radiobutton formControlName="agencyType" label="Both" name="agencyType" value="0"></ejs-radiobutton>
       </div>
     </div>
   </form>

@@ -6,7 +6,7 @@ import { SendDocumentAgency } from 'src/app/shared/enums/send-document-agency';
 import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
 import { Status } from 'src/app/shared/enums/status';
 import { BusinessUnit } from 'src/app/shared/models/business-unit.model';
-import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
+import { Organization, OrganizationDataSource, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 
 import {
@@ -23,6 +23,7 @@ import {
   GetMasterSkillsByPage,
   GetOrganizationById,
   GetOrganizationByIdSucceeded,
+  GetOrganizationDataSources,
   GetOrganizationLogo,
   GetOrganizationLogoSucceeded,
   GetOrganizationsByPage,
@@ -88,6 +89,7 @@ export interface AdminStateModel {
   isDirty: boolean;
   dataBaseConnections: string[];
   masterSkillDataSources: MasterSkillDataSources | null;
+  organizationDataSources: OrganizationDataSource | null;
 }
 
 @State<AdminStateModel>({
@@ -118,6 +120,7 @@ export interface AdminStateModel {
     isDirty: false,
     dataBaseConnections: [],
     masterSkillDataSources: null,
+    organizationDataSources: null,
   },
 })
 @Injectable()
@@ -186,6 +189,9 @@ export class AdminState {
   @Selector()
   static masterSkillDataSources(state: AdminStateModel): MasterSkillDataSources | null { return state.masterSkillDataSources; }
 
+  @Selector()
+  static organizationDataSources(state: AdminStateModel): OrganizationDataSource | null { return state.organizationDataSources; }
+
   constructor(
     private organizationService: OrganizationService,
     private skillsService: SkillsService,
@@ -205,9 +211,9 @@ export class AdminState {
   }
 
   @Action(GetOrganizationsByPage)
-  GetOrganizationsByPage({ patchState }: StateContext<AdminStateModel>, { pageNumber, pageSize }: GetOrganizationsByPage): Observable<OrganizationPage> {
+  GetOrganizationsByPage({ patchState }: StateContext<AdminStateModel>, { pageNumber, pageSize, filters}: GetOrganizationsByPage): Observable<OrganizationPage> {
     patchState({ isOrganizationLoading: true });
-    return this.organizationService.getOrganizations(pageNumber, pageSize).pipe(tap((payload) => {
+    return this.organizationService.getOrganizations(pageNumber, pageSize, filters).pipe(tap((payload) => {
       patchState({ isOrganizationLoading: false, organizations: payload });
       return payload;
     }));
@@ -434,6 +440,13 @@ export class AdminState {
   GetMasterSkillDataSources({ patchState }: StateContext<AdminStateModel>): Observable<MasterSkillDataSources> {
     return this.skillsService.getMasterSkillsDataSources().pipe(tap(data => {
       patchState({ masterSkillDataSources: data });
+    }));
+  };
+
+  @Action(GetOrganizationDataSources)
+  GetOrganizationDataSources({ patchState }: StateContext<AdminStateModel>): Observable<OrganizationDataSource> {
+    return this.organizationService.getOrganizationDataSources().pipe(tap(data => {
+      patchState({ organizationDataSources: data });
     }));
   };
 }

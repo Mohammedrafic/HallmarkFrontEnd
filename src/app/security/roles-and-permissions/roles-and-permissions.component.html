@@ -39,6 +39,6 @@
 
 <app-side-dialog [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()">
   <section>
-    <app-role-form [form]="$any(roleFormGroup)" [businessUnits]="businessUnits"></app-role-form>
+    <app-role-form [form]="$any(roleFormGroup)" [businessUnits]="businessUnits" [roleId]="roleId"></app-role-form>
   </section>
 </app-side-dialog>

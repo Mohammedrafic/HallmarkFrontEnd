@@ -50,6 +50,18 @@
   <div class="active-toggle">
     <ejs-switch class="switch" [disabled]="form.disabled" [checked]="form.get('isActive')?.value" (change)="toggleActive()"></ejs-switch>
     <span class="e-text">Active</span>
+    <div class="active-error" *ngIf="showActiveError">
+      <div>
+        <i-feather name="alert-circle" class="icon validation-icon"></i-feather>
+      </div>
+      <div>
+        <div *ngIf="usersAssignedToRole.userNames.length" class="user-names">
+          <div class="user-error-message">Here is a list of Users that have this role and you need to reassign the role:</div>
+          <div *ngFor="let user of usersAssignedToRole.userNames">{{user.firstName}} {{user.lastName}}</div>
+        </div>
+        <div *ngIf="usersAssignedToRole.hasUsersOutsideVisibility">There are Users with this Role outside the scope of your Visibility.</div>
+      </div>
+    </div>
   </div>
 
   <hr class="divider" />

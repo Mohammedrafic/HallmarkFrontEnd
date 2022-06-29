@@ -5,7 +5,8 @@ import {
   CANCEL_REJECTION_REASON,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE
+  DELETE_RECORD_TITLE,
+  ONLY_LETTERS
 } from "@shared/constants";
 import { ShowSideDialog } from "../../store/app.actions";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
@@ -14,8 +15,11 @@ import { delay, filter, Observable, takeWhile } from "rxjs";
 import {
   GetRejectReasonsByPage,
   RemoveRejectReasons,
-  SaveRejectReasons, SaveRejectReasonsError, SaveRejectReasonsSuccess,
-  UpdateRejectReasons, UpdateRejectReasonsSuccess
+  SaveRejectReasons,
+  SaveRejectReasonsError,
+  SaveRejectReasonsSuccess,
+  UpdateRejectReasons,
+  UpdateRejectReasonsSuccess
 } from "@organization-management/store/reject-reason.actions";
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { RejectReasonPage } from "@shared/models/reject-reason.model";
@@ -146,7 +150,7 @@ export class RejectReasonComponent extends AbstractGridConfigurationComponent im
   private createForm(): void {
     this.form = new FormGroup({
       id: new FormControl(null),
-      reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(/^[a-zA-Z\s]*$/)])
+      reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ONLY_LETTERS)])
     })
   }
 

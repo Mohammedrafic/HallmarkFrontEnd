@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
@@ -10,11 +10,11 @@ import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/expor
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
-import { Observable, Subject, throttleTime } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
-import { Organization, OrganizationPage } from 'src/app/shared/models/organization.model';
+import { Organization, OrganizationDataSource, OrganizationFilter, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
-import { ExportOrganizations, GetOrganizationsByPage } from '../../store/admin.actions';
+import { ExportOrganizations, GetOrganizationDataSources, GetOrganizationsByPage } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
 
 @Component({
@@ -23,9 +23,10 @@ import { AdminState } from '../../store/admin.state';
   styleUrls: ['./client-management-content.component.scss'],
   providers: [SortService, FreezeService]
 })
-export class ClientManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit {
+export class ClientManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private pageSubject = new Subject<number>();
+  private unsubscribe$: Subject<void> = new Subject();
 
   public columnsToExport: ExportColumn[] = [
     { text:'Organization Name', column: 'OrganizationName'},
@@ -44,11 +45,14 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
   @Select(AdminState.organizations)
   organizations$: Observable<OrganizationPage>;
 
+  @Select(AdminState.organizationDataSources)
+  organizationDataSources$: Observable<OrganizationDataSource>;
+
   @ViewChild('grid')
   public grid: GridComponent;
 
   public OrganizationFilterFormGroup: FormGroup;
-  public filters: any = {};
+  public filters: OrganizationFilter = {};
   public filterColumns: any;
 
   constructor(private store: Store,
@@ -63,21 +67,30 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
     this.fileName = 'Organizations ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
     store.dispatch(new SetHeaderState({ title: 'Organization List', iconName: 'file-text' }));
     this.OrganizationFilterFormGroup = this.fb.group({
-      name: new FormControl([]),
-      status: new FormControl([]),
-      city: new FormControl([]),
-      contact: new FormControl([]),
+      searchTerm: new FormControl(''),
+      organizationNames: new FormControl([]),
+      statuses: new FormControl([]),
+      cities: new FormControl([]),
+      contacts: new FormControl([]),
     });
   }
 
   ngOnInit(): void {
     this.idFieldName = 'organizationId';
     this.filterColumns = {
-      name: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      status: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      city: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      contact: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      searchTerm: { type: ControlTypes.Text },
+      organizationNames: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      statuses: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      cities: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      contacts: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
     }
+    this.organizationDataSources$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data: OrganizationDataSource) => {
+      this.filterColumns.organizationNames.dataSource = data.organizationNames;
+      this.filterColumns.statuses.dataSource = data.statuses;
+      this.filterColumns.contacts.dataSource = data.contacts;
+      this.filterColumns.cities.dataSource = data.cities;
+    });
+    this.store.dispatch(new GetOrganizationDataSources());
     this.getOrganizationList();
     this.pageSubject.pipe(throttleTime(1)).subscribe((page) => {
       this.currentPage = page;
@@ -89,20 +102,33 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
     this.grid.rowHeight = this.ROW_HEIGHT;
   }
 
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
+  public override updatePage(): void {
+    this.getOrganizationList();
+  }
+
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
   private getOrganizationList(): void {
-    this.store.dispatch(new GetOrganizationsByPage(this.currentPage, this.pageSize));
+    this.filters.orderBy = this.orderBy;
+    this.filters.pageNumber = this.currentPage;
+    this.filters.pageSize = this.pageSize;
+    this.store.dispatch(new GetOrganizationsByPage(this.currentPage, this.pageSize, this.filters));
   }
 
   public onFilterClose() {
     this.OrganizationFilterFormGroup.setValue({
-      name: this.filters.name || [],
-      status: this.filters.status || [],
-      city: this.filters.city || [],
-      contact: this.filters.contact || [],
+      searchTerm: this.filters.searchTerm || '',
+      organizationNames: this.filters.organizationNames || [],
+      statuses: this.filters.statuses || [],
+      cities: this.filters.cities || [],
+      contacts: this.filters.contacts || [],
     });
     this.filteredItems = this.filterService.generateChips(this.OrganizationFilterFormGroup, this.filterColumns, this.datePipe);
   }
