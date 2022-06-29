@@ -87,6 +87,7 @@ import { BillRatesGridComponent } from "@shared/components/bill-rates/components
 import { BillRateState } from "@shared/components/bill-rates/store/bill-rate.state";
 import { ChildOrderDialogComponent } from "@shared/components/child-order-dialog/child-order-dialog.component";
 import { RejectReasonDialogComponent } from './components/reject-reason-dialog/reject-reason-dialog.component';
+import { ClickOutsideDirective } from './directives/click-outside.directive';
 
 const icons = {
   AlertCircle,
@@ -116,6 +117,7 @@ const COMPONENTS = [
   ValidateDirective,
   HighlightGridRowDirective,
   AddBackgroundForEmptyGridDirective,
+  ClickOutsideDirective,
   ImageUploaderComponent,
   DocumentUploaderComponent,
   SideDialogComponent,

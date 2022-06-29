@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 
 import { NgxsModule } from '@ngxs/store';
 import { FeatherModule } from 'angular-feather';
-import { DialogAllModule } from '@syncfusion/ej2-angular-popups';
+import { DialogAllModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 import { DateTimePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
@@ -39,7 +39,7 @@ import { ProfileCumulativeHoursComponent } from './components/profile-cumulative
 import { ProfileUploadsComponent } from './components/profile-uploads/profile-uploads.component';
 import { ProfileInvoicesComponent } from './components/profile-invoices/profile-invoices.component';
 import { TimesheetsService } from './services/timesheets.service';
-import { RejectReasonDialogComponent } from './components/reject-reason-dialog/reject-reason-dialog.component';
+import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
 import { TimesheetDetailsService } from "./services/timesheet-details.service";
 
 const gridIcons = {
@@ -83,7 +83,7 @@ const gridIcons = {
     ProfileCumulativeHoursComponent,
     ProfileUploadsComponent,
     ProfileInvoicesComponent,
-    RejectReasonDialogComponent,
+    TimesheetRejectReasonDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -114,6 +114,7 @@ const gridIcons = {
     DateWeekPickerModule,
     UploaderModule,
     TextBoxModule,
+    TooltipModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [

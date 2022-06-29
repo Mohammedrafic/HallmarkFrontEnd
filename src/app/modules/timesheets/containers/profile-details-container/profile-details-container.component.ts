@@ -13,7 +13,7 @@ import {
 
 import { filter, Observable, takeUntil, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 
 import { Destroyable } from '@core/helpers';
 import { GlobalWindow } from '@core/tokens';
@@ -31,6 +31,8 @@ import { Uploader } from "@syncfusion/ej2-angular-inputs";
 import { DialogActionPayload } from '../../interface';
 import { DialogAction } from '../../enums';
 import { ExportType } from "../../enums";
+import { Invoice, ProfileUploadedFile } from "../../interface";
+import { UploaderComponent } from "@syncfusion/ej2-angular-inputs";
 
 interface ExportOption extends ItemModel {
   ext: string | null;
@@ -52,11 +54,13 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     { text: ExportType.CSV_file, id: '1', ext: 'csv' },
     { text: ExportType.Custom, id: '2', ext: null },
   ];
-  public rejectReasonDialogVisible: boolean = false;
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('dnwDialog') dnwDialog: DialogComponent;
-  @ViewChild('uploadButton') uploadBtn: HTMLButtonElement;
+  @ViewChild('uploadTooltip') uploadTooltip: TooltipComponent;
+
+  @ViewChild('uploader')
+  public uploader: UploaderComponent;
 
   @Select(TimesheetsState.profileTimesheets)
   timeSheetsProfile$: Observable<ProfileTimeSheetDetail[]>;
@@ -69,9 +73,17 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
 
+  @Select(TimesheetsState.timeSheetDetailsUploads)
+  public uploadedFiles$: Observable<ProfileUploadedFile[]>;
+
+  @Select(TimesheetsState.timesheetDetailsInvoices)
+  public invoices$: Observable<Invoice[]>;
+
   public targetElement: HTMLBodyElement;
-  public uploadTargetElement: HTMLButtonElement;
   public profileDetailsDialogsTarget: HTMLElement | null = null;
+  public dropElement: HTMLElement | null = null;
+  public dropAreaVisible: boolean = false;
+  public rejectReasonDialogVisible: boolean = false;
   public isNextDisabled = false;
 
   constructor(
@@ -83,12 +95,12 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.targetElement = this.globalWindow.document.body as HTMLBodyElement;
 
     this.isProfileOpen$.pipe(takeUntil(this.componentDestroy())).subscribe(() => {
-      this.uploadTargetElement = document.getElementById('profile-details-file-upload-area') as HTMLButtonElement;
       this.profileDetailsDialogsTarget = document.getElementById('dialog_dialog-content') as HTMLElement;
-    })
+      this.dropElement = document.getElementById('timesheet-details-files-droparea') as HTMLElement;
+    });
   }
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.getProfileTimesheets();
     this.getDialogState();
   }
@@ -161,5 +173,27 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.store.dispatch(new TimesheetDetails.Export(
       new ExportPayload(fileTypeId)
     ));
+  }
+
+  public onFileSelected(event: { filesData: File[]}): void {
+    const [{name, type}] = event.filesData;
+
+    this.store.dispatch(
+      new TimesheetDetails.AddFile({name, type})
+    ).subscribe(() => this.hideUploadArea());
+  }
+
+  public hideUploadArea(): void {
+    this.dropAreaVisible = false;
+    this.uploadTooltip.close();
+  }
+
+  public showUploadArea(container: HTMLElement): void {
+    if (this.dropAreaVisible) {
+      this.hideUploadArea();
+    } else {
+      this.dropAreaVisible = true;
+      this.uploadTooltip.open(container);
+    }
   }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 
 import { DialogUtility } from '@syncfusion/ej2-angular-popups';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from "@shared/constants";
 
 @Injectable({
   providedIn: 'root',
@@ -46,5 +47,13 @@ export class ConfirmService {
     cencel.isFlat = false;
 
     return isAllowed$;
+  }
+
+  public confirmDelete(): Observable<boolean> {
+    return this.confirm(DELETE_RECORD_TEXT, {
+      title: DELETE_RECORD_TITLE,
+      okButtonLabel: 'Delete',
+      okButtonClass: 'delete-button'
+    });
   }
 }

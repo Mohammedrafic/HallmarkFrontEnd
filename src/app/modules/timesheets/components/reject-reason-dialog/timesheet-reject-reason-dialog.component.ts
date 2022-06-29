@@ -3,12 +3,12 @@ import { DialogComponent } from "@syncfusion/ej2-angular-popups";
 import { FormControl, FormGroup } from "@angular/forms";
 
 @Component({
-  selector: 'app-reject-reason-dialog',
-  templateUrl: './reject-reason-dialog.component.html',
-  styleUrls: ['./reject-reason-dialog.component.scss'],
+  selector: 'app-timesheet-reject-reason-dialog',
+  templateUrl: './timesheet-reject-reason-dialog.component.html',
+  styleUrls: ['./timesheet-reject-reason-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class RejectReasonDialogComponent {
+export class TimesheetRejectReasonDialogComponent {
   @Input()
   public container: HTMLElement | null = null;
 
@@ -36,5 +36,6 @@ export class RejectReasonDialogComponent {
     this.rejectReasonChange.emit(
       this.form.get('reason')?.value
     );
+    this.onVisibleChange(false);
   }
 }

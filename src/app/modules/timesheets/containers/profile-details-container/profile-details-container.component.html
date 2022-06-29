@@ -45,25 +45,48 @@
         <div class="spacer"></div>
 
         <div class="header-controls">
-          <ejs-datepicker
-            [width]="200"
-            id="inactiveDate"
-            class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
-          ></ejs-datepicker>
+         <div style="display: flex; align-items: center" class="timesheet-details-upload-container" #uploadContainer>
+           <ejs-datepicker
+             [width]="200"
+             id="inactiveDate"
+             class="datepicker"
+             format="MM/dd/yyyy"
+             placeholder="MM/DD/YYYY"
+           ></ejs-datepicker>
 
-          <button ejs-button cssClass="e-outline" class="upload-button" id="qwerty" (click)="browse()" #uplBtn>
-            Upload
-            <i-feather name="upload" class="icon"></i-feather>
-          </button>
+           <button ejs-button cssClass="e-outline" class="upload-button" #uploadBtn (click)="showUploadArea(uploadContainer)">
+             Upload
+             <i-feather name="upload" class="icon"></i-feather>
+           </button>
 
-          <ejs-uploader style="display: none;"
-                        [dropArea]="uploadTargetElement"
-                        [allowedExtensions]="allowedExtensions"
-                        [maxFileSize]="maxFileSize"
-                        [autoUpload]="false"
-          ></ejs-uploader>
+           <ejs-tooltip #uploadTooltip [container]="uploadContainer" [showTipPointer]="false"
+                        opensOn="Custom"
+                        position="TopLeft" width="100%">
+             <ng-template #content>
+               <div class="file-upload-area-container"
+                    appClickOutside
+                    (clickOutside)="hideUploadArea()"
+                    [exclude]="uploadBtn.element"
+               >
+                 <h2>Upload Documents</h2>
+                 <div class="upload-area">
+                   <div id="timesheet-details-files-droparea" class="droparea"(click)="browse()" #dropEl>
+                     <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
+                   </div>
+                   <ejs-uploader #uploader
+                                 [dropArea]="dropEl"
+                                 [allowedExtensions]="allowedExtensions"
+                                 [maxFileSize]="maxFileSize"
+                                 [multiple]="false"
+                                 [autoUpload]="false"
+                                 [showFileList]="false"
+                                 (selected)="onFileSelected($event)">
+                   </ejs-uploader>
+                 </div>
+               </div>
+             </ng-template>
+           </ejs-tooltip>
+         </div>
 
           <button
             ejs-dropdownbutton
@@ -102,13 +125,17 @@
         <div class="tile-dark-blue">
           <app-profile-cumulative-hours></app-profile-cumulative-hours>
         </div>
-        <div class="tile-dark-blue profile-uploads">
-          <app-profile-uploads></app-profile-uploads>
-        </div>
+        <ng-container *ngIf="uploadedFiles$ | async as uploads">
+          <div class="tile-dark-blue profile-uploads" *ngIf="uploads.length">
+            <app-profile-uploads [uploads]="uploads"></app-profile-uploads>
+          </div>
+        </ng-container>
 
-        <div class="tile-dark-blue profile-invoices">
-          <app-profile-invoices></app-profile-invoices>
-        </div>
+       <ng-container *ngIf="invoices$ | async as invoices">
+         <div class="tile-dark-blue profile-invoices" *ngIf="invoices.length">
+           <app-profile-invoices [invoices]="invoices"></app-profile-invoices>
+         </div>
+       </ng-container>
       </div>
 
       <section class="profile-table-container">
@@ -140,5 +167,8 @@
     </div>
   </ng-template>
 </ejs-dialog>
+
 <app-add-timesheet (updateTable)="handleUpdateTable()"></app-add-timesheet>
-<app-reject-reason-dialog [(visible)]="rejectReasonDialogVisible" [container]="profileDetailsDialogsTarget"></app-reject-reason-dialog>
+<app-timesheet-reject-reason-dialog [(visible)]="rejectReasonDialogVisible"
+                                    [container]="profileDetailsDialogsTarget"
+></app-timesheet-reject-reason-dialog>

@@ -1,8 +1,7 @@
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { Invoice } from "../../interface";
 
-interface Invoice {
-  name: string;
-}
+
 
 @Component({
   selector: 'app-profile-invoices',
@@ -11,11 +10,8 @@ interface Invoice {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProfileInvoicesComponent {
-  public readonly invoices: Invoice[] = [
-    {
-      name: 'Invoice_SenderP'
-    }
-  ];
+  @Input()
+  public invoices: Invoice[] = [];
 
   public trackByName(_: number, item: Invoice): string {
     return item.name;

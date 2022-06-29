@@ -16,6 +16,7 @@ import { TimesheetDetails } from "../actions/timesheet-details.actions";
 import { ExportPayload } from "@shared/models/export.model";
 import { TimesheetDetailsService } from "../../services/timesheet-details.service";
 import { downloadBlobFile } from "@shared/utils/file.utils";
+import { Invoice, ProfileUploadedFile } from "../../interface";
 import { DialogActionPayload } from '../../interface';
 
 @State<TimesheetsModel>({
@@ -48,6 +49,16 @@ export class TimesheetsState {
   @Selector([TimesheetsState])
   static timeSheetEditDialogOpen(state: TimesheetsModel): ProfileTimeSheetActionType | null {
     return state.editDialogType;
+  }
+
+  @Selector([TimesheetsState])
+  static timeSheetDetailsUploads(state: TimesheetsModel): ProfileUploadedFile[] | null {
+    return state?.timesheetDetails?.uploads ?? null;
+  }
+
+  @Selector([TimesheetsState])
+  static timesheetDetailsInvoices(state: TimesheetsModel): Invoice[] | null {
+    return state?.timesheetDetails?.invoices ?? null;
   }
 
   @Action(Timesheets.GetAll)
@@ -101,12 +112,42 @@ export class TimesheetsState {
   }
 
   @Action(TimesheetDetails.Export)
-  ExportTimesheetDetails({patchState}: StateContext<TimesheetsModel>, payload: ExportPayload): Observable<Blob> {
+  ExportTimesheetDetails({}: StateContext<TimesheetsModel>, payload: ExportPayload): Observable<Blob> {
     return this.timesheetDetailsService.exportDetails(payload)
       .pipe(
         tap((file: Blob) => {
           downloadBlobFile(file, 'empty.csv');
         })
+      );
+  }
+
+  @Action(TimesheetDetails.AddFile)
+  AddFile({ patchState, getState }: StateContext<TimesheetsModel>, { payload }: TimesheetDetails.AddFile): Observable<ProfileUploadedFile> {
+    const { timesheetDetails } = getState();
+
+    return this.timesheetDetailsService.uploadFile(payload)
+      .pipe(
+        tap((file: ProfileUploadedFile) => patchState({
+          timesheetDetails: {
+            ...timesheetDetails,
+            uploads: [...timesheetDetails?.uploads ?? [], file],
+          }
+        }))
+      );
+  }
+
+  @Action(TimesheetDetails.RemoveFile)
+  RemoveFile({ patchState, getState }: StateContext<TimesheetsModel>, { payload }: TimesheetDetails.RemoveFile): Observable<boolean> {
+    const { timesheetDetails } = getState();
+
+    return this.timesheetDetailsService.deleteFile(payload)
+      .pipe(
+        tap((fileUploaded: boolean) => patchState({
+          timesheetDetails: {
+            ...timesheetDetails,
+            uploads: (timesheetDetails?.uploads || []).filter((file: ProfileUploadedFile) => file.name !== payload.name),
+          }
+        }))
       );
   }
 }

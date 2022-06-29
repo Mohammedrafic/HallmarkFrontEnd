@@ -1,4 +1,7 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ProfileUploadedFile } from "../../interface";
+import { Store } from "@ngxs/store";
+import { TimesheetDetails } from "../../store/actions/timesheet-details.actions";
 
 @Component({
   selector: 'app-profile-uploads',
@@ -7,14 +10,15 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileUploadsComponent {
-  public readonly uploads: {name: string; type: string;}[] = [
-    {
-      name: 'SandersP.pdf',
-      type: 'pdf',
-    },
-    {
-      name: 'SandersP.pdf',
-      type: 'pdf',
-    },
-  ];
+  @Input()
+  public uploads: ProfileUploadedFile[] = [];
+
+  public constructor(
+    private readonly store: Store,
+  ) {
+  }
+
+  public removeInvoice(item: ProfileUploadedFile): void {
+    this.store.dispatch(new TimesheetDetails.RemoveFile(item));
+  }
 }

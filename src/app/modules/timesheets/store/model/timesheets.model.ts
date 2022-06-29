@@ -1,5 +1,5 @@
 import { PageOfCollections } from '@shared/models/page.model';
-import { ITimesheet } from '../../interface';
+import { Invoice, ITimesheet, ProfileUploadedFile } from '../../interface';
 import { ProfileTimeSheetActionType } from '../../enums';
 
 export type TimeSheetsPage = PageOfCollections<ITimesheet>;
@@ -12,7 +12,7 @@ export interface TimesheetsModel {
   timeSheetDialogOpen: boolean;
   editDialogType: ProfileTimeSheetActionType | null;
   profileDialogTimesheet: ProfileTimeSheetDetail | null;
-  timesheetDetails: unknown | null;
+  timesheetDetails: TimesheetDetails;
 }
 
 export interface ProfileTimeSheetDetail {
@@ -25,4 +25,9 @@ export interface ProfileTimeSheetDetail {
   hours: number;
   rate: number;
   total: number;
+}
+
+export interface TimesheetDetails {
+  uploads: ProfileUploadedFile[];
+  invoices: Invoice[];
 }

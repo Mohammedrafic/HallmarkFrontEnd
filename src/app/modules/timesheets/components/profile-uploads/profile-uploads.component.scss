@@ -13,6 +13,10 @@
   }
 
   table tr {
+    .file-icon, .file-name {
+      color: $primary-active-blue-10;
+    }
+
     td {
       height: 25px;
     }
@@ -24,6 +28,10 @@
 
     .delete-icon {
       padding-left: 15px;
+
+      i-feather {
+        cursor: pointer;
+      }
     }
   }
 }

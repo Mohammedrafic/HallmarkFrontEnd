@@ -4,3 +4,5 @@ export * from './i-tab-config.interface';
 export * from './i-timesheet.interface';
 export * from './profile-details-hours-chart-settings.interface';
 export * from './timesheet-details.interface';
+export * from './profile-uploaded-file.interface';
+export * from './invoice.interface';
