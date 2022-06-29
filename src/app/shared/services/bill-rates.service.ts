@@ -1,7 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { BillRateFilters, BillRateOption, BillRateSetup, BillRateSetupPage, BillRateSetupPost } from '@shared/models/bill-rate.model';
+import {Observable, of} from 'rxjs';
+import {
+  BillRateFilters,
+  BillRateOption,
+  BillRateSetup,
+  BillRateSetupPage,
+  BillRateSetupPost, ExternalBillRateTypePage,
+  ExternalBillRateType, ExternalBillRateSave
+} from '@shared/models/bill-rate.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({
@@ -20,7 +27,19 @@ export class BillRatesService {
   }
 
   /**
-   * Create or save/update bill rate
+   * Get the list of bill rates types
+   * @param filter filter parameters
+   * @return Array of bill rates types
+   */
+  public getExternalBillRates(filter: BillRateFilters): Observable<ExternalBillRateTypePage> {
+    const {pageNumber = 1, pageSize = 1} = filter;
+    return this.http.get<ExternalBillRateTypePage>(
+      `/api/ExternalBillRates`,
+      { params: { PageNumber: pageNumber, PageSize: pageSize }});
+  }
+
+  /**
+   * Create or save/update bill rate type
    * @param billRate object to save/update
    * @return Created/Updated bill rate
    */
@@ -28,12 +47,38 @@ export class BillRatesService {
     return this.http.post<BillRateSetup[]>(`/api/BillRates/setup`, billRate);
   }
 
+  /**
+   * Create bill rate
+   * @param billRate object to save
+   * @return Created bill rate
+   */
+  public saveExternalBillRateType(billRate: ExternalBillRateSave): Observable<ExternalBillRateType> {
+    return this.http.post<ExternalBillRateType>(`/api/ExternalBillRates`, billRate);
+  }
+
+  /**
+   * Update bill rate
+   * @param id object to update
+   * @return Update bill rate
+   */
+  public updateExternalBillRateType(id: number, billRate: ExternalBillRateSave): Observable<ExternalBillRateType> {
+    return this.http.put<ExternalBillRateType>(`/api/ExternalBillRates/${id}`, billRate);
+  }
+
     /**
    * Remove bill rate by its id
    * @param id
    */
-  public removeBillRateById(id: number): Observable<void> { // TODO: pending BE implementation
+  public removeBillRateById(id: number): Observable<void> {
     return this.http.delete<void>(`/api/BillRates/setup/${id}`);
+  }
+
+  /**
+   * Remove bill rate type by its id
+   * @param id
+   */
+  public removeExternalBillRateById(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/ExternalBillRates/${id}`);
   }
 
   /**

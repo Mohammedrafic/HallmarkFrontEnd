@@ -45,6 +45,18 @@ export interface BillRate {
 
 export interface OrderBillRateDto extends Omit<BillRate, 'billRateConfig' | 'billRateGroupId'> { }
 
+export class ExternalBillRateType {
+  id: number;
+  billRateConfigId: number;
+  name: string;
+  billRateTitle: string;
+}
+
+export class ExternalBillRateSave {
+  name: string;
+  billRateConfigId: number = 0;
+}
+
 export class BillRateSetup {
   billRateSettingId: number;
   regionId: number;
@@ -116,3 +128,4 @@ export class BillRateFilters {
 }
 
 export type BillRateSetupPage = PageOfCollections<BillRateSetup>;
+export type ExternalBillRateTypePage = PageOfCollections<ExternalBillRateType>;

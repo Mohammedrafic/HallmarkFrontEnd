@@ -5,7 +5,7 @@ import { SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
 export enum OrderManagemetTabs {
   MyAgency = 'My Agency',
   OtherAgencies = 'Other Agencies',
-  AllAngencies = 'All Angencies',
+  AllAgencies = 'All Agencies',
 }
 
 @Component({
@@ -15,7 +15,7 @@ export enum OrderManagemetTabs {
 })
 export class TabNavigationComponent implements OnInit {
   @Output() selectedTab = new EventEmitter<OrderManagemetTabs>();
-  
+
   public tabTitle = OrderManagemetTabs;
 
   ngOnInit(): void {
