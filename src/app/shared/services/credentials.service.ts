@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { CredentialType } from '@shared/models/credential-type.model';
-import { Credential } from '@shared/models/credential.model';
+import { Credential, CredentialFilter, CredentialFilterDataSources, CredentialPage } from '@shared/models/credential.model';
 import {
   CredentialSetupFilterGet,
   CredentialSetupFilterDto,
@@ -57,7 +57,10 @@ export class CredentialsService {
    * Get credential list
    * @return list of credentials
    */
-  public getCredential(): Observable<Credential[]> {
+  public getCredential(filters?: CredentialFilter): Observable<Credential[] | CredentialPage> {
+    if (filters) {
+      return this.http.post<CredentialPage>(`/api/MasterCredentials/filter`, filters);
+    }
     return this.http.get<Credential[]>(`/api/MasterCredentials/all`);
   }
 
@@ -94,7 +97,7 @@ export class CredentialsService {
    * @param mappingId
    */
   public removeCredentialSetups(mappingId: number): Observable<void> {
-    return this.http.delete<void>(`/api/CredentialSetups/${mappingId}`);
+    return this.http.delete<void>(`/api/CredentialSetups?MappingId=${mappingId}`);
   }
 
   /**
@@ -150,5 +153,13 @@ export class CredentialsService {
    */
   public saveUpdateCredentialSetupMapping(credentialSetupMapping: CredentialSetupMappingPost): Observable<SaveUpdatedCredentialSetupDetailIds> {
     return this.http.post<SaveUpdatedCredentialSetupDetailIds>(`/api/CredentialSetups/mappings`, credentialSetupMapping);
+  }
+
+  /**
+   * Get credentials filtering options
+   * @return list of credentials filtering options
+   */
+  public getCredentialsDataSources(): Observable<CredentialFilterDataSources> {
+    return this.http.get<CredentialFilterDataSources>(`/api/MasterCredentials/filteringOptions`);
   }
 }

@@ -14,6 +14,7 @@ import {
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob
 } from "@agency/store/order-management.actions";
+import { DatePipe } from '@angular/common';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 @Component({
@@ -44,7 +45,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store, private actions$: Actions) { }
+  constructor(private store: Store, private actions$: Actions, private datePipe: DatePipe) { }
 
   public ngOnChanges(): void {
     this.checkRejectReason();
@@ -119,7 +120,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
       jobId: new FormControl(''),
       date: new FormControl(''),
       billRates: new FormControl(''),
-      candidates: new FormControl(''),
+      avStartDate: new FormControl(''),
       candidateBillRate: new FormControl(''),
       locationName: new FormControl(''),
       yearExp: new FormControl(''),
@@ -128,6 +129,14 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
       comments: new FormControl(''),
       rejectReason: new FormControl('')
     });
+  }
+
+  private onCloseDialog(): void {
+    this.closeModalEvent.next();
+  }
+
+  private  getAvailableStartDate(date: string): string | null {
+    return this.datePipe.transform(date, 'MM/dd/yyyy');
   }
 
   private patchForm(): void {
@@ -139,7 +148,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
           jobId: value.orderId,
           date: [value.order.jobStartDate, value.order.jobEndDate],
           billRates: value.order.hourlyRate,
-          candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
+          avStartDate: this.getAvailableStartDate(value.availableStartDate),
           candidateBillRate: value.candidateBillRate,
           locationName: value.order.locationName,
           yearExp: value.yearsOfExperience,

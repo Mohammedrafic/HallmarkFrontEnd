@@ -10,7 +10,7 @@ import lodashMap from 'lodash/fp/map';
 
 import { SetHeaderState } from '../store/app.actions';
 import { DashboardService } from './services/dashboard.service';
-import { GetDashboardData, SetPanels, SaveDashboard, ResetState } from './store/dashboard.actions';
+import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile } from './store/dashboard.actions';
 import { DashboardState, DashboardStateModel } from './store/dashboard.state';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { WidgetDataDependenciesAggregatedModel } from './models/widget-data-dependencies-aggregated.model';
@@ -40,6 +40,8 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   @Select(DashboardState.isDashboardLoading) public readonly isLoading$: Observable<
     DashboardStateModel['isDashboardLoading']
   >;
+
+  @Select(DashboardState.isMobile) private readonly isMobile$: Observable<DashboardStateModel['isMobile']>;
 
   @Select(UserState.lastSelectedOrganizationId) private readonly organizationId$: Observable<
     UserStateModel['lastSelectedOrganizationId']
@@ -91,6 +93,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   public dashboardCreatedHandler(): void {
     this.initViewChangesListener();
+    this.getIsDashboardMobileView();
   }
 
   public handleWidgetToggleEvent({ widget, isSelected }: WidgetToggleModel): void {
@@ -117,9 +120,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   private removeWidget(widget: WidgetOptionModel): void {
-    const updatePanelsList = this.dashboardSFComponentSerialized.filter(
-      (panel: PanelModel) => panel.id !== widget.id
-    );
+    const updatePanelsList = this.dashboardSFComponentSerialized.filter((panel: PanelModel) => panel.id !== widget.id);
 
     this.saveDashboard(updatePanelsList);
   }
@@ -173,29 +174,36 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     return lodashMap((panel: PanelModel) => panel.id as string, panels);
   }
 
-  private getIsDashboardMobileView(): Observable<boolean> {
-    return this.breakpointObserver
+  private getIsDashboardMobileView(): void {
+    this.breakpointObserver
       .observe([`(${this.dashboardSFComponent.mediaQuery})`])
-      .pipe(map((breakpointState: BreakpointState) => breakpointState.matches));
+      .pipe(map((breakpointState: BreakpointState) => breakpointState.matches))
+      .subscribe((isMobile) => this.store.dispatch(new IsMobile(isMobile)));
   }
 
   private initViewChangesListener() {
-    combineLatest([this.getPanels$(), this.getIsDashboardMobileView()])
+    combineLatest([this.getPanels$(), this.isMobile$])
       .pipe(
         distinctUntilChanged((previous, current) => isEqual(previous, current)),
         takeUntil(this.destroy$)
       )
       .subscribe(([panels, isMobile]: [PanelModel[], boolean]) => {
         const updatedPanels = isMobile ? this.getUpdatePanelsForMobileView(panels) : panels;
-
         this.store.dispatch(new SetPanels(updatedPanels));
       });
   }
 
   private getUpdatePanelsForMobileView(panels: PanelModel[]): PanelModel[] {
-    return lodashMap(
-      (panel: PanelModel) => ({ ...panel, sizeX: 1, sizeY: 1, maxSizeY: 1, maxSizeX: 1, minSizeY: 1, minSizeX: 1 }),
-      panels
-    );
+    return lodashMap((panel: PanelModel) => {
+      if (
+        panel.id === WidgetTypeEnum.FILLED_POSITIONS ||
+        panel.id === WidgetTypeEnum.IN_PROGRESS_POSITIONS ||
+        panel.id === WidgetTypeEnum.OPEN_POSITIONS
+      ) {
+        return { ...panel, sizeY: 0.3, maxSizeY: 0.3, minSizeY: 0.3 };
+      } else {
+        return { ...panel, sizeX: 1, sizeY: 1, maxSizeY: 1, maxSizeX: 1, minSizeY: 1, minSizeX: 1 };
+      }
+    }, panels);
   }
 }

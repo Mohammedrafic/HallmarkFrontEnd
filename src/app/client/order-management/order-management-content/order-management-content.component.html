@@ -135,7 +135,7 @@
           *ngFor="let child of data.children"
           [candidat]="child"
           [order]="data"
-          [selected]="selectedCandidat?.selected.order === data.id && selectedCandidat?.selected.positionId === child.positionId"
+          [selected]="selectedCandidat?.selected?.order === data.id && selectedCandidat?.selected.positionId === child.positionId"
           (clickEvent)="onOpenCandidateDialog($event, data)"
         ></app-grid-subrow-candidate>
       </div>

@@ -1,6 +1,6 @@
 import { Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
@@ -41,7 +41,6 @@ import {
   BillRateUnit
 } from '@shared/models/bill-rate.model';
 import { OrderTypeOptions } from '@shared/enums/order-type';
-import { GetOrganizationStructure } from '../../../store/user.actions';
 import { MaskedTextBoxComponent } from '@syncfusion/ej2-angular-inputs';
 import { intervalMaxValidator, intervalMinValidator } from '@shared/validators/interval.validator';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -216,6 +215,12 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       }
     });
 
+    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
+      this.currentPage = page;
+      this.filters.pageNumber = page;
+      this.store.dispatch(new GetBillRates(this.filters));
+    });
+
     this.filterColumns.orderTypeIds.dataSource = OrderTypeOptions;
 
     this.intervalMinField = this.billRatesFormGroup.get('intervalMin') as AbstractControl;
@@ -303,12 +308,12 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.store.dispatch(new ExportBillRateSetup(new ExportPayload(
-      fileType, 
-      { 
+      fileType,
+      {
         ...this.filters,
         ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
         offset: Math.abs(new Date().getTimezoneOffset()),
-      }, 
+      },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       null,
       options?.fileName || this.defaultFileName

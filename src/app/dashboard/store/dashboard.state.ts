@@ -5,16 +5,18 @@ import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { Observable, tap } from 'rxjs';
 
 import { DashboardService } from '../services/dashboard.service';
-import { GetDashboardData, SetPanels, SaveDashboard, ResetState } from './dashboard.actions';
+import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile } from './dashboard.actions';
 import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import lodashMap from 'lodash/fp/map';
 import { DashboardDataModel } from '../models/dashboard-data.model';
+import { widgetTypeToConfigurationMapper } from '../constants/widget-type-to-configuration-mapper';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
   isDashboardLoading: boolean;
   widgets: WidgetOptionModel[];
+  isMobile: boolean;
 }
 
 @State<DashboardStateModel>({
@@ -23,6 +25,7 @@ export interface DashboardStateModel {
     panels: [],
     isDashboardLoading: false,
     widgets: [],
+    isMobile: false,
   },
 })
 @Injectable()
@@ -47,6 +50,11 @@ export class DashboardState {
     return state.widgets;
   }
 
+  @Selector()
+  static isMobile(state: DashboardStateModel): DashboardStateModel['isMobile'] {
+    return state.isMobile;
+  }
+
   public constructor(private readonly actions: Actions, private dashboardService: DashboardService) {}
 
   @Action(GetDashboardData)
@@ -56,17 +64,24 @@ export class DashboardState {
     return this.dashboardService.getDashboardsData().pipe(
       tap(({ panels, widgets }: DashboardDataModel) => {
         patchState({ panels, widgets, isDashboardLoading: false });
-      }),
+      })
     );
   }
 
   @Action(SaveDashboard)
   private saveDashboard(
-    { patchState }: StateContext<DashboardStateModel>,
+    { patchState, getState }: StateContext<DashboardStateModel>,
     { payload }: SaveDashboard
   ): Observable<void> {
-    patchState({ panels: payload });
-    return this.dashboardService.saveDashboard(payload);
+    const panels: PanelModel[] = getState().isMobile
+      ? payload.map((panel: PanelModel) => ({
+          ...panel,
+          ...widgetTypeToConfigurationMapper[panel.id as WidgetTypeEnum],
+        }))
+      : payload;
+      patchState({ panels });
+
+    return this.dashboardService.saveDashboard(panels);
   }
 
   @Action(SetPanels)
@@ -77,5 +92,10 @@ export class DashboardState {
   @Action(ResetState)
   private resetState({ patchState }: StateContext<DashboardStateModel>): void {
     patchState({ panels: [], widgets: [], isDashboardLoading: false });
+  }
+
+  @Action(IsMobile)
+  private isMobile({ patchState }: StateContext<DashboardStateModel>, { payload }: IsMobile): void {
+    patchState({ isMobile: payload });
   }
 }

@@ -268,7 +268,9 @@ export type OrderCandidateJob = {
     applicantStatus: number;
     statusText: string;
   };
-  billRates: BillRate[]
+  billRates: BillRate[],
+  allowDeployCredentials: boolean;
+  hasAllRequiredOnboardedCredentials: boolean;
 };
 
 export type ApplicantStatus = {

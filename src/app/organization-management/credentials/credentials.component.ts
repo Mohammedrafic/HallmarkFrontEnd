@@ -1,13 +1,13 @@
 import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
 import { Router } from '@angular/router';
 import { CredentialsState } from '../store/credentials.state';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
 import { CredentialsNavigationTabs } from '@shared/enums/credentials-navigation-tabs';
-import { SetNavigationTab, ShowExportCredentialListDialog } from '../store/credentials.actions';
+import { SetCredentialsFilterCount, SetNavigationTab, ShowExportCredentialListDialog } from '../store/credentials.actions';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 
@@ -31,9 +31,13 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
 
   public isCredentialListActive = true;
 
+  public filteredItemsCount = 0;
+
   constructor(private router: Router,
-              private store: Store) {
+              private store: Store,
+              private actions$: Actions) {
                 super();
+                actions$.pipe(ofActionDispatched(SetCredentialsFilterCount)).subscribe(count => this.filteredItemsCount = count.payload);
               }
 
   ngOnDestroy(): void {

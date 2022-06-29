@@ -86,7 +86,7 @@ import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { CredentialType } from '@shared/models/credential-type.model';
-import { Credential } from '@shared/models/credential.model';
+import { Credential, CredentialPage } from '@shared/models/credential.model';
 import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
 import { CandidateStateModel } from '@agency/store/candidate.state';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
@@ -133,7 +133,7 @@ export interface OrganizationManagementStateModel {
   allSkillsCategories: SkillCategoriesPage | null;
   isDirty: boolean;
   credentialTypes: CredentialType[];
-  credentials: Credential[];
+  credentials: Credential[] | CredentialPage;
   isCredentialTypesLoading: boolean;
   isCredentialLoading: boolean;
   skillGroups: CredentialSkillGroupPage | null;
@@ -254,7 +254,7 @@ export class OrganizationManagementState {
   static credentialTypes(state: OrganizationManagementStateModel): CredentialType[] { return state.credentialTypes; }
 
   @Selector()
-  static credentials(state: OrganizationManagementStateModel): Credential[] { return state.credentials }
+  static credentials(state: OrganizationManagementStateModel): Credential[] | CredentialPage { return state.credentials }
 
   @Selector()
   static skillGroups(state: OrganizationManagementStateModel): CredentialSkillGroupPage  | null { return state.skillGroups }
@@ -643,8 +643,8 @@ export class OrganizationManagementState {
   }
 
   @Action(GetCredential)
-  GetCredential({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetCredential): Observable<Credential[]> {
-    return this.credentialsService.getCredential().pipe(tap((payload) => {
+  GetCredential({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetCredential): Observable<Credential[] | CredentialPage> {
+    return this.credentialsService.getCredential(payload).pipe(tap((payload) => {
       patchState({ credentials: payload });
       return payload;
     }));
