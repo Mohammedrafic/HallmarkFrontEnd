@@ -32,10 +32,10 @@ export class BillRatesService {
    * @return Array of bill rates types
    */
   public getExternalBillRates(filter: BillRateFilters): Observable<ExternalBillRateTypePage> {
-    const {pageNumber = 1, pageSize = 1} = filter;
+    const {pageNumber = 1, pageSize = 1, name = ''} = filter;
     return this.http.get<ExternalBillRateTypePage>(
       `/api/ExternalBillRates`,
-      { params: { PageNumber: pageNumber, PageSize: pageSize }});
+      { params: { PageNumber: pageNumber, PageSize: pageSize, Name: name }});
   }
 
   /**
