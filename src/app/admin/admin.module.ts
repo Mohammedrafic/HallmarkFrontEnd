@@ -45,6 +45,8 @@ import {
 import { MasterHolidaysComponent } from './master-data/holidays/holidays.component';
 import { HolidaysState } from './store/holidays.state';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { RejectReasonMasterComponent } from './master-data/reject-reason-master/reject-reason-master.component';
+import { RejectReasonMasterState } from "@admin/store/reject-reason-mater.state";
 
 const sidebarIcons = {
   Download,
@@ -74,6 +76,7 @@ const sidebarIcons = {
     SkillCategoriesGridComponent,
     MasterCredentialsTypesComponent,
     MasterHolidaysComponent,
+    RejectReasonMasterComponent,
   ],
   imports: [
     CommonModule,
@@ -111,6 +114,7 @@ const sidebarIcons = {
     NgxsModule.forFeature([
       AdminState,
       HolidaysState,
+      RejectReasonMasterState
     ]),
   ],
   providers: [

@@ -11,6 +11,7 @@ import {
   MasterCredentialsTypesComponent
 } from './master-data/master-credentials/master-credentials-types/master-credentials-types.component';
 import { MasterHolidaysComponent } from './master-data/holidays/holidays.component';
+import { RejectReasonMasterComponent } from "@admin/master-data/reject-reason-master/reject-reason-master.component";
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -64,6 +65,10 @@ const routes: Routes = [
           {
             path: 'holidays',
             component: MasterHolidaysComponent
+          },
+          {
+            path: 'reject-reason',
+            component: RejectReasonMasterComponent
           }
         ]
       }
