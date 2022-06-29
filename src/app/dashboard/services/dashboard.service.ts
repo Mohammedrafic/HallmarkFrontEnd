@@ -41,6 +41,8 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { ActivePositionsDto, ActivePositionTypeInfo } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
+import { widgetTypes } from '../constants/widget-types';
+import { widgetTitles } from '../constants/widget-titles';
 
 @Injectable()
 export class DashboardService {
@@ -104,10 +106,12 @@ export class DashboardService {
   private getWidgetList(): Observable<WidgetOptionModel[]> {
     return this.httpClient.get<AvailableWidgetsResponseModel>(`${this.baseUrl}/AvailableWidgets`).pipe(
       map((response: AvailableWidgetsResponseModel) =>
-        response.widgetTypes.map((widget) => {
+        response.widgetTypes.map((widget: WidgetOptionModel) => {
+          const widgetId = widgetTypes[widget.widgetType];
           return {
             ...widget,
-            id: widget.title.replace(/[ ,]+/g, "_") as WidgetTypeEnum,
+            title: widgetTitles[widgetId],
+            id: widgetTypes[widgetId],
           };
         })
       )
