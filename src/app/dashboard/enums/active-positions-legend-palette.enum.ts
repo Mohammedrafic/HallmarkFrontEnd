@@ -1,4 +1,4 @@
-export enum ActivePositionsLegendPalette {
+export enum ActivePositionsChartStatuses {
   OPEN = 'Open',
   IN_PROGRESS = 'In progress',
   PENDING = 'In Progress (Pending)',

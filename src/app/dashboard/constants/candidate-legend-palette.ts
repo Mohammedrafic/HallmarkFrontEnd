@@ -1,12 +1,12 @@
-import { CandidateLegendPalette } from '../enums/candidate-legend-palette.enum';
+import { CandidateChartStatuses } from '../enums/candidate-legend-palette.enum';
 
-export const candidateLegendPalette: Record<CandidateLegendPalette, string> = {
-  [CandidateLegendPalette.APPLIED]: 'var(--widget-status-applied-open)',
-  [CandidateLegendPalette.NOT_APPLIED]: 'var(--widget-status-not-applied)',
-  [CandidateLegendPalette.SHORTLISTED]: 'var(--widget-status-shortlisted-incomplete)',
-  [CandidateLegendPalette.OFFERED]: 'var(--widget-status-offered-pending)',
-  [CandidateLegendPalette.REJECTED]: 'var(--widget-status-rejected-closed)',
-  [CandidateLegendPalette.ACCEPTED]: 'var(--widget-status-accepted)',
-  [CandidateLegendPalette.ONBOARD]: 'var(--widget-status-onboard-filled)',
-  [CandidateLegendPalette.CUSTOM]: 'var(--widget-status-custom)',
+export const candidateLegendPalette: Record<CandidateChartStatuses, string> = {
+  [CandidateChartStatuses.APPLIED]: 'var(--widget-status-applied-open)',
+  [CandidateChartStatuses.NOT_APPLIED]: 'var(--widget-status-not-applied)',
+  [CandidateChartStatuses.SHORTLISTED]: 'var(--widget-status-shortlisted-incomplete)',
+  [CandidateChartStatuses.OFFERED]: 'var(--widget-status-offered-pending)',
+  [CandidateChartStatuses.REJECTED]: 'var(--widget-status-rejected-closed)',
+  [CandidateChartStatuses.ACCEPTED]: 'var(--widget-status-accepted)',
+  [CandidateChartStatuses.ONBOARD]: 'var(--widget-status-onboard-filled)',
+  [CandidateChartStatuses.CUSTOM]: 'var(--widget-status-custom)',
 };

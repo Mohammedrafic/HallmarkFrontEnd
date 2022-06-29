@@ -1,4 +1,4 @@
-export enum CandidateLegendPalette {
+export enum CandidateChartStatuses {
   APPLIED = 'Applied',
   NOT_APPLIED = 'Not applied',
   SHORTLISTED = 'Shortlisted',

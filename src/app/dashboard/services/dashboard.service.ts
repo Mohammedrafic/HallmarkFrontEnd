@@ -41,9 +41,9 @@ import { ActivePositionsDto, ActivePositionTypeInfo } from '../models/active-pos
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
 import { activePositionsLegendPalette } from '../constants/active-positions-legend-palette';
-import { ActivePositionsLegendPalette } from '../enums/active-positions-legend-palette.enum';
+import { ActivePositionsChartStatuses } from '../enums/active-positions-legend-palette.enum';
 import { candidateLegendPalette } from '../constants/candidate-legend-palette';
-import { CandidateLegendPalette } from '../enums/candidate-legend-palette.enum';
+import { CandidateChartStatuses } from '../enums/candidate-legend-palette.enum';
 
 @Injectable()
 export class DashboardService {
@@ -126,7 +126,7 @@ export class DashboardService {
           chartData: lodashMapPlain(candidatesInfo, ({ count, status }: CandidateTypeInfoModel, index: number) => ({
             label: status,
             value: count,
-            color: candidateLegendPalette[status as CandidateLegendPalette],
+            color: candidateLegendPalette[status as CandidateChartStatuses],
           })),
         };
       })
@@ -224,7 +224,7 @@ export class DashboardService {
             ({ count, statusName }: ActivePositionTypeInfo, index: number) => ({
               label: statusName,
               value: count,
-              color: activePositionsLegendPalette[statusName as ActivePositionsLegendPalette],
+              color: activePositionsLegendPalette[statusName as ActivePositionsChartStatuses],
             })
           ),
         };
