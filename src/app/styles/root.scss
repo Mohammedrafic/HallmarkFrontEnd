@@ -1,4 +1,4 @@
-@import 'colors';
+@import "colors";
 
 :root {
   --primary-active-blue: #{$primary-active-blue};
@@ -15,6 +15,16 @@
 
   --tooltip-background: #{$white};
   --tooltip-text: #{$black};
+
+  --widget-status-applied-open: #{mix($supportive-green-10, $primary-active-blue-60, 65%)};
+  --widget-status-not-applied: #{mix($secondary-dark-blue-30, $primary-active-blue-60, 65%)};
+  --widget-status-shortlisted-incomplete: #{mix($supportive-orange, $primary-active-blue-60, 65%)};
+  --widget-status-offered-pending: #{mix($supportive-red, $primary-active-blue-60, 65%)};
+  --widget-status-rejected-closed: #{mix($secondary-dark-blue-20, $primary-active-blue-60, 65%)};
+  --widget-status-accepted: #{mix($supportive-purple, $primary-active-blue-60, 65%)};
+  --widget-status-onboard-filled: #{mix($primary-active-blue-30, $primary-active-blue-60, 65%)};
+  --widget-status-in-progress: #{mix($primary-active-blue, $primary-active-blue-60, 65%)};
+  --widget-status-custom: #{mix($secondary-dark-blue-15, $primary-active-blue-60, 65%)};
 
   --form-control-gap-y: 15px;
   --form-control-gap-x: 12px;

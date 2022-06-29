@@ -36,7 +36,7 @@
                                [allowFiltering]="false"
                                formControlName="candidateProfileSkills"
                                [fields]="skillsFields"
-                               [dataSource]="(skills$ | async)?.items">
+                               [dataSource]="skills$ | async">
               </ejs-multiselect>
             </div>
           </div>

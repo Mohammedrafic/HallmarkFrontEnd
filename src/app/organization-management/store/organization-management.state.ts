@@ -87,8 +87,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialPage } from '@shared/models/credential.model';
-import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
-import { CandidateStateModel } from '@agency/store/candidate.state';
+import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED, usedByOrderErrorMessage } from 'src/app/shared/constants/messages';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { CategoriesService } from '@shared/services/categories.service';
@@ -385,13 +384,16 @@ export class OrganizationManagementState {
   }
 
   @Action(DeleteDepartmentById)
-  DeleteDepartmentById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { department }: DeleteDepartmentById): Observable<any> {
+  DeleteDepartmentById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { department, filters }: DeleteDepartmentById): Observable<any> {
     return this.departmentService.deleteDepartmentById(department.departmentId).pipe(tap((payload) => {
       patchState({ isDepartmentLoading: false });
-      dispatch(new GetDepartmentsByLocationId(department.locationId));
+      dispatch(new GetDepartmentsByLocationId(department.locationId, filters));
       return payload;
     }),
-      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
+      catchError((error: any) => {
+        const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Department', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+        return dispatch(new ShowToast(MessageTypes.Error, message));
+      }));
   }
 
   @Action(GetRegions)
@@ -480,13 +482,16 @@ export class OrganizationManagementState {
   }
 
   @Action(DeleteLocationById)
-  DeleteLocationById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { locationId, regionId }: DeleteLocationById): Observable<any> {
+  DeleteLocationById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { locationId, regionId, filters }: DeleteLocationById): Observable<any> {
     return this.locationService.deleteLocationById(locationId).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
-      dispatch(new GetLocationsByRegionId(regionId));
+      dispatch(new GetLocationsByRegionId(regionId, filters));
       return payload;
     }),
-    catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
+    catchError((error: any) => {
+      const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Location', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+      return dispatch(new ShowToast(MessageTypes.Error, message));
+    }));
   }
 
   @Action(GetMasterSkillsByPage)
@@ -603,7 +608,10 @@ export class OrganizationManagementState {
       dispatch(new RemoveAssignedSkillSucceeded);
       return payload;
     }),
-    catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Skill cannot be deleted')))));
+    catchError((error: any) => {
+      const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Skill', error.error.errors['EntityInUse']) : 'Skill cannot be deleted';
+      return dispatch(new ShowToast(MessageTypes.Error, message));
+    }));
   }
 
   @Action(GetCredentialTypes)
@@ -677,11 +685,14 @@ export class OrganizationManagementState {
       dispatch(new GetCredential());
       return payload;
     }),
-    catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
+    catchError((error: any) => {
+      const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Location', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+      return dispatch(new ShowToast(MessageTypes.Error, message));
+    }));
   }
 
   @Action(GetAllSkills)
-  GetAllSkills({ patchState }: StateContext<CandidateStateModel>, { }: GetAllSkills): Observable<SkillsPage> {
+  GetAllSkills({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetAllSkills): Observable<SkillsPage> {
     return this.skillsService.getAllMasterSkills().pipe(
       tap((payload) => {
         patchState({ skills: payload });

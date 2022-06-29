@@ -296,7 +296,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       })
       .subscribe((confirm) => {
         if (confirm && department.departmentId) {
-          this.store.dispatch(new DeleteDepartmentById(department));
+          this.store.dispatch(new DeleteDepartmentById(department, this.filters));
         }
         this.removeActiveCssClass();
       });
