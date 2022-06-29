@@ -38,6 +38,7 @@ export class BillRatesComponent extends AbstractGridConfigurationComponent imple
 
   searchQuery: string = '';
   private unsubscribe$: Subject<void> = new Subject();
+  public filteredItems$ = new Subject<number>();
 
   constructor(private store: Store) {
     super();

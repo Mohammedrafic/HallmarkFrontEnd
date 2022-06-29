@@ -20,3 +20,5 @@ export const ORDER_EDITS = "The recent changes may affect the data previously de
 export const CANCEL_REJECTION_REASON = "Are you sure you want to cancel? All data will be deleted"
 export const CANCEL_ORDER_CONFIRM_TEXT = 'Are you sure you want to cancel this order? This order will be deleted';
 export const CANCEL_ORDER_CONFIRM_TITLE = 'Cancel Order';
+
+export const usedByOrderErrorMessage = (val: string, entities: string) => `${val} cannot be deleted. This ${val} was used in ${entities}.`;

@@ -73,7 +73,7 @@ export class UpdateDepartment {
 
 export class DeleteDepartmentById {
   static readonly type = '[organizationManagement] Delete Department by id';
-  constructor(public department: Department) { }
+  constructor(public department: Department, public filters?: DepartmentFilter) { }
 }
 
 export class GetRegions {
@@ -123,7 +123,7 @@ export class UpdateLocation {
 
 export class DeleteLocationById {
   static readonly type = '[organizationManagement] Delete Location by id';
-  constructor(public locationId: number, public regionId: number) { }
+  constructor(public locationId: number, public regionId: number, public filters?: LocationFilter) { }
 }
 
 export class GetBusinessUnitList {

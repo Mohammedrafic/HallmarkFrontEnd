@@ -52,6 +52,7 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { DatePipe } from '@angular/common';
+import { valuesOnly } from '@shared/utils/enum.utils';
 
 @Component({
   selector: 'app-bill-rate-setup',
@@ -64,6 +65,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   @ViewChild('rateHours') rateHoursInput: MaskedTextBoxComponent;
   @Input() isActive: boolean = false;
   @Input() export$: Subject<ExportedFileType> | undefined;
+  @Input() filteredItems$: Subject<number>;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
@@ -195,6 +197,14 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       displayInJob: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Display in Job'},
     }
 
+    this.filterColumns.billRatesCategory.dataSource = Object.values(BillRateCategory)
+      .filter(valuesOnly)
+      .map((name, id) => ({ name, id }));
+
+    this.filterColumns.billRatesType.dataSource = Object.values(BillRateType)
+      .filter(valuesOnly)
+      .map((name, id) => ({ name, id }));
+
     this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
       this.orgRegions = structure.regions;
       this.allRegions = [...this.orgRegions];
@@ -248,6 +258,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         this.filterColumns.locationIds.dataSource = [];
         this.billRateFilterFormGroup.get('locationIds')?.setValue([]);
         this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns);
+        this.filteredItems$.next(this.filteredItems.length);
       }
     });
 
@@ -262,6 +273,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           this.filterColumns.departmentIds.dataSource = [];
           this.billRateFilterFormGroup.get('departmentIds')?.setValue([]);
           this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns);
+          this.filteredItems$.next(this.filteredItems.length);
         }
       });
 
@@ -447,8 +459,14 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public onFilterClearAll(): void {
     this.billRateFilterFormGroup.reset();
     this.filteredItems = [];
+    this.filteredItems$.next(this.filteredItems.length);
     this.currentPage = 1;
     this.filters = {};
+    this.store.dispatch(new GetBillRates({
+      pageNumber: this.currentPage,
+      pageSize: this.pageSize,
+      ...this.filters
+    }));
   }
 
   public onFilterClose() {
@@ -472,11 +490,13 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       displayInJob: this.filters.displayInJob || null,
     });
     this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns, this.datePipe);
+    this.filteredItems$.next(this.filteredItems.length);
   }
 
   public onFilterApply(): void {
     this.filters = this.billRateFilterFormGroup.getRawValue();
     this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns, this.datePipe);
+    this.filteredItems$.next(this.filteredItems.length);
     this.store.dispatch(new GetBillRates({
       pageNumber: this.currentPage,
       pageSize: this.pageSize,

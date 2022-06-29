@@ -1,3 +1,5 @@
+import { Component, Input, OnInit, SimpleChanges, ChangeDetectionStrategy, OnChanges } from '@angular/core';
+
 import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged } from 'rxjs';
 import { map } from 'rxjs/operators';
 import lodashFilter from 'lodash/fp/filter';
@@ -10,11 +12,7 @@ import type {
   LegendSettingsModel,
 } from '@syncfusion/ej2-angular-charts';
 
-import { Component, Input, OnInit, SimpleChanges, ChangeDetectionStrategy, OnChanges } from '@angular/core';
-
 import { ChartAccumulation, DonutChartData } from '../../models/chart-accumulation-widget.model';
-
-import { legendPalette } from '../../constants/legend-palette';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
 
 @Component({
@@ -30,11 +28,9 @@ export class AccumulationChartComponent
   @Input() public chartData: ChartAccumulation | undefined;
   @Input() public isLoading: boolean;
 
-  public formattedChartData: DonutChartData[];
   public toggleLegend: number[] = [];
   public filteredChartData$: Observable<DonutChartData[]>;
 
-  public readonly palette: string[] = legendPalette;
   public readonly tooltipSettings: TooltipSettingsModel = {
     enable: true,
     template: '<div class="widget-tooltip"><div>${x}</div><b>${y}</b></div>',

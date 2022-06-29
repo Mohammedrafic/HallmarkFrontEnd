@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
@@ -24,6 +24,8 @@ const EDIT_DIALOG_TITLE = 'Edit Role';
   styleUrls: ['./roles-and-permissions.component.scss'],
 })
 export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
+  @ViewChild('roleForm') roleForm: RoleFormComponent;
+
   @Select(SecurityState.bussinesData)
   public bussinesData$: Observable<BusinessUnit[]>;
 
@@ -123,7 +125,7 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
 
   public onSave(): void {
     this.roleFormGroup.markAllAsTouched();
-    if (this.roleFormGroup.valid) {
+    if (this.roleFormGroup.valid && !this.roleForm.showActiveError) {
       const value = this.roleFormGroup.getRawValue();
       const roleDTO: RoleDTO = {
         ...value,

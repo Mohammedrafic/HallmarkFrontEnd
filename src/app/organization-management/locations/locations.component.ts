@@ -351,7 +351,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
       })
       .subscribe((confirm) => {
         if (confirm && location.id && this.selectedRegion.id) {
-          this.store.dispatch(new DeleteLocationById(location.id, this.selectedRegion.id));
+          this.store.dispatch(new DeleteLocationById(location.id, this.selectedRegion.id, this.filters));
         }
         this.removeActiveCssClass();
       });

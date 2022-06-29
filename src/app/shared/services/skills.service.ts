@@ -12,10 +12,18 @@ export class SkillsService {
 
   /**
    * Get all master skills
-   * @return list of master skills
+   * @return skills page
    */
   public getAllMasterSkills(): Observable<SkillsPage> {
-    return this.http.get<any>(`/api/masterSkills`, { params: { PageNumber: 1, PageSize: 100 }}); // TODO: need API to get all skills
+    return this.http.get<SkillsPage>(`/api/masterSkills`, { params: { PageNumber: 1, PageSize: 100 }});
+  }
+
+  /**
+   * Get all master skills array
+   * @return list of master skills
+   */
+  public getAllMasterSkillsArray(): Observable<Skill[]> {
+    return this.http.get<Skill[]>('/api/masterSkills/forAgency');
   }
 
   /**
