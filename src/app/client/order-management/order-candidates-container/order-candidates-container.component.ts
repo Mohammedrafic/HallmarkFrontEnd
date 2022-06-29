@@ -2,7 +2,7 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
 import { Select, Store } from '@ngxs/store';
-import { OrderCandidatesListPage, OrderManagement } from '@shared/models/order-management.model';
+import { OrderCandidatesListPage } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
@@ -26,9 +26,7 @@ export class OrderCandidatesContainerComponent implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
 
-  constructor(private store: Store) {
-   
-  }
+  constructor(private store: Store) {}
 
   ngOnInit(): void {
     this.orderCandidatePage$.pipe(takeUntil((this.unsubscribe$))).subscribe((order) => {

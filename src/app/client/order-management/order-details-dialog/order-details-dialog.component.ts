@@ -18,6 +18,7 @@ import { ApproveOrder, DeleteOrder } from '@client/store/order-managment-content
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_ORDER_CONFIRM_TEXT, CANCEL_ORDER_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { Location } from '@angular/common';
+import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -46,6 +47,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
   public orderStatus  = OrderStatus;
+  public candidatesCounter: number;
 
   private secondHasOpendOnes = false;
 
@@ -58,6 +60,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   ngOnInit(): void {
     this.onOpenEvent();
+    this.subscribeOnOrderCandidatePage();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -163,6 +166,14 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         this.sideDialog.hide();
         disabledBodyOverflow(false);
       }
+    });
+  }
+
+  private subscribeOnOrderCandidatePage(): void {
+    this.orderCandidatePage$.pipe(takeUntil((this.unsubscribe$))).subscribe((order: OrderCandidatesListPage) => {
+      this.candidatesCounter = order && order.items?.filter((candidate) =>
+        candidate.status !== ApplicantStatus.Rejected  && candidate.status !== ApplicantStatus.NotApplied
+      ).length;
     });
   }
 }

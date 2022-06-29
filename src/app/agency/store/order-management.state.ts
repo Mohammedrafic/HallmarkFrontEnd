@@ -36,6 +36,7 @@ import {
   UpdateAgencyCandidateJob
 } from './order-management.actions';
 import { isUndefined } from 'lodash';
+import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 
 export interface OrderManagementModel {
   ordersPage: AgencyOrderManagementPage | null;
@@ -78,7 +79,9 @@ export class OrderManagementState {
 
   @Selector()
   static orderCandidatesLenght(state: OrderManagementModel): number {
-    return state.orderCandidatesListPage?.items.length || 0;
+    return state.orderCandidatesListPage?.items.filter((candidate) =>
+      candidate.status !== ApplicantStatus.Rejected  && candidate.status !== ApplicantStatus.NotApplied
+    ).length || 0;
   }
 
   @Selector()
