@@ -71,51 +71,53 @@ export class TimesheetsState {
 
     const local = localStorage.getItem('timesheets');
 
-    if (isAgency) {
-      if (local) {
-        dataToStore = JSON.parse(local as string);
+    if (local) {
+      dataToStore = JSON.parse(local as string);
 
-        patchState({
-          timesheets: dataToStore,
-        });
+      patchState({
+        timesheets: dataToStore,
+      });
 
-        return of(dataToStore);
-      } else {
-        return this.timesheetsService.getTimesheets(payload)
-        .pipe(
-          tap((res) => {
-            dataToStore = res;
-            localStorage.setItem('timesheets', JSON.stringify(dataToStore));
-            patchState({
-              timesheets: dataToStore,
-            });
-          }));
-      }
+      return of(dataToStore);
     } else {
-      const data = localStorage.getItem('submited-timsheets');
-      if (data) {
-        dataToStore = JSON.parse(data as string);
-        patchState({
-          timesheets: dataToStore,
-        });
-        return of(dataToStore);
-      } else {
-        const init = {
-          items: [],
-          pageNumber: 1,
-          totalPages: 1,
-          totalCount: 0,
-          hasPreviousPage: false,
-          hasNextPage: false,
-        };
-
-        patchState({
-          timesheets: init,
-        });
-        return of(init);
-      }
-
+      return this.timesheetsService.getTimesheets(payload)
+      .pipe(
+        tap((res) => {
+          dataToStore = res;
+          localStorage.setItem('timesheets', JSON.stringify(dataToStore));
+          patchState({
+            timesheets: dataToStore,
+          });
+        }));
     }
+
+    // if (isAgency) {
+
+    // } else {
+    //   const data = localStorage.getItem('submited-timsheets');
+    //   if (data) {
+    //     dataToStore = JSON.parse(data as string);
+    //     patchState({
+    //       timesheets: dataToStore,
+    //     });
+    //     return of(dataToStore);
+    //   } else {
+    //     const init = {
+    //       items: [],
+    //       pageNumber: 1,
+    //       totalPages: 1,
+    //       totalCount: 0,
+    //       hasPreviousPage: false,
+    //       hasNextPage: false,
+    //     };
+
+    //     patchState({
+    //       timesheets: init,
+    //     });
+    //     return of(init);
+    //   }
+
+    // }
 
 
   }
