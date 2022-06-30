@@ -80,7 +80,7 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
     },
     { field: 'department', headerName: 'Department' },
     { field: 'departmentId', headerName: 'Department ID' },
-    { field: 'jobClassification', headerName: 'Job Classification' },
+    { field: 'jobClassificationText', headerName: 'Job Classification' },
     { field: 'jobStatus', headerName: 'Job Status' },
     { field: 'jobTitle', headerName: 'Job Title' },
     { field: 'location', headerName: 'Location' },
