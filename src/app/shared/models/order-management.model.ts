@@ -322,7 +322,7 @@ export class OrderFilter {
   jobStartDate?: Date;
   jobEndDate?: Date;
   orderStatuses?: number[];
-  candidateStatues?: number[];
+  candidateStatuses?: number[];
   candidatesCountFrom?: number;
   candidatesCountTo?: number;
   agencyIds?: number[];
