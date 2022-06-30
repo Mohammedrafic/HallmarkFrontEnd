@@ -6,7 +6,7 @@
   <ng-template #legend>
     <div #legend class="app-maps-chart__legend">
       <div>
-        <div class="app-maps-chart__range-line"></div>
+        <div class="app-maps-chart__range-line" (click)="redirectToSourceContent()"></div>
         <div class="app-maps-chart__range-values">
           {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.from }} -
           {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.to }}

@@ -46,6 +46,7 @@ import { activePositionsLegendPalette } from '../constants/active-positions-lege
 import { ActivePositionsChartStatuses } from '../enums/active-positions-legend-palette.enum';
 import { candidateLegendPalette } from '../constants/candidate-legend-palette';
 import { CandidateChartStatuses } from '../enums/candidate-legend-palette.enum';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class DashboardService {
@@ -66,7 +67,7 @@ export class DashboardService {
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient, private readonly router: Router) {}
 
   public getDashboardsData(): Observable<DashboardDataModel> {
     return forkJoin({ panels: this.getDashboardState(), widgets: this.getWidgetList() }).pipe(
@@ -233,5 +234,9 @@ export class DashboardService {
         };
       })
     );
+  }
+
+  public redirectToUrl(url: string): void {
+    this.router.navigateByUrl(url);
   }
 }

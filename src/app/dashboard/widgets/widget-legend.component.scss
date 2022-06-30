@@ -1,11 +1,23 @@
-@import 'colors';
+@import "colors";
 
 .widget-legend {
   &__item,
   &__item-content {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    width: 100%;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__row-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
   }
 
   &__legend-text {

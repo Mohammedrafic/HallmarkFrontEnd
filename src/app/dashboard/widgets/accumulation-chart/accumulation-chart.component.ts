@@ -14,6 +14,7 @@ import type {
 
 import { ChartAccumulation, DonutChartData } from '../../models/chart-accumulation-widget.model';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
+import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-accumulation-chart',
@@ -41,6 +42,10 @@ export class AccumulationChartComponent
     new BehaviorSubject<ChartAccumulation | null>(null);
 
   private readonly selectedEntries$: BehaviorSubject<string[] | null> = new BehaviorSubject<string[] | null>(null);
+
+  constructor(private readonly dashboardService: DashboardService) {
+    super();
+  }
 
   public ngOnChanges(changes: SimpleChanges): void {
     changes['chartData'] && this.handleChartDataChanges();
@@ -77,5 +82,9 @@ export class AccumulationChartComponent
       ),
       distinctUntilChanged((previous: DonutChartData[], current: DonutChartData[]) => isEqual(previous, current))
     );
+  }
+
+  public redirectToSourceContent(): void {
+    this.dashboardService.redirectToUrl('client/order-management');
   }
 }
