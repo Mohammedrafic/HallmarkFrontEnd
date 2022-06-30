@@ -74,7 +74,8 @@ import {
   GetAllOrganizationSkills,
   GetMasterSkillsByOrganization,
   GetLocationFilterOptions,
-  GetDepartmentFilterOptions
+  GetDepartmentFilterOptions,
+  GetOrganizationSettingsFilterOptions
 } from './organization-management.actions';
 import { Department, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
@@ -144,6 +145,7 @@ export interface OrganizationManagementStateModel {
   allOrganizationSkills: Skill[] | null;
   locationFilterOptions: LocationFilterOptions | null;
   departmentFilterOptions: DepartmentFilterOptions | null;
+  organizationSettingsFilterOptions: string[] | null;
 }
 
 @State<OrganizationManagementStateModel>({
@@ -187,7 +189,8 @@ export interface OrganizationManagementStateModel {
     skillDataSource: { skillABBRs: [], skillDescriptions: [], glNumbers: [] },
     allOrganizationSkills: null,
     locationFilterOptions: null,
-    departmentFilterOptions: null
+    departmentFilterOptions: null,
+    organizationSettingsFilterOptions: null,
   },
 })
 @Injectable()
@@ -272,6 +275,9 @@ export class OrganizationManagementState {
 
   @Selector()
   static departmentFilterOptions(state: OrganizationManagementStateModel): DepartmentFilterOptions | null { return state.departmentFilterOptions; }
+
+  @Selector()
+  static organizationSettingsFilterOptions(state: OrganizationManagementStateModel): string[] | null { return state.organizationSettingsFilterOptions; }
 
   constructor(
     private organizationService: OrganizationService,
@@ -738,8 +744,8 @@ export class OrganizationManagementState {
   }
 
   @Action(GetOrganizationSettings)
-  GetOrganizationSettingsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetOrganizationSettings): Observable<OrganizationSettingsGet[]> {
-    return this.organizationSettingsService.getOrganizationSettings().pipe(tap((payload) => {
+  GetOrganizationSettingsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { filters }: GetOrganizationSettings): Observable<OrganizationSettingsGet[]> {
+    return this.organizationSettingsService.getOrganizationSettings(filters).pipe(tap((payload) => {
       patchState({ organizationSettings: payload });
       return payload;
     }));
@@ -819,6 +825,14 @@ export class OrganizationManagementState {
   GetDepartmentFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetDepartmentFilterOptions): Observable<DepartmentFilterOptions> {
     return this.departmentService.getDepartmentFilterOptions(payload).pipe(tap(options => {
       patchState({ departmentFilterOptions: options });
+      return options;
+    }));
+  };
+
+  @Action(GetOrganizationSettingsFilterOptions)
+  GetOrganizationSettingsFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetOrganizationSettingsFilterOptions): Observable<string[]> {
+    return this.organizationSettingsService.getOrganizationSettingsFilteringOptions().pipe(tap(options => {
+      patchState({ organizationSettingsFilterOptions: options });
       return options;
     }));
   };
