@@ -57,6 +57,21 @@ export class ExternalBillRateSave {
   billRateConfigId: number = 0;
 }
 
+export class ExternalBillRateMapping {
+  billRateConfigId: number;
+  billRateTitle: string;
+  externalBillRates: Array<{
+    id: number;
+    name: string;
+  }>
+}
+
+export class ExternalBillRateMapped {
+  externalBillRateId: number;
+  externalBillRateName: string;
+  mapped: boolean;
+}
+
 export class BillRateSetup {
   billRateSettingId: number;
   regionId: number;
@@ -130,3 +145,4 @@ export class BillRateFilters {
 
 export type BillRateSetupPage = PageOfCollections<BillRateSetup>;
 export type ExternalBillRateTypePage = PageOfCollections<ExternalBillRateType>;
+export type ExternalBillRateMappingPage = PageOfCollections<ExternalBillRateMapping>;
