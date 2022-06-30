@@ -65,12 +65,8 @@ $chip-margin: 8px;
   }
 
   .e-chip {
-    &.e-accepted {
-      margin-right: $chip-margin;
-    }
-
-    &.e-filled {
-      margin-left: $chip-margin;
+    &:first-child {
+      margin-right: 20px;
     }
   }
 
