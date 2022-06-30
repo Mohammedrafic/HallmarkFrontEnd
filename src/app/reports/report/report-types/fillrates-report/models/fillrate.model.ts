@@ -1,20 +1,22 @@
+import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
+
 export interface FillrateModel {
   actualEndDate: string;
   actualStartDate: string;
   agency: string;
-  agencyId: string;
+  agencyId: number;
   badgeId: string;
   candidate: string;
-  candidateStatus: string;
+  candidateStatus: ApplicantStatus
   daysOrderStartToActualStartDate: string;
   department: string;
-  departmentId: string;
+  departmentId: number;
   jobClassification: string;
-  jobId: string;
+  jobId: number;
   jobStatus: string;
   jobTitle: string;
   location: string;
-  locationId: string;
+  locationId: number;
   ltaOrderNumber: string;
   onboardDate: string;
   orderEndDate: string;

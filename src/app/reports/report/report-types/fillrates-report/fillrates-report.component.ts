@@ -1,16 +1,17 @@
-import { Store } from '@ngxs/store';
-import { Observable, forkJoin, takeUntil, filter, distinctUntilChanged } from 'rxjs';
-import type { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import lodashMap from 'lodash/fp/map';
-import flow from 'lodash/fp/flow';
-import lodashFilter from 'lodash/fp/filter';
-import identity from 'lodash/fp/identity';
 import flatten from 'lodash/fp/flatten';
+import flow from 'lodash/fp/flow';
+import identity from 'lodash/fp/identity';
 import isEqual from 'lodash/fp/isEqual';
+import lodashFilter from 'lodash/fp/filter';
+import lodashMap from 'lodash/fp/map';
+import type { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import type { ValueFormatterParams } from '@ag-grid-community/core';
+import { Observable, forkJoin, takeUntil, filter, distinctUntilChanged } from 'rxjs';
+import { Store } from '@ngxs/store';
 
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, NgModule, Type, Inject } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 
 import { ApplicantStatus } from '@shared/models/order-management.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
@@ -57,14 +58,26 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
   public readonly skillOptionFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
 
   public readonly columnDefinitions: ColumnDefinitionModel[] = [
-    { field: 'actualEndDate', headerName: 'Actual End Date' },
-    { field: 'actualStartDate', headerName: 'Actual Start Date' },
+    {
+      field: 'actualEndDate',
+      headerName: 'Actual End Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
+    {
+      field: 'actualStartDate',
+      headerName: 'Actual Start Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
     { field: 'agency', headerName: 'Agency' },
     { field: 'agencyId', headerName: 'Agency ID' },
     { field: 'badgeId', headerName: 'Badge ID' },
     { field: 'candidate', headerName: 'Candidate' },
     { field: 'candidateStatus', headerName: 'Candidate Status' },
-    { field: 'daysOrderStartToActualStartDate', headerName: 'Days Order Start To Actual Start Date' },
+    {
+      field: 'daysOrderStartToActualStartDate',
+      headerName: 'Days Order Start To Actual Start Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
     { field: 'department', headerName: 'Department' },
     { field: 'departmentId', headerName: 'Department ID' },
     { field: 'jobClassification', headerName: 'Job Classification' },
@@ -73,14 +86,30 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
     { field: 'location', headerName: 'Location' },
     { field: 'locationId', headerName: 'Location ID' },
     { field: 'ltaOrderNumber', headerName: 'Lta Order Number' },
-    { field: 'onboardDate', headerName: 'Onboard Date' },
-    { field: 'orderEndDate', headerName: 'Order End Date' },
-    { field: 'orderStartDate', headerName: 'Order Start Date' },
+    {
+      field: 'onboardDate',
+      headerName: 'Onboard Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
+    {
+      field: 'orderEndDate',
+      headerName: 'Order End Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
+    {
+      field: 'orderStartDate',
+      headerName: 'Order Start Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
     { field: 'orderType', headerName: 'Order Type' },
     { field: 'reason', headerName: 'Reason' },
     { field: 'reasonCode', headerName: 'Reason Code' },
     { field: 'region', headerName: 'Region' },
-    { field: 'rejectedDate', headerName: 'Rejected Date' },
+    {
+      field: 'rejectedDate',
+      headerName: 'Rejected Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
     { field: 'skill', headerName: 'Skill' },
   ];
 
@@ -141,6 +170,7 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
   public constructor(
     @Inject(reportDirectiveDataToken) public override readonly reportDirectiveData: ReportDirectiveDataModel,
     private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly datePipe: DatePipe,
     private readonly fillratesReportService: FillratesReportService,
     private readonly formBuilder: FormBuilder,
     protected override readonly filterService: FilterService,
@@ -261,6 +291,10 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
       flatten,
       lodashFilter(identity)
     )(entityIds);
+  }
+
+  private getFormattedDate(date: string): string {
+    return this.datePipe.transform(date, 'MM/dd/yy') ?? '';
   }
 }
 
