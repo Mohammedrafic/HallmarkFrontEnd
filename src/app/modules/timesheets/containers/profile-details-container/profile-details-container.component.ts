@@ -314,7 +314,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
       const subm = JSON.parse(localStorage.getItem('submited-timsheets') as string);
       const idx = subm.items.findIndex((item: any) => item.id === profile.id);
-      subm.items[sheetIdx].status = profile.status = TIMETHEETS_STATUSES.ORG_APPROVED;
+      subm.items[idx].status = profile.status = TIMETHEETS_STATUSES.ORG_APPROVED;
 
       localStorage.setItem('submited-timsheets', JSON.stringify(
         {
