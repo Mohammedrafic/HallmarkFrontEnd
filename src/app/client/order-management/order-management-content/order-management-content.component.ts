@@ -183,7 +183,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       agencyType: { type: ControlTypes.Radio, dataSource: { 1: 'Yes', 2: 'No' }, default: '0' },
     }
     this.orderFilterDataSources$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data: OrderFilterDataSource) => {
-      this.filterColumns.orderStatuses.dataSource = data.orderStatus;
+      this.filterColumns.orderStatuses.dataSource = data.orderStatuses;
       this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
       this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
     });

@@ -341,6 +341,6 @@ export class FilterStatus {
 
 export class OrderFilterDataSource {
   partneredAgencies: OrderPartnerAgency[];
-  orderStatus: FilterStatus[];
+  orderStatuses: FilterStatus[];
   candidateStatuses: FilterStatus[];
 }
