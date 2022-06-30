@@ -1,0 +1,14 @@
+
+.historical-events {
+  &__wrapper {
+    max-height: 309px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+    overflow: auto;
+  }
+
+  &__span {
+    font-weight: 700;
+  }
+}

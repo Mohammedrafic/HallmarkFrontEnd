@@ -36,6 +36,8 @@ import {
   UpdateAgencyCandidateJob
 } from './order-management.actions';
 import { isUndefined } from 'lodash';
+import { HistoricalEvent } from '@shared/models/historical-event.model';
+import { GetHistoricalData } from '@client/store/order-managment-content.actions';
 import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 
 export interface OrderManagementModel {
@@ -46,6 +48,7 @@ export interface OrderManagementModel {
   orderApplicantsInitialData: OrderApplicantsInitialData | null;
   selectedOrder: Order | null;
   orderDialogOptions: DialogNextPreviousOption;
+  historicalEvents: HistoricalEvent[] | null
   rejectionReasonsList: RejectReason[];
 }
 
@@ -62,7 +65,8 @@ export interface OrderManagementModel {
     orderDialogOptions: {
       next: false,
       previous: false
-    }
+    },
+    historicalEvents: null
   },
 })
 @Injectable()
@@ -124,6 +128,11 @@ export class OrderManagementState {
   @Selector()
   static candidatesJob(state: OrderManagementModel): OrderCandidateJob | null {
     return state.candidatesJob;
+  }
+
+  @Selector()
+  static candidateHistoricalData(state: OrderManagementModel): HistoricalEvent[] | null {
+    return state.historicalEvents
   }
 
   constructor(private orderManagementContentService: OrderManagementContentService,
@@ -256,6 +265,19 @@ export class OrderManagementState {
           new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
           new RejectCandidateForAgencySuccess()
         ]);
+      })
+    )
+  }
+
+  @Action(GetHistoricalData)
+  GetHistoricalData(
+    {patchState}: StateContext<OrderManagementModel>,
+    {organizationId, candidateJobId}: GetHistoricalData
+  ): Observable<HistoricalEvent[]> {
+    return this.orderManagementContentService.getHistoricalData(organizationId, candidateJobId).pipe(
+      tap(payload => {
+        patchState({historicalEvents: payload})
+        return payload
       })
     )
   }

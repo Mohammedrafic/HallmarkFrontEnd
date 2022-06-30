@@ -21,6 +21,7 @@ import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { RejectReasonPayload } from "@shared/models/reject-reason.model";
+import { HistoricalEvent } from '../models/historical-event.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -227,9 +228,19 @@ export class OrderManagementContentService {
   }
 
   /**
-   * Get order filter data sources 
+   * Get order filter data sources
    */
   public getOrderFilterDataSources(): Observable<OrderFilterDataSource> {
     return this.http.get<OrderFilterDataSource>('/api/OrdersFilteringOptions/organization');
   }
+
+  /**
+   * Get the historical data for candidate
+   * @return Array of historical events
+   */
+  public getHistoricalData(organizationId: number, jobId: number): Observable<HistoricalEvent[]> {
+    return this.http.get<HistoricalEvent[]>(`/api/AppliedCandidates/historicalData?OrganizationId=${organizationId}&CandidateJobId=${jobId}`);
+  }
 }
+
+
