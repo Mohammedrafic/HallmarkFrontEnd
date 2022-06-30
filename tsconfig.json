@@ -28,7 +28,8 @@
       "@order-credentials/*": ["src/app/order-credentials/*"],
       "@organization-management/*": ["src/app/organization-management/*"],
       "@shared/*": ["src/app/shared/*"],
-      "@shell/*": ["src/app/shell/*"]
+      "@shell/*": ["src/app/shell/*"],
+      "@core/*": ["src/app/core/*"],
     },
     "lib": ["es2020", "dom"]
   },

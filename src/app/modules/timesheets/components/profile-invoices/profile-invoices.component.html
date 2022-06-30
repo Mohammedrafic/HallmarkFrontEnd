@@ -1,0 +1,5 @@
+<div class="invoices-container">
+  <h3>Invoice</h3>
+
+  <a href="#" [routerLink]="null" *ngFor="let invoice of invoices; trackBy: trackByName">{{invoice.name}}</a>
+</div>

@@ -7,6 +7,7 @@ import {
   CheckCircle,
   User,
   Briefcase,
+  Download,
   Folder,
   MapPin,
   Calendar,
@@ -85,6 +86,9 @@ import { BillRatesGridComponent } from "@shared/components/bill-rates/components
 import { BillRateState } from "@shared/components/bill-rates/store/bill-rate.state";
 import { ChildOrderDialogComponent } from "@shared/components/child-order-dialog/child-order-dialog.component";
 import { RejectReasonDialogComponent } from './components/reject-reason-dialog/reject-reason-dialog.component';
+import { ClickOutsideDirective } from './directives/click-outside.directive';
+import { ExportButtonComponent } from './components/export-button/export-button.component';
+import { TabsListComponent } from './components/tabs-list/tabs-list.component';
 import { PageToolbarModule } from '@shared/components/page-toolbar/page-toolbar.module';
 import { FilterDialogModule } from '@shared/components/filter-dialog/filter-dialog.module';
 import { DeployCandidateMessageComponent } from './components/order-candidates-list/deploy-candidate-message/deploy-candidate-message.component';
@@ -99,11 +103,12 @@ const icons = {
   Folder,
   MapPin,
   Calendar,
+  Download,
   Mail,
   Send,
   Edit,
   Plus,
-  Trash2
+  Trash2,
 };
 
 const COMPONENTS = [
@@ -116,6 +121,7 @@ const COMPONENTS = [
   ValidateDirective,
   HighlightGridRowDirective,
   AddBackgroundForEmptyGridDirective,
+  ClickOutsideDirective,
   ImageUploaderComponent,
   DocumentUploaderComponent,
   SideDialogComponent,
@@ -144,6 +150,7 @@ const COMPONENTS = [
   GridSubrowCandidateComponent,
   BillRatesComponent,
   ChildOrderDialogComponent,
+  ExportButtonComponent,
   DeployCandidateMessageComponent
 ];
 
@@ -180,8 +187,8 @@ const COMPONENTS = [
     PageToolbarModule,
     FilterDialogModule
   ],
-  exports: [...COMPONENTS, PageToolbarModule, FilterDialogModule],
-  declarations: [...COMPONENTS, ErrorMessageComponent, BillRateFormComponent, BillRatesGridComponent],
+  exports: [...COMPONENTS, TabsListComponent, PageToolbarModule, FilterDialogModule],
+  declarations: [...COMPONENTS, ErrorMessageComponent, BillRateFormComponent, BillRatesGridComponent, TabsListComponent],
   providers: [
     DatePipe,
     ColumnMenuService,

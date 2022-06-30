@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { SortingDirections } from '@shared/enums/sorting';
 import { FilteredItem } from '@shared/models/filter.model';
-import { GridComponent, PageEventArgs } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, PageEventArgs, SelectionSettingsModel } from '@syncfusion/ej2-angular-grids';
 import { ResizeSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
 import { GRID_CONFIG } from '../../constants/grid-config';
@@ -57,7 +57,7 @@ export abstract class AbstractGridConfigurationComponent {
     { text: ExportType[2], id: 2 }
   ];
 
-  selectionSettings = {
+  selectionSettings: SelectionSettingsModel = {
     persistSelection: true
   };
   selectedItems: any[] = [];
