@@ -1,4 +1,4 @@
-<ejs-tab id="tab_default" heightAdjustMode="Auto" #tabNavigation (selecting)="onSelect($event)">
+<ejs-tab id="tab_default" heightAdjustMode="Auto" (selecting)="onSelect($event)">
   <div class="e-tab-header">
     <div *ngFor="let tab of tabConfig; trackBy: trackByFn">
       {{ tab.title }}

@@ -1,0 +1,21 @@
+<app-page-toolbar>
+  <ng-container left>
+    <app-tabs-list [tabConfig]="tabsConfig"></app-tabs-list>
+  </ng-container>
+
+  <ng-container right>
+    <app-search class="search" *ngIf="false"></app-search>
+    <button
+      ejs-button
+      cssClass="e-outline button-filter button--no-wrap"
+      (click)="showFilters()">
+      Filters <i-feather name="sliders" class="icon"></i-feather>
+    </button>
+    <app-export-button (optionSelected)="onExportOptionSelect($event)"></app-export-button>
+    <button ejs-button class="e-primary">Create Invoice</button>
+  </ng-container>
+</app-page-toolbar>
+
+<section>
+  <app-invoices-table [tableData]="invoicesData$ | async" [config]="tableConfig"></app-invoices-table>
+</section>
