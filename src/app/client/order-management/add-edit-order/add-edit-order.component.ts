@@ -198,7 +198,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.jobDescriptionForm.valid &&
       this.orderDetailsFormComponent.contactDetailsForm.valid &&
       this.orderDetailsFormComponent.workLocationForm.valid &&
-      this.orderDetailsFormComponent.workflowForm.valid &&
+      (this.orderDetailsFormComponent.workflowForm.valid && !this.orderDetailsFormComponent.workflowForm.disabled) &&
       this.orderDetailsFormComponent.specialProject.valid &&
       this.billRatesComponent.billRatesControl.valid
     ) {

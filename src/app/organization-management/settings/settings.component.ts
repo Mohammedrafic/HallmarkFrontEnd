@@ -8,6 +8,7 @@ import { Department } from '@shared/models/department.model';
 import { Location } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
 import {
+  OrganizationSettingFilter,
   OrganizationSettingsDropDownOption,
   OrganizationSettingsGet,
   OrganizationSettingsPost,
@@ -22,6 +23,7 @@ import {
   GetDepartmentsByLocationId,
   GetLocationsByRegionId,
   GetOrganizationSettings,
+  GetOrganizationSettingsFilterOptions,
   GetRegions,
   SaveOrganizationSettings
 } from '../store/organization-management.actions';
@@ -68,6 +70,9 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   @Select(OrganizationManagementState.regions)
   regions$: Observable<Region[]>;
 
+  @Select(OrganizationManagementState.organizationSettingsFilterOptions)
+  organizationSettingsFilterOptions$: Observable<string[]>;
+
   @Select(OrganizationManagementState.locationsByRegionId)
   locations$: Observable<Location[]>;
 
@@ -110,10 +115,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   private unsubscribe$: Subject<void> = new Subject();
 
   public SettingsFilterFormGroup: FormGroup;
-  public filters: any = {
-    pageNumber: this.currentPage,
-    pageSize: this.pageSizePager
-  };
+  public filters: OrganizationSettingFilter = {};
   public filterColumns: any;
 
   public optionFields = {
@@ -134,7 +136,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.filterColumns = {
       regionIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      departmentsIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      departmentIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       attributes: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
     }
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
@@ -143,6 +145,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       } else {
         this.organizationId = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
       }
+      this.store.dispatch(new GetOrganizationSettingsFilterOptions())
       this.getSettings();
     });
     this.mapGridData();
@@ -153,6 +156,10 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       this.orgRegions = structure.regions;
       this.allRegions = [...this.orgRegions];
       this.filterColumns.regionIds.dataSource = this.allRegions;
+    });
+
+    this.organizationSettingsFilterOptions$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((options: string[]) => {
+      this.filterColumns.attributes.dataSource = options;
     });
 
     this.SettingsFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
@@ -174,13 +181,13 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       if (val?.length) {
         const selectedLocations: OrganizationLocation[] = [];
         val.forEach(id => selectedLocations.push(this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)));
-        this.filterColumns.departmentsIds.dataSource = [];
+        this.filterColumns.departmentIds.dataSource = [];
         selectedLocations.forEach(location => {
-          this.filterColumns.departmentsIds.dataSource.push(...location.departments as [])
+          this.filterColumns.departmentIds.dataSource.push(...location.departments as [])
         });
       } else {
-        this.filterColumns.departmentsIds.dataSource = [];
-        this.SettingsFilterFormGroup.get('departmentsIds')?.setValue([]);
+        this.filterColumns.departmentIds.dataSource = [];
+        this.SettingsFilterFormGroup.get('departmentIds')?.setValue([]);
         this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
       }
     });
@@ -192,7 +199,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   }
 
   private getSettings(): void {
-    this.store.dispatch(new GetOrganizationSettings());
+    this.store.dispatch(new GetOrganizationSettings(this.filters));
     this.store.dispatch(new GetRegions());
   }
 
@@ -204,7 +211,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.SettingsFilterFormGroup.setValue({
       regionIds: this.filters.regionIds || [],
       locationIds: this.filters.locationIds || [],
-      departmentsIds: this.filters.departmentsIds || [],
+      departmentIds: this.filters.departmentIds || [],
       attributes: this.filters.attributes || [],
     });
     this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
@@ -224,8 +231,6 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
   
   public onFilterApply(): void {
     this.filters = this.SettingsFilterFormGroup.getRawValue();
-    this.filters.pageNumber = this.currentPage,
-    this.filters.pageSize = this.pageSizePager
     this.filteredItems = this.filterService.generateChips(this.SettingsFilterFormGroup, this.filterColumns);
     this.getSettings();
     this.store.dispatch(new ShowFilterDialog(false));
@@ -592,7 +597,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.SettingsFilterFormGroup = this.formBuilder.group({
       regionIds: [[]],
       locationIds: [[]],
-      departmentsIds: [[]],
+      departmentIds: [[]],
       attributes: [[]],
     });
   }

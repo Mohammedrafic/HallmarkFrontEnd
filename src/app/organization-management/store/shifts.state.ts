@@ -3,7 +3,7 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { militaryToStandard } from '@shared/utils/date-time.utils';
 import { catchError, Observable, of, tap } from "rxjs";
 
-import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages";
+import { RECORD_ADDED, RECORD_MODIFIED, usedByOrderErrorMessage } from "src/app/shared/constants/messages";
 import { MessageTypes } from "src/app/shared/enums/message-types";
 import { Shift, ShiftsPage } from 'src/app/shared/models/shift.model';
 import { ShowToast } from "src/app/store/app.actions";
@@ -77,7 +77,10 @@ export class ShiftsState {
         dispatch(new DeleteShiftSucceeded(payload));
         return payload;
       }),
-      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Shift cannot be deleted')))));
+      catchError((error: any) => {
+        const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Shift', error.error.errors['EntityInUse']) : 'Shift cannot be deleted';
+        return dispatch(new ShowToast(MessageTypes.Error, message));
+      }));
   }
 
   @Action(ExportShifts)

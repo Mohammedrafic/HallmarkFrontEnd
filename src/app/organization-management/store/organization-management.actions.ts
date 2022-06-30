@@ -8,7 +8,7 @@ import { Region } from '@shared/models/region.model';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialFilter } from '@shared/models/credential.model';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
-import { OrganizationSettingsPost } from '@shared/models/organization-settings.model';
+import { OrganizationSettingFilter, OrganizationSettingsPost } from '@shared/models/organization-settings.model';
 import { ExportPayload } from "@shared/models/export.model";
 
 export class SetGeneralStatesByCountry {
@@ -73,7 +73,7 @@ export class UpdateDepartment {
 
 export class DeleteDepartmentById {
   static readonly type = '[organizationManagement] Delete Department by id';
-  constructor(public department: Department) { }
+  constructor(public department: Department, public filters?: DepartmentFilter) { }
 }
 
 export class GetRegions {
@@ -123,7 +123,7 @@ export class UpdateLocation {
 
 export class DeleteLocationById {
   static readonly type = '[organizationManagement] Delete Location by id';
-  constructor(public locationId: number, public regionId: number) { }
+  constructor(public locationId: number, public regionId: number, public filters?: LocationFilter) { }
 }
 
 export class GetBusinessUnitList {
@@ -298,7 +298,7 @@ export class RemoveCredentialSkillGroup {
 
 export class GetOrganizationSettings {
   static readonly type = '[organizationManagement] Get Organization Settings';
-  constructor() {}
+  constructor(public filters?: OrganizationSettingFilter) {}
 }
 
 export class SaveOrganizationSettings {
@@ -349,4 +349,9 @@ export class GetLocationFilterOptions {
 export class GetDepartmentFilterOptions {
   static readonly type = '[organizationManagement] Get Department Filter Options';
   constructor(public payload: number) { }
+}
+
+export class GetOrganizationSettingsFilterOptions {
+  static readonly type = '[organizationManagement] Get Organization Settings Filter Options';
+  constructor() { }
 }

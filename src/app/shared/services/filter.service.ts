@@ -23,7 +23,7 @@ export class FilterService {
       form.controls[event.column].setValue(val);
     } else if (filterColumns[event.column].type === ControlTypes.Checkbox) {
       form.controls[event.column].setValue(false);
-    } if (filterColumns[event.column].type === ControlTypes.Radio) {
+    } else if (filterColumns[event.column].type === ControlTypes.Radio) {
       form.controls[event.column].setValue(filterColumns[event.column].default);
     } else {
       form.controls[event.column].setValue('');

@@ -10,8 +10,8 @@
         </ejs-chiplist>
       </div>
       <div class="e-card-content">
-        <button *ngIf="!isRejected" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
-        <button ejs-button [isPrimary]="true" *ngIf="candidate?.statusName !== 'Accepted' && !isRejected" class="apply-button" (click)="onAccept()">Accept</button>
+        <button *ngIf="!isReadOnly" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
+        <button ejs-button [isPrimary]="true" *ngIf="candidate?.statusName !== 'Accepted' && !isReadOnly" class="apply-button" (click)="onAccept()">Accept</button>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>

@@ -74,7 +74,8 @@ import {
   GetAllOrganizationSkills,
   GetMasterSkillsByOrganization,
   GetLocationFilterOptions,
-  GetDepartmentFilterOptions
+  GetDepartmentFilterOptions,
+  GetOrganizationSettingsFilterOptions
 } from './organization-management.actions';
 import { Department, DepartmentFilterOptions, DepartmentsPage } from '@shared/models/department.model';
 import { Region } from '@shared/models/region.model';
@@ -87,7 +88,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialPage } from '@shared/models/credential.model';
-import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
+import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED, usedByOrderErrorMessage } from 'src/app/shared/constants/messages';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { CategoriesService } from '@shared/services/categories.service';
@@ -141,9 +142,10 @@ export interface OrganizationManagementStateModel {
   isOrganizationSettingsLoading: boolean;
   organizationSettings: OrganizationSettingsGet[];
   skillDataSource: SkillDataSource;
-  allOrganizationSkills: SkillsPage | null;
+  allOrganizationSkills: Skill[] | null;
   locationFilterOptions: LocationFilterOptions | null;
   departmentFilterOptions: DepartmentFilterOptions | null;
+  organizationSettingsFilterOptions: string[] | null;
 }
 
 @State<OrganizationManagementStateModel>({
@@ -187,7 +189,8 @@ export interface OrganizationManagementStateModel {
     skillDataSource: { skillABBRs: [], skillDescriptions: [], glNumbers: [] },
     allOrganizationSkills: null,
     locationFilterOptions: null,
-    departmentFilterOptions: null
+    departmentFilterOptions: null,
+    organizationSettingsFilterOptions: null,
   },
 })
 @Injectable()
@@ -265,13 +268,16 @@ export class OrganizationManagementState {
   static skillDataSource(state: OrganizationManagementStateModel): SkillDataSource { return state.skillDataSource; }
 
   @Selector()
-  static allOrganizationSkills(state: OrganizationManagementStateModel): SkillsPage | null { return state.allOrganizationSkills; }
+  static allOrganizationSkills(state: OrganizationManagementStateModel): Skill[] | null { return state.allOrganizationSkills; }
 
   @Selector()
   static locationFilterOptions(state: OrganizationManagementStateModel): LocationFilterOptions | null { return state.locationFilterOptions; }
 
   @Selector()
   static departmentFilterOptions(state: OrganizationManagementStateModel): DepartmentFilterOptions | null { return state.departmentFilterOptions; }
+
+  @Selector()
+  static organizationSettingsFilterOptions(state: OrganizationManagementStateModel): string[] | null { return state.organizationSettingsFilterOptions; }
 
   constructor(
     private organizationService: OrganizationService,
@@ -384,13 +390,16 @@ export class OrganizationManagementState {
   }
 
   @Action(DeleteDepartmentById)
-  DeleteDepartmentById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { department }: DeleteDepartmentById): Observable<any> {
+  DeleteDepartmentById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { department, filters }: DeleteDepartmentById): Observable<any> {
     return this.departmentService.deleteDepartmentById(department.departmentId).pipe(tap((payload) => {
       patchState({ isDepartmentLoading: false });
-      dispatch(new GetDepartmentsByLocationId(department.locationId));
+      dispatch(new GetDepartmentsByLocationId(department.locationId, filters));
       return payload;
     }),
-      catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
+      catchError((error: any) => {
+        const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Department', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+        return dispatch(new ShowToast(MessageTypes.Error, message));
+      }));
   }
 
   @Action(GetRegions)
@@ -479,13 +488,16 @@ export class OrganizationManagementState {
   }
 
   @Action(DeleteLocationById)
-  DeleteLocationById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { locationId, regionId }: DeleteLocationById): Observable<any> {
+  DeleteLocationById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { locationId, regionId, filters }: DeleteLocationById): Observable<any> {
     return this.locationService.deleteLocationById(locationId).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
-      dispatch(new GetLocationsByRegionId(regionId));
+      dispatch(new GetLocationsByRegionId(regionId, filters));
       return payload;
     }),
-    catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
+    catchError((error: any) => {
+      const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Location', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+      return dispatch(new ShowToast(MessageTypes.Error, message));
+    }));
   }
 
   @Action(GetMasterSkillsByPage)
@@ -602,7 +614,10 @@ export class OrganizationManagementState {
       dispatch(new RemoveAssignedSkillSucceeded);
       return payload;
     }),
-    catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Skill cannot be deleted')))));
+    catchError((error: any) => {
+      const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Skill', error.error.errors['EntityInUse']) : 'Skill cannot be deleted';
+      return dispatch(new ShowToast(MessageTypes.Error, message));
+    }));
   }
 
   @Action(GetCredentialTypes)
@@ -676,7 +691,10 @@ export class OrganizationManagementState {
       dispatch(new GetCredential());
       return payload;
     }),
-    catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
+    catchError((error: any) => {
+      const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Location', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+      return dispatch(new ShowToast(MessageTypes.Error, message));
+    }));
   }
 
   @Action(GetAllSkills)
@@ -699,7 +717,7 @@ export class OrganizationManagementState {
 
   @Action(SaveUpdateCredentialSkillGroup)
   SaveUpdateSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveUpdateCredentialSkillGroup): Observable<CredentialSkillGroup> {
-    return this.skillGroupService.saveUpdateSkillGroup(payload).pipe(tap((payload) => {
+    return this.skillGroupService.saveUpdateSkillGroup(payload).pipe(tap((response) => {
       patchState({ isSkillGroupLoading: false });
       if (payload.id) {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
@@ -707,7 +725,7 @@ export class OrganizationManagementState {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
       }
       dispatch(new GetCredentialSkillGroup());
-      return payload;
+      return response;
     }));
   }
 
@@ -726,8 +744,8 @@ export class OrganizationManagementState {
   }
 
   @Action(GetOrganizationSettings)
-  GetOrganizationSettingsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetOrganizationSettings): Observable<OrganizationSettingsGet[]> {
-    return this.organizationSettingsService.getOrganizationSettings().pipe(tap((payload) => {
+  GetOrganizationSettingsByOrganizationId({ patchState }: StateContext<OrganizationManagementStateModel>, { filters }: GetOrganizationSettings): Observable<OrganizationSettingsGet[]> {
+    return this.organizationSettingsService.getOrganizationSettings(filters).pipe(tap((payload) => {
       patchState({ organizationSettings: payload });
       return payload;
     }));
@@ -788,7 +806,7 @@ export class OrganizationManagementState {
   };
 
   @Action(GetAllOrganizationSkills)
-  GetAllOrganizationSkills({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetAllOrganizationSkills): Observable<SkillsPage> {
+  GetAllOrganizationSkills({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetAllOrganizationSkills): Observable<Skill[]> {
     return this.skillsService.getAllOrganizationSkills().pipe(tap(skills => {
       patchState({ allOrganizationSkills: skills });
       return skills;
@@ -807,6 +825,14 @@ export class OrganizationManagementState {
   GetDepartmentFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetDepartmentFilterOptions): Observable<DepartmentFilterOptions> {
     return this.departmentService.getDepartmentFilterOptions(payload).pipe(tap(options => {
       patchState({ departmentFilterOptions: options });
+      return options;
+    }));
+  };
+
+  @Action(GetOrganizationSettingsFilterOptions)
+  GetOrganizationSettingsFilterOptions({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetOrganizationSettingsFilterOptions): Observable<string[]> {
+    return this.organizationSettingsService.getOrganizationSettingsFilteringOptions().pipe(tap(options => {
+      patchState({ organizationSettingsFilterOptions: options });
       return options;
     }));
   };

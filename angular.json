@@ -39,7 +39,8 @@
                 "src/app/styles/variables"
               ]
             },
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": ["lodash"]
           },
           "configurations": {
             "production": {
@@ -52,7 +53,7 @@
                 {
                   "type": "anyComponentStyle",
                   "maximumWarning": "5kb",
-                  "maximumError": "10kb"
+                  "maximumError": "250kb"
                 }
               ],
               "fileReplacements": [

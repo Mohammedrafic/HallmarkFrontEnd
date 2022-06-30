@@ -28,7 +28,6 @@ import {
 } from "@syncfusion/ej2-angular-inputs";
 import { DropDownListModule, ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 
-import { PageToolbarComponent } from './components/page-toolbar/page-toolbar.component';
 import { ValidateDirective } from './directives/validate.directive';
 import { ErrorMessageComponent } from './components/error-message/error-message.component';
 import { ValidationErrorPipe } from './pipes/validation-error.pipe';
@@ -43,7 +42,6 @@ import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { SideDialogComponent } from './components/side-dialog/side-dialog.component';
 import { SideMenuComponent } from './components/side-menu/side-menu.component';
 import { SearchComponent } from './components/search/search.component';
-import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.component';
 import { ExportDialogComponent } from './components/export-dialog/export-dialog.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
@@ -91,6 +89,8 @@ import { RejectReasonDialogComponent } from './components/reject-reason-dialog/r
 import { ClickOutsideDirective } from './directives/click-outside.directive';
 import { ExportButtonComponent } from './components/export-button/export-button.component';
 import { TabsListComponent } from './components/tabs-list/tabs-list.component';
+import { PageToolbarModule } from '@shared/components/page-toolbar/page-toolbar.module';
+import { FilterDialogModule } from '@shared/components/filter-dialog/filter-dialog.module';
 
 const icons = {
   AlertCircle,
@@ -111,7 +111,6 @@ const icons = {
 };
 
 const COMPONENTS = [
-  PageToolbarComponent,
   ValidationErrorPipe,
   ChipsCssClass,
   OrderTypeName,
@@ -125,7 +124,6 @@ const COMPONENTS = [
   ImageUploaderComponent,
   DocumentUploaderComponent,
   SideDialogComponent,
-  FilterDialogComponent,
   MessageToastComponent,
   FileUploadDialogComponent,
   ExportDialogComponent,
@@ -184,8 +182,10 @@ const COMPONENTS = [
     MaskedTextBoxAllModule,
     TabAllModule,
     NgxsModule.forFeature([BillRateState]),
+    PageToolbarModule,
+    FilterDialogModule
   ],
-  exports: [...COMPONENTS, TabsListComponent],
+  exports: [...COMPONENTS, TabsListComponent, PageToolbarModule, FilterDialogModule],
   declarations: [...COMPONENTS, ErrorMessageComponent, BillRateFormComponent, BillRatesGridComponent, TabsListComponent],
   providers: [
     DatePipe,

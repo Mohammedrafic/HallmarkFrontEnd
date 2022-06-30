@@ -1,470 +1,537 @@
-import { BusinessUnitType } from "../enums/business-unit-type"
+import { BusinessUnitType } from '../enums/business-unit-type';
+
+interface MenuItemConfigurationModel {
+  icon: string;
+  route: string;
+}
+
+const reportsMenuItemConfiguration: MenuItemConfigurationModel = { icon: 'trello', route: 'reports' };
 
 export const MENU_CONFIG: any = {
-  [BusinessUnitType.Hallmark] : {
-    1: { // Dashboard
+  [BusinessUnitType.Hallmark]: {
+    1: {
+      // Dashboard
       icon: 'home',
-      route: '/admin/dashboard'
+      route: '/admin/dashboard',
     },
-    2: { // Organization
+    2: {
+      // Organization
       icon: 'file-text',
-      route: '/admin/client-management'
+      route: '/admin/client-management',
     },
-    3: { // Agency
+    3: {
+      // Agency
       icon: 'clock',
-      route: 'agency/agency-list'
+      route: 'agency/agency-list',
     },
-    4: { // MSP
+    4: {
+      // MSP
       icon: 'package',
-      route: ''
+      route: '',
     },
-    5: { // Reports
-      icon: 'trello',
-      route: ''
-    },
-    6: { // Security
+    5: reportsMenuItemConfiguration,
+    6: {
+      // Security
       icon: 'lock',
-      route: ''
+      route: '',
     },
-    7: { // Financial Module
+    7: {
+      // Financial Module
       icon: 'dollar-sign',
-      route: ''
+      route: '',
     },
-    8: { // Master Data
+    8: {
+      // Master Data
       icon: 'user',
-      route: '/admin/master-data'
+      route: '/admin/master-data',
     },
-    11: { // Organization List
+    11: {
+      // Organization List
       icon: '',
-      route: '/admin/client-management'
+      route: '/admin/client-management',
     },
-    12: { // Associated Agencies
+    12: {
+      // Associated Agencies
       icon: 'clock',
-      route: ''
+      route: '',
     },
-    13: { // Order Management
+    13: {
+      // Order Management
       icon: 'file-text',
-      route: '/client/order-management'
+      route: '/client/order-management',
     },
-    14: { // Candidates
+    14: {
+      // Candidates
       icon: 'file-text',
-      route: 'agency/candidates'
+      route: 'agency/candidates',
     },
-    15: { // Timesheets
+    15: {
+      // Timesheets
       icon: 'clock',
-      route: 'client/timesheets'
+      route: '',
     },
-    16: { // Invoices
+    16: {
+      // Invoices
       icon: 'dollar-sign',
-      route: ''
+      route: '',
     },
-    17: { // Reports
-      icon: 'trello',
-      route: ''
-    },
-    18: { // Settings
+    17: reportsMenuItemConfiguration,
+    18: {
+      // Settings
       icon: 'user',
-      route: '/admin/organization-management'
+      route: '/admin/organization-management',
     },
     19: {
       icon: '',
-      route: ''
+      route: '',
     },
-    20: { // Agency List
+    20: {
+      // Agency List
       icon: '',
-      route: 'agency/agency-list'
+      route: 'agency/agency-list',
     },
-    21: { // Associated Organizations
+    21: {
+      // Associated Organizations
       icon: 'file-text',
-      route: ''
+      route: '',
     },
-    22: { // Order Management
+    22: {
+      // Order Management
       icon: 'file-text',
-      route: 'agency/order-management'
+      route: 'agency/order-management',
     },
-    23: { // Candidates
+    23: {
+      // Candidates
       icon: 'file-text',
-      route: 'agency/candidates'
+      route: 'agency/candidates',
     },
-    24: { // Timesheets
+    24: {
+      // Timesheets
       icon: 'clock',
-      route: 'agency/timesheets'
+      route: '',
     },
-    25: { // Invoices
+    25: {
+      // Invoices
       icon: 'dollar-sign',
-      route: ''
+      route: '',
     },
-    26: { // Reports
-      icon: 'trello',
-      route: ''
-    },
-    27: { // Settings
+    26: reportsMenuItemConfiguration,
+    27: {
+      // Settings
       icon: '',
-      route: ''
+      route: '',
     },
-    29: { // MSP List
+    29: {
+      // MSP List
       icon: '',
-      route: ''
+      route: '',
     },
-    30: { // Roles & Permissions
+    30: {
+      // Roles & Permissions
       icon: '',
-      route: 'security/roles-and-permissions'
+      route: 'security/roles-and-permissions',
     },
-    31: { // User List
+    31: {
+      // User List
       icon: '',
-      route: 'security/user-list'
+      route: 'security/user-list',
     },
-    32 : {
-
-    }
   },
 
-  [BusinessUnitType.MSP] : {
-    1: { // Dashboard
+  [BusinessUnitType.MSP]: {
+    1: {
+      // Dashboard
       icon: 'home',
-      route: '/admin/dashboard'
+      route: '/admin/dashboard',
     },
-    2: { // Organization
+    2: {
+      // Organization
       icon: 'file-text',
-      route: '/admin/client-management'
+      route: '/admin/client-management',
     },
-    3: { // Agency
+    3: {
+      // Agency
       icon: 'clock',
-      route: 'agency/agency-list'
+      route: 'agency/agency-list',
     },
-    4: { // MSP
+    4: {
+      // MSP
       icon: 'package',
-      route: ''
+      route: '',
     },
-    5: { // Reports
-      icon: 'trello',
-      route: ''
-    },
-    6: { // Security
+    5: reportsMenuItemConfiguration,
+    6: {
+      // Security
       icon: 'lock',
-      route: ''
+      route: '',
     },
-    7: { // Financial Module
+    7: {
+      // Financial Module
       icon: 'dollar-sign',
-      route: ''
+      route: '',
     },
-    8: { // Master Data
+    8: {
+      // Master Data
       icon: 'user',
-      route: '/admin/master-data'
+      route: '/admin/master-data',
     },
-    11: { // Organization List
+    11: {
+      // Organization List
       icon: '',
-      route: '/admin/client-management'
+      route: '/admin/client-management',
     },
-    12: { // Associated Agencies
+    12: {
+      // Associated Agencies
       icon: 'clock',
-      route: ''
+      route: '',
     },
-    13: { // Order Management
+    13: {
+      // Order Management
       icon: 'file-text',
-      route: '/client/order-management'
+      route: '/client/order-management',
     },
-    14: { // Candidates
+    14: {
+      // Candidates
       icon: 'file-text',
-      route: 'agency/candidates'
+      route: 'agency/candidates',
     },
-    15: { // Timesheets
+    15: {
+      // Timesheets
       icon: 'clock',
-      route: 'agency/timesheets'
+      route: '',
     },
-    16: { // Invoices
+    16: {
+      // Invoices
       icon: 'dollar-sign',
-      route: ''
+      route: '',
     },
-    17: { // Reports
-      icon: 'trello',
-      route: ''
-    },
-    18: { // Settings
+    17: reportsMenuItemConfiguration,
+    18: {
+      // Settings
       icon: 'user',
-      route: '/admin/organization-management'
+      route: '/admin/organization-management',
     },
     19: {
       icon: '',
-      route: ''
+      route: '',
     },
-    20: { // Agency List
+    20: {
+      // Agency List
       icon: '',
-      route: 'agency/agency-list'
+      route: 'agency/agency-list',
     },
-    21: { // Associated Organizations
+    21: {
+      // Associated Organizations
       icon: 'file-text',
-      route: ''
+      route: '',
     },
-    22: { // Order Management
+    22: {
+      // Order Management
       icon: 'file-text',
-      route: 'agency/order-management'
+      route: 'agency/order-management',
     },
-    23: { // Candidates
+    23: {
+      // Candidates
       icon: 'file-text',
-      route: 'agency/candidates'
+      route: 'agency/candidates',
     },
-    24: { // Timesheets
+    24: {
+      // Timesheets
       icon: 'clock',
-      route: ''
+      route: '',
     },
-    25: { // Invoices
+    25: {
+      // Invoices
       icon: 'dollar-sign',
-      route: ''
+      route: '',
     },
-    26: { // Reports
-      icon: 'trello',
-      route: ''
-    },
-    27: { // Settings
+    26: reportsMenuItemConfiguration,
+    27: {
+      // Settings
       icon: '',
-      route: ''
+      route: '',
     },
-    29: { // MSP List
+    29: {
+      // MSP List
       icon: '',
-      route: ''
+      route: '',
     },
-    30: { // Roles & Permissions
+    30: {
+      // Roles & Permissions
       icon: '',
-      route: 'security/roles-and-permissions'
+      route: 'security/roles-and-permissions',
     },
-    31: { // User List
+    31: {
+      // User List
       icon: '',
-      route: 'security/user-list'
-    }
+      route: 'security/user-list',
+    },
   },
 
-  [BusinessUnitType.Organization] : {
-    1: { // Dashboard
+  [BusinessUnitType.Organization]: {
+    1: {
+      // Dashboard
       icon: 'home',
-      route: '/client/dashboard'
+      route: '/client/dashboard',
     },
-    2: { // Organization
+    2: {
+      // Organization
       icon: 'file-text',
-      route: ''
+      route: '',
     },
-    3: { // Agency
+    3: {
+      // Agency
       icon: 'clock',
-      route: 'agency/agency-list'
+      route: 'agency/agency-list',
     },
-    4: { // MSP
+    4: {
+      // MSP
       icon: 'package',
-      route: ''
+      route: '',
     },
-    5: { // Reports
-      icon: 'trello',
-      route: ''
-    },
-    6: { // Security
+    5: reportsMenuItemConfiguration,
+    6: {
+      // Security
       icon: 'lock',
-      route: ''
+      route: '',
     },
-    7: { // Financial Module
+    7: {
+      // Financial Module
       icon: 'dollar-sign',
-      route: ''
+      route: '',
     },
-    8: { // Master Data
+    8: {
+      // Master Data
       icon: 'user',
-      route: ''
+      route: '',
     },
-    11: { // Organization List
+    11: {
+      // Organization List
       icon: '',
-      route: ''
+      route: '',
     },
-    12: { // Associated Agencies
+    12: {
+      // Associated Agencies
       icon: 'clock',
-      route: ''
+      route: '',
     },
-    13: { // Order Management
+    13: {
+      // Order Management
       icon: 'file-text',
-      route: 'client/order-management'
+      route: 'client/order-management',
     },
-    14: { // Candidates
+    14: {
+      // Candidates
       icon: 'file-text',
-      route: 'agency/candidates'
+      route: 'agency/candidates',
     },
-    15: { // Timesheets
+    15: {
+      // Timesheets
       icon: 'clock',
       route: 'client/timesheets'
     },
-    16: { // Invoices
+    16: {
+      // Invoices
       icon: 'dollar-sign',
-      route: ''
+      route: '',
     },
-    17: { // Reports
-      icon: 'trello',
-      route: ''
-    },
-    18: { // Settings
+    17: reportsMenuItemConfiguration,
+    18: {
+      // Settings
       icon: 'user',
-      route: 'client/organization-management'
+      route: 'client/organization-management',
     },
-    19: { // User Management
+    19: {
+      // User Management
       icon: 'lock',
-      route: ''
+      route: '',
     },
-    20: { // Agency List
+    20: {
+      // Agency List
       icon: '',
-      route: 'agency/agency-list'
+      route: 'agency/agency-list',
     },
-    21: { // Associated Organizations
+    21: {
+      // Associated Organizations
       icon: 'file-text',
-      route: ''
+      route: '',
     },
-    22: { // Order Management
+    22: {
+      // Order Management
       icon: 'file-text',
-      route: ''
+      route: '',
     },
-    23: { // Candidates
+    23: {
+      // Candidates
       icon: 'file-text',
-      route: 'agency/candidates'
+      route: 'agency/candidates',
     },
-    24: { // Timesheets
+    24: {
+      // Timesheets
       icon: 'clock',
-      route: ''
+      route: '',
     },
-    25: { // Invoices
+    25: {
+      // Invoices
       icon: 'dollar-sign',
-      route: ''
+      route: '',
     },
-    26: { // Reports
-      icon: 'trello',
-      route: ''
-    },
-    27: { // Settings
+    26: reportsMenuItemConfiguration,
+    27: {
+      // Settings
       icon: '',
-      route: ''
+      route: '',
     },
-    29: { // MSP List
+    29: {
+      // MSP List
       icon: '',
-      route: ''
+      route: '',
     },
-    30: { // Roles & Permissions
+    30: {
+      // Roles & Permissions
       icon: '',
-      route: 'security/roles-and-permissions'
+      route: 'security/roles-and-permissions',
     },
-    31: { // User List
+    31: {
+      // User List
       icon: '',
-      route: 'security/user-list'
-    }
+      route: 'security/user-list',
+    },
   },
 
-  [BusinessUnitType.Agency] : {
-    1: { // Dashboard
+  [BusinessUnitType.Agency]: {
+    1: {
+      // Dashboard
       icon: 'home',
-      route: '/agency/dashboard'
+      route: '/agency/dashboard',
     },
-    2: { // Organization
+    2: {
+      // Organization
       icon: 'file-text',
-      route: ''
+      route: '',
     },
-    3: { // Agency
+    3: {
+      // Agency
       icon: 'clock',
-      route: 'agency/agency-list'
+      route: 'agency/agency-list',
     },
-    4: { // MSP
+    4: {
+      // MSP
       icon: 'package',
-      route: ''
+      route: '',
     },
-    5: { // Reports
-      icon: 'trello',
-      route: ''
-    },
-    6: { // Security
+    5: reportsMenuItemConfiguration,
+    6: {
+      // Security
       icon: 'lock',
-      route: ''
+      route: '',
     },
-    7: { // Financial Module
+    7: {
+      // Financial Module
       icon: 'dollar-sign',
-      route: ''
+      route: '',
     },
-    8: { // Master Data
+    8: {
+      // Master Data
       icon: 'user',
-      route: ''
+      route: '',
     },
-    11: { // Organization List
+    11: {
+      // Organization List
       icon: '',
-      route: ''
+      route: '',
     },
-    12: { // Associated Agencies
+    12: {
+      // Associated Agencies
       icon: 'clock',
-      route: ''
+      route: '',
     },
-    13: { // Order Management
+    13: {
+      // Order Management
       icon: 'file-text',
-      route: ''
+      route: '',
     },
-    14: { // Candidates
+    14: {
+      // Candidates
       icon: 'file-text',
-      route: 'agency/candidates'
+      route: 'agency/candidates',
     },
-    15: { // Timesheets
-      icon: 'clock',
-      route: 'agency/timesheets'
-    },
-    16: { // Invoices
-      icon: 'dollar-sign',
-      route: ''
-    },
-    17: { // Reports
-      icon: 'trello',
-      route: ''
-    },
-    18: { // Settings
-      icon: 'user',
-      route: ''
-    },
-    19: { // User Management
-      icon: 'lock',
-      route: ''
-    },
-    20: { // Agency List
-      icon: '',
-      route: 'agency/agency-list'
-    },
-    21: { // Associated Organizations
-      icon: 'file-text',
-      route: 'agency/profile'
-    },
-    22: { // Order Management
-      icon: 'file-text',
-      route: 'agency/order-management'
-    },
-    23: { // Candidates
-      icon: 'file-text',
-      route: 'agency/candidates'
-    },
-    24: { // Timesheets
+    15: {
+      // Timesheets
       icon: 'clock',
       route: 'agency/timesheets'
     },
-    25: { // Invoices
+    16: {
+      // Invoices
       icon: 'dollar-sign',
-      route: ''
+      route: '',
     },
-    26: { // Reports
-      icon: 'trello',
-      route: ''
-    },
-    27: { // Settings
+    17: reportsMenuItemConfiguration,
+    18: {
+      // Settings
       icon: 'user',
-      route: ''
+      route: '',
     },
-    28: { // User Management
+    19: {
+      // User Management
       icon: 'lock',
-      route: ''
+      route: '',
     },
-    29: { // MSP List
+    20: {
+      // Agency List
       icon: '',
-      route: ''
+      route: 'agency/agency-list',
     },
-    30: { // Roles & Permissions
-      icon: '',
-      route: 'security/roles-and-permissions'
+    21: {
+      // Associated Organizations
+      icon: 'file-text',
+      route: 'agency/profile',
     },
-    31: { // User List
+    22: {
+      // Order Management
+      icon: 'file-text',
+      route: 'agency/order-management',
+    },
+    23: {
+      // Candidates
+      icon: 'file-text',
+      route: 'agency/candidates',
+    },
+    24: {
+      // Timesheets
+      icon: 'clock',
+      route: 'agency/timesheets'
+    },
+    25: {
+      // Invoices
+      icon: 'dollar-sign',
+      route: '',
+    },
+    26: reportsMenuItemConfiguration,
+    27: {
+      // Settings
+      icon: 'user',
+      route: '',
+    },
+    28: {
+      // User Management
+      icon: 'lock',
+      route: '',
+    },
+    29: {
+      // MSP List
       icon: '',
-      route: 'security/user-list'
-    }
+      route: '',
+    },
+    30: {
+      // Roles & Permissions
+      icon: '',
+      route: 'security/roles-and-permissions',
+    },
+    31: {
+      // User List
+      icon: '',
+      route: 'security/user-list',
+    },
   },
-}
+};

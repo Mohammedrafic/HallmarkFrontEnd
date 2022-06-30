@@ -15,7 +15,7 @@ import {
 import { WorkflowService } from '@shared/services/workflow.service';
 import { ShowToast } from '../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_CANNOT_BE_SAVED, RECORD_MODIFIED } from '@shared/constants';
+import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_CANNOT_BE_SAVED, RECORD_MODIFIED, usedByOrderErrorMessage } from '@shared/constants';
 import {  WorkflowWithDetails } from '@shared/models/workflow.model';
 import { WorkflowMappingPage, WorkflowMappingPost } from '@shared/models/workflow-mapping.model';
 import { RolesPerUser, User } from '@shared/models/user-managment-page.model';
@@ -147,7 +147,10 @@ export class WorkflowState {
           dispatch(new GetWorkflowMappingPages(filters));
           return payload;
         }),
-        catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))
+        catchError((error: any) => {
+          const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Workflow', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+          return dispatch(new ShowToast(MessageTypes.Error, message));
+        })
       );
   }
 
