@@ -183,3 +183,9 @@ export class GetOrderFIlterDataSources {
   constructor() {
   }
 }
+
+export class GetHistoricalData {
+  static readonly type = '[agency order management] Get Historical Data';
+  constructor(public organizationId: number, public candidateJobId: number) {
+  }
+}

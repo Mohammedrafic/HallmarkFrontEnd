@@ -33,15 +33,6 @@
           <section class="order-details-form-section">
             <app-order-details-form #orderDetailsForm [isActive]="selectedTab === SelectedTab.OrderDetails"></app-order-details-form>
           </section>
-
-          <section class="bill-rates-section">
-            <app-bill-rates
-              #billRates
-              [billRates]="orderBillRates"
-              [isActive]="selectedTab === SelectedTab.OrderDetails"
-              (billRatesChanged)="onBillRatesChanged()">
-            </app-bill-rates>
-          </section>
         </ng-container>
       </ng-template>
     </e-tabitem>
@@ -60,6 +51,25 @@
           (credentialChanged)="onCredentialChanged($event)"
           (credentialDeleted)="onCredentialDeleted($event)"
           ></app-order-credentials>
+      </ng-template>
+    </e-tabitem>
+
+    <e-tabitem>
+      <ng-template #headerText>
+        <div class="stepper-header">
+          <div class="stepper-title">Bill Rates</div>
+          <div class="stepper-sub-title">Set Bill Rates</div>
+        </div>
+      </ng-template>
+      <ng-template #content>
+        <section class="bill-rates-section">
+          <app-bill-rates
+            #billRates
+            [billRates]="orderBillRates"
+            [isActive]="selectedTab === SelectedTab.BillRates"
+            (billRatesChanged)="onBillRatesChanged()">
+          </app-bill-rates>
+        </section>
       </ng-template>
     </e-tabitem>
   </e-tabitems>

@@ -25,7 +25,7 @@
   </section>
   <section class="content-container">
     <div class="job-details">
-      <ejs-accordion>
+      <ejs-accordion expandMode="Single">
         <e-accordionitems>
           <e-accordionitem expanded="true">
             <ng-template #header>
@@ -118,7 +118,7 @@
               <div>Historical Events</div>
             </ng-template>
             <ng-template #content>
-              <div>Historical Events</div>
+              <app-historical-events [organizationId]="candidateJob?.organizationId || -1" [candidateJobId]="candidate.candidateJobId"></app-historical-events>
             </ng-template>
           </e-accordionitem>
         </e-accordionitems>

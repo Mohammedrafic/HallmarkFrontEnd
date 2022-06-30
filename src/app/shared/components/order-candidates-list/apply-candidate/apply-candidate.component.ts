@@ -34,6 +34,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public readOnlyMode: boolean;
   public candidatStatus = CandidatStatus;
   public today = new Date();
+  public organizationId: number;
 
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
@@ -43,7 +44,6 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private unsubscribe$: Subject<void> = new Subject();
-  private organizationId: number;
   private candidateId: number;
 
 
