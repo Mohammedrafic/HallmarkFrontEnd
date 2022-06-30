@@ -13,7 +13,7 @@ import {
   Input, OnChanges, SimpleChanges
 } from '@angular/core';
 
-import { filter, Observable, takeUntil, throttleTime, debounceTime } from 'rxjs';
+import { filter, Observable, takeUntil, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 
@@ -221,6 +221,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   }
 
   handleApprove(): void {
+    const profile = JSON.parse(localStorage.getItem('profile') as string);
+
     if (this.isAgency) {
       const profile = JSON.parse(localStorage.getItem('profile') as string);
       profile.status = TIMETHEETS_STATUSES.PENDING_APPROVE;
@@ -244,15 +246,22 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
       const timesheet = JSON.parse(localStorage.getItem('timesheet-details-tables') as string);
       const temp = localStorage.getItem('submited-timsheets');
-      let submitted: any[];
+      let submitted: any;
 
       if (temp) {
         submitted = JSON.parse(temp);
       } else {
-        submitted = [];
+        submitted = {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          items: [],
+          pageNumber: 1,
+          totalCount: 1,
+          totalPages: 1,
+        };
       }
 
-      submitted.push(
+      submitted.items.push(
         {
           ...profile,
           timesheets: timesheet,
@@ -265,6 +274,50 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
         pageSize: 20,
       }, this.isAgency));
 
+    } else {
+
+      let approved: any;
+      profile.status = TIMETHEETS_STATUSES.ORG_APPROVED;
+      localStorage.setItem('profile', JSON.stringify(profile));
+
+      const timesheets = JSON.parse(localStorage.getItem('timesheets') as string);
+      const sheetIdx = timesheets.items.findIndex((item: any) => item.id === profile.id);
+      timesheets.items[sheetIdx].status = profile.status = TIMETHEETS_STATUSES.ORG_APPROVED;
+
+      const subm = JSON.parse(localStorage.getItem('submited-timsheets') as string);
+      const idx = subm.items.findIndex((item: any) => item.id === profile.id);
+      subm.items[sheetIdx].status = profile.status = TIMETHEETS_STATUSES.ORG_APPROVED;
+
+      localStorage.setItem('submited-timsheets', JSON.stringify(
+        {
+          ...subm,
+        }
+      ));
+
+      if (localStorage.getItem('approved-timesheets')) {
+        approved = localStorage.getItem('approved-timesheets');
+        approved.items.push(profile);
+      } else {
+        approved = {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          items: [profile],
+          pageNumber: 1,
+          totalCount: 1,
+          totalPages: 1,
+        };
+        localStorage.setItem('APPROVED_TIMESHEETS', JSON.stringify(approved));
+      }
+
+      localStorage.setItem('timesheets', JSON.stringify(
+        {
+          ...timesheets,
+        }
+      ));
+      this.store.dispatch(new Timesheets.GetAll({
+        pageNumber: 1,
+        pageSize: 20,
+      }, this.isAgency));
     }
   }
 }

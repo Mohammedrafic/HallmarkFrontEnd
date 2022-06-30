@@ -20,13 +20,13 @@ export class DemoService {
   createTimeSheets(orders: AgencyOrderManagement[]): any[] {
     const selectedOrders: any[] = [];
 
-    orders.forEach((order, i) => {
+    orders.forEach((order, idx) => {
       if (order.children.length > 0) {
           const timesheets = order.children.filter((child) => child.statusName === 'Onboard')
           .map((cand, index: number) => {
             return {
               ...cand,
-              id: index + 20 + i,
+              id: index + Math.random() * 7,
               department: order.department,
               startDate: new Date(order.jobStartDate),
               endDate: this.calcLastWorkDay(order.jobStartDate),

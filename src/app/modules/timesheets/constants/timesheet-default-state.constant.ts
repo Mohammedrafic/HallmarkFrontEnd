@@ -10,21 +10,7 @@ export const DEFAULT_TIMESHEETS_STATE: TimesheetsModel = {
   editDialogType: ProfileTimeSheetActionType.Add,
   profileDialogTimesheet: null,
   timesheetDetails: {
-    uploads: [
-      {
-        name: 'SandersP.pdf',
-        type: 'pdf',
-      },
-      {
-        name: 'SandersP.csv',
-        type: 'csv',
-      },
-    ],
-    invoices: [
-      {
-        id: '123',
-        name: 'Invoice_SenderP'
-      }
-    ],
+    uploads: [],
+    invoices: [],
   },
 }

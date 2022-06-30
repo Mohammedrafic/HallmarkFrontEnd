@@ -73,9 +73,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.initFormGroup();
     this.startPageStateWatching();
 
-    this.timesheets$.subscribe((data) => {
-      console.log(data)
-    })
+
   }
 
   public handleChangeTab(tabIndex: number): void {

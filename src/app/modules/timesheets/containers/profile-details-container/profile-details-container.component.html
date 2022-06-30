@@ -134,7 +134,7 @@
         </div>
         <ng-container *ngIf="uploadedFiles$ | async as uploads">
           <div class="tile-dark-blue profile-uploads" *ngIf="uploads.length">
-            <app-profile-uploads [uploads]="uploads"></app-profile-uploads>
+            <app-profile-uploads *ngIf="!uploads"></app-profile-uploads>
           </div>
         </ng-container>
 
