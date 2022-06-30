@@ -711,7 +711,7 @@ export class OrganizationManagementState {
 
   @Action(SaveUpdateCredentialSkillGroup)
   SaveUpdateSkillGroup({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: SaveUpdateCredentialSkillGroup): Observable<CredentialSkillGroup> {
-    return this.skillGroupService.saveUpdateSkillGroup(payload).pipe(tap((payload) => {
+    return this.skillGroupService.saveUpdateSkillGroup(payload).pipe(tap((response) => {
       patchState({ isSkillGroupLoading: false });
       if (payload.id) {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
@@ -719,7 +719,7 @@ export class OrganizationManagementState {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
       }
       dispatch(new GetCredentialSkillGroup());
-      return payload;
+      return response;
     }));
   }
 
