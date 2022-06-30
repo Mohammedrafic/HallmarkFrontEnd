@@ -158,7 +158,12 @@ export class DashboardService {
     mapData,
     applicantsByRegion,
   }: ApplicantsByRegionDataModel): CandidatesByStateWidgetAggregatedDataModel {
-    const maxCandidatesValue = flow(values, max)(applicantsByRegion);
+    const candidatesWithState = flow([
+      Object.entries,
+      (arr) => arr.filter(([key, value]: [key: string, value: number]) => key !== 'Unknown'),
+      Object.fromEntries,
+    ])(applicantsByRegion);
+    const maxCandidatesValue = flow(values, max)(candidatesWithState);
     const unknownStateCandidates = applicantsByRegion['Unknown'];
     const combinedData = { ...mapData, ...USAMapCandidatesDataLayerSettings };
     const dataSource = lodashMap(
