@@ -53,7 +53,6 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   public title = 'Add';
   public logo: Blob | null = null;
   public titles = Titles;
-  public businessUnitType = BusinessUnitType;
   public isMspUser = false;
 
   public createUnderFields = {
@@ -64,7 +63,12 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     text: 'text', value: 'id'
   };
 
+  get showDataBaseControl(): boolean {
+    return this.title === 'Add' && this.user?.businessUnitType === BusinessUnitType.Hallmark;
+  }
+
   private unsubscribe$: Subject<void> = new Subject();
+  private user: User | null;
 
   @Select(AdminState.countries)
   countries$: Observable<string[]>;
@@ -139,11 +143,13 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
       this.isMspUser = true;
       this.CreateUnderFormGroup.patchValue({ createUnder: user.businessUnitId });
     }
+    this.subscribeOnUser();
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+    this.user = null;
   }
 
   public save(): void {
@@ -313,7 +319,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     });
 
     this.dataBaseConnectionsFormGroup = this.fb.group({
-      connectionName: new FormControl(organization?.createUnder?.dbConnectionName ?? '', [Validators.required])
+      connectionName: new FormControl(organization?.createUnder?.dbConnectionName ?? '', this.showDataBaseControl ? [Validators.required] : [])
     });
 
 
@@ -388,5 +394,11 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
       this.store.dispatch(new SetBillingStatesByCountry(organization.billingDetails.country));
       this.store.dispatch(new SetDirtyState(false));
     }
+  }
+
+  private subscribeOnUser(): void {
+    this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe(user => {
+      this.user = user;
+    })
   }
 }
