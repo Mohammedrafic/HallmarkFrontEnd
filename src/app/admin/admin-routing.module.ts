@@ -75,6 +75,10 @@ const routes: Routes = [
       {
         path: 'timesheets',
         loadChildren: () => import('../modules/timesheets/timesheets.module').then((m) => m.TimesheetsModule),
+      },
+      {
+        path: 'invoices',
+        loadChildren: () => import('../modules/invoices/invoices.module').then((m) => m.InvoicesModule),
       }
     ],
   },

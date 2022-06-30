@@ -30,7 +30,6 @@ import { TimesheetsContainerComponent } from './containers/timesheets-container/
 import { TimesheetsTableComponent } from './components/timesheets-table/timesheets-table.component';
 import { TimesheetsState } from './store/state/timesheets.state';
 import { TimesheetsApiService } from './services/timesheets-api.service';
-import { TabDynamicNavigationComponent } from './components/tab-dynamic-navigation/tab-dynamic-navigation.component';
 import { ProfileDetailsContainerComponent } from './containers/profile-details-container/profile-details-container.component';
 import { ProfileTimesheetTableComponent } from './components/profile-timesheet-table/profile-timesheet-table.component';
 import { AddTimesheetComponent } from './components/add-timesheet/add-timesheet.component';
@@ -77,7 +76,6 @@ const gridIcons = {
   declarations: [
     TimesheetsContainerComponent,
     TimesheetsTableComponent,
-    TabDynamicNavigationComponent,
     ProfileDetailsContainerComponent,
     ProfileTimesheetTableComponent,
     AddTimesheetComponent,

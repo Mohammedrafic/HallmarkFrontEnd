@@ -1,9 +1,9 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tab-dynamic-navigation
+    <app-tabs-list
       [tabConfig]="tabConfig"
       (changeTab)="handleChangeTab($event)">
-    </app-tab-dynamic-navigation>
+    </app-tabs-list>
   </ng-container>
   <ng-container right>
     <app-search class="search"></app-search>
@@ -16,14 +16,7 @@
       (click)="showFilters()">
       Filters <i-feather name="sliders" class="icon"></i-feather>
     </button>
-    <button
-      ejs-dropdownbutton
-      [items]="exportOptions"
-      (select)="exportSelected($event)"
-      id="importButton"
-      cssClass="e-outline button-export button--no-wrap">
-      Export <i-feather name="download" class="icon"></i-feather>
-    </button>
+   <app-export-button (optionSelected)="exportSelected($event)"></app-export-button>
   </ng-container>
 </app-page-toolbar>
 

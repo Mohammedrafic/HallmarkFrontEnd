@@ -7,6 +7,7 @@ import {
   CheckCircle,
   User,
   Briefcase,
+  Download,
   Folder,
   MapPin,
   Calendar,
@@ -88,6 +89,8 @@ import { BillRateState } from "@shared/components/bill-rates/store/bill-rate.sta
 import { ChildOrderDialogComponent } from "@shared/components/child-order-dialog/child-order-dialog.component";
 import { RejectReasonDialogComponent } from './components/reject-reason-dialog/reject-reason-dialog.component';
 import { ClickOutsideDirective } from './directives/click-outside.directive';
+import { ExportButtonComponent } from './components/export-button/export-button.component';
+import { TabsListComponent } from './components/tabs-list/tabs-list.component';
 
 const icons = {
   AlertCircle,
@@ -99,11 +102,12 @@ const icons = {
   Folder,
   MapPin,
   Calendar,
+  Download,
   Mail,
   Send,
   Edit,
   Plus,
-  Trash2
+  Trash2,
 };
 
 const COMPONENTS = [
@@ -146,7 +150,8 @@ const COMPONENTS = [
   RejectReasonDialogComponent,
   GridSubrowCandidateComponent,
   BillRatesComponent,
-  ChildOrderDialogComponent
+  ChildOrderDialogComponent,
+  ExportButtonComponent,
 ];
 
 @NgModule({
@@ -180,8 +185,8 @@ const COMPONENTS = [
     TabAllModule,
     NgxsModule.forFeature([BillRateState]),
   ],
-  exports: [...COMPONENTS],
-  declarations: [...COMPONENTS, ErrorMessageComponent, BillRateFormComponent, BillRatesGridComponent],
+  exports: [...COMPONENTS, TabsListComponent],
+  declarations: [...COMPONENTS, ErrorMessageComponent, BillRateFormComponent, BillRatesGridComponent, TabsListComponent],
   providers: [
     DatePipe,
     ColumnMenuService,

@@ -1,0 +1,8 @@
+<button
+  ejs-dropdownbutton
+  [items]="options"
+  (select)="optionSelected.emit($event)"
+  id="importButton"
+  cssClass="e-outline button-export button--no-wrap">
+  Export <i-feather name="download" class="icon"></i-feather>
+</button>
