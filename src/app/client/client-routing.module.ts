@@ -66,20 +66,20 @@ const routes: Routes = [
         component: ReportsContentComponent,
       },
       {
-        path: 'organization-management',
-        loadChildren: () =>
-          import('../organization-management/organization-management.module').then((m) => m.OrganizationManagementModule),
-        //     canLoad: [ AdminGuard ],
-        //     canActivate: [ AdminGuard ]
-      },
-      {
         path: 'timesheets',
         loadChildren: () => import('../modules/timesheets/timesheets.module').then((m) => m.TimesheetsModule),
         data: {
           isOrganizationArea: true,
           isAgencyArea: false,
         }
-      }
+      },
+      {
+        path: 'organization-management',
+        loadChildren: () =>
+          import('../organization-management/organization-management.module').then((m) => m.OrganizationManagementModule),
+        //     canLoad: [ AdminGuard ],
+        //     canActivate: [ AdminGuard ]
+      },
     ],
   },
 ];
