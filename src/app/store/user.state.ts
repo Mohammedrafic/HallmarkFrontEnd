@@ -180,11 +180,13 @@ export class UserState {
   @Action(SaveLastSelectedOrganizationAgencyId)
   SaveLastSelectedOrganizationAgencyId(
     { dispatch }: StateContext<UserStateModel>,
-    { payload }: SaveLastSelectedOrganizationAgencyId
+    { payload, isOrganizationId }: SaveLastSelectedOrganizationAgencyId
   ): Observable<LasSelectedOrganizationAgency> {
     return this.userService.saveLastSelectedOrganizationAgencyId(payload).pipe(map(() => {
       dispatch(new SetLastSelectedOrganizationAgencyId(payload));
-      dispatch(new GetOrganizationStructure());
+      if (isOrganizationId) {
+        dispatch(new GetOrganizationStructure());
+      }
       return payload;
     }));
   }
