@@ -1,0 +1,58 @@
+@import '../../../../styles/variables/colors';
+
+::ng-deep {
+  .profile-details-reject-reason-dialog {
+    font-family: 'Open Sans', sans-serif;
+
+    h2 {
+      margin: 0;
+      padding: 20px 18px 18px 18px;
+      font-weight: 700;
+      font-size: 24px;
+      color: $black;
+    }
+
+    .content {
+      padding: 18px 18px;
+
+      .description {
+        font-weight: 400;
+        font-size: 16px;
+        color: $pure-black;
+        margin-bottom: 18px;
+      }
+
+      .input-title {
+        font-weight: 400;
+        font-size: 14px;
+        color: $secondary-dark-blue-15;
+        margin-bottom: 2px;
+      }
+    }
+
+    h2, .content {
+      border-bottom: 1px solid $secondary-dark-blue-45;
+    }
+
+    .e-dlg-content {
+      padding: 0 !important;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 16px 14px;
+
+      button {
+        margin-left: 10px;
+      }
+    }
+
+    .reject-reason-input {
+      textarea {
+        height: 100px !important;
+      }
+    }
+  }
+}

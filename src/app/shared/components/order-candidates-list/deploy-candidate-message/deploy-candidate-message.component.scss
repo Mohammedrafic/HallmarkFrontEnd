@@ -1,0 +1,14 @@
+@import "colors";
+
+.warning-deployed-candidate {
+  margin-left: 5px;
+  margin-top: 0.7rem;
+  color: $primary-active-blue;
+  font-size: 1rem;
+  span {
+    font-weight: 700;
+  }
+  .icon {
+    margin-right: 5px;
+  }
+}

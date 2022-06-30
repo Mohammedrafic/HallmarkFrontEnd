@@ -25,4 +25,12 @@
   --widget-status-onboard-filled: #{mix($primary-active-blue-30, $primary-active-blue-60, 65%)};
   --widget-status-in-progress: #{mix($primary-active-blue, $primary-active-blue-60, 65%)};
   --widget-status-custom: #{mix($secondary-dark-blue-15, $primary-active-blue-60, 65%)};
+
+  --form-control-gap-y: 15px;
+  --form-control-gap-x: 12px;
+
+  --grid-background-color: #{$white};
+  --grid-border-color: #{$grid-row-border};
+  --grid-border-radius: 12px;
+  --grid-row-background-color-hover: #{$primary-active-blue-90}
 }

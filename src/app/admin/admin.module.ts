@@ -1,3 +1,4 @@
+import { TimesheetsModule } from './../modules/timesheets/timesheets.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -107,7 +108,7 @@ const sidebarIcons = {
     MaskedTextBoxModule,
     MultiSelectAllModule,
     DropDownButtonModule,
-
+    TimesheetsModule,
     FeatherModule.pick(sidebarIcons),
 
     //STORE

@@ -2,7 +2,13 @@
   <section class="header-container">
     <div class="e-card-header">
       <div class="e-card-header-caption candidat-status">
-        <h3 class="e-card-title">{{candidate?.lastName}}, {{candidate?.firstName}}</h3>
+        <div class="deploy-candidate-wrapper">
+          <h3 class="e-card-title candidate-title">
+            {{candidate?.lastName}}, {{candidate?.firstName}}
+            <i-feather name="briefcase" class="icon" *ngIf="isDeployedAndAgency"></i-feather>
+          </h3>
+          <app-deploy-candidate-message *ngIf="isDeployedAndAgency" [candidate]="candidate"></app-deploy-candidate-message>
+        </div>
         <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
           <e-chips>
             <e-chip [text]="candidatStatus[candidate.candidateStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
@@ -42,7 +48,7 @@
                     <div class="input-container bootstrap">
                       <label class="input-group">Job ID</label>
                       <div class="input-group input-readonly">
-                        <input appValidateWithMessage formControlName="jobId" class="e-input" type="text" placeholder="Job ID" readonly/>
+                        <input appValidateWithMessage formControlName="jobId" class="e-input" type="text" readonly/>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
@@ -54,13 +60,13 @@
                     <div class="input-container bootstrap">
                       <label class="input-group">Candidates</label>
                       <div class="input-group input-readonly">
-                        <input appValidateWithMessage formControlName="candidates" class="e-input" type="text" placeholder="Candidates" readonly/>
+                        <input appValidateWithMessage formControlName="candidates" class="e-input" type="text" readonly/>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Guaranteed Work Week</label>
                       <div class="input-group">
-                        <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" placeholder="Guaranteed Work Week" maxlength="50"/>
+                        <input appValidateWithMessage formControlName="workWeek" class="e-input" type="text" maxlength="50"/>
                       </div>
                     </div>
                   </div>
@@ -68,25 +74,25 @@
                     <div class="input-container bootstrap">
                       <label class="input-group">Bill Rate</label>
                       <div class="input-group input-readonly">
-                        <input appValidateWithMessage formControlName="billRates" class="e-input" type="text" placeholder="Input text" readonly/>
+                        <input appValidateWithMessage formControlName="billRates" class="e-input" type="text" readonly/>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Location</label>
                       <div class="input-group input-readonly">
-                        <input appValidateWithMessage formControlName="locationName" class="e-input" type="text" placeholder="Location" readonly/>
+                        <input appValidateWithMessage formControlName="locationName" class="e-input" type="text" readonly/>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Candidate Bill Rate</label>
                       <div class="input-group input-readonly">
-                        <input appValidateWithMessage formControlName="candidateBillRate" class="e-input" type="text" placeholder="Input text" readonly/>
+                        <input appValidateWithMessage formControlName="candidateBillRate" class="e-input" type="text" readonly/>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Clock ID </label>
                       <div>
-                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" placeholder="Clock ID" maxlength="50"/>
+                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" maxlength="50"/>
                       </div>
                     </div>
                   </div>
@@ -94,26 +100,26 @@
                 <div class="input-container bootstrap">
                   <label class="input-group">Available Start Date</label>
                   <div class="input-group input-readonly">
-                    <input appValidateWithMessage formControlName="avStartDate" class="e-input" type="text" placeholder="Input text" readonly/>
+                    <input appValidateWithMessage formControlName="avStartDate" class="e-input" type="text" readonly/>
                   </div>
                 </div>
                 <div class="form-container row">
                   <div class="input-container bootstrap">
                     <label class="input-group">Yrs. of Exp.</label>
                     <div class="input-group input-readonly">
-                      <input appValidateWithMessage formControlName="yearExp" class="e-input" type="text" placeholder="0" readonly/>
+                      <input appValidateWithMessage formControlName="yearExp" class="e-input" type="text" readonly/>
                     </div>
                   </div>
                   <div class="input-container bootstrap">
                     <label class="input-group">Exp. as Travelers</label>
                     <div class="input-group input-readonly">
-                      <input appValidateWithMessage formControlName="travelExp" class="e-input" type="text" placeholder="0" readonly/>
+                      <input appValidateWithMessage formControlName="travelExp" class="e-input" type="text" readonly/>
                     </div>
                   </div>
                   <div class="input-container bootstrap">
                     <label class="input-group">Offered Bill Rate</label>
                     <div class="input-group">
-                      <input appValidateWithMessage formControlName="offeredBillRate" class="e-input" type="text" placeholder="$ 0.00"/>
+                      <input appValidateWithMessage formControlName="offeredBillRate" class="e-input" type="text"/>
                     </div>
                   </div>
                 </div>
@@ -192,6 +198,12 @@
     <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
   </section>
 </section>
+
+<app-reject-reason-dialog
+  [rejectReasonsList]="rejectReasons"
+  [openEvent]="openRejectDialog"
+  (applyReject)="onRejectCandidate($event)"
+></app-reject-reason-dialog>
 
 <app-reject-reason-dialog
   [rejectReasonsList]="rejectReasons"

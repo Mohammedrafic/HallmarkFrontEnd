@@ -32,12 +32,13 @@ import {
   UpdateCredentialSetup,
   UpdateCredentialSetupSucceeded
 } from '@organization-management/store/credentials.actions';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 @Component({
   selector: 'app-credentials-setup',
   templateUrl: './credentials-setup.component.html',
   styleUrls: ['./credentials-setup.component.scss'],
-  providers: [FreezeService]
+  providers: [FreezeService, MaskedDateTimeService]
 })
 export class CredentialsSetupComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;

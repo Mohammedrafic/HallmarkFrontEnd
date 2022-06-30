@@ -182,10 +182,10 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       departmentIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       skillIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'skillDescription', valueId: 'id' },
-      billRateTitleIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'title', valueId: 'id' },
-      orderTypeIds:  { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      billRatesCategory: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      billRatesType: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      billRateConfigIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'title', valueId: 'id' },
+      orderTypes:  { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      billRateCategories: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
+      billRateTypes: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       effectiveDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       intervalMin: { type: ControlTypes.Text, valueType: ValueType.Text },
       intervalMax: { type: ControlTypes.Text, valueType: ValueType.Text },
@@ -197,11 +197,11 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       displayInJob: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Display in Job'},
     }
 
-    this.filterColumns.billRatesCategory.dataSource = Object.values(BillRateCategory)
+    this.filterColumns.billRateCategories.dataSource = Object.values(BillRateCategory)
       .filter(valuesOnly)
       .map((name, id) => ({ name, id }));
 
-    this.filterColumns.billRatesType.dataSource = Object.values(BillRateType)
+    this.filterColumns.billRateTypes.dataSource = Object.values(BillRateType)
       .filter(valuesOnly)
       .map((name, id) => ({ name, id }));
 
@@ -221,7 +221,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRatesOptions$.pipe(takeUntil(this.unsubscribe$)).subscribe(options => {
       if (options && options.length > 0) {
         this.billRatesOptions = options;
-        this.filterColumns.billRateTitleIds.dataSource = options;
+        this.filterColumns.billRateConfigIds.dataSource = options;
       }
     });
 
@@ -231,7 +231,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       this.store.dispatch(new GetBillRates(this.filters));
     });
 
-    this.filterColumns.orderTypeIds.dataSource = OrderTypeOptions;
+    this.filterColumns.orderTypes.dataSource = OrderTypeOptions;
 
     this.intervalMinField = this.billRatesFormGroup.get('intervalMin') as AbstractControl;
     this.intervalMinField.addValidators(intervalMinValidator(this.billRatesFormGroup, 'intervalMax'));
@@ -475,10 +475,10 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       locationIds: this.filters.locationIds || [],
       departmentIds: this.filters.departmentIds || [],
       skillIds: this.filters.skillIds || [],
-      billRateTitleIds: this.filters.billRateTitleIds || [],
-      orderTypeIds: this.filters.orderTypeIds || [],
-      billRatesCategory: this.filters.billRatesCategory || [],
-      billRatesType: this.filters.billRatesType || [],
+      billRateConfigIds: this.filters.billRateConfigIds || [],
+      orderTypes: this.filters.orderTypes || [],
+      billRateCategories: this.filters.billRateCategories || [],
+      billRateTypes: this.filters.billRateTypes || [],
       effectiveDate: this.filters.effectiveDate || null,
       intervalMin: this.filters.intervalMin || null,
       intervalMax: this.filters.intervalMax || null,
@@ -495,6 +495,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public onFilterApply(): void {
     this.filters = this.billRateFilterFormGroup.getRawValue();
+    this.filters.effectiveDate = this.filters.effectiveDate || null;
     this.filteredItems = this.filterService.generateChips(this.billRateFilterFormGroup, this.filterColumns, this.datePipe);
     this.filteredItems$.next(this.filteredItems.length);
     this.store.dispatch(new GetBillRates({
@@ -532,10 +533,10 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       locationIds: [[]],
       departmentIds: [[]],
       skillIds: [[]],
-      billRateTitleIds: [[]],
-      orderTypeIds: [[]],
-      billRatesCategory: [[]],
-      billRatesType: [[]],
+      billRateConfigIds: [[]],
+      orderTypes: [[]],
+      billRateCategories: [[]],
+      billRateTypes: [[]],
       effectiveDate: [null],
       intervalMin: [null],
       intervalMax: [null],

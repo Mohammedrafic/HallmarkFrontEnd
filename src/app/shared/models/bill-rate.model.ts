@@ -111,11 +111,11 @@ export class BillRateFilters {
   locationIds?: number[];
   departmentIds?: number[];
   skillIds?: number[];
-  orderTypeIds?: number[];
+  orderTypes?: number[];
   billRateTitleIds?: number[];
   billRateConfigIds?: string[];
-  billRatesCategory?: string[];
-  billRatesType?: string[];
+  billRateCategories?: string[];
+  billRateTypes?: string[];
   effectiveDate?: Date | null;
   intervalMin?: number | null;
   intervalMax?: number | null;

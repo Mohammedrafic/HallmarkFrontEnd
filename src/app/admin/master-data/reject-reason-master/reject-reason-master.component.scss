@@ -19,6 +19,12 @@
       width: 100% !important;
     }
   }
+
+  .grid-component {
+    overflow-y: auto;
+    height: 100%;
+  }
+
 }
 
 .reason-form {

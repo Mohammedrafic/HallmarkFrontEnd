@@ -48,3 +48,10 @@ export class OrganizationSettingValueOptions {
   key: string;
   value: string;
 }
+
+export class OrganizationSettingFilter {
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentIds?: number[];
+  attributes?: string[];
+}

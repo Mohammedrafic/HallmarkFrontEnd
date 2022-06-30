@@ -9,7 +9,8 @@
     "test": "ng test",
     "test-headless": "ng test --watch=false --browsers=ChromeHeadless",
     "test-coverage": "ng test --code-coverage",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "postinstall": "ngcc --properties es2015 browser module main"
   },
   "private": true,
   "dependencies": {
@@ -38,6 +39,9 @@
     "@syncfusion/ej2-angular-splitbuttons": "^20.1.47",
     "@syncfusion/ej2-layouts": "^20.1.47",
     "@syncfusion/ej2-notifications": "^20.1.47",
+    "@ag-grid-community/core": "27.3.0",
+    "@ag-grid-community/angular": "27.3.0",
+    "@ag-grid-community/client-side-row-model": "27.3.0",
     "angular-feather": "^6.3.0",
     "lodash": "^4.17.21",
     "ngx-mask": "13.1.15",

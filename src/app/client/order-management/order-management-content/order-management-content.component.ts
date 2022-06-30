@@ -11,6 +11,7 @@ import { OrderManagemetTabs } from '@client/order-management/order-management-co
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
   ApproveOrder,
+  ClearSelectedOrder,
   DeleteOrder,
   DeleteOrderSucceeded,
   GetAgencyOrderCandidatesList,
@@ -275,6 +276,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   ngOnDestroy(): void {
+    this.store.dispatch(new ClearSelectedOrder());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }

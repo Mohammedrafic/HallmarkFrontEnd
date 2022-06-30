@@ -17,4 +17,15 @@
       width: 26px;
     }
   }
+  .icon {
+    color: $primary-active-blue-10;
+    width: 14px !important;
+    height: 14px !important;
+    padding-left: 5px;
+  }
+
+}
+
+.e-tooltip-wrap .e-arrow-tip .e-tip-bottom {
+  display: none;
 }

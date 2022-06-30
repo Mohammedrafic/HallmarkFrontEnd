@@ -13,7 +13,7 @@ import {
 } from '@organization-management/store/bill-rates.actions';
 import { BillRatesService } from '@shared/services/bill-rates.service';
 import {
-  RECORD_ADDED,
+  RECORD_ADDED, RECORD_ALREADY_EXISTS,
   RECORD_CANNOT_BE_DELETED,
   RECORD_CANNOT_BE_SAVED,
   RECORD_CANNOT_BE_UPDATED,
@@ -112,7 +112,13 @@ export class BillRatesState {
           return payloadResponse;
         }),
         catchError((error: any) => {
-          return dispatch(new ShowToast(MessageTypes.Error, error && error.error && error.error.detail ? error.error.detail : RECORD_CANNOT_BE_SAVED))
+          let message;
+          if (error.status === 400) {
+            message = RECORD_ALREADY_EXISTS;
+          } else {
+            message = error.error?.detail || RECORD_CANNOT_BE_SAVED;
+          }
+          return dispatch(new ShowToast(MessageTypes.Error, message))
         }));
   }
 

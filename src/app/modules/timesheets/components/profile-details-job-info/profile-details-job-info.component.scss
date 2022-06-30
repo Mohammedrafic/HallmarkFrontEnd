@@ -1,0 +1,32 @@
+@import '../../../../styles/variables/colors';
+
+.job-info-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  .job-info-section {
+    display: flex;
+    margin-right: 25px;
+  }
+
+  i-feather {
+    color: $secondary-dark-blue-40;
+    margin-right: 5px;
+  }
+
+  .title {
+    font-weight: 400;
+    font-size: 12px;
+    color: $secondary-dark-blue-30;
+  }
+
+  .value {
+    font-weight: 700;
+    font-size: 12px;
+    white-space: nowrap;
+    color: $black;
+    min-width: 70px;
+  }
+}
+

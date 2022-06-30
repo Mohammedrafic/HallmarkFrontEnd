@@ -95,6 +95,10 @@ export type OrderCandidatesList = {
   statusName: string;
   submissionsPercentage: number;
   candidateJobId: number;
+  deployedCandidateInfo: null | {
+    jobId: number;
+    organizationId: number;
+  };
   candidateStatus?: CandidateStatus;
 };
 
@@ -268,7 +272,9 @@ export type OrderCandidateJob = {
     applicantStatus: number;
     statusText: string;
   };
-  billRates: BillRate[],
+  billRates: BillRate[];
+  organizationName: string;
+  positionId: number;
   allowDeployCredentials: boolean;
   hasAllRequiredOnboardedCredentials: boolean;
 };

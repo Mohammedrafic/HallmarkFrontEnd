@@ -1,0 +1,19 @@
+<div class="app-grid">
+  <ag-grid-angular
+    (gridReady)="handleGridReadyEvent($event)"
+    [columnDefs]="columnDefinitions"
+    [defaultColDef]="defaultColumnDefinition"
+    [modules]="modules"
+    [rowData]="rowData"
+    [rowHeight]="gridConfig.initialRowHeight"
+    [headerHeight]="52"
+    class="ag-theme-alpine app-grid__component"
+  ></ag-grid-angular>
+  <app-grid-pagination
+    (navigateToPageEmitter)="navigateToPageEmitter.emit($event)"
+    (pageSizeChangeEmitter)="pageSizeChangeEmitter.emit($event)"
+    [currentPage]="currentPage"
+    [pageSize]="pageSize"
+    [totalRecordsCount]="totalRecordsCount"
+  ></app-grid-pagination>
+</div>
