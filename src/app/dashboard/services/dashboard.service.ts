@@ -40,6 +40,8 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { ActivePositionsDto, ActivePositionTypeInfo } from '../models/active-positions-dto.model';
 import { MONTHS } from '../constants/months';
 import { PositionByTypeDto, PositionsByTypeResponseModel } from '../models/positions-by-type-response.model';
+import { widgetTypes } from '../constants/widget-types';
+
 import { activePositionsLegendPalette } from '../constants/active-positions-legend-palette';
 import { ActivePositionsChartStatuses } from '../enums/active-positions-legend-palette.enum';
 import { candidateLegendPalette } from '../constants/candidate-legend-palette';
@@ -107,10 +109,10 @@ export class DashboardService {
   private getWidgetList(): Observable<WidgetOptionModel[]> {
     return this.httpClient.get<AvailableWidgetsResponseModel>(`${this.baseUrl}/AvailableWidgets`).pipe(
       map((response: AvailableWidgetsResponseModel) =>
-        response.widgetTypes.map((widget) => {
+        response.widgetTypes.map((widget: WidgetOptionModel) => {
           return {
             ...widget,
-            id: widget.title.replace(/[ ,]+/g, "_") as WidgetTypeEnum,
+            id: widgetTypes[widget.widgetType],
           };
         })
       )
@@ -156,6 +158,7 @@ export class DashboardService {
     applicantsByRegion,
   }: ApplicantsByRegionDataModel): CandidatesByStateWidgetAggregatedDataModel {
     const maxCandidatesValue = flow(values, max)(applicantsByRegion);
+    const unknownStateCandidates = applicantsByRegion['Unknown'];
     const combinedData = { ...mapData, ...USAMapCandidatesDataLayerSettings };
     const dataSource = lodashMap(
       (stateDefinition: Record<string, string>) => ({
@@ -169,7 +172,7 @@ export class DashboardService {
       colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
 
-    return { chartData: [{ ...combinedData, dataSource, shapeSettings }] };
+    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates };
   }
 
   private getDashboardState(): Observable<PanelModel[]> {

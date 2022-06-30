@@ -6,6 +6,13 @@
     display: block;
   }
 
+  &__legend {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+  }
+
   &__range-line {
     height: 16px;
     border-radius: 4px;
@@ -15,5 +22,23 @@
   &__range-values {
     text-align: center;
     margin-top: 10px;
+  }
+
+  &__unknown-candidates {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 4px;
+  }
+
+  &__text {
+    font-size: 14px;
+    color: $secondary-dark-blue-20;
+    line-height: 20px;
+  }
+
+  &__number {
+    font-size: 16px;
+    font-weight: 700;
+    color: $black;
   }
 }
