@@ -172,7 +172,9 @@
   </ng-template>
 </ejs-dialog>
 
-<app-timesheet-reject-reason-dialog [(visible)]="rejectReasonDialogVisible"
-                                    [container]="profileDetailsDialogsTarget"
+<app-timesheet-reject-reason-dialog
+  [(visible)]="rejectReasonDialogVisible"
+  [container]="profileDetailsDialogsTarget"
+  (rejectReasonChange)="handleReject($event)"
 ></app-timesheet-reject-reason-dialog>
 <app-add-timesheet [profileId]="profileId" (updateTable)="handleUpdateTable()"></app-add-timesheet>

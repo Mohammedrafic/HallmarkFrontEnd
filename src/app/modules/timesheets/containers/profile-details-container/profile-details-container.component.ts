@@ -228,6 +228,26 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     }
   }
 
+  public handleReject(reason: string): void {
+    const profile = JSON.parse(localStorage.getItem('profile') as string);
+    profile.status = TIMETHEETS_STATUSES.REJECTED;
+
+    const timesheets = JSON.parse(localStorage.getItem('timesheets') as string);
+    const submitedTimesheets = JSON.parse(localStorage.getItem('submited-timsheets') as string);
+
+    const newTimesheets = this.patchStatus(timesheets, profile.id, TIMETHEETS_STATUSES.REJECTED);
+    const newSubmitedTimesheets = this.patchStatus(submitedTimesheets, profile.id, TIMETHEETS_STATUSES.REJECTED);
+
+    localStorage.setItem('profile', JSON.stringify(profile));
+    localStorage.setItem('timesheets', JSON.stringify(newTimesheets));
+    localStorage.setItem('submited-timsheets', JSON.stringify(newSubmitedTimesheets));
+
+    this.store.dispatch(new Timesheets.GetAll({
+      pageNumber: 1,
+      pageSize: 20,
+    }, this.isAgency));
+  }
+
   handleApprove(): void {
     const profile = JSON.parse(localStorage.getItem('profile') as string);
 
@@ -327,5 +347,16 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
         pageSize: 20,
       }, this.isAgency));
     }
+  }
+
+  private patchStatus(oldObject: any, profileId: number, status: TIMETHEETS_STATUSES): any {
+    return Object.assign({}, oldObject, {
+      items: oldObject.items.map((el: any) => ({
+        ...el,
+        ...(el.id === profileId && {
+          status
+        })
+      }))
+    });
   }
 }
