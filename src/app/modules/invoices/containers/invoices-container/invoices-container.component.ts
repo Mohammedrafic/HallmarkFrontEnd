@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Select, Store } from "@ngxs/store";
 import { SetHeaderState, ShowFilterDialog } from "../../../../store/app.actions";
 import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
@@ -14,7 +14,8 @@ import { Destroyable } from "@core/helpers";
 @Component({
   selector: 'app-invoices-container',
   templateUrl: './invoices-container.component.html',
-  styleUrls: ['./invoices-container.component.scss']
+  styleUrls: ['./invoices-container.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoicesContainerComponent extends Destroyable implements OnInit {
   public readonly tabsConfig: TabsListConfig[] = [

@@ -1,189 +1,189 @@
 <ejs-grid
-  #grid
-  [dataSource]="tableData?.items"
-  [allowPaging]="allowPaging"
-  [pageSettings]="pageSettings"
-  [height]="gridHeight"
-  [rowHeight]="rowHeight"
-  [resizeSettings]="resizeSettings"
-  [allowSorting]="allowSorting"
-  [allowResizing]="allowResizing"
-  [allowTextWrap]="true"
-  [selectionSettings]="selectionSettings"
-  [textWrapSettings]="wrapSettings"
-  (rowSelected)="rowSelected($event)"
+    #grid
+    [dataSource]="tableData?.items"
+    [allowPaging]="allowPaging"
+    [pageSettings]="pageSettings"
+    [height]="gridHeight"
+    [rowHeight]="rowHeight"
+    [resizeSettings]="resizeSettings"
+    [allowSorting]="allowSorting"
+    [allowResizing]="allowResizing"
+    [allowTextWrap]="true"
+    [selectionSettings]="selectionSettings"
+    [textWrapSettings]="wrapSettings"
+    (rowSelected)="rowSelected($event)"
 >
-  <e-columns>
-    <e-column
-      type="checkbox"
-      [customAttributes]="{ class: 'bootstrap' }"
-      [width]="50">
-    </e-column>
-    <e-column
-      field="weekPeriod"
-      headerText="WEEK PERIOD"
-    >
-      <ng-template #template let-data>
-        {{data.weekPeriod}}
-      </ng-template>
-    </e-column>
-    <e-column field="organization" headerText="Organization">
-      <ng-template #template let-data>
-        {{data.organization}}
-      </ng-template>
-    </e-column>
-    <e-column
-      field="location"
-      headerText="LOCATION"
-    >
-      <ng-template #template let-data>
-        {{data.location}}
-      </ng-template>
-    </e-column>
-    <e-column
-            field="location"
-            headerText="LOCATION"
-    >
-      <ng-template #template let-data>
-        {{data.location}}
-      </ng-template>
-    </e-column>
-    <e-column
-      field="department"
-      headerText="DEPARTMENT"
-    >
-      <ng-template #template let-data>
-        {{data.department}}
-      </ng-template>
-    </e-column>
-    <e-column
-      field="candidate"
-      headerText="CANDIDATE"
-      textAlign="Left"
-    >
-      <ng-template #template let-data>
-        <div class="candidate">{{data.candidate}}</div>
-      </ng-template>
-    </e-column>
-    <e-column
-            field="rate"
-            headerText="RATE"
-            textAlign="Right"
-            [width]="100"
-    >
-      <ng-template #template let-data>
-        <div class="number-bold">{{data.rate | number : '1.2-2'}}</div>
-      </ng-template>
-    </e-column>
+    <e-columns>
+        <e-column
+                type="checkbox"
+                [customAttributes]="{ class: 'bootstrap' }"
+                [width]="50">
+        </e-column>
+        <e-column
+                field="weekPeriod"
+                headerText="WEEK PERIOD"
+        >
+            <ng-template #template let-data>
+                {{data.weekPeriod}}
+            </ng-template>
+        </e-column>
+        <e-column field="organization" headerText="Organization">
+            <ng-template #template let-data>
+                {{data.organization}}
+            </ng-template>
+        </e-column>
+        <e-column
+                field="location"
+                headerText="LOCATION"
+        >
+            <ng-template #template let-data>
+                {{data.location}}
+            </ng-template>
+        </e-column>
+        <e-column
+                field="location"
+                headerText="LOCATION"
+        >
+            <ng-template #template let-data>
+                {{data.location}}
+            </ng-template>
+        </e-column>
+        <e-column
+                field="department"
+                headerText="DEPARTMENT"
+        >
+            <ng-template #template let-data>
+                {{data.department}}
+            </ng-template>
+        </e-column>
+        <e-column
+                field="candidate"
+                headerText="CANDIDATE"
+                textAlign="Left"
+        >
+            <ng-template #template let-data>
+                <div class="candidate">{{data.candidate}}</div>
+            </ng-template>
+        </e-column>
+        <e-column
+                field="rate"
+                headerText="RATE"
+                textAlign="Right"
+                [width]="100"
+        >
+            <ng-template #template let-data>
+                <div class="number-bold">{{data.rate | number : '1.2-2'}}</div>
+            </ng-template>
+        </e-column>
 
-    <e-column
-            field="bonus"
-            headerText="BONUS"
-            textAlign="Right"
-            [width]="100"
-    >
-      <ng-template #template let-data>
-        <div class="number-bold">{{data.bonus | number : '1.2-2'}}</div>
-      </ng-template>
-    </e-column>
+        <e-column
+                field="bonus"
+                headerText="BONUS"
+                textAlign="Right"
+                [width]="100"
+        >
+            <ng-template #template let-data>
+                <div class="number-bold">{{data.bonus | number : '1.2-2'}}</div>
+            </ng-template>
+        </e-column>
 
-    <e-column
-            field="hours"
-            headerText="HOURS"
-            textAlign="Right"
-            [width]="100"
-    >
-      <ng-template #template let-data>
-        <div class="number-bold">{{data.hours | number : '1.2-2'}}</div>
-      </ng-template>
-    </e-column>
+        <e-column
+                field="hours"
+                headerText="HOURS"
+                textAlign="Right"
+                [width]="100"
+        >
+            <ng-template #template let-data>
+                <div class="number-bold">{{data.hours | number : '1.2-2'}}</div>
+            </ng-template>
+        </e-column>
 
-    <e-column
-      field="amount"
-      headerText="AMOUNT"
-      textAlign="Right"
-      [width]="100"
-    >
-      <ng-template #template let-data>
-        <div class="number-bold">{{data.amount | number : '1.2-2'}}</div>
-      </ng-template>
-    </e-column>
-    <e-column
-      headerTextAlign="Right"
-      freeze="Right"
-      [width]="112"
-    >
-      <ng-template #headerTemplate let-data>
-        <div class="controls-header">
-          <button ejs-button cssClass="e-flat icon-button">
-<!--            (click)="onRowScaleUpClick()"-->
-            <span><i-feather name="menu" class="icon"></i-feather></span>
-          </button>
-          <button ejs-button cssClass="e-flat icon-button">
-<!--            (click)="onRowScaleDownClick()"-->
-            <span><i-feather name="align-justify" class="icon"></i-feather></span>
-          </button>
+        <e-column
+                field="amount"
+                headerText="AMOUNT"
+                textAlign="Right"
+                [width]="100"
+        >
+            <ng-template #template let-data>
+                <div class="number-bold">{{data.amount | number : '1.2-2'}}</div>
+            </ng-template>
+        </e-column>
+        <e-column
+                headerTextAlign="Right"
+                freeze="Right"
+                [width]="112"
+        >
+            <ng-template #headerTemplate let-data>
+                <div class="controls-header">
+                    <button ejs-button cssClass="e-flat icon-button">
+                        <!--            (click)="onRowScaleUpClick()"-->
+                        <span><i-feather name="menu" class="icon"></i-feather></span>
+                    </button>
+                    <button ejs-button cssClass="e-flat icon-button">
+                        <!--            (click)="onRowScaleDownClick()"-->
+                        <span><i-feather name="align-justify" class="icon"></i-feather></span>
+                    </button>
+                </div>
+            </ng-template>
+            <ng-template #template let-data>
+                <div class="row-tool-buttons" (click)="stopPropagation($event)">
+                    <button ejs-button cssClass="e-flat default-icon-button">
+                        <span><i-feather name="message-square" class="icon"></i-feather></span>
+                    </button>
+                    <button ejs-button cssClass="e-flat secondary-icon-button" *ngIf="isLockMenuButtonsShown">
+                        <span><i-feather name="lock" class="icon"></i-feather></span>
+                    </button>
+<!--                    <button-->
+<!--                            ejs-dropdownbutton-->
+<!--                            [items]="data.isMoreMenuWithDeleteButton ? moreMenuWithDelete : moreMenuWithClose"-->
+<!--                            (select)="menuOptionSelected($event, data)"-->
+<!--                            cssClass="e-flat primary-icon-button"-->
+<!--                    >-->
+<!--                        <span><i-feather name="more-vertical" class="icon"></i-feather></span>-->
+<!--                    </button>-->
+                </div>
+            </ng-template>
+        </e-column>
+    </e-columns>
+
+    <ng-template #pagerTemplate let-data>
+        <div class="e-pagertemplate">
+            <div class="control-section">
+                <div class="content-wrapper">
+                    <section class="left-side-pager-controls">
+                        <ejs-dropdownlist
+                                id="rowsPerPage"
+                                class="dropdown-no-border"
+                                [dataSource]="rowsPerPageDropDown"
+                                [(value)]="activeRowsPerPageDropDown"
+                                (change)="updatePageSize($event)"
+                        ></ejs-dropdownlist>
+                        <ejs-numerictextbox
+                                id="goToPage"
+                                class="numeric-input-no-border"
+                                format="#"
+                                [validateDecimalOnType]="validateDecimalOnType"
+                                [decimals]="decimals"
+                                placeholder="Go to:"
+                                min="1"
+                                [max]="tableData?.totalPages"
+                                [showSpinButton]="false"
+                                (change)="goToPage($event)"
+                        ></ejs-numerictextbox>
+                    </section>
+                    <section class="right-side-pager-controls">
+                        <ejs-pager
+                                id="gridPager"
+                                #gridPager
+                                [pageSize]="pageSize"
+                                [totalRecordsCount]="data.totalRecordsCount"
+                                [enablePagerMessage]="false"
+                                [currentPage]="tableData?.pageNumber"
+                                (click)="updateCurrentPage($event)"
+                        ></ejs-pager>
+                    </section>
+                </div>
+            </div>
         </div>
-      </ng-template>
-      <ng-template #template let-data>
-        <div class="row-tool-buttons" (click)="stopPropagation($event)">
-          <button ejs-button cssClass="e-flat default-icon-button">
-            <span><i-feather name="message-square" class="icon"></i-feather></span>
-          </button>
-          <button ejs-button cssClass="e-flat secondary-icon-button" *ngIf="isLockMenuButtonsShown">
-            <span><i-feather name="lock" class="icon"></i-feather></span>
-          </button>
-          <button
-            ejs-dropdownbutton
-            [items]="data.isMoreMenuWithDeleteButton ? moreMenuWithDelete : moreMenuWithClose"
-            (select)="menuOptionSelected($event, data)"
-            cssClass="e-flat primary-icon-button"
-          >
-            <span><i-feather name="more-vertical" class="icon"></i-feather></span>
-          </button>
-        </div>
-      </ng-template>
-    </e-column>
-  </e-columns>
-
-  <ng-template #pagerTemplate let-data>
-    <div class="e-pagertemplate">
-      <div class="control-section">
-        <div class="content-wrapper">
-          <section class="left-side-pager-controls">
-            <ejs-dropdownlist
-              id="rowsPerPage"
-              class="dropdown-no-border"
-              [dataSource]="rowsPerPageDropDown"
-              [(value)]="activeRowsPerPageDropDown"
-              (change)="updatePageSize($event)"
-            ></ejs-dropdownlist>
-            <ejs-numerictextbox
-              id="goToPage"
-              class="numeric-input-no-border"
-              format="#"
-              [validateDecimalOnType]="validateDecimalOnType"
-              [decimals]="decimals"
-              placeholder="Go to:"
-              min="1"
-              [max]="tableData?.totalPages"
-              [showSpinButton]="false"
-              (change)="goToPage($event)"
-            ></ejs-numerictextbox>
-          </section>
-          <section class="right-side-pager-controls">
-            <ejs-pager
-              id="gridPager"
-              #gridPager
-              [pageSize]="pageSize"
-              [totalRecordsCount]="data.totalRecordsCount"
-              [enablePagerMessage]="false"
-              [currentPage]="tableData?.pageNumber"
-              (click)="updateCurrentPage($event)"
-            ></ejs-pager>
-          </section>
-        </div>
-      </div>
-    </div>
-  </ng-template>
+    </ng-template>
 </ejs-grid>
