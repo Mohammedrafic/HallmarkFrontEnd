@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+.app-dropdown {
+  ::ng-deep {
+    .e-control-wrapper {
+      border: none !important;
+    }
+  }
+}

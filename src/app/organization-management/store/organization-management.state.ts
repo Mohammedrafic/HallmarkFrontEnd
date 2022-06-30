@@ -141,7 +141,7 @@ export interface OrganizationManagementStateModel {
   isOrganizationSettingsLoading: boolean;
   organizationSettings: OrganizationSettingsGet[];
   skillDataSource: SkillDataSource;
-  allOrganizationSkills: SkillsPage | null;
+  allOrganizationSkills: Skill[] | null;
   locationFilterOptions: LocationFilterOptions | null;
   departmentFilterOptions: DepartmentFilterOptions | null;
 }
@@ -265,7 +265,7 @@ export class OrganizationManagementState {
   static skillDataSource(state: OrganizationManagementStateModel): SkillDataSource { return state.skillDataSource; }
 
   @Selector()
-  static allOrganizationSkills(state: OrganizationManagementStateModel): SkillsPage | null { return state.allOrganizationSkills; }
+  static allOrganizationSkills(state: OrganizationManagementStateModel): Skill[] | null { return state.allOrganizationSkills; }
 
   @Selector()
   static locationFilterOptions(state: OrganizationManagementStateModel): LocationFilterOptions | null { return state.locationFilterOptions; }
@@ -800,7 +800,7 @@ export class OrganizationManagementState {
   };
 
   @Action(GetAllOrganizationSkills)
-  GetAllOrganizationSkills({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetAllOrganizationSkills): Observable<SkillsPage> {
+  GetAllOrganizationSkills({ patchState }: StateContext<OrganizationManagementStateModel>, { }: GetAllOrganizationSkills): Observable<Skill[]> {
     return this.skillsService.getAllOrganizationSkills().pipe(tap(skills => {
       patchState({ allOrganizationSkills: skills });
       return skills;
