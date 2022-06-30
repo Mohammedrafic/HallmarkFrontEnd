@@ -301,6 +301,7 @@ export class OrderFilter {
   jobStartDate?: Date;
   jobEndDate?: Date;
   orderStatuses?: number[];
+  candidateStatues?: number[];
   candidatesCountFrom?: number;
   candidatesCountTo?: number;
   agencyIds?: number[];
@@ -312,12 +313,13 @@ export class OrderPartnerAgency {
   name: string;
 }
 
-export class FilterOrderStatus {
+export class FilterStatus {
   status: number;
   statusText: string;
 }
 
 export class OrderFilterDataSource {
   partneredAgencies: OrderPartnerAgency[];
-  orderStatus: FilterOrderStatus[];
+  orderStatus: FilterStatus[];
+  candidateStatuses: FilterStatus[];
 }
