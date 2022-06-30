@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
 
 import { RejectReason } from "@shared/models/reject-reason.model";
 import { Observable, Subject, takeUntil } from "rxjs";
@@ -22,7 +22,7 @@ import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/
   templateUrl: './accept-candidate.component.html',
   styleUrls: ['./accept-candidate.component.scss']
 })
-export class AcceptCandidateComponent implements OnInit, OnDestroy {
+export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Output() closeModalEvent: EventEmitter<void> = new EventEmitter();
 
   @Input() candidate: OrderCandidatesList;
@@ -36,19 +36,23 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
 
   form: FormGroup;
 
+  get isRejected(): boolean {
+    return this.isReadOnly && this.candidate.status === ApplicantStatusEnum.Rejected;
+  }
+
   public candidateJob: OrderCandidateJob;
   public candidatStatus = CandidatStatus;
   public billRatesData: BillRate[] = [];
   public rejectReasons: RejectReason[] = [];
-  public isRejected = false;
+  public isReadOnly = false;
   public openRejectDialog = new Subject<boolean>();
 
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private store: Store, private actions$: Actions, private datePipe: DatePipe) { }
 
-  public ngOnChanges(): void {
-    this.checkRejectReason();
+  ngOnChanges(): void {
+    this.checkReadOnlyStatuses();
   }
 
   ngOnInit(): void {
@@ -67,7 +71,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
   public onClose(): void {
     this.closeModalEvent.emit();
     this.billRatesData = [];
-    this.isRejected = false;
+    this.isReadOnly = false;
   }
 
   public onAccept(): void {
@@ -100,7 +104,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
   }
 
   public rejectCandidateJob(event: {rejectReason: number}): void {
-    this.isRejected = true;
+    this.isReadOnly = true;
+    this.candidate.status = ApplicantStatusEnum.Rejected;
 
     if(this.candidateJob) {
       const payload = {
@@ -175,9 +180,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy {
     });
   }
 
-  private checkRejectReason(): void {
-    if(this.candidate.status === ApplicantStatusEnum.Rejected) {
-      this.isRejected = true;
+  private checkReadOnlyStatuses(): void {
+    const readOnlyStatuses = [ApplicantStatusEnum.Rejected, ApplicantStatusEnum.Applied, ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.OnBoarded];
+    if (readOnlyStatuses.includes(this.candidate.status)) {
+      this.isReadOnly = true;
     }
   }
 }

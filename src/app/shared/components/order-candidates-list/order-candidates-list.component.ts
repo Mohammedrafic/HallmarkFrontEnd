@@ -85,8 +85,9 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
       const isOrganization = this.router.url.includes('client');
 
       if (isAgency) {
-        const allowedApplyStatuses = [ApplicantStatus.NotApplied, ApplicantStatus.Applied, ApplicantStatus.Shortlisted, ApplicantStatus.OnBoarded];
-        const allowedAcceptStatuses = [ApplicantStatus.Offered, ApplicantStatus.Accepted, ApplicantStatus.Rejected];
+        const allowedApplyStatuses = [ApplicantStatus.NotApplied];
+        const allowedAcceptStatuses = [ApplicantStatus.Offered, ApplicantStatus.Accepted, ApplicantStatus.Rejected,
+                                       ApplicantStatus.Applied, ApplicantStatus.Shortlisted, ApplicantStatus.OnBoarded];
 
         if (allowedApplyStatuses.includes(this.candidate.status)) {
           this.store.dispatch(new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId));
