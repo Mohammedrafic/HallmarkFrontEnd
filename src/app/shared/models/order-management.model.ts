@@ -104,6 +104,27 @@ export type OrderCandidatesList = {
 
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;
 
+export type AgencyOrderFilters = {
+  orderBy?: string;
+  pageNumber?: number;
+  pageSize?: number;
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentsIds?: number[];
+  orderId?: number;
+  skillIds?: number[];
+  candidateStatuses?: number[];
+  organizationIds?: number[];
+  orderTypes?: number[];
+  orderStatuses?: number[];
+  jobTitle?: string;
+  billRateFrom?: number;
+  billRateTo?: number;
+  openPositions?: number;
+  jobStartDate?: Date;
+  jobEndDate?: Date;
+};
+
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
 
 export type AgencyOrder = {

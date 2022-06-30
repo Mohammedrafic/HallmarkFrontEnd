@@ -3,6 +3,7 @@ import { map, Observable, switchMap } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import {
   AcceptJobDTO,
+  AgencyOrderFilters,
   AgencyOrderManagementPage,
   ApplicantStatus,
   CreateOrderDto,
@@ -48,8 +49,8 @@ export class OrderManagementContentService {
    @param pageNumber
    @param pageSize
    */
-  public getAgencyOrders(pageNumber: number, pageSize: number /** TODO: Add filter params */): Observable<AgencyOrderManagementPage> {
-    return this.http.get<AgencyOrderManagementPage>(`/api/Orders/agencyOrders`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+  public getAgencyOrders(pageNumber: number, pageSize: number, filters: AgencyOrderFilters): Observable<AgencyOrderManagementPage> {
+    return this.http.post<AgencyOrderManagementPage>(`/api/Agency/Orders`, { pageNumber, pageSize, ...filters });
   }
 
   /**
