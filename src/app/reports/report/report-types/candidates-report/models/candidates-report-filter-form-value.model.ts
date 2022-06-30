@@ -1,4 +1,4 @@
-export interface ReportFilterFormValueModel {
+export interface CandidatesReportFilterFormValueModel {
   candidateName: string;
   agencies: number[];
   skills: number[];
