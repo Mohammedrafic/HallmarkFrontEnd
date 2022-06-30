@@ -13,6 +13,21 @@
     margin-left: 8px;
   }
 
+  .deploy-candidate-wrapper{
+    display: flex;
+    flex-direction: row;
+
+    @media(max-width: 2500px) {
+      flex-direction: column;
+      .candidate-title {
+        white-space: nowrap;
+      }
+    }
+    .icon {
+      color: $primary-active-blue;
+    }
+  }
+
   .content-container {
     display: flex;
     margin-top: 24px;

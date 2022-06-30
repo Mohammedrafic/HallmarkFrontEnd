@@ -91,6 +91,7 @@ import { ExportButtonComponent } from './components/export-button/export-button.
 import { TabsListComponent } from './components/tabs-list/tabs-list.component';
 import { PageToolbarModule } from '@shared/components/page-toolbar/page-toolbar.module';
 import { FilterDialogModule } from '@shared/components/filter-dialog/filter-dialog.module';
+import { DeployCandidateMessageComponent } from './components/order-candidates-list/deploy-candidate-message/deploy-candidate-message.component';
 
 const icons = {
   AlertCircle,
@@ -150,6 +151,7 @@ const COMPONENTS = [
   BillRatesComponent,
   ChildOrderDialogComponent,
   ExportButtonComponent,
+  DeployCandidateMessageComponent
 ];
 
 @NgModule({

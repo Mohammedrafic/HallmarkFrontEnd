@@ -22,6 +22,7 @@ import {
 } from "@client/store/order-managment-content.actions";
 import { ApplicantStatus as ApplicantStatusEnum, } from "@shared/enums/applicant-status.enum";
 import { RejectReason } from "@shared/models/reject-reason.model";
+import { GetCandidateJob } from '@agency/store/order-management.actions';
 import { ShowToast } from "../../../../store/app.actions";
 import { MessageTypes } from "@shared/enums/message-types";
 
@@ -43,6 +44,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   @Input() candidate: OrderCandidatesList;
   @Input() isTab: boolean = false;
+  @Input() isAgency: boolean = false;
 
   public form: FormGroup;
   public jobStatusControl: FormControl;
@@ -64,6 +66,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   get endDateControl(): AbstractControl | null {
     return this.form.get('endDate');
+  }
+
+  get isDeployedAndAgency(): boolean {
+    return this.isAgency && !!this.candidate.deployedCandidateInfo
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -202,6 +208,9 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     } else {
       this.form.enable();
       this.isOnboarded = true;
+    }
+    if(this.candidate.deployedCandidateInfo && !this.isAgency) {
+      this.form.disable()
     }
   }
 

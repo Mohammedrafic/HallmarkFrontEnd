@@ -6,7 +6,11 @@ import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from "@shared/
 import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { Observable, Subject, takeUntil } from "rxjs";
 
-import { ApplyOrderApplicants, ApplyOrderApplicantsSucceed, ReloadOrderCandidatesLists } from "@agency/store/order-management.actions";
+import {
+  ApplyOrderApplicants,
+  ApplyOrderApplicantsSucceed,
+  ReloadOrderCandidatesLists
+} from "@agency/store/order-management.actions";
 import { OrderManagementState } from "@agency/store/order-management.state";
 import { BillRate } from "@shared/models/bill-rate.model";
 import { OrderApplicantsInitialData } from "@shared/models/order-applicants.model";
@@ -24,6 +28,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() candidate: OrderCandidatesList;
   @Input() billRatesData: BillRate[] = [];
   @Input() isTab: boolean = false;
+  @Input() isAgency: boolean = false;
 
   public formGroup: FormGroup;
   public readOnlyMode: boolean;
@@ -33,15 +38,24 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
 
+  get isDeployedAndAgency(): boolean {
+    return this.isAgency && !!this.candidate.deployedCandidateInfo
+  }
+
   private unsubscribe$: Subject<void> = new Subject();
   private organizationId: number;
   private candidateId: number;
 
-  constructor(private store: Store, private actions$: Actions) { }
+
+  constructor(private store: Store, private actions$: Actions) {
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['candidate']) {
       this.readOnlyMode = changes['candidate'].currentValue.status !== ApplicantStatusEnum.NotApplied;
+    }
+    if(this.candidate.deployedCandidateInfo && this.isAgency) {
+      this.readOnlyMode = true
     }
   }
 
@@ -112,6 +126,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
         this.setFormValue(data);
       }
     });
+
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ApplyOrderApplicantsSucceed)).subscribe(() => {
       this.readOnlyMode = true;
     });

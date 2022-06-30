@@ -81,10 +81,9 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
 
     if (this.order && this.candidate) {
       // TODO: find better approach
-      const isAgency = this.router.url.includes('agency');
       const isOrganization = this.router.url.includes('client');
 
-      if (isAgency) {
+      if (this.isAgency()) {
         const allowedApplyStatuses = [ApplicantStatus.NotApplied];
         const allowedAcceptStatuses = [ApplicantStatus.Offered, ApplicantStatus.Accepted, ApplicantStatus.Rejected,
                                        ApplicantStatus.Applied, ApplicantStatus.Shortlisted, ApplicantStatus.OnBoarded];
@@ -93,7 +92,9 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
           this.store.dispatch(new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId));
           this.openDialog(this.apply);
         } else if (allowedAcceptStatuses.includes(this.candidate.status)) {
-          this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
+          if (!this.candidate.deployedCandidateInfo) {
+            this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
+          }
           this.openDialog(this.accept);
         }
       } else if (isOrganization) {
@@ -114,6 +115,11 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
 
   public onCloseDialog(): void {
     this.sideDialog.hide();
+  }
+
+  public isAgency(): boolean{
+    // TODO: find better approach
+    return this.router.url.includes('agency');
   }
 
   private subscribeOnPageChanges(): void {
