@@ -1,0 +1,85 @@
+@import '../../../../styles/variables/colors';
+
+.e-grid {
+  border-radius: 12px;
+
+  .e-row {
+    .e-checkbox-wrapper .e-frame.e-check, body.light .e-css.e-checkbox-wrapper .e-frame.e-check {
+      background-color: #fff;
+      color: $primary-active-blue-10;
+    }
+
+    .red-text {
+      font-weight: 700;
+      color: $supportive-red;
+    }
+
+    .e-rowcell a {
+      font-weight: 700;
+      color: $primary-active-blue-10;
+    }
+  }
+
+  &.e-gridhover tr[role=row]:not(.e-editedrow):hover .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
+    background-color: $primary-active-blue-90 !important;
+  }
+
+  & td.e-active {
+    background-color: $primary-active-blue-70;
+    color: $black !important;
+  }
+
+  .e-success-row {
+    background-color: $supportive-green-50;
+  }
+
+  .align-right {
+    text-align: right;
+  }
+
+  .e-sortnumber {
+    display: none;
+  }
+
+  .e-sortfilterdiv.e-icons.e-descending.e-icon-descending {
+    float: right;
+  }
+
+  .controls-header,
+  .row-tool-buttons {
+    display: flex;
+    justify-content: end;
+    cursor: pointer;
+
+    .icon {
+      margin: 0;
+    }
+  }
+
+  .row-tool-buttons {
+    display: flex;
+    cursor: pointer;
+  }
+
+  .e-item-active {
+    color: $primary-active-blue;
+  }
+}
+
+.e-btn-icon.e-icons.e-icon-right.e-caret {
+  display: none;
+}
+
+.candidate {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  color: $primary-active-blue-10;
+}
+
+.number-bold {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  color: $black;
+}
