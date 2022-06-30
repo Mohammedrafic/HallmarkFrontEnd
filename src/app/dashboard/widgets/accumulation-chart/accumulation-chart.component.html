@@ -29,10 +29,14 @@
     >
       <div class="widget-legend__item-content">
         <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onClickLegend(legend.label)"></ejs-checkbox>
-        <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"></div>
-        <div class="widget-legend__legend-text">{{ legend.label }}</div>
+        <div class="widget-legend__row-container" (click)="redirectToSourceContent()">
+          <div class="widget-legend__row">
+            <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"></div>
+            <div class="widget-legend__legend-text">{{ legend.label }}</div>
+          </div>
+          <div class="app-accumulation-chart__legend-score">{{ legend.value }}</div>
+        </div>
       </div>
-      <div class="app-accumulation-chart__legend-score">{{ legend.value }}</div>
     </div>
   </ng-template>
 </app-widget-wrapper>

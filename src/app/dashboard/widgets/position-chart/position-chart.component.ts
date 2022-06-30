@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { Router } from '@angular/router';
 import { CandidatesPositionDataModel } from '../../models/candidates-positions.model';
+import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-position-chart',
@@ -17,7 +17,7 @@ export class PositionChartComponent {
     y: 0,
   };
 
-  constructor(private readonly router: Router) {}
+  constructor(private readonly dashboardService: DashboardService) {}
 
   public mouseDown($event: MouseEvent): void {
     this.mousePosition.x = $event.screenX;
@@ -26,7 +26,7 @@ export class PositionChartComponent {
 
   public toSourceContent(event: MouseEvent): void {
     if (this.mousePosition.x === event.screenX && this.mousePosition.y === event.screenY) {
-      this.router.navigateByUrl('client/order-management');
+      this.dashboardService.redirectToUrl('client/order-management');
     }
   }
 }
