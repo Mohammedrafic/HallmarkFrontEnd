@@ -54,12 +54,11 @@ import { ORDER_CONTACT_DETAIL_TITLES, ORDER_EDITS } from '@shared/constants';
 import PriceUtils from '@shared/utils/price.utils';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { SkillCategory } from '@shared/models/skill-category.model';
-import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { OrderStatus } from '@shared/enums/order-management';
 import { disableControls } from '@shared/utils/form.utils';
-import {AlertService} from "@shared/services/alert.service";
-import {ConfirmService} from "@shared/services/confirm.service";
+import { AlertService } from '@shared/services/alert.service';
+import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
 
 @Component({
   selector: 'app-order-details-form',
@@ -385,6 +384,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       }
 
       this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
+      this.store.dispatch(new GetPredefinedCredentials(departmentId, skillId));
     });
 
     combineLatest([
@@ -694,7 +694,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.orderStatus = order.statusText;
     this.orderTypeForm.controls['orderType'].patchValue(order.orderType);
     this.generalInformationForm.controls['title'].patchValue(order.title);
-    this.generalInformationForm.controls['skillId'].patchValue(order.skillId);
+
+    this.skills$.pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => this.generalInformationForm.controls['skillId'].patchValue(order.skillId));
+
     this.generalInformationForm.controls['hourlyRate'].patchValue(hourlyRate);
     this.generalInformationForm.controls['openPositions'].patchValue(order.openPositions);
     this.generalInformationForm.controls['minYrsRequired'].patchValue(order.minYrsRequired);
@@ -704,10 +707,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.controls['shiftRequirementId'].patchValue(order.shiftRequirementId);
     this.generalInformationForm.controls['shiftStartTime'].patchValue(order.shiftStartTime);
     this.generalInformationForm.controls['shiftEndTime'].patchValue(order.shiftEndTime);
-    this.specialProject.controls['projectTypeId'].patchValue(order.projectTypeId);
-    this.specialProject.controls['projectNameId'].patchValue(order.projectNameId);
-    this.specialProject.controls['reasonForRequestId'].patchValue(order.reasonForRequestId);
-    this.specialProject.controls['poNumberId'].patchValue(order.poNumberId);
+
+    this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() =>{
+        this.specialProject.controls['projectTypeId'].patchValue(order.projectTypeId);
+        this.specialProject.controls['projectNameId'].patchValue(order.projectNameId);
+        this.specialProject.controls['reasonForRequestId'].patchValue(order.reasonForRequestId);
+        this.specialProject.controls['poNumberId'].patchValue(order.poNumberId);
+      });
 
     if (order.regionId) {
       this.store.dispatch(new GetLocationsByRegionId(order.regionId)).pipe(take(1)).subscribe(() => {
@@ -740,7 +747,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       .map(jobDistribution => jobDistribution.agencyId);
 
     this.jobDistributionForm.controls['jobDistribution'].patchValue(jobDistributionValues);
-    this.jobDistributionForm.controls['agency'].patchValue(agencyValues);
+
+    this.associateAgencies$.pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => this.jobDistributionForm.controls['agency'].patchValue(agencyValues));
+
     this.jobDistributionForm.controls['jobDistributions'].patchValue(order.jobDistributions);
 
     this.jobDescriptionForm.controls['classification'].patchValue(order.classification);
@@ -772,9 +782,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.workLocationsFormArray.push(this.newWorkLocationFormGroup());
     }
 
-    this.workflowForm.controls['workflowId'].patchValue(order.workflowId);
-
-    this.disableFormControls(order);
+    setTimeout(() => {
+      this.workflowForm.controls['workflowId'].patchValue(order.workflowId);
+      this.disableFormControls(order);
+    }, 1000);
   }
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {

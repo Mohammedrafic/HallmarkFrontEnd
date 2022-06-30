@@ -28,6 +28,7 @@
     class="grid-component"
     [dataSource]="(rejectReasonPage$ | async)?.items"
     [allowSorting]="false"
+    [height]="fullScreenGridHeight"
     [allowResizing]="true"
     [allowSelection]="false"
     [resizeSettings]="resizeSettings"
@@ -35,7 +36,6 @@
     [enableVirtualization]="true"
     [pageSettings]="pageSettings"
     [rowHeight]="rowHeight"
-    [height]="gridHeight"
   >
     <e-columns>
       <e-column field="reason" headerText="Reason" textAlign="Left" ></e-column>

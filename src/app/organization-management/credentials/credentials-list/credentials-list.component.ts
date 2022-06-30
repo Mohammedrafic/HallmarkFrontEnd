@@ -1,6 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { combineLatestWith, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { combineLatestWith, filter, Observable, Subject, takeUntil, tap, throttleTime } from 'rxjs';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
@@ -303,7 +303,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   }
 
   private mapGridData(): void {
-    this.credentials$.pipe(combineLatestWith(this.credentialTypes$),
+    this.credentials$.pipe(combineLatestWith(this.credentialTypes$), tap(() => this.gridDataSource = []),
       filter(([credentials, credentialTypes]) => credentials?.items?.length > 0 && credentialTypes.length > 0))
       .subscribe(([credentials, credentialTypes]) => {
         this.lastAvailablePage = credentials.totalPages;

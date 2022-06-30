@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
@@ -24,6 +24,8 @@ const EDIT_DIALOG_TITLE = 'Edit Role';
   styleUrls: ['./roles-and-permissions.component.scss'],
 })
 export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
+  @ViewChild('roleForm') roleForm: RoleFormComponent;
+
   @Select(SecurityState.bussinesData)
   public bussinesData$: Observable<BusinessUnit[]>;
 
@@ -34,7 +36,7 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
   public businessUnits = BUSINESS_UNITS_VALUES;
   public optionFields = OPRION_FIELDS;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
-  public roleId: number;
+  public roleId: number | null;
 
   get dialogTitle(): string {
     return this.isEditRole ? EDIT_DIALOG_TITLE : DEFAULT_DIALOG_TITLE;
@@ -78,9 +80,7 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
         ofActionSuccessful(SaveRoleSucceeded),
         takeWhile(() => this.isAlive)
       )
-      .subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false));
-      });
+      .subscribe(() => this.closeDialog());
 
     this.bussinesData$.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       this.existingRoleName = data.map(({ name }) => name);
@@ -114,19 +114,20 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
         })
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
-          this.store.dispatch(new ShowSideDialog(false));
+          this.closeDialog();
         });
     } else {
-      this.store.dispatch(new ShowSideDialog(false));
+      this.closeDialog();
     }
   }
 
   public onSave(): void {
     this.roleFormGroup.markAllAsTouched();
-    if (this.roleFormGroup.valid) {
+    if (this.roleFormGroup.valid && !this.roleForm.showActiveError) {
       const value = this.roleFormGroup.getRawValue();
       const roleDTO: RoleDTO = {
         ...value,
+        id: this.roleId,
         businessUnitId: value.businessUnitId || null,
         permissions: value.permissions.map((stringValue: string) => Number(stringValue)),
       };
@@ -179,5 +180,10 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
         this.businessControl.patchValue(0);
       }
     });
+  }
+
+  private closeDialog(): void {
+    this.store.dispatch(new ShowSideDialog(false));
+    this.roleId = null;
   }
 }

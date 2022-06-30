@@ -34,7 +34,8 @@ import {
   SetIsDirtyOrderForm,
   SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob,
-  UpdateOrganisationCandidateJobSucceed
+  UpdateOrganisationCandidateJobSucceed,
+  GetHistoricalData
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -65,6 +66,7 @@ import { OrderManagementModel } from '@agency/store/order-management.state';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { RejectReasonService } from "@shared/services/reject-reason.service";
 import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
+import { HistoricalEvent } from '@shared/models/historical-event.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -89,6 +91,7 @@ export interface OrderManagementContentStateModel {
   isDirtyOrderForm: boolean;
   rejectionReasonsList: RejectReason[] | null;
   orderFilterDataSources: OrderFilterDataSource | null;
+  historicalEvents: HistoricalEvent[] | null
 }
 
 @State<OrderManagementContentStateModel>({
@@ -115,7 +118,8 @@ export interface OrderManagementContentStateModel {
     predefinedBillRates: [],
     isDirtyOrderForm: false,
     rejectionReasonsList: null,
-    orderFilterDataSources: null
+    orderFilterDataSources: null,
+    historicalEvents: null
   }
 })
 @Injectable()
@@ -225,6 +229,11 @@ export class OrderManagementContentState {
   @Selector()
   static orderFilterDataSources(state: OrderManagementContentStateModel): OrderFilterDataSource | null {
     return state.orderFilterDataSources
+  }
+
+  @Selector()
+  static candidateHistoricalData(state: OrderManagementContentStateModel) {
+    return state.historicalEvents
   }
 
   constructor(
@@ -510,6 +519,19 @@ export class OrderManagementContentState {
       tap(payload => {
         patchState({ orderFilterDataSources: payload });
         return payload;
+      })
+    )
+  }
+
+  @Action(GetHistoricalData)
+  GetHistoricalData(
+    {patchState}: StateContext<OrderManagementContentStateModel>,
+    {organizationId, candidateJobId}: GetHistoricalData
+  ): Observable<HistoricalEvent[]> {
+    return this.orderManagementService.getHistoricalData(organizationId, candidateJobId).pipe(
+      tap((payload: HistoricalEvent[]) => {
+        patchState({historicalEvents: payload})
+        return payload
       })
     )
   }

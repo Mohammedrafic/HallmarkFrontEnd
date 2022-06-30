@@ -7,7 +7,7 @@ import {
   BillRateSetup,
   BillRateSetupPage,
   BillRateSetupPost, ExternalBillRateTypePage,
-  ExternalBillRateType, ExternalBillRateSave
+  ExternalBillRateType, ExternalBillRateSave, ExternalBillRateMappingPage, ExternalBillRateMapped
 } from '@shared/models/bill-rate.model';
 import { ExportPayload } from '@shared/models/export.model';
 
@@ -39,6 +39,27 @@ export class BillRatesService {
   }
 
   /**
+   * Get the list of bill rates mapping
+   * @param filter filter parameters
+   * @return Array of bill rates mapping
+   */
+  public getExternalBillRateMapping(filter: BillRateFilters): Observable<ExternalBillRateMappingPage> {
+    const {pageNumber = 1, pageSize = 1, name = ''} = filter;
+    return this.http.get<ExternalBillRateMappingPage>(
+      `/api/BillRatesConfigs/ExternalBillRateMappings`,
+      { params: { PageNumber: pageNumber, PageSize: pageSize, Name: name }});
+  }
+
+  /**
+   * Get the list of bill rates mapping for specific id
+   * @param filter filter parameters
+   * @return Array of bill rates mapping
+   */
+  public getExternalBillRateMappingById(id: number): Observable<ExternalBillRateMapped> {
+    return this.http.get<ExternalBillRateMapped>(`/api/BillRatesConfigs/${id}/ExternalBillRateMappings`);
+  }
+
+  /**
    * Create or save/update bill rate type
    * @param billRate object to save/update
    * @return Created/Updated bill rate
@@ -65,6 +86,15 @@ export class BillRatesService {
     return this.http.put<ExternalBillRateType>(`/api/ExternalBillRates/${id}`, billRate);
   }
 
+  /**
+   * Create/update bill rate mapping
+   * @param billRate object to save
+   * @return Created/update bill rate mapping
+   */
+  public saveUpdateExternalBillRateMapping(id: number, ids: Array<{id: number}>): Observable<ExternalBillRateType> {
+    return this.http.post<ExternalBillRateType>(`/api/BillRatesConfigs/${id}/ExternalBillRateMappings`, {externalBillRates: ids});
+  }
+
     /**
    * Remove bill rate by its id
    * @param id
@@ -82,6 +112,14 @@ export class BillRatesService {
   }
 
   /**
+   * Remove bill rate mapping by its id
+   * @param id
+   */
+  public removeExternalBillRateMappingById(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/BillRatesConfigs/${id}/ExternalBillRateMappings`);
+  }
+
+  /**
    * Get Bill Rate Options
    * @return list of Bill Rate eOptions
    */
@@ -94,5 +132,19 @@ export class BillRatesService {
    */
   public exportBillRateSetup(payload: ExportPayload): Observable<any> {
     return this.http.post(`/api/BillRates/export`, payload, { responseType: 'blob' });
+  }
+
+  /**
+   * Export external bill rate
+   */
+  public exportExternalBillRate(payload: ExportPayload): Observable<any> {
+    return this.http.post(`/api/ExternalBillRates/export`, payload, { responseType: 'blob' });
+  }
+
+  /**
+   * Export external bill rate mapping
+   */
+  public exportExternalBillRateMapping(payload: ExportPayload): Observable<any> {
+    return this.http.post(`/api/BillRatesConfigs/export`, payload, { responseType: 'blob' });
   }
 }

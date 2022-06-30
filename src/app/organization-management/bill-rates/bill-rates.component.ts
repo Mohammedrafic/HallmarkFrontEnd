@@ -88,9 +88,6 @@ export class BillRatesComponent extends AbstractGridConfigurationComponent imple
       case BillRateNavigationTabs.ExternalBillRateTypeMapping :
         this.addBillRateBtnText = "Add Mapping";
         break;
-      case BillRateNavigationTabs.BillRateSetup :
-      default :
-        this.addBillRateBtnText = "Add Record";
     }
   }
 

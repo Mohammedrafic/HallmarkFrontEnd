@@ -2,7 +2,13 @@
   <section class="header-container">
     <div class="e-card-header">
       <div class="e-card-header-caption candidat-status">
-        <h3 class="e-card-title">{{candidate?.lastName}}, {{candidate?.firstName}}</h3>
+        <div class="deploy-candidate-wrapper">
+          <h3 class="e-card-title candidate-title">
+            {{candidate?.lastName}}, {{candidate?.firstName}}
+            <i-feather name="briefcase" class="icon" *ngIf="isDeployedAndAgency"></i-feather>
+          </h3>
+          <app-deploy-candidate-message *ngIf="isDeployedAndAgency" [candidate]="candidate"></app-deploy-candidate-message>
+        </div>
         <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
           <e-chips>
             <e-chip [text]="candidatStatus[candidate.candidateStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
@@ -10,8 +16,8 @@
         </ejs-chiplist>
       </div>
       <div class="e-card-content">
-        <button *ngIf="!isRejected" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
-        <button ejs-button [isPrimary]="true" *ngIf="candidate?.statusName !== 'Accepted' && !isRejected" class="apply-button" (click)="onAccept()">Accept</button>
+        <button *ngIf="!isReadOnly" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
+        <button ejs-button [isPrimary]="true" *ngIf="candidate?.statusName !== 'Accepted' && !isReadOnly && !candidate.deployedCandidateInfo" class="apply-button" (click)="onAccept()">Accept</button>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
@@ -20,7 +26,7 @@
   </section>
   <section class="content-container">
     <div class="candidate-info">
-      <ejs-accordion>
+      <ejs-accordion expandMode="Single">
         <e-accordionitems>
           <e-accordionitem expanded="true">
             <ng-template #header>
@@ -33,7 +39,7 @@
                     <div class="input-container bootstrap">
                       <label class="input-group">Job ID</label>
                       <div>
-                        <input appValidateWithMessage formControlName="jobId" class="e-input" type="text" placeholder="Job ID" />
+                        <input appValidateWithMessage formControlName="jobId" class="e-input" type="text"/>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
@@ -48,7 +54,7 @@
                     <div class="input-container bootstrap">
                       <label class="input-group">Available Start Date</label>
                       <div class="input-group input-readonly">
-                        <input appValidateWithMessage formControlName="avStartDate" class="e-input" type="text" placeholder="Input text" readonly/>
+                        <input appValidateWithMessage formControlName="avStartDate" class="e-input" type="text" readonly/>
                       </div>
                     </div>
                   </div>
@@ -56,19 +62,19 @@
                     <div class="input-container bootstrap">
                       <label class="input-group">Bill Rate</label>
                       <div>
-                        <input appValidateWithMessage formControlName="billRates" class="e-input" type="text" placeholder="Input text" />
+                        <input appValidateWithMessage formControlName="billRates" class="e-input" type="text"/>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Location</label>
                       <div>
-                        <input appValidateWithMessage formControlName="locationName" class="e-input" type="text" placeholder="Location" />
+                        <input appValidateWithMessage formControlName="locationName" class="e-input" type="text"/>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
                       <label class="input-group">Candidate Bill Rate</label>
                       <div>
-                        <input appValidateWithMessage formControlName="candidateBillRate" class="e-input" type="text" placeholder="Input text" />
+                        <input appValidateWithMessage formControlName="candidateBillRate" class="e-input" type="text"/>
                       </div>
                     </div>
                   </div>
@@ -77,19 +83,19 @@
                   <div class="input-container bootstrap">
                     <label class="input-group">Yrs. of Exp.</label>
                     <div>
-                      <input appValidateWithMessage formControlName="yearExp" class="e-input" type="text" placeholder="0" />
+                      <input appValidateWithMessage formControlName="yearExp" class="e-input" type="text"/>
                     </div>
                   </div>
                   <div class="input-container bootstrap">
                     <label class="input-group">Exp. as Travelers</label>
                     <div>
-                      <input appValidateWithMessage formControlName="travelExp" class="e-input" type="text" placeholder="0" />
+                      <input appValidateWithMessage formControlName="travelExp" class="e-input" type="text"/>
                     </div>
                   </div>
                   <div class="input-container bootstrap">
                     <label class="input-group">Offered Bill Rate</label>
                     <div>
-                      <input appValidateWithMessage formControlName="offeredBillRate" class="e-input" type="text" placeholder="$ 0.00" />
+                      <input appValidateWithMessage formControlName="offeredBillRate" class="e-input" type="text"/>
                     </div>
                   </div>
                 </div>
@@ -113,7 +119,7 @@
             <div>Historical Events</div>
           </ng-template>
           <ng-template #content>
-            <div>Historical Events</div>
+            <app-historical-events [organizationId]="candidateJob?.organizationId || -1" [candidateJobId]="candidate.candidateJobId"></app-historical-events>
           </ng-template>
         </e-accordionitem>
       </e-accordionitems>

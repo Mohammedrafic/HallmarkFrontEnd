@@ -1,0 +1,181 @@
+<form class="bootstrap" [formGroup]="form" *ngIf="form">
+  <div>
+    <div class="input-container">
+      <label for="externalId">Order ID</label>
+      <div class="input-group">
+        <input class="e-input" type="text" maxlength="50" formControlName="orderId" />
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="input-container">
+      <label>Organization</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="organizationIds"
+          placeholder="All"
+          [fields]="optionFields"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.organizationIds.dataSource"
+        >
+        </ejs-multiselect>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="row">
+      <div class="input-container">
+        <label>Region</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="regionIds"
+                           placeholder="All"
+                           [fields]="optionFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.regionIds.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Location</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="locationIds"
+                           placeholder="All"
+                           [fields]="optionFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.locationIds.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div> 
+    <div>
+      <div class="input-container">
+        <label>Department</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="departmentsIds"
+                           placeholder="All"
+                           [fields]="optionFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.departmentsIds.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div> -->
+  <div class="row">
+    <div class="input-container">
+      <label>Skill</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="skillIds"
+          placeholder="All"
+          [fields]="optionFields"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.skillIds.dataSource "
+        >
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Order Type</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="orderTypes"
+          placeholder="All"
+          [fields]="optionFields"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.orderTypes.dataSource"
+        >
+        </ejs-multiselect>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-container">
+      <label>Candidate Status</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="candidateStatuses"
+          placeholder="All"
+          [fields]="statusFields"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.candidateStatuses.dataSource"
+        >
+        </ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Order Status</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="orderStatuses"
+          placeholder="All"
+          [fields]="statusFields"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.orderStatuses.dataSource"
+        >
+        </ejs-multiselect>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="input-container">
+      <label>Job Title</label>
+      <div class="input-group">
+        <input class="e-input" type="text" maxlength="50" formControlName="jobTitle" />
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-container">
+      <label>Bill Rate From</label>
+      <div class="input-group">
+        <input class="e-input" type="text" maxlength="50" formControlName="billRateFrom" />
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Bill Rate To</label>
+      <div class="input-group">
+        <input class="e-input" type="text" maxlength="50" formControlName="billRateTo" />
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="input-container">
+      <label for="externalId"># of Positions</label>
+      <div class="input-group">
+        <input class="e-input" type="text" maxlength="50" formControlName="openPositions" />
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-container calendar">
+      <label for="inactiveDate">Job Start Date</label>
+      <div class="input-group datepicker">
+        <ejs-datepicker class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobStartDate">
+        </ejs-datepicker>
+      </div>
+    </div>
+    <div class="input-container calendar">
+      <label for="inactiveDate">Job End Date</label>
+      <div class="input-group datepicker">
+        <ejs-datepicker class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobEndDate">
+        </ejs-datepicker>
+      </div>
+    </div>
+  </div>
+</form>
+

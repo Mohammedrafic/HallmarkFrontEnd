@@ -119,7 +119,8 @@ export class UserState {
       const faq = 10;
       const businessUnitType = payload;
       if (businessUnitType) {
-        menu.menuItems = menu.menuItems.filter((menuItem: MenuItem) => menuItem.id !== education && menuItem.id !== faq).map((menuItem: MenuItem) => {
+        menu.menuItems = menu.menuItems.filter((menuItem: MenuItem) => menuItem.id !== education && menuItem.id !== faq)
+        .map((menuItem: MenuItem) => {
           menuItem.icon = MENU_CONFIG[businessUnitType][menuItem.id].icon;
           menuItem.route = MENU_CONFIG[businessUnitType][menuItem.id].route;
           if (menuItem.children) {
@@ -136,6 +137,13 @@ export class UserState {
           return menuItem;
         });
       }
+
+      menu.menuItems.push({
+        title: 'Invoices',
+        route: 'admin/invoices',
+        icon: 'dollar-sign',
+      } as MenuItem)
+
       return patchState({ menu: menu });
     }));
   }
@@ -171,12 +179,14 @@ export class UserState {
 
   @Action(SaveLastSelectedOrganizationAgencyId)
   SaveLastSelectedOrganizationAgencyId(
-    { dispatch }: StateContext<UserStateModel>,
-    { payload }: SaveLastSelectedOrganizationAgencyId
+    { dispatch, getState }: StateContext<UserStateModel>,
+    { payload, isOrganizationId }: SaveLastSelectedOrganizationAgencyId
   ): Observable<LasSelectedOrganizationAgency> {
     return this.userService.saveLastSelectedOrganizationAgencyId(payload).pipe(map(() => {
       dispatch(new SetLastSelectedOrganizationAgencyId(payload));
-      dispatch(new GetOrganizationStructure());
+      if (isOrganizationId && getState().lastSelectedOrganisationAgency === 'Organization') {
+        dispatch(new GetOrganizationStructure());
+      }
       return payload;
     }));
   }

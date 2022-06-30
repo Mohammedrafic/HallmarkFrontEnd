@@ -4,12 +4,19 @@
   </ng-template>
 
   <ng-template #legend>
-    <div #legend>
-      <div class="app-maps-chart__range-line"></div>
-      <div class="app-maps-chart__range-values">
-        {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.from }} -
-        {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.to }}
+    <div #legend class="app-maps-chart__legend">
+      <div>
+        <div class="app-maps-chart__range-line" (click)="redirectToSourceContent()"></div>
+        <div class="app-maps-chart__range-values">
+          {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.from }} -
+          {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.to }}
+        </div>
       </div>
+    
+    <div class="app-maps-chart__unknown-candidates">
+      <span class="app-maps-chart__text">Applicants with no state indicated</span>
+      <span class="app-maps-chart__number">{{ chartData?.unknownStateCandidates }}</span>
     </div>
+  </div>
   </ng-template>
 </app-widget-wrapper>

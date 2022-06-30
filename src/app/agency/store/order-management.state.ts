@@ -24,6 +24,7 @@ import { ShowToast } from "src/app/store/app.actions";
 import {
   ApplyOrderApplicants,
   ApplyOrderApplicantsSucceed,
+  GetAgencyFilterOptions,
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
   GetAgencyOrdersPage,
@@ -36,6 +37,10 @@ import {
   UpdateAgencyCandidateJob
 } from './order-management.actions';
 import { isUndefined } from 'lodash';
+import { AgencyOrderFilteringOptions } from "@shared/models/agency.model";
+import { OrderFilteringOptionsService } from "@shared/services/order-filtering-options.service";
+import { HistoricalEvent } from '@shared/models/historical-event.model';
+import { GetHistoricalData } from '@client/store/order-managment-content.actions';
 import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
 
 export interface OrderManagementModel {
@@ -46,7 +51,9 @@ export interface OrderManagementModel {
   orderApplicantsInitialData: OrderApplicantsInitialData | null;
   selectedOrder: Order | null;
   orderDialogOptions: DialogNextPreviousOption;
+  historicalEvents: HistoricalEvent[] | null
   rejectionReasonsList: RejectReason[];
+  orderFilteringOptions: AgencyOrderFilteringOptions | null
 }
 
 @State<OrderManagementModel>({
@@ -62,7 +69,9 @@ export interface OrderManagementModel {
     orderDialogOptions: {
       next: false,
       previous: false
-    }
+    },
+    orderFilteringOptions: null,
+    historicalEvents: null
   },
 })
 @Injectable()
@@ -126,16 +135,29 @@ export class OrderManagementState {
     return state.candidatesJob;
   }
 
+
+  @Selector()
+  static orderFilteringOptions(state: OrderManagementModel): AgencyOrderFilteringOptions | null {
+    return state.orderFilteringOptions
+  }
+  
+  @Selector()
+  static candidateHistoricalData(state: OrderManagementModel): HistoricalEvent[] | null {
+    return state.historicalEvents
+  }
+
   constructor(private orderManagementContentService: OrderManagementContentService,
               private rejectReasonService: RejectReasonService,
-              private orderApplicantsService: OrderApplicantsService) {}
+              private orderApplicantsService: OrderApplicantsService,
+              private orderFilteringOptionsService: OrderFilteringOptionsService,
+              ) {}
 
   @Action(GetAgencyOrdersPage)
   GetAgencyOrdersPage(
     { patchState }: StateContext<OrderManagementModel>,
-    { pageNumber, pageSize }: GetAgencyOrdersPage
+    { pageNumber, pageSize, filters }: GetAgencyOrdersPage
   ): Observable<AgencyOrderManagementPage> {
-    return this.orderManagementContentService.getAgencyOrders(pageNumber, pageSize).pipe(
+    return this.orderManagementContentService.getAgencyOrders(pageNumber, pageSize, filters).pipe(
       tap((payload) => {
         patchState({ ordersPage: payload});
         return payload;
@@ -256,6 +278,26 @@ export class OrderManagementState {
           new ShowToast(MessageTypes.Success, RECORD_MODIFIED),
           new RejectCandidateForAgencySuccess()
         ]);
+      })
+    )
+  }
+
+  @Action(GetAgencyFilterOptions)
+  GetAgencyFilterOptions({ patchState }: StateContext<OrderManagementModel>): Observable<AgencyOrderFilteringOptions> {
+    return this.orderFilteringOptionsService.getAgencyOptions().pipe(
+      tap((payload) => { patchState({ orderFilteringOptions: payload }) })
+    );
+  }
+  
+  @Action(GetHistoricalData)
+  GetHistoricalData(
+    {patchState}: StateContext<OrderManagementModel>,
+    {organizationId, candidateJobId}: GetHistoricalData
+  ): Observable<HistoricalEvent[]> {
+    return this.orderManagementContentService.getHistoricalData(organizationId, candidateJobId).pipe(
+      tap(payload => {
+        patchState({historicalEvents: payload})
+        return payload
       })
     )
   }

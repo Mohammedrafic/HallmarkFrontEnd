@@ -1,0 +1,32 @@
+@import '../../styles/variables/colors';
+
+.e-input-group.e-float-icon-left.search-with-icon {
+  height: 38px;
+}
+
+.search {
+  flex-grow: 1;
+  max-width: 400px;
+}
+
+.bootstrap .row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 12px;
+}
+
+.input-container {
+  margin-bottom: 12px;
+
+  :last-child {
+    margin-bottom: 0;
+  }
+
+  label {
+    color: $secondary-dark-blue-15;
+  }
+}
+
+.button--no-wrap {
+  white-space: nowrap !important;
+}

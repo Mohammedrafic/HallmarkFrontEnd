@@ -65,6 +65,7 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   private credentialSetupList: CredentialSetupGet[] = [];
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
+  private previouslySavedMappingsNumber: number;
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -91,7 +92,8 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   }
 
   public onMapCredentialFormCancelClick(): void {
-    if (this.mapCredentialsFormGroup.dirty) {
+    if ((this.isEdit && (this.mapCredentialsFormGroup.dirty || this.selectedItems.length !== this.previouslySavedMappingsNumber))
+      || (!this.isEdit && (this.mapCredentialsFormGroup.dirty || this.selectedItems.length))) {
       this.confirmService
         .confirm(CANCEL_COFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
@@ -222,6 +224,7 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
             }
           });
 
+          this.previouslySavedMappingsNumber = this.selectedItems.length;
           this.grid.refresh();
         });
       }

@@ -32,7 +32,7 @@ export type RoleTreeField = {
 })
 export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
   @Input() form: FormGroup;
-  @Input() roleId: number;
+  @Input() roleId: number | null;
   @Input() businessUnits: { text: string | BusinessUnitType; id: number }[];
 
   @ViewChild('tree') tree: TreeViewComponent;
@@ -107,7 +107,7 @@ export class RoleFormComponent implements OnInit, OnDestroy, OnChanges {
     const activeControl = this.form.get('isActive');
     activeControl?.patchValue(!activeControl.value);
     if (!activeControl?.value) {
-      this.store.dispatch(new GetUsersAssignedToRole(this.roleId));
+      this.store.dispatch(new GetUsersAssignedToRole(this.roleId as number));
     }
   }
 

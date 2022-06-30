@@ -388,7 +388,7 @@ ejs-grid.e-control.e-grid {
     cursor: pointer;
     display: flex;
     align-items: center;
-  
+
     i-feather {
       margin-left: 4px;
       width: 14px;
@@ -435,6 +435,44 @@ ejs-grid.e-control.e-grid {
   }
 }
 
-.e-grid .e-sortnumber {
-  display: none !important;
+.table-block {
+  ejs-grid.e-control.e-grid {
+    border-radius: initial;
+
+    .e-headercontent {
+      border-right-color: transparent;
+    }
+
+    .e-gridheader {
+      border-top-color: transparent;
+    }
+  }
+}
+
+.table-block {
+  ejs-grid.e-control.e-grid {
+    border-radius: initial;
+
+    .e-headercontent {
+      border-right-color: transparent;
+    }
+
+    .e-gridheader {
+      border-top-color: transparent;
+    }
+  }
+}
+
+.table-block {
+  ejs-grid.e-control.e-grid {
+    border-radius: initial;
+
+    .e-headercontent {
+      border-right-color: transparent;
+    }
+
+    .e-gridheader {
+      border-top-color: transparent;
+    }
+  }
 }

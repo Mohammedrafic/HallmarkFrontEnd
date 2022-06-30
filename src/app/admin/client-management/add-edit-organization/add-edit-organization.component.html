@@ -18,11 +18,7 @@
                           [dataSource]="businessUnits$ | async"></ejs-dropdownlist>
       </div>
     </form>
-    <form
-      id="connectiodanString"
-      [formGroup]="dataBaseConnectionsFormGroup"
-      *ngIf="title === 'Add' && (user$ | async)?.businessUnitType === businessUnitType.Hallmark"
-    >
+    <form id="connectiodanString" [formGroup]="dataBaseConnectionsFormGroup" *ngIf="showDataBaseControl">
       <label>Data Base<span class="required">*</span></label>
       <div class="input-group dropdown connection-string-dropdown">
         <ejs-dropdownlist

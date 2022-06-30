@@ -18,10 +18,13 @@ import {
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
-  UpdateOrganisationCandidateJob
+  UpdateOrganisationCandidateJob,
 } from "@client/store/order-managment-content.actions";
 import { ApplicantStatus as ApplicantStatusEnum, } from "@shared/enums/applicant-status.enum";
 import { RejectReason } from "@shared/models/reject-reason.model";
+import { GetCandidateJob } from '@agency/store/order-management.actions';
+import { ShowToast } from "../../../../store/app.actions";
+import { MessageTypes } from "@shared/enums/message-types";
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -41,8 +44,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   @Input() candidate: OrderCandidatesList;
   @Input() isTab: boolean = false;
+  @Input() isAgency: boolean = false;
 
   public form: FormGroup;
+  public jobStatusControl: FormControl;
 
   public optionFields = OPTION_FIELDS;
   public jobStatus = JOB_STATUS;
@@ -63,6 +68,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     return this.form.get('endDate');
   }
 
+  get isDeployedAndAgency(): boolean {
+    return this.isAgency && !!this.candidate.deployedCandidateInfo
+  }
+
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(
@@ -78,6 +87,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.subscribeOnReasonsList();
     this.checkRejectReason();
     this.subscribeOnSuccessRejection();
+    this.subscribeOnUpdateOrganisationCandidateJobError();
   }
 
   ngOnDestroy(): void {
@@ -86,9 +96,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   }
 
   public onDropDownChanged(event: {itemData: {text: string, id: number}}): void {
-    if(event.itemData.text === ONBOARDED_STATUS) {
+    if(event.itemData?.text === ONBOARDED_STATUS) {
       this.onAccept();
-      this.store.dispatch(new ReloadOrganisationOrderCandidatesLists())
     } else {
       this.store.dispatch(new GetRejectReasonsForOrganisation());
       this.openRejectDialog.next(true);
@@ -114,7 +123,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public onClose() {
     this.closeModalEvent.emit();
     this.candidateJob = null;
-    this.jobStatus = [];
+    this.jobStatusControl.reset();
     this.billRatesData = [];
     this.isRejected = false;
   }
@@ -200,6 +209,9 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       this.form.enable();
       this.isOnboarded = true;
     }
+    if(this.candidate.deployedCandidateInfo && !this.isAgency) {
+      this.form.disable()
+    }
   }
 
   private subscribeOnReasonsList(): void {
@@ -225,6 +237,15 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     });
   }
 
+  private subscribeOnUpdateOrganisationCandidateJobError(): void {
+    this.actions$.pipe(ofActionSuccessful(ShowToast))
+      .pipe(
+        filter((error) => error.type === MessageTypes.Error),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe(() => this.jobStatusControl.reset());
+  }
+
   private createForm() : void {
     this.form = new FormGroup({
       jobId: new FormControl(''),
@@ -245,5 +266,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       endDate: new FormControl(''),
       rejectReason: new FormControl('')
     });
+
+    this.jobStatusControl = new FormControl('');
   }
 }

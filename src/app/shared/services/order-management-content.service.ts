@@ -3,6 +3,7 @@ import { map, Observable, switchMap } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import {
   AcceptJobDTO,
+  AgencyOrderFilters,
   AgencyOrderManagementPage,
   ApplicantStatus,
   CreateOrderDto,
@@ -21,6 +22,7 @@ import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { RejectReasonPayload } from "@shared/models/reject-reason.model";
+import { HistoricalEvent } from '../models/historical-event.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -47,8 +49,8 @@ export class OrderManagementContentService {
    @param pageNumber
    @param pageSize
    */
-  public getAgencyOrders(pageNumber: number, pageSize: number /** TODO: Add filter params */): Observable<AgencyOrderManagementPage> {
-    return this.http.get<AgencyOrderManagementPage>(`/api/Orders/agencyOrders`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+  public getAgencyOrders(pageNumber: number, pageSize: number, filters: AgencyOrderFilters): Observable<AgencyOrderManagementPage> {
+    return this.http.post<AgencyOrderManagementPage>(`/api/Agency/Orders`, { pageNumber, pageSize, ...filters });
   }
 
   /**
@@ -227,9 +229,19 @@ export class OrderManagementContentService {
   }
 
   /**
-   * Get order filter data sources 
+   * Get order filter data sources
    */
   public getOrderFilterDataSources(): Observable<OrderFilterDataSource> {
     return this.http.get<OrderFilterDataSource>('/api/OrdersFilteringOptions/organization');
   }
+
+  /**
+   * Get the historical data for candidate
+   * @return Array of historical events
+   */
+  public getHistoricalData(organizationId: number, jobId: number): Observable<HistoricalEvent[]> {
+    return this.http.get<HistoricalEvent[]>(`/api/AppliedCandidates/historicalData?OrganizationId=${organizationId}&CandidateJobId=${jobId}`);
+  }
 }
+
+

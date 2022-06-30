@@ -4,11 +4,7 @@
 @use "root";
 
 @import "./variables/colors.scss";
-
-@font-face {
-  @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap");
-  font-family: "Open Sans", sans-serif;
-}
+@import "./fusion";
 
 html {
   height: 100%;
@@ -130,10 +126,12 @@ body {
   i-feather.icon {
     width: 16px;
     height: 16px;
+    &.fill-red {
+      stroke: #FF5858
+    }
 
-    svg {
-      width: 100%;
-      height: 100%;
+    &.fill-red {
+      stroke: #FF5858
     }
   }
 

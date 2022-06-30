@@ -7,6 +7,7 @@ import {
   CheckCircle,
   User,
   Briefcase,
+  Download,
   Folder,
   MapPin,
   Calendar,
@@ -76,7 +77,8 @@ import { AddBackgroundForEmptyGridDirective } from '@shared/directives/add-backg
 import { FormatPhoneNumberPipe } from '@shared/pipes/format-phone-number.pipe';
 import { RateHourPipe } from '@shared/pipes/rate-hour.pipe';
 import { OfferDeploymentComponent } from './components/order-candidates-list/offer-deployment/offer-deployment.component';
-import { BillRatePipe } from '@shared/pipes/bill-rate.pipe';
+import { BillRatePipe } from "@shared/pipes/bill-rate.pipe";
+import { HistoricalEventsComponent } from './components/historical-events/historical-events.component';
 import { GridSubrowCandidateComponent } from './components/grid-subrow-candidate/grid-subrow-candidate.component';
 import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.component';
 import { BillRateFormComponent } from '@shared/components/bill-rates/components/bill-rate-form/bill-rate-form.component';
@@ -84,8 +86,13 @@ import { BillRatesGridComponent } from '@shared/components/bill-rates/components
 import { BillRateState } from '@shared/components/bill-rates/store/bill-rate.state';
 import { ChildOrderDialogComponent } from '@shared/components/child-order-dialog/child-order-dialog.component';
 import { RejectReasonDialogComponent } from './components/reject-reason-dialog/reject-reason-dialog.component';
+import { ClickOutsideDirective } from './directives/click-outside.directive';
+import { ExportButtonComponent } from './components/export-button/export-button.component';
+import { TabsListComponent } from './components/tabs-list/tabs-list.component';
 import { PageToolbarModule } from '@shared/components/page-toolbar/page-toolbar.module';
 import { FilterDialogModule } from '@shared/components/filter-dialog/filter-dialog.module';
+import { DeployCandidateMessageComponent } from './components/order-candidates-list/deploy-candidate-message/deploy-candidate-message.component';
+import {ExBillRateNamesPipe} from "@shared/pipes/external-bill-rate-names.pipe";
 import { SideMenuModule } from '@shared/components/side-menu/side-menu.module';
 
 const icons = {
@@ -98,6 +105,7 @@ const icons = {
   Folder,
   MapPin,
   Calendar,
+  Download,
   Mail,
   Send,
   Edit,
@@ -112,9 +120,11 @@ const COMPONENTS = [
   FormatPhoneNumberPipe,
   RateHourPipe,
   BillRatePipe,
+  ExBillRateNamesPipe,
   ValidateDirective,
   HighlightGridRowDirective,
   AddBackgroundForEmptyGridDirective,
+  ClickOutsideDirective,
   ImageUploaderComponent,
   DocumentUploaderComponent,
   SideDialogComponent,
@@ -137,11 +147,13 @@ const COMPONENTS = [
   OnboardedCandidateComponent,
   ApplyCandidateComponent,
   OfferDeploymentComponent,
+  HistoricalEventsComponent,
   BillRatesComponent,
   RejectReasonDialogComponent,
   GridSubrowCandidateComponent,
-  BillRatesComponent,
   ChildOrderDialogComponent,
+  ExportButtonComponent,
+  DeployCandidateMessageComponent
 ];
 
 @NgModule({
@@ -177,8 +189,8 @@ const COMPONENTS = [
     FilterDialogModule,
     SideMenuModule,
   ],
-  exports: [...COMPONENTS, PageToolbarModule, FilterDialogModule, SideMenuModule],
-  declarations: [...COMPONENTS, ErrorMessageComponent, BillRateFormComponent, BillRatesGridComponent],
+  exports: [...COMPONENTS, TabsListComponent, PageToolbarModule, FilterDialogModule, SideMenuModule],
+  declarations: [...COMPONENTS, ErrorMessageComponent, BillRateFormComponent, BillRatesGridComponent, TabsListComponent],
   providers: [
     DatePipe,
     ColumnMenuService,

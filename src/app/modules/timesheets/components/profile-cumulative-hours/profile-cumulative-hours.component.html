@@ -1,0 +1,117 @@
+<div class="profile-hours-statistics-container">
+  <section class="cumulative-hours">
+    <h3>Cumulative Hours</h3>
+
+    <ejs-accumulationchart style='display:block; top: -20px; left: -15px'
+                           class="cumulative-hours-chart"
+                           [background]="chartSettings.background"
+                           [width]="chartSettings.donutChart.width"
+                           [height]="chartSettings.donutChart.height"
+                           [legendSettings]="chartSettings.legend"
+                           [tooltip]="chartSettings.tooltip"
+                           (pointRender)="onPointRender($event)"
+    >
+      <e-accumulation-annotations>
+        <e-accumulation-annotation [content]="weekChartAnnotation"
+                                   region="Series"
+                                   coordinateUnits="Pixel"
+                                   x="30"
+                                   y="38"
+        ></e-accumulation-annotation>
+      </e-accumulation-annotations>
+
+      <e-accumulation-series-collection>
+        <e-accumulation-series xName='x'
+                               yName='y'
+                               innerRadius="70%"
+                               radius="70%"
+                               [dataSource]='weekHoursChartData'
+                               [dataLabel]="chartSettings.dataLabel"
+                               [startAngle]="100"
+        ></e-accumulation-series>
+      </e-accumulation-series-collection>
+    </ejs-accumulationchart>
+  </section>
+
+  <section class="cumulative-hours-otd">
+    <h3>Cumulative Hours OTD</h3>
+    <ejs-accumulationchart style='display:block; top: -20px; left: -15px'
+                           class="cumulative-hours-chart"
+                           selectionMode="Point"
+                           [enableAnimation]="true"
+                           [background]="chartSettings.background"
+                           [width]="chartSettings.donutChart.width"
+                           [height]="chartSettings.donutChart.height"
+                           [legendSettings]="chartSettings.legend"
+                           [tooltip]="chartSettings.tooltip"
+                           (pointRender)="onPointRender($event)"
+
+    >
+      <e-accumulation-annotations>
+        <e-accumulation-annotation [content]="cumulativeChartAnnotation"
+                                   region="Series"
+                                   coordinateUnits="Pixel"
+                                   x="30"
+                                   y="38"
+        ></e-accumulation-annotation>
+      </e-accumulation-annotations>
+
+      <e-accumulation-series-collection>
+        <e-accumulation-series xName='x'
+                               yName='y'
+                               innerRadius="70%"
+                               radius="70%"
+
+                               [dataSource]='cumulativeHoursChartData'
+                               [dataLabel]="chartSettings.dataLabel"
+                               [startAngle]="100"
+        ></e-accumulation-series>
+      </e-accumulation-series-collection>
+    </ejs-accumulationchart>
+  </section>
+
+  <section class="charts-legend">
+    <h3></h3>
+    <div>
+      <table>
+        <tr>
+          <th></th>
+          <th></th>
+          <th class="week-title">Week</th>
+          <th class="total-title">Cumulative</th>
+        </tr>
+        <tr *ngFor="let legendItem of hoursData; let i = index; trackBy: trackByName">
+          <td>
+            <div class="marker" [style.backgroundColor]="chartColorsMap[legendItem.type]"></div>
+          </td>
+          <td class="name">{{legendItem.type}}</td>
+          <td class="value1">{{legendItem.weekly ? (legendItem.weekly | number : '1.2-2') : '-'}}</td>
+          <td class="value2">{{legendItem.total ? (legendItem.total | number : '1.2-2') : '-'}}</td>
+          <td>
+            <ejs-checkbox [checked]="true"
+                          (change)="toggleChartCategoryVisibility($event, legendItem)"
+            ></ejs-checkbox>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <ng-template #weekChartAnnotation>
+    <ng-container [ngTemplateOutlet]="chartAnnotation" [ngTemplateOutletContext]="{title: 'Week Working', value: totalWeekHours}"></ng-container>
+  </ng-template>
+
+  <ng-template #cumulativeChartAnnotation>
+    <ng-container [ngTemplateOutlet]="chartAnnotation" [ngTemplateOutletContext]="{title: 'Total Working', value: '740.4'}"></ng-container>
+  </ng-template>
+
+  <ng-template #chartAnnotation let-value="value" let-title="title">
+    <div class="chart-annotation">
+      <div class="work-time-value">{{value}}</div>
+      <div class="work-time-title">
+        {{title}}
+        <div>hrs.</div>
+      </div>
+    </div>
+  </ng-template>
+</div>

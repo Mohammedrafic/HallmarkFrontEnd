@@ -89,7 +89,7 @@ export class OrganizationAgencySelectorComponent implements OnDestroy {
             new SaveLastSelectedOrganizationAgencyId({
               lastSelectedOrganizationId: !isAgency ? user.businessUnitId : null,
               lastSelectedAgencyId: isAgency ? user.businessUnitId : null,
-            })
+            }, !isAgency)
           );
         }
 
@@ -107,14 +107,14 @@ export class OrganizationAgencySelectorComponent implements OnDestroy {
         this.store.dispatch(new SaveLastSelectedOrganizationAgencyId({
           lastSelectedOrganizationId: selectedOrganizationAgencyId,
           lastSelectedAgencyId: this.store.selectSnapshot(UserState.lastSelectedAgencyId),
-        }));
+        }, true));
       }
       if (selectedType === 'Agency') {
         this.store.dispatch(new LastSelectedOrganisationAgency(selectedType));
         this.store.dispatch(new SaveLastSelectedOrganizationAgencyId({
           lastSelectedOrganizationId: this.store.selectSnapshot(UserState.lastSelectedOrganizationId),
           lastSelectedAgencyId: selectedOrganizationAgencyId
-        }));
+        }, false));
       }
     });
   }
@@ -207,7 +207,7 @@ export class OrganizationAgencySelectorComponent implements OnDestroy {
 
     if (this.isAgencyOrOrganization) {
       this.organizationAgency = this.organizations[0] || this.agencies[0];
-      
+
     } else {
       this.organizationsAgencies$.next(organizationsAgencies);
     }

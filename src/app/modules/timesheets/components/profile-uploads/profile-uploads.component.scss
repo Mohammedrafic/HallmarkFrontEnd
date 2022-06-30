@@ -1,0 +1,38 @@
+@import '../../../../styles/variables/colors';
+
+.profile-uploads-container {
+  padding: 10px 16px 10px 14px;
+
+  h3 {
+    margin-bottom: 15px;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: 700;
+    font-size: 14px;
+    color: $black;
+  }
+
+  table tr {
+    .file-icon, .file-name {
+      color: $primary-active-blue-10;
+    }
+
+    td {
+      height: 25px;
+    }
+
+    .file-name {
+      padding-left: 10px;
+      padding-right: 30px;
+    }
+
+    .delete-icon {
+      padding-left: 15px;
+
+      i-feather {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
