@@ -2,7 +2,13 @@
   <section class="header-container">
     <div class="e-card-header">
       <div class="e-card-header-caption candidat-status">
-        <h3 class="e-card-title">{{candidate?.lastName}}, {{candidate?.firstName}}</h3>
+        <div class="deploy-candidate-wrapper">
+          <h3 class="e-card-title candidate-title">
+            {{candidate?.lastName}}, {{candidate?.firstName}}
+            <i-feather name="briefcase" class="icon" *ngIf="isDeployedAndAgency"></i-feather>
+          </h3>
+          <app-deploy-candidate-message *ngIf="isDeployedAndAgency" [candidate]="candidate"></app-deploy-candidate-message>
+        </div>
         <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
           <e-chips>
             <e-chip [text]="candidatStatus[candidate.candidateStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
@@ -192,6 +198,12 @@
     <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
   </section>
 </section>
+
+<app-reject-reason-dialog
+  [rejectReasonsList]="rejectReasons"
+  [openEvent]="openRejectDialog"
+  (applyReject)="onRejectCandidate($event)"
+></app-reject-reason-dialog>
 
 <app-reject-reason-dialog
   [rejectReasonsList]="rejectReasons"

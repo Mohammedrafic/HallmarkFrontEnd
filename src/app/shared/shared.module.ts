@@ -87,6 +87,7 @@ import { ChildOrderDialogComponent } from "@shared/components/child-order-dialog
 import { RejectReasonDialogComponent } from './components/reject-reason-dialog/reject-reason-dialog.component';
 import { PageToolbarModule } from '@shared/components/page-toolbar/page-toolbar.module';
 import { FilterDialogModule } from '@shared/components/filter-dialog/filter-dialog.module';
+import { DeployCandidateMessageComponent } from './components/order-candidates-list/deploy-candidate-message/deploy-candidate-message.component';
 
 const icons = {
   AlertCircle,
@@ -142,7 +143,8 @@ const COMPONENTS = [
   RejectReasonDialogComponent,
   GridSubrowCandidateComponent,
   BillRatesComponent,
-  ChildOrderDialogComponent
+  ChildOrderDialogComponent,
+  DeployCandidateMessageComponent
 ];
 
 @NgModule({

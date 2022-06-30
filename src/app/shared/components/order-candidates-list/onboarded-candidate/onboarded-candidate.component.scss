@@ -16,6 +16,21 @@
     margin: 0 8px 0 12px;
   }
 
+  .deploy-candidate-wrapper{
+    display: flex;
+    flex-direction: row;
+
+    @media(max-width: 2500px) {
+      flex-direction: column;
+      .candidate-title {
+        white-space: nowrap;
+      }
+    }
+    .icon {
+      color: $primary-active-blue;
+    }
+  }
+
   .content-container {
     display: flex;
     margin-top: 24px;
@@ -79,6 +94,12 @@
       background-color: $secondary-dark-blue-50;
       border-radius: 8px;
     }
+  }
+
+  .warning-deployed-candidate {
+    color: $supportive-red-00;
+    padding: 15px 5px 5px;
+    font-size: 1rem;
   }
 }
 

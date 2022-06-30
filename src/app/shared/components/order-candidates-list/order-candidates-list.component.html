@@ -22,7 +22,13 @@
     <e-columns>
       <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
         <ng-template #template let-data>
-          <div class="link" (click)="onViewNavigation(data)">{{data.lastName}}, {{data.firstName}}</div>
+          <div class="link" (click)="onViewNavigation(data)">{{data.lastName}}, {{data.firstName}}
+            <ng-container *ngIf="data.deployedCandidateInfo && isAgency()">
+              <ejs-tooltip content="Deployed Candidate" position="TopRight">
+                <i-feather name="briefcase" class="icon" ></i-feather>
+              </ejs-tooltip>
+            </ng-container>
+          </div>
         </ng-template>
       </e-column>
       <e-column field="statusName" headerText="Status" textAlign="Left" width="150">
@@ -128,17 +134,19 @@
   <ng-container *ngTemplateOutlet="templateState | async"></ng-container>
 
   <ng-template #onboarded>
-    <app-onboarded-candidate (closeModalEvent)="onCloseDialog()" [candidate]="candidate"></app-onboarded-candidate>
+    <app-onboarded-candidate (closeModalEvent)="onCloseDialog()" [candidate]="candidate" [isAgency]="isAgency()"></app-onboarded-candidate>
   </ng-template>
 
   <ng-template #accept>
-    <app-accept-candidate (closeModalEvent)="onCloseDialog()" [candidate]="candidate"></app-accept-candidate>
+    <app-accept-candidate (closeModalEvent)="onCloseDialog()" [candidate]="candidate" [isAgency]="isAgency()"></app-accept-candidate>
   </ng-template>
 
   <ng-template #apply>
     <app-apply-candidate (closeDialogEmitter)="onCloseDialog()"
                          [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
-                         [candidate]="candidate">
+                         [candidate]="candidate"
+                         [isAgency]="isAgency()"
+    >
     </app-apply-candidate>
   </ng-template>
 

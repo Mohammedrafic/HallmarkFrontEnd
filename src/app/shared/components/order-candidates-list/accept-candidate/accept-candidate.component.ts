@@ -27,6 +27,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() candidate: OrderCandidatesList;
   @Input() isTab: boolean = false;
+  @Input() isAgency: boolean = false;
 
   @Select(OrderManagementState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
@@ -46,6 +47,10 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public rejectReasons: RejectReason[] = [];
   public isReadOnly = false;
   public openRejectDialog = new Subject<boolean>();
+
+  get isDeployedAndAgency(): boolean {
+    return this.isAgency && !!this.candidate.deployedCandidateInfo
+  }
 
   private unsubscribe$: Subject<void> = new Subject();
 
