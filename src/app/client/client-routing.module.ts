@@ -54,8 +54,12 @@ const routes: Routes = [
         component: TimesheetsContentComponent,
       },
       {
-        path: 'invoices/:param',
-        component: InvoicesContentComponent,
+        path: 'invoices',
+        loadChildren: () => import('../modules/invoices/invoices.module').then((m) => m.InvoicesModule),
+        data: {
+          isOrganizationArea: true,
+          isAgencyArea: false,
+        }
       },
       {
         path: 'candidates',

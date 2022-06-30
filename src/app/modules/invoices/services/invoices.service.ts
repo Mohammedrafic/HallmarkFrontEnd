@@ -2,8 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable, of } from "rxjs";
 import { PageOfCollections } from "@shared/models/page.model";
-import { InvoiceRecord } from "../interfaces";
-import { GetInvoicesData } from "../interfaces/get-invoices-data.model";
+import { GetInvoicesData, InvoiceRecord } from "../interfaces";
 
 const mockedRecords: InvoiceRecord[] = generateInvoiceRecords(100);
 
@@ -39,7 +38,10 @@ function generateInvoiceRecords(amount: number = 100): InvoiceRecord[] {
       location: 'Thone - Johnson Memorial Hospital',
       department: 'Emergency Department',
       candidate: 'Adkins, Adele Blue',
+      jobTitle: 'Job Title',
+      skill: 'TestSkill',
       amount: 1400,
+      startDate: '02/02/2022',
       hours: getRandomNumberInRange(20, 40),
       bonus: 0,
       rate: getRandomNumberInRange(36, 1400),

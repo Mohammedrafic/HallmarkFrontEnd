@@ -73,7 +73,7 @@ export const MENU_CONFIG: any = {
     16: {
       // Invoices
       icon: 'dollar-sign',
-      route: '',
+      route: 'client/invoices',
     },
     17: reportsMenuItemConfiguration,
     18: {
@@ -113,7 +113,7 @@ export const MENU_CONFIG: any = {
     25: {
       // Invoices
       icon: 'dollar-sign',
-      route: '',
+      route: 'agency/invoices',
     },
     26: reportsMenuItemConfiguration,
     27: {
@@ -333,7 +333,7 @@ export const MENU_CONFIG: any = {
     16: {
       // Invoices
       icon: 'dollar-sign',
-      route: '',
+      route: 'client/invoices',
     },
     17: reportsMenuItemConfiguration,
     18: {
@@ -464,7 +464,7 @@ export const MENU_CONFIG: any = {
     16: {
       // Invoices
       icon: 'dollar-sign',
-      route: '',
+      route: 'agency/invoices',
     },
     17: reportsMenuItemConfiguration,
     18: {
@@ -505,7 +505,7 @@ export const MENU_CONFIG: any = {
     25: {
       // Invoices
       icon: 'dollar-sign',
-      route: '',
+      route: 'agency/invoices',
     },
     26: reportsMenuItemConfiguration,
     27: {

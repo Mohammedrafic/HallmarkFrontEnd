@@ -20,11 +20,11 @@
       [width]="50">
     </e-column>
     <e-column
-      field="weekPeriod"
+      field="startDate"
       headerText="WEEK PERIOD"
     >
       <ng-template #template let-data>
-        {{data.weekPeriod}}
+        {{data.startDate | date:'W - ccc M/d/yy'}}
       </ng-template>
     </e-column>
     <e-column field="organization" headerText="Organization">

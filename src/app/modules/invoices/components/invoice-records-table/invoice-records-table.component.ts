@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { InvoiceRecord } from "../../interfaces";
+import { InvoiceRecord, InvoicesTable } from "../../interfaces";
 import { ItemModel } from "@syncfusion/ej2-splitbuttons/src/common/common-model";
 import { MoreMenuType } from "../../../timesheets/enums";
 import { ITimesheet } from "../../../timesheets/interface";
-import { InvoicesTable } from "../../interfaces/invoices-table.class";
 
 @Component({
   selector: 'app-invoice-records-table',

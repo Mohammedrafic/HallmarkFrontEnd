@@ -87,6 +87,14 @@ const routes: Routes = [
         }
       },
       {
+        path: 'invoices',
+        loadChildren: () => import('../modules/invoices/invoices.module').then((m) => m.InvoicesModule),
+        data: {
+          isOrganizationArea: false,
+          isAgencyArea: true,
+        }
+      },
+      {
         path: 'order-management',
         component: OrderManagementComponent,
         data: {

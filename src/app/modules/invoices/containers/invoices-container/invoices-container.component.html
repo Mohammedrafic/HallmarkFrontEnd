@@ -47,50 +47,52 @@
                 [dataSource]="[]">
         </ejs-dropdownlist>
 
-        <div class="form-row">
-          <div class="mr-12">
-            <label>Time In</label>
-            <ejs-timepicker
-                    placeholder="HH:MM"
-                    format="hh:mm a"
-                    [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                    [enableMask]="true"
-                    maskPlaceholder="HH:MM">
-            </ejs-timepicker>
-          </div>
+       <ng-container *ngIf="false">
+         <div class="form-row">
+           <div class="mr-12">
+             <label>Time In</label>
+             <ejs-timepicker
+                     placeholder="HH:MM"
+                     format="hh:mm a"
+                     [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                     [enableMask]="true"
+                     maskPlaceholder="HH:MM">
+             </ejs-timepicker>
+           </div>
 
-          <div>
-            <label>Time Out</label>
-            <ejs-timepicker
-                    placeholder="HH:MM"
-                    format="hh:mm a"
-                    [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                    [enableMask]="true"
-                    maskPlaceholder="HH:MM">
-            </ejs-timepicker>
-          </div>
-        </div>
+           <div>
+             <label>Time Out</label>
+             <ejs-timepicker
+                     placeholder="HH:MM"
+                     format="hh:mm a"
+                     [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                     [enableMask]="true"
+                     maskPlaceholder="HH:MM">
+             </ejs-timepicker>
+           </div>
+         </div>
 
-        <div class="form-row">
-          <div class="mr-12">
-            <label>Cost center <span class="required"></span></label>
-            <ejs-dropdownlist
-                    title="Group by choice"
-                    [fields]="{}"
-                    [dataSource]="[]">
-            </ejs-dropdownlist>
-          </div>
+         <div class="form-row">
+           <div class="mr-12">
+             <label>Cost center <span class="required"></span></label>
+             <ejs-dropdownlist
+                     title="Group by choice"
+                     [fields]="{}"
+                     [dataSource]="[]">
+             </ejs-dropdownlist>
+           </div>
 
-          <div>
-            <label>Category <span class="required"></span></label>
-            <ejs-dropdownlist
-                    title="Group by choice"
-                    [fields]="{}"
-                    [dataSource]="[]">
-            </ejs-dropdownlist>
-          </div>
-        </div>
+           <div>
+             <label>Category <span class="required"></span></label>
+             <ejs-dropdownlist
+                     title="Group by choice"
+                     [fields]="{}"
+                     [dataSource]="[]">
+             </ejs-dropdownlist>
+           </div>
+         </div>
 
+       </ng-container>
         </div>
     </form>
   </ng-template>
