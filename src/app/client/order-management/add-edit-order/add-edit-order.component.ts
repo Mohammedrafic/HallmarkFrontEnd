@@ -6,7 +6,7 @@ import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
-import { Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { filter, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { SetImportFileDialogState } from '@admin/store/admin.actions';
@@ -27,6 +27,8 @@ import { BillRate, OrderBillRateDto } from '@shared/models/bill-rate.model';
 import { IOrderCredentialItem } from '@order-credentials/types';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrderStatus } from '@shared/enums/order-management';
+import { OrderCandidatesCredentialsState } from '@order-credentials/store/credentials.state';
+import { UpdatePredefinedCredentials } from '@order-credentials/store/credentials.actions';
 
 enum SelectedTab {
   OrderDetails,
@@ -58,6 +60,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   @Select(OrderManagementContentState.predefinedBillRates)
   predefinedBillRates$: Observable<BillRate[]>;
+
+  @Select(OrderCandidatesCredentialsState.predefinedCredentials)
+  predefinedCredentials$: Observable<IOrderCredentialItem[]>;
 
   public SelectedTab = SelectedTab;
   public orderId: number;
@@ -123,15 +128,15 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       })
     ).subscribe();
 
-    this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe(predefinedBillRates => {
-      this.orderBillRates = predefinedBillRates;
-    });
+    this.subscribeOnPredefinedCredentials();
+    this.subscribeOnPredefinedBillRates();
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.store.dispatch(new ClearPredefinedBillRates());
+    this.store.dispatch(new UpdatePredefinedCredentials([]));
     this.store.dispatch(new SetIsDirtyOrderForm(false));
   }
 
@@ -400,6 +405,21 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     } else {
       this.store.dispatch(new SaveOrder(order, documents));
     }
+  }
+
+  private subscribeOnPredefinedCredentials(): void {
+    this.predefinedCredentials$.pipe(
+      filter((predefinedCredentials: IOrderCredentialItem[]) => !!predefinedCredentials.length && this.orderId === 0),
+      takeUntil(this.unsubscribe$)
+    ).subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
+      this.orderCredentials = predefinedCredentials;
+    });
+  }
+
+  private subscribeOnPredefinedBillRates(): void {
+    this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe(predefinedBillRates => {
+      this.orderBillRates = predefinedBillRates;
+    });
   }
 
   private saveAsTemplate(): void {
