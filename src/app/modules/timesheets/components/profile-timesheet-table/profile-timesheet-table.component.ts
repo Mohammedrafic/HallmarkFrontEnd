@@ -1,18 +1,28 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
   OnChanges,
+  OnDestroy,
   Output,
   ViewChild
 } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+
+import { of, combineLatest, Subscription, filter } from 'rxjs';
+import { Store } from '@ngxs/store';
 
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ProfileTimeSheetDetail } from '../../store/model/timesheets.model';
 import { ProfileTimesheetTableConfig } from '../../constants';
+import { Timesheets } from '../../store/actions/timesheets.actions';
+import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
 
 
 @Component({
@@ -22,7 +32,7 @@ import { ProfileTimesheetTableConfig } from '../../constants';
   changeDetection: ChangeDetectionStrategy.OnPush,
 
 })
-export class ProfileTimesheetTableComponent extends AbstractGridConfigurationComponent implements OnChanges {
+export class ProfileTimesheetTableComponent extends AbstractGridConfigurationComponent implements OnDestroy, OnChanges {
   @ViewChild('profileTable') readonly profileTable: GridComponent;
 
   @Input() timeSheetsProfile: ProfileTimeSheetDetail[];
@@ -30,6 +40,9 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
   @Input() tempProfile: any;
 
   @Output() openAddSideDialog: EventEmitter<number> = new EventEmitter<number>();
+  @Output() updateTable: EventEmitter<void> = new EventEmitter<void>();
+  @Output() deleteTableItemId: EventEmitter<{ profileId: number; tableItemId: number | any }>
+    = new EventEmitter<{ profileId: number; tableItemId: number | any }>();
 
   public override readonly allowPaging = false;
 
@@ -37,7 +50,7 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
 
   public readonly tableConfig = ProfileTimesheetTableConfig;
 
-  tempData: any[];
+  tempData: any[]; // TODO change tempData everywhere to timeSheetsProfile
 
   profileId: number;
 
@@ -46,8 +59,15 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
       { field: 'timeIn', direction: 'Ascending' },
     ],
   };
+  public isEditOn = false;
+  public subscription: Subscription;
 
-  constructor() {
+  constructor(
+    private store: Store,
+    private cdr: ChangeDetectorRef,
+    private confirmService: ConfirmService,
+    private profileTimesheetService: ProfileTimesheetService
+  ) {
     super();
 
   }
@@ -56,9 +76,13 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
     this.createTableData();
   }
 
-  public editTimesheet(timesheet: ProfileTimeSheetDetail): void {}
+  ngOnDestroy(): void {
+    this.handleSubscription();
+  }
 
-  public deleteTimesheet(timesheet: ProfileTimeSheetDetail): void {}
+  public editTimesheets(): void {
+    this.updateTableView(true);
+  }
 
   private createTableData(): void {
     let profile;
@@ -68,7 +92,6 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
     } else {
       profile = {}
     }
-
 
     this.profileId = profile.id;
     this.tempData = [];
@@ -113,7 +136,7 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
         ...storageItem,
       }));
     }
-
+    this.tempData = this.tempData.map(el => ({ ...el, form: this.profileTimesheetService.populateForm(el) }));
   }
 
   private setInitTime(time: Date) {
@@ -126,5 +149,86 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
     const clonedDate = new Date(time.getTime());
     clonedDate.setHours(17, 0,  0);
     return clonedDate;
+  }
+
+  public deleteTimesheet(timesheet: ProfileTimeSheetDetail): void {
+    this.deleteTableItemId.emit({ profileId: this.profileId, tableItemId: timesheet.id });
+  }
+
+  public cancelChanges(): void {
+    if (this.tempData.some(el => el.form?.dirty)) {
+      this.confirmService
+        .confirm(CANCEL_COFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => confirm))
+        .subscribe(() => {
+          this.resetForms();
+          this.updateTableView();
+        });
+    } else {
+      this.resetForms();
+      this.updateTableView();
+    }
+  }
+
+  public saveChanges(): void {
+    if (!this.tempData.some(el => el.form?.invalid)) {
+      this.handleSubscription();
+      this.subscription = combineLatest(
+        this.tempData
+          .map(el =>
+            el.form?.valid && el.form?.touched
+              ? this.store.dispatch(new Timesheets.PatchProfileTimesheet(
+                this.profileId,
+                el.id,
+                el.form.getRawValue()
+              )) :
+              of(null)
+          )
+      ).subscribe(() => {
+        this.updateTable.emit();
+        this.updateTableView();
+      });
+    } else {
+      this.tempData.forEach(el => {
+        el.form?.markAllAsTouched();
+      });
+    }
+  }
+
+  public handleRowChange(form: FormGroup, key: string): void {
+    form.get(key)?.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+    this.cdr.detectChanges();
+  }
+
+  private updateTableView(isEdit = false): void {
+    this.isEditOn = isEdit;
+    this.toggleColumn(isEdit);
+    this.profileTable.autoFitColumns();
+    this.cdr.detectChanges();
+  }
+
+  private handleSubscription(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+
+  private resetForms(): void {
+    this.tempData = this.tempData.map(el => {
+      el.form = this.profileTimesheetService.populateForm(el);
+
+      return el;
+    });
+  }
+
+  private toggleColumn(isShow = false): void {
+    if (isShow) {
+      this.profileTable.showColumns(this.tableConfig.actions.header);
+    } else {
+      this.profileTable.hideColumns(this.tableConfig.actions.header);
+    }
   }
 }

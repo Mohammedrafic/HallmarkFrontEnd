@@ -137,6 +137,14 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.getProfileTimesheets();
   }
 
+  public handleDeleteItem({ profileId, tableItemId }: { profileId: number; tableItemId: number | any }): void {
+    this.store.dispatch(new Timesheets.DeleteProfileTimesheet(profileId, tableItemId)).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.getProfileTimesheets();
+    });
+  }
+
   private getProfileTimesheets(): void {
     this.store.dispatch(new Timesheets.GetProfileTimesheets())
     .pipe(takeUntil(this.componentDestroy()));

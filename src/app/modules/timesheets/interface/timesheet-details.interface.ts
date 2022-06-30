@@ -4,6 +4,7 @@ export interface DetailsColumnConfig {
   align: TableColumnAlign;
   width: number;
   header: string;
+  dataSource?: any[];
 }
 
 export interface DetailsTableConfig {

@@ -462,3 +462,17 @@ ejs-grid.e-control.e-grid {
     }
   }
 }
+
+.table-block {
+  ejs-grid.e-control.e-grid {
+    border-radius: initial;
+
+    .e-headercontent {
+      border-right-color: transparent;
+    }
+
+    .e-gridheader {
+      border-top-color: transparent;
+    }
+  }
+}

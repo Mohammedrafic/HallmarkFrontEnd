@@ -150,7 +150,10 @@
           *ngIf="timeSheetsProfile$ | async as timeSheetsProfile"
           [timeSheetsProfile]="timeSheetsProfile"
           [tempProfile]="profileData"
-          (openAddSideDialog)="handleOpenSideDialog($event)">
+          (openAddSideDialog)="handleOpenSideDialog($event)"
+          (updateTable)="handleUpdateTable()"
+          (deleteTableItemId)="handleDeleteItem($event)"
+        >
         </app-profile-timesheet-table>
       </section>
       <div class="timesheet-navigation">

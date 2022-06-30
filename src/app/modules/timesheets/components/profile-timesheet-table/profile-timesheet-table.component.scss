@@ -23,6 +23,14 @@
     font-weight: 700;
     line-height: 28px;
   }
+
+  .button-cancel {
+    margin-right: 12px;
+  }
+
+  .e-btn {
+    width: 81px;
+  }
 }
 
 .add-action {
@@ -32,10 +40,19 @@
   border: none;
   background: transparent;
   cursor: pointer;
+
+  &.spaced {
+    margin-left: auto;
+    margin-right: 10px;
+  }
 }
 
 .table-block {
   .ejs-grid.e-control.e-grid {
-    border-radius: none!important;
+    border-radius: 0 !important;
+  }
+  .e-rowcell.e-templatecell:last-child {
+    padding-left: 0;
+    padding-right: 0;
   }
 }

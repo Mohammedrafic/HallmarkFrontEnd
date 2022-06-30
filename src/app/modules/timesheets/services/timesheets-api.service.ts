@@ -62,4 +62,29 @@ export class TimesheetsApiService {
 
     return of(null);
   }
+
+  public patchProfileTimesheets(profileId: number, profileTimesheetId: number, body: ProfileTimeSheetDetail): Observable<null> {
+    const tableLocalData = JSON.parse(`${localStorage.getItem('timesheet-details-tables')}`);
+    const newTableData = Object.assign({}, tableLocalData, {
+      [profileId]: tableLocalData[profileId].map((el: any) => ({
+        ...el,
+        ...(el.id === profileTimesheetId && body)
+      }))
+    });
+
+    localStorage.setItem('timesheet-details-tables', JSON.stringify(newTableData));
+
+    return of(null);
+  }
+
+  public deleteProfileTimesheets(profileId: number, profileTimesheetId: number): Observable<null> {
+    const tableLocalData = JSON.parse(`${localStorage.getItem('timesheet-details-tables')}`);
+    const newTableData = Object.assign({}, tableLocalData, {
+      [profileId]: tableLocalData[profileId].filter((el: any) => el.id !== profileTimesheetId)
+    });
+
+    localStorage.setItem('timesheet-details-tables', JSON.stringify(newTableData));
+
+    return of(null);
+  }
 }

@@ -19,6 +19,7 @@ import { downloadBlobFile } from "@shared/utils/file.utils";
 import { Invoice, ProfileUploadedFile } from "../../interface";
 import { DialogActionPayload } from '../../interface';
 import { Router } from '@angular/router';
+import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -30,6 +31,7 @@ export class TimesheetsState {
     private timesheetsService: TimesheetsApiService,
     private timesheetDetailsService: TimesheetDetailsService,
     private router: Router,
+    private profileTimesheetService: ProfileTimesheetService
   ) {
   }
 
@@ -126,13 +128,29 @@ export class TimesheetsState {
     return this.timesheetsService.postProfileTimesheets(payload);
   }
 
+  @Action(Timesheets.PatchProfileTimesheet)
+  PatchProfileTimesheet(
+    ctx: StateContext<TimesheetsModel>,
+    { profileId, profileTimesheetId, payload }: Timesheets.PatchProfileTimesheet
+  ): Observable<null> {
+    return this.timesheetsService.patchProfileTimesheets(profileId, profileTimesheetId, payload);
+  }
+
+  @Action(Timesheets.DeleteProfileTimesheet)
+  DeleteProfileTimesheet(
+    ctx: StateContext<TimesheetsModel>,
+    { profileId, profileTimesheetId }: Timesheets.DeleteProfileTimesheet
+  ): Observable<null> {
+    return this.timesheetsService.deleteProfileTimesheets(profileId, profileTimesheetId);
+  }
+
   @Action(Timesheets.GetProfileTimesheets)
   GetProfileTimeSheets({ patchState }: StateContext<TimesheetsModel>): Observable<ProfileTimeSheetDetail[]> {
     return this.timesheetsService.getProfileTimesheets()
     .pipe(
       tap((data) => {
         patchState({
-          profileTimesheets: data,
+          profileTimesheets: data.map(el => ({ ...el, form: this.profileTimesheetService.populateForm(el) })),
         });
       }),
     );

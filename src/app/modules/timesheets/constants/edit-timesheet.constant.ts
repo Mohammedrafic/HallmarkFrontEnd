@@ -94,15 +94,35 @@ export const ProfileTimesheetTableConfig: DetailsTableConfig = {
     width: 120,
     header: 'Time Out',
   },
+  category: {
+    align: TableColumnAlign.Right,
+    width: 130,
+    header: 'Bill Rate Type',
+    dataSource: [
+      {
+        id: 1,
+        text: 'Regular'
+      },
+      {
+        id: 2,
+        text: 'Fixed'
+      },
+    ],
+  },
   costCenter: {
     align: TableColumnAlign.Right,
     width: 130,
     header: 'Cost Center',
-  },
-  category: {
-    align: TableColumnAlign.Right,
-    width: 130,
-    header: 'Category',
+    dataSource: [
+      {
+        id: 1,
+        text: 'FAV-87100'
+      },
+      {
+        id: 2,
+        text: 'FAV-90'
+      },
+    ],
   },
   hours: {
     align: TableColumnAlign.Right,
@@ -120,8 +140,8 @@ export const ProfileTimesheetTableConfig: DetailsTableConfig = {
     header: 'Total',
   },
   actions: {
-    align: TableColumnAlign.Right,
-    width: 120,
+    align: TableColumnAlign.Center,
+    width: 48,
     header: '',
   }
 }

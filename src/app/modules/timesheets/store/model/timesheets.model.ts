@@ -1,6 +1,7 @@
 import { PageOfCollections } from '@shared/models/page.model';
 import { Invoice, ITimesheet, ProfileUploadedFile } from '../../interface';
 import { ProfileTimeSheetActionType } from '../../enums';
+import { FormGroup } from '@angular/forms';
 
 export type TimeSheetsPage = PageOfCollections<ITimesheet>;
 
@@ -18,6 +19,7 @@ export interface TimesheetsModel {
 export interface ProfileTimeSheetDetail {
   id?: number;
   day: Date;
+  form?: FormGroup;
   timeIn: string;
   timeOut: string;
   costCenter: string;

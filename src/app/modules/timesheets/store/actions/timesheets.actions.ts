@@ -34,4 +34,25 @@ export namespace Timesheets {
     constructor(public readonly payload: any) {
     }
   }
+
+  export class PatchProfileTimesheet {
+    static readonly type = TIMESHEETS_ACTIONS.PATCH_PROFILE_TIMESHEET;
+
+    constructor(
+      public readonly profileId: number | any,
+      public readonly profileTimesheetId: number | any,
+      public readonly payload: any
+    ) {
+    }
+  }
+
+  export class DeleteProfileTimesheet {
+    static readonly type = TIMESHEETS_ACTIONS.DELETE_PROFILE_TIMESHEET;
+
+    constructor(
+      public readonly profileId: number | any,
+      public readonly profileTimesheetId: number | any
+    ) {
+    }
+  }
 }

@@ -43,6 +43,7 @@ import { TimesheetsService } from './services/timesheets.service';
 import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
 import { TimesheetDetailsService } from "./services/timesheet-details.service";
 import { DemoService } from './services/demo.service';
+import { ProfileTimesheetService } from './services/profile-timesheet.service';
 
 const gridIcons = {
   MessageSquare,
@@ -124,6 +125,7 @@ const gridIcons = {
     EditTimesheetService,
     MaskedDateTimeService,
     TimesheetsService,
+    ProfileTimesheetService,
     CapitalizeFirstPipe,
     TimesheetDetailsService,
     DemoService,
