@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 import { takeWhile, Observable, Subject } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
@@ -23,14 +24,19 @@ import {
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
   ReloadOrderCandidatesLists,
+  GetAgencyFilterOptions,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AgencyOrderManagement, OrderManagementChild, AgencyOrderManagementPage } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, OrderManagementChild, AgencyOrderManagementPage, AgencyOrderFilters } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { Location } from '@angular/common';
+import { DatePipe, Location } from '@angular/common';
 import { UserState } from 'src/app/store/user.state';
 import { isUndefined } from 'lodash';
+import { FilterService } from '@shared/services/filter.service';
+import { ShowFilterDialog } from 'src/app/store/app.actions';
+import { FilteredItem } from '@shared/models/filter.model';
+import { AgencyOrderFiltersComponent } from './agency-order-filters/agency-order-filters.component';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -39,6 +45,8 @@ import { isUndefined } from 'lodash';
   providers: [ChipsCssClass, DetailRowService],
 })
 export class OrderManagementGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+  @Input() filteredItems$: Subject<number>;
+ 
   @ViewChild('grid') override gridWithChildRow: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
 
@@ -60,13 +68,18 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public typeValueAccess = typeValueAccess;
   public previousSelectedOrderId: number | null;
   public selectedCandidat: any | null;
+  public filters: AgencyOrderFilters = {};
+  public filterColumns = AgencyOrderFiltersComponent.generateFolterColumns();
+  public OrderFilterFormGroup: FormGroup = AgencyOrderFiltersComponent.generateFiltersForm();
 
   private statusSortDerection: SortDirection = 'Ascending';
   private isAlive = true;
 
   constructor(private store: Store,
               private location: Location,
-              private actions$: Actions) {
+              private actions$: Actions,
+              private datePipe: DatePipe,
+              private filterService: FilterService) {
     super();
   }
 
@@ -112,7 +125,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private dispatchNewPage(): void {
-    this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize));
+    this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
   }
 
   public onCompare(): void {
@@ -171,6 +184,51 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.openChildDialog.next([order, candidat]);
   }
 
+  // Filter
+  public onFilterClose() {
+    this.OrderFilterFormGroup.setValue({
+      orderId: this.filters.orderId || null,
+      regionIds: this.filters.regionIds || [],
+      locationIds: this.filters.locationIds || [],
+      departmentsIds: this.filters.departmentsIds || [],
+      skillIds: this.filters.skillIds || [],
+      orderTypes: this.filters.orderTypes || [],
+      jobTitle: this.filters.jobTitle || null,
+      billRateFrom: this.filters.billRateFrom || null,
+      billRateTo: this.filters.billRateTo || null,
+      openPositions: this.filters.openPositions || null,
+      jobStartDate: this.filters.jobStartDate || null,
+      jobEndDate: this.filters.jobEndDate || null,
+      candidateStatuses: this.filters.candidateStatuses || [],
+      organizationIds: this.filters.organizationIds || [],
+      orderStatuses: this.filters.orderStatuses || [],
+    });
+    this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
+    this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.OrderFilterFormGroup, this.filterColumns);
+  }
+
+  public onFilterClearAll(): void {
+    this.OrderFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {};
+    this.dispatchNewPage();
+    this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  public onFilterApply(): void {
+    this.filters = this.OrderFilterFormGroup.getRawValue();
+    this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
+    this.dispatchNewPage();
+    this.store.dispatch(new ShowFilterDialog(false));
+    this.filteredItems$.next(this.filteredItems.length);
+  }
+  // End - Filter
+
   private onOrderPreviewChange(): void {
     this.openPreview.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (!isOpen) {
@@ -210,12 +268,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.openPreview.next(false);
       this.openCandidat.next(false);
       this.dispatchNewPage();
+      this.store.dispatch(new GetAgencyFilterOptions());
     });
   }
 
   private onReloadOrderCandidatesLists(): void {
     this.actions$.pipe(ofActionSuccessful(ReloadOrderCandidatesLists), takeWhile(() => this.isAlive)).subscribe(() => {
-      this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize)).subscribe((data) => {
+      this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters)).subscribe((data) => {
         const order = data.agencyOrders.ordersPage.items.find((item: AgencyOrderManagement) => item.orderId === this.selectedOrder.orderId);
         if (order) {
           this.onRowClick({ data: order });

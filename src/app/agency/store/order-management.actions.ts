@@ -1,11 +1,11 @@
 import { DialogNextPreviousOption } from "@shared/components/dialog-next-previous/dialog-next-previous.component";
 import { OrderApplicantsApplyData } from "@shared/models/order-applicants.model";
-import { AcceptJobDTO } from "@shared/models/order-management.model";
+import { AcceptJobDTO, AgencyOrderFilters } from "@shared/models/order-management.model";
 import { RejectReasonPayload } from "@shared/models/reject-reason.model";
 
 export class GetAgencyOrdersPage {
   static readonly type = '[agency order management] Get Agency Orders Page';
-  constructor(public pageNumber: number, public pageSize: number) {}
+  constructor(public pageNumber: number, public pageSize: number, public filters: AgencyOrderFilters) {}
 }
 export class GetOrderById {
   static readonly type = '[agency order management] Get Order By Id';
@@ -86,3 +86,7 @@ export class ReloadOrderCandidatesLists {
   constructor() {}
 }
 
+export class GetAgencyFilterOptions {
+  static readonly type = '[agency order management] Get Agency Filte rOptions';
+  constructor() { }
+}

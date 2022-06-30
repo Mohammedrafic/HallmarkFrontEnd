@@ -37,6 +37,7 @@
     [textWrapSettings]="wrapSettings"
     (rowSelected)="onRowClick($event)"
     (dataBound)="onDataBound()"
+    (actionBegin)="actionBegin($event)"
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
@@ -286,7 +287,7 @@
         </div>
       </div>
     </div>
-    <div class="bootstrap">
+    <div class="row bootstrap">
       <div class="input-container">
         <label>Order Status</label>
         <div class="input-group multiselect">
@@ -297,6 +298,19 @@
                            [allowFiltering]="true"
                            [showDropDownIcon]="true"
                            [dataSource]="filterColumns.orderStatuses.dataSource">
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Candidate Status</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect mode="CheckBox"
+                           formControlName="candidateStatues"
+                           placeholder="All"
+                           [fields]="statusFields"
+                           [allowFiltering]="true"
+                           [showDropDownIcon]="true"
+                           [dataSource]="filterColumns.candidateStatues.dataSource">
           </ejs-multiselect>
         </div>
       </div>

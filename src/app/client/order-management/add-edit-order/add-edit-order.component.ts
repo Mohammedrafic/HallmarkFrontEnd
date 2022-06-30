@@ -30,7 +30,8 @@ import { OrderStatus } from '@shared/enums/order-management';
 
 enum SelectedTab {
   OrderDetails,
-  Credentials
+  Credentials,
+  BillRates
 }
 
 enum SubmitButtonItem {

@@ -16,6 +16,7 @@ import {
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed
 } from "@client/store/order-managment-content.actions";
+
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { BillRatesComponent } from "@shared/components/bill-rates/bill-rates.component";
 import { RejectReason } from "@shared/models/reject-reason.model";
@@ -45,6 +46,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public rejectReasons: RejectReason[] = [];
   public isRejected = false;
   public candidatStatus = CandidatStatus;
+  public candidateJob: OrderCandidateJob | null;
 
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
@@ -52,7 +54,6 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   applicantStatuses$: Observable<ApplicantStatus[]>;
 
   private unsubscribe$: Subject<void> = new Subject();
-  private candidateJob: OrderCandidateJob | null;
   private isOfferedStatus: boolean;
   private currentApplicantStatus: ApplicantStatus;
 
