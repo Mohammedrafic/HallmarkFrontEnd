@@ -62,7 +62,9 @@ export class ImageUploaderComponent implements OnInit {
 
   private addValidationMessage(file: FileInfo) {
     requestAnimationFrame(() => {
-      this.uploaderErrorMessageElement = document.getElementsByClassName('e-validation-fails')[0] as HTMLElement;
+      this.uploaderErrorMessageElement = document.getElementsByClassName('e-validation-fails')[0] ?
+        document.getElementsByClassName('e-validation-fails')[0] as HTMLElement :
+        document.getElementsByClassName('e-file-status e-file-invalid')[0] as HTMLElement;
       if (this.uploaderErrorMessageElement) {
         this.uploaderErrorMessageElement.innerText = file.size > this.maxFileSize
           ? 'The file should not exceed 10MB.'
