@@ -103,7 +103,8 @@
 
         <div class="controls-block">
           <div class="checkbox-block">
-            <ejs-checkbox [checked]="false" (checkedChange)="onDWNCheckboxSelectedChange($event)" label="DNW"></ejs-checkbox>
+            <ejs-switch class="toggle" [checked]="false" (checkedChange)="onDWNCheckboxSelectedChange($event)"></ejs-switch>
+            <span>DNW</span>
           </div>
 
           <button *ngIf="!isAgency" ejs-button cssClass="e-outline" class="reject-button" (click)="onRejectButtonClick()">

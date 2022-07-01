@@ -74,3 +74,7 @@
   font-weight: 700;
   color: $primary-active-blue;
 }
+
+ejs-grid.e-control.e-grid .e-frozencontent.e-frozen-right-content > .e-table {
+  border-left: none!important;
+}

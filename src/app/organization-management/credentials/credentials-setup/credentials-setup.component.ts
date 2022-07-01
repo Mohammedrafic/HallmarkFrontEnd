@@ -28,6 +28,7 @@ import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { CredentialsState } from '@organization-management/store/credentials.state';
 import {
+  ClearCredentialSetup,
   GetCredentialSetupByMappingId, GetFilteredCredentialSetupData,
   UpdateCredentialSetup,
   UpdateCredentialSetupSucceeded
@@ -77,7 +78,7 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   public mappingData: CredentialSetupGet[];
 
   private unsubscribe$: Subject<void> = new Subject();
-  private lastSelectedCredential?: CredentialSetupFilterGet;
+  private lastSelectedCredential: CredentialSetupFilterGet | null;
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -106,12 +107,12 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   }
 
   public onCredentialCheckboxChange(credentialSetup: CredentialSetupGet, checkboxName: string, event: any): void {
-    this.credentialsSetupFormGroup.setValue({
-      mappingId: credentialSetup.mappingId,
-      masterCredentialId: credentialSetup.masterCredentialId,
-      comments: credentialSetup.comments,
-      inactiveDate: credentialSetup.inactiveDate,
-    });
+    this.credentialsSetupFormGroup.controls['mappingId'].setValue(credentialSetup.mappingId);
+    this.credentialsSetupFormGroup.controls['masterCredentialId'].setValue(credentialSetup.masterCredentialId);
+    this.credentialsSetupFormGroup.controls['credentialType'].setValue(credentialSetup.credentialType);
+    this.credentialsSetupFormGroup.controls['description'].setValue(credentialSetup.description);
+    this.credentialsSetupFormGroup.controls['comments'].setValue(credentialSetup.comments);
+    this.credentialsSetupFormGroup.controls['inactiveDate'].setValue(credentialSetup.inactiveDate);
 
     switch(checkboxName) {
       case 'isActive':
@@ -257,8 +258,9 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
       this.store.dispatch(new GetCredentialSetupByMappingId(selectedCredential.mappingId));
     } else {
       // if no selected credential in Credential grid, then clear data from Mapping grid
-      this.lastSelectedCredential = undefined;
+      this.lastSelectedCredential = null;
       this.gridDataSource = [];
+      this.store.dispatch(new ClearCredentialSetup());
     }
   }
 
@@ -294,6 +296,9 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
 
   private organizationChangedHandler(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((organizationId) => {
+      this.lastSelectedCredential = null;
+      this.gridDataSource = [];
+      this.store.dispatch(new ClearCredentialSetup());
       this.store.dispatch(new GetCredentialSkillGroup());
     });
   }

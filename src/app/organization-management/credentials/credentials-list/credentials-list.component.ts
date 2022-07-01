@@ -123,7 +123,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveCredentialSucceeded)).subscribe(() => {
       this.clearFormDetails();
-      this.store.dispatch(new GetCredential());
+      this.getCredentials();
     });
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
@@ -242,7 +242,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
       })
       .subscribe((confirm) => {
         if (confirm) {
-          this.store.dispatch(new RemoveCredential(credential));
+          this.store.dispatch(new RemoveCredential(credential, this.filters));
         }
         this.removeActiveCssClass();
       });

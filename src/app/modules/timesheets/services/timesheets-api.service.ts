@@ -65,6 +65,7 @@ export class TimesheetsApiService {
 
   public patchProfileTimesheets(profileId: number, profileTimesheetId: number, body: ProfileTimeSheetDetail): Observable<null> {
     const tableLocalData = JSON.parse(`${localStorage.getItem('timesheet-details-tables')}`);
+
     const newTableData = Object.assign({}, tableLocalData, {
       [profileId]: tableLocalData[profileId].map((el: any) => ({
         ...el,
