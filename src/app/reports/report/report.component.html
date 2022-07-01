@@ -1,0 +1,41 @@
+<ng-container
+  [ngTemplateOutlet]="reportTemplate"
+  [ngTemplateOutletContext]="{
+    reportComponent: reportComponent$ | async,
+    filters: filters$ | async
+  }"
+>
+</ng-container>
+
+<ng-template #reportTemplate let-reportComponent="reportComponent" let-filters="filters">
+  <div class="app-report">
+    <app-page-toolbar>
+      <div right>
+        <app-button
+          (clickEmitter)="showFilters()"
+          [type]="buttonTypeEnum.OUTLINED"
+          [badgeText]="filters?.length"
+          iconName="sliders"
+          text="Filters"
+        ></app-button>
+      </div>
+    </app-page-toolbar>
+    <div class="app-report__grid">
+      <ng-container
+        [ngTemplateOutlet]="reportComponent ? reportComponentTemplate : loaderTemplate"
+        [ngTemplateOutletContext]="{ reportComponent: reportComponent }"
+      ></ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #loaderTemplate>
+  <app-inline-loader></app-inline-loader>
+</ng-template>
+
+<ng-template #reportComponentTemplate let-reportComponent="reportComponent">
+  <ng-template
+    [ngComponentOutlet]="reportComponent.component"
+    [ngComponentOutletInjector]="reportComponent.injector"
+  ></ng-template>
+</ng-template>

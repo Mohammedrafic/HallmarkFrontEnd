@@ -1,0 +1,16 @@
+.app-fillrates-report {
+  &__filters-form {
+    display: flex;
+    flex-direction: column;
+    row-gap: var(--form-control-gap-y);
+  }
+
+  &__row-controls {
+    display: flex;
+    column-gap: var(--form-control-gap-x);
+  }
+
+  &__row-control {
+    flex: 1;
+  }
+}

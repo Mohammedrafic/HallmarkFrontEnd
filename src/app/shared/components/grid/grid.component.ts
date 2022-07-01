@@ -38,7 +38,7 @@ export class GridComponent<Data> extends DestroyableDirective implements OnChang
   @Output() public navigateToPageEmitter: EventEmitter<number> = new EventEmitter<number>();
   @Output() public pageSizeChangeEmitter: EventEmitter<number> = new EventEmitter<number>();
 
-  public readonly defaultColumnDefinition: ColumnDefinitionModel = { minWidth: 100, resizable: true, flex: 1 };
+  public readonly defaultColumnDefinition: ColumnDefinitionModel = { minWidth: 100, resizable: true };
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public readonly modules: Module[] = [ClientSideRowModelModule];
 
