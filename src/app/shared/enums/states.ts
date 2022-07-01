@@ -53,7 +53,7 @@ export const UsaStates = [
   'Washington',
   'West Virginia',
   'Wisconsin',
-  'Wyoming'
+  'Wyoming',
 ];
 
 export const CanadaStates = [
@@ -61,7 +61,6 @@ export const CanadaStates = [
   'British Columbia',
   'Manitoba',
   'New Brunswick',
-  'Newfoundland',
   'Newfoundland and Labrador',
   'Northwest Territories',
   'Nova Scotia',
@@ -71,5 +70,4 @@ export const CanadaStates = [
   'Quebec',
   'Saskatchewan',
   'Yukon',
-  'Yukon Territory'
 ];
