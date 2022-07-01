@@ -1,16 +1,20 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { Store } from "@ngxs/store";
-import { SetHeaderState, ShowFilterDialog } from "../../../../store/app.actions";
 import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
-import { Observable, of, takeUntil } from "rxjs";
-import { PageOfCollections } from "@shared/models/page.model";
-import { InvoiceRecord, InvoicesTableConfig, PagingQueryParams } from "../../interfaces";
-import { TabsListConfig } from "@shared/components/tabs-list/tabs-list-config.model";
 import { ActivatedRoute, Params, Router } from "@angular/router";
-import { Invoices } from "../../store/actions/invoices.actions";
-import { Destroyable } from "@core/helpers";
+
+import { Store } from "@ngxs/store";
+import { Observable, of, takeUntil } from "rxjs";
 import { map } from "rxjs/operators";
+
+import { PageOfCollections } from "@shared/models/page.model";
+import { TabsListConfig } from "@shared/components/tabs-list/tabs-list-config.model";
+import { Destroyable } from "@core/helpers";
+
+import { SetHeaderState, ShowFilterDialog } from "../../../../store/app.actions";
+import { InvoicePage, InvoiceRecord, InvoicesTableConfig, PagingQueryParams } from '../../interfaces';
+import { Invoices } from "../../store/actions/invoices.actions";
 import { ProfileTimeSheetDetail } from "../../../timesheets/store/model/timesheets.model";
+import { INVOICES_TAB_CONFIG, MOK_ALL_INVOICES_PAGE } from '../../constants/invoices.constant';
 
 @Component({
   selector: 'app-invoices-container',
@@ -19,24 +23,8 @@ import { ProfileTimeSheetDetail } from "../../../timesheets/store/model/timeshee
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoicesContainerComponent extends Destroyable implements OnInit {
-  public readonly tabsConfig: TabsListConfig[] = [
-    {
-      title: 'Invoice Records',
-    },
-    {
-      title: 'All Invoices'
-    },
-    {
-      title: 'Pending Approval'
-    },
-    {
-      title: 'Pending',
-      amount: 2,
-    },
-    {
-      title: 'Paid',
-    }
-  ];
+  public readonly tabsConfig: TabsListConfig[] = INVOICES_TAB_CONFIG;
+  public selectedTabIdx: number = 0;
 
   public readonly tableConfig: InvoicesTableConfig = {
     onPageChange: this.onPageChange.bind(this),
@@ -49,6 +37,8 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
 
   // @Select(InvoicesState.invoicesData)
   public invoicesData$: Observable<PageOfCollections<InvoiceRecord>>;
+
+  public allInvoices: InvoicePage = MOK_ALL_INVOICES_PAGE;
 
   public get dateControl(): FormControl {
     return this.formGroup.get('date') as FormControl;
@@ -136,7 +126,26 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
   public onExportOptionSelect(event: unknown): void {
   }
 
-  public onTabSelect(event: unknown): void {
+  public handleChangeTab(tabIdx: number): void {
+    this.selectedTabIdx = tabIdx;
+    switch (tabIdx) {
+      case 0: {
+        console.log(0);
+        break;
+      }
+      case 1: {
+        console.log(1);
+        break;
+      }
+      case 2: {
+        console.log(2);
+        break;
+      }
+      case 3: {
+        console.log(2);
+        break;
+      }
+    }
   }
 
   private onPageChange(page: number): void {

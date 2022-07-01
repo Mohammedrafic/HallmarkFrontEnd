@@ -1,0 +1,26 @@
+<div
+  class="candidate-row"
+  [ngClass]="{'selected': selected}"
+  (click)="clickEvent.emit(rowData)"
+>
+  <div class="info">
+    <div class="data"><a href='#'>{{ child.name }}</a></div>
+    <div class="title">Candidate Name</div>
+  </div>
+  <div class="info">
+    <div class="data">{{ child.amount }}</div>
+    <div class="title">Amount</div>
+  </div>
+  <div class="info">
+    <div class="data">{{ child.workWeek | date: 'W - ccc M/d/yy' }}</div>
+    <div class="title">Week Period</div>
+  </div>
+  <div class="info">
+    <div class="data">${{ child.billRate }}</div>
+    <div class="title">Bill Rate $</div>
+  </div>
+  <div class="info">
+    <div class="data"><a href='#'>{{ child.timesheetId }}</a></div>
+    <div class="title">Timesheet</div>
+  </div>
+</div>

@@ -1,6 +1,9 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tabs-list [tabConfig]="tabsConfig"></app-tabs-list>
+    <app-tabs-list
+      [tabConfig]="tabsConfig"
+      (changeTab)="handleChangeTab($event)">
+    </app-tabs-list>
   </ng-container>
 
   <ng-container right>
@@ -17,7 +20,14 @@
 </app-page-toolbar>
 
 <section>
-  <app-invoice-records-table [tableData]="invoicesData$ | async" [config]="tableConfig"></app-invoice-records-table>
+  <ng-container [ngSwitch]="selectedTabIdx">
+    <ng-container *ngSwitchCase="1">
+      <app-all-invoices-table [tableData]="allInvoices"></app-all-invoices-table>
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+      <app-invoice-records-table [tableData]="invoicesData$ | async" [config]="tableConfig"></app-invoice-records-table>
+    </ng-container>
+  </ng-container>
 </section>
 
 <ejs-dialog

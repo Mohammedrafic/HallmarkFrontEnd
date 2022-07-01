@@ -1,4 +1,5 @@
-import { TIMETHEETS_STATUSES } from '../../modules/timesheets/enums/timesheets.enum';
+import { TIMETHEETS_STATUSES } from '../../modules/timesheets/enums';
+import { INVOICES_STATUSES } from '../../modules/invoices/enums/invoices.enum';
 
 export enum Status {
   'In Progress',
@@ -8,14 +9,14 @@ export enum Status {
 }
 
 export const STATUS_COLOR_GROUP = {
-  'e-success': ['open', 'Active', 'Completed', 'active', 'completed','applied', TIMETHEETS_STATUSES.PENDING_APPROVE],
-  'e-warning': ['incomplete', 'suspended', 'Suspended', 'Incomplete', 'shortlisted', 'in progress (pending)'],
-  'e-default': ['closed', 'Inactive', 'inactive', 'Closed', TIMETHEETS_STATUSES.REJECTED],
-  'e-pending': ['pending', 'Pending', 'offered', TIMETHEETS_STATUSES.MISSING],
-  'e-progress': ['in progress', 'In Progress', 'Verified', 'verified'],
-  'e-accepted': ['accepted','Accepted', 'in progress (accepted)', TIMETHEETS_STATUSES.ORG_APPROVED],
-  'e-filled': ['filled', 'Filled', 'onboarded', "onboarded"],
-  'e-awaiting': ['not applied', 'Not Applied']
+  'e-success': ['open', 'Active', 'Completed', 'active', 'completed','applied', TIMETHEETS_STATUSES.PENDING_APPROVE, INVOICES_STATUSES.PENDING_APPROVAL], // green
+  'e-warning': ['incomplete', 'suspended', 'Suspended', 'Incomplete', 'shortlisted', 'in progress (pending)', INVOICES_STATUSES.PENDING_PAYMENT], // yellow
+  'e-default': ['closed', 'Inactive', 'inactive', 'Closed', TIMETHEETS_STATUSES.REJECTED], // hard gray
+  'e-pending': ['pending', 'Pending', 'offered', TIMETHEETS_STATUSES.MISSING], // red
+  'e-progress': ['in progress', 'In Progress', 'Verified', 'verified', INVOICES_STATUSES.SUBMITED_PEND_APPR], // blue
+  'e-accepted': ['accepted','Accepted', 'in progress (accepted)', TIMETHEETS_STATUSES.ORG_APPROVED], // purple
+  'e-filled': ['filled', 'Filled', 'onboarded', "onboarded"], // light blue
+  'e-awaiting': ['not applied', 'Not Applied'] // gray
 }
 
 export enum AgencyStatus {
