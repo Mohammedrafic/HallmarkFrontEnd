@@ -153,7 +153,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       jobStartDate: new FormControl(null),
       jobEndDate: new FormControl(null),
       orderStatuses: new FormControl([]),
-      candidateStatues: new FormControl([]),
+      candidateStatuses: new FormControl([]),
       candidatesCountFrom: new FormControl(null),
       candidatesCountTo: new FormControl(null),
       agencyIds: new FormControl([]),
@@ -176,16 +176,16 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       jobStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       jobEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       orderStatuses: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'statusText', valueId: 'status' },
-      candidateStatues: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'statusText', valueId: 'status' },
+      candidateStatuses: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'statusText', valueId: 'status' },
       candidatesCountFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
       candidatesCountTo: { type: ControlTypes.Text, valueType: ValueType.Text },
       agencyIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       agencyType: { type: ControlTypes.Radio, dataSource: { 1: 'Yes', 2: 'No' }, default: '0' },
     }
     this.orderFilterDataSources$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data: OrderFilterDataSource) => {
-      this.filterColumns.orderStatuses.dataSource = data.orderStatus;
+      this.filterColumns.orderStatuses.dataSource = data.orderStatuses;
       this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
-      this.filterColumns.candidateStatues.dataSource = data.candidateStatuses;
+      this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
     });
     this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
       this.orgStructure = structure;
@@ -320,7 +320,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       jobStartDate: this.filters.jobStartDate || null,
       jobEndDate: this.filters.jobEndDate || null,
       orderStatuses: this.filters.orderStatuses || [],
-      candidateStatues: this.filters.candidateStatues || [],
+      candidateStatuses: this.filters.candidateStatuses || [],
       candidatesCountFrom: this.filters.candidatesCountFrom || null,
       candidatesCountTo: this.filters.candidatesCountTo || null,
       agencyIds: this.filters.agencyIds || [],

@@ -1,5 +1,5 @@
 <section class="container">
-  <div class="toolbar-buttons" *ngIf="isBillRateSetupTabActive || isExternalBillRateType">
+  <div class="toolbar-buttons">
     <app-search
       [hidden]="isBillRateSetupTabActive"
       class="search"
@@ -20,7 +20,7 @@
       (select)="exportSelected($event)"
       cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
     <button
-      *ngIf="!isReadOnly"
+      *ngIf="!isReadOnly && !isExternalBillRateTypeMapping"
       ejs-button
       [isPrimary]="true"
       (click)="addBillRateSetupRecord()">{{addBillRateBtnText}}</button>
@@ -34,21 +34,32 @@
       <e-tabitem>
         <ng-template #headerText><div>Bill Rate Setup</div></ng-template>
         <ng-template #content>
-          <app-bill-rate-setup [filteredItems$]="filteredItems$" [export$]="exportMap.get(selectedTab)" [isActive]="isBillRateSetupTabActive"></app-bill-rate-setup>
+          <app-bill-rate-setup
+            [filteredItems$]="filteredItems$" [export$]="exportMap.get(selectedTab)"
+            [isActive]="isBillRateSetupTabActive">
+          </app-bill-rate-setup>
         </ng-template>
       </e-tabitem>
 
       <e-tabitem>
         <ng-template #headerText><div>External Bill Rate</div></ng-template>
         <ng-template #content>
-          <app-external-bill-rate [export$]="exportMap.get(selectedTab)" [searchQuery]="searchQuery" [isActive]="isExternalBillRateType"></app-external-bill-rate>
+          <app-external-bill-rate
+            [export$]="exportMap.get(selectedTab)"
+            [searchQuery]="searchQuery"
+            [isActive]="isExternalBillRateType">
+          </app-external-bill-rate>
         </ng-template>
       </e-tabitem>
 
       <e-tabitem>
         <ng-template #headerText><div>External Bill Rate Mapping</div></ng-template>
         <ng-template #content>
-          <app-bill-rate-type-mapping [isActive]="isExternalBillRateTypeMapping"></app-bill-rate-type-mapping>
+          <app-bill-rate-type-mapping
+            [export$]="exportMap.get(selectedTab)"
+            [searchQuery]="searchQuery"
+            [isActive]="isExternalBillRateTypeMapping">
+          </app-bill-rate-type-mapping>
         </ng-template>
       </e-tabitem>
     </e-tabitems>

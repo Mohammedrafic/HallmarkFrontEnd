@@ -63,6 +63,7 @@ export class DashboardService {
     [WidgetTypeEnum.OPEN_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
     [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
+    [WidgetTypeEnum.TASKS]: (filters: DashboardFiltersModel)=> this.getTasksWidgetData(),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -129,7 +130,7 @@ export class DashboardService {
           chartData: lodashMapPlain(candidatesInfo, ({ count, status }: CandidateTypeInfoModel, index: number) => ({
             label: status,
             value: count,
-            color: candidateLegendPalette[status as CandidateChartStatuses],
+            color: candidateLegendPalette[status as CandidateChartStatuses] || candidateLegendPalette[CandidateChartStatuses.CUSTOM],
           })),
         };
       })
@@ -243,5 +244,9 @@ export class DashboardService {
 
   public redirectToUrl(url: string): void {
     this.router.navigateByUrl(url);
+  }
+
+  private getTasksWidgetData(): Observable<string> {
+    return of('assets/icons/temporary-widget-tasks.png');
   }
 }

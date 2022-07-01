@@ -11,7 +11,7 @@ import {CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_REC
 import {ShowExportDialog, ShowSideDialog} from "../../../store/app.actions";
 import {
   DeleteBillRatesTypeById,
-  ExportBillRateSetup,
+  ExportExternalBillRate,
   GetExternalBillRateType, SaveBillRateType, UpdateBillRateType
 } from "@organization-management/store/bill-rates.actions";
 import {FieldSettingsModel} from "@syncfusion/ej2-angular-dropdowns";
@@ -51,7 +51,7 @@ export class ExternalBillRateComponent extends AbstractGridConfigurationComponen
   public isReadOnly = false;
 
   public columnsToExport: ExportColumn[] = [
-    { text:'External Bill Rate', column: 'Name'},
+    { text:'External Bill Rate', column: 'ExternalBillRate'},
     { text:'Bill Rate Title', column: 'BillRateTitle'},
   ];
 
@@ -67,16 +67,13 @@ export class ExternalBillRateComponent extends AbstractGridConfigurationComponen
 
   ngOnInit(): void {
     this.createFormGroups();
+    this.subsToExport();
     this.store.dispatch(new GetExternalBillRateType({ pageNumber: this.currentPage, pageSize: this.pageSize }));
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
       if (val.isDialogShown) {
         this.defaultFileName = 'Bill Rates/External Bill Rate ' + this.generateDateTime(this.datePipe);
         this.fileName = this.defaultFileName;
       }
-    });
-    this.export$?.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
-      this.defaultFileName = 'Bill Rates/External Bill Rate ' + this.generateDateTime(this.datePipe);
-      this.defaultExport(event);
     });
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;
@@ -85,7 +82,8 @@ export class ExternalBillRateComponent extends AbstractGridConfigurationComponen
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['searchQuery']?.currentValue || changes['searchQuery']?.currentValue === "") {
+    const searchQuery = changes['searchQuery'];
+    if (!searchQuery?.isFirstChange() && (searchQuery?.currentValue || searchQuery?.currentValue === "")) {
       this.store.dispatch(new GetExternalBillRateType({ pageNumber: this.currentPage, pageSize: this.pageSize, name: this.searchQuery }));
     }
   }
@@ -99,6 +97,13 @@ export class ExternalBillRateComponent extends AbstractGridConfigurationComponen
     this.externalBillRateTypeForm = this.fb.group({
       name: [null, [Validators.required, Validators.maxLength(100)]],
       billRateTitleId: [null],
+    });
+  }
+
+  private subsToExport(): void {
+    this.export$?.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
+      this.defaultFileName = 'Bill Rates/External Bill Rate ' + this.generateDateTime(this.datePipe);
+      this.defaultExport(event);
     });
   }
 
@@ -189,11 +194,12 @@ export class ExternalBillRateComponent extends AbstractGridConfigurationComponen
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.store.dispatch(new ExportBillRateSetup(new ExportPayload(
+    this.store.dispatch(new ExportExternalBillRate(new ExportPayload(
       fileType,
       {
         ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null,
         offset: Math.abs(new Date().getTimezoneOffset()),
+        name: this.searchQuery
       },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       null,

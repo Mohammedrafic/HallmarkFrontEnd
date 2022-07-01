@@ -46,9 +46,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   @Select(UserState.lastSelectedOrganizationId) private readonly organizationId$: Observable<
     UserStateModel['lastSelectedOrganizationId']
   >;
-  @Select(UserState.lastSelectedAgencyId) private readonly agencyId$: Observable<
-    UserStateModel['lastSelectedAgencyId']
-  >;
 
   @Select(UserState.lastSelectedOrganizationAgency)
   private readonly lastSelectedOrganizationAgency$: Observable<string>;

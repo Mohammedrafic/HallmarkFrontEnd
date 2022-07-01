@@ -54,12 +54,11 @@ import { ORDER_CONTACT_DETAIL_TITLES, ORDER_EDITS } from '@shared/constants';
 import PriceUtils from '@shared/utils/price.utils';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { SkillCategory } from '@shared/models/skill-category.model';
-import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { OrderStatus } from '@shared/enums/order-management';
 import { disableControls } from '@shared/utils/form.utils';
-import {AlertService} from "@shared/services/alert.service";
-import {ConfirmService} from "@shared/services/confirm.service";
+import { AlertService } from '@shared/services/alert.service';
+import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
 
 @Component({
   selector: 'app-order-details-form',
@@ -385,6 +384,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       }
 
       this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
+      this.store.dispatch(new GetPredefinedCredentials(departmentId, skillId));
     });
 
     combineLatest([

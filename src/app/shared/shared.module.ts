@@ -93,6 +93,7 @@ import { TabsListComponent } from './components/tabs-list/tabs-list.component';
 import { PageToolbarModule } from '@shared/components/page-toolbar/page-toolbar.module';
 import { FilterDialogModule } from '@shared/components/filter-dialog/filter-dialog.module';
 import { DeployCandidateMessageComponent } from './components/order-candidates-list/deploy-candidate-message/deploy-candidate-message.component';
+import {ExBillRateNamesPipe} from "@shared/pipes/external-bill-rate-names.pipe";
 
 const icons = {
   AlertCircle,
@@ -119,6 +120,7 @@ const COMPONENTS = [
   FormatPhoneNumberPipe,
   RateHourPipe,
   BillRatePipe,
+  ExBillRateNamesPipe,
   ValidateDirective,
   HighlightGridRowDirective,
   AddBackgroundForEmptyGridDirective,
