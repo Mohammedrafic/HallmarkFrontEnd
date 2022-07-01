@@ -86,8 +86,23 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
 
   onEditButtonClick(saveSkillGroup: CredentialSkillGroup, event: any): void {
     this.addActiveCssClass(event);
-    // reassign search grid data to allAssignedSkills in Edit mode
-    this.searchDataSource = this.allAssignedSkills;
+    const currentRowSkillGroupIds = saveSkillGroup.skills?.map(s => s.id);
+    const savedSkillIdsWithoutCurrentRow = Array.from(this.reservedMasterSkillIds).filter(s => {
+      if (currentRowSkillGroupIds && !currentRowSkillGroupIds.includes(s)) {
+        return s;
+      }
+      return null;
+    });
+
+    const updatedAssignedSkills = this.allAssignedSkills.filter(s => {
+      if (!savedSkillIdsWithoutCurrentRow.includes(s.id)) {
+        return s;
+      }
+      return null;
+    });
+
+    // reassign search grid data in Edit mode
+    this.searchDataSource = updatedAssignedSkills;
 
     this.isGridStateInvalid = false;
     this.isEdit = true;
@@ -96,10 +111,10 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     const savedSkillIds: number[] = [];
     const savedSkillIdsIndexes: number[] = [];
     saveSkillGroup.skills?.forEach(savedSkill => {
-      const foundAssignedSkill = this.allAssignedSkills.find(skill => skill.id === savedSkill.id);
+      const foundAssignedSkill = updatedAssignedSkills.find(skill => skill.id === savedSkill.id);
       if (foundAssignedSkill) {
         savedSkillIds.push(foundAssignedSkill.id);
-        savedSkillIdsIndexes.push(this.allAssignedSkills.indexOf(foundAssignedSkill));
+        savedSkillIdsIndexes.push(updatedAssignedSkills.indexOf(foundAssignedSkill));
       }
     });
 
