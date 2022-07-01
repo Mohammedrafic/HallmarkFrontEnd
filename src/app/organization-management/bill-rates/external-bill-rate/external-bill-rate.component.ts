@@ -18,6 +18,7 @@ import {FieldSettingsModel} from "@syncfusion/ej2-angular-dropdowns";
 import {ExportedFileType} from "@shared/enums/exported-file-type";
 import {DatePipe} from "@angular/common";
 import {ExportColumn, ExportOptions, ExportPayload} from "@shared/models/export.model";
+import {UserState} from "../../../store/user.state";
 
 @Component({
   selector: 'app-external-bill-rate',
@@ -44,6 +45,9 @@ export class ExternalBillRateComponent extends AbstractGridConfigurationComponen
   billRatesOptions$: Observable<BillRateOption[]>;
   billRateTitleFields: FieldSettingsModel = { text: 'title', value: 'id' };
 
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
+
   private pageSubject = new Subject<number>();
   public fileName: string;
   private unsubscribe$: Subject<void> = new Subject();
@@ -68,17 +72,9 @@ export class ExternalBillRateComponent extends AbstractGridConfigurationComponen
   ngOnInit(): void {
     this.createFormGroups();
     this.subsToExport();
-    this.store.dispatch(new GetExternalBillRateType({ pageNumber: this.currentPage, pageSize: this.pageSize }));
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
-      if (val.isDialogShown) {
-        this.defaultFileName = 'Bill Rates/External Bill Rate ' + this.generateDateTime(this.datePipe);
-        this.fileName = this.defaultFileName;
-      }
-    });
-    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
-      this.currentPage = page;
-      this.store.dispatch(new GetExternalBillRateType({pageNumber: this.currentPage, pageSize: this.pageSize}));
-    });
+    this.subsToOrganizationChange();
+    this.subsToActions();
+    this.subsToPageChange();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -104,6 +100,28 @@ export class ExternalBillRateComponent extends AbstractGridConfigurationComponen
     this.export$?.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
       this.defaultFileName = 'Bill Rates/External Bill Rate ' + this.generateDateTime(this.datePipe);
       this.defaultExport(event);
+    });
+  }
+
+  private subsToOrganizationChange(): void {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.store.dispatch(new GetExternalBillRateType({ pageNumber: this.currentPage, pageSize: this.pageSize }));
+    });
+  }
+
+  private subsToActions(): void {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
+      if (val.isDialogShown) {
+        this.defaultFileName = 'Bill Rates/External Bill Rate ' + this.generateDateTime(this.datePipe);
+        this.fileName = this.defaultFileName;
+      }
+    });
+  }
+
+  private subsToPageChange(): void {
+    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
+      this.currentPage = page;
+      this.store.dispatch(new GetExternalBillRateType({pageNumber: this.currentPage, pageSize: this.pageSize}));
     });
   }
 

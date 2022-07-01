@@ -18,12 +18,12 @@
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
-      <e-column field="name" headerText="Bill Rate Title" width=200>
+      <e-column field="billRateTitle" headerText="Bill Rate Title" width=200>
         <ng-template #template let-data>
           <span>{{ data.billRateTitle }}</span>
         </ng-template>
       </e-column>
-      <e-column field="title" headerText="External Bill Rate" width=500>
+      <e-column field="externalBillRates" headerText="External Bill Rate" width=500>
         <ng-template #template let-data>
           <span>{{data.externalBillRates | exBillRateNames}}</span>
         </ng-template>

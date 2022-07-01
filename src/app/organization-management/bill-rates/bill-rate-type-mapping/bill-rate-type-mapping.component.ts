@@ -3,7 +3,7 @@ import {GridComponent} from "@syncfusion/ej2-angular-grids";
 import {AbstractControl, FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {Actions, ofActionDispatched, Select, Store} from "@ngxs/store";
 import {BillRatesState} from "@organization-management/store/bill-rates.state";
-import {filter, Observable, Subject, takeUntil} from "rxjs";
+import {filter, Observable, Subject, takeUntil, throttleTime} from "rxjs";
 import {
   BillRateOption, ExternalBillRateMapped,
   ExternalBillRateMapping,
@@ -23,6 +23,7 @@ import {AbstractGridConfigurationComponent} from "@shared/components/abstract-gr
 import {ExportedFileType} from "@shared/enums/exported-file-type";
 import {ExportColumn, ExportOptions, ExportPayload} from "@shared/models/export.model";
 import {DatePipe} from "@angular/common";
+import {UserState} from "../../../store/user.state";
 
 @Component({
   selector: 'app-bill-rate-type-mapping',
@@ -60,6 +61,9 @@ export class BillRateTypeMappingComponent extends AbstractGridConfigurationCompo
   externalBillRateMapped$: Observable<ExternalBillRateMapped[]>;
   externalBillRateMappedFields: FieldSettingsModel = { text: 'externalBillRateName', value: 'externalBillRateId' };
 
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
+
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   private editRecordId?: number;
@@ -88,13 +92,9 @@ export class BillRateTypeMappingComponent extends AbstractGridConfigurationCompo
     this.patchExternalBillRates();
     this.subsToBillRateTitleChange();
     this.subsToExport();
-    this.store.dispatch(new GetExternalBillRateMapping({ pageNumber: this.currentPage, pageSize: this.pageSize }));
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
-      if (val.isDialogShown) {
-        this.defaultFileName = 'Bill Rates/External Bill Rate ' + this.generateDateTime(this.datePipe);
-        this.fileName = this.defaultFileName;
-      }
-    });
+    this.subsToOrganizationChange();
+    this.subsToActions();
+    this.subsToPageChange();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -140,6 +140,28 @@ export class BillRateTypeMappingComponent extends AbstractGridConfigurationCompo
     this.export$?.pipe(takeUntil(this.unsubscribe$)).subscribe((event: ExportedFileType) => {
       this.defaultFileName = 'Bill Rates/External Bill Rate Mapping' + this.generateDateTime(this.datePipe);
       this.defaultExport(event);
+    });
+  }
+
+  private subsToOrganizationChange(): void {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((id) => {
+      this.store.dispatch(new GetExternalBillRateMapping({ pageNumber: this.currentPage, pageSize: this.pageSize }));
+    });
+  }
+
+  private subsToActions(): void {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((val) => {
+      if (val.isDialogShown) {
+        this.defaultFileName = 'Bill Rates/External Bill Rate ' + this.generateDateTime(this.datePipe);
+        this.fileName = this.defaultFileName;
+      }
+    });
+  }
+
+  private subsToPageChange(): void {
+    this.pageSubject.pipe(takeUntil(this.unsubscribe$), throttleTime(100)).subscribe((page) => {
+      this.currentPage = page;
+      this.store.dispatch(new GetExternalBillRateMapping({pageNumber: this.currentPage, pageSize: this.pageSize}));
     });
   }
 
