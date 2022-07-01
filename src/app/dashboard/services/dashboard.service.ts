@@ -248,7 +248,7 @@ export class DashboardService {
   }
 
   private getTasksWidgetData(): Observable<string> {
-    return of('assets/icons/temporary-widget-tasks.png');
+    return of('temporary-collapsed-widget-tasks');
   }
 
   private getChatWidgetData(): Observable<string> {
