@@ -24,7 +24,7 @@ export class CandidatesReportService {
   ): CandidatesReportDataRequestPayloadModel {
     return {
       agencies: filterFormValue.agencies ?? [],
-      applicantStatus: filterFormValue.statuses ?? [],
+      applicantStatuses: filterFormValue.statuses ?? [],
       candidateName: filterFormValue.candidateName ?? '',
       pageNumber: pageQueryParams.page,
       pageSize: pageQueryParams.pageSize,

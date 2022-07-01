@@ -14,7 +14,6 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 
 import { ApplicantStatus } from '@shared/models/order-management.model';
-import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { BaseReportDirective } from '../base-report.directive';
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
@@ -49,7 +48,6 @@ import { reportDirectiveDataToken } from '../../constants/report-directive-data.
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 class FillratesReportComponent extends BaseReportDirective<FillrateModel> implements OnInit {
-  public readonly agenciesOptionFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   public readonly candidatesStatusesOptionFields: FieldSettingsModel = { text: 'statusText', value: 'applicantStatus' };
   public readonly departmentsOptionFields: FieldSettingsModel = baseDropdownFieldsSettings;
   public readonly locationsOptionFields: FieldSettingsModel = baseDropdownFieldsSettings;
@@ -125,13 +123,6 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
   ];
 
   public readonly filterColumns: FilterColumnsModel = {
-    agencies: {
-      dataSource: [],
-      type: ControlTypes.Multiselect,
-      valueField: this.agenciesOptionFields.text,
-      valueId: this.agenciesOptionFields.value,
-      valueType: ValueType.Id,
-    },
     skills: {
       dataSource: [],
       type: ControlTypes.Multiselect,
@@ -199,15 +190,10 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
   }
 
   protected getFiltersData(): void {
-    forkJoin([
-      this.fillratesReportService.getAssignedSkills(),
-      this.fillratesReportService.getApplicantsStatuses(),
-      this.fillratesReportService.getAssociateAgencies(),
-    ])
+    forkJoin([this.fillratesReportService.getAssignedSkills(), this.fillratesReportService.getApplicantsStatuses()])
       .pipe(takeUntil(this.destroy$))
-      .subscribe(([skills, statuses, agencies]: [Skill[], ApplicantStatus[], AssociateAgency[]]) => {
+      .subscribe(([skills, statuses]: [Skill[], ApplicantStatus[]]) => {
         this.filterColumns['skills'].dataSource = skills;
-        this.filterColumns['agencies'].dataSource = agencies;
         this.filterColumns['candidatesStatuses'].dataSource = statuses;
         this.changeDetectorRef.markForCheck();
       });
@@ -219,7 +205,6 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
 
   protected getReportFiltersForm(): FormGroup {
     return this.formBuilder.group({
-      agencies: [[]],
       candidatesStatuses: [[]],
       departments: [[]],
       locations: [[]],
