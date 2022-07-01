@@ -45,6 +45,7 @@ function generateInvoiceRecords(amount: number = 100): InvoiceRecord[] {
       hours: getRandomNumberInRange(20, 40),
       bonus: 0,
       rate: getRandomNumberInRange(36, 1400),
+      timesheetId: 11,
     }
   });
 }

@@ -1,7 +1,6 @@
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
-import { AllInvoicesTable, InvoicePage } from '../interfaces';
+import { AllInvoicesTable, Invoice, InvoicePage } from '../interfaces';
 import { INVOICES_STATUSES } from '../enums/invoices.enum';
-import { DetailsTableConfig } from '../../timesheets/interface';
 import { TableColumnAlign } from '../../timesheets/enums';
 
 export const INVOICES_TAB_CONFIG: TabsListConfig[] = [
@@ -49,43 +48,49 @@ export const MOK_CHILDREN_ITEMS = [
 
 export const MOK_ALL_INVOICES_ITEMS = [
   {
-    invoiceId: '20-30-01',
+    id: '20-30-01',
     statusText: INVOICES_STATUSES.SUBMITED_PEND_APPR,
     amount: 5000,
-    type: 'Interface',
+    type: 'Interfaced',
     organization: 'AB Staffing',
     location: 'Thone - Johnson Memorial Hospital',
     department: 'Emergency Department 1',
     candidate: 'Adkis, Adele Blue',
-    issueDate: '2022-07-01T15:00:00',
-    dueDate: '2022-07-20T12:00:00',
+    issueDate: new Date(),
+    dueDate: new Date(),
     children: MOK_CHILDREN_ITEMS,
+    groupBy: '',
+    groupName: '',
   },
   {
-    invoiceId: '20-30-01',
+    id: '20-30-01',
     statusText: INVOICES_STATUSES.PENDING_APPROVAL,
     amount: 5000,
-    type: 'Interface',
+    type: 'Interfaced',
     organization: 'AB Staffing',
     location: 'Thone - Johnson Memorial Hospital',
     department: 'Emergency Department 1',
     candidate: 'Adkis, Adele Blue',
-    issueDate: '2022-07-01T15:00:00',
-    dueDate: '2022-07-20T12:00:00'
+    issueDate: new Date(),
+    dueDate: new Date(),
+    groupBy: '',
+    groupName: '',
   },
   {
-    invoiceId: '20-30-01',
+    id: '20-30-01',
     statusText: INVOICES_STATUSES.PENDING_PAYMENT,
     amount: 5000,
-    type: 'Interface',
+    type: 'Interfaced',
     organization: 'AB Staffing',
     location: 'Thone - Johnson Memorial Hospital',
     department: 'Emergency Department 1',
     candidate: 'Adkis, Adele Blue',
-    issueDate: '2022-07-01T15:00:00',
-    dueDate: '2022-07-20T12:00:00'
+    issueDate: new Date(),
+    dueDate: new Date(),
+    groupBy: '',
+    groupName: '',
   },
-];
+] as unknown as Invoice[];
 
 export const MOK_ALL_INVOICES_PAGE: InvoicePage = {
   items: MOK_ALL_INVOICES_ITEMS,

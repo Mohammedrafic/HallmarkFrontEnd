@@ -10,4 +10,7 @@ export interface InvoiceRecord {
   bonus: number;
   hours: number;
   amount: number;
+  timesheetId: number;
+  minRate?: number;
+  maxRate?: number;
 }

@@ -12,12 +12,14 @@
   [selectionSettings]="selectionSettings"
   [textWrapSettings]="wrapSettings"
   (rowSelected)="rowSelected($event)"
+  (rowDeselected)="rowDeselected($event, grid)"
 >
   <e-columns>
     <e-column
       type="checkbox"
       [customAttributes]="{ class: 'bootstrap' }"
-      [width]="50">
+      [width]="50"
+    >
     </e-column>
     <e-column
       field="startDate"
@@ -30,14 +32,6 @@
     <e-column field="organization" headerText="Organization">
       <ng-template #template let-data>
         {{data.organization}}
-      </ng-template>
-    </e-column>
-    <e-column
-      field="location"
-      headerText="LOCATION"
-    >
-      <ng-template #template let-data>
-        {{data.location}}
       </ng-template>
     </e-column>
     <e-column
