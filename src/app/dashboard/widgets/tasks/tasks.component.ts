@@ -1,16 +1,23 @@
-import { ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
 import { Actions, ofActionDispatched } from '@ngxs/store';
+import { Subject, takeUntil } from 'rxjs';
 import { ToggleSidebarState } from 'src/app/store/app.actions';
 @Component({
   selector: 'app-tasks',
   templateUrl: './tasks.component.html',
   styleUrls: ['./tasks.component.scss'],
 })
-export class TasksComponent implements OnInit, OnChanges {
+export class TasksComponent implements OnInit, OnChanges, OnDestroy {
   @Input() public tasks: any;
   url: string;
+  destroy: Subject<boolean> = new Subject();
 
   constructor(private actions$: Actions, private cdr: ChangeDetectorRef) {}
+  
+  ngOnDestroy(): void {
+    this.destroy.next(true);
+    this.destroy.complete();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.url = changes['tasks'].currentValue;
@@ -18,7 +25,7 @@ export class TasksComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     // temporary functionality to display  widget as an image to demo
-    this.actions$.pipe(ofActionDispatched(ToggleSidebarState)).subscribe((isOpen) => {
+    this.actions$.pipe(takeUntil(this.destroy),ofActionDispatched(ToggleSidebarState)).subscribe((isOpen) => {
       if (isOpen.payload) {
         setTimeout(() => {
           this.url = 'temporary-widget-tasks';
