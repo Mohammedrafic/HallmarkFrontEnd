@@ -59,6 +59,11 @@ export class GetCredentialSetupByMappingId {
   constructor(public mappingId: number) {}
 }
 
+export class ClearCredentialSetup {
+  static readonly type = '[credentials] Clear Credential Setup';
+  constructor() {}
+}
+
 export class RemoveCredentialSetupByMappingId {
   static readonly type = '[credentials] Remove Credential Setup by Id';
   constructor(public mappingId: number, public filter: CredentialSetupFilterDto) {}
