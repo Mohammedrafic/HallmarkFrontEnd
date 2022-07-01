@@ -225,7 +225,7 @@ export class DashboardService {
   }
 
   private getActivePositionWidgetData(filters: DashboardFiltersModel): Observable<AccumulationChartModel> {
-    return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, {}).pipe(
+    return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { granulateInProgress: true }).pipe(
       map(({ orderStatusesDetails }: ActivePositionsDto) => {
         return {
           id: WidgetTypeEnum.ACTIVE_POSITIONS,
