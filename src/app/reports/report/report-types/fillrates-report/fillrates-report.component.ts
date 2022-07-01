@@ -58,37 +58,29 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
   public readonly skillOptionFields: FieldSettingsModel = { text: 'skillDescription', value: 'id' };
 
   public readonly columnDefinitions: ColumnDefinitionModel[] = [
-    {
-      field: 'actualEndDate',
-      headerName: 'Actual End Date',
-      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
-    },
-    {
-      field: 'actualStartDate',
-      headerName: 'Actual Start Date',
-      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
-    },
-    { field: 'agency', headerName: 'Agency' },
-    { field: 'agencyId', headerName: 'Agency ID' },
-    { field: 'badgeId', headerName: 'Badge ID' },
-    { field: 'candidate', headerName: 'Candidate' },
-    { field: 'candidateStatus', headerName: 'Candidate Status' },
-    {
-      field: 'daysOrderStartToActualStartDate',
-      headerName: 'Days Order Start To Actual Start Date',
-      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
-    },
-    { field: 'department', headerName: 'Department' },
-    { field: 'departmentId', headerName: 'Department ID' },
-    { field: 'jobClassificationText', headerName: 'Job Classification' },
-    { field: 'jobStatus', headerName: 'Job Status' },
-    { field: 'jobTitle', headerName: 'Job Title' },
+    { field: 'region', headerName: 'Region' },
     { field: 'location', headerName: 'Location' },
     { field: 'locationId', headerName: 'Location ID' },
-    { field: 'ltaOrderNumber', headerName: 'Lta Order Number' },
+    { field: 'department', headerName: 'Department' },
+    { field: 'departmentId', headerName: 'Department ID' },
+    { field: 'skill', headerName: 'Skill' },
+    { field: 'agency', headerName: 'Agency' },
+    { field: 'agencyId', headerName: 'Agency ID' },
+    { field: 'candidate', headerName: 'Candidate' },
+    { field: 'candidateStatusText', headerName: 'Candidate Status' },
     {
-      field: 'onboardDate',
-      headerName: 'Onboard Date',
+      field: 'rejectedDate',
+      headerName: 'Rejected Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
+    { field: 'reason', headerName: 'Reason' },
+    { field: 'badgeId', headerName: 'Badge ID' },
+    { field: 'jobId', headerName: 'Job ID' },
+    { field: 'ltaOrderNumber', headerName: 'Lta Order No' },
+    { field: 'jobTitle', headerName: 'Job Title' },
+    {
+      field: 'orderStartDate',
+      headerName: 'Order Start Date',
       valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
     },
     {
@@ -98,19 +90,38 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
     },
     {
       field: 'orderStartDate',
-      headerName: 'Order Start Date',
-      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+      headerName: 'Start Time',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedTime(params.value),
     },
-    { field: 'orderType', headerName: 'Order Type' },
-    { field: 'reason', headerName: 'Reason' },
-    { field: 'reasonCode', headerName: 'Reason Code' },
-    { field: 'region', headerName: 'Region' },
     {
-      field: 'rejectedDate',
-      headerName: 'Rejected Date',
+      field: 'orderEndDate',
+      headerName: 'End Time',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedTime(params.value),
+    },
+    { field: 'orderTypeText', headerName: 'Order Type' },
+    { field: 'jobStatus', headerName: 'Job Status' },
+    { field: 'reasonCode', headerName: 'Reason Code' },
+    { field: 'jobClassificationText', headerName: 'Job Classification' },
+    {
+      field: 'actualStartDate',
+      headerName: 'Actual Start Date',
       valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
     },
-    { field: 'skill', headerName: 'Skill' },
+    {
+      field: 'actualEndDate',
+      headerName: 'Actual End Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
+    {
+      field: 'daysOrderStartToActualStartDate',
+      headerName: 'Days Order Start To Actual Start Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
+    {
+      field: 'onboardDate',
+      headerName: 'Onboard Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
   ];
 
   public readonly filterColumns: FilterColumnsModel = {
@@ -294,7 +305,15 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
   }
 
   private getFormattedDate(date: string): string {
-    return this.datePipe.transform(date, 'MM/dd/yy') ?? '';
+    return this.getFormattedDateWithFormat(date, 'MM/dd/yy');
+  }
+
+  private getFormattedTime(date: string): string {
+    return this.getFormattedDateWithFormat(date, 'hh:mm');
+  }
+
+  private getFormattedDateWithFormat(date: string, format: string): string {
+    return this.datePipe.transform(date, format) ?? '';
   }
 }
 
