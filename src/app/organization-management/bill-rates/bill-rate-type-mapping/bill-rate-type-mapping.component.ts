@@ -100,8 +100,13 @@ export class BillRateTypeMappingComponent extends AbstractGridConfigurationCompo
 
   ngOnChanges(changes: SimpleChanges): void {
     const searchQuery = changes['searchQuery'];
+    const isActive = changes['isActive'];
+
     if (!searchQuery?.isFirstChange() && (searchQuery?.currentValue || searchQuery?.currentValue === "")) {
       this.store.dispatch(new GetExternalBillRateMapping({ pageNumber: this.currentPage, pageSize: this.pageSize, name: this.searchQuery }));
+    }
+    if (isActive.currentValue && !isActive.isFirstChange()) {
+      this.store.dispatch(new GetExternalBillRateMapping({ pageNumber: this.currentPage, pageSize: this.pageSize }));
     }
   }
 
