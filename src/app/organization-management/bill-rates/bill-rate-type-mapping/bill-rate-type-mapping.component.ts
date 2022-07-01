@@ -85,6 +85,7 @@ export class BillRateTypeMappingComponent extends AbstractGridConfigurationCompo
     private datePipe: DatePipe,
   ) {
     super();
+    this.idFieldName = 'billRateConfigId';
   }
 
   ngOnInit(): void {
