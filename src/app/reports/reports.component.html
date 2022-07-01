@@ -1,4 +1,4 @@
-<div class="app-reports">
+<div class="app-reports" *ngIf="!isAgency">
   <app-side-menu [config]="reportsList"></app-side-menu>
   <div class="app-reports__grid">
     <router-outlet></router-outlet>

@@ -106,13 +106,13 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public updateCandidateJob(event: { itemData: ApplicantStatus }, reloadJob = false): void {
-    if (event.itemData.applicantStatus === ApplicantStatusEnum.Rejected) {
+    if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
       this.store.dispatch(new GetRejectReasonsForOrganisation());
       this.openRejectDialog.next(true);
     } else {
       if (this.formGroup.valid && this.candidateJob) {
         const value = this.formGroup.getRawValue();
-        this.isOfferedStatus = event.itemData.applicantStatus === ApplicantStatusEnum.Offered;
+        this.isOfferedStatus = event.itemData?.applicantStatus === ApplicantStatusEnum.Offered;
         this.store.dispatch(new UpdateOrganisationCandidateJob({
           orderId: this.candidateJob.orderId,
           organizationId: this.candidateJob.organizationId,

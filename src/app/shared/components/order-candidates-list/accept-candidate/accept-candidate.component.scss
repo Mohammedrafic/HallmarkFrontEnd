@@ -84,3 +84,13 @@
   display: flex;
   align-items: center;
 }
+
+.d-flex {
+  display: flex;
+  gap: 10px;
+
+  .input-container {
+    margin-bottom: 12px;
+    flex: 1 1 0px;
+  }
+}

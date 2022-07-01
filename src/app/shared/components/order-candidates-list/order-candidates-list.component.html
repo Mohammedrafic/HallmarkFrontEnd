@@ -70,8 +70,8 @@
       <e-column textAlign="Right" freeze="Right" width="80">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
-              <span><i-feather name="edit" class="icon"></i-feather></span>
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data, $event)">
+              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
           </div>
         </ng-template>

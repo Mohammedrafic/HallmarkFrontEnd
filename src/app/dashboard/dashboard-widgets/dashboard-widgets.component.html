@@ -61,6 +61,10 @@
             *ngSwitchCase="widgetTypeEnum.TASKS"
             [tasks]="widgetsData?.[widgetTypeEnum.TASKS]"
           ></app-tasks>
+          <app-chat
+            *ngSwitchCase="widgetTypeEnum.CHAT"
+            [chatData]="widgetsData?.[widgetTypeEnum.CHAT]"
+          ></app-chat>
         </ng-template>
       </e-panel>
     </e-panels>
