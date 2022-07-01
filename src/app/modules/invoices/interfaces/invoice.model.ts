@@ -17,8 +17,8 @@ export interface Invoice extends InvoiceRecord {
 
 export type InvoicePage = PageOfCollections<Invoice>;
 
-export interface AllInvoicesTable {
-  invoiceId: DetailsColumnConfig;
+export interface AllInvoicesTableColumns {
+  id: DetailsColumnConfig;
   statusText: DetailsColumnConfig;
   amount: DetailsColumnConfig;
   type: DetailsColumnConfig;
@@ -26,6 +26,15 @@ export interface AllInvoicesTable {
   location: DetailsColumnConfig;
   department: DetailsColumnConfig;
   candidate: DetailsColumnConfig;
-  issueDate: DetailsColumnConfig;
+  issuedDate: DetailsColumnConfig;
   dueDate: DetailsColumnConfig;
+}
+
+export interface InvoiceItem {
+  candidate: string;
+  amount: number;
+  startDate: string;
+  minRate: number;
+  maxRate: number;
+  timesheetId: string;
 }

@@ -1,5 +1,5 @@
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
-import { AllInvoicesTable, Invoice, InvoicePage } from '../interfaces';
+import { AllInvoicesTableColumns, Invoice, InvoiceItem, InvoicePage } from '../interfaces';
 import { INVOICES_STATUSES } from '../enums/invoices.enum';
 import { TableColumnAlign } from '../../timesheets/enums';
 
@@ -22,87 +22,84 @@ export const INVOICES_TAB_CONFIG: TabsListConfig[] = [
   }
 ];
 
-export const MOK_CHILDREN_ITEMS = [
-  {
-    name: 'Sanders, Paul',
-    amount: 1400,
-    workWeek: '2022-07-01T12:12:00',
-    billRate: '10.00 - 25.00',
-    timesheetId: '12345',
-  },
-  {
-    name: 'Paul, Sanders',
-    amount: 1600,
-    workWeek: '2022-07-01T12:12:00',
-    billRate: '16.00 - 25.00',
-    timesheetId: '12346',
-  },
-  {
-    name: 'Sanders, Paul',
-    amount: 1430,
-    workWeek: '2022-07-03T12:12:00',
-    billRate: '09.00 - 25.00',
-    timesheetId: '12347',
-  }
-];
+// export const MOK_CHILDREN_ITEMS: InvoiceItem[] = [
+//   {
+//     candidate: 'Sanders, Paul',
+//     amount: 1400,
+//     startDate: '2022-07-01T12:12:00',
+//     minRate: 50,
+//     maxRate: 50,
+//     timesheetId: '12345',
+//   },
+//   {
+//     candidate: 'Paul, Sanders',
+//     amount: 1600,
+//     startDate: '2022-07-01T12:12:00',
+//     minRate: 40,
+//     maxRate: 50,
+//     timesheetId: '12346',
+//   },
+//   {
+//     candidate: 'Sanders, Paul',
+//     amount: 1430,
+//     startDate: '2022-07-03T12:12:00',
+//     minRate: 20,
+//     maxRate: 50,
+//     timesheetId: '12347',
+//   }
+// ];
 
-export const MOK_ALL_INVOICES_ITEMS = [
-  {
-    id: '20-30-01',
-    statusText: INVOICES_STATUSES.SUBMITED_PEND_APPR,
-    amount: 5000,
-    type: 'Interfaced',
-    organization: 'AB Staffing',
-    location: 'Thone - Johnson Memorial Hospital',
-    department: 'Emergency Department 1',
-    candidate: 'Adkis, Adele Blue',
-    issueDate: new Date(),
-    dueDate: new Date(),
-    children: MOK_CHILDREN_ITEMS,
-    groupBy: '',
-    groupName: '',
-  },
-  {
-    id: '20-30-01',
-    statusText: INVOICES_STATUSES.PENDING_APPROVAL,
-    amount: 5000,
-    type: 'Interfaced',
-    organization: 'AB Staffing',
-    location: 'Thone - Johnson Memorial Hospital',
-    department: 'Emergency Department 1',
-    candidate: 'Adkis, Adele Blue',
-    issueDate: new Date(),
-    dueDate: new Date(),
-    groupBy: '',
-    groupName: '',
-  },
-  {
-    id: '20-30-01',
-    statusText: INVOICES_STATUSES.PENDING_PAYMENT,
-    amount: 5000,
-    type: 'Interfaced',
-    organization: 'AB Staffing',
-    location: 'Thone - Johnson Memorial Hospital',
-    department: 'Emergency Department 1',
-    candidate: 'Adkis, Adele Blue',
-    issueDate: new Date(),
-    dueDate: new Date(),
-    groupBy: '',
-    groupName: '',
-  },
-] as unknown as Invoice[];
+// export const MOK_ALL_INVOICES_ITEMS = [
+//   {
+//     id: '20-30-01',
+//     statusText: INVOICES_STATUSES.SUBMITED_PEND_APPR,
+//     amount: 5000,
+//     type: 'Interface',
+//     organization: 'AB Staffing',
+//     location: 'Thone - Johnson Memorial Hospital',
+//     department: 'Emergency Department 1',
+//     candidate: 'Adkis, Adele Blue',
+//     issueDate: '2022-07-01T15:00:00',
+//     dueDate: '2022-07-20T12:00:00',
+//     invoices: MOK_CHILDREN_ITEMS,
+//   },
+//   {
+//     id: '20-30-01',
+//     statusText: INVOICES_STATUSES.PENDING_APPROVAL,
+//     amount: 5000,
+//     type: 'Interface',
+//     organization: 'AB Staffing',
+//     location: 'Thone - Johnson Memorial Hospital',
+//     department: 'Emergency Department 1',
+//     candidate: 'Adkis, Adele Blue',
+//     issueDate: '2022-07-01T15:00:00',
+//     dueDate: '2022-07-20T12:00:00'
+//   },
+//   {
+//     id: '20-30-01',
+//     statusText: INVOICES_STATUSES.PENDING_PAYMENT,
+//     amount: 5000,
+//     type: 'Interface',
+//     organization: 'AB Staffing',
+//     location: 'Thone - Johnson Memorial Hospital',
+//     department: 'Emergency Department 1',
+//     candidate: 'Adkis, Adele Blue',
+//     issueDate: '2022-07-01T15:00:00',
+//     dueDate: '2022-07-20T12:00:00'
+//   },
+// ];
 
-export const MOK_ALL_INVOICES_PAGE: InvoicePage = {
-  items: MOK_ALL_INVOICES_ITEMS,
+export const DEFAULT_ALL_INVOICES: InvoicePage = {
+  items: [],
   pageNumber: 1,
-  totalCount: 1,
+  totalCount: 0,
   totalPages: 1,
   hasPreviousPage: false,
   hasNextPage: false,
 };
 
-export const AllInvoicesTableConfig: AllInvoicesTable = {
-  invoiceId: {
+export const AllInvoicesTableConfig: AllInvoicesTableColumns = {
+  id: {
     align: TableColumnAlign.Left,
     width: 158,
     header: 'Invoice Id',
@@ -142,7 +139,7 @@ export const AllInvoicesTableConfig: AllInvoicesTable = {
     width: 184,
     header: 'Candidate',
   },
-  issueDate: {
+  issuedDate: {
     align: TableColumnAlign.Left,
     width: 234,
     header: 'Issue Date',

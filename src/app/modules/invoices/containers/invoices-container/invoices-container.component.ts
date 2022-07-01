@@ -14,7 +14,7 @@ import { SetHeaderState, ShowFilterDialog } from "../../../../store/app.actions"
 import { Invoice, InvoicePage, InvoiceRecord, InvoicesTableConfig, PagingQueryParams } from '../../interfaces';
 import { Invoices } from "../../store/actions/invoices.actions";
 import { ProfileTimeSheetDetail } from "../../../timesheets/store/model/timesheets.model";
-import { INVOICES_TAB_CONFIG, MOK_ALL_INVOICES_PAGE } from '../../constants/invoices.constant';
+import { DEFAULT_ALL_INVOICES, INVOICES_TAB_CONFIG } from '../../constants/invoices.constant';
 import { ItemModel } from "@syncfusion/ej2-angular-navigations";
 import { DialogComponent } from "@syncfusion/ej2-angular-popups";
 import { InvoiceRecordsTableComponent } from "../../components/invoice-records-table/invoice-records-table.component";
@@ -42,7 +42,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
   // @Select(InvoicesState.invoicesData)
   public invoicesData$: Observable<PageOfCollections<InvoiceRecord>>;
 
-  public allInvoices: InvoicePage = MOK_ALL_INVOICES_PAGE;
+  public allInvoices: InvoicePage;
 
   public get dateControl(): FormControl {
     return this.formGroup.get('date') as FormControl;
@@ -88,7 +88,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
       }));
     });
 
-    this.invoicesData$ = of(JSON.parse(localStorage.getItem('submited-timsheets') as string)).pipe(
+    this.invoicesData$ = of(JSON.parse(localStorage.getItem('submited-timsheets') as string))?.pipe(
       map((v: PageOfCollections<TimesheetData>) => {
         return {
           ...v,
@@ -158,7 +158,8 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
         break;
       }
       case 1: {
-        console.log(1);
+        this.allInvoices = JSON.parse(`${localStorage.getItem('invoices')}`) || DEFAULT_ALL_INVOICES;
+
         break;
       }
       case 2: {

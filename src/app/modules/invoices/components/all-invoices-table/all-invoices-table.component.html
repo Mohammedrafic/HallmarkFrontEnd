@@ -21,19 +21,19 @@
       [width]="50">
     </e-column>
     <e-column
-      field="invoiceId"
-      [headerText]="tableConfig.invoiceId.header"
-      [textAlign]="tableConfig.invoiceId.align"
-      [width]="tableConfig.invoiceId.width"
+      field="id"
+      [headerText]="tableConfig.id.header"
+      [textAlign]="tableConfig.id.align"
+      [width]="tableConfig.id.width"
     >
       <ng-template #template let-data>
-        <ng-container *ngIf="!data.children?.length; else withToggle">
-          <a href="#">{{ data.invoiceId }}</a>
+        <ng-container *ngIf="!data.invoices?.length; else withToggle">
+          <a href="#">{{ data.id }}</a>
         </ng-container>
 
         <ng-template #withToggle>
           <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-            <a href="#">{{ data.invoiceId }}</a>
+            <a href="#">{{ data.id }}</a>
             <i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
           </div>
         </ng-template>
@@ -116,13 +116,13 @@
       </ng-template>
     </e-column>
     <e-column
-      field="issueDate"
-      [headerText]="tableConfig.issueDate.header"
-      [textAlign]="tableConfig.issueDate.align"
-      [width]="tableConfig.issueDate.width"
+      field="issuedDate"
+      [headerText]="tableConfig.issuedDate.header"
+      [textAlign]="tableConfig.issuedDate.align"
+      [width]="tableConfig.issuedDate.width"
     >
       <ng-template #template let-data>
-        <span>{{ data.issueDate | date: 'MM/dd/yyyy' }}</span>
+        <span>{{ data.issuedDate | date: 'MM/dd/yyyy' }}</span>
       </ng-template>
     </e-column>
     <e-column
@@ -140,8 +140,8 @@
   <ng-template #detailTemplate let-data>
     <div class="subrow-wrapper">
       <app-all-invoices-subrow
-        *ngFor="let child of data.children"
-        [child]="child"
+        *ngFor="let invoice of data.invoices"
+        [invoice]="invoice"
         [rowData]="data">
       </app-all-invoices-subrow>
     </div>
