@@ -1,5 +1,4 @@
 import type { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import type { ValueFormatterParams } from '@ag-grid-community/core';
 import { Store } from '@ngxs/store';
 import { forkJoin, Observable, takeUntil } from 'rxjs';
 
@@ -72,16 +71,7 @@ class CandidatesReportComponent extends BaseReportDirective<CandidateModel> {
     { field: 'address', headerName: 'Address' },
     { field: 'state', headerName: 'State' },
     { field: 'city', headerName: 'City' },
-    {
-      field: 'applicantStatus',
-      headerName: 'Applicant status',
-      valueFormatter: (valueFormatterParams: ValueFormatterParams): string => {
-        const targetApplicantStatus: ApplicantStatus | undefined = this.filterColumns['statuses'].dataSource?.find(
-          (applicantStatus: ApplicantStatus) => applicantStatus.applicantStatus === valueFormatterParams.value
-        );
-        return targetApplicantStatus?.statusText ?? '';
-      },
-    },
+    { field: 'applicantStatusText', headerName: 'Applicant status' },
   ];
 
   public constructor(
