@@ -397,7 +397,7 @@ export class OrganizationManagementState {
       return payload;
     }),
       catchError((error: any) => {
-        const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Department', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+        const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Department', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
         return dispatch(new ShowToast(MessageTypes.Error, message));
       }));
   }
@@ -495,7 +495,7 @@ export class OrganizationManagementState {
       return payload;
     }),
     catchError((error: any) => {
-      const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Location', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+      const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Location', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
       return dispatch(new ShowToast(MessageTypes.Error, message));
     }));
   }
@@ -615,7 +615,7 @@ export class OrganizationManagementState {
       return payload;
     }),
     catchError((error: any) => {
-      const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Skill', error.error.errors['EntityInUse']) : 'Skill cannot be deleted';
+      const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Skill', error.error.errors['EntityInUse']) : 'Skill cannot be deleted';
       return dispatch(new ShowToast(MessageTypes.Error, message));
     }));
   }
@@ -685,14 +685,14 @@ export class OrganizationManagementState {
   }
 
   @Action(RemoveCredential)
-  RemoveCredential({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload }: RemoveCredential): Observable<any> {
+  RemoveCredential({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { payload, filters }: RemoveCredential): Observable<any> {
     return this.credentialsService.removeCredential(payload).pipe(tap(() => {
       patchState({ isCredentialLoading: false });
-      dispatch(new GetCredential());
+      dispatch(new GetCredential(filters));
       return payload;
     }),
     catchError((error: any) => {
-      const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Location', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+      const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Credential', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
       return dispatch(new ShowToast(MessageTypes.Error, message));
     }));
   }

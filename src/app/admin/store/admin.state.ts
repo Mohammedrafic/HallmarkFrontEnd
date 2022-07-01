@@ -54,7 +54,7 @@ import { MasterSkillDataSources, Skill, SkillsPage } from 'src/app/shared/models
 import { SkillCategoriesPage, SkillCategory } from 'src/app/shared/models/skill-category.model';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
-import { RECORD_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
+import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED, usedByOrderErrorMessage } from 'src/app/shared/constants/messages';
 import { CredentialType } from '@shared/models/credential-type.model';
 import { CredentialsService } from '@shared/services/credentials.service';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
@@ -394,7 +394,10 @@ export class AdminState {
         dispatch(new GetCredentialTypes());
         return payload;
       }),
-      catchError((error: any) =>  dispatch(new ShowToast(MessageTypes.Error, error.error.detail))));
+      catchError((error: any) =>  {
+        const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Workflow', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+        return dispatch(new ShowToast(MessageTypes.Error, message));
+      }));
   }
 
   @Action(ExportSkills)

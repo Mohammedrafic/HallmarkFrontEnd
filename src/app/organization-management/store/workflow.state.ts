@@ -104,13 +104,16 @@ export class WorkflowState {
   }
 
   @Action(RemoveWorkflow)
-  RemoveWorkflow({ patchState, dispatch }: StateContext<WorkflowStateModel>, { payload }: RemoveWorkflow): Observable<void> {
+  RemoveWorkflow({ dispatch }: StateContext<WorkflowStateModel>, { payload }: RemoveWorkflow): Observable<void> {
     return this.workflowService.removeWorkflow(payload)
       .pipe(tap(() => {
           dispatch(new GetWorkflows());
           return payload;
         }),
-        catchError((error: any) => dispatch(new ShowToast(MessageTypes.Error, RECORD_CANNOT_BE_DELETED))));
+        catchError((error: any) => {
+          const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Workflow', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+          return dispatch(new ShowToast(MessageTypes.Error, message));
+        }));
   }
 
   @Action(GetWorkflowMappingPages)
@@ -148,7 +151,7 @@ export class WorkflowState {
           return payload;
         }),
         catchError((error: any) => {
-          const message = error.error.errors['EntityInUse'] ? usedByOrderErrorMessage('Workflow', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+          const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Workflow', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
           return dispatch(new ShowToast(MessageTypes.Error, message));
         })
       );
