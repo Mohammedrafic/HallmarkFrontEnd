@@ -63,7 +63,8 @@ export class DashboardService {
     [WidgetTypeEnum.OPEN_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
     [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
-    [WidgetTypeEnum.TASKS]: (filters: DashboardFiltersModel)=> this.getTasksWidgetData(),
+    [WidgetTypeEnum.TASKS]: ()=> this.getTasksWidgetData(),
+    [WidgetTypeEnum.CHAT]: () => this.getChatWidgetData(),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -224,7 +225,7 @@ export class DashboardService {
   }
 
   private getActivePositionWidgetData(filters: DashboardFiltersModel): Observable<AccumulationChartModel> {
-    return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, {}).pipe(
+    return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { granulateInProgress: true }).pipe(
       map(({ orderStatusesDetails }: ActivePositionsDto) => {
         return {
           id: WidgetTypeEnum.ACTIVE_POSITIONS,
@@ -247,6 +248,10 @@ export class DashboardService {
   }
 
   private getTasksWidgetData(): Observable<string> {
-    return of('assets/icons/temporary-widget-tasks.png');
+    return of('temporary-collapsed-widget-tasks');
+  }
+
+  private getChatWidgetData(): Observable<string> {
+    return of('assets/icons/temporary-widget-chat.png');
   }
 }

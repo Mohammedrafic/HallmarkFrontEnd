@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { NgxsModule } from '@ngxs/store';
 
 import { SharedModule } from '@shared/shared.module';
 import { DialogModule } from "@syncfusion/ej2-angular-popups";
@@ -18,7 +17,6 @@ import { RolesAndPermissionsComponent } from './roles-and-permissions/roles-and-
 import { SecurityComponent } from './security.component';
 import { RolesGridComponent } from './roles-and-permissions/roles-grid/roles-grid.component';
 import { RoleFormComponent } from './roles-and-permissions/role-form/role-form.component';
-import { SecurityState } from './store/security.state';
 import { UserListComponent } from './user-list/user-list.component';
 import { UserGridComponent } from './user-list/user-grid/user-grid.component';
 import { AddEditUserComponent } from './user-list/add-edit-user/add-edit-user.component';
@@ -66,7 +64,6 @@ const scurityIcons = {
     ChipListModule,
 
     FeatherModule.pick(scurityIcons),
-    NgxsModule.forFeature([SecurityState]),
   ]
 })
 export class SecurityModule { }

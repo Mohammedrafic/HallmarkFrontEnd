@@ -1,5 +1,5 @@
-import { BehaviorSubject, Observable, switchMap, finalize } from 'rxjs';
-import { Store } from '@ngxs/store';
+import { BehaviorSubject, Observable, switchMap, finalize, takeUntil } from 'rxjs';
+import { Select, Store } from '@ngxs/store';
 
 import { Directive, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
@@ -12,9 +12,13 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { PageQueryFilterParamsService, PageQueryParams } from '@shared/services/page-query-filter-params.service';
 import { ReportDirectiveDataModel } from '../models/report-directive-data.model';
 import { ShowFilterDialog } from '../../../store/app.actions';
+import { UserState } from 'src/app/store/user.state';
 
 @Directive()
 export abstract class BaseReportDirective<T> extends DestroyableDirective implements OnInit {
+  @Select(UserState.lastSelectedOrganizationId)
+  lastSelectedOrganizationId$: Observable<number>;
+
   public abstract readonly columnDefinitions: ColumnDefinitionModel[];
   public abstract readonly filterColumns: FilterColumnsModel;
 
@@ -28,7 +32,7 @@ export abstract class BaseReportDirective<T> extends DestroyableDirective implem
     public readonly reportDirectiveData: ReportDirectiveDataModel,
     protected readonly filterService: FilterService,
     protected readonly pageQueryFilterParamsService: PageQueryFilterParamsService,
-    protected readonly store: Store,
+    protected readonly store: Store
   ) {
     super();
   }
@@ -37,6 +41,7 @@ export abstract class BaseReportDirective<T> extends DestroyableDirective implem
     this.reportFiltersForm = this.getReportFiltersForm();
     this.getReportListDataStream();
     this.getFiltersData();
+    this.onOrgChange();
   }
 
   public handlePageSizeChange(pageSize: number): void {
@@ -84,6 +89,15 @@ export abstract class BaseReportDirective<T> extends DestroyableDirective implem
   }
 
   private updateFilters(): void {
-    this.reportDirectiveData.filterChangeHandler(this.filterService.generateChips(this.reportFiltersForm, this.filterColumns));
+    this.reportDirectiveData.filterChangeHandler(
+      this.filterService.generateChips(this.reportFiltersForm, this.filterColumns)
+    );
+  }
+
+  private onOrgChange(): void {
+    this.lastSelectedOrganizationId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.updateFilters();
+      this.getReportListDataStream();
+    });
   }
 }

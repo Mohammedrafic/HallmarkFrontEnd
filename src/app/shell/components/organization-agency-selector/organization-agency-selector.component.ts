@@ -142,8 +142,16 @@ export class OrganizationAgencySelectorComponent implements OnDestroy {
     this.isOrganizationAgencyArea$.pipe(takeUntil(this.unsubscribe$)).subscribe(area => {
       const isOrganizationArea = area.isOrganizationArea;
       const isAgencyArea = area.isAgencyArea;
-
-      this.applyOrganizationsAgencies(isOrganizationArea, isAgencyArea);
+      if (isOrganizationArea && isAgencyArea) {
+        this.applyOrganizationsAgencies(isOrganizationArea, isAgencyArea);
+        return;
+      }
+      if (isOrganizationArea || isAgencyArea) {
+        const currentArea = isOrganizationArea ? 'Organization' : 'Agency';
+        this.store.dispatch(new LastSelectedOrganisationAgency(currentArea)).subscribe(() => {
+          this.applyOrganizationsAgencies(isOrganizationArea, isAgencyArea);
+        });
+      }
     });
   }
 

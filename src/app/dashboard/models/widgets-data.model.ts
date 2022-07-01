@@ -13,4 +13,5 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.FILLED_POSITIONS]: CandidatesPositionDataModel;
   [WidgetTypeEnum.ACTIVE_POSITIONS]: ChartAccumulation;
   [WidgetTypeEnum.TASKS]: string;
+  [WidgetTypeEnum.CHAT]: string;
 }
