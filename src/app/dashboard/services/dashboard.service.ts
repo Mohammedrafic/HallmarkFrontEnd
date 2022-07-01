@@ -63,7 +63,8 @@ export class DashboardService {
     [WidgetTypeEnum.OPEN_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
     [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
-    [WidgetTypeEnum.TASKS]: (filters: DashboardFiltersModel)=> this.getTasksWidgetData(),
+    [WidgetTypeEnum.TASKS]: ()=> this.getTasksWidgetData(),
+    [WidgetTypeEnum.CHAT]: () => this.getChatWidgetData(),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -248,5 +249,9 @@ export class DashboardService {
 
   private getTasksWidgetData(): Observable<string> {
     return of('assets/icons/temporary-widget-tasks.png');
+  }
+
+  private getChatWidgetData(): Observable<string> {
+    return of('assets/icons/temporary-widget-chat.png');
   }
 }
