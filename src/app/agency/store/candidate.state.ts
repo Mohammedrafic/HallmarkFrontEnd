@@ -318,6 +318,7 @@ export class CandidateState {
   @Action(SaveCandidatesCredential)
   SaveCandidatesCredential({ patchState, dispatch, getState }: StateContext<CandidateStateModel>, { payload }: SaveCandidatesCredential): Observable<CandidateCredential | void> {
     const isCreating = !payload.id;
+    payload.candidateProfileId = getState().candidate?.id as number;
     patchState({ isCandidateLoading: true });
     return this.candidateService.saveCredential(payload).pipe(tap((payload) => {
         patchState({ isCandidateLoading: false });

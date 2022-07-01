@@ -69,7 +69,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
-  private readonly candidateProfileId: number;
   private masterCredentialId: number | null;
   private credentialId: number | null;
   private filesDetails: Blob[] = []
@@ -113,7 +112,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
               private confirmService: ConfirmService) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Candidates', iconName: 'clock' }));
-    this.candidateProfileId = parseInt(route.snapshot.paramMap.get('id') as string);
   }
 
   ngOnInit(): void {
@@ -341,7 +339,6 @@ export class CredentialsGridComponent extends AbstractGridConfigurationComponent
     if (this.masterCredentialId) {
       this.store.dispatch(new SaveCandidatesCredential({
         status, number, insitute, experience, createdOn, createdUntil, completedDate,
-        candidateProfileId: this.candidateProfileId,
         masterCredentialId: this.masterCredentialId,
         id: this.credentialId as number
       }));
