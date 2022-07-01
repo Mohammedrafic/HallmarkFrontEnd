@@ -1,0 +1,98 @@
+<ng-container
+  [ngTemplateOutlet]="reportTemplate"
+  [ngTemplateOutletContext]="{
+    filters: reportDirectiveData.filters$ | async,
+    pageQueryParams: pageQueryParams$ | async,
+    reportListData: reportListData$ | async,
+    isLoading: isLoading$ | async
+  }"
+>
+</ng-container>
+
+<ng-template
+  #reportTemplate
+  let-reportListData="reportListData"
+  let-filters="filters"
+  let-isLoading="isLoading"
+  let-pageQueryParams="pageQueryParams"
+>
+  <app-grid
+    (navigateToPageEmitter)="handlePageChange($event)"
+    (pageSizeChangeEmitter)="handlePageSizeChange($event)"
+    [columnDefinitions]="columnDefinitions"
+    [currentPage]="pageQueryParams.page"
+    [isLoading]="isLoading"
+    [pageSize]="pageQueryParams.pageSize"
+    [rowData]="reportListData?.items"
+    [totalRecordsCount]="reportListData?.totalCount"
+  ></app-grid>
+
+  <app-filter-dialog
+    [count]="reportListData?.totalCount"
+    [items]="filters"
+    (applyFilterClicked)="applyFilters()"
+    (clearAllFiltersClicked)="clearFilters()"
+    (deleteFilter)="deleteFilter($event)"
+  >
+    <div class="app-fillrates-report__filters-form">
+      <app-multiselect-dropdown
+        [dataSource]="filterColumns['skills'].dataSource"
+        [formGroupInstance]="reportFiltersForm"
+        [fields]="skillOptionFields"
+        controlName="skills"
+        id="skills"
+        label="Skill"
+        placeholder="All"
+      ></app-multiselect-dropdown>
+      <app-multiselect-dropdown
+        [dataSource]="filterColumns['candidatesStatuses'].dataSource"
+        [formGroupInstance]="reportFiltersForm"
+        [fields]="candidatesStatusesOptionFields"
+        controlName="candidatesStatuses"
+        id="statuses"
+        label="Statuses"
+        placeholder="All"
+      ></app-multiselect-dropdown>
+      <div class="app-fillrates-report__row-controls">
+        <app-multiselect-dropdown
+          [dataSource]="filterColumns['regions'].dataSource"
+          [fields]="regionsOptionFields"
+          [formGroupInstance]="reportFiltersForm"
+          class="app-fillrates-report__row-control"
+          controlName="regions"
+          id="regions"
+          label="Regions"
+          placeholder="All"
+        ></app-multiselect-dropdown>
+        <app-multiselect-dropdown
+          [dataSource]="filterColumns['locations'].dataSource"
+          [fields]="locationsOptionFields"
+          [formGroupInstance]="reportFiltersForm"
+          class="app-fillrates-report__row-control"
+          controlName="locations"
+          id="locations"
+          label="Locations"
+          placeholder="All"
+        ></app-multiselect-dropdown>
+      </div>
+      <app-multiselect-dropdown
+        [dataSource]="filterColumns['departments'].dataSource"
+        [formGroupInstance]="reportFiltersForm"
+        [fields]="departmentsOptionFields"
+        controlName="departments"
+        id="departments"
+        label="Departments"
+        placeholder="All"
+      ></app-multiselect-dropdown>
+      <app-multiselect-dropdown
+        [dataSource]="filterColumns['orderTypes'].dataSource"
+        [formGroupInstance]="reportFiltersForm"
+        [fields]="orderTypesOptionFields"
+        controlName="orderTypes"
+        id="orderTypes"
+        label="Order Types"
+        placeholder="All"
+      ></app-multiselect-dropdown>
+    </div>
+  </app-filter-dialog>
+</ng-template>

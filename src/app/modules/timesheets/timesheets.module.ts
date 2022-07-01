@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { NgxsModule } from '@ngxs/store';
 import { FeatherModule } from 'angular-feather';
 import { DialogAllModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
-import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxModule, ChipListModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { DateTimePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { TabAllModule } from '@syncfusion/ej2-angular-navigations';
 import { FileText, ChevronRight, AlignJustify, Briefcase, Calendar, CheckCircle, ChevronDown,
@@ -116,6 +116,7 @@ const gridIcons = {
     UploaderModule,
     TextBoxModule,
     TooltipModule,
+    SwitchModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [

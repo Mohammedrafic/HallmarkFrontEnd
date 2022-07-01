@@ -3,7 +3,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
-import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import {
+  FieldSettingsModel,
+  ISelectAllEventArgs,
+  MultiSelectComponent,
+} from '@syncfusion/ej2-angular-dropdowns';
 import { CredentialSkillGroup } from '@shared/models/skill-group.model';
 import { CANCEL_COFIRM_TEXT, DATA_OVERRIDE_TEXT, DATA_OVERRIDE_TITLE, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { combineLatestWith, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
@@ -25,6 +29,13 @@ import {
   SaveUpdateCredentialSetupMappingSucceeded
 } from '@organization-management/store/credentials.actions';
 
+export enum DropdownsList {
+  Regions = 'regions',
+  Locations = 'locations',
+  Departments = 'departments',
+  Groups = 'groups'
+}
+
 @Component({
   selector: 'app-map-credentials-form',
   templateUrl: './map-credentials-form.component.html',
@@ -32,6 +43,10 @@ import {
 })
 export class MapCredentialsFormComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
+  @ViewChild('regionsDropdown') regionsDropdown: MultiSelectComponent;
+  @ViewChild('locationsDropdown') locationsDropdown: MultiSelectComponent;
+  @ViewChild('departmentsDropdown') departmentsDropdown: MultiSelectComponent;
+  @ViewChild('groupsDropdown') groupsDropdown: MultiSelectComponent;
 
   @Input() orgRegions: OrganizationRegion[];
   @Input() groups: CredentialSkillGroup[];
@@ -56,16 +71,22 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   @Select(OrganizationManagementState.credentialTypes)
   credentialTypes$: Observable<CredentialType[]>;
 
-  public formHeaderLabel: string = 'Map Credentials';
-  public isDropdownEnabled = true;
-
   public credentialSetupMappingToPost?: CredentialSetupMappingPost;
   public isEdit: boolean;
+  public DropdownsList = DropdownsList;
+
+  get dialogTitle(): string {
+    return this.isEdit ? 'Edit Mapping' : 'Map Credentials';
+  }
 
   private credentialSetupList: CredentialSetupGet[] = [];
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private previouslySavedMappingsNumber: number;
+  private isAllRegionsSelected?: boolean;
+  private isAllLocationsSelected?: boolean;
+  private isAllDepartmentsSelected?: boolean;
+  private isAllGroupsSelected?: boolean;
 
   constructor(private store: Store,
               private actions$: Actions,
@@ -91,6 +112,59 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
     this.unsubscribe$.complete();
   }
 
+  public onSelectAllRegions(selectAllEvent: ISelectAllEventArgs): void {
+    this.isAllRegionsSelected = selectAllEvent.isChecked && this.orgRegions.length > 1;
+    this.disableDropdownItemsIfSelectedAll(DropdownsList.Regions);
+  }
+
+  public onSelectAllLocations(selectAllEvent: ISelectAllEventArgs): void {
+    this.isAllLocationsSelected = selectAllEvent.isChecked && this.locations.length > 1;
+    this.disableDropdownItemsIfSelectedAll(DropdownsList.Locations);
+  }
+
+  public onSelectAllDepartments(selectAllEvent: ISelectAllEventArgs): void {
+    this.isAllDepartmentsSelected = selectAllEvent.isChecked && this.departments.length > 1;
+    this.disableDropdownItemsIfSelectedAll(DropdownsList.Departments);
+  }
+
+  public onSelectAllGroups(selectAllEvent: ISelectAllEventArgs): void {
+    this.isAllGroupsSelected = selectAllEvent.isChecked && this.groups.length > 1;
+    this.disableDropdownItemsIfSelectedAll(DropdownsList.Groups);
+  }
+
+  public disableDropdownItemsIfSelectedAll(dropdownName: string): void {
+    let dropdownComponent: MultiSelectComponent = this.regionsDropdown;
+    let isAllItemsSelected = this.isAllRegionsSelected;
+
+    switch(dropdownName) {
+      case DropdownsList.Regions:
+        dropdownComponent = this.regionsDropdown;
+        isAllItemsSelected = this.isAllRegionsSelected;
+        break;
+      case DropdownsList.Locations:
+        dropdownComponent = this.locationsDropdown;
+        isAllItemsSelected = this.isAllLocationsSelected;
+        break;
+      case DropdownsList.Departments:
+        dropdownComponent = this.departmentsDropdown;
+        isAllItemsSelected = this.isAllDepartmentsSelected;
+        break;
+      case DropdownsList.Groups:
+        dropdownComponent = this.groupsDropdown;
+        isAllItemsSelected = this.isAllGroupsSelected;
+        break;
+    }
+
+    // disable items in dropdown if Select All was clicked
+    if (isAllItemsSelected && dropdownComponent) {
+      dropdownComponent.ulElement.previousElementSibling?.querySelectorAll('.e-list-item').forEach((element: any) => element.classList.add('e-hide'));
+      dropdownComponent.getItems().forEach((element: any) => element.classList.add('e-hide'));
+    } else if (dropdownComponent) {
+      dropdownComponent.ulElement.previousElementSibling?.querySelectorAll('.e-list-item').forEach((element: any) => element.classList.remove('e-hide'));
+      dropdownComponent.getItems().forEach((element: any) => element.classList.remove('e-hide'));
+    }
+  }
+
   public onMapCredentialFormCancelClick(): void {
     if ((this.isEdit && (this.mapCredentialsFormGroup.dirty || this.selectedItems.length !== this.previouslySavedMappingsNumber))
       || (!this.isEdit && (this.mapCredentialsFormGroup.dirty || this.selectedItems.length))) {
@@ -109,18 +183,13 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   }
 
   public onMapCredentialFormSaveClick(): void {
-    if (this.mapCredentialsFormGroup.valid && !this.isGridStateInvalid) {
+    if (this.mapCredentialsFormGroup.valid && this.selectedItems.length) {
       const credentials = this.getCredentialSetupDetails();
-      const isAllRegions = this.mapCredentialsFormGroup.controls['regionIds'].value.length === this.orgRegions.length;
-
       const credentialSetupMapping: CredentialSetupMappingPost = {
-        regionIds: isAllRegions ? [] : this.mapCredentialsFormGroup.controls['regionIds'].value, // [] means All on the BE side
-        locationIds: isAllRegions && this.mapCredentialsFormGroup.controls['locationIds'].value.length === this.locations.length
-          ? [] : this.mapCredentialsFormGroup.controls['locationIds'].value, // [] means All on the BE side
-        departmentIds: isAllRegions && this.mapCredentialsFormGroup.controls['departmentIds'].value.length === this.departments.length
-          ? [] : this.mapCredentialsFormGroup.controls['departmentIds'].value, // [] means All on the BE side
-        skillGroupIds: this.mapCredentialsFormGroup.controls['groupIds'].value.length === this.groups.length
-          ? [] : this.mapCredentialsFormGroup.controls['groupIds'].value,
+        regionIds: this.isAllRegionsSelected ? [] : this.mapCredentialsFormGroup.controls['regionIds'].value, // [] means All on the BE side
+        locationIds: this.isAllLocationsSelected ? [] : this.mapCredentialsFormGroup.controls['locationIds'].value, // [] means All on the BE side
+        departmentIds: this.isAllDepartmentsSelected ? [] : this.mapCredentialsFormGroup.controls['departmentIds'].value, // [] means All on the BE side
+        skillGroupIds: this.isAllGroupsSelected ? [] : this.mapCredentialsFormGroup.controls['groupIds'].value,
         credentials: credentials
       }
 
@@ -198,19 +267,41 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
     // subscribe on mappingDataForEdit$ to be able to set up Mapping form in Edit mode
     this.mappingDataForEdit$.pipe(takeUntil(this.unsubscribe$)).subscribe(credentialSetupMapping => {
       if (credentialSetupMapping) {
-        this.formHeaderLabel = 'Edit Mapping';
         this.isEdit = true;
-        // disable dropdowns in Edit mode
-        this.isDropdownEnabled = false;
-
         // setup form data
-        this.mapCredentialsFormGroup.setValue({
-          mappingId: credentialSetupMapping.credentionSetupMappingId,
-          regionIds: credentialSetupMapping.regionIds ? credentialSetupMapping.regionIds : this.orgRegions.map(r => r.id),
-          locationIds: credentialSetupMapping.locationIds ? credentialSetupMapping.locationIds : this.locations.map(l => l.id),
-          departmentIds: credentialSetupMapping.departmentIds ? credentialSetupMapping.departmentIds : this.departments.map(d => d.id),
-          groupIds: credentialSetupMapping.skillGroupIds ? credentialSetupMapping.skillGroupIds : this.groups.map(g => g.id),
-        });
+        this.mapCredentialsFormGroup.controls['mappingId'].setValue(credentialSetupMapping.credentionSetupMappingId);
+
+        if (!credentialSetupMapping.regionIds) {
+          this.isAllRegionsSelected = true;
+          const allRegions = this.orgRegions.map(r => r.id);
+          this.mapCredentialsFormGroup.controls['regionIds'].setValue(allRegions);
+        } else {
+          this.mapCredentialsFormGroup.controls['regionIds'].setValue(credentialSetupMapping.regionIds);
+        }
+
+        if (!credentialSetupMapping.locationIds) {
+          this.isAllLocationsSelected = true;
+          const locationIds = this.locations.map(location => location.id);
+          this.mapCredentialsFormGroup.controls['locationIds'].setValue(locationIds);
+        } else {
+          this.mapCredentialsFormGroup.controls['locationIds'].setValue(credentialSetupMapping.locationIds);
+        }
+
+        if (!credentialSetupMapping.departmentIds) {
+          this.isAllDepartmentsSelected = true;
+          const departmentIds = this.departments.map(department => department.id);
+          this.mapCredentialsFormGroup.controls['departmentIds'].setValue(departmentIds);
+        } else {
+          this.mapCredentialsFormGroup.controls['departmentIds'].setValue(credentialSetupMapping.departmentIds);
+        }
+
+        if (!credentialSetupMapping.skillGroupIds) {
+          this.isAllGroupsSelected = true;
+          const groupIds = this.groups.map(g => g.id);
+          this.mapCredentialsFormGroup.controls['groupIds'].setValue(groupIds);
+        } else {
+          this.mapCredentialsFormGroup.controls['groupIds'].setValue(credentialSetupMapping.skillGroupIds);
+        }
 
         credentialSetupMapping.credentials.forEach(savedMapping => {
           (this.gridDataSource as CredentialSetupGet[]).map((credential, index) => {
@@ -259,7 +350,9 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   }
 
   private dropdownChangedHandler(): void {
-    this.mapCredentialsFormGroup.get('regionIds')?.valueChanges.subscribe((regionIds: number[]) => {
+    this.mapCredentialsFormGroup.get('regionIds')?.valueChanges
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((regionIds: number[]) => {
       if (regionIds && regionIds.length > 0) {
         this.locations = [];
         regionIds.forEach((id) => {
@@ -279,7 +372,9 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
       this.mapCredentialsFormGroup.controls['departmentIds'].setValue(null);
     });
 
-    this.mapCredentialsFormGroup.get('locationIds')?.valueChanges.subscribe((locationIds: number[]) => {
+    this.mapCredentialsFormGroup.get('locationIds')?.valueChanges
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((locationIds: number[]) => {
       if (locationIds && locationIds.length > 0) {
         this.departments = [];
         locationIds.forEach(id => {
@@ -358,10 +453,12 @@ export class MapCredentialsFormComponent extends AbstractGridConfigurationCompon
   private clearFormDetails(): void {
     this.removeActiveCssClass();
     this.mapCredentialsFormGroup.reset();
-    this.formHeaderLabel = 'Map Credentials';
-    this.isDropdownEnabled = true;
     this.credentialSetupMappingToPost = undefined;
     this.isEdit = false;
+    this.isAllRegionsSelected = undefined;
+    this.isAllLocationsSelected = undefined;
+    this.isAllDepartmentsSelected = undefined;
+    this.isAllGroupsSelected = undefined;
     this.clearSelection(this.grid);
   }
 

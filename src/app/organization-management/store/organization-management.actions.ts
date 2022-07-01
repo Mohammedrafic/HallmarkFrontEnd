@@ -273,7 +273,7 @@ export class SaveCredentialSucceeded {
 
 export class RemoveCredential {
   static readonly type = '[organizationManagement] Remove Credential by ID';
-  constructor(public payload: Credential) { }
+  constructor(public payload: Credential, public filters?: CredentialFilter) { }
 }
 
 export class GetAllSkills {

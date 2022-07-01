@@ -120,7 +120,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.getPredefinedBillRatesData$.pipe(
       takeUntil(this.unsubscribe$),
       switchMap(getPredefinedBillRatesData => {
-        if (getPredefinedBillRatesData && !this.billRatesComponent?.billRatesControl.value.length) {
+        if (getPredefinedBillRatesData && !this.orderBillRates.length) {
           return this.store.dispatch(new GetPredefinedBillRates());
         } else {
           return of(null);

@@ -13,6 +13,7 @@ export class ProfileTimesheetService {
       timeOut: [new Date(data.timeOut), [Validators.required]],
       category: [data.category, [Validators.required]],
       costCenter: [data.costCenter, []],
+      hours: [{ value: data.hours, disabled: true}]
     });
 
     group.get('timeIn')?.addValidators(startTimeValidator(group, 'timeOut'));

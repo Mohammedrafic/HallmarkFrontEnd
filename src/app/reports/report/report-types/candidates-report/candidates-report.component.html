@@ -1,0 +1,74 @@
+<ng-container
+  [ngTemplateOutlet]="reportTemplate"
+  [ngTemplateOutletContext]="{
+    filters: reportDirectiveData.filters$ | async,
+    isLoading: isLoading$ | async,
+    pageQueryParams: pageQueryParams$ | async,
+    reportListData: reportListData$ | async
+  }"
+>
+</ng-container>
+
+<ng-template
+  #reportTemplate
+  let-reportListData="reportListData"
+  let-filters="filters"
+  let-isLoading="isLoading"
+  let-pageQueryParams="pageQueryParams"
+>
+  <app-grid
+    (navigateToPageEmitter)="handlePageChange($event)"
+    (pageSizeChangeEmitter)="handlePageSizeChange($event)"
+    [columnDefinitions]="columnDefinitions"
+    [currentPage]="pageQueryParams.page"
+    [isLoading]="isLoading"
+    [pageSize]="pageQueryParams.pageSize"
+    [rowData]="reportListData?.items"
+    [totalRecordsCount]="reportListData?.totalCount"
+  ></app-grid>
+
+  <app-filter-dialog
+    [count]="reportListData?.totalCount"
+    [items]="filters"
+    (applyFilterClicked)="applyFilters()"
+    (clearAllFiltersClicked)="clearFilters()"
+    (deleteFilter)="deleteFilter($event)"
+  >
+    <div class="app-candidates-report__filters-form">
+      <app-input
+        [formGroupInstance]="reportFiltersForm"
+        controlName="candidateName"
+        id="candidateName"
+        label="Candidate name"
+        placeholder="Candidate name"
+      ></app-input>
+      <app-multiselect-dropdown
+        [dataSource]="filterColumns['skills'].dataSource"
+        [formGroupInstance]="reportFiltersForm"
+        [fields]="skillOptionFields"
+        controlName="skills"
+        id="skills"
+        label="Skill"
+        placeholder="All"
+      ></app-multiselect-dropdown>
+      <app-multiselect-dropdown
+        [dataSource]="filterColumns['agencies'].dataSource"
+        [formGroupInstance]="reportFiltersForm"
+        [fields]="agenciesOptionFields"
+        controlName="agencies"
+        id="agencies"
+        label="Agencies"
+        placeholder="All"
+      ></app-multiselect-dropdown>
+      <app-multiselect-dropdown
+        [dataSource]="filterColumns['statuses'].dataSource"
+        [formGroupInstance]="reportFiltersForm"
+        [fields]="statusesOptionFields"
+        controlName="statuses"
+        id="statuses"
+        label="Statuses"
+        placeholder="All"
+      ></app-multiselect-dropdown>
+    </div>
+  </app-filter-dialog>
+</ng-template>
