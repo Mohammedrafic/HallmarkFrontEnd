@@ -193,9 +193,15 @@ export class AddTimesheetComponent extends Destroyable implements OnInit, OnChan
       filter((value) => !!value),
       takeUntil(this.componentDestroy())
     ).subscribe((value) => {
-
       this.minTime = value;
       this.endTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+      if (this.form.get('timeOut')?.valid) {
+        const timeIn = this.form.get('timeIn')?.value;
+        const timeOut = this.form.get('timeOut')?.value;
+        const calcHours = Math.abs(timeOut.getTime() - timeIn.getTime()) / 36e5;
+
+        this.form.patchValue({ hours: calcHours })
+      }
       this.cd.markForCheck();
     });
 
@@ -205,6 +211,13 @@ export class AddTimesheetComponent extends Destroyable implements OnInit, OnChan
     ).subscribe((value: Date) => {
       this.maxTime = value;
       this.startTimeField.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+      if (this.form.get('timeIn')?.valid) {
+        const timeIn = this.form.get('timeIn')?.value;
+        const timeOut = this.form.get('timeOut')?.value;
+        const calcHours = Math.abs(timeOut.getTime() - timeIn.getTime()) / 36e5;
+
+        this.form.patchValue({ hours: calcHours })
+      }
       this.cd.markForCheck();
     });
   }

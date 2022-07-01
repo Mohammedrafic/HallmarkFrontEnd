@@ -138,12 +138,6 @@ export class UserState {
         });
       }
 
-      menu.menuItems.push({
-        title: 'Invoices',
-        route: 'admin/invoices',
-        icon: 'dollar-sign',
-      } as MenuItem)
-
       return patchState({ menu: menu });
     }));
   }

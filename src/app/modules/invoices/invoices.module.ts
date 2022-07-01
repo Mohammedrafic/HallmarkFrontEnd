@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InvoicesContainerComponent } from './containers/invoices-container/invoices-container.component';
-import { InvoicesTableComponent } from './components/invoices-table/invoices-table.component';
+import { InvoiceRecordsTableComponent } from './components/invoice-records-table/invoice-records-table.component';
 import { SharedModule } from "@shared/shared.module";
 import { DateWeekPickerModule } from "@shared/components/date-week-picker/date-week-picker.module";
 import { FeatherModule } from "angular-feather";
@@ -22,10 +22,14 @@ import { NgxsModule } from "@ngxs/store";
 import { InvoicesState } from "./store/state/invoices.state";
 import { InvoicesService } from "./services/invoices.service";
 import { ReactiveFormsModule } from "@angular/forms";
+import { InvoicesTableComponent } from './components/invoices-table/invoices-table.component';
+import { DialogModule } from "@syncfusion/ej2-angular-popups";
+import { TimePickerModule } from "@syncfusion/ej2-angular-calendars";
 
 @NgModule({
   declarations: [
     InvoicesContainerComponent,
+    InvoiceRecordsTableComponent,
     InvoicesTableComponent
   ],
   imports: [
@@ -50,6 +54,8 @@ import { ReactiveFormsModule } from "@angular/forms";
     PagerModule,
     NgxsModule.forFeature([InvoicesState]),
     ReactiveFormsModule,
+    DialogModule,
+    TimePickerModule,
   ],
   providers: [
     InvoicesService,

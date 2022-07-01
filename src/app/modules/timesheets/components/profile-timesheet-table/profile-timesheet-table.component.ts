@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { of, combineLatest, Subscription, filter } from 'rxjs';
+import { of, combineLatest, Subscription, filter, takeUntil, Observable } from 'rxjs';
 import { Store } from '@ngxs/store';
 
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
@@ -23,8 +23,9 @@ import { Timesheets } from '../../store/actions/timesheets.actions';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
+import { TakeUntilDestroy } from '@core/decorators';
 
-
+@TakeUntilDestroy
 @Component({
   selector: 'app-profile-timesheet-table',
   templateUrl: './profile-timesheet-table.component.html',
@@ -33,6 +34,8 @@ import { ProfileTimesheetService } from '../../services/profile-timesheet.servic
 
 })
 export class ProfileTimesheetTableComponent extends AbstractGridConfigurationComponent implements OnDestroy, OnChanges {
+  protected componentDestroy: () => Observable<unknown>;
+
   @ViewChild('profileTable') readonly profileTable: GridComponent;
 
   @Input() timeSheetsProfile: ProfileTimeSheetDetail[];
@@ -138,7 +141,7 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
         ...storageItem,
       }));
     }
-    this.tempData = this.tempData.map(el => ({ ...el, form: this.profileTimesheetService.populateForm(el) }));
+    this.tempData = this.tempData.map((el) => ({ ...el, form: this.profileTimesheetService.populateForm(el) }));
   }
 
   private setInitTime(time: Date) {
@@ -177,19 +180,23 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
 
   public saveChanges(): void {
     if (!this.tempData.some(el => el.form?.invalid)) {
-      this.handleSubscription();
       this.subscription = combineLatest(
         this.tempData
-          .map(el =>
-            el.form?.valid && el.form?.touched
-              ? this.store.dispatch(new Timesheets.PatchProfileTimesheet(
-                this.profileId,
-                el.id,
-                el.form.getRawValue()
-              )) :
-              of(null)
-          )
-      ).subscribe(() => {
+          .map((el) => {
+            return el.form?.valid && el.form?.touched
+            ? this.store.dispatch(new Timesheets.PatchProfileTimesheet(
+              this.profileId,
+              el.id,
+              {
+                ...el.form.getRawValue(),
+                hours: Math.abs(el.form.getRawValue().timeOut.getTime() - el.form.getRawValue().timeIn.getTime()) / 36e5,
+              }
+            )) :
+            of(null)
+          }
+          ),
+      ).pipe(takeUntil(this.componentDestroy()))
+      .subscribe(() => {
         this.updateTable.emit();
         this.updateTableView();
       });

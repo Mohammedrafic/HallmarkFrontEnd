@@ -70,11 +70,16 @@
   display: none;
 }
 
-.name {
+.candidate {
   font-weight: 700;
-  color: $primary-active-blue;
+  font-size: 14px;
+  line-height: 20px;
+  color: $primary-active-blue-10;
 }
 
-ejs-grid.e-control.e-grid .e-frozencontent.e-frozen-right-content > .e-table {
-  border-left: none!important;
+.number-bold {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 20px;
+  color: $black;
 }
