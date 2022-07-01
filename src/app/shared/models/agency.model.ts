@@ -71,3 +71,22 @@ export type AgencyPaymentDetails = {
 };
 
 export type AgencyPage = PageOfCollections<Agency>;
+
+export type AgencyOrderFilteringOptions = {
+  partneredOrganizations: {
+    id: number;
+    name: string;
+  }[];
+  orderStatuses: {
+    status: number;
+    statusText: string;
+  }[];
+  candidateStatuses: {
+    status: number;
+    statusText: string;
+  }[];
+  masterSkills: {
+    id: number;
+    name: string;
+  }[];
+};

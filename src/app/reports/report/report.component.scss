@@ -1,0 +1,13 @@
+:host {
+  height: 100%;
+}
+
+.app-report {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &__grid {
+    flex: 1;
+  }
+}

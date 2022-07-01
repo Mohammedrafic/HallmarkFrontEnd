@@ -1,25 +1,27 @@
-import { Observable } from 'rxjs';
+import { Observable, catchError, of } from 'rxjs';
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { ApplicantStatus } from '@shared/models/order-management.model';
+import { ApplicantsService } from '@shared/services/applicants.service';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { CandidateModel } from './models/candidate.model';
+import { CandidatesReportDataRequestPayloadModel } from './models/candidates-report-data-request-payload.model';
+import { CandidatesReportFilterFormValueModel } from './models/candidates-report-filter-form-value.model';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { PageOfCollections } from '@shared/models/page.model';
 import { PageQueryParams } from '@shared/services/page-query-filter-params.service';
-import { ReportDataRequestPayloadModel } from './models/report-data-request-payload.model';
-import { ReportFilterFormValueModel } from './models/report-filter-form-value.model';
 import { Skill } from '@shared/models/skill.model';
 import { SkillsService } from '@shared/services/skills.service';
+import { defaultEmptyPageOfCollections } from '@shared/constants/default-empty-page-of-collections';
 
 @Injectable({ providedIn: 'root' })
-export class ReportsService {
+export class CandidatesReportService {
   private static getReportDataRequestPayload(
     pageQueryParams: PageQueryParams,
-    filterFormValue: ReportFilterFormValueModel
-  ): ReportDataRequestPayloadModel {
+    filterFormValue: CandidatesReportFilterFormValueModel
+  ): CandidatesReportDataRequestPayloadModel {
     return {
       agencies: filterFormValue.agencies ?? [],
       applicantStatus: filterFormValue.statuses ?? [],
@@ -31,9 +33,10 @@ export class ReportsService {
   }
 
   public constructor(
-    private readonly skillsService: SkillsService,
+    private readonly applicantsService: ApplicantsService,
+    private readonly httpClient: HttpClient,
     private readonly orderManagementContentService: OrderManagementContentService,
-    private readonly httpClient: HttpClient
+    private readonly skillsService: SkillsService
   ) {}
 
   public getAssignedSkills(): Observable<Skill[]> {
@@ -45,20 +48,20 @@ export class ReportsService {
   }
 
   public getApplicantsStatuses(): Observable<ApplicantStatus[]> {
-    return this.httpClient.get<ApplicantStatus[]>('/api/Applicants/filterstatuses');
+    return this.applicantsService.getApplicantsStatuses();
   }
 
   public getReportData(
     pageQueryParams: PageQueryParams,
-    filterFormValue: ReportFilterFormValueModel
+    filterFormValue: CandidatesReportFilterFormValueModel
   ): Observable<PageOfCollections<CandidateModel>> {
-    const payload: ReportDataRequestPayloadModel = ReportsService.getReportDataRequestPayload(
+    const payload: CandidatesReportDataRequestPayloadModel = CandidatesReportService.getReportDataRequestPayload(
       pageQueryParams,
       filterFormValue
     );
 
-    return this.httpClient.get<PageOfCollections<CandidateModel>>('/api/Reports/candidates', {
-      params: { ...payload },
-    });
+    return this.httpClient
+      .get<PageOfCollections<CandidateModel>>('/api/Reports/candidates', { params: { ...payload } })
+      .pipe(catchError(() => of(defaultEmptyPageOfCollections<CandidateModel>())));
   }
 }

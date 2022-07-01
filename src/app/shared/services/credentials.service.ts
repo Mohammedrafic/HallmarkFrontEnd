@@ -1,17 +1,20 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential, CredentialFilter, CredentialFilterDataSources, CredentialPage } from '@shared/models/credential.model';
 import {
-  CredentialSetupFilterGet,
   CredentialSetupFilterDto,
+  CredentialSetupFilterGet,
   CredentialSetupGet,
-  CredentialSetupPost, CredentialSetupMappingPost, SaveUpdatedCredentialSetupDetailIds
+  CredentialSetupMappingPost,
+  CredentialSetupPost,
+  SaveUpdatedCredentialSetupDetailIds
 } from '@shared/models/credential-setup.model';
 import { ExportPayload } from '@shared/models/export.model';
+import { IOrderCredentialItem } from '@order-credentials/types';
 
 @Injectable({ providedIn: 'root' })
 export class CredentialsService {
@@ -161,5 +164,23 @@ export class CredentialsService {
    */
   public getCredentialsDataSources(): Observable<CredentialFilterDataSources> {
     return this.http.get<CredentialFilterDataSources>(`/api/MasterCredentials/filteringOptions`);
+  }
+
+  /**
+   * Get predefined credentials
+   * @return list of credentials
+   */
+  public getPredefinedCredentials(departmentId: number, skillId: number): Observable<IOrderCredentialItem[]> {
+    const params = { departmentId, skillId };
+    return this.http.get<IOrderCredentialItem[]>(`/api/credentialsetups/predefined/forOrder`, { params })
+      .pipe(map((credentials: IOrderCredentialItem[]) => (credentials.map((credential: any) => ({
+        credentialName: credential.name,
+        credentialId: credential.masterCredentialId,
+        credentialType: credential.credentialType,
+        comment: credential.comments,
+        reqForSubmission: credential.reqSubmission,
+        reqForOnboard: credential.reqOnboard,
+        optional: credential.isActive
+      })))));
   }
 }

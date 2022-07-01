@@ -104,6 +104,27 @@ export type OrderCandidatesList = {
 
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;
 
+export type AgencyOrderFilters = {
+  orderBy?: string;
+  pageNumber?: number;
+  pageSize?: number;
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentsIds?: number[];
+  orderId?: number;
+  skillIds?: number[];
+  candidateStatuses?: number[];
+  organizationIds?: number[];
+  orderTypes?: number[];
+  orderStatuses?: number[];
+  jobTitle?: string;
+  billRateFrom?: number;
+  billRateTo?: number;
+  openPositions?: number;
+  jobStartDate?: Date;
+  jobEndDate?: Date;
+};
+
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
 
 export type AgencyOrder = {
@@ -301,6 +322,7 @@ export class OrderFilter {
   jobStartDate?: Date;
   jobEndDate?: Date;
   orderStatuses?: number[];
+  candidateStatuses?: number[];
   candidatesCountFrom?: number;
   candidatesCountTo?: number;
   agencyIds?: number[];
@@ -312,12 +334,13 @@ export class OrderPartnerAgency {
   name: string;
 }
 
-export class FilterOrderStatus {
+export class FilterStatus {
   status: number;
   statusText: string;
 }
 
 export class OrderFilterDataSource {
   partneredAgencies: OrderPartnerAgency[];
-  orderStatus: FilterOrderStatus[];
+  orderStatuses: FilterStatus[];
+  candidateStatuses: FilterStatus[];
 }

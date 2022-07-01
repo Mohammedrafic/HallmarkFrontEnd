@@ -57,6 +57,10 @@
             [chartData]="widgetsData?.[widgetTypeEnum.FILLED_POSITIONS]"
             [isLoading]="isLoading"
           ></app-position-chart>
+          <app-tasks
+            *ngSwitchCase="widgetTypeEnum.TASKS"
+            [tasks]="widgetsData?.[widgetTypeEnum.TASKS]"
+          ></app-tasks>
         </ng-template>
       </e-panel>
     </e-panels>

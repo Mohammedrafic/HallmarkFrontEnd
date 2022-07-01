@@ -9,6 +9,7 @@ import { MapsChartModule } from '../widgets/maps-chart/maps-chart.module';
 import { WidgetWrapperModule } from '../widgets/widget-wrapper/widget-wrapper.module';
 import { LineChartModule } from '../widgets/line-chart/line-chart.module';
 import { PositionChartModule } from '../widgets/position-chart/position-chart.module';
+import { TasksModule } from '../widgets/tasks/tasks.module';
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -21,6 +22,7 @@ import { PositionChartModule } from '../widgets/position-chart/position-chart.mo
     WidgetWrapperModule,
     LineChartModule,
     PositionChartModule,
+    TasksModule,
   ]
 })
 export class DashboardWidgetsModule { }
