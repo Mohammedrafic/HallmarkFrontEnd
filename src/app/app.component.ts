@@ -5,7 +5,6 @@ import { Store } from '@ngxs/store';
 import { filter, map, mergeMap } from 'rxjs/operators';
 
 import { SetIsOrganizationAgencyArea } from './store/app.actions';
-import { GetOrganizationStructure } from './store/user.actions';
 
 @Component({
   selector: 'app-root',
