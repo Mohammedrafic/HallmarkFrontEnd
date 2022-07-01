@@ -45,15 +45,6 @@
         placeholder="All"
       ></app-multiselect-dropdown>
       <app-multiselect-dropdown
-        [dataSource]="filterColumns['agencies'].dataSource"
-        [formGroupInstance]="reportFiltersForm"
-        [fields]="agenciesOptionFields"
-        controlName="agencies"
-        id="agencies"
-        label="Agencies"
-        placeholder="All"
-      ></app-multiselect-dropdown>
-      <app-multiselect-dropdown
         [dataSource]="filterColumns['candidatesStatuses'].dataSource"
         [formGroupInstance]="reportFiltersForm"
         [fields]="candidatesStatusesOptionFields"

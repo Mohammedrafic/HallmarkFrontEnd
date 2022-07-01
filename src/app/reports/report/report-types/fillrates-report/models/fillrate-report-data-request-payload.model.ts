@@ -3,7 +3,6 @@ import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { BasePaginatedRequestPayloadModel } from '@shared/models/base-paginated-request-payload.model';
 
 export interface FillrateReportDataRequestPayloadModel extends BasePaginatedRequestPayloadModel {
-  agencyIds: number[];
   candidatesStatuses: ApplicantStatus[];
   departmentsIds: number[];
   locationIds: number[];

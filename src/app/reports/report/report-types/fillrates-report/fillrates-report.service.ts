@@ -5,7 +5,6 @@ import { HttpClient } from '@angular/common/http';
 
 import { ApplicantStatus } from '@shared/models/order-management.model';
 import { ApplicantsService } from '@shared/services/applicants.service';
-import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { FillrateModel } from './models/fillrate.model';
 import { FillrateReportDataRequestPayloadModel } from './models/fillrate-report-data-request-payload.model';
 import { FillrateReportFilterFormValueModel } from './models/fillrate-report-filter-form-value.model';
@@ -23,7 +22,6 @@ export class FillratesReportService {
     filterFormValue: FillrateReportFilterFormValueModel
   ): FillrateReportDataRequestPayloadModel {
     return {
-      agencyIds: filterFormValue.agencies ?? [],
       candidatesStatuses: filterFormValue.candidatesStatuses ?? [],
       departmentsIds: filterFormValue.departments ?? [],
       locationIds: filterFormValue.locations ?? [],
@@ -44,10 +42,6 @@ export class FillratesReportService {
 
   public getAssignedSkills(): Observable<Skill[]> {
     return this.skillsService.getAllOrganizationSkills();
-  }
-
-  public getAssociateAgencies(): Observable<AssociateAgency[]> {
-    return this.orderManagementContentService.getAssociateAgencies();
   }
 
   public getApplicantsStatuses(): Observable<ApplicantStatus[]> {
