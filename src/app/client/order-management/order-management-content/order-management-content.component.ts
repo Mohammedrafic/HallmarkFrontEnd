@@ -214,6 +214,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.organizationId$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => {
+        this.clearFilters();
         if (!this.previousSelectedOrderId) {
           this.getOrders();
         }
@@ -337,11 +338,15 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filterService.removeValue(event, this.OrderFilterFormGroup, this.filterColumns);
   }
 
-  public onFilterClearAll(): void {
+  private clearFilters(): void {
     this.OrderFilterFormGroup.reset();
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
     this.getOrders();
   }
 

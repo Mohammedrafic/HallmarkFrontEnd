@@ -145,6 +145,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       } else {
         this.organizationId = this.store.selectSnapshot(UserState.user)?.businessUnitId as number;
       }
+      this.clearFilters();
       this.store.dispatch(new GetOrganizationSettingsFilterOptions())
       this.getSettings();
     });
@@ -221,11 +222,15 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
     this.filterService.removeValue(event, this.SettingsFilterFormGroup, this.filterColumns);
   }
 
-  public onFilterClearAll(): void {
+  private clearFilters(): void {
     this.SettingsFilterFormGroup.reset();
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = { };
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
     this.getSettings();
   }
   
@@ -415,7 +420,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
           ? this.organizationSettingsFormGroup.controls['value'].value.toString() : 'false';
         break;
       case OrganizationSettingControlType.Text:
-        dynamicValue = this.organizationSettingsFormGroup.controls['value'].value.toString()
+        dynamicValue = this.organizationSettingsFormGroup.controls['value'].value?.toString()
         break;
       default:
         dynamicValue = this.organizationSettingsFormGroup.controls['value'].value;

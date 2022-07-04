@@ -20,7 +20,7 @@ import { WorkflowGroupType } from '@shared/enums/workflow-group-type';
 import { WorkflowStepType } from '@shared/enums/workflow-step-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { UserState } from '../../../store/user.state';
-import { GetAllOrganizationSkills, GetAllSkills } from '@organization-management/store/organization-management.actions';
+import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
 
 export enum WorkflowNavigationTabs {
   JobOrderWorkflow,
@@ -75,10 +75,14 @@ export class JobOrderComponent implements OnInit, OnDestroy {
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetWorkflowsSucceed))
       .subscribe((workflows) => {
         if (this.isJobOrderWorkflowTabActive) {
-          if (!this.selectedCard || (this.workflowsWithDetails.length !== workflows.payload.length)) {
-            this.workflowsWithDetails = workflows.payload;
-            this.customStepOrderFormGroup.reset();
-            this.customStepApplicationFormGroup.reset();
+          this.workflowsWithDetails = workflows.payload;
+          this.customStepOrderFormGroup.reset();
+          this.customStepApplicationFormGroup.reset();
+
+          if (this.selectedCard) {
+            const index = this.workflowsWithDetails.findIndex(w => w.id === this.selectedCard?.id);
+            this.onCardSelected(this.workflowsWithDetails[index]);
+          } else {
             this.onCardSelected(this.workflowsWithDetails[0]);
           }
         }

@@ -145,6 +145,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       this.getDepartments();
     });
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
+      this.clearFilters();
       this.store.dispatch(new GetRegions());
     });
   }
@@ -191,11 +192,15 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     this.filterService.removeValue(event, this.DepartmentFilterFormGroup, this.filterColumns);
   }
 
-  public onFilterClearAll(): void {
+  private clearFilters(): void {
     this.DepartmentFilterFormGroup.reset();
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
     this.getDepartments();
   }
 

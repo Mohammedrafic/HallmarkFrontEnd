@@ -137,6 +137,11 @@ tr.highlight {
   .e-customized-expand-cell {
     border-top: 1px solid $grid-row-border;
   }
+
+  &:last-of-type .e-customized-expand-cell,
+  &:last-of-type .e-detailrowcollapse {
+    border-bottom: 1px solid $grid-row-border;
+  }
 }
 
 .e-row[aria-selected='true'] {

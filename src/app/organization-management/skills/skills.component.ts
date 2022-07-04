@@ -108,6 +108,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     }
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.currentPage = 1;
+      this.clearFilters();
       this.getSkills();
     });
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
@@ -197,13 +198,17 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
     this.filterService.removeValue(event, this.SkillFilterFormGroup, this.filterColumns);
   }
 
-  public onFilterClearAll(): void {
+  private clearFilters(): void {
     this.SkillFilterFormGroup.reset();
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {
       orderBy: this.orderBy
     };
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
     this.store.dispatch(new GetAssignedSkillsByPage(this.currentPage, this.pageSize, this.filters));
   }
 

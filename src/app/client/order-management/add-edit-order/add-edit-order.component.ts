@@ -206,7 +206,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.workLocationForm.valid &&
       (this.orderDetailsFormComponent.workflowForm.valid && !this.orderDetailsFormComponent.workflowForm.disabled) &&
       this.orderDetailsFormComponent.specialProject.valid &&
-      this.billRatesComponent.billRatesControl.valid
+      (this.billRatesComponent?.billRatesControl.valid || this.orderBillRates.length)
     ) {
       const order = this.collectOrderData(true);
       const documents = this.orderDetailsFormComponent.documents;
@@ -265,7 +265,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       ...this.orderDetailsFormComponent.workflowForm.value,
       ...this.orderDetailsFormComponent.specialProject.value,
       ...{ credentials: this.orderCredentials },
-      ...{ billRates: this.billRatesComponent.billRatesControl.value }
+      ...{ billRates: this.billRatesComponent?.billRatesControl.value || this.orderBillRates }
     };
 
     const {

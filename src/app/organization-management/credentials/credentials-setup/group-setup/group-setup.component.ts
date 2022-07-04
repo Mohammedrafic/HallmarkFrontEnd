@@ -273,6 +273,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
     combineLatest([this.skillGroups$, this.allOrganizationSkills$])
     .pipe(takeUntil(this.unsubscribe$)).subscribe(([savedSkillGroupsPages, allOrganizationSkills]) => {
       if (savedSkillGroupsPages && savedSkillGroupsPages.items) {
+        this.reservedMasterSkillIds.clear();
         savedSkillGroupsPages.items.forEach(item => {
           item.skills?.forEach(s => {
             this.reservedMasterSkillIds.add(s.id);

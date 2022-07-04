@@ -108,6 +108,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
           ApplicantStatus.Applied,
           ApplicantStatus.Shortlisted,
           ApplicantStatus.OnBoarded,
+          ApplicantStatus.PreOfferCustom,
         ];
 
         if (allowedApplyStatuses.includes(this.candidate.status)) {
