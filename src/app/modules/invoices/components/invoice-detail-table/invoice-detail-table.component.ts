@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { InvoiceItem } from '../../interfaces';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ProfileTimesheetTableConfig } from '../../../timesheets/constants';
@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
   templateUrl: './invoice-detail-table.component.html',
   styleUrls: ['./invoice-detail-table.component.scss']
 })
-export class InvoiceDetailTableComponent extends AbstractGridConfigurationComponent implements OnChanges {
+export class InvoiceDetailTableComponent extends AbstractGridConfigurationComponent {
   @Input() invoice: InvoiceItem | any;
 
   public initialSort = {
@@ -19,17 +19,12 @@ export class InvoiceDetailTableComponent extends AbstractGridConfigurationCompon
   };
   public readonly tableHeight = 220;
   public readonly tableConfig = ProfileTimesheetTableConfig;
-  public tempData: any[] = [];
   public isAgency = false;
 
   constructor(private router: Router) {
     super();
 
     this.isAgency = this.router.url.includes('agency');
-  }
-
-  ngOnChanges() {
-    this.createTableData();
   }
 
   public get createRange(): string {
@@ -40,29 +35,6 @@ export class InvoiceDetailTableComponent extends AbstractGridConfigurationCompon
 
   public deleteTableItem(data: any): void {
 
-  }
-
-  /**
-   * Todo remove after demo
-   */
-  private createTableData(): void {
-    let initDate: Date = new Date(this.invoice.startDate);
-    for (let i = 0; i < 5; i++) {
-      const tableItem = {
-        id: 500 + i,
-        day: new Date(initDate),
-        timeIn: this.setInitTime(new Date(initDate)),
-        timeOut: this.setEndOfday(new Date(initDate)),
-        costCenter: 'AB group',
-        category: 'Regular',
-        hours: 8,
-        rate: this.invoice.rate,
-        total: this.invoice.rate * 8,
-      };
-
-      this.tempData.push(tableItem);
-      initDate = new Date(initDate.setDate(initDate.getDate() + 1));
-    }
   }
 
   private setInitTime(time: Date) {
