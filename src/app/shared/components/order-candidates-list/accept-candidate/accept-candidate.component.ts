@@ -186,7 +186,13 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private checkReadOnlyStatuses(): void {
-    const readOnlyStatuses = [ApplicantStatusEnum.Rejected, ApplicantStatusEnum.Applied, ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.OnBoarded];
+    const readOnlyStatuses = [
+      ApplicantStatusEnum.Rejected,
+      ApplicantStatusEnum.Applied,
+      ApplicantStatusEnum.Shortlisted,
+      ApplicantStatusEnum.OnBoarded,
+      ApplicantStatusEnum.PreOfferCustom
+    ];
     if (readOnlyStatuses.includes(this.candidate.status)) {
       this.isReadOnly = true;
     }

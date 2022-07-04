@@ -1,22 +1,22 @@
-import { TIMETHEETS_STATUSES } from '../../modules/timesheets/enums/timesheets.enum';
+import { TIMETHEETS_STATUSES } from '../../modules/timesheets/enums';
 
 export enum Status {
   'In Progress',
   'Inactive',
   'Active',
-  'Suspended'
+  'Suspended',
 }
 
 export const STATUS_COLOR_GROUP = {
-  'e-success': ['open', 'Active', 'Completed', 'active', 'completed','applied', TIMETHEETS_STATUSES.PENDING_APPROVE],
+  'e-success': ['open', 'Active', 'Completed', 'active', 'completed', 'applied', TIMETHEETS_STATUSES.PENDING_APPROVE],
   'e-warning': ['incomplete', 'suspended', 'Suspended', 'Incomplete', 'shortlisted', 'in progress (pending)'],
   'e-default': ['closed', 'Inactive', 'inactive', 'Closed', TIMETHEETS_STATUSES.REJECTED],
   'e-pending': ['pending', 'Pending', 'offered', TIMETHEETS_STATUSES.MISSING],
   'e-progress': ['in progress', 'In Progress', 'Verified', 'verified'],
-  'e-accepted': ['accepted','Accepted', 'in progress (accepted)', TIMETHEETS_STATUSES.ORG_APPROVED],
-  'e-filled': ['filled', 'Filled', 'onboarded', "onboarded"],
-  'e-awaiting': ['not applied', 'Not Applied']
-}
+  'e-accepted': ['accepted', 'Accepted', 'in progress (accepted)', TIMETHEETS_STATUSES.ORG_APPROVED],
+  'e-filled': ['filled', 'Filled', 'onboarded', 'onboard'],
+  'e-awaiting': ['not applied', 'Not Applied'],
+};
 
 export enum AgencyStatus {
   Pending,
@@ -28,18 +28,18 @@ export enum AgencyStatus {
 export enum CandidateStatus {
   Inactive,
   Active,
-  Incomplete
+  Incomplete,
 }
 
 export enum CreatedCandidateStatus {
   Inactive,
-  Active
+  Active,
 }
 
 export enum CredentialVerifiedStatus {
   Pending,
   Verified,
-  Completed
+  Completed,
 }
 
 export enum CreateUserStatus {
@@ -51,9 +51,9 @@ export enum OrderStatusText {
   Incomplete = 1,
   PreOpen = 5,
   Open = 20,
-  "In progress" = 30,
-  "In Progress (Pending)" = 31,
-  "In Progress (Accepted)" = 32,
+  'In progress' = 30,
+  'In Progress (Pending)' = 31,
+  'In Progress (Accepted)' = 32,
   Filled = 50,
-  Closed = 60
+  Closed = 60,
 }

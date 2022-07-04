@@ -738,7 +738,8 @@ export class OrganizationManagementState {
       return payload;
     }),
       catchError((error: any) => {
-        return dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : RECORD_CANNOT_BE_DELETED))
+        const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Group', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+        return dispatch(new ShowToast(MessageTypes.Error, message));
       })
     );
   }

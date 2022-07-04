@@ -9,5 +9,6 @@ export const widgetTypes: Record<string, WidgetTypeEnum> = {
   8: WidgetTypeEnum.IN_PROGRESS_POSITIONS,
   9: WidgetTypeEnum.FILLED_POSITIONS,
   10: WidgetTypeEnum.FILLED_POSITIONS_TREND,
+  12: WidgetTypeEnum.CHAT,
   13: WidgetTypeEnum.TASKS,
 };

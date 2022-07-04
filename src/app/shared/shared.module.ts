@@ -94,6 +94,7 @@ import { FilterDialogModule } from '@shared/components/filter-dialog/filter-dial
 import { DeployCandidateMessageComponent } from './components/order-candidates-list/deploy-candidate-message/deploy-candidate-message.component';
 import {ExBillRateNamesPipe} from "@shared/pipes/external-bill-rate-names.pipe";
 import { SideMenuModule } from '@shared/components/side-menu/side-menu.module';
+import {SecurityState} from "../security/store/security.state";
 
 const icons = {
   AlertCircle,
@@ -184,7 +185,7 @@ const COMPONENTS = [
     TextBoxModule,
     MaskedTextBoxAllModule,
     TabAllModule,
-    NgxsModule.forFeature([BillRateState]),
+    NgxsModule.forFeature([BillRateState, SecurityState]),
     PageToolbarModule,
     FilterDialogModule,
     SideMenuModule,

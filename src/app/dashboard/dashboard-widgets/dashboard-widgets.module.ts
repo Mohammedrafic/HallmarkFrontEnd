@@ -11,6 +11,7 @@ import { LineChartModule } from '../widgets/line-chart/line-chart.module';
 import { PositionChartModule } from '../widgets/position-chart/position-chart.module';
 import { TasksModule } from '../widgets/tasks/tasks.module';
 import { TrendChartModule } from '../widgets/trend-chart/trend-chart.module';
+import { ChatModule } from '../widgets/chat/chat.module';
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -25,6 +26,7 @@ import { TrendChartModule } from '../widgets/trend-chart/trend-chart.module';
     PositionChartModule,
     TasksModule,
     TrendChartModule,
+    ChatModule,
   ]
 })
 export class DashboardWidgetsModule { }

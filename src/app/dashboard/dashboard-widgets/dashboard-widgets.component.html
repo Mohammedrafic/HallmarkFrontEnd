@@ -65,6 +65,10 @@
           *ngSwitchCase="widgetTypeEnum.FILLED_POSITIONS_TREND"
             [widget]="widgetsData?.[widgetTypeEnum.FILLED_POSITIONS_TREND]"
           ></app-trend-chart>
+          <app-chat
+            *ngSwitchCase="widgetTypeEnum.CHAT"
+            [chatData]="widgetsData?.[widgetTypeEnum.CHAT]"
+          ></app-chat>
         </ng-template>
       </e-panel>
     </e-panels>

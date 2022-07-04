@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {Component, Inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
@@ -60,7 +60,7 @@ import { valuesOnly } from '@shared/utils/enum.utils';
   styleUrls: ['./bill-rate-setup.component.scss'],
   providers: [FreezeService]
 })
-export class BillRateSetupComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+export class BillRateSetupComponent extends AbstractGridConfigurationComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
   @ViewChild('rateHours') rateHoursInput: MaskedTextBoxComponent;
   @Input() isActive: boolean = false;
@@ -169,10 +169,9 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       this.defaultFileName = 'Bill Rates/Bill Rate Setup ' + this.generateDateTime(this.datePipe);
       this.defaultExport(event);
     });
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.store.dispatch(new GetAllOrganizationSkills());
-      this.store.dispatch(new GetBillRates({ pageNumber: this.currentPage, pageSize: this.pageSize }));
-      this.store.dispatch(new GetBillRateOptions());
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((id) => {
+      this.clearFilters();
+      this.loadData();
     });
 
     this.handlePagePermission();
@@ -303,9 +302,23 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       });
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    const isActive = changes['isActive'];
+
+    if (isActive.currentValue && !isActive.isFirstChange()) {
+      this.loadData();
+    }
+  }
+
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public loadData(): void {
+    this.store.dispatch(new GetAllOrganizationSkills());
+    this.store.dispatch(new GetBillRates({ pageNumber: this.currentPage, pageSize: this.pageSize }));
+    this.store.dispatch(new GetBillRateOptions());
   }
 
   public closeExport() {
@@ -456,12 +469,16 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.filterService.removeValue(event, this.billRateFilterFormGroup, this.filterColumns);
   }
 
-  public onFilterClearAll(): void {
+  private clearFilters(): void {
     this.billRateFilterFormGroup.reset();
     this.filteredItems = [];
     this.filteredItems$.next(this.filteredItems.length);
     this.currentPage = 1;
     this.filters = {};
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
     this.store.dispatch(new GetBillRates({
       pageNumber: this.currentPage,
       pageSize: this.pageSize,

@@ -12,7 +12,9 @@ import { ShowSideDialog } from '../../../store/app.actions';
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import { OrganizationManagementState } from '../../store/organization-management.state';
 import {
-  GetCredentialSkillGroup
+  GetCredential,
+  GetCredentialSkillGroup,
+  GetCredentialTypes
 } from '../../store/organization-management.actions';
 import { CredentialSkillGroup, CredentialSkillGroupPage } from '@shared/models/skill-group.model';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -214,10 +216,15 @@ export class CredentialsSetupComponent extends AbstractGridConfigurationComponen
   }
 
   public onCredentialMappingClick(): void {
+    this.store.dispatch(new GetCredential());
+    this.store.dispatch(new GetCredentialTypes());
     this.store.dispatch(new ShowSideDialog(true));
   }
 
   public onMappingEditClick(): void {
+    this.store.dispatch(new GetCredential());
+    this.store.dispatch(new GetCredentialTypes());
+
     // check if we have selected credential row in Credential grid, then proceed to Edit Mapping
     if (this.lastSelectedCredential) {
       const savedCredentials: CredentialSetupDetails[] = [];

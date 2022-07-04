@@ -67,6 +67,8 @@ export class DashboardService {
     [WidgetTypeEnum.TASKS]: (filters: DashboardFiltersModel) => this.getTasksWidgetData(),
     [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filterd: DashboardFiltersModel) =>
       this.getFilledPositionTrendWidgetData(),
+    [WidgetTypeEnum.TASKS]: ()=> this.getTasksWidgetData(),
+    [WidgetTypeEnum.CHAT]: () => this.getChatWidgetData(),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -233,7 +235,7 @@ export class DashboardService {
   }
 
   private getActivePositionWidgetData(filters: DashboardFiltersModel): Observable<AccumulationChartModel> {
-    return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, {}).pipe(
+    return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { granulateInProgress: true }).pipe(
       map(({ orderStatusesDetails }: ActivePositionsDto) => {
         return {
           id: WidgetTypeEnum.ACTIVE_POSITIONS,
@@ -256,7 +258,11 @@ export class DashboardService {
   }
 
   private getTasksWidgetData(): Observable<string> {
-    return of('assets/icons/temporary-widget-tasks.png');
+    return of('temporary-collapsed-widget-tasks');
+  }
+
+  private getChatWidgetData(): Observable<string> {
+    return of('assets/icons/temporary-widget-chat.png');
   }
 
   private getFilledPositionTrendWidgetData(): Observable<PositionTrend> {
