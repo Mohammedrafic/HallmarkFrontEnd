@@ -2,6 +2,7 @@ export class WorkflowWithDetails {
   id?: number;
   name: string;
   type: number;
+  requireMappingsUpdate?: boolean;
   workflows?: Workflow[];
   isActive?: boolean; // used only on UI to highlight clicked card
 }
