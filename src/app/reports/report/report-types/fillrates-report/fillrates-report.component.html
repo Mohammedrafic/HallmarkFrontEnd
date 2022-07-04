@@ -34,7 +34,7 @@
     (clearAllFiltersClicked)="clearFilters()"
     (deleteFilter)="deleteFilter($event)"
   >
-    <div class="app-fillrates-report__filters-form">
+    <div class="app-fillrates-report__filters-form" [formGroup]="reportFiltersForm">
       <app-multiselect-dropdown
         [dataSource]="filterColumns['skills'].dataSource"
         [formGroupInstance]="reportFiltersForm"
@@ -93,6 +93,38 @@
         label="Order Types"
         placeholder="All"
       ></app-multiselect-dropdown>
+      <div class="app-fillrates-report__row-controls">
+        <div class="input-container calendar app-fillrates-report__row-control">
+          <label for="inactiveDate">Order Start Date</label>
+          <div class="input-group datepicker">
+            <ejs-datepicker
+            class="datepicker"
+            format="MM/dd/yyyy"
+            placeholder="MM/DD/YYYY"
+            formControlName="orderStartDate"
+            >
+          </ejs-datepicker>
+        </div>
+      </div>
+      <div class="input-container calendar app-fillrates-report__row-control">
+        <label for="inactiveDate">Order End Date</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+          class="datepicker"
+          format="MM/dd/yyyy"
+          placeholder="MM/DD/YYYY"
+          formControlName="orderEndDate"
+          >
+        </ejs-datepicker>
+      </div>
     </div>
-  </app-filter-dialog>
+  </div>
+  <div class="app-fillrates-report__row-controls">
+    <div class="checkbox-container bootstrap">
+      <ejs-checkbox label="Exclude Internal Agency" [checked]="reportFiltersForm.get('excludeFcAgency')?.value" (change)="onExcludeFcAgencyChange()"></ejs-checkbox>
+    </div>
+  </div>
+</div>
+</app-filter-dialog>
 </ng-template>
+

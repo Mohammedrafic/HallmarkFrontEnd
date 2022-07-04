@@ -61,7 +61,7 @@ export class CandidatesReportService {
     );
 
     return this.httpClient
-      .get<PageOfCollections<CandidateModel>>('/api/Reports/candidates', { params: { ...payload } })
+      .post<PageOfCollections<CandidateModel>>('/api/Reports/candidates', payload)
       .pipe(catchError(() => of(defaultEmptyPageOfCollections<CandidateModel>())));
   }
 }
