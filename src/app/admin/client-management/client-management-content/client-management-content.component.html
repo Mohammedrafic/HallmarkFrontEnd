@@ -8,7 +8,7 @@
     <ng-container right>
       <section class="org-controls-container">
         <div>
-          <button ejs-button [isPrimary]="true" (click)="navigateToOrganizationForm()">Add Organization</button>
+          <button *ngIf="hasCreateOrganizationPermission" ejs-button [isPrimary]="true" (click)="navigateToOrganizationForm()">Add Organization</button>
           <button
             ejs-dropdownbutton
             [items]="exportOptions"

@@ -10,3 +10,8 @@ export type PermissionsTreeItem = {
 };
 
 export type PermissionsTree = PermissionsTreeItem[];
+
+export type CurrentUserPermission = {
+  permissionId: number;
+  name: string;
+};
