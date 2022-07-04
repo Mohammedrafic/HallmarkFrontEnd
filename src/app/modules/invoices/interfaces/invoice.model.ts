@@ -12,7 +12,7 @@ export interface Invoice extends InvoiceRecord {
   invoices: InvoiceRecord[];
   issuedDate: Date;
   dueDate: Date;
-  statusText: INVOICES_STATUSES
+  statusText: INVOICES_STATUSES;
 }
 
 export type InvoicePage = PageOfCollections<Invoice>;

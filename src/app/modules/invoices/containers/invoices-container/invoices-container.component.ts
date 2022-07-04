@@ -106,7 +106,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
 
         return {
           ...v,
-          items: [...this.restoreInvoiceRecords(v.items), ...(existingRecords?.items || [])],
+          items: [...this.restoreInvoiceRecords(v.items || []), ...(existingRecords?.items || [])],
         };
       })
     ).pipe(
@@ -196,8 +196,17 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
       return acc.includes(groupByValue) ? acc : [...acc, groupByValue];
     }, []);
 
+    const submittedTimesheets = JSON.parse(
+      localStorage.getItem('submited-timsheets') as string
+    ) as PageOfCollections<{ id: number; timesheets: { [key: number]: ProfileTimeSheetDetail[] } }>;
+
     const groupedInvoices = groups.map<Invoice>((groupName: string) => {
-      const groupInvoices = items.filter((record) => record[this.groupInvoicesBy] === groupName);
+      const groupInvoices = items.filter((record) => record[this.groupInvoicesBy] === groupName)
+        .map(record => {
+          record.timesheets = (submittedTimesheets || []).items
+            .find(timesheet => timesheet.id === record.timesheetId)?.timesheets[record.timesheetId];
+          return record;
+        });
       const issuedDate = new Date();
       const dueDate = new Date();
       dueDate.setDate(issuedDate.getDate() + 2);
@@ -256,11 +265,12 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
                        id: timesheetId,
                      }: TimesheetData
     ) => {
-      const timesheetDetailsTables = JSON.parse(
-        localStorage.getItem('timesheet-details-tables') as string
-      ) as {[key: number]: ProfileTimeSheetDetail[]};
+      const submittedTimesheets = JSON.parse(
+        localStorage.getItem('submited-timsheets') as string
+      ) as PageOfCollections<{ id: number; timesheets: { [key: number]: ProfileTimeSheetDetail[] } }>;
+      const items = submittedTimesheets.items || [];
 
-      const timehseetDetails = timesheetDetailsTables[timesheetId] || [];
+      const timehseetDetails = items.find(ts => ts.id === timesheetId)?.timesheets[timesheetId] || [];
       const hours = timehseetDetails.reduce((acc, item) => acc + item.hours, 0);
       const amount = timehseetDetails.reduce((acc, item) => acc + item.hours * item.rate, 0);
       const rates = timehseetDetails.map((v) => v.rate).sort();
