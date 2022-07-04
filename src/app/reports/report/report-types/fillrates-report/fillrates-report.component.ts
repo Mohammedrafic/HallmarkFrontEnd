@@ -105,21 +105,21 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
     {
       field: 'distributionDate',
       headerName: 'Distribution Date',
-      valueFormatter: (params: ValueFormatterParams) => this.getFormattedTime(params.value),
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
     },
     {
       field: 'appliedDate',
       headerName: 'Applied Date',
-      valueFormatter: (params: ValueFormatterParams) => this.getFormattedTime(params.value),
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
     },
     {
-      field: 'distributionToActualAppliedDays',
+      field: 'distributionToAppliedDays',
       headerName: '#Days Job Dist. to Cand. Appl.'
     },
     {
       field: 'shortlistedDate',
       headerName: 'Shortlisted Date',
-      valueFormatter: (params: ValueFormatterParams) => this.getFormattedTime(params.value),
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
     },
     {
       field: 'appliedToShortlistdDays',
@@ -128,7 +128,7 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
     {
       field: 'offeredDate',
       headerName: 'Offered Date',
-      valueFormatter: (params: ValueFormatterParams) => this.getFormattedTime(params.value),
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
     },
     {
       field: 'appliedToOfferedDays',
@@ -141,7 +141,7 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
     {
       field: 'acceptedDate',
       headerName: 'Accepted Date',
-      valueFormatter: (params: ValueFormatterParams) => this.getFormattedTime(params.value),
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
     },
     {
       field: 'offeredToAcceptedDays',
