@@ -37,4 +37,5 @@ export interface InvoiceItem {
   minRate: number;
   maxRate: number;
   timesheetId: string;
+  timesheets?: any[];
 }
