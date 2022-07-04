@@ -2,7 +2,7 @@ import { BasePaginatedRequestPayloadModel } from '@shared/models/base-paginated-
 
 export interface CandidatesReportDataRequestPayloadModel extends BasePaginatedRequestPayloadModel {
   agencies: number[];
-  applicantStatus: number[];
+  applicantStatuses: number[];
   candidateName: string;
   skills: number[];
 }

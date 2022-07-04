@@ -69,9 +69,12 @@ label {
 
 .form-line {
   display: flex;
+  align-items: flex-end;
+
   &:not(:last-child) {
     margin-bottom: 15px;
   }
+
   > *:not(:first-child) {
     box-sizing: border-box;
     padding-left: 16px;

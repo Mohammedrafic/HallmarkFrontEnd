@@ -20,7 +20,7 @@
       (select)="exportSelected($event)"
       cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
     <button
-      *ngIf="!isReadOnly && !isExternalBillRateTypeMapping"
+      *ngIf="showButton"
       ejs-button
       [isPrimary]="true"
       (click)="addBillRateSetupRecord()">{{addBillRateBtnText}}</button>

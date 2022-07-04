@@ -1,22 +1,58 @@
-<div class="login-container">
-  <h1>Simple login</h1>
-
-  <form *ngIf="usersDropDownData?.length" [formGroup]="loginForm" (ngSubmit)="onLogin()">
-    <div class="dropdown-container bootstrap">
-      <ejs-dropdownlist
-        [fields]="optionFields"
-        formControlName="user"
-        [dataSource]="usersDropDownData" >
-      </ejs-dropdownlist>
+<section class="login-page">
+  <div class="row">
+    <div class="left-column">
+      <div class="logo">
+        <img src="./assets/logo-login.svg" alt="einstein">
+      </div>
+      <div class="text-box">
+        <h2>WELCOME!</h2>
+        <p>Log In with your email....</p>
+      </div>
+      <form *ngIf="usersDropDownData?.length" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+        <div class="input-container bootstrap">
+          <label>Email</label>
+          <div class="input-group">
+            <input
+              class="e-input"
+              type="text"/>
+          </div>
+        </div>
+        <div class="input-container bootstrap">
+          <label>Password</label>
+          <div class="input-group">
+            <input
+              class="e-input"
+              type="password"
+            />
+          </div>
+        </div>
+        <div class="user-action row">
+          <div class="forgot">
+            Forgot Your Password?
+          </div>
+          <div class="remember bootstrap">
+            <ejs-checkbox label="Remember me"></ejs-checkbox>
+          </div>
+        </div>
+        <div class="input-container bootstrap">
+          <div class="input-group">
+            <ejs-dropdownlist
+              [fields]="optionFields"
+              formControlName="user"
+              [dataSource]="usersDropDownData" >
+            </ejs-dropdownlist>
+          </div>
+        </div>
+        <div class="button-container">
+          <button
+            [disabled]="!loginForm.controls['user'].value"
+            class="e-control e-btn e-lib e-primary"
+            type="submit">
+            Login
+          </button>
+        </div>
+      </form>
     </div>
-
-    <div class="button-container">
-      <button
-        [disabled]="!loginForm.controls['user'].value"
-        class="e-control e-btn e-lib e-primary"
-        type="submit">
-        Login
-      </button>
-    </div>
-  </form>
-</div>
+    <div class="right-column"></div>
+  </div>
+</section>

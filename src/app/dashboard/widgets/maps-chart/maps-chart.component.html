@@ -12,11 +12,11 @@
           {{ chartData?.chartData?.[0]?.shapeSettings?.colorMapping?.[0]?.to }}
         </div>
       </div>
-    
-    <div class="app-maps-chart__unknown-candidates">
-      <span class="app-maps-chart__text">Applicants with no state indicated</span>
-      <span class="app-maps-chart__number">{{ chartData?.unknownStateCandidates }}</span>
+
+      <div *ngIf="chartData?.unknownStateCandidates" class="app-maps-chart__unknown-candidates">
+        <span class="app-maps-chart__text">Applicants with no state indicated</span>
+        <span class="app-maps-chart__number">{{ chartData?.unknownStateCandidates }}</span>
+      </div>
     </div>
-  </div>
   </ng-template>
 </app-widget-wrapper>
