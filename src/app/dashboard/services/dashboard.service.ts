@@ -64,6 +64,7 @@ export class DashboardService {
     [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
     [WidgetTypeEnum.TASKS]: (filters: DashboardFiltersModel)=> this.getTasksWidgetData(),
+    [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filterd: DashboardFiltersModel) => this.getFilledPositionTrendWidgetData(),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -205,9 +206,13 @@ export class DashboardService {
 
   private calculateTimeRanges(): { startDate: string; endDate: string } {
     const date = new Date();
-    const startDate = new Date(date.setMonth(date.getMonth() - 3)).toISOString();
-    const endDate = new Date(date.setMonth(date.getMonth() + 6)).toISOString();
+    const startDate = this.getDateAsISOString(date.setMonth(date.getMonth() - 3));
+    const endDate = this.getDateAsISOString(date.setMonth(date.getMonth() + 6));
     return { startDate, endDate };
+  }
+
+  private getDateAsISOString(timestamp: number): string {
+    return new Date(timestamp).toISOString();
   }
 
   private convertDtoToPositionTypes(data: PositionByTypeDto[]): PositionByTypeDataModel[] {
@@ -248,5 +253,15 @@ export class DashboardService {
 
   private getTasksWidgetData(): Observable<string> {
     return of('assets/icons/temporary-widget-tasks.png');
+  }
+
+  private getFilledPositionTrendWidgetData(): Observable<any> {
+    const date = new Date();
+    const timeRanges = {
+      dateFrom: this.getDateAsISOString(date.setMonth(date.getMonth() - 1)),
+      dateTo: this.getDateAsISOString(Date.now()),
+    }
+    console.error(timeRanges)
+    return this.httpClient.post(`${this.baseUrl}/filledpositionstrend`, {timeRanges})
   }
 }
