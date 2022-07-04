@@ -310,11 +310,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
       const timesheets = JSON.parse(localStorage.getItem('timesheets') as string);
       const sheetIdx = timesheets.items.findIndex((item: any) => item.id === profile.id);
-      timesheets.items[sheetIdx].status = profile.status = TIMETHEETS_STATUSES.ORG_APPROVED;
+      timesheets.items[sheetIdx].status = TIMETHEETS_STATUSES.ORG_APPROVED;
 
       const subm = JSON.parse(localStorage.getItem('submited-timsheets') as string);
       const idx = subm.items.findIndex((item: any) => item.id === profile.id);
-      subm.items[idx].status = profile.status = TIMETHEETS_STATUSES.ORG_APPROVED;
+      subm.items[idx].status = TIMETHEETS_STATUSES.ORG_APPROVED;
 
       localStorage.setItem('submited-timsheets', JSON.stringify(
         {
@@ -322,8 +322,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
         }
       ));
 
-      if (localStorage.getItem('approved-timesheets')) {
-        approved = localStorage.getItem('approved-timesheets');
+      if (localStorage.getItem('APPROVED_TIMESHEETS')) {
+        approved = JSON.parse(localStorage.getItem('APPROVED_TIMESHEETS') as string);
+
         approved.items.push(profile);
       } else {
         approved = {
@@ -334,9 +335,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
           totalCount: 1,
           totalPages: 1,
         };
-        localStorage.setItem('APPROVED_TIMESHEETS', JSON.stringify(approved));
-      }
 
+      }
+      localStorage.setItem('APPROVED_TIMESHEETS', JSON.stringify(approved));
       localStorage.setItem('timesheets', JSON.stringify(
         {
           ...timesheets,
