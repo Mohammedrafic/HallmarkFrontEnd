@@ -1,0 +1,36 @@
+@import '../../../../styles/variables/colors.scss';
+
+.candidate-row {
+  height: 64px;
+  display: flex;
+  grid-column-gap: 50px;
+  align-items: center;
+  padding-left: 103px;
+
+  &:hover {
+    background-color: $primary-active-blue-90;
+  }
+
+  .info {
+    font-size: 12px;
+
+    .data {
+      font-weight: 700;
+      color: $black;
+
+      a {
+        color: $primary-active-blue-10;
+      }
+    }
+
+    .title {
+      margin-top: 2px;
+      font-weight: 400;
+      color: $secondary-dark-blue-30;
+    }
+  }
+
+  &.selected {
+    background-color: $primary-active-blue-70;
+  }
+}

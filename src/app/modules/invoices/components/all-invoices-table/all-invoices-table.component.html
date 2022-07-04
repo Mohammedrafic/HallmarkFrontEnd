@@ -1,0 +1,190 @@
+<ejs-grid
+  #grid
+  class="e-gridwithchildrow"
+  [dataSource]="tableData?.items"
+  [allowPaging]="allowPaging"
+  [pageSettings]="pageSettings"
+  [height]="gridHeight"
+  [rowHeight]="rowHeight"
+  [resizeSettings]="resizeSettings"
+  [allowSorting]="allowSorting"
+  [allowResizing]="allowResizing"
+  [allowTextWrap]="true"
+  [selectionSettings]="selectionSettings"
+  [textWrapSettings]="wrapSettings"
+  (rowSelected)="rowSelected($event)"
+>
+  <e-columns>
+    <e-column
+      type="checkbox"
+      [customAttributes]="{ class: 'bootstrap' }"
+      [width]="50">
+    </e-column>
+    <e-column
+      field="id"
+      [headerText]="tableConfig.id.header"
+      [textAlign]="tableConfig.id.align"
+      [width]="tableConfig.id.width"
+    >
+      <ng-template #template let-data>
+        <ng-container *ngIf="!data.invoices?.length; else withToggle">
+          <a href="#">{{ data.id }}</a>
+        </ng-container>
+
+        <ng-template #withToggle>
+          <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
+            <a href="#">{{ data.id }}</a>
+            <i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
+          </div>
+        </ng-template>
+      </ng-template>
+    </e-column>
+    <e-column
+      field="statusText"
+      [headerText]="tableConfig.statusText.header"
+      [textAlign]="tableConfig.statusText.align"
+      [width]="tableConfig.statusText.width"
+    >
+      <ng-template #template let-data>
+        <div class="status-cell">
+          <ejs-chiplist>
+            <e-chips>
+              <e-chip [text]="data.statusText" [cssClass]="(data.statusText | chipsCssClass)"></e-chip>
+            </e-chips>
+          </ejs-chiplist>
+        </div>
+      </ng-template>
+    </e-column>
+    <e-column
+      field="amount"
+      [headerText]="tableConfig.amount.header"
+      [textAlign]="tableConfig.amount.align"
+      [width]="tableConfig.amount.width"
+    >
+      <ng-template #template let-data>
+        <b>{{ data.amount }}</b>
+      </ng-template>
+    </e-column>
+    <e-column
+      field="type"
+      [headerText]="tableConfig.type.header"
+      [textAlign]="tableConfig.type.align"
+      [width]="tableConfig.type.width"
+    >
+      <ng-template #template let-data>
+        <span>{{ data.type }}</span>
+      </ng-template>
+    </e-column>
+    <e-column
+      field="organization"
+      [headerText]="tableConfig.organization.header"
+      [textAlign]="tableConfig.organization.align"
+      [width]="tableConfig.organization.width"
+    >
+      <ng-template #template let-data>
+        <span>{{ data.organization }}</span>
+      </ng-template>
+    </e-column>
+    <e-column
+      field="location"
+      [headerText]="tableConfig.location.header"
+      [textAlign]="tableConfig.location.align"
+      [width]="tableConfig.location.width"
+    >
+      <ng-template #template let-data>
+        <span>{{ data.location }}</span>
+      </ng-template>
+    </e-column>
+    <e-column
+      field="department"
+      [headerText]="tableConfig.department.header"
+      [textAlign]="tableConfig.department.align"
+      [width]="tableConfig.department.width"
+    >
+      <ng-template #template let-data>
+        <span>{{ data.department }}</span>
+      </ng-template>
+    </e-column>
+    <e-column
+      field="candidate"
+      [headerText]="tableConfig.candidate.header"
+      [textAlign]="tableConfig.candidate.align"
+      [width]="tableConfig.candidate.width"
+    >
+      <ng-template #template let-data>
+        <a href="#">{{ data.candidate }}</a>
+      </ng-template>
+    </e-column>
+    <e-column
+      field="issuedDate"
+      [headerText]="tableConfig.issuedDate.header"
+      [textAlign]="tableConfig.issuedDate.align"
+      [width]="tableConfig.issuedDate.width"
+    >
+      <ng-template #template let-data>
+        <span>{{ data.issuedDate | date: 'MM/dd/yyyy' }}</span>
+      </ng-template>
+    </e-column>
+    <e-column
+      field="dueDate"
+      [headerText]="tableConfig.dueDate.header"
+      [textAlign]="tableConfig.dueDate.align"
+      [width]="tableConfig.dueDate.width"
+    >
+      <ng-template #template let-data>
+        <span>{{ data.dueDate | date: 'MM/dd/yyyy' }}</span>
+      </ng-template>
+    </e-column>
+  </e-columns>
+
+  <ng-template #detailTemplate let-data>
+    <div class="subrow-wrapper">
+      <app-all-invoices-subrow
+        *ngFor="let invoice of data.invoices"
+        [invoice]="invoice"
+        [rowData]="data">
+      </app-all-invoices-subrow>
+    </div>
+  </ng-template>
+
+  <ng-template #pagerTemplate let-data>
+    <div class="e-pagertemplate">
+      <div class="control-section">
+        <div class="content-wrapper">
+          <section class="left-side-pager-controls">
+            <ejs-dropdownlist
+              id="rowsPerPage"
+              class="dropdown-no-border"
+              [dataSource]="rowsPerPageDropDown"
+              [(value)]="activeRowsPerPageDropDown"
+              (change)="updatePageSize($event)"
+            ></ejs-dropdownlist>
+            <ejs-numerictextbox
+              id="goToPage"
+              class="numeric-input-no-border"
+              format="#"
+              [validateDecimalOnType]="validateDecimalOnType"
+              [decimals]="decimals"
+              placeholder="Go to:"
+              min="1"
+              [max]="tableData?.totalPages"
+              [showSpinButton]="false"
+              (change)="goToPage($event)"
+            ></ejs-numerictextbox>
+          </section>
+          <section class="right-side-pager-controls">
+            <ejs-pager
+              id="gridPager"
+              #gridPager
+              [pageSize]="pageSize"
+              [totalRecordsCount]="data.totalRecordsCount"
+              [enablePagerMessage]="false"
+              [currentPage]="tableData?.pageNumber"
+              (click)="updateCurrentPage($event)"
+            ></ejs-pager>
+          </section>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</ejs-grid>

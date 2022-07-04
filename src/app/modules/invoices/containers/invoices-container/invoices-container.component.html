@@ -1,6 +1,9 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tabs-list [tabConfig]="tabsConfig"></app-tabs-list>
+    <app-tabs-list
+      [tabConfig]="tabsConfig"
+      (changeTab)="handleChangeTab($event)">
+    </app-tabs-list>
   </ng-container>
 
   <ng-container right>
@@ -12,13 +15,29 @@
       Filters <i-feather name="sliders" class="icon"></i-feather>
     </button>
     <app-export-button (optionSelected)="onExportOptionSelect($event)"></app-export-button>
-    <button ejs-button class="e-primary" (click)="createInvoiceDialog.show()">Create Invoice</button>
+    <button ejs-button class="e-primary"
+            [disabled]="!invoiceRecordsTable?.selectedItems?.length"
+            (click)="createInvoiceDialog.show()">
+      Create Invoice
+    </button>
   </ng-container>
 </app-page-toolbar>
 
 <section>
-  <app-invoice-records-table [tableData]="invoicesData$ | async" [config]="tableConfig"></app-invoice-records-table>
+  <ng-container [ngSwitch]="selectedTabIdx">
+    <ng-container *ngSwitchCase="1">
+      <app-all-invoices-table [tableData]="allInvoices"></app-all-invoices-table>
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+      <app-invoice-records-table [tableData]="invoicesData$ | async"
+                                 [config]="tableConfig"
+                                 #invoiceRecordsTable
+      ></app-invoice-records-table>
+    </ng-container>
+  </ng-container>
 </section>
+
+<app-invoice-record-dialog #invoiceRecordDialog></app-invoice-record-dialog>
 
 <ejs-dialog
         #createInvoiceDialog
@@ -31,69 +50,25 @@
   <ng-template #content>
     <form class="create-invoice-dialog-content">
       <div class="title">
-        <h2>Add Invoice Segment</h2>
+        <h2>Create Invoice</h2>
 
         <div class="spacer"></div>
 
-        <button ejs-button class="e-outline" (click)="createInvoiceDialog.hide()">Cancel</button>
-        <button ejs-button class="e-primary" type="submit" (click)="createInvoiceDialog.hide()">Create</button>
+        <button ejs-button class="e-outline" (click)="createInvoiceDialog.hide()" type="button">Cancel</button>
+        <button ejs-button class="e-primary"
+                type="submit"
+                (click)="$event.preventDefault(); createInvoices(invoiceRecordsTable?.selectedItems)"
+        >
+          Create
+        </button>
       </div>
 
       <div class="dropdown-container bootstrap">
-        <label>Day</label>
-        <ejs-dropdownlist
-                title="Group by choice"
-                [fields]="{}"
-                [dataSource]="[]">
-        </ejs-dropdownlist>
-
-       <ng-container *ngIf="false">
-         <div class="form-row">
-           <div class="mr-12">
-             <label>Time In</label>
-             <ejs-timepicker
-                     placeholder="HH:MM"
-                     format="hh:mm a"
-                     [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                     [enableMask]="true"
-                     maskPlaceholder="HH:MM">
-             </ejs-timepicker>
-           </div>
-
-           <div>
-             <label>Time Out</label>
-             <ejs-timepicker
-                     placeholder="HH:MM"
-                     format="hh:mm a"
-                     [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                     [enableMask]="true"
-                     maskPlaceholder="HH:MM">
-             </ejs-timepicker>
-           </div>
-         </div>
-
-         <div class="form-row">
-           <div class="mr-12">
-             <label>Cost center <span class="required"></span></label>
-             <ejs-dropdownlist
-                     title="Group by choice"
-                     [fields]="{}"
-                     [dataSource]="[]">
-             </ejs-dropdownlist>
-           </div>
-
-           <div>
-             <label>Category <span class="required"></span></label>
-             <ejs-dropdownlist
-                     title="Group by choice"
-                     [fields]="{}"
-                     [dataSource]="[]">
-             </ejs-dropdownlist>
-           </div>
-         </div>
-
-       </ng-container>
-        </div>
+        <label>Group Invoice by</label>
+        <ejs-dropdownlist [dataSource]="invoicesGroupByOptions"
+                          [value]="invoicesGroupByOptions[0].text"
+                          [fields]="fieldValues" (select)="onInvoiceGrouping($event)" #groupBy></ejs-dropdownlist>
+      </div>
     </form>
   </ng-template>
 </ejs-dialog>

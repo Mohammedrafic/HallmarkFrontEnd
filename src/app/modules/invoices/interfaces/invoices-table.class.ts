@@ -22,7 +22,7 @@ export class InvoicesTable<T> extends AbstractGridConfigurationComponent {
   public override selectionSettings: SelectionSettingsModel = {
     type: 'Single',
     mode: 'Row',
-    checkboxMode: 'ResetOnRowClick',
+    checkboxMode: 'Default',
   };
 
   public readonly wrapSettings: TextWrapSettingsModel = {
@@ -36,6 +36,8 @@ export class InvoicesTable<T> extends AbstractGridConfigurationComponent {
     if (!event.isInteracted) {
       this.rowSelect.emit(event.rowIndex);
     }
+
+    super.rowSelected(event, this.grid);
   }
 
   public updatePageSize({value}: ChangeEventArgs): void {

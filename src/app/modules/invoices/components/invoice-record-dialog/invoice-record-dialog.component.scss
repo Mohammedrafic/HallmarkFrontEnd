@@ -1,0 +1,48 @@
+@import "colors";
+
+.create-invoice-dialog-content {
+  display: flex;
+  flex-direction: column;
+  padding: 25px 24px;
+
+  .title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+
+    h2 {
+      font-weight: 700;
+      font-size: 24px;
+      margin: 0;
+      color: $black;
+    }
+  }
+
+  label {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .spacer {
+    flex-grow: 1;
+  }
+
+  button[type="submit"] {
+    margin-left: 8px;
+  }
+
+  .mr-12 {
+    margin-right: 12px;
+  }
+
+  .form-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    width: 100%;
+  }
+
+  .w-100 {
+    width: 100%;
+  }
+}

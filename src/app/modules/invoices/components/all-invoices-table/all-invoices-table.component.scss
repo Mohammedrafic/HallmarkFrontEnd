@@ -9,15 +9,14 @@
       color: $primary-active-blue-10;
     }
 
-    .red-text {
-      font-weight: 700;
-      color: $supportive-red;
-    }
-
     .e-rowcell a {
       font-weight: 700;
       color: $primary-active-blue-10;
     }
+  }
+
+  ejs-chiplist.e-control.e-chip-list .e-chip {
+    width: initial !important;
   }
 
   &.e-gridhover tr[role=row]:not(.e-editedrow):hover .e-rowcell:not(.e-cellselectionbackground):not(.e-active):not(.e-updatedtd):not(.e-indentcell) {
@@ -72,9 +71,4 @@
 
 .name {
   font-weight: 700;
-  color: $primary-active-blue;
-}
-
-ejs-grid.e-control.e-grid .e-frozencontent.e-frozen-right-content > .e-table {
-  border-left: none!important;
 }
