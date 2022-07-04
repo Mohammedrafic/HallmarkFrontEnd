@@ -7,7 +7,7 @@ import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { AccumulationChartModel } from '@syncfusion/ej2-angular-charts';
 import type { LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
 import { catchError, forkJoin, Observable, of } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { filter, map, shareReplay } from 'rxjs/operators';
 import flow from 'lodash/fp/flow';
 import values from 'lodash/fp/values';
 import max from 'lodash/fp/max';
@@ -47,6 +47,7 @@ import { ActivePositionsChartStatuses } from '../enums/active-positions-legend-p
 import { candidateLegendPalette } from '../constants/candidate-legend-palette';
 import { CandidateChartStatuses } from '../enums/candidate-legend-palette.enum';
 import { Router } from '@angular/router';
+import { PositionTrend } from '../models/position-trend.model';
 
 @Injectable()
 export class DashboardService {
@@ -63,8 +64,9 @@ export class DashboardService {
     [WidgetTypeEnum.OPEN_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
     [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
-    [WidgetTypeEnum.TASKS]: (filters: DashboardFiltersModel)=> this.getTasksWidgetData(),
-    [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filterd: DashboardFiltersModel) => this.getFilledPositionTrendWidgetData(),
+    [WidgetTypeEnum.TASKS]: (filters: DashboardFiltersModel) => this.getTasksWidgetData(),
+    [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filterd: DashboardFiltersModel) =>
+      this.getFilledPositionTrendWidgetData(),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -131,7 +133,9 @@ export class DashboardService {
           chartData: lodashMapPlain(candidatesInfo, ({ count, status }: CandidateTypeInfoModel, index: number) => ({
             label: status,
             value: count,
-            color: candidateLegendPalette[status as CandidateChartStatuses] || candidateLegendPalette[CandidateChartStatuses.CUSTOM],
+            color:
+              candidateLegendPalette[status as CandidateChartStatuses] ||
+              candidateLegendPalette[CandidateChartStatuses.CUSTOM],
           })),
         };
       })
@@ -255,13 +259,25 @@ export class DashboardService {
     return of('assets/icons/temporary-widget-tasks.png');
   }
 
-  private getFilledPositionTrendWidgetData(): Observable<any> {
+  private getFilledPositionTrendWidgetData(): Observable<PositionTrend> {
     const date = new Date();
     const timeRanges = {
       dateFrom: this.getDateAsISOString(date.setMonth(date.getMonth() - 1)),
       dateTo: this.getDateAsISOString(Date.now()),
-    }
-    console.error(timeRanges)
-    return this.httpClient.post(`${this.baseUrl}/filledpositionstrend`, {timeRanges})
+    };
+
+    return this.httpClient.post<{ values: number[] }>(`${this.baseUrl}/filledpositionstrend`, { timeRanges }).pipe(
+      map((data: { values: number[] }) => {
+        const currentValue: number = data.values.pop() || 0;
+        const previousValue: number = data.values.pop() || 0;
+        
+        return {
+          id: WidgetTypeEnum.FILLED_POSITIONS_TREND,
+          percentRatio: ((currentValue - previousValue) / previousValue) * 100 || 0,
+          value: currentValue,
+          chartData: data.values.map((item: number, index: number) => ({ x: index, y: item })),
+        };
+      })
+    );
   }
 }
