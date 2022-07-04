@@ -13,12 +13,20 @@ import { Destroyable } from "@core/helpers";
 import { SetHeaderState, ShowFilterDialog } from "../../../../store/app.actions";
 import { Invoice, InvoicePage, InvoiceRecord, InvoicesTableConfig, PagingQueryParams } from '../../interfaces';
 import { Invoices } from "../../store/actions/invoices.actions";
-import { ProfileTimeSheetDetail } from "../../../timesheets/store/model/timesheets.model";
+import { ProfileTimeSheetDetail, TimesheetDetails } from "../../../timesheets/store/model/timesheets.model";
 import { DEFAULT_ALL_INVOICES, INVOICES_TAB_CONFIG } from '../../constants/invoices.constant';
 import { ItemModel } from "@syncfusion/ej2-angular-navigations";
 import { DialogComponent } from "@syncfusion/ej2-angular-popups";
 import { InvoiceRecordsTableComponent } from "../../components/invoice-records-table/invoice-records-table.component";
 import { INVOICES_STATUSES } from '../../enums/invoices.enum';
+
+const defaultPagingData: Omit<PageOfCollections<unknown>, 'items'> = {
+  totalPages: 1,
+  pageNumber: 1,
+  hasPreviousPage: false,
+  hasNextPage: false,
+  totalCount: 1,
+};
 
 @Component({
   selector: 'app-invoices-container',
@@ -88,59 +96,42 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
       }));
     });
 
-    this.invoicesData$ = of(JSON.parse(localStorage.getItem('submited-timsheets') as string))?.pipe(
+    this.invoicesData$ = of(
+      JSON.parse(localStorage.getItem('APPROVED_TIMESHEETS') as string)
+    ).pipe(
       map((v: PageOfCollections<TimesheetData>) => {
+        const existingRecords: PageOfCollections<InvoiceRecord> = JSON.parse(
+          localStorage.getItem('invoice-records') as string
+        );
+
         return {
           ...v,
-          items: this.getInvoiceRecords(v.items),
+          items: [...this.restoreInvoiceRecords(v.items), ...(existingRecords?.items || [])],
         };
       })
     ).pipe(
-      tap((data) => this.invoiceRecords = data),
+      tap((recordsData) => {
+        this.invoiceRecords = recordsData;
+
+        localStorage.setItem('invoice-records', JSON.stringify({
+          ...defaultPagingData,
+          items: recordsData.items,
+          totalCount: recordsData.items.length,
+        } as PageOfCollections<InvoiceRecord>));
+
+        localStorage.setItem('APPROVED_TIMESHEETS', JSON.stringify(
+            {
+              ...defaultPagingData,
+              items: [],
+            } as PageOfCollections<unknown>
+          )
+        );
+      }),
     );
   }
 
   public ngOnInit(): void {
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
-  }
-
-  private getInvoiceRecords(data: TimesheetData[]): InvoiceRecord[] {
-    return data.map(({
-                       orgName,
-                       location,
-                       department,
-                       skill,
-                       jobTitle,
-                       firstName,
-                       lastName,
-                       billRate,
-                       startDate,
-                       timesheets,
-                       id: timesheetId,
-                     }: TimesheetData) => {
-
-      const timehseetDetails = timesheets[timesheetId];
-      const hours = timehseetDetails.reduce((acc, item) => acc + item.hours, 0);
-      const amount = timehseetDetails.reduce((acc, item) => acc + item.hours * item.rate, 0);
-      const rates = timehseetDetails.map((v) => v.rate).sort();
-
-      return {
-        organization: orgName,
-        location,
-        department,
-        skill,
-        jobTitle,
-        candidate: `${lastName}, ${firstName}`,
-        bonus: 0,
-        rate: billRate,
-        startDate,
-        amount: amount,
-        hours: hours,
-        minRate: rates[0],
-        maxRate: rates[rates.length - 1],
-        timesheetId,
-      } as InvoiceRecord;
-    })
   }
 
   public showFilters(): void {
@@ -214,7 +205,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
       return {
         groupBy: this.groupInvoicesBy,
         groupName: groupName,
-        id: `24-25-${getRandomNumberInRange(300, 500)}`,
+        id: `${getRandomNumberInRange(20, 24)}-${getRandomNumberInRange(25, 30)}-${getRandomNumberInRange(300, 500)}`,
         organization,
         location,
         department,
@@ -225,26 +216,74 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
         issuedDate,
         dueDate,
         statusText: INVOICES_STATUSES.SUBMITED_PEND_APPR,
-      } as Invoice
+      } as Invoice;
     });
+
+    const filterIds = items.map(item => item.timesheetId);
+    const filteredInvoiceRecords = this.invoiceRecords.items.filter(item => !filterIds.includes(item.timesheetId));
 
     this.invoicesData$ = of({
       ...this.invoiceRecords,
-      items: this.invoiceRecords.items.filter(item => !items.includes(item)),
+      items: filteredInvoiceRecords,
     });
 
     const storeData: PageOfCollections<Invoice> = {
+      ...defaultPagingData,
       items: groupedInvoices,
-      totalPages: 1,
-      pageNumber: 1,
-      hasPreviousPage: false,
-      hasNextPage: false,
-      totalCount: 1,
     };
 
     localStorage.setItem('invoices', JSON.stringify(storeData));
+    localStorage.setItem('pending-invoices', JSON.stringify(storeData));
+    localStorage.setItem('invoice-records', JSON.stringify({
+      ...defaultPagingData,
+      items: filteredInvoiceRecords,
+    } as PageOfCollections<InvoiceRecord>));
+
     this.createInvoiceDialog?.hide();
   }
+
+  private restoreInvoiceRecords(data: TimesheetData[]): InvoiceRecord[] {
+    return data.map(({
+                       orgName,
+                       location,
+                       department,
+                       skill,
+                       jobTitle,
+                       firstName,
+                       lastName,
+                       billRate,
+                       startDate,
+                       id: timesheetId,
+                     }: TimesheetData
+    ) => {
+      const timesheetDetailsTables = JSON.parse(
+        localStorage.getItem('timesheet-details-tables') as string
+      ) as {[key: number]: ProfileTimeSheetDetail[]};
+
+      const timehseetDetails = timesheetDetailsTables[timesheetId] || [];
+      const hours = timehseetDetails.reduce((acc, item) => acc + item.hours, 0);
+      const amount = timehseetDetails.reduce((acc, item) => acc + item.hours * item.rate, 0);
+      const rates = timehseetDetails.map((v) => v.rate).sort();
+
+      return {
+        organization: orgName,
+        location,
+        department,
+        skill,
+        jobTitle,
+        candidate: `${lastName}, ${firstName}`,
+        bonus: 0,
+        rate: billRate,
+        startDate,
+        amount: amount,
+        hours: hours,
+        minRate: rates[0],
+        maxRate: rates[rates.length - 1],
+        timesheetId,
+      } as InvoiceRecord;
+    })
+  }
+
 }
 
 type GroupInvoicesBy = keyof Pick<InvoiceRecord, 'location' | 'department'>;
@@ -259,9 +298,6 @@ interface TimesheetData {
   skill: string;
   billRate: number;
   startDate: string;
-  timesheets: {
-    [key: number]: ProfileTimeSheetDetail[],
-  };
   id: number;
 }
 

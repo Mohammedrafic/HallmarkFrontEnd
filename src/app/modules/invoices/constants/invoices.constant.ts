@@ -14,7 +14,7 @@ export const INVOICES_TAB_CONFIG: TabsListConfig[] = [
     title: 'Pending Approval'
   },
   {
-    title: 'Pending',
+    title: 'Pending Payment',
     amount: 2,
   },
   {
