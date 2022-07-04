@@ -102,42 +102,6 @@
         <div class="number-bold">{{data.amount | number : '1.2-2'}}</div>
       </ng-template>
     </e-column>
-    <e-column
-      headerTextAlign="Right"
-      freeze="Right"
-      [width]="112"
-    >
-      <ng-template #headerTemplate let-data>
-        <div class="controls-header">
-          <button ejs-button cssClass="e-flat icon-button">
-<!--            (click)="onRowScaleUpClick()"-->
-            <span><i-feather name="menu" class="icon"></i-feather></span>
-          </button>
-          <button ejs-button cssClass="e-flat icon-button">
-<!--            (click)="onRowScaleDownClick()"-->
-            <span><i-feather name="align-justify" class="icon"></i-feather></span>
-          </button>
-        </div>
-      </ng-template>
-      <ng-template #template let-data>
-        <div class="row-tool-buttons" (click)="stopPropagation($event)">
-          <button ejs-button cssClass="e-flat default-icon-button">
-            <span><i-feather name="message-square" class="icon"></i-feather></span>
-          </button>
-          <button ejs-button cssClass="e-flat secondary-icon-button" *ngIf="isLockMenuButtonsShown">
-            <span><i-feather name="lock" class="icon"></i-feather></span>
-          </button>
-          <button
-            ejs-dropdownbutton
-            [items]="data.isMoreMenuWithDeleteButton ? moreMenuWithDelete : moreMenuWithClose"
-            (select)="menuOptionSelected($event, data)"
-            cssClass="e-flat primary-icon-button"
-          >
-            <span><i-feather name="more-vertical" class="icon"></i-feather></span>
-          </button>
-        </div>
-      </ng-template>
-    </e-column>
   </e-columns>
 
   <ng-template #pagerTemplate let-data>
