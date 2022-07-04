@@ -4,6 +4,7 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
 import { ConfirmService } from "@shared/services/confirm.service";
+import { MultiSelectComponent } from "@syncfusion/ej2-angular-dropdowns";
 import { DialogComponent } from "@syncfusion/ej2-angular-popups";
 import { filter, Observable, Subject, takeUntil } from "rxjs";
 
@@ -24,6 +25,7 @@ import { SecurityState } from "src/app/security/store/security.state";
 })
 export class AddEditVisibilityComponent implements OnInit, OnDestroy {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
+  @ViewChild('regionMultiselect') regionMultiselect: MultiSelectComponent;
 
   @Input() openEvent: Subject<UserVisibilitySetting | null>;
 
@@ -158,6 +160,7 @@ export class AddEditVisibilityComponent implements OnInit, OnDestroy {
 
   private subscribeOnFormValuesChanges(): void {
     this.organisationsControl?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((value: number) => {
+      this.regionMultiselect.refresh();
       if (value || value === null) {
         const selectedOrganisation: Organisation = this.organisations.find(org => org.organizationId === value) as Organisation;
         const regions: Region[] = [];
