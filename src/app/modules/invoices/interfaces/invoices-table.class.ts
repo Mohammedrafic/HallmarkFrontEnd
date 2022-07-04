@@ -3,7 +3,7 @@ import {
 } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
 import { GridComponent, SelectionSettingsModel } from "@syncfusion/ej2-angular-grids";
 import { TextWrapSettingsModel } from "@syncfusion/ej2-grids/src/grid/base/grid-model";
-import { Directive, EventEmitter, Input, ViewChild } from "@angular/core";
+import { Directive, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { PageOfCollections } from "@shared/models/page.model";
 import { InvoicesTableConfig } from "./invoices-table.model";
 import { ChangeEventArgs } from "@syncfusion/ej2-angular-dropdowns";

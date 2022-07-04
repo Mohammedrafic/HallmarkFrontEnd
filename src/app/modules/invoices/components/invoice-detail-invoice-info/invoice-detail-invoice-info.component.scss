@@ -1,0 +1,43 @@
+@import '../../../../styles/variables/colors';
+
+.job-info-container {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 30px;
+
+  .job-info-section {
+    display: flex;
+  }
+
+  .amount {
+    justify-content: flex-end;
+
+    .value {
+      margin-bottom: 5px;
+      font-weight: 700;
+      font-size: 24px;
+      line-height: 32px;
+    }
+  }
+
+  i-feather {
+    color: $secondary-dark-blue-40;
+    margin-right: 5px;
+  }
+
+  .title {
+    font-weight: 400;
+    font-size: 12px;
+    color: $secondary-dark-blue-30;
+  }
+
+  .value {
+    font-weight: 700;
+    font-size: 12px;
+    white-space: nowrap;
+    color: $black;
+    min-width: 70px;
+  }
+}
+

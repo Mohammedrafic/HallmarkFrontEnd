@@ -1,0 +1,124 @@
+<section *ngIf="invoice" class="table-container">
+  <div class="table-block">
+    <div class="table-header">
+      <h3>{{ invoice.candidate }}</h3>
+      <div class="info">
+        <div class="info-item">
+          <h5 class="value">{{ invoice.startDate | date: 'W - ccc M/d/yy' }}</h5>
+          <p class="title">Week Period</p>
+        </div>
+        <div class="info-item">
+          <h5 class="value">${{ createRange }}</h5>
+          <p class="title">Bill Rate $</p>
+        </div>
+        <div class="info-item">
+          <h5 class="value">{{ invoice.amount }}</h5>
+          <p class="title">Amount</p>
+        </div>
+        <div *ngIf="isAgency" class="info-item">
+          <h5 class="value">% 10</h5>
+          <p class="title">Hallmark fee</p>
+        </div>
+      </div>
+    </div>
+    <ejs-grid #profileTable
+              [dataSource]="tempData"
+              [allowSorting]="true"
+              [allowResizing]="true"
+              [resizeSettings]="resizeSettings"
+              [sortSettings]="initialSort"
+              [allowPaging]="false"
+              [enableVirtualization]="true"
+              allowTextWrap="true"
+              [height]="tableHeight"
+    >
+      <e-columns>
+        <e-column field="day"
+                  [headerText]="tableConfig.day.header"
+                  [textAlign]="tableConfig.day.align"
+                  [width]="tableConfig.day.width">
+          <ng-template #template let-data>
+            <span>{{ data.day | date:'E' }}</span>
+          </ng-template>
+        </e-column>
+        <e-column field="timeIn" type="date"
+                  [headerText]="tableConfig.timeIn.header"
+                  [textAlign]="tableConfig.timeIn.align"
+                  [width]="tableConfig.timeIn.width">
+          <ng-template #template let-data>
+            <span>{{ data.timeIn | date: 'MM/dd/yy, HH:mm' }}</span>
+          </ng-template>
+        </e-column>
+        <e-column field="timeOut"
+                  [headerText]="tableConfig.timeOut.header"
+                  [textAlign]="tableConfig.timeOut.align"
+                  [width]="tableConfig.timeOut.width">
+          <ng-template #template let-data>
+            <span>{{ data.timeOut | date: 'MM/dd/yy, HH:mm' }}</span>
+          </ng-template>
+        </e-column>
+        <e-column field="category"
+                  [headerText]="tableConfig.category.header"
+                  [textAlign]="tableConfig.category.align"
+                  [width]="tableConfig.category.width">
+          <ng-template #template let-data>
+            <span>{{ data.category }}</span>
+          </ng-template>
+        </e-column>
+        <e-column field="costCenter"
+                  [headerText]="tableConfig.costCenter.header"
+                  [textAlign]="tableConfig.costCenter.align"
+                  [width]="tableConfig.costCenter.width">
+          <ng-template #template let-data>
+            <span>{{ data.costCenter }}</span>
+          </ng-template>
+        </e-column>
+        <e-column field="hours"
+                  [headerText]="tableConfig.hours.header"
+                  [textAlign]="tableConfig.hours.align"
+                  [width]="tableConfig.hours.width">
+          <ng-template #template let-data>
+            <b>{{ data.hours }}</b>
+          </ng-template>
+        </e-column>
+        <e-column field="rate"
+                  [headerText]="tableConfig.rate.header"
+                  [textAlign]="tableConfig.rate.align"
+                  [width]="tableConfig.rate.width">
+          <ng-template #template let-data>
+            <b>{{ data.rate | currency:'USD':'symbol':'1.0-2' }}</b>
+          </ng-template>
+        </e-column>
+        <e-column field="total"
+                  [headerText]="tableConfig.total.header"
+                  [textAlign]="tableConfig.total.align"
+                  [width]="tableConfig.total.width">
+          <ng-template #template let-data>
+            <b>{{ data.total | currency:'USD':'symbol':'1.0-2' }}</b>
+          </ng-template>
+        </e-column>
+        <e-column
+          field=""
+          [headerText]="tableConfig.actions.header"
+          [textAlign]="tableConfig.actions.align"
+          [width]="tableConfig.actions.width">
+          <ng-template #template let-data>
+            <div class="row-tool-buttons">
+              <button
+                ejs-button
+                cssClass="e-flat default-icon-button">
+                <span><i-feather name="message-square" class="icon"></i-feather></span>
+              </button>
+              <button
+                ejs-button
+                cssClass="e-flat default-icon-button"
+                (click)="deleteTableItem(data)">
+                <span><i-feather name="trash2" class="icon fill-red"></i-feather></span>
+              </button>
+            </div>
+          </ng-template>
+        </e-column>
+      </e-columns>
+    </ejs-grid>
+  </div>
+</section>

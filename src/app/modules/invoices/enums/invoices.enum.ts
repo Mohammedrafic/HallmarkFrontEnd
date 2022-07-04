@@ -3,3 +3,8 @@ export enum INVOICES_STATUSES {
   PENDING_APPROVAL = 'pending approval',
   PENDING_PAYMENT = 'pending payment',
 }
+
+export enum INVOICES_ACTIONS {
+  GET = '[invoices] GET',
+  TOGGLE_INVOICE_DIALOG = '[invoices] TOGGLE INVOICE DIALOG',
+}

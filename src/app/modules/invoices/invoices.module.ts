@@ -17,7 +17,10 @@ import {
   Menu,
   MessageSquare,
   MoreVertical,
-  Sliders
+  Package,
+  Percent,
+  Sliders,
+  X,
 } from 'angular-feather/icons';
 import { GridAllModule, PagerModule } from "@syncfusion/ej2-angular-grids";
 import { DropDownListModule } from "@syncfusion/ej2-angular-dropdowns";
@@ -32,6 +35,10 @@ import { TimePickerModule } from "@syncfusion/ej2-angular-calendars";
 import { InvoiceRecordDialogComponent } from './components/invoice-record-dialog/invoice-record-dialog.component';
 import { AllInvoicesTableComponent } from './components/all-invoices-table/all-invoices-table.component';
 import { AllInvoicesSubrowComponent } from './components/all-invoices-subrow/all-invoices-subrow.component';
+import { InvoiceDetailContainerComponent } from './containers/invoice-details-container/invoice-detail-container.component';
+import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { InvoiceDetailInvoiceInfoComponent } from './components/invoice-detail-invoice-info/invoice-detail-invoice-info.component';
+import { InvoiceDetailTableComponent } from './components/invoice-detail-table/invoice-detail-table.component';
 
 @NgModule({
   declarations: [
@@ -41,6 +48,9 @@ import { AllInvoicesSubrowComponent } from './components/all-invoices-subrow/all
     AllInvoicesTableComponent,
     AllInvoicesSubrowComponent,
     InvoiceRecordDialogComponent,
+    InvoiceDetailContainerComponent,
+    InvoiceDetailInvoiceInfoComponent,
+    InvoiceDetailTableComponent,
   ],
   imports: [
     CommonModule,
@@ -54,7 +64,10 @@ import { AllInvoicesSubrowComponent } from './components/all-invoices-subrow/all
       MoreVertical,
       Sliders,
       ChevronRight,
-      ChevronDown
+      ChevronDown,
+      X,
+      Percent,
+      Package,
     }),
     TabModule,
     DropDownButtonModule,
@@ -72,6 +85,7 @@ import { AllInvoicesSubrowComponent } from './components/all-invoices-subrow/all
   ],
   providers: [
     InvoicesService,
+    ChipsCssClass,
   ]
 })
 export class InvoicesModule { }

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 
 import { Invoice, InvoicesTable } from '../../interfaces';
 import { ITimesheet } from '../../../timesheets/interface';
@@ -15,6 +15,8 @@ import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
 })
 export class AllInvoicesTableComponent extends InvoicesTable<Invoice> {
   @ViewChild('grid') override gridWithChildRow: GridComponent;
+
+  @Output() rowSelectedData: EventEmitter<any> = new EventEmitter<any>();
 
   public readonly tableConfig = AllInvoicesTableConfig;
 
@@ -37,5 +39,9 @@ export class AllInvoicesTableComponent extends InvoicesTable<Invoice> {
         break;
       }
     }
+  }
+
+  public handleRowSelected(event: any): void {
+    this.rowSelectedData.emit(event);
   }
 }

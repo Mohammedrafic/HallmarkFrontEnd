@@ -3,11 +3,14 @@ import { HttpClient } from "@angular/common/http";
 import { Observable, of } from "rxjs";
 import { PageOfCollections } from "@shared/models/page.model";
 import { GetInvoicesData, InvoiceRecord } from "../interfaces";
+import { BaseObservable } from '@core/helpers';
 
 const mockedRecords: InvoiceRecord[] = generateInvoiceRecords(100);
 
 @Injectable()
 export class InvoicesService {
+  private currentSelectedTableRowIndex: BaseObservable<number> = new BaseObservable<number>(null as any);
+
   constructor(
     private http: HttpClient,
   ) {
@@ -27,6 +30,20 @@ export class InvoicesService {
       pageNumber: page,
       totalPages: totalPages,
     } as PageOfCollections<InvoiceRecord>);
+  }
+
+  public getCurrentTableIdxStream(): Observable<number> {
+    return this.currentSelectedTableRowIndex.getStream();
+  }
+
+  public setNextValue(next: boolean): void {
+    this.currentSelectedTableRowIndex.set(next ?
+      this.currentSelectedTableRowIndex.get() + 1 :
+      this.currentSelectedTableRowIndex.get() - 1);
+  }
+
+  public setCurrentSelectedIndexValue(value: number): void {
+    this.currentSelectedTableRowIndex.set(value);
   }
 }
 

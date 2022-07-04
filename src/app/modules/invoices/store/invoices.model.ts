@@ -3,4 +3,6 @@ import { InvoiceRecord } from "../interfaces";
 
 export interface InvoicesModel {
   invoicesData: PageOfCollections<InvoiceRecord>;
+  isInvoiceDetailDialogOpen: boolean;
+  selectedInvoiceId: number;
 }

@@ -26,7 +26,10 @@
 <section>
   <ng-container [ngSwitch]="selectedTabIdx">
     <ng-container *ngSwitchCase="1">
-      <app-all-invoices-table [tableData]="allInvoices"></app-all-invoices-table>
+      <app-all-invoices-table
+        [tableData]="allInvoices"
+        (rowSelectedData)="handleRowSelected($event)">
+      </app-all-invoices-table>
     </ng-container>
     <ng-container *ngSwitchDefault>
       <app-invoice-records-table [tableData]="invoicesData$ | async"
@@ -72,3 +75,9 @@
     </form>
   </ng-template>
 </ejs-dialog>
+
+<app-invoice-detail-container
+  [currentSelectedRowIndex]="currentSelectedTableRowIndex | async"
+  [maxRowIndex]="allInvoices?.items?.length || 0"
+  (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
+></app-invoice-detail-container>

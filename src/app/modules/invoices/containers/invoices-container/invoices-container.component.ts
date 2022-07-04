@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
 import { ActivatedRoute, Params, Router } from "@angular/router";
 
@@ -19,6 +19,8 @@ import { ItemModel } from "@syncfusion/ej2-angular-navigations";
 import { DialogComponent } from "@syncfusion/ej2-angular-popups";
 import { InvoiceRecordsTableComponent } from "../../components/invoice-records-table/invoice-records-table.component";
 import { INVOICES_STATUSES } from '../../enums/invoices.enum';
+import { DialogAction } from '../../../timesheets/enums';
+import { InvoicesService } from '../../services/invoices.service';
 
 const defaultPagingData: Omit<PageOfCollections<unknown>, 'items'> = {
   totalPages: 1,
@@ -79,11 +81,17 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
   @ViewChild('invoiceRecordsTable')
   public invoiceRecordsTable: InvoiceRecordsTableComponent;
 
+  public currentSelectedTableRowIndex: Observable<number>
+    = this.invoicesService.getCurrentTableIdxStream();
+  public pageSize = 30;
+
   constructor(
     private store: Store,
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
+    private invoicesService: InvoicesService,
   ) {
     super();
     route.queryParams.pipe(
@@ -249,6 +257,18 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
     } as PageOfCollections<InvoiceRecord>));
 
     this.createInvoiceDialog?.hide();
+  }
+
+  public handleRowSelected(selectedRowData: any): void {
+    this.invoicesService.setCurrentSelectedIndexValue(selectedRowData.rowIndex);
+    localStorage.setItem('selected_invoice_row', JSON.stringify(selectedRowData.data));
+    this.store.dispatch(new Invoices.ToggleInvoiceDialog(DialogAction.Open, selectedRowData.rowIndex));
+    this.cdr.markForCheck();
+  }
+
+  public onNextPreviousOrderEvent(next: boolean): void {
+    this.invoicesService.setNextValue(next);
+    this.cdr.markForCheck();
   }
 
   private restoreInvoiceRecords(data: TimesheetData[]): InvoiceRecord[] {

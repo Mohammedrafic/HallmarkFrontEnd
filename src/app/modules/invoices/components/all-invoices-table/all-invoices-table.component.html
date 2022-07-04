@@ -12,7 +12,7 @@
   [allowTextWrap]="true"
   [selectionSettings]="selectionSettings"
   [textWrapSettings]="wrapSettings"
-  (rowSelected)="rowSelected($event)"
+  (rowSelected)="handleRowSelected($event)"
 >
   <e-columns>
     <e-column
@@ -28,12 +28,12 @@
     >
       <ng-template #template let-data>
         <ng-container *ngIf="!data.invoices?.length; else withToggle">
-          <a href="#">{{ data.id }}</a>
+          <span class="link">{{ data.id }}</span>
         </ng-container>
 
         <ng-template #withToggle>
           <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-            <a href="#">{{ data.id }}</a>
+            <span class="link">{{ data.id }}</span>
             <i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
           </div>
         </ng-template>
@@ -112,7 +112,7 @@
       [width]="tableConfig.candidate.width"
     >
       <ng-template #template let-data>
-        <a href="#">{{ data.candidate }}</a>
+        <span class="link">{{ data.candidate }}</span>
       </ng-template>
     </e-column>
     <e-column
