@@ -1,3 +1,5 @@
+import { ProfileTimeSheetDetail } from '../../timesheets/store/model/timesheets.model';
+
 export interface InvoiceRecord {
   startDate: string;
   organization: string;
@@ -13,4 +15,5 @@ export interface InvoiceRecord {
   timesheetId: number;
   minRate?: number;
   maxRate?: number;
+  timesheets?: ProfileTimeSheetDetail[];
 }
