@@ -64,7 +64,7 @@ class CandidatesReportComponent extends BaseReportDirective<CandidateModel> {
   public readonly columnDefinitions: ColumnDefinitionModel[] = [
     { field: 'agency', headerName: 'Agency' },
     { field: 'name', headerName: 'Name' },
-    { field: 'skills', headerName: 'Skill Type' },
+    { field: 'skill', headerName: 'Skill Type' },
     { field: 'email', headerName: 'Email' },
     { field: 'workPhoneNumber', headerName: 'Work Phone Number' },
     { field: 'cellPhoneNumber', headerName: 'Cell Phone Number' },
