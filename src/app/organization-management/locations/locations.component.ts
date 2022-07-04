@@ -156,6 +156,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.businessUnitId = id;
       this.getOrganization();
+      this.clearFilters();
     });
     this.organization$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
@@ -241,15 +242,19 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.filterService.removeValue(event, this.LocationFilterFormGroup, this.filterColumns);
   }
 
-  public onFilterClearAll(): void {
+  private clearFilters(): void {
     this.LocationFilterFormGroup.reset();
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {
-      regionId: this.selectedRegion.id,
+      regionId: this.selectedRegion?.id,
       pageNumber: this.currentPage,
       pageSize: this.pageSizePager
     };
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
     this.getLocations();
   }
   

@@ -48,6 +48,9 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
   @Select(AdminState.organizationDataSources)
   organizationDataSources$: Observable<OrganizationDataSource>;
 
+  @Select(AdminState.statuses)
+  statuses$: Observable<string[]>;
+
   @ViewChild('grid')
   public grid: GridComponent;
 
@@ -86,9 +89,11 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
     }
     this.organizationDataSources$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data: OrganizationDataSource) => {
       this.filterColumns.organizationNames.dataSource = data.organizationNames;
-      this.filterColumns.statuses.dataSource = data.statuses;
       this.filterColumns.contacts.dataSource = data.contacts;
       this.filterColumns.cities.dataSource = data.cities;
+    });
+    this.statuses$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data: string[]) => {
+      this.filterColumns.statuses.dataSource = data;
     });
     this.store.dispatch(new GetOrganizationDataSources());
     this.getOrganizationList();

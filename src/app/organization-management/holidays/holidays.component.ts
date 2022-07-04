@@ -201,6 +201,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     this.filterColumns.years.dataSource = this.yearsList;
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.currentPage = 1;
+      this.clearFilters();
       this.store.dispatch([new GetAllMasterHolidays(), new GetHolidayDataSources()]);
       this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
     });
@@ -291,11 +292,15 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
     this.filterService.removeValue(event, this.HolidayFilterFormGroup, this.filterColumns);
   }
 
-  public onFilterClearAll(): void {
+  private clearFilters(): void {
     this.HolidayFilterFormGroup.reset();
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
     this.store.dispatch(new GetHolidaysByPage(this.currentPage, this.pageSize, this.orderBy, this.filters));
   }
 

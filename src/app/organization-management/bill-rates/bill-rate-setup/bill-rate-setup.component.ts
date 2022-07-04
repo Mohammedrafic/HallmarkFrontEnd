@@ -170,6 +170,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       this.defaultExport(event);
     });
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((id) => {
+      this.clearFilters();
       this.loadData();
     });
 
@@ -468,12 +469,16 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.filterService.removeValue(event, this.billRateFilterFormGroup, this.filterColumns);
   }
 
-  public onFilterClearAll(): void {
+  private clearFilters(): void {
     this.billRateFilterFormGroup.reset();
     this.filteredItems = [];
     this.filteredItems$.next(this.filteredItems.length);
     this.currentPage = 1;
     this.filters = {};
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
     this.store.dispatch(new GetBillRates({
       pageNumber: this.currentPage,
       pageSize: this.pageSize,

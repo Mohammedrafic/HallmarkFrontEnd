@@ -211,13 +211,17 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.filterService.removeValue(event, this.OrderFilterFormGroup, this.filterColumns);
   }
 
-  public onFilterClearAll(): void {
+  private clearFilters(): void {
     this.OrderFilterFormGroup.reset();
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};
-    this.dispatchNewPage();
     this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
+    this.dispatchNewPage();
   }
 
   public onFilterApply(): void {
@@ -267,6 +271,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.lastSelectedAgencyId$.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
       this.openPreview.next(false);
       this.openCandidat.next(false);
+      this.clearFilters();
       this.dispatchNewPage();
       this.store.dispatch(new GetAgencyFilterOptions());
     });
