@@ -9,5 +9,6 @@ export const widgetTypeToConfigurationMapper: Record<WidgetTypeEnum, PanelModel>
   [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: { sizeX: 1, sizeY: 1, maxSizeX: 1, maxSizeY: 1, minSizeX: 1, minSizeY: 1 },
   [WidgetTypeEnum.OPEN_POSITIONS]: { sizeX: 1, sizeY: 1, maxSizeX: 1, maxSizeY: 1, minSizeX: 1, minSizeY: 1 },
   [WidgetTypeEnum.FILLED_POSITIONS]: { sizeX: 1, sizeY: 1, maxSizeX: 1, maxSizeY: 1, minSizeX: 1, minSizeY: 1 },
+  [WidgetTypeEnum.FILLED_POSITIONS_TREND]: { sizeX: 3, sizeY: 1, maxSizeX: 3, maxSizeY: 1, minSizeX: 3, minSizeY: 1 },
   [WidgetTypeEnum.TASKS]: { sizeX: 3, sizeY: 5, maxSizeX: 3, maxSizeY: 5, minSizeX: 3, minSizeY: 5 },
 };

@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 
-import { DashboardComponent } from './dashboard.components';
+import { DashboardComponent } from './dashboard.component';
 import { DashboardControlModule } from './dashboard-control/dashboard-control.module';
 import { DashboardService } from './services/dashboard.service';
 import { DashboardState } from './store/dashboard.state';
