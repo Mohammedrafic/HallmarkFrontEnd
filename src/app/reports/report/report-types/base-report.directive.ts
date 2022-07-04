@@ -13,6 +13,7 @@ import { PageQueryFilterParamsService, PageQueryParams } from '@shared/services/
 import { ReportDirectiveDataModel } from '../models/report-directive-data.model';
 import { ShowFilterDialog } from '../../../store/app.actions';
 import { UserState } from 'src/app/store/user.state';
+import { DatePipe } from '@angular/common';
 
 @Directive()
 export abstract class BaseReportDirective<T> extends DestroyableDirective implements OnInit {
@@ -32,7 +33,8 @@ export abstract class BaseReportDirective<T> extends DestroyableDirective implem
     public readonly reportDirectiveData: ReportDirectiveDataModel,
     protected readonly filterService: FilterService,
     protected readonly pageQueryFilterParamsService: PageQueryFilterParamsService,
-    protected readonly store: Store
+    protected readonly store: Store,
+    protected readonly datePipe: DatePipe,
   ) {
     super();
   }
@@ -90,7 +92,7 @@ export abstract class BaseReportDirective<T> extends DestroyableDirective implem
 
   private updateFilters(): void {
     this.reportDirectiveData.filterChangeHandler(
-      this.filterService.generateChips(this.reportFiltersForm, this.filterColumns)
+      this.filterService.generateChips(this.reportFiltersForm, this.filterColumns, this.datePipe)
     );
   }
 

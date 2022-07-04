@@ -51,7 +51,7 @@ export class FilterService {
           });
         });
       } else if (filterColumns[key].type === ControlTypes.Checkbox) {
-        chips.push({ text: filterColumns[key].checkboxTitle, column: key, value: val });
+        chips.push({ text: filterColumns[key].checkBoxTitle, column: key, value: val });
       } else if (filterColumns[key].type === ControlTypes.Date && datePipe) {
         chips.push({ text: datePipe.transform(val,'MM/dd/yyyy'), column: key, value: val });
       } else if (filterColumns[key].type === ControlTypes.Radio) {

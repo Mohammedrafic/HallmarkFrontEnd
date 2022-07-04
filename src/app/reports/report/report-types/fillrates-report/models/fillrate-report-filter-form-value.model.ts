@@ -8,4 +8,7 @@ export interface FillrateReportFilterFormValueModel {
   orderTypes: OrderType[];
   regions: number[];
   skills: number[];
+  orderEndDate: Date;
+  orderStartDate: Date;
+  excludeFcAgency: boolean;
 }

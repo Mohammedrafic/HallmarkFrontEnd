@@ -10,7 +10,7 @@ import { Observable, forkJoin, takeUntil, filter, distinctUntilChanged } from 'r
 import { Store } from '@ngxs/store';
 
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, NgModule, Type, Inject } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DatePipe } from '@angular/common';
 
 import { ApplicantStatus } from '@shared/models/order-management.model';
@@ -40,6 +40,8 @@ import { ReportDirectiveDataModel } from '../../models/report-directive-data.mod
 import { UserState } from '../../../../store/user.state';
 import { baseDropdownFieldsSettings } from '@shared/constants/base-dropdown-fields-settings';
 import { reportDirectiveDataToken } from '../../constants/report-directive-data.token';
+import { DatePickerAllModule } from '@syncfusion/ej2-angular-calendars';
+import { CheckBoxAllModule } from '@syncfusion/ej2-angular-buttons';
 
 @Component({
   selector: 'app-fillrates-report',
@@ -165,6 +167,9 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
       valueId: this.departmentsOptionFields.value,
       valueType: ValueType.Id,
     },
+    orderEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+    orderStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+    excludeFcAgency: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Allow Internal' },
   };
 
   private regions: OrganizationRegion[] = [];
@@ -172,14 +177,14 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
   public constructor(
     @Inject(reportDirectiveDataToken) public override readonly reportDirectiveData: ReportDirectiveDataModel,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly datePipe: DatePipe,
+    protected override readonly datePipe: DatePipe,
     private readonly fillratesReportService: FillratesReportService,
     private readonly formBuilder: FormBuilder,
     protected override readonly filterService: FilterService,
     protected override readonly pageQueryFilterParamsService: PageQueryFilterParamsService,
     protected override readonly store: Store
   ) {
-    super(reportDirectiveData, filterService, pageQueryFilterParamsService, store);
+    super(reportDirectiveData, filterService, pageQueryFilterParamsService, store, datePipe);
   }
 
   public override ngOnInit(): void {
@@ -187,6 +192,11 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
     this.store.dispatch(new GetOrganizationStructure());
     this.initOrganizationStructureChangesListener();
     this.initReportFiltersFormFieldsChangesListeners();
+  }
+
+  public onExcludeFcAgencyChange(): void {
+    const checkboxControl = this.reportFiltersForm.get('excludeFcAgency');
+    checkboxControl?.patchValue(!checkboxControl.value);
   }
 
   protected getFiltersData(): void {
@@ -211,6 +221,9 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
       orderTypes: [[]],
       regions: [[]],
       skills: [[]],
+      orderEndDate: [''],
+      orderStartDate: [''],
+      excludeFcAgency: [false]
     });
   }
 
@@ -304,7 +317,7 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
 
 @NgModule({
   declarations: [FillratesReportComponent],
-  imports: [CommonModule, GridModule, FilterDialogModule, MultiselectDropdownModule],
+  imports: [CommonModule, GridModule, FilterDialogModule, MultiselectDropdownModule, DatePickerAllModule, CheckBoxAllModule, ReactiveFormsModule],
 })
 class FillratesReportModule {}
 
