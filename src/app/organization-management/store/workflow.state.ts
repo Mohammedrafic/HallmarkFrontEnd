@@ -10,7 +10,10 @@ import {
   RemoveWorkflowDeclined,
   SaveWorkflow,
   SaveWorkflowMapping,
-  UpdateWorkflow, SaveWorkflowMappingSucceed, GetRolesForWorkflowMapping, GetUsersForWorkflowMapping
+  UpdateWorkflow,
+  SaveWorkflowMappingSucceed,
+  GetRolesForWorkflowMapping,
+  GetUsersForWorkflowMapping
 } from './workflow.actions';
 import { WorkflowService } from '@shared/services/workflow.service';
 import { ShowToast } from '../../store/app.actions';
@@ -19,6 +22,7 @@ import {
   RECORD_ADDED,
   RECORD_CANNOT_BE_DELETED,
   RECORD_CANNOT_BE_SAVED,
+  RECORD_CANNOT_BE_UPDATED,
   RECORD_MODIFIED,
   usedByOrderErrorMessage,
   usedInMappingMessage
@@ -26,7 +30,6 @@ import {
 import {  WorkflowWithDetails } from '@shared/models/workflow.model';
 import { WorkflowMappingPage, WorkflowMappingPost } from '@shared/models/workflow-mapping.model';
 import { RolesPerUser, User } from '@shared/models/user-managment-page.model';
-import { UsersService } from '../../security/services/users.service';
 import { getAllErrors } from '@shared/utils/error.utils';
 
 export interface WorkflowStateModel {
@@ -93,16 +96,19 @@ export class WorkflowState {
   UpdateWorkflow({ patchState, dispatch }: StateContext<WorkflowStateModel>, { workflow, isRemoveStep }: UpdateWorkflow): Observable<WorkflowWithDetails | void> {
     return this.workflowService.updateWorkflow(workflow)
       .pipe(tap((payloadResponse) => {
-          payloadResponse?.requireMappingsUpdate
+          payloadResponse?.requireMappingsUpdate && !isRemoveStep
             ? dispatch(new ShowToast(MessageTypes.Warning, usedInMappingMessage('Workflow')))
             : dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
           dispatch(new GetWorkflows());
           return payloadResponse;
         }),
         catchError((error: any) => {
-          dispatch(new ShowToast(MessageTypes.Error, error.error.detail))
           if (isRemoveStep) {
+            const message = 'The custom step cannot be deleted. User should delete Mapping(s) firstly and after that delete Custom step from Workflow';
+            dispatch(new ShowToast(MessageTypes.Error, message))
             dispatch(new RemoveWorkflowDeclined());
+          } else {
+            dispatch(new ShowToast(MessageTypes.Error, error.error && error.error.errors ? getAllErrors(error.error) : RECORD_CANNOT_BE_UPDATED));
           }
           return of(error);
         })
@@ -117,7 +123,7 @@ export class WorkflowState {
           return payload;
         }),
         catchError((error: any) => {
-          const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Workflow', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+          const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Workflow', error.error.errors['EntityInUse']) : 'Workflow cannot be deleted';
           return dispatch(new ShowToast(MessageTypes.Error, message));
         }));
   }
@@ -157,7 +163,7 @@ export class WorkflowState {
           return payload;
         }),
         catchError((error: any) => {
-          const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Workflow', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+          const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Workflow Mapping', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
           return dispatch(new ShowToast(MessageTypes.Error, message));
         })
       );
