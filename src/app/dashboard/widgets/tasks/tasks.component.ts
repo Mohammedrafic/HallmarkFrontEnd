@@ -31,13 +31,11 @@ export class TasksComponent implements OnInit, OnChanges, OnDestroy {
           this.url = 'temporary-widget-tasks';
           this.cdr.markForCheck();
         }, 400);
-        console.error(this.url);
       } else {
         setTimeout(() => {
           this.url = 'temporary-collapsed-widget-tasks';
           this.cdr.markForCheck();
         }, 400);
-        console.error(this.url);
       }
     });
   }

@@ -274,7 +274,7 @@ export class DashboardService {
     return this.httpClient.post<{ values: number[] }>(`${this.baseUrl}/filledpositionstrend`, { timeRanges }).pipe(
       map((data: { values: number[] }) => {
         const [previousValue, currentValue] = data.values.slice(-2);
-        const coefficient = previousValue === 0 && currentValue > 0 ? 1 : previousValue;
+        const coefficient = previousValue === 0 ? 1 : previousValue;
 
         // this calculation is just for the demo
         // percentRation : ((currentValue - previousValue) / coefficient) * 100 || 0;
@@ -282,7 +282,7 @@ export class DashboardService {
 
         return {
           id: WidgetTypeEnum.FILLED_POSITIONS_TREND,
-          percentRatio: ((currentValue - previousValue) / coefficient) * 100 || 0, // calculation for demo
+          percentRatio: ((currentValue - previousValue) / coefficient) * 100 || 0,
           value: currentValue,
           chartData: data.values.map((item: number, index: number) => ({ x: index, y: item })),
         };
