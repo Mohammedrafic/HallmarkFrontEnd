@@ -7,7 +7,7 @@ import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { AccumulationChartModel } from '@syncfusion/ej2-angular-charts';
 import type { LayerSettingsModel } from '@syncfusion/ej2-angular-maps';
 import { catchError, forkJoin, Observable, of } from 'rxjs';
-import { filter, map, shareReplay } from 'rxjs/operators';
+import { map, shareReplay } from 'rxjs/operators';
 import flow from 'lodash/fp/flow';
 import values from 'lodash/fp/values';
 import max from 'lodash/fp/max';
@@ -65,8 +65,7 @@ export class DashboardService {
     [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
     [WidgetTypeEnum.TASKS]: (filters: DashboardFiltersModel) => this.getTasksWidgetData(),
-    [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filterd: DashboardFiltersModel) =>
-      this.getFilledPositionTrendWidgetData(),
+    [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filterd: DashboardFiltersModel) => this.getFilledPositionTrendWidgetData(),
     [WidgetTypeEnum.TASKS]: ()=> this.getTasksWidgetData(),
     [WidgetTypeEnum.CHAT]: () => this.getChatWidgetData(),
   };
