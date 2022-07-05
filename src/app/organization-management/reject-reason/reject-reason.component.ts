@@ -8,6 +8,7 @@ import {
   DELETE_RECORD_TITLE,
   ONLY_LETTERS
 } from "@shared/constants";
+import { UserState } from "src/app/store/user.state";
 import { ShowSideDialog } from "../../store/app.actions";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
@@ -34,6 +35,9 @@ export class RejectReasonComponent extends AbstractGridConfigurationComponent im
   @Select(RejectReasonState.rejectReasonsPage)
   public rejectReasonPage$: Observable<RejectReasonPage>;
 
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
+
   public form: FormGroup;
   public title: string = '';
 
@@ -54,6 +58,7 @@ export class RejectReasonComponent extends AbstractGridConfigurationComponent im
     this.subscribeOnSaveReasonError();
     this.subscribeOnUpdateReasonSuccess();
     this.subscribeOnSaveReasonSuccess();
+    this.subscribeOnOrganization();
   }
 
   ngOnDestroy(): void {
@@ -177,5 +182,12 @@ export class RejectReasonComponent extends AbstractGridConfigurationComponent im
       ofActionSuccessful(UpdateRejectReasonsSuccess),
       takeWhile(() => this.isAlive)
     ).subscribe(() => this.initGrid());
+  }
+
+  private subscribeOnOrganization(): void {
+    this.organizationId$.pipe(takeWhile(() => this.isAlive)).subscribe(id => {
+      this.currentPage = 1;
+      this.store.dispatch(new GetRejectReasonsByPage(this.currentPage, this.pageSize));
+    });
   }
 }
