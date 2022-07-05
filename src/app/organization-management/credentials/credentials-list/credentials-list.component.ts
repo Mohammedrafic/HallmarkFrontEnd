@@ -104,7 +104,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
       searchTerm: { type: ControlTypes.Text, valueType: ValueType.Text },
       credentialIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       credentialTypeIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      expireDateApplicable: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Expiry Date Applicable'},
+      expireDateApplicable: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Expiry Date Applicable'},
     }
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.clearFilters();

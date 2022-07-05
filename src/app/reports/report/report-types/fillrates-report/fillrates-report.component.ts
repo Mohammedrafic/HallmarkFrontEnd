@@ -88,12 +88,12 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
       valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
     },
     {
-      field: 'orderStartDate',
+      field: 'startTime',
       headerName: 'Start Time',
       valueFormatter: (params: ValueFormatterParams) => this.getFormattedTime(params.value),
     },
     {
-      field: 'orderEndDate',
+      field: 'endTime',
       headerName: 'End Time',
       valueFormatter: (params: ValueFormatterParams) => this.getFormattedTime(params.value),
     },
@@ -363,7 +363,9 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
   }
 
   private getFormattedTime(date: string): string {
-    return this.getFormattedDateWithFormat(date, 'hh:mm');
+    // TBD: Wrong time format
+    const [hh, mm] = date.split(':');
+    return `${hh}:${mm}`;
   }
 
   private getFormattedDateWithFormat(date: string, format: string): string {

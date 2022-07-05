@@ -1,8 +1,10 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { OrganizationService } from '@shared/services/organization.service';
 
 import { Select, Store } from '@ngxs/store';
-import { BehaviorSubject, combineLatest, Observable, Subject, switchMap, takeUntil } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, mergeMap, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 import {
   GetUserAgencies,
@@ -35,8 +37,9 @@ interface IOrganizationAgency {
   styleUrls: ['./organization-agency-selector.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OrganizationAgencySelectorComponent implements OnDestroy {
+export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   public organizationAgencyControl: FormControl = new FormControl();
+  public selectedLogo$ = new BehaviorSubject<SafeUrl | null>(null);
 
   public optionFields = {
     text: 'name',
@@ -68,13 +71,16 @@ export class OrganizationAgencySelectorComponent implements OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store, private cd: ChangeDetectorRef) {
+  constructor(private store: Store, private cd: ChangeDetectorRef, private domSanitizer: DomSanitizer, private organizationService: OrganizationService) {}
+
+  ngOnInit(): void {
     this.subscribeUserChange();
     this.isOrganizationAgencyAreaChange();
     this.subscribeOrganizationAgencies();
 
     this.organizationAgencyControl.valueChanges.pipe(
       takeUntil(this.unsubscribe$),
+      mergeMap((id) => this.getLogo(id)),
       switchMap(() => this.user$)
     ).subscribe(user => {
       const agencyOrganizations = [BusinessUnitType.Agency, BusinessUnitType.Organization];
@@ -122,6 +128,16 @@ export class OrganizationAgencySelectorComponent implements OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public getLogo(id: number): Observable<Blob | boolean> {
+    return this.organizationService.getOrganizationLogo(id).pipe(
+        tap(blob => {
+          const url = window.URL.createObjectURL(blob);
+          this.selectedLogo$.next(this.domSanitizer.bypassSecurityTrustUrl(url));
+        }), catchError(() => {
+          this.selectedLogo$.next(null);
+          return of(false)}));
   }
 
   private subscribeUserChange(): void {

@@ -1,7 +1,7 @@
 <div class="widget">
   <div class="widget-data">
     <div *ngIf="widget" class="widget-value">
-      <span class="widget-value-number">{{ widget.value }}</span>
+      <span class="widget-value-number">{{ widget.total }}</span>
       <span class="widget-value-percent" [ngClass]="{ 'widget-data-grow': widget.percentRatio >= 0 }"
         >{{ widget.percentRatio | number: '1.2-2' }} %</span
       >
@@ -29,7 +29,8 @@
             <e-series
               *ngIf="widget"
               [dataSource]="widget.chartData"
-              [fill]="widget.percentRatio < 0 ? '#FF5858' : '#5AA658'"
+              [fill]="widget.percentRatio < 0 ? 'var(--supportive-red)' : 'var(--supportive-green-10)'"
+
               type="Spline"
               xName="x"
               yName="y"

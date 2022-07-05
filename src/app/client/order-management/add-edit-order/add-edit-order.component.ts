@@ -256,14 +256,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private collectOrderData(isSubmit: boolean): CreateOrderDto {
     const allValues = {
-      ...this.orderDetailsFormComponent.orderTypeForm.value,
-      ...this.orderDetailsFormComponent.generalInformationForm.value,
-      ...this.orderDetailsFormComponent.jobDistributionForm.value,
-      ...this.orderDetailsFormComponent.jobDescriptionForm.value,
-      ...this.orderDetailsFormComponent.contactDetailsForm.value,
-      ...this.orderDetailsFormComponent.workLocationForm.value,
-      ...this.orderDetailsFormComponent.workflowForm.value,
-      ...this.orderDetailsFormComponent.specialProject.value,
+      ...this.orderDetailsFormComponent.orderTypeForm.getRawValue(),
+      ...this.orderDetailsFormComponent.generalInformationForm.getRawValue(),
+      ...this.orderDetailsFormComponent.jobDistributionForm.getRawValue(),
+      ...this.orderDetailsFormComponent.jobDescriptionForm.getRawValue(),
+      ...this.orderDetailsFormComponent.contactDetailsForm.getRawValue(),
+      ...this.orderDetailsFormComponent.workLocationForm.getRawValue(),
+      ...this.orderDetailsFormComponent.workflowForm.getRawValue(),
+      ...this.orderDetailsFormComponent.specialProject.getRawValue(),
       ...{ credentials: this.orderCredentials },
       ...{ billRates: this.billRatesComponent?.billRatesControl.value || this.orderBillRates }
     };
