@@ -178,36 +178,6 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
   }
 }
 
-.timesheet-navigation {
-  display: flex;
-  align-items: center;
-  padding: 15px 20px 0 20px;
-  padding-bottom: 0;
-  border-top: 1px solid $secondary-dark-blue-45;
-
-  .prev, .next {
-    color: $primary-active-blue-10;
-    font-weight: 590;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-
-    &.disabled {
-      opacity: 0.5;
-      pointer-events: none;
-    }
-  }
-
-  .prev i-feather {
-    margin-right: 8px;
-  }
-
-  .next i-feather {
-    margin-left: 8px;
-  }
-}
-
 .dnw-dialog-content-container {
   h2 {
     margin: 0;

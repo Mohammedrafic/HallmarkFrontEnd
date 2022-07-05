@@ -6,12 +6,18 @@ export namespace Invoices {
   export class Get {
     static readonly type = INVOICES_ACTIONS.GET;
 
-    constructor(public readonly payload: GetInvoicesData) {}
+    constructor(public readonly payload: GetInvoicesData) {
+    }
   }
 
   export class ToggleInvoiceDialog {
     static readonly type = INVOICES_ACTIONS.TOGGLE_INVOICE_DIALOG;
 
-    constructor(public readonly action: DialogAction, public readonly id?: number) {}
+    constructor(
+      public readonly action: DialogAction,
+      public readonly id?: number,
+      public readonly prevId?: string,
+      public readonly nextId?: string) {
+    }
   }
 }

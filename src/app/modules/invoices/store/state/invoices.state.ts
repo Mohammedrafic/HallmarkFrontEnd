@@ -34,6 +34,16 @@ export class InvoicesState {
     return { dialogState: state.isInvoiceDetailDialogOpen, rowId: state.selectedInvoiceId };
   }
 
+  @Selector([InvoicesState])
+  static nextInvoiceId(state: InvoicesModel): string | null {
+    return state?.nextInvoiceId ?? null;
+  }
+
+  @Selector([InvoicesState])
+  static prevInvoiceId(state: InvoicesModel): string | null {
+    return state?.prevInvoiceId ?? null;
+  }
+
   @Action(Invoices.Get)
   GetInvoices({ patchState }: StateContext<InvoicesModel>, { payload }: Invoices.Get): Observable<PageOfCollections<InvoiceRecord>> {
     return this.invoicesService.getInvoices(payload).pipe(
@@ -46,11 +56,14 @@ export class InvoicesState {
   @Action(Invoices.ToggleInvoiceDialog)
   ToggleInvoiceDialog(
     { patchState }: StateContext<InvoicesModel>,
-    { action, id }: { action: DialogAction, id: number}
+    { action, id, prevId, nextId }: Invoices.ToggleInvoiceDialog
   ): void {
+    const isOpen: boolean = action === DialogAction.Open;
+
     patchState({
-      isInvoiceDetailDialogOpen: action === DialogAction.Open,
+      isInvoiceDetailDialogOpen: isOpen,
       selectedInvoiceId: id,
+      ...(isOpen ? {prevInvoiceId: prevId, nextInvoiceId: nextId} : {}),
     });
   }
 }

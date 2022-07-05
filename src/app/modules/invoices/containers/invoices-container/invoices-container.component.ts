@@ -21,6 +21,7 @@ import { InvoiceRecordsTableComponent } from "../../components/invoice-records-t
 import { INVOICES_STATUSES } from '../../enums/invoices.enum';
 import { DialogAction } from '../../../timesheets/enums';
 import { InvoicesService } from '../../services/invoices.service';
+import { AllInvoicesTableComponent } from '../../components/all-invoices-table/all-invoices-table.component';
 
 const defaultPagingData: Omit<PageOfCollections<unknown>, 'items'> = {
   totalPages: 1,
@@ -50,7 +51,7 @@ export class InvoicesContainerComponent extends Destroyable {
   });
 
   // @Select(InvoicesState.invoicesData)
-  public invoicesData$: Observable<PageOfCollections<InvoiceRecord>>;
+  public invoiceRecordsData$: Observable<PageOfCollections<InvoiceRecord>>;
 
   public allInvoices: InvoicePage;
 
@@ -81,6 +82,9 @@ export class InvoicesContainerComponent extends Destroyable {
   @ViewChild('invoiceRecordsTable')
   public invoiceRecordsTable: InvoiceRecordsTableComponent;
 
+  @ViewChild('allInvoicesTable')
+  public allInvoicesTable: AllInvoicesTableComponent;
+
   public currentSelectedTableRowIndex: Observable<number>
     = this.invoicesService.getCurrentTableIdxStream();
   public pageSize = 30;
@@ -106,7 +110,7 @@ export class InvoicesContainerComponent extends Destroyable {
       }));
     });
 
-    this.invoicesData$ = of(
+    this.invoiceRecordsData$ = of(
       JSON.parse(localStorage.getItem('APPROVED_TIMESHEETS') as string)
     ).pipe(
       map((v: PageOfCollections<TimesheetData>) => {
@@ -213,7 +217,7 @@ export class InvoicesContainerComponent extends Destroyable {
       localStorage.getItem('submited-timsheets') as string
     ) as PageOfCollections<{ id: number; timesheets: { [key: number]: ProfileTimeSheetDetail[] } }>;
 
-    const groupedInvoices = groups.map<Invoice>((groupName: string) => {
+    const groupedInvoices: Invoice[] = groups.map<Invoice>((groupName: string) => {
       const groupInvoices = items.filter((record) => record[this.groupInvoicesBy] === groupName)
         .map(record => {
           record.timesheets = (submittedTimesheets || []).items
@@ -244,15 +248,20 @@ export class InvoicesContainerComponent extends Destroyable {
     const filterIds = items.map(item => item.timesheetId);
     const filteredInvoiceRecords = this.invoiceRecords.items.filter(item => !filterIds.includes(item.timesheetId));
 
-    this.invoicesData$ = of({
-      ...this.invoiceRecords,
+    this.invoiceRecordsData$ = of({
+      ...defaultPagingData,
       items: filteredInvoiceRecords,
     });
 
+    const existingInvoices: PageOfCollections<Invoice> = JSON.parse(
+      localStorage.getItem('invoices') as string
+    );
+
     const storeData: PageOfCollections<Invoice> = {
       ...defaultPagingData,
-      items: groupedInvoices,
+      items: [...groupedInvoices, ...(existingInvoices?.items || [])],
     };
+
 
     localStorage.setItem('invoices', JSON.stringify(storeData));
     localStorage.setItem('pending-invoices', JSON.stringify(storeData));
@@ -264,15 +273,27 @@ export class InvoicesContainerComponent extends Destroyable {
     this.createInvoiceDialog?.hide();
   }
 
-  public handleRowSelected(selectedRowData: any): void {
+  public handleRowSelected(selectedRowData: {rowIndex: number; data: Invoice}): void {
     this.invoicesService.setCurrentSelectedIndexValue(selectedRowData.rowIndex);
     localStorage.setItem('selected_invoice_row', JSON.stringify(selectedRowData.data));
-    this.store.dispatch(new Invoices.ToggleInvoiceDialog(DialogAction.Open, selectedRowData.rowIndex));
+    const prevId: string = this.allInvoices.items[selectedRowData.rowIndex - 1]?.id;
+    const nextId: string = this.allInvoices.items[selectedRowData.rowIndex + 1]?.id;
+
+    this.store.dispatch(
+      new Invoices.ToggleInvoiceDialog(
+        DialogAction.Open,
+        selectedRowData.rowIndex,
+        prevId,
+        nextId
+    ));
     this.cdr.markForCheck();
   }
 
   public onNextPreviousOrderEvent(next: boolean): void {
     this.invoicesService.setNextValue(next);
+    const index = this.invoicesService.getNextIndex();
+    this.allInvoicesTable.selectRow(index);
+
     this.cdr.markForCheck();
   }
 

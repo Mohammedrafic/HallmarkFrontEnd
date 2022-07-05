@@ -45,6 +45,10 @@ export class InvoicesService {
   public setCurrentSelectedIndexValue(value: number): void {
     this.currentSelectedTableRowIndex.set(value);
   }
+
+  public getNextIndex(): number {
+    return this.currentSelectedTableRowIndex.get();
+  }
 }
 
 function generateInvoiceRecords(amount: number = 100): InvoiceRecord[] {
