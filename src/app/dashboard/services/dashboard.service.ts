@@ -47,7 +47,7 @@ import { ActivePositionsChartStatuses } from '../enums/active-positions-legend-p
 import { candidateLegendPalette } from '../constants/candidate-legend-palette';
 import { CandidateChartStatuses } from '../enums/candidate-legend-palette.enum';
 import { Router } from '@angular/router';
-import { PositionTrend } from '../models/position-trend.model';
+import { PositionTrend, PositionTrendDto } from '../models/position-trend.model';
 
 @Injectable()
 export class DashboardService {
@@ -272,15 +272,15 @@ export class DashboardService {
       dateTo: this.getDateAsISOString(Date.now()),
     };
 
-    return this.httpClient.post<{ values: number[] }>(`${this.baseUrl}/filledpositionstrend`, { timeRanges }).pipe(
-      map((data: { values: number[] }) => {
+    return this.httpClient.post<PositionTrendDto>(`${this.baseUrl}/filledpositionstrend`, {}).pipe(
+      map((data: PositionTrendDto) => {
         const [previousValue, currentValue] = data.values.slice(-2);
         const coefficient = previousValue === 0 ? 1 : previousValue;
 
         return {
           id: WidgetTypeEnum.FILLED_POSITIONS_TREND,
           percentRatio: ((currentValue - previousValue) / coefficient) * 100,
-          value: currentValue,
+          total: data.total,
           chartData: data.values.map((item: number, index: number) => ({ x: index, y: item })),
         };
       })

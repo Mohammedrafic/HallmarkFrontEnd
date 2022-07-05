@@ -32,5 +32,8 @@
   --grid-background-color: #{$white};
   --grid-border-color: #{$grid-row-border};
   --grid-border-radius: 12px;
-  --grid-row-background-color-hover: #{$primary-active-blue-90}
+  --grid-row-background-color-hover: #{$primary-active-blue-90};
+
+  --supportive-red: #{$supportive-red};
+  --supportive-green-10: #{$supportive-green-10};
 }
