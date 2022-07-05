@@ -22,7 +22,6 @@ export class InvoicesChartComponent implements OnInit , OnChanges{
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.error(changes)
     this.url = changes['chartData'].currentValue;
   }
 
@@ -34,13 +33,11 @@ export class InvoicesChartComponent implements OnInit , OnChanges{
           this.url = 'temporary-widget-invoices-collapsed';
           this.cdr.markForCheck();
         }, 400);
-        console.error(this.url);
       } else {
         setTimeout(() => {
           this.url = 'temporary-widget-invoices';
           this.cdr.markForCheck();
         }, 400);
-        console.error(this.url);
       }
     });
   }
