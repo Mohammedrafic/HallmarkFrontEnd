@@ -351,7 +351,10 @@ export class AdminState {
       dispatch(new RemoveMasterSkillSucceeded);
       return payload;
     }),
-    catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error.error.detail)))));
+    catchError((error: any) => {
+      const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Skill', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+      return dispatch(new ShowToast(MessageTypes.Error, message));
+    }));
   }
 
   @Action(GetAllSkills)
