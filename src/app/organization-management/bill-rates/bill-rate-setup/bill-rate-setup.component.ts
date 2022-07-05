@@ -188,12 +188,12 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       effectiveDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       intervalMin: { type: ControlTypes.Text, valueType: ValueType.Text },
       intervalMax: { type: ControlTypes.Text, valueType: ValueType.Text },
-      considerForWeeklyOt: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Consider for Weekly OT'},
-      considerForDailyOt: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Consider for Daily OT'},
-      considerFor7thDayOt: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Consider for 7th Day OT'},
-      regularLocal: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Regular/Local'},
-      displayInTimesheet: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Display in Timesheet'},
-      displayInJob: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Display in Job'},
+      considerForWeeklyOt: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Consider for Weekly OT'},
+      considerForDailyOt: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Consider for Daily OT'},
+      considerFor7thDayOt: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Consider for 7th Day OT'},
+      regularLocal: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Regular/Local'},
+      displayInTimesheet: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Display in Timesheet'},
+      displayInJob: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Display in Job'},
     }
 
     this.filterColumns.billRateCategories.dataSource = Object.values(BillRateCategory)

@@ -142,6 +142,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
       )
       .subscribe(() => {
         this.resetDashboardState();
+        this.setWidgetsData();
         this.store.dispatch(new GetDashboardData());
       });
   }

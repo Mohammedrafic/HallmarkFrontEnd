@@ -1,5 +1,5 @@
 export enum TableColumnAlign {
-  Right = 'Raght',
+  Right = 'Right',
   Left = 'Left',
   Center = 'Center',
 }

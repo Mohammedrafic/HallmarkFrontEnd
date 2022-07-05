@@ -1,0 +1,108 @@
+<ejs-dialog
+    #createInvoiceDialog
+    cssClass="dialog filter"
+    [width]="470"
+    [visible]="false"
+    [isModal]="true"
+    [animationSettings]="{ effect: 'SlideRight' }"
+>
+    <ng-template #content>
+        <form class="create-invoice-dialog-content">
+            <div class="title">
+                <h2>Add Invoice Segment</h2>
+
+                <div class="spacer"></div>
+
+                <button ejs-button class="e-outline" (click)="createInvoiceDialog.hide()">Cancel</button>
+                <button ejs-button class="e-primary" type="submit" (click)="createInvoiceDialog.hide()">Create</button>
+            </div>
+
+            <div class="dropdown-container bootstrap">
+                <div class="form-row">
+                    <div class="w-100">
+                        <label>Day</label>
+                        <ejs-dropdownlist
+                                title="Group by choice"
+                                [fields]="{}"
+                                [dataSource]="[]">
+                        </ejs-dropdownlist>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="mr-12">
+                        <label>Time In</label>
+                        <ejs-timepicker
+                                placeholder="HH:MM"
+                                format="hh:mm a"
+                                [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                                [enableMask]="true"
+                                maskPlaceholder="HH:MM">
+                        </ejs-timepicker>
+                    </div>
+
+                    <div>
+                        <label>Time Out</label>
+                        <ejs-timepicker
+                                placeholder="HH:MM"
+                                format="hh:mm a"
+                                [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                                [enableMask]="true"
+                                maskPlaceholder="HH:MM">
+                        </ejs-timepicker>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="mr-12">
+                        <label>Cost center <span class="required"></span></label>
+                        <ejs-dropdownlist
+                                [dataSource]="costCenterOptions">
+                        </ejs-dropdownlist>
+                    </div>
+
+                    <div>
+                        <label>Category <span class="required"></span></label>
+                        <ejs-dropdownlist
+                                [dataSource]="categoryOptions">
+                        </ejs-dropdownlist>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div>
+                        <label>Hours/Miles <span class="required">*</span></label>
+                        <div class="input-group">
+                            <input
+                                    class="e-input"
+                                    type="number"
+                            />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label>Bill Rate <span class="required">*</span></label>
+                        <div class="input-group">
+                            <input
+                                    class="e-input"
+                                    type="number"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-row">
+                    <div>
+                        <label>Total <span class="required">*</span></label>
+                        <div class="input-group">
+                            <input class="e-input"
+                                   type="number"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </ng-template>
+</ejs-dialog>

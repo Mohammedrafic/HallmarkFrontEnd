@@ -12,6 +12,7 @@ export interface ITimesheet {
   billRate: number;
   agencyName: string;
   totalHours: number;
+  status?: TIMETHEETS_STATUSES
 }
 
 export interface ITimesheetsFilter {

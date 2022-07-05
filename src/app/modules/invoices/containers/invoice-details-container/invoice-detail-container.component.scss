@@ -2,8 +2,31 @@
 
 $chip-margin: 8px;
 
+.edit-btn {
+  width: 40px;
+  margin-right: 12px;
+  padding: 8px 0 !important;
+
+  i-feather {
+    margin-left: initial;
+  }
+}
+
+.separator {
+  width: 1px;
+  height: 39px;
+  margin: 0 12px;
+  background: #d9d9d9;
+}
+
+ejs-chiplist.e-control.e-chip-list .e-chip {
+  width: initial;
+}
+
 .profile-table-container {
-  padding-bottom: 21px;
+  padding-top: 12px;
+  padding-bottom: 16px;
+  border-top: 1px solid $secondary-dark-blue-45;
 }
 
 .container {
@@ -38,8 +61,7 @@ $chip-margin: 8px;
 .profile-details-header {
   display: flex;
   align-items: center;
-  padding-bottom: 20px;
-  border-bottom: 1px solid $secondary-dark-blue-45;
+  padding-bottom: 24px;
 
   .e-avatar {
     margin-right: 16px;
@@ -52,27 +74,10 @@ $chip-margin: 8px;
     margin-bottom: 0;
   }
 
-  ejs-chiplist {
-    position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      height: 20px;
-      left: 125px;
-      border-left: 1px solid $secondary-dark-blue-40;
-    }
-  }
-
-  .e-chip {
-    &:first-child {
-      margin-right: 20px;
-    }
-  }
-
   .header-controls {
-    display: flex;
     margin-top: 5px;
+    display: flex;
+    align-items: center;
 
     .e-input-group {
       margin-bottom: 0;
@@ -154,6 +159,7 @@ $chip-margin: 8px;
 }
 
 .job-general-info {
+  margin-bottom: 16px;
   padding: 25px;
 }
 
@@ -169,35 +175,6 @@ $chip-margin: 8px;
   .profile-invoices {
     margin-left: 12px;
     flex-grow: 1;
-  }
-}
-
-.timesheet-navigation {
-  display: flex;
-  align-items: center;
-  padding: 15px 20px 0 20px;
-  border-top: 1px solid $secondary-dark-blue-45;
-
-  .prev, .next {
-    color: $primary-active-blue-10;
-    font-weight: 590;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-
-    &.disabled {
-      opacity: 0.5;
-      pointer-events: none;
-    }
-  }
-
-  .prev i-feather {
-    margin-right: 8px;
-  }
-
-  .next i-feather {
-    margin-left: 8px;
   }
 }
 
@@ -254,4 +231,32 @@ $chip-margin: 8px;
 
 .e-switch-wrapper.e-wrapper {
   margin-right: 10px;
+}
+
+.profile-table-block {
+  //height: 565px;
+  overflow: auto;
+}
+
+.invoice-details-container-dialog {
+  .e-dlg-content {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    section.container {
+      overflow: auto;
+      flex-grow: 1;
+    }
+
+    app-navigation-panel {
+      display: flex;
+      width: 100%;
+
+      .navigation-panel-container {
+        padding-top: 28px;
+        padding-bottom: 28px;
+      }
+    }
+  }
 }

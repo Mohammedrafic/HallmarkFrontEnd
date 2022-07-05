@@ -1,10 +1,12 @@
 import { Router } from '@angular/router';
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   EventEmitter,
-  Input, OnInit,
+  Input, OnChanges, OnInit,
   Output,
+  SimpleChanges,
   ViewChild
 } from '@angular/core';
 
@@ -32,10 +34,13 @@ import { Actions } from '@ngxs/store';
   styleUrls: ['./timesheets-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TimesheetsTableComponent extends AbstractGridConfigurationComponent {
+export class TimesheetsTableComponent extends AbstractGridConfigurationComponent implements OnChanges {
   @ViewChild('grid') grid: GridComponent;
 
   @Input() tableData: TimeSheetsPage;
+
+  @Input() tabIndex: number;
+
   @Input() set changeTableItem(next: number | null) {
     if (next !== null) {
       this.grid.selectRow(next);
@@ -43,25 +48,59 @@ export class TimesheetsTableComponent extends AbstractGridConfigurationComponent
   };
 
   @Output() changePage: EventEmitter<number> = new EventEmitter<number>();
+
   @Output() changePerPage: EventEmitter<number> = new EventEmitter<number>();
+
   @Output() sortHandler: EventEmitter<string> = new EventEmitter<string>();
+
   @Output() timesheetRowSelected: EventEmitter<number> =  new EventEmitter<number>();
 
+  /**
+   * TODO: combine all table settings in one settings constant.
+   */
+
   public allowWrap = TIMESHEETS_GRID_CONFIG.isWordWrappingEnabled;
+
   public wrapSettings: TextWrapSettingsModel = TIMESHEETS_GRID_CONFIG.wordWrapSettings;
+
   public selectionOptions: SelectionSettingsModel = tableSelectionModel;
+
   public isLockMenuButtonsShown = false;
+
   public moreMenuWithDeleteButton: ItemModel[] = moreMenuWithDelete;
+
   public moreMenuWithCloseButton: ItemModel[] = moreMenuWithClose;
+
   public timesheetsTableColumnWidth: ITimesheetsColumnWidth = timesheetsTableColumnWidth;
+
   public TIMESHEETS_STATUSES = TIMETHEETS_STATUSES;
   isAgency: boolean;
 
+  filtredItems: ITimesheet[] = []
+
   constructor(
     private router: Router,
+    private cd: ChangeDetectorRef,
   ) {
     super();
     this.isAgency = this.router.url.includes('agency');
+  }
+
+  ngOnChanges(): void {
+    if (this.tableData) {
+      this.filtredItems = this.tableData.items.filter((item) => {
+        if (this.tabIndex === 1) {
+          return item.status === TIMETHEETS_STATUSES.PENDING_APPROVE;
+        }
+        if (this.tabIndex === 2) {
+          return item.status === TIMETHEETS_STATUSES.MISSING;
+        }
+        if (this.tabIndex === 3) {
+          return item.status === TIMETHEETS_STATUSES.REJECTED;
+        }
+        return item;
+      });
+    }
   }
 
   public onRowClick(event: any): void {

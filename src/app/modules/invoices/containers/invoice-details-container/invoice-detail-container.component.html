@@ -1,0 +1,67 @@
+<ejs-dialog
+  id="dialog"
+  #sideDialog
+  cssClass="dialog invoice-details-container-dialog"
+  [width]="'1180px'"
+  [visible]="false"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <section class="container">
+      <div class="profile-details-header">
+        <div class="flex flex-column">
+          <h3 class="username">Invoice ID {{ invoiceData?.id }}</h3>
+          <ejs-chiplist #chipList class="events-off">
+            <e-chips>
+              <e-chip
+                *ngIf="invoiceData"
+                [text]="invoiceData?.statusText"
+                [cssClass]="invoiceData?.statusText || '' | chipsCssClass">
+              </e-chip>
+            </e-chips>
+          </ejs-chiplist>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="header-controls">
+          <button
+            ejs-button
+            [disabled]="isApproveDisable"
+            cssClass="e-primary"
+            (click)="handleApprove()">
+            Approve
+          </button>
+          <div class="separator"></div>
+          <app-export-button (optionSelected)="export($event)"></app-export-button>
+        </div>
+
+        <i-feather name="x" class="icon close-button" (click)="handleProfileClose()"></i-feather>
+      </div>
+
+      <div class="job-general-info tile-dark-blue">
+        <app-invoice-detail-invoice-info [invoiceInfo]="invoiceData"></app-invoice-detail-invoice-info>
+      </div>
+
+      <div class="profile-table-block">
+        <ng-container *ngIf="invoiceData">
+          <section
+            *ngFor="let invoice of invoiceData.invoices"
+            class="profile-table-container">
+              <app-invoice-detail-table
+                [invoice]="invoice">
+              </app-invoice-detail-table>
+          </section>
+        </ng-container>
+      </div>
+    </section>
+      <app-navigation-panel
+              prevLabel="Previous Order"
+              nextLabel="Next Order"
+              [prevDisabled]="(prevId$ | async) === null"
+              [nextDisabled]="(nextId$ | async) === null"
+              (prevClick)="onNextPreviousOrder(false)"
+              (nextClick)="onNextPreviousOrder(true)"
+      ></app-navigation-panel>
+  </ng-template>
+</ejs-dialog>

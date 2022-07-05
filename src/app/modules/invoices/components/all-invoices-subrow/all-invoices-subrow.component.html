@@ -1,0 +1,26 @@
+<div
+  class="candidate-row"
+  [ngClass]="{'selected': selected}"
+  (click)="clickEvent.emit(rowData)"
+>
+  <div class="info">
+    <div class="data"><span class="link">{{ invoice.candidate }}</span></div>
+    <div class="title">Candidate Name</div>
+  </div>
+  <div class="info">
+    <div class="data">{{ invoice.amount }}</div>
+    <div class="title">Amount</div>
+  </div>
+  <div class="info">
+    <div class="data">{{ invoice.startDate | date: 'W - ccc M/d/yy' }}</div>
+    <div class="title">Week Period</div>
+  </div>
+  <div class="info">
+    <div class="data">${{ createRange }}</div>
+    <div class="title">Bill Rate $</div>
+  </div>
+  <div class="info">
+    <div class="data"><span class="link">{{ invoice.timesheetId }}</span></div>
+    <div class="title">Timesheet</div>
+  </div>
+</div>

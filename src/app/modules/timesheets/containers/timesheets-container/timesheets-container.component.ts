@@ -17,7 +17,7 @@ import { ITabConfigInterface } from '../../interface';
 import { exportOptions, TAB_ADMIN_TIMESHEETS } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
-import { DialogAction, ExportType, TimesheetsTableColumns } from '../../enums';
+import { DialogAction, ExportType, TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../../enums';
 import { IFilterColumns, ITimesheetsFilter } from '../../interface';
 import { TimesheetsService } from '../../services/timesheets.service';
 import { filterOptionFields } from '../../constants';
@@ -50,6 +50,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public currentSelectedTableRowIndex: Observable<number>
     = this.timesheetsService.getStream();
   public pageSize = 30;
+  public currentTab = 0;
 
   private pageNumberSubj: BaseObservable<number> = new BaseObservable<number>(1);
   isAgency: boolean;
@@ -72,31 +73,14 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.initFilterColumnDataSources();
     this.initFormGroup();
     this.startPageStateWatching();
-
+    this.calcTabsChips();
 
   }
 
   public handleChangeTab(tabIndex: number): void {
-    switch (tabIndex) {
-      case 0: {
-        this.pageSize = 30;
-        this.pageNumberSubj.set(1);
-
-        break;
-      }
-      case 1: {
-        console.log(1);
-        break;
-      }
-      case 2: {
-        console.log(2);
-        break;
-      }
-      case 3: {
-        console.log(2);
-        break;
-      }
-    }
+    this.currentTab = tabIndex;
+    this.pageSize = 30;
+    this.pageNumberSubj.set(1);
   }
 
   public handleChangePage(page: number): void {
@@ -126,6 +110,10 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.formGroup.reset();
     this.filteredItems = [];
     this.pageNumberSubj.set(1);
+  }
+
+  public onTabChange(status: TIMETHEETS_STATUSES): void {
+
   }
 
   public onFilterApply(): void {
@@ -173,5 +161,21 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.filterColumns.skillName.dataSource = this.timesheetsService.setDataSources(TimesheetsTableColumns.SkillName);
     this.filterColumns.departmentName.dataSource = this.timesheetsService.setDataSources(TimesheetsTableColumns.DepartmentName);
     this.filterColumns.agencyName.dataSource = this.timesheetsService.setDataSources(TimesheetsTableColumns.AgencyName);
+  }
+
+  private calcTabsChips(): void {
+    this.timesheets$.pipe(
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((data) => {
+      const pending = data.items.filter((item) => item.status === TIMETHEETS_STATUSES.PENDING_APPROVE).length;
+      const missing = data.items.filter((item) => item.status === TIMETHEETS_STATUSES.MISSING).length;
+      const rejected = data.items.filter((item) => item.status === TIMETHEETS_STATUSES.REJECTED).length;
+
+      this.tabConfig[1].amount = pending;
+      this.tabConfig[2].amount = missing;
+      this.tabConfig[3].amount = rejected;
+      this.cd.markForCheck();
+    })
   }
 }

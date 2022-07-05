@@ -104,7 +104,7 @@ export class SkillsComponent extends AbstractGridConfigurationComponent implemen
       skillAbbrs: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
       skillDescriptions: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
       glNumbers: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-      allowOnboard: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Allow Onboard'},
+      allowOnboard: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Allow Onboard'},
     }
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.currentPage = 1;

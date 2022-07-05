@@ -1,0 +1,16 @@
+<div class="job-info-container">
+  <ng-container *ngFor="let item of items; trackBy: trackByTitle">
+    <div
+      [class.amount]="item.isAmount"
+      [ngStyle]="{
+        visibility: !item.isHide ? 'visible' : 'hidden'
+      }"
+      class="job-info-section">
+        <i-feather [name]="item.icon" class="icon"></i-feather>
+        <div>
+          <div class="value">{{ item.value }}</div>
+          <div class="title">{{ item.title }}</div>
+        </div>
+    </div>
+  </ng-container>
+</div>

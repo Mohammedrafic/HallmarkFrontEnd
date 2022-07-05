@@ -230,6 +230,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       if (data && data.items) {
         data.items.forEach(item => {
           item.isMoreMenuWithDeleteButton = !this.openInProgressFilledStatuses.includes(item.statusText.toLowerCase());
+          item.children.sort((a, b) => a.positionId - b.positionId);
         });
       }
     });
