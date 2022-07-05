@@ -60,7 +60,7 @@ export class InvoiceDetailInvoiceInfoComponent implements OnChanges {
       {
         title: 'Invoice Amount',
         icon: '',
-        value: `$${data.amount}`,
+        value: `$${Number((data.amount * 1.05).toFixed(2))}`,
         isAmount: true,
       },
       {
