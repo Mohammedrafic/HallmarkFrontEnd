@@ -14,4 +14,5 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.ACTIVE_POSITIONS]: ChartAccumulation;
   [WidgetTypeEnum.TASKS]: string;
   [WidgetTypeEnum.CHAT]: string;
+  [WidgetTypeEnum.INVOICES]: string;
 }
