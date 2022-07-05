@@ -126,12 +126,6 @@ export class JobOrderComponent implements OnInit, OnDestroy {
       this.orderWorkflow = card.workflows[0];
       this.applicationWorkflow = card.workflows[1];
 
-      const isWorkflowUsedElseWhere = false;
-      // TODO: the information should be provided by BE side
-      if (isWorkflowUsedElseWhere) {
-        this.store.dispatch(new ShowToast(MessageTypes.Error, 'This change has been affected Workflow Mapping, please update it on the Workflow Mapping tab'));
-      }
-
       setTimeout(() => {
         this.customOrderSteps$.next(this.orderWorkflow.steps);
         this.customApplicationSteps$.next(this.applicationWorkflow.steps);

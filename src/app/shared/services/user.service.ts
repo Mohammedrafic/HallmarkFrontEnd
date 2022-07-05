@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { CurrentUserPermission } from "@shared/models/permission.model";
 import { Observable } from 'rxjs';
 import { UsersAssignedToRole, UsersPage } from 'src/app/shared/models/user.model';
 import { BusinessUnitType } from '../enums/business-unit-type';
@@ -60,5 +61,13 @@ export class UserService {
    */
   public getUsersAssignedToRole(roleId: number): Observable<UsersAssignedToRole> {
     return this.http.get<UsersAssignedToRole>(`/api/Users/GetByRoleId/${roleId}`);
+  }
+
+  /**
+   * Get Current User Permissions
+   * @returns list of Permissions
+   */
+  public getCurrentUserPermissions(): Observable<CurrentUserPermission[]> {
+    return this.http.get<CurrentUserPermission[]>('/api/Permissions/currentUser');
   }
 }

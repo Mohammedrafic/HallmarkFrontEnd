@@ -16,4 +16,5 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.TASKS]: string;
   [WidgetTypeEnum.FILLED_POSITIONS_TREND]: PositionTrend;
   [WidgetTypeEnum.CHAT]: string;
+  [WidgetTypeEnum.INVOICES]: string;
 }

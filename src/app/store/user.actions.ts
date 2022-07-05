@@ -51,3 +51,8 @@ export class GetUsersAssignedToRole {
   static readonly type = '[user] Get Users Assigned To Role';
   constructor(public payload: number) { }
 }
+
+export class GetCurrentUserPermissions {
+  static readonly type = '[user] Get Current User Permissions';
+  constructor() { }
+}

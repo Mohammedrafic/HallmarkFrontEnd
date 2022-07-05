@@ -23,3 +23,4 @@ export const CANCEL_ORDER_CONFIRM_TEXT = 'Are you sure you want to cancel this o
 export const CANCEL_ORDER_CONFIRM_TITLE = 'Cancel Order';
 
 export const usedByOrderErrorMessage = (val: string, entities: string) => `${val} cannot be deleted. This ${val} was used in ${entities}.`;
+export const usedInMappingMessage = ( mappingName: string ) => `This change has been affected ${mappingName} Mapping, please update it on the ${mappingName} Mapping tab`

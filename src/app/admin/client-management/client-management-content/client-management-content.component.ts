@@ -8,12 +8,15 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { FilteredItem } from '@shared/models/filter.model';
+import { CurrentUserPermission } from "@shared/models/permission.model";
 import { FilterService } from '@shared/services/filter.service';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { Organization, OrganizationDataSource, OrganizationFilter, OrganizationPage } from 'src/app/shared/models/organization.model';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
+import { GetCurrentUserPermissions } from "src/app/store/user.actions";
+import { UserState } from "src/app/store/user.state";
 import { ExportOrganizations, GetOrganizationDataSources, GetOrganizationsByPage } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
 
@@ -33,7 +36,7 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
     { text:'Organization Status', column: 'OrganizationStatus'},
     { text:'City', column: 'City'},
     { text:'Contact', column: 'Contact'},
-    { text:'Phone', column: 'Phone'} 
+    { text:'Phone', column: 'Phone'}
   ];
   public fileName: string;
   public defaultFileName: string;
@@ -51,12 +54,22 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
   @Select(AdminState.statuses)
   statuses$: Observable<string[]>;
 
+  @Select(UserState.currentUserPermissions)
+  currentUserPermissions$: Observable<any[]>;
+
   @ViewChild('grid')
   public grid: GridComponent;
 
   public OrganizationFilterFormGroup: FormGroup;
   public filters: OrganizationFilter = {};
   public filterColumns: any;
+
+  get hasCreateOrganizationPermission(): boolean {
+    const createDeleteOrganizationPermissionId = 102;
+    return this.permissions.map(permission => permission.permissionId).includes(createDeleteOrganizationPermissionId);
+  }
+
+  private permissions: CurrentUserPermission[] = [];
 
   constructor(private store: Store,
               private router: Router,
@@ -79,6 +92,8 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
   }
 
   ngOnInit(): void {
+    this.store.dispatch(new GetCurrentUserPermissions());
+    this.subscribeOnPermissions();
     this.idFieldName = 'organizationId';
     this.filterColumns = {
       searchTerm: { type: ControlTypes.Text },
@@ -208,5 +223,9 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
 
   public editOrganization(data: Organization): void {
     this.router.navigate(['./edit', data.organizationId], { relativeTo: this.route });
+  }
+
+  private subscribeOnPermissions(): void {
+    this.currentUserPermissions$.pipe(takeUntil(this.unsubscribe$)).subscribe(permissions => this.permissions = permissions);
   }
 }

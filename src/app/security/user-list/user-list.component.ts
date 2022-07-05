@@ -88,6 +88,7 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   public onAddNewUser() {
+    this.createdUser = null;
     this.isEditRole = false;
     this.userSettingForm.reset();
     this.userSettingForm.enable();

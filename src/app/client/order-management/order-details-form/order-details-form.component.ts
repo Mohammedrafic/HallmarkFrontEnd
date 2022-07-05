@@ -1,11 +1,11 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
 import { combineLatest, debounceTime, filter, Observable, of, Subject, switchMap, take, takeUntil } from 'rxjs';
 
-import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { ChangeEventArgs, DropDownListComponent, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
 import {
   GetDepartmentsByLocationId,
@@ -73,6 +73,10 @@ import { GetPredefinedCredentials } from '@order-credentials/store/credentials.a
 })
 export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Input() isActive = false;
+
+  @ViewChild('workflowDropdown')
+  public workflowDropdown: DropDownListComponent;
+
   public orderTypeForm: FormGroup;
   public generalInformationForm: FormGroup;
   public jobDistributionForm: FormGroup;
@@ -772,10 +776,12 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.workLocationsFormArray.push(this.newWorkLocationFormGroup());
     }
 
-    setTimeout(() => {
+    this.workflows$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.workflowForm.controls['workflowId'].patchValue(order.workflowId);
       this.disableFormControls(order);
-    }, 1000);
+      this.workflowDropdown.refresh();
+    });
+
   }
 
   private autoSetupJobEndDateControl(duration: Duration, jobStartDate: Date): void {
@@ -854,7 +860,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   /** During editing order (in progress or filled), some fields have to be disabled */
   private disableFormControls(order: Order): void {
     if (order.status === OrderStatus.InProgress || order.status === OrderStatus.Filled) {
-      this.generalInformationForm = disableControls(this.generalInformationForm, ['regionId', 'skillId']);
+      this.generalInformationForm = disableControls(this.generalInformationForm, ['regionId', 'skillId'], false);
       this.workflowForm.get('workflowId')?.disable({ onlySelf: true });
     }
   }

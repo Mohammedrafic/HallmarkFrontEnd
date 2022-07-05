@@ -69,6 +69,10 @@
             *ngSwitchCase="widgetTypeEnum.CHAT"
             [chatData]="widgetsData?.[widgetTypeEnum.CHAT]"
           ></app-chat>
+          <app-invoices-chart
+            *ngSwitchCase="widgetTypeEnum.INVOICES"
+            [chartData]="widgetsData?.[widgetTypeEnum.INVOICES]"
+            ></app-invoices-chart>
         </ng-template>
       </e-panel>
     </e-panels>

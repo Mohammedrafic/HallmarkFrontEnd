@@ -198,11 +198,11 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
     this.filterColumns.billRateCategories.dataSource = Object.values(BillRateCategory)
       .filter(valuesOnly)
-      .map((name, id) => ({ name, id }));
+      .map((name) => ({ name, id: BillRateCategory[name as BillRateCategory] }));
 
     this.filterColumns.billRateTypes.dataSource = Object.values(BillRateType)
       .filter(valuesOnly)
-      .map((name, id) => ({ name, id }));
+      .map((name) => ({ name, id: BillRateType[name as BillRateType] }));
 
     this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
       this.orgRegions = structure.regions;

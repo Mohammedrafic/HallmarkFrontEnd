@@ -394,8 +394,8 @@ export class AdminState {
         dispatch(new GetCredentialTypes());
         return payload;
       }),
-      catchError((error: any) =>  {
-        const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Workflow', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
+      catchError((error: any) => {
+        const message = error.error.errors?.EntityInUse ? usedByOrderErrorMessage('Credential type', error.error.errors['EntityInUse']) : RECORD_CANNOT_BE_DELETED;
         return dispatch(new ShowToast(MessageTypes.Error, message));
       }));
   }

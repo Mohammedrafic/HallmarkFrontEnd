@@ -6,7 +6,7 @@ import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
 import { ConfirmService } from "@shared/services/confirm.service";
 import { MultiSelectComponent } from "@syncfusion/ej2-angular-dropdowns";
 import { DialogComponent } from "@syncfusion/ej2-angular-popups";
-import { filter, Observable, Subject, takeUntil } from "rxjs";
+import { delay, filter, Observable, Subject, takeUntil } from "rxjs";
 
 import { BusinessUnitType } from "@shared/enums/business-unit-type";
 import { User } from "@shared/models/user-managment-page.model";
@@ -159,7 +159,7 @@ export class AddEditVisibilityComponent implements OnInit, OnDestroy {
   }
 
   private subscribeOnFormValuesChanges(): void {
-    this.organisationsControl?.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((value: number) => {
+    this.organisationsControl?.valueChanges.pipe(takeUntil(this.unsubscribe$), delay(100)).subscribe((value: number) => { // TODO: find better approach than delay
       this.regionMultiselect.refresh();
       if (value || value === null) {
         const selectedOrganisation: Organisation = this.organisations.find(org => org.organizationId === value) as Organisation;

@@ -12,4 +12,5 @@ export const widgetTypeToConfigurationMapper: Record<WidgetTypeEnum, PanelModel>
   [WidgetTypeEnum.FILLED_POSITIONS_TREND]: { sizeX: 3, sizeY: 1, maxSizeX: 3, maxSizeY: 1, minSizeX: 3, minSizeY: 1 },
   [WidgetTypeEnum.TASKS]: { sizeX: 3, sizeY: 5, maxSizeX: 3, maxSizeY: 5, minSizeX: 3, minSizeY: 5 },
   [WidgetTypeEnum.CHAT]: { sizeX: 3, sizeY: 3, maxSizeX: 3, maxSizeY: 3, minSizeX: 3, minSizeY: 3 },
+  [WidgetTypeEnum.INVOICES]: { sizeX: 3, sizeY: 3, maxSizeX: 3, maxSizeY: 3, minSizeX: 3, minSizeY: 3 },
 };
