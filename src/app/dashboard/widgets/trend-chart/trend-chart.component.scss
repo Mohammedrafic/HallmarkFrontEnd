@@ -1,0 +1,67 @@
+@import "colors";
+
+.widget {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 16px 20px;
+  box-sizing: border-box;
+
+  .widget-data {
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+
+    .widget-value {
+      display: flex;
+      align-items: center;
+      font-weight: 700;
+
+      .widget-value-number {
+        font-size: 24px;
+        color: $black;
+      }
+
+      .widget-value-percent {
+        font-size: 14px;
+        color: $supportive-red;
+        margin: 0 5px 0 15px;
+      }
+
+      .widget-data-down {
+        display: inline-block;
+        color: $supportive-red;
+        transform: rotate(180deg);
+      }
+
+      .widget-data-grow {
+        color: $supportive-green-10;
+      }
+    }
+
+    .widget-chart {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex: 1;
+
+      .chart {
+        height: 100%;
+        width: 70%;
+        margin-top: -8px;
+        margin-left: 10%;
+      }
+    }
+  }
+  
+  .widget-text {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: $secondary-dark-blue-30;
+  }
+}
