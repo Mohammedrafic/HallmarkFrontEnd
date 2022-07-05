@@ -60,6 +60,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   ngOnInit(): void {
+    this.today.setHours(0);
     this.createForm();
     this.subscribeOnInitialData();
   }

@@ -39,7 +39,7 @@ interface IOrganizationAgency {
 })
 export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   public organizationAgencyControl: FormControl = new FormControl();
-  public selectedLogo$ = new Subject<SafeUrl | null>();
+  public selectedLogo$ = new BehaviorSubject<SafeUrl | null>(null);
 
   public optionFields = {
     text: 'name',
