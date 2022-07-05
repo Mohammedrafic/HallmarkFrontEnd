@@ -140,7 +140,7 @@ export class OrderManagementState {
   static orderFilteringOptions(state: OrderManagementModel): AgencyOrderFilteringOptions | null {
     return state.orderFilteringOptions
   }
-  
+
   @Selector()
   static candidateHistoricalData(state: OrderManagementModel): HistoricalEvent[] | null {
     return state.historicalEvents
@@ -288,7 +288,7 @@ export class OrderManagementState {
       tap((payload) => { patchState({ orderFilteringOptions: payload }) })
     );
   }
-  
+
   @Action(GetHistoricalData)
   GetHistoricalData(
     {patchState}: StateContext<OrderManagementModel>,
@@ -298,6 +298,10 @@ export class OrderManagementState {
       tap(payload => {
         patchState({historicalEvents: payload})
         return payload
+      }),
+      catchError(()=> {
+        patchState({historicalEvents: []})
+        return of()
       })
     )
   }

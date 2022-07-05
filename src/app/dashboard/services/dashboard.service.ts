@@ -65,6 +65,7 @@ export class DashboardService {
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
     [WidgetTypeEnum.TASKS]: ()=> this.getTasksWidgetData(),
     [WidgetTypeEnum.CHAT]: () => this.getChatWidgetData(),
+    [WidgetTypeEnum.INVOICES]: (filters: DashboardFiltersModel) => this.getInvocesWidgetData(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -253,5 +254,9 @@ export class DashboardService {
 
   private getChatWidgetData(): Observable<string> {
     return of('assets/icons/temporary-widget-chat.png');
+  }
+
+  private getInvocesWidgetData(filters: DashboardFiltersModel): Observable<any> {
+    return of('temporary-widget-invoices');
   }
 }

@@ -2,7 +2,7 @@ import type { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Store } from '@ngxs/store';
 import { forkJoin, Observable, takeUntil } from 'rxjs';
 
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, ChangeDetectionStrategy, NgModule, Type, ChangeDetectorRef, Inject } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
@@ -64,7 +64,7 @@ class CandidatesReportComponent extends BaseReportDirective<CandidateModel> {
   public readonly columnDefinitions: ColumnDefinitionModel[] = [
     { field: 'agency', headerName: 'Agency' },
     { field: 'name', headerName: 'Name' },
-    { field: 'skills', headerName: 'Skill Type' },
+    { field: 'skill', headerName: 'Skill Type' },
     { field: 'email', headerName: 'Email' },
     { field: 'workPhoneNumber', headerName: 'Work Phone Number' },
     { field: 'cellPhoneNumber', headerName: 'Cell Phone Number' },
@@ -81,9 +81,10 @@ class CandidatesReportComponent extends BaseReportDirective<CandidateModel> {
     private readonly formBuilder: FormBuilder,
     protected override readonly filterService: FilterService,
     protected override readonly pageQueryFilterParamsService: PageQueryFilterParamsService,
-    protected override readonly store: Store
+    protected override readonly store: Store,
+    protected override readonly datePipe: DatePipe,
   ) {
-    super(reportDirectiveData, filterService, pageQueryFilterParamsService, store);
+    super(reportDirectiveData, filterService, pageQueryFilterParamsService, store, datePipe);
   }
 
   protected getReportFiltersForm(): FormGroup {

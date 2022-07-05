@@ -170,6 +170,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       this.defaultExport(event);
     });
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((id) => {
+      this.clearFilters();
       this.loadData();
     });
 
@@ -197,11 +198,11 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
     this.filterColumns.billRateCategories.dataSource = Object.values(BillRateCategory)
       .filter(valuesOnly)
-      .map((name, id) => ({ name, id }));
+      .map((name) => ({ name, id: BillRateCategory[name as BillRateCategory] }));
 
     this.filterColumns.billRateTypes.dataSource = Object.values(BillRateType)
       .filter(valuesOnly)
-      .map((name, id) => ({ name, id }));
+      .map((name) => ({ name, id: BillRateType[name as BillRateType] }));
 
     this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
       this.orgRegions = structure.regions;
@@ -468,12 +469,16 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.filterService.removeValue(event, this.billRateFilterFormGroup, this.filterColumns);
   }
 
-  public onFilterClearAll(): void {
+  private clearFilters(): void {
     this.billRateFilterFormGroup.reset();
     this.filteredItems = [];
     this.filteredItems$.next(this.filteredItems.length);
     this.currentPage = 1;
     this.filters = {};
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
     this.store.dispatch(new GetBillRates({
       pageNumber: this.currentPage,
       pageSize: this.pageSize,

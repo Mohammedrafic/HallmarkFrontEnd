@@ -9,4 +9,7 @@ export interface FillrateReportDataRequestPayloadModel extends BasePaginatedRequ
   orderTypes: OrderType[];
   regionIds: number[];
   skillIds: number[];
+  orderEndDate: Date;
+  orderStartDate: Date;
+  excludeFcAgency: boolean;
 }

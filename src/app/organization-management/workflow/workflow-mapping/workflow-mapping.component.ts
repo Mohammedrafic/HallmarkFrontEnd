@@ -161,6 +161,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     });
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.currentPage = 1;
+      this.clearFilters();
       this.store.dispatch(new GetAllOrganizationSkills());
       this.store.dispatch(new GetWorkflowMappingPages(this.filters));
       this.store.dispatch(new GetRolesForWorkflowMapping());
@@ -353,11 +354,15 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
     this.filterService.removeValue(event, this.WorkflowFilterFormGroup, this.filterColumns);
   }
 
-  public onFilterClearAll(): void {
+  private clearFilters(): void {
     this.WorkflowFilterFormGroup.reset();
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
     this.store.dispatch(new GetWorkflowMappingPages(this.filters));
   }
 

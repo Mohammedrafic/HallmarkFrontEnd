@@ -74,6 +74,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   private statusSortDerection: SortDirection = 'Ascending';
   private isAlive = true;
+  private selectedIndex: number | null;
 
   constructor(private store: Store,
               private location: Location,
@@ -109,6 +110,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.gridWithChildRow.selectRow(index);
         this.onRowClick({ data });
       }
+    }
+     if (this.selectedIndex) {
+      this.gridWithChildRow.selectRow(this.selectedIndex);
     }
   }
 
@@ -148,6 +152,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         new GetAgencyOrderCandidatesList(event.data.orderId, event.data.organizationId, this.currentPage, this.pageSize)
       );
       this.store.dispatch(new GetAgencyOrderGeneralInformation(event.data.orderId, event.data.organizationId));
+      this.selectedIndex = Number(event.rowIndex);
     }
   }
 
@@ -182,6 +187,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.orderId, order.organizationId, options));
     this.openChildDialog.next([order, candidat]);
+    this.selectedIndex = null;
   }
 
   // Filter
@@ -211,13 +217,17 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.filterService.removeValue(event, this.OrderFilterFormGroup, this.filterColumns);
   }
 
-  public onFilterClearAll(): void {
+  private clearFilters(): void {
     this.OrderFilterFormGroup.reset();
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};
-    this.dispatchNewPage();
     this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
+    this.dispatchNewPage();
   }
 
   public onFilterApply(): void {
@@ -267,6 +277,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.lastSelectedAgencyId$.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
       this.openPreview.next(false);
       this.openCandidat.next(false);
+      this.clearFilters();
       this.dispatchNewPage();
       this.store.dispatch(new GetAgencyFilterOptions());
     });
@@ -277,7 +288,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters)).subscribe((data) => {
         const order = data.agencyOrders.ordersPage.items.find((item: AgencyOrderManagement) => item.orderId === this.selectedOrder.orderId);
         if (order) {
-          this.onRowClick({ data: order });
+          this.onRowClick({ data: order, rowIndex: this.selectedIndex });
         }
       });
     });

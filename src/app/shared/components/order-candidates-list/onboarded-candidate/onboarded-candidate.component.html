@@ -184,7 +184,7 @@
               <div>Historical Events</div>
             </ng-template>
             <ng-template #content>
-              <app-historical-events [organizationId]="candidateJob?.organizationId || -1" [candidateJobId]="candidate.candidateJobId"></app-historical-events>
+              <app-historical-events [organizationId]="candidateJob?.organizationId || -1" [candidateJobId]="candidate.candidateJobId" [candidateId]="candidate.candidateId"></app-historical-events>
             </ng-template>
           </e-accordionitem>
         </e-accordionitems>
@@ -198,12 +198,6 @@
     <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
   </section>
 </section>
-
-<app-reject-reason-dialog
-  [rejectReasonsList]="rejectReasons"
-  [openEvent]="openRejectDialog"
-  (applyReject)="onRejectCandidate($event)"
-></app-reject-reason-dialog>
 
 <app-reject-reason-dialog
   [rejectReasonsList]="rejectReasons"

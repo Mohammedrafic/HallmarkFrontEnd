@@ -532,6 +532,10 @@ export class OrderManagementContentState {
       tap((payload: HistoricalEvent[]) => {
         patchState({historicalEvents: payload})
         return payload
+      }),
+      catchError(()=> {
+        patchState({historicalEvents: []})
+        return of()
       })
     )
   }

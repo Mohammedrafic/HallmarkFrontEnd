@@ -11,6 +11,7 @@ import { LineChartModule } from '../widgets/line-chart/line-chart.module';
 import { PositionChartModule } from '../widgets/position-chart/position-chart.module';
 import { TasksModule } from '../widgets/tasks/tasks.module';
 import { ChatModule } from '../widgets/chat/chat.module';
+import { InvoicesChartModule } from '../widgets/invoices-chart/invoices-chart.module';
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -25,6 +26,7 @@ import { ChatModule } from '../widgets/chat/chat.module';
     PositionChartModule,
     TasksModule,
     ChatModule,
+    InvoicesChartModule
   ]
 })
 export class DashboardWidgetsModule { }

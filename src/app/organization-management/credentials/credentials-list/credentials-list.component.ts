@@ -107,6 +107,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
       expireDateApplicable: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkboxTitle: 'Expiry Date Applicable'},
     }
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
+      this.clearFilters();
       this.getCredentials();
     });
     this.credentialDataSources$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(data => {
@@ -169,12 +170,16 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
     this.filterService.removeValue(event, this.CredentialsFilterFormGroup, this.filterColumns);
   }
 
-  public onFilterClearAll(): void {
+  private clearFilters(): void {
     this.CredentialsFilterFormGroup.reset();
     this.filteredItems = [];
     this.store.dispatch(new SetCredentialsFilterCount(this.filteredItems.length));
     this.currentPage = 1;
     this.filters = {};
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
     this.getCredentials();
   }
 

@@ -601,6 +601,7 @@
                 <label>Workflow<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
+                    #workflowDropdown
                     formControlName="workflowId"
                     appValidateWithMessage
                     [dataSource]="workflows$ | async"

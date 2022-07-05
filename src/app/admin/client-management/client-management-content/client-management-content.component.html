@@ -8,7 +8,7 @@
     <ng-container right>
       <section class="org-controls-container">
         <div>
-          <button ejs-button [isPrimary]="true" (click)="navigateToOrganizationForm()">Add Organization</button>
+          <button *ngIf="hasCreateOrganizationPermission" ejs-button [isPrimary]="true" (click)="navigateToOrganizationForm()">Add Organization</button>
           <button
             ejs-dropdownbutton
             [items]="exportOptions"
@@ -66,7 +66,7 @@
             <span>{{ data.contactDetails[0].phoneNumberExt | formatPhoneNumber }}</span>
           </ng-template>
         </e-column>
-        <e-column field="" headerText="" textAlign="Right" width="90">
+        <e-column field="" headerText="" textAlign="Right" width="150" freeze="Right">
           <ng-template #headerTemplate let-data>
             <div class="controls-header"></div>
           </ng-template>

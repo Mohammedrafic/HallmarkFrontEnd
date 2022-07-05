@@ -30,6 +30,9 @@ export class FillratesReportService {
       pageSize: pageQueryParams.pageSize,
       regionIds: filterFormValue.regions ?? [],
       skillIds: filterFormValue.skills ?? [],
+      orderEndDate: filterFormValue.orderEndDate,
+      orderStartDate: filterFormValue.orderStartDate,
+      excludeFcAgency: filterFormValue.excludeFcAgency
     };
   }
 
@@ -58,7 +61,7 @@ export class FillratesReportService {
     );
 
     return this.httpClient
-      .get<PageOfCollections<FillrateModel>>('/api/Reports/fillRate', { params: { ...payload } })
+      .post<PageOfCollections<FillrateModel>>('/api/Reports/fillRate', payload)
       .pipe(catchError(() => of(defaultEmptyPageOfCollections<FillrateModel>())));
   }
 }
