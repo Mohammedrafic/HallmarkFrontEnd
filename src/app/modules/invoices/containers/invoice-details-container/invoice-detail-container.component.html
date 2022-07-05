@@ -42,16 +42,17 @@
         <app-invoice-detail-invoice-info [invoiceInfo]="invoiceData"></app-invoice-detail-invoice-info>
       </div>
 
-      <ng-container *ngIf="invoiceData">
-        <section
-          *ngFor="let invoice of invoiceData.invoices"
-          class="profile-table-container">
-            <app-invoice-detail-table
-              [invoice]="invoice">
-            </app-invoice-detail-table>
-        </section>
-      </ng-container>
-
+      <div class="profile-table-block">
+        <ng-container *ngIf="invoiceData">
+          <section
+            *ngFor="let invoice of invoiceData.invoices"
+            class="profile-table-container">
+              <app-invoice-detail-table
+                [invoice]="invoice">
+              </app-invoice-detail-table>
+          </section>
+        </ng-container>
+      </div>
       <div class="timesheet-navigation">
         <div
           [class.disabled]="currentSelectedRowIndex === 0"

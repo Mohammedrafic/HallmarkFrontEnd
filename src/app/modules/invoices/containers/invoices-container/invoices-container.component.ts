@@ -36,7 +36,7 @@ const defaultPagingData: Omit<PageOfCollections<unknown>, 'items'> = {
   styleUrls: ['./invoices-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InvoicesContainerComponent extends Destroyable implements OnInit {
+export class InvoicesContainerComponent extends Destroyable {
   public readonly tabsConfig: TabsListConfig[] = INVOICES_TAB_CONFIG;
   public selectedTabIdx: number = 0;
 
@@ -94,6 +94,8 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
     private invoicesService: InvoicesService,
   ) {
     super();
+    this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
+
     route.queryParams.pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(({page = 1, pageSize = 30}: Params) => {
@@ -108,9 +110,16 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
       JSON.parse(localStorage.getItem('APPROVED_TIMESHEETS') as string)
     ).pipe(
       map((v: PageOfCollections<TimesheetData>) => {
-        const existingRecords: PageOfCollections<InvoiceRecord> = JSON.parse(
+        const existingRecords: PageOfCollections<InvoiceRecord> = localStorage.getItem('invoice-records') ? JSON.parse(
           localStorage.getItem('invoice-records') as string
-        );
+        ) : {
+          items: [],
+          pageNumber: 1,
+          totalPages: 1,
+          totalCount: 1,
+          hasPreviousPage: false,
+          hasNextPage: false,
+        };
 
         return {
           ...v,
@@ -136,10 +145,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
         );
       }),
     );
-  }
-
-  public ngOnInit(): void {
-    this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
   }
 
   public showFilters(): void {
