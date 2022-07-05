@@ -24,4 +24,14 @@ $gap: 12px;
       margin-left: $gap;
     }
   }
+
+  .e-tab-header {
+    .e-items.e-toolbar-items {
+      padding: 0;
+
+      .e-scroll-nav {
+        display: none;
+      }
+    }
+  }
 }

@@ -141,7 +141,7 @@ export const ProfileTimesheetTableConfig: DetailsTableConfig = {
   },
   actions: {
     align: TableColumnAlign.Center,
-    width: 48,
+    width: 88,
     header: '',
   }
 }

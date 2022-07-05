@@ -150,25 +150,14 @@
         >
         </app-profile-timesheet-table>
       </section>
-      <div class="timesheet-navigation">
-        <div
-          [class.disabled]="currentSelectedRowIndex === 0"
-          (click)="onNextPreviousOrder(false)"
-          class="prev">
-            <i-feather name="arrow-left" class="icon"></i-feather>
-            Previous Timesheet
-        </div>
 
-        <div class="spacer"></div>
-
-        <div
-          [class.disabled]="isNextDisabled"
-          (click)="onNextPreviousOrder(true)"
-          class="next">
-          Next Timesheet
-          <i-feather name="arrow-right" class="icon"></i-feather>
-        </div>
-      </div>
+      <app-navigation-panel prevLabel="Previous Timesheet"
+                            nextLabel="Next Timesheet"
+                            [prevDisabled]="currentSelectedRowIndex === 0"
+                            [nextDisabled]="isNextDisabled"
+                            (prevClick)="onNextPreviousOrder(false)"
+                            (nextClick)="onNextPreviousOrder(true)"
+      ></app-navigation-panel>
     </section>
   </ng-template>
 </ejs-dialog>
