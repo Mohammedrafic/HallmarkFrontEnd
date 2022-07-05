@@ -225,7 +225,7 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
     },
     orderEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
     orderStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-    excludeFcAgency: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Allow Internal' },
+    excludeFcAgency: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Exclude Agency' },
   };
 
   private regions: OrganizationRegion[] = [];
@@ -277,8 +277,8 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
       orderTypes: [[]],
       regions: [[]],
       skills: [[]],
-      orderEndDate: [''],
-      orderStartDate: [''],
+      orderEndDate: [null],
+      orderStartDate: [null],
       excludeFcAgency: [false]
     });
   }

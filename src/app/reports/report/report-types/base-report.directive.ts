@@ -61,7 +61,7 @@ export abstract class BaseReportDirective<T> extends DestroyableDirective implem
   }
 
   public clearFilters(): void {
-    this.reportFiltersForm.reset();
+    this.reportFiltersForm = this.getReportFiltersForm();
     this.updateFilters();
     this.getReportListDataStream();
   }
