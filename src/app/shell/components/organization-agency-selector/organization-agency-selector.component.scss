@@ -15,8 +15,9 @@
 .logo-container {
   @include flex-center;
   img {
-    max-width: 32px;
-    max-height: 32px;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
   }
 }
 

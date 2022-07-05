@@ -22,8 +22,8 @@
 
       <ng-template #valueTemplate let-data>
         <div class="value-container">
-          <div *ngIf="data.logo" class="logo-container">
-            <img [src]="data.logo" alt="logo">
+          <div *ngIf="selectedLogo$ | async as logo" class="logo-container">
+            <img  [src]="logo" alt="logo">
           </div>
 
           <p class="title">{{data.name}}</p>
@@ -34,8 +34,8 @@
 </div>
 
 <div *ngIf="isAgencyOrOrganization" class="organization-agency-title-container">
-  <div *ngIf="organizationAgency?.logo" class="logo-container">
-    <img [src]="organizationAgency?.logo" alt="logo">
+  <div *ngIf="selectedLogo$ | async as logo" class="logo-container">
+    <img class="e-avatar" [src]="logo" alt="logo">
   </div>
 
   <p class="title">{{organizationAgency?.name}}</p>
