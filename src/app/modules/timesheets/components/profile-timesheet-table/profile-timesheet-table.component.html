@@ -2,7 +2,7 @@
   <div class="table-block">
     <div class="table-header">
       <h3>Timesheet</h3>
-      <button (click)="openAddSideDialog.emit(profileId)" class="add-action spaced">+ Add Rcord</button>
+      <button (click)="openAddSideDialog.emit(profileId)" class="add-action spaced">+ Add Record</button>
       <button
         *ngIf="!isEditOn; else editHandlers"
         (click)="editTimesheets()"

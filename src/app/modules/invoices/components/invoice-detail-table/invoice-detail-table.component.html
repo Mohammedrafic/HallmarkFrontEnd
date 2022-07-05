@@ -12,11 +12,11 @@
           <p class="title">Bill Rate $</p>
         </div>
         <div class="info-item">
-          <h5 class="value">{{ invoice.amount }}</h5>
+          <h5 class="value">${{ invoice.amount }}</h5>
           <p class="title">Amount</p>
         </div>
         <div *ngIf="isAgency" class="info-item">
-          <h5 class="value">% 10</h5>
+          <h5 class="value">${{ (invoice.amount * 0.05) | number:'1.0-2'}}</h5>
           <p class="title">Hallmark fee</p>
         </div>
       </div>
