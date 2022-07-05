@@ -193,7 +193,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       ApplicantStatusEnum.OnBoarded,
       ApplicantStatusEnum.PreOfferCustom
     ];
-    if (readOnlyStatuses.includes(this.candidate.status)) {
+    if (readOnlyStatuses.includes(this.candidate.status) || this.isDeployedAndAgency) {
       this.isReadOnly = true;
     }
   }
