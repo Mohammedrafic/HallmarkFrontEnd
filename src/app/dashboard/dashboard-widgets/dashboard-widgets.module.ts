@@ -10,7 +10,9 @@ import { WidgetWrapperModule } from '../widgets/widget-wrapper/widget-wrapper.mo
 import { LineChartModule } from '../widgets/line-chart/line-chart.module';
 import { PositionChartModule } from '../widgets/position-chart/position-chart.module';
 import { TasksModule } from '../widgets/tasks/tasks.module';
+import { TrendChartModule } from '../widgets/trend-chart/trend-chart.module';
 import { ChatModule } from '../widgets/chat/chat.module';
+import { InvoicesChartModule } from '../widgets/invoices-chart/invoices-chart.module';
 
 @NgModule({
   declarations: [DashboardWidgetsComponent],
@@ -24,7 +26,9 @@ import { ChatModule } from '../widgets/chat/chat.module';
     LineChartModule,
     PositionChartModule,
     TasksModule,
+    TrendChartModule,
     ChatModule,
+    InvoicesChartModule
   ]
 })
 export class DashboardWidgetsModule { }

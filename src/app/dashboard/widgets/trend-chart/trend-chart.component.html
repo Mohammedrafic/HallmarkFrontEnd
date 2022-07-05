@@ -1,0 +1,47 @@
+<div class="widget">
+  <div class="widget-data">
+    <div *ngIf="widget" class="widget-value">
+      <span class="widget-value-number">{{ widget.value }}</span>
+      <span class="widget-value-percent" [ngClass]="{ 'widget-data-grow': widget.percentRatio >= 0 }"
+        >{{ widget.percentRatio | number: '1.2-2' }} %</span
+      >
+      <span
+        *ngIf="widget.percentRatio"
+        class="e-icons e-arrow-right-up"
+        [ngClass]="{
+          'widget-data-grow': widget.percentRatio > 0,
+          'widget-data-down': widget.percentRatio < 0
+        }"
+      ></span>
+    </div>
+
+    <div class="widget-chart">
+      <div class="chart">
+        <ejs-chart
+          #sfComponent
+          [id]="widget?.id"
+          [chartArea]="chartArea"
+          [primaryXAxis]="primaryXAxis"
+          [primaryYAxis]="primaryYAxis"
+          style="height: inherit"
+        >
+          <e-series-collection>
+            <e-series
+              *ngIf="widget"
+              [dataSource]="widget.chartData"
+              [fill]="widget.percentRatio < 0 ? '#FF5858' : '#5AA658'"
+              type="Spline"
+              xName="x"
+              yName="y"
+            ></e-series>
+          </e-series-collection>
+        </ejs-chart>
+      </div>
+    </div>
+  </div>
+
+  <div class="widget-text">
+    <span>Filled Position Trend</span>
+    <span>Last 30 days</span>
+  </div>
+</div>

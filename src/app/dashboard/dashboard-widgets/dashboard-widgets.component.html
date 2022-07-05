@@ -61,10 +61,18 @@
             *ngSwitchCase="widgetTypeEnum.TASKS"
             [tasks]="widgetsData?.[widgetTypeEnum.TASKS]"
           ></app-tasks>
+          <app-trend-chart
+            *ngSwitchCase="widgetTypeEnum.FILLED_POSITIONS_TREND"
+            [widget]="widgetsData?.[widgetTypeEnum.FILLED_POSITIONS_TREND]"
+          ></app-trend-chart>
           <app-chat
             *ngSwitchCase="widgetTypeEnum.CHAT"
             [chatData]="widgetsData?.[widgetTypeEnum.CHAT]"
           ></app-chat>
+          <app-invoices-chart
+            *ngSwitchCase="widgetTypeEnum.INVOICES"
+            [chartData]="widgetsData?.[widgetTypeEnum.INVOICES]"
+            ></app-invoices-chart>
         </ng-template>
       </e-panel>
     </e-panels>

@@ -75,8 +75,7 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
     },
     { field: 'reason', headerName: 'Reason' },
     { field: 'badgeId', headerName: 'Badge ID' },
-    { field: 'jobId', headerName: 'Job ID' },
-    { field: 'ltaOrderNumber', headerName: 'Lta Order No' },
+    { field: 'formattedId', headerName: 'Job ID' },
     { field: 'jobTitle', headerName: 'Job Title' },
     {
       field: 'orderStartDate',
@@ -102,6 +101,56 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
     { field: 'jobStatus', headerName: 'Job Status' },
     { field: 'reasonCode', headerName: 'Reason Code' },
     { field: 'jobClassificationText', headerName: 'Job Classification' },
+
+    {
+      field: 'distributionDate',
+      headerName: 'Distribution Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
+    {
+      field: 'appliedDate',
+      headerName: 'Applied Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
+    {
+      field: 'distributionToAppliedDays',
+      headerName: '#Days Job Dist. to Cand. Appl.'
+    },
+    {
+      field: 'shortlistedDate',
+      headerName: 'Shortlisted Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
+    {
+      field: 'appliedToShortlistdDays',
+      headerName: '#Days Cand Appl to Shortlisted'
+    },
+    {
+      field: 'offeredDate',
+      headerName: 'Offered Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
+    {
+      field: 'appliedToOfferedDays',
+      headerName: '#Days Cand Appl to Offered Date'
+    },
+    {
+      field: 'shortlistedToOfferedDays',
+      headerName: '#Days Cand Shortlisted to Offered Date'
+    },
+    {
+      field: 'acceptedDate',
+      headerName: 'Accepted Date',
+      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
+    {
+      field: 'offeredToAcceptedDays',
+      headerName: '#Days Off. Date  to Accept. Date'
+    },
+    {
+      field: 'distributedToAcceptedDays',
+      headerName: '#Days order Dist. Date to Accepted Date'
+    },
     {
       field: 'actualStartDate',
       headerName: 'Actual Start Date',
@@ -113,14 +162,21 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
       valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
     },
     {
-      field: 'daysOrderStartToActualStartDate',
-      headerName: 'Days Order Start To Actual Start Date',
-      valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+      field: 'orderStartToActualStartDays',
+      headerName: '#Days Order Start to Actual Start Date'
     },
     {
       field: 'onboardDate',
       headerName: 'Onboard Date',
       valueFormatter: (params: ValueFormatterParams) => this.getFormattedDate(params.value),
+    },
+    {
+      field: 'acceptToOnboardDays',
+      headerName: '#Days Accept. Date to Onboard Date'
+    },
+    {
+      field: 'distributionToActualDays',
+      headerName: '#Days Order Dist. to Actual Start Date'
     },
   ];
 
@@ -169,7 +225,7 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
     },
     orderEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
     orderStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-    excludeFcAgency: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Allow Internal' },
+    excludeFcAgency: { type: ControlTypes.Checkbox, valueType: ValueType.Text, checkBoxTitle: 'Exclude Agency' },
   };
 
   private regions: OrganizationRegion[] = [];
@@ -221,8 +277,8 @@ class FillratesReportComponent extends BaseReportDirective<FillrateModel> implem
       orderTypes: [[]],
       regions: [[]],
       skills: [[]],
-      orderEndDate: [''],
-      orderStartDate: [''],
+      orderEndDate: [null],
+      orderStartDate: [null],
       excludeFcAgency: [false]
     });
   }

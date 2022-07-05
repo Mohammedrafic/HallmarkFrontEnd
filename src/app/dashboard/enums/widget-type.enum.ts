@@ -7,5 +7,7 @@ export enum WidgetTypeEnum {
   FILLED_POSITIONS = 'Filled_Positions',
   ACTIVE_POSITIONS = 'Active_Positions',
   TASKS = 'Tasks_widget',
-  CHAT = 'Chat_widget'
+  FILLED_POSITIONS_TREND = 'Filled_Positions_Trend',
+  CHAT = 'Chat_widget',
+  INVOICES= 'Invoces_widget',
 }

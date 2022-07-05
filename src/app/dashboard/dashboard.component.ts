@@ -25,8 +25,8 @@ import type { WidgetsDataModel } from './models/widgets-data.model';
 
 @Component({
   selector: 'app-dashboard',
-  templateUrl: './dashboard.components.html',
-  styleUrls: ['dashboard.components.scss'],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['dashboard.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
