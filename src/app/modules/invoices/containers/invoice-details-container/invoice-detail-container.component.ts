@@ -29,6 +29,7 @@ import { TimesheetDetails } from '../../../timesheets/store/actions/timesheet-de
 import { ExportPayload } from '@shared/models/export.model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { InvoicesModel } from '../../store/invoices.model';
+import { INVOICES_STATUSES } from '../../enums/invoices.enum';
 
 interface ExportOption extends ItemModel {
   ext: string | null;
@@ -50,6 +51,7 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   @Input() currentSelectedRowIndex: number | null = null;
   @Input() maxRowIndex: number = 30;
 
+  @Output() updateTable: EventEmitter<void> = new EventEmitter<void>();
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
 
   @Select(InvoicesState.nextInvoiceId)
@@ -67,6 +69,10 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
     private store: Store,
   ) {
     super();
+  }
+
+  public get isApproveDisable(): boolean {
+    return this.invoiceData?.statusText === INVOICES_STATUSES.PENDING_PAYMENT;
   }
 
   ngOnInit(): void {
@@ -96,7 +102,19 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   }
 
   public handleApprove(): void {
-
+    this.invoiceData.statusText = INVOICES_STATUSES.PENDING_PAYMENT;
+    localStorage.setItem('selected_invoice_row', JSON.stringify(this.invoiceData));
+    this.chipList.cssClass = this.chipPipe.transform(this.invoiceData.statusText);
+    const oldInvoices = JSON.parse(`${ localStorage.getItem('invoices') }`);
+    const newInvoices = Object.assign({}, oldInvoices, {
+      items: oldInvoices.items.map((el: any) => ({
+        ...el,
+        ...(el.id === this.invoiceData.id && { statusText: INVOICES_STATUSES.PENDING_PAYMENT }),
+      })),
+    });
+    localStorage.setItem('invoices', JSON.stringify(newInvoices));
+    this.updateTable.emit();
+    this.cdr.detectChanges();
   }
 
   public onNextPreviousOrder(next: boolean): void {

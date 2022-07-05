@@ -27,6 +27,7 @@
         <div class="header-controls">
           <button
             ejs-button
+            [disabled]="isApproveDisable"
             cssClass="e-primary"
             (click)="handleApprove()">
             Approve

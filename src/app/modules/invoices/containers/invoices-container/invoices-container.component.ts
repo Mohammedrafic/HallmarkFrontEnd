@@ -1,23 +1,23 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
-import { ActivatedRoute, Params, Router } from "@angular/router";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 
-import { Store } from "@ngxs/store";
-import { Observable, of, takeUntil } from "rxjs";
-import { map, tap } from "rxjs/operators";
+import { Store } from '@ngxs/store';
+import { Observable, of, takeUntil } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
-import { PageOfCollections } from "@shared/models/page.model";
-import { TabsListConfig } from "@shared/components/tabs-list/tabs-list-config.model";
-import { Destroyable } from "@core/helpers";
+import { PageOfCollections } from '@shared/models/page.model';
+import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
+import { Destroyable } from '@core/helpers';
 
-import { SetHeaderState, ShowFilterDialog } from "../../../../store/app.actions";
+import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
 import { Invoice, InvoicePage, InvoiceRecord, InvoicesTableConfig, PagingQueryParams } from '../../interfaces';
-import { Invoices } from "../../store/actions/invoices.actions";
-import { ProfileTimeSheetDetail, TimesheetDetails } from "../../../timesheets/store/model/timesheets.model";
+import { Invoices } from '../../store/actions/invoices.actions';
+import { ProfileTimeSheetDetail } from '../../../timesheets/store/model/timesheets.model';
 import { DEFAULT_ALL_INVOICES, INVOICES_TAB_CONFIG } from '../../constants/invoices.constant';
-import { ItemModel } from "@syncfusion/ej2-angular-navigations";
-import { DialogComponent } from "@syncfusion/ej2-angular-popups";
-import { InvoiceRecordsTableComponent } from "../../components/invoice-records-table/invoice-records-table.component";
+import { ItemModel } from '@syncfusion/ej2-angular-navigations';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { InvoiceRecordsTableComponent } from '../../components/invoice-records-table/invoice-records-table.component';
 import { INVOICES_STATUSES } from '../../enums/invoices.enum';
 import { DialogAction } from '../../../timesheets/enums';
 import { InvoicesService } from '../../services/invoices.service';
@@ -160,25 +160,7 @@ export class InvoicesContainerComponent extends Destroyable {
 
   public handleChangeTab(tabIdx: number): void {
     this.selectedTabIdx = tabIdx;
-    switch (tabIdx) {
-      case 0: {
-        console.log(0);
-        break;
-      }
-      case 1: {
-        this.allInvoices = JSON.parse(`${localStorage.getItem('invoices')}`) || DEFAULT_ALL_INVOICES;
-
-        break;
-      }
-      case 2: {
-        console.log(2);
-        break;
-      }
-      case 3: {
-        console.log(2);
-        break;
-      }
-    }
+    this.getInvoicesByTab();
   }
 
   private onPageChange(page: number): void {
@@ -297,6 +279,48 @@ export class InvoicesContainerComponent extends Destroyable {
     this.cdr.markForCheck();
   }
 
+  public handleUpdateTable(): void {
+    this.getInvoicesByTab();
+  }
+
+  private getInvoicesByTab(): void {
+    const invoices = JSON.parse(`${localStorage.getItem('invoices')}`) || DEFAULT_ALL_INVOICES;
+
+    switch (this.selectedTabIdx) {
+      case 0: {
+        console.log(0);
+        break;
+      }
+      case 1: {
+        this.allInvoices = invoices;
+
+        break;
+      }
+      case 2: {
+        this.allInvoices = this.filterByStatus(invoices, INVOICES_STATUSES.SUBMITED_PEND_APPR);
+
+        break;
+      }
+      case 3: {
+        this.allInvoices = this.filterByStatus(invoices, INVOICES_STATUSES.PENDING_PAYMENT);
+
+        break;
+      }
+      case 4: {
+        this.allInvoices = this.filterByStatus(invoices, INVOICES_STATUSES.PAID);
+
+        break;
+      }
+    }
+  }
+
+  private filterByStatus(invoicePage: InvoicePage, status: INVOICES_STATUSES): InvoicePage {
+    return {
+      ...invoicePage,
+      items: invoicePage.items.filter(el => el.statusText === status),
+    };
+  }
+
   private restoreInvoiceRecords(data: TimesheetData[]): InvoiceRecord[] {
     return data.map(({
                        orgName,
@@ -339,7 +363,6 @@ export class InvoicesContainerComponent extends Destroyable {
       } as InvoiceRecord;
     })
   }
-
 }
 
 type GroupInvoicesBy = keyof Pick<InvoiceRecord, 'location' | 'department'>;
