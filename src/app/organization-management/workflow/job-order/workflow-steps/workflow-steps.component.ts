@@ -62,7 +62,7 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.workflowSteps$.pipe(filter(Boolean),takeUntil(this.unsubscribe$)).subscribe((steps: Step[]) => {
       this.setStepNameAndStatus(this.workflow);
-      this.initialSteps = steps.slice(); // make a copy of steps to use them in case update will fail
+      this.initialSteps = steps.map(s => s); // make a copy of steps to use them in case update will fail
       this.steps = steps;
 
       // remove steps that were added but not saved during workflows switching
@@ -86,6 +86,16 @@ export class WorkflowStepsComponent implements OnInit, OnDestroy {
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(RemoveWorkflowDeclined)).subscribe(() => {
       this.steps = this.initialSteps;
+      this.workflow.steps = this.initialSteps;
+      this.customStepName.clear();
+      this.customStepStatus.clear();
+
+      this.steps.forEach((item) => {
+        if (item.type === WorkflowStepType.Custom) {
+          this.customStepName.push(this.formBuilder.control(item.name, [Validators.required, Validators.maxLength(50)]));
+          this.customStepStatus.push(this.formBuilder.control(item.status, [Validators.required, Validators.maxLength(50)]));
+        }
+      });
     });
   }
 
