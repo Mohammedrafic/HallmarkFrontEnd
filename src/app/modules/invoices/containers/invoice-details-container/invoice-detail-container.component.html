@@ -53,25 +53,14 @@
           </section>
         </ng-container>
       </div>
-      <div class="timesheet-navigation">
-        <div
-          [class.disabled]="currentSelectedRowIndex === 0"
-          (click)="onNextPreviousOrder(false)"
-          class="prev">
-          <i-feather name="arrow-left" class="icon"></i-feather>
-          Previous Order
-        </div>
-
-        <div class="spacer"></div>
-
-        <div
-          [class.disabled]="isNextDisabled"
-          (click)="onNextPreviousOrder(true)"
-          class="next">
-          Next Order
-          <i-feather name="arrow-right" class="icon"></i-feather>
-        </div>
-      </div>
+      <app-navigation-panel
+              prevLabel="Previous Order"
+              nextLabel="Next Order"
+              [prevDisabled]="(prevId$ | async) === null"
+              [nextDisabled]="(nextId$ | async) === null"
+              (prevClick)="onNextPreviousOrder(false)"
+              (nextClick)="onNextPreviousOrder(true)"
+      ></app-navigation-panel>
     </section>
   </ng-template>
 </ejs-dialog>

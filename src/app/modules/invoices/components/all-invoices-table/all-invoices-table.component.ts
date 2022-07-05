@@ -44,4 +44,8 @@ export class AllInvoicesTableComponent extends InvoicesTable<Invoice> {
   public handleRowSelected(event: any): void {
     this.rowSelectedData.emit(event);
   }
+
+  public selectRow(index: number): void {
+    this.grid.selectRow(index);
+  }
 }

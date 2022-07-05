@@ -28,6 +28,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { TimesheetDetails } from '../../../timesheets/store/actions/timesheet-details.actions';
 import { ExportPayload } from '@shared/models/export.model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
+import { InvoicesModel } from '../../store/invoices.model';
 
 interface ExportOption extends ItemModel {
   ext: string | null;
@@ -50,6 +51,12 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   @Input() maxRowIndex: number = 30;
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
+
+  @Select(InvoicesState.nextInvoiceId)
+  public nextId$: Observable<string>;
+
+  @Select(InvoicesState.prevInvoiceId)
+  public prevId$: Observable<string>;
 
   public invoiceData: Invoice;
   public isNextDisabled = false;

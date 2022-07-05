@@ -27,12 +27,13 @@
   <ng-container [ngSwitch]="selectedTabIdx">
     <ng-container *ngSwitchCase="1">
       <app-all-invoices-table
+        #allInvoicesTable
         [tableData]="allInvoices"
         (rowSelectedData)="handleRowSelected($event)">
       </app-all-invoices-table>
     </ng-container>
     <ng-container *ngSwitchDefault>
-      <app-invoice-records-table [tableData]="invoicesData$ | async"
+      <app-invoice-records-table [tableData]="invoiceRecordsData$ | async"
                                  [config]="tableConfig"
                                  #invoiceRecordsTable
       ></app-invoice-records-table>
