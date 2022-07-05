@@ -6,7 +6,7 @@
         >{{ widget.percentRatio | number: '1.2-2' }} %</span
       >
       <span
-        *ngIf="widget"
+        *ngIf="widget.percentRatio"
         class="e-icons e-arrow-right-up"
         [ngClass]="{
           'widget-data-grow': widget.percentRatio > 0,
