@@ -277,20 +277,16 @@ export class DashboardService {
         const [previousValue, currentValue] = data.values.slice(-2);
         const coefficient = previousValue === 0 ? 1 : previousValue;
 
-        // this calculation is just for the demo
-        // percentRation : ((currentValue - previousValue) / coefficient) * 100 || 0;
-        // the final formula will be provided by the client
-
         return {
           id: WidgetTypeEnum.FILLED_POSITIONS_TREND,
-          percentRatio: ((currentValue - previousValue) / coefficient) * 100 || 0,
+          percentRatio: ((currentValue - previousValue) / coefficient) * 100,
           value: currentValue,
           chartData: data.values.map((item: number, index: number) => ({ x: index, y: item })),
         };
       })
     );
   }
-  
+
   private getInvocesWidgetData(filters: DashboardFiltersModel): Observable<any> {
     return of('temporary-widget-invoices');
   }
