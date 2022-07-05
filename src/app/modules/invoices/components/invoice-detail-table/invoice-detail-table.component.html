@@ -16,7 +16,7 @@
           <p class="title">Amount</p>
         </div>
         <div *ngIf="isAgency" class="info-item">
-          <h5 class="value">${{ (invoice.amount * 0.05) | number:'1.0-2'}}</h5>
+          <h5 class="value">${{ (isAgency ? (invoice.amount * 0.05) : invoice.amount )  | number:'1.0-2' }}</h5>
           <p class="title">Hallmark fee</p>
         </div>
       </div>

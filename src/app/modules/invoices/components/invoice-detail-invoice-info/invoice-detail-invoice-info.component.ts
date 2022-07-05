@@ -27,7 +27,13 @@ export class InvoiceDetailInvoiceInfoComponent implements OnChanges {
 
   public items: InvoiceInfoUIItem[] = [];
 
-  constructor(private datePipe: DatePipe) {
+  private isAgency: boolean;
+
+  constructor(
+    private datePipe: DatePipe,
+    private router: Router,
+    ) {
+    this.isAgency = this.router.url.includes('agency');
   }
 
   ngOnChanges(): void {
@@ -60,7 +66,7 @@ export class InvoiceDetailInvoiceInfoComponent implements OnChanges {
       {
         title: 'Invoice Amount',
         icon: '',
-        value: `$${Number((data.amount * 1.05).toFixed(2))}`,
+        value: `$${this.isAgency ? Number((data.amount * 1.05).toFixed(2)) : data.amount}`,
         isAmount: true,
       },
       {
