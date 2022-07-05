@@ -23,12 +23,13 @@ import { DialogAction } from '../../../timesheets/enums';
 import { InvoicesService } from '../../services/invoices.service';
 import { AllInvoicesTableComponent } from '../../components/all-invoices-table/all-invoices-table.component';
 
-const defaultPagingData: Omit<PageOfCollections<unknown>, 'items'> = {
+const defaultPagingData: PageOfCollections<unknown> = {
   totalPages: 1,
   pageNumber: 1,
   hasPreviousPage: false,
   hasNextPage: false,
   totalCount: 1,
+  items: [],
 };
 
 @Component({
@@ -116,14 +117,7 @@ export class InvoicesContainerComponent extends Destroyable {
       map((v: PageOfCollections<TimesheetData>) => {
         const existingRecords: PageOfCollections<InvoiceRecord> = localStorage.getItem('invoice-records') ? JSON.parse(
           localStorage.getItem('invoice-records') as string
-        ) : {
-          items: [],
-          pageNumber: 1,
-          totalPages: 1,
-          totalCount: 1,
-          hasPreviousPage: false,
-          hasNextPage: false,
-        };
+        ) : defaultPagingData;
 
         return {
           ...v,
@@ -140,12 +134,7 @@ export class InvoicesContainerComponent extends Destroyable {
           totalCount: recordsData.items.length,
         } as PageOfCollections<InvoiceRecord>));
 
-        localStorage.setItem('APPROVED_TIMESHEETS', JSON.stringify(
-            {
-              ...defaultPagingData,
-              items: [],
-            } as PageOfCollections<unknown>
-          )
+        localStorage.setItem('APPROVED_TIMESHEETS', JSON.stringify(defaultPagingData)
         );
       }),
     );
@@ -235,15 +224,14 @@ export class InvoicesContainerComponent extends Destroyable {
       items: filteredInvoiceRecords,
     });
 
-    const existingInvoices: PageOfCollections<Invoice> = JSON.parse(
+    const existingInvoices: PageOfCollections<Invoice> | null = localStorage.getItem('invoices') ? JSON.parse(
       localStorage.getItem('invoices') as string
-    );
+    ) : null;
 
     const storeData: PageOfCollections<Invoice> = {
       ...defaultPagingData,
       items: [...groupedInvoices, ...(existingInvoices?.items || [])],
     };
-
 
     localStorage.setItem('invoices', JSON.stringify(storeData));
     localStorage.setItem('pending-invoices', JSON.stringify(storeData));
@@ -251,6 +239,11 @@ export class InvoicesContainerComponent extends Destroyable {
       ...defaultPagingData,
       items: filteredInvoiceRecords,
     } as PageOfCollections<InvoiceRecord>));
+
+    this.invoiceRecords = {
+      ...defaultPagingData,
+      items: filteredInvoiceRecords,
+    };
 
     this.createInvoiceDialog?.hide();
   }

@@ -1,7 +1,7 @@
 <ejs-dialog
   id="dialog"
   #sideDialog
-  cssClass="dialog"
+  cssClass="dialog invoice-details-container-dialog"
   [width]="'1180px'"
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
@@ -54,6 +54,7 @@
           </section>
         </ng-container>
       </div>
+    </section>
       <app-navigation-panel
               prevLabel="Previous Order"
               nextLabel="Next Order"
@@ -62,6 +63,5 @@
               (prevClick)="onNextPreviousOrder(false)"
               (nextClick)="onNextPreviousOrder(true)"
       ></app-navigation-panel>
-    </section>
   </ng-template>
 </ejs-dialog>
