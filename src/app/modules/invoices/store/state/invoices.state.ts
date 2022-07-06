@@ -29,10 +29,10 @@ export class InvoicesState {
     return state?.invoicesData ?? null;
   }
 
-  @Selector([InvoicesState])
-  static isInvoiceDetailDialogOpen(state: InvoicesModel): DialogActionPayload {
-    return { dialogState: state.isInvoiceDetailDialogOpen, rowId: state.selectedInvoiceId };
-  }
+  // @Selector([InvoicesState])
+  // static isInvoiceDetailDialogOpen(state: InvoicesModel): DialogActionPayload {
+  //   return { dialogState: state.isInvoiceDetailDialogOpen, rowId: state.selectedInvoiceId };
+  // }
 
   @Selector([InvoicesState])
   static nextInvoiceId(state: InvoicesModel): string | null {

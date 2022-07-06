@@ -32,7 +32,7 @@ interface JobInfoUIItem {
 export class ProfileDetailsJobInfoComponent implements OnChanges {
   public items: JobInfoUIItem[] = [];
 
-  @Input() jobData;
+  @Input() jobData: any;
 
   isAgency: boolean;
 
@@ -43,20 +43,6 @@ export class ProfileDetailsJobInfoComponent implements OnChanges {
     private datePipe: DatePipe,
     private router: Router,
   ) {
-    let data;
-    if (localStorage.getItem('profile')) {
-      data = JSON.parse(localStorage.getItem('profile') as string);
-      this.jobData = {
-        jobTitle: data.jobTitle,
-        location: data.location,
-        department: data.department,
-        skill: data.skill,
-        startDate: data.startDate,
-        endDate: data.endDate,
-        agency: 'AB Staffing',
-      };
-    }
-
     this.isAgency = this.router.url.includes('agency');
   }
 

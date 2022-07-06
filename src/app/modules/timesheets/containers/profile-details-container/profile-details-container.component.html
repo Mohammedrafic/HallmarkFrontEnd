@@ -34,17 +34,17 @@
       ></span>
 
         <div class="flex flex-column">
-          <h3 class="username">{{ profileData?.firstName }}, {{profileData?.lastName}}</h3>
-          <!-- <ejs-chiplist #chipList class="events-off">
+          <h3 class="username">{{ candidateInfo?.firstName }}, {{candidateInfo?.lastName}}</h3>
+          <ejs-chiplist #chipList class="events-off">
             <e-chips>
               <e-chip
-                *ngIf="profileData"
-                [text]="profileData?.status"
-                [cssClass]="profileData?.status | chipsCssClass">
+                *ngIf="candidateInfo"
+                [text]="candidateInfo?.timesheetStatus"
+                [cssClass]="candidateInfo?.timesheetStatus || '' | chipsCssClass">
               </e-chip>
-              <e-chip [text]="onboardedStatus" [cssClass]="onboardedStatus | chipsCssClass"></e-chip>
+              <e-chip [text]="candidateInfo?.status" [cssClass]="candidateInfo?.status || '' | chipsCssClass"></e-chip>
             </e-chips>
-          </ejs-chiplist> -->
+          </ejs-chiplist>
         </div>
 
         <div class="spacer"></div>
@@ -100,7 +100,7 @@
       </div>
 
       <div class="order-header">
-        <h2 class="order-id">Order ID {{ profileData?.orderId}}</h2>
+        <h2 class="order-id">Order ID {{ candidateInfo?.orderId}}</h2>
 
         <div class="controls-block">
           <div class="checkbox-block">
@@ -124,7 +124,7 @@
 
       <div class="job-general-info tile-dark-blue">
         <app-profile-details-job-info
-        [jobData]="profileData"></app-profile-details-job-info>
+        [jobData]="candidateInfo"></app-profile-details-job-info>
       </div>
 
       <div class="profile-hours-statistics">
@@ -148,7 +148,7 @@
         <app-profile-timesheet-table
           *ngIf="candidateTimesheets$ | async as candidateTimesheets"
           [candidateTimesheets]="candidateTimesheets"
-          [tempProfile]="profileData"
+          [tempProfile]="candidateInfo"
           (openAddSideDialog)="handleOpenSideDialog()"
           (updateTable)="handleUpdateTable()"
           (deleteTableItemId)="handleDeleteItem($event)"

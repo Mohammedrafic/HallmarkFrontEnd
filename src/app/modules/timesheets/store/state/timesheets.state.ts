@@ -16,7 +16,7 @@ import { DialogAction } from '../../enums';
 import { DefaultTimesheetState } from './../../constants/timesheet-default-state.constant';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';
-import { CandidateTimesheet, TimesheetsFilterState, TimesheetUploadedFile } from '../../interface';
+import { CandidateInfo, CandidateTimesheet, TimesheetsFilterState, TimesheetUploadedFile } from '../../interface';
 import { DialogActionPayload } from '../../interface';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
 
@@ -54,7 +54,7 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static candidateInfo(state: TimesheetsModel): unknown | null {
+  static candidateInfo(state: TimesheetsModel): CandidateInfo | null {
     return state.candidateInfo;
   }
 

@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { Invoice } from "../../interface";
 
-
+import { Invoice } from '@core/interface';
 
 @Component({
   selector: 'app-profile-invoices',
   templateUrl: './profile-invoices.component.html',
   styleUrls: ['./profile-invoices.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileInvoicesComponent {
   @Input()

@@ -1,11 +1,11 @@
+import { ChartPointRenderEvent } from './../../interface/candidate-chart.interface';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { profileDetailsHoursChartColorsMap } from "../../constants/timesheets.constant";
 import { HourOccupationType } from "../../enums/hour-occupation-type.enum";
 import { profileDetailsHoursChartSettings } from "../../constants/profile-details-hours-chart-settings.constant";
 import { CheckBoxChangeEventArgs } from "@syncfusion/ej2-angular-grids";
 import { mockedHoursChartData, ProfileHoursChartData } from "../../constants/mocked-hours-charts-data.constant";
-import { DonutChartData } from "../../interface/donut-chart-data.interface";
-import { ChartPointRenderEvent } from "../../interface/chart-point-render-event.interface";
+import { DonutChartData } from '../../interface/candidate-chart.interface';
 
 @Component({
   selector: 'app-profile-cumulative-hours',

@@ -22,7 +22,7 @@ import { GlobalWindow } from '@core/tokens';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import { CandidateTimesheet, DialogActionPayload } from '../../interface';
+import { CandidateInfo, CandidateTimesheet, DialogActionPayload } from '../../interface';
 import { DialogAction, SubmitBtnText } from '../../enums';
 
 
@@ -65,13 +65,16 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public submitText: string;
 
-  public profileData: any;
+  public candidateInfo: CandidateInfo;
 
   @Select(TimesheetsState.candidateTimesheets)
   public candidateTimesheets$: Observable<CandidateTimesheet[]>;
 
   @Select(TimesheetsState.isTimesheetOpen)
   public isTimesheetOpen$: Observable<DialogActionPayload>;
+
+  @Select(TimesheetsState.candidateInfo)
+  public candidateInfo$: Observable<CandidateInfo>;
 
   constructor(
     private store: Store,
@@ -88,6 +91,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public ngOnInit(): void {
     this.getProfileTimesheets();
     this.getDialogState();
+    this.getCandidateInfo();
   }
 
   public onNextPreviousOrder(next: boolean): void {
@@ -139,5 +143,15 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       takeUntil(this.componentDestroy())
       )
     .subscribe((payload) => {});
+  }
+
+  private getCandidateInfo(): void {
+    this.candidateInfo$
+    .pipe(
+      takeUntil(this.componentDestroy())
+    )
+    .subscribe((data) => {
+      this.candidateInfo = data;
+    });
   }
 }

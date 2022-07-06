@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { ProfileUploadedFile } from "../../interface";
+import { TimesheetUploadedFile } from "../../interface";
 import { Store } from "@ngxs/store";
 import { TimesheetDetails } from "../../store/actions/timesheet-details.actions";
 
@@ -11,14 +11,12 @@ import { TimesheetDetails } from "../../store/actions/timesheet-details.actions"
 })
 export class ProfileUploadsComponent {
   @Input()
-  public uploads: ProfileUploadedFile[] = [];
+  public uploads: TimesheetUploadedFile[] = [];
 
   public constructor(
     private readonly store: Store,
   ) {
   }
 
-  public removeInvoice(item: ProfileUploadedFile): void {
-    this.store.dispatch(new TimesheetDetails.RemoveFile(item));
-  }
+  public removeInvoice(item: TimesheetUploadedFile): void {}
 }

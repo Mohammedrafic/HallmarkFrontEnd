@@ -29,3 +29,18 @@ export interface TimesheetUploadedFile {
   name: string;
   type: string;
 }
+
+export interface CandidateInfo {
+  orderId: string;
+  status: string;
+  timesheetStatus: string;
+  firstName: string;
+  lastName: string;
+  jobTitle: string;
+  location: string;
+  department: string;
+  skill: string;
+  startdate: Date;
+  enddate: Date;
+  unitName: string;
+}
