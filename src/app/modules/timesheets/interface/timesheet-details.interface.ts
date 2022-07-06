@@ -1,4 +1,5 @@
-import { TableColumnAlign } from "../enums/timesheet-common.enum";
+import { DialogAction } from '../enums';
+import { TableColumnAlign } from '../enums/timesheet-common.enum';
 
 export interface DetailsColumnConfig {
   align: TableColumnAlign;
@@ -21,5 +22,10 @@ export interface DetailsTableConfig {
 
 export interface DialogActionPayload {
   dialogState: boolean;
-  rowId: number | null;
+  id:  number;
+}
+
+export interface TimesheetUploadedFile {
+  name: string;
+  type: string;
 }

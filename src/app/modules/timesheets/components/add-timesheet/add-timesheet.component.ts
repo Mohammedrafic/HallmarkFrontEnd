@@ -31,8 +31,6 @@ import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import { ProfileTimeSheetActionType } from '../../enums';
-import { ProfileTimeSheetDetail } from '../../store/model/timesheets.model';
 import { EditTimesheetService } from '../../services/edit-timesheet.service';
 import { EditTimsheetForm } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
@@ -50,9 +48,6 @@ export class AddTimesheetComponent extends Destroyable implements OnInit, OnChan
   @ViewChild('sideEditDialog') protected sideEditDialog: DialogComponent;
 
   @Input() profileId: number;
-
-  @Select(TimesheetsState.timeSheetEditDialogOpen)
-  readonly editDialogType$: Observable<{ dialogType: ProfileTimeSheetActionType, timesheet: ProfileTimeSheetDetail}>;
 
   @Output() updateTable: EventEmitter<void> = new EventEmitter<void>();
 
@@ -159,23 +154,6 @@ export class AddTimesheetComponent extends Destroyable implements OnInit, OnChan
   }
 
   private getDialogState(): void {
-    this.editDialogType$
-    .pipe(
-      filter(() => !!this.sideEditDialog),
-      tap((event) => {
-        if (!event) {
-          this.sideEditDialog.hide();
-        }
-      }),
-      filter((event) => !!event),
-      takeUntil(this.componentDestroy())
-      )
-    .subscribe((event: { dialogType: ProfileTimeSheetActionType, timesheet: ProfileTimeSheetDetail}) => {
-      this.resetForm();
-      this.sideEditDialog.show();
-
-      this.cd.markForCheck();
-    })
   }
 
   private createForm(): void {

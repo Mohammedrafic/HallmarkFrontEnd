@@ -41,7 +41,6 @@ import { ProfileInvoicesComponent } from './components/profile-invoices/profile-
 import { TimesheetsService } from './services/timesheets.service';
 import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
 import { TimesheetDetailsService } from "./services/timesheet-details.service";
-import { DemoService } from './services/demo.service';
 import { ProfileTimesheetService } from './services/profile-timesheet.service';
 
 const gridIcons = {
@@ -127,7 +126,6 @@ const gridIcons = {
     ProfileTimesheetService,
     CapitalizeFirstPipe,
     TimesheetDetailsService,
-    DemoService,
     ChipsCssClass,
   ]
 })

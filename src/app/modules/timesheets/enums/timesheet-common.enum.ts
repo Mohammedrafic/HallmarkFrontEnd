@@ -3,3 +3,8 @@ export enum TableColumnAlign {
   Left = 'Left',
   Center = 'Center',
 }
+
+export enum SubmitBtnText {
+  Submit = 'submit',
+  Approve = 'approve',
+}

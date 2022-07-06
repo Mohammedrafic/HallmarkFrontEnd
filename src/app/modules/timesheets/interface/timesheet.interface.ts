@@ -1,7 +1,7 @@
 import { TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../enums/timesheets.enum';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
-export interface ITimesheet {
+export interface Timesheet {
   id: number;
   name: string;
   statusText: TIMETHEETS_STATUSES;
@@ -15,7 +15,7 @@ export interface ITimesheet {
   status?: TIMETHEETS_STATUSES
 }
 
-export interface ITimesheetsFilter {
+export interface TimesheetsFilterState {
   orderBy?: string;
   pageNumber: number;
   pageSize: number;
@@ -25,9 +25,7 @@ export interface ITimesheetsFilter {
   status?: string[];
   skill?: string[];
   department?: string[];
-  billRate?: number;
   agencyName?: string[];
-  totalHours?: number;
 }
 
 export type ITimesheetsColumnWidth = {

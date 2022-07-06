@@ -1,4 +1,5 @@
-import { ProfileDetailsHoursChartSettings } from "../interface/profile-details-hours-chart-settings.interface";
+import { ProfileDetailsHoursChartSettings } from './../interface/candidate-chart.interface';
+
 
 export const profileDetailsHoursChartSettings: ProfileDetailsHoursChartSettings = {
   yAxis: {

@@ -1,11 +1,11 @@
 import { TIMESHEETS_ACTIONS, DialogAction } from '../../enums';
-import { ITimesheetsFilter } from '../../interface';
+import { TimesheetsFilterState } from '../../interface';
 
 export namespace Timesheets {
   export class GetAll {
     static readonly type = TIMESHEETS_ACTIONS.GET_TIMESHEETS;
 
-    constructor(public readonly payload: ITimesheetsFilter, public readonly isAgency: boolean) {
+    constructor(public readonly payload: TimesheetsFilterState, public readonly isAgency: boolean) {
     }
   }
 

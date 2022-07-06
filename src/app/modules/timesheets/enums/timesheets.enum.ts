@@ -17,10 +17,6 @@ export enum TIMETHEETS_STATUSES {
   REJECTED = 'rejected',
 }
 
-export enum ProfileTimeSheetActionType {
-  Add = 'add',
-}
-
 export enum ExportType {
   Excel_file = 'Excel File',
   CSV_file = 'CSV File',

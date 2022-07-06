@@ -4,9 +4,8 @@ import {
   ChangeDetectorRef,
   Component,
   EventEmitter,
-  Input, OnChanges, OnInit,
+  Input, OnChanges,
   Output,
-  SimpleChanges,
   ViewChild
 } from '@angular/core';
 
@@ -18,7 +17,7 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { MoreMenuType, TIMETHEETS_STATUSES } from '../../enums';
-import { ITimesheet, ITimesheetsColumnWidth } from '../../interface';
+import { ITimesheetsColumnWidth, Timesheet } from '../../interface';
 import {
   moreMenuWithClose,
   moreMenuWithDelete,
@@ -76,7 +75,7 @@ export class TimesheetsTableComponent extends AbstractGridConfigurationComponent
   public TIMESHEETS_STATUSES = TIMETHEETS_STATUSES;
   isAgency: boolean;
 
-  filtredItems: ITimesheet[] = []
+  filtredItems: Timesheet[] = []
 
   constructor(
     private router: Router,
@@ -118,7 +117,7 @@ export class TimesheetsTableComponent extends AbstractGridConfigurationComponent
     this.rowHeight = ROW_HEIGHT.SCALE_DOWN_HEIGHT;
   }
 
-  public menuOptionSelected(event: any, data: ITimesheet): void {
+  public menuOptionSelected(event: any, data: Timesheet): void {
     switch (event.item.properties.text) {
       case MoreMenuType.Edit: {
         break;

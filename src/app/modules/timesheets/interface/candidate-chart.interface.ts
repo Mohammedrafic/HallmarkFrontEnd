@@ -18,3 +18,16 @@ export interface ProfileDetailsHoursChartSettings {
   barChart: ChartSizeSettings;
   background: string;
 }
+
+export interface ChartPointRenderEvent<T = string> {
+  point: {
+    x: T,
+    y: number;
+  };
+  fill: string;
+}
+
+export interface DonutChartData<T = string> {
+  x: T;
+  y: number;
+}

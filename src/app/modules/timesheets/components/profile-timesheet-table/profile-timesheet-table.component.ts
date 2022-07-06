@@ -13,17 +13,18 @@ import { FormGroup } from '@angular/forms';
 
 import { of, combineLatest, Subscription, filter, takeUntil, Observable } from 'rxjs';
 import { Store } from '@ngxs/store';
-
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { ProfileTimeSheetDetail } from '../../store/model/timesheets.model';
+import { TakeUntilDestroy } from '@core/decorators';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+
 import { ProfileTimesheetTableConfig } from '../../constants';
 import { Timesheets } from '../../store/actions/timesheets.actions';
-import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import { ConfirmService } from '@shared/services/confirm.service';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
-import { TakeUntilDestroy } from '@core/decorators';
+import { CandidateTimesheet } from '../../interface';
+
 
 @TakeUntilDestroy
 @Component({
@@ -36,15 +37,19 @@ import { TakeUntilDestroy } from '@core/decorators';
 export class ProfileTimesheetTableComponent extends AbstractGridConfigurationComponent implements OnDestroy, OnChanges {
   protected componentDestroy: () => Observable<unknown>;
 
-  @ViewChild('profileTable') readonly profileTable: GridComponent;
+  @ViewChild('profileTable')
+  public readonly profileTable: GridComponent;
 
-  @Input() timeSheetsProfile: ProfileTimeSheetDetail[];
+  @Input() candidateTimesheets: CandidateTimesheet[];
 
   @Input() tempProfile: any;
 
   @Output() openAddSideDialog: EventEmitter<number> = new EventEmitter<number>();
+
   @Output() updateTable: EventEmitter<void> = new EventEmitter<void>();
+
   @Output() deleteTableItemId: EventEmitter<{ profileId: number; tableItemId: number | any }>
+
     = new EventEmitter<{ profileId: number; tableItemId: number | any }>();
 
   public override readonly allowPaging = false;
@@ -156,7 +161,7 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
     return clonedDate;
   }
 
-  public deleteTimesheet(timesheet: ProfileTimeSheetDetail): void {
+  public deleteTimesheet(timesheet: CandidateTimesheet): void {
     this.deleteTableItemId.emit({ profileId: this.profileId, tableItemId: timesheet.id });
   }
 

@@ -1,7 +1,7 @@
 <ejs-dialog
   cssClass="dnw-dialog"
   #dnwDialog
-  [target]="profileDetailsDialogsTarget"
+  [target]="candidateDialogTarget"
   [width]="'350px'"
   [visible]="false"
 >
@@ -15,6 +15,7 @@
       </div>
     </div>
   </ng-template>
+
 </ejs-dialog>
 
 <ejs-dialog
@@ -34,7 +35,7 @@
 
         <div class="flex flex-column">
           <h3 class="username">{{ profileData?.firstName }}, {{profileData?.lastName}}</h3>
-          <ejs-chiplist #chipList class="events-off">
+          <!-- <ejs-chiplist #chipList class="events-off">
             <e-chips>
               <e-chip
                 *ngIf="profileData"
@@ -43,13 +44,13 @@
               </e-chip>
               <e-chip [text]="onboardedStatus" [cssClass]="onboardedStatus | chipsCssClass"></e-chip>
             </e-chips>
-          </ejs-chiplist>
+          </ejs-chiplist> -->
         </div>
 
         <div class="spacer"></div>
 
         <div class="header-controls">
-         <div style="display: flex; align-items: center" class="timesheet-details-upload-container" #uploadContainer>
+         <!-- <div style="display: flex; align-items: center" class="timesheet-details-upload-container" #uploadContainer>
            <ejs-datepicker
              [width]="200"
              id="inactiveDate"
@@ -90,9 +91,9 @@
                </div>
              </ng-template>
            </ejs-tooltip>
-         </div>
+         </div> -->
 
-          <app-export-button (optionSelected)="export($event)"></app-export-button>
+          <!-- <app-export-button (optionSelected)="export($event)"></app-export-button> -->
         </div>
 
         <i-feather name="x" class="icon close-button" (click)="handleProfileClose()"></i-feather>
@@ -103,7 +104,11 @@
 
         <div class="controls-block">
           <div class="checkbox-block">
-            <ejs-switch class="toggle" [checked]="false" (checkedChange)="onDWNCheckboxSelectedChange($event)"></ejs-switch>
+            <ejs-switch
+              class="toggle"
+              [checked]="false"
+              (checkedChange)="onDWNCheckboxSelectedChange()">
+            </ejs-switch>
             <span>DNW</span>
           </div>
 
@@ -126,45 +131,50 @@
         <div class="tile-dark-blue">
           <app-profile-cumulative-hours></app-profile-cumulative-hours>
         </div>
-        <ng-container *ngIf="uploadedFiles$ | async as uploads">
+        <!-- <ng-container *ngIf="uploadedFiles$ | async as uploads">
           <div class="tile-dark-blue profile-uploads" *ngIf="uploads.length">
             <app-profile-uploads *ngIf="!uploads"></app-profile-uploads>
           </div>
-        </ng-container>
+        </ng-container> -->
 
-       <ng-container *ngIf="invoices$ | async as invoices">
+       <!-- <ng-container *ngIf="invoices$ | async as invoices">
          <div class="tile-dark-blue profile-invoices" *ngIf="invoices.length">
            <app-profile-invoices [invoices]="invoices"></app-profile-invoices>
          </div>
-       </ng-container>
+       </ng-container> -->
       </div>
 
       <section class="profile-table-container">
         <app-profile-timesheet-table
-          *ngIf="timeSheetsProfile$ | async as timeSheetsProfile"
-          [timeSheetsProfile]="timeSheetsProfile"
+          *ngIf="candidateTimesheets$ | async as candidateTimesheets"
+          [candidateTimesheets]="candidateTimesheets"
           [tempProfile]="profileData"
-          (openAddSideDialog)="handleOpenSideDialog($event)"
+          (openAddSideDialog)="handleOpenSideDialog()"
           (updateTable)="handleUpdateTable()"
           (deleteTableItemId)="handleDeleteItem($event)"
         >
         </app-profile-timesheet-table>
       </section>
 
-      <app-navigation-panel prevLabel="Previous Timesheet"
-                            nextLabel="Next Timesheet"
-                            [prevDisabled]="currentSelectedRowIndex === 0"
-                            [nextDisabled]="isNextDisabled"
-                            (prevClick)="onNextPreviousOrder(false)"
-                            (nextClick)="onNextPreviousOrder(true)"
+      <app-navigation-panel
+        prevLabel="Previous Timesheet"
+        nextLabel="Next Timesheet"
+        [prevDisabled]="currentSelectedRowIndex === 0"
+        [nextDisabled]="isNextDisabled"
+        (prevClick)="onNextPreviousOrder(false)"
+        (nextClick)="onNextPreviousOrder(true)"
       ></app-navigation-panel>
+
     </section>
   </ng-template>
 </ejs-dialog>
 
 <app-timesheet-reject-reason-dialog
   [(visible)]="rejectReasonDialogVisible"
-  [container]="profileDetailsDialogsTarget"
-  (rejectReasonChange)="handleReject($event)"
+  [container]="candidateDialogTarget"
+  (rejectReasonChange)="handleReject()"
 ></app-timesheet-reject-reason-dialog>
-<app-add-timesheet [profileId]="profileId" (updateTable)="handleUpdateTable()"></app-add-timesheet>
+
+<app-add-timesheet
+  (updateTable)="handleUpdateTable()">
+</app-add-timesheet>

@@ -1,28 +1,25 @@
-import { ORG_ID_STORAGE_KEY, AGENCY_ID_STORAGE_KEY } from './../../../../shared/constants/local-storage-keys';
-import { BusinessUnitType } from './../../../../shared/enums/business-unit-type';
-import { map, switchMap } from 'rxjs/operators';
-import { ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import {
+  ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef,
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Select, Store } from '@ngxs/store';
 
-import { Observable, takeUntil, tap, throttleTime } from 'rxjs';
+import { Select, Store } from '@ngxs/store';
+import { Observable, takeUntil, throttleTime } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { BaseObservable, Destroyable } from '@core/helpers';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
-import { ITabConfigInterface } from '../../interface';
+import { TabConfig, TimesheetsFilterState } from '../../interface';
 import { exportOptions, TAB_ADMIN_TIMESHEETS } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { DialogAction, ExportType, TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../../enums';
-import { IFilterColumns, ITimesheetsFilter } from '../../interface';
+import { IFilterColumns } from '../../interface';
 import { TimesheetsService } from '../../services/timesheets.service';
 import { filterOptionFields } from '../../constants';
 import { Timesheets } from '../../store/actions/timesheets.actions';
-import { DemoService } from '../../services/demo.service';
 import { UserState } from 'src/app/store/user.state';
 import { User } from '@shared/models/user.model';
 import { Router } from '@angular/router';
@@ -40,13 +37,13 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   @Select(UserState.user)
   user$: Observable<User>;
 
-  public tabConfig: ITabConfigInterface[] = TAB_ADMIN_TIMESHEETS;
+  public tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
   public formGroup: FormGroup;
   public exportOptions: ItemModel[] = exportOptions;
   public filterOptionFields = filterOptionFields;
   public filterColumns: IFilterColumns;
   public filteredItems: FilteredItem[] = [];
-  public filters: ITimesheetsFilter;
+  public filters: TimesheetsFilterState;
   public currentSelectedTableRowIndex: Observable<number>
     = this.timesheetsService.getStream();
   public pageSize = 30;
@@ -59,7 +56,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     private store: Store,
     private filterService: FilterService,
     private timesheetsService: TimesheetsService,
-    private demoService: DemoService,
     private cd: ChangeDetectorRef,
     private router: Router,
   ) {
