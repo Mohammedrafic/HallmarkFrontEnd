@@ -33,8 +33,8 @@ import type { WidgetsDataModel } from './models/widgets-data.model';
 export class DashboardComponent extends DestroyableDirective implements OnInit, OnDestroy {
   @ViewChild(DashboardWidgetsComponent, { static: false }) dashboardWidgetsComponent: DashboardWidgetsComponent;
 
-  @ViewChild("widgetsTemplate", { read: TemplateRef }) widgetsContentRef: TemplateRef<DashboardWidgetsComponent>;
-  @ViewChild("outlet", { read: ViewContainerRef }) outletRef: ViewContainerRef;
+  @ViewChild('widgetsTemplate', { read: TemplateRef }) widgetsContentRef: TemplateRef<DashboardWidgetsComponent>;
+  @ViewChild('outlet', { read: ViewContainerRef }) outletRef: ViewContainerRef;
 
   @Select(DashboardState.dashboardPanels) public readonly panels$: Observable<DashboardStateModel['panels']>;
   @Select(DashboardState.selectedWidgets) public readonly selectedWidgets$: Observable<WidgetTypeEnum[]>;
@@ -124,11 +124,11 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   private rerednerDashboard(): void {
     /* due to an error in Syncfusion library, it is necessary to rerender dashboard
       after adding a new panel if panels were dragged before that */
-    if(this.panelsAreDragged) {
+    if (this.panelsAreDragged) {
       this.outletRef.clear();
       this.outletRef.createEmbeddedView(this.widgetsContentRef);
       this.panelsAreDragged = false;
-      }
+    }
   }
 
   private removeWidget(widget: WidgetOptionModel): void {

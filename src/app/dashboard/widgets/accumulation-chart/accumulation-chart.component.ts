@@ -59,7 +59,7 @@ export class AccumulationChartComponent
 
   public redirectToSourceContent(event: MouseEvent): void {
     if (this.mousePosition.x === event.screenX && this.mousePosition.y === event.screenY) {
-    this.dashboardService.redirectToUrl('client/order-management');
+      this.dashboardService.redirectToUrl('client/order-management');
     }
   }
 
