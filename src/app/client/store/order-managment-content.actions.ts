@@ -18,6 +18,11 @@ export class GetOrderById {
   constructor(public id: number, public organizationId: number, public options: DialogNextPreviousOption) {}
 }
 
+export class GetReOrders {
+  static readonly type = '[order management] Get ReOrders';
+  constructor(public payload: OrderManagementFilter | object) { }
+}
+
 export class GetAgencyOrderCandidatesList {
   static readonly type = '[order management] Get Order Candidates Page';
   constructor(

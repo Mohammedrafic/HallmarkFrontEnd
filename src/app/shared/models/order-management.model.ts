@@ -10,6 +10,7 @@ import { JobDistributionModel } from './job-distribution.model';
 import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
 
 export class OrderManagement {
+  // TODO: modification pending
   id: number;
   organizationId: number;
   status: number;
@@ -48,6 +49,7 @@ export class OrderManagementFilter {
 export type OrderManagementPage = PageOfCollections<OrderManagement>;
 
 export type AgencyOrderManagement = {
+  // TODO: modification pending
   orderId: number;
   statusText: string;
   status: OrderStatus;
@@ -306,6 +308,7 @@ export type ApplicantStatus = {
 };
 
 export class OrderFilter {
+  // TODO: modification pending
   orderBy?: string;
   pageNumber?: number;
   pageSize?: number;

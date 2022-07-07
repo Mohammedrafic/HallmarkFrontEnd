@@ -45,6 +45,14 @@ export class OrderManagementContentService {
   }
 
   /**
+   * Get the re-orders
+   @param payload filter with details we need to get
+   */
+  public getReOrders(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
+    return this.http.post<OrderManagementPage>(`/api/Orders/ReOrders`, payload); // TODO: modification pending after BE implementation
+  }
+
+  /**
    * Get the agency orders
    @param pageNumber
    @param pageSize

@@ -37,7 +37,6 @@
     [textWrapSettings]="wrapSettings"
     (rowSelected)="onRowClick($event)"
     (dataBound)="onDataBound()"
-    (actionBegin)="actionBegin($event)"
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
@@ -78,7 +77,7 @@
               <b>{{ data.id }}</b>
             </div>
           </ng-container>
-  
+
           <ng-template #withToggle>
             <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
               <b>{{ data.id }}</b

@@ -35,7 +35,8 @@ import {
   SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
-  GetHistoricalData
+  GetHistoricalData,
+  GetReOrders
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -273,6 +274,14 @@ export class OrderManagementContentState {
         return payload;
       })
     );
+  }
+
+  @Action(GetReOrders)
+  GetReOrders({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }: GetReOrders): Observable<OrderManagementPage> {
+    return this.orderManagementService.getReOrders(payload).pipe(tap((payload) => {
+      patchState({ ordersPage: payload });
+      return payload;
+    }));
   }
 
   @Action(GetAgencyOrderCandidatesList)
