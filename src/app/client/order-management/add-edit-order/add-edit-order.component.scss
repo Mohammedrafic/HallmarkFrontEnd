@@ -4,8 +4,17 @@
   padding: 20px 0;
   display: flex;
 
-  h3 {
-    margin-left: 25px;
+  .form-title {
+    display: flex;
+
+    h3 {
+      margin-left: 25px;
+    }
+    
+    .order-id {
+      margin: 6px 5px 5px 15px;
+      font-size: 18px;
+    }
   }
 
   .controls-form {
