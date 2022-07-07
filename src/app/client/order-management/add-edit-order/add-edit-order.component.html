@@ -4,7 +4,7 @@
   </div>
   <div class="form-title">
     <h3>{{ title }} Order</h3>
-    <span class="order-id">ID: {{(selectedOrder$ | async)?.id}}</span>
+    <span *ngIf="orderId > 0" class="order-id">ID: {{orderId}}</span>
   </div>
   <div class="controls-form stick-right">
     <button ejs-button cssClass="e-outline button-import" (click)="onImportDataClick()">
