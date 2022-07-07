@@ -7,7 +7,11 @@ export const DefaultTimesheetState: TimesheetsModel = {
     pageSize: 30,
   },
   tabCounts: null,
-  timeSheetRecords: [],
+  timeSheetRecords: {
+    timeRecords: [],
+    miles: [],
+    expenses: [],
+  },
   candidateInfo: null,
   candidateChartData: null,
   candidateAttachments: {

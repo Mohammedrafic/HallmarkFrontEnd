@@ -15,7 +15,7 @@ import { DialogAction } from '../../enums';
 import { DefaultTimesheetState } from '../../constants';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';
-import { CandidateInfo, TabCountConfig, TimesheetRecord, TimesheetsFilterState, TimesheetUploadedFile } from '../../interface';
+import { CandidateInfo, TabCountConfig, TimesheetAttachments, TimesheetRecord, TimesheetRecordsDto, TimesheetsFilterState, TimesheetUploadedFile } from '../../interface';
 import { DialogActionPayload } from '../../interface';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
 
@@ -53,7 +53,7 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static candidateTimesheets(state: TimesheetsModel): TimesheetRecord[] {
+  static tmesheetRecords(state: TimesheetsModel): TimesheetRecordsDto {
     return state.timeSheetRecords;
   }
 
@@ -130,11 +130,6 @@ export class TimesheetsState {
     return this.timesheetsApiService.deleteProfileTimesheets(profileId, profileTimesheetId);
   }
 
-  @Action(Timesheets.GetTimesheetRecords)
-  GetTimesheetRecords({ patchState }: StateContext<TimesheetsModel>): Observable<TimesheetRecord[]> {
-    return this.timesheetsApiService.getTimesheetRecords(1)
-  }
-
   @Action(Timesheets.ToggleCandidateDialog)
   ToggleCandidateDialog({ patchState }: StateContext<TimesheetsModel>,
     { action, id }: { action: DialogAction, id: number}): void {
@@ -159,5 +154,53 @@ export class TimesheetsState {
           downloadBlobFile(file, 'empty.csv');
         })
       );
+  }
+
+  @Action(TimesheetDetails.GetTimesheetRecords)
+  GetTimesheetRecords({ patchState }: StateContext<TimesheetsModel>, id: number): Observable<TimesheetRecordsDto> {
+    return this.timesheetsApiService.getTimesheetRecords(id)
+    .pipe(
+      tap((res) => {
+        patchState({
+          timeSheetRecords: res,
+        });
+      })
+    )
+  }
+
+  @Action(TimesheetDetails.GetCandidateInfo)
+  GetCandidateInfo({ patchState }: StateContext<TimesheetsModel>, id: number): Observable<CandidateInfo> {
+    return this.timesheetsApiService.getCandidateInfo(id)
+    .pipe(
+      tap((res) => {
+        patchState({
+          candidateInfo: res,
+        });
+      })
+    )
+  }
+
+  @Action(TimesheetDetails.GetCandidateChartData)
+  GetCandidateChartData({ patchState }: StateContext<TimesheetsModel>, id: number): Observable<unknown> {
+    return this.timesheetsApiService.getCandidateChartData(id)
+    .pipe(
+      tap((res) => {
+        patchState({
+          candidateChartData: res,
+        });
+      })
+    )
+  }
+
+  @Action(TimesheetDetails.GetCandidateAttachments)
+  GetCandidateAttachments({ patchState }: StateContext<TimesheetsModel>, id: number): Observable<TimesheetAttachments> {
+    return this.timesheetsApiService.getCandidateAttachments(id)
+    .pipe(
+      tap((res) => {
+        patchState({
+          candidateAttachments: res,
+        });
+      })
+    )
   }
 }

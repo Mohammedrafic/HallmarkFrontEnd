@@ -6,6 +6,7 @@ import {
   TimesheetsFilterState,
   CandidateInfo,
   TabCountConfig,
+  TimesheetRecordsDto,
 } from '../../interface';
 
 
@@ -17,7 +18,7 @@ export interface TimesheetsModel {
   candidateInfo: CandidateInfo | null;
   candidateChartData: unknown | null;
   candidateAttachments: TimesheetAttachments;
-  timeSheetRecords: TimesheetRecord[];
+  timeSheetRecords: TimesheetRecordsDto;
   costCenterOptions: unknown[];
   billRateTypes: unknown[];
   isTimeSheetOpen: boolean;

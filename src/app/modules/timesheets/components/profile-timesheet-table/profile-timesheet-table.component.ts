@@ -23,7 +23,7 @@ import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ProfileTimesheetTableConfig } from '../../constants';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
-import { TimesheetRecord } from '../../interface';
+import { TimesheetRecord, TimesheetRecordsDto } from '../../interface';
 
 
 @TakeUntilDestroy
@@ -40,9 +40,7 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
   @ViewChild('profileTable')
   public readonly profileTable: GridComponent;
 
-  @Input() candidateTimesheets: TimesheetRecord[];
-
-  @Input() tempProfile: any;
+  @Input() candidateRecords: TimesheetRecordsDto;
 
   @Output() openAddSideDialog: EventEmitter<number> = new EventEmitter<number>();
 

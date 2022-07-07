@@ -27,17 +27,41 @@ export interface DialogConfig {
   fields: DialogConfigField[][];
 }
 
+export interface MileRecord {
+  id: number;
+  day: string;
+  costCenter: string;
+  billRateType: string;
+  amount: number;
+  rate: number;
+  total: number;
+}
+
+export interface ExpensesRecord {
+  id: number;
+  day: string;
+  costCenter: string;
+  billRateType: string;
+  description: string;
+  total: number;
+}
+
 export interface TimesheetRecord {
-  id?: number;
-  day: Date;
-  form?: FormGroup;
+  id: number;
+  day: string;
   timeIn: string;
   timeOut: string;
   costCenter: string;
-  category: string;
-  hours: number;
+  billRateType: string;
+  amount: number;
   rate: number;
   total: number;
+}
+
+export interface TimesheetRecordsDto {
+  timeRecords: TimesheetRecord[];
+  miles: MileRecord[];
+  expenses: ExpensesRecord[];
 }
 
 export interface TimesheetAttachments {

@@ -5,6 +5,6 @@ export enum TableColumnAlign {
 }
 
 export enum SubmitBtnText {
-  Submit = 'submit',
-  Approve = 'approve',
+  Submit = 'Submit',
+  Approve = 'Approve',
 }

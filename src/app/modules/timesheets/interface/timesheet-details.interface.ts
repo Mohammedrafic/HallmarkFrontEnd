@@ -31,6 +31,8 @@ export interface TimesheetUploadedFile {
 }
 
 export interface CandidateInfo {
+  id: number;
+  imgPath: string;
   orderId: string;
   status: string;
   timesheetStatus: string;
@@ -40,7 +42,7 @@ export interface CandidateInfo {
   location: string;
   department: string;
   skill: string;
-  startdate: Date;
-  enddate: Date;
+  startDate: string;
+  endDate: string;
   unitName: string;
 }

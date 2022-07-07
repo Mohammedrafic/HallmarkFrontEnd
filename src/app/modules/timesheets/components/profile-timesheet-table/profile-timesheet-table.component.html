@@ -16,15 +16,15 @@
       </ng-template>
     </div>
     <ejs-grid #profileTable
-    [dataSource]="tempData"
-    [allowSorting]="true"
-    [allowResizing]="true"
-    [resizeSettings]="resizeSettings"
-    [sortSettings]="initialSort"
-    [allowPaging]="false"
-    [enableVirtualization]="true"
-    allowTextWrap="true"
-    [height]="tableHeight"
+      [dataSource]="candidateRecords.timeRecords"
+      [allowSorting]="true"
+      [allowResizing]="true"
+      [resizeSettings]="resizeSettings"
+      [sortSettings]="initialSort"
+      [allowPaging]="false"
+      [enableVirtualization]="true"
+      allowTextWrap="true"
+      [height]="tableHeight"
     >
       <e-columns>
         <e-column field="day"
@@ -84,7 +84,7 @@
             </ng-template>
           </ng-template>
         </e-column>
-        <e-column field="category"
+        <e-column field="billRateType"
           [headerText]="tableConfig.category.header"
           [textAlign]="tableConfig.category.align"
           [width]="tableConfig.category.width">
@@ -93,12 +93,12 @@
                 *ngIf="isEditOn; else defaultView"
                 [formGroup]="data.form" autocomplete="off" class="bootstrap">
                 <ejs-dropdownlist
-                  formControlName="category"
+                  formControlName="billRateType"
                   [dataSource]="tableConfig.category.dataSource"
                 ></ejs-dropdownlist>
               </form>
               <ng-template #defaultView>
-                <span>{{ data.category }}</span>
+                <span>{{ data.billRateType }}</span>
               </ng-template>
             </ng-template>
         </e-column>
@@ -120,7 +120,7 @@
             </ng-template>
           </ng-template>
         </e-column>
-        <e-column field="hours"
+        <e-column field="amount"
           [headerText]="tableConfig.hours.header"
           [textAlign]="tableConfig.hours.align"
           [width]="tableConfig.hours.width">

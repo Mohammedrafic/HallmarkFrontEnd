@@ -11,19 +11,21 @@ import {
   Input,
 } from '@angular/core';
 
-import { filter, Observable, takeUntil, throttleTime } from 'rxjs';
+import { filter, Observable, switchMap, takeUntil, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { UploaderComponent } from "@syncfusion/ej2-angular-inputs";
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { Destroyable } from '@core/helpers';
-import { GlobalWindow } from '@core/tokens';
+import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import { CandidateInfo, TimesheetRecord, DialogActionPayload } from '../../interface';
+import {
+  CandidateInfo, DialogActionPayload, TimesheetUploadedFile, TimesheetRecordsDto,
+} from '../../interface';
 import { DialogAction, SubmitBtnText } from '../../enums';
+import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
 
 
 @Component({
@@ -33,8 +35,8 @@ import { DialogAction, SubmitBtnText } from '../../enums';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileDetailsContainerComponent extends Destroyable implements OnInit {
-  @ViewChild('sideDialog')
-  public sideDialog: DialogComponent;
+  @ViewChild('candidateDialog')
+  public candidateDialog: DialogComponent;
 
   @ViewChild('dnwDialog')
   public dnwDialog: DialogComponent;
@@ -44,6 +46,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   @ViewChild('chipList')
   public chipList: ChipListComponent;
+
+  @ViewChild('dropEl')
+  public dropEl: HTMLDivElement;
 
   @Input() currentSelectedRowIndex: number | null = null;
 
@@ -59,10 +64,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public submitText: string;
 
-  public candidateInfo: CandidateInfo;
-
-  @Select(TimesheetsState.candidateTimesheets)
-  public candidateTimesheets$: Observable<TimesheetRecord[]>;
+  @Select(TimesheetsState.tmesheetRecords)
+  public tmesheetRecords$: Observable<TimesheetRecordsDto>;
 
   @Select(TimesheetsState.isTimesheetOpen)
   public isTimesheetOpen$: Observable<DialogActionPayload>;
@@ -70,12 +73,18 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @Select(TimesheetsState.candidateInfo)
   public candidateInfo$: Observable<CandidateInfo>;
 
+  @Select(TimesheetsState.candidateChartData)
+  public chartData$: Observable<unknown>;
+
+  @Select(TimesheetsState.timeSheetAttachments)
+  public attachments$: Observable<TimesheetUploadedFile[]>;
+
   constructor(
     private store: Store,
     private route: ActivatedRoute,
+    private profileService: ProfileTimesheetService,
     private cd: ChangeDetectorRef,
     private chipPipe: ChipsCssClass,
-    @Inject(GlobalWindow) private readonly globalWindow: WindowProxy & typeof globalThis,
     ) {
     super();
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
@@ -83,9 +92,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   }
 
   public ngOnInit(): void {
-    this.getProfileTimesheets();
     this.getDialogState();
-    this.getCandidateInfo();
   }
 
   public onNextPreviousOrder(next: boolean): void {
@@ -93,7 +100,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   }
 
   public handleUpdateTable(): void {
-    this.getProfileTimesheets();
+    // this.getProfileTimesheets();
   }
 
   public handleDeleteItem({ profileId, tableItemId }: { profileId: number; tableItemId: number | any }): void {
@@ -112,7 +119,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     .pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
-      this.sideDialog.hide();
+      this.candidateDialog.hide();
     });
   }
 
@@ -124,28 +131,16 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public handleApprove(): void {}
 
-  private getProfileTimesheets(): void {
-    // this.store.dispatch(new Timesheets.GetProfileTimesheets())
-    // .pipe(takeUntil(this.componentDestroy()));
-  }
-
   private getDialogState(): void {
     this.isTimesheetOpen$
     .pipe(
       throttleTime(100),
-      filter((val) => val.dialogState),
+      filter((data) => data.dialogState),
+      switchMap((data) => this.profileService.getCandidateData(data.id)),
       takeUntil(this.componentDestroy())
       )
-    .subscribe((payload) => {});
-  }
-
-  private getCandidateInfo(): void {
-    this.candidateInfo$
-    .pipe(
-      takeUntil(this.componentDestroy())
-    )
-    .subscribe((data) => {
-      this.candidateInfo = data;
+    .subscribe(() => {
+      this.candidateDialog.show();
     });
   }
 }

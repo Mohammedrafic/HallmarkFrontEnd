@@ -9,10 +9,6 @@ export namespace Timesheets {
     }
   }
 
-  export class GetTimesheetRecords {
-    static readonly type = TIMESHEETS_ACTIONS.GET_TIMESHEET_RECORDS;
-  }
-
   export class ToggleCandidateDialog {
     static readonly type = TIMESHEETS_ACTIONS.OPEN_PROFILE;
 
