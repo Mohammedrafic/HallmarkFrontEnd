@@ -1,18 +1,23 @@
-import { TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../enums/timesheets.enum';
+import { TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../enums';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
 export interface Timesheet {
   id: number;
   name: string;
+  firstName: string;
+  lastName: string;
   statusText: TIMETHEETS_STATUSES;
   orderId: string;
-  skillName: string;
-  workWeek: string;
-  departmentName: string;
-  billRate: number;
+  skill: string;
+  location: string;
+  startDate: string;
+  department: string;
   agencyName: string;
-  totalHours: number;
-  status?: TIMETHEETS_STATUSES
+  orgName: string;
+  billRate: number;
+  totalDays: number;
+  status: TIMETHEETS_STATUSES;
+  workWeek: string;
 }
 
 export interface TimesheetsFilterState {
@@ -26,6 +31,12 @@ export interface TimesheetsFilterState {
   skill?: string[];
   department?: string[];
   agencyName?: string[];
+}
+
+export interface TimesheetsSelectedRowEvent {
+  rowIndex: number;
+  data: Timesheet;
+  isInteracted?: boolean;
 }
 
 export type ITimesheetsColumnWidth = {

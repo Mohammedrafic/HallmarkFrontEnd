@@ -3,8 +3,9 @@ import { Injectable } from '@angular/core';
 
 import { Observable, of } from 'rxjs';
 
-import { TimesheetsFilterState, TimesheetRecord } from '../interface';
+import { TimesheetsFilterState, TimesheetRecord, TabCountConfig } from '../interface';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
+import { MokTabsCounts, MokTimesheet } from '../constants';
 
 @Injectable()
 export class TimesheetsApiService {
@@ -14,17 +15,18 @@ export class TimesheetsApiService {
   ) {}
 
   public getTimesheets(filters: TimesheetsFilterState): Observable<TimeSheetsPage> {
-    // return this.http.get('')
-    return of(
-      {
-        items: [],
-        pageNumber: 1,
-        totalPages: 1,
-        totalCount: 1,
-        hasPreviousPage: false,
-        hasNextPage: false,
-      }
-    )
+    return of({
+      pageNumber: 1,
+      totalPages: 1,
+      totalCount: 0,
+      items: [MokTimesheet],
+      hasNextPage: false,
+      hasPreviousPage: false,
+    });
+  }
+
+  public getTabsCounts(): Observable<TabCountConfig> {
+    return of(MokTabsCounts);
   }
 
   public getTimesheetRecords(id: number): Observable<TimesheetRecord[]> {

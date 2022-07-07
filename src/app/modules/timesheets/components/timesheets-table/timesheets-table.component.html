@@ -1,6 +1,6 @@
 <ejs-grid
   #grid
-  [dataSource]="filtredItems"
+  [dataSource]="tableData.items"
   [allowPaging]="allowPaging"
   [pageSettings]="pageSettings"
   [height]="gridHeight"
@@ -8,9 +8,9 @@
   [resizeSettings]="resizeSettings"
   [allowSorting]="allowSorting"
   [allowResizing]="allowResizing"
-  [allowTextWrap]="allowWrap"
-  [selectionSettings]="selectionOptions"
-  [textWrapSettings]="wrapSettings"
+  [allowTextWrap]="tableSettings.allowWrap"
+  [selectionSettings]="tableSettings.selectionOptions"
+  [textWrapSettings]="tableSettings.wrapSettings"
   (rowSelected)="onRowClick($event)"
 >
   <e-columns>
@@ -73,7 +73,7 @@
         <ng-template #template let-data>
           <div class="align-right">
             <b>
-             {{data.startDate | date:'W - ccc M/d/yy'}}
+             {{ data.startDate | date:'W - ccc M/d/yy' }}
             </b>
           </div>
         </ng-template>

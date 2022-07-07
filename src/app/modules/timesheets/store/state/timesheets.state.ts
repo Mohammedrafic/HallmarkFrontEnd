@@ -12,10 +12,10 @@ import {
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
 import { DialogAction } from '../../enums';
-import { DefaultTimesheetState } from './../../constants/timesheet-default-state.constant';
+import { DefaultTimesheetState } from '../../constants';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';
-import { CandidateInfo, TimesheetRecord, TimesheetsFilterState, TimesheetUploadedFile } from '../../interface';
+import { CandidateInfo, TabCountConfig, TimesheetRecord, TimesheetsFilterState, TimesheetUploadedFile } from '../../interface';
 import { DialogActionPayload } from '../../interface';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
 
@@ -45,6 +45,11 @@ export class TimesheetsState {
   @Selector([TimesheetsState])
   static isTimesheetOpen(state: TimesheetsModel): DialogActionPayload {
     return { dialogState: state.isTimeSheetOpen, id: state.selectedTimeSheetId };
+  }
+
+  @Selector([TimesheetsState])
+  static tabCounts(state: TimesheetsModel): TabCountConfig | null {
+    return state.tabCounts;
   }
 
   @Selector([TimesheetsState])
@@ -78,14 +83,26 @@ export class TimesheetsState {
   }
 
   @Action(Timesheets.GetAll)
-  GetTimesheets({ patchState }: StateContext<TimesheetsModel>,
-    { payload, isAgency }: Timesheets.GetAll): Observable<TimeSheetsPage> {
-
-      return this.timesheetsApiService.getTimesheets(payload)
+  GetTimesheets(
+    { patchState }: StateContext<TimesheetsModel>,
+    { payload, isAgency }: Timesheets.GetAll
+  ): Observable<TimeSheetsPage> {
+    return this.timesheetsApiService.getTimesheets(Object.assign({}, payload, { isAgency }))
       .pipe(
-        tap((timesheetsDto) => patchState({
-          timesheets: timesheetsDto,
-        })),
+        tap((res) => {
+          patchState({
+            timesheets: res,
+          });
+        }));
+  }
+
+  @Action(Timesheets.GetTabsCounts)
+  GetTabsCounts({ patchState }: StateContext<TimesheetsModel>): Observable<TabCountConfig> {
+    return this.timesheetsApiService.getTabsCounts()
+      .pipe(
+        tap((res) => patchState({
+          tabCounts: res,
+        }))
       );
   }
 

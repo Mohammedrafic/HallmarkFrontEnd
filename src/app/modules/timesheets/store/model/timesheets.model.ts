@@ -5,6 +5,7 @@ import {
   TimesheetAttachments,
   TimesheetsFilterState,
   CandidateInfo,
+  TabCountConfig,
 } from '../../interface';
 
 
@@ -22,4 +23,5 @@ export interface TimesheetsModel {
   isTimeSheetOpen: boolean;
   selectedTimeSheetId: number;
   isAddDialogOpen: boolean;
+  tabCounts: TabCountConfig | null;
 }

@@ -6,7 +6,7 @@ import { GRID_CONFIG } from '@shared/constants';
 
 import { SortingDirections } from '@client/client.config';
 import { MoreMenuType, TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../enums';
-import { IFilterColumns, IFilterDataSource, ITimesheetsColumnWidth } from '../interface';
+import { IFilterColumns, IFilterDataSource, ITimesheetsColumnWidth, TableSettingsConfig } from '../interface';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
@@ -76,6 +76,15 @@ export const defaultFilterColumns: IFilterColumns = {
 export const filterOptionFields = {
   text: 'name',
   value: 'name'
+};
+
+export const TableSettings: TableSettingsConfig = {
+  allowWrap: TIMESHEETS_GRID_CONFIG.isWordWrappingEnabled,
+  wrapSettings: TIMESHEETS_GRID_CONFIG.wordWrapSettings,
+  selectionOptions: tableSelectionModel,
+  isLockMenuButtonsShown: false,
+  moreMenuWithDeleteButton: moreMenuWithDelete,
+  moreMenuWithCloseButton: moreMenuWithClose,
 };
 
 export const filterColumnDataSource: IFilterDataSource = {

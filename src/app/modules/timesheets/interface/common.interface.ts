@@ -1,5 +1,8 @@
 import { FormGroup } from '@angular/forms';
 
+import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
+import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
+
 import { FieldType } from '../enums';
 import { TimesheetUploadedFile } from './timesheet-details.interface';
 
@@ -44,4 +47,19 @@ export interface TimesheetAttachments {
 export interface TabConfig {
   title: string;
   amount?: number;
+}
+
+export interface TabCountConfig {
+  pending: number;
+  missing: number;
+  rejected: number;
+}
+
+export interface TableSettingsConfig {
+  allowWrap: boolean;
+  wrapSettings: TextWrapSettingsModel;
+  selectionOptions: SelectionSettingsModel;
+  isLockMenuButtonsShown: boolean;
+  moreMenuWithDeleteButton: ItemModel[];
+  moreMenuWithCloseButton: ItemModel[];
 }

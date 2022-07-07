@@ -57,4 +57,8 @@ export namespace Timesheets {
     ) {
     }
   }
+
+  export class GetTabsCounts {
+    static readonly type = TIMESHEETS_ACTIONS.GET_TABS_COUNTS;
+  }
 }

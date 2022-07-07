@@ -1,28 +1,34 @@
 import {
-  ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef,
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
+import { filter } from 'rxjs/operators';
 import { Observable, takeUntil, throttleTime } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { BaseObservable, Destroyable } from '@core/helpers';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
+import { User } from '@shared/models/user.model';
+
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
-import { TabConfig, TimesheetsFilterState } from '../../interface';
+import { UserState } from 'src/app/store/user.state';
+import { TabConfig, Timesheet, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
 import { exportOptions, TAB_ADMIN_TIMESHEETS } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
-import { DialogAction, ExportType, TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../../enums';
+import { DialogAction, ExportType, TimesheetsTableColumns } from '../../enums';
 import { IFilterColumns } from '../../interface';
 import { TimesheetsService } from '../../services/timesheets.service';
 import { filterOptionFields } from '../../constants';
 import { Timesheets } from '../../store/actions/timesheets.actions';
-import { UserState } from 'src/app/store/user.state';
-import { User } from '@shared/models/user.model';
-import { Router } from '@angular/router';
+import { getTimesheetStatusFromIdx } from '../../helpers/functions';
 
 @Component({
   selector: 'app-timesheets-container.ts',
@@ -49,8 +55,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public pageSize = 30;
   public currentTab = 0;
 
+  public isAgency: boolean;
+
   private pageNumberSubj: BaseObservable<number> = new BaseObservable<number>(1);
-  isAgency: boolean;
 
   constructor(
     private store: Store,
@@ -68,9 +75,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.initFilterColumn();
     this.initFilterColumnDataSources();
     this.initFormGroup();
+    this.initTabsCount();
     this.startPageStateWatching();
     this.calcTabsChips();
-
   }
 
   public handleChangeTab(tabIndex: number): void {
@@ -108,10 +115,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.pageNumberSubj.set(1);
   }
 
-  public onTabChange(status: TIMETHEETS_STATUSES): void {
-
-  }
-
   public onFilterApply(): void {
     this.filters = this.formGroup.getRawValue();
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
@@ -119,8 +122,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  public rowSelected(rowIndex: number): void {
-    this.timesheetsService.setCurrentSelectedIndexValue(rowIndex);
+  public rowSelected(selectedRow: TimesheetsSelectedRowEvent): void {
+    this.timesheetsService.setCurrentSelectedIndexValue(selectedRow.rowIndex);
     this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Open, 12));
     this.cd.markForCheck();
   }
@@ -138,9 +141,13 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private initTimesheets(): void {
-    this.store.dispatch(new Timesheets.GetAll(Object.assign({}, this.filters, {
-      pageNumber: this.pageNumberSubj.get(),
-      pageSize: this.pageSize,
+    this.store.dispatch(new Timesheets.GetAll(Object.assign(
+      {},
+      this.filters,
+      {
+        pageNumber: this.pageNumberSubj.get(),
+        pageSize: this.pageSize,
+        statusText: getTimesheetStatusFromIdx(this.currentTab),
     }), this.isAgency)).pipe(takeUntil(this.componentDestroy()));
   }
 
@@ -159,19 +166,20 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.filterColumns.agencyName.dataSource = this.timesheetsService.setDataSources(TimesheetsTableColumns.AgencyName);
   }
 
+  private initTabsCount(): void {
+    this.store.dispatch(new Timesheets.GetTabsCounts());
+  }
+
   private calcTabsChips(): void {
-    this.timesheets$.pipe(
+    this.store.select(TimesheetsState.tabCounts).pipe(
+      filter(Boolean),
       takeUntil(this.componentDestroy()),
     )
     .subscribe((data) => {
-      const pending = data.items.filter((item) => item.status === TIMETHEETS_STATUSES.PENDING_APPROVE).length;
-      const missing = data.items.filter((item) => item.status === TIMETHEETS_STATUSES.MISSING).length;
-      const rejected = data.items.filter((item) => item.status === TIMETHEETS_STATUSES.REJECTED).length;
-
-      this.tabConfig[1].amount = pending;
-      this.tabConfig[2].amount = missing;
-      this.tabConfig[3].amount = rejected;
+      this.tabConfig[1].amount = data.pending;
+      this.tabConfig[2].amount = data.missing;
+      this.tabConfig[3].amount = data.rejected;
       this.cd.markForCheck();
-    })
+    });
   }
 }

@@ -6,6 +6,7 @@ export const DefaultTimesheetState: TimesheetsModel = {
     pageNumber: 1,
     pageSize: 30,
   },
+  tabCounts: null,
   timeSheetRecords: [],
   candidateInfo: null,
   candidateChartData: null,

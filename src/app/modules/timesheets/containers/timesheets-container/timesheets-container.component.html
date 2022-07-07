@@ -25,7 +25,6 @@
     *ngIf="timesheets$ | async as timesheets"
     [tableData]="timesheets"
     [changeTableItem]="currentSelectedTableRowIndex | async"
-    [tabIndex]="currentTab"
     (changePage)="handleChangePage($event)"
     (changePerPage)="handleChangePerPage($event)"
     (timesheetRowSelected)="rowSelected($event)"
