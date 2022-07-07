@@ -1,12 +1,11 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-
+import unionBy from 'lodash/fp/unionBy';
+import { filter, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { ItemModel, SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { MenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
-
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
-import { filter, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { SetHeaderState } from 'src/app/store/app.actions';
 import { SetImportFileDialogState } from '@admin/store/admin.actions';
@@ -17,9 +16,8 @@ import {
   GetSelectedOrderById,
   SaveOrder,
   SaveOrderSucceeded,
-  SetIsDirtyOrderForm
+  SetIsDirtyOrderForm,
 } from '@client/store/order-managment-content.actions';
-
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
 import { CreateOrderDto, EditOrderDto, GetPredefinedBillRatesData, Order } from '@shared/models/order-management.model';
 import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.component';
@@ -33,19 +31,19 @@ import { UpdatePredefinedCredentials } from '@order-credentials/store/credential
 enum SelectedTab {
   OrderDetails,
   Credentials,
-  BillRates
+  BillRates,
 }
 
 enum SubmitButtonItem {
   SaveForLater = '0',
   Save = '1',
-  SaveAsTemplate = '2'
+  SaveAsTemplate = '2',
 }
 
 @Component({
   selector: 'app-add-edit-order',
   templateUrl: './add-edit-order.component.html',
-  styleUrls: ['./add-edit-order.component.scss']
+  styleUrls: ['./add-edit-order.component.scss'],
 })
 export class AddEditOrderComponent implements OnDestroy, OnInit {
   @ViewChild('stepper') tab: TabComponent;
@@ -70,7 +68,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public title: string;
   public submitMenuItems: ItemModel[] = [
     { id: SubmitButtonItem.SaveForLater, text: 'Save For Later' },
-    { id: SubmitButtonItem.SaveAsTemplate, text: 'Save as Template' }
+    { id: SubmitButtonItem.SaveAsTemplate, text: 'Save as Template' },
   ];
   public selectedTab: SelectedTab = SelectedTab.OrderDetails;
   // todo: update/set credentials list in edit mode for order
@@ -94,9 +92,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   ngOnInit(): void {
     if (this.orderId > 0) {
-      this.selectedOrder$
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(order => {
+      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
         if (order?.credentials) {
           this.orderCredentials = [...order.credentials];
         }
@@ -117,16 +113,18 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.router.navigate(['/client/order-management']);
     });
 
-    this.getPredefinedBillRatesData$.pipe(
-      takeUntil(this.unsubscribe$),
-      switchMap(getPredefinedBillRatesData => {
-        if (getPredefinedBillRatesData && !this.orderBillRates.length) {
-          return this.store.dispatch(new GetPredefinedBillRates());
-        } else {
-          return of(null);
-        }
-      })
-    ).subscribe();
+    this.getPredefinedBillRatesData$
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        switchMap((getPredefinedBillRatesData) => {
+          if (getPredefinedBillRatesData && !this.orderBillRates.length) {
+            return this.store.dispatch(new GetPredefinedBillRates());
+          } else {
+            return of(null);
+          }
+        })
+      )
+      .subscribe();
 
     this.subscribeOnPredefinedCredentials();
     this.subscribeOnPredefinedBillRates();
@@ -176,7 +174,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   public onCredentialChanged(cred: IOrderCredentialItem): void {
-    const isExist = this.orderCredentials.find(({credentialId}) => cred.credentialId === credentialId);
+    const isExist = this.orderCredentials.find(
+      ({ credentialId }: IOrderCredentialItem) => cred.credentialId === credentialId
+    );
     if (isExist) {
       Object.assign(isExist, cred);
     } else {
@@ -187,7 +187,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   public onCredentialDeleted(cred: IOrderCredentialItem): void {
-    const credToDelete = this.orderCredentials.find(({credentialId}) => cred.credentialId === credentialId) as IOrderCredentialItem;
+    const credToDelete = this.orderCredentials.find(
+      ({ credentialId }: IOrderCredentialItem) => cred.credentialId === credentialId
+    ) as IOrderCredentialItem;
     if (credToDelete) {
       const index = this.orderCredentials.indexOf(credToDelete);
       this.orderCredentials.splice(index, 1);
@@ -212,11 +214,16 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       const documents = this.orderDetailsFormComponent.documents;
 
       if (this.orderId) {
-        this.store.dispatch(new EditOrder({
-          ...order,
-          id: this.orderId,
-          deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids
-        }, documents));
+        this.store.dispatch(
+          new EditOrder(
+            {
+              ...order,
+              id: this.orderId,
+              deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids,
+            },
+            documents
+          )
+        );
       } else {
         this.store.dispatch(new SaveOrder(order, documents));
       }
@@ -233,7 +240,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private getMenuButtonIndex(menuItem: SubmitButtonItem): number {
-    return this.submitMenuItems.findIndex(i => i.id === menuItem);
+    return this.submitMenuItems.findIndex((i: ItemModel) => i.id === menuItem);
   }
 
   private addMenuItem(menuItem: SubmitButtonItem, text: string): void {
@@ -265,7 +272,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       ...this.orderDetailsFormComponent.workflowForm.getRawValue(),
       ...this.orderDetailsFormComponent.specialProject.getRawValue(),
       ...{ credentials: this.orderCredentials },
-      ...{ billRates: this.billRatesComponent?.billRatesControl.value || this.orderBillRates }
+      ...{ billRates: this.billRatesComponent?.billRatesControl.value || this.orderBillRates },
     };
 
     const {
@@ -303,7 +310,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       workLocations,
       workflowId,
       credentials,
-      canApprove
+      canApprove,
     } = allValues;
 
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[]).map((billRate: BillRate) => {
@@ -348,7 +355,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       credentials,
       workflowId,
       isSubmit,
-      canApprove
+      canApprove,
     };
 
     if (!order.hourlyRate) {
@@ -397,32 +404,37 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
 
     if (this.orderId) {
-      this.store.dispatch(new EditOrder({
-        ...order,
-        id: this.orderId,
-        deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids
-      }, documents));
+      this.store.dispatch(
+        new EditOrder(
+          {
+            ...order,
+            id: this.orderId,
+            deleteDocumentsGuids: this.orderDetailsFormComponent.deleteDocumentsGuids,
+          },
+          documents
+        )
+      );
     } else {
       this.store.dispatch(new SaveOrder(order, documents));
     }
   }
 
   private subscribeOnPredefinedCredentials(): void {
-    this.predefinedCredentials$.pipe(
-      filter((predefinedCredentials: IOrderCredentialItem[]) => !!predefinedCredentials.length && this.orderId === 0),
-      takeUntil(this.unsubscribe$)
-    ).subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
-      this.orderCredentials = predefinedCredentials;
-    });
+    this.predefinedCredentials$
+      .pipe(
+        filter((predefinedCredentials: IOrderCredentialItem[]) => !!predefinedCredentials.length),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((predefinedCredentials: IOrderCredentialItem[]) => {
+        this.orderCredentials = unionBy('credentialId', this.orderCredentials, predefinedCredentials);
+      });
   }
 
   private subscribeOnPredefinedBillRates(): void {
-    this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe(predefinedBillRates => {
+    this.predefinedBillRates$.pipe(takeUntil(this.unsubscribe$)).subscribe((predefinedBillRates) => {
       this.orderBillRates = predefinedBillRates;
     });
   }
 
-  private saveAsTemplate(): void {
-
-  }
+  private saveAsTemplate(): void {}
 }
