@@ -266,12 +266,6 @@ export class DashboardService {
   }
 
   private getFilledPositionTrendWidgetData(): Observable<PositionTrend> {
-    const date = new Date();
-    const timeRanges = {
-      dateFrom: this.getDateAsISOString(date.setMonth(date.getMonth() - 1)),
-      dateTo: this.getDateAsISOString(Date.now()),
-    };
-
     return this.httpClient.post<PositionTrendDto>(`${this.baseUrl}/filledpositionstrend`, {}).pipe(
       map((data: PositionTrendDto) => {
         const [previousValue, currentValue] = data.values.slice(-2);
