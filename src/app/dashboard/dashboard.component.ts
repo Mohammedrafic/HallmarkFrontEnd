@@ -118,10 +118,10 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     const updatePanelsList = [...this.dashboardSFComponentSerialized, newPanel];
 
     this.saveDashboard(updatePanelsList);
-    this.rerednerDashboard();
+    this.reRenderDashboard();
   }
 
-  private rerednerDashboard(): void {
+  private reRenderDashboard(): void {
     /* due to an error in Syncfusion library, it is necessary to rerender dashboard
       after adding a new panel if panels were dragged before that */
     if (this.panelsAreDragged) {
