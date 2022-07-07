@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation, ChangeDetectionStrategy, ViewContainerRef, TemplateRef } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
@@ -33,6 +33,9 @@ import type { WidgetsDataModel } from './models/widgets-data.model';
 export class DashboardComponent extends DestroyableDirective implements OnInit, OnDestroy {
   @ViewChild(DashboardWidgetsComponent, { static: false }) dashboardWidgetsComponent: DashboardWidgetsComponent;
 
+  @ViewChild("widgetsTemplate", { read: TemplateRef }) widgetsContentRef: TemplateRef<DashboardWidgetsComponent>;
+  @ViewChild("outlet", { read: ViewContainerRef }) outletRef: ViewContainerRef;
+
   @Select(DashboardState.dashboardPanels) public readonly panels$: Observable<DashboardStateModel['panels']>;
   @Select(DashboardState.selectedWidgets) public readonly selectedWidgets$: Observable<WidgetTypeEnum[]>;
   @Select(DashboardState.widgets) public readonly widgets$: Observable<DashboardStateModel['widgets']>;
@@ -49,6 +52,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   @Select(UserState.lastSelectedOrganizationAgency)
   private readonly lastSelectedOrganizationAgency$: Observable<string>;
+  private panelsAreDragged = false;
 
   public widgetsData$: Observable<WidgetsDataModel>;
   public isOrganization$: Observable<boolean>;
@@ -114,6 +118,17 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     const updatePanelsList = [...this.dashboardSFComponentSerialized, newPanel];
 
     this.saveDashboard(updatePanelsList);
+    this.rerednerDashboard();
+  }
+
+  private rerednerDashboard(): void {
+    /* due to an error in Syncfusion library, it is necessary to rerender dashboard
+      after adding a new panel if panels were dragged before that */
+    if(this.panelsAreDragged) {
+      this.outletRef.clear();
+      this.outletRef.createEmbeddedView(this.widgetsContentRef);
+      this.panelsAreDragged = false;
+      }
   }
 
   private removeWidget(widget: WidgetOptionModel): void {
@@ -128,6 +143,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   public moveDashboardPanel(): void {
     this.saveDashboard(this.dashboardSFComponentSerialized);
+    this.panelsAreDragged = true;
   }
 
   private getFiltersGroup(): FormGroup {
