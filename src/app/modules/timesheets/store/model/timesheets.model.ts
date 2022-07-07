@@ -1,7 +1,7 @@
 import { PageOfCollections } from '@shared/models/page.model';
 import {
   Timesheet,
-  CandidateTimesheet,
+  TimesheetRecord,
   TimesheetAttachments,
   TimesheetsFilterState,
   CandidateInfo,
@@ -16,7 +16,7 @@ export interface TimesheetsModel {
   candidateInfo: CandidateInfo | null;
   candidateChartData: unknown | null;
   candidateAttachments: TimesheetAttachments;
-  candidateTimeSheets: CandidateTimesheet[];
+  timeSheetRecords: TimesheetRecord[];
   costCenterOptions: unknown[];
   billRateTypes: unknown[];
   isTimeSheetOpen: boolean;

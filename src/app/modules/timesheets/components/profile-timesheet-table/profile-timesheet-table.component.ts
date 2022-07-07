@@ -23,7 +23,7 @@ import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ProfileTimesheetTableConfig } from '../../constants';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
-import { CandidateTimesheet } from '../../interface';
+import { TimesheetRecord } from '../../interface';
 
 
 @TakeUntilDestroy
@@ -40,7 +40,7 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
   @ViewChild('profileTable')
   public readonly profileTable: GridComponent;
 
-  @Input() candidateTimesheets: CandidateTimesheet[];
+  @Input() candidateTimesheets: TimesheetRecord[];
 
   @Input() tempProfile: any;
 
@@ -161,7 +161,7 @@ export class ProfileTimesheetTableComponent extends AbstractGridConfigurationCom
     return clonedDate;
   }
 
-  public deleteTimesheet(timesheet: CandidateTimesheet): void {
+  public deleteTimesheet(timesheet: TimesheetRecord): void {
     this.deleteTableItemId.emit({ profileId: this.profileId, tableItemId: timesheet.id });
   }
 

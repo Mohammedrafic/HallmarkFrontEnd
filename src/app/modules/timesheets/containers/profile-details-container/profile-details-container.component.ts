@@ -22,7 +22,7 @@ import { GlobalWindow } from '@core/tokens';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import { CandidateInfo, CandidateTimesheet, DialogActionPayload } from '../../interface';
+import { CandidateInfo, TimesheetRecord, DialogActionPayload } from '../../interface';
 import { DialogAction, SubmitBtnText } from '../../enums';
 
 
@@ -51,12 +51,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
 
-  public candidateDialogTarget: HTMLElement;
-
-  public dropElement: HTMLElement | null = null;
-
-  public dropAreaVisible: boolean = false;
-
   public rejectReasonDialogVisible: boolean = false;
 
   public isNextDisabled = false;
@@ -68,7 +62,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public candidateInfo: CandidateInfo;
 
   @Select(TimesheetsState.candidateTimesheets)
-  public candidateTimesheets$: Observable<CandidateTimesheet[]>;
+  public candidateTimesheets$: Observable<TimesheetRecord[]>;
 
   @Select(TimesheetsState.isTimesheetOpen)
   public isTimesheetOpen$: Observable<DialogActionPayload>;
@@ -109,12 +103,12 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     ).subscribe();
   }
 
-  public handleOpenSideDialog(): void {
-    this.store.dispatch(new Timesheets.OpenProfileTimesheetAddDialog());
+  public openAddDialog(): void {
+    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open));
   }
 
   public handleProfileClose(): void {
-    this.store.dispatch(new Timesheets.ToggleProfileDialog(DialogAction.Close))
+    this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close))
     .pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(() => {
@@ -131,8 +125,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public handleApprove(): void {}
 
   private getProfileTimesheets(): void {
-    this.store.dispatch(new Timesheets.GetProfileTimesheets())
-    .pipe(takeUntil(this.componentDestroy()));
+    // this.store.dispatch(new Timesheets.GetProfileTimesheets())
+    // .pipe(takeUntil(this.componentDestroy()));
   }
 
   private getDialogState(): void {

@@ -1,7 +1,7 @@
 <ejs-dialog
   cssClass="dnw-dialog"
   #dnwDialog
-  [target]="candidateDialogTarget"
+  [target]="sideDialog.element"
   [width]="'350px'"
   [visible]="false"
 >
@@ -149,7 +149,7 @@
           *ngIf="candidateTimesheets$ | async as candidateTimesheets"
           [candidateTimesheets]="candidateTimesheets"
           [tempProfile]="candidateInfo"
-          (openAddSideDialog)="handleOpenSideDialog()"
+          (openAddSideDialog)="openAddDialog()"
           (updateTable)="handleUpdateTable()"
           (deleteTableItemId)="handleDeleteItem($event)"
         >
@@ -171,7 +171,7 @@
 
 <app-timesheet-reject-reason-dialog
   [(visible)]="rejectReasonDialogVisible"
-  [container]="candidateDialogTarget"
+  [container]="sideDialog.element"
   (rejectReasonChange)="handleReject()"
 ></app-timesheet-reject-reason-dialog>
 

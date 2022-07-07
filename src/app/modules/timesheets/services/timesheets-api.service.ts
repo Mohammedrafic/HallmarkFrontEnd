@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 
 import { Observable, of } from 'rxjs';
 
-import { TimesheetsFilterState, CandidateTimesheet } from '../interface';
+import { TimesheetsFilterState, TimesheetRecord } from '../interface';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
 
 @Injectable()
@@ -27,18 +27,18 @@ export class TimesheetsApiService {
     )
   }
 
-  public getCandidateTimesheets(id: number): Observable<CandidateTimesheet[]> {
+  public getTimesheetRecords(id: number): Observable<TimesheetRecord[]> {
     return of([]);
   }
 
-  public postProfileTimesheets(body: CandidateTimesheet): Observable<null> {
+  public postProfileTimesheets(body: TimesheetRecord): Observable<null> {
     return of(null);
   }
 
   public patchProfileTimesheets(
     profileId: number,
     profileTimesheetId:number,
-    body: CandidateTimesheet,
+    body: TimesheetRecord,
   ): Observable<null> {
     return of(null);
   }

@@ -5,7 +5,6 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 
 import { ExportPayload } from '@shared/models/export.model';
 import { downloadBlobFile } from '@shared/utils/file.utils';
-
 import {
   TimeSheetsPage,
   TimesheetsModel,
@@ -16,7 +15,7 @@ import { DialogAction } from '../../enums';
 import { DefaultTimesheetState } from './../../constants/timesheet-default-state.constant';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';
-import { CandidateInfo, CandidateTimesheet, TimesheetsFilterState, TimesheetUploadedFile } from '../../interface';
+import { CandidateInfo, TimesheetRecord, TimesheetsFilterState, TimesheetUploadedFile } from '../../interface';
 import { DialogActionPayload } from '../../interface';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
 
@@ -49,8 +48,8 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static candidateTimesheets(state: TimesheetsModel): CandidateTimesheet[] {
-    return state.candidateTimeSheets;
+  static candidateTimesheets(state: TimesheetsModel): TimesheetRecord[] {
+    return state.timeSheetRecords;
   }
 
   @Selector([TimesheetsState])
@@ -114,12 +113,12 @@ export class TimesheetsState {
     return this.timesheetsApiService.deleteProfileTimesheets(profileId, profileTimesheetId);
   }
 
-  @Action(Timesheets.GetProfileTimesheets)
-  GetProfileTimeSheets({ patchState }: StateContext<TimesheetsModel>): Observable<CandidateTimesheet[]> {
-    return this.timesheetsApiService.getCandidateTimesheets(1)
+  @Action(Timesheets.GetTimesheetRecords)
+  GetTimesheetRecords({ patchState }: StateContext<TimesheetsModel>): Observable<TimesheetRecord[]> {
+    return this.timesheetsApiService.getTimesheetRecords(1)
   }
 
-  @Action(Timesheets.ToggleProfileDialog)
+  @Action(Timesheets.ToggleCandidateDialog)
   ToggleCandidateDialog({ patchState }: StateContext<TimesheetsModel>,
     { action, id }: { action: DialogAction, id: number}): void {
     patchState({
@@ -128,7 +127,7 @@ export class TimesheetsState {
     });
   }
 
-  @Action(Timesheets.OpenProfileTimesheetAddDialog)
+  @Action(Timesheets.ToggleTimesheetAddDialog)
   ToggleAddDialog({ patchState }: StateContext<TimesheetsModel>, action: DialogAction): void {
     patchState({
       isAddDialogOpen: action === DialogAction.Open,

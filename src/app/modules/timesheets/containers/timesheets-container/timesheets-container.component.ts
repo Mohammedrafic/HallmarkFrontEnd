@@ -121,7 +121,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public rowSelected(rowIndex: number): void {
     this.timesheetsService.setCurrentSelectedIndexValue(rowIndex);
-    this.store.dispatch(new Timesheets.ToggleProfileDialog(DialogAction.Open, 12));
+    this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Open, 12));
     this.cd.markForCheck();
   }
 

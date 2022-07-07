@@ -24,7 +24,7 @@ export interface DialogConfig {
   fields: DialogConfigField[][];
 }
 
-export interface CandidateTimesheet {
+export interface TimesheetRecord {
   id?: number;
   day: Date;
   form?: FormGroup;

@@ -9,18 +9,20 @@ export namespace Timesheets {
     }
   }
 
-  export class GetProfileTimesheets {
-    static readonly type = TIMESHEETS_ACTIONS.GET_PROFILE_TIMESHEETS;
+  export class GetTimesheetRecords {
+    static readonly type = TIMESHEETS_ACTIONS.GET_TIMESHEET_RECORDS;
   }
 
-  export class ToggleProfileDialog {
+  export class ToggleCandidateDialog {
     static readonly type = TIMESHEETS_ACTIONS.OPEN_PROFILE;
 
     constructor(public readonly action: DialogAction, public readonly id?: number) {}
   }
 
-  export class OpenProfileTimesheetAddDialog {
+  export class ToggleTimesheetAddDialog {
     static readonly type = TIMESHEETS_ACTIONS.OPEN_PROFILE_TIMESHEET_ADD_DIALOG;
+
+    constructor(public readonly action: DialogAction) {}
   }
 
 
