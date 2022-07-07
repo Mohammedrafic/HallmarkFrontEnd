@@ -1,7 +1,7 @@
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { ExportType, HourOccupationType, TIMETHEETS_STATUSES } from '../enums';
-import { TabConfig, TabCountConfig, Timesheet } from '../interface';
+import { CandidateHoursAndMilesData, TabConfig, TabCountConfig, Timesheet } from '../interface';
 
 
 export const TAB_ADMIN_TIMESHEETS: TabConfig[] = [
@@ -53,22 +53,52 @@ export const MokTimesheet: Timesheet = {
   workWeek: '4 - WE 02/20/2022',
 };
 
-export const profileDetailsHoursChartColors = [
-  '#FFFFFF',
-  '#D8E5FF',
-  '#B2CCFF',
-  '#9EBFFF',
-  '#6499FF',
-  '#518CFF',
-  '#3E7FFF',
-];
-
 export const profileDetailsHoursChartColorsMap: Record<HourOccupationType, string> = {
   [HourOccupationType.OnCall]: '#3E7FFF',
   [HourOccupationType.Callback]: '#518CFF',
   [HourOccupationType.Regular]: '#6499FF',
   [HourOccupationType.Holiday]: '#9EBFFF',
-  [HourOccupationType.Charge]: '#B2CCFF',
   [HourOccupationType.Preceptor]: '#D8E5FF',
   [HourOccupationType.Orientation]: '#FFFFFF',
+};
+
+export const MockCandidateHoursAndMilesData: CandidateHoursAndMilesData = {
+  hours: [
+    {
+      type: HourOccupationType.OnCall,
+      week: 32.47,
+      cumulative: 52.47,
+    },
+    {
+      type: HourOccupationType.Callback,
+      week: 2.5,
+      cumulative: 42.5,
+    },
+    {
+      type: HourOccupationType.Regular,
+      week: 36,
+      cumulative: 76,
+    },
+    {
+      type: HourOccupationType.Holiday,
+      week: 36,
+      cumulative: 76,
+    },
+    {
+      type: HourOccupationType.Preceptor,
+      week: 36,
+      cumulative: 66,
+    },
+    {
+      type: HourOccupationType.Orientation,
+      week: 36,
+      cumulative: 36,
+    }
+  ],
+  miles: {
+    week: 60,
+    cumulative: 120,
+    weekCharge: 120,
+    cumulativeCharge: 240,
+  }
 };

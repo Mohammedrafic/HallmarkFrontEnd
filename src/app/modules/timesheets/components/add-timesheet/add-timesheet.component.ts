@@ -30,7 +30,6 @@ import { endTimeValidator, startTimeValidator } from '@shared/validators/date.va
 import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 
-import { TimesheetsState } from '../../store/state/timesheets.state';
 import { EditTimesheetService } from '../../services/edit-timesheet.service';
 import { EditTimsheetForm } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';

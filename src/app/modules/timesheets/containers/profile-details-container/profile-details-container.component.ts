@@ -2,7 +2,6 @@ import { ActivatedRoute } from '@angular/router';
 import {
   ChangeDetectionStrategy,
   Component,
-  Inject,
   OnInit,
   ViewChild,
   ChangeDetectorRef,
@@ -11,21 +10,23 @@ import {
   Input,
 } from '@angular/core';
 
-import { filter, Observable, switchMap, takeUntil, throttleTime } from 'rxjs';
+import { filter, Observable, switchMap, take, takeUntil, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { UploaderComponent } from "@syncfusion/ej2-angular-inputs";
-import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
+import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { Destroyable } from '@core/helpers';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import {
-  CandidateInfo, DialogActionPayload, TimesheetUploadedFile, TimesheetRecordsDto,
+  CandidateInfo, DialogActionPayload, TimesheetUploadedFile, TimesheetRecordsDto, CandidateHoursAndMilesData,
 } from '../../interface';
 import { DialogAction, SubmitBtnText } from '../../enums';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { ConfirmDeleteTimesheetDialogContent } from '../../constants/confirm-delete-timesheet-dialog-content.const';
 
 
 @Component({
@@ -71,8 +72,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @Select(TimesheetsState.candidateInfo)
   public candidateInfo$: Observable<CandidateInfo>;
 
-  @Select(TimesheetsState.candidateChartData)
-  public chartData$: Observable<unknown>;
+  @Select(TimesheetsState.candidateHoursAndMilesData)
+  public hoursAndMilesData$: Observable<CandidateHoursAndMilesData>;
 
   @Select(TimesheetsState.timeSheetAttachments)
   public attachments$: Observable<TimesheetUploadedFile[]>;
@@ -83,6 +84,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     private profileService: ProfileTimesheetService,
     private cd: ChangeDetectorRef,
     private chipPipe: ChipsCssClass,
+    private confirmService: ConfirmService,
     ) {
     super();
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
@@ -127,7 +129,17 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public onRejectButtonClick(): void {}
 
-  public onDWNCheckboxSelectedChange(): void {}
+  public onDWNCheckboxSelectedChange({checked}: {checked: boolean}, switchComponent: SwitchComponent): void {
+    checked && this.confirmService.confirm(ConfirmDeleteTimesheetDialogContent,{
+      title: 'Delete Timesheet',
+      okButtonLabel: 'Proceed',
+      okButtonClass: 'delete-button',
+    })
+      .pipe(
+        take(1)
+      )
+      .subscribe((submitted: boolean) => !submitted && switchComponent.writeValue(false));
+  }
 
   public handleReject(): void {}
 

@@ -45,6 +45,7 @@ import { ProfileTimesheetService } from './services/profile-timesheet.service';
 import { TimesheetsFilterDialogComponent } from './components/timesheets-filter-dialog/timesheets-filter-dialog.component';
 import { GridModule } from '@shared/components/grid/grid.module';
 import { TimesheetTableStatusCellComponent } from './components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
+import { ProfileMilesComponent } from './components/profile-cumulative-hours/profile-miles/profile-miles.component';
 
 const gridIcons = {
   MessageSquare,
@@ -89,6 +90,7 @@ const gridIcons = {
     TimesheetRejectReasonDialogComponent,
     TimesheetsFilterDialogComponent,
     TimesheetTableStatusCellComponent,
+    ProfileMilesComponent,
   ],
   imports: [
     CommonModule,

@@ -5,10 +5,7 @@ import { Action, Selector, State, StateContext } from '@ngxs/store';
 
 import { ExportPayload } from '@shared/models/export.model';
 import { downloadBlobFile } from '@shared/utils/file.utils';
-import {
-  TimeSheetsPage,
-  TimesheetsModel,
-} from '../model/timesheets.model';
+import { TimesheetsModel, TimeSheetsPage, } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
 import { DialogAction, TimesheetsTableColumns } from '../../enums';
@@ -16,17 +13,17 @@ import { DefaultFiltersState, DefaultTimesheetState } from '../../constants';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';
 import {
+  CandidateHoursAndMilesData,
   CandidateInfo,
+  DialogActionPayload,
   FilterColumns,
   FilterDataSource,
   TabCountConfig,
   TimesheetAttachments,
-  TimesheetRecord,
   TimesheetRecordsDto,
   TimesheetsFilterState,
   TimesheetUploadedFile
 } from '../../interface';
-import { DialogActionPayload } from '../../interface';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
 import { patch } from '@ngxs/store/operators';
 
@@ -74,8 +71,8 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static candidateChartData(state: TimesheetsModel): unknown | null {
-    return state.candidateChartData;
+  static candidateHoursAndMilesData(state: TimesheetsModel): CandidateHoursAndMilesData | null {
+    return state.candidateHoursAndMilesData;
   }
 
   @Selector([TimesheetsState])
@@ -211,12 +208,12 @@ export class TimesheetsState {
   }
 
   @Action(TimesheetDetails.GetCandidateChartData)
-  GetCandidateChartData({ patchState }: StateContext<TimesheetsModel>, id: number): Observable<unknown> {
-    return this.timesheetsApiService.getCandidateChartData(id)
+  GetCandidateChartData({ patchState }: StateContext<TimesheetsModel>, id: number): Observable<CandidateHoursAndMilesData> {
+    return this.timesheetsApiService.getCandidateHoursAndMilesData(id)
     .pipe(
       tap((res) => {
         patchState({
-          candidateChartData: res,
+          candidateHoursAndMilesData: res,
         });
       })
     )

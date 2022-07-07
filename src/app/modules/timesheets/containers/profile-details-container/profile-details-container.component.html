@@ -1,27 +1,7 @@
 <ejs-dialog
-  cssClass="dnw-dialog"
-  #dnwDialog
-  [target]="candidateDialog.element"
-  [width]="'350px'"
-  [visible]="false"
->
-  <ng-template #content>
-    <div class="dnw-dialog-content-container">
-      <h2>You have selected DNW</h2>
-      <div class="content">Timesheet for the week will be deleted. Are you sure you want to proceed?</div>
-      <div class="actions">
-        <button ejs-button class="e-outline" (click)="dnwDialog.hide()">Cancel</button>
-        <button ejs-button class="e-danger">Proceed</button>
-      </div>
-    </div>
-  </ng-template>
-
-</ejs-dialog>
-
-<ejs-dialog
   id="dialog"
   #candidateDialog
-  cssClass="dialog"
+  cssClass="dialog timesheet-details-dialog"
   [width]="'1180px'"
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
@@ -108,11 +88,11 @@
 
         <div class="controls-block">
           <div class="checkbox-block">
-            <ejs-switch
+            <ejs-switch #dnwSwitch
               class="toggle"
               [checked]="false"
-              (checkedChange)="onDWNCheckboxSelectedChange()">
-            </ejs-switch>
+              (change)="onDWNCheckboxSelectedChange($event, dnwSwitch)"
+            ></ejs-switch>
             <span>DNW</span>
           </div>
 
@@ -135,9 +115,16 @@
       </div>
 
       <div class="profile-hours-statistics">
-        <div class="tile-dark-blue">
-          <app-profile-cumulative-hours></app-profile-cumulative-hours>
-        </div>
+        <ng-container *ngIf="hoursAndMilesData$ | async as hoursAndMilesData">
+          <div class="tile-dark-blue" *ngIf="hoursAndMilesData?.hours?.length">
+            <app-profile-cumulative-hours [hoursData]="hoursAndMilesData.hours"></app-profile-cumulative-hours>
+          </div>
+
+          <div class="tile-dark-blue miles" *ngIf="hoursAndMilesData.miles">
+            <app-profile-miles [milesData]="hoursAndMilesData.miles"></app-profile-miles>
+          </div>
+        </ng-container>
+
         <ng-container *ngIf="attachments$ | async as uploads">
           <div class="tile-dark-blue profile-uploads" *ngIf="uploads.length">
             <app-profile-uploads *ngIf="!uploads"></app-profile-uploads>
@@ -160,18 +147,17 @@
           (deleteTableItemId)="handleDeleteItem($event)"
         >
         </app-profile-timesheet-table>
-
-      <app-navigation-panel
-        prevLabel="Previous Timesheet"
-        nextLabel="Next Timesheet"
-        [prevDisabled]="currentSelectedRowIndex === 0"
-        [nextDisabled]="isNextDisabled"
-        (prevClick)="onNextPreviousOrder(false)"
-        (nextClick)="onNextPreviousOrder(true)"
-      ></app-navigation-panel>
-
       </section>
+
     </section>
+    <app-navigation-panel
+            prevLabel="Previous Timesheet"
+            nextLabel="Next Timesheet"
+            [prevDisabled]="currentSelectedRowIndex === 0"
+            [nextDisabled]="isNextDisabled"
+            (prevClick)="onNextPreviousOrder(false)"
+            (nextClick)="onNextPreviousOrder(true)"
+    ></app-navigation-panel>
   </ng-template>
 </ejs-dialog>
 

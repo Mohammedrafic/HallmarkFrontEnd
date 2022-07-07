@@ -1,11 +1,11 @@
-import { ChartPointRenderEvent } from './../../interface/candidate-chart.interface';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { profileDetailsHoursChartColorsMap } from "../../constants/timesheets.constant";
-import { HourOccupationType } from "../../enums/hour-occupation-type.enum";
-import { profileDetailsHoursChartSettings } from "../../constants/profile-details-hours-chart-settings.constant";
+
 import { CheckBoxChangeEventArgs } from "@syncfusion/ej2-angular-grids";
-import { mockedHoursChartData, ProfileHoursChartData } from "../../constants/mocked-hours-charts-data.constant";
-import { DonutChartData } from '../../interface/candidate-chart.interface';
+
+import { CandidateHoursData, ChartPointRenderEvent, DonutChartData } from '../../interface';
+import { profileDetailsHoursChartColorsMap, profileDetailsHoursChartSettings } from "../../constants";
+import { HourOccupationType } from "../../enums";
+import { CandidateBarChartHelper } from '../../helpers/candidate-bar-chart.helper';
 
 @Component({
   selector: 'app-profile-cumulative-hours',
@@ -14,7 +14,7 @@ import { DonutChartData } from '../../interface/candidate-chart.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileCumulativeHoursComponent {
-  private _hoursData: ProfileHoursChartData[];
+  private _hoursData: CandidateHoursData[];
 
   public readonly chartSettings = profileDetailsHoursChartSettings;
   public readonly chartColorsMap: Record<HourOccupationType, string> = profileDetailsHoursChartColorsMap;
@@ -25,12 +25,12 @@ export class ProfileCumulativeHoursComponent {
   public totalCumulativeHours: number = 0;
 
   @Input()
-  public set hoursData(value: ProfileHoursChartData[]) {
+  public set hoursData(value: CandidateHoursData[]) {
     this._hoursData = value;
 
     value = value.slice().reverse();
-    this.weekHoursChartData = value.map(toWeekHoursChartData);
-    this.cumulativeHoursChartData = value.map(toCumulativeHoursChartData);
+    this.weekHoursChartData = value.map(CandidateBarChartHelper.toWeekHoursChartData);
+    this.cumulativeHoursChartData = value.map(CandidateBarChartHelper.toCumulativeHoursChartData);
     this.updateTotalHoursData();
   }
 
@@ -38,11 +38,7 @@ export class ProfileCumulativeHoursComponent {
     return this._hoursData;
   }
 
-  constructor() {
-    this.hoursData = mockedHoursChartData;
-  }
-
-  public trackByName(_: number, item: ProfileHoursChartData): string {
+  public trackByName(_: number, item: CandidateHoursData): string {
     return item.type;
   }
 
@@ -50,16 +46,16 @@ export class ProfileCumulativeHoursComponent {
     event.fill = profileDetailsHoursChartColorsMap[event.point.x];
   }
 
-  public toggleChartCategoryVisibility({checked}: CheckBoxChangeEventArgs, legendItem: ProfileHoursChartData): void {
-    const index = this.hoursData.findIndex((data: ProfileHoursChartData) => data.type === legendItem.type);
+  public toggleChartCategoryVisibility({checked}: CheckBoxChangeEventArgs, legendItem: CandidateHoursData): void {
+    const index = this.hoursData.findIndex((data: CandidateHoursData) => data.type === legendItem.type);
 
     this.weekHoursChartData = this.weekHoursChartData.map(item => {
-      item.y = item.x === legendItem.type ? checked ? this.hoursData[index].weekly : 0 : item.y;
+      item.y = item.x === legendItem.type ? checked ? this.hoursData[index].week : 0 : item.y;
       return item;
     });
 
     this.cumulativeHoursChartData = this.cumulativeHoursChartData.map(item => {
-      item.y = item.x === legendItem.type ? checked ? this.hoursData[index].total : 0 : item.y;
+      item.y = item.x === legendItem.type ? checked ? this.hoursData[index].cumulative : 0 : item.y;
       return item;
     });
 
@@ -80,16 +76,3 @@ export class ProfileCumulativeHoursComponent {
   }
 }
 
-function toWeekHoursChartData({type, weekly}: ProfileHoursChartData): DonutChartData<HourOccupationType> {
-  return {
-    x: type,
-    y: weekly,
-  };
-}
-
-function toCumulativeHoursChartData({type, total}: ProfileHoursChartData): DonutChartData<HourOccupationType> {
-  return {
-    x: type,
-    y: total,
-  };
-}

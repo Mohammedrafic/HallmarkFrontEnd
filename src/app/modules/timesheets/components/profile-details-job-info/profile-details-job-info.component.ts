@@ -1,27 +1,14 @@
 import { Router } from '@angular/router';
-import { ChangeDetectionStrategy, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { Observable } from "rxjs";
+
 import { Select } from "@ngxs/store";
+
 import { AppState } from "../../../../store/app.state";
-import { map, Observable } from "rxjs";
 import { IsOrganizationAgencyAreaStateModel } from "@shared/models/is-organization-agency-area-state.model";
-
-interface JobData {
-  jobTitle: string;
-  location: string;
-  department: string;
-  skill: string;
-  startDate: string;
-  endDate: string;
-  agency: string;
-  orgName?: string;
-}
-
-interface JobInfoUIItem {
-  icon: string;
-  value: unknown;
-  title: string;
-}
+import { CandidateInfoUIItem } from '../../interface/candidate-info-ui-item.interface';
+import { CandidateInfo } from '../../interface';
 
 @Component({
   selector: 'app-profile-details-job-info',
@@ -30,11 +17,12 @@ interface JobInfoUIItem {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileDetailsJobInfoComponent implements OnChanges {
-  public items: JobInfoUIItem[] = [];
+  public items: CandidateInfoUIItem[] = [];
 
-  @Input() jobData: any;
+  public isAgency: boolean;
 
-  isAgency: boolean;
+  @Input()
+  public jobData: CandidateInfo | null;
 
   @Select(AppState.isOrganizationAgencyArea)
   public readonly isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
@@ -46,17 +34,17 @@ export class ProfileDetailsJobInfoComponent implements OnChanges {
     this.isAgency = this.router.url.includes('agency');
   }
 
-  ngOnChanges(): void {
+  public ngOnChanges(): void {
     if (this.jobData) {
       this.items = this.getUIItems(this.jobData);
     }
   }
 
-  public trackByTitle(_: number, item: JobInfoUIItem): string {
+  public trackByTitle(_: number, item: CandidateInfoUIItem): string {
     return item.title;
   }
 
-  private getUIItems(data: JobData): JobInfoUIItem[] {
+  private getUIItems(data: CandidateInfo): CandidateInfoUIItem[] {
     return [
       {
         title: 'Job Title',
@@ -86,8 +74,8 @@ export class ProfileDetailsJobInfoComponent implements OnChanges {
       {
         title: !this.isAgency ? 'Agency' : 'Organization',
         icon: 'briefcase',
-        value: data.orgName,
+        value: data.unitName,
       },
-    ]
+    ];
   }
 }
