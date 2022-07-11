@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Observable, tap } from 'rxjs';
+import { Observable, of, tap, throttleTime } from 'rxjs';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 
 import { ExportPayload } from '@shared/models/export.model';
@@ -11,13 +11,24 @@ import {
 } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
-import { DialogAction } from '../../enums';
-import { DefaultTimesheetState } from '../../constants';
+import { DialogAction, TimesheetsTableColumns } from '../../enums';
+import { DefaultFiltersState, DefaultTimesheetState } from '../../constants';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';
-import { CandidateInfo, TabCountConfig, TimesheetAttachments, TimesheetRecord, TimesheetRecordsDto, TimesheetsFilterState, TimesheetUploadedFile } from '../../interface';
+import {
+  CandidateInfo,
+  FilterColumns,
+  FilterDataSource,
+  TabCountConfig,
+  TimesheetAttachments,
+  TimesheetRecord,
+  TimesheetRecordsDto,
+  TimesheetsFilterState,
+  TimesheetUploadedFile
+} from '../../interface';
 import { DialogActionPayload } from '../../interface';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
+import { patch } from '@ngxs/store/operators';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -82,18 +93,37 @@ export class TimesheetsState {
     return state.billRateTypes;
   }
 
+  @Selector([TimesheetsState])
+  static timesheetsFiltersColumns(state: TimesheetsModel): FilterColumns {
+    return state.timesheetsFiltersColumns;
+  }
+
   @Action(Timesheets.GetAll)
   GetTimesheets(
-    { patchState }: StateContext<TimesheetsModel>,
-    { payload, isAgency }: Timesheets.GetAll
+    { patchState, getState }: StateContext<TimesheetsModel>,
   ): Observable<TimeSheetsPage> {
-    return this.timesheetsApiService.getTimesheets(Object.assign({}, payload, { isAgency }))
+    const filters = getState().timesheetsFilters;
+
+    return this.timesheetsApiService.getTimesheets(filters)
       .pipe(
         tap((res) => {
           patchState({
             timesheets: res,
           });
         }));
+  }
+
+  @Action(Timesheets.UpdateFiltersState)
+  UpdateFiltersState(
+    { setState }: StateContext<TimesheetsModel>,
+    { payload }: Timesheets.UpdateFiltersState,
+  ): Observable<null> {
+    return of(null).pipe(
+      throttleTime(100),
+      tap(() => setState(patch({
+        timesheetsFilters: payload ? patch(payload) : DefaultFiltersState,
+      })))
+    );
   }
 
   @Action(Timesheets.GetTabsCounts)
@@ -202,5 +232,26 @@ export class TimesheetsState {
         });
       })
     )
+  }
+
+  @Action(Timesheets.SetFiltersDataSource)
+  SetFiltersDataSource(
+    { setState }: StateContext<TimesheetsModel>,
+    { payload }: Timesheets.SetFiltersDataSource
+  ): Observable<FilterDataSource> {
+    return this.timesheetsApiService.setDataSources(payload)
+      .pipe(
+        tap((res: FilterDataSource) => {
+          Object.keys(res).forEach((key: string) => {
+            setState(patch({
+              timesheetsFiltersColumns: patch({
+                [key]: patch({
+                  dataSource: res[key as TimesheetsTableColumns],
+                })
+              })
+            }))
+          });
+        })
+      );
   }
 }

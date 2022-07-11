@@ -1,14 +1,12 @@
 import { Injectable } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
+import { Observable } from 'rxjs';
 import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
 import { CustomFormGroup } from '@core/interface';
-import { IDataSourceItem, IFilterColumns } from '../interface';
-import { defaultFilterColumns, filterColumnDataSource } from '../constants';
-import { TimesheetsTableColumns } from '../enums';
-import { TimsheetForm } from '../interface';
 import { BaseObservable } from '@core/helpers';
-import { Observable } from 'rxjs';
+
+import { TimsheetForm } from '../interface';
 
 @Injectable()
 export class TimesheetsService {
@@ -19,26 +17,16 @@ export class TimesheetsService {
 
   public createForm(): CustomFormGroup<TimsheetForm> {
     return this.fb.group({
-      date: [null],
       search: [''],
-      orderId: [''],
-      status: [[]],
-      skill: [[]],
-      department: [[]],
-      billRate: [0],
+      orderId: [[]],
+      statusText: [[]],
+      skillName: [[]],
+      departmentName: [[]],
       agencyName: [[]],
-      totalHours: [0],
+      orgName: [[]],
+      region: [[]],
+      location: [[]],
     }) as CustomFormGroup<TimsheetForm>;
-  }
-
-  public createFilterColumns(): IFilterColumns {
-    return defaultFilterColumns;
-  }
-
-  public setDataSources(filterKey: TimesheetsTableColumns): IDataSourceItem[] | any {
-    return filterColumnDataSource[filterKey].map((el: IDataSourceItem) =>
-      ({...el, name: this.capitalizeFirst.transform(el.name)})
-    );
   }
 
   public getStream(): Observable<number> {

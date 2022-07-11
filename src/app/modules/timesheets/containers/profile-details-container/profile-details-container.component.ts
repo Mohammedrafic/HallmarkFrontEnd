@@ -58,8 +58,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public rejectReasonDialogVisible: boolean = false;
 
-  public isNextDisabled = false;
-
   public isAgency: boolean;
 
   public submitText: string;
@@ -89,6 +87,10 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     super();
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
     this.submitText = this.isAgency ? SubmitBtnText.Submit : SubmitBtnText.Approve;
+  }
+
+  public get isNextDisabled(): boolean {
+    return this.maxRowIndex - 1 === this.currentSelectedRowIndex;
   }
 
   public ngOnInit(): void {

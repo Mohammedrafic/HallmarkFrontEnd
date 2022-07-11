@@ -1,11 +1,9 @@
 import { TimesheetsModel } from '../store/model/timesheets.model';
+import { DefaultFilterColumns, DefaultFiltersState } from './timesheets-table.constant';
 
 export const DefaultTimesheetState: TimesheetsModel = {
   timesheets: null,
-  timesheetsFilters: {
-    pageNumber: 1,
-    pageSize: 30,
-  },
+  timesheetsFilters: DefaultFiltersState,
   tabCounts: null,
   timeSheetRecords: {
     timeRecords: [],
@@ -22,4 +20,5 @@ export const DefaultTimesheetState: TimesheetsModel = {
   billRateTypes: [],
   costCenterOptions: [],
   isAddDialogOpen: false,
+  timesheetsFiltersColumns: DefaultFilterColumns,
 }

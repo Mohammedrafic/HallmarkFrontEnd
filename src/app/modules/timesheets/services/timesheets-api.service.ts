@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { Observable, of } from 'rxjs';
+import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
 
 import {
   TimesheetsFilterState,
@@ -10,23 +11,27 @@ import {
   TimesheetAttachments,
   TabCountConfig,
   TimesheetRecordsDto,
+  DataSourceItem,
+  FilterDataSource,
 } from '../interface';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
-import { MokTabsCounts, MokTimesheet } from '../constants';
+import { filterColumnDataSource, MokTabsCounts, MokTimesheet } from '../constants';
 import { CandidateMockInfo, MockTimesheetRecords } from '../constants/timesheet-records-mock.constant';
+import { TimesheetsTableColumns } from '../enums';
 
 @Injectable()
 export class TimesheetsApiService {
 
   constructor(
     private http: HttpClient,
+    private capitalizeFirst: CapitalizeFirstPipe,
   ) {}
 
   public getTimesheets(filters: TimesheetsFilterState): Observable<TimeSheetsPage> {
     return of({
       pageNumber: 1,
       totalPages: 1,
-      totalCount: 0,
+      totalCount: 1,
       items: [MokTimesheet],
       hasNextPage: false,
       hasPreviousPage: false,
@@ -55,6 +60,18 @@ export class TimesheetsApiService {
 
   public deleteProfileTimesheets(profileId: number, profileTimesheetId: number): Observable<null> {
     return of(null);
+  }
+
+  public setDataSources(filterKeys: TimesheetsTableColumns[]): Observable<FilterDataSource> {
+    const res = filterKeys.reduce((acc: any, key) => {
+      acc[key] = filterColumnDataSource[key].map((el: DataSourceItem) =>
+        ({...el, name: this.capitalizeFirst.transform(el.name)})
+      );
+
+      return acc;
+    }, {});
+
+    return of(res);
   }
 
   public getCandidateInfo(id: number): Observable<CandidateInfo> {

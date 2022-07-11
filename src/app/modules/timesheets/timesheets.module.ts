@@ -40,8 +40,11 @@ import { ProfileUploadsComponent } from './components/profile-uploads/profile-up
 import { ProfileInvoicesComponent } from './components/profile-invoices/profile-invoices.component';
 import { TimesheetsService } from './services/timesheets.service';
 import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
-import { TimesheetDetailsService } from "./services/timesheet-details.service";
+import { TimesheetDetailsService } from './services/timesheet-details.service';
 import { ProfileTimesheetService } from './services/profile-timesheet.service';
+import { TimesheetsFilterDialogComponent } from './components/timesheets-filter-dialog/timesheets-filter-dialog.component';
+import { GridModule } from '@shared/components/grid/grid.module';
+import { TimesheetTableStatusCellComponent } from './components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
 
 const gridIcons = {
   MessageSquare,
@@ -84,6 +87,8 @@ const gridIcons = {
     ProfileUploadsComponent,
     ProfileInvoicesComponent,
     TimesheetRejectReasonDialogComponent,
+    TimesheetsFilterDialogComponent,
+    TimesheetTableStatusCellComponent,
   ],
   imports: [
     CommonModule,
@@ -116,6 +121,7 @@ const gridIcons = {
     TextBoxModule,
     TooltipModule,
     SwitchModule,
+    GridModule
   ],
   exports: [TimesheetsContainerComponent],
   providers: [

@@ -1,0 +1,27 @@
+@import "colors";
+
+.table-wrapper {
+  height: 100%;
+
+  & .ag-header-cell-text {
+    color: $secondary-dark-blue-15;
+  }
+
+  & .ag-theme-alpine .ag-ltr .ag-cell {
+    &.status-cell {
+      display: flex;
+      align-items: center;
+    }
+
+    &.name {
+      font-weight: 700;
+      color: $primary-active-blue-10;
+      cursor: pointer;
+    }
+
+    &.bold {
+      font-weight: 700;
+      cursor: pointer;
+    }
+  }
+}

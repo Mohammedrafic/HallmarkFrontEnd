@@ -1,12 +1,15 @@
 <div class="app-grid">
   <ag-grid-angular
     (gridReady)="handleGridReadyEvent($event)"
+    (rowSelected)="handleSelectionChanged($event)"
     [columnDefs]="columnDefinitions"
     [defaultColDef]="defaultColumnDefinition"
     [modules]="modules"
     [rowData]="rowData"
     [rowHeight]="gridConfig.initialRowHeight"
     [headerHeight]="52"
+    [suppressRowClickSelection]="suppressRowClickSelection"
+    [rowSelection]="rowSelection"
     class="ag-theme-alpine app-grid__component"
   ></ag-grid-angular>
   <app-grid-pagination

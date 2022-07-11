@@ -46,7 +46,7 @@ export const MokTimesheet: Timesheet = {
   startDate: '2022-07-06T16:00:00',
   department: 'Emergency Department',
   agencyName: 'AB Staffing',
-  orgName: 'AB Staffing',
+  orgName: 'ABG Staffing',
   billRate: 10,
   totalDays: 32,
   status: TIMETHEETS_STATUSES.PENDING_APPROVE,

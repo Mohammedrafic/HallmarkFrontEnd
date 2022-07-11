@@ -7,6 +7,7 @@ import {
   CandidateInfo,
   TabCountConfig,
   TimesheetRecordsDto,
+  FilterColumns,
 } from '../../interface';
 
 
@@ -25,4 +26,5 @@ export interface TimesheetsModel {
   selectedTimeSheetId: number;
   isAddDialogOpen: boolean;
   tabCounts: TabCountConfig | null;
+  timesheetsFiltersColumns: FilterColumns;
 }

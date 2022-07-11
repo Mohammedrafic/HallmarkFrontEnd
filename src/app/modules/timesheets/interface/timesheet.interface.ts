@@ -22,15 +22,20 @@ export interface Timesheet {
 
 export interface TimesheetsFilterState {
   orderBy?: string;
-  pageNumber: number;
-  pageSize: number;
+  pageNumber?: number;
+  pageSize?: number;
   date?: string;
   search?: string;
-  orderId?: string;
-  status?: string[];
-  skill?: string[];
-  department?: string[];
+  orderId?: string[];
+  status?: string;
+  statusText?: string[];
+  skillName?: string[];
+  departmentName?: string[];
+  location?: string[];
+  region?: string[];
+  orgName?: string[];
   agencyName?: string[];
+  isAgency?: boolean;
 }
 
 export interface TimesheetsSelectedRowEvent {
@@ -40,22 +45,22 @@ export interface TimesheetsSelectedRowEvent {
 }
 
 export type ITimesheetsColumnWidth = {
-  [key in TimesheetsTableColumns]: number;
+  [key in TimesheetsTableColumns]?: number;
 };
 
-export type IFilterColumns = {
+export type FilterColumns = {
   [key in TimesheetsTableColumns]: {
     type: ControlTypes;
     valueType: ValueType;
-    dataSource?: IDataSourceItem[] | any;
+    dataSource?: DataSourceItem[] | any;
   }
 }
 
-export type IFilterDataSource = {
-  [key in TimesheetsTableColumns]?: IDataSourceItem[] | any;
+export type FilterDataSource = {
+  [key in TimesheetsTableColumns]?: DataSourceItem[] | any;
 }
 
-export interface IDataSourceItem {
+export interface DataSourceItem {
   id: number;
   name: string;
 }

@@ -30,6 +30,8 @@ export class GridComponent<Data> extends DestroyableDirective implements OnChang
   @Input() public columnDefinitions: ColumnDefinitionModel[] | null;
   @Input() public currentPage: number = 1;
   @Input() public isLoading: boolean | null = false;
+  @Input() public suppressRowClickSelection: boolean = false;
+  @Input() public rowSelection: 'single' | 'multiple' = 'single';
   @Input() public pageSize: number = GRID_CONFIG.rowsPerPageDropDownObject[0].value;
   @Input() public rowData: Data[] | null | undefined;
   @Input() public totalRecordsCount: number = 1;
@@ -37,6 +39,7 @@ export class GridComponent<Data> extends DestroyableDirective implements OnChang
   @Output() public gridReadyEmitter: EventEmitter<GridReadyEventModel> = new EventEmitter();
   @Output() public navigateToPageEmitter: EventEmitter<number> = new EventEmitter<number>();
   @Output() public pageSizeChangeEmitter: EventEmitter<number> = new EventEmitter<number>();
+  @Output() public gridSelectedRow: EventEmitter<any> = new EventEmitter<any>();
 
   public readonly defaultColumnDefinition: ColumnDefinitionModel = { minWidth: 100, resizable: true };
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
@@ -58,6 +61,10 @@ export class GridComponent<Data> extends DestroyableDirective implements OnChang
   public handleGridReadyEvent(event: GridReadyEventModel): void {
     this.gridInstance$.next(event);
     this.gridReadyEmitter.emit(event);
+  }
+
+  public handleSelectionChanged(event: GridReadyEventModel): void {
+    this.gridSelectedRow.emit(event);
   }
 
   private initLoadingStateChangesListener(): void {

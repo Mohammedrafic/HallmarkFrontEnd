@@ -10,14 +10,14 @@ export interface EditTimsheetForm {
 }
 
 export interface TimsheetForm {
-  date: string;
   search: string;
-  orderId: string;
+  orderId: string[];
   status: string[];
   skill: string[];
   department: string[];
-  billRate: number;
   agencyName: string[];
-  totalHours: number;
+  orgName: string[];
+  region: string[];
+  location: string[];
 }
 

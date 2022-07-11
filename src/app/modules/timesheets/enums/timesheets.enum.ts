@@ -8,6 +8,8 @@ export enum TIMESHEETS_ACTIONS {
   PATCH_PROFILE_TIMESHEET = '[timesheets] PATCH PROFILE TIMESHEET',
   DELETE_PROFILE_TIMESHEET = '[timesheets] DELETE PROFILE TIMESHEET',
   GET_TABS_COUNTS = '[timesheets] GET TABS COUNTS',
+  SET_FILTERS_DATA_SOURCE = '[timesheets] SET FILTERS DATA SOURCE',
+  UPDATE_FILTERS_STATE = '[timesheets] UPDATE FILTERS STATE',
 }
 
 export enum TimesheetDetailsActions {
@@ -42,13 +44,15 @@ export enum TimesheetsTableColumns {
   Name = 'name',
   StatusText = 'statusText',
   OrderId = 'orderId',
-  SkillName = 'skillName',
+  Skill = 'skill',
   Location = 'location',
+  Region = 'region',
+  OrgName = 'orgName',
   WorkWeek = 'workWeek',
-  DepartmentName = 'departmentName',
+  Department = 'department',
   BillRate = 'billRate',
   AgencyName = 'agencyName',
-  TotalHours = 'totalHours',
+  TotalDays = 'totalDays',
   Controls = 'controls',
 }
 

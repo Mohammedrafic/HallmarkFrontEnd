@@ -1,12 +1,9 @@
-import { TIMESHEETS_ACTIONS, DialogAction } from '../../enums';
+import { TIMESHEETS_ACTIONS, DialogAction, TimesheetsTableColumns } from '../../enums';
 import { TimesheetsFilterState } from '../../interface';
 
 export namespace Timesheets {
   export class GetAll {
     static readonly type = TIMESHEETS_ACTIONS.GET_TIMESHEETS;
-
-    constructor(public readonly payload: TimesheetsFilterState, public readonly isAgency: boolean) {
-    }
   }
 
   export class ToggleCandidateDialog {
@@ -56,5 +53,19 @@ export namespace Timesheets {
 
   export class GetTabsCounts {
     static readonly type = TIMESHEETS_ACTIONS.GET_TABS_COUNTS;
+  }
+
+  export class SetFiltersDataSource {
+    static readonly type = TIMESHEETS_ACTIONS.SET_FILTERS_DATA_SOURCE;
+
+    constructor(public readonly payload: TimesheetsTableColumns[]) {
+    }
+  }
+
+  export class UpdateFiltersState {
+    static readonly type = TIMESHEETS_ACTIONS.UPDATE_FILTERS_STATE;
+
+    constructor(public readonly payload?: TimesheetsFilterState) {
+    }
   }
 }

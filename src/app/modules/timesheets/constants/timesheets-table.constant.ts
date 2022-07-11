@@ -1,98 +1,127 @@
-import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
-import { SelectionSettingsModel } from '@syncfusion/ej2-angular-grids';
-
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import { GRID_CONFIG } from '@shared/constants';
+import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 
-import { SortingDirections } from '@client/client.config';
-import { MoreMenuType, TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../enums';
-import { IFilterColumns, IFilterDataSource, ITimesheetsColumnWidth, TableSettingsConfig } from '../interface';
+import { TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../enums';
+import { FilterColumns, FilterDataSource, TimesheetsFilterState } from '../interface';
+import {
+  TimesheetTableStatusCellComponent
+} from '../components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
 
-export const ROW_HEIGHT = {
-  SCALE_UP_HEIGHT: 140,
-  SCALE_DOWN_HEIGHT: 64
-};
-
-export const moreMenuWithDelete: ItemModel[] = [
-  { text: MoreMenuType.Edit, id: '0' },
-  { text: MoreMenuType.Duplicate, id: '1' },
-  { text: MoreMenuType.Delete, id: '3' }
+export const TimesheetsGridConfig: ColumnDefinitionModel[] = [
+  {
+    field: TimesheetsTableColumns.Checkbox,
+    headerName: '',
+    width: 50,
+    minWidth: 50,
+    headerCheckboxSelection: true,
+    headerCheckboxSelectionFilteredOnly: true,
+    checkboxSelection: true,
+  },
+  {
+    field: TimesheetsTableColumns.Name,
+    headerName: 'NAME',
+    width: 158,
+    minWidth: 158,
+    cellClass: 'name',
+    filter: true,
+  },
+  {
+    field: TimesheetsTableColumns.StatusText,
+    headerName: 'STATUS',
+    width: 170,
+    minWidth: 170,
+    cellRenderer: TimesheetTableStatusCellComponent,
+    cellClass: 'status-cell',
+    filter: true,
+  },
+  {
+    field: TimesheetsTableColumns.OrderId,
+    headerName: 'ORDER ID',
+    width: 140,
+    minWidth: 140,
+    cellClass: 'name',
+    filter: true,
+  },
+  {
+    field: TimesheetsTableColumns.Skill,
+    headerName: 'SKILL',
+    width: 270,
+    minWidth: 270,
+    filter: true,
+  },
+  {
+    field: TimesheetsTableColumns.Location,
+    headerName: 'LOCATION',
+    width: 200,
+    minWidth: 200,
+    wrapText: true,
+    filter: true,
+  },
+  {
+    field: TimesheetsTableColumns.WorkWeek,
+    headerName: 'WORK WEEK',
+    width: 240,
+    minWidth: 240,
+    cellClass: 'bold',
+    filter: true,
+  },
+  {
+    field: TimesheetsTableColumns.Department,
+    headerName: 'DEPARTMENT',
+    width: 264,
+    minWidth: 264,
+    wrapText: true,
+    filter: true,
+  },
+  {
+    field: TimesheetsTableColumns.BillRate,
+    headerName: 'BILL RATE $',
+    width: 140,
+    minWidth: 140,
+  },
+  {
+    field: TimesheetsTableColumns.AgencyName,
+    headerName: '',
+    width: 164,
+    minWidth: 164,
+    wrapText: true,
+    filter: true,
+  },
+  {
+    field: TimesheetsTableColumns.TotalDays,
+    headerName: 'TOTAL DAYS',
+    width: 160,
+    minWidth: 160
+  },
 ];
 
-export const moreMenuWithClose: ItemModel[] = [
-  { text: MoreMenuType.Edit, id: '0' },
-  { text: MoreMenuType.Duplicate, id: '1' },
-  { text: MoreMenuType.Close, id: '2' }
-];
-
-export const tableSelectionModel: SelectionSettingsModel = {
-  type: 'Single',
-  mode: 'Row',
-  checkboxMode: 'ResetOnRowClick'
-};
-
-export const timesheetsTableColumnWidth: ITimesheetsColumnWidth = {
-  checkbox: 50,
-  name: 158,
-  statusText: 152,
-  orderId: 140,
-  location: 120,
-  skillName: 270,
-  workWeek: 240,
-  departmentName: 264,
-  billRate: 140,
-  agencyName: 164,
-  totalHours: 160,
-  controls: 112
-};
-
-export const TIMESHEETS_GRID_CONFIG = {
-  ...GRID_CONFIG,
-  columns: [
-    { field: TimesheetsTableColumns.Checkbox },
-    { field: TimesheetsTableColumns.Name, direction: SortingDirections.Descending },
-    { field: TimesheetsTableColumns.StatusText, direction: SortingDirections.Descending },
-    { field: TimesheetsTableColumns.OrderId, direction: SortingDirections.Descending },
-    { field: TimesheetsTableColumns.SkillName, direction: SortingDirections.Descending },
-    { field: TimesheetsTableColumns.WorkWeek, direction: SortingDirections.Descending },
-    { field: TimesheetsTableColumns.DepartmentName, direction: SortingDirections.Descending },
-    { field: TimesheetsTableColumns.BillRate, direction: SortingDirections.Descending },
-    { field: TimesheetsTableColumns.AgencyName, direction: SortingDirections.Descending },
-    { field: TimesheetsTableColumns.TotalHours, direction: SortingDirections.Descending },
-    { field: TimesheetsTableColumns.Controls, direction: SortingDirections.Descending }
-  ]
-}
-
-export const defaultFilterColumns: IFilterColumns = {
-  orderId: { type: ControlTypes.Text, valueType: ValueType.Text },
+export const DefaultFilterColumns: FilterColumns = {
+  orderId: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
   statusText: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
-  skillName: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
-  departmentName: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
-  billRate: { type: ControlTypes.Text, valueType: ValueType.Text },
+  skill: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
+  department: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
   agencyName: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
-  totalHours: { type: ControlTypes.Text, valueType: ValueType.Text },
-} as IFilterColumns;
+  orgName: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
+  region: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
+  location: { type: ControlTypes.Multiselect, valueType: ValueType.Text }
+} as FilterColumns;
+
+export const DefaultFiltersState: TimesheetsFilterState = {
+  pageNumber: 1,
+  pageSize: 30
+};
 
 export const filterOptionFields = {
   text: 'name',
   value: 'name'
 };
 
-export const TableSettings: TableSettingsConfig = {
-  allowWrap: TIMESHEETS_GRID_CONFIG.isWordWrappingEnabled,
-  wrapSettings: TIMESHEETS_GRID_CONFIG.wordWrapSettings,
-  selectionOptions: tableSelectionModel,
-  isLockMenuButtonsShown: false,
-  moreMenuWithDeleteButton: moreMenuWithDelete,
-  moreMenuWithCloseButton: moreMenuWithClose,
-};
-
-export const filterColumnDataSource: IFilterDataSource = {
+export const filterColumnDataSource: FilterDataSource = {
   statusText: Object.values(TIMETHEETS_STATUSES).map((val, idx) => ({
     id: idx + 1,
-    name: val,
+    name: val
   })),
-  skillName: [
+  skill: [
     {
       id: 1,
       name: 'Certified Nursed Assistant'
@@ -100,9 +129,9 @@ export const filterColumnDataSource: IFilterDataSource = {
     {
       id: 2,
       name: 'Qualified Doctor'
-    },
+    }
   ],
-  departmentName: [
+  department: [
     {
       id: 1,
       name: 'Emergency'
@@ -110,16 +139,56 @@ export const filterColumnDataSource: IFilterDataSource = {
     {
       id: 2,
       name: 'Surgery'
-    },
+    }
   ],
   agencyName: [
     {
       id: 1,
-      name: 'AB Staffing',
+      name: 'AB Staffing'
     },
     {
       id: 2,
-      name: 'SQIN',
+      name: 'SQIN'
     }
   ],
+  orgName: [
+    {
+      id: 1,
+      name: 'Org 1'
+    },
+    {
+      id: 2,
+      name: 'Org 2'
+    }
+  ],
+  region: [
+    {
+      id: 1,
+      name: 'AR region'
+    },
+    {
+      id: 2,
+      name: 'AOP region'
+    }
+  ],
+  location: [
+    {
+      id: 1,
+      name: 'Location 1'
+    },
+    {
+      id: 2,
+      name: 'Location 2'
+    }
+  ],
+  orderId: [
+    {
+      id: 1,
+      name: '20-30-01'
+    },
+    {
+      id: 2,
+      name: '20-30-02'
+    }
+  ]
 };
