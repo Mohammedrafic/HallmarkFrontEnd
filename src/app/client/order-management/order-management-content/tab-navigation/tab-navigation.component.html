@@ -1,6 +1,7 @@
 <ejs-tab id="tab_default" heightAdjustMode="Auto" #tabNavigation (selecting)="onSelect($event)">
   <div class="e-tab-header">
     <div>{{ tabTitle.AllOrders }}</div>
+    <div>{{ tabTitle.PerDiem }}</div>
     <div>
       {{ tabTitle.ReOrders }}
       <span *ngIf="reOrdersCount" class="tab-navigation e-badge e-badge-success e-badge-circle">{{ reOrdersCount }}</span>

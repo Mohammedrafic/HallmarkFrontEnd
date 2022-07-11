@@ -24,5 +24,7 @@
         <app-order-management-grid *ngSwitchCase="selectedTabCases.MyAgency" [filteredItems$]="filteredItems$"></app-order-management-grid>
         <div *ngSwitchCase="selectedTabCases.OtherAgencies">OtherAgencies</div>
         <div *ngSwitchCase="selectedTabCases.AllAgencies">AllAgencies</div>
+        <!--TODO: columns config-->
+        <app-order-management-grid *ngSwitchCase="selectedTabCases.PerDiem" [filteredItems$]="filteredItems$"></app-order-management-grid>
     </ng-container>
 </section>

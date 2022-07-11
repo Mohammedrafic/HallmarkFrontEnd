@@ -52,7 +52,11 @@ export const ReOrdersColumnsConfig = [
   {
     fieldName: 'startDate',
     visible: false
-  }
+  },
+  {
+    fieldName: 'shiftCount',
+    visible: false
+  },
 ];
 
 export const AllOrdersColumnsConfig = [
@@ -83,5 +87,56 @@ export const AllOrdersColumnsConfig = [
   {
     fieldName: 'agencyName',
     visible: false
+  },
+  {
+    fieldName: 'shiftCount',
+    visible: false
+  },
+];
+
+export const PerDiemColumnsConfig = [
+  {
+    fieldName: 'id',
+    visible: true
+  },
+  {
+    fieldName: 'orderType',
+    visible: true
+  },
+  {
+    fieldName: 'startDate',
+    visible: false
+  },
+  {
+    fieldName: 'reOrderId',
+    visible: false
+  },
+  {
+    fieldName: 'reOrderDate',
+    visible: false
+  },
+  {
+    fieldName: 'shift',
+    visible: false
+  },
+  {
+    fieldName: 'agencyName',
+    visible: false
+  },
+  {
+    fieldName: 'openPositions',
+    visible: false
+  },
+  {
+    fieldName: 'billRate',
+    visible: false
+  },
+  {
+    fieldName: 'orderType',
+    visible: false
+  },
+  {
+    fieldName: 'shiftCount',
+    visible: true
   },
 ];

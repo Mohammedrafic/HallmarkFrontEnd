@@ -44,6 +44,7 @@ import {
   MoreMenuType,
   OrderType,
   OrderTypeName,
+  PerDiemColumnsConfig,
   ReOrdersColumnsConfig,
   ROW_HEIGHT
 } from './order-management-content.constants';
@@ -212,6 +213,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
+        this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
+        break;
+      case OrganizationOrderManagementTabs.PerDiem:
+        // TODO: perdiem 
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.ReOrders:
@@ -384,6 +389,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       case OrganizationOrderManagementTabs.AllOrders:
         this.isLockMenuButtonsShown = true;
         this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
+        this.getOrders();
+        break;
+      case OrganizationOrderManagementTabs.PerDiem:
+        this.isLockMenuButtonsShown = true;
+        this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
         this.getOrders();
         break;
       case OrganizationOrderManagementTabs.ReOrders:
