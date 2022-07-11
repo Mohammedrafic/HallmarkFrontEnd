@@ -1,25 +1,33 @@
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { Component, Input, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
-import { Select } from '@ngxs/store';
-import { filter, Observable } from 'rxjs';
+import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
+import { Select, Store } from '@ngxs/store';
+import { filter, forkJoin, Observable, takeUntil, tap } from 'rxjs';
+
+import { isEmpty } from 'lodash';
 
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { OrderTypeOptions } from '@shared/enums/order-type';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
-
+import { GetOrganizationStructure } from '@agency/store/order-management.actions';
+import { OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
+import { getDepartmentFromLocations, getLocationsFromRegions } from './agency-order-filters.utils';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 @Component({
   selector: 'app-agency-order-filters',
   templateUrl: './agency-order-filters.component.html',
   styleUrls: ['./agency-order-filters.component.scss'],
 })
-export class AgencyOrderFiltersComponent implements OnInit {
+export class AgencyOrderFiltersComponent extends DestroyableDirective implements OnInit, AfterViewInit {
   @Input() form: FormGroup;
   @Input() filterColumns: any;
 
   @Select(OrderManagementState.orderFilteringOptions)
   orderFilteringOptions$: Observable<AgencyOrderFilteringOptions>;
+
+  @Select(OrderManagementState.gridFilterRegions)
+  gridFilterRegions$: Observable<OrganizationRegion[]>;
 
   public optionFields = {
     text: 'name',
@@ -30,13 +38,94 @@ export class AgencyOrderFiltersComponent implements OnInit {
     value: 'status',
   };
 
+  get regionIdsControl(): AbstractControl {
+    return this.form.get('regionIds') as AbstractControl;
+  }
+
+  get locationIdsControl(): AbstractControl {
+    return this.form.get('locationIds') as AbstractControl;
+  }
+
+  get departmentsIdsControl(): AbstractControl {
+    return this.form.get('departmentsIds') as AbstractControl;
+  }
+
+  constructor(private store: Store) {
+    super();
+  }
+
   ngOnInit(): void {
     this.onOrderFilteringOptionsChange();
   }
 
+  ngAfterViewInit(): void {
+    forkJoin([
+      this.onOrganizationIdsControlChange(),
+      this.onGridFilterRegions(),
+      this.onRegionIdsControlChange(),
+      this.onLocationIdsControlChange(),
+    ])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe();
+  }
+
+  private onOrganizationIdsControlChange(): Observable<number[]> {
+    const organizationIdsControl = this.form.get('organizationIds') as AbstractControl;
+
+    return organizationIdsControl.valueChanges.pipe(
+      tap((value: number[]) => {
+        if (isEmpty(value)) {
+          this.regionIdsControl.reset();
+          this.locationIdsControl.reset();
+          this.departmentsIdsControl.reset();
+        } else {
+          this.store.dispatch(new GetOrganizationStructure(value));
+        }
+      })
+    );
+  }
+
+  private onRegionIdsControlChange(): Observable<number[]> {
+    return this.regionIdsControl.valueChanges.pipe(
+      tap((value: number[]) => {
+        if (isEmpty(value)) {
+          this.locationIdsControl.reset();
+          this.departmentsIdsControl.reset();
+        } else {
+          const regions: OrganizationRegion[] = this.filterColumns.regionIds.dataSource.filter(
+            ({ id }: { id: number }) => value.includes(id)
+          );
+          this.filterColumns.locationIds.dataSource = getLocationsFromRegions(regions);
+        }
+      })
+    );
+  }
+
+  private onLocationIdsControlChange(): Observable<number[]> {
+    return this.locationIdsControl.valueChanges.pipe(
+      tap((value: number[]) => {
+        if (isEmpty(value)) {
+          this.departmentsIdsControl.reset();
+        } else {
+          const locations: OrganizationLocation[] = this.filterColumns.locationIds.dataSource.filter(
+            ({ id }: { id: number }) => value.includes(id)
+          );
+          this.filterColumns.departmentsIds.dataSource = getDepartmentFromLocations(locations);
+        }
+      })
+    );
+  }
+
+  private onGridFilterRegions(): Observable<unknown> {
+    return this.gridFilterRegions$.pipe(tap((regions) => (this.filterColumns.regionIds.dataSource = regions)));
+  }
+
   private onOrderFilteringOptionsChange(): void {
     this.orderFilteringOptions$
-      .pipe(filter((options) => !!options))
+      .pipe(
+        filter((options) => !!options),
+        takeUntil(this.destroy$)
+      )
       .subscribe(({ candidateStatuses, masterSkills, orderStatuses, partneredOrganizations }) => {
         this.filterColumns.organizationIds.dataSource = partneredOrganizations;
         this.filterColumns.skillIds.dataSource = masterSkills;

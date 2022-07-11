@@ -31,6 +31,13 @@ export class OrganizationService {
   }
 
   /**
+   * Get regions-locations-departments for selected organizations
+   */
+  public getOrganizationsStructure(organizationIds: number[]): Observable<OrganizationStructure[]> {
+    return this.http.get<OrganizationStructure[]>(`/api/Organizations/structure/partnered`, { params: { organizationIds } });
+  }
+
+  /**
    * Get organization by id
    * @param id
    * @return specific organization

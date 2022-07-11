@@ -1,7 +1,7 @@
-import { DialogNextPreviousOption } from "@shared/components/dialog-next-previous/dialog-next-previous.component";
-import { OrderApplicantsApplyData } from "@shared/models/order-applicants.model";
-import { AcceptJobDTO, AgencyOrderFilters } from "@shared/models/order-management.model";
-import { RejectReasonPayload } from "@shared/models/reject-reason.model";
+import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import { OrderApplicantsApplyData } from '@shared/models/order-applicants.model';
+import { AcceptJobDTO, AgencyOrderFilters } from '@shared/models/order-management.model';
+import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 
 export class GetAgencyOrdersPage {
   static readonly type = '[agency order management] Get Agency Orders Page';
@@ -24,25 +24,17 @@ export class GetAgencyOrderCandidatesList {
 
 export class GetAgencyOrderGeneralInformation {
   static readonly type = '[agency order management] Get Agency Order General Information';
-  constructor(
-    public id: number,
-    public organizationId: number
-  ) {}
+  constructor(public id: number, public organizationId: number) {}
 }
 
 export class GetCandidateJob {
   static readonly type = '[agency order management] Get Agency Candidate Job';
-  constructor(
-    public organizationId: number,
-    public jobId: number
-  ) {}
+  constructor(public organizationId: number, public jobId: number) {}
 }
 
 export class UpdateAgencyCandidateJob {
   static readonly type = '[agency order management] Update Agency Candidate Job';
-  constructor(
-    public payload: AcceptJobDTO
-  ) {}
+  constructor(public payload: AcceptJobDTO) {}
 }
 
 export class GetRejectReasonsForAgency {
@@ -52,9 +44,7 @@ export class GetRejectReasonsForAgency {
 
 export class RejectCandidateJob {
   static readonly type = '[agency order management] Reject Candidate Job';
-  constructor(
-    public payload: RejectReasonPayload
-  ) {}
+  constructor(public payload: RejectReasonPayload) {}
 }
 
 export class RejectCandidateForAgencySuccess {
@@ -64,11 +54,7 @@ export class RejectCandidateForAgencySuccess {
 
 export class GetOrderApplicantsData {
   static readonly type = '[agency order management] Get Order Applicants Initial Data';
-  constructor(
-    public orderId: number,
-    public organizationId: number,
-    public candidateId: number
-  ) {}
+  constructor(public orderId: number, public organizationId: number, public candidateId: number) {}
 }
 
 export class ApplyOrderApplicants {
@@ -88,5 +74,11 @@ export class ReloadOrderCandidatesLists {
 
 export class GetAgencyFilterOptions {
   static readonly type = '[agency order management] Get Agency Filte rOptions';
-  constructor() { }
+  constructor() {}
 }
+
+export class GetOrganizationStructure {
+  static readonly type = '[agency order management] Get Organization Structure';
+  constructor(public organizationIds: number[]) {}
+}
+

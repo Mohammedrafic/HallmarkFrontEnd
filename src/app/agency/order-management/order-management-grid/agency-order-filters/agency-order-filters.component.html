@@ -24,49 +24,73 @@
       </div>
     </div>
   </div>
-  <!-- <div class="row">
-      <div class="input-container">
-        <label>Region</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="regionIds"
-                           placeholder="All"
-                           [fields]="optionFields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.regionIds.dataSource">
-          </ejs-multiselect>
-        </div>
+  <div class="row">
+    <div class="input-container">
+      <label>Region</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="regionIds"
+          placeholder="All"
+          [fields]="optionFields"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.regionIds.dataSource"
+        >
+          <ng-template #itemTemplate let-data>
+            <div class="order-filter-item">
+              <span>{{ data?.name }}</span>
+              <span class="order-filter-item_parent">{{ data?.orgName }}</span>
+            </div>
+          </ng-template>
+        </ejs-multiselect>
       </div>
-      <div class="input-container">
-        <label>Location</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="locationIds"
-                           placeholder="All"
-                           [fields]="optionFields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.locationIds.dataSource">
-          </ejs-multiselect>
-        </div>
+    </div>
+    <div class="input-container">
+      <label>Location</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="locationIds"
+          placeholder="All"
+          [fields]="optionFields"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.locationIds.dataSource"
+        >
+          <ng-template #itemTemplate let-data>
+            <div class="order-filter-item">
+              <span>{{ data?.name }}</span>
+              <span class="order-filter-item_parent">{{ data?.regionName }}</span>
+            </div>
+          </ng-template>
+        </ejs-multiselect>
       </div>
-    </div> 
-    <div>
-      <div class="input-container">
-        <label>Department</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="departmentsIds"
-                           placeholder="All"
-                           [fields]="optionFields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.departmentsIds.dataSource">
-          </ejs-multiselect>
-        </div>
+    </div>
+  </div>
+  <div>
+    <div class="input-container">
+      <label>Department</label>
+      <div class="input-group multiselect">
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="departmentsIds"
+          placeholder="All"
+          [fields]="optionFields"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.departmentsIds.dataSource"
+        >
+          <ng-template #itemTemplate let-data>
+            <div class="order-filter-item">
+              <span>{{ data?.name }}</span>
+              <span class="order-filter-item_parent">{{ data?.locationName }}</span>
+            </div>
+          </ng-template>
+        </ejs-multiselect>
       </div>
-    </div> -->
+    </div>
+  </div>
   <div class="row">
     <div class="input-container">
       <label>Skill</label>
@@ -78,7 +102,7 @@
           [fields]="optionFields"
           [allowFiltering]="true"
           [showDropDownIcon]="true"
-          [dataSource]="filterColumns.skillIds.dataSource "
+          [dataSource]="filterColumns.skillIds.dataSource"
         >
         </ejs-multiselect>
       </div>
