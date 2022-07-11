@@ -28,3 +28,13 @@
 .e-tooltip-wrap .e-arrow-tip .e-tip-bottom {
   display: none;
 }
+
+.input-group.switch {
+  display: flex;
+  align-items: center;
+}
+
+.switch-label {
+  display: flex;
+  cursor: pointer;
+}

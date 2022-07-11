@@ -189,10 +189,10 @@ export class OrderManagementState {
   @Action(GetAgencyOrderCandidatesList)
   GetAgencyOrderCandidatesPage(
     { patchState }: StateContext<OrderManagementModel>,
-    { orderId, organizationId, pageNumber, pageSize }: GetAgencyOrderCandidatesList
+    { orderId, organizationId, pageNumber, pageSize, includeDeployed }: GetAgencyOrderCandidatesList
   ): Observable<OrderCandidatesListPage> {
     return this.orderManagementContentService
-      .getAgencyOrderCandidatesList(orderId, organizationId, pageNumber, pageSize)
+      .getAgencyOrderCandidatesList(orderId, organizationId, pageNumber, pageSize, includeDeployed)
       .pipe(
         tap((payload) => {
           patchState({ orderCandidatesListPage: payload });

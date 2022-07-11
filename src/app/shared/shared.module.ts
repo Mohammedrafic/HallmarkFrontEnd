@@ -37,7 +37,7 @@ import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 import { ImageUploaderComponent } from './components/image-uploader/image-uploader.component';
 import { DocumentUploaderComponent } from './components/document-uploader/document-uploader.component';
 import { FileUploadDialogComponent } from './components/file-upload-dialog/file-upload-dialog.component';
-import { ButtonModule, ChipListAllModule, RadioButtonAllModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, ChipListAllModule, RadioButtonAllModule, CheckBoxModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { SideDialogComponent } from './components/side-dialog/side-dialog.component';
 import { SearchComponent } from './components/search/search.component';
@@ -190,6 +190,7 @@ const COMPONENTS = [
     PageToolbarModule,
     FilterDialogModule,
     SideMenuModule,
+    SwitchModule,
   ],
   exports: [...COMPONENTS, TabsListComponent, PageToolbarModule, FilterDialogModule, SideMenuModule, NavigationPanelComponent],
   declarations: [...COMPONENTS, ErrorMessageComponent, BillRateFormComponent, BillRatesGridComponent, TabsListComponent, NavigationPanelComponent],
