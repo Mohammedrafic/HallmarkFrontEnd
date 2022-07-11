@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { takeWhile, Observable, Subject } from 'rxjs';
+import { Observable, Subject, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
@@ -17,17 +17,22 @@ import { CheckBoxComponent } from '@syncfusion/ej2-angular-buttons';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { GRID_CONFIG } from '@shared/constants';
-import { ROW_HEIGHT, typeValueAccess } from './order-management-grid.constants';
+import { MyAgencyOrdersColumnsConfig, ReOrdersColumnsConfig, ROW_HEIGHT, typeValueAccess } from './order-management-grid.constants';
 import {
-  GetAgencyOrdersPage,
-  GetOrderById,
+  GetAgencyFilterOptions,
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
+  GetAgencyOrdersPage,
+  GetOrderById,
   ReloadOrderCandidatesLists,
-  GetAgencyFilterOptions,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AgencyOrderManagement, OrderManagementChild, AgencyOrderManagementPage, AgencyOrderFilters } from '@shared/models/order-management.model';
+import {
+  AgencyOrderFilters,
+  AgencyOrderManagement,
+  AgencyOrderManagementPage,
+  OrderManagementChild
+} from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { DatePipe, Location } from '@angular/common';
@@ -37,6 +42,7 @@ import { FilterService } from '@shared/services/filter.service';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { FilteredItem } from '@shared/models/filter.model';
 import { AgencyOrderFiltersComponent } from './agency-order-filters/agency-order-filters.component';
+import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -46,7 +52,8 @@ import { AgencyOrderFiltersComponent } from './agency-order-filters/agency-order
 })
 export class OrderManagementGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() filteredItems$: Subject<number>;
- 
+  @Input() selectedTab: AgencyOrderManagementTabs;
+
   @ViewChild('grid') override gridWithChildRow: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
 
@@ -129,7 +136,37 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private dispatchNewPage(): void {
-    this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+    switch (this.selectedTab) {
+      case AgencyOrderManagementTabs.MyAgency:
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        break;
+      case AgencyOrderManagementTabs.PerDiem:
+        // TODO: pending implementation
+        break;
+      case AgencyOrderManagementTabs.ReOrders:
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        break;
+      default:
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        break;
+    }
+  }
+
+  public onGridCreated(): void {
+    switch (this.selectedTab) {
+      case AgencyOrderManagementTabs.MyAgency:
+        this.refreshGridColumns(MyAgencyOrdersColumnsConfig, this.gridWithChildRow);
+        break;
+      case AgencyOrderManagementTabs.PerDiem:
+        // TODO: pending implementation
+        break;
+      case AgencyOrderManagementTabs.ReOrders:
+        this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
+        break;
+      default:
+        this.refreshGridColumns(MyAgencyOrdersColumnsConfig, this.gridWithChildRow);
+        break;
+    }
   }
 
   public onCompare(): void {

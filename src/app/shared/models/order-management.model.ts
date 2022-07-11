@@ -54,8 +54,8 @@ export class OrderManagementFilter {
 export type OrderManagementPage = PageOfCollections<OrderManagement>;
 
 export type AgencyOrderManagement = {
-  // TODO: modification pending
   orderId: number;
+  reOrderId?: number; // TODO: verify name after BE implementation
   statusText: string;
   status: OrderStatus;
   jobTitle: string;
@@ -63,11 +63,15 @@ export type AgencyOrderManagement = {
   location: string;
   numberOfPositions: number;
   department: string;
+  agencyName?: string[]; // TODO: verify name after BE implementation
+  shiftStartTime?: string; // TODO: verify name after BE implementation
+  shiftEndTime?: string; // TODO: verify name after BE implementation
   orderType: OrderType;
   billRate: number;
   candidatesCount: number;
   isLocked: boolean;
   jobStartDate: string;
+  reOrderDate?: string; // TODO: verify name after BE implementation
   organizationId: number;
   organizationName: string;
   children: OrderManagementChild[];

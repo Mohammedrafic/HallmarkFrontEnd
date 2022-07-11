@@ -66,6 +66,16 @@ export class OrderManagementContentService {
   }
 
   /**
+   * Get the agency re-orders
+   @param pageNumber
+   @param pageSize
+   @param filters
+   */
+  public getAgencyReOrders(pageNumber: number, pageSize: number, filters: AgencyOrderFilters): Observable<AgencyOrderManagementPage> {
+    return this.http.post<AgencyOrderManagementPage>(`/api/Agency/ReOrders`, { pageNumber, pageSize, ...filters }); // TODO: modification pending after BE implementation
+  }
+
+  /**
    * Get the agency order candidates
    @param orderId
    @param organizationId

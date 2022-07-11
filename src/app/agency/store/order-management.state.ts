@@ -31,6 +31,7 @@ import {
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
   GetAgencyOrdersPage,
+  GetAgencyReOrdersPage,
   GetCandidateJob,
   GetOrderApplicantsData,
   GetOrderById,
@@ -46,8 +47,6 @@ import { HistoricalEvent } from '@shared/models/historical-event.model';
 import { GetHistoricalData } from '@client/store/order-managment-content.actions';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import {
-  OrganizationDepartment,
-  OrganizationLocation,
   OrganizationRegion,
   OrganizationStructure,
 } from '@shared/models/organization.model';
@@ -184,6 +183,15 @@ export class OrderManagementState {
         return payload;
       })
     );
+  }
+
+  @Action(GetAgencyReOrdersPage)
+  GetAgencyReOrdersPage({ patchState }: StateContext<OrderManagementModel>, { pageNumber, pageSize, filters }: GetAgencyReOrdersPage): Observable<AgencyOrderManagementPage> {
+    return this.orderManagementContentService.getAgencyReOrders(pageNumber, pageSize, filters)
+      .pipe(tap((payload) => {
+        patchState({ ordersPage: payload });
+        return payload;
+      }));
   }
 
   @Action(GetAgencyOrderCandidatesList)

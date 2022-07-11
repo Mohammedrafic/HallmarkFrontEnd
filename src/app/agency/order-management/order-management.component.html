@@ -21,10 +21,23 @@
 
 <section class="last-content-section-padding">
     <ng-container [ngSwitch]="selectedTab">
-        <app-order-management-grid *ngSwitchCase="selectedTabCases.MyAgency" [filteredItems$]="filteredItems$"></app-order-management-grid>
+      <app-order-management-grid
+        *ngSwitchCase="selectedTabCases.MyAgency"
+        [filteredItems$]="filteredItems$"
+        [selectedTab]="selectedTab"
+      ></app-order-management-grid>
         <div *ngSwitchCase="selectedTabCases.OtherAgencies">OtherAgencies</div>
         <div *ngSwitchCase="selectedTabCases.AllAgencies">AllAgencies</div>
         <!--TODO: columns config-->
-        <app-order-management-grid *ngSwitchCase="selectedTabCases.PerDiem" [filteredItems$]="filteredItems$"></app-order-management-grid>
+      <app-order-management-grid
+        *ngSwitchCase="selectedTabCases.PerDiem"
+        [filteredItems$]="filteredItems$"
+        [selectedTab]="selectedTab"
+      ></app-order-management-grid>
+      <app-order-management-grid
+        *ngSwitchCase="selectedTabCases.ReOrders"
+        [filteredItems$]="filteredItems$"
+        [selectedTab]="selectedTab"
+      ></app-order-management-grid>
     </ng-container>
 </section>

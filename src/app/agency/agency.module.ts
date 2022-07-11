@@ -55,7 +55,7 @@ import { AgencyState } from './store/agency.state';
 import { CandidateState } from './store/candidate.state';
 import { AssociatedOrgGridComponent } from './agency-list/add-edit-agency/associated-org-grid/associated-org-grid.component';
 import { InviteDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/invite-dialog/invite-dialog.component';
-import { DialogAllModule } from '@syncfusion/ej2-angular-popups';
+import { DialogAllModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { ExperienceGridComponent } from './candidates/add-edit-candidate/experience-grid/experience-grid.component';
 import { EducationGridComponent } from './candidates/add-edit-candidate/education-grid/education-grid.component';
 import { EditAssociatedDialogComponent } from './agency-list/add-edit-agency/associated-org-grid/edit-associated-dialog/edit-associated-dialog.component';
@@ -152,6 +152,7 @@ const sidebarIcons = {
     GridAllModule,
     ChipListModule,
     PagerModule,
+    TooltipModule,
     NumericTextBoxModule,
     TextBoxModule,
     DatePickerModule,
