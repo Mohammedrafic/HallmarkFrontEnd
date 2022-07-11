@@ -39,7 +39,14 @@ import { GetAllOrganizationSkills } from '@organization-management/store/organiz
 import { OrderTypeOptions } from '@shared/enums/order-type';
 import { DatePipe, Location } from '@angular/common';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
-import { MoreMenuType, OrderType, OrderTypeName, ROW_HEIGHT } from './order-management-content.constants';
+import {
+  AllOrdersColumnsConfig,
+  MoreMenuType,
+  OrderType,
+  OrderTypeName,
+  ReOrdersColumnsConfig,
+  ROW_HEIGHT
+} from './order-management-content.constants';
 
 @Component({
   selector: 'app-order-management-content',
@@ -101,9 +108,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     text: 'statusText',
     value: 'status'
   };
+
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private selectedDataRow: Order;
+
   public selectedOrder: Order;
   public openDetails = new Subject<boolean>();
   public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
@@ -115,6 +124,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public previousSelectedOrderId: number | null;
   public selectedCandidat: any | null;
   public openChildDialog = new Subject<any>();
+  public isReOrdersTab = false;
+
   private selectedIndex: number | null;
 
   constructor(private store: Store,
@@ -130,6 +141,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.fb.group({
       orderId: new FormControl(null),
+      reOrderId: new FormControl(null),
       regionIds: new FormControl([]),
       locationIds: new FormControl([]),
       departmentsIds: new FormControl([]),
@@ -141,6 +153,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       openPositions: new FormControl(null),
       jobStartDate: new FormControl(null),
       jobEndDate: new FormControl(null),
+      reOrderDate: new FormControl(null),
       orderStatuses: new FormControl([]),
       candidateStatuses: new FormControl([]),
       candidatesCountFrom: new FormControl(null),
@@ -187,8 +200,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private getOrders(): void {
     //this.filters.orderBy = this.orderBy; TODO: pending ordering fix on BE
     this.filters.orderId ? this.filters.orderId : null;
+    this.filters.reOrderId = this.filters.reOrderId ? this.filters.reOrderId : undefined;
     this.filters.jobStartDate ? this.filters.jobStartDate : null;
     this.filters.jobEndDate ? this.filters.jobEndDate : null;
+    this.filters.reOrderDate = this.filters.reOrderDate ? this.filters.reOrderDate : undefined;
     this.filters.billRateFrom ? this.filters.billRateFrom : null;
     this.filters.billRateTo ? this.filters.billRateTo : null;
     this.filters.pageNumber = this.currentPage;
@@ -200,9 +215,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.ReOrders:
-        // TODO: possible modifications later
-        // TODO: modify filters for ReOrders
-        this.store.dispatch(new GetReOrders(this.filters));
+        // TODO: remove after BE implementation
+        this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
+        // TODO: uncomment after BE implementation
+        // this.store.dispatch(new GetReOrders(this.filters));
         break;
       case OrganizationOrderManagementTabs.Incomplete:
         this.store.dispatch(new GetIncompleteOrders({ pageNumber: this.currentPage, pageSize: this.pageSize }));
@@ -213,6 +229,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public onFilterClose() {
     this.OrderFilterFormGroup.setValue({
       orderId: this.filters.orderId || null,
+      reOrderId: this.filters.reOrderId || null,
       regionIds: this.filters.regionIds || [],
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
@@ -224,6 +241,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       openPositions: this.filters.openPositions || null,
       jobStartDate: this.filters.jobStartDate || null,
       jobEndDate: this.filters.jobEndDate || null,
+      reOrderDate: this.filters.reOrderDate || null,
       orderStatuses: this.filters.orderStatuses || [],
       candidateStatuses: this.filters.candidateStatuses || [],
       candidatesCountFrom: this.filters.candidatesCountFrom || null,
@@ -360,21 +378,25 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public tabSelected(tabIndex: OrganizationOrderManagementTabs): void {
     this.activeTab = tabIndex;
     this.currentPage = 1;
+    this.isReOrdersTab = false;
 
     switch (tabIndex) {
       case OrganizationOrderManagementTabs.AllOrders:
         this.isLockMenuButtonsShown = true;
+        this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
         this.getOrders();
         break;
       case OrganizationOrderManagementTabs.ReOrders:
-        // TODO: pending implementation
-        // this.getOrders();
+        this.isReOrdersTab = true;
+        this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
+        this.getOrders();
         break;
       case OrganizationOrderManagementTabs.OrderTemplates:
         // TODO: pending implementation
         break;
       case OrganizationOrderManagementTabs.Incomplete:
         this.isLockMenuButtonsShown = false;
+        this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
         this.store.dispatch(new GetIncompleteOrders({}));
         break;
     }

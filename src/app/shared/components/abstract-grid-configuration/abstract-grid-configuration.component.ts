@@ -6,6 +6,8 @@ import { GridComponent, PageEventArgs, SelectionSettingsModel } from '@syncfusio
 import { ResizeSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
 import { GRID_CONFIG } from '../../constants/grid-config';
+import { isNullOrUndefined } from '@syncfusion/ej2-base';
+import { GridColumn } from '@shared/models/grid-column.model';
 
 enum ExportType {
   'Excel File',
@@ -204,5 +206,14 @@ export abstract class AbstractGridConfigurationComponent {
       this.gridWithChildRow.detailRowModule.expand(Number(data.index));
       this.subrowsState.add(index);
     }
+  }
+
+  public refreshGridColumns(columns: GridColumn[], grid: GridComponent): void {
+    columns.forEach(g => {
+      if (!isNullOrUndefined(grid.getColumnByField(g.fieldName))) {
+        grid.getColumnByField(g.fieldName).visible = g.visible;
+      }
+    });
+    grid.refreshColumns();
   }
 }

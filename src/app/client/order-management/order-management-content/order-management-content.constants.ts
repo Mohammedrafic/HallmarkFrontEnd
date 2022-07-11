@@ -23,3 +23,65 @@ export enum OrderType {
   PermPlacement = 2,
   Traveler = 3
 }
+
+export const ReOrdersColumnsConfig = [
+  {
+    fieldName: 'reOrderId',
+    visible: true
+  },
+  {
+    fieldName: 'reOrderDate',
+    visible: true
+  },
+  {
+    fieldName: 'shift',
+    visible: true
+  },
+  {
+    fieldName: 'agencyName',
+    visible: true
+  },
+  {
+    fieldName: 'id',
+    visible: false
+  },
+  {
+    fieldName: 'orderType',
+    visible: false
+  },
+  {
+    fieldName: 'startDate',
+    visible: false
+  }
+];
+
+export const AllOrdersColumnsConfig = [
+  {
+    fieldName: 'id',
+    visible: true
+  },
+  {
+    fieldName: 'orderType',
+    visible: true
+  },
+  {
+    fieldName: 'startDate',
+    visible: true
+  },
+  {
+    fieldName: 'reOrderId',
+    visible: false
+  },
+  {
+    fieldName: 'reOrderDate',
+    visible: false
+  },
+  {
+    fieldName: 'shift',
+    visible: false
+  },
+  {
+    fieldName: 'agencyName',
+    visible: false
+  },
+];
