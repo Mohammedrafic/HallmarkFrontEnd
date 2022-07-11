@@ -27,6 +27,7 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { OrderStatus } from '@shared/enums/order-management';
 import { OrderCandidatesCredentialsState } from '@order-credentials/store/credentials.state';
 import { UpdatePredefinedCredentials } from '@order-credentials/store/credentials.actions';
+import { OrderType } from '@shared/enums/order-type';
 
 enum SelectedTab {
   OrderDetails,
@@ -77,6 +78,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private unsubscribe$: Subject<void> = new Subject();
 
+  public isPerDiem = false;
+  public disableOrderType = false;
+
   constructor(private store: Store, private router: Router, private route: ActivatedRoute, private actions$: Actions) {
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
 
@@ -104,6 +108,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.addMenuItem(SubmitButtonItem.SaveForLater, 'Save For Later');
           this.removeMenuItem(SubmitButtonItem.Save);
         } else {
+          if (order?.orderType === OrderType.OpenPerDiem) {
+            this.disableOrderType = true;
+          }
           this.addMenuItem(SubmitButtonItem.Save, 'Save');
           this.removeMenuItem(SubmitButtonItem.SaveForLater);
         }
@@ -136,6 +143,11 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.store.dispatch(new ClearPredefinedBillRates());
     this.store.dispatch(new UpdatePredefinedCredentials([]));
     this.store.dispatch(new SetIsDirtyOrderForm(false));
+  }
+
+  public onOrderTypeChange(orderType: OrderType): void {
+    this.isPerDiem = orderType === OrderType.OpenPerDiem;
+    this.tab.hideTab(SelectedTab.BillRates, this.isPerDiem);
   }
 
   public navigateBack(): void {
@@ -208,7 +220,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.workLocationForm.valid &&
       (this.orderDetailsFormComponent.workflowForm.disabled || this.orderDetailsFormComponent.workflowForm.valid) &&
       this.orderDetailsFormComponent.specialProject.valid &&
-      (this.billRatesComponent?.billRatesControl.valid || this.orderBillRates.length)
+      (this.billRatesComponent?.billRatesControl.valid || this.orderBillRates.length || this.isPerDiem)
     ) {
       const order = this.collectOrderData(true);
       const documents = this.orderDetailsFormComponent.documents;
@@ -262,6 +274,12 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private collectOrderData(isSubmit: boolean): CreateOrderDto {
+    let orderBillRates: BillRate[] | null;
+    if (this.isPerDiem) {
+      orderBillRates = null;
+    } else {
+      orderBillRates = this.billRatesComponent?.billRatesControl.value || this.orderBillRates
+    }
     const allValues = {
       ...this.orderDetailsFormComponent.orderTypeForm.getRawValue(),
       ...this.orderDetailsFormComponent.generalInformationForm.getRawValue(),
@@ -272,7 +290,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       ...this.orderDetailsFormComponent.workflowForm.getRawValue(),
       ...this.orderDetailsFormComponent.specialProject.getRawValue(),
       ...{ credentials: this.orderCredentials },
-      ...{ billRates: this.billRatesComponent?.billRatesControl.value || this.orderBillRates },
+      ...{ billRates: orderBillRates }
     };
 
     const {
@@ -313,7 +331,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       canApprove,
     } = allValues;
 
-    const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[]).map((billRate: BillRate) => {
+    const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
       const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate } = billRate;
       return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate };
     });

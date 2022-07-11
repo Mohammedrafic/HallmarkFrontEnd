@@ -14,7 +14,7 @@ import {
   OrderFilterDataSource,
   OrderManagementFilter,
   OrderManagementPage,
-  SuggesstedDetails
+  SuggestedDetails
 } from '@shared/models/order-management.model';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
@@ -181,8 +181,8 @@ export class OrderManagementContentService {
    * @param locationId
    * @returns suggessted details data
    */
-  public getSuggestedDetails(locationId: number | string): Observable<SuggesstedDetails> {
-    return this.http.get<SuggesstedDetails>(`/api/Orders/suggestedDetails/${locationId}`);
+  public getSuggestedDetails(locationId: number | string): Observable<SuggestedDetails> {
+    return this.http.get<SuggestedDetails>(`/api/Orders/suggestedDetails/${locationId}`);
   }
 
   /**

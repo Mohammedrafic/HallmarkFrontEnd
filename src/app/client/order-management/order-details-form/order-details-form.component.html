@@ -109,180 +109,182 @@
                 </div>
               </div>
 
-              <div class="form-line">
-                <!-- Hourly rate -->
-                <div class="input-container bootstrap form-line-item-20">
-                  <label>Hourly rate<span class="required">*</span></label>
-                  <div class="input-group">
-                    <input
-                      class="e-input"
-                      type="text"
-                      formControlName="hourlyRate"
-                      appValidateWithMessage
-                      maxlength="10"
-                      (focus)="priceUtils.setPriceMask(generalInformationForm,'hourlyRate', $event)"
-                      (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'hourlyRate', $event)"
-                    />
+              <ng-container *ngIf="!isPerDiem">
+                <div class="form-line">
+                  <!-- Hourly rate -->
+                  <div class="input-container bootstrap form-line-item-20">
+                    <label>Hourly rate<span class="required">*</span></label>
+                    <div class="input-group">
+                      <input
+                        class="e-input"
+                        type="text"
+                        formControlName="hourlyRate"
+                        appValidateWithMessage
+                        maxlength="10"
+                        (focus)="priceUtils.setPriceMask(generalInformationForm,'hourlyRate', $event)"
+                        (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'hourlyRate', $event)"
+                      />
+                    </div>
+                  </div>
+  
+                  <!-- # Open Positions -->
+                  <div class="input-container bootstrap form-line-item-20">
+                    <label># Open Positions<span class="required">*</span></label>
+                    <div class="input-group">
+                      <input
+                        class="e-input"
+                        type="text"
+                        formControlName="openPositions"
+                        appValidateWithMessage
+                        maxlength="10" />
+                    </div>
+                  </div>
+  
+                  <!-- Min Yrs. Req. -->
+                  <div class="input-container bootstrap form-line-item-20">
+                    <label>Min Yrs. Req.</label>
+                    <div class="input-group">
+                      <input
+                        class="e-input"
+                        type="text"
+                        formControlName="minYrsRequired"
+                        appValidateWithMessage
+                        maxlength="10" />
+                    </div>
+                  </div>
+  
+                  <!-- Joining Bonus -->
+                  <div class="input-container bootstrap form-line-item-20">
+                    <label>Joining Bonus</label>
+                    <div class="input-group">
+                      <input
+                        class="e-input"
+                        formControlName="joiningBonus"
+                        maxlength="10"
+                        appValidateWithMessage
+                        type="text"
+                        (focus)="priceUtils.setPriceMask(generalInformationForm, 'joiningBonus', $event)"
+                        (blur)="priceUtils.setTwoDecimals(generalInformationForm,'joiningBonus', $event)"
+                      />
+                    </div>
+                  </div>
+  
+                  <!-- Comp. Bonus -->
+                  <div class="input-container bootstrap form-line-item-20">
+                    <label>Comp. Bonus</label>
+                    <div class="input-group">
+                      <input
+                        class="e-input"
+                        type="text"
+                        formControlName="compBonus"
+                        appValidateWithMessage
+                        maxlength="10"
+                        (focus)="priceUtils.setPriceMask(generalInformationForm, 'compBonus', $event)"
+                        (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'compBonus', $event)"
+                      />
+                    </div>
                   </div>
                 </div>
-
-                <!-- # Open Positions -->
-                <div class="input-container bootstrap form-line-item-20">
-                  <label># Open Positions<span class="required">*</span></label>
-                  <div class="input-group">
-                    <input
-                      class="e-input"
-                      type="text"
-                      formControlName="openPositions"
-                      appValidateWithMessage
-                      maxlength="10" />
+  
+                <div class="form-line">
+                  <!-- Duration -->
+                  <div class="input-container bootstrap form-line-item-20">
+                    <label>Duration<span class="required">*</span></label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist
+                        formControlName="duration"
+                        appValidateWithMessage
+                        [dataSource]="durations"
+                        [fields]="durationFields">
+                      </ejs-dropdownlist>
+                    </div>
+                  </div>
+  
+                  <!-- Job Start Date -->
+                  <div class="datepicker-container form-line-item-20">
+                    <label>Job Start Date<span class="required">*</span></label>
+                    <div class="input-group datepicker bootstrap">
+                      <ejs-datepicker
+                        class="datepicker"
+                        format="MM/dd/yyyy"
+                        placeholder="MM/DD/YYYY"
+                        formControlName="jobStartDate"
+                        appValidateWithMessage
+                        [enableMask]="true"
+                        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                        [min]="today">
+                      </ejs-datepicker>
+                    </div>
+                  </div>
+  
+                  <!-- Job End Date -->
+                  <div class="datepicker-container form-line-item-20">
+                    <label>Job End Date<span class="required">*</span></label>
+                    <div class="input-group datepicker bootstrap">
+                      <ejs-datepicker
+                        class="datepicker"
+                        format="MM/dd/yyyy"
+                        placeholder="MM/DD/YYYY"
+                        formControlName="jobEndDate"
+                        appValidateWithMessage
+                        [enableMask]="true"
+                        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                        [enabled]="isJobEndDateControlEnabled"
+                        [enableMask]="true"
+                        [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                        [min]="generalInformationForm.controls['jobStartDate'].value">
+                      </ejs-datepicker>
+                    </div>
                   </div>
                 </div>
-
-                <!-- Min Yrs. Req. -->
-                <div class="input-container bootstrap form-line-item-20">
-                  <label>Min Yrs. Req.</label>
-                  <div class="input-group">
-                    <input
-                      class="e-input"
-                      type="text"
-                      formControlName="minYrsRequired"
-                      appValidateWithMessage
-                      maxlength="10" />
+  
+                <div class="form-line">
+                  <!-- Shift Requirements -->
+                  <div class="input-container bootstrap form-line-item-20">
+                    <label>Shift Requirement<span class="required">*</span></label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist
+                        formControlName="shiftRequirementId"
+                        appValidateWithMessage
+                        [dataSource]="masterShifts$ | async"
+                        [fields]="masterShiftFields">
+                      </ejs-dropdownlist>
+                    </div>
+                  </div>
+  
+                  <!-- Shift Start Time -->
+                  <div class="input-container calendar form-line-item-20">
+                    <label for="startTime">Shift Start Time<span class="required">*</span></label>
+                    <div class="input-group datepicker bootstrap">
+                      <ejs-timepicker
+                        placeholder="HH:MM"
+                        formControlName="shiftStartTime"
+                        appValidateWithMessage
+                        format="hh:mm a"
+                        [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                        [enableMask]="true"
+                        maskPlaceholder="HH:MM">
+                      </ejs-timepicker>
+                    </div>
+                  </div>
+  
+                  <!-- Shift End Time -->
+                  <div class="input-container calendar form-line-item-20">
+                    <label for="startTime">Shift End Time<span class="required">*</span></label>
+                    <div class="input-group datepicker bootstrap">
+                      <ejs-timepicker
+                        placeholder="HH:MM"
+                        formControlName="shiftEndTime"
+                        appValidateWithMessage
+                        format="hh:mm a"
+                        [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                        [enableMask]="true"
+                        maskPlaceholder="HH:MM">
+                      </ejs-timepicker>
+                    </div>
                   </div>
                 </div>
-
-                <!-- Joining Bonus -->
-                <div class="input-container bootstrap form-line-item-20">
-                  <label>Joining Bonus</label>
-                  <div class="input-group">
-                    <input
-                      class="e-input"
-                      formControlName="joiningBonus"
-                      maxlength="10"
-                      appValidateWithMessage
-                      type="text"
-                      (focus)="priceUtils.setPriceMask(generalInformationForm, 'joiningBonus', $event)"
-                      (blur)="priceUtils.setTwoDecimals(generalInformationForm,'joiningBonus', $event)"
-                    />
-                  </div>
-                </div>
-
-                <!-- Comp. Bonus -->
-                <div class="input-container bootstrap form-line-item-20">
-                  <label>Comp. Bonus</label>
-                  <div class="input-group">
-                    <input
-                      class="e-input"
-                      type="text"
-                      formControlName="compBonus"
-                      appValidateWithMessage
-                      maxlength="10"
-                      (focus)="priceUtils.setPriceMask(generalInformationForm, 'compBonus', $event)"
-                      (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'compBonus', $event)"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-line">
-                <!-- Duration -->
-                <div class="input-container bootstrap form-line-item-20">
-                  <label>Duration<span class="required">*</span></label>
-                  <div class="input-group dropdown">
-                    <ejs-dropdownlist
-                      formControlName="duration"
-                      appValidateWithMessage
-                      [dataSource]="durations"
-                      [fields]="durationFields">
-                    </ejs-dropdownlist>
-                  </div>
-                </div>
-
-                <!-- Job Start Date -->
-                <div class="datepicker-container form-line-item-20">
-                  <label>Job Start Date<span class="required">*</span></label>
-                  <div class="input-group datepicker bootstrap">
-                    <ejs-datepicker
-                      class="datepicker"
-                      format="MM/dd/yyyy"
-                      placeholder="MM/DD/YYYY"
-                      formControlName="jobStartDate"
-                      appValidateWithMessage
-                      [enableMask]="true"
-                      [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                      [min]="today">
-                    </ejs-datepicker>
-                  </div>
-                </div>
-
-                <!-- Job End Date -->
-                <div class="datepicker-container form-line-item-20">
-                  <label>Job End Date<span class="required">*</span></label>
-                  <div class="input-group datepicker bootstrap">
-                    <ejs-datepicker
-                      class="datepicker"
-                      format="MM/dd/yyyy"
-                      placeholder="MM/DD/YYYY"
-                      formControlName="jobEndDate"
-                      appValidateWithMessage
-                      [enableMask]="true"
-                      [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                      [enabled]="isJobEndDateControlEnabled"
-                      [enableMask]="true"
-                      [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                      [min]="generalInformationForm.controls['jobStartDate'].value">
-                    </ejs-datepicker>
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-line">
-                <!-- Shift Requirements -->
-                <div class="input-container bootstrap form-line-item-20">
-                  <label>Shift Requirement<span class="required">*</span></label>
-                  <div class="input-group dropdown">
-                    <ejs-dropdownlist
-                      formControlName="shiftRequirementId"
-                      appValidateWithMessage
-                      [dataSource]="masterShifts$ | async"
-                      [fields]="masterShiftFields">
-                    </ejs-dropdownlist>
-                  </div>
-                </div>
-
-                <!-- Shift Start Time -->
-                <div class="input-container calendar form-line-item-20">
-                  <label for="startTime">Shift Start Time<span class="required">*</span></label>
-                  <div class="input-group datepicker bootstrap">
-                    <ejs-timepicker
-                      placeholder="HH:MM"
-                      formControlName="shiftStartTime"
-                      appValidateWithMessage
-                      format="hh:mm a"
-                      [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                      [enableMask]="true"
-                      maskPlaceholder="HH:MM">
-                    </ejs-timepicker>
-                  </div>
-                </div>
-
-                <!-- Shift End Time -->
-                <div class="input-container calendar form-line-item-20">
-                  <label for="startTime">Shift End Time<span class="required">*</span></label>
-                  <div class="input-group datepicker bootstrap">
-                    <ejs-timepicker
-                      placeholder="HH:MM"
-                      formControlName="shiftEndTime"
-                      appValidateWithMessage
-                      format="hh:mm a"
-                      [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                      [enableMask]="true"
-                      maskPlaceholder="HH:MM">
-                    </ejs-timepicker>
-                  </div>
-                </div>
-              </div>
+              </ng-container>
             </form>
           </div>
         </div>
@@ -678,5 +680,10 @@
       (selectDocuments)="onDocumentsSelected($event)"
       (deleteDocument)="onDocumentDeleted($event)">
     </app-document-uploader>
+    <div tabindex="0" class="e-card comments" *ngIf="isPerDiem">
+      <div class="e-card-content">
+        <app-comments [useBackground]="false"></app-comments>
+      </div>
+    </div>
   </div>
 </section>

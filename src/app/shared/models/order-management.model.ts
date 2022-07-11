@@ -134,7 +134,7 @@ export type AgencyOrder = {
   organizationId: number;
 };
 
-export class SuggesstedDetails {
+export class SuggestedDetails {
   workLocation: {
     address: string;
     state: string;
