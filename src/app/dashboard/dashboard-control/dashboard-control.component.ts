@@ -17,6 +17,7 @@ export class DashboardControlComponent {
   @Input() public isLoading: boolean | null;
   @Input() public selectedWidgets: WidgetTypeEnum[] | null;
   @Input() public widgets: WidgetOptionModel[] | null;
+  @Input() public hasOrderManagePermission: boolean;
 
   @Output() public widgetToggleEmitter: EventEmitter<WidgetToggleModel> = new EventEmitter();
 

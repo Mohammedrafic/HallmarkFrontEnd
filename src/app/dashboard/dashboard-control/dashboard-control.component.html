@@ -4,7 +4,7 @@
       <button ejs-button cssClass="e-outline" (click)="toggleDialog(true)">
         Manage Widgets <i-feather name="sliders" class="icon"></i-feather>
       </button>
-      <button ejs-button [isPrimary]="true" (click)="onCreateOrder()">Create Order</button>
+      <button *ngIf="hasOrderManagePermission" ejs-button [isPrimary]="true" (click)="onCreateOrder()">Create Order</button>
     </ng-container>
   </app-page-toolbar>
   <app-widget-list
