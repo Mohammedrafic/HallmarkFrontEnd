@@ -4,8 +4,6 @@
  * are used to initialize Angular and MSAL Angular configurations in
  * in app.module.ts file.
  */
-
-
  import { LogLevel, Configuration, BrowserCacheLocation } from '@azure/msal-browser';
 
  const isIE = window.navigator.userAgent.indexOf("MSIE ") > -1 || window.navigator.userAgent.indexOf("Trident/") > -1;

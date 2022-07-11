@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { map, Subject, takeUntil } from 'rxjs';
 import { tap } from 'rxjs/internal/operators/tap';
+import { B2CAuthService } from 'src/app/b2c-auth/b2c-auth.service';
 import { User } from 'src/app/shared/models/user.model';
 import { SetIsFirstLoadState, ToggleSidebarState } from 'src/app/store/app.actions';
 import { SetCurrentUser } from 'src/app/store/user.actions';
@@ -31,13 +32,18 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   public users: User[];
   public usersDropDownData: IOptionField[];
 
+  // get isLoggedIn(): any {
+  //   return this.b2CAuthService.isLoggedIn();
+  // }
+
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(
     private formBuilder: FormBuilder,
     private usersService: UserService,
     private router: Router,
-    private store: Store
+    private store: Store,
+    private b2CAuthService: B2CAuthService
   ) {
     this.loginForm = this.formBuilder.group({
       user: new FormControl('')
@@ -73,9 +79,13 @@ export class LoginPageComponent implements OnInit, OnDestroy {
 
     if (index >= 0) {
       const selectedUser = this.users[index];
+      debugger
       this.store.dispatch(new SetCurrentUser(selectedUser));
       this.router.navigate(['/']);
     }
   }
 
+  public loginWithSSO(): void {
+    this.b2CAuthService.loginSSO();
+  }
 }

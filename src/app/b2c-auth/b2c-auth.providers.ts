@@ -1,12 +1,20 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Provider } from '@angular/core';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
-import { MsalBroadcastService, MsalGuard, MsalGuardConfiguration, MsalInterceptor, MsalInterceptorConfiguration, MsalModule, MsalRedirectComponent, MsalService, MSAL_GUARD_CONFIG, MSAL_INSTANCE, MSAL_INTERCEPTOR_CONFIG } from '@azure/msal-angular';
+import {
+  MsalBroadcastService,
+  MsalGuard,
+  MsalGuardConfiguration,
+  MsalInterceptor,
+  MsalInterceptorConfiguration,
+  MsalService,
+  MSAL_GUARD_CONFIG,
+  MSAL_INSTANCE,
+  MSAL_INTERCEPTOR_CONFIG,
+} from '@azure/msal-angular';
 import { InteractionType, IPublicClientApplication, PublicClientApplication } from '@azure/msal-browser';
 
 import { msalConfig, loginRequest, protectedResources } from './auth-config';
-import { SsoAuthButtonComponent } from './components/sso-auth-button/sso-auth-button.component';
 
 /**
  * Here we pass the configuration parameters to create an MSAL instance.
@@ -18,8 +26,8 @@ export function MSALInstanceFactory(): IPublicClientApplication {
 }
 
 /**
- * MSAL Angular will automatically retrieve tokens for resources 
- * added to protectedResourceMap. For more info, visit: 
+ * MSAL Angular will automatically retrieve tokens for resources
+ * added to protectedResourceMap. For more info, visit:
  * https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-angular/docs/v2-docs/initialization.md#get-tokens-for-web-api-calls
  */
 export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
@@ -29,7 +37,7 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
 
   return {
     interactionType: InteractionType.Popup,
-    protectedResourceMap
+    protectedResourceMap,
   };
 }
 
@@ -38,43 +46,32 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
  * additional scopes you want the user to consent upon login, add them here as well.
  */
 export function MSALGuardConfigFactory(): MsalGuardConfiguration {
-  return { 
+  return {
     interactionType: InteractionType.Popup,
-    authRequest: loginRequest
+    authRequest: loginRequest,
   };
 }
 
-@NgModule({
-  declarations: [
-    SsoAuthButtonComponent
-  ],
-  exports: [SsoAuthButtonComponent],
-  imports: [
-    CommonModule,
-    MsalModule
-  ],
-  providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: MsalInterceptor,
-      multi: true
-    },
-    {
-      provide: MSAL_INSTANCE,
-      useFactory: MSALInstanceFactory
-    },
-    {
-      provide: MSAL_GUARD_CONFIG,
-      useFactory: MSALGuardConfigFactory
-    },
-    {
-      provide: MSAL_INTERCEPTOR_CONFIG,
-      useFactory: MSALInterceptorConfigFactory
-    },
-    MsalService,
-    MsalGuard,
-    MsalBroadcastService,
-  ],
-  bootstrap: [MsalRedirectComponent]
-})
-export class B2CAuthModule { }
+export const MSAL_PROVIDERS: Provider[] = [
+  {
+    provide: HTTP_INTERCEPTORS,
+    useClass: MsalInterceptor,
+    multi: true,
+  },
+  {
+    provide: MSAL_INSTANCE,
+    useFactory: MSALInstanceFactory,
+  },
+  {
+    provide: MSAL_GUARD_CONFIG,
+    useFactory: MSALGuardConfigFactory,
+  },
+  {
+    provide: MSAL_INTERCEPTOR_CONFIG,
+    useFactory: MSALInterceptorConfigFactory,
+  },
+  MsalService,
+  MsalGuard,
+  MsalBroadcastService,
+];
+

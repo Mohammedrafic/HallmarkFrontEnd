@@ -7,6 +7,7 @@
       <div class="text-box">
         <h2>WELCOME!</h2>
         <p>Log In with your email....</p>
+        <!-- {{ isLoggedIn }} -->
       </div>
       <form *ngIf="usersDropDownData?.length" [formGroup]="loginForm" (ngSubmit)="onLogin()">
         <div class="input-container bootstrap">
@@ -50,7 +51,7 @@
             type="submit">
             Login
           </button>
-          <app-sso-auth-button></app-sso-auth-button>
+          <button class="e-control e-btn e-lib e-primary e-outline" type="button" (click)="loginWithSSO()">Login with SSO</button>
         </div>
       </form>
     </div>
