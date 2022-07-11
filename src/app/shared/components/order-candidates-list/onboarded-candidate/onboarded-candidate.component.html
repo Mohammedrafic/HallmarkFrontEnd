@@ -103,6 +103,12 @@
                     <input appValidateWithMessage formControlName="avStartDate" class="e-input" type="text" readonly/>
                   </div>
                 </div>
+                <div *ngIf="isAccepted" class="input-container bootstrap offered-start-date">
+                  <label class="input-group">Offered Start Date</label>
+                  <div class="input-group input-readonly">
+                    <input appValidateWithMessage formControlName="offeredStartDate" class="e-input" type="text" readonly/>
+                  </div>
+                </div>
                 <div class="form-container row">
                   <div class="input-container bootstrap">
                     <label class="input-group">Yrs. of Exp.</label>

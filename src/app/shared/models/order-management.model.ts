@@ -255,6 +255,7 @@ export type AcceptJobDTO = {
   organizationId: number;
   requestComment: string;
   billRates: BillRate[];
+  offeredStartDate: string;
 };
 
 export type CandidateProfile = {
@@ -309,6 +310,7 @@ export type OrderCandidateJob = {
   positionId: number;
   allowDeployCredentials: boolean;
   hasAllRequiredOnboardedCredentials: boolean;
+  offeredStartDate: string;
 };
 
 export type ApplicantStatus = {

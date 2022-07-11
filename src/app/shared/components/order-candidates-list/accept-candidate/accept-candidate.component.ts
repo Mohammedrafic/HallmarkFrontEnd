@@ -37,10 +37,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   form: FormGroup;
 
-  get isRejected(): boolean {
-    return this.isReadOnly && this.candidate.status === ApplicantStatusEnum.Rejected;
-  }
-
   public candidateJob: OrderCandidateJob;
   public candidatStatus = CandidatStatus;
   public billRatesData: BillRate[] = [];
@@ -50,6 +46,21 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
 
   get isDeployedAndAgency(): boolean {
     return this.isAgency && !!this.candidate.deployedCandidateInfo
+  }
+
+  get isRejected(): boolean {
+    return this.isReadOnly && this.candidate.status === ApplicantStatusEnum.Rejected;
+  }
+
+  get isOnboard(): boolean {
+    return this.candidate.status === ApplicantStatusEnum.OnBoarded;
+  }
+
+  get showGuaranteedWorkWeek(): boolean {
+    return this.candidate.status === ApplicantStatusEnum.Shortlisted
+      || this.candidate.status === ApplicantStatusEnum.PreOfferCustom
+      || this.candidate.status === ApplicantStatusEnum.Offered
+      || this.isOnboard;
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -97,7 +108,8 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       clockId: this.candidateJob.clockId,
       guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
       allowDeplayWoCredentials: false,
-      billRates: this.billRatesData
+      billRates: this.billRatesData,
+      offeredStartDate: this.candidateJob.offeredStartDate
     })).subscribe(() => {
       this.store.dispatch(new ReloadOrderCandidatesLists());
     });
@@ -137,7 +149,12 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       travelExp: new FormControl(''),
       offeredBillRate: new FormControl(''),
       comments: new FormControl(''),
-      rejectReason: new FormControl('')
+      rejectReason: new FormControl(''),
+      guaranteedWorkWeek: new FormControl(''),
+      offeredStartDate: new FormControl(''),
+      clockId: new FormControl(''),
+      actualStartDate: new FormControl(''),
+      actualEndDate: new FormControl(''),
     });
   }
 
@@ -145,7 +162,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.closeModalEvent.next();
   }
 
-  private  getAvailableStartDate(date: string): string | null {
+  private  getDateString(date: string): string | null {
     return this.datePipe.transform(date, 'MM/dd/yyyy');
   }
 
@@ -158,14 +175,19 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           jobId: value.orderId,
           date: [value.order.jobStartDate, value.order.jobEndDate],
           billRates: value.order.hourlyRate,
-          avStartDate: this.getAvailableStartDate(value.availableStartDate),
+          avStartDate: this.getDateString(value.availableStartDate),
           candidateBillRate: value.candidateBillRate,
           locationName: value.order.locationName,
           yearExp: value.yearsOfExperience,
           travelExp: value.expAsTravelers,
           offeredBillRate: value.offeredBillRate,
           comments: value.requestComment,
-          rejectReason: value.rejectReason
+          rejectReason: value.rejectReason,
+          guaranteedWorkWeek: value.guaranteedWorkWeek,
+          offeredStartDate: this.getDateString(value.offeredStartDate),
+          clockId: value.clockId,
+          actualStartDate: this.getDateString(value.actualStartDate),
+          actualEndDate: this.getDateString(value.actualEndDate),
         });
       }
     });

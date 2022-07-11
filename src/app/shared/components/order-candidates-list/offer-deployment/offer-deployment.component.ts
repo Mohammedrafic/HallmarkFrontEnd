@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, S
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
+import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { Observable, Subject, takeUntil } from "rxjs";
 
 import { BillRate } from "@shared/models/bill-rate.model";
@@ -24,7 +25,8 @@ import { RejectReason } from "@shared/models/reject-reason.model";
 @Component({
   selector: 'app-offer-deployment',
   templateUrl: './offer-deployment.component.html',
-  styleUrls: ['./offer-deployment.component.scss']
+  styleUrls: ['./offer-deployment.component.scss'],
+  providers: [MaskedDateTimeService]
 })
 export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   @Select(OrderManagementContentState.rejectionReasonsList)
@@ -47,6 +49,20 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public isRejected = false;
   public candidatStatus = CandidatStatus;
   public candidateJob: OrderCandidateJob | null;
+  public today = new Date();
+
+  get showYearsOfExperience(): boolean {
+    return this.candidate.status === ApplicantStatusEnum.Applied
+      || this.candidate.status === ApplicantStatusEnum.Shortlisted
+      || this.candidate.status === ApplicantStatusEnum.PreOfferCustom;
+  }
+
+  get showGuaranteedWorkWeek(): boolean {
+    return this.candidate.status === ApplicantStatusEnum.Applied
+      || this.candidate.status === ApplicantStatusEnum.Shortlisted
+      || this.candidate.status === ApplicantStatusEnum.PreOfferCustom
+      || this.candidate.status === ApplicantStatusEnum.Offered;
+  }
 
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
@@ -69,6 +85,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public ngOnInit(): void {
+    this.today.setHours(0);
     this.createForm();
     this.subscribeOnInitialData();
     this.subscribeOnSuccessRejection();
@@ -124,7 +141,8 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
           actualStartDate: this.candidateJob.actualStartDate,
           actualEndDate: this.candidateJob.actualEndDate,
           clockId: this.candidateJob.clockId,
-          guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
+          guaranteedWorkWeek: value.guaranteedWorkWeek,
+          offeredStartDate: value.offeredStartDate,
           allowDeplayWoCredentials: true,
           billRates: this.billRatesComponent.billRatesControl.value
         })).subscribe(() => {
@@ -151,7 +169,11 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       availableStartDate: new FormControl(''),
       candidateBillRate: new FormControl(null),
       requestComment: new FormControl(''),
-      rejectReason: new FormControl('')
+      rejectReason: new FormControl(''),
+      yearsOfExperience: new FormControl(''),
+      expAsTravelers: new FormControl(''),
+      guaranteedWorkWeek: new FormControl('', [Validators.maxLength(200)]),
+      offeredStartDate: new FormControl('')
     });
   }
 
@@ -165,7 +187,11 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       availableStartDate: data.availableStartDate,
       candidateBillRate: data.candidateBillRate,
       requestComment: data.requestComment,
-      rejectReason: data.rejectReason
+      rejectReason: data.rejectReason,
+      yearsOfExperience: data.yearsOfExperience,
+      expAsTravelers: data.expAsTravelers,
+      guaranteedWorkWeek: data.guaranteedWorkWeek,
+      offeredStartDate: data.offeredStartDate || data.order.jobStartDate
     });
   }
 
