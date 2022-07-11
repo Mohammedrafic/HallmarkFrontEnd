@@ -212,7 +212,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public save(): void {
     if (
-      this.orderDetailsFormComponent.orderTypeForm.valid &&
+      (this.orderDetailsFormComponent.orderTypeForm.disabled || this.orderDetailsFormComponent.orderTypeForm.valid) &&
       this.orderDetailsFormComponent.generalInformationForm.valid &&
       this.orderDetailsFormComponent.jobDistributionForm.valid &&
       this.orderDetailsFormComponent.jobDescriptionForm.valid &&
