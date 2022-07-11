@@ -24,13 +24,18 @@
     [selectedWidgets]="selectedWidgets"
     [widgets]="widgets"
   ></app-dashboard-control>
-  <div class="control-section">
-    <app-dashboard-widgets
-      (dashboardCreatedEmitter)="dashboardCreatedHandler()"
-      (dragStopEmitter)="moveDashboardPanel()"
-      [isLoading]="isLoading"
-      [panels]="panels"
-      [widgetsData]="widgetsData"
-    ></app-dashboard-widgets>
-  </div>
+
+  <ng-container [ngTemplateOutlet]="widgetsTemplate" #outlet></ng-container>
+
+  <ng-template #widgetsTemplate>
+    <div class="control-section">
+      <app-dashboard-widgets
+        (dashboardCreatedEmitter)="dashboardCreatedHandler()"
+        (dragStopEmitter)="moveDashboardPanel()"
+        [isLoading]="isLoading"
+        [panels]="panels"
+        [widgetsData]="widgetsData"
+      ></app-dashboard-widgets>
+    </div>
+  </ng-template>
 </ng-template>

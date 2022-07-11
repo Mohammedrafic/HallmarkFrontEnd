@@ -19,7 +19,7 @@ export class PositionChartComponent {
 
   constructor(private readonly dashboardService: DashboardService) {}
 
-  public mouseDown($event: MouseEvent): void {
+  public defineMousePosition($event: MouseEvent): void {
     this.mousePosition.x = $event.screenX;
     this.mousePosition.y = $event.screenY;
   }

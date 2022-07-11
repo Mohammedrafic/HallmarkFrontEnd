@@ -29,7 +29,7 @@
     >
       <div class="widget-legend__item-content">
         <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onClickLegend(legend.label)"></ejs-checkbox>
-        <div class="widget-legend__row-container" (click)="redirectToSourceContent()">
+        <div class="widget-legend__row-container" (click)="redirectToSourceContent($event)" (mousedown)="defineMousePosition($event)">
           <div class="widget-legend__row">
             <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"></div>
             <div class="widget-legend__legend-text">{{ legend.label }}</div>

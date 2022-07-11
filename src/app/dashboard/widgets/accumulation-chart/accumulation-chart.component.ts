@@ -43,8 +43,24 @@ export class AccumulationChartComponent
 
   private readonly selectedEntries$: BehaviorSubject<string[] | null> = new BehaviorSubject<string[] | null>(null);
 
+  private mousePosition = {
+    x: 0,
+    y: 0,
+  };
+
   constructor(private readonly dashboardService: DashboardService) {
     super();
+  }
+
+  public defineMousePosition($event: MouseEvent): void {
+    this.mousePosition.x = $event.screenX;
+    this.mousePosition.y = $event.screenY;
+  }
+
+  public redirectToSourceContent(event: MouseEvent): void {
+    if (this.mousePosition.x === event.screenX && this.mousePosition.y === event.screenY) {
+      this.dashboardService.redirectToUrl('client/order-management');
+    }
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -82,9 +98,5 @@ export class AccumulationChartComponent
       ),
       distinctUntilChanged((previous: DonutChartData[], current: DonutChartData[]) => isEqual(previous, current))
     );
-  }
-
-  public redirectToSourceContent(): void {
-    this.dashboardService.redirectToUrl('client/order-management');
   }
 }
