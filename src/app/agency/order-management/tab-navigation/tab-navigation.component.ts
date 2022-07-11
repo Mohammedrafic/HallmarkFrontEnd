@@ -1,12 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-
 import { SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
-
-export enum OrderManagemetTabs {
-  MyAgency = 'My Agency',
-  OtherAgencies = 'Other Agencies',
-  AllAgencies = 'All Agencies',
-}
+import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-tab-navigation',
@@ -14,16 +8,16 @@ export enum OrderManagemetTabs {
   styleUrls: ['./tab-navigation.component.scss'],
 })
 export class TabNavigationComponent implements OnInit {
-  @Output() selectedTab = new EventEmitter<OrderManagemetTabs>();
+  @Output() selectedTab = new EventEmitter<AgencyOrderManagementTabs>();
 
-  public tabTitle = OrderManagemetTabs;
+  public tabTitle = AgencyOrderManagementTabs;
 
   ngOnInit(): void {
-    this.selectedTab.emit(OrderManagemetTabs.MyAgency);
+    this.selectedTab.emit(AgencyOrderManagementTabs.MyAgency);
   }
 
   public onSelect(event: SelectingEventArgs): void {
-    const tabsArray = Object.values(OrderManagemetTabs);
+    const tabsArray = Object.values(AgencyOrderManagementTabs);
     this.selectedTab.emit(tabsArray[event.selectingIndex]);
   }
 }

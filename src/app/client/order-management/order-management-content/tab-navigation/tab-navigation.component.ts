@@ -1,11 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
-
-export enum OrderManagemetTabs {
-  AllOrders = 'All Orders',
-  OrderTemplates = 'Order Templates',
-  Incomplete = 'Incomplete',
-}
+import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
   selector: 'app-tab-navigation',
@@ -14,13 +9,13 @@ export enum OrderManagemetTabs {
 })
 export class TabNavigationComponent {
   @Input() incompleteCount: number;
-  @Input() pandingCount: number;
-  @Output() selectedTab = new EventEmitter<OrderManagemetTabs>();
+  @Input() reOrdersCount: number;
+  @Output() selectedTab = new EventEmitter<OrganizationOrderManagementTabs>();
 
-  public tabTitle = OrderManagemetTabs;
+  public tabTitle = OrganizationOrderManagementTabs;
 
   public onSelect(event: SelectingEventArgs): void {
-    const tabsArray = Object.values(OrderManagemetTabs);
+    const tabsArray = Object.values(OrganizationOrderManagementTabs);
     this.selectedTab.emit(tabsArray[event.selectingIndex]);
   }
 }

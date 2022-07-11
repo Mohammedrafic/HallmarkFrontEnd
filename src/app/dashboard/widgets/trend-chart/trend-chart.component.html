@@ -27,10 +27,8 @@
         >
           <e-series-collection>
             <e-series
-              *ngIf="widget"
-              [dataSource]="widget.chartData"
-              [fill]="widget.percentRatio < 0 ? 'var(--supportive-red)' : 'var(--supportive-green-10)'"
-
+              [dataSource]="widget?.chartData ?? []"
+              [fill]="widget && widget.percentRatio < 0 ? 'var(--supportive-red)' : 'var(--supportive-green-10)'"
               type="Spline"
               xName="x"
               yName="y"

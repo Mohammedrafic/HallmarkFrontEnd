@@ -11,6 +11,7 @@ import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-stat
 
 export class OrderManagement {
   id: number;
+  reOrderId?: number; // TODO: verify name after BE implementation
   organizationId: number;
   status: number;
   statusText: string;
@@ -21,6 +22,10 @@ export class OrderManagement {
   locationName: string;
   departmentId: number;
   departmentName: string;
+  agencyName?: string[]; // TODO: verify name after BE implementation
+  shiftStartTime?: string; // TODO: verify name after BE implementation
+  shiftEndTime?: string; // TODO: verify name after BE implementation
+  shift?: string; // used only in UI to group and show shiftStartTime - shiftEndTime range
   skillId: number;
   skillName: string;
   orderType: number;
@@ -28,6 +33,7 @@ export class OrderManagement {
   openPositions: number;
   candidates: number;
   startDate: string;
+  reOrderDate?: string; // TODO: verify name after BE implementation
   isLocked?: boolean;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
   children: OrderManagementChild[];
@@ -48,6 +54,7 @@ export class OrderManagementFilter {
 export type OrderManagementPage = PageOfCollections<OrderManagement>;
 
 export type AgencyOrderManagement = {
+  // TODO: modification pending
   orderId: number;
   statusText: string;
   status: OrderStatus;
@@ -132,7 +139,7 @@ export type AgencyOrder = {
   organizationId: number;
 };
 
-export class SuggesstedDetails {
+export class SuggestedDetails {
   workLocation: {
     address: string;
     state: string;
@@ -312,6 +319,7 @@ export class OrderFilter {
   regionIds?: number[];
   locationIds?: number[];
   departmentsIds?: number[];
+  reOrderId?: number; // TODO: verify name after BE implementation
   orderId?: number;
   skillIds?: number[];
   orderTypes?: number[];
@@ -321,6 +329,7 @@ export class OrderFilter {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
+  reOrderDate?: Date; // TODO: verify name after BE implementation
   orderStatuses?: number[];
   candidateStatuses?: number[];
   candidatesCountFrom?: number;

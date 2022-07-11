@@ -48,10 +48,12 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   @Select(OrderManagementState.selectedOrder)
   public selectedOrder$: Observable<Order>;
   public templateState: Subject<any> = new Subject();
+  public includeDeployedCandidates: boolean;
 
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public candidate: OrderCandidatesList;
+  public isAgency: boolean;
 
   private pageSubject = new Subject<number>();
 
@@ -60,7 +62,15 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   }
 
   ngOnInit() {
+    this.isAgency = this.router.url.includes('agency');
+
     this.subscribeOnPageChanges();
+  }
+
+  public onSwitcher(): void {
+    this.store.dispatch(
+      new GetAgencyOrderCandidatesList(this.order.orderId, this.order.organizationId, this.currentPage, this.pageSize, !this.includeDeployedCandidates)
+    ).subscribe(() => this.includeDeployedCandidates = !this.includeDeployedCandidates);
   }
 
   public onRowsDropDownChanged(): void {
@@ -99,7 +109,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
       // TODO: find better approach
       const isOrganization = this.router.url.includes('client');
 
-      if (this.isAgency()) {
+      if (this.isAgency) {
         const allowedApplyStatuses = [ApplicantStatus.NotApplied];
         const allowedAcceptStatuses = [
           ApplicantStatus.Offered,
@@ -153,16 +163,11 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
     this.removeActiveCssClass();
   }
 
-  public isAgency(): boolean {
-    // TODO: find better approach
-    return this.router.url.includes('agency');
-  }
-
   private subscribeOnPageChanges(): void {
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
       this.store.dispatch(
-        new GetAgencyOrderCandidatesList(this.order.orderId, this.order.organizationId, this.currentPage, this.pageSize)
+        new GetAgencyOrderCandidatesList(this.order.orderId, this.order.organizationId, this.currentPage, this.pageSize, this.includeDeployedCandidates)
       );
     });
   }

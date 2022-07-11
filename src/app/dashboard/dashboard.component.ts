@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation, ChangeDetectionStrategy, ViewContainerRef, TemplateRef } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
@@ -22,6 +22,8 @@ import { WidgetToggleModel } from './models/widget-toggle.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { DashboardWidgetsComponent } from './dashboard-widgets/dashboard-widgets.component';
 import type { WidgetsDataModel } from './models/widgets-data.model';
+import { GetCurrentUserPermissions } from '../store/user.actions';
+import { CurrentUserPermission } from '@shared/models/permission.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -33,27 +35,31 @@ import type { WidgetsDataModel } from './models/widgets-data.model';
 export class DashboardComponent extends DestroyableDirective implements OnInit, OnDestroy {
   @ViewChild(DashboardWidgetsComponent, { static: false }) dashboardWidgetsComponent: DashboardWidgetsComponent;
 
+  @ViewChild('widgetsTemplate', { read: TemplateRef }) widgetsContentRef: TemplateRef<DashboardWidgetsComponent>;
+  @ViewChild('outlet', { read: ViewContainerRef }) outletRef: ViewContainerRef;
+
   @Select(DashboardState.dashboardPanels) public readonly panels$: Observable<DashboardStateModel['panels']>;
   @Select(DashboardState.selectedWidgets) public readonly selectedWidgets$: Observable<WidgetTypeEnum[]>;
   @Select(DashboardState.widgets) public readonly widgets$: Observable<DashboardStateModel['widgets']>;
-
-  @Select(DashboardState.isDashboardLoading) public readonly isLoading$: Observable<
-    DashboardStateModel['isDashboardLoading']
-  >;
-
+  @Select(DashboardState.isDashboardLoading) public readonly isLoading$: Observable<DashboardStateModel['isDashboardLoading']>;
   @Select(DashboardState.isMobile) private readonly isMobile$: Observable<DashboardStateModel['isMobile']>;
 
-  @Select(UserState.lastSelectedOrganizationId) private readonly organizationId$: Observable<
-    UserStateModel['lastSelectedOrganizationId']
-  >;
+  @Select(UserState.lastSelectedOrganizationId) private readonly organizationId$: Observable<UserStateModel['lastSelectedOrganizationId']>;
+  @Select(UserState.lastSelectedOrganizationAgency) private readonly lastSelectedOrganizationAgency$: Observable<string>;
+  @Select(UserState.currentUserPermissions) private readonly currentUserPermissions$: Observable<CurrentUserPermission[]>;
 
-  @Select(UserState.lastSelectedOrganizationAgency)
-  private readonly lastSelectedOrganizationAgency$: Observable<string>;
+  private panelsAreDragged = false;
+  private permissions: CurrentUserPermission[] = [];
 
   public widgetsData$: Observable<WidgetsDataModel>;
   public isOrganization$: Observable<boolean>;
 
   public readonly filtersGroup: FormGroup = this.getFiltersGroup();
+
+  get hasOrderManagePermission(): boolean {
+    const manageOrderPermissionId = 1801;
+    return this.permissions.map(permission => permission.permissionId).includes(manageOrderPermissionId);
+  }
 
   constructor(
     private readonly store: Store,
@@ -66,9 +72,18 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   public ngOnInit(): void {
-    this.setWidgetsData();
     this.isUserOrganization();
     this.initOrganizationChangeListener();
+    this.getCurrentUserPermissions();
+    this.subscribeOnPermissions();
+  }
+
+  private getCurrentUserPermissions(): void {
+    this.store.dispatch(new GetCurrentUserPermissions());
+  }
+
+  private subscribeOnPermissions(): void {
+    this.currentUserPermissions$.pipe(takeUntil(this.destroy$)).subscribe(permissions => this.permissions = permissions);
   }
 
   private isUserOrganization(): void {
@@ -114,6 +129,17 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     const updatePanelsList = [...this.dashboardSFComponentSerialized, newPanel];
 
     this.saveDashboard(updatePanelsList);
+    this.reRenderDashboard();
+  }
+
+  private reRenderDashboard(): void {
+    /* due to an error in Syncfusion library, it is necessary to rerender dashboard
+      after adding a new panel if panels were dragged before that */
+    if (this.panelsAreDragged) {
+      this.outletRef.clear();
+      this.outletRef.createEmbeddedView(this.widgetsContentRef);
+      this.panelsAreDragged = false;
+    }
   }
 
   private removeWidget(widget: WidgetOptionModel): void {
@@ -128,6 +154,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   public moveDashboardPanel(): void {
     this.saveDashboard(this.dashboardSFComponentSerialized);
+    this.panelsAreDragged = true;
   }
 
   private getFiltersGroup(): FormGroup {

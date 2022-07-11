@@ -35,7 +35,8 @@ import {
   SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
-  GetHistoricalData
+  GetHistoricalData,
+  GetReOrders
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -47,7 +48,7 @@ import {
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementPage,
-  SuggesstedDetails
+  SuggestedDetails
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -83,7 +84,7 @@ export interface OrderManagementContentStateModel {
   workflows: WorkflowByDepartmentAndSkill[];
   projectTypes: ProjectType[];
   projectSpecialData: ProjectSpecialData | null;
-  suggestedDetails: SuggesstedDetails | null;
+  suggestedDetails: SuggestedDetails | null;
   projectNames: ProjectName[];
   masterShifts: MasterShift[];
   associateAgencies: AssociateAgency[];
@@ -165,7 +166,7 @@ export class OrderManagementContentState {
   }
 
   @Selector()
-  static suggestedDetails(state: OrderManagementContentStateModel): SuggesstedDetails | null {
+  static suggestedDetails(state: OrderManagementContentStateModel): SuggestedDetails | null {
     return state.suggestedDetails
   }
 
@@ -275,6 +276,14 @@ export class OrderManagementContentState {
     );
   }
 
+  @Action(GetReOrders)
+  GetReOrders({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }: GetReOrders): Observable<OrderManagementPage> {
+    return this.orderManagementService.getReOrders(payload).pipe(tap((payload) => {
+      patchState({ ordersPage: payload });
+      return payload;
+    }));
+  }
+
   @Action(GetAgencyOrderCandidatesList)
   GetAgencyOrderCandidatesPage(
     { patchState }: StateContext<OrderManagementContentStateModel>,
@@ -374,7 +383,7 @@ export class OrderManagementContentState {
   }
 
   @Action(GetSuggestedDetails)
-  GetSuggestedDetails({ patchState }: StateContext<OrderManagementContentStateModel>, { locationId }: GetSuggestedDetails): Observable<SuggesstedDetails> {
+  GetSuggestedDetails({ patchState }: StateContext<OrderManagementContentStateModel>, { locationId }: GetSuggestedDetails): Observable<SuggestedDetails> {
     return this.orderManagementService.getSuggestedDetails(locationId).pipe(tap(payload => {
       patchState({ suggestedDetails: payload });
     }));

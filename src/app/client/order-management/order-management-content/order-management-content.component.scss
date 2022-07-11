@@ -49,6 +49,16 @@
   .e-item-active {
     color: $primary-active-blue;
   }
+
+  .agency-name {
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+
+.e-tip-content {
+  display: flex;
+  justify-content: center;
 }
 
 .e-btn-icon.e-icons.e-icon-right.e-caret {
@@ -81,10 +91,10 @@
 .row {
   display: flex;
   justify-content: space-between;
-  
+
   .input-container {
     width: 100%;
-    
+
     &:first-child {
       margin-right: 12px;
     }

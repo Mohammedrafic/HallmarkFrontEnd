@@ -37,7 +37,6 @@
     [textWrapSettings]="wrapSettings"
     (rowSelected)="onRowClick($event)"
     (dataBound)="onDataBound()"
-    (actionBegin)="actionBegin($event)"
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
@@ -78,11 +77,28 @@
               <b>{{ data.id }}</b>
             </div>
           </ng-container>
-  
+
           <ng-template #withToggle>
             <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
               <b>{{ data.id }}</b
               ><i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
+            </div>
+          </ng-template>
+        </ng-template>
+      </e-column>
+      <e-column field="reOrderId" headerText="RE-ORDER ID" width="140" [visible]="false">
+        <!-- TODO: verify after BE implementation -->
+        <ng-template #template let-data>
+          <ng-container *ngIf="!data.children?.length; else withToggle">
+            <div>
+              <b>{{ data.reOrderId }}</b>
+            </div>
+          </ng-container>
+
+          <ng-template #withToggle>
+            <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
+              <b>{{ data.reOrderId }}</b>
+              <i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
             </div>
           </ng-template>
         </ng-template>
@@ -125,6 +141,52 @@
       <e-column field="startDate" headerText="START DATE" width="150">
         <ng-template #template let-data>
           <span>{{ data.startDate | date:'MM/dd/yyyy' }}</span>
+        </ng-template>
+      </e-column>
+      <e-column field="reOrderDate" headerText="RE-ORDER DATE" width="150" [visible]="false">
+        <!-- TODO: verify after BE implementation -->
+        <ng-template #template let-data>
+          <span>{{ data.reOrderDate | date:'MM/dd/yyyy' }}</span>
+        </ng-template>
+      </e-column>
+      <e-column field="shift" headerText="SHIFT" width="150" [visible]="false">
+        <!-- TODO: verify after BE implementation -->
+        <ng-template #template let-data>
+          <span>{{ data.shiftStartTime }}-{{ data.shiftEndTime }}</span>
+        </ng-template>
+      </e-column>
+      <e-column field="agencyName" headerText="AGENCY" width="150" [visible]="false">
+        <!-- TODO: verify after BE implementation -->
+        <ng-template #template let-data>
+          <ng-container *ngIf="!data.agencyName?.length">
+            <span>All</span>
+          </ng-container>
+
+          <ng-container *ngIf="data.agencyName?.length === 2">
+            <span *ngFor="let agency of data.agencyName; let i = index" class="agency-name">
+              {{ agency }}
+              <span class="agency-name" *ngIf="i !== data.agencyName.length - 1">, </span>
+            </span>
+          </ng-container>
+
+          <ng-container *ngIf="data.agencyName?.length >= 3 && data.agencyName?.length <= 5">
+            <ejs-tooltip
+              content="{{ data.agencyName.length }}"
+              target="#agencyName"
+            >
+              <span id="agencyName" class="agency-name">Multiple Agencies</span>
+            </ejs-tooltip>
+          </ng-container>
+
+          <ng-container *ngIf="data.agencyName?.length > 5">
+            <span id="agencyName" class="agency-name">Multiple Agencies</span>
+          </ng-container>
+        </ng-template>
+      </e-column>
+      <e-column field="shiftCount" headerText="# of Shifts Next 90 Days " width="150" [visible]="false">
+        <!-- TODO: Pending BE -->
+        <ng-template #template let-data>
+          -
         </ng-template>
       </e-column>
     </e-columns>
