@@ -7,6 +7,7 @@ import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { LoginRoutingModule } from './login-routing.module';
 import { LoginPageComponent } from './login-page/login-page.component';
 import { CheckBoxModule } from "@syncfusion/ej2-angular-buttons";
+import { B2CAuthModule } from '../b2c-auth/b2c-auth.module';
 
 @NgModule({
   declarations: [LoginPageComponent],
@@ -16,6 +17,7 @@ import { CheckBoxModule } from "@syncfusion/ej2-angular-buttons";
     LoginRoutingModule,
     ReactiveFormsModule,
     CheckBoxModule,
+    B2CAuthModule,
   ],
 })
 export class LoginModule {}
