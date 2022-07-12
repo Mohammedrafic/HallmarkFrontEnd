@@ -144,6 +144,18 @@ export class TimesheetsState {
       );
   }
 
+  @Action(TimesheetDetails.GetTimesheetRecords)
+  GetTimesheetRecords({ patchState }: StateContext<TimesheetsModel>, id: number): Observable<TimesheetRecordsDto> {
+    return this.timesheetsApiService.getTimesheetRecords(id)
+    .pipe(
+      tap((res) => {
+        patchState({
+          timeSheetRecords: res,
+        });
+      })
+    )
+  }
+
   @Action(Timesheets.PostProfileTimesheet)
   PostProfileTimesheet(
     ctx: StateContext<TimesheetsModel>,
@@ -152,12 +164,15 @@ export class TimesheetsState {
     return this.timesheetsApiService.postProfileTimesheets(payload);
   }
 
-  @Action(Timesheets.PatchProfileTimesheet)
-  PatchProfileTimesheet(
+  @Action(TimesheetDetails.PatchTimesheetRecords)
+  PatchTimesheetRecords(
     ctx: StateContext<TimesheetsModel>,
-    { profileId, profileTimesheetId, payload }: Timesheets.PatchProfileTimesheet
-  ): Observable<null> {
-    return this.timesheetsApiService.patchProfileTimesheets(profileId, profileTimesheetId, payload);
+    { id, recordsToUpdate }: TimesheetDetails.PatchTimesheetRecords,
+  ): Observable<TimesheetRecordsDto> {
+    return this.timesheetsApiService.patchTimesheetRecords(id, recordsToUpdate)
+    .pipe(
+      switchMap(() => this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(id))),
+    )
   }
 
   @Action(Timesheets.DeleteProfileTimesheet)
@@ -305,18 +320,6 @@ export class TimesheetsState {
           downloadBlobFile(file, `empty.${payload.exportFileType === ExportedFileType.csv ? 'csv' : 'xlsx'}`);
         })
       );
-  }
-
-  @Action(TimesheetDetails.GetTimesheetRecords)
-  GetTimesheetRecords({ patchState }: StateContext<TimesheetsModel>, id: number): Observable<TimesheetRecordsDto> {
-    return this.timesheetsApiService.getTimesheetRecords(id)
-    .pipe(
-      tap((res) => {
-        patchState({
-          timeSheetRecords: res,
-        });
-      })
-    )
   }
 
   @Action(TimesheetDetails.GetCandidateInfo)

@@ -45,3 +45,8 @@ export interface CandidateInfo {
   endDate: string;
   unitName: string;
 }
+
+export interface CostCenterOption {
+  id: number;
+  name: string;
+}

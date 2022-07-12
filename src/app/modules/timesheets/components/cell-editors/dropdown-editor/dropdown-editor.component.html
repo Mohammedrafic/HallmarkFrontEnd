@@ -1,0 +1,20 @@
+<ng-container [ngSwitch]="editable">
+
+  <ng-template [ngSwitchCase]="false">
+    <span>{{ value.text }}</span>
+  </ng-template>
+
+  <ng-template [ngSwitchCase]="true">
+    <div class="bootstrap">
+      <ejs-dropdownlist
+      class="dropdown-no-border"
+      [dataSource]="options"
+      [value]="value.text"
+      (change)="itemChange($event)"
+    >
+    </ejs-dropdownlist>
+    </div>
+
+  </ng-template>
+
+</ng-container>

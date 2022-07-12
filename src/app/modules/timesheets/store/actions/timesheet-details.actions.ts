@@ -63,4 +63,10 @@ export namespace TimesheetDetails {
     ) {
     }
   }
+
+  export class PatchTimesheetRecords {
+    static readonly type = TimesheetDetailsActions.PatchTimesheetRecords;
+
+    constructor(public readonly id: number,public readonly recordsToUpdate: Record<string, string | number>[]) {}
+  }
 }

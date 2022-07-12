@@ -8,6 +8,8 @@
 @import "./ag-grid-styles";
 
 @import "../../assets/fonts/open-sans.scss";
+@import '@ag-grid-community/core/dist/styles/ag-grid.scss';
+@import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
 
 html {
   height: 100%;

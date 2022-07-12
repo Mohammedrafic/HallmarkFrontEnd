@@ -1,0 +1,56 @@
+import { AbstractControl, FormGroup } from '@angular/forms';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
+
+import { ICellRendererAngularComp } from '@ag-grid-community/angular';
+import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
+import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+
+import { DropdownOption } from '../../../interface';
+
+@Component({
+  selector: 'app-dropdown-editor',
+  templateUrl: './dropdown-editor.component.html',
+  styleUrls: ['./dropdown-editor.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class DropdownEditorComponent implements ICellRendererAngularComp {
+  public value: DropdownOption;
+
+  public options: DropdownOption[] = [];
+
+  public editable = false;
+
+  public control: AbstractControl;
+
+  constructor(
+    private cd: ChangeDetectorRef,
+  ) {}
+
+  public agInit(params: ICellRendererParams): void {
+    this.setData(params);
+  }
+
+  public refresh(params: ICellRendererParams): boolean {
+    this.setData(params);
+    this.setFormControl(params);
+    return true;
+  }
+
+  public itemChange(event: ChangeEventArgs):  void {
+    this.control.patchValue(event.itemData.value);
+  }
+
+  private setData(params: ICellRendererParams): void {
+    this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
+    this.options = (params.colDef as ColDef).cellRendererParams.options;
+    this.value = this.options.find((item) => item.value === params.value) as DropdownOption;
+    this.cd.markForCheck();
+  }
+
+  private setFormControl(params: ICellRendererParams): void {
+    if (params.colDef?.cellRendererParams.formGroup?.[params.data.id]) {
+      const group = params.colDef?.cellRendererParams.formGroup[params.data.id] as FormGroup;
+      this.control = group.get((params.colDef as ColDef).field as string) as AbstractControl;
+    }
+  }
+}

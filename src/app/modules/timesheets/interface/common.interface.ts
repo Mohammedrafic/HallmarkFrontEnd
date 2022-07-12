@@ -1,3 +1,4 @@
+import { RecordFields } from './../enums/timesheet-common.enum';
 import { FormGroup } from '@angular/forms';
 
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
@@ -51,18 +52,20 @@ export interface TimesheetRecord {
   day: string;
   timeIn: string;
   timeOut: string;
-  costCenter: string;
-  billRateType: string;
+  costCenter: number;
+  billRateType: number;
   amount: number;
   rate: number;
   total: number;
 }
 
 export interface TimesheetRecordsDto {
-  timeRecords: TimesheetRecord[];
-  miles: MileRecord[];
-  expenses: ExpensesRecord[];
+  [RecordFields.Time]: RecordValue[];
+  [RecordFields.Miles]: RecordValue[];
+  [RecordFields.Expenses]: RecordValue[];
 }
+
+export type RecordValue = TimesheetRecord | MileRecord | ExpensesRecord;
 
 export interface TimesheetAttachments {
   attachments: TimesheetUploadedFile[];

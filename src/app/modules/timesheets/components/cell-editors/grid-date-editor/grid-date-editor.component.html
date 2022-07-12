@@ -1,0 +1,22 @@
+<ng-container [ngSwitch]="editable">
+
+  <ng-template [ngSwitchCase]="false">
+    <span>{{ dateValue | date:'H:mm'}}</span>
+  </ng-template>
+
+  <ng-template [ngSwitchCase]="true">
+    <div class="wrapper">
+      <ejs-timepicker
+        placeholder="HH:MM"
+        format="hh:mm a"
+        [value]="dateValue"
+        [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+        [enableMask]="false"
+        [step]="15"
+        maskPlaceholder="HH:MM"
+        (change)="handleTimeChange($event)">
+      </ejs-timepicker>
+    </div>
+  </ng-template>
+
+</ng-container>

@@ -1,0 +1,19 @@
+@import 'colors';
+
+::ng-deep {
+  ejs-dropdownlist {
+    width: 115px!important;
+    height: 40px;
+    border: 1px solid $secondary-dark-blue-40;
+    border-radius: 8px;
+    padding-bottom: 1px;
+    overflow: hidden;
+    span.e-input-group {
+      margin-top: 0!important;
+    }
+  }
+}
+
+.bootstrap {
+  height: 40px;
+}

@@ -1,0 +1,29 @@
+@import 'colors';
+
+.date-editor-container {
+  height: 40px;
+  width: 98px;
+  border: 1px solid $secondary-dark-blue-40;
+  border-radius: 8px;
+}
+
+::ng-deep {
+  .wrapper {
+    height: 40px;
+
+    ejs-timepicker.e-timepicker {
+      .e-input-group.e-control-wrapper.e-time-wrapper {
+        height: 40px!important;
+        width: 115px!important;
+        display: flex!important;
+        align-items: center!important;
+        padding: 0 16px;
+
+        .e-input {
+          padding: 0!important;
+        }
+      }
+    }
+  }
+
+}

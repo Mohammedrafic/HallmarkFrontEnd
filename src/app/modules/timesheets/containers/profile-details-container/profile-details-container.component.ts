@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import { Observable, of, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
+import { take, filter, Observable, switchMap, takeUntil, tap, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { UploaderComponent } from "@syncfusion/ej2-angular-inputs";
@@ -75,6 +75,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public submitText: string;
 
+  public candidateId: number;
   public fileName: string = '';
 
   public timesheetId: number;
@@ -177,6 +178,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
             new Timesheets.DeleteTimesheet(this.timesheetId),
           ]);
         } else {
+          // TODO what's this?
           !submitted && switchComponent.writeValue(false);
         }
       });
@@ -199,7 +201,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     .pipe(
       tap(({id}) => this.timesheetId = id),
       throttleTime(100),
-      switchMap((data) => data.dialogState ? this.profileService.getCandidateData(data.id) : of(null)),
+      filter((data) => data.dialogState),
+      tap((data) => { this.candidateId =  data.id }),
+      switchMap((data) => this.profileService.getCandidateData(data.id)),
       takeUntil(this.componentDestroy())
       )
     .subscribe((data) => {
@@ -223,7 +227,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   }
 
   public customExport(event: {columns: any[]; fileName: string; fileType: ExportedFileType }): void {
-    console.log(event);
     this.closeExport();
     this.exportProfileDetails(event.fileType);
   }

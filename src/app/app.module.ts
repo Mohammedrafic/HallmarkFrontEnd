@@ -27,12 +27,12 @@ import { NgxMaskModule } from 'ngx-mask';
       AppState,
       UserState
     ]),
-    NgxsReduxDevtoolsPluginModule.forRoot({
-      disabled: environment.production
-    }),
-    NgxsLoggerPluginModule.forRoot({
-      disabled: environment.production
-    }),
+    // NgxsReduxDevtoolsPluginModule.forRoot({
+    //   disabled: environment.production
+    // }),
+    // NgxsLoggerPluginModule.forRoot({
+    //   disabled: environment.production
+    // }),
     NgxMaskModule.forRoot(),
   ],
   providers: [

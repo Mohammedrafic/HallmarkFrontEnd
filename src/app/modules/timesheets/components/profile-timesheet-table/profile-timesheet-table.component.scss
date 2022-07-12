@@ -1,4 +1,6 @@
-@import "../../../../styles/variables/colors.scss";
+@import '../../../../styles/variables/colors.scss';
+@import '@ag-grid-community/core/dist/styles/ag-grid.scss';
+@import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
 
 .table-container {
   margin-bottom: 25px;
@@ -33,6 +35,7 @@
 }
 
 .add-action {
+  width: 80px;
   color: $primary-active-blue-10;
   font-size: 14px;
   font-weight: 600;
@@ -41,17 +44,18 @@
   cursor: pointer;
 
   &.spaced {
+    width: 135px;
     margin-left: auto;
     margin-right: 10px;
   }
 }
 
-.table-block {
-  .ejs-grid.e-control.e-grid {
-    border-radius: 0 !important;
-  }
-  .e-rowcell.e-templatecell:last-child {
-    padding-left: 0;
-    padding-right: 0;
+.timesheet-table-container {
+  height: 255px;
+}
+
+::ng-deep {
+  .ag-cell-focus, .ag-cell {
+    border: none !important;
   }
 }

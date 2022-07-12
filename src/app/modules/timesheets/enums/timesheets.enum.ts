@@ -21,6 +21,9 @@ export enum TimesheetDetailsActions {
   GetCandidateInfo = '[timesheet details] Get candidate info',
   GetCandidateChartData = '[timesheet details] Get candidate chart data',
   GetCandidateAttachments = '[timesheet details] Get candidate attachments',
+  GetCandidateCostCenters = '[timesheet details] Get candidate cost centers',
+  GetCandidateBillRates = '[timesheet details] Get candidate bill rates',
+  PatchTimesheetRecords = '[timesheet details] Patch timesheet records',
 }
 
 export enum TIMETHEETS_STATUSES {

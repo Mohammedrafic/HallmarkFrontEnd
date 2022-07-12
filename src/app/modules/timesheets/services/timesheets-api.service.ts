@@ -1,7 +1,9 @@
+
+
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Observable, of } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
 
 import {
@@ -11,12 +13,18 @@ import {
   TimesheetAttachments,
   TabCountConfig,
   TimesheetRecordsDto,
+  CostCenterOption,
+  DropdownOption,
+} from '../interface';
+import { BillRate } from '@shared/models';
+import { BillRatesOptions } from './../constants/timesheet-records-mock.constant';
+import {
   DataSourceItem,
   FilterDataSource,
 } from '../interface';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
 import { filterColumnDataSource, MokTabsCounts, MokTimesheet, MockCandidateHoursAndMilesData } from '../constants';
-import { CandidateMockInfo, MockTimesheetRecords } from '../constants/timesheet-records-mock.constant';
+import { CandidateMockInfo, MockTimesheetRecords, CostCenterOptions } from '../constants/timesheet-records-mock.constant';
 import { TimesheetsTableColumns } from '../enums';
 import { CandidateHoursAndMilesData } from '../interface';
 
@@ -51,10 +59,9 @@ export class TimesheetsApiService {
     return of(null);
   }
 
-  public patchProfileTimesheets(
-    profileId: number,
-    profileTimesheetId:number,
-    body: TimesheetRecord,
+  public patchTimesheetRecords(
+    id: number,
+    records: Record<string, string | number>[],
   ): Observable<null> {
     return of(null);
   }
@@ -89,5 +96,29 @@ export class TimesheetsApiService {
 
   public getCandidateAttachments(id: number): Observable<TimesheetAttachments> {
     return of();
+  }
+
+  public getCandidateCostCenters(id: number): Observable<DropdownOption[]> {
+    return of(CostCenterOptions)
+    .pipe(
+      map((res) => res.map((item) => {
+        return {
+          text: item.name,
+          value: item.id,
+        }
+      })),
+    );
+  }
+
+  public getCandidateBillRates(id: number): Observable<DropdownOption[]> {
+    return of (BillRatesOptions)
+    .pipe(
+      map((res) => res.map((item) => {
+        return {
+          text: item.billRateConfig.title,
+          value: item.billRateConfig.id,
+        }
+      })),
+    );
   }
 }

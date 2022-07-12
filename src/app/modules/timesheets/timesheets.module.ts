@@ -1,3 +1,5 @@
+import { GridDateEditorComponent } from './components/cell-editors/grid-date-editor/grid-date-editor.component';
+import { AgGridModule } from '@ag-grid-community/angular';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
@@ -42,6 +44,9 @@ import { TimesheetsService } from './services/timesheets.service';
 import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
 import { TimesheetDetailsApiService } from "./services/timesheet-details-api.service";
 import { ProfileTimesheetService } from './services/profile-timesheet.service';
+import { TimesheetRecordsService } from './services/timesheet-records.service';
+import { DropdownEditorComponent } from './components/cell-editors/dropdown-editor/dropdown-editor.component';
+import { ActionsCellComponent } from './components/cell-editors/actions-cell/actions-cell.component';
 import { TimesheetsFilterDialogComponent } from './components/timesheets-filter-dialog/timesheets-filter-dialog.component';
 import { GridModule } from '@shared/components/grid/grid.module';
 import { TimesheetTableStatusCellComponent } from './components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
@@ -88,6 +93,9 @@ const gridIcons = {
     ProfileUploadsComponent,
     ProfileInvoicesComponent,
     TimesheetRejectReasonDialogComponent,
+    GridDateEditorComponent,
+    DropdownEditorComponent,
+    ActionsCellComponent,
     TimesheetsFilterDialogComponent,
     TimesheetTableStatusCellComponent,
     ProfileMilesComponent,
@@ -123,7 +131,8 @@ const gridIcons = {
     TextBoxModule,
     TooltipModule,
     SwitchModule,
-    GridModule
+    AgGridModule,
+    GridModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [
@@ -135,6 +144,7 @@ const gridIcons = {
     CapitalizeFirstPipe,
     TimesheetDetailsApiService,
     ChipsCssClass,
+    TimesheetRecordsService,
   ]
 })
 export class TimesheetsModule {}
