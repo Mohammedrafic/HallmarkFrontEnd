@@ -25,7 +25,7 @@ import { BillRate } from '@shared/models/bill-rate.model';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { HistoricalEvent } from '../models/historical-event.model';
 import { ExportPayload } from '@shared/models/export.model';
-import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { AgencyOrderManagementTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -331,12 +331,32 @@ export class OrderManagementContentService {
 
   /**
    * Export organization list
+   * @param payload
+   * @param tab
    */
   public export(payload: ExportPayload, tab: OrganizationOrderManagementTabs): Observable<any> {
-    if (tab === OrganizationOrderManagementTabs.PerDiem) {
-      return this.http.post(`/api/Orders/perdiem/export`, payload, { responseType: 'blob' });
+    switch(tab) {
+      case OrganizationOrderManagementTabs.PerDiem:
+        return this.http.post(`/api/Orders/perdiem/export`, payload, { responseType: 'blob' });
+      case OrganizationOrderManagementTabs.ReOrders:
+        return this.http.post(`/api/Orders/ReOrders/export`, payload, { responseType: 'blob' }); // TODO: modification pending after BE implementation
+      default:
+        return this.http.post(`/api/Orders/export`, payload, { responseType: 'blob' });
     }
-    return this.http.post(`/api/Orders/export`, payload, { responseType: 'blob' });
+  }
+
+  /**
+   * Export agency list
+   * @param payload
+   * @param tab
+   */
+  public exportAgency(payload: ExportPayload, tab: AgencyOrderManagementTabs): Observable<any> {
+    switch(tab) {
+      case AgencyOrderManagementTabs.ReOrders:
+        return this.http.post(`/api/Agency/ReOrders/export`, payload, { responseType: 'blob' }); // TODO: modification pending after BE implementation
+      default:
+        return this.http.post(`/api/Agency/export`, payload, { responseType: 'blob' });
+    }
   }
 }
 

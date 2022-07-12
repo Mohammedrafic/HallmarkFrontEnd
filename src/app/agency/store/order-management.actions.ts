@@ -2,6 +2,8 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { OrderApplicantsApplyData } from '@shared/models/order-applicants.model';
 import { AcceptJobDTO, AgencyOrderFilters } from '@shared/models/order-management.model';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
+import { ExportPayload } from '@shared/models/export.model';
+import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 
 export class GetAgencyOrdersPage {
   static readonly type = '[agency order management] Get Agency Orders Page';
@@ -87,6 +89,10 @@ export class GetAgencyFilterOptions {
 export class GetOrganizationStructure {
   static readonly type = '[agency order management] Get Organization Structure';
   constructor(public organizationIds: number[]) {}
+}
+export class ExportAgencyOrders {
+  static readonly type = '[order management] Export Agency Orders list';
+  constructor(public payload: ExportPayload, public tab: AgencyOrderManagementTabs) { }
 }
 
 

@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { Observable, Subject, takeWhile } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
@@ -17,8 +17,17 @@ import { CheckBoxComponent } from '@syncfusion/ej2-angular-buttons';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { GRID_CONFIG } from '@shared/constants';
-import { MyAgencyOrdersColumnsConfig, PerDiemColumnsConfig, ReOrdersColumnsConfig, ROW_HEIGHT, typeValueAccess } from './order-management-grid.constants';
 import {
+  myAgencyColumnsToExport,
+  MyAgencyOrdersColumnsConfig,
+  PerDiemColumnsConfig,
+  ReOrdersColumnsConfig,
+  reOrdersColumnsToExport,
+  ROW_HEIGHT,
+  typeValueAccess
+} from './order-management-grid.constants';
+import {
+  ExportAgencyOrders,
   GetAgencyFilterOptions,
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
@@ -39,11 +48,13 @@ import { DatePipe, Location } from '@angular/common';
 import { UserState } from 'src/app/store/user.state';
 import { isUndefined } from 'lodash';
 import { FilterService } from '@shared/services/filter.service';
-import { ShowFilterDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { FilteredItem } from '@shared/models/filter.model';
 import { AgencyOrderFiltersComponent } from './agency-order-filters/agency-order-filters.component';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { OrderType } from '@shared/enums/order-type';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -54,6 +65,8 @@ import { OrderType } from '@shared/enums/order-type';
 export class OrderManagementGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() filteredItems$: Subject<number>;
   @Input() selectedTab: AgencyOrderManagementTabs;
+  @Input() exportButtonClicked: boolean;
+  @Input() onExportClicked$: Subject<any>;
 
   @ViewChild('grid') override gridWithChildRow: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
@@ -68,7 +81,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public wrapSettings: TextWrapSettingsModel = GRID_CONFIG.wordWrapSettings;
   public allowWrap = GRID_CONFIG.isWordWrappingEnabled;
-  public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
+  public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick', persistSelection: true };
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
   public openCandidat = new Subject<boolean>();
@@ -79,10 +92,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public filters: AgencyOrderFilters = {};
   public filterColumns = AgencyOrderFiltersComponent.generateFilterColumns();
   public OrderFilterFormGroup: FormGroup = AgencyOrderFiltersComponent.generateFiltersForm();
+  public columnsToExport: ExportColumn[];
+  public fileName: string;
+  public defaultFileName: string;
 
   private statusSortDerection: SortDirection = 'Ascending';
   private isAlive = true;
   private selectedIndex: number | null;
+  private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private store: Store,
               private location: Location,
@@ -102,10 +119,48 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.dispatchNewPage();
     }
     this.onReloadOrderCandidatesLists();
+    this.onExportSelectedSubscribe();
+    this.idFieldName = 'orderId';
   }
 
   ngOnDestroy(): void {
     this.isAlive = false;
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
+  public onExportSelectedSubscribe(): void {
+    this.onExportClicked$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .subscribe((event: any) => this.exportSelected(event));
+  }
+
+  public override customExport(): void {
+    this.defaultFileName = `Agency Management/${this.selectedTab} ` + this.generateDateTime(this.datePipe);
+    this.fileName = this.defaultFileName;
+    this.store.dispatch(new ShowExportDialog(true));
+  }
+
+  public closeExport() {
+    this.fileName = '';
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = `Agency Management/${this.selectedTab} ` + this.generateDateTime(this.datePipe);
+    this.store.dispatch(new ExportAgencyOrders(new ExportPayload(
+      fileType,
+      { ...this.filters, ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null },
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      null,
+      options?.fileName || this.defaultFileName
+    ), this.selectedTab));
+    this.clearSelection(this.gridWithChildRow);
   }
 
   public onDataBound(): void {
@@ -139,6 +194,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private dispatchNewPage(): void {
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
+        this.columnsToExport = myAgencyColumnsToExport;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.PerDiem:
@@ -147,9 +203,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.ReOrders:
+        this.columnsToExport = reOrdersColumnsToExport;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       default:
+        this.columnsToExport = myAgencyColumnsToExport;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
     }
@@ -183,6 +241,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onRowClick(event: any): void {
+    this.rowSelected(event, this.gridWithChildRow);
     if (!event.isInteracted) {
       this.selectedOrder = event.data;
       const options = this.getDialogNextPreviousOption(event.data);

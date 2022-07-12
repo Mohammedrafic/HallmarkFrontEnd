@@ -1,4 +1,4 @@
-import { ExportColumn } from "@shared/models/export.model";
+import { ExportColumn } from '@shared/models/export.model';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
@@ -56,9 +56,11 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text:'Status', column: 'StatusText'},
   { text:'Job Title', column: 'JobTitle'},
   { text:'Skill', column: 'SkillName'},
+  { text:'# of Positions', column: 'OpenPositions' },
   { text:'Location', column: 'LocationName'},
   { text:'Department', column: 'DepartmentName'},
   { text:'Candidates', column: 'Candidates'},
+  { text:'Bill Rate', column: 'BillRate'},
   { text:'Re-Order Date', column: 'ReOrderDate'},
   { text:'Shift', column: 'Shift'},
   { text:'Agency', column: 'Agency'},

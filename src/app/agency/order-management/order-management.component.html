@@ -13,8 +13,13 @@
         <span *ngIf="((filteredItems$ | async) || 0) as filteredItems" class="e-badge e-badge-success e-badge-circle">{{ filteredItems }}</span>
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
-    </button>
-      <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+      </button>
+      <button
+        ejs-dropdownbutton
+        [items]="exportOptions"
+        (select)="onExportSelected($event)"
+        id="importButton"
+        cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
     </div>
   </ng-container>
 </app-page-toolbar>
@@ -25,6 +30,7 @@
         *ngSwitchCase="selectedTabCases.MyAgency"
         [filteredItems$]="filteredItems$"
         [selectedTab]="selectedTab"
+        [onExportClicked$]="exportSelected$"
       ></app-order-management-grid>
         <div *ngSwitchCase="selectedTabCases.OtherAgencies">OtherAgencies</div>
         <div *ngSwitchCase="selectedTabCases.AllAgencies">AllAgencies</div>
@@ -33,11 +39,13 @@
         *ngSwitchCase="selectedTabCases.PerDiem"
         [filteredItems$]="filteredItems$"
         [selectedTab]="selectedTab"
+        [onExportClicked$]="exportSelected$"
       ></app-order-management-grid>
       <app-order-management-grid
         *ngSwitchCase="selectedTabCases.ReOrders"
         [filteredItems$]="filteredItems$"
         [selectedTab]="selectedTab"
+        [onExportClicked$]="exportSelected$"
       ></app-order-management-grid>
     </ng-container>
 </section>

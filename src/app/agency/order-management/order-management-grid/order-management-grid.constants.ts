@@ -1,6 +1,7 @@
 import { OrderType } from '@shared/enums/order-type';
 import { AgencyOrderManagement } from '@shared/models/order-management.model';
 import { GridColumn } from '@shared/models/grid-column.model';
+import { ExportColumn } from '@shared/models/export.model';
 
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
@@ -10,6 +11,36 @@ export const ROW_HEIGHT = {
 export const typeValueAccess = (_: string, { orderType }: AgencyOrderManagement) => {
   return OrderType[orderType];
 };
+
+export const myAgencyColumnsToExport: ExportColumn[] = [
+  { text:'Order ID', column: 'OrderId'},
+  { text:'Status', column: 'Status'},
+  { text:'Job Title', column: 'JobTitle'},
+  { text:'Organization', column: 'OrganizationName' },
+  { text:'# of Positions', column: 'NumberOfPositions'},
+  { text:'Candidates', column: 'CandidatesCount'},
+  { text:'Bill Rate', column: 'BillRate'},
+  { text:'Skill', column: 'Skill'},
+  { text:'Location', column: 'LocationName'},
+  { text:'Department', column: 'DepartmentName'},
+  { text:'Type', column: 'Type'},
+  { text:'Start Date', column: 'JobStartDate'},
+];
+
+export const reOrdersColumnsToExport: ExportColumn[] = [
+  { text:'Re-Order ID', column: 'ReOrderId'},
+  { text:'Status', column: 'Status'},
+  { text:'Job Title', column: 'JobTitle'},
+  { text:'# of Positions', column: 'NumberOfPositions' },
+  { text:'Candidates', column: 'CandidatesCount'},
+  { text:'Bill Rate', column: 'BillRate'},
+  { text:'Skill', column: 'Skill'},
+  { text:'Location', column: 'LocationName'},
+  { text:'Department', column: 'DepartmentName'},
+  { text:'Re-Order Date', column: 'ReOrderDate'},
+  { text:'Shift', column: 'Shift'},
+  { text:'Agency', column: 'AgencyName'},
+];
 
 export const ReOrdersColumnsConfig: GridColumn[] = [
   {

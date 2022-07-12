@@ -263,8 +263,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.ReOrders:
-        // TODO: remove after BE implementation
         this.columnsToExport = reOrdersColumnsToExport;
+        // TODO: remove after BE implementation
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
         // TODO: uncomment after BE implementation
         // this.store.dispatch(new GetReOrders(this.filters));

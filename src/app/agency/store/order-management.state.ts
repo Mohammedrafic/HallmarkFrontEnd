@@ -28,6 +28,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import {
   ApplyOrderApplicants,
   ApplyOrderApplicantsSucceed,
+  ExportAgencyOrders,
   GetAgencyFilterOptions,
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
@@ -54,6 +55,7 @@ import {
 } from '@shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 import { getRegionsFromOrganizationStructure } from '@agency/order-management/order-management-grid/agency-order-filters/agency-order-filters.utils';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 
 export interface OrderManagementModel {
   ordersPage: AgencyOrderManagementPage | null;
@@ -368,4 +370,12 @@ export class OrderManagementState {
       })
     );
   }
+
+  @Action(ExportAgencyOrders)
+  ExportAgencyOrders({ }: StateContext<OrderManagementModel>, { payload, tab }: ExportAgencyOrders): Observable<any> {
+    return this.orderManagementContentService.exportAgency(payload, tab).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
 }

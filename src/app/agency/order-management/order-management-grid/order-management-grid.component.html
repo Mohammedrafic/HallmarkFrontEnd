@@ -15,6 +15,7 @@
   [textWrapSettings]="wrapSettings"
   [enableVirtualization]="true"
   (rowSelected)="onRowClick($event)"
+  (rowDeselected)="rowDeselected($event, gridWithChildRow)"
   (dataBound)="onDataBound()"
   (actionBegin)="actionBegin($event)"
   (created)="onGridCreated()"
@@ -225,6 +226,13 @@
     </div>
   </ng-template>
 </ejs-grid>
+
+<app-export-dialog
+  [columns]="columnsToExport"
+  [fileName]="fileName"
+  (cancel)="closeExport()"
+  (export)="export($event)"
+></app-export-dialog>
 
 <app-preview-order-dialog
   [order]="selectedOrder"
