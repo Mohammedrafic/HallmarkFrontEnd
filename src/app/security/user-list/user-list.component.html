@@ -28,13 +28,19 @@
   <ng-container right>
     <ng-container>
       <button ejs-button cssClass="e-outline">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+      <button
+        ejs-dropdownbutton
+        [items]="exportOptions"
+        (select)="exportSelected($event)"
+        id="importButton"
+        cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
       <button ejs-button [isPrimary]="true" (click)="onAddNewUser()">Add User</button>
     </ng-container>
   </ng-container>
 </app-page-toolbar>
 
 <section class="last-content-section-padding">
-  <app-user-grid [filterForm]="businessForm" (editUserEvent)="onEdit($event)"></app-user-grid>
+  <app-user-grid [filterForm]="businessForm" [export$]="exportUsers$" (editUserEvent)="onEdit($event)"></app-user-grid>
 </section>
 
 <app-side-dialog width="832" [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()">

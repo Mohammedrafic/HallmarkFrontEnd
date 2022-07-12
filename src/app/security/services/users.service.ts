@@ -1,12 +1,17 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
+import { HttpClient } from '@angular/common/http';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { Organisation, UserVisibilitySettingBody, UserVisibilitySettingsPage } from "@shared/models/visibility-settings.model";
-import { Observable } from "rxjs";
-import { RolesPerUser, User, UserDTO, UsersPage } from "@shared/models/user-managment-page.model";
+import {
+  Organisation,
+  UserVisibilitySettingBody,
+  UserVisibilitySettingsPage,
+} from '@shared/models/visibility-settings.model';
+import { Observable } from 'rxjs';
+import { RolesPerUser, User, UserDTO, UsersPage } from '@shared/models/user-managment-page.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UsersService {
   constructor(private http: HttpClient) {}
@@ -26,7 +31,9 @@ export class UsersService {
     PageNumber: number,
     PageSize: number
   ): Observable<UsersPage> {
-    return this.http.get<UsersPage>(`/api/Users/Filtered`, { params: {BusinessUnitType, BusinessUnitId, PageNumber, PageSize } });
+    return this.http.get<UsersPage>(`/api/Users/Filtered`, {
+      params: { BusinessUnitType, BusinessUnitId, PageNumber, PageSize },
+    });
   }
 
   /**
@@ -36,11 +43,8 @@ export class UsersService {
    *
    * @return RolesPerUser
    */
-  public getRolesPerUser(
-    BusinessUnitType: BusinessUnitType,
-    BusinessUnitId: number,
-  ): Observable<RolesPerUser[]> {
-    return this.http.get<RolesPerUser[]>(`/api/Roles/basicinfo`, { params: {BusinessUnitType, BusinessUnitId } });
+  public getRolesPerUser(BusinessUnitType: BusinessUnitType, BusinessUnitId: number): Observable<RolesPerUser[]> {
+    return this.http.get<RolesPerUser[]>(`/api/Roles/basicinfo`, { params: { BusinessUnitType, BusinessUnitId } });
   }
 
   /**
@@ -92,5 +96,13 @@ export class UsersService {
    */
   public getUserVisibilitySettingsOrganisation(userId: string): Observable<Organisation[]> {
     return this.http.get<Organisation[]>(`/api/Organizations/structure/All/${userId}`);
+  }
+
+  /**
+   * Export users list
+   * @param payload
+   */
+  public export(payload: ExportPayload): Observable<Blob> {
+    return this.http.post(`/api/Users/export`, payload, { responseType: 'blob' });
   }
 }

@@ -27,6 +27,7 @@ import {
   RemoveUserVisibilitySettingSucceeded,
   GetOrganizationsStructureAll,
   GetNewRoleBusinessByUnitTypeSucceeded,
+  ExportUserList,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -40,6 +41,7 @@ import { UsersService } from '../services/users.service';
 import { RolesPerUser, User, UsersPage } from '@shared/models/user-managment-page.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { getAllErrors } from '@shared/utils/error.utils';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 
 const BUSINNESS_DATA_DEFAULT_VALUE = { id: 0, name: 'All' };
 const BUSINNESS_DATA_HALLMARK_VALUE = { id: 0, name: 'Hallmark' };
@@ -393,5 +395,14 @@ export class SecurityState {
       })
     );
   }
-}
 
+  @Action(ExportUserList)
+  ExportUserList({}: StateContext<SecurityStateModel>, { payload }: ExportUserList): Observable<Blob> {
+    return this.userService.export(payload).pipe(
+      tap((file: Blob) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      })
+    );
+  }
+}
