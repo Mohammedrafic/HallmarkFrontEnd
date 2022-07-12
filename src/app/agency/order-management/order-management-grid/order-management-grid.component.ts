@@ -76,7 +76,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public previousSelectedOrderId: number | null;
   public selectedCandidat: any | null;
   public filters: AgencyOrderFilters = {};
-  public filterColumns = AgencyOrderFiltersComponent.generateFolterColumns();
+  public filterColumns = AgencyOrderFiltersComponent.generateFilterColumns();
   public OrderFilterFormGroup: FormGroup = AgencyOrderFiltersComponent.generateFiltersForm();
 
   private statusSortDerection: SortDirection = 'Ascending';
@@ -231,6 +231,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onFilterClose() {
     this.OrderFilterFormGroup.setValue({
       orderId: this.filters.orderId || null,
+      reOrderId: this.filters.reOrderId || null,
       regionIds: this.filters.regionIds || [],
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
@@ -242,7 +243,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       openPositions: this.filters.openPositions || null,
       jobStartDate: this.filters.jobStartDate || null,
       jobEndDate: this.filters.jobEndDate || null,
+      reOrderDate: this.filters.reOrderDate || null,
       candidateStatuses: this.filters.candidateStatuses || [],
+      candidatesCountFrom: this.filters.candidatesCountFrom || null,
+      candidatesCountTo: this.filters.candidatesCountTo || null,
       organizationIds: this.filters.organizationIds || [],
       orderStatuses: this.filters.orderStatuses || [],
     });

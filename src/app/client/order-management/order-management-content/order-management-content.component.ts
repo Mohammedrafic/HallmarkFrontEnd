@@ -6,7 +6,7 @@ import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
-import { STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
+import { CandidatesStatusText, OrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
   ApproveOrder,
@@ -125,7 +125,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public previousSelectedOrderId: number | null;
   public selectedCandidat: any | null;
   public openChildDialog = new Subject<any>();
-  public isReOrdersTab = false;
+  public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
 
   private selectedIndex: number | null;
 
@@ -216,7 +216,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.PerDiem:
-        // TODO: perdiem 
+        // TODO: perdiem
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.ReOrders:
@@ -383,7 +383,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public tabSelected(tabIndex: OrganizationOrderManagementTabs): void {
     this.activeTab = tabIndex;
     this.currentPage = 1;
-    this.isReOrdersTab = false;
 
     switch (tabIndex) {
       case OrganizationOrderManagementTabs.AllOrders:
@@ -397,7 +396,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.getOrders();
         break;
       case OrganizationOrderManagementTabs.ReOrders:
-        this.isReOrdersTab = true;
         this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
         this.getOrders();
         break;
@@ -527,9 +525,13 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private onOrderFilterDataSourcesLoadHandler(): void {
     this.orderFilterDataSources$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data: OrderFilterDataSource) => {
-      this.filterColumns.orderStatuses.dataSource = data.orderStatuses;
+      this.filterColumns.orderStatuses.dataSource = this.activeTab === OrganizationOrderManagementTabs.ReOrders
+        ? data.orderStatuses.filter(status => [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status))
+        : data.orderStatuses;
       this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
-      this.filterColumns.candidateStatuses.dataSource = data.candidateStatuses;
+      this.filterColumns.candidateStatuses.dataSource = this.activeTab === OrganizationOrderManagementTabs.ReOrders
+        ? data.candidateStatuses.filter(status => [CandidatesStatusText.Onboard, CandidatesStatusText.Offered].includes(status.status)) // TODO: after BE implementation also add Pending, Rejected
+        : data.candidateStatuses;
     });
   }
 

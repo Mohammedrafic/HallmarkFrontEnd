@@ -232,6 +232,17 @@
 
 <app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>
 
-<app-filter-dialog [items]="filteredItems" [count]="(ordersPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
-  <app-agency-order-filters [form]="OrderFilterFormGroup" [filterColumns]="filterColumns"></app-agency-order-filters>
+<app-filter-dialog
+  [items]="filteredItems"
+  [count]="(ordersPage$ | async)?.totalCount"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
+  <app-agency-order-filters
+    [form]="OrderFilterFormGroup"
+    [filterColumns]="filterColumns"
+    [activeTab]="selectedTab"
+  ></app-agency-order-filters>
 </app-filter-dialog>

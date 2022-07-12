@@ -123,8 +123,11 @@ export type AgencyOrderFilters = {
   locationIds?: number[];
   departmentsIds?: number[];
   orderId?: number;
+  reOrderId?: number; // TODO: verify name after BE implementation
   skillIds?: number[];
   candidateStatuses?: number[];
+  candidatesCountFrom?: number; // TODO: verify name after BE implementation
+  candidatesCountTo?: number; // TODO: verify name after BE implementation
   organizationIds?: number[];
   orderTypes?: number[];
   orderStatuses?: number[];
@@ -134,6 +137,7 @@ export type AgencyOrderFilters = {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
+  reOrderDate?: Date; // TODO: verify name after BE implementation
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;

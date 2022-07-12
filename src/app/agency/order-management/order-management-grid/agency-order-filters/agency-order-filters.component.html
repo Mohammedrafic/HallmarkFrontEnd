@@ -1,9 +1,16 @@
 <form class="bootstrap" [formGroup]="form" *ngIf="form">
   <div>
-    <div class="input-container">
-      <label for="externalId">Order ID</label>
+    <div class="input-container" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders">
+      <label for="orderId">Order ID</label>
       <div class="input-group">
-        <input class="e-input" type="text" maxlength="50" formControlName="orderId" />
+        <input id="orderId" class="e-input" type="text" maxlength="50" formControlName="orderId" />
+      </div>
+    </div>
+
+    <div class="input-container" *ngIf="activeTab === AgencyOrderManagementTabs.ReOrders">
+      <label for="reOrderId">Re-Order ID</label>
+      <div class="input-group">
+        <input id="reOrderId" class="e-input" type="text" maxlength="50" formControlName="reOrderId" />
       </div>
     </div>
   </div>
@@ -107,7 +114,7 @@
         </ejs-multiselect>
       </div>
     </div>
-    <div class="input-container">
+    <div class="input-container" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders">
       <label>Order Type</label>
       <div class="input-group multiselect">
         <ejs-multiselect
@@ -177,26 +184,62 @@
       </div>
     </div>
   </div>
-  <div>
+  <div class="row" *ngIf="activeTab === AgencyOrderManagementTabs.ReOrders">
     <div class="input-container">
-      <label for="externalId"># of Positions</label>
+      <label>Candidates Count From</label>
       <div class="input-group">
-        <input class="e-input" type="text" maxlength="50" formControlName="openPositions" />
+        <input
+          class="e-input"
+          type="text"
+          maxlength="50"
+          formControlName="candidatesCountFrom"/>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Candidates Count To</label>
+      <div class="input-group">
+        <input
+          class="e-input"
+          type="text"
+          maxlength="50"
+          formControlName="candidatesCountTo"/>
       </div>
     </div>
   </div>
-  <div class="row">
+  <div>
+    <div class="input-container">
+      <label for="numberOfPositions"># of Positions</label>
+      <div class="input-group">
+        <input id="numberOfPositions" class="e-input" type="text" maxlength="50" formControlName="openPositions" />
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders">
     <div class="input-container calendar">
-      <label for="inactiveDate">Job Start Date</label>
+      <label for="jobStartDate">Job Start Date</label>
       <div class="input-group datepicker">
-        <ejs-datepicker class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobStartDate">
+        <ejs-datepicker id="jobStartDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobStartDate">
         </ejs-datepicker>
       </div>
     </div>
     <div class="input-container calendar">
-      <label for="inactiveDate">Job End Date</label>
+      <label for="jobEndDate">Job End Date</label>
       <div class="input-group datepicker">
-        <ejs-datepicker class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobEndDate">
+        <ejs-datepicker id="jobEndDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobEndDate">
+        </ejs-datepicker>
+      </div>
+    </div>
+  </div>
+  <div class="calendar-container" *ngIf="activeTab === AgencyOrderManagementTabs.ReOrders">
+    <div class="input-container calendar">
+      <label for="reOrderDate">Re-Order Date</label>
+      <div class="input-group datepicker">
+        <ejs-datepicker
+          id="reOrderDate"
+          class="datepicker"
+          format="MM/dd/yyyy"
+          placeholder="MM/DD/YYYY"
+          formControlName="reOrderDate">
         </ejs-datepicker>
       </div>
     </div>

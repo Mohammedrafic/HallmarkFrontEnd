@@ -58,3 +58,11 @@ export enum OrderStatusText {
   Filled = 50,
   Closed = 60,
 }
+
+export enum CandidatesStatusText {
+  Applied = 10,
+  Shortlisted = 20,
+  Offered = 40,
+  Accepted = 50,
+  Onboard = 60
+}

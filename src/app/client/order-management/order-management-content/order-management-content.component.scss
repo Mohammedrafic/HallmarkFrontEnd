@@ -95,10 +95,14 @@
   .input-container {
     width: 100%;
 
-    &:first-child {
-      margin-right: 12px;
+    &:nth-child(n+2) {
+      margin-left: 12px;
     }
   }
+}
+
+.calendar-container {
+  width: 234px;
 }
 
 .subrow-wrapper {

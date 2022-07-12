@@ -13,6 +13,8 @@ import { GetOrganizationStructure } from '@agency/store/order-management.actions
 import { OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { getDepartmentFromLocations, getLocationsFromRegions } from './agency-order-filters.utils';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { CandidatesStatusText, OrderStatusText } from '@shared/enums/status';
 
 @Component({
   selector: 'app-agency-order-filters',
@@ -22,6 +24,9 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 export class AgencyOrderFiltersComponent extends DestroyableDirective implements OnInit, AfterViewInit {
   @Input() form: FormGroup;
   @Input() filterColumns: any;
+  @Input() activeTab: AgencyOrderManagementTabs;
+
+  public AgencyOrderManagementTabs = AgencyOrderManagementTabs;
 
   @Select(OrderManagementState.orderFilteringOptions)
   orderFilteringOptions$: Observable<AgencyOrderFilteringOptions>;
@@ -129,14 +134,19 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       .subscribe(({ candidateStatuses, masterSkills, orderStatuses, partneredOrganizations }) => {
         this.filterColumns.organizationIds.dataSource = partneredOrganizations;
         this.filterColumns.skillIds.dataSource = masterSkills;
-        this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
-        this.filterColumns.orderStatuses.dataSource = orderStatuses;
+        this.filterColumns.candidateStatuses.dataSource = this.activeTab === AgencyOrderManagementTabs.ReOrders
+          ? candidateStatuses.filter(status => [CandidatesStatusText.Onboard, CandidatesStatusText.Offered].includes(status.status)) // TODO: after BE implementation also add Pending, Rejected;
+          : candidateStatuses;
+        this.filterColumns.orderStatuses.dataSource = this.activeTab === AgencyOrderManagementTabs.ReOrders
+          ? orderStatuses.filter(status => [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status))
+          : orderStatuses;
       });
   }
 
   static generateFiltersForm(): FormGroup {
     return new FormGroup({
       orderId: new FormControl(null),
+      reOrderId: new FormControl(null),
       organizationIds: new FormControl([]),
       regionIds: new FormControl([]),
       locationIds: new FormControl([]),
@@ -144,6 +154,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       skillIds: new FormControl([]),
       orderTypes: new FormControl([]),
       candidateStatuses: new FormControl([]),
+      candidatesCountFrom: new FormControl(null),
+      candidatesCountTo: new FormControl(null),
       orderStatuses: new FormControl([]),
       jobTitle: new FormControl(null),
       billRateFrom: new FormControl(null),
@@ -151,12 +163,14 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       openPositions: new FormControl(null),
       jobStartDate: new FormControl(null),
       jobEndDate: new FormControl(null),
+      reOrderDate: new FormControl(null),
     });
   }
 
-  static generateFolterColumns(): any {
+  static generateFilterColumns(): any {
     return {
       orderId: { type: ControlTypes.Text, valueType: ValueType.Text },
+      reOrderId: { type: ControlTypes.Text, valueType: ValueType.Text },
       organizationIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
@@ -206,6 +220,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         valueField: 'statusText',
         valueId: 'status',
       },
+      candidatesCountFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
+      candidatesCountTo: { type: ControlTypes.Text, valueType: ValueType.Text },
       orderStatuses: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
@@ -219,6 +235,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       openPositions: { type: ControlTypes.Text, valueType: ValueType.Text },
       jobStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       jobEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+      reOrderDate: { type: ControlTypes.Date, valueType: ValueType.Text },
     };
   }
 }
