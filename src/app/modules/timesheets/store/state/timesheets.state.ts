@@ -1,17 +1,21 @@
 import { Injectable } from '@angular/core';
 
-import { Observable, of, tap, throttleTime } from 'rxjs';
-import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { filter, Observable, of, switchMap, take, tap, throttleTime } from 'rxjs';
+import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
+import { patch } from '@ngxs/store/operators';
 
-import { ExportPayload } from '@shared/models/export.model';
 import { downloadBlobFile } from '@shared/utils/file.utils';
 import { TimesheetsModel, TimeSheetsPage, } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
-import { DialogAction, TimesheetsTableColumns } from '../../enums';
-import { DefaultFiltersState, DefaultTimesheetState } from '../../constants';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
-import { TimesheetDetailsService } from '../../services/timesheet-details.service';
+import { DialogAction, TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../../enums';
+import {
+  approveTimesheetDialogData,
+  DefaultFiltersState,
+  DefaultTimesheetState,
+  submitTimesheetDialogData
+} from '../../constants';
 import {
   CandidateHoursAndMilesData,
   CandidateInfo,
@@ -19,13 +23,18 @@ import {
   FilterColumns,
   FilterDataSource,
   TabCountConfig,
+  Timesheet,
   TimesheetAttachments,
   TimesheetRecordsDto,
   TimesheetsFilterState,
   TimesheetUploadedFile
 } from '../../interface';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
-import { patch } from '@ngxs/store/operators';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { ShowToast } from '../../../../store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -35,8 +44,10 @@ import { patch } from '@ngxs/store/operators';
 export class TimesheetsState {
   constructor(
     private timesheetsApiService: TimesheetsApiService,
-    private timesheetDetailsService: TimesheetDetailsService,
-    private profileTimesheetService: ProfileTimesheetService
+    private timesheetDetailsApiService: TimesheetDetailsApiService,
+    private profileTimesheetService: ProfileTimesheetService,
+    private store: Store,
+    private confirmService: ConfirmService,
   ) {
   }
 
@@ -173,12 +184,125 @@ export class TimesheetsState {
     });
   }
 
+  @Action(Timesheets.DeleteTimesheet)
+  DeleteTimesheet({ getState, patchState }: StateContext<TimesheetsModel>, {timesheetId}: Timesheets.DeleteTimesheet): void {
+    const state = getState();
+    const timesheets = state.timesheets as TimeSheetsPage;
+
+    patchState({
+      timesheets: {
+        ...timesheets,
+        items: (timesheets.items || []).filter(item => item.id !== timesheetId),
+      }
+    });
+  }
+
+  @Action(TimesheetDetails.AgencySubmitTimesheet)
+  SubmitTimesheet({getState, patchState}: StateContext<TimesheetsModel>, { id }: TimesheetDetails.AgencySubmitTimesheet): void {
+    const {title, submitButtonText, confirmMessage, successMessage} = submitTimesheetDialogData;
+    const state = getState();
+    const timesheets = state.timesheets as TimeSheetsPage;
+
+    this.confirmService.confirm(confirmMessage, {
+      title,
+      okButtonLabel: submitButtonText,
+      okButtonClass: 'delete-button'
+    })
+      .pipe(
+        take(1),
+        filter((submitted: boolean) => submitted),
+        switchMap(() => this.timesheetDetailsApiService.agencySubmitTimesheet(id))
+      )
+      .subscribe(() => {
+        patchState({
+          timesheets: {
+            ...timesheets,
+            items: timesheets.items.map((item) => {
+              if (item.id === id) {
+                item.statusText = TIMETHEETS_STATUSES.PENDING_APPROVE;
+                item.status = TIMETHEETS_STATUSES.PENDING_APPROVE;
+              }
+
+              return item;
+            }),
+          }
+        });
+
+        this.store.dispatch([
+          new ShowToast(MessageTypes.Success, successMessage),
+          new Timesheets.ToggleCandidateDialog(DialogAction.Close)
+        ]);
+      });
+  }
+
+  @Action(TimesheetDetails.OrganizationApproveTimesheet)
+  ApproveTimesheet({getState, patchState}: StateContext<TimesheetsModel>, { id }: TimesheetDetails.OrganizationApproveTimesheet): void {
+    const {title, submitButtonText, confirmMessage, successMessage} = approveTimesheetDialogData;
+    const state = getState();
+    const timesheets = state.timesheets as TimeSheetsPage;
+
+    this.confirmService.confirm(confirmMessage, {
+      title,
+      okButtonLabel: submitButtonText,
+      okButtonClass: 'delete-button'
+    })
+      .pipe(
+        take(1),
+        filter((submitted: boolean) => submitted),
+        switchMap(() => this.timesheetDetailsApiService.organizationApproveTimesheet(id))
+      )
+      .subscribe(() => {
+        this.store.dispatch([
+          new ShowToast(MessageTypes.Success, successMessage),
+          new Timesheets.ToggleCandidateDialog(DialogAction.Close)
+        ]);
+        patchState({
+          timesheets: {
+            ...timesheets,
+            items: timesheets.items.map(item => {
+              if (item.id === id) {
+                item.statusText = TIMETHEETS_STATUSES.ORG_APPROVED;
+                item.status = TIMETHEETS_STATUSES.ORG_APPROVED;
+              }
+
+              return item;
+            })
+          }
+        });
+      });
+  }
+
+  @Action(TimesheetDetails.RejectTimesheet)
+  RejectTimesheet({getState, patchState}: StateContext<TimesheetsModel>, { id }: TimesheetDetails.RejectTimesheet): void {
+    const state = getState();
+    const timesheets = state.timesheets as TimeSheetsPage;
+
+    this.timesheetDetailsApiService.rejectTimesheet(id)
+      .subscribe(() => {
+        patchState({
+          timesheets: {
+            ...timesheets,
+            items: timesheets.items.map((item: Timesheet) => {
+              if (item.id === id) {
+                item.status = TIMETHEETS_STATUSES.REJECTED;
+                item.statusText = TIMETHEETS_STATUSES.REJECTED;
+              }
+
+              return item;
+            }),
+          }
+        });
+
+        this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close));
+      });
+  }
+
   @Action(TimesheetDetails.Export)
-  ExportTimesheetDetails({}: StateContext<TimesheetsModel>, payload: ExportPayload): Observable<Blob> {
-    return this.timesheetDetailsService.exportDetails(payload)
+  ExportTimesheetDetails({}: StateContext<TimesheetsModel>, { payload }: TimesheetDetails.Export): Observable<Blob> {
+    return this.timesheetDetailsApiService.export(payload)
       .pipe(
         tap((file: Blob) => {
-          downloadBlobFile(file, 'empty.csv');
+          downloadBlobFile(file, `empty.${payload.exportFileType === ExportedFileType.csv ? 'csv' : 'xlsx'}`);
         })
       );
   }

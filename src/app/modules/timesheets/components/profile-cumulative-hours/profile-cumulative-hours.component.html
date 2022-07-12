@@ -84,11 +84,12 @@
             <div class="marker" [style.backgroundColor]="chartColorsMap[legendItem.type]"></div>
           </td>
           <td class="name">{{legendItem.type}}</td>
-          <td class="value1">{{legendItem.week ? (legendItem.week | number : '1.2-2') : '-'}}</td>
-          <td class="value2">{{legendItem.cumulative ? (legendItem.cumulative | number : '1.2-2') : '-'}}</td>
+          <td class="week-hours-value">{{legendItem.week ? (legendItem.week | number : '1.2-2') : '-'}}</td>
+          <td class="cumulative-hours-value">{{legendItem.cumulative ? (legendItem.cumulative | number : '1.2-2') : '-'}}</td>
           <td class="checkbox-cell">
-            <ejs-checkbox [checked]="true"
-                          (change)="toggleChartCategoryVisibility($event, legendItem)"
+            <ejs-checkbox
+                    [checked]="true"
+                    (change)="toggleChartCategoryVisibility($event, legendItem)"
             ></ejs-checkbox>
           </td>
         </tr>

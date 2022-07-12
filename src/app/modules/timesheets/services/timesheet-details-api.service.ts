@@ -4,12 +4,26 @@ import { Observable, of } from 'rxjs';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable()
-export class TimesheetDetailsService {
+export class TimesheetDetailsApiService {
   constructor(private http: HttpClient) { }
 
-  public exportDetails(data: ExportPayload): Observable<Blob>  {
+  public export(data: ExportPayload): Observable<Blob>  {
     const testData = {field1: 'Field1Value', field2: 'Field2Value'};
-    return of(new Blob([JSON.stringify(testData, null, 2)], {type: 'application/csv'}));
+    return of(
+      new Blob([JSON.stringify(testData, null, 2)], {type: 'application/text'})
+    );
+  }
+
+  public agencySubmitTimesheet(id: number): Observable<{}> {
+    return of({});
+  }
+
+  public organizationApproveTimesheet(id: number): Observable<{}> {
+    return of({});
+  }
+
+  public rejectTimesheet(id: number): Observable<null> {
+    return of(null);
   }
 
   // public uploadFile(data: ProfileUploadedFile): Observable<ProfileUploadedFile> {

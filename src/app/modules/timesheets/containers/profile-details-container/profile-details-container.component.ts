@@ -1,16 +1,16 @@
 import { ActivatedRoute } from '@angular/router';
 import {
   ChangeDetectionStrategy,
-  Component,
-  OnInit,
-  ViewChild,
   ChangeDetectorRef,
-  Output,
+  Component,
   EventEmitter,
   Input,
+  OnInit,
+  Output,
+  ViewChild,
 } from '@angular/core';
 
-import { filter, Observable, switchMap, take, takeUntil, throttleTime } from 'rxjs';
+import { Observable, of, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { UploaderComponent } from "@syncfusion/ej2-angular-inputs";
@@ -21,12 +21,21 @@ import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import {
-  CandidateInfo, DialogActionPayload, TimesheetUploadedFile, TimesheetRecordsDto, CandidateHoursAndMilesData,
+  CandidateHoursAndMilesData,
+  CandidateInfo,
+  DialogActionPayload,
+  TimesheetRecordsDto,
+  TimesheetUploadedFile,
 } from '../../interface';
 import { DialogAction, SubmitBtnText } from '../../enums';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ConfirmDeleteTimesheetDialogContent } from '../../constants/confirm-delete-timesheet-dialog-content.const';
+import { ShowExportDialog } from '../../../../store/app.actions';
+import { ExportColumn, ExportPayload } from '@shared/models/export.model';
+import { DatePipe } from '@angular/common';
+import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 
 @Component({
@@ -34,6 +43,9 @@ import { ConfirmDeleteTimesheetDialogContent } from '../../constants/confirm-del
   templateUrl: './profile-details-container.component.html',
   styleUrls: ['./profile-details-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    DatePipe,
+  ]
 })
 export class ProfileDetailsContainerComponent extends Destroyable implements OnInit {
   @ViewChild('candidateDialog')
@@ -63,6 +75,21 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public submitText: string;
 
+  public fileName: string = '';
+
+  public timesheetId: number;
+
+  public readonly columnsToExport: ExportColumn[] = [
+    { text:'First Name', column: 'firstName'},
+    { text:'Last Name', column: 'lastName'},
+    { text:'Job Title', column: 'jobTitle'},
+    { text:'Location', column: 'location'},
+    { text:'Department', column: 'department'},
+    { text:'Skill', column: 'skill'},
+    { text:'Start Date', column: 'startDate'},
+    { text:'End Date', column: 'endDate'},
+  ];
+
   @Select(TimesheetsState.tmesheetRecords)
   public tmesheetRecords$: Observable<TimesheetRecordsDto>;
 
@@ -78,6 +105,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @Select(TimesheetsState.timeSheetAttachments)
   public attachments$: Observable<TimesheetUploadedFile[]>;
 
+  public readonly exportedFileType: typeof ExportedFileType = ExportedFileType;
+
   constructor(
     private store: Store,
     private route: ActivatedRoute,
@@ -85,7 +114,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     private cd: ChangeDetectorRef,
     private chipPipe: ChipsCssClass,
     private confirmService: ConfirmService,
-    ) {
+    private datePipe: DatePipe,
+  ) {
     super();
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
     this.submitText = this.isAgency ? SubmitBtnText.Submit : SubmitBtnText.Approve;
@@ -127,7 +157,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     });
   }
 
-  public onRejectButtonClick(): void {}
+  public onRejectButtonClick(): void {
+    this.rejectReasonDialogVisible = true;
+  }
 
   public onDWNCheckboxSelectedChange({checked}: {checked: boolean}, switchComponent: SwitchComponent): void {
     checked && this.confirmService.confirm(ConfirmDeleteTimesheetDialogContent,{
@@ -136,25 +168,75 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       okButtonClass: 'delete-button',
     })
       .pipe(
-        take(1)
+        take(1),
       )
-      .subscribe((submitted: boolean) => !submitted && switchComponent.writeValue(false));
+      .subscribe((submitted: boolean) => {
+        if (submitted) {
+          this.store.dispatch([
+            new Timesheets.ToggleCandidateDialog(DialogAction.Close),
+            new Timesheets.DeleteTimesheet(this.timesheetId),
+          ]);
+        } else {
+          !submitted && switchComponent.writeValue(false);
+        }
+      });
   }
 
-  public handleReject(): void {}
+  public handleReject(): void {
+    this.store.dispatch(TimesheetDetails.RejectTimesheet);
+  }
 
-  public handleApprove(): void {}
+  public handleApprove(): void {
+    const id = this.timesheetId;
+    this.store.dispatch(
+      this.isAgency ? new TimesheetDetails.AgencySubmitTimesheet(id) :
+        new TimesheetDetails.OrganizationApproveTimesheet(id)
+    ).subscribe();
+  }
 
   private getDialogState(): void {
     this.isTimesheetOpen$
     .pipe(
+      tap(({id}) => this.timesheetId = id),
       throttleTime(100),
-      filter((data) => data.dialogState),
-      switchMap((data) => this.profileService.getCandidateData(data.id)),
+      switchMap((data) => data.dialogState ? this.profileService.getCandidateData(data.id) : of(null)),
       takeUntil(this.componentDestroy())
       )
-    .subscribe(() => {
-      this.candidateDialog.show();
+    .subscribe((data) => {
+      data ? this.candidateDialog.show() : this.candidateDialog.hide();
     });
+  }
+
+  public closeExport(): void {
+    this.fileName = '';
+    this.store.dispatch(
+      new ShowExportDialog(false)
+    );
+  }
+
+  public exportProfileDetails(fileType: ExportedFileType): void {
+    this.store.dispatch(
+      new TimesheetDetails.Export(
+        new ExportPayload(fileType),
+      )
+    )
+  }
+
+  public customExport(event: {columns: any[]; fileName: string; fileType: ExportedFileType }): void {
+    console.log(event);
+    this.closeExport();
+    this.exportProfileDetails(event.fileType);
+  }
+
+  public showCustomExportDialog(): void {
+    this.fileName = `Timesheet ${this.generateDateTime(this.datePipe)}`;
+
+    this.store.dispatch(
+      new ShowExportDialog(true)
+    );
+  }
+
+  private generateDateTime(datePipe: DatePipe): string {
+    return datePipe ? datePipe.transform(Date.now(), 'MM/dd/yyyy hh:mm a') as string : '';
   }
 }

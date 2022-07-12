@@ -1,5 +1,5 @@
 import { ExportPayload } from "@shared/models/export.model";
-import { TimesheetDetailsActions } from "../../enums";
+import { TimesheetDetailsActions, TIMESHEETS_ACTIONS } from "../../enums";
 
 export namespace TimesheetDetails {
   export class Export {
@@ -35,5 +35,32 @@ export namespace TimesheetDetails {
   export class GetCandidateAttachments {
     static readonly type = TimesheetDetailsActions.GetCandidateAttachments;
     constructor(public id: number) {}
+  }
+
+  export class AgencySubmitTimesheet {
+    static readonly type = TIMESHEETS_ACTIONS.AGENCY_SUBMIT_TIMESHEET;
+
+    constructor(
+      public readonly id: number,
+    ) {
+    }
+  }
+
+  export class OrganizationApproveTimesheet {
+    static readonly type = TIMESHEETS_ACTIONS.ORGANIZATION_APPROVE_TIMESHEET;
+
+    constructor(
+      public readonly id: number,
+    ) {
+    }
+  }
+
+  export class RejectTimesheet {
+    static readonly type = TIMESHEETS_ACTIONS.REJECT_TIMESHEET;
+
+    constructor(
+      public readonly id: number,
+    ) {
+    }
   }
 }

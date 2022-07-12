@@ -63,6 +63,10 @@ export class TimesheetsApiService {
     return of(null);
   }
 
+  public deleteTimesheet(id: number): Observable<boolean> {
+    return of(true);
+  }
+
   public setDataSources(filterKeys: TimesheetsTableColumns[]): Observable<FilterDataSource> {
     const res = filterKeys.reduce((acc: any, key) => {
       acc[key] = filterColumnDataSource[key].map((el: DataSourceItem) =>

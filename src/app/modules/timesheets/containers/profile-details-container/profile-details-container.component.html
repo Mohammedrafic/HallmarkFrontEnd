@@ -76,14 +76,18 @@
               </ng-template>
             </ejs-tooltip>
 
-           <app-export-button></app-export-button>
+            <app-export-button
+                    (csvExport)="exportProfileDetails(exportedFileType.csv)"
+                    (excelExport)="exportProfileDetails(exportedFileType.excel)"
+                    (customExport)="showCustomExportDialog()"
+            ></app-export-button>
          </div>
 
          <i-feather name="x" class="icon close-button" (click)="handleProfileClose()"></i-feather>
        </div>
       </div>
 
-      <div class="order-header">
+      <div class="order-header" *ngIf="candidateInfo$ | async as candidateInfo">
         <h2 class="order-id">Order ID {{ (candidateInfo$ | async)?.orderId}}</h2>
 
         <div class="controls-block">
@@ -170,3 +174,10 @@
 <app-add-timesheet
   (updateTable)="handleUpdateTable()">
 </app-add-timesheet>
+
+<app-export-dialog
+        [columns]="columnsToExport"
+        [fileName]="fileName"
+        (cancel)="closeExport()"
+        (export)="customExport($event)"
+></app-export-dialog>

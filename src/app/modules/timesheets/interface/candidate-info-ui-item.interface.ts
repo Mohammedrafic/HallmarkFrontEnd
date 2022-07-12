@@ -1,5 +1,5 @@
 export interface CandidateInfoUIItem {
   icon: string;
-  value: unknown;
+  value: string;
   title: string;
 }

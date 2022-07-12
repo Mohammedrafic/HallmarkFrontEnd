@@ -4,11 +4,9 @@ import { DatePipe } from '@angular/common';
 import { Observable } from "rxjs";
 
 import { Select } from "@ngxs/store";
-
 import { AppState } from "../../../../store/app.state";
 import { IsOrganizationAgencyAreaStateModel } from "@shared/models/is-organization-agency-area-state.model";
-import { CandidateInfoUIItem } from '../../interface/candidate-info-ui-item.interface';
-import { CandidateInfo } from '../../interface';
+import { CandidateInfo, CandidateInfoUIItem } from "../../interface";
 
 @Component({
   selector: 'app-profile-details-job-info',
