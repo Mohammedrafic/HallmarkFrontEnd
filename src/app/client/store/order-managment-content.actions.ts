@@ -2,6 +2,8 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { AcceptJobDTO, CreateOrderDto, EditOrderDto, OrderManagementFilter } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { RejectReasonPayload } from "@shared/models/reject-reason.model";
+import { ExportPayload } from '@shared/models/export.model';
+import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 
 export class GetIncompleteOrders {
   static readonly type = '[order management] Get Incomplete Orders';
@@ -190,7 +192,12 @@ export class GetOrderFIlterDataSources {
 }
 
 export class GetHistoricalData {
-  static readonly type = '[agency order management] Get Historical Data';
+  static readonly type = '[order management] Get Historical Data';
   constructor(public organizationId: number, public candidateJobId: number) {
   }
+}
+
+export class ExportOrders {
+  static readonly type = '[order management] Export Organization list';
+  constructor(public payload: ExportPayload, public tab: OrganizationOrderManagementTabs) { }
 }

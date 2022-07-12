@@ -23,6 +23,8 @@ import { OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { HistoricalEvent } from '../models/historical-event.model';
+import { ExportPayload } from '@shared/models/export.model';
+import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -302,6 +304,16 @@ export class OrderManagementContentService {
     return this.http.get<HistoricalEvent[]>(
       `/api/AppliedCandidates/historicalData?OrganizationId=${organizationId}&CandidateJobId=${jobId}`
     );
+  }
+
+  /**
+   * Export organization list
+   */
+  public export(payload: ExportPayload, tab: OrganizationOrderManagementTabs): Observable<any> {
+    if (tab === OrganizationOrderManagementTabs.PerDiem) {
+      return this.http.post(`/api/Orders/perdiem/export`, payload, { responseType: 'blob' });
+    }
+    return this.http.post(`/api/Orders/export`, payload, { responseType: 'blob' });
   }
 }
 

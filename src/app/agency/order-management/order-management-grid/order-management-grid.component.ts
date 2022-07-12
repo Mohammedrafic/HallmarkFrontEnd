@@ -17,7 +17,7 @@ import { CheckBoxComponent } from '@syncfusion/ej2-angular-buttons';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { GRID_CONFIG } from '@shared/constants';
-import { MyAgencyOrdersColumnsConfig, ReOrdersColumnsConfig, ROW_HEIGHT, typeValueAccess } from './order-management-grid.constants';
+import { MyAgencyOrdersColumnsConfig, PerDiemColumnsConfig, ReOrdersColumnsConfig, ROW_HEIGHT, typeValueAccess } from './order-management-grid.constants';
 import {
   GetAgencyFilterOptions,
   GetAgencyOrderCandidatesList,
@@ -141,7 +141,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.PerDiem:
-        // TODO: pending implementation
+        // TODO: pending BE
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.ReOrders:
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
@@ -158,7 +159,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.refreshGridColumns(MyAgencyOrdersColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.PerDiem:
-        // TODO: pending implementation
+        this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.ReOrders:
         this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);

@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
-import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { CandidatesStatusText, OrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
@@ -13,6 +13,7 @@ import {
   ClearSelectedOrder,
   DeleteOrder,
   DeleteOrderSucceeded,
+  ExportOrders,
   GetAgencyOrderCandidatesList,
   GetIncompleteOrders,
   GetOrderById,
@@ -41,13 +42,18 @@ import { DatePipe, Location } from '@angular/common';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import {
   AllOrdersColumnsConfig,
+  allOrdersColumnsToExport,
   MoreMenuType,
   OrderType,
   OrderTypeName,
   PerDiemColumnsConfig,
+  perDiemColumnsToExport,
   ReOrdersColumnsConfig,
+  reOrdersColumnsToExport,
   ROW_HEIGHT
 } from './order-management-content.constants';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 @Component({
   selector: 'app-order-management-content',
@@ -116,7 +122,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public selectedOrder: Order;
   public openDetails = new Subject<boolean>();
-  public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
+  public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick', persistSelection: true };
   public OrderFilterFormGroup: FormGroup;
   public filters: OrderFilter = {};
   public filterColumns: any;
@@ -128,6 +134,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
 
   private selectedIndex: number | null;
+
+  public columnsToExport: ExportColumn[];
+
+  public fileName: string;
+  public defaultFileName: string;
 
   constructor(private store: Store,
               private router: Router,
@@ -194,6 +205,35 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.unsubscribe$.complete();
   }
 
+  public override customExport(): void {
+    this.defaultFileName = `Organization Management/${this.activeTab} ` + this.generateDateTime(this.datePipe);
+    this.fileName = this.defaultFileName;
+    this.store.dispatch(new ShowExportDialog(true));
+  }
+
+  public closeExport() {
+    this.fileName = '';
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = `Organization Management/${this.activeTab} ` + this.generateDateTime(this.datePipe);
+    this.store.dispatch(new ExportOrders(new ExportPayload(
+      fileType,
+      // TODO: pass filters
+      { ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null },
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      null,
+      options?.fileName || this.defaultFileName
+    ), this.activeTab));
+    this.clearSelection(this.gridWithChildRow);
+  }
+
   public override updatePage(): void {
     this.getOrders();
   }
@@ -213,19 +253,23 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
+        this.columnsToExport = allOrdersColumnsToExport;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.PerDiem:
-        // TODO: perdiem
+        // TODO: perdiem 
+        this.columnsToExport = perDiemColumnsToExport;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.ReOrders:
         // TODO: remove after BE implementation
+        this.columnsToExport = reOrdersColumnsToExport;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
         // TODO: uncomment after BE implementation
         // this.store.dispatch(new GetReOrders(this.filters));
         break;
       case OrganizationOrderManagementTabs.Incomplete:
+        this.columnsToExport = allOrdersColumnsToExport;
         this.store.dispatch(new GetIncompleteOrders({ pageNumber: this.currentPage, pageSize: this.pageSize }));
         break;
     }
@@ -285,6 +329,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onDataBound(): void {
+    this.gridDataBound(this.gridWithChildRow);
     this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
       const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
@@ -316,6 +361,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onRowClick(event: any): void {
+    this.rowSelected(event, this.gridWithChildRow);
     if (!event.isInteracted) {
       this.selectedDataRow = event.data;
       const data = event.data;

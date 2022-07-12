@@ -36,7 +36,8 @@ import {
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
   GetHistoricalData,
-  GetReOrders
+  GetReOrders,
+  ExportOrders
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -68,6 +69,7 @@ import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { RejectReasonService } from "@shared/services/reject-reason.service";
 import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
 import { HistoricalEvent } from '@shared/models/historical-event.model';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -548,4 +550,12 @@ export class OrderManagementContentState {
       })
     )
   }
+
+  @Action(ExportOrders)
+  ExportOrders({ }: StateContext<OrderManagementContentStateModel>, { payload, tab }: ExportOrders): Observable<any> {
+    return this.orderManagementService.export(payload, tab).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
 }

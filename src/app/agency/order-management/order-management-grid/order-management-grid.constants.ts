@@ -80,3 +80,46 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
     visible: false
   },
 ];
+
+export const PerDiemColumnsConfig = [
+  {
+    fieldName: 'orderId',
+    visible: true
+  },
+  {
+    fieldName: 'type',
+    visible: true
+  },
+  {
+    fieldName: 'jobStartDate',
+    visible: false
+  },
+  {
+    fieldName: 'reOrderId',
+    visible: false
+  },
+  {
+    fieldName: 'reOrderDate',
+    visible: false
+  },
+  {
+    fieldName: 'shift',
+    visible: false
+  },
+  {
+    fieldName: 'agencyName',
+    visible: false
+  },
+  {
+    fieldName: 'numberOfPositions',
+    visible: false
+  },
+  {
+    fieldName: 'billRate',
+    visible: false
+  },
+  {
+    fieldName: 'shiftCount',
+    visible: true
+  },
+];

@@ -12,7 +12,12 @@
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
     </button>
-    <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+    <button
+      ejs-dropdownbutton
+      [items]="exportOptions"
+      (select)="exportSelected($event)"
+      id="importButton"
+      cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
     <button ejs-button [isPrimary]="true" (click)="navigateToOrderForm()">Create Order</button>
   </ng-container>
 </app-page-toolbar>
@@ -36,6 +41,7 @@
     [selectionSettings]="selectionOptions"
     [textWrapSettings]="wrapSettings"
     (rowSelected)="onRowClick($event)"
+    (rowDeselected)="rowDeselected($event, gridWithChildRow)"
     (dataBound)="onDataBound()"
   >
     <e-columns>
@@ -249,6 +255,8 @@
     </ng-template>
   </ejs-grid>
 </section>
+
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
 
 <app-filter-dialog [items]="filteredItems" [count]="(ordersPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
   <form [formGroup]="OrderFilterFormGroup">
@@ -513,4 +521,5 @@
   [order]="selectedOrder"
   [openEvent]="openDetails"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"></app-order-details-dialog>
-  <app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>
+
+<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>
