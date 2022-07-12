@@ -27,7 +27,7 @@ export class GetAgencyOrderCandidatesList {
     public organizationId: number,
     public pageNumber: number,
     public pageSize: number,
-    public includeDeployed?: boolean,
+    public excludeDeployed?: boolean,
   ) {}
 }
 

@@ -34,7 +34,7 @@ export class OrderCandidatesComponent extends DestroyableDirective implements On
 
   public onGetCandidatesList(event: CandidateListEvent): void {
     this.store.dispatch(
-      new GetAgencyOrderCandidatesList(event.orderId, event.organizationId, event.currentPage, event.pageSize, event.includeDeployedCandidates)
+      new GetAgencyOrderCandidatesList(event.orderId, event.organizationId, event.currentPage, event.pageSize, event.excludeDeployed)
     );
   }
 

@@ -34,7 +34,7 @@ export type CandidateListEvent = {
   organizationId: number,
   currentPage: number
   pageSize: number
-  includeDeployedCandidates: boolean,
+  excludeDeployed: boolean,
 }
 
 @Component({
@@ -59,7 +59,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   public selectedOrder$: Observable<Order>;
 
   public templateState: Subject<any> = new Subject();
-  public includeDeployedCandidates: boolean;
+  public includeDeployedCandidates: boolean = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public candidate: OrderCandidatesList;
@@ -85,7 +85,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
       organizationId: this.order.organizationId,
       currentPage: this.currentPage,
       pageSize: this.pageSize,
-      includeDeployedCandidates: this.includeDeployedCandidates,
+      excludeDeployed: !this.includeDeployedCandidates,
     });
   }
 
@@ -187,7 +187,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
         organizationId: this.order.organizationId,
         currentPage: this.currentPage,
         pageSize: this.pageSize,
-        includeDeployedCandidates: this.includeDeployedCandidates,
+        excludeDeployed: this.includeDeployedCandidates,
       });
     });
   }
