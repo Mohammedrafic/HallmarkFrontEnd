@@ -43,6 +43,7 @@ import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { FilteredItem } from '@shared/models/filter.model';
 import { AgencyOrderFiltersComponent } from './agency-order-filters/agency-order-filters.component';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -142,6 +143,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         break;
       case AgencyOrderManagementTabs.PerDiem:
         // TODO: pending BE
+        this.filters.orderTypes = [OrderType.OpenPerDiem];
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.ReOrders:
@@ -237,7 +239,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
       skillIds: this.filters.skillIds || [],
-      orderTypes: this.filters.orderTypes || [],
+      orderTypes: this.selectedTab === AgencyOrderManagementTabs.PerDiem ? [] : this.filters.orderTypes || [],
       jobTitle: this.filters.jobTitle || null,
       billRateFrom: this.filters.billRateFrom || null,
       billRateTo: this.filters.billRateTo || null,

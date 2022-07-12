@@ -88,7 +88,7 @@ export const PerDiemColumnsConfig = [
   },
   {
     fieldName: 'type',
-    visible: true
+    visible: false
   },
   {
     fieldName: 'jobStartDate',

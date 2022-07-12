@@ -54,6 +54,7 @@ import {
 } from './order-management-content.constants';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 @Component({
   selector: 'app-order-management-content',
@@ -225,8 +226,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.defaultFileName = `Organization Management/${this.activeTab} ` + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportOrders(new ExportPayload(
       fileType,
-      // TODO: pass filters
-      { ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null },
+      { ...this.filters, ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       null,
       options?.fileName || this.defaultFileName
@@ -257,7 +257,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.PerDiem:
-        // TODO: perdiem 
+        // TODO: perdiem
+        this.filters.orderTypes = [OrderType.OpenPerDiem];
         this.columnsToExport = perDiemColumnsToExport;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
         break;
@@ -283,7 +284,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
       skillIds: this.filters.skillIds || [],
-      orderTypes: this.filters.orderTypes || [],
+      orderTypes: this.activeTab === OrganizationOrderManagementTabs.PerDiem ? [] : this.filters.orderTypes || [],
       jobTitle: this.filters.jobTitle || null,
       billRateFrom: this.filters.billRateFrom || null,
       billRateTo: this.filters.billRateTo || null,
@@ -571,13 +572,23 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private onOrderFilterDataSourcesLoadHandler(): void {
     this.orderFilterDataSources$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data: OrderFilterDataSource) => {
-      this.filterColumns.orderStatuses.dataSource = this.activeTab === OrganizationOrderManagementTabs.ReOrders
-        ? data.orderStatuses.filter(status => [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status))
-        : data.orderStatuses;
+      let statuses = [];
+      let candidateStatuses = [];
+      if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
+        statuses = data.orderStatuses.filter(status => [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status));
+        candidateStatuses = data.candidateStatuses.filter(status => [CandidatesStatusText.Onboard, CandidatesStatusText.Offered].includes(status.status)) // TODO: after BE implementation also add Pending, Rejected
+      } else if (this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
+        statuses = data.orderStatuses.filter(status => [OrderStatusText.Open, OrderStatusText.Closed].includes(status.status));
+        candidateStatuses = data.candidateStatuses.filter(status => [
+          CandidatStatus['Not Applied'], CandidatStatus.Applied, CandidatStatus.Offered, CandidatStatus.Accepted, CandidatStatus.OnBoard, CandidatStatus.Rejected
+        ].includes(status.status));
+      } else {
+        statuses = data.orderStatuses;
+        candidateStatuses = data.candidateStatuses;
+      }
+      this.filterColumns.orderStatuses.dataSource = statuses;
       this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
-      this.filterColumns.candidateStatuses.dataSource = this.activeTab === OrganizationOrderManagementTabs.ReOrders
-        ? data.candidateStatuses.filter(status => [CandidatesStatusText.Onboard, CandidatesStatusText.Offered].includes(status.status)) // TODO: after BE implementation also add Pending, Rejected
-        : data.candidateStatuses;
+      this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
     });
   }
 
