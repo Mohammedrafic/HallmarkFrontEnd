@@ -68,4 +68,11 @@ export namespace Timesheets {
     constructor(public readonly payload?: TimesheetsFilterState) {
     }
   }
+
+  export class DeleteTimesheet {
+    static readonly type = TIMESHEETS_ACTIONS.DELETE_TIMESHEET;
+
+    constructor(public timesheetId: number) {
+    }
+  }
 }

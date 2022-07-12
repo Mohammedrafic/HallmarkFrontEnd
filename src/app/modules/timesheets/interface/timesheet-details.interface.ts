@@ -1,5 +1,4 @@
-import { DialogAction } from '../enums';
-import { TableColumnAlign } from '../enums/timesheet-common.enum';
+import { TableColumnAlign } from '../enums';
 
 export interface DetailsColumnConfig {
   align: TableColumnAlign;

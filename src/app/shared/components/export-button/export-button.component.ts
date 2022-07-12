@@ -17,4 +17,28 @@ export class ExportButtonComponent {
 
   @Output()
   public readonly optionSelected: EventEmitter<any> = new EventEmitter<any>();
+
+  @Output()
+  public readonly csvExport: EventEmitter<void> = new EventEmitter<void>();
+
+  @Output()
+  public readonly excelExport: EventEmitter<void> = new EventEmitter<void>();
+
+  @Output()
+  public readonly customExport: EventEmitter<void> = new EventEmitter<void>();
+
+  public onExportOptionSelected({item}: {item: ItemModel}): void {
+    this.optionSelected.emit(item);
+
+    switch (item.text) {
+      case ExportType.Excel_file:
+        return this.excelExport.emit();
+      case ExportType.CSV_file:
+        return this.csvExport.emit();
+      case ExportType.Custom:
+        return this.customExport.emit();
+      default:
+        throw new Error(`Export type ${item.text} is not supported`);
+    }
+  }
 }

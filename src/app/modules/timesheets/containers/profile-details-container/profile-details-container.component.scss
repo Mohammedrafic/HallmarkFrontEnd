@@ -170,6 +170,11 @@ $chip-margin: 8px;
     margin-left: 12px;
     flex-grow: 1;
   }
+
+  .miles {
+    margin: 0 8px;
+    flex-grow: 1;
+  }
 }
 
 .timesheet-navigation {
@@ -254,4 +259,15 @@ $chip-margin: 8px;
 
 .e-switch-wrapper.e-wrapper {
   margin-right: 10px;
+}
+
+.timesheet-details-dialog {
+  .e-dlg-content {
+    display: flex;
+    flex-direction: column;
+
+    section.container {
+      overflow: auto;
+    }
+  }
 }

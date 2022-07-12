@@ -41,10 +41,12 @@ import { ProfileInvoicesComponent } from './components/profile-invoices/profile-
 import { TimesheetsService } from './services/timesheets.service';
 import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
 import { TimesheetDetailsService } from './services/timesheet-details.service';
+import { TimesheetDetailsApiService } from "./services/timesheet-details-api.service";
 import { ProfileTimesheetService } from './services/profile-timesheet.service';
 import { TimesheetsFilterDialogComponent } from './components/timesheets-filter-dialog/timesheets-filter-dialog.component';
 import { GridModule } from '@shared/components/grid/grid.module';
 import { TimesheetTableStatusCellComponent } from './components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
+import { ProfileMilesComponent } from './components/profile-cumulative-hours/profile-miles/profile-miles.component';
 
 const gridIcons = {
   MessageSquare,
@@ -89,6 +91,7 @@ const gridIcons = {
     TimesheetRejectReasonDialogComponent,
     TimesheetsFilterDialogComponent,
     TimesheetTableStatusCellComponent,
+    ProfileMilesComponent,
   ],
   imports: [
     CommonModule,
@@ -131,7 +134,7 @@ const gridIcons = {
     TimesheetsService,
     ProfileTimesheetService,
     CapitalizeFirstPipe,
-    TimesheetDetailsService,
+    TimesheetDetailsApiService,
     ChipsCssClass,
   ]
 })

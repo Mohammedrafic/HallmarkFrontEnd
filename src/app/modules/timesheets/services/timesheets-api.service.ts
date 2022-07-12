@@ -15,9 +15,10 @@ import {
   FilterDataSource,
 } from '../interface';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
-import { filterColumnDataSource, MokTabsCounts, MokTimesheet } from '../constants';
+import { filterColumnDataSource, MokTabsCounts, MokTimesheet, MockCandidateHoursAndMilesData } from '../constants';
 import { CandidateMockInfo, MockTimesheetRecords } from '../constants/timesheet-records-mock.constant';
 import { TimesheetsTableColumns } from '../enums';
+import { CandidateHoursAndMilesData } from '../interface';
 
 @Injectable()
 export class TimesheetsApiService {
@@ -62,6 +63,10 @@ export class TimesheetsApiService {
     return of(null);
   }
 
+  public deleteTimesheet(id: number): Observable<boolean> {
+    return of(true);
+  }
+
   public setDataSources(filterKeys: TimesheetsTableColumns[]): Observable<FilterDataSource> {
     const res = filterKeys.reduce((acc: any, key) => {
       acc[key] = filterColumnDataSource[key].map((el: DataSourceItem) =>
@@ -78,8 +83,8 @@ export class TimesheetsApiService {
     return of(CandidateMockInfo);
   }
 
-  public getCandidateChartData(id: number): Observable<unknown> {
-    return of();
+  public getCandidateHoursAndMilesData(id: number): Observable<CandidateHoursAndMilesData> {
+    return of(MockCandidateHoursAndMilesData);
   }
 
   public getCandidateAttachments(id: number): Observable<TimesheetAttachments> {

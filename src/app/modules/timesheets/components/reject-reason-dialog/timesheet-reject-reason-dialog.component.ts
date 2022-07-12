@@ -15,18 +15,18 @@ export class TimesheetRejectReasonDialogComponent {
   @Input()
   public visible: boolean = false;
 
+  @Output()
+  public readonly visibleChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  @Output()
+  public readonly rejectReasonChange: EventEmitter<string> = new EventEmitter<string>();
+
   @ViewChild('rejectReasonDialog')
   public rejectReasonDialog: DialogComponent;
 
   public readonly form: FormGroup = new FormGroup({
     reason: new FormControl(''),
   });
-
-  @Output()
-  public readonly visibleChange: EventEmitter<boolean> = new EventEmitter<boolean>();
-
-  @Output()
-  public readonly rejectReasonChange: EventEmitter<string> = new EventEmitter<string>();
 
   public onVisibleChange(value: boolean): void {
     this.visibleChange.emit(value);

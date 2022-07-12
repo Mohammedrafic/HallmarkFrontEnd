@@ -11,7 +11,7 @@ export const DefaultTimesheetState: TimesheetsModel = {
     expenses: [],
   },
   candidateInfo: null,
-  candidateChartData: null,
+  candidateHoursAndMilesData: null,
   candidateAttachments: {
     attachments: [],
   },
