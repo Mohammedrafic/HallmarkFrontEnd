@@ -4,7 +4,7 @@ import {
   GetOrderApplicantsData,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { Select, Store } from '@ngxs/store';
@@ -29,6 +29,14 @@ import { ApplyCandidateComponent } from './apply-candidate/apply-candidate.compo
 import { OfferDeploymentComponent } from './offer-deployment/offer-deployment.component';
 import { OnboardedCandidateComponent } from './onboarded-candidate/onboarded-candidate.component';
 
+export type CandidateListEvent = {
+  orderId: number,
+  organizationId: number,
+  currentPage: number
+  pageSize: number
+  includeDeployedCandidates: boolean,
+}
+
 @Component({
   selector: 'app-order-candidates-list',
   templateUrl: './order-candidates-list.component.html',
@@ -42,14 +50,16 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   @ViewChild('onboarded') onboarded: OnboardedCandidateComponent;
   @ViewChild('offerDeployment') offerDeployment: OfferDeploymentComponent;
 
-  @Input() candidatesList: OrderCandidatesListPage;
+  @Input() candidatesList: OrderCandidatesListPage | null;
   @Input() order: AgencyOrder;
+
+  @Output() getCandidatesList = new EventEmitter<CandidateListEvent>();
 
   @Select(OrderManagementState.selectedOrder)
   public selectedOrder$: Observable<Order>;
+
   public templateState: Subject<any> = new Subject();
   public includeDeployedCandidates: boolean;
-
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public candidate: OrderCandidatesList;
@@ -68,9 +78,15 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   }
 
   public onSwitcher(): void {
-    this.store.dispatch(
-      new GetAgencyOrderCandidatesList(this.order.orderId, this.order.organizationId, this.currentPage, this.pageSize, !this.includeDeployedCandidates)
-    ).subscribe(() => this.includeDeployedCandidates = !this.includeDeployedCandidates);
+    this.includeDeployedCandidates = !this.includeDeployedCandidates;
+
+    this.getCandidatesList.emit({
+      orderId: this.order.orderId,
+      organizationId: this.order.organizationId,
+      currentPage: this.currentPage,
+      pageSize: this.pageSize,
+      includeDeployedCandidates: this.includeDeployedCandidates,
+    });
   }
 
   public onRowsDropDownChanged(): void {
@@ -166,9 +182,13 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   private subscribeOnPageChanges(): void {
     this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
-      this.store.dispatch(
-        new GetAgencyOrderCandidatesList(this.order.orderId, this.order.organizationId, this.currentPage, this.pageSize, this.includeDeployedCandidates)
-      );
+      this.getCandidatesList.emit({
+        orderId: this.order.orderId,
+        organizationId: this.order.organizationId,
+        currentPage: this.currentPage,
+        pageSize: this.pageSize,
+        includeDeployedCandidates: this.includeDeployedCandidates,
+      });
     });
   }
 
@@ -177,3 +197,4 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
     this.sideDialog.show();
   }
 }
+

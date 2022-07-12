@@ -3,5 +3,5 @@
 </div>
 <div class="line"></div>
 <div class="candidates-list">
-  <app-order-candidates-list *ngIf="orderCandidatePage" [candidatesList]="orderCandidatePage" [order]="orderCandidates"></app-order-candidates-list>
+  <app-order-candidates-list [candidatesList]="orderCandidatePage$ | async" [order]="orderCandidates" (getCandidatesList)="onGetCandidatesList($event)"></app-order-candidates-list>
 </div>

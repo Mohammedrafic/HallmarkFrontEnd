@@ -2,4 +2,4 @@
   <app-general-order-info *ngIf="order" [orderInformation]="order"></app-general-order-info>
 </section>
 <div class="separator"></div>
-<app-order-candidates-list *ngIf="orderCandidatePage" [candidatesList]="orderCandidatePage" [order]="orderCandidates"></app-order-candidates-list>
+<app-order-candidates-list *ngIf="orderCandidatePage" [candidatesList]="orderCandidatePage" [order]="orderCandidates" (getCandidatesList)="onGetCandidatesList($event)"></app-order-candidates-list>

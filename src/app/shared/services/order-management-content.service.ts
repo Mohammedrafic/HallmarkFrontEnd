@@ -73,7 +73,11 @@ export class OrderManagementContentService {
    @param pageSize
    @param filters
    */
-  public getAgencyReOrders(pageNumber: number, pageSize: number, filters: AgencyOrderFilters): Observable<AgencyOrderManagementPage> {
+  public getAgencyReOrders(
+    pageNumber: number,
+    pageSize: number,
+    filters: AgencyOrderFilters
+  ): Observable<AgencyOrderManagementPage> {
     return this.http.post<AgencyOrderManagementPage>(`/api/Agency/ReOrders`, { pageNumber, pageSize, ...filters }); // TODO: modification pending after BE implementation
   }
 
@@ -171,10 +175,19 @@ export class OrderManagementContentService {
     orderId: number,
     organizationId: number,
     pageNumber: number,
-    pageSize: number
+    pageSize: number,
+    includeDeployed?: boolean
   ): Observable<OrderCandidatesListPage> {
+    let params: any = {
+      PageNumber: pageNumber,
+      PageSize: pageSize,
+    };
+
+    if (includeDeployed) {
+      params = { ...params, includeDeployed };
+    }
     return this.http.get<OrderCandidatesListPage>(`/api/CandidateProfile/order/${orderId}`, {
-      params: { PageNumber: pageNumber, PageSize: pageSize },
+      params,
     });
   }
 

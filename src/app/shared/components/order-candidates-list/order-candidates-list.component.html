@@ -3,7 +3,7 @@
     <div class="title">
       <h3>Candidates List</h3>
     </div>
-    <div class="input-container" *ngIf="isAgency">
+    <div class="input-container">
       <div class="input-group switch" (click)="onSwitcher(); false;">
         <ejs-switch
           id="switcher"
@@ -18,7 +18,7 @@
     #orderCandidatesGrid
     id="users-grid"
     class="users-grid e-gridwithheader"
-    [dataSource]="candidatesList.items"
+    [dataSource]="candidatesList?.items || []"
     [allowSorting]="false"
     [allowResizing]="true"
     [allowSelection]="false"
