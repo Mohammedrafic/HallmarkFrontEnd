@@ -40,7 +40,6 @@ import { ProfileUploadsComponent } from './components/profile-uploads/profile-up
 import { ProfileInvoicesComponent } from './components/profile-invoices/profile-invoices.component';
 import { TimesheetsService } from './services/timesheets.service';
 import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
-import { TimesheetDetailsService } from './services/timesheet-details.service';
 import { TimesheetDetailsApiService } from "./services/timesheet-details-api.service";
 import { ProfileTimesheetService } from './services/profile-timesheet.service';
 import { TimesheetsFilterDialogComponent } from './components/timesheets-filter-dialog/timesheets-filter-dialog.component';
