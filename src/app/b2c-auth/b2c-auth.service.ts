@@ -45,12 +45,14 @@ export class B2CAuthService {
 
   public onLoginSuccess(): Observable<EventMessage> {
     return this.msalBroadcastService.msalSubject$.pipe(
-      filter((msg: EventMessage) => msg.eventType === EventType.LOGIN_SUCCESS)
+      filter(
+        (msg: EventMessage) =>
+          msg.eventType === EventType.LOGIN_SUCCESS || msg.eventType === EventType.ACQUIRE_TOKEN_SUCCESS
+      )
     );
   }
 
   public isLoggedIn(): boolean {
-    console.log(this.authService.instance.getActiveAccount());
     return this.authService.instance.getActiveAccount() !== null;
   }
 
