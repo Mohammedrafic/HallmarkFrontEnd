@@ -13,6 +13,7 @@ import { OrderApplicantsInitialData } from '@shared/models/order-applicants.mode
 import {
   AgencyOrderManagement,
   AgencyOrderManagementPage,
+  CandidatesBasicInfo,
   OrderCandidateJob,
   OrderCandidatesListPage,
 } from '@shared/models/order-management.model';
@@ -33,6 +34,7 @@ import {
   GetAgencyOrdersPage,
   GetAgencyReOrdersPage,
   GetCandidateJob,
+  GetCandidatesBasicInfo,
   GetOrderApplicantsData,
   GetOrderById,
   GetOrganizationStructure,
@@ -58,6 +60,7 @@ export interface OrderManagementModel {
   orderCandidatesListPage: OrderCandidatesListPage | null;
   orderCandidatesInformation: Order | null;
   candidatesJob: OrderCandidateJob | null;
+  candidatesBasicInfo: CandidatesBasicInfo | null;
   orderApplicantsInitialData: OrderApplicantsInitialData | null;
   selectedOrder: Order | null;
   orderDialogOptions: DialogNextPreviousOption;
@@ -76,6 +79,7 @@ export interface OrderManagementModel {
     orderApplicantsInitialData: null,
     selectedOrder: null,
     candidatesJob: null,
+    candidatesBasicInfo: null,
     rejectionReasonsList: [],
     orderDialogOptions: {
       next: false,
@@ -162,6 +166,11 @@ export class OrderManagementState {
   @Selector()
   static gridFilterRegions(state: OrderManagementModel): OrganizationRegion[] {
     return getRegionsFromOrganizationStructure(state.organizationStructure);
+  }
+
+  @Selector()
+  static candidateBasicInfo(state: OrderManagementModel): CandidatesBasicInfo | null {
+    return state.candidatesBasicInfo
   }
 
   constructor(
@@ -345,5 +354,18 @@ export class OrderManagementState {
     return this.organizationService
       .getOrganizationsStructure(organizationIds)
       .pipe(tap((payload) => patchState({ organizationStructure: payload })));
+  }
+
+  @Action(GetCandidatesBasicInfo)
+  GetCandidatesBasicInfo(
+    { patchState }: StateContext<OrderManagementModel>,
+    { organizationId, jobId }: GetCandidatesBasicInfo
+  ): Observable<CandidatesBasicInfo> {
+    return this.orderManagementContentService.getCandidatesBasicInfo(organizationId, jobId).pipe(
+      tap((payload) => {
+        patchState({candidatesBasicInfo: payload});
+        return payload;
+      })
+    );
   }
 }

@@ -44,10 +44,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public isReadOnly = false;
   public openRejectDialog = new Subject<boolean>();
 
-  get isDeployedAndAgency(): boolean {
-    return this.isAgency && !!this.candidate.deployedCandidateInfo
-  }
-
   get isRejected(): boolean {
     return this.isReadOnly && this.candidate.status === ApplicantStatusEnum.Rejected;
   }
@@ -215,7 +211,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       ApplicantStatusEnum.OnBoarded,
       ApplicantStatusEnum.PreOfferCustom
     ];
-    if (readOnlyStatuses.includes(this.candidate.status) || this.isDeployedAndAgency) {
+    if (readOnlyStatuses.includes(this.candidate.status) || this.candidate.deployedCandidateInfo) {
       this.isReadOnly = true;
     }
   }

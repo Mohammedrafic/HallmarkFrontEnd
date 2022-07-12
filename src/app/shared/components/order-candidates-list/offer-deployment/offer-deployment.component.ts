@@ -38,6 +38,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
 
   @Input() candidate: OrderCandidatesList;
   @Input() isTab: boolean = false;
+  @Input() isAgency: boolean = false;
 
   public openRejectDialog = new Subject<boolean>();
   public billRatesData: BillRate[] = [];
@@ -210,6 +211,10 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).subscribe(() => {
       this.readOnlyMode = this.isOfferedStatus;
     });
+
+    if (this.candidate.deployedCandidateInfo) {
+      this.formGroup.disable()
+    }
   }
 
   private subscribeOnSuccessRejection(): void {

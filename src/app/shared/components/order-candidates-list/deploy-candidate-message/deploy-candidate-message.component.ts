@@ -1,9 +1,10 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { OrderCandidateJob, OrderCandidatesList } from '../../../models/order-management.model';
+import { CandidatesBasicInfo, OrderCandidatesList } from '../../../models/order-management.model';
 import { Select, Store } from '@ngxs/store';
-import { GetCandidateJob } from '@agency/store/order-management.actions';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { GetCandidatesBasicInfo } from '@agency/store/order-management.actions';
+import { combineLatest, Observable, Subject, takeUntil } from 'rxjs';
 import { OrderManagementState } from '@agency/store/order-management.state';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
 @Component({
   selector: 'app-deploy-candidate-message',
@@ -12,11 +13,14 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 })
 export class DeployCandidateMessageComponent implements OnChanges, OnInit, OnDestroy {
   @Input() candidate: OrderCandidatesList
+  @Input() isAgency: boolean
 
-  @Select(OrderManagementState.candidatesJob)
-  candidateJobState$: Observable<OrderCandidateJob>
+  @Select(OrderManagementState.candidateBasicInfo)
+  candidateBasicInfoStateAg$: Observable<CandidatesBasicInfo>
+  @Select(OrderManagementContentState.candidateBasicInfo)
+  candidateBasicInfoStateOrg$: Observable<CandidatesBasicInfo>
 
-  public candidateJob: OrderCandidateJob
+  public candidateBasicInfo: CandidatesBasicInfo
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -24,16 +28,14 @@ export class DeployCandidateMessageComponent implements OnChanges, OnInit, OnDes
 
 
   ngOnInit(): void {
-    this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
-      this.candidateJob = data
-    })
+    this.subscribeOnInitialObs()
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     const deployedCandidate = this.candidate.deployedCandidateInfo
 
     if (deployedCandidate) {
-      this.store.dispatch(new GetCandidateJob(this.candidate.deployedCandidateInfo!.organizationId, this.candidate.deployedCandidateInfo!.jobId))
+      this.store.dispatch(new GetCandidatesBasicInfo(this.candidate.deployedCandidateInfo!.organizationId, this.candidate.deployedCandidateInfo!.jobId))
     }
   }
 
@@ -43,4 +45,10 @@ export class DeployCandidateMessageComponent implements OnChanges, OnInit, OnDes
   }
 
 
+  private subscribeOnInitialObs() {
+    combineLatest([this.candidateBasicInfoStateAg$, this.candidateBasicInfoStateOrg$]).pipe(takeUntil(this.unsubscribe$))
+      .subscribe(([dataAg, dataOrg]) => {
+      this.candidateBasicInfo = dataAg ?? dataOrg
+    })
+  }
 }

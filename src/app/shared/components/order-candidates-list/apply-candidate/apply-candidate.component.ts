@@ -39,10 +39,6 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
 
-  get isDeployedAndAgency(): boolean {
-    return this.isAgency && !!this.candidate.deployedCandidateInfo
-  }
-
   private unsubscribe$: Subject<void> = new Subject();
   private candidateId: number;
 

@@ -68,10 +68,6 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     return this.form.get('endDate');
   }
 
-  get isDeployedAndAgency(): boolean {
-    return this.isAgency && !!this.candidate.deployedCandidateInfo
-  }
-
   get isAccepted(): boolean {
     return this.candidate.status === ApplicantStatusEnum.Accepted;
   }

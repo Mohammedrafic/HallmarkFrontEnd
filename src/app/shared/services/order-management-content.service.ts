@@ -6,6 +6,7 @@ import {
   AgencyOrderFilters,
   AgencyOrderManagementPage,
   ApplicantStatus,
+  CandidatesBasicInfo,
   CreateOrderDto,
   EditOrderDto,
   Order,
@@ -317,6 +318,15 @@ export class OrderManagementContentService {
     return this.http.get<HistoricalEvent[]>(
       `/api/AppliedCandidates/historicalData?OrganizationId=${organizationId}&CandidateJobId=${jobId}`
     );
+  }
+
+  /**
+   * Get basic info about candidate
+   @param organizationId
+   @param jobId
+   */
+  public getCandidatesBasicInfo(organizationId: number, jobId: number): Observable<CandidatesBasicInfo> {
+    return this.http.get<CandidatesBasicInfo>(`/api/AppliedCandidates/basicInfo?OrganizationId=${organizationId}&JobId=${jobId}`);
   }
 
   /**

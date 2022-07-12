@@ -89,3 +89,11 @@ export class GetOrganizationStructure {
   constructor(public organizationIds: number[]) {}
 }
 
+
+export class GetCandidatesBasicInfo {
+  static readonly type = '[order management] Get Candidates Basic Info'
+  constructor(
+    public organizationId: number,
+    public jobId: number
+  ) {}
+}
