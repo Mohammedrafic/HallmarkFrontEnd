@@ -53,6 +53,25 @@ export const MokTimesheet: Timesheet = {
   workWeek: '4 - WE 02/20/2022',
 };
 
+export const MokTimesheet1: Timesheet = {
+  id: 2,
+  name: 'Jane Dou',
+  firstName: 'Jane',
+  lastName: 'Dou',
+  statusText: TIMETHEETS_STATUSES.ORG_APPROVED,
+  orderId: '22-30-02',
+  skill: 'Certified Assistant',
+  location: 'Certified Assistant',
+  startDate: '2022-07-08T15:00:00',
+  department: 'Emergency Clinic',
+  agencyName: 'AB1 Staffing',
+  orgName: 'ABG1 Staffing',
+  billRate: 20,
+  totalDays: 32,
+  status: TIMETHEETS_STATUSES.ORG_APPROVED,
+  workWeek: '4 - WE 02/20/2022',
+};
+
 export const profileDetailsHoursChartColorsMap: Record<HourOccupationType, string> = {
   [HourOccupationType.OnCall]: '#3E7FFF',
   [HourOccupationType.Callback]: '#518CFF',

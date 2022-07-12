@@ -56,6 +56,7 @@ export enum TimesheetsTableColumns {
   Region = 'region',
   OrgName = 'orgName',
   WorkWeek = 'workWeek',
+  StartDate = 'startDate',
   Department = 'department',
   BillRate = 'billRate',
   AgencyName = 'agencyName',

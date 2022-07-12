@@ -23,7 +23,7 @@ import {
   FilterDataSource,
 } from '../interface';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
-import { filterColumnDataSource, MokTabsCounts, MokTimesheet, MockCandidateHoursAndMilesData } from '../constants';
+import { filterColumnDataSource, MokTabsCounts, MokTimesheet, MockCandidateHoursAndMilesData, MokTimesheet1 } from '../constants';
 import { CandidateMockInfo, MockTimesheetRecords, CostCenterOptions } from '../constants/timesheet-records-mock.constant';
 import { TimesheetsTableColumns } from '../enums';
 import { CandidateHoursAndMilesData } from '../interface';
@@ -41,7 +41,7 @@ export class TimesheetsApiService {
       pageNumber: 1,
       totalPages: 1,
       totalCount: 1,
-      items: [MokTimesheet],
+      items: [MokTimesheet, MokTimesheet1],
       hasNextPage: false,
       hasPreviousPage: false,
     });

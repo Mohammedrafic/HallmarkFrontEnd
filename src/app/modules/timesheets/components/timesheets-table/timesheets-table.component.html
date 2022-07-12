@@ -2,12 +2,13 @@
   (navigateToPageEmitter)="onGoToClick($event)"
   (pageSizeChangeEmitter)="onRowsDropDownChanged($event)"
   (gridSelectedRow)="selectedRow($event)"
-  [suppressRowClickSelection]="true"
+  [suppressRowClickSelection]="false"
   [rowSelection]="rowSelection"
   [columnDefinitions]="columnDefinitions"
   [currentPage]="currentPage"
   [isLoading]="isLoading"
   [pageSize]="pageSize"
   [rowData]="tableData?.items"
-  [totalRecordsCount]="tableData?.totalCount || 0">
+  [totalRecordsCount]="tableData?.totalCount || 0"
+  [changeTableSelectedIndex]="newSelectedIndex">
 </app-grid>

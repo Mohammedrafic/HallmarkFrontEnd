@@ -22,7 +22,7 @@
   <app-timesheets-table
     *ngIf="timesheets$ | async as timesheets"
     [tableData]="timesheets"
-    [changeTableItem]="currentSelectedTableRowIndex | async"
+    [newSelectedIndex]="currentSelectedTableRowIndex | async"
     (changePage)="handleChangePage($event)"
     (changePerPage)="handleChangePerPage($event)"
     (timesheetRowSelected)="rowSelected($event)"

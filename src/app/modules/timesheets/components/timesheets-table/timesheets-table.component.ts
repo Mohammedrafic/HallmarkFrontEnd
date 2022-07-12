@@ -11,8 +11,7 @@ import { ColumnDefinitionModel } from '@shared/components/grid/models/column-def
 
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { TimesheetsSelectedRowEvent } from '../../interface';
-import { TimesheetsGridConfig } from '../../constants';
-import { TimesheetsTableColumns } from '../../enums';
+import { TimesheetsColumnsDefinition } from '../../constants';
 
 @Component({
   selector: 'app-timesheets-table',
@@ -22,10 +21,7 @@ import { TimesheetsTableColumns } from '../../enums';
 })
 export class TimesheetsTableComponent {
   @Input() tableData: TimeSheetsPage;
-
-  @Input() set changeTableItem(next: number | null) {
-    if (next !== null) {}
-  };
+  @Input() newSelectedIndex: null | number;
 
   @Output() changePage: EventEmitter<number> = new EventEmitter<number>();
 
@@ -35,23 +31,16 @@ export class TimesheetsTableComponent {
 
   @Output() timesheetRowSelected: EventEmitter<TimesheetsSelectedRowEvent> = new EventEmitter<TimesheetsSelectedRowEvent>();
 
+  public readonly columnDefinitions: ColumnDefinitionModel[] =
+    TimesheetsColumnsDefinition(this.router.url.includes('agency'));
   public currentPage = 1;
   public pageSize = 30;
-  public readonly columnDefinitions: ColumnDefinitionModel[] = TimesheetsGridConfig;
-  public isAgency: boolean;
   public isLoading = false;
-  public rowSelection: 'single' | 'multiple' = 'single';
-
-  private alreadySelected = false;
+  public rowSelection: 'single' | 'multiple' = 'multiple';
 
   constructor(
     private router: Router,
-  ) {
-    this.isAgency = this.router.url.includes('agency');
-
-    this.columnDefinitions[9].field = this.isAgency ? TimesheetsTableColumns.OrgName : TimesheetsTableColumns.AgencyName;
-    this.columnDefinitions[9].headerName = this.isAgency ? 'Org NAME' : 'Agency Name';
-  }
+  ) {}
 
   public onRowsDropDownChanged(pageSize: number): void {
     this.pageSize = pageSize;
@@ -64,9 +53,6 @@ export class TimesheetsTableComponent {
   }
 
   public selectedRow(event: TimesheetsSelectedRowEvent): void {
-    this.alreadySelected = !this.alreadySelected;
-    if (this.alreadySelected) {
-      this.timesheetRowSelected.emit(event);
-    }
+    this.timesheetRowSelected.emit(event);
   }
 }

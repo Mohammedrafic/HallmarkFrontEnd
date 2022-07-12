@@ -36,6 +36,19 @@ export class GridComponent<Data> extends DestroyableDirective implements OnChang
   @Input() public rowData: Data[] | null | undefined;
   @Input() public totalRecordsCount: number = 1;
 
+  @Input() set changeTableSelectedIndex(next: number | null) {
+    if (next !== null) {
+      this.gridInstance$.getValue()?.api.forEachNode((node) => {
+        if (node.rowIndex === next) {
+          node.setSelected(true);
+          this.gridSelectedRow.emit(node);
+        } else {
+          node.setSelected(false);
+        }
+      });
+    }
+  };
+
   @Output() public gridReadyEmitter: EventEmitter<GridReadyEventModel> = new EventEmitter();
   @Output() public navigateToPageEmitter: EventEmitter<number> = new EventEmitter<number>();
   @Output() public pageSizeChangeEmitter: EventEmitter<number> = new EventEmitter<number>();

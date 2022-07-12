@@ -1,7 +1,7 @@
 <div class="app-grid">
   <ag-grid-angular
     (gridReady)="handleGridReadyEvent($event)"
-    (rowSelected)="handleSelectionChanged($event)"
+    (rowClicked)="handleSelectionChanged($event)"
     [columnDefs]="columnDefinitions"
     [defaultColDef]="defaultColumnDefinition"
     [modules]="modules"

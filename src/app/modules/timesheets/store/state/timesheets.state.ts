@@ -1,6 +1,14 @@
 import { Injectable } from '@angular/core';
 
-import { filter, Observable, of, switchMap, take, tap, throttleTime } from 'rxjs';
+import {
+  Observable,
+  tap,
+  filter,
+  of,
+  throttleTime,
+  switchMap,
+  take,
+} from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
