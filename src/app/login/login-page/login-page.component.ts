@@ -1,7 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthenticationResult } from '@azure/msal-browser';
 import { Store } from '@ngxs/store';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { map, Subject, takeUntil } from 'rxjs';
 import { tap } from 'rxjs/internal/operators/tap';
 import { B2CAuthService } from 'src/app/b2c-auth/b2c-auth.service';
@@ -20,7 +22,7 @@ interface IOptionField {
   templateUrl: './login-page.component.html',
   styleUrls: ['./login-page.component.scss']
 })
-export class LoginPageComponent implements OnInit, OnDestroy {
+export class LoginPageComponent extends DestroyableDirective implements OnInit, OnDestroy {
 
   public optionFields = {
     text: 'fullName',
@@ -32,12 +34,6 @@ export class LoginPageComponent implements OnInit, OnDestroy {
   public users: User[];
   public usersDropDownData: IOptionField[];
 
-  // get isLoggedIn(): any {
-  //   return this.b2CAuthService.isLoggedIn();
-  // }
-
-  private unsubscribe$: Subject<void> = new Subject();
-
   constructor(
     private formBuilder: FormBuilder,
     private usersService: UserService,
@@ -45,14 +41,16 @@ export class LoginPageComponent implements OnInit, OnDestroy {
     private store: Store,
     private b2CAuthService: B2CAuthService
   ) {
-    this.loginForm = this.formBuilder.group({
-      user: new FormControl('')
-    });
+    super();
   }
 
   ngOnInit(): void {
+    this.loginForm = this.formBuilder.group({
+      user: new FormControl('')
+    });
+
     this.usersService.getUsers(1, 100).pipe(
-      takeUntil(this.unsubscribe$),
+      takeUntil(this.destroy$),
       map(response => response.items),
       tap(users => {
         this.users = users;
@@ -63,11 +61,11 @@ export class LoginPageComponent implements OnInit, OnDestroy {
         this.loginForm.controls['user'].setValue(users[0].id);
       })
     ).subscribe();
-  }
 
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
+    this.b2CAuthService.onLoginSuccess().subscribe((result) => {
+      const payload = result.payload as AuthenticationResult;
+      debugger
+    })
   }
 
   public onLogin(): void {
@@ -79,7 +77,6 @@ export class LoginPageComponent implements OnInit, OnDestroy {
 
     if (index >= 0) {
       const selectedUser = this.users[index];
-      debugger
       this.store.dispatch(new SetCurrentUser(selectedUser));
       this.router.navigate(['/']);
     }

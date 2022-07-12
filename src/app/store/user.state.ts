@@ -109,7 +109,9 @@ export class UserState {
 
   @Action(LogoutUser)
   LogoutUser({ patchState }: StateContext<UserStateModel>): void {
-    this.b2CAuthService.logout();
+    if (this.b2CAuthService.isLoggedIn()) {
+      this.b2CAuthService.logout();
+    }
 
     window.localStorage.removeItem(AUTH_STORAGE_KEY);
     window.localStorage.removeItem(USER_STORAGE_KEY);
