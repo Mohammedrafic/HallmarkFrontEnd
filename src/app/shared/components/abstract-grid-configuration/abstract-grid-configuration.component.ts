@@ -216,4 +216,14 @@ export abstract class AbstractGridConfigurationComponent {
     });
     grid.refreshColumns();
   }
+
+  protected onSubrowAllToggle(index?: number): void {
+    if(index) {
+      this.gridWithChildRow.detailRowModule.expandAll();
+      this.subrowsState.add(index - 1);
+    } else {
+      this.gridWithChildRow.detailRowModule.collapseAll();
+      this.subrowsState.clear()
+    }
+  }
 }

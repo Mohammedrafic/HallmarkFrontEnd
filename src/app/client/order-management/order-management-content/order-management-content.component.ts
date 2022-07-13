@@ -132,9 +132,13 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public previousSelectedOrderId: number | null;
   public selectedCandidat: any | null;
   public openChildDialog = new Subject<any>();
+  public isReOrdersTab = false;
+  public isRowScaleUp: boolean = true;
+  public isSubrowDisplay: boolean = false;
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
 
   private selectedIndex: number | null;
+  private ordersPage: OrderManagementPage;
 
   public columnsToExport: ExportColumn[];
 
@@ -402,10 +406,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onRowScaleUpClick(): void {
+    this.isRowScaleUp = false;
     this.rowHeight = ROW_HEIGHT.SCALE_UP_HEIGHT;
   }
 
   public onRowScaleDownClick(): void {
+    this.isRowScaleUp = true;
     this.rowHeight = ROW_HEIGHT.SCALE_DOWN_HEIGHT;
   }
 
@@ -504,6 +510,18 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
   }
 
+  public expandAll(): void {
+    this.isSubrowDisplay = true
+    this.ordersPage.items.forEach((item: OrderManagement, index: number): void => {
+      super.onSubrowAllToggle(index + 1)
+    })
+  }
+
+  public collapseAll(): void {
+    this.isSubrowDisplay = false
+    super.onSubrowAllToggle()
+  }
+
   private onReloadOrderCandidatesLists(): void {
     this.actions$.pipe(
       ofActionSuccessful(ReloadOrganisationOrderCandidatesLists),
@@ -529,6 +547,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private onOrdersDataLoadHandler(): void {
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
+      this.ordersPage = data
       if (data && data.items) {
         data.items.forEach(item => {
           item.isMoreMenuWithDeleteButton = !this.openInProgressFilledStatuses.includes(item.statusText.toLowerCase());

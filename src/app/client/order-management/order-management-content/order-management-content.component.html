@@ -49,12 +49,22 @@
       <e-column headerTextAlign="Right" width="130">
         <ng-template #headerTemplate let-data>
           <div class="controls-header">
-            <button ejs-button cssClass="e-flat icon-button">
+            <button ejs-button cssClass="e-flat icon-button c" *ngIf="!isSubrowDisplay; else onSubrowToggle" (click)="expandAll()">
+              <span><img src="assets/icons/menu-expand.svg" alt="coll" class="icon"></span>
+            </button>
+            <ng-template #onSubrowToggle>
+              <button ejs-button cssClass="e-flat icon-button" (click)="collapseAll()">
+                <span><img src="assets/icons/menu-collapse.svg" alt="coll" class="icon c"></span>
+              </button>
+            </ng-template>
+            <button ejs-button cssClass="e-flat icon-button" *ngIf="isRowScaleUp; else onRowScaleDown">
               <span><i-feather name="menu" class="icon" (click)="onRowScaleUpClick()"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat icon-button">
-              <span><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
-            </button>
+            <ng-template #onRowScaleDown>
+              <button ejs-button cssClass="e-flat icon-button">
+                <span><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
+              </button>
+            </ng-template>
           </div>
         </ng-template>
         <ng-template #template let-data>
