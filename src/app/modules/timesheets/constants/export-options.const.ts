@@ -1,4 +1,4 @@
-import { ExportOption } from '../interface/export-option.interface';
+import { ExportOption } from '../interface';
 import { ExportType } from '../enums';
 
 export const exportOptions: ExportOption[] = [

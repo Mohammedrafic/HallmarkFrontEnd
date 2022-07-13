@@ -15,8 +15,8 @@
         <e-accumulation-annotation [content]="weekChartAnnotation"
                                    region="Series"
                                    coordinateUnits="Pixel"
-                                   x="30"
-                                   y="38"
+                                   x="34"
+                                   y="46"
         ></e-accumulation-annotation>
       </e-accumulation-annotations>
 
@@ -51,8 +51,8 @@
         <e-accumulation-annotation [content]="cumulativeChartAnnotation"
                                    region="Series"
                                    coordinateUnits="Pixel"
-                                   x="30"
-                                   y="38"
+                                   x="34"
+                                   y="46"
         ></e-accumulation-annotation>
       </e-accumulation-annotations>
 
@@ -98,20 +98,20 @@
   </section>
 
   <ng-template #weekChartAnnotation>
-    <ng-container [ngTemplateOutlet]="chartAnnotation" [ngTemplateOutletContext]="{title: 'Week Working', value: totalWeekHours}"></ng-container>
+    <ng-container [ngTemplateOutlet]="chartAnnotation"
+                  [ngTemplateOutletContext]="{value: totalWeekHours}"
+    ></ng-container>
   </ng-template>
 
   <ng-template #cumulativeChartAnnotation>
-    <ng-container [ngTemplateOutlet]="chartAnnotation" [ngTemplateOutletContext]="{title: 'Total Working', value: totalCumulativeHours}"></ng-container>
+    <ng-container [ngTemplateOutlet]="chartAnnotation"
+                  [ngTemplateOutletContext]="{value: totalCumulativeHours}"
+    ></ng-container>
   </ng-template>
 
-  <ng-template #chartAnnotation let-value="value" let-title="title">
+  <ng-template #chartAnnotation let-value="value">
     <div class="chart-annotation">
       <div class="work-time-value">{{value}}</div>
-      <div class="work-time-title">
-        {{title}}
-        <div>hrs.</div>
-      </div>
     </div>
   </ng-template>
 </div>

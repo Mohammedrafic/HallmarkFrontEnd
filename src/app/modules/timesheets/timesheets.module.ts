@@ -51,6 +51,7 @@ import { TimesheetsFilterDialogComponent } from './components/timesheets-filter-
 import { GridModule } from '@shared/components/grid/grid.module';
 import { TimesheetTableStatusCellComponent } from './components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
 import { ProfileMilesComponent } from './components/profile-cumulative-hours/profile-miles/profile-miles.component';
+import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
 
 const gridIcons = {
   MessageSquare,
@@ -133,6 +134,7 @@ const gridIcons = {
     SwitchModule,
     AgGridModule,
     GridModule,
+    PdfViewerModule
   ],
   exports: [TimesheetsContainerComponent],
   providers: [

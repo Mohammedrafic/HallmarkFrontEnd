@@ -129,3 +129,5 @@ export const approveTimesheetDialogData = {
   confirmMessage: 'Are you sure you want to approve this timesheet?',
   successMessage: 'Success. Timesheet Approved',
 };
+
+export const rejectReasonMaxLength: number = 250;

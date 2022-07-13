@@ -15,6 +15,7 @@ export const DefaultTimesheetState: TimesheetsModel = {
   candidateAttachments: {
     attachments: [],
   },
+  candidateInvoices: [],
   isTimeSheetOpen: false,
   selectedTimeSheetId: 0,
   billRateTypes: [],

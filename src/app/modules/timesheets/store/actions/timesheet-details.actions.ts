@@ -6,15 +6,6 @@ export namespace TimesheetDetails {
     static readonly type = '[timesheet details] Export';
     constructor(public payload: ExportPayload) { }
   }
-  // export class AddFile {
-  //   static readonly type = '[timesheet details] Add file';
-  //   constructor(public payload: ProfileUploadedFile) { }
-  // }
-
-  // export class RemoveFile {
-  //   static readonly type = '[timesheet details] Remove file';
-  //   constructor(public payload: ProfileUploadedFile) { }
-  // }
 
   export class GetTimesheetRecords {
     static readonly type = TimesheetDetailsActions.GetTimesheetRecords;
@@ -35,6 +26,13 @@ export namespace TimesheetDetails {
   export class GetCandidateAttachments {
     static readonly type = TimesheetDetailsActions.GetCandidateAttachments;
     constructor(public id: number) {}
+  }
+
+  export class GetCandidateInvoices {
+    static readonly type = TimesheetDetailsActions.GetCandidateInvoices;
+
+    constructor(public id: number) {
+    }
   }
 
   export class AgencySubmitTimesheet {
@@ -60,6 +58,7 @@ export namespace TimesheetDetails {
 
     constructor(
       public readonly id: number,
+      public readonly reason: string,
     ) {
     }
   }
@@ -68,5 +67,20 @@ export namespace TimesheetDetails {
     static readonly type = TimesheetDetailsActions.PatchTimesheetRecords;
 
     constructor(public readonly id: number,public readonly recordsToUpdate: Record<string, string | number>[]) {}
+  }
+
+  export class UploadFiles {
+    static readonly type = TimesheetDetailsActions.UploadFiles;
+
+    // TODO: Remove names property after connection with API
+    constructor(public id: number, public files: Blob[], public names: string[]) {
+    }
+  }
+
+  export class DeleteFile {
+    static readonly type = TimesheetDetailsActions.DeleteFile;
+
+    constructor(public id: number) {
+    }
   }
 }

@@ -1,16 +1,13 @@
 <div class="profile-uploads-container">
   <h3>Attachments</h3>
 
-  <table>
-    <tr *ngFor="let item of uploads">
-      <td class="file-icon">
-        <i-feather name="download" class="icon"></i-feather>
-      </td>
-      <td class="file-name">{{item.name}}</td>
-      <td class="delete-icon" (click)="removeInvoice(item)">
-        <i-feather name="trash-2" class="icon"></i-feather>
-      </td>
-    </tr>
-  </table>
-
+  <div *ngFor="let item of uploads" class="uploads-list">
+    <div class="attachment" (click)="downloadFile(item)">
+      <i-feather name="download" class="icon file-icon"></i-feather>
+      <div class="file-name">{{item.name}}</div>
+      <div class="delete-icon">
+        <i-feather name="trash-2" class="icon" (click)="removeFile(item)"></i-feather>
+      </div>
+    </div>
+  </div>
 </div>
