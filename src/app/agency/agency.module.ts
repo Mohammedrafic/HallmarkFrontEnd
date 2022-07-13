@@ -27,10 +27,10 @@ import {
   Unlock,
   AlertTriangle,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
 } from 'angular-feather/icons';
-import { UploaderModule } from "@syncfusion/ej2-angular-inputs";
-import { PdfViewerModule } from "@syncfusion/ej2-angular-pdfviewer";
+import { UploaderModule } from '@syncfusion/ej2-angular-inputs';
+import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
 import { ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
 import { AgencyComponent } from './agency.component';
 import { AgencyRoutingModule } from './agency-routing.module';
@@ -70,12 +70,13 @@ import { OrderManagementGridComponent } from './order-management/order-managemen
 import { PreviewOrderDialogComponent } from './order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
 import { FileViewerComponent } from './candidates/add-edit-candidate/file-viewer/file-viewer.component';
 import { ProfileComponent } from './profile/profile.component';
-import { OrderCandidatesComponent } from "@agency/order-management/order-management-grid/preview-order-dialog/candidates/order-candidates.component";
+import { OrderCandidatesComponent } from '@agency/order-management/order-management-grid/preview-order-dialog/candidates/order-candidates.component';
 import { CandidatDialogComponent } from './order-management/order-management-grid/candidat-dialog/candidat-dialog.component';
 import { OrderManagementState } from './store/order-management.state';
 import { CandidatDetailsComponent } from './order-management/order-management-grid/candidat-dialog/candidat-details/candidat-details.component';
 import { NgxMaskModule } from 'ngx-mask';
 import { AgencyOrderFiltersComponent } from './order-management/order-management-grid/agency-order-filters/agency-order-filters.component';
+import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 
 const sidebarIcons = {
   Sliders,
@@ -99,7 +100,7 @@ const sidebarIcons = {
   Unlock,
   AlertTriangle,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
 };
 
 @NgModule({
@@ -161,6 +162,7 @@ const sidebarIcons = {
     DialogAllModule,
     MultiSelectAllModule,
     MaskedTextBoxModule,
+    DropDownButtonModule,
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),

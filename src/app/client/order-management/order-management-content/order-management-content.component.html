@@ -5,14 +5,19 @@
     ></app-tab-navigation>
   </ng-container>
   <ng-container right>
-    <app-search></app-search>
+    <app-search #search (inputKeyUpEnter)="searchOrders($event)"></app-search>
     <button ejs-button cssClass="e-outline button-filter" (click)="showFilters()">
       <div class="filter-button-content">
         <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
     </button>
-    <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+    <button
+      ejs-dropdownbutton
+      [items]="exportOptions"
+      (select)="exportSelected($event)"
+      id="importButton"
+      cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
     <button ejs-button [isPrimary]="true" (click)="navigateToOrderForm()">Create Order</button>
   </ng-container>
 </app-page-toolbar>
@@ -36,6 +41,7 @@
     [selectionSettings]="selectionOptions"
     [textWrapSettings]="wrapSettings"
     (rowSelected)="onRowClick($event)"
+    (rowDeselected)="rowDeselected($event, gridWithChildRow)"
     (dataBound)="onDataBound()"
   >
     <e-columns>
@@ -43,12 +49,22 @@
       <e-column headerTextAlign="Right" width="130">
         <ng-template #headerTemplate let-data>
           <div class="controls-header">
-            <button ejs-button cssClass="e-flat icon-button">
+            <button ejs-button cssClass="e-flat icon-button c" *ngIf="!isSubrowDisplay; else onSubrowToggle" (click)="expandAll()">
+              <span><img src="assets/icons/menu-expand.svg" alt="coll" class="icon"></span>
+            </button>
+            <ng-template #onSubrowToggle>
+              <button ejs-button cssClass="e-flat icon-button" (click)="collapseAll()">
+                <span><img src="assets/icons/menu-collapse.svg" alt="coll" class="icon c"></span>
+              </button>
+            </ng-template>
+            <button ejs-button cssClass="e-flat icon-button" *ngIf="isRowScaleUp; else onRowScaleDown">
               <span><i-feather name="menu" class="icon" (click)="onRowScaleUpClick()"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat icon-button">
-              <span><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
-            </button>
+            <ng-template #onRowScaleDown>
+              <button ejs-button cssClass="e-flat icon-button">
+                <span><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
+              </button>
+            </ng-template>
           </div>
         </ng-template>
         <ng-template #template let-data>
@@ -250,6 +266,8 @@
   </ejs-grid>
 </section>
 
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+
 <app-filter-dialog [items]="filteredItems" [count]="(ordersPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
   <form [formGroup]="OrderFilterFormGroup">
     <div class="bootstrap">
@@ -349,7 +367,7 @@
           </ejs-multiselect>
         </div>
       </div>
-      <div class="input-container" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders">
+      <div class="input-container" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders && activeTab !== OrganizationOrderManagementTabs.PerDiem">
         <label>Order Type</label>
         <div class="input-group multiselect">
           <ejs-multiselect mode="CheckBox"
@@ -402,7 +420,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap">
+    <div class="row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem">
       <div class="input-container">
         <label>Bill Rate From</label>
         <div class="input-group">
@@ -442,7 +460,7 @@
         </div>
       </div>
     </div>
-    <div class="bootstrap">
+    <div class="bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem">
       <div class="input-container">
         <label for="numberOfPositions"># of Positions</label>
         <div class="input-group">
@@ -455,7 +473,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders">
+    <div class="row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders && activeTab !== OrganizationOrderManagementTabs.PerDiem">
       <div class="input-container calendar">
         <label for="jobStartDate">Job Start Date</label>
         <div class="input-group datepicker">
@@ -513,4 +531,5 @@
   [order]="selectedOrder"
   [openEvent]="openDetails"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"></app-order-details-dialog>
-  <app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>
+
+<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>

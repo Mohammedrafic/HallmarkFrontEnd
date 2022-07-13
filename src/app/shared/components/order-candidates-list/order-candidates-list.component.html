@@ -3,7 +3,7 @@
     <div class="title">
       <h3>Candidates List</h3>
     </div>
-    <div class="input-container" *ngIf="isAgency">
+    <div class="input-container">
       <div class="input-group switch" (click)="onSwitcher(); false;">
         <ejs-switch
           id="switcher"
@@ -18,7 +18,7 @@
     #orderCandidatesGrid
     id="users-grid"
     class="users-grid e-gridwithheader"
-    [dataSource]="candidatesList.items"
+    [dataSource]="candidatesList?.items || []"
     [allowSorting]="false"
     [allowResizing]="true"
     [allowSelection]="false"
@@ -33,7 +33,7 @@
       <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
         <ng-template #template let-data>
           <div class="link" (click)="onViewNavigation(data)">{{data.lastName}}, {{data.firstName}}
-            <ng-container *ngIf="data.deployedCandidateInfo && isAgency">
+            <ng-container *ngIf="data.deployedCandidateInfo">
               <ejs-tooltip content="Deployed Candidate" position="TopRight">
                 <i-feather name="briefcase" class="icon" ></i-feather>
               </ejs-tooltip>
@@ -161,7 +161,7 @@
   </ng-template>
 
   <ng-template #offerDeployment>
-    <app-offer-deployment (closeDialogEmitter)="onCloseDialog()" [candidate]="candidate"></app-offer-deployment>
+    <app-offer-deployment (closeDialogEmitter)="onCloseDialog()" [candidate]="candidate" [isAgency]="isAgency"></app-offer-deployment>
   </ng-template>
   <ng-template #footerTemplate>
     <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>

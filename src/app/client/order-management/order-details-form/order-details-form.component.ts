@@ -906,6 +906,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.generalInformationForm = disableControls(this.generalInformationForm, ['regionId', 'skillId'], false);
       this.workflowForm.get('workflowId')?.disable({ onlySelf: true });
     }
+    if (order.orderType === OrderType.OpenPerDiem && order.status === OrderStatus.Open) {
+      this.generalInformationForm = disableControls(this.generalInformationForm, ['title', 'regionId', 'locationId', 'departmentId', 'skillId'], false);
+      this.workflowForm.get('workflowId')?.disable({ onlySelf: true });
+    }
   }
 
   private resetLocation(): void {

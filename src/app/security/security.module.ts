@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { SharedModule } from '@shared/shared.module';
-import { DialogModule } from "@syncfusion/ej2-angular-popups";
+import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { Sliders, Edit, Trash2, Plus } from 'angular-feather/icons';
-import {ButtonAllModule, ChipListModule, SwitchAllModule} from '@syncfusion/ej2-angular-buttons';
-import {TabAllModule, TreeViewAllModule} from '@syncfusion/ej2-angular-navigations';
-import {DropDownListModule, MultiSelectAllModule} from '@syncfusion/ej2-angular-dropdowns';
+import { ButtonAllModule, ChipListModule, SwitchAllModule } from '@syncfusion/ej2-angular-buttons';
+import { TabAllModule, TreeViewAllModule } from '@syncfusion/ej2-angular-navigations';
+import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { GridAllModule, PagerAllModule } from '@syncfusion/ej2-angular-grids';
-import {MaskedTextBoxModule, NumericTextBoxAllModule} from '@syncfusion/ej2-angular-inputs';
+import { MaskedTextBoxModule, NumericTextBoxAllModule } from '@syncfusion/ej2-angular-inputs';
 import { FeatherModule } from 'angular-feather';
 
 import { SecurityRoutingModule } from './security-routing.module';
@@ -23,12 +23,13 @@ import { AddEditUserComponent } from './user-list/add-edit-user/add-edit-user.co
 import { UserSettingsComponent } from './user-list/add-edit-user/user-settings/user-settings.component';
 import { VisibilitySettingsComponent } from './user-list/add-edit-user/visibility-settings/visibility-settings.component';
 import { AddEditVisibilityComponent } from './user-list/add-edit-user/visibility-settings/add-edit-visibility/add-edit-visibility.component';
+import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 
 const scurityIcons = {
   Sliders,
   Edit,
   Plus,
-  Trash2
+  Trash2,
 };
 
 @NgModule({
@@ -42,7 +43,7 @@ const scurityIcons = {
     AddEditUserComponent,
     UserSettingsComponent,
     VisibilitySettingsComponent,
-    AddEditVisibilityComponent
+    AddEditVisibilityComponent,
   ],
   imports: [
     CommonModule,
@@ -62,8 +63,9 @@ const scurityIcons = {
     MaskedTextBoxModule,
     MultiSelectAllModule,
     ChipListModule,
+    DropDownButtonModule,
 
     FeatherModule.pick(scurityIcons),
-  ]
+  ],
 })
-export class SecurityModule { }
+export class SecurityModule {}

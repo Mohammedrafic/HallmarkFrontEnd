@@ -6,6 +6,7 @@ import {
   AgencyOrderFilters,
   AgencyOrderManagementPage,
   ApplicantStatus,
+  CandidatesBasicInfo,
   CreateOrderDto,
   EditOrderDto,
   Order,
@@ -23,6 +24,8 @@ import { OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { HistoricalEvent } from '../models/historical-event.model';
+import { ExportPayload } from '@shared/models/export.model';
+import { AgencyOrderManagementTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -45,17 +48,10 @@ export class OrderManagementContentService {
   }
 
   /**
-   * Get the re-orders
-   @param payload filter with details we need to get
-   */
-  public getReOrders(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
-    return this.http.post<OrderManagementPage>(`/api/Orders/ReOrders`, payload); // TODO: modification pending after BE implementation
-  }
-
-  /**
    * Get the agency orders
    @param pageNumber
    @param pageSize
+   @param filters
    */
   public getAgencyOrders(
     pageNumber: number,
@@ -63,16 +59,6 @@ export class OrderManagementContentService {
     filters: AgencyOrderFilters
   ): Observable<AgencyOrderManagementPage> {
     return this.http.post<AgencyOrderManagementPage>(`/api/Agency/Orders`, { pageNumber, pageSize, ...filters });
-  }
-
-  /**
-   * Get the agency re-orders
-   @param pageNumber
-   @param pageSize
-   @param filters
-   */
-  public getAgencyReOrders(pageNumber: number, pageSize: number, filters: AgencyOrderFilters): Observable<AgencyOrderManagementPage> {
-    return this.http.post<AgencyOrderManagementPage>(`/api/Agency/ReOrders`, { pageNumber, pageSize, ...filters }); // TODO: modification pending after BE implementation
   }
 
   /**
@@ -87,15 +73,15 @@ export class OrderManagementContentService {
     organizationId: number,
     pageNumber: number,
     pageSize: number,
-    includeDeployed?: boolean
+    excludeDeployed?: boolean
   ): Observable<OrderCandidatesListPage> {
     let params: any = {
       PageNumber: pageNumber,
       PageSize: pageSize,
     };
 
-    if (includeDeployed) {
-      params = { ...params, includeDeployed };
+    if (excludeDeployed) {
+      params = { ...params, excludeDeployed };
     }
     return this.http.get<OrderCandidatesListPage>(
       `/api/CandidateProfile/order/${orderId}/organization/${organizationId}`,
@@ -169,10 +155,19 @@ export class OrderManagementContentService {
     orderId: number,
     organizationId: number,
     pageNumber: number,
-    pageSize: number
+    pageSize: number,
+    excludeDeployed?: boolean
   ): Observable<OrderCandidatesListPage> {
+    let params: any = {
+      PageNumber: pageNumber,
+      PageSize: pageSize,
+    };
+
+    if (excludeDeployed) {
+      params = { ...params, excludeDeployed };
+    }
     return this.http.get<OrderCandidatesListPage>(`/api/CandidateProfile/order/${orderId}`, {
-      params: { PageNumber: pageNumber, PageSize: pageSize },
+      params,
     });
   }
 
@@ -302,6 +297,45 @@ export class OrderManagementContentService {
     return this.http.get<HistoricalEvent[]>(
       `/api/AppliedCandidates/historicalData?OrganizationId=${organizationId}&CandidateJobId=${jobId}`
     );
+  }
+
+  /**
+   * Get basic info about candidate
+   @param organizationId
+   @param jobId
+   */
+  public getCandidatesBasicInfo(organizationId: number, jobId: number): Observable<CandidatesBasicInfo> {
+    return this.http.get<CandidatesBasicInfo>(`/api/AppliedCandidates/basicInfo?OrganizationId=${organizationId}&JobId=${jobId}`);
+  }
+
+  /**
+   * Export organization list
+   * @param payload
+   * @param tab
+   */
+  public export(payload: ExportPayload, tab: OrganizationOrderManagementTabs): Observable<any> {
+    switch(tab) {
+      case OrganizationOrderManagementTabs.PerDiem:
+        return this.http.post(`/api/Orders/perdiem/export`, payload, { responseType: 'blob' });
+      case OrganizationOrderManagementTabs.ReOrders:
+        return this.http.post(`/api/Orders/ReOrders/export`, payload, { responseType: 'blob' }); // TODO: modification pending after BE implementation
+      default:
+        return this.http.post(`/api/Orders/export`, payload, { responseType: 'blob' });
+    }
+  }
+
+  /**
+   * Export agency list
+   * @param payload
+   * @param tab
+   */
+  public exportAgency(payload: ExportPayload, tab: AgencyOrderManagementTabs): Observable<any> {
+    switch(tab) {
+      case AgencyOrderManagementTabs.ReOrders:
+        return this.http.post(`/api/Agency/ReOrders/export`, payload, { responseType: 'blob' }); // TODO: modification pending after BE implementation
+      default:
+        return this.http.post(`/api/Agency/export`, payload, { responseType: 'blob' });
+    }
   }
 }
 

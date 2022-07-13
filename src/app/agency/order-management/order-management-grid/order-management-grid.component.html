@@ -15,6 +15,7 @@
   [textWrapSettings]="wrapSettings"
   [enableVirtualization]="true"
   (rowSelected)="onRowClick($event)"
+  (rowDeselected)="rowDeselected($event, gridWithChildRow)"
   (dataBound)="onDataBound()"
   (actionBegin)="actionBegin($event)"
   (created)="onGridCreated()"
@@ -139,6 +140,12 @@
         </ng-container>
       </ng-template>
     </e-column>
+    <e-column field="shiftCount" headerText="# of Shifts Next 90 Days " width="150" [visible]="false">
+      <!-- TODO: Pending BE -->
+      <ng-template #template let-data>
+        -
+      </ng-template>
+    </e-column>
     <e-column headerTextAlign="Right" width="120">
       <ng-template #headerTemplate let-data>
         <div class="controls-header">
@@ -219,6 +226,13 @@
     </div>
   </ng-template>
 </ejs-grid>
+
+<app-export-dialog
+  [columns]="columnsToExport"
+  [fileName]="fileName"
+  (cancel)="closeExport()"
+  (export)="export($event)"
+></app-export-dialog>
 
 <app-preview-order-dialog
   [order]="selectedOrder"

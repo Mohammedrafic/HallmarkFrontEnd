@@ -5,15 +5,19 @@
   [dataSource]="userGridData$ | async"
   [allowSorting]="true"
   [allowResizing]="true"
-  [allowSelection]="false"
   [resizeSettings]="resizeSettings"
   [allowPaging]="allowPaging"
   [enableVirtualization]="true"
   [pageSettings]="pageSettings"
   [height]="gridHeight"
   (rowDataBound)='rowDataBound($event)'
+  (rowSelected)="rowSelected($event, grid)"
+  (rowDeselected)="rowDeselected($event, grid)"
+  [selectionSettings]="selectionSettings"
+  (actionBegin)="actionBegin($event)"
 >
   <e-columns>
+    <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="40"></e-column>
     <e-column field="firstName" headerText="First Name" textAlign="Left" ></e-column>
     <e-column field="lastName" headerText="Last Name" textAlign="Left" ></e-column>
     <e-column field="isDeleted" headerText="Status" width=200>
@@ -97,3 +101,4 @@
   </ng-template>
 </ejs-grid>
 
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>

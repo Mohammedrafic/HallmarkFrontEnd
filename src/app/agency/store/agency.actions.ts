@@ -1,5 +1,12 @@
 import { Agency } from 'src/app/shared/models/agency.model';
-import { AssociateOrganizations, FeeExceptionsDTO, FeeExceptionsPage, FeeSettings, PartnershipSettings } from 'src/app/shared/models/associate-organizations.model';
+import {
+  AssociateOrganizations,
+  FeeExceptionsDTO,
+  FeeExceptionsPage,
+  FeeSettings,
+  PartnershipSettings,
+} from 'src/app/shared/models/associate-organizations.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 export class SaveAgency {
   static readonly type = '[agency] Save Agency';
@@ -13,7 +20,7 @@ export class SaveAgencySucceeded {
 
 export class GetOrganizationsByPage {
   static readonly type = '[agency] Get Organizations by Page';
-  constructor(public pageNumber: number, public pageSize: number) { }
+  constructor(public pageNumber: number, public pageSize: number) {}
 }
 
 export class InvateOrganizations {
@@ -43,61 +50,61 @@ export class DeleteAssociateOrganizationsByIdSucceeded {
 
 export class GetAgencyByPage {
   static readonly type = '[agency] Get Agency by Page';
-  constructor(public pageNumber: number, public pageSize: number) { }
+  constructor(public pageNumber: number, public pageSize: number) {}
 }
 
 export class GetAgencyById {
   static readonly type = '[agency] Get Agency by ID';
-  constructor(public payload: number) { }
+  constructor(public payload: number) {}
 }
 
 export class GetAgencyByIdSucceeded {
   static readonly type = '[agency] Get Agency by ID Succeeded';
-  constructor(public payload: Agency) { }
+  constructor(public payload: Agency) {}
 }
 
 export class GetFeeSettingByOrganizationId {
   static readonly type = '[agency] Get Fee Setting By Organization Id';
-  constructor(public organizationId: number, public pageNumber: number, public pageSize: number) { }
+  constructor(public organizationId: number, public pageNumber: number, public pageSize: number) {}
 }
 
 export class GetFeeSettingByOrganizationIdSucceeded {
   static readonly type = '[agency] Get Fee Setting By Organization Id Succeeded';
-  constructor(public payload: FeeSettings) { }
+  constructor(public payload: FeeSettings) {}
 }
 export class UploadAgencyLogo {
   static readonly type = '[agency] Upload Agency Logo';
-  constructor(public file: Blob, public businessUnitId: number) { }
+  constructor(public file: Blob, public businessUnitId: number) {}
 }
 
 export class GetAgencyLogo {
   static readonly type = '[agency] Get Agency Logo';
-  constructor(public payload: number) { }
+  constructor(public payload: number) {}
 }
 
-export class RemoveAgencyLogo  {
+export class RemoveAgencyLogo {
   static readonly type = '[agency] Remove Agency Logo ';
-  constructor(public payload: number) { }
+  constructor(public payload: number) {}
 }
 
 export class GetAgencyLogoSucceeded {
   static readonly type = '[agency] Get Agency Logo Succeeded';
-  constructor(public payload: Blob) { }
+  constructor(public payload: Blob) {}
 }
 
 export class ClearAgencyEditStore {
   static readonly type = '[agency] Clear Agency Edit Store';
-  constructor() { }
+  constructor() {}
 }
 
 export class GetFeeExceptionsInitialData {
   static readonly type = '[agency] Get Fee Exceptions Initial Data';
-  constructor(public organizationId: number) { }
+  constructor(public organizationId: number) {}
 }
 
 export class GetJobDistributionInitialData {
   static readonly type = '[agency] Get Job Distribution Initial Data';
-  constructor(public organizationId: number) { }
+  constructor(public organizationId: number) {}
 }
 
 export class SavePartnershipSettings {
@@ -112,7 +119,7 @@ export class SavePartnershipSettingsSucceeded {
 
 export class GetPartnershipSettings {
   static readonly type = '[agency] Get Partnership Settings By Organization Id';
-  constructor(public organizationId: number) { }
+  constructor(public organizationId: number) {}
 }
 
 export class SaveFeeExceptions {
@@ -142,5 +149,10 @@ export class UpdateAssociateOrganizationsPage {
 
 export class GetBusinessUnitList {
   static readonly type = '[agency] Get The List Of Business Units';
-  constructor() { }
+  constructor() {}
+}
+
+export class ExportAgencyList {
+  static readonly type = '[agency] Export Agency List';
+  constructor(public payload: ExportPayload) {}
 }

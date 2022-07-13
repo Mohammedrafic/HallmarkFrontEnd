@@ -317,6 +317,31 @@ export type OrderCandidateJob = {
   offeredStartDate: string;
 };
 
+export type CandidatesBasicInfo = {
+  jobId: number;
+  organizationId: number;
+  organizationName: string;
+  orderId: number;
+  candidateProfileId: number;
+  positionId: number;
+  billRatesGroupId: number;
+  workflowStepId: number;
+  candidateBillRate: number;
+  offeredBillRate: number;
+  expAsTravelers: number;
+  onBoardDate: string;
+  availableStartDate: string;
+  requestComment: string;
+  rejectDate: string;
+  rejectBy: string;
+  rejectReasonId: number;
+  allowDeployCredentials: boolean;
+  actualStartDate: string;
+  actualEndDate: string;
+  clockId: string;
+  guaranteedWorkWeek: string;
+}
+
 export type ApplicantStatus = {
   applicantStatus: number;
   statusText: string;

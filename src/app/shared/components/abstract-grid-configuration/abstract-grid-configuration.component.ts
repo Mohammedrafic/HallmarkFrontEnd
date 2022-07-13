@@ -12,12 +12,12 @@ import { GridColumn } from '@shared/models/grid-column.model';
 enum ExportType {
   'Excel File',
   'CSV File',
-  'Custom'
+  'Custom',
 }
 
 export abstract class AbstractGridConfigurationComponent {
   gridWithChildRow: GridComponent;
-// grid
+  // grid
   gridDataSource: object[] = [];
   allowPaging = GRID_CONFIG.isPagingEnabled;
   pageSettings = GRID_CONFIG.gridPageSettings;
@@ -51,16 +51,16 @@ export abstract class AbstractGridConfigurationComponent {
   clickedElement: any;
 
   // Subrow
-  subrowsState = new Set<number>()
+  subrowsState = new Set<number>();
 
   exportOptions = [
     { text: ExportType[0], id: 0 },
     { text: ExportType[1], id: 1 },
-    { text: ExportType[2], id: 2 }
+    { text: ExportType[2], id: 2 },
   ];
 
   selectionSettings: SelectionSettingsModel = {
-    persistSelection: true
+    persistSelection: true,
   };
   selectedItems: any[] = [];
   idFieldName = 'id'; // Override in child component in case different id property
@@ -68,11 +68,11 @@ export abstract class AbstractGridConfigurationComponent {
   filteredItems: FilteredItem[] = [];
   filteredCount = 0;
 
-  protected constructor() { }
+  protected constructor() {}
 
   generateDateTime(datePipe: DatePipe): string {
     if (datePipe) {
-      return datePipe.transform(Date.now(),'MM/dd/yyyy hh:mm a') as string;
+      return datePipe.transform(Date.now(), 'MM/dd/yyyy hh:mm a') as string;
     }
     return '';
   }
@@ -196,7 +196,7 @@ export abstract class AbstractGridConfigurationComponent {
     event.stopPropagation();
   }
 
-  public onSubrowToggle(event: MouseEvent, data: { index: string}): void {
+  public onSubrowToggle(event: MouseEvent, data: { index: string }): void {
     event.stopPropagation();
     const index = Number(data.index);
     if (this.subrowsState.has(index)) {
@@ -215,5 +215,15 @@ export abstract class AbstractGridConfigurationComponent {
       }
     });
     grid.refreshColumns();
+  }
+
+  protected onSubrowAllToggle(index?: number): void {
+    if(index) {
+      this.gridWithChildRow.detailRowModule.expandAll();
+      this.subrowsState.add(index - 1);
+    } else {
+      this.gridWithChildRow.detailRowModule.collapseAll();
+      this.subrowsState.clear()
+    }
   }
 }

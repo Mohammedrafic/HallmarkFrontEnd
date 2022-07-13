@@ -1,3 +1,5 @@
+import { ExportColumn } from '@shared/models/export.model';
+
 export const ROW_HEIGHT = {
   SCALE_UP_HEIGHT: 140,
   SCALE_DOWN_HEIGHT: 64
@@ -17,12 +19,45 @@ export enum OrderTypeName {
   Traveler = 'Traveler'
 }
 
-export enum OrderType {
-  ContractToPerm = 0,
-  OpenPerDiem = 1,
-  PermPlacement = 2,
-  Traveler = 3
-}
+export const allOrdersColumnsToExport: ExportColumn[] = [
+  { text:'Order ID', column: 'Id'},
+  { text:'Status', column: 'StatusText'},
+  { text:'Job Title', column: 'JobTitle'},
+  { text:'Skill', column: 'SkillName'},
+  { text:'# of Positions', column: 'OpenPositions'},
+  { text:'Location', column: 'LocationName'},
+  { text:'Department', column: 'DepartmentName'},
+  { text:'Type', column: 'OrderType'},
+  { text:'Bill Rate', column: 'BillRate'},
+  { text:'Candidates', column: 'Candidates'},
+  { text:'Start Date', column: 'StartDate'},
+];
+
+export const perDiemColumnsToExport: ExportColumn[] = [
+  { text:'Order ID', column: 'Id'},
+  { text:'Status', column: 'StatusText'},
+  { text:'Job Title', column: 'JobTitle'},
+  { text:'Skill', column: 'SkillName'},
+  { text:'Location', column: 'LocationName'},
+  { text:'Department', column: 'DepartmentName'},
+  { text:'Candidates', column: 'Candidates'},
+  { text:'# of Shifts Next 90 Days', column: 'shiftCount'},
+];
+
+export const reOrdersColumnsToExport: ExportColumn[] = [
+  { text:'Re-Order ID', column: 'Id'},
+  { text:'Status', column: 'StatusText'},
+  { text:'Job Title', column: 'JobTitle'},
+  { text:'Skill', column: 'SkillName'},
+  { text:'# of Positions', column: 'OpenPositions' },
+  { text:'Location', column: 'LocationName'},
+  { text:'Department', column: 'DepartmentName'},
+  { text:'Candidates', column: 'Candidates'},
+  { text:'Bill Rate', column: 'BillRate'},
+  { text:'Re-Order Date', column: 'ReOrderDate'},
+  { text:'Shift', column: 'Shift'},
+  { text:'Agency', column: 'Agency'},
+];
 
 export const ReOrdersColumnsConfig = [
   {
@@ -101,7 +136,7 @@ export const PerDiemColumnsConfig = [
   },
   {
     fieldName: 'orderType',
-    visible: true
+    visible: false
   },
   {
     fieldName: 'startDate',
@@ -129,10 +164,6 @@ export const PerDiemColumnsConfig = [
   },
   {
     fieldName: 'billRate',
-    visible: false
-  },
-  {
-    fieldName: 'orderType',
     visible: false
   },
   {
