@@ -34,7 +34,7 @@ export class ProfileInvoicesComponent {
       .pipe(
         takeUntil(this.componentDestroy())
       )
-      .subscribe((previewBlob) => {
+      .subscribe((previewBlob: Blob) => {
         const reader = new FileReader();
 
         reader.readAsDataURL(previewBlob);
