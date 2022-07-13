@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
-import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from "@shared/enums/applicant-status.enum";
+import { CandidatStatus } from "@shared/enums/applicant-status.enum";
 import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { Observable, Subject, takeUntil } from "rxjs";
 
@@ -46,10 +46,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   constructor(private store: Store, private actions$: Actions) {
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['candidate']) {
-      this.readOnlyMode = changes['candidate'].currentValue.status !== ApplicantStatusEnum.NotApplied;
-    }
+  ngOnChanges(): void {
     if(this.candidate.deployedCandidateInfo && this.isAgency) {
       this.readOnlyMode = true
     }
@@ -66,7 +63,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.unsubscribe$.complete();
   }
 
-  onCloseDialog(): void {
+  closeDialog(): void {
     this.closeDialogEmitter.next();
   }
 
@@ -84,6 +81,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
       })).subscribe(() => {
         this.store.dispatch(new ReloadOrderCandidatesLists());
       });
+      this.closeDialog();
     }
   }
 

@@ -108,7 +108,7 @@ export class OrderManagementState {
   static orderCandidatesLenght(state: OrderManagementModel): number {
     return (
       state.orderCandidatesListPage?.items.filter(
-        (candidate) => candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.NotApplied
+        (candidate) => candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.NotApplied  && candidate.status !== ApplicantStatus.Withdraw
       ).length || 0
     );
   }

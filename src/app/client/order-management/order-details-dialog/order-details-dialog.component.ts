@@ -172,7 +172,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   private subscribeOnOrderCandidatePage(): void {
     this.orderCandidatePage$.pipe(takeUntil((this.unsubscribe$))).subscribe((order: OrderCandidatesListPage) => {
       this.candidatesCounter = order && order.items?.filter((candidate) =>
-        candidate.status !== ApplicantStatus.Rejected  && candidate.status !== ApplicantStatus.NotApplied
+        candidate.status !== ApplicantStatus.Rejected  && candidate.status !== ApplicantStatus.Withdraw
       ).length;
     });
   }

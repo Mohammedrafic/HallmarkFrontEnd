@@ -17,7 +17,7 @@
       </div>
       <div class="e-card-content">
         <button *ngIf="!readOnlyMode" ejs-button [isPrimary]="true" class="apply-button" (click)="applyOrderApplicants()">Apply</button>
-        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>

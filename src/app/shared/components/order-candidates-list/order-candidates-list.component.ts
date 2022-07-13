@@ -1,8 +1,4 @@
-import {
-  GetAgencyOrderCandidatesList,
-  GetCandidateJob,
-  GetOrderApplicantsData,
-} from '@agency/store/order-management.actions';
+import { GetCandidateJob, GetOrderApplicantsData, } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
@@ -12,12 +8,7 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import {
-  AgencyOrder,
-  Order,
-  OrderCandidatesList,
-  OrderCandidatesListPage,
-} from '@shared/models/order-management.model';
+import { AgencyOrder, Order, OrderCandidatesList, OrderCandidatesListPage, } from '@shared/models/order-management.model';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -126,7 +117,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
       const isOrganization = this.router.url.includes('client');
 
       if (this.isAgency) {
-        const allowedApplyStatuses = [ApplicantStatus.NotApplied];
+        const allowedApplyStatuses = [ApplicantStatus.NotApplied, ApplicantStatus.Withdraw];
         const allowedAcceptStatuses = [
           ApplicantStatus.Offered,
           ApplicantStatus.Accepted,
@@ -150,6 +141,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
         }
       } else if (isOrganization) {
         const allowedOfferDeploymentStatuses = [
+          ApplicantStatus.Withdraw,
           ApplicantStatus.Rejected,
           ApplicantStatus.Applied,
           ApplicantStatus.Shortlisted,

@@ -16,14 +16,14 @@
         </ejs-chiplist>
       </div>
       <div class="e-card-content button-container">
-        <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !candidate.deployedCandidateInfo">
+        <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !candidate.deployedCandidateInfo && !isReadOnly">
           <ejs-dropdownlist [fields]="optionFields"
                             [dataSource]="nextApplicantStatuses"
                             placeholder="Select Status"
                             (change)="updateCandidateJob($event)">
           </ejs-dropdownlist>
         </div>
-        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>
@@ -69,10 +69,10 @@
                     </div>
                   </div>
                   <div class="input-container">
-                    <label>Offered Bill Rate<span *ngIf="!isRejected" class="required">*</span></label>
-                    <div class="input-group" [ngClass]="{'input-readonly': isRejected}">
+                    <label>Offered Bill Rate<span *ngIf="!isRejected && !isReadOnly" class="required">*</span></label>
+                    <div class="input-group" [ngClass]="{'input-readonly': isRejected || isReadOnly}">
                       <input appValidateWithMessage
-                             [readonly]="isRejected"
+                             [readonly]="isRejected || isReadOnly"
                              formControlName="offeredBillRate"
                              class="e-input"
                              type="number"/>

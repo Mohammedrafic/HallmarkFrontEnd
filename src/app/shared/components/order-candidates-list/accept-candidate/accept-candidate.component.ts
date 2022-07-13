@@ -5,7 +5,7 @@ import { Observable, Subject, takeUntil } from "rxjs";
 import { FormControl, FormGroup} from "@angular/forms";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { OrderManagementState } from "@agency/store/order-management.state";
-import { OrderCandidateJob, OrderCandidatesList } from "@shared/models/order-management.model";
+import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from "@shared/models/order-management.model";
 import { BillRate } from "@shared/models/bill-rate.model";
 import {
   GetRejectReasonsForAgency,
@@ -59,7 +59,13 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       || this.isOnboard;
   }
 
+  get showWithdrawAction(): boolean {
+    return (this.candidate.status === ApplicantStatusEnum.Shortlisted || this.candidate.status === ApplicantStatusEnum.PreOfferCustom)
+      && !this.isWithdraw && !this.candidate.deployedCandidateInfo;
+  }
+
   private unsubscribe$: Subject<void> = new Subject();
+  private isWithdraw: boolean;
 
   constructor(private store: Store, private actions$: Actions, private datePipe: DatePipe) { }
 
@@ -80,35 +86,20 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.unsubscribe$.complete();
   }
 
-  public onClose(): void {
+  public closeDialog(): void {
     this.closeModalEvent.emit();
     this.billRatesData = [];
     this.isReadOnly = false;
+    this.isWithdraw = false;
   }
 
   public onAccept(): void {
-    const value = this.form.getRawValue();
-    this.store.dispatch(new UpdateAgencyCandidateJob({
-      organizationId: this.candidateJob.organizationId,
-      jobId: this.candidateJob.jobId,
-      orderId: this.candidateJob.orderId,
-      nextApplicantStatus: {
-        applicantStatus: 50,
-        statusText: "Accepted"
-      },
-      candidateBillRate: value.candidateBillRate,
-      offeredBillRate: value.offeredBillRate,
-      requestComment: value.comments,
-      actualStartDate: this.candidateJob.actualStartDate,
-      actualEndDate: this.candidateJob.actualEndDate,
-      clockId: this.candidateJob.clockId,
-      guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
-      allowDeplayWoCredentials: false,
-      billRates: this.billRatesData,
-      offeredStartDate: this.candidateJob.offeredStartDate
-    })).subscribe(() => {
-      this.store.dispatch(new ReloadOrderCandidatesLists());
-    });
+    this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: "Accepted" });
+  }
+
+  public onWithdraw(): void {
+    this.isWithdraw = true;
+    this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Withdraw, statusText: "Withdraw" });
   }
 
   public onReject(): void {
@@ -130,7 +121,31 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
       this.store.dispatch( new RejectCandidateJob(payload));
+      this.closeDialog();
     }
+  }
+
+  private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
+    const value = this.form.getRawValue();
+    this.store.dispatch(new UpdateAgencyCandidateJob({
+      organizationId: this.candidateJob.organizationId,
+      jobId: this.candidateJob.jobId,
+      orderId: this.candidateJob.orderId,
+      nextApplicantStatus: applicantStatus,
+      candidateBillRate: value.candidateBillRate,
+      offeredBillRate: value.offeredBillRate,
+      requestComment: value.comments,
+      actualStartDate: this.candidateJob.actualStartDate,
+      actualEndDate: this.candidateJob.actualEndDate,
+      clockId: this.candidateJob.clockId,
+      guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
+      allowDeplayWoCredentials: false,
+      billRates: this.billRatesData,
+      offeredStartDate: this.candidateJob.offeredStartDate
+    })).subscribe(() => {
+      this.store.dispatch(new ReloadOrderCandidatesLists());
+    });
+    this.closeDialog();
   }
 
   private createForm() : void {
@@ -152,10 +167,6 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       actualStartDate: new FormControl(''),
       actualEndDate: new FormControl(''),
     });
-  }
-
-  private onCloseDialog(): void {
-    this.closeModalEvent.next();
   }
 
   private  getDateString(date: string): string | null {

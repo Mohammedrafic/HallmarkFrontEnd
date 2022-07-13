@@ -107,7 +107,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public onRejectCandidate(event: {rejectReason: number}): void {
     this.isRejected = true;
 
-    if(this.candidateJob) {
+    if (this.candidateJob) {
       const payload = {
         organizationId: this.candidateJob.organizationId,
         jobId: this.candidateJob.jobId,
@@ -115,12 +115,13 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       };
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
-      this.form.patchValue({rejectReason: value})
-      this.store.dispatch( new RejectCandidateJob(payload))
+      this.form.patchValue({ rejectReason: value });
+      this.store.dispatch( new RejectCandidateJob(payload));
+      this.closeDialog();
     }
   }
 
-  public onClose() {
+  public closeDialog() {
     this.closeModalEvent.emit();
     this.candidateJob = null;
     this.jobStatusControl.reset();
@@ -152,6 +153,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       })).subscribe(() => {
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
       });
+      this.closeDialog();
     }
   }
 

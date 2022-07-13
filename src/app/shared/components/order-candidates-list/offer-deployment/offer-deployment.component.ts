@@ -14,8 +14,7 @@ import {
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
-  UpdateOrganisationCandidateJob,
-  UpdateOrganisationCandidateJobSucceed
+  UpdateOrganisationCandidateJob
 } from "@client/store/order-managment-content.actions";
 
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
@@ -45,7 +44,6 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public formGroup: FormGroup;
   public nextApplicantStatuses: ApplicantStatus[];
   public optionFields = { text: 'statusText', value: 'applicantStatus' };
-  public readOnlyMode: boolean;
   public rejectReasons: RejectReason[] = [];
   public isRejected = false;
   public candidatStatus = CandidatStatus;
@@ -65,21 +63,25 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       || this.candidate.status === ApplicantStatusEnum.Offered;
   }
 
+  get isReadOnly(): boolean {
+    return this.isRejected || this.readOnlyMode;
+  }
+
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
   @Select(OrderManagementContentState.applicantStatuses)
   applicantStatuses$: Observable<ApplicantStatus[]>;
 
   private unsubscribe$: Subject<void> = new Subject();
-  private isOfferedStatus: boolean;
   private currentApplicantStatus: ApplicantStatus;
+  private readOnlyMode: boolean;
 
   constructor(private store: Store, private actions$: Actions) {
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
     this.readOnlyMode =
-      changes['candidate']?.currentValue.status === ApplicantStatusEnum.Offered ||
+      changes['candidate']?.currentValue.status === ApplicantStatusEnum.Withdraw ||
       changes['candidate']?.currentValue.status === ApplicantStatusEnum.Rejected;
 
     this.checkRejectReason();
@@ -98,19 +100,18 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     this.unsubscribe$.complete();
   }
 
-  public onCloseDialog(): void {
+  public closeDialog(): void {
     this.closeDialogEmitter.next();
     this.nextApplicantStatuses = [];
     this.billRatesData = [];
     this.candidateJob = null;
-    this.isOfferedStatus = false;
     this.isRejected = false;
   }
 
   public onRejectCandidate(event: {rejectReason: number}): void {
     this.isRejected = true;
 
-    if(this.candidateJob) {
+    if (this.candidateJob) {
       const payload = {
         organizationId: this.candidateJob.organizationId,
         jobId: this.candidateJob.jobId,
@@ -118,8 +119,9 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       };
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
-      this.formGroup.patchValue({rejectReason: value})
-      this.store.dispatch( new RejectCandidateJob(payload))
+      this.formGroup.patchValue({ rejectReason: value });
+      this.store.dispatch( new RejectCandidateJob(payload));
+      this.closeDialog();
     }
   }
 
@@ -130,7 +132,6 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     } else {
       if (this.formGroup.valid && this.candidateJob) {
         const value = this.formGroup.getRawValue();
-        this.isOfferedStatus = event.itemData?.applicantStatus === ApplicantStatusEnum.Offered;
         this.store.dispatch(new UpdateOrganisationCandidateJob({
           orderId: this.candidateJob.orderId,
           organizationId: this.candidateJob.organizationId,
@@ -152,6 +153,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
             this.store.dispatch(new GetOrganisationCandidateJob(this.candidateJob?.organizationId as number, this.candidate.candidateJobId));
           }
         });
+        this.closeDialog();
       }
     }
   }
@@ -208,9 +210,6 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     });
     this.applicantStatuses$.pipe(takeUntil(this.unsubscribe$))
       .subscribe((data: ApplicantStatus[]) => this.nextApplicantStatuses = data);
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed)).subscribe(() => {
-      this.readOnlyMode = this.isOfferedStatus;
-    });
 
     if (this.candidate.deployedCandidateInfo) {
       this.formGroup.disable()
