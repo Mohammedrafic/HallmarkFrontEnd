@@ -31,6 +31,9 @@ export class ProfileInvoicesComponent {
     this.previewInvoice = invoice;
 
     this.timesheetDetailsApiService.loadInvoiceBlob(invoice.url)
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
       .subscribe((previewBlob) => {
         const reader = new FileReader();
 
