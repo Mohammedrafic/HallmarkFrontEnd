@@ -3,20 +3,22 @@ import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext, Actions } from '@ngxs/store';
 import { PanelModel } from '@syncfusion/ej2-angular-layouts';
 import { Observable, tap } from 'rxjs';
+import lodashMap from 'lodash/fp/map';
 
 import { DashboardService } from '../services/dashboard.service';
-import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile } from './dashboard.actions';
+import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile, SetFilteredItems } from './dashboard.actions';
 import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
-import lodashMap from 'lodash/fp/map';
 import { DashboardDataModel } from '../models/dashboard-data.model';
 import { widgetTypeToConfigurationMapper } from '../constants/widget-type-to-configuration-mapper';
+import { FilteredItem } from '@shared/models/filter.model';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
   isDashboardLoading: boolean;
   widgets: WidgetOptionModel[];
   isMobile: boolean;
+  filteredItems: FilteredItem[];
 }
 
 @State<DashboardStateModel>({
@@ -26,6 +28,7 @@ export interface DashboardStateModel {
     isDashboardLoading: false,
     widgets: [],
     isMobile: false,
+    filteredItems: []
   },
 })
 @Injectable()
@@ -53,6 +56,11 @@ export class DashboardState {
   @Selector()
   static isMobile(state: DashboardStateModel): DashboardStateModel['isMobile'] {
     return state.isMobile;
+  }
+
+  @Selector()
+  static filteredItems(state: DashboardStateModel): DashboardStateModel['filteredItems'] {
+    return state.filteredItems;
   }
 
   public constructor(private readonly actions: Actions, private dashboardService: DashboardService) {}
@@ -97,5 +105,10 @@ export class DashboardState {
   @Action(IsMobile)
   private isMobile({ patchState }: StateContext<DashboardStateModel>, { payload }: IsMobile): void {
     patchState({ isMobile: payload });
+  }
+
+  @Action(SetFilteredItems)
+  private setFilteredItems({patchState}: StateContext<DashboardStateModel>, {payload}: SetFilteredItems) {
+    patchState({filteredItems: payload})
   }
 }

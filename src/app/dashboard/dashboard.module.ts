@@ -10,6 +10,7 @@ import { DashboardControlModule } from './dashboard-control/dashboard-control.mo
 import { DashboardService } from './services/dashboard.service';
 import { DashboardState } from './store/dashboard.state';
 import { DashboardWidgetsModule } from './dashboard-widgets/dashboard-widgets.module';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 
 @NgModule({
   declarations: [DashboardComponent],
@@ -17,7 +18,7 @@ import { DashboardWidgetsModule } from './dashboard-widgets/dashboard-widgets.mo
     CommonModule,
     DashboardControlModule,
     RouterModule.forChild([{ path: '', component: DashboardComponent }]),
-    NgxsModule.forFeature([DashboardState]),
+      NgxsModule.forFeature([DashboardState, OrganizationManagementState]),
     ReactiveFormsModule,
     DashboardWidgetsModule,
   ],
