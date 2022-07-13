@@ -12,7 +12,12 @@
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
     </button>
-    <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+    <button
+      ejs-dropdownbutton
+      [items]="exportOptions"
+      (select)="exportSelected($event)"
+      id="importButton"
+      cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
     <button ejs-button [isPrimary]="true" (click)="navigateToOrderForm()">Create Order</button>
   </ng-container>
 </app-page-toolbar>
@@ -36,6 +41,7 @@
     [selectionSettings]="selectionOptions"
     [textWrapSettings]="wrapSettings"
     (rowSelected)="onRowClick($event)"
+    (rowDeselected)="rowDeselected($event, gridWithChildRow)"
     (dataBound)="onDataBound()"
   >
     <e-columns>
@@ -43,12 +49,22 @@
       <e-column headerTextAlign="Right" width="130">
         <ng-template #headerTemplate let-data>
           <div class="controls-header">
-            <button ejs-button cssClass="e-flat icon-button">
+            <button ejs-button cssClass="e-flat icon-button c" *ngIf="!isSubrowDisplay; else onSubrowToggle" (click)="expandAll()">
+              <span><img src="assets/icons/menu-expand.svg" alt="coll" class="icon"></span>
+            </button>
+            <ng-template #onSubrowToggle>
+              <button ejs-button cssClass="e-flat icon-button" (click)="collapseAll()">
+                <span><img src="assets/icons/menu-collapse.svg" alt="coll" class="icon c"></span>
+              </button>
+            </ng-template>
+            <button ejs-button cssClass="e-flat icon-button" *ngIf="isRowScaleUp; else onRowScaleDown">
               <span><i-feather name="menu" class="icon" (click)="onRowScaleUpClick()"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat icon-button">
-              <span><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
-            </button>
+            <ng-template #onRowScaleDown>
+              <button ejs-button cssClass="e-flat icon-button">
+                <span><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
+              </button>
+            </ng-template>
           </div>
         </ng-template>
         <ng-template #template let-data>
@@ -250,16 +266,32 @@
   </ejs-grid>
 </section>
 
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+
 <app-filter-dialog [items]="filteredItems" [count]="(ordersPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
   <form [formGroup]="OrderFilterFormGroup">
     <div class="bootstrap">
-      <div class="input-container">
-        <label for="externalId">Order ID</label>
+      <div class="input-container" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders">
+        <label for="orderId">Order ID</label>
         <div class="input-group">
-          <input  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  formControlName="orderId"/>
+          <input
+            id="orderId"
+            class="e-input"
+            type="text"
+            maxlength="50"
+            formControlName="orderId"/>
+        </div>
+      </div>
+
+      <div class="input-container" *ngIf="activeTab === OrganizationOrderManagementTabs.ReOrders">
+        <label for="reOrderId">Re-Order ID</label>
+        <div class="input-group">
+          <input
+            id="reOrderId"
+            class="e-input"
+            type="text"
+            maxlength="50"
+            formControlName="reOrderId"/>
         </div>
       </div>
     </div>
@@ -335,7 +367,7 @@
           </ejs-multiselect>
         </div>
       </div>
-      <div class="input-container">
+      <div class="input-container" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders && activeTab !== OrganizationOrderManagementTabs.PerDiem">
         <label>Order Type</label>
         <div class="input-group multiselect">
           <ejs-multiselect mode="CheckBox"
@@ -388,7 +420,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap">
+    <div class="row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem">
       <div class="input-container">
         <label>Bill Rate From</label>
         <div class="input-group">
@@ -428,22 +460,25 @@
         </div>
       </div>
     </div>
-    <div class="bootstrap">
+    <div class="bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem">
       <div class="input-container">
-        <label for="externalId"># of Positions</label>
+        <label for="numberOfPositions"># of Positions</label>
         <div class="input-group">
-          <input  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  formControlName="openPositions"/>
+          <input
+            id="numberOfPositions"
+            class="e-input"
+            type="text"
+            maxlength="50"
+            formControlName="openPositions"/>
         </div>
       </div>
     </div>
-    <div class="row bootstrap">
+    <div class="row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders && activeTab !== OrganizationOrderManagementTabs.PerDiem">
       <div class="input-container calendar">
-        <label for="inactiveDate">Job Start Date</label>
+        <label for="jobStartDate">Job Start Date</label>
         <div class="input-group datepicker">
           <ejs-datepicker
+            id="jobStartDate"
             class="datepicker"
             format="MM/dd/yyyy"
             placeholder="MM/DD/YYYY"
@@ -453,13 +488,29 @@
         </div>
       </div>
       <div class="input-container calendar">
-        <label for="inactiveDate">Job End Date</label>
+        <label for="jobEndDate">Job End Date</label>
         <div class="input-group datepicker">
           <ejs-datepicker
+            id="jobEndDate"
             class="datepicker"
             format="MM/dd/yyyy"
             placeholder="MM/DD/YYYY"
             formControlName="jobEndDate"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap calendar-container" *ngIf="activeTab === OrganizationOrderManagementTabs.ReOrders">
+      <div class="input-container calendar">
+        <label for="reOrderDate">Re-Order Date</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            id="reOrderDate"
+            class="datepicker"
+            format="MM/dd/yyyy"
+            placeholder="MM/DD/YYYY"
+            formControlName="reOrderDate"
           >
           </ejs-datepicker>
         </div>
@@ -480,4 +531,5 @@
   [order]="selectedOrder"
   [openEvent]="openDetails"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"></app-order-details-dialog>
-  <app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>
+
+<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>

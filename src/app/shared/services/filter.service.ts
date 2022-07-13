@@ -40,7 +40,7 @@ export class FilterService {
     let chips: any[] = [];
     Object.keys(form.controls).forEach(key => {
       const val = form.controls[key].value;
-      if (!val) return;
+      if (!val || !val.length) return;
       if (filterColumns[key].type === ControlTypes.Multiselect) {
         val.forEach((item: any) => {
           chips.push({

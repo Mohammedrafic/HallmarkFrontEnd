@@ -68,8 +68,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     return this.form.get('endDate');
   }
 
-  get isDeployedAndAgency(): boolean {
-    return this.isAgency && !!this.candidate.deployedCandidateInfo
+  get isAccepted(): boolean {
+    return this.candidate.status === ApplicantStatusEnum.Accepted;
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -107,7 +107,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public onRejectCandidate(event: {rejectReason: number}): void {
     this.isRejected = true;
 
-    if(this.candidateJob) {
+    if (this.candidateJob) {
       const payload = {
         organizationId: this.candidateJob.organizationId,
         jobId: this.candidateJob.jobId,
@@ -115,12 +115,13 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       };
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
-      this.form.patchValue({rejectReason: value})
-      this.store.dispatch( new RejectCandidateJob(payload))
+      this.form.patchValue({ rejectReason: value });
+      this.store.dispatch( new RejectCandidateJob(payload));
+      this.closeDialog();
     }
   }
 
-  public onClose() {
+  public closeDialog() {
     this.closeModalEvent.emit();
     this.candidateJob = null;
     this.jobStatusControl.reset();
@@ -147,10 +148,12 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
         clockId: value.clockId,
         guaranteedWorkWeek: value.workWeek,
         allowDeplayWoCredentials: value.allow,
-        billRates: this.billRatesData
+        billRates: this.billRatesData,
+        offeredStartDate: this.candidateJob.offeredStartDate
       })).subscribe(() => {
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
       });
+      this.closeDialog();
     }
   }
 
@@ -166,7 +169,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
           candidates: `${value.candidateProfile.lastName} ${value.candidateProfile.firstName}`,
           candidateBillRate: value.candidateBillRate,
           locationName: value.order.locationName,
-          avStartDate: this.getAvailableStartDate(value.availableStartDate),
+          avStartDate: this.getDateString(value.availableStartDate),
           yearExp: value.yearsOfExperience,
           travelExp: value.expAsTravelers,
           comments: value.requestComment,
@@ -176,7 +179,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
           allow: value.allowDeployCredentials,
           startDate: value.actualStartDate ? value.actualStartDate : value.order.jobStartDate,
           endDate: value.actualEndDate ? value.actualEndDate : value.order.jobEndDate,
-          rejectReason: value.rejectReason
+          rejectReason: value.rejectReason,
+          offeredStartDate: this.getDateString(value.offeredStartDate)
         });
 
         this.isFormDisabled(value.applicantStatus.applicantStatus);
@@ -184,7 +188,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     });
   }
 
-  private  getAvailableStartDate(date: string): string | null {
+  private  getDateString(date: string): string | null {
     return this.datePipe.transform(date, 'MM/dd/yyyy');
   }
 
@@ -264,7 +268,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       allow: new FormControl(false),
       startDate: new FormControl(''),
       endDate: new FormControl(''),
-      rejectReason: new FormControl('')
+      rejectReason: new FormControl(''),
+      offeredStartDate: new FormControl('')
     });
 
     this.jobStatusControl = new FormControl('');

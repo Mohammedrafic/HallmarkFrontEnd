@@ -51,7 +51,10 @@ import {
   SavePartnershipSettings,
   GetBusinessUnitList,
   RemoveAgencyLogo,
+  ExportAgencyList,
 } from './agency.actions';
+import { AdminStateModel } from '@admin/store/admin.state';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 
 export interface AgencyStateModel {
   isAgencyLoading: boolean;
@@ -64,7 +67,7 @@ export interface AgencyStateModel {
   feeExceptionsInitialData: FeeExceptionsInitialData | null;
   jobDistributionInitialData: JobDistributionInitialData | null;
   partnershipSettings: PartnershipSettings | null;
-  businessUnits: BusinessUnit[],
+  businessUnits: BusinessUnit[];
 }
 
 @State<AgencyStateModel>({
@@ -104,8 +107,10 @@ export class AgencyState {
 
   @Selector()
   static organizations(state: AgencyStateModel): Organization[] {
-    const existOrg = state.associateOrganizationsPages.items.map(({organizationId}) => organizationId);
-    return state.organizations?.items.filter(({ organizationId }) => !existOrg.includes(organizationId as number)) || [];
+    const existOrg = state.associateOrganizationsPages.items.map(({ organizationId }) => organizationId);
+    return (
+      state.organizations?.items.filter(({ organizationId }) => !existOrg.includes(organizationId as number)) || []
+    );
   }
 
   @Selector()
@@ -114,7 +119,9 @@ export class AgencyState {
   }
 
   @Selector()
-  static associateOrganizationsPages(state: AgencyStateModel): AssociateOrganizationsPage| { items: AssociateOrganizationsPage['items'] } {
+  static associateOrganizationsPages(
+    state: AgencyStateModel
+  ): AssociateOrganizationsPage | { items: AssociateOrganizationsPage['items'] } {
     return state.associateOrganizationsPages;
   }
 
@@ -226,7 +233,10 @@ export class AgencyState {
   }
 
   @Action(GetAgencyByPage)
-  GetAgencyByPage({ patchState }: StateContext<AgencyStateModel>, { pageNumber, pageSize }: GetAgencyByPage): Observable<AgencyPage> {
+  GetAgencyByPage(
+    { patchState }: StateContext<AgencyStateModel>,
+    { pageNumber, pageSize }: GetAgencyByPage
+  ): Observable<AgencyPage> {
     patchState({ isAgencyLoading: true });
     return this.agencyService.getAgencies(pageNumber, pageSize).pipe(
       tap((payload) => {
@@ -237,7 +247,10 @@ export class AgencyState {
   }
 
   @Action(GetAgencyById)
-  GetAgencyById({ patchState, dispatch }: StateContext<AgencyStateModel>, { payload }: GetAgencyById): Observable<Agency> {
+  GetAgencyById(
+    { patchState, dispatch }: StateContext<AgencyStateModel>,
+    { payload }: GetAgencyById
+  ): Observable<Agency> {
     patchState({ isAgencyLoading: true });
     return this.agencyService.getAgencyById(payload).pipe(
       tap((payload) => {
@@ -263,7 +276,10 @@ export class AgencyState {
   }
 
   @Action(UploadAgencyLogo)
-  UploadOrganizationLogo({ patchState }: StateContext<AgencyStateModel>, { file, businessUnitId }: UploadAgencyLogo): Observable<any> {
+  UploadOrganizationLogo(
+    { patchState }: StateContext<AgencyStateModel>,
+    { file, businessUnitId }: UploadAgencyLogo
+  ): Observable<any> {
     patchState({ isAgencyLoading: true });
     return this.agencyService.saveAgencyLogo(file, businessUnitId).pipe(
       tap((payload) => {
@@ -290,7 +306,6 @@ export class AgencyState {
       catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Logo cannot be deleted'))))
     );
   }
-
 
   @Action(ClearAgencyEditStore)
   ClearAgencyEditStore({ patchState }: StateContext<AgencyStateModel>): void {
@@ -411,7 +426,7 @@ export class AgencyState {
           baseFee,
         };
         patchState({ feeSettings });
-        dispatch(new UpdateAssociateOrganizationsPage())
+        dispatch(new UpdateAssociateOrganizationsPage());
         dispatch(new ShowToast(MessageTypes.Success, RECORD_SAVED));
       })
     );
@@ -439,10 +454,25 @@ export class AgencyState {
   }
 
   @Action(GetBusinessUnitList)
-  GetBusinessUnitList({ patchState }: StateContext<AgencyStateModel>, { }: GetBusinessUnitList): Observable<BusinessUnit[]> {
-    return this.organizationService.getBusinessUnit().pipe(tap((payload) => {
-      patchState({ businessUnits: payload});
-      return payload;
-    }));
+  GetBusinessUnitList(
+    { patchState }: StateContext<AgencyStateModel>,
+    {}: GetBusinessUnitList
+  ): Observable<BusinessUnit[]> {
+    return this.organizationService.getBusinessUnit().pipe(
+      tap((payload) => {
+        patchState({ businessUnits: payload });
+        return payload;
+      })
+    );
+  }
+
+  @Action(ExportAgencyList)
+  ExportAgencyList({}: StateContext<AdminStateModel>, { payload }: ExportAgencyList): Observable<Blob> {
+    return this.agencyService.export(payload).pipe(
+      tap((file: Blob) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      })
+    );
   }
 }

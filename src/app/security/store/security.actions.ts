@@ -1,7 +1,8 @@
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Role, RoleDTO } from '@shared/models/roles.model';
-import { User, UserDTO } from "@shared/models/user-managment-page.model";
-import { UserVisibilitySettingBody } from "@shared/models/visibility-settings.model";
+import { User, UserDTO } from '@shared/models/user-managment-page.model';
+import { UserVisibilitySettingBody } from '@shared/models/visibility-settings.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 export class GetBusinessByUnitType {
   static readonly type = '[security] Get Business By Unit Type';
@@ -20,11 +21,7 @@ export class GetRolesPage {
 
 export class GetRolePerUser {
   static readonly type = '[security] Get Roles Per User';
-  constructor(
-    public businessUnitType: BusinessUnitType,
-    public businessUnitId: number,
-  ) {
-  }
+  constructor(public businessUnitType: BusinessUnitType, public businessUnitId: number) {}
 }
 
 export class GetUsersPage {
@@ -109,5 +106,10 @@ export class RemoveUserVisibilitySettingSucceeded {
 
 export class GetOrganizationsStructureAll {
   static readonly type = '[security] Get Organizations Structure All';
-  constructor(public userId: string) { }
+  constructor(public userId: string) {}
+}
+
+export class ExportUserList {
+  static readonly type = '[security] Export User List';
+  constructor(public payload: ExportPayload) {}
 }

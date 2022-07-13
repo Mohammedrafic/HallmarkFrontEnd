@@ -54,8 +54,8 @@ export class OrderManagementFilter {
 export type OrderManagementPage = PageOfCollections<OrderManagement>;
 
 export type AgencyOrderManagement = {
-  // TODO: modification pending
   orderId: number;
+  reOrderId?: number; // TODO: verify name after BE implementation
   statusText: string;
   status: OrderStatus;
   jobTitle: string;
@@ -63,11 +63,15 @@ export type AgencyOrderManagement = {
   location: string;
   numberOfPositions: number;
   department: string;
+  agencyName?: string[]; // TODO: verify name after BE implementation
+  shiftStartTime?: string; // TODO: verify name after BE implementation
+  shiftEndTime?: string; // TODO: verify name after BE implementation
   orderType: OrderType;
   billRate: number;
   candidatesCount: number;
   isLocked: boolean;
   jobStartDate: string;
+  reOrderDate?: string; // TODO: verify name after BE implementation
   organizationId: number;
   organizationName: string;
   children: OrderManagementChild[];
@@ -119,8 +123,11 @@ export type AgencyOrderFilters = {
   locationIds?: number[];
   departmentsIds?: number[];
   orderId?: number;
+  reOrderId?: number; // TODO: verify name after BE implementation
   skillIds?: number[];
   candidateStatuses?: number[];
+  candidatesCountFrom?: number; // TODO: verify name after BE implementation
+  candidatesCountTo?: number; // TODO: verify name after BE implementation
   organizationIds?: number[];
   orderTypes?: number[];
   orderStatuses?: number[];
@@ -130,6 +137,7 @@ export type AgencyOrderFilters = {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
+  reOrderDate?: Date; // TODO: verify name after BE implementation
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -251,6 +259,7 @@ export type AcceptJobDTO = {
   organizationId: number;
   requestComment: string;
   billRates: BillRate[];
+  offeredStartDate: string;
 };
 
 export type CandidateProfile = {
@@ -305,7 +314,33 @@ export type OrderCandidateJob = {
   positionId: number;
   allowDeployCredentials: boolean;
   hasAllRequiredOnboardedCredentials: boolean;
+  offeredStartDate: string;
 };
+
+export type CandidatesBasicInfo = {
+  jobId: number;
+  organizationId: number;
+  organizationName: string;
+  orderId: number;
+  candidateProfileId: number;
+  positionId: number;
+  billRatesGroupId: number;
+  workflowStepId: number;
+  candidateBillRate: number;
+  offeredBillRate: number;
+  expAsTravelers: number;
+  onBoardDate: string;
+  availableStartDate: string;
+  requestComment: string;
+  rejectDate: string;
+  rejectBy: string;
+  rejectReasonId: number;
+  allowDeployCredentials: boolean;
+  actualStartDate: string;
+  actualEndDate: string;
+  clockId: string;
+  guaranteedWorkWeek: string;
+}
 
 export type ApplicantStatus = {
   applicantStatus: number;

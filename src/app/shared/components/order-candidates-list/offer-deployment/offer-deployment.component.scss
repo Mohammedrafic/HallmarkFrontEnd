@@ -12,9 +12,26 @@
     }
   }
 
+  .deploy-candidate-wrapper {
+    display: flex;
+    flex-direction: row;
+
+    @media(max-width: 2500px) {
+      flex-direction: column;
+      .candidate-title {
+        white-space: nowrap;
+      }
+    }
+
+    .icon {
+      color: $primary-active-blue;
+    }
+  }
+
   .content-container {
     display: flex;
     margin-top: 24px;
+
 
     .job-details {
       margin-right: 12px;
@@ -23,6 +40,10 @@
       .input-container, .dropdown-container, .datepicker-container {
         margin-bottom: 12px;
         flex: 1 1 0px;
+
+        label {
+          white-space: nowrap;
+        }
       }
 
       .input-group.input-readonly {

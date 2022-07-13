@@ -4,6 +4,12 @@
   </ng-container>
   <ng-container right>
     <button ejs-button cssClass="e-outline">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+    <button
+      ejs-dropdownbutton
+      [items]="exportOptions"
+      (select)="exportSelected($event)"
+      id="importButton"
+      cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
     <button ejs-button [isPrimary]="true" (click)="navigateToAgencyForm()">Add Agency</button>
   </ng-container>
 </app-page-toolbar>
@@ -12,7 +18,6 @@
   <ejs-grid #grid
             [dataSource]="(agencies$ | async)?.items"
             [allowPaging]="allowPaging"
-            [allowSelection]="false"
             [pageSettings]="pageSettings"
             [height]="gridHeight"
             [rowHeight]="rowHeight"
@@ -21,8 +26,14 @@
             [sortSettings]="initialSort"
             [allowSorting]="allowSorting"
             [allowResizing]="allowResizing"
-            (dataBound)="dataBound()">
+            (dataBound)="dataBound()"
+            (rowSelected)="rowSelected($event, grid)"
+            (rowDeselected)="rowDeselected($event, grid)"
+            [selectionSettings]="selectionSettings"
+            (actionBegin)="actionBegin($event)"
+    >
     <e-columns>
+      <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="40"></e-column>
       <e-column field="agencyDetails.name" headerText="AGENCY NAME" width=400></e-column>
       <e-column field="agencyDetails.status" headerText="AGENCY STATUS" width=200>
         <ng-template #template let-data>
@@ -89,3 +100,5 @@
     </ng-template>
   </ejs-grid>
 </section>
+
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>

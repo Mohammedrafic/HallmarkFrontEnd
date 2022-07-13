@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { Agency, AgencyPage } from 'src/app/shared/models/agency.model';
+import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,7 @@ export class AgencyService {
    * @return list of agencies
    */
   public getAgencies(pageNumber: number, pageSize: number): Observable<AgencyPage> {
-    return this.http.get<AgencyPage>(`/api/agency`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+    return this.http.get<AgencyPage>(`/api/agency`, { params: { PageNumber: pageNumber, PageSize: pageSize } });
   }
 
   /**
@@ -35,7 +36,9 @@ export class AgencyService {
    * @return Created/Updated agency
    */
   public saveAgency(agency: Agency): Observable<Agency> {
-    return agency.agencyDetails.id ? this.http.put<Agency>(`/api/agency`, agency) : this.http.post<Agency>(`/api/agency`, agency);
+    return agency.agencyDetails.id
+      ? this.http.put<Agency>(`/api/agency`, agency)
+      : this.http.post<Agency>(`/api/agency`, agency);
   }
 
   /**
@@ -58,5 +61,13 @@ export class AgencyService {
    */
   public removeAgencyLogo(businessUnitId: number): Observable<never> {
     return this.http.delete<never>(`/api/BusinessUnit/${businessUnitId}/logo`);
+  }
+
+  /**
+   * Export agency list
+   * @param payload
+   */
+  public export(payload: ExportPayload): Observable<Blob> {
+    return this.http.post(`/api/Agency/export`, payload, { responseType: 'blob' });
   }
 }
