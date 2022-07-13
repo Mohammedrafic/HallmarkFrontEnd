@@ -253,7 +253,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filters.billRateTo ? this.filters.billRateTo : null;
     this.filters.pageNumber = this.currentPage;
     this.filters.agencyType = this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) : null;
-    this.pageSize = this.pageSize;
+    this.filters.pageSize = this.pageSize;
 
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
