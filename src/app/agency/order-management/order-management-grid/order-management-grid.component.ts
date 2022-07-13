@@ -21,6 +21,7 @@ import {
   myAgencyColumnsToExport,
   MyAgencyOrdersColumnsConfig,
   PerDiemColumnsConfig,
+  perDiemColumnsToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
   ROW_HEIGHT,
@@ -199,6 +200,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         break;
       case AgencyOrderManagementTabs.PerDiem:
         // TODO: pending BE
+        this.columnsToExport = perDiemColumnsToExport;
         this.filters.orderTypes = [OrderType.OpenPerDiem];
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;

@@ -436,6 +436,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public tabSelected(tabIndex: OrganizationOrderManagementTabs): void {
     this.activeTab = tabIndex;
     this.currentPage = 1;
+    this.filters = {};
 
     switch (tabIndex) {
       case OrganizationOrderManagementTabs.AllOrders:

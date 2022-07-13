@@ -42,6 +42,18 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text:'Agency', column: 'AgencyName'},
 ];
 
+export const perDiemColumnsToExport: ExportColumn[] = [
+  { text:'Order ID', column: 'OrderId'},
+  { text:'Status', column: 'Status'},
+  { text:'Job Title', column: 'JobTitle'},
+  { text:'Organization', column: 'OrganizationName' },
+  { text:'Candidates', column: 'CandidatesCount'},
+  { text:'Skill', column: 'Skill'},
+  { text:'Location', column: 'LocationName'},
+  { text:'Department', column: 'DepartmentName'},
+  { text:'# of Shifts Next 90 Days', column: 'ShiftCount'},
+];
+
 export const ReOrdersColumnsConfig: GridColumn[] = [
   {
     fieldName: 'reOrderId',
