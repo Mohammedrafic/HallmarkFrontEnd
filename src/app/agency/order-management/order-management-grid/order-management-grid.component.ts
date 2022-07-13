@@ -40,8 +40,8 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import {
   AgencyOrderFilters,
   AgencyOrderManagement,
-  AgencyOrderManagementPage,
-  OrderManagementChild
+  AgencyOrderManagementPage, OrderManagement,
+  OrderManagementChild, OrderManagementPage
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -97,6 +97,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public columnsToExport: ExportColumn[];
   public fileName: string;
   public defaultFileName: string;
+  public isRowScaleUp: boolean = true;
+  public isSubrowDisplay: boolean = false;
+  public ordersPage: AgencyOrderManagementPage;
 
   private statusSortDerection: SortDirection = 'Ascending';
   private isAlive = true;
@@ -131,6 +134,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.OrderFilterFormGroup.controls['jobTitle'].setValue('');
         this.onFilterApply();
       }
+    });
+    this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
+      this.ordersPage = data
     });
   }
 
@@ -193,6 +199,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
       this.dispatchNewPage();
+      this.isSubrowDisplay = false
     }
   }
 
@@ -276,10 +283,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onRowScaleUpClick(): void {
+    this.isRowScaleUp = false;
     this.rowHeight = ROW_HEIGHT.SCALE_UP_HEIGHT;
   }
 
   public onRowScaleDownClick(): void {
+    this.isRowScaleUp = true;
     this.rowHeight = ROW_HEIGHT.SCALE_DOWN_HEIGHT;
   }
 
@@ -300,6 +309,18 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.store.dispatch(new GetOrderById(order.orderId, order.organizationId, options));
     this.openChildDialog.next([order, candidat]);
     this.selectedIndex = null;
+  }
+
+  public expandAll(): void {
+    this.isSubrowDisplay = true
+    this.ordersPage.items.forEach((item: AgencyOrderManagement, index: number): void => {
+      super.onSubrowAllToggle(index + 1)
+    })
+  }
+
+  public collapseAll(): void {
+    this.isSubrowDisplay = false
+    super.onSubrowAllToggle()
   }
 
   // Filter

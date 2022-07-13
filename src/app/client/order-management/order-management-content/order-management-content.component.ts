@@ -429,6 +429,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
+      this.isSubrowDisplay = false
     }
   }
 
