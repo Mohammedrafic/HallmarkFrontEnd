@@ -62,7 +62,7 @@
 */
 export const protectedResources = {
  todoListApi: {
-   endpoint: 'http://localhost:44351/api/todolist',
+   endpoint: '%%API_ENDPOINT_URL%%',
    scopes: ['https://HHCSDev.onmicrosoft.com/E2DevAPI/API.Access.User'],
  },
 }
