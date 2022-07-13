@@ -2,7 +2,8 @@ export enum OrderType {
   ContractToPerm,
   OpenPerDiem,
   PermPlacement,
-  Traveler
+  Traveler,
+  ReOrder = 10
 }
 
 export const OrderTypeOptions = [

@@ -33,7 +33,6 @@ import {
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
   GetAgencyOrdersPage,
-  GetAgencyReOrdersPage,
   GetCandidateJob,
   GetCandidatesBasicInfo,
   GetOrderApplicantsData,
@@ -194,15 +193,6 @@ export class OrderManagementState {
         return payload;
       })
     );
-  }
-
-  @Action(GetAgencyReOrdersPage)
-  GetAgencyReOrdersPage({ patchState }: StateContext<OrderManagementModel>, { pageNumber, pageSize, filters }: GetAgencyReOrdersPage): Observable<AgencyOrderManagementPage> {
-    return this.orderManagementContentService.getAgencyReOrders(pageNumber, pageSize, filters)
-      .pipe(tap((payload) => {
-        patchState({ ordersPage: payload });
-        return payload;
-      }));
   }
 
   @Action(GetAgencyOrderCandidatesList)

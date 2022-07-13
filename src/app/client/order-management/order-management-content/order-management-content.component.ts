@@ -19,7 +19,6 @@ import {
   GetOrderById,
   GetOrderFIlterDataSources,
   GetOrders,
-  GetReOrders,
   ReloadOrganisationOrderCandidatesLists
 } from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -37,14 +36,13 @@ import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { Skill } from '@shared/models/skill.model';
 import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
-import { OrderTypeOptions } from '@shared/enums/order-type';
+import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { DatePipe, Location } from '@angular/common';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import {
   AllOrdersColumnsConfig,
   allOrdersColumnsToExport,
   MoreMenuType,
-  OrderType,
   OrderTypeName,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
@@ -132,7 +130,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public previousSelectedOrderId: number | null;
   public selectedCandidat: any | null;
   public openChildDialog = new Subject<any>();
-  public isReOrdersTab = false;
   public isRowScaleUp: boolean = true;
   public isSubrowDisplay: boolean = false;
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
@@ -267,11 +264,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.ReOrders:
+        this.filters.orderTypes = [OrderType.ReOrder];
         this.columnsToExport = reOrdersColumnsToExport;
-        // TODO: remove after BE implementation
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
-        // TODO: uncomment after BE implementation
-        // this.store.dispatch(new GetReOrders(this.filters));
         break;
       case OrganizationOrderManagementTabs.Incomplete:
         this.columnsToExport = allOrdersColumnsToExport;

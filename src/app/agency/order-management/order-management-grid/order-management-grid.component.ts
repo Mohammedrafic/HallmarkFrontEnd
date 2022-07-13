@@ -206,6 +206,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         break;
       case AgencyOrderManagementTabs.ReOrders:
         this.columnsToExport = reOrdersColumnsToExport;
+        this.filters.orderTypes = [OrderType.ReOrder];
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       default:

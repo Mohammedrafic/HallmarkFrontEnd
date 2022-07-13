@@ -48,17 +48,10 @@ export class OrderManagementContentService {
   }
 
   /**
-   * Get the re-orders
-   @param payload filter with details we need to get
-   */
-  public getReOrders(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
-    return this.http.post<OrderManagementPage>(`/api/Orders/ReOrders`, payload); // TODO: modification pending after BE implementation
-  }
-
-  /**
    * Get the agency orders
    @param pageNumber
    @param pageSize
+   @param filters
    */
   public getAgencyOrders(
     pageNumber: number,
@@ -66,20 +59,6 @@ export class OrderManagementContentService {
     filters: AgencyOrderFilters
   ): Observable<AgencyOrderManagementPage> {
     return this.http.post<AgencyOrderManagementPage>(`/api/Agency/Orders`, { pageNumber, pageSize, ...filters });
-  }
-
-  /**
-   * Get the agency re-orders
-   @param pageNumber
-   @param pageSize
-   @param filters
-   */
-  public getAgencyReOrders(
-    pageNumber: number,
-    pageSize: number,
-    filters: AgencyOrderFilters
-  ): Observable<AgencyOrderManagementPage> {
-    return this.http.post<AgencyOrderManagementPage>(`/api/Agency/ReOrders`, { pageNumber, pageSize, ...filters }); // TODO: modification pending after BE implementation
   }
 
   /**
