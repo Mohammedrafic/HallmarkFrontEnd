@@ -15,7 +15,7 @@ pool:
   # vmImage: ubuntu-latest
   name: prduse2
   demands:
-    - agent.name -equals softserve
+    - agent.name -equals 3Cloud
 
 resources: 
 - repo: self
