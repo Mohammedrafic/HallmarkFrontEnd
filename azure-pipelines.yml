@@ -15,7 +15,7 @@ pool:
   # vmImage: ubuntu-latest
   name: prduse2
   demands:
-    - agent.name -equals 3Cloud
+    - agent.name -equals softserve
 
 resources: 
 - repo: self
@@ -89,7 +89,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: 'helm package $(Build.SourcesDirectory)/helm --app-version=$(buildId)$(imageVersionIdentifier) -d $(Build.ArtifactStagingDirectory)/helm'
-    
+
 - task: PublishBuildArtifacts@1
   displayName: publish helm package
   inputs:
