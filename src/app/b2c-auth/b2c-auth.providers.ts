@@ -31,9 +31,8 @@ export function MSALInstanceFactory(): IPublicClientApplication {
  * added to protectedResourceMap. For more info, visit:
  * https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-angular/docs/v2-docs/initialization.md#get-tokens-for-web-api-calls
  */
-export function MSALInterceptorConfigFactory(injector: Injector): MsalInterceptorConfiguration {
+export function MSALInterceptorConfigFactory(appSettings: AppSettings): MsalInterceptorConfiguration {
   const protectedResourceMap = new Map<string, Array<string>>();
-  const appSettings = injector.get(APP_SETTINGS);
   protectedResourceMap.set(appSettings.API_BASE_URL, protectedResources.api.scopes);
 
   return {
@@ -70,7 +69,7 @@ export const MSAL_PROVIDERS: Provider[] = [
   {
     provide: MSAL_INTERCEPTOR_CONFIG,
     useFactory: MSALInterceptorConfigFactory,
-    deps: [Injector]
+    deps: [APP_SETTINGS]
   },
   MsalService,
   MsalGuard,
