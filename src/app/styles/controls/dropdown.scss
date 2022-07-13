@@ -76,6 +76,12 @@ body.light, body.dark {
       }
     }
   }
+
+  ejs-multiselect {
+    .e-searcher {
+      display: none !important;
+    }
+  }
 }
 
 /** Begin organization-agency-dropdown styles */
