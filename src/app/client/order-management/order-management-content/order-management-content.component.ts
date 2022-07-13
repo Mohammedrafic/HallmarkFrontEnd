@@ -297,7 +297,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
       skillIds: this.filters.skillIds || [],
-      orderTypes: this.activeTab === OrganizationOrderManagementTabs.PerDiem ? [] : this.filters.orderTypes || [],
+      orderTypes: this.activeTab === OrganizationOrderManagementTabs.PerDiem
+        || this.activeTab === OrganizationOrderManagementTabs.ReOrders ? [] : this.filters.orderTypes || [],
       jobTitle: this.filters.jobTitle || null,
       billRateFrom: this.filters.billRateFrom || null,
       billRateTo: this.filters.billRateTo || null,
@@ -581,6 +582,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private orderFilterColumnsSetup(): void {
     this.filterColumns = {
       orderId: { type: ControlTypes.Text, valueType: ValueType.Text },
+      reOrderId: { type: ControlTypes.Text, valueType: ValueType.Text },
       regionIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       departmentsIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
@@ -592,6 +594,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       openPositions: { type: ControlTypes.Text, valueType: ValueType.Text },
       jobStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       jobEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+      reOrderDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       orderStatuses: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'statusText', valueId: 'status' },
       candidateStatuses: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'statusText', valueId: 'status' },
       candidatesCountFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
