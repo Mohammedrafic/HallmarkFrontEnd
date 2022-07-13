@@ -61,8 +61,8 @@
 * https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-browser/docs/resources-and-scopes.md
 */
 export const protectedResources = {
- todoListApi: {
-   endpoint: '%%API_ENDPOINT_URL%%',
+ api: {
+   endpoint: 'https://dev.einstein2.com/einsteinapi',
    scopes: ['https://HHCSDev.onmicrosoft.com/E2DevAPI/API.Access.User'],
  },
 }

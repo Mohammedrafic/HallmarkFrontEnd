@@ -1,4 +1,4 @@
-import { Provider } from '@angular/core';
+import { Injector, Provider } from '@angular/core';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import {
@@ -15,6 +15,7 @@ import {
 import { InteractionType, IPublicClientApplication, PublicClientApplication } from '@azure/msal-browser';
 
 import { msalConfig, loginRequest, protectedResources } from './auth-config';
+import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 
 /**
  * Here we pass the configuration parameters to create an MSAL instance.
@@ -30,10 +31,10 @@ export function MSALInstanceFactory(): IPublicClientApplication {
  * added to protectedResourceMap. For more info, visit:
  * https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-angular/docs/v2-docs/initialization.md#get-tokens-for-web-api-calls
  */
-export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
+export function MSALInterceptorConfigFactory(injector: Injector): MsalInterceptorConfiguration {
   const protectedResourceMap = new Map<string, Array<string>>();
-
-  protectedResourceMap.set(protectedResources.todoListApi.endpoint, protectedResources.todoListApi.scopes);
+  const appSettings = injector.get(APP_SETTINGS);
+  protectedResourceMap.set(appSettings.API_BASE_URL, protectedResources.api.scopes);
 
   return {
     interactionType: InteractionType.Popup,
@@ -69,6 +70,7 @@ export const MSAL_PROVIDERS: Provider[] = [
   {
     provide: MSAL_INTERCEPTOR_CONFIG,
     useFactory: MSALInterceptorConfigFactory,
+    deps: [Injector]
   },
   MsalService,
   MsalGuard,

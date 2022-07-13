@@ -69,9 +69,9 @@ export class LoginPageComponent extends DestroyableDirective implements OnInit, 
       .onLoginSuccess()
       .pipe(
         takeUntil(this.destroy$),
-        mergeMap(() => this.usersService.getUser()),
-        mergeMap((user) => this.store.dispatch(new SetCurrentUser(user))),
-        tap(() => this.router.navigate(['/']))
+        // mergeMap(() => this.usersService.getUser()),
+        // mergeMap((user) => this.store.dispatch(new SetCurrentUser(user))),
+        // tap(() => this.router.navigate(['/']))
       )
       .subscribe();
   }
