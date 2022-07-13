@@ -1,6 +1,8 @@
 <app-grid
   (navigateToPageEmitter)="onGoToClick($event)"
   (pageSizeChangeEmitter)="onRowsDropDownChanged($event)"
+  (approveEmitter)="bulkApprove($event)"
+  (exportEmitter)="bulkExport($event)"
   (gridSelectedRow)="selectedRow($event)"
   [suppressRowClickSelection]="false"
   [rowSelection]="rowSelection"
@@ -10,5 +12,7 @@
   [pageSize]="pageSize"
   [rowData]="tableData?.items"
   [totalRecordsCount]="tableData?.totalCount || 0"
-  [changeTableSelectedIndex]="newSelectedIndex">
+  [changeTableSelectedIndex]="newSelectedIndex"
+  [allowBulkSelection]="true"
+>
 </app-grid>

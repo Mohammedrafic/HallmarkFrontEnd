@@ -40,7 +40,7 @@ export class TimesheetsApiService {
     return of({
       pageNumber: 1,
       totalPages: 1,
-      totalCount: 1,
+      totalCount: 2,
       items: [MokTimesheet, MokTimesheet1],
       hasNextPage: false,
       hasPreviousPage: false,

@@ -29,9 +29,9 @@ export const exportOptions: ItemModel[] = [
 ];
 
 export const MokTabsCounts: TabCountConfig = {
-  pending: 1,
-  missing: 4,
-  rejected: 7,
+  pending: 0,
+  missing: 0,
+  rejected: 0,
 };
 
 export const MokTimesheet: Timesheet = {

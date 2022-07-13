@@ -1,6 +1,7 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
+import { ColDef } from '@ag-grid-community/core';
 
 import { TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../enums';
 import { FilterColumns, FilterDataSource, TimesheetsFilterState } from '../interface';
@@ -10,6 +11,12 @@ import {
 import { GridValuesHelper } from '../helpers/grid-values.helper';
 
 const valueHelper = new GridValuesHelper();
+
+const commonColumn: ColDef = {
+  filter: true,
+  sortable: true,
+  resizable: true,
+}
 
 export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionModel[] => {
   return [
@@ -21,6 +28,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       headerCheckboxSelection: true,
       headerCheckboxSelectionFilteredOnly: true,
       checkboxSelection: true,
+      ...commonColumn,
     },
     {
       field: TimesheetsTableColumns.Name,
@@ -28,7 +36,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       width: 158,
       minWidth: 158,
       cellClass: 'name',
-      filter: true,
+      ...commonColumn,
     },
     {
       field: TimesheetsTableColumns.StatusText,
@@ -37,7 +45,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       minWidth: 170,
       cellRenderer: TimesheetTableStatusCellComponent,
       cellClass: 'status-cell',
-      filter: true,
+      ...commonColumn,
     },
     {
       field: TimesheetsTableColumns.OrderId,
@@ -45,14 +53,14 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       width: 140,
       minWidth: 140,
       cellClass: 'name',
-      filter: true,
+      ...commonColumn,
     },
     {
       field: TimesheetsTableColumns.Skill,
       headerName: 'SKILL',
       width: 270,
       minWidth: 270,
-      filter: true,
+      ...commonColumn,
     },
     {
       field: TimesheetsTableColumns.Location,
@@ -60,7 +68,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       width: 200,
       minWidth: 200,
       wrapText: true,
-      filter: true,
+      ...commonColumn,
     },
     {
       field: TimesheetsTableColumns.StartDate,
@@ -68,7 +76,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       width: 240,
       minWidth: 240,
       cellClass: 'bold',
-      filter: true,
+      ...commonColumn,
       valueFormatter: (params: any) => valueHelper.formatDate(params.value, 'W - ccc M/d/yy'),
     },
     {
@@ -77,7 +85,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       width: 264,
       minWidth: 264,
       wrapText: true,
-      filter: true,
+      ...commonColumn,
     },
     {
       field: TimesheetsTableColumns.BillRate,
@@ -91,7 +99,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       width: 164,
       minWidth: 164,
       wrapText: true,
-      filter: true,
+      ...commonColumn,
     },
     {
       field: TimesheetsTableColumns.TotalDays,

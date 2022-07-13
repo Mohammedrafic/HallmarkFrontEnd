@@ -12,6 +12,7 @@ import { ColumnDefinitionModel } from '@shared/components/grid/models/column-def
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { TimesheetsSelectedRowEvent } from '../../interface';
 import { TimesheetsColumnsDefinition } from '../../constants';
+import { RowNode } from '@ag-grid-community/core';
 
 @Component({
   selector: 'app-timesheets-table',
@@ -54,5 +55,11 @@ export class TimesheetsTableComponent {
 
   public selectedRow(event: TimesheetsSelectedRowEvent): void {
     this.timesheetRowSelected.emit(event);
+  }
+
+  public bulkApprove(event: RowNode[]): void {
+  }
+
+  public bulkExport(event: RowNode[]): void {
   }
 }
