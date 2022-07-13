@@ -13,8 +13,9 @@ trigger:
 
 pool:
   # vmImage: ubuntu-latest
-  demands:
-    - agent.name -equals softserve
+  name: prduse2
+  # demands:
+  #   - agent.name -equals softserve
 
 resources: 
 - repo: self
