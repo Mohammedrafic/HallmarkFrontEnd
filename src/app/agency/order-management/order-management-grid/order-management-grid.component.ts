@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { debounceTime, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
@@ -68,6 +68,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() selectedTab: AgencyOrderManagementTabs;
   @Input() exportButtonClicked: boolean;
   @Input() onExportClicked$: Subject<any>;
+  @Input() search$: Subject<string>;
 
   @ViewChild('grid') override gridWithChildRow: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
@@ -122,6 +123,15 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.onReloadOrderCandidatesLists();
     this.onExportSelectedSubscribe();
     this.idFieldName = 'orderId';
+    this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe((value: string) => {
+      if (value.length >= 2) {
+        this.OrderFilterFormGroup.controls['jobTitle'].setValue(value);
+        this.onFilterApply();
+      } else if (value.length === 0 && this.filters.jobTitle?.length) {
+        this.OrderFilterFormGroup.controls['jobTitle'].setValue('');
+        this.onFilterApply();
+      }
+    });
   }
 
   ngOnDestroy(): void {

@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Subject } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { SearchComponent } from '@shared/components/search/search.component';
 
 @Component({
   selector: 'app-order-management',
@@ -11,10 +12,13 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
   styleUrls: ['./order-management.component.scss'],
 })
 export class OrderManagementComponent extends AbstractGridConfigurationComponent {
+  @ViewChild('search') search: SearchComponent;
+
   public selectedTab: AgencyOrderManagementTabs;
   public selectedTabCases = AgencyOrderManagementTabs;
   public filteredItems$ = new Subject<number>();
   public exportSelected$ = new Subject<any>();
+  public search$ = new Subject<string>();
 
   constructor(private store: Store) {
     super();
@@ -22,6 +26,7 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
   }
 
   public onTabChanged(selectedTab: AgencyOrderManagementTabs): void {
+    this.search?.clear();
     this.selectedTab = selectedTab;
   }
 
@@ -31,5 +36,9 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
 
   public onExportSelected(event: any): void {
     this.exportSelected$.next(event);
+  }
+
+  public searchOrders(event: KeyboardEvent): void {
+    this.search$.next((event.target as HTMLInputElement).value);
   }
 }

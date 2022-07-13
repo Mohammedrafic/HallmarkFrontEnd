@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { debounceTime, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
@@ -53,6 +53,7 @@ import {
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { SearchComponent } from '@shared/components/search/search.component';
 
 @Component({
   selector: 'app-order-management-content',
@@ -62,6 +63,7 @@ import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 })
 export class OrderManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') override gridWithChildRow: GridComponent;
+  @ViewChild('search') search: SearchComponent;
 
   @Select(OrderManagementContentState.ordersPage)
   ordersPage$: Observable<OrderManagementPage>;
@@ -117,6 +119,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
+  private search$ = new Subject();
   private selectedDataRow: Order;
 
   public selectedOrder: Order;
@@ -239,6 +242,17 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.getOrders();
   }
 
+  public searchOrders(event: KeyboardEvent): void {
+    const value = (event.target as HTMLInputElement).value;
+    if (value.length >= 2) {
+      this.OrderFilterFormGroup.controls['jobTitle'].setValue(value);
+      this.search$.next(value);
+    } else if (value.length === 0 && this.filters.jobTitle?.length) {
+      this.OrderFilterFormGroup.controls['jobTitle'].setValue('');
+      this.search$.next(value);
+    }
+  }
+
   private getOrders(): void {
     //this.filters.orderBy = this.orderBy; TODO: pending ordering fix on BE
     this.filters.orderId ? this.filters.orderId : null;
@@ -314,6 +328,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};
+    this.search?.clear();
   }
 
   public onFilterClearAll(): void {
@@ -432,6 +447,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.activeTab = tabIndex;
     this.currentPage = 1;
     this.filters = {};
+    this.search?.clear();
 
     switch (tabIndex) {
       case OrganizationOrderManagementTabs.AllOrders:
@@ -583,6 +599,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       agencyIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       agencyType: { type: ControlTypes.Radio, dataSource: {1: 'Yes', 2: 'No'}, default: '0' },
     }
+    this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe(() => {
+      this.onFilterApply();
+    });
   }
 
   private onOrderFilterDataSourcesLoadHandler(): void {

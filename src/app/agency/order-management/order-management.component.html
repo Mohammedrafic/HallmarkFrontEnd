@@ -4,7 +4,7 @@
   </ng-container>
   <ng-container right>
     <div class="toolbar-actions">
-      <app-search class="search"></app-search>
+      <app-search #search (inputKeyUpEnter)="searchOrders($event)" class="search"></app-search>
       <button
       ejs-button
       id="filterButton"
@@ -31,6 +31,7 @@
         [filteredItems$]="filteredItems$"
         [selectedTab]="selectedTab"
         [onExportClicked$]="exportSelected$"
+        [search$]="search$"
       ></app-order-management-grid>
         <div *ngSwitchCase="selectedTabCases.OtherAgencies">OtherAgencies</div>
         <div *ngSwitchCase="selectedTabCases.AllAgencies">AllAgencies</div>
@@ -40,12 +41,14 @@
         [filteredItems$]="filteredItems$"
         [selectedTab]="selectedTab"
         [onExportClicked$]="exportSelected$"
+        [search$]="search$"
       ></app-order-management-grid>
       <app-order-management-grid
         *ngSwitchCase="selectedTabCases.ReOrders"
         [filteredItems$]="filteredItems$"
         [selectedTab]="selectedTab"
         [onExportClicked$]="exportSelected$"
+        [search$]="search$"
       ></app-order-management-grid>
     </ng-container>
 </section>
