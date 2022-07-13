@@ -50,7 +50,10 @@ steps:
   inputs:
     versionSpec: '16.x'
   displayName: 'Install Node.js'
-
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: 'yarn install --frozen-lockfile'
 - task: Bash@3
   displayName: install yarn packages
   inputs:
