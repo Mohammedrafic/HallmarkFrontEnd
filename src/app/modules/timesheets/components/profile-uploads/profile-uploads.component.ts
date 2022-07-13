@@ -19,6 +19,10 @@ export class ProfileUploadsComponent {
   ) {
   }
 
+  public trackById(_: number, item: TimesheetUploadedFile): number {
+    return item.id;
+  }
+
   public removeFile(item: TimesheetUploadedFile): void {
     this.store.dispatch(new TimesheetDetails.DeleteFile(item.id));
   }
