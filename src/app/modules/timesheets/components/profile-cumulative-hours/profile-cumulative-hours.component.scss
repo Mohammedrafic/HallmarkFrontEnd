@@ -1,11 +1,5 @@
 @import '../../../../styles/variables/colors';
 
-.work-time-title {
-  font-weight: 400;
-  font-size: 8px;
-  color: #999999;
-}
-
 .work-time-value {
   font-weight: 700;
   font-size: 15px;
@@ -110,12 +104,4 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
-  .work-time-value {
-    margin-bottom: 4px;
-  }
-
-  .work-time-title {
-    text-align: center;
-  }
 }

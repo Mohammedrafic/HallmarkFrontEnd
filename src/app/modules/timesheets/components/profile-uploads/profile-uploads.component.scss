@@ -12,25 +12,31 @@
     color: $black;
   }
 
-  table tr {
-    .file-icon, .file-name {
-      color: $primary-active-blue-10;
-    }
+  .uploads-list {
+    display: flex;
+    flex-direction: column;
 
-    td {
-      height: 25px;
-    }
+    .attachment {
+      display: flex;
+      padding-bottom: 5px;
 
-    .file-name {
-      padding-left: 10px;
-      padding-right: 30px;
-    }
-
-    .delete-icon {
-      padding-left: 15px;
-
-      i-feather {
+      .file-icon, .file-name {
+        color: $primary-active-blue-10;
         cursor: pointer;
+      }
+
+      .file-name {
+        padding-left: 10px;
+        margin-right: 30px;
+        flex-grow: 1;
+      }
+
+      .delete-icon {
+        padding-left: 15px;
+
+        i-feather {
+          cursor: pointer;
+        }
       }
     }
   }

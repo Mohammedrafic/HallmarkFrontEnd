@@ -103,6 +103,7 @@ export const CandidateMockInfo: CandidateInfo = {
   startDate: 'Thu Jul 05 2022 12:36:26 GMT+0300',
   endDate: 'Fri Jul 08 2022 12:36:26 GMT+0300',
   unitName: 'Some Agency',
+  rejectReason: null,
 };
 
 export const CostCenterOptions: CostCenterOption[] = [

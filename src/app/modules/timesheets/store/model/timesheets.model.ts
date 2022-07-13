@@ -6,7 +6,7 @@ import {
   TimesheetAttachments,
   TimesheetRecordsDto,
   TimesheetsFilterState,
-  FilterColumns,
+  FilterColumns, TimesheetDetailsInvoice,
 } from '../../interface';
 import { CandidateHoursAndMilesData } from '../../interface';
 
@@ -19,6 +19,7 @@ export interface TimesheetsModel {
   candidateInfo: CandidateInfo | null;
   candidateHoursAndMilesData: CandidateHoursAndMilesData | null;
   candidateAttachments: TimesheetAttachments;
+  candidateInvoices: TimesheetDetailsInvoice[];
   timeSheetRecords: TimesheetRecordsDto;
   costCenterOptions: unknown[];
   billRateTypes: unknown[];

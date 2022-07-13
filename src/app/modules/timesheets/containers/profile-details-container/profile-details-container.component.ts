@@ -2,7 +2,7 @@ import { ActivatedRoute } from '@angular/router';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
-  Component,
+  Component, ElementRef,
   EventEmitter,
   Input,
   OnInit,
@@ -10,10 +10,10 @@ import {
   ViewChild,
 } from '@angular/core';
 
-import { take, filter, Observable, switchMap, takeUntil, tap, throttleTime } from 'rxjs';
+import { take, filter, Observable, switchMap, takeUntil, tap, throttleTime, of } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { UploaderComponent } from "@syncfusion/ej2-angular-inputs";
+import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
+import { SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { Destroyable } from '@core/helpers';
@@ -23,7 +23,7 @@ import { TimesheetsState } from '../../store/state/timesheets.state';
 import {
   CandidateHoursAndMilesData,
   CandidateInfo,
-  DialogActionPayload,
+  DialogActionPayload, TimesheetDetailsInvoice,
   TimesheetRecordsDto,
   TimesheetUploadedFile,
 } from '../../interface';
@@ -36,6 +36,8 @@ import { ExportColumn, ExportPayload } from '@shared/models/export.model';
 import { DatePipe } from '@angular/common';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { FileExtensionsString } from '@core/constants';
+import { FileSize } from '@core/enums';
 
 
 @Component({
@@ -63,6 +65,12 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @ViewChild('dropEl')
   public dropEl: HTMLDivElement;
 
+  @ViewChild('uploadTooltip')
+  public uploadTooltip: TooltipComponent;
+
+  @ViewChild('uploadArea')
+  public uploadArea: ElementRef<HTMLDivElement>;
+
   @Input() currentSelectedRowIndex: number | null = null;
 
   @Input() maxRowIndex: number = 30;
@@ -76,9 +84,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public submitText: string;
 
   public candidateId: number;
-  public fileName: string = '';
 
-  public timesheetId: number;
+  public fileName: string = '';
 
   public readonly columnsToExport: ExportColumn[] = [
     { text:'First Name', column: 'firstName'},
@@ -106,7 +113,12 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @Select(TimesheetsState.timeSheetAttachments)
   public attachments$: Observable<TimesheetUploadedFile[]>;
 
+  @Select(TimesheetsState.timeSheetInvoices)
+  public invoices$: Observable<TimesheetDetailsInvoice[]>;
+
   public readonly exportedFileType: typeof ExportedFileType = ExportedFileType;
+  public readonly allowedFileExtensions: string = FileExtensionsString;
+  public readonly maxFileSize: number = FileSize.MB_10;
 
   constructor(
     private store: Store,
@@ -175,8 +187,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
         if (submitted) {
           this.store.dispatch([
             new Timesheets.ToggleCandidateDialog(DialogAction.Close),
-            new Timesheets.DeleteTimesheet(this.timesheetId),
-          ]);
+            new Timesheets.DeleteTimesheet(this.candidateId),
+          ]).subscribe(() => this.handleProfileClose());
         } else {
           // TODO what's this?
           !submitted && switchComponent.writeValue(false);
@@ -184,30 +196,32 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       });
   }
 
-  public handleReject(): void {
-    this.store.dispatch(TimesheetDetails.RejectTimesheet);
+  public handleReject(reason: string): void {
+    this.store.dispatch(new TimesheetDetails.RejectTimesheet(this.candidateId, reason))
+      .subscribe(() => this.handleProfileClose());
   }
 
   public handleApprove(): void {
-    const id = this.timesheetId;
+    const id = this.candidateId;
     this.store.dispatch(
       this.isAgency ? new TimesheetDetails.AgencySubmitTimesheet(id) :
         new TimesheetDetails.OrganizationApproveTimesheet(id)
-    ).subscribe();
+    ).pipe(
+      tap(() => this.handleProfileClose())
+    );
   }
 
   private getDialogState(): void {
     this.isTimesheetOpen$
     .pipe(
-      tap(({id}) => this.timesheetId = id),
       throttleTime(100),
       filter((data) => data.dialogState),
       tap((data) => { this.candidateId =  data.id }),
       switchMap((data) => this.profileService.getCandidateData(data.id)),
       takeUntil(this.componentDestroy())
       )
-    .subscribe((data) => {
-      data ? this.candidateDialog.show() : this.candidateDialog.hide();
+    .subscribe(() => {
+      this.candidateDialog?.show();
     });
   }
 
@@ -237,6 +251,20 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.store.dispatch(
       new ShowExportDialog(true)
     );
+  }
+
+  public onFilesSelected(event: SelectedEventArgs): void {
+    const blobList: Blob[] = event.filesData.map(file => file.rawFile as Blob);
+    const names: string[] = event.filesData.map(file => file.name);
+
+    this.store.dispatch(new TimesheetDetails.UploadFiles(this.candidateId, blobList, names));
+    this.uploadTooltip?.close();
+  }
+
+  public browse() : void {
+    this.uploadArea.nativeElement
+      ?.getElementsByClassName('e-file-select-wrap')[0]
+      ?.querySelector('button')?.click();
   }
 
   private generateDateTime(datePipe: DatePipe): string {

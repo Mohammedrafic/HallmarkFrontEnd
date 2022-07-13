@@ -36,6 +36,7 @@ export class ProfileTimesheetService {
       this.store.dispatch(new TimesheetDetails.GetCandidateChartData(id)),
       this.store.dispatch(new TimesheetDetails.GetCandidateAttachments(id)),
       this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(id)),
+      this.store.dispatch(new TimesheetDetails.GetCandidateInvoices(id)),
     ]);
   }
 }

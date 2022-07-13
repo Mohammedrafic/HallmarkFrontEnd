@@ -40,37 +40,44 @@
           class="timesheet-details-upload-container"
           #uploadContainer>
 
+<!--            TODO: Remove after resolving issue with date filter. -->
+            <div class="date-filter-mock" style="width: 300px"></div>
+
             <button
              ejs-button
              cssClass="e-outline"
              class="upload-button"
              #uploadBtn
+             (click)="uploadTooltip.open(uploadContainer)"
              >Upload
               <i-feather name="upload" class="icon"></i-feather>
             </button>
 
-            <ejs-tooltip #uploadTooltip [container]="uploadContainer" [showTipPointer]="false"
+            <ejs-tooltip #uploadTooltip
+                         [container]="uploadContainer"
+                         [showTipPointer]="false"
                          opensOn="Custom"
                          position="TopLeft" width="100%">
               <ng-template #content>
                 <div class="file-upload-area-container"
                      appClickOutside
+                     (clickOutside)="uploadTooltip.close()"
                      [exclude]="uploadBtn.element"
                 >
                   <h2>Upload Documents</h2>
-                  <div class="upload-area">
-                    <div class="droparea" #dropEl>
+                  <div class="upload-area" #uploadArea>
+                    <div class="droparea" #dropEl (click)="browse()">
                       <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
                     </div>
-                    <!-- <ejs-uploader #uploader
+                    <ejs-uploader #uploader
                                   [dropArea]="dropEl"
-                                  [allowedExtensions]="allowedExtensions"
+                                  [allowedExtensions]="allowedFileExtensions"
                                   [maxFileSize]="maxFileSize"
-                                  [multiple]="false"
+                                  [multiple]="true"
                                   [autoUpload]="false"
                                   [showFileList]="false"
-                                  (selected)="onFileSelected($event)">
-                    </ejs-uploader> -->
+                                  (selected)="onFilesSelected($event)">
+                    </ejs-uploader>
                   </div>
                 </div>
               </ng-template>
@@ -89,9 +96,12 @@
 
       <div class="order-header" *ngIf="candidateInfo$ | async as candidateInfo">
         <h2 class="order-id">Order ID {{ (candidateInfo$ | async)?.orderId}}</h2>
+        <div class="bootstrap reject-reason-input" *ngIf="candidateInfo?.rejectReason as rejectReason">
+          <div class="e-input input">{{rejectReason}}</div>
+        </div>
 
         <div class="controls-block">
-          <div class="checkbox-block">
+          <div class="checkbox-block" *ngIf="isAgency">
             <ejs-switch #dnwSwitch
               class="toggle"
               [checked]="false"
@@ -131,15 +141,15 @@
 
         <ng-container *ngIf="attachments$ | async as uploads">
           <div class="tile-dark-blue profile-uploads" *ngIf="uploads.length">
-            <app-profile-uploads *ngIf="!uploads"></app-profile-uploads>
+            <app-profile-uploads [uploads]="uploads"></app-profile-uploads>
           </div>
         </ng-container>
 
-       <!-- <ng-container *ngIf="invoices$ | async as invoices">
+       <ng-container *ngIf="invoices$ | async as invoices">
          <div class="tile-dark-blue profile-invoices" *ngIf="invoices.length">
            <app-profile-invoices [invoices]="invoices"></app-profile-invoices>
          </div>
-       </ng-container> -->
+       </ng-container>
       </div>
 
       <section class="profile-table-container">
@@ -169,7 +179,7 @@
 <app-timesheet-reject-reason-dialog
   [(visible)]="rejectReasonDialogVisible"
   [container]="candidateDialog.element"
-  (rejectReasonChange)="handleReject()"
+  (rejectReasonChange)="handleReject($event)"
 ></app-timesheet-reject-reason-dialog>
 
 <app-add-timesheet

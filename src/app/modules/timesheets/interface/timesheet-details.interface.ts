@@ -25,8 +25,10 @@ export interface DialogActionPayload {
 }
 
 export interface TimesheetUploadedFile {
+  id: number;
   name: string;
-  type: string;
+  // TODO: Remove after connection with API
+  blob?: Blob;
 }
 
 export interface CandidateInfo {
@@ -44,6 +46,7 @@ export interface CandidateInfo {
   startDate: string;
   endDate: string;
   unitName: string;
+  rejectReason: string | null;
 }
 
 export interface CostCenterOption {

@@ -6,3 +6,4 @@ export * from './export-option.interface';
 export * from './candidate-info-ui-item.interface';
 export * from './candidate-chart.interface';
 export * from './candidate-hours-and-miles-data.interface';
+export * from './timesheet-details-invoice.interface';
