@@ -1,5 +1,6 @@
 import { ControlTypes } from "@shared/enums/control-types.enum";
-import { OrganizationRegion } from "@shared/models/organization.model";
+import { OrganizationLocation, OrganizationRegion } from "@shared/models/organization.model";
+import { Skill } from "@shared/models/skill.model";
 import { ValueType } from "@syncfusion/ej2-angular-grids";
 
 export interface IFilterColumnsDataModel {
@@ -12,7 +13,7 @@ export interface IFilterColumnsDataModel {
 export interface FilterColumn {
   type: ControlTypes;
   valueType: ValueType;
-  dataSource: OrganizationRegion[] | any[];
+  dataSource: OrganizationRegion[] | OrganizationLocation[] | Skill[];
   valueField: string;
   valueId: string;
 }
