@@ -1,6 +1,6 @@
 export interface DashboardFiltersModel {
-  department: number[];
-  location: number[];
-  region: number[];
-  skill: number[];
+  regionIds?: number[];
+  locationIds?: number[];
+  departmentsIds?: number[];
+  skillIds?: number[];
 }

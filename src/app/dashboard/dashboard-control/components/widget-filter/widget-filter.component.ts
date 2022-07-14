@@ -11,7 +11,8 @@ import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from 
 import { Skill } from '@shared/models/skill.model';
 import { FilterService } from '@shared/services/filter.service';
 import { combineLatest, distinctUntilChanged, filter, map, Observable, takeUntil } from 'rxjs';
-import { IFilterColumnsDataModel, WidgetFilter } from 'src/app/dashboard/models/widget-filter.model';
+import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
+import { IFilterColumnsDataModel } from 'src/app/dashboard/models/widget-filter.model';
 import { SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
@@ -31,11 +32,10 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   public filteredItems: FilteredItem[] = [];
   public widgetFilterFormGroup: FormGroup;
-  public filters: WidgetFilter = {};
+  public filters: DashboardFiltersModel = {};
   public filterColumns: IFilterColumnsDataModel;
   public regions: OrganizationRegion[] = [];
   public orgStructure: OrganizationStructure;
-  public departmetsValues: number[] = [];
   public optionFields = {
     text: 'name',
     value: 'id',
@@ -92,10 +92,6 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
           this.setFilterState();
         }
       });
-  }
-
-  public setDepartmetsValues(): void {
-    this.departmetsValues = this.filters.departmentsIds?.length ? this.filters.departmentsIds : [];
   }
 
   public onFilterDelete(event: FilteredItem): void {
@@ -181,7 +177,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
         );
         this.filterColumns.locationIds.dataSource = [];
         selectedRegions.forEach((region) => {
-          region.locations?.forEach((location: OrganizationLocation) => (location.regionName = region.name));
+          region?.locations?.forEach((location: OrganizationLocation) => (location.regionName = region.name));
           this.filterColumns.locationIds.dataSource.push(...(region.locations as []));
         });
       } else {
@@ -247,13 +243,15 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
         this.cdr.markForCheck();
         this.filters = {};
         filters.forEach((item: FilteredItem) => {
-          const filterKey = item.column as keyof WidgetFilter;
+          const filterKey = item.column as keyof DashboardFiltersModel;
           if (filterKey in this.filters) {
             this.filters[filterKey]?.push(item.value);
           } else {
             this.filters[filterKey] = [item.value];
           }
         });
+
+        Object.entries(this.filters).forEach(([key, value]) => this.widgetFilterFormGroup.get(key)?.setValue(value));
       });
   }
 }

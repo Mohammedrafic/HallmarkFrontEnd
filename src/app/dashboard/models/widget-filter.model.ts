@@ -17,10 +17,3 @@ export interface FilterColumn {
   valueField: string;
   valueId: string;
 }
-
-export interface WidgetFilter {
-  regionIds?: number[];
-  locationIds?: number[];
-  departmentsIds?: number[];
-  skillIds?: number[];
-}
