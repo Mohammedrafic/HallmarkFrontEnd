@@ -1,15 +1,19 @@
-import { CandidateHoursData, DonutChartData } from '../interface';
+import { DonutChartData, TimesheetStatisticsDetails } from '../interface';
 import { HourOccupationType } from '../enums';
 
 export class CandidateBarChartHelper {
-  public static toWeekHoursChartData({type, week: week}: CandidateHoursData): DonutChartData<HourOccupationType> {
+  public static toWeekHoursChartData(
+    { billRateConfigName: type, weekHours: week }: TimesheetStatisticsDetails
+  ): DonutChartData<HourOccupationType> {
     return {
       x: type,
       y: week,
     };
   }
 
-  public static toCumulativeHoursChartData({type, cumulative}: CandidateHoursData): DonutChartData<HourOccupationType> {
+  public static toCumulativeHoursChartData(
+    { billRateConfigName: type, cumulativeHours: cumulative }: TimesheetStatisticsDetails
+  ): DonutChartData<HourOccupationType> {
     return {
       x: type,
       y: cumulative,

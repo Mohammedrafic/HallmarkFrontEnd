@@ -2,12 +2,7 @@ import { Router } from '@angular/router';
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { Observable } from 'rxjs';
-import { Select } from '@ngxs/store';
-
-import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
-import { AppState } from '../../../../store/app.state';
-import { CandidateInfo, CandidateInfoUIItem } from '../../interface';
+import { CandidateInfoUIItem, TimesheetDetailsModel } from "../../interface";
 
 @Component({
   selector: 'app-profile-details-job-info',
@@ -21,7 +16,7 @@ export class ProfileDetailsJobInfoComponent implements OnChanges {
   public isAgency: boolean;
 
   @Input()
-  public jobData: CandidateInfo | null;
+  public jobData: TimesheetDetailsModel | null;
 
   constructor(
     private datePipe: DatePipe,
@@ -40,37 +35,37 @@ export class ProfileDetailsJobInfoComponent implements OnChanges {
     return item.title;
   }
 
-  private getUIItems(data: CandidateInfo): CandidateInfoUIItem[] {
+  private getUIItems(data: TimesheetDetailsModel): CandidateInfoUIItem[] {
     return [
       {
         title: 'Job Title',
         icon: 'user',
-        value: data.jobTitle,
+        value: data.orderTitle,
       },
       {
         title: 'Region / Location',
         icon: 'map-pin',
-        value: data.location,
+        value: data.orderLocationName,
       },
       {
         title: 'Department',
         icon: 'folder',
-        value: data.department,
+        value: data.orderDepartmentName,
       },
       {
         title: 'Skill',
         icon: 'folder',
-        value: data.skill,
+        value: data.orderSkillAbbreviation,
       },
       {
         title: 'Start - End Date',
         icon: 'calendar',
-        value: `${this.datePipe.transform(data.startDate, 'MM/d/y')} - ${this.datePipe.transform(data.endDate, 'MM/d/y')}`,
+        value: `${this.datePipe.transform(data.jobStartDate, 'MM/d/y')} - ${this.datePipe.transform(data.jobEndDate, 'MM/d/y')}`,
       },
       {
         title: !this.isAgency ? 'Agency' : 'Organization',
         icon: 'briefcase',
-        value: data.unitName,
+        value: this.isAgency ? data.agencyName : data.organizationName,
       },
     ];
   }

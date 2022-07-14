@@ -28,6 +28,8 @@
     }
 
     &.charts-legend {
+      padding-left: 0;
+
       h3 {
         visibility: hidden;
       }
@@ -104,4 +106,5 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  min-width: 110px;
 }

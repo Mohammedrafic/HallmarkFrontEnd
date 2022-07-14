@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Store } from '@ngxs/store';
 
 import { downloadBlobFile } from '@shared/utils/file.utils';
-import { TimesheetUploadedFile } from '../../interface';
+import { TimesheetAttachment } from '../../interface';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 
 @Component({
@@ -14,22 +14,22 @@ import { TimesheetDetails } from '../../store/actions/timesheet-details.actions'
 })
 export class ProfileUploadsComponent {
   @Input()
-  public uploads: TimesheetUploadedFile[] = [];
+  public attachments: TimesheetAttachment[] | null = [];
 
   constructor(
     private store: Store,
   ) {
   }
 
-  public trackById(_: number, item: TimesheetUploadedFile): number {
+  public trackById(_: number, item: TimesheetAttachment): number {
     return item.id;
   }
 
-  public removeFile(item: TimesheetUploadedFile): void {
+  public removeFile(item: TimesheetAttachment): void {
     this.store.dispatch(new TimesheetDetails.DeleteFile(item.id));
   }
 
-  public downloadFile(item: TimesheetUploadedFile): void {
-    item.blob && downloadBlobFile(item.blob, item.name);
+  public downloadFile(item: TimesheetAttachment): void {
+    item.blob && downloadBlobFile(item.blob, item.fileName);
   }
 }

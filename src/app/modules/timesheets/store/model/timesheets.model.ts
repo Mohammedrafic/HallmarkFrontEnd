@@ -1,14 +1,16 @@
 import { PageOfCollections } from '@shared/models/page.model';
 import {
+  CandidateHoursAndMilesData,
   CandidateInfo,
+  FilterColumns,
   TabCountConfig,
   Timesheet,
   TimesheetAttachments,
+  TimesheetDetailsModel,
+  TimesheetInvoice,
   TimesheetRecordsDto,
   TimesheetsFilterState,
-  FilterColumns, TimesheetDetailsInvoice,
 } from '../../interface';
-import { CandidateHoursAndMilesData } from '../../interface';
 
 
 export type TimeSheetsPage = PageOfCollections<Timesheet>;
@@ -19,7 +21,7 @@ export interface TimesheetsModel {
   candidateInfo: CandidateInfo | null;
   candidateHoursAndMilesData: CandidateHoursAndMilesData | null;
   candidateAttachments: TimesheetAttachments;
-  candidateInvoices: TimesheetDetailsInvoice[];
+  candidateInvoices: TimesheetInvoice[];
   timeSheetRecords: TimesheetRecordsDto;
   costCenterOptions: unknown[];
   billRateTypes: unknown[];
@@ -28,4 +30,6 @@ export interface TimesheetsModel {
   isAddDialogOpen: boolean;
   tabCounts: TabCountConfig | null;
   timesheetsFiltersColumns: FilterColumns;
+  timesheetDetails: TimesheetDetailsModel | null;
 }
+

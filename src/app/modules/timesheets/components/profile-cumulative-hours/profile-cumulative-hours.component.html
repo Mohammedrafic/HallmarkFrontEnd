@@ -1,6 +1,6 @@
 <div class="profile-hours-statistics-container">
   <section class="cumulative-hours">
-    <h3>Cumulative Hours</h3>
+    <h3>Week Hours</h3>
 
     <ejs-accumulationchart style='display:block; top: -20px; left: -15px'
                            class="cumulative-hours-chart"
@@ -15,7 +15,6 @@
         <e-accumulation-annotation [content]="weekChartAnnotation"
                                    region="Series"
                                    coordinateUnits="Pixel"
-                                   x="34"
                                    y="46"
         ></e-accumulation-annotation>
       </e-accumulation-annotations>
@@ -34,7 +33,7 @@
   </section>
 
   <section class="cumulative-hours-otd">
-    <h3>Cumulative Hours OTD</h3>
+    <h3>Cumulative Hours</h3>
     <ejs-accumulationchart style='display:block; top: -20px; left: -15px'
                            class="cumulative-hours-chart"
                            selectionMode="Point"
@@ -51,7 +50,6 @@
         <e-accumulation-annotation [content]="cumulativeChartAnnotation"
                                    region="Series"
                                    coordinateUnits="Pixel"
-                                   x="34"
                                    y="46"
         ></e-accumulation-annotation>
       </e-accumulation-annotations>
@@ -79,13 +77,17 @@
           <th class="week-title">Week</th>
           <th class="total-title" colspan="2">Cumulative</th>
         </tr>
-        <tr *ngFor="let legendItem of hoursData; let i = index; trackBy: trackByName">
+        <tr *ngFor="let legendItem of legendItems; let i = index; trackBy: trackByName">
           <td>
-            <div class="marker" [style.backgroundColor]="chartColorsMap[legendItem.type]"></div>
+            <div class="marker" [style.backgroundColor]="chartColorsMap[legendItem.billRateConfigName]"></div>
           </td>
-          <td class="name">{{legendItem.type}}</td>
-          <td class="week-hours-value">{{legendItem.week ? (legendItem.week | number : '1.2-2') : '-'}}</td>
-          <td class="cumulative-hours-value">{{legendItem.cumulative ? (legendItem.cumulative | number : '1.2-2') : '-'}}</td>
+          <td class="name">{{legendItem.billRateConfigName}}</td>
+          <td class="week-hours-value">
+            {{legendItem.weekHours ? (legendItem.weekHours | number : '1.2-2') : '-'}}
+          </td>
+          <td class="cumulative-hours-value">
+            {{legendItem.cumulativeHours ? (legendItem.cumulativeHours | number : '1.2-2') : '-'}}
+          </td>
           <td class="checkbox-cell">
             <ejs-checkbox
                     [checked]="true"
@@ -99,13 +101,13 @@
 
   <ng-template #weekChartAnnotation>
     <ng-container [ngTemplateOutlet]="chartAnnotation"
-                  [ngTemplateOutletContext]="{value: totalWeekHours}"
+                  [ngTemplateOutletContext]="{value: totalWeekHours === 0 ? 'No Data' : totalWeekHours}"
     ></ng-container>
   </ng-template>
 
   <ng-template #cumulativeChartAnnotation>
     <ng-container [ngTemplateOutlet]="chartAnnotation"
-                  [ngTemplateOutletContext]="{value: totalCumulativeHours}"
+                  [ngTemplateOutletContext]="{value: totalCumulativeHours === 0 ? 'No Data' : totalCumulativeHours}"
     ></ng-container>
   </ng-template>
 

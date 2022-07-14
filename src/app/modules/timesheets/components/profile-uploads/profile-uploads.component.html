@@ -1,10 +1,10 @@
 <div class="profile-uploads-container">
   <h3>Attachments</h3>
 
-  <div *ngFor="let item of uploads; trackBy: trackById" class="uploads-list">
-    <div class="attachment" (click)="downloadFile(item)">
+  <div class="uploads-list">
+    <div *ngFor="let item of attachments; trackBy: trackById" class="attachment" (click)="downloadFile(item)">
       <i-feather name="download" class="icon file-icon"></i-feather>
-      <div class="file-name">{{item.name}}</div>
+      <div class="file-name">{{item.fileName}}</div>
       <div class="delete-icon">
         <i-feather name="trash-2" class="icon" (click)="removeFile(item)"></i-feather>
       </div>

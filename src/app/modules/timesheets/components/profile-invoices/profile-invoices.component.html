@@ -4,8 +4,9 @@
   <a *ngFor="let invoice of invoices; trackBy: trackByName"
      [href]="invoice.url"
      target="_blank"
+     class="invoice"
   >
-    {{invoice.name}}
+    {{invoice.fileName}}
   </a>
 </div>
 

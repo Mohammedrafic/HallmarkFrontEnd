@@ -1,4 +1,7 @@
 import { TableColumnAlign } from '../enums';
+import { TimesheetStatistics } from './timesheet-statistics.interface';
+import { TimesheetAttachment } from './timesheet-attachment.interface';
+import { TimesheetInvoice } from './timesheet-invoice.interface';
 
 export interface DetailsColumnConfig {
   align: TableColumnAlign;
@@ -24,13 +27,6 @@ export interface DialogActionPayload {
   id:  number;
 }
 
-export interface TimesheetUploadedFile {
-  id: number;
-  name: string;
-  // TODO: Remove after connection with API
-  blob?: Blob;
-}
-
 export interface CandidateInfo {
   id: number;
   imgPath: string;
@@ -52,4 +48,30 @@ export interface CandidateInfo {
 export interface CostCenterOption {
   id: number;
   name: string;
+}
+
+export interface TimesheetDetailsModel {
+  id: number;
+  statusText: string
+  status: number;
+  organizationId: number;
+  candidateId: number;
+  candidateName: string;
+  candidateSurname: string;
+  isDidNotWork: boolean;
+  orderId: number;
+  orderTitle: string;
+  orderRegionName: string | null;
+  orderLocationName: string | null;
+  orderDepartmentName: string | null;
+  orderSkillAbbreviation: string | null;
+  jobStartDate: string;
+  jobEndDate: string;
+  organizationName: string | null;
+  agencyName: string | null;
+  timesheetStatistic: TimesheetStatistics;
+  attachments: TimesheetAttachment[];
+  invoices: TimesheetInvoice[];
+
+  rejectReason?: string;
 }

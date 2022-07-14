@@ -32,10 +32,10 @@ import {
   FilterDataSource,
   TabCountConfig,
   Timesheet,
-  TimesheetAttachments, TimesheetDetailsInvoice,
+  TimesheetAttachments, TimesheetInvoice,
   TimesheetRecordsDto,
   TimesheetsFilterState,
-  TimesheetUploadedFile
+  TimesheetAttachment, TimesheetDetailsModel, CandidateMilesData, TimesheetStatistics
 } from '../../interface';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -94,12 +94,12 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static timeSheetAttachments(state: TimesheetsModel): TimesheetUploadedFile[] {
+  static timeSheetAttachments(state: TimesheetsModel): TimesheetAttachment[] {
     return state.candidateAttachments.attachments;
   }
 
   @Selector([TimesheetsState])
-  static timeSheetInvoices(state: TimesheetsModel): TimesheetDetailsInvoice[] {
+  static timeSheetInvoices(state: TimesheetsModel): TimesheetInvoice[] {
     return state.candidateInvoices;
   }
 
@@ -116,6 +116,44 @@ export class TimesheetsState {
   @Selector([TimesheetsState])
   static timesheetsFiltersColumns(state: TimesheetsModel): FilterColumns {
     return state.timesheetsFiltersColumns;
+  }
+
+  @Selector([TimesheetsState])
+  static timesheetDetails(state: TimesheetsModel): TimesheetDetailsModel | null {
+    return state.timesheetDetails;
+  }
+
+  @Selector([TimesheetsState])
+  static timesheetDetailsMilesStatistics(state: TimesheetsModel): CandidateMilesData | null {
+    const statistics: TimesheetStatistics | null = state?.timesheetDetails?.timesheetStatistic ?? null;
+
+    if (!statistics) {
+      return null;
+    }
+
+    const {
+      weekMiles: week,
+      cumulativeMilesByOrder: cumulative,
+      weekCharge,
+      cumulativeChargeByOrder: cumulativeCharge
+    }: TimesheetStatistics = statistics;
+
+    return {
+      week,
+      cumulative,
+      weekCharge,
+      cumulativeCharge
+    };
+  }
+
+  @Selector([TimesheetsState])
+  static timesheetDetailsChartsVisible(state: TimesheetsModel): boolean {
+    if (state?.timesheetDetails) {
+      const { weekMiles = 0, cumulativeMilesByOrder = 0} = state.timesheetDetails.timesheetStatistic;
+      return weekMiles + cumulativeMilesByOrder > 0;
+    }
+
+    return false;
   }
 
   @Action(Timesheets.GetAll)
@@ -209,6 +247,24 @@ export class TimesheetsState {
     patchState({
       isAddDialogOpen: action === DialogAction.Open,
     });
+  }
+
+  @Action(Timesheets.GetTimesheetDetails)
+  GetTimesheetDetails(
+    { patchState }: StateContext<TimesheetsModel>,
+    { timesheetId }: Timesheets.GetTimesheetDetails
+  ): Observable<TimesheetDetailsModel> {
+    return this.timesheetDetailsApiService.getTimesheetDetails(timesheetId)
+      .pipe(
+        tap((res: TimesheetDetailsModel) => patchState({
+            timesheetDetails: {
+              ...res,
+              // TODO: Remove
+              candidateId: 8,
+            },
+          })
+        )
+      );
   }
 
   @Action(Timesheets.DeleteTimesheet)
@@ -314,8 +370,8 @@ export class TimesheetsState {
       .pipe(
         tap(() => {
           patchState({
-            candidateInfo: {
-              ...state.candidateInfo as CandidateInfo,
+            timesheetDetails: {
+              ...state.timesheetDetails as TimesheetDetailsModel,
               rejectReason: reason,
             },
             timesheets: {
@@ -382,7 +438,7 @@ export class TimesheetsState {
 
   @Action(TimesheetDetails.GetCandidateInvoices)
   GetCandidateInvoices({ patchState }: StateContext<TimesheetsModel>, { id }: TimesheetDetails.GetCandidateInvoices)
-    : Observable<TimesheetDetailsInvoice[]> {
+    : Observable<TimesheetInvoice[]> {
     return this.timesheetDetailsApiService.getCandidateInvoices(id)
       .pipe(
         tap((res) => {
@@ -395,24 +451,26 @@ export class TimesheetsState {
 
   @Action(TimesheetDetails.UploadFiles)
   UploadCandidateFiles({ getState, patchState }: StateContext<TimesheetsModel>, { id, files, names }: TimesheetDetails.UploadFiles)
-    : Observable<TimesheetUploadedFile[]> {
+    : Observable<TimesheetAttachment[]> {
     return this.timesheetDetailsApiService.uploadCandidateFiles(id, files)
       .pipe(
         tap((res: any[]) => {
-          const attachments = getState()?.candidateAttachments?.attachments ?? [];
+          const details = getState().timesheetDetails as TimesheetDetailsModel;
+
           patchState({
-            candidateAttachments: {
+            timesheetDetails: {
+              ...details,
               attachments: [
                 ...files.map((item, index) => {
                   return {
                     id: Math.random(),
-                    name: names[index],
+                    fileName: names[index],
                     blob: item,
-                  }
+                  } as TimesheetAttachment
                 }),
-                ...attachments,
-              ]
-            },
+                ...(details?.attachments || []),
+              ],
+            }
           });
         })
       )
@@ -426,12 +484,13 @@ export class TimesheetsState {
     return this.timesheetDetailsApiService.deleteCandidateFile(id)
       .pipe(
         tap(() => {
-          const attachments = getState()?.candidateAttachments?.attachments ?? [];
+          const details = getState()?.timesheetDetails as TimesheetDetailsModel;
 
           patchState({
-            candidateAttachments: {
-              attachments: attachments.filter((attachment) => attachment.id !== id),
-            },
+            timesheetDetails: {
+              ...details,
+              attachments: (details.attachments || []).filter((attachment) => attachment.id !== id)
+            }
           });
         })
       )

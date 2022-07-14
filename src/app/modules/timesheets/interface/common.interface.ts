@@ -6,7 +6,7 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
 import { FieldType } from '../enums';
-import { TimesheetUploadedFile } from './timesheet-details.interface';
+import { TimesheetAttachment } from './timesheet-attachment.interface';
 
 
 export interface DropdownOption {
@@ -71,7 +71,7 @@ export interface TimesheetRecordsDto {
 export type RecordValue = TimesheetRecord | MileRecord | ExpensesRecord;
 
 export interface TimesheetAttachments {
-  attachments: TimesheetUploadedFile[];
+  attachments: TimesheetAttachment[];
 }
 
 export interface TabConfig {

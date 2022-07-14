@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { CandidateMilesData } from '../../../interface';
+import { CandidateMilesData, TimesheetStatistics } from '../../../interface';
 
 @Component({
   selector: 'app-profile-miles',

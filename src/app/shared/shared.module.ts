@@ -96,6 +96,7 @@ import {ExBillRateNamesPipe} from "@shared/pipes/external-bill-rate-names.pipe";
 import { SideMenuModule } from '@shared/components/side-menu/side-menu.module';
 import {SecurityState} from "../security/store/security.state";
 import { NavigationPanelComponent } from './components/navigation-panel/navigation-panel.component';
+import { CandidateAvatarPipe } from './pipes/candidate-avatar.pipe';
 
 const icons = {
   AlertCircle,
@@ -192,8 +193,8 @@ const COMPONENTS = [
     SideMenuModule,
     SwitchModule,
   ],
-  exports: [...COMPONENTS, TabsListComponent, PageToolbarModule, FilterDialogModule, SideMenuModule, NavigationPanelComponent],
-  declarations: [...COMPONENTS, ErrorMessageComponent, BillRateFormComponent, BillRatesGridComponent, TabsListComponent, NavigationPanelComponent],
+  exports: [...COMPONENTS, TabsListComponent, PageToolbarModule, FilterDialogModule, SideMenuModule, NavigationPanelComponent, CandidateAvatarPipe],
+  declarations: [...COMPONENTS, ErrorMessageComponent, BillRateFormComponent, BillRatesGridComponent, TabsListComponent, NavigationPanelComponent, CandidateAvatarPipe],
   providers: [
     DatePipe,
     ColumnMenuService,

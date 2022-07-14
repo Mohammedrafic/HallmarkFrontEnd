@@ -7,28 +7,23 @@
   [animationSettings]="{ effect: 'SlideRight' }"
 >
   <ng-template #content>
-    <section class="container">
+    <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails">
       <div class="profile-details-header">
         <img
           class="e-avatar e-avatar-xlarge"
-          [src]="(candidateInfo$ | async)?.imgPath"/>
+          [src]="timesheetDetails.candidateId | candidateAvatar"/>
 
         <div class="flex flex-column">
           <h3 class="username">
-            {{ (candidateInfo$ | async)?.firstName }}, {{(candidateInfo$ | async)?.lastName}}
+            {{ timesheetDetails.candidateSurname }}, {{ timesheetDetails.candidateName}}
           </h3>
 
           <ejs-chiplist #chipList class="events-off">
             <e-chips>
               <e-chip
-                *ngIf="(candidateInfo$ | async)"
-                [text]="(candidateInfo$ | async)?.timesheetStatus"
-                [cssClass]="(candidateInfo$ | async)?.timesheetStatus || '' | chipsCssClass">
+                [text]="timesheetDetails.statusText"
+                [cssClass]="timesheetDetails.statusText || '' | chipsCssClass">
               </e-chip>
-              <e-chip
-                [text]="(candidateInfo$ | async)?.status"
-                [cssClass]="(candidateInfo$ | async)?.status || '' | chipsCssClass">
-            </e-chip>
             </e-chips>
           </ejs-chiplist>
         </div>
@@ -94,9 +89,9 @@
        </div>
       </div>
 
-      <div class="order-header" *ngIf="candidateInfo$ | async as candidateInfo">
-        <h2 class="order-id">Order ID {{ (candidateInfo$ | async)?.orderId}}</h2>
-        <div class="bootstrap reject-reason-input" *ngIf="candidateInfo?.rejectReason as rejectReason">
+      <div class="order-header">
+        <h2 class="order-id">Order ID {{ timesheetDetails?.orderId}}</h2>
+        <div class="bootstrap reject-reason-input" *ngIf="timesheetDetails?.rejectReason as rejectReason">
           <div class="e-input input">{{rejectReason}}</div>
         </div>
 
@@ -104,7 +99,7 @@
           <div class="checkbox-block" *ngIf="isAgency">
             <ejs-switch #dnwSwitch
               class="toggle"
-              [checked]="false"
+              [checked]="timesheetDetails.isDidNotWork"
               (change)="onDWNCheckboxSelectedChange($event, dnwSwitch)"
             ></ejs-switch>
             <span>DNW</span>
@@ -124,32 +119,29 @@
       </div>
 
       <div class="job-general-info tile-dark-blue">
-        <app-profile-details-job-info
-        [jobData]="(candidateInfo$ | async)"></app-profile-details-job-info>
+          <app-profile-details-job-info
+                  [jobData]="timesheetDetails"
+          ></app-profile-details-job-info>
       </div>
 
       <div class="profile-hours-statistics">
-        <ng-container *ngIf="hoursAndMilesData$ | async as hoursAndMilesData">
-          <div class="tile-dark-blue" *ngIf="hoursAndMilesData?.hours?.length">
-            <app-profile-cumulative-hours [hoursData]="hoursAndMilesData.hours"></app-profile-cumulative-hours>
+          <div class="tile-dark-blue" *ngIf="chartsVisible$ | async">
+              <app-profile-cumulative-hours
+                      [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
+              ></app-profile-cumulative-hours>
           </div>
 
-          <div class="tile-dark-blue miles" *ngIf="hoursAndMilesData.miles">
-            <app-profile-miles [milesData]="hoursAndMilesData.miles"></app-profile-miles>
+          <div class="tile-dark-blue miles" *ngIf="milesData$ | async as milesData">
+            <app-profile-miles [milesData]="milesData"></app-profile-miles>
           </div>
-        </ng-container>
 
-        <ng-container *ngIf="attachments$ | async as uploads">
-          <div class="tile-dark-blue profile-uploads" *ngIf="uploads.length">
-            <app-profile-uploads [uploads]="uploads"></app-profile-uploads>
+          <div class="tile-dark-blue profile-uploads" *ngIf="timesheetDetails?.attachments?.length">
+            <app-profile-uploads [attachments]="timesheetDetails.attachments"></app-profile-uploads>
           </div>
-        </ng-container>
 
-       <ng-container *ngIf="invoices$ | async as invoices">
-         <div class="tile-dark-blue profile-invoices" *ngIf="invoices.length">
-           <app-profile-invoices [invoices]="invoices"></app-profile-invoices>
+         <div class="tile-dark-blue profile-invoices" *ngIf="timesheetDetails?.invoices?.length">
+           <app-profile-invoices [invoices]="timesheetDetails.invoices"></app-profile-invoices>
          </div>
-       </ng-container>
       </div>
 
       <section class="profile-table-container">
