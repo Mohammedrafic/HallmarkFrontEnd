@@ -92,6 +92,10 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     return this.isRejected || this.readOnlyMode;
   }
 
+  get isReadOnlyBillRates(): boolean {
+    return this.candidate.status === ApplicantStatusEnum.Withdraw;
+  }
+
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
   @Select(OrderManagementContentState.applicantStatuses)

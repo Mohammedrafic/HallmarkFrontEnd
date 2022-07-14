@@ -187,6 +187,7 @@
     <app-bill-rates #billRates
                     [billRates]="billRatesData"
                     [isActive]="true"
+                    [readOnlyMode]="isReadOnlyBillRates"
                     (billRatesChanged)="onBillRatesChanged()">
     </app-bill-rates>
   </section>
