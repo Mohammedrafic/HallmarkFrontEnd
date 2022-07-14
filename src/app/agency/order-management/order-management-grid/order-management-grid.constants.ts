@@ -13,33 +13,44 @@ export const typeValueAccess = (_: string, { orderType }: AgencyOrderManagement)
 };
 
 export const myAgencyColumnsToExport: ExportColumn[] = [
-  { text:'Order ID', column: 'OrderId'},
-  { text:'Status', column: 'Status'},
-  { text:'Job Title', column: 'JobTitle'},
-  { text:'Organization', column: 'OrganizationName' },
-  { text:'# of Positions', column: 'NumberOfPositions'},
-  { text:'Candidates', column: 'CandidatesCount'},
-  { text:'Bill Rate', column: 'BillRate'},
-  { text:'Skill', column: 'Skill'},
-  { text:'Location', column: 'LocationName'},
-  { text:'Department', column: 'DepartmentName'},
-  { text:'Type', column: 'Type'},
-  { text:'Start Date', column: 'JobStartDate'},
+  { text: 'Order ID', column: 'OrderId' },
+  { text: 'Status', column: 'Status' },
+  { text: 'Job Title', column: 'JobTitle' },
+  { text: 'Organization', column: 'OrganizationName' },
+  { text: '# of Positions', column: 'NumberOfPositions' },
+  { text: 'Candidates', column: 'CandidatesCount' },
+  { text: 'Bill Rate', column: 'BillRate' },
+  { text: 'Skill', column: 'Skill' },
+  { text: 'Location', column: 'LocationName' },
+  { text: 'Department', column: 'DepartmentName' },
+  { text: 'Type', column: 'Type' },
+  { text: 'Start Date', column: 'JobStartDate' },
+];
+
+export const myAgencyChildColumnsToExport: ExportColumn[] = [
+  { text: 'Position ID', column: 'PositionId' },
+  { text: 'Candidate Name', column: 'CandidateName' },
+  { text: 'Child Order Status', column: 'ChildOrderStatus' },
+  { text: 'Candidate Status', column: 'CandidateStatus' },
+  { text: 'Child Skill', column: 'ChildOrderSkill' },
+  { text: 'Child Bill Rate', column: 'CandidateBillRate' },
+  { text: 'Submissions', column: 'SubmissionsPercentage' },
+  { text: 'Onboarded', column: 'OnboardedPercentage' },
 ];
 
 export const reOrdersColumnsToExport: ExportColumn[] = [
-  { text:'Re-Order ID', column: 'ReOrderId'},
-  { text:'Status', column: 'Status'},
-  { text:'Job Title', column: 'JobTitle'},
-  { text:'# of Positions', column: 'NumberOfPositions' },
-  { text:'Candidates', column: 'CandidatesCount'},
-  { text:'Bill Rate', column: 'BillRate'},
-  { text:'Skill', column: 'Skill'},
-  { text:'Location', column: 'LocationName'},
-  { text:'Department', column: 'DepartmentName'},
-  { text:'Re-Order Date', column: 'ReOrderDate'},
-  { text:'Shift', column: 'Shift'},
-  { text:'Agency', column: 'AgencyName'},
+  { text: 'Re-Order ID', column: 'ReOrderId' },
+  { text: 'Status', column: 'Status' },
+  { text: 'Job Title', column: 'JobTitle' },
+  { text: '# of Positions', column: 'NumberOfPositions' },
+  { text: 'Candidates', column: 'CandidatesCount' },
+  { text: 'Bill Rate', column: 'BillRate' },
+  { text: 'Skill', column: 'Skill' },
+  { text: 'Location', column: 'LocationName' },
+  { text: 'Department', column: 'DepartmentName' },
+  { text: 'Re-Order Date', column: 'ReOrderDate' },
+  { text: 'Shift', column: 'Shift' },
+  { text: 'Agency', column: 'AgencyName' },
 ];
 
 export const perDiemColumnsToExport: ExportColumn[] = [
@@ -57,112 +68,112 @@ export const perDiemColumnsToExport: ExportColumn[] = [
 export const ReOrdersColumnsConfig: GridColumn[] = [
   {
     fieldName: 'reOrderId',
-    visible: true
+    visible: true,
   },
   {
     fieldName: 'reOrderDate',
-    visible: true
+    visible: true,
   },
   {
     fieldName: 'shift',
-    visible: true
+    visible: true,
   },
   {
     fieldName: 'agencyName',
-    visible: true
+    visible: true,
   },
   {
     fieldName: 'orderId',
-    visible: false
+    visible: false,
   },
   {
     fieldName: 'type',
-    visible: false
+    visible: false,
   },
   {
     fieldName: 'jobStartDate',
-    visible: false
+    visible: false,
   },
   {
     fieldName: 'organizationName',
-    visible: false
-  }
+    visible: false,
+  },
 ];
 
 export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
   {
     fieldName: 'orderId',
-    visible: true
+    visible: true,
   },
   {
     fieldName: 'type',
-    visible: true
+    visible: true,
   },
   {
     fieldName: 'jobStartDate',
-    visible: true
+    visible: true,
   },
   {
     fieldName: 'organizationName',
-    visible: true
+    visible: true,
   },
   {
     fieldName: 'reOrderId',
-    visible: false
+    visible: false,
   },
   {
     fieldName: 'reOrderDate',
-    visible: false
+    visible: false,
   },
   {
     fieldName: 'shift',
-    visible: false
+    visible: false,
   },
   {
     fieldName: 'agencyName',
-    visible: false
+    visible: false,
   },
 ];
 
 export const PerDiemColumnsConfig = [
   {
     fieldName: 'orderId',
-    visible: true
+    visible: true,
   },
   {
     fieldName: 'type',
-    visible: false
+    visible: false,
   },
   {
     fieldName: 'jobStartDate',
-    visible: false
+    visible: false,
   },
   {
     fieldName: 'reOrderId',
-    visible: false
+    visible: false,
   },
   {
     fieldName: 'reOrderDate',
-    visible: false
+    visible: false,
   },
   {
     fieldName: 'shift',
-    visible: false
+    visible: false,
   },
   {
     fieldName: 'agencyName',
-    visible: false
+    visible: false,
   },
   {
     fieldName: 'numberOfPositions',
-    visible: false
+    visible: false,
   },
   {
     fieldName: 'billRate',
-    visible: false
+    visible: false,
   },
   {
     fieldName: 'shiftCount',
-    visible: true
+    visible: true,
   },
 ];

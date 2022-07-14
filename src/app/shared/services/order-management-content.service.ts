@@ -305,7 +305,9 @@ export class OrderManagementContentService {
    @param jobId
    */
   public getCandidatesBasicInfo(organizationId: number, jobId: number): Observable<CandidatesBasicInfo> {
-    return this.http.get<CandidatesBasicInfo>(`/api/AppliedCandidates/basicInfo?OrganizationId=${organizationId}&JobId=${jobId}`);
+    return this.http.get<CandidatesBasicInfo>(
+      `/api/AppliedCandidates/basicInfo?OrganizationId=${organizationId}&JobId=${jobId}`
+    );
   }
 
   /**
@@ -314,7 +316,7 @@ export class OrderManagementContentService {
    * @param tab
    */
   public export(payload: ExportPayload, tab: OrganizationOrderManagementTabs): Observable<any> {
-    switch(tab) {
+    switch (tab) {
       case OrganizationOrderManagementTabs.PerDiem:
         return this.http.post(`/api/Orders/perdiem/export`, payload, { responseType: 'blob' });
       case OrganizationOrderManagementTabs.ReOrders:
@@ -330,12 +332,13 @@ export class OrderManagementContentService {
    * @param tab
    */
   public exportAgency(payload: ExportPayload, tab: AgencyOrderManagementTabs): Observable<any> {
-    switch(tab) {
+    switch (tab) {
       case AgencyOrderManagementTabs.ReOrders:
         return this.http.post(`/api/Agency/ReOrders/export`, payload, { responseType: 'blob' }); // TODO: modification pending after BE implementation
+      case AgencyOrderManagementTabs.MyAgency:
+        return this.http.post(`/api/agency/orders/export`, payload, { responseType: 'blob' });
       default:
         return this.http.post(`/api/Agency/export`, payload, { responseType: 'blob' });
     }
   }
 }
-
