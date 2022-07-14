@@ -10,7 +10,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 @Component({
   selector: 'app-export-dialog',
   templateUrl: './export-dialog.component.html',
-  styleUrls: ['./export-dialog.component.scss']
+  styleUrls: ['./export-dialog.component.scss'],
 })
 export class ExportDialogComponent implements OnInit, OnDestroy {
   private unsubscribe$: Subject<void> = new Subject();
@@ -20,7 +20,7 @@ export class ExportDialogComponent implements OnInit, OnDestroy {
   @ViewChild('chipList') chipList: ChipListComponent;
 
   @Input() width: string = '496px';
-  
+
   @Input() set fileName(value: string) {
     this._fileName = value;
   }
@@ -29,14 +29,41 @@ export class ExportDialogComponent implements OnInit, OnDestroy {
   @Output() export = new EventEmitter();
 
   public ExportedFileType = ExportedFileType;
-  public selectedColumns:string[] = [];
+  public selectedColumns: string[] = [];
   public fileType = ExportedFileType.excel;
   public _fileName: string;
 
-  constructor(private action$: Actions) { }
+  constructor(private action$: Actions) {}
 
   ngOnInit(): void {
-    this.action$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe(payload => {
+    this.subscribeOnOpenExportDialog();
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
+  public onCancel(): void {
+    this.cancel.emit();
+  }
+
+  public selectChips(event: { index: number }): void {
+    if ((this.chipList.selectedChips as number[]).length === 0) {
+      this.chipList.select(event.index);
+    }
+  }
+
+  public onExport(): void {
+    this.export.emit({
+      fileName: this._fileName,
+      fileType: this.fileType,
+      columns: (this.chipList.selectedChips as []).map((val: number) => this.columns[val]),
+    });
+  }
+
+  private subscribeOnOpenExportDialog(): void {
+    this.action$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(ShowExportDialog)).subscribe((payload) => {
       if (payload.isDialogShown) {
         this.chipList.select(this.columns.map((val, i) => i));
         this.exportDialog.show();
@@ -45,23 +72,6 @@ export class ExportDialogComponent implements OnInit, OnDestroy {
         this.fileType = ExportedFileType.excel;
         this.exportDialog.hide();
       }
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
-  }
-
-  onCancel(): void {
-    this.cancel.emit();
-  }
-
-  onExport(): void {
-    this.export.emit({
-      fileName: this._fileName,
-      fileType: this.fileType,
-      columns: (this.chipList.selectedChips as []).map((val: number) => this.columns[val])
     });
   }
 }

@@ -16,7 +16,15 @@
         </ejs-chiplist>
       </div>
       <div class="e-card-content">
-        <button *ngIf="!readOnlyMode" ejs-button [isPrimary]="true" class="apply-button" (click)="applyOrderApplicants()">Apply</button>
+        <button
+          *ngIf="!readOnlyMode"
+          ejs-button
+          [isPrimary]="true"
+          [disabled]="isLocked"
+          class="apply-button"
+          (click)="applyOrderApplicants()">
+          Apply
+        </button>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
@@ -25,7 +33,7 @@
   </section>
   <section class="content-container">
     <div class="job-details">
-      <ejs-accordion expandMode="Single">
+      <ejs-accordion #accordionElement expandMode="Single" (expanding)="toForbidExpandSecondRow($event)" (clicked)="clickedOnAccordion($event)">
         <e-accordionitems>
           <e-accordionitem expanded="true">
             <ng-template #header>
@@ -41,9 +49,15 @@
                     </div>
                   </div>
                   <div class="input-container">
-                    <label>Bill Rate</label>
+                    <label>Bill Rate ($)</label>
                     <div class="input-group input-readonly">
-                      <input formControlName="orderBillRate" class="e-input" type="text" readonly/>
+                      <input
+                        formControlName="orderBillRate"
+                        class="e-input"
+                        type="text"
+                        (focus)="priceUtils.setPriceMask(formGroup, 'orderBillRate', $event)"
+                        (blur)="priceUtils.setTwoDecimals(formGroup, 'orderBillRate', $event)"
+                        readonly/>
                     </div>
                   </div>
                 </div>
@@ -80,12 +94,14 @@
                     </div>
                   </div>
                   <div class="input-container">
-                    <label>Candidate Bill Rate<span *ngIf="!readOnlyMode" class="required">*</span></label>
+                    <label>Candidate Bill Rate ($)<span *ngIf="!readOnlyMode" class="required">*</span></label>
                     <div class="input-group" [ngClass]="{'input-readonly': readOnlyMode}">
                       <input appValidateWithMessage
                              formControlName="candidateBillRate"
                              class="e-input"
-                             type="number"
+                             type="text"
+                             (focus)="priceUtils.setPriceMask(formGroup, 'candidateBillRate', $event)"
+                             (blur)="priceUtils.setTwoDecimals(formGroup, 'candidateBillRate', $event)"
                              [readonly]="readOnlyMode"/>
                     </div>
                   </div>

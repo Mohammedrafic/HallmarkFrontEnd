@@ -18,6 +18,7 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { GRID_CONFIG } from '@shared/constants';
 import {
+  myAgencyChildColumnsToExport,
   myAgencyColumnsToExport,
   MyAgencyOrdersColumnsConfig,
   PerDiemColumnsConfig,
@@ -25,7 +26,7 @@ import {
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
   ROW_HEIGHT,
-  typeValueAccess
+  typeValueAccess,
 } from './order-management-grid.constants';
 import {
   ExportAgencyOrders,
@@ -40,8 +41,8 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import {
   AgencyOrderFilters,
   AgencyOrderManagement,
-  AgencyOrderManagementPage, OrderManagement,
-  OrderManagementChild, OrderManagementPage
+  AgencyOrderManagementPage,
+  OrderManagementChild,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -83,7 +84,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public wrapSettings: TextWrapSettingsModel = GRID_CONFIG.wordWrapSettings;
   public allowWrap = GRID_CONFIG.isWordWrappingEnabled;
-  public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick', persistSelection: true };
+  public selectionOptions: SelectionSettingsModel = {
+    type: 'Single',
+    mode: 'Row',
+    checkboxMode: 'ResetOnRowClick',
+    persistSelection: true,
+  };
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
   public openCandidat = new Subject<boolean>();
@@ -106,11 +112,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store,
-              private location: Location,
-              private actions$: Actions,
-              private datePipe: DatePipe,
-              private filterService: FilterService) {
+  constructor(
+    private store: Store,
+    private location: Location,
+    private actions$: Actions,
+    private datePipe: DatePipe,
+    private filterService: FilterService
+  ) {
     super();
   }
 
@@ -135,8 +143,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.onFilterApply();
       }
     });
-    this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
-      this.ordersPage = data
+    this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.ordersPage = data;
     });
   }
 
@@ -158,26 +166,34 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.store.dispatch(new ShowExportDialog(true));
   }
 
-  public closeExport() {
+  public closeExport(): void {
+    this.clearSelection(this.gridWithChildRow);
     this.fileName = '';
     this.store.dispatch(new ShowExportDialog(false));
   }
 
   public export(event: ExportOptions): void {
-    this.closeExport();
     this.defaultExport(event.fileType, event);
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.defaultFileName = `Agency Management/${this.selectedTab} ` + this.generateDateTime(this.datePipe);
-    this.store.dispatch(new ExportAgencyOrders(new ExportPayload(
-      fileType,
-      { ...this.filters, ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null },
-      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
-      null,
-      options?.fileName || this.defaultFileName
-    ), this.selectedTab));
-    this.clearSelection(this.gridWithChildRow);
+    this.store.dispatch(
+      new ExportAgencyOrders(
+        new ExportPayload(
+          fileType,
+          {
+            ...this.filters,
+            ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
+          },
+          options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
+          null,
+          options?.fileName || this.defaultFileName
+        ),
+        this.selectedTab
+      )
+    );
+    this.closeExport();
   }
 
   public onDataBound(): void {
@@ -185,13 +201,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     if (this.previousSelectedOrderId) {
       const [data, index] = this.store.selectSnapshot(OrderManagementState.lastSelectedOrder)(
         this.previousSelectedOrderId
-        );
+      );
       if (data && !isUndefined(index)) {
         this.gridWithChildRow.selectRow(index);
         this.onRowClick({ data });
       }
     }
-     if (this.selectedIndex) {
+    if (this.selectedIndex) {
       this.gridWithChildRow.selectRow(this.selectedIndex);
     }
   }
@@ -199,7 +215,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
       this.dispatchNewPage();
-      this.isSubrowDisplay = false
+      this.isSubrowDisplay = false;
     }
   }
 
@@ -262,6 +278,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public onRowClick(event: any): void {
     this.rowSelected(event, this.gridWithChildRow);
+
     if (!event.isInteracted) {
       this.selectedOrder = event.data;
       const options = this.getDialogNextPreviousOption(event.data);
@@ -273,6 +290,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.store.dispatch(new GetAgencyOrderGeneralInformation(event.data.orderId, event.data.organizationId));
       this.selectedIndex = Number(event.rowIndex);
     }
+
+    this.checkSelectedChildrenItem();
+  }
+
+  public onRowDeselect(event: any, grid: any) {
+    this.rowDeselected(event, grid);
+    this.checkSelectedChildrenItem();
   }
 
   public setRowHighlight(args: RowDataBoundEventArgs & { data: AgencyOrderManagement }): void {
@@ -302,7 +326,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.selectedCandidat = candidat;
     this.selectedCandidat.selected = {
       order: order.orderId,
-      positionId: candidat.positionId
+      positionId: candidat.positionId,
     };
     this.selectedOrder = order;
     const options = this.getDialogNextPreviousOption(order);
@@ -312,15 +336,15 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public expandAll(): void {
-    this.isSubrowDisplay = true
+    this.isSubrowDisplay = true;
     this.ordersPage.items.forEach((item: AgencyOrderManagement, index: number): void => {
-      super.onSubrowAllToggle(index + 1)
-    })
+      super.onSubrowAllToggle(index + 1);
+    });
   }
 
   public collapseAll(): void {
-    this.isSubrowDisplay = false
-    super.onSubrowAllToggle()
+    this.isSubrowDisplay = false;
+    super.onSubrowAllToggle();
   }
 
   // Filter
@@ -360,6 +384,15 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.currentPage = 1;
     this.filters = {};
     this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  private checkSelectedChildrenItem(): void {
+    if (this.selectedTab === AgencyOrderManagementTabs.MyAgency) {
+      const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children.length !== 0);
+      this.columnsToExport = hasSelectedItemChildren
+        ? [...myAgencyColumnsToExport, ...myAgencyChildColumnsToExport]
+        : myAgencyColumnsToExport;
+    }
   }
 
   public onFilterClearAll(): void {
@@ -421,14 +454,22 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private onReloadOrderCandidatesLists(): void {
-    this.actions$.pipe(ofActionSuccessful(ReloadOrderCandidatesLists), takeWhile(() => this.isAlive)).subscribe(() => {
-      this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters)).subscribe((data) => {
-        const order = data.agencyOrders.ordersPage.items.find((item: AgencyOrderManagement) => item.orderId === this.selectedOrder.orderId);
-        if (order) {
-          this.onRowClick({ data: order, rowIndex: this.selectedIndex });
-        }
+    this.actions$
+      .pipe(
+        ofActionSuccessful(ReloadOrderCandidatesLists),
+        takeWhile(() => this.isAlive)
+      )
+      .subscribe(() => {
+        this.store
+          .dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters))
+          .subscribe((data) => {
+            const order = data.agencyOrders.ordersPage.items.find(
+              (item: AgencyOrderManagement) => item.orderId === this.selectedOrder.orderId
+            );
+            if (order) {
+              this.onRowClick({ data: order, rowIndex: this.selectedIndex });
+            }
+          });
       });
-    });
   }
 }
-

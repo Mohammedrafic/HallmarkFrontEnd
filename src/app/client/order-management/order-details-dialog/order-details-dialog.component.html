@@ -22,8 +22,7 @@
               <div class="vertical-divider"></div>
               <div *ngIf="order" class="order-other-statuses">
                 <span class="custom-chip">{{ order.orderType | orderTypeName }}</span>
-                <span class="custom-chip" *ngIf="order.isLocked">Locked</span>
-                <span class="custom-chip" *ngIf="!order.isLocked">Unlocked</span>
+                <span class="custom-chip"> {{order.isLocked ? "Locked" : "Unlocked"}}</span>
               </div>
             </div>
           </div>
@@ -37,8 +36,9 @@
             <button ejs-button cssClass="e-outline edit-button" (click)="editOrder(order)"><i-feather name="edit" class="icon"></i-feather></button>
             <button ejs-button cssClass="e-outline" *ngIf="showCloseButton">Close Order</button>
             <button ejs-button cssClass="e-primary delete-button" (click)="deleteOrder(order.id)" *ngIf="!showCloseButton">Delete</button>
-            <button ejs-button [isPrimary]="true" (click)="lockOrder()">
-              Lock <i-feather name="lock" class="icon"></i-feather>
+            <button ejs-button [isPrimary]="true" (click)="lockOrder()" [disabled]="disabledLock">
+              {{order?.isLocked ? "Unlock" : "Lock"}}
+              <i-feather [name]="order?.isLocked ? 'unlock' : 'lock'" class="icon"></i-feather>
             </button>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>
@@ -46,7 +46,7 @@
           </div>
         </div>
       </section>
-      <div class="order-tabs" [ngClass]="{ 'first-active': firstActive && orderStatus.Incomplete != order?.status }">
+      <div class="order-tabs" [ngClass]="{ 'first-active': firstActive && orderStatus.Incomplete !== order?.status }">
         <ejs-tab #tab *ngIf="orderStatus.Incomplete !== order?.status" (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
           <e-tabitems>
             <e-tabitem>

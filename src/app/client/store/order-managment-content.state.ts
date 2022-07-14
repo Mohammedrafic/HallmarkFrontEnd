@@ -36,6 +36,7 @@ import {
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
   GetHistoricalData,
+  SetLock,
   ExportOrders
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
@@ -283,6 +284,21 @@ export class OrderManagementContentState {
         patchState({ selectedOrder: payload });
         return payload;
       })
+    );
+  }
+
+  @Action(SetLock)
+  SetLock({ dispatch }: StateContext<OrderManagementContentStateModel>, { id, lockStatus, filters, updateOpened }: SetLock): Observable<boolean | void> {
+    return this.orderManagementService.setLock(id, lockStatus).pipe(
+      tap(() => {
+        const message = lockStatus ? `The Order ${id} is locked` : `The Order ${id} is unlocked`;
+        const actions = [
+          new GetOrders(filters),
+          new ShowToast(MessageTypes.Success, message),
+        ];
+        dispatch(updateOpened ? [...actions, new GetSelectedOrderById(id)] : actions);
+      }),
+      catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error?.detail)))
     );
   }
 

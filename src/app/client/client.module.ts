@@ -6,6 +6,7 @@ import { FeatherModule } from 'angular-feather';
 import {
   MessageSquare,
   Lock,
+  Unlock,
   ChevronDown,
   AlignJustify,
   Menu,
@@ -74,6 +75,7 @@ import { OrderCandidatesContainerComponent } from './order-management/order-cand
 const gridIcons = {
   MessageSquare,
   Lock,
+  Unlock,
   ChevronDown,
   AlignJustify,
   Menu,

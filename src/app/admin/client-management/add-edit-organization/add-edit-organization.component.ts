@@ -97,6 +97,10 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   @Select(AdminState.dataBaseConnections)
   dataBaseConnections$: Observable<string[]>;
 
+  get isAddMode(): boolean {
+    return this.title === 'Add'
+  }
+
   constructor(private actions$: Actions, private store: Store, private router: Router, private route: ActivatedRoute, private fb: FormBuilder) {
     actions$.pipe(
       takeUntil(this.unsubscribe$),
