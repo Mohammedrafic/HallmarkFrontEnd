@@ -1,11 +1,12 @@
 import { Injectable, Inject } from '@angular/core';
-import { filter, Observable } from 'rxjs';
+import { filter, Observable, tap } from 'rxjs';
 
 import { MsalBroadcastService, MsalGuardConfiguration, MsalService, MSAL_GUARD_CONFIG } from '@azure/msal-angular';
 import {
   AuthenticationResult,
   EventMessage,
   EventType,
+  InteractionStatus,
   InteractionType,
   PopupRequest,
   RedirectRequest,
@@ -52,12 +53,36 @@ export class B2CAuthService {
     );
   }
 
+  public b2cStable(): Observable<InteractionStatus> {
+    return this.msalBroadcastService.inProgress$.pipe(
+      filter((status: InteractionStatus) => status === InteractionStatus.None),
+      tap(() => {
+        this.checkAndSetActiveAccount();
+      })
+    );
+  }
+
   public isLoggedIn(): boolean {
     return this.authService.instance.getActiveAccount() !== null;
   }
 
   public logout(): void {
     this.authService.logout();
+  }
+
+  public checkAndSetActiveAccount(): void {
+    /**
+     * If no active account set but there are accounts signed in, sets first account to active account
+     * To use active account set here, subscribe to inProgress$ first in your component
+     * Note: Basic usage demonstrated. Your app may require more complicated account selection logic
+     */
+    let activeAccount = this.authService.instance.getActiveAccount();
+
+    if (!activeAccount && this.authService.instance.getAllAccounts().length > 0) {
+      let accounts = this.authService.instance.getAllAccounts();
+      this.authService.instance.setActiveAccount(accounts[0]);
+      debugger
+    }
   }
 }
 

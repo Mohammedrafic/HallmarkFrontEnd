@@ -3,6 +3,7 @@ import { NavigationEnd, Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
 import { filter, map, mergeMap } from 'rxjs/operators';
+import { B2CAuthService } from './b2c-auth/b2c-auth.service';
 
 import { SetIsOrganizationAgencyArea } from './store/app.actions';
 
@@ -14,10 +15,12 @@ import { SetIsOrganizationAgencyArea } from './store/app.actions';
 export class AppComponent implements OnInit {
   public isIframe = false;
 
-  constructor(private router: Router, private store: Store) {}
+  constructor(private router: Router, private store: Store, private b2CAuthService: B2CAuthService) {}
 
   ngOnInit(): void {
     this.isIframe = window !== window.parent && !window.opener;
+
+    // this.b2CAuthService.b2cStable().subscribe();
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
