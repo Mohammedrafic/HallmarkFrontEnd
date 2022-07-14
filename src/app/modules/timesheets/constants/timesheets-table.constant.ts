@@ -37,11 +37,11 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       minWidth: 158,
       cellClass: 'name',
       ...commonColumn,
+      valueFormatter: (params: any) => `${params.data.firstName} ${params.data.lastName}`,
     },
     {
       field: TimesheetsTableColumns.StatusText,
       headerName: 'STATUS',
-      width: 170,
       minWidth: 170,
       cellRenderer: TimesheetTableStatusCellComponent,
       cellClass: 'status-cell',

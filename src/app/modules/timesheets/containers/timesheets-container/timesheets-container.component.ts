@@ -23,7 +23,6 @@ import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { DialogAction, ExportType } from '../../enums';
 import { TimesheetsService } from '../../services/timesheets.service';
 import { Timesheets } from '../../store/actions/timesheets.actions';
-import { getTimesheetStatusFromIdx } from '../../helpers/functions';
 
 @Component({
   selector: 'app-timesheets-container.ts',
@@ -70,7 +69,11 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public handleChangeTab(tabIndex: number): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState({ status: getTimesheetStatusFromIdx(tabIndex) }));
+    this.store.dispatch(new Timesheets.UpdateFiltersState({
+      statusIds: this.tabConfig[tabIndex].value ?
+        [`${this.tabConfig[tabIndex].value}`] :
+        [],
+    }));
   }
 
   public handleChangePage(page: number): void {

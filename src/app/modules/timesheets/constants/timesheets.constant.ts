@@ -10,17 +10,25 @@ export const TAB_ADMIN_TIMESHEETS: TabConfig[] = [
   },
   {
     title: 'Pending Approval',
-    amount: 2,
+    value: 2,
   },
   {
     title: 'Missing',
-    amount: 6,
+    value: 4,
   },
   {
     title: 'Rejected',
-    amount: 5,
+    value: 5,
   }
 ];
+
+export const MapTimesheetsStatuses: Map<TIMETHEETS_STATUSES, number> = new Map()
+  .set(TIMETHEETS_STATUSES.INCOMPLETE, 1)
+  .set(TIMETHEETS_STATUSES.PENDING_APPROVE, 2)
+  .set(TIMETHEETS_STATUSES.PENDING_APPROVE_ASTERIX, 3)
+  .set(TIMETHEETS_STATUSES.MISSING, 4)
+  .set(TIMETHEETS_STATUSES.REJECTED, 5)
+  .set(TIMETHEETS_STATUSES.APPROVED, 6);
 
 export const exportOptions: ItemModel[] = [
   { text: ExportType.Excel_file, id: '0' },

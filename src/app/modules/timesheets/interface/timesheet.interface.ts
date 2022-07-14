@@ -28,6 +28,7 @@ export interface TimesheetsFilterState {
   search?: string;
   orderId?: string[];
   status?: string;
+  statusIds?: string[];
   statusText?: string[];
   skillName?: string[];
   departmentName?: string[];

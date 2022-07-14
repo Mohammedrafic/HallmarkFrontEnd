@@ -43,14 +43,7 @@ export class TimesheetsApiService {
   ) {}
 
   public getTimesheets(filters: TimesheetsFilterState): Observable<TimeSheetsPage> {
-    return of({
-      pageNumber: 1,
-      totalPages: 1,
-      totalCount: 2,
-      items: [MokTimesheet, MokTimesheet1],
-      hasNextPage: false,
-      hasPreviousPage: false,
-    });
+    return this.http.get<TimeSheetsPage>('/api/Timesheets');
   }
 
   public getTabsCounts(): Observable<TabCountConfig> {
