@@ -246,4 +246,8 @@ export const approveTimesheetDialogData = {
   successMessage: 'Success. Timesheet Approved',
 };
 
+export const rejectTimesheetDialogData = {
+  successMessage: 'Success. Timesheet Rejected',
+};
+
 export const rejectReasonMaxLength: number = 250;

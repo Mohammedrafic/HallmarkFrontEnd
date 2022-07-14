@@ -75,4 +75,11 @@ export namespace Timesheets {
     constructor(public timesheetId: number) {
     }
   }
+
+  export class GetTimesheetDetails {
+    static readonly type = TIMESHEETS_ACTIONS.GET_TIMESHEET_DETAILS;
+
+    constructor(public timesheetId: number) {
+    }
+  }
 }

@@ -18,7 +18,12 @@
 
     .attachment {
       display: flex;
+      align-items: center;
       padding-bottom: 5px;
+
+      .file-icon {
+        flex-shrink: 0;
+      }
 
       .file-icon, .file-name {
         color: $primary-active-blue-10;
@@ -32,8 +37,6 @@
       }
 
       .delete-icon {
-        padding-left: 15px;
-
         i-feather {
           cursor: pointer;
         }

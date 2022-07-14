@@ -22,4 +22,5 @@ export const DefaultTimesheetState: TimesheetsModel = {
   costCenterOptions: [],
   isAddDialogOpen: false,
   timesheetsFiltersColumns: DefaultFilterColumns,
+  timesheetDetails: null,
 }

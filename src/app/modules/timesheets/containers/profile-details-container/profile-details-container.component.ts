@@ -1,4 +1,4 @@
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import {
   ChangeDetectionStrategy,
   Component, ElementRef,
@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { take, filter, Observable, switchMap, takeUntil, tap, throttleTime } from 'rxjs';
+import { take, filter, Observable, takeUntil, tap, throttleTime, distinctUntilChanged } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
@@ -27,9 +27,9 @@ import { TimesheetsState } from '../../store/state/timesheets.state';
 import {
   CandidateHoursAndMilesData,
   CandidateInfo,
-  DialogActionPayload, TimesheetDetailsInvoice,
+  DialogActionPayload,
   TimesheetRecordsDto,
-  TimesheetUploadedFile,
+  TimesheetDetailsModel, CandidateMilesData,
 } from '../../interface';
 import { DialogAction, SubmitBtnText } from '../../enums';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
@@ -39,6 +39,8 @@ import {
 } from '../../constants/confirm-delete-timesheet-dialog-content.const';
 import { ShowExportDialog } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
+import { CandidateService } from '@agency/services/candidates.service';
+
 
 @Component({
   selector: 'app-profile-details-container',
@@ -112,11 +114,14 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @Select(TimesheetsState.candidateHoursAndMilesData)
   public readonly hoursAndMilesData$: Observable<CandidateHoursAndMilesData>;
 
-  @Select(TimesheetsState.timeSheetAttachments)
-  public readonly attachments$: Observable<TimesheetUploadedFile[]>;
+  @Select(TimesheetsState.timesheetDetails)
+  public readonly timesheetDetails$: Observable<TimesheetDetailsModel>;
 
-  @Select(TimesheetsState.timeSheetInvoices)
-  public readonly invoices$: Observable<TimesheetDetailsInvoice[]>;
+  @Select(TimesheetsState.timesheetDetailsMilesStatistics)
+  public readonly milesData$: Observable<CandidateMilesData>
+
+ @Select(TimesheetsState.timesheetDetailsChartsVisible)
+  public readonly chartsVisible$: Observable<boolean>
 
   public readonly exportedFileType: typeof ExportedFileType = ExportedFileType;
   public readonly allowedFileExtensions: string = FileExtensionsString;
@@ -128,6 +133,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     private profileService: ProfileTimesheetService,
     private confirmService: ConfirmService,
     private datePipe: DatePipe,
+    private candidateService: CandidateService,
+    private router: Router,
   ) {
     super();
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
@@ -140,6 +147,14 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public ngOnInit(): void {
     this.getDialogState();
+    this.closeDialogOnNavigationStart();
+  }
+
+  public closeDialogOnNavigationStart(): void {
+    this.router.events.pipe(
+      filter((e) => e instanceof NavigationStart),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(() => this.handleProfileClose());
   }
 
   public onNextPreviousOrder(next: boolean): void {
@@ -194,10 +209,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
             new Timesheets.ToggleCandidateDialog(DialogAction.Close),
             new Timesheets.DeleteTimesheet(this.candidateId),
           ]).subscribe(() => this.handleProfileClose());
-        } else {
-          // TODO: what's this?
-          !submitted && switchComponent.writeValue(false);
         }
+
+        switchComponent.writeValue(false);
       });
   }
 
@@ -220,9 +234,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.isTimesheetOpen$
     .pipe(
       throttleTime(100),
-      filter((data) => data.dialogState),
-      tap((data) => { this.candidateId = data.id }),
-      switchMap((data) => this.profileService.getCandidateData(data.id)),
+      distinctUntilChanged((prev, next) => JSON.stringify(prev) === JSON.stringify(next)),
+      tap(({ id, dialogState }) => {
+        this.candidateId = id;
+        this.store.dispatch(new Timesheets.GetTimesheetDetails(id));
+      }),
       takeUntil(this.componentDestroy())
       )
     .subscribe(() => {
@@ -283,8 +299,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close))
     .pipe(
       takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.candidateDialog.hide();
-    });
+    ).subscribe(() => this.candidateDialog.hide());
   }
 }

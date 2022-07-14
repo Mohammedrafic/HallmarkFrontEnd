@@ -7,8 +7,8 @@ import { ExportPayload } from '@shared/models/export.model';
 import {
   CandidateHoursAndMilesData,
   TimesheetAttachments,
-  TimesheetDetailsInvoice,
-  TimesheetUploadedFile
+  TimesheetInvoice,
+  TimesheetAttachment, TimesheetDetailsModel
 } from '../interface';
 import { MockCandidateHoursAndMilesData } from '../constants';
 import { CandidateMockInfo } from '../constants/timesheet-records-mock.constant';
@@ -45,10 +45,11 @@ export class TimesheetDetailsApiService {
     return of();
   }
 
-  public getCandidateInvoices(id: number): Observable<TimesheetDetailsInvoice[]> {
+  public getCandidateInvoices(id: number): Observable<TimesheetInvoice[]> {
     return of([
       {
-        name: 'Example',
+        id: 1,
+        fileName: 'Example',
         url: 'http://www.africau.edu/images/default/sample.pdf',
       }
     ]);
@@ -58,7 +59,7 @@ export class TimesheetDetailsApiService {
     return this.http.get(url, { responseType: 'blob' });
   }
 
-  public uploadCandidateFiles(candidateId: number, files: Blob[]): Observable<TimesheetUploadedFile[]> {
+  public uploadCandidateFiles(candidateId: number, files: Blob[]): Observable<TimesheetAttachment[]> {
     const formData = new FormData();
     files.forEach((file) => formData.append('file', file))
 
@@ -70,11 +71,7 @@ export class TimesheetDetailsApiService {
     return of(null);
   }
 
-  // public uploadFile(data: ProfileUploadedFile): Observable<ProfileUploadedFile> {
-  //   return of(data);
-  // }
-
-  // public deleteFile(data: ProfileUploadedFile): Observable<boolean> {
-  //   return of(true);
-  // }
+  public getTimesheetDetails(id: number): Observable<TimesheetDetailsModel> {
+    return this.http.get<TimesheetDetailsModel>(`/api/Timesheets/${id}`);
+  }
 }

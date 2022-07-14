@@ -39,7 +39,7 @@ import { AddTimesheetComponent } from './components/add-timesheet/add-timesheet.
 import { EditTimesheetService } from './services/edit-timesheet.service';
 import { ProfileDetailsJobInfoComponent } from './components/profile-details-job-info/profile-details-job-info.component';
 import { ProfileCumulativeHoursComponent } from './components/profile-cumulative-hours/profile-cumulative-hours.component';
-import { ProfileUploadsComponent } from './components/profile-uploads/profile-uploads.component';
+import { TimesheetAttachmentsComponent } from './components/profile-uploads/timesheet-attachments.component';
 import { ProfileInvoicesComponent } from './components/profile-invoices/profile-invoices.component';
 import { TimesheetsService } from './services/timesheets.service';
 import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
@@ -96,7 +96,7 @@ const gridIcons = {
     AddTimesheetComponent,
     ProfileDetailsJobInfoComponent,
     ProfileCumulativeHoursComponent,
-    ProfileUploadsComponent,
+    TimesheetAttachmentsComponent,
     ProfileInvoicesComponent,
     TimesheetRejectReasonDialogComponent,
     GridDateEditorComponent,

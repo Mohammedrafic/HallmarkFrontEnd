@@ -4,7 +4,7 @@ import { PdfViewerComponent } from '@syncfusion/ej2-angular-pdfviewer';
 import { takeUntil } from 'rxjs';
 
 import { Destroyable } from '@core/helpers';
-import { TimesheetDetailsInvoice } from '../../interface';
+import { TimesheetInvoice } from '../../interface';
 import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
 
 @Component({
@@ -14,7 +14,7 @@ import { TimesheetDetailsApiService } from '../../services/timesheet-details-api
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileInvoicesComponent extends Destroyable {
-  public previewInvoice: TimesheetDetailsInvoice | null = null;
+  public previewInvoice: TimesheetInvoice | null = null;
 
   public readonly serviceUrl = 'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
 
@@ -22,7 +22,7 @@ export class ProfileInvoicesComponent extends Destroyable {
   public pdfViewer: PdfViewerComponent;
 
   @Input()
-  public invoices: TimesheetDetailsInvoice[] = [];
+  public invoices: TimesheetInvoice[] | null = [];
 
   constructor(
     private timesheetDetailsApiService: TimesheetDetailsApiService,
@@ -30,11 +30,11 @@ export class ProfileInvoicesComponent extends Destroyable {
     super();
   }
 
-  public trackByName(_: number, item: TimesheetDetailsInvoice): string {
-    return item.name;
+  public trackByName(_: number, item: TimesheetInvoice): string {
+    return item.fileName;
   }
 
-  public preview(invoice: TimesheetDetailsInvoice): void {
+  public preview(invoice: TimesheetInvoice): void {
     this.previewInvoice = invoice;
 
     this.timesheetDetailsApiService.loadInvoiceBlob(invoice.url)
