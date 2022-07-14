@@ -22,12 +22,12 @@ import {
 } from '@client/store/order-managment-content.actions';
 import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
 import { RejectReason } from '@shared/models/reject-reason.model';
-import { GetCandidateJob } from '@agency/store/order-management.actions';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations';
-import { AccordionOneField } from '../../../models/accordion-one-field.model';
+import { AccordionOneField } from '@shared/models/accordion-one-field.model';
+import PriceUtils from '@shared/utils/price.utils';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -63,6 +63,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public rejectReasons: RejectReason[] = [];
   public openRejectDialog = new Subject<boolean>();
   public isRejected = false;
+  public priceUtils = PriceUtils;
   public accordionClickElement: HTMLElement | null;
   public accordionOneField: AccordionOneField;
 

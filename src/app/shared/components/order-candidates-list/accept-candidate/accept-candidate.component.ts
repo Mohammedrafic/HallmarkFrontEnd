@@ -18,7 +18,8 @@ import { DatePipe } from '@angular/common';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations';
-import { AccordionOneField } from '../../../models/accordion-one-field.model';
+import { AccordionOneField } from '@shared/models/accordion-one-field.model';
+import PriceUtils from '@shared/utils/price.utils';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -50,6 +51,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public openRejectDialog = new Subject<boolean>();
   public accordionClickElement: HTMLElement | null;
   public accordionOneField: AccordionOneField;
+  public priceUtils = PriceUtils;
 
   get isRejected(): boolean {
     return this.isReadOnly && this.candidate.status === ApplicantStatusEnum.Rejected;

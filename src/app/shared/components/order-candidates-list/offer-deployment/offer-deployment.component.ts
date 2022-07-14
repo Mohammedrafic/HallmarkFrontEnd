@@ -35,7 +35,8 @@ import { RejectReason } from '@shared/models/reject-reason.model';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations';
 import { ShowToast } from 'src/app/store/app.actions';
-import { AccordionOneField } from '../../../models/accordion-one-field.model';
+import { AccordionOneField } from '@shared/models/accordion-one-field.model';
+import PriceUtils from '@shared/utils/price.utils';
 
 @Component({
   selector: 'app-offer-deployment',
@@ -68,6 +69,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public today = new Date();
   public accordionClickElement: HTMLElement | null;
   public accordionOneField: AccordionOneField;
+  public priceUtils = PriceUtils;
 
   get showYearsOfExperience(): boolean {
     return (

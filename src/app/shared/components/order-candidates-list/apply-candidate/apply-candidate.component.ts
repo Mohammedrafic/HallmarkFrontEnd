@@ -17,7 +17,8 @@ import { OrderApplicantsInitialData } from '@shared/models/order-applicants.mode
 import { OrderCandidatesList } from '@shared/models/order-management.model';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { ExpandEventArgs, AccordionClickArgs } from '@syncfusion/ej2-navigations';
-import { AccordionOneField } from '../../../models/accordion-one-field.model';
+import { AccordionOneField } from '@shared/models/accordion-one-field.model';
+import PriceUtils from '@shared/utils/price.utils';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -41,6 +42,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public candidatStatus = CandidatStatus;
   public today = new Date();
   public organizationId: number;
+  public priceUtils = PriceUtils;
   public accordionClickElement: HTMLElement | null;
   public accordionOneField: AccordionOneField;
 

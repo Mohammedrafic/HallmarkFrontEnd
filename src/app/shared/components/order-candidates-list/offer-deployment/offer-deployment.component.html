@@ -51,9 +51,15 @@
                     </div>
                   </div>
                   <div class="input-container">
-                    <label>Bill Rate</label>
+                    <label>Bill Rate ($)</label>
                     <div class="input-group input-readonly">
-                      <input formControlName="orderBillRate" class="e-input" type="text" readonly/>
+                      <input
+                        formControlName="orderBillRate"
+                        class="e-input"
+                        type="text"
+                        (focus)="priceUtils.setPriceMask(formGroup, 'orderBillRate', $event)"
+                        (blur)="priceUtils.setTwoDecimals(formGroup, 'orderBillRate', $event)"
+                        readonly/>
                     </div>
                   </div>
                 </div>
@@ -67,19 +73,27 @@
                 </div>
                 <div class="d-flex bootstrap">
                   <div class="input-container">
-                    <label>Candidate Bill Rate</label>
+                    <label>Candidate Bill Rate ($)</label>
                     <div class="input-group input-readonly">
-                      <input formControlName="candidateBillRate" class="e-input" type="number" readonly/>
+                      <input
+                        formControlName="candidateBillRate"
+                        class="e-input"
+                        type="number"
+                        (focus)="priceUtils.setPriceMask(formGroup, 'candidateBillRate', $event)"
+                        (blur)="priceUtils.setTwoDecimals(formGroup, 'candidateBillRate', $event)"
+                        readonly/>
                     </div>
                   </div>
                   <div class="input-container">
-                    <label>Offered Bill Rate<span *ngIf="!isRejected && !isReadOnly" class="required">*</span></label>
+                    <label>Offered Bill Rate ($)<span *ngIf="!isRejected && !isReadOnly" class="required">*</span></label>
                     <div class="input-group" [ngClass]="{'input-readonly': isRejected || isReadOnly}">
                       <input appValidateWithMessage
                              [readonly]="isRejected || isReadOnly"
                              formControlName="offeredBillRate"
                              class="e-input"
-                             type="number"/>
+                             (focus)="priceUtils.setPriceMask(formGroup, 'offeredBillRate', $event)"
+                             (blur)="priceUtils.setTwoDecimals(formGroup, 'offeredBillRate', $event)"
+                             type="text"/>
                     </div>
                   </div>
                 </div>

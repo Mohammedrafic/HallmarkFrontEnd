@@ -72,9 +72,16 @@
                   </div>
                   <div class="right-column">
                     <div class="input-container bootstrap">
-                      <label class="input-group">Bill Rate</label>
+                      <label class="input-group">Bill Rate ($)</label>
                       <div class="input-group input-readonly">
-                        <input appValidateWithMessage formControlName="billRates" class="e-input" type="text" readonly/>
+                        <input
+                          appValidateWithMessage
+                          formControlName="billRates"
+                          class="e-input"
+                          type="text"
+                          (focus)="priceUtils.setPriceMask(form, 'billRates', $event)"
+                          (blur)="priceUtils.setTwoDecimals(form, 'billRates', $event)"
+                          readonly/>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
@@ -84,9 +91,16 @@
                       </div>
                     </div>
                     <div class="input-container bootstrap">
-                      <label class="input-group">Candidate Bill Rate</label>
+                      <label class="input-group">Candidate Bill Rate ($)</label>
                       <div class="input-group input-readonly">
-                        <input appValidateWithMessage formControlName="candidateBillRate" class="e-input" type="text" readonly/>
+                        <input
+                          appValidateWithMessage
+                          formControlName="candidateBillRate"
+                          class="e-input"
+                          type="text"
+                          (focus)="priceUtils.setPriceMask(form, 'candidateBillRate', $event)"
+                          (blur)="priceUtils.setTwoDecimals(form, 'candidateBillRate', $event)"
+                          readonly/>
                       </div>
                     </div>
                     <div class="input-container bootstrap">
@@ -123,9 +137,16 @@
                     </div>
                   </div>
                   <div class="input-container bootstrap">
-                    <label class="input-group">Offered Bill Rate</label>
+                    <label class="input-group">Offered Bill Rate ($)</label>
                     <div class="input-group">
-                      <input appValidateWithMessage formControlName="offeredBillRate" class="e-input" type="text"/>
+                      <input
+                        appValidateWithMessage
+                        formControlName="offeredBillRate"
+                        class="e-input"
+                        type="text"
+                        (focus)="priceUtils.setPriceMask(form, 'offeredBillRate', $event)"
+                        (blur)="priceUtils.setTwoDecimals(form, 'offeredBillRate', $event)"
+                      />
                     </div>
                   </div>
                 </div>
