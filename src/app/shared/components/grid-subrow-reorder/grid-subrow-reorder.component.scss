@@ -1,0 +1,45 @@
+@import '../../../styles/variables/colors.scss';
+
+.reorder-row {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding-left: 103px;
+
+  &:hover {
+    background-color: $primary-active-blue-90;
+  }
+
+  .info {
+    font-size: 12px;
+
+    &:not(:last-child) {
+      margin-right: 26px;
+    }
+
+    .data {
+      font-weight: 700;
+      color: $black;
+    }
+
+    .title {
+      margin-top: 2px;
+      font-weight: 400;
+      color: $secondary-dark-blue-30;
+    }
+  }
+
+  .status {
+    padding-left: 30px;
+  }
+
+  &.selected {
+    background-color: $primary-active-blue-70;
+  }
+}
+
+ejs-chiplist.e-control.e-chip-list .e-chip {
+  min-width: 112px;
+  width: auto;
+}
+

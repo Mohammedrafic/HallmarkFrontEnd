@@ -94,7 +94,7 @@
       </e-column>
       <e-column field="id" headerText="ORDER ID" width="120">
         <ng-template #template let-data>
-          <ng-container *ngIf="!data.children?.length; else withToggle">
+          <ng-container *ngIf="showReOrders ? !data.reOrders?.length : !data.children?.length; else withToggle">
             <div>
               <b>{{ data.id }}</b>
             </div>
@@ -214,15 +214,23 @@
     </e-columns>
 
     <ng-template #detailTemplate let-data>
-
-      <div class="subrow-wrapper">
+      <div class="subrow-wrapper" *ngIf="!showReOrders">
         <app-grid-subrow-candidate
           *ngFor="let child of data.children"
           [candidat]="child"
           [order]="data"
-          [selected]="selectedCandidat?.selected?.order === data.id && selectedCandidat?.selected.positionId === child.positionId"
+          [selected]="selectedCandidate?.selected?.order === data.id && selectedCandidate?.selected.positionId === child.positionId"
           (clickEvent)="onOpenCandidateDialog($event, data)"
         ></app-grid-subrow-candidate>
+      </div>
+      <div class="subrow-wrapper" *ngIf="showReOrders">
+        <app-grid-subrow-reorder
+          *ngFor="let child of data.reOrders"
+          [reOrder]="child"
+          [order]="data"
+          [selected]="selectedReOrder?.selected?.order === data.id && selectedReOrder?.selected.reOrder === child.id"
+          (clickEvent)="onOpenReorderDialog($event, data)"
+        ></app-grid-subrow-reorder>
       </div>
     </ng-template>
 
@@ -538,4 +546,4 @@
   [openEvent]="openDetails"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"></app-order-details-dialog>
 
-<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>
+<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidate"  [openEvent]="openChildDialog"></app-child-order-dialog>

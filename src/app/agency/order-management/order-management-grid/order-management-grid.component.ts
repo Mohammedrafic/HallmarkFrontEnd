@@ -43,6 +43,7 @@ import {
   AgencyOrderFilters,
   AgencyOrderManagement,
   AgencyOrderManagementPage,
+  Order,
   OrderManagementChild,
 } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
@@ -99,7 +100,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public openChildDialog = new Subject<any>();
   public typeValueAccess = typeValueAccess;
   public previousSelectedOrderId: number | null;
-  public selectedCandidat: any | null;
+  public selectedCandidate: any | null;
+  public selectedReOrder: any | null;
   public filters: AgencyOrderFilters = {};
   public filterColumns = AgencyOrderFiltersComponent.generateFilterColumns();
   public OrderFilterFormGroup: FormGroup = AgencyOrderFiltersComponent.generateFiltersForm();
@@ -109,6 +111,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public isRowScaleUp: boolean = true;
   public isSubrowDisplay: boolean = false;
   public ordersPage: AgencyOrderManagementPage;
+  public showReOrders = false;
 
   private statusSortDerection: SortDirection = 'Ascending';
   private isAlive = true;
@@ -257,15 +260,19 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onGridCreated(): void {
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
+        this.showReOrders = false;
         this.refreshGridColumns(MyAgencyOrdersColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.PerDiem:
+        this.showReOrders = true;
         this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.ReOrders:
+        this.showReOrders = false;
         this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
         break;
       default:
+        this.showReOrders = false;
         this.refreshGridColumns(MyAgencyOrdersColumnsConfig, this.gridWithChildRow);
         break;
     }
@@ -327,9 +334,22 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.gridWithChildRow.selectRow(nextIndex);
   }
 
+  public onOpenReorderDialog(reOrder: AgencyOrderManagement, order: AgencyOrderManagement): void {
+    this.selectedReOrder = reOrder;
+    this.selectedReOrder.selected = {
+      order: order.orderId,
+      reOrder: reOrder.orderId
+    };
+    const options = this.getDialogNextPreviousOption(order);
+    this.store.dispatch(new GetOrderById(order.orderId, order.organizationId, options));
+    this.selectedOrder = order;
+    //this.openChildDialog.next([order, candidate]); TODO: pending reorder modal
+    this.selectedIndex = null;
+  }
+
   public onOpenCandidateDialog(candidat: OrderManagementChild, order: AgencyOrderManagement): void {
-    this.selectedCandidat = candidat;
-    this.selectedCandidat.selected = {
+    this.selectedCandidate = candidat;
+    this.selectedCandidate.selected = {
       order: order.orderId,
       positionId: candidat.positionId,
     };
@@ -430,7 +450,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.previousSelectedOrderId = null;
       } else {
         this.openChildDialog.next(false);
-        this.selectedCandidat = null;
+        this.selectedCandidate = null;
       }
     });
   }
@@ -438,7 +458,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private onChildDialogChange(): void {
     this.openChildDialog.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (!isOpen) {
-        this.selectedCandidat = null;
+        this.selectedCandidate = null;
       } else {
         this.openPreview.next(false);
         this.gridWithChildRow?.clearRowSelection();

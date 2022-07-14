@@ -15,7 +15,7 @@ import {
   GetIncompleteOrders,
   GetMasterShifts,
   GetOrderById,
-  GetOrderFIlterDataSources,
+  GetOrderFilterDataSources,
   GetOrders,
   GetOrganisationCandidateJob,
   GetOrganizationStatesWithKeyCode,
@@ -36,8 +36,10 @@ import {
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
   GetHistoricalData,
+  ExportOrders,
+  ClearSuggestions,
   SetLock,
-  ExportOrders
+  ClearOrders
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -271,6 +273,11 @@ export class OrderManagementContentState {
     }));
   }
 
+  @Action(ClearOrders)
+  ClearOrders({ patchState }: StateContext<OrderManagementContentStateModel>, { }: ClearOrders): OrderManagementContentStateModel {
+    return  patchState({ ordersPage: null });
+  }
+
   @Action(GetOrderById)
   GetOrderById(
     { patchState }: StateContext<OrderManagementContentStateModel>,
@@ -407,6 +414,11 @@ export class OrderManagementContentState {
     }));
   }
 
+  @Action(ClearSuggestions)
+  ClearSuggestions({ patchState }: StateContext<OrderManagementContentStateModel>, { }: ClearSuggestions): OrderManagementContentStateModel {
+    return patchState({ suggestedDetails: null });
+  }
+
   @Action(GetProjectNames)
   GetProjectNames({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<ProjectName[]> {
     return this.projectsService.getProjectNames().pipe(tap(payload => {
@@ -538,8 +550,8 @@ export class OrderManagementContentState {
     );
   }
 
-  @Action(GetOrderFIlterDataSources)
-  GetOrderFIlterDataSources(
+  @Action(GetOrderFilterDataSources)
+  GetOrderFilterDataSources(
     { patchState }: StateContext<OrderManagementContentStateModel>
   ): Observable<OrderFilterDataSource> {
     return this.orderManagementService.getOrderFilterDataSources().pipe(

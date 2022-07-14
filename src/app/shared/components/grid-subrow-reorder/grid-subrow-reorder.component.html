@@ -1,0 +1,40 @@
+<div class="reorder-row"  [ngClass]="{'selected': selected}" (click)="clickEvent.emit(reOrder)">
+  <div class="info">
+    <div class="data">{{ reOrder.id }}</div>
+    <div class="title">Re-Order ID</div>
+  </div>
+  <div class="info status">
+    <ejs-chiplist>
+      <e-chips>
+        <e-chip [text]="orderStatusText[reOrder.status]" [cssClass]="orderStatusText[reOrder.status] | chipsCssClass"></e-chip>
+      </e-chips>
+    </ejs-chiplist>
+  </div>
+  <div class="info">
+    <!--TODO: Pending BE accepted positions-->
+    <div class="data">{{reOrder.openPositions}} / {{reOrder.openPositions}}</div>
+    <div class="title">Open Positions</div>
+  </div>
+  <div class="info">
+    <!--TODO: Pending BE-->
+    <div class="data">Agency Name Mock</div>
+    <div class="title">Agency Name</div>
+  </div>
+  <div class="info">
+    <div class="data"> {{order.billRate | billRate: reOrder.billRate: reOrder.status: reOrder.billRate}}</div>
+    <div class="title">Bill Rate $</div>
+  </div>
+  <div class="info">
+    <div class="data">{{reOrder.reOrderDate | date: 'MM/dd/yyy'}}</div>
+    <div class="title">Re-Order Date</div>
+  </div>
+  <div class="info">
+    <!--TODO: Pending BE-->
+    <div class="data">07:00-18:30</div>
+    <div class="title">Re-Order Shift</div>
+  </div>
+  <div class="info">
+    <div class="data">{{reOrder.candidates}}</div>
+    <div class="title">Candidates</div>
+  </div>
+</div>
