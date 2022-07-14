@@ -7,9 +7,8 @@
       <div class="text-box">
         <h2>WELCOME!</h2>
         <p>Log In with your email....</p>
-        <!-- {{ isLoggedIn }} -->
       </div>
-      <form *ngIf="usersDropDownData?.length" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+      <form [formGroup]="loginForm" #spiner>
         <div class="input-container bootstrap">
           <label>Email</label>
           <div class="input-group">

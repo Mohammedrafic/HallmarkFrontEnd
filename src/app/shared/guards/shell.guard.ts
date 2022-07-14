@@ -1,18 +1,19 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 
-import { AUTH_STORAGE_KEY } from '@shared/constants/local-storage-keys';
+import { USER_STORAGE_KEY } from '@shared/constants/local-storage-keys';
+import { B2CAuthService } from 'src/app/b2c-auth/b2c-auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShellGuard implements CanActivate {
-  constructor(private router: Router) { }
+  constructor(private router: Router, private b2CAuthService: B2CAuthService) { }
 
   canActivate(): boolean {
-    const userId = window.localStorage.getItem(AUTH_STORAGE_KEY);
+    const user = window.localStorage.getItem(USER_STORAGE_KEY);
 
-    if (userId) {
+    if (this.b2CAuthService.isLoggedIn() && user) {
       return true;
     }
 

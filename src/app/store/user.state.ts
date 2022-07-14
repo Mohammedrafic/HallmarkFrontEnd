@@ -102,7 +102,6 @@ export class UserState {
 
   @Action(SetCurrentUser)
   SetCurrentUser({ patchState }: StateContext<UserStateModel>, { payload }: SetCurrentUser): void {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, payload.id);
     window.localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(payload));
     patchState({ user: payload });
   }
@@ -113,7 +112,6 @@ export class UserState {
       this.b2CAuthService.logout();
     }
 
-    window.localStorage.removeItem(AUTH_STORAGE_KEY);
     window.localStorage.removeItem(USER_STORAGE_KEY);
     window.localStorage.removeItem(ORG_ID_STORAGE_KEY);
     window.localStorage.removeItem(AGENCY_ID_STORAGE_KEY);
