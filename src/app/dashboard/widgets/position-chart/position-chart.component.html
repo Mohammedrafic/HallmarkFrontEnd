@@ -4,7 +4,7 @@
       <span class="widget__title">{{ chartData?.count }}</span>
       <span
         class="widget__type"
-        (mousedown)="mouseDown($event)"
+        (mousedown)="defineMousePosition($event)"
         (click)="toSourceContent($event)"
         >{{ chartData?.statusName | titlecase }} Positions</span>
     </div>

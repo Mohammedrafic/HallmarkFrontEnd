@@ -1,11 +1,14 @@
 @import 'colors';
 
 .comments-container {
-  background-color: $secondary-dark-blue-50;
   border-radius: 8px;
   display: flex;
   flex-flow: column;
   height: 100%;
+
+  &.background {
+    background-color: $secondary-dark-blue-50;
+  }
 
   .comments-header {
     margin-top: 16px;

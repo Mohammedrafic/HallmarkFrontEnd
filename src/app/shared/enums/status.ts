@@ -11,7 +11,7 @@ export enum Status {
 export const STATUS_COLOR_GROUP = {
   'e-success': ['open', 'Active', 'Completed', 'active', 'completed', 'applied', TIMETHEETS_STATUSES.PENDING_APPROVE, INVOICES_STATUSES.PENDING_APPROVAL],  // green
   'e-warning': ['incomplete', 'suspended', 'Suspended', 'Incomplete', 'shortlisted', 'in progress (pending)', INVOICES_STATUSES.PENDING_PAYMENT], // yellow
-  'e-default': ['closed', 'Inactive', 'inactive', 'Closed', TIMETHEETS_STATUSES.REJECTED],// hard gray
+  'e-default': ['closed', 'Inactive', 'inactive', 'Closed', 'withdraw', TIMETHEETS_STATUSES.REJECTED],// hard gray
   'e-pending': ['pending', 'Pending', 'offered', TIMETHEETS_STATUSES.MISSING], // red
   'e-progress': ['in progress', 'In Progress', 'Verified', 'verified', INVOICES_STATUSES.SUBMITED_PEND_APPR], // blue
   'e-accepted': ['accepted', 'Accepted', 'in progress (accepted)', TIMETHEETS_STATUSES.ORG_APPROVED], // purple
@@ -57,4 +57,12 @@ export enum OrderStatusText {
   'In Progress (Accepted)' = 32,
   Filled = 50,
   Closed = 60,
+}
+
+export enum CandidatesStatusText {
+  Applied = 10,
+  Shortlisted = 20,
+  Offered = 40,
+  Accepted = 50,
+  Onboard = 60
 }

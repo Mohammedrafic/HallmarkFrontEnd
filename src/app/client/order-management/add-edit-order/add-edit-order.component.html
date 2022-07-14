@@ -2,7 +2,10 @@
   <div>
     <button ejs-button cssClass="e-outline" (click)="navigateBack()">Back</button>
   </div>
-  <div class="form-title"><h3>{{ title }} Order</h3></div>
+  <div class="form-title">
+    <h3>{{ title }} Order</h3>
+    <span *ngIf="orderId > 0" class="order-id">ID: {{orderId}}</span>
+  </div>
   <div class="controls-form stick-right">
     <button ejs-button cssClass="e-outline button-import" (click)="onImportDataClick()">
       Import
@@ -31,7 +34,7 @@
       <ng-template #content>
         <ng-container>
           <section class="order-details-form-section">
-            <app-order-details-form #orderDetailsForm [isActive]="selectedTab === SelectedTab.OrderDetails"></app-order-details-form>
+            <app-order-details-form #orderDetailsForm (orderTypeChanged)="onOrderTypeChange($event)" [disableOrderType]="disableOrderType" [isActive]="selectedTab === SelectedTab.OrderDetails"></app-order-details-form>
           </section>
         </ng-container>
       </ng-template>

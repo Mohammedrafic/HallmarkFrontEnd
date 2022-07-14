@@ -5,6 +5,10 @@ body.light, body.dark {
     width: 448px;
     border-radius: 8px;
 
+    & + .e-dlg-overlay {
+      background-color: $black;
+    }
+
     div.e-dlg-header-content {
       border-radius: 8px 8px 0 0;
       border-bottom: 1px solid $secondary-dark-blue-40;

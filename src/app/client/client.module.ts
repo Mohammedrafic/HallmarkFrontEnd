@@ -66,7 +66,7 @@ import { NgxsModule } from '@ngxs/store';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { OrderDetailsDialogComponent } from './order-management/order-details-dialog/order-details-dialog.component';
-import { DialogModule } from '@syncfusion/ej2-angular-popups';
+import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { OrderDetailsContainerComponent } from './order-management/order-details-container/order-details-container.component';
 import { OrderCandidatesContainerComponent } from './order-management/order-candidates-container/order-candidates-container.component';
@@ -132,6 +132,7 @@ const gridIcons = {
     NumericTextBoxModule,
     MenuModule,
     TabAllModule,
+    TooltipModule,
     SplitButtonModule,
     DatePickerModule,
     TimePickerModule,

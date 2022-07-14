@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { takeWhile, Observable, Subject } from 'rxjs';
+import { debounceTime, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
@@ -17,26 +17,45 @@ import { CheckBoxComponent } from '@syncfusion/ej2-angular-buttons';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { GRID_CONFIG } from '@shared/constants';
-import { ROW_HEIGHT, typeValueAccess } from './order-management-grid.constants';
 import {
-  GetAgencyOrdersPage,
-  GetOrderById,
+  myAgencyColumnsToExport,
+  MyAgencyOrdersColumnsConfig,
+  PerDiemColumnsConfig,
+  perDiemColumnsToExport,
+  ReOrdersColumnsConfig,
+  reOrdersColumnsToExport,
+  ROW_HEIGHT,
+  typeValueAccess
+} from './order-management-grid.constants';
+import {
+  ExportAgencyOrders,
+  GetAgencyFilterOptions,
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
+  GetAgencyOrdersPage,
+  GetOrderById,
   ReloadOrderCandidatesLists,
-  GetAgencyFilterOptions,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AgencyOrderManagement, OrderManagementChild, AgencyOrderManagementPage, AgencyOrderFilters } from '@shared/models/order-management.model';
+import {
+  AgencyOrderFilters,
+  AgencyOrderManagement,
+  AgencyOrderManagementPage, OrderManagement,
+  OrderManagementChild, OrderManagementPage
+} from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { DatePipe, Location } from '@angular/common';
 import { UserState } from 'src/app/store/user.state';
 import { isUndefined } from 'lodash';
 import { FilterService } from '@shared/services/filter.service';
-import { ShowFilterDialog } from 'src/app/store/app.actions';
+import { ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { FilteredItem } from '@shared/models/filter.model';
 import { AgencyOrderFiltersComponent } from './agency-order-filters/agency-order-filters.component';
+import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { OrderType } from '@shared/enums/order-type';
+import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -46,7 +65,11 @@ import { AgencyOrderFiltersComponent } from './agency-order-filters/agency-order
 })
 export class OrderManagementGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() filteredItems$: Subject<number>;
- 
+  @Input() selectedTab: AgencyOrderManagementTabs;
+  @Input() exportButtonClicked: boolean;
+  @Input() onExportClicked$: Subject<any>;
+  @Input() search$: Subject<string>;
+
   @ViewChild('grid') override gridWithChildRow: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
 
@@ -60,7 +83,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public wrapSettings: TextWrapSettingsModel = GRID_CONFIG.wordWrapSettings;
   public allowWrap = GRID_CONFIG.isWordWrappingEnabled;
-  public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick' };
+  public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick', persistSelection: true };
   public selectedOrder: AgencyOrderManagement;
   public openPreview = new Subject<boolean>();
   public openCandidat = new Subject<boolean>();
@@ -69,12 +92,19 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public previousSelectedOrderId: number | null;
   public selectedCandidat: any | null;
   public filters: AgencyOrderFilters = {};
-  public filterColumns = AgencyOrderFiltersComponent.generateFolterColumns();
+  public filterColumns = AgencyOrderFiltersComponent.generateFilterColumns();
   public OrderFilterFormGroup: FormGroup = AgencyOrderFiltersComponent.generateFiltersForm();
+  public columnsToExport: ExportColumn[];
+  public fileName: string;
+  public defaultFileName: string;
+  public isRowScaleUp: boolean = true;
+  public isSubrowDisplay: boolean = false;
+  public ordersPage: AgencyOrderManagementPage;
 
   private statusSortDerection: SortDirection = 'Ascending';
   private isAlive = true;
   private selectedIndex: number | null;
+  private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private store: Store,
               private location: Location,
@@ -94,10 +124,60 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.dispatchNewPage();
     }
     this.onReloadOrderCandidatesLists();
+    this.onExportSelectedSubscribe();
+    this.idFieldName = 'orderId';
+    this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe((value: string) => {
+      if (value.length >= 2) {
+        this.OrderFilterFormGroup.controls['jobTitle'].setValue(value);
+        this.onFilterApply();
+      } else if (value.length === 0 && this.filters.jobTitle?.length) {
+        this.OrderFilterFormGroup.controls['jobTitle'].setValue('');
+        this.onFilterApply();
+      }
+    });
+    this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
+      this.ordersPage = data
+    });
   }
 
   ngOnDestroy(): void {
     this.isAlive = false;
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
+  public onExportSelectedSubscribe(): void {
+    this.onExportClicked$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .subscribe((event: any) => this.exportSelected(event));
+  }
+
+  public override customExport(): void {
+    this.defaultFileName = `Agency Management/${this.selectedTab} ` + this.generateDateTime(this.datePipe);
+    this.fileName = this.defaultFileName;
+    this.store.dispatch(new ShowExportDialog(true));
+  }
+
+  public closeExport() {
+    this.fileName = '';
+    this.store.dispatch(new ShowExportDialog(false));
+  }
+
+  public export(event: ExportOptions): void {
+    this.closeExport();
+    this.defaultExport(event.fileType, event);
+  }
+
+  public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
+    this.defaultFileName = `Agency Management/${this.selectedTab} ` + this.generateDateTime(this.datePipe);
+    this.store.dispatch(new ExportAgencyOrders(new ExportPayload(
+      fileType,
+      { ...this.filters, ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null },
+      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
+      null,
+      options?.fileName || this.defaultFileName
+    ), this.selectedTab));
+    this.clearSelection(this.gridWithChildRow);
   }
 
   public onDataBound(): void {
@@ -119,6 +199,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
       this.dispatchNewPage();
+      this.isSubrowDisplay = false
     }
   }
 
@@ -129,7 +210,44 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private dispatchNewPage(): void {
-    this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+    switch (this.selectedTab) {
+      case AgencyOrderManagementTabs.MyAgency:
+        this.columnsToExport = myAgencyColumnsToExport;
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        break;
+      case AgencyOrderManagementTabs.PerDiem:
+        // TODO: pending BE
+        this.columnsToExport = perDiemColumnsToExport;
+        this.filters.orderTypes = [OrderType.OpenPerDiem];
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        break;
+      case AgencyOrderManagementTabs.ReOrders:
+        this.columnsToExport = reOrdersColumnsToExport;
+        this.filters.orderTypes = [OrderType.ReOrder];
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        break;
+      default:
+        this.columnsToExport = myAgencyColumnsToExport;
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        break;
+    }
+  }
+
+  public onGridCreated(): void {
+    switch (this.selectedTab) {
+      case AgencyOrderManagementTabs.MyAgency:
+        this.refreshGridColumns(MyAgencyOrdersColumnsConfig, this.gridWithChildRow);
+        break;
+      case AgencyOrderManagementTabs.PerDiem:
+        this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
+        break;
+      case AgencyOrderManagementTabs.ReOrders:
+        this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
+        break;
+      default:
+        this.refreshGridColumns(MyAgencyOrdersColumnsConfig, this.gridWithChildRow);
+        break;
+    }
   }
 
   public onCompare(): void {
@@ -143,6 +261,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onRowClick(event: any): void {
+    this.rowSelected(event, this.gridWithChildRow);
     if (!event.isInteracted) {
       this.selectedOrder = event.data;
       const options = this.getDialogNextPreviousOption(event.data);
@@ -164,10 +283,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onRowScaleUpClick(): void {
+    this.isRowScaleUp = false;
     this.rowHeight = ROW_HEIGHT.SCALE_UP_HEIGHT;
   }
 
   public onRowScaleDownClick(): void {
+    this.isRowScaleUp = true;
     this.rowHeight = ROW_HEIGHT.SCALE_DOWN_HEIGHT;
   }
 
@@ -190,22 +311,38 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.selectedIndex = null;
   }
 
+  public expandAll(): void {
+    this.isSubrowDisplay = true
+    this.ordersPage.items.forEach((item: AgencyOrderManagement, index: number): void => {
+      super.onSubrowAllToggle(index + 1)
+    })
+  }
+
+  public collapseAll(): void {
+    this.isSubrowDisplay = false
+    super.onSubrowAllToggle()
+  }
+
   // Filter
   public onFilterClose() {
     this.OrderFilterFormGroup.setValue({
       orderId: this.filters.orderId || null,
+      reOrderId: this.filters.reOrderId || null,
       regionIds: this.filters.regionIds || [],
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
       skillIds: this.filters.skillIds || [],
-      orderTypes: this.filters.orderTypes || [],
+      orderTypes: this.selectedTab === AgencyOrderManagementTabs.PerDiem ? [] : this.filters.orderTypes || [],
       jobTitle: this.filters.jobTitle || null,
       billRateFrom: this.filters.billRateFrom || null,
       billRateTo: this.filters.billRateTo || null,
       openPositions: this.filters.openPositions || null,
       jobStartDate: this.filters.jobStartDate || null,
       jobEndDate: this.filters.jobEndDate || null,
+      reOrderDate: this.filters.reOrderDate || null,
       candidateStatuses: this.filters.candidateStatuses || [],
+      candidatesCountFrom: this.filters.candidatesCountFrom || null,
+      candidatesCountTo: this.filters.candidatesCountTo || null,
       organizationIds: this.filters.organizationIds || [],
       orderStatuses: this.filters.orderStatuses || [],
     });

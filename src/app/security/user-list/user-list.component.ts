@@ -1,24 +1,21 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, UNIT_FIELDS, DISABLED_GROUP } from "./user-list.constants";
-import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
-import { SecurityState } from "../store/security.state";
-import { filter, map, Observable, takeWhile } from "rxjs";
-import { BusinessUnit } from "@shared/models/business-unit.model";
-import { AbstractControl, FormControl, FormGroup } from "@angular/forms";
-import { SetHeaderState, ShowSideDialog } from "../../store/app.actions";
-import {
-  GetBusinessByUnitType,
-  GetRolePerUser,
-  SaveUser,
-  SaveUserSucceeded
-} from "../store/security.actions";
-import { UserState } from "../../store/user.state";
-import { BusinessUnitType } from "@shared/enums/business-unit-type";
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
-import { UserSettingsComponent } from "./add-edit-user/user-settings/user-settings.component";
-import { ConfirmService } from "@shared/services/confirm.service";
-import { UserDTO, User } from "@shared/models/user-managment-page.model";
-import { take } from "rxjs/operators";
+import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, UNIT_FIELDS, DISABLED_GROUP } from './user-list.constants';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { SecurityState } from '../store/security.state';
+import { filter, map, Observable, Subject, takeWhile } from 'rxjs';
+import { BusinessUnit } from '@shared/models/business-unit.model';
+import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
+import { SetHeaderState, ShowExportDialog, ShowSideDialog } from '../../store/app.actions';
+import { GetBusinessByUnitType, GetRolePerUser, SaveUser, SaveUserSucceeded } from '../store/security.actions';
+import { UserState } from '../../store/user.state';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
+import { UserSettingsComponent } from './add-edit-user/user-settings/user-settings.component';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { UserDTO, User } from '@shared/models/user-managment-page.model';
+import { take } from 'rxjs/operators';
+import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 const DEFAULT_DIALOG_TITLE = 'Add User';
 const EDIT_DIALOG_TITLE = 'Edit User';
@@ -26,15 +23,16 @@ const EDIT_DIALOG_TITLE = 'Edit User';
 @Component({
   selector: 'app-user-list',
   templateUrl: './user-list.component.html',
-  styleUrls: ['./user-list.component.scss']
+  styleUrls: ['./user-list.component.scss'],
 })
-export class UserListComponent implements OnInit, OnDestroy {
+export class UserListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Select(SecurityState.businessUserData)
-  public businessUserData$:Observable<(type: number) => BusinessUnit[]>
+  public businessUserData$: Observable<(type: number) => BusinessUnit[]>;
 
   @Select(SecurityState.newBusinessDataPerUser)
-  public newBusinessDataPerUser$:Observable<(type: number) => BusinessUnit[]>
+  public newBusinessDataPerUser$: Observable<(type: number) => BusinessUnit[]>;
 
+  public exportUsers$ = new Subject<ExportedFileType>();
   public businessForm: FormGroup;
   public userSettingForm: FormGroup;
   public isEditRole = false;
@@ -58,11 +56,8 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   private isAlive = true;
 
-  constructor(
-    private store: Store,
-    private confirmService: ConfirmService,
-    private actions$: Actions
-  ) {
+  constructor(private store: Store, private confirmService: ConfirmService, private actions$: Actions) {
+    super();
     this.store.dispatch(new SetHeaderState({ title: 'Security', iconName: 'lock' }));
   }
 
@@ -83,8 +78,8 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.createdUser = null;
   }
 
-  get bussinesUserData$(): Observable< BusinessUnit[]> {
-    return  this.businessUserData$.pipe(map(fn => fn(this.businessUnitControl?.value)));
+  get bussinesUserData$(): Observable<BusinessUnit[]> {
+    return this.businessUserData$.pipe(map((fn) => fn(this.businessUnitControl?.value)));
   }
 
   public onAddNewUser() {
@@ -126,21 +121,21 @@ export class UserListComponent implements OnInit, OnDestroy {
 
   public onSave(): void {
     this.userSettingForm.markAllAsTouched();
-    if(this.userSettingForm.valid) {
+    if (this.userSettingForm.valid) {
       const value = this.userSettingForm.getRawValue();
-      let userDTO : UserDTO = {
+      let userDTO: UserDTO = {
         businessUnitId: value.businessUnitId || null,
         metadata: {
           ...value,
-          isDeleted: !value.isDeleted
+          isDeleted: !value.isDeleted,
         },
-        roleIds: value.roles
-      }
-      if(this.isEditRole) {
-         userDTO = {
+        roleIds: value.roles,
+      };
+      if (this.isEditRole) {
+        userDTO = {
           ...userDTO,
-           userId: value.id,
-        }
+          userId: value.id,
+        };
       }
       this.store.dispatch(new SaveUser(userDTO));
     }
@@ -152,23 +147,31 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.userSettingForm.reset();
     this.userSettingForm.enable();
 
-    if(user.roles) {
+    if (user.roles) {
       const editedUser = {
         ...user,
         roles: [...user.roles],
         isDeleted: !user.isDeleted,
         businessUnitId: user.businessUnitId || 0,
-        emailConfirmation: user.email
-      }
+        emailConfirmation: user.email,
+      };
       this.userSettingForm.patchValue({
         ...editedUser,
-        roles: user.roles?.map((role:any) => role.id)
+        roles: user.roles?.map((role: any) => role.id),
       });
     }
 
     this.subscribeOnFieldsChanges(user);
     this.disableBussinesUnitForRole();
     this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  public override customExport(): void {
+    this.store.dispatch(new ShowExportDialog(true));
+  }
+
+  public override defaultExport(fileType: ExportedFileType): void {
+    this.exportUsers$.next(fileType);
   }
 
   private generateBusinessForm(): FormGroup {
@@ -218,14 +221,18 @@ export class UserListComponent implements OnInit, OnDestroy {
   }
 
   private subscribeOnFieldsChanges(user: User) {
-    if(user.businessUnitType !== BusinessUnitType.Hallmark) {
+    if (user.businessUnitType !== BusinessUnitType.Hallmark) {
       this.newBusinessDataPerUser$.pipe(take(2)).subscribe(() => {
         this.userSettingForm.get('businessUnitId')?.setValue(user.businessUnitId);
       });
     }
 
-    this.store.dispatch(new GetRolePerUser(user.businessUnitId as BusinessUnitType || 0, user.businessUnitType as BusinessUnitType)).subscribe((() => {
-      this.userSettingForm.get('roles')?.setValue(user.roles?.map((role:any) => role.id));
-    }));
+    this.store
+      .dispatch(
+        new GetRolePerUser((user.businessUnitId as BusinessUnitType) || 0, user.businessUnitType as BusinessUnitType)
+      )
+      .subscribe(() => {
+        this.userSettingForm.get('roles')?.setValue(user.roles?.map((role: any) => role.id));
+      });
   }
 }

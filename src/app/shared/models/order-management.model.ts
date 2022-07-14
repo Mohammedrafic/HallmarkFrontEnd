@@ -11,6 +11,7 @@ import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-stat
 
 export class OrderManagement {
   id: number;
+  reOrderId?: number; // TODO: verify name after BE implementation
   organizationId: number;
   status: number;
   statusText: string;
@@ -21,6 +22,10 @@ export class OrderManagement {
   locationName: string;
   departmentId: number;
   departmentName: string;
+  agencyName?: string[]; // TODO: verify name after BE implementation
+  shiftStartTime?: string; // TODO: verify name after BE implementation
+  shiftEndTime?: string; // TODO: verify name after BE implementation
+  shift?: string; // used only in UI to group and show shiftStartTime - shiftEndTime range
   skillId: number;
   skillName: string;
   orderType: number;
@@ -28,6 +33,7 @@ export class OrderManagement {
   openPositions: number;
   candidates: number;
   startDate: string;
+  reOrderDate?: string; // TODO: verify name after BE implementation
   isLocked?: boolean;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
   children: OrderManagementChild[];
@@ -49,6 +55,7 @@ export type OrderManagementPage = PageOfCollections<OrderManagement>;
 
 export type AgencyOrderManagement = {
   orderId: number;
+  reOrderId?: number; // TODO: verify name after BE implementation
   statusText: string;
   status: OrderStatus;
   jobTitle: string;
@@ -56,11 +63,15 @@ export type AgencyOrderManagement = {
   location: string;
   numberOfPositions: number;
   department: string;
+  agencyName?: string[]; // TODO: verify name after BE implementation
+  shiftStartTime?: string; // TODO: verify name after BE implementation
+  shiftEndTime?: string; // TODO: verify name after BE implementation
   orderType: OrderType;
   billRate: number;
   candidatesCount: number;
   isLocked: boolean;
   jobStartDate: string;
+  reOrderDate?: string; // TODO: verify name after BE implementation
   organizationId: number;
   organizationName: string;
   children: OrderManagementChild[];
@@ -112,8 +123,11 @@ export type AgencyOrderFilters = {
   locationIds?: number[];
   departmentsIds?: number[];
   orderId?: number;
+  reOrderId?: number; // TODO: verify name after BE implementation
   skillIds?: number[];
   candidateStatuses?: number[];
+  candidatesCountFrom?: number; // TODO: verify name after BE implementation
+  candidatesCountTo?: number; // TODO: verify name after BE implementation
   organizationIds?: number[];
   orderTypes?: number[];
   orderStatuses?: number[];
@@ -123,6 +137,7 @@ export type AgencyOrderFilters = {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
+  reOrderDate?: Date; // TODO: verify name after BE implementation
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -132,7 +147,7 @@ export type AgencyOrder = {
   organizationId: number;
 };
 
-export class SuggesstedDetails {
+export class SuggestedDetails {
   workLocation: {
     address: string;
     state: string;
@@ -244,6 +259,7 @@ export type AcceptJobDTO = {
   organizationId: number;
   requestComment: string;
   billRates: BillRate[];
+  offeredStartDate: string;
 };
 
 export type CandidateProfile = {
@@ -298,11 +314,38 @@ export type OrderCandidateJob = {
   positionId: number;
   allowDeployCredentials: boolean;
   hasAllRequiredOnboardedCredentials: boolean;
+  offeredStartDate: string;
 };
+
+export type CandidatesBasicInfo = {
+  jobId: number;
+  organizationId: number;
+  organizationName: string;
+  orderId: number;
+  candidateProfileId: number;
+  positionId: number;
+  billRatesGroupId: number;
+  workflowStepId: number;
+  candidateBillRate: number;
+  offeredBillRate: number;
+  expAsTravelers: number;
+  onBoardDate: string;
+  availableStartDate: string;
+  requestComment: string;
+  rejectDate: string;
+  rejectBy: string;
+  rejectReasonId: number;
+  allowDeployCredentials: boolean;
+  actualStartDate: string;
+  actualEndDate: string;
+  clockId: string;
+  guaranteedWorkWeek: string;
+}
 
 export type ApplicantStatus = {
   applicantStatus: number;
   statusText: string;
+  isEnabled?: boolean;
 };
 
 export class OrderFilter {
@@ -312,6 +355,7 @@ export class OrderFilter {
   regionIds?: number[];
   locationIds?: number[];
   departmentsIds?: number[];
+  reOrderId?: number; // TODO: verify name after BE implementation
   orderId?: number;
   skillIds?: number[];
   orderTypes?: number[];
@@ -321,6 +365,7 @@ export class OrderFilter {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
+  reOrderDate?: Date; // TODO: verify name after BE implementation
   orderStatuses?: number[];
   candidateStatuses?: number[];
   candidatesCountFrom?: number;

@@ -5,9 +5,9 @@
         <div class="deploy-candidate-wrapper">
           <h3 class="e-card-title candidate-title">
             {{candidate?.lastName}}, {{candidate?.firstName}}
-            <i-feather name="briefcase" class="icon" *ngIf="isDeployedAndAgency"></i-feather>
+            <i-feather name="briefcase" class="icon" *ngIf="candidate.deployedCandidateInfo"></i-feather>
           </h3>
-          <app-deploy-candidate-message *ngIf="isDeployedAndAgency" [candidate]="candidate"></app-deploy-candidate-message>
+          <app-deploy-candidate-message *ngIf="candidate.deployedCandidateInfo" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
         </div>
         <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
           <e-chips>
@@ -27,7 +27,7 @@
           >
           </ejs-dropdownlist>
         </div>
-        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onClose()">
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>
@@ -101,6 +101,12 @@
                   <label class="input-group">Available Start Date</label>
                   <div class="input-group input-readonly">
                     <input appValidateWithMessage formControlName="avStartDate" class="e-input" type="text" readonly/>
+                  </div>
+                </div>
+                <div *ngIf="isAccepted" class="input-container bootstrap offered-start-date">
+                  <label class="input-group">Offered Start Date</label>
+                  <div class="input-group input-readonly">
+                    <input appValidateWithMessage formControlName="offeredStartDate" class="e-input" type="text" readonly/>
                   </div>
                 </div>
                 <div class="form-container row">

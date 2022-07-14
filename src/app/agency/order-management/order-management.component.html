@@ -4,7 +4,7 @@
   </ng-container>
   <ng-container right>
     <div class="toolbar-actions">
-      <app-search class="search"></app-search>
+      <app-search #search (inputKeyUpEnter)="searchOrders($event)" class="search"></app-search>
       <button
       ejs-button
       id="filterButton"
@@ -13,16 +13,42 @@
         <span *ngIf="((filteredItems$ | async) || 0) as filteredItems" class="e-badge e-badge-success e-badge-circle">{{ filteredItems }}</span>
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
-    </button>
-      <button ejs-button cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+      </button>
+      <button
+        ejs-dropdownbutton
+        [items]="exportOptions"
+        (select)="onExportSelected($event)"
+        id="importButton"
+        cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
     </div>
   </ng-container>
 </app-page-toolbar>
 
 <section class="last-content-section-padding">
     <ng-container [ngSwitch]="selectedTab">
-        <app-order-management-grid *ngSwitchCase="selectedTabCases.MyAgency" [filteredItems$]="filteredItems$"></app-order-management-grid>
+      <app-order-management-grid
+        *ngSwitchCase="selectedTabCases.MyAgency"
+        [filteredItems$]="filteredItems$"
+        [selectedTab]="selectedTab"
+        [onExportClicked$]="exportSelected$"
+        [search$]="search$"
+      ></app-order-management-grid>
         <div *ngSwitchCase="selectedTabCases.OtherAgencies">OtherAgencies</div>
         <div *ngSwitchCase="selectedTabCases.AllAgencies">AllAgencies</div>
+        <!--TODO: columns config-->
+      <app-order-management-grid
+        *ngSwitchCase="selectedTabCases.PerDiem"
+        [filteredItems$]="filteredItems$"
+        [selectedTab]="selectedTab"
+        [onExportClicked$]="exportSelected$"
+        [search$]="search$"
+      ></app-order-management-grid>
+      <app-order-management-grid
+        *ngSwitchCase="selectedTabCases.ReOrders"
+        [filteredItems$]="filteredItems$"
+        [selectedTab]="selectedTab"
+        [onExportClicked$]="exportSelected$"
+        [search$]="search$"
+      ></app-order-management-grid>
     </ng-container>
 </section>

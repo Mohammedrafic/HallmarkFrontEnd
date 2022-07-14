@@ -5,4 +5,12 @@
     box-shadow: 0 4px 8px 0 $bill-rates-grid-hover-shadow;
     border-radius: 10px;
   }
+
+  .grid-footer {
+    height: 51px;
+    background-color: $white;
+    border: 1px solid $grid-row-border;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+  }
 }

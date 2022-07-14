@@ -4,7 +4,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { OrganizationService } from '@shared/services/organization.service';
 
 import { Select, Store } from '@ngxs/store';
-import { BehaviorSubject, catchError, combineLatest, mergeMap, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, debounceTime, distinctUntilChanged, mergeMap, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 import {
   GetUserAgencies,
@@ -80,6 +80,8 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
     this.organizationAgencyControl.valueChanges.pipe(
       takeUntil(this.unsubscribe$),
+      debounceTime(300),
+      distinctUntilChanged(),
       mergeMap((id) => this.getLogo(id)),
       switchMap(() => this.user$)
     ).subscribe(user => {

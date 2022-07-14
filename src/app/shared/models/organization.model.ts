@@ -125,11 +125,13 @@ export class OrganizationLocation {
 export class OrganizationRegion {
   id: number | null;
   name?: string;
+  orgName?: string;
   locations: any[] | null;
 }
 
 export class OrganizationStructure {
   organizationId: number;
+  organizationName: string;
   regions: OrganizationRegion[];
 }
 

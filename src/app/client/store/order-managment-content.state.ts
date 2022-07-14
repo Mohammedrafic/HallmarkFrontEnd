@@ -35,11 +35,13 @@ import {
   SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
-  GetHistoricalData
+  GetHistoricalData,
+  ExportOrders
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
   ApplicantStatus,
+  CandidatesBasicInfo,
   GetPredefinedBillRatesData,
   Order,
   OrderCandidateJob,
@@ -47,7 +49,7 @@ import {
   OrderFilterDataSource,
   OrderManagement,
   OrderManagementPage,
-  SuggesstedDetails
+  SuggestedDetails
 } from '@shared/models/order-management.model';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
@@ -67,11 +69,14 @@ import { ProjectSpecialData } from '@shared/models/project-special-data.model';
 import { RejectReasonService } from "@shared/services/reject-reason.service";
 import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
 import { HistoricalEvent } from '@shared/models/historical-event.model';
+import { GetCandidatesBasicInfo } from '@agency/store/order-management.actions';
+import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
   selectedOrder: Order | null;
   candidatesJob: OrderCandidateJob | null;
+  candidatesBasicInfo: CandidatesBasicInfo | null;
   applicantStatuses: ApplicantStatus[];
   orderCandidatesListPage: OrderCandidatesListPage | null;
   orderDialogOptions: {
@@ -83,7 +88,7 @@ export interface OrderManagementContentStateModel {
   workflows: WorkflowByDepartmentAndSkill[];
   projectTypes: ProjectType[];
   projectSpecialData: ProjectSpecialData | null;
-  suggestedDetails: SuggesstedDetails | null;
+  suggestedDetails: SuggestedDetails | null;
   projectNames: ProjectName[];
   masterShifts: MasterShift[];
   associateAgencies: AssociateAgency[];
@@ -101,6 +106,7 @@ export interface OrderManagementContentStateModel {
     selectedOrder: null,
     orderCandidatesListPage: null,
     candidatesJob: null,
+    candidatesBasicInfo: null,
     applicantStatuses: [],
     orderDialogOptions: {
       next: false,
@@ -165,7 +171,7 @@ export class OrderManagementContentState {
   }
 
   @Selector()
-  static suggestedDetails(state: OrderManagementContentStateModel): SuggesstedDetails | null {
+  static suggestedDetails(state: OrderManagementContentStateModel): SuggestedDetails | null {
     return state.suggestedDetails
   }
 
@@ -232,8 +238,13 @@ export class OrderManagementContentState {
   }
 
   @Selector()
-  static candidateHistoricalData(state: OrderManagementContentStateModel) {
+  static candidateHistoricalData(state: OrderManagementContentStateModel): HistoricalEvent[] | null {
     return state.historicalEvents
+  }
+
+  @Selector()
+  static candidateBasicInfo(state: OrderManagementContentStateModel): CandidatesBasicInfo | null {
+    return state.candidatesBasicInfo
   }
 
   constructor(
@@ -278,9 +289,9 @@ export class OrderManagementContentState {
   @Action(GetAgencyOrderCandidatesList)
   GetAgencyOrderCandidatesPage(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { orderId, organizationId, pageNumber, pageSize }: GetAgencyOrderCandidatesList
+    { orderId, organizationId, pageNumber, pageSize, excludeDeployed }: GetAgencyOrderCandidatesList
   ): Observable<OrderCandidatesListPage> {
-    return this.orderManagementService.getOrderCandidatesList(orderId, organizationId, pageNumber, pageSize).pipe(
+    return this.orderManagementService.getOrderCandidatesList(orderId, organizationId, pageNumber, pageSize, excludeDeployed).pipe(
       tap((payload) => {
         patchState({ orderCandidatesListPage: payload });
         return payload
@@ -374,7 +385,7 @@ export class OrderManagementContentState {
   }
 
   @Action(GetSuggestedDetails)
-  GetSuggestedDetails({ patchState }: StateContext<OrderManagementContentStateModel>, { locationId }: GetSuggestedDetails): Observable<SuggesstedDetails> {
+  GetSuggestedDetails({ patchState }: StateContext<OrderManagementContentStateModel>, { locationId }: GetSuggestedDetails): Observable<SuggestedDetails> {
     return this.orderManagementService.getSuggestedDetails(locationId).pipe(tap(payload => {
       patchState({ suggestedDetails: payload });
     }));
@@ -539,4 +550,25 @@ export class OrderManagementContentState {
       })
     )
   }
+
+  @Action(GetCandidatesBasicInfo)
+  GetCandidatesBasicInfo(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { organizationId, jobId }: GetCandidatesBasicInfo
+  ): Observable<CandidatesBasicInfo> {
+    return this.orderManagementService.getCandidatesBasicInfo(organizationId, jobId).pipe(
+      tap((payload) => {
+        patchState({candidatesBasicInfo: payload});
+        return payload;
+      })
+    );
+  }
+
+  @Action(ExportOrders)
+  ExportOrders({ }: StateContext<OrderManagementContentStateModel>, { payload, tab }: ExportOrders): Observable<any> {
+    return this.orderManagementService.export(payload, tab).pipe(tap(file => {
+      const url = window.URL.createObjectURL(file);
+      saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+    }));
+  };
 }

@@ -1,11 +1,15 @@
 import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
-import { Store, Actions, ofActionDispatched } from '@ngxs/store';
+
+import { Store, Actions, ofActionDispatched, Select } from '@ngxs/store';
 import { Observable, map, distinctUntilChanged } from 'rxjs';
-import { ShowSideDialog } from 'src/app/store/app.actions';
+
+import { FilteredItem } from '@shared/models/filter.model';
+import { ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetToggleModel } from '../models/widget-toggle.model';
+import { DashboardState } from '../store/dashboard.state';
 
 @Component({
   selector: 'app-dashboard-control',
@@ -17,8 +21,11 @@ export class DashboardControlComponent {
   @Input() public isLoading: boolean | null;
   @Input() public selectedWidgets: WidgetTypeEnum[] | null;
   @Input() public widgets: WidgetOptionModel[] | null;
+  @Input() public hasOrderManagePermission: boolean;
 
   @Output() public widgetToggleEmitter: EventEmitter<WidgetToggleModel> = new EventEmitter();
+
+  @Select(DashboardState.filteredItems) public readonly filteredItems$: Observable<FilteredItem[]>;
 
   public readonly isDialogOpened$: Observable<boolean> = this.isDialogOpened();
 
@@ -26,6 +33,10 @@ export class DashboardControlComponent {
 
   public toggleDialog(isDialogShown: boolean): void {
     this.store.dispatch(new ShowSideDialog(isDialogShown));
+  }
+
+  public showFilterDialog(): void {
+    this.store.dispatch(new ShowFilterDialog(true));
   }
 
   private isDialogOpened(): Observable<boolean> {
