@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { take, filter, Observable, takeUntil, tap, throttleTime } from 'rxjs';
+import { take, filter, Observable, takeUntil, tap, throttleTime, distinctUntilChanged } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
@@ -91,8 +91,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   private isChangesSaved = true;
 
-  public data: DialogActionPayload | null = null;
-
   public readonly columnsToExport: ExportColumn[] = [
     { text:'First Name', column: 'firstName'},
     { text:'Last Name', column: 'lastName'},
@@ -149,6 +147,10 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public ngOnInit(): void {
     this.getDialogState();
+    this.closeDialogOnNavigationStart();
+  }
+
+  public closeDialogOnNavigationStart(): void {
     this.router.events.pipe(
       filter((e) => e instanceof NavigationStart),
       takeUntil(this.componentDestroy()),
@@ -232,18 +234,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.isTimesheetOpen$
     .pipe(
       throttleTime(100),
-      filter(({ dialogState, id }: DialogActionPayload) => {
-        if (this.data) {
-          const {dialogState: prevDialogState, id: prevId} = this.data;
-
-          return !(dialogState === prevDialogState && id === prevId) && dialogState;
-        }
-
-        return dialogState;
-      }),
+      distinctUntilChanged((prev, next) => JSON.stringify(prev) === JSON.stringify(next)),
       tap(({ id, dialogState }) => {
         this.candidateId = id;
-        this.data = {id, dialogState};
         this.store.dispatch(new Timesheets.GetTimesheetDetails(id));
       }),
       takeUntil(this.componentDestroy())
@@ -306,9 +299,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close))
     .pipe(
       takeUntil(this.componentDestroy())
-    ).subscribe((data: DialogActionPayload) => {
-      this.data = data;
-      this.candidateDialog.hide();
-    });
+    ).subscribe(() => this.candidateDialog.hide());
   }
 }

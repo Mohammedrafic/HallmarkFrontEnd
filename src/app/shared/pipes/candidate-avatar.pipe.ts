@@ -1,7 +1,8 @@
 import { ChangeDetectorRef, OnDestroy, Pipe, PipeTransform } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { CandidateService } from '@agency/services/candidates.service';
-import { Observable, Subscriber, switchMap, tap } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
+import { ObservableHelper } from '@core/helpers/observable.helper';
 
 @Pipe({
   name: 'candidateAvatar',
@@ -25,22 +26,9 @@ export class CandidateAvatarPipe implements PipeTransform, OnDestroy {
     return this.asyncPipe.transform<string>(
       this.request || (this.request = this.candidateService.getCandidatePhoto(candidateId)
         .pipe(
-          switchMap((blob: Blob) => blobToBase64Observable(blob)),
+          switchMap((blob: Blob) => ObservableHelper.blobToBase64Observable(blob)),
         )
     ));
   }
-}
-
-function blobToBase64Observable(blob: Blob): Observable<string> {
-  return new Observable<string>((subscriber: Subscriber<string>) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      subscriber.next(reader.result as string);
-      subscriber.complete();
-    };
-
-    reader.readAsDataURL(blob);
-  })
 }
 

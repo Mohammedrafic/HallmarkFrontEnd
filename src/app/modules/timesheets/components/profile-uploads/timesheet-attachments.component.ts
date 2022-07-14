@@ -7,12 +7,12 @@ import { TimesheetAttachment } from '../../interface';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 
 @Component({
-  selector: 'app-profile-uploads',
-  templateUrl: './profile-uploads.component.html',
-  styleUrls: ['./profile-uploads.component.scss'],
+  selector: 'app-attachments-uploads',
+  templateUrl: './timesheet-attachments.component.html',
+  styleUrls: ['./timesheet-attachments.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileUploadsComponent {
+export class TimesheetAttachmentsComponent {
   @Input()
   public attachments: TimesheetAttachment[] | null = [];
 
@@ -30,6 +30,7 @@ export class ProfileUploadsComponent {
   }
 
   public downloadFile(item: TimesheetAttachment): void {
+    // TODO: Implement file downloading with API
     item.blob && downloadBlobFile(item.blob, item.fileName);
   }
 }
