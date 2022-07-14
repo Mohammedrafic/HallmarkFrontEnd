@@ -43,6 +43,7 @@ export class RejectReasonDialogComponent implements OnInit, OnDestroy {
     this.form.markAllAsTouched();
     if(this.form.valid){
       this.applyReject.emit(this.form.value);
+      this.form.reset();
       this.rejectDialog.hide();
     }
   }

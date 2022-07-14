@@ -1,14 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import {
-  Observable,
-  tap,
-  filter,
-  of,
-  throttleTime,
-  switchMap,
-  take,
-} from 'rxjs';
+import { filter, Observable, of, switchMap, take, tap, throttleTime, } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -22,22 +14,26 @@ import {
   approveTimesheetDialogData,
   DefaultFiltersState,
   DefaultTimesheetState,
+  rejectTimesheetDialogData,
   submitTimesheetDialogData
 } from '../../constants';
 import {
   CandidateHoursAndMilesData,
   CandidateInfo,
+  CandidateMilesData,
   DialogActionPayload,
   FilterColumns,
   FilterDataSource,
   TabCountConfig,
   Timesheet,
-  TimesheetAttachments, TimesheetInvoice,
+  TimesheetAttachment,
+  TimesheetAttachments,
+  TimesheetDetailsModel,
+  TimesheetInvoice,
   TimesheetRecordsDto,
   TimesheetsFilterState,
-  TimesheetAttachment, TimesheetDetailsModel, CandidateMilesData, TimesheetStatistics
+  TimesheetStatistics
 } from '../../interface';
-import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -369,6 +365,10 @@ export class TimesheetsState {
     return this.timesheetDetailsApiService.rejectTimesheet(id, reason)
       .pipe(
         tap(() => {
+          this.store.dispatch([
+            new ShowToast(MessageTypes.Success, rejectTimesheetDialogData.successMessage),
+          ]);
+
           patchState({
             timesheetDetails: {
               ...state.timesheetDetails as TimesheetDetailsModel,
