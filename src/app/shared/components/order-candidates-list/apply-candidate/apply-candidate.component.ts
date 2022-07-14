@@ -1,28 +1,33 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroup, Validators } from "@angular/forms";
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
-import { CandidatStatus } from "@shared/enums/applicant-status.enum";
-import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
-import { Observable, Subject, takeUntil } from "rxjs";
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
+import { Observable, Subject, takeUntil } from 'rxjs';
 
 import {
   ApplyOrderApplicants,
   ApplyOrderApplicantsSucceed,
-  ReloadOrderCandidatesLists
-} from "@agency/store/order-management.actions";
-import { OrderManagementState } from "@agency/store/order-management.state";
-import { BillRate } from "@shared/models/bill-rate.model";
-import { OrderApplicantsInitialData } from "@shared/models/order-applicants.model";
-import { OrderCandidatesList } from "@shared/models/order-management.model";
+  ReloadOrderCandidatesLists,
+} from '@agency/store/order-management.actions';
+import { OrderManagementState } from '@agency/store/order-management.state';
+import { BillRate } from '@shared/models/bill-rate.model';
+import { OrderApplicantsInitialData } from '@shared/models/order-applicants.model';
+import { OrderCandidatesList } from '@shared/models/order-management.model';
+import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
+import { ExpandEventArgs, AccordionClickArgs } from '@syncfusion/ej2-navigations';
+import { AccordionOneField } from '../../../models/accordion-one-field.model';
 
 @Component({
   selector: 'app-apply-candidate',
   templateUrl: './apply-candidate.component.html',
   styleUrls: ['./apply-candidate.component.scss'],
-  providers: [MaskedDateTimeService]
+  providers: [MaskedDateTimeService],
 })
 export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
+  @ViewChild('accordionElement') accordionComponent: AccordionComponent;
+
   @Output() public closeDialogEmitter: EventEmitter<void> = new EventEmitter();
 
   @Input() candidate: OrderCandidatesList;
@@ -35,6 +40,8 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public candidatStatus = CandidatStatus;
   public today = new Date();
   public organizationId: number;
+  public accordionClickElement: HTMLElement | null;
+  public accordionOneField: AccordionOneField;
 
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
@@ -42,13 +49,11 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private unsubscribe$: Subject<void> = new Subject();
   private candidateId: number;
 
-
-  constructor(private store: Store, private actions$: Actions) {
-  }
+  constructor(private store: Store, private actions$: Actions) {}
 
   ngOnChanges(): void {
-    if(this.candidate.deployedCandidateInfo && this.isAgency) {
-      this.readOnlyMode = true
+    if (this.candidate.deployedCandidateInfo && this.isAgency) {
+      this.readOnlyMode = true;
     }
   }
 
@@ -70,19 +75,33 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   applyOrderApplicants(): void {
     if (this.formGroup.valid) {
       const value = this.formGroup.getRawValue();
-      this.store.dispatch(new ApplyOrderApplicants({
-        orderId: value.orderId,
-        organizationId: this.organizationId,
-        candidateId: this.candidateId,
-        candidateBillRate: value.candidateBillRate,
-        expAsTravelers: value.expAsTravelers,
-        availableStartDate: value.availableStartDate,
-        requestComment: value.requestComment
-      })).subscribe(() => {
-        this.store.dispatch(new ReloadOrderCandidatesLists());
-      });
+      this.store
+        .dispatch(
+          new ApplyOrderApplicants({
+            orderId: value.orderId,
+            organizationId: this.organizationId,
+            candidateId: this.candidateId,
+            candidateBillRate: value.candidateBillRate,
+            expAsTravelers: value.expAsTravelers,
+            availableStartDate: value.availableStartDate,
+            requestComment: value.requestComment,
+          })
+        )
+        .subscribe(() => {
+          this.store.dispatch(new ReloadOrderCandidatesLists());
+        });
       this.closeDialog();
     }
+  }
+
+  public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
+    this.accordionOneField = new AccordionOneField(this.accordionComponent);
+    this.accordionClickElement = this.accordionOneField.clickedOnAccordion(accordionClick);
+  }
+
+  public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
+    this.accordionOneField = new AccordionOneField(this.accordionComponent);
+    this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
   }
 
   private createForm(): void {
@@ -109,18 +128,20 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
       yearsOfExperience: data.yearsOfExperience,
       candidateBillRate: data.orderBillRate,
       expAsTravelers: data.expAsTravelers || 0,
-      requestComment: data.requestComment || ''
+      requestComment: data.requestComment || '',
     });
   }
 
   private subscribeOnInitialData(): void {
-    this.orderApplicantsInitialData$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrderApplicantsInitialData) => {
-      if (data) {
-        this.organizationId = data.organizationId;
-        this.candidateId = data.candidateId;
-        this.setFormValue(data);
-      }
-    });
+    this.orderApplicantsInitialData$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((data: OrderApplicantsInitialData) => {
+        if (data) {
+          this.organizationId = data.organizationId;
+          this.candidateId = data.candidateId;
+          this.setFormValue(data);
+        }
+      });
 
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ApplyOrderApplicantsSucceed)).subscribe(() => {
       this.readOnlyMode = true;
