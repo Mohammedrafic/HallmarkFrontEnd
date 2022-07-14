@@ -18,6 +18,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.regionIds.dataSource"
+            [value]="filters.regionIds"
           >
           </ejs-multiselect>
           <span *ngIf="region" class="e-badge e-badge-success e-badge-circle">{{ region }}</span>
@@ -35,6 +36,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.locationIds.dataSource"
+            [value]="filters.locationIds"
           >
           </ejs-multiselect>
           <span *ngIf="locations" class="e-badge e-badge-success e-badge-circle">{{ locations }}</span>
@@ -52,6 +54,8 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.departmentsIds.dataSource"
+            [value]="departmetsValues"
+            (dataBound)="setDepartmetsValues()"
           >
           </ejs-multiselect>
           <span *ngIf="departments" class="e-badge e-badge-success e-badge-circle">{{ departments }}</span>
@@ -69,6 +73,7 @@
             [allowFiltering]="true"
             [showDropDownIcon]="true"
             [dataSource]="filterColumns.skillIds.dataSource"
+            [value]="filters.skillIds"
           >
           </ejs-multiselect>
           <span *ngIf="skills" class="e-badge e-badge-success e-badge-circle">{{ skills }}</span>
