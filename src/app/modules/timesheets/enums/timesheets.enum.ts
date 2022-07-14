@@ -54,6 +54,7 @@ export enum MoreMenuType {
 
 export enum TimesheetsTableColumns {
   Checkbox = 'checkbox',
+  Approve = 'approve',
   Name = 'name',
   StatusText = 'statusText',
   OrderId = 'orderId',

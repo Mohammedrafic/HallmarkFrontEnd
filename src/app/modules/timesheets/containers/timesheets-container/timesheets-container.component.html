@@ -23,6 +23,7 @@
     *ngIf="timesheets$ | async as timesheets"
     [tableData]="timesheets"
     [newSelectedIndex]="currentSelectedTableRowIndex | async"
+    [activeTabIdx]="activeTabIdx"
     (changePage)="handleChangePage($event)"
     (changePerPage)="handleChangePerPage($event)"
     (timesheetRowSelected)="rowSelected($event)"

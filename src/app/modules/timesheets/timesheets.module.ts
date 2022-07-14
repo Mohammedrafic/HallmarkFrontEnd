@@ -54,6 +54,9 @@ import { TimesheetTableStatusCellComponent } from './components/timesheets-table
 import { ProfileMilesComponent } from './components/profile-cumulative-hours/profile-miles/profile-miles.component';
 import { InputEditorComponent } from './components/cell-editors/input-editor/input-editor.component';
 import { GridDateEditorComponent } from './components/cell-editors/grid-date-editor/grid-date-editor.component';
+import {
+  TimesheetTableApproveCellComponent
+} from './components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
 
 const gridIcons = {
   MessageSquare,
@@ -101,6 +104,7 @@ const gridIcons = {
     ActionsCellComponent,
     TimesheetsFilterDialogComponent,
     TimesheetTableStatusCellComponent,
+    TimesheetTableApproveCellComponent,
     ProfileMilesComponent,
     InputEditorComponent,
   ],

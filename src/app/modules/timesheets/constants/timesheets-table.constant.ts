@@ -9,6 +9,9 @@ import {
   TimesheetTableStatusCellComponent
 } from '../components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
 import { GridValuesHelper } from '../helpers/grid-values.helper';
+import {
+  TimesheetTableApproveCellComponent
+} from '../components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
 
 const valueHelper = new GridValuesHelper();
 
@@ -29,6 +32,15 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       headerCheckboxSelectionFilteredOnly: true,
       checkboxSelection: true,
       ...commonColumn,
+    },
+    {
+      field: TimesheetsTableColumns.Approve,
+      headerName: '',
+      width: 100,
+      minWidth: 100,
+      hide: true,
+      cellClass: 'approve-cell',
+      cellRenderer: TimesheetTableApproveCellComponent,
     },
     {
       field: TimesheetsTableColumns.Name,

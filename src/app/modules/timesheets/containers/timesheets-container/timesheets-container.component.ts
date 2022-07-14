@@ -41,6 +41,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   readonly user$: Observable<User>;
 
   public readonly tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
+  public activeTabIdx = 0;
   public readonly exportOptions: ItemModel[] = exportOptions;
   public filters: TimesheetsFilterState | undefined;
   public readonly dateControl: FormControl = new FormControl(null);
@@ -69,6 +70,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public handleChangeTab(tabIndex: number): void {
+    this.activeTabIdx = tabIndex;
     this.store.dispatch(new Timesheets.UpdateFiltersState({
       statusIds: this.tabConfig[tabIndex].value ?
         [`${this.tabConfig[tabIndex].value}`] :

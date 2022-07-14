@@ -19,9 +19,14 @@
         }
 
         .e-numericitem {
-          border-color: white;
+          border-color: #fff;
           background: transparent;
-          color: white;
+          color: #fff;
+
+          &.e-currentitem {
+            background: #fff;
+            color: #3e7fff;
+          }
         }
 
         .e-nextpage, .e-prevpage {

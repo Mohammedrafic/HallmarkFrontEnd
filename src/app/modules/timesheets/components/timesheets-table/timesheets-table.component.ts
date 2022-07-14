@@ -4,6 +4,7 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   Output,
 } from '@angular/core';
 
@@ -13,6 +14,9 @@ import { ColumnDefinitionModel } from '@shared/components/grid/models/column-def
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { TimesheetsSelectedRowEvent } from '../../interface';
 import { TimesheetsColumnsDefinition } from '../../constants';
+import { BehaviorSubject } from 'rxjs';
+import { GridReadyEventModel } from '@shared/components/grid/models/grid-ready-event.model';
+import { TimesheetsTableColumns } from '../../enums';
 
 @Component({
   selector: 'app-timesheets-table',
@@ -20,10 +24,11 @@ import { TimesheetsColumnsDefinition } from '../../constants';
   styleUrls: ['./timesheets-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimesheetsTableComponent {
+export class TimesheetsTableComponent implements OnChanges {
   @Input() tableData: TimeSheetsPage;
 
   @Input() newSelectedIndex: null | number;
+  @Input() activeTabIdx: number;
 
   @Output() readonly changePage: EventEmitter<number> = new EventEmitter<number>();
 
@@ -41,9 +46,17 @@ export class TimesheetsTableComponent {
   public isLoading = false;
   public rowSelection: 'single' | 'multiple' = 'multiple';
 
+  private readonly gridInstance$: BehaviorSubject<GridReadyEventModel | null> =
+    new BehaviorSubject<GridReadyEventModel | null>(null);
+
   constructor(
     private router: Router,
   ) {}
+
+  ngOnChanges(): void {
+    this.gridInstance$.getValue()?.columnApi
+      .setColumnVisible(TimesheetsTableColumns.Approve, this.activeTabIdx === 1);
+  }
 
   public onRowsDropDownChanged(pageSize: number): void {
     this.pageSize = pageSize;
@@ -63,5 +76,9 @@ export class TimesheetsTableComponent {
   }
 
   public bulkExport(event: RowNode[]): void {
+  }
+
+  public gridReady(event: GridReadyEventModel): void {
+    this.gridInstance$.next(event);
   }
 }
