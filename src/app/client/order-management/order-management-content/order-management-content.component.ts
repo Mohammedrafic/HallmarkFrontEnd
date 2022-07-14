@@ -19,7 +19,7 @@ import {
   GetOrderById,
   GetOrderFIlterDataSources,
   GetOrders,
-  ReloadOrganisationOrderCandidatesLists
+  ReloadOrganisationOrderCandidatesLists, SetLock
 } from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { OrderManagementChild, Order, OrderFilter, OrderManagement, OrderManagementPage, OrderFilterDataSource } from '@shared/models/order-management.model';
@@ -54,6 +54,7 @@ import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/expor
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { SearchComponent } from '@shared/components/search/search.component';
+import {OrderStatus} from "@shared/enums/order-management";
 
 @Component({
   selector: 'app-order-management-content',
@@ -136,6 +137,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public isRowScaleUp: boolean = true;
   public isSubrowDisplay: boolean = false;
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
+  public orderStatus = OrderStatus;
 
   private selectedIndex: number | null;
   private ordersPage: OrderManagementPage;
@@ -706,5 +708,19 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       this.getOrders();
       this.openDetails.next(false);
     });
+  }
+
+  public lockOrder(order: Order): void {
+    this.store.dispatch(new SetLock(order.id, !order.isLocked, this.filters));
+  }
+
+  disabledLock(status: OrderStatus): boolean {
+    const statuses = [
+      this.orderStatus.Open,
+      this.orderStatus.InProgress,
+      this.orderStatus.Filled
+    ];
+
+    return !statuses.includes(status);
   }
 }

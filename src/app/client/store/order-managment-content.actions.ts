@@ -1,5 +1,5 @@
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { AcceptJobDTO, CreateOrderDto, EditOrderDto, OrderManagementFilter } from '@shared/models/order-management.model';
+import {AcceptJobDTO, CreateOrderDto, EditOrderDto, OrderFilter, OrderManagementFilter} from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { RejectReasonPayload } from "@shared/models/reject-reason.model";
 import { ExportPayload } from '@shared/models/export.model';
@@ -18,6 +18,11 @@ export class GetOrders {
 export class GetOrderById {
   static readonly type = '[order management] Get Order By Id';
   constructor(public id: number, public organizationId: number, public options: DialogNextPreviousOption) {}
+}
+
+export class SetLock {
+  static readonly type = '[order management] Set Lock';
+  constructor(public id: number, public lockStatus: boolean, public filters: OrderFilter = {}, public updateOpened = false) { }
 }
 
 export class GetAgencyOrderCandidatesList {

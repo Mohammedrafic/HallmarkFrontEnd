@@ -34,6 +34,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   @Input() billRatesData: BillRate[] = [];
   @Input() isTab: boolean = false;
   @Input() isAgency: boolean = false;
+  @Input() isLocked: boolean | undefined = false;
 
   public formGroup: FormGroup;
   public readOnlyMode: boolean;

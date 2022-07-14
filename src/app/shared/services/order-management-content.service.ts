@@ -48,6 +48,13 @@ export class OrderManagementContentService {
   }
 
   /**
+   * Lock/Unlock the order
+   */
+  public setLock(orderId: number, lockStatus: boolean): Observable<boolean> {
+    return this.http.post<boolean>(`/api/Orders/setLock`, {orderId, lockStatus });
+  }
+
+  /**
    * Get the agency orders
    @param pageNumber
    @param pageSize
