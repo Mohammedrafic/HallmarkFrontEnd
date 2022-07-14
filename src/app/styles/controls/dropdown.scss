@@ -77,6 +77,10 @@ body.light, body.dark {
     }
   }
 
+  .disabled-item {
+    color: $secondary-dark-blue-30;
+  }
+
   ejs-multiselect {
     .e-searcher {
       display: none !important;

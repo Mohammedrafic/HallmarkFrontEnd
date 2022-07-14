@@ -19,8 +19,12 @@
         <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !candidate.deployedCandidateInfo && !isReadOnly">
           <ejs-dropdownlist [fields]="optionFields"
                             [dataSource]="nextApplicantStatuses"
+                            [itemTemplate]="itemTemplate"
                             placeholder="Select Status"
-                            (change)="updateCandidateJob($event)">
+                            (select)="updateCandidateJob($event)">
+            <ng-template #itemTemplate let-data>
+              <span [ngClass]="{'disabled-item': !data.isEnabled}">{{data.statusText}}</span>
+            </ng-template>
           </ejs-dropdownlist>
         </div>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="closeDialog()">

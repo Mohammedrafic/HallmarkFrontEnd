@@ -2,6 +2,8 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, S
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
+import { SET_READONLY_STATUS } from "@shared/constants";
+import { MessageTypes } from "@shared/enums/message-types";
 import { MaskedDateTimeService } from "@syncfusion/ej2-angular-calendars";
 import { Observable, Subject, takeUntil } from "rxjs";
 
@@ -20,6 +22,7 @@ import {
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { BillRatesComponent } from "@shared/components/bill-rates/bill-rates.component";
 import { RejectReason } from "@shared/models/reject-reason.model";
+import { ShowToast } from "src/app/store/app.actions";
 
 @Component({
   selector: 'app-offer-deployment',
@@ -126,35 +129,39 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   public updateCandidateJob(event: { itemData: ApplicantStatus }, reloadJob = false): void {
-    if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
-      this.store.dispatch(new GetRejectReasonsForOrganisation());
-      this.openRejectDialog.next(true);
-    } else {
-      if (this.formGroup.valid && this.candidateJob) {
-        const value = this.formGroup.getRawValue();
-        this.store.dispatch(new UpdateOrganisationCandidateJob({
-          orderId: this.candidateJob.orderId,
-          organizationId: this.candidateJob.organizationId,
-          jobId: this.candidateJob.jobId,
-          nextApplicantStatus: event.itemData,
-          candidateBillRate: this.candidateJob.candidateBillRate,
-          offeredBillRate: value.offeredBillRate,
-          requestComment: this.candidateJob.requestComment,
-          actualStartDate: this.candidateJob.actualStartDate,
-          actualEndDate: this.candidateJob.actualEndDate,
-          clockId: this.candidateJob.clockId,
-          guaranteedWorkWeek: value.guaranteedWorkWeek,
-          offeredStartDate: value.offeredStartDate,
-          allowDeplayWoCredentials: true,
-          billRates: this.billRatesComponent.billRatesControl.value
-        })).subscribe(() => {
-          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-          if (reloadJob) {
-            this.store.dispatch(new GetOrganisationCandidateJob(this.candidateJob?.organizationId as number, this.candidate.candidateJobId));
-          }
-        });
-        this.closeDialog();
+    if (event.itemData?.isEnabled) {
+      if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
+        this.store.dispatch(new GetRejectReasonsForOrganisation());
+        this.openRejectDialog.next(true);
+      } else {
+        if (this.formGroup.valid && this.candidateJob) {
+          const value = this.formGroup.getRawValue();
+          this.store.dispatch(new UpdateOrganisationCandidateJob({
+            orderId: this.candidateJob.orderId,
+            organizationId: this.candidateJob.organizationId,
+            jobId: this.candidateJob.jobId,
+            nextApplicantStatus: event.itemData,
+            candidateBillRate: this.candidateJob.candidateBillRate,
+            offeredBillRate: value.offeredBillRate,
+            requestComment: this.candidateJob.requestComment,
+            actualStartDate: this.candidateJob.actualStartDate,
+            actualEndDate: this.candidateJob.actualEndDate,
+            clockId: this.candidateJob.clockId,
+            guaranteedWorkWeek: value.guaranteedWorkWeek,
+            offeredStartDate: value.offeredStartDate,
+            allowDeplayWoCredentials: true,
+            billRates: this.billRatesComponent.billRatesControl.value
+          })).subscribe(() => {
+            this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+            if (reloadJob) {
+              this.store.dispatch(new GetOrganisationCandidateJob(this.candidateJob?.organizationId as number, this.candidate.candidateJobId));
+            }
+          });
+          this.closeDialog();
+        }
       }
+    } else {
+      this.store.dispatch(new ShowToast(MessageTypes.Error, SET_READONLY_STATUS));
     }
   }
 
