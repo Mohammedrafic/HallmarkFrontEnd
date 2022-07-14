@@ -581,7 +581,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       .subscribe((regionIds: number[]) => {
         if (regionIds && regionIds.length > 0) {
           this.locations = [];
-          this.billRatesFormGroup.controls['locationIds'].setValue(null);
           regionIds.forEach((id) => {
             const selectedRegion = this.orgRegions.find(region => region.id === id);
             this.locations.push(...selectedRegion?.locations as any);
@@ -595,6 +594,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           this.departments = [];
         }
 
+        this.billRatesFormGroup.controls['locationIds'].setValue(null);
         this.billRatesFormGroup.controls['departmentIds'].setValue(null);
       });
   }

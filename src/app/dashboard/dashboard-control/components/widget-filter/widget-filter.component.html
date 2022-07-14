@@ -1,0 +1,79 @@
+<app-filter-dialog
+  [items]="filteredItems$ | async"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
+  <form [formGroup]="widgetFilterFormGroup">
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Region</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="regionIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.regionIds.dataSource"
+          >
+          </ejs-multiselect>
+          <span *ngIf="region" class="e-badge e-badge-success e-badge-circle">{{ region }}</span>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label>Location</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="locationIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.locationIds.dataSource"
+          >
+          </ejs-multiselect>
+          <span *ngIf="locations" class="e-badge e-badge-success e-badge-circle">{{ locations }}</span>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label>Department</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="departmentsIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.departmentsIds.dataSource"
+          >
+          </ejs-multiselect>
+          <span *ngIf="departments" class="e-badge e-badge-success e-badge-circle">{{ departments }}</span>
+        </div>
+      </div>
+
+      <div class="input-container">
+        <label>Skill</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="skillIds"
+            placeholder="All"
+            [fields]="skillsFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.skillIds.dataSource"
+          >
+          </ejs-multiselect>
+          <span *ngIf="skills" class="e-badge e-badge-success e-badge-circle">{{ skills }}</span>
+        </div>
+      </div>
+    </div>
+  </form>
+</app-filter-dialog>

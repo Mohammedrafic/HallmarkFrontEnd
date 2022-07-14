@@ -36,7 +36,6 @@ import {
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
   GetHistoricalData,
-  GetReOrders,
   ExportOrders
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
@@ -72,7 +71,6 @@ import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.mod
 import { HistoricalEvent } from '@shared/models/historical-event.model';
 import { GetCandidatesBasicInfo } from '@agency/store/order-management.actions';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
-import { OrganizationManagementStateModel } from '@organization-management/store/organization-management.state';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -286,14 +284,6 @@ export class OrderManagementContentState {
         return payload;
       })
     );
-  }
-
-  @Action(GetReOrders)
-  GetReOrders({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }: GetReOrders): Observable<OrderManagementPage> {
-    return this.orderManagementService.getReOrders(payload).pipe(tap((payload) => {
-      patchState({ ordersPage: payload });
-      return payload;
-    }));
   }
 
   @Action(GetAgencyOrderCandidatesList)

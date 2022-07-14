@@ -345,6 +345,7 @@ export type CandidatesBasicInfo = {
 export type ApplicantStatus = {
   applicantStatus: number;
   statusText: string;
+  isEnabled?: boolean;
 };
 
 export class OrderFilter {

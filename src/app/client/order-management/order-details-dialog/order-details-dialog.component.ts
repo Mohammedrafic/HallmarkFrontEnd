@@ -49,6 +49,14 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public orderStatus  = OrderStatus;
   public candidatesCounter: number;
 
+  public showCloseButton = false;
+  private openInProgressFilledStatuses = [
+    'open',
+    'in progress',
+    'filled',
+    'custom step'
+  ];
+
   private secondHasOpendOnes = false;
 
   constructor(private chipsCssClass: ChipsCssClass,
@@ -65,6 +73,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   ngOnChanges(changes: SimpleChanges): void {
     if (this.chipList && changes['order'].currentValue) {
+      this.showCloseButton = this.openInProgressFilledStatuses.includes(changes['order'].currentValue.statusText.toLowerCase());
       this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
       this.chipList.text = changes['order'].currentValue.statusText.toUpperCase();
     }

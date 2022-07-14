@@ -24,3 +24,8 @@ export class IsMobile {
   static readonly type = `${dashboardStatePrefix} Is Mobile`;
   constructor(public payload: boolean) {}
 }
+
+export class SetFilteredItems {
+  static readonly type = `${dashboardStatePrefix} Set Filtered Items`;
+  constructor(public payload: any) {}
+}

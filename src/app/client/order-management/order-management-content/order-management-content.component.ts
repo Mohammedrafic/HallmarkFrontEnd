@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { debounceTime, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
@@ -19,7 +19,6 @@ import {
   GetOrderById,
   GetOrderFIlterDataSources,
   GetOrders,
-  GetReOrders,
   ReloadOrganisationOrderCandidatesLists
 } from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -37,14 +36,13 @@ import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { Skill } from '@shared/models/skill.model';
 import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
-import { OrderTypeOptions } from '@shared/enums/order-type';
+import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { DatePipe, Location } from '@angular/common';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import {
   AllOrdersColumnsConfig,
   allOrdersColumnsToExport,
   MoreMenuType,
-  OrderType,
   OrderTypeName,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
@@ -55,6 +53,7 @@ import {
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { SearchComponent } from '@shared/components/search/search.component';
 
 @Component({
   selector: 'app-order-management-content',
@@ -64,6 +63,7 @@ import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 })
 export class OrderManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') override gridWithChildRow: GridComponent;
+  @ViewChild('search') search: SearchComponent;
 
   @Select(OrderManagementContentState.ordersPage)
   ordersPage$: Observable<OrderManagementPage>;
@@ -119,6 +119,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
+  private search$ = new Subject();
   private selectedDataRow: Order;
 
   public selectedOrder: Order;
@@ -132,7 +133,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public previousSelectedOrderId: number | null;
   public selectedCandidat: any | null;
   public openChildDialog = new Subject<any>();
-  public isReOrdersTab = false;
   public isRowScaleUp: boolean = true;
   public isSubrowDisplay: boolean = false;
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
@@ -242,6 +242,17 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.getOrders();
   }
 
+  public searchOrders(event: KeyboardEvent): void {
+    const value = (event.target as HTMLInputElement).value;
+    if (value.length >= 2) {
+      this.OrderFilterFormGroup.controls['jobTitle'].setValue(value);
+      this.search$.next(value);
+    } else if (value.length === 0 && this.filters.jobTitle?.length) {
+      this.OrderFilterFormGroup.controls['jobTitle'].setValue('');
+      this.search$.next(value);
+    }
+  }
+
   private getOrders(): void {
     //this.filters.orderBy = this.orderBy; TODO: pending ordering fix on BE
     this.filters.orderId ? this.filters.orderId : null;
@@ -253,7 +264,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filters.billRateTo ? this.filters.billRateTo : null;
     this.filters.pageNumber = this.currentPage;
     this.filters.agencyType = this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) : null;
-    this.pageSize = this.pageSize;
+    this.filters.pageSize = this.pageSize;
 
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
@@ -267,11 +278,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.ReOrders:
+        this.filters.orderTypes = [OrderType.ReOrder];
         this.columnsToExport = reOrdersColumnsToExport;
-        // TODO: remove after BE implementation
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
-        // TODO: uncomment after BE implementation
-        // this.store.dispatch(new GetReOrders(this.filters));
         break;
       case OrganizationOrderManagementTabs.Incomplete:
         this.columnsToExport = allOrdersColumnsToExport;
@@ -288,7 +297,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
       skillIds: this.filters.skillIds || [],
-      orderTypes: this.activeTab === OrganizationOrderManagementTabs.PerDiem ? [] : this.filters.orderTypes || [],
+      orderTypes: this.activeTab === OrganizationOrderManagementTabs.PerDiem
+        || this.activeTab === OrganizationOrderManagementTabs.ReOrders ? [] : this.filters.orderTypes || [],
       jobTitle: this.filters.jobTitle || null,
       billRateFrom: this.filters.billRateFrom || null,
       billRateTo: this.filters.billRateTo || null,
@@ -319,6 +329,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};
+    this.search?.clear();
   }
 
   public onFilterClearAll(): void {
@@ -418,6 +429,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
+      this.isSubrowDisplay = false
     }
   }
 
@@ -436,6 +448,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public tabSelected(tabIndex: OrganizationOrderManagementTabs): void {
     this.activeTab = tabIndex;
     this.currentPage = 1;
+    this.filters = {};
+    this.search?.clear();
 
     switch (tabIndex) {
       case OrganizationOrderManagementTabs.AllOrders:
@@ -569,6 +583,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private orderFilterColumnsSetup(): void {
     this.filterColumns = {
       orderId: { type: ControlTypes.Text, valueType: ValueType.Text },
+      reOrderId: { type: ControlTypes.Text, valueType: ValueType.Text },
       regionIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       departmentsIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
@@ -580,6 +595,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       openPositions: { type: ControlTypes.Text, valueType: ValueType.Text },
       jobStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       jobEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+      reOrderDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       orderStatuses: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'statusText', valueId: 'status' },
       candidateStatuses: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'statusText', valueId: 'status' },
       candidatesCountFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
@@ -587,6 +603,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       agencyIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
       agencyType: { type: ControlTypes.Radio, dataSource: {1: 'Yes', 2: 'No'}, default: '0' },
     }
+    this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe(() => {
+      this.onFilterApply();
+    });
   }
 
   private onOrderFilterDataSourcesLoadHandler(): void {

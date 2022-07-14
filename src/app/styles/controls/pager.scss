@@ -20,7 +20,7 @@ body.light, body.dark {
 }
 
 body.light .e-pager .e-currentitem, body.light .e-pager .e-currentitem:hover {
-  background: transparent;
+  background: $white !important;
   color: $primary-active-blue-10;
   border: 2px solid $primary-active-blue-10;
   font-size: 14px;

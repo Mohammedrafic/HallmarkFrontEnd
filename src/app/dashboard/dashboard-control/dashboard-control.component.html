@@ -1,12 +1,36 @@
-<div class="dashboard-control">
-  <app-page-toolbar>
-    <ng-container right>
+<ng-container
+  [ngTemplateOutlet]="dashboardToolbar"
+  [ngTemplateOutletContext]="{ items: filteredItems$ | async }"
+></ng-container>
+
+<ng-template #dashboardToolbar let-items="items">
+  <div class="dashboard-toolbar">
+    <div class="left-content">
+      <section class="applied-filters">
+        <span class="applied-filters__title">Applied Filters:</span>
+        <span *ngIf="!items.length">None</span>
+        <div class="chips-container">
+          <ejs-chiplist [chips]="items" enableDelete="true"></ejs-chiplist>
+        </div>
+      </section>
+    </div>
+
+    <div class="right-content">
+      <button ejs-button cssClass="e-outline" (click)="showFilterDialog()">
+        <div class="filter-button-content">
+          <span *ngIf="items.length" class="e-badge e-badge-success e-badge-circle">{{ items.length }}</span>
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
       <button ejs-button cssClass="e-outline" (click)="toggleDialog(true)">
         Manage Widgets <i-feather name="sliders" class="icon"></i-feather>
       </button>
-      <button *ngIf="hasOrderManagePermission" ejs-button [isPrimary]="true" (click)="onCreateOrder()">Create Order</button>
-    </ng-container>
-  </app-page-toolbar>
+      <button *ngIf="hasOrderManagePermission" ejs-button [isPrimary]="true" (click)="onCreateOrder()">
+        Create Order
+      </button>
+    </div>
+  </div>
+
   <app-widget-list
     *ngIf="isDialogOpened$ | async"
     (closeDialogEmitter)="toggleDialog(false)"
@@ -15,4 +39,6 @@
     [widgets]="widgets"
     [isLoading]="isLoading"
   ></app-widget-list>
-</div>
+
+  <app-widget-filter></app-widget-filter>
+</ng-template>

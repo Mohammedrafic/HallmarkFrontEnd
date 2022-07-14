@@ -19,13 +19,6 @@ export enum OrderTypeName {
   Traveler = 'Traveler'
 }
 
-export enum OrderType {
-  ContractToPerm = 0,
-  OpenPerDiem = 1,
-  PermPlacement = 2,
-  Traveler = 3
-}
-
 export const allOrdersColumnsToExport: ExportColumn[] = [
   { text:'Order ID', column: 'Id'},
   { text:'Status', column: 'StatusText'},

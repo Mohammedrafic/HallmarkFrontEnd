@@ -24,6 +24,7 @@ import { DashboardWidgetsComponent } from './dashboard-widgets/dashboard-widgets
 import type { WidgetsDataModel } from './models/widgets-data.model';
 import { GetCurrentUserPermissions } from '../store/user.actions';
 import { CurrentUserPermission } from '@shared/models/permission.model';
+import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
 
 @Component({
   selector: 'app-dashboard',
@@ -171,6 +172,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
         this.resetDashboardState();
         this.setWidgetsData();
         this.store.dispatch(new GetDashboardData());
+        this.store.dispatch(new GetAllOrganizationSkills());
       });
   }
 
