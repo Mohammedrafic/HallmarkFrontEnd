@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 
 import { Store } from '@ngxs/store';
@@ -11,9 +11,15 @@ import { SetIsOrganizationAgencyArea } from './store/app.actions';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
-  constructor(private router: Router, private store: Store) {
-    router.events.pipe(
+export class AppComponent implements OnInit {
+  public isIframe = false;
+
+  constructor(private router: Router, private store: Store) {}
+
+  ngOnInit(): void {
+    this.isIframe = window !== window.parent && !window.opener;
+
+    this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
       map(() => this.router.routerState.root),
       map(route => {

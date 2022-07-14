@@ -62,6 +62,10 @@
           button {
             display: block;
             width: 100%;
+
+            &:not(:last-child) {
+              margin-bottom: 16px;
+            }
           }
         }
       }
