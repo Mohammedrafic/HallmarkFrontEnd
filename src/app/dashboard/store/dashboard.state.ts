@@ -12,6 +12,7 @@ import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import { DashboardDataModel } from '../models/dashboard-data.model';
 import { widgetTypeToConfigurationMapper } from '../constants/widget-type-to-configuration-mapper';
 import { FilteredItem } from '@shared/models/filter.model';
+import { DASHBOARD_FILTER_STATE } from '@shared/constants';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
@@ -28,7 +29,7 @@ export interface DashboardStateModel {
     isDashboardLoading: false,
     widgets: [],
     isMobile: false,
-    filteredItems: []
+    filteredItems: JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [],
   },
 })
 @Injectable()
@@ -109,6 +110,8 @@ export class DashboardState {
 
   @Action(SetFilteredItems)
   private setFilteredItems({patchState}: StateContext<DashboardStateModel>, {payload}: SetFilteredItems) {
-    patchState({filteredItems: payload})
+    patchState({filteredItems: payload});
+    window.localStorage.setItem(DASHBOARD_FILTER_STATE, JSON.stringify(payload));
+    
   }
 }
