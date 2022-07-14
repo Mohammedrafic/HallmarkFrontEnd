@@ -1,12 +1,13 @@
-@import "../variables/colors.scss";
+@import 'colors.scss';
 
 .e-badge.e-badge-success.e-badge-circle {
-  height: 1.13rem !important;
-  width: 1.13rem !important;
+  height: 16px !important;
+  width: 16px !important;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 0.75rem;
+  font-weight: 700;
+  font-size: 11px;
   background-color: $primary-active-blue-15 !important;
   transition: transform 500ms;
   transform: translate(0, 0);

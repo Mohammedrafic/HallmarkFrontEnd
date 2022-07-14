@@ -1,6 +1,7 @@
 <app-page-toolbar>
   <ng-container left>
     <app-tab-navigation
+      [reOrdersNumber$]="reOrderCount$"
       (selectedTab)="tabSelected($event)"
     ></app-tab-navigation>
   </ng-container>
@@ -41,7 +42,7 @@
     [selectionSettings]="selectionOptions"
     [textWrapSettings]="wrapSettings"
     (rowSelected)="onRowClick($event)"
-    (rowDeselected)="rowDeselected($event, gridWithChildRow)"
+    (rowDeselected)="onRowDeselect($event, gridWithChildRow)"
     (dataBound)="onDataBound()"
   >
     <e-columns>

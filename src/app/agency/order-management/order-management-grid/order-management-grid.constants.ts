@@ -42,16 +42,25 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Re-Order ID', column: 'ReOrderId' },
   { text: 'Status', column: 'Status' },
   { text: 'Job Title', column: 'JobTitle' },
-  { text: '# of Positions', column: 'NumberOfPositions' },
-  { text: 'Candidates', column: 'CandidatesCount' },
-  { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Skill', column: 'Skill' },
-  { text: 'Location', column: 'LocationName' },
-  { text: 'Department', column: 'DepartmentName' },
+  { text: '# of Positions', column: 'CountOfPosition' },
+  { text: 'Location', column: 'Location'},
+  { text: 'Department', column: 'Department'},
+  { text: 'Candidates', column: 'Candidates'},
+  { text: 'Bill Rate', column: 'BillRate'},
   { text: 'Re-Order Date', column: 'ReOrderDate' },
   { text: 'Shift', column: 'Shift' },
-  { text: 'Agency', column: 'AgencyName' },
+  { text: 'Agency', column: 'Agency'},
 ];
+
+export const reOrdersChildColumnToExport: ExportColumn[] = [
+  { text: 'Position ID', column: 'PositionID'},
+  { text: 'Position Status', column: 'PositionStatus'},
+  { text: 'Candidate Name', column: 'CandidateName'},
+  { text: 'Candidate Status', column: 'CandidateStatus'},
+  { text: 'Submission', column: 'Submission'},
+  { text: 'Onboarded', column: 'Onboarded'},
+]
 
 export const perDiemColumnsToExport: ExportColumn[] = [
   { text:'Order ID', column: 'OrderId'},

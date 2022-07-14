@@ -11,7 +11,7 @@ import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-stat
 
 export class OrderManagement {
   id: number;
-  reOrderId?: number; // TODO: verify name after BE implementation
+  reOrderId?: number;
   organizationId: number;
   status: number;
   statusText: string;
@@ -33,8 +33,9 @@ export class OrderManagement {
   openPositions: number;
   candidates: number;
   startDate: string;
-  reOrderDate?: string; // TODO: verify name after BE implementation
+  reOrderDate?: string;
   isLocked?: boolean;
+  reOrderCount?: number;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
   children: OrderManagementChild[];
 }
@@ -55,7 +56,7 @@ export type OrderManagementPage = PageOfCollections<OrderManagement>;
 
 export type AgencyOrderManagement = {
   orderId: number;
-  reOrderId?: number; // TODO: verify name after BE implementation
+  reOrderId?: number;
   statusText: string;
   status: OrderStatus;
   jobTitle: string;
@@ -71,7 +72,8 @@ export type AgencyOrderManagement = {
   candidatesCount: number;
   isLocked: boolean;
   jobStartDate: string;
-  reOrderDate?: string; // TODO: verify name after BE implementation
+  reOrderDate?: string;
+  reOrderCount?: number;
   organizationId: number;
   organizationName: string;
   children: OrderManagementChild[];
@@ -123,7 +125,7 @@ export type AgencyOrderFilters = {
   locationIds?: number[];
   departmentsIds?: number[];
   orderId?: number;
-  reOrderId?: number; // TODO: verify name after BE implementation
+  reOrderId?: number;
   skillIds?: number[];
   candidateStatuses?: number[];
   candidatesCountFrom?: number; // TODO: verify name after BE implementation
@@ -137,7 +139,7 @@ export type AgencyOrderFilters = {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
-  reOrderDate?: Date; // TODO: verify name after BE implementation
+  reOrderDate?: Date;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -355,7 +357,7 @@ export class OrderFilter {
   regionIds?: number[];
   locationIds?: number[];
   departmentsIds?: number[];
-  reOrderId?: number; // TODO: verify name after BE implementation
+  reOrderId?: number;
   orderId?: number;
   skillIds?: number[];
   orderTypes?: number[];
@@ -365,7 +367,7 @@ export class OrderFilter {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
-  reOrderDate?: Date; // TODO: verify name after BE implementation
+  reOrderDate?: Date;
   orderStatuses?: number[];
   candidateStatuses?: number[];
   candidatesCountFrom?: number;

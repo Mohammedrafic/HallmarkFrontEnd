@@ -48,6 +48,7 @@ import {
   perDiemColumnsToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
+  reOrdersChildColumnToExport,
   ROW_HEIGHT
 } from './order-management-content.constants';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
@@ -138,6 +139,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public isSubrowDisplay: boolean = false;
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
   public orderStatus = OrderStatus;
+  public reOrderCount$ = new Subject<number>();
 
   private selectedIndex: number | null;
   private ordersPage: OrderManagementPage;
@@ -232,7 +234,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.defaultFileName = `Organization Management/${this.activeTab} ` + this.generateDateTime(this.datePipe);
     this.store.dispatch(new ExportOrders(new ExportPayload(
       fileType,
-      { ...this.filters, ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null },
+      {
+        ...this.filters,
+        isAgency: this.activeTab === OrganizationOrderManagementTabs.ReOrders ? false : null,
+        ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null
+      },
       options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
       null,
       options?.fileName || this.defaultFileName
@@ -334,6 +340,16 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.search?.clear();
   }
 
+  private checkSelectedChildrenItem(): void {
+    const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children.length !== 0);
+
+    if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
+      this.columnsToExport = hasSelectedItemChildren
+        ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
+        : reOrdersColumnsToExport;
+    }
+  }
+
   public onFilterClearAll(): void {
     this.clearFilters();
     this.getOrders();
@@ -390,6 +406,13 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       this.openChildDialog.next(false);
       this.openDetails.next(true);
     }
+
+    this.checkSelectedChildrenItem();
+  }
+
+  public onRowDeselect(event: any, grid: any) {
+    this.rowDeselected(event, grid);
+    this.checkSelectedChildrenItem();
   }
 
   private onChildDialogChange(): void {
@@ -562,10 +585,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private onOrdersDataLoadHandler(): void {
-    this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
-      this.ordersPage = data
+    this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.ordersPage = data;
       if (data && data.items) {
-        data.items.forEach(item => {
+        this.reOrderCount$.next(data.items[0]?.reOrderCount || 0);
+        data.items.forEach((item) => {
           item.isMoreMenuWithDeleteButton = !this.openInProgressFilledStatuses.includes(item.statusText.toLowerCase());
           if (item.children && item.children.length) {
             item.children.sort((a, b) => a.positionId - b.positionId);

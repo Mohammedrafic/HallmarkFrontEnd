@@ -3,3 +3,10 @@
     margin-left: 0.3rem;
   }
 }
+
+.first-active {
+  .e-tab .e-tab-header:not(.e-vertical) .e-indicator {
+    left: 0 !important;
+    right: 445px !important;
+  }
+}

@@ -15,7 +15,7 @@
   [textWrapSettings]="wrapSettings"
   [enableVirtualization]="true"
   (rowSelected)="onRowClick($event)"
-  (rowDeselected)="rowDeselected($event, gridWithChildRow)"
+  (rowDeselected)="onRowDeselect($event, gridWithChildRow)"
   (dataBound)="onDataBound()"
   (actionBegin)="actionBegin($event)"
   (created)="onGridCreated()"

@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { debounceTime, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -23,6 +23,7 @@ import {
   MyAgencyOrdersColumnsConfig,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
+  reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
   ROW_HEIGHT,
@@ -70,6 +71,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() exportButtonClicked: boolean;
   @Input() onExportClicked$: Subject<any>;
   @Input() search$: Subject<string>;
+
+  @Output() reOrderNumber = new EventEmitter<number>();
 
   @ViewChild('grid') override gridWithChildRow: GridComponent;
   @ViewChild('gridPager') pager: PagerComponent;
@@ -145,6 +148,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     });
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.ordersPage = data;
+      this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
     });
   }
 
@@ -184,6 +188,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           fileType,
           {
             ...this.filters,
+            isAgency: this.selectedTab === AgencyOrderManagementTabs.ReOrders ? true : null,
             ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
           },
           options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
@@ -356,7 +361,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
       skillIds: this.filters.skillIds || [],
-      orderTypes: this.selectedTab === AgencyOrderManagementTabs.PerDiem ? [] : this.filters.orderTypes || [],
+      orderTypes: this.selectedTab === AgencyOrderManagementTabs.PerDiem
+        || this.selectedTab === AgencyOrderManagementTabs.ReOrders ? [] : this.filters.orderTypes || [],
       jobTitle: this.filters.jobTitle || null,
       billRateFrom: this.filters.billRateFrom || null,
       billRateTo: this.filters.billRateTo || null,
@@ -387,11 +393,18 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private checkSelectedChildrenItem(): void {
+    const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children.length !== 0);
+
     if (this.selectedTab === AgencyOrderManagementTabs.MyAgency) {
-      const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children.length !== 0);
       this.columnsToExport = hasSelectedItemChildren
         ? [...myAgencyColumnsToExport, ...myAgencyChildColumnsToExport]
         : myAgencyColumnsToExport;
+    }
+
+    if (this.selectedTab ===  AgencyOrderManagementTabs.ReOrders) {
+      this.columnsToExport = hasSelectedItemChildren
+        ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
+        : reOrdersColumnsToExport;
     }
   }
 
