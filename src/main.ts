@@ -19,7 +19,9 @@ if (environment.production) {
   enableProdMode();
 }
 
-fetch('./assets/app.settings.json')
+const settingsUrl = environment.production ? './ui/assets/app.settings.json': './assets/app.settings.json';
+
+fetch(settingsUrl)
   .then((res) => res.json())
   .then((settings) => {
     
