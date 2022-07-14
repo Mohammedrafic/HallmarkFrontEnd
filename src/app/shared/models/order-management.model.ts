@@ -113,6 +113,7 @@ export type OrderCandidatesList = {
     organizationId: number;
   };
   candidateStatus?: CandidateStatus;
+  agencyName?: string;
 };
 
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;
@@ -342,7 +343,7 @@ export type CandidatesBasicInfo = {
   actualEndDate: string;
   clockId: string;
   guaranteedWorkWeek: string;
-}
+};
 
 export type ApplicantStatus = {
   applicantStatus: number;
