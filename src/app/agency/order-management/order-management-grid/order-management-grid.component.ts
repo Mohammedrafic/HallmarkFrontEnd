@@ -165,7 +165,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public override customExport(): void {
-    this.defaultFileName = `Agency Management/${this.selectedTab} ` + this.generateDateTime(this.datePipe);
+    this.defaultFileName = `Order Management/${this.selectedTab} ` + this.generateDateTime(this.datePipe);
     this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
   }
@@ -181,7 +181,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
-    this.defaultFileName = `Agency Management/${this.selectedTab} ` + this.generateDateTime(this.datePipe);
+    this.defaultFileName = `Order Management/${this.selectedTab} ` + this.generateDateTime(this.datePipe);
     this.store.dispatch(
       new ExportAgencyOrders(
         new ExportPayload(

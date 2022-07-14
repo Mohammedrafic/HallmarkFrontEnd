@@ -30,12 +30,12 @@ export const myAgencyColumnsToExport: ExportColumn[] = [
 export const myAgencyChildColumnsToExport: ExportColumn[] = [
   { text: 'Position ID', column: 'PositionId' },
   { text: 'Candidate Name', column: 'CandidateName' },
-  { text: 'Child Order Status', column: 'ChildOrderStatus' },
+  { text: 'Position Status', column: 'ChildOrderStatus' },
   { text: 'Candidate Status', column: 'CandidateStatus' },
-  { text: 'Child Skill', column: 'ChildOrderSkill' },
-  { text: 'Child Bill Rate', column: 'CandidateBillRate' },
-  { text: 'Submissions', column: 'SubmissionsPercentage' },
-  { text: 'Onboarded', column: 'OnboardedPercentage' },
+  { text: 'Candidate Skill', column: 'ChildOrderSkill' },
+  { text: 'Candidate Bill Rate', column: 'CandidateBillRate' },
+  { text: 'Submission %', column: 'SubmissionsPercentage' },
+  { text: 'Onboard %', column: 'OnboardedPercentage' },
 ];
 
 export const reOrdersColumnsToExport: ExportColumn[] = [
@@ -63,15 +63,15 @@ export const reOrdersChildColumnToExport: ExportColumn[] = [
 ]
 
 export const perDiemColumnsToExport: ExportColumn[] = [
-  { text:'Order ID', column: 'OrderId'},
-  { text:'Status', column: 'Status'},
-  { text:'Job Title', column: 'JobTitle'},
-  { text:'Organization', column: 'OrganizationName' },
-  { text:'Candidates', column: 'CandidatesCount'},
-  { text:'Skill', column: 'Skill'},
-  { text:'Location', column: 'LocationName'},
-  { text:'Department', column: 'DepartmentName'},
-  { text:'# of Shifts Next 90 Days', column: 'ShiftCount'},
+  { text: 'Order ID', column: 'OrderId' },
+  { text: 'Status', column: 'Status' },
+  { text: 'Job Title', column: 'JobTitle' },
+  { text: 'Organization', column: 'OrganizationName' },
+  { text: 'Candidates', column: 'CandidatesCount' },
+  { text: 'Skill', column: 'Skill' },
+  { text: 'Location', column: 'LocationName' },
+  { text: 'Department', column: 'DepartmentName' },
+  { text: '# of Shifts Next 90 Days', column: 'ShiftCount' },
 ];
 
 export const ReOrdersColumnsConfig: GridColumn[] = [
