@@ -2,7 +2,7 @@
   #grid
   class="e-gridwithchildrow"
   (rowDataBound)="setRowHighlight($event)"
-  [dataSource]="(ordersPage$ | async)?.items || []"
+  [dataSource]="ordersPage?.items || []"
   [allowPaging]="allowPaging"
   [pageSettings]="pageSettings"
   [height]="gridHeight"
@@ -22,6 +22,38 @@
 >
   <e-columns>
     <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
+    <e-column headerTextAlign="Right" width="120">
+      <ng-template #headerTemplate let-data>
+        <div class="controls-header">
+          <button ejs-button cssClass="e-flat icon-button c" *ngIf="!isSubrowDisplay; else onSubrowToggle" (click)="expandAll()">
+            <span><img src="assets/icons/menu-expand.svg" alt="coll" class="icon"></span>
+          </button>
+          <ng-template #onSubrowToggle>
+            <button ejs-button cssClass="e-flat icon-button" (click)="collapseAll()">
+              <span><img src="assets/icons/menu-collapse.svg" alt="coll" class="icon c"></span>
+            </button>
+          </ng-template>
+          <button ejs-button cssClass="e-flat icon-button" *ngIf="isRowScaleUp; else onRowScaleDown">
+            <span><i-feather name="menu" class="icon" (click)="onRowScaleUpClick()"></i-feather></span>
+          </button>
+          <ng-template #onRowScaleDown>
+            <button ejs-button cssClass="e-flat icon-button">
+              <span><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
+            </button>
+          </ng-template>
+        </div>
+      </ng-template>
+      <ng-template #template let-data>
+        <div class="row-tool-buttons">
+          <button ejs-button cssClass="e-flat" [disabled]="true">
+            <span><i-feather [name]="data.isLocked ? 'lock' : 'unlock'" class="icon"></i-feather></span>
+          </button>
+          <button ejs-button cssClass="e-flat default-icon-button">
+            <span><i-feather name="message-square" class="icon"></i-feather></span>
+          </button>
+        </div>
+      </ng-template>
+    </e-column>
     <e-column field="orderId" headerText="ORDER ID" width="142">
       <ng-template #template let-data>
         <ng-container *ngIf="!data.children?.length; else withToggle">
@@ -146,28 +178,6 @@
         -
       </ng-template>
     </e-column>
-    <e-column headerTextAlign="Right" width="120">
-      <ng-template #headerTemplate let-data>
-        <div class="controls-header">
-          <button ejs-button cssClass="e-flat icon-button">
-            <span><i-feather name="menu" class="icon" (click)="onRowScaleUpClick()"></i-feather></span>
-          </button>
-          <button ejs-button cssClass="e-flat icon-button">
-            <span><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
-          </button>
-        </div>
-      </ng-template>
-      <ng-template #template let-data>
-        <div class="row-tool-buttons">
-          <button ejs-button cssClass="e-flat" [disabled]="true">
-            <span><i-feather [name]="data.isLocked ? 'lock' : 'unlock'" class="icon"></i-feather></span>
-          </button>
-          <button ejs-button cssClass="e-flat default-icon-button">
-            <span><i-feather name="message-square" class="icon"></i-feather></span>
-          </button>
-        </div>
-      </ng-template>
-    </e-column>
   </e-columns>
 
   <ng-template #detailTemplate let-data>
@@ -203,7 +213,7 @@
               [decimals]="decimals"
               placeholder="Go to:"
               min="1"
-              [max]="(ordersPage$ | async)?.totalPages"
+              [max]="ordersPage?.totalPages"
               [showSpinButton]="false"
               (change)="onGoToClick($event)"
             >
@@ -213,8 +223,8 @@
             <ejs-pager
               id="gridPager"
               #gridPager
-              [pageSize]="pageSizePager"
-              [totalRecordsCount]="(ordersPage$ | async)?.totalCount"
+              [pageSize]="pageSize"
+              [totalRecordsCount]="ordersPage?.totalCount"
               [enablePagerMessage]="false"
               [currentPage]="currentPagerPage"
               (click)="onGoToClick($event)"
@@ -248,7 +258,7 @@
 
 <app-filter-dialog
   [items]="filteredItems"
-  [count]="(ordersPage$ | async)?.totalCount"
+  [count]="ordersPage?.totalCount"
   (deleteFilter)="onFilterDelete($event)"
   (clearAllFiltersClicked)="onFilterClearAll()"
   (applyFilterClicked)="onFilterApply()"

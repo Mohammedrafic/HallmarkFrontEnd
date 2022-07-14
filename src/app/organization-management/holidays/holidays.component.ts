@@ -151,6 +151,7 @@ export class HolidaysComponent extends AbstractGridConfigurationComponent implem
           this.locations = [];
           this.isAllRegionsSelected = false;
         }
+        this.HolidayFormGroup.get('locations')?.setValue(null);
       }
     });
     this.HolidayFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
