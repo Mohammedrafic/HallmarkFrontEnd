@@ -14,7 +14,6 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 
 import { Destroyable } from '@core/helpers';
 import { User } from '@shared/models/user.model';
-
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { TabConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
@@ -34,19 +33,19 @@ import { getTimesheetStatusFromIdx } from '../../helpers/functions';
 })
 export class TimesheetsContainerComponent extends Destroyable implements OnInit {
   @Select(TimesheetsState.timesheets)
-  timesheets$: Observable<TimeSheetsPage>;
+  readonly timesheets$: Observable<TimeSheetsPage>;
 
   @Select(TimesheetsState.timesheetsFilters)
-  timesheetsFilters$!: Observable<TimesheetsFilterState>;
+  readonly timesheetsFilters$!: Observable<TimesheetsFilterState>;
 
   @Select(UserState.user)
-  user$: Observable<User>;
+  readonly user$: Observable<User>;
 
-  public tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
-  public exportOptions: ItemModel[] = exportOptions;
+  public readonly tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
+  public readonly exportOptions: ItemModel[] = exportOptions;
   public filters: TimesheetsFilterState | undefined;
-  public dateControl: FormControl = new FormControl(null);
-  public currentSelectedTableRowIndex: Observable<number>
+  public readonly dateControl: FormControl = new FormControl(null);
+  public readonly currentSelectedTableRowIndex: Observable<number>
     = this.timesheetsService.getStream();
 
   public isAgency: boolean;
@@ -126,7 +125,8 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private calcTabsChips(): void {
-    this.store.select(TimesheetsState.tabCounts).pipe(
+    this.store.select(TimesheetsState.tabCounts)
+    .pipe(
       filter(Boolean),
       takeUntil(this.componentDestroy()),
     )

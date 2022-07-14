@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
@@ -6,7 +6,8 @@ import { ICellRendererParams } from '@ag-grid-community/core';
 @Component({
   selector: 'app-timesheet-table-status-cell',
   templateUrl: './timesheet-table-status-cell.component.html',
-  styleUrls: ['./timesheet-table-status-cell.component.scss']
+  styleUrls: ['./timesheet-table-status-cell.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TimesheetTableStatusCellComponent implements ICellRendererAngularComp {
   public cellValue: string;

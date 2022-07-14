@@ -6,3 +6,11 @@ export enum FieldType {
   Number = 'number',
   Dropdown = 'dropdown',
  }
+
+
+ export enum EditFieldTypes {
+  Currency = 'currency',
+  Text = 'text',
+  Time = 'time',
+  DateTime = 'dateTime',
+ }

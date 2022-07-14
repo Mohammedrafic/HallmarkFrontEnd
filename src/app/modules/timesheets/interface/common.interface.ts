@@ -1,3 +1,4 @@
+import { ColDef } from '@ag-grid-community/core';
 import { RecordFields } from './../enums/timesheet-common.enum';
 import { FormGroup } from '@angular/forms';
 
@@ -31,20 +32,22 @@ export interface DialogConfig {
 export interface MileRecord {
   id: number;
   day: string;
-  costCenter: string;
-  billRateType: string;
+  costCenter: number;
+  billRateType: number;
   amount: number;
   rate: number;
   total: number;
+  billRateConfigName: string;
 }
 
 export interface ExpensesRecord {
   id: number;
   day: string;
-  costCenter: string;
-  billRateType: string;
+  costCenter: number;
+  billRateType: number;
   description: string;
-  total: number;
+  amount: number;
+  billRateConfigName: string;
 }
 
 export interface TimesheetRecord {

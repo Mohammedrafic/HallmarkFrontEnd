@@ -1,6 +1,6 @@
-import { AxisModel, ChartAreaModel, DataLabelSettingsModel } from "@syncfusion/ej2-angular-charts";
-import { LegendSettingsModel } from "@syncfusion/ej2-charts/src/common/legend/legend-model";
-import { TooltipSettingsModel } from "@syncfusion/ej2-charts/src/common/model/base-model";
+import { AxisModel, ChartAreaModel, DataLabelSettingsModel } from '@syncfusion/ej2-angular-charts';
+import { LegendSettingsModel } from '@syncfusion/ej2-charts/src/common/legend/legend-model';
+import { TooltipSettingsModel } from '@syncfusion/ej2-charts/src/common/model/base-model';
 
 interface ChartSizeSettings {
   width: string;

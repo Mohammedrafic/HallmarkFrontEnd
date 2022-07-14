@@ -1,5 +1,3 @@
-
-
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
@@ -13,18 +11,26 @@ import {
   TimesheetAttachments,
   TabCountConfig,
   TimesheetRecordsDto,
-  CostCenterOption,
   DropdownOption,
 } from '../interface';
-import { BillRate } from '@shared/models';
 import { BillRatesOptions } from './../constants/timesheet-records-mock.constant';
 import {
   DataSourceItem,
   FilterDataSource,
 } from '../interface';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
-import { filterColumnDataSource, MokTabsCounts, MokTimesheet, MockCandidateHoursAndMilesData, MokTimesheet1 } from '../constants';
-import { CandidateMockInfo, MockTimesheetRecords, CostCenterOptions } from '../constants/timesheet-records-mock.constant';
+import {
+  filterColumnDataSource,
+  MokTabsCounts,
+  MokTimesheet,
+  MockCandidateHoursAndMilesData,
+  MokTimesheet1,
+} from '../constants';
+import {
+  CandidateMockInfo,
+  MockTimesheetRecords,
+  CostCenterOptions,
+} from '../constants/timesheet-records-mock.constant';
 import { TimesheetsTableColumns } from '../enums';
 import { CandidateHoursAndMilesData } from '../interface';
 

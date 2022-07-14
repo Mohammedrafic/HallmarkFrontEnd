@@ -1,10 +1,11 @@
-import { GridDateEditorComponent } from './components/cell-editors/grid-date-editor/grid-date-editor.component';
-import { AgGridModule } from '@ag-grid-community/angular';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+
+import { AgGridModule } from '@ag-grid-community/angular';
+import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
 import { NgxsModule } from '@ngxs/store';
 import { FeatherModule } from 'angular-feather';
 import { DialogAllModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
@@ -42,7 +43,7 @@ import { ProfileUploadsComponent } from './components/profile-uploads/profile-up
 import { ProfileInvoicesComponent } from './components/profile-invoices/profile-invoices.component';
 import { TimesheetsService } from './services/timesheets.service';
 import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
-import { TimesheetDetailsApiService } from "./services/timesheet-details-api.service";
+import { TimesheetDetailsApiService } from './services/timesheet-details-api.service';
 import { ProfileTimesheetService } from './services/profile-timesheet.service';
 import { TimesheetRecordsService } from './services/timesheet-records.service';
 import { DropdownEditorComponent } from './components/cell-editors/dropdown-editor/dropdown-editor.component';
@@ -51,7 +52,8 @@ import { TimesheetsFilterDialogComponent } from './components/timesheets-filter-
 import { GridModule } from '@shared/components/grid/grid.module';
 import { TimesheetTableStatusCellComponent } from './components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
 import { ProfileMilesComponent } from './components/profile-cumulative-hours/profile-miles/profile-miles.component';
-import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
+import { InputEditorComponent } from './components/cell-editors/input-editor/input-editor.component';
+import { GridDateEditorComponent } from './components/cell-editors/grid-date-editor/grid-date-editor.component';
 
 const gridIcons = {
   MessageSquare,
@@ -100,6 +102,7 @@ const gridIcons = {
     TimesheetsFilterDialogComponent,
     TimesheetTableStatusCellComponent,
     ProfileMilesComponent,
+    InputEditorComponent,
   ],
   imports: [
     CommonModule,

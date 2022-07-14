@@ -53,7 +53,6 @@ export class TimesheetsState {
   constructor(
     private timesheetsApiService: TimesheetsApiService,
     private timesheetDetailsApiService: TimesheetDetailsApiService,
-    private profileTimesheetService: ProfileTimesheetService,
     private store: Store,
     private confirmService: ConfirmService,
   ) {

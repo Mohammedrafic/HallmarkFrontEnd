@@ -1,13 +1,14 @@
 <ng-container [ngSwitch]="editable">
 
   <ng-template [ngSwitchCase]="false">
-    <span>{{ value.text }}</span>
+    <div class="init-value-wrapper">
+      <span>{{ value.text }}</span>
+    </div>
   </ng-template>
 
   <ng-template [ngSwitchCase]="true">
     <div class="bootstrap">
       <ejs-dropdownlist
-      class="dropdown-no-border"
       [dataSource]="options"
       [value]="value.text"
       (change)="itemChange($event)"

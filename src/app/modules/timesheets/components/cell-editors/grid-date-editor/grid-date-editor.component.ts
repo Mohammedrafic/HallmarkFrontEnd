@@ -1,9 +1,11 @@
-import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { AbstractControl, FormGroup } from '@angular/forms';
 import { ChangeDetectionStrategy, Component, ChangeDetectorRef } from '@angular/core';
 
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams, ColDef } from '@ag-grid-community/core';
+import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+
+import { EditFieldTypes } from './../../../enums/add-edit-timesheet.enum';
 
 @Component({
   selector: 'app-grid-date-editor',
@@ -20,23 +22,30 @@ export class GridDateEditorComponent implements ICellRendererAngularComp {
 
   public control: AbstractControl;
 
+  public type: EditFieldTypes;
+
   constructor(
     private cd: ChangeDetectorRef,
   ) {}
 
   public agInit(params: ICellRendererParams): void {
-    this.dateValue = new Date(params.value);
+    const data = params.data as Record<string, string | number>;
+    const day = data[params.colDef?.field as string];
+    this.dateValue = new Date(day ? day : 0);
     this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
   }
 
   public refresh(params: ICellRendererParams): boolean {
+    this.dateValue = new Date(params.value);
     this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
+    this.type = (params.colDef as ColDef).cellRendererParams.type;
     this.setFormControl(params);
     this.cd.markForCheck();
     return true;
   }
 
   public handleTimeChange(event: ChangeEventArgs): void {
+    this.control.markAsTouched();
     this.control.patchValue(event.value);
   }
 

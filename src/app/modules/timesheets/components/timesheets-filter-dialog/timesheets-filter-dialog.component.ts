@@ -4,10 +4,10 @@ import { FormGroup } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { Observable, takeUntil } from 'rxjs';
 import { filter } from 'rxjs/operators';
+
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { Destroyable } from '@core/helpers';
-
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { filterOptionFields } from '../../constants';
@@ -25,10 +25,10 @@ import { leftOnlyValidValues } from '../../helpers/functions';
 })
 export class TimesheetsFilterDialogComponent extends Destroyable implements OnInit {
   @Select(TimesheetsState.timesheets)
-  timesheets$: Observable<TimeSheetsPage>;
+  readonly timesheets$: Observable<TimeSheetsPage>;
 
-  @Output() updateTableByFilters: EventEmitter<any> = new EventEmitter<any>();
-  @Output() resetFilters: EventEmitter<void> = new EventEmitter<void>();
+  @Output() readonly updateTableByFilters: EventEmitter<any> = new EventEmitter<any>();
+  @Output() readonly resetFilters: EventEmitter<void> = new EventEmitter<void>();
 
   public filteredItems: FilteredItem[] = [];
   public filterOptionFields = filterOptionFields;

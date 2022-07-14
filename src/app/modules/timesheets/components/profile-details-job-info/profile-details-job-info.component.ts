@@ -1,12 +1,13 @@
 import { Router } from '@angular/router';
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { Observable } from "rxjs";
 
-import { Select } from "@ngxs/store";
-import { AppState } from "../../../../store/app.state";
-import { IsOrganizationAgencyAreaStateModel } from "@shared/models/is-organization-agency-area-state.model";
-import { CandidateInfo, CandidateInfoUIItem } from "../../interface";
+import { Observable } from 'rxjs';
+import { Select } from '@ngxs/store';
+
+import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
+import { AppState } from '../../../../store/app.state';
+import { CandidateInfo, CandidateInfoUIItem } from '../../interface';
 
 @Component({
   selector: 'app-profile-details-job-info',
@@ -21,9 +22,6 @@ export class ProfileDetailsJobInfoComponent implements OnChanges {
 
   @Input()
   public jobData: CandidateInfo | null;
-
-  @Select(AppState.isOrganizationAgencyArea)
-  public readonly isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
 
   constructor(
     private datePipe: DatePipe,

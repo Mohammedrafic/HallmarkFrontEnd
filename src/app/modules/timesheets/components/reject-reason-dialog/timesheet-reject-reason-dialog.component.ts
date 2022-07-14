@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { DialogComponent } from "@syncfusion/ej2-angular-popups";
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+
 import { rejectReasonMaxLength } from '../../constants';
 
 @Component({
@@ -26,9 +27,7 @@ export class TimesheetRejectReasonDialogComponent {
   @ViewChild('rejectReasonDialog')
   public rejectReasonDialog: DialogComponent;
 
-  public readonly form: FormGroup = this.fb.group({
-    reason: ['', [Validators.required, Validators.maxLength(rejectReasonMaxLength)]],
-  });
+  public readonly form: FormGroup;
 
   public get reasonControl(): FormControl {
     return this.form?.get('reason') as FormControl;
@@ -37,6 +36,9 @@ export class TimesheetRejectReasonDialogComponent {
   constructor(
     private fb: FormBuilder,
   ) {
+    this.form = this.fb.group({
+      reason: ['', [Validators.required, Validators.maxLength(rejectReasonMaxLength)]],
+    });
   }
 
   public onVisibleChange(value: boolean): void {

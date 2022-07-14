@@ -37,13 +37,19 @@ export class DropdownEditorComponent implements ICellRendererAngularComp {
   }
 
   public itemChange(event: ChangeEventArgs):  void {
+    this.control.markAsTouched();
     this.control.patchValue(event.itemData.value);
   }
 
   private setData(params: ICellRendererParams): void {
+    if ((params.colDef as ColDef).field === 'billRateType') {
+
+    }
     this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
     this.options = (params.colDef as ColDef).cellRendererParams.options;
+
     this.value = this.options.find((item) => item.value === params.value) as DropdownOption;
+
     this.cd.markForCheck();
   }
 

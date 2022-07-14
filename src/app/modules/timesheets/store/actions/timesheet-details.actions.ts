@@ -1,5 +1,5 @@
-import { ExportPayload } from "@shared/models/export.model";
-import { TimesheetDetailsActions, TIMESHEETS_ACTIONS } from "../../enums";
+import { ExportPayload } from '@shared/models/export.model';
+import { TimesheetDetailsActions, TIMESHEETS_ACTIONS } from '../../enums';
 
 export namespace TimesheetDetails {
   export class Export {

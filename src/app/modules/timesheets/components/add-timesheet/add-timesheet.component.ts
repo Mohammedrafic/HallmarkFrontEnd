@@ -13,12 +13,10 @@ import {
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 
-import { Select, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import {
   filter,
-  Observable,
   takeUntil,
-  tap,
   concatMap,
 } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';

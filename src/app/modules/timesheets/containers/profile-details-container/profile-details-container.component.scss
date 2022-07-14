@@ -4,7 +4,7 @@
 $chip-margin: 8px;
 
 .profile-table-container {
-  padding-bottom: 21px;
+  padding-bottom: 0;
 }
 
 .container {
@@ -286,7 +286,7 @@ $chip-margin: 8px;
     flex-direction: column;
 
     section.container {
-      overflow: auto;
+      overflow: hidden;
     }
   }
 }

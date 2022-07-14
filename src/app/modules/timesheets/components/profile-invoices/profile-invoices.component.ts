@@ -1,7 +1,11 @@
 import { ChangeDetectionStrategy, Component, Input, ViewChild } from '@angular/core';
+
+import { PdfViewerComponent } from '@syncfusion/ej2-angular-pdfviewer';
+import { takeUntil } from 'rxjs';
+
+import { Destroyable } from '@core/helpers';
 import { TimesheetDetailsInvoice } from '../../interface';
 import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
-import { PdfViewerComponent } from '@syncfusion/ej2-angular-pdfviewer';
 
 @Component({
   selector: 'app-profile-invoices',
@@ -9,8 +13,10 @@ import { PdfViewerComponent } from '@syncfusion/ej2-angular-pdfviewer';
   styleUrls: ['./profile-invoices.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileInvoicesComponent {
+export class ProfileInvoicesComponent extends Destroyable {
   public previewInvoice: TimesheetDetailsInvoice | null = null;
+
+  public readonly serviceUrl = 'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
 
   @ViewChild('pdfViewer')
   public pdfViewer: PdfViewerComponent;
@@ -21,6 +27,7 @@ export class ProfileInvoicesComponent {
   constructor(
     private timesheetDetailsApiService: TimesheetDetailsApiService,
   ) {
+    super();
   }
 
   public trackByName(_: number, item: TimesheetDetailsInvoice): string {

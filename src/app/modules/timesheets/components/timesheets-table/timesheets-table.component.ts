@@ -7,12 +7,12 @@ import {
   Output,
 } from '@angular/core';
 
-import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
+import { RowNode } from '@ag-grid-community/core';
 
+import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { TimesheetsSelectedRowEvent } from '../../interface';
 import { TimesheetsColumnsDefinition } from '../../constants';
-import { RowNode } from '@ag-grid-community/core';
 
 @Component({
   selector: 'app-timesheets-table',
@@ -22,15 +22,17 @@ import { RowNode } from '@ag-grid-community/core';
 })
 export class TimesheetsTableComponent {
   @Input() tableData: TimeSheetsPage;
+
   @Input() newSelectedIndex: null | number;
 
-  @Output() changePage: EventEmitter<number> = new EventEmitter<number>();
+  @Output() readonly changePage: EventEmitter<number> = new EventEmitter<number>();
 
-  @Output() changePerPage: EventEmitter<number> = new EventEmitter<number>();
+  @Output() readonly changePerPage: EventEmitter<number> = new EventEmitter<number>();
 
-  @Output() sortHandler: EventEmitter<string> = new EventEmitter<string>();
+  @Output() readonly sortHandler: EventEmitter<string> = new EventEmitter<string>();
 
-  @Output() timesheetRowSelected: EventEmitter<TimesheetsSelectedRowEvent> = new EventEmitter<TimesheetsSelectedRowEvent>();
+  @Output() readonly timesheetRowSelected: EventEmitter<TimesheetsSelectedRowEvent>
+  = new EventEmitter<TimesheetsSelectedRowEvent>();
 
   public readonly columnDefinitions: ColumnDefinitionModel[] =
     TimesheetsColumnsDefinition(this.router.url.includes('agency'));

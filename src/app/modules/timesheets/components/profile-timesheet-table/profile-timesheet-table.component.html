@@ -2,7 +2,19 @@
   <div class="table-block">
     <div class="table-header">
 
-      <ejs-tab #tabs (selecting)="selectTab($event)"></ejs-tab>
+      <div [ngClass]="{ 'first-tab': isFirstSelected}" class="tab-wrapper">
+        <ejs-tab id="tab_default" #tabs (selected)="onTabSelect($event)">
+          <e-tabitems>
+            <e-tabitem *ngFor="let tab of tabsConfig; trackBy: trackByIndex">
+              <ng-template #headerText >
+                <div >{{ tab.title }}</div>
+              </ng-template>
+              <ng-template #content>
+              </ng-template>
+            </e-tabitem>
+          </e-tabitems>
+        </ejs-tab>
+      </div>
 
       <button class="add-action spaced">+ Add Record</button>
       <button
@@ -22,7 +34,7 @@
     <div class="timesheet-table-container">
       <ag-grid-angular #grid
         [columnDefs]="timesheetColDef"
-        [rowData]="(timesheetRecords$ | async)?.timeRecords"
+        [rowData]="(timesheetRecords$ | async)?.[currentTab]"
         [rowHeight]="64"
         [modules]="modules"
         [pagination]="false"

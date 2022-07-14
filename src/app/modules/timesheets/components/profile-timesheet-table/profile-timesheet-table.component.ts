@@ -5,55 +5,59 @@ import {
   Component,
   EventEmitter,
   Input,
-  OnChanges,
   Output,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 
 import { Observable, takeUntil, forkJoin } from 'rxjs';
+import { filter, skip, take } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { TabComponent, SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
 
-import { ConfirmService } from '@shared/services/confirm.service';
 import { Destroyable } from '@core/helpers';
 import { RecordFields } from './../../enums/timesheet-common.enum';
-import { RecordValue } from './../../interface/common.interface';
-import { TimesheetRecordsColdef } from './../../constants/timsheets-details.constant';
-import { TimesheetRecordsDto } from '../../interface';
+import {
+  TimesheetRecordsColdef,
+  TimesheetRecordsColConfig,
+  RecordsTabConfig,
+} from './../../constants/timsheets-details.constant';
+import { ConfirmService } from './../../../../shared/services/confirm.service';
+import { TabConfig } from './../../interface/common.interface';
+import { ConfirmTabChange } from './../../constants/confirm-delete-timesheet-dialog-content.const';
+import { DialogActionPayload, TimesheetRecordsDto } from '../../interface';
 import { TimesheetRecordsService } from '../../services/timesheet-records.service';
-import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 
+/**
+ * TODO: move tabs into separate component if possible
+ */
 @Component({
   selector: 'app-profile-timesheet-table',
   templateUrl: './profile-timesheet-table.component.html',
   styleUrls: ['./profile-timesheet-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileTimesheetTableComponent extends Destroyable implements OnChanges, AfterViewInit {
+export class ProfileTimesheetTableComponent extends Destroyable implements AfterViewInit {
+  @ViewChild('tabs') readonly tabs: TabComponent;
 
-  @ViewChild('tabs') tabs: TabComponent;
-
-  @ViewChild('grid') grid: IClientSideRowModel;
-
-  @Input() candidateRecords: TimesheetRecordsDto;
+  @ViewChild('grid') readonly grid: IClientSideRowModel;
 
   @Input() candidateId: number;
 
-  @Output() openAddSideDialog: EventEmitter<number> = new EventEmitter<number>();
+  @Output() readonly openAddSideDialog: EventEmitter<number> = new EventEmitter<number>();
 
-  @Output() updateTable: EventEmitter<void> = new EventEmitter<void>();
-
-  @Output() deleteTableItemId: EventEmitter<{ profileId: number; tableItemId: number | any }>
-
-    = new EventEmitter<{ profileId: number; tableItemId: number | any }>();
+  @Output() readonly changesSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @Select(TimesheetsState.tmesheetRecords)
-  public timesheetRecords$: Observable<TimesheetRecordsDto>;
+  public readonly timesheetRecords$: Observable<TimesheetRecordsDto>;
+
+  @Select(TimesheetsState.isTimesheetOpen)
+  public readonly isTimesheetOpen$: Observable<DialogActionPayload>;
 
   public isEditOn = false;
 
@@ -61,41 +65,73 @@ export class ProfileTimesheetTableComponent extends Destroyable implements OnCha
 
   public readonly modules: Module[] = [ClientSideRowModelModule];
 
-  private gridApi: GridApi;
+  public tabsConfig: TabConfig[] = RecordsTabConfig;
 
-  private records: TimesheetRecordsDto;
+  public records: TimesheetRecordsDto;
 
-  private currentTab: RecordFields = RecordFields.Time;
+  public currentTab: RecordFields = RecordFields.Time;
+
+  public isFirstSelected = true;
+
+  private isChangesSaved = true;
 
   private formControls: Record<string, FormGroup> = {};
 
+  private gridApi: GridApi;
+
+  private slectingindex: number;
+
   constructor(
     private store: Store,
-    private cdr: ChangeDetectorRef,
     private confirmService: ConfirmService,
     private timesheetRecordsService: TimesheetRecordsService,
     private apiService: TimesheetsApiService,
-    private fb: FormBuilder,
+    private cd: ChangeDetectorRef,
   ) {
     super();
   }
 
-  ngOnChanges(): void {
-    this.setTabItems();
+  ngAfterViewInit(): void {
+    this.getRecords();
+    this.watchForDialogState();
   }
 
-  ngAfterViewInit(): void {
-    this.setTabItems();
-    this.getRecords();
+  onTabSelect(selectEvent: SelectingEventArgs): void {
+    this.isFirstSelected = false;
+
+    if (!this.isChangesSaved && (this.slectingindex !== selectEvent.selectedIndex)) {
+      this.confirmService.confirm(ConfirmTabChange, {
+        title: 'Unsaved Progress',
+        okButtonLabel: 'Proceed',
+        okButtonClass: 'delete-button',
+      })
+      .pipe(
+        take(1),
+      )
+      .subscribe((submitted) => {
+        if (submitted) {
+          this.isChangesSaved = true;
+          this.selectTab(selectEvent.selectedIndex);
+          this.setInitialTableState();
+        } else {
+          this.slectingindex = selectEvent.previousIndex;
+          this.tabs.select(selectEvent.previousIndex);
+        }
+      });
+    } else {
+      this.selectTab(selectEvent.selectedIndex);
+    }
   }
 
   public editTimesheets(): void {
     this.isEditOn = true;
     this.createForm();
-    this.setColDef();
+    this.setEditModeColDef();
   }
 
-  public selectTab(event: SelectingEventArgs): void {}
+  private selectTab(index: number): void {
+    this.changeColDefs(index);
+  }
 
   public onGridReady(params: GridReadyEvent): void {
     this.gridApi = params.api;
@@ -103,25 +139,31 @@ export class ProfileTimesheetTableComponent extends Destroyable implements OnCha
   }
 
   public cancelChanges(): void {
+    this.changesSaved.emit(true);
+    this.isChangesSaved = true;
     this.setInitialTableState();
   }
 
   public saveChanges(): void {
     const diffs = this.timesheetRecordsService.findDiffs(
       this.records[this.currentTab], this.formControls, this.timesheetColDef);
-    this.store.dispatch(new TimesheetDetails.PatchTimesheetRecords(this.candidateId, diffs))
-    .pipe(
-      takeUntil(this.componentDestroy())
-    )
-    .subscribe(() => {
-      this.setInitialTableState();
-    })
+
+    if (diffs.length) {
+
+      this.store.dispatch(new TimesheetDetails.PatchTimesheetRecords(this.candidateId, diffs))
+      .pipe(
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe(() => {
+        this.changesSaved.emit(true);
+        this.isChangesSaved = true;
+        this.setInitialTableState();
+      });
+    }
   }
 
-  private setTabItems(): void {
-    if (this.candidateRecords && this.tabs) {
-      this.timesheetRecordsService.createTabs(this.candidateRecords, this.tabs);
-    }
+  public trackByIndex(index: number, item: TabConfig): number {
+    return index;
   }
 
   private getFormOptions(): void {
@@ -141,19 +183,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements OnCha
   }
 
   private createForm(): void {
-    this.records[this.currentTab].forEach((record) => {
-      const config = this.timesheetColDef.filter((item) => item.cellRendererParams?.editMode);
-      const controls: Record<string, string[] | number[] | Validators[]> = {};
-
-      config.forEach((column) => {
-        const field = column.field as keyof RecordValue;
-        const value = record[field];
-
-        controls[field] = [value, Validators.required];
-      });
-
-      this.formControls[record.id] = this.fb.group(controls);
-    });
+    this.formControls = this.timesheetRecordsService.createEditForm(
+      this.records, this.currentTab, this.timesheetColDef);
+    this.watchFormChanges();
   }
 
   private getRecords(): void {
@@ -166,11 +198,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements OnCha
     });
   }
 
-  private setColDef(): void {
+  private setEditModeColDef(): void {
     this.timesheetColDef = this.timesheetColDef.map((def) => {
       if (def.cellRendererParams && def.cellRendererParams.editMode) {
         def.cellRendererParams.isEditable = this.isEditOn;
-        def.width = 135;
         def.cellRendererParams.formGroup = this.formControls;
       }
       return def;
@@ -182,6 +213,39 @@ export class ProfileTimesheetTableComponent extends Destroyable implements OnCha
   private setInitialTableState(): void {
     this.isEditOn = false;
     this.formControls = {};
-    this.setColDef();
+    this.setEditModeColDef();
   }
+
+  private changeColDefs(idx: number): void {
+    this.currentTab = this.timesheetRecordsService.getCurrentTabName(idx);
+    this.timesheetColDef = TimesheetRecordsColConfig[this.currentTab];
+    this.cd.markForCheck();
+  }
+
+  private watchForDialogState(): void {
+    this.isTimesheetOpen$
+    .pipe(
+      skip(1),
+      filter((payload) => !payload.dialogState),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      this.cancelChanges();
+    })
+  }
+
+  private watchFormChanges(): void {
+    this.timesheetRecordsService.watchFormChanges(this.formControls)
+    .pipe(
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      if (this.timesheetRecordsService.checkIfFormTouched(this.formControls)) {
+        this.isChangesSaved = false;
+        this.changesSaved.emit(false);
+      }
+    })
+  }
+
+
 }

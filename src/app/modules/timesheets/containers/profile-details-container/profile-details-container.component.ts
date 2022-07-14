@@ -1,7 +1,6 @@
 import { ActivatedRoute } from '@angular/router';
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component, ElementRef,
   EventEmitter,
   Input,
@@ -9,15 +8,20 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
+import { DatePipe } from '@angular/common';
 
-import { take, filter, Observable, switchMap, takeUntil, tap, throttleTime, of } from 'rxjs';
+import { take, filter, Observable, switchMap, takeUntil, tap, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
-import { SelectedEventArgs, UploaderComponent } from "@syncfusion/ej2-angular-inputs";
+import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { Destroyable } from '@core/helpers';
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { FileSize } from '@core/enums';
+import { FileExtensionsString } from '@core/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { ExportColumn, ExportPayload } from '@shared/models/export.model';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import {
@@ -29,16 +33,12 @@ import {
 } from '../../interface';
 import { DialogAction, SubmitBtnText } from '../../enums';
 import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { ConfirmDeleteTimesheetDialogContent } from '../../constants/confirm-delete-timesheet-dialog-content.const';
+import {
+  ConfirmDeleteTimesheetDialogContent,
+  ConfirmUnsavedChages,
+} from '../../constants/confirm-delete-timesheet-dialog-content.const';
 import { ShowExportDialog } from '../../../../store/app.actions';
-import { ExportColumn, ExportPayload } from '@shared/models/export.model';
-import { DatePipe } from '@angular/common';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
-import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { FileExtensionsString } from '@core/constants';
-import { FileSize } from '@core/enums';
-
 
 @Component({
   selector: 'app-profile-details-container',
@@ -75,7 +75,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   @Input() maxRowIndex: number = 30;
 
-  @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
+  @Output() readonly nextPreviousOrderEvent = new EventEmitter<boolean>();
 
   public rejectReasonDialogVisible: boolean = false;
 
@@ -86,6 +86,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public candidateId: number;
 
   public fileName: string = '';
+
+  private isChangesSaved = true;
 
   public readonly columnsToExport: ExportColumn[] = [
     { text:'First Name', column: 'firstName'},
@@ -99,22 +101,22 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   ];
 
   @Select(TimesheetsState.tmesheetRecords)
-  public tmesheetRecords$: Observable<TimesheetRecordsDto>;
+  public readonly tmesheetRecords$: Observable<TimesheetRecordsDto>;
 
   @Select(TimesheetsState.isTimesheetOpen)
-  public isTimesheetOpen$: Observable<DialogActionPayload>;
+  public readonly isTimesheetOpen$: Observable<DialogActionPayload>;
 
   @Select(TimesheetsState.candidateInfo)
-  public candidateInfo$: Observable<CandidateInfo>;
+  public readonly candidateInfo$: Observable<CandidateInfo>;
 
   @Select(TimesheetsState.candidateHoursAndMilesData)
-  public hoursAndMilesData$: Observable<CandidateHoursAndMilesData>;
+  public readonly hoursAndMilesData$: Observable<CandidateHoursAndMilesData>;
 
   @Select(TimesheetsState.timeSheetAttachments)
-  public attachments$: Observable<TimesheetUploadedFile[]>;
+  public readonly attachments$: Observable<TimesheetUploadedFile[]>;
 
   @Select(TimesheetsState.timeSheetInvoices)
-  public invoices$: Observable<TimesheetDetailsInvoice[]>;
+  public readonly invoices$: Observable<TimesheetDetailsInvoice[]>;
 
   public readonly exportedFileType: typeof ExportedFileType = ExportedFileType;
   public readonly allowedFileExtensions: string = FileExtensionsString;
@@ -124,8 +126,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     private store: Store,
     private route: ActivatedRoute,
     private profileService: ProfileTimesheetService,
-    private cd: ChangeDetectorRef,
-    private chipPipe: ChipsCssClass,
     private confirmService: ConfirmService,
     private datePipe: DatePipe,
   ) {
@@ -146,28 +146,33 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.nextPreviousOrderEvent.emit(next);
   }
 
-  public handleUpdateTable(): void {
-    // this.getProfileTimesheets();
+  public handleEditChanges(event: boolean): void {
+    this.isChangesSaved = event;
   }
 
-  public handleDeleteItem({ profileId, tableItemId }: { profileId: number; tableItemId: number | any }): void {
-    this.store.dispatch(new Timesheets.DeleteProfileTimesheet(profileId, tableItemId))
-    .pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe();
-  }
+  public handleUpdateTable(): void {}
 
   public openAddDialog(): void {
     this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open));
   }
 
   public handleProfileClose(): void {
-    this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close))
-    .pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.candidateDialog.hide();
-    });
+    if (!this.isChangesSaved) {
+      this.confirmService.confirm(ConfirmUnsavedChages, {
+        title: 'Unsaved Progress',
+        okButtonLabel: 'Proceed',
+        okButtonClass: 'delete-button',
+      })
+      .pipe(
+        take(1),
+        filter((submitted) => submitted)
+      )
+      .subscribe(() => {
+        this.closeDialog();
+      });
+    } else {
+      this.closeDialog();
+    }
   }
 
   public onRejectButtonClick(): void {
@@ -175,7 +180,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   }
 
   public onDWNCheckboxSelectedChange({checked}: {checked: boolean}, switchComponent: SwitchComponent): void {
-    checked && this.confirmService.confirm(ConfirmDeleteTimesheetDialogContent,{
+    checked && this.confirmService.confirm(ConfirmDeleteTimesheetDialogContent, {
       title: 'Delete Timesheet',
       okButtonLabel: 'Proceed',
       okButtonClass: 'delete-button',
@@ -190,7 +195,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
             new Timesheets.DeleteTimesheet(this.candidateId),
           ]).subscribe(() => this.handleProfileClose());
         } else {
-          // TODO what's this?
+          // TODO: what's this?
           !submitted && switchComponent.writeValue(false);
         }
       });
@@ -216,7 +221,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     .pipe(
       throttleTime(100),
       filter((data) => data.dialogState),
-      tap((data) => { this.candidateId =  data.id }),
+      tap((data) => { this.candidateId = data.id }),
       switchMap((data) => this.profileService.getCandidateData(data.id)),
       takeUntil(this.componentDestroy())
       )
@@ -240,6 +245,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     )
   }
 
+  /**
+   * TODO: move event interface to interface folder and get rid of any
+   */
   public customExport(event: {columns: any[]; fileName: string; fileType: ExportedFileType }): void {
     this.closeExport();
     this.exportProfileDetails(event.fileType);
@@ -269,5 +277,14 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   private generateDateTime(datePipe: DatePipe): string {
     return datePipe ? datePipe.transform(Date.now(), 'MM/dd/yyyy hh:mm a') as string : '';
+  }
+
+  private closeDialog(): void {
+    this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close))
+    .pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.candidateDialog.hide();
+    });
   }
 }

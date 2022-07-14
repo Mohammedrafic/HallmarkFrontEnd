@@ -58,4 +58,22 @@
   .ag-cell-focus, .ag-cell {
     border: none !important;
   }
+
+  .ag-cell-value {
+    padding-left: 5px!important;
+    padding-right: 5px!important;
+  }
+
+  .common-cell {
+    padding-left: 17px!important;
+    padding-right: 17px!important;
+    text-align: right;
+  }
+}
+
+.first-tab {
+  .e-tab .e-tab-header:not(.e-vertical) .e-indicator {
+    left: 0px !important;
+    right: 151px !important;
+  }
 }

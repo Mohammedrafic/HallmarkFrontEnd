@@ -1,5 +1,5 @@
 import { BillRate, BillRateCategory, BillRateType, BillRateUnit } from './../../../shared/models/bill-rate.model';
-import { CandidateInfo, CostCenterOption, TimesheetRecordsDto } from "../interface";
+import { CandidateInfo, CostCenterOption, TimesheetRecordsDto } from '../interface';
 
 export const MockTimesheetRecords: TimesheetRecordsDto = {
   timeRecords: [
@@ -52,38 +52,42 @@ export const MockTimesheetRecords: TimesheetRecordsDto = {
     {
       id: 21,
       day: 'Thu Jul 05 2022 12:36:26 GMT+0300',
-      costCenter: 'Cost center',
-      billRateType: 'Miles',
+      costCenter: 19,
+      billRateType: 446,
       amount: 120,
       rate: 5,
       total: 600,
+      billRateConfigName: 'Miles',
     },
     {
       id: 22,
       day: 'Thu Jul 06 2022 12:36:26 GMT+0300',
-      costCenter: 'Cost center',
-      billRateType: 'Miles',
+      costCenter: 19,
+      billRateType: 446,
       amount: 120,
       rate: 5,
       total: 600,
+      billRateConfigName: 'Miles',
     },
   ],
   expenses: [
     {
       id: 31,
       day: 'Thu Jul 05 2022 12:36:26 GMT+0300',
-      costCenter: 'Cost center',
-      billRateType: 'Expenses',
+      costCenter: 19,
+      billRateType: 446,
       description: 'Having lunch',
-      total: 57,
+      amount: 57,
+      billRateConfigName: 'Expenses',
     },
     {
       id: 32,
       day: 'Thu Jul 06 2022 12:36:26 GMT+0300',
-      costCenter: 'Cost center',
-      billRateType: 'Expenses',
+      costCenter: 19,
+      billRateType: 446,
       description: 'Taxi to down town',
-      total: 89,
+      amount: 89,
+      billRateConfigName: 'Expenses',
     },
   ],
 };
@@ -179,7 +183,7 @@ export const BillRatesOptions: BillRate[] = [
     billRateConfig: {
       id: 446,
       category: BillRateCategory.Overtime,
-      title: 'Holiday',
+      title: 'Miles',
       type: BillRateType.Additional,
       unit: BillRateUnit.Currency,
       intervalMin: false,

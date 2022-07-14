@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { TimesheetUploadedFile } from "../../interface";
+
 import { Store } from '@ngxs/store';
-import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
+
 import { downloadBlobFile } from '@shared/utils/file.utils';
+import { TimesheetUploadedFile } from '../../interface';
+import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 
 @Component({
   selector: 'app-profile-uploads',
