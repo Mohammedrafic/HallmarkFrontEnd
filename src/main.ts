@@ -19,7 +19,7 @@ if (environment.production) {
   enableProdMode();
 }
 
-fetch('/assets/app.settings.json')
+fetch('./assets/app.settings.json')
   .then((res) => res.json())
   .then((settings) => {
     
