@@ -17,9 +17,11 @@
   <div>
     <div class="input-container">
       <label>Organization</label>
-      <div class="input-group multiselect">
+      <div class="input-group">
         <ejs-multiselect
           mode="CheckBox"
+          selectAllText="All"
+          [showSelectAll]="true"
           formControlName="organizationIds"
           placeholder="All"
           [fields]="optionFields"
@@ -31,12 +33,13 @@
       </div>
     </div>
   </div>
-  <div class="row">
     <div class="input-container">
       <label>Region</label>
-      <div class="input-group multiselect">
+      <div class="input-group">
         <ejs-multiselect
           mode="CheckBox"
+          selectAllText="All"
+          [showSelectAll]="true"
           formControlName="regionIds"
           placeholder="All"
           [fields]="optionFields"
@@ -55,10 +58,12 @@
     </div>
     <div class="input-container">
       <label>Location</label>
-      <div class="input-group multiselect">
+      <div class="input-group">
         <ejs-multiselect
           mode="CheckBox"
           formControlName="locationIds"
+          selectAllText="All"
+          [showSelectAll]="true"
           placeholder="All"
           [fields]="optionFields"
           [allowFiltering]="true"
@@ -74,13 +79,14 @@
         </ejs-multiselect>
       </div>
     </div>
-  </div>
   <div>
     <div class="input-container">
       <label>Department</label>
-      <div class="input-group multiselect">
+      <div class="input-group">
         <ejs-multiselect
           mode="CheckBox"
+          selectAllText="All"
+          [showSelectAll]="true"
           formControlName="departmentsIds"
           placeholder="All"
           [fields]="optionFields"
