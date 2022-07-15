@@ -62,6 +62,6 @@
     </div>
   </div>
 </section>
-<section class="bill-rates" *ngIf="order?.orderType !== orderType.OpenPerDiem">
+<section class="bill-rates" *ngIf="order && order?.orderType !== orderType.OpenPerDiem">
   <app-bill-rates-view-grid [billRatesData]="order.billRates"></app-bill-rates-view-grid>
 </section>
