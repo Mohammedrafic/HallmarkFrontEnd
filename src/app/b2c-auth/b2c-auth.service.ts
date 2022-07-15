@@ -48,12 +48,12 @@ export class B2CAuthService {
     return this.msalBroadcastService.msalSubject$.pipe(
       filter(
         (msg: EventMessage) =>
-          msg.eventType === EventType.LOGIN_SUCCESS
+          msg.eventType === EventType.LOGIN_SUCCESS || msg.eventType === EventType.ACQUIRE_TOKEN_SUCCESS
       )
     );
   }
 
-  public b2cStable(): Observable<InteractionStatus> {
+  public interactionStatusNone(): Observable<InteractionStatus> {
     return this.msalBroadcastService.inProgress$.pipe(
       filter((status: InteractionStatus) => status === InteractionStatus.None),
       tap(() => {
@@ -67,7 +67,11 @@ export class B2CAuthService {
   }
 
   public logout(): void {
-    this.authService.logout();
+    if (this.msalGuardConfig.interactionType === InteractionType.Popup) {
+      this.authService.logout();
+    } else {
+      this.authService.logoutRedirect();
+    }
   }
 
   public checkAndSetActiveAccount(): void {

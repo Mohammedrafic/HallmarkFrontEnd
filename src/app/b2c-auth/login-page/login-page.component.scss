@@ -10,6 +10,7 @@
       padding: 70px;
       width: 20%;
       min-width: 400px;
+      position: relative;
 
       .text-box {
         margin-top: 180px;
@@ -73,7 +74,7 @@
     }
 
     .right-column {
-      background-image: url("../../../assets/login.jpg");
+      // background-image: url("../../../assets/login.jpg");
       background-repeat: no-repeat;
       background-size: cover;
       background-position: center;
