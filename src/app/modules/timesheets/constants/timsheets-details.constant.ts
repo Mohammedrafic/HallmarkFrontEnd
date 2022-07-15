@@ -48,7 +48,10 @@ const billRateColDef: ColDef = {
   ...commonColumn,
   cellClass: 'common-cell',
   width: 110,
-  valueFormatter: (data) => valueHelper.formatCurrency(data.value),
+  valueFormatter: (data) => {
+    if(!data.value) return 'ERROR'
+    return valueHelper.formatCurrency(data.value)
+  },
 };
 
 const amountColdef = (headerText: string): ColDef => (
@@ -82,7 +85,10 @@ const totalCol: ColDef = {
   ...commonColumn,
   cellClass: 'common-cell',
   width: 140,
-  valueFormatter: (data) => valueHelper.formatCurrency(data.value),
+  valueFormatter: (data) => {
+    if(!data.value) return 'ERROR'
+    return valueHelper.formatCurrency(data.value)
+  },
 };
 
 const billRateTypeStatic: ColDef = {
@@ -107,7 +113,10 @@ export const TimesheetRecordsColdef: ColDef[] = [
       isEditable: false,
       type: EditFieldTypes.Time,
     },
-    valueFormatter: (data) => valueHelper.formatDate(data.value, 'HH:mm'),
+    valueFormatter: (data) => {
+      if(!data.value) return 'ERROR'
+      return valueHelper.formatDate(data.value, 'HH:mm')
+    },
   },
   {
     field: 'timeOut',
@@ -121,7 +130,10 @@ export const TimesheetRecordsColdef: ColDef[] = [
       isEditable: false,
       type: EditFieldTypes.DateTime,
     },
-    valueFormatter: (data) => valueHelper.formatDate(data.value, 'HH:mm'),
+    valueFormatter: (data) => {
+      if(!data.value) return 'ERROR'
+      return valueHelper.formatDate(data.value, 'HH:mm')
+    },
   },
   editableCostCenterDef,
   {
@@ -210,7 +222,10 @@ export const ExpensesRecordsColDef: ColDef[] = [
     ...amountColdef('Amount'),
     width: 200,
     cellRenderer: InputEditorComponent,
-    valueFormatter: (data) => valueHelper.formatCurrency(data.value),
+    valueFormatter: (data) => {
+      if(!data.value) return 'ERROR'
+      return valueHelper.formatCurrency(data.value)
+    },
     cellRendererParams: {
       editMode: true,
       isEditable: false,

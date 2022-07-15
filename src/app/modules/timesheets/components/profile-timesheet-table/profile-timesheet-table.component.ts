@@ -10,8 +10,8 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { Observable, takeUntil, forkJoin } from 'rxjs';
-import { filter, skip, take } from 'rxjs/operators';
+import { Observable, takeUntil } from 'rxjs';
+import { filter, skip, take, tap, switchMap } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { TabComponent, SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
@@ -30,7 +30,6 @@ import { ConfirmTabChange } from './../../constants/confirm-delete-timesheet-dia
 import { DialogActionPayload, TimesheetRecordsDto } from '../../interface';
 import { TimesheetRecordsService } from '../../services/timesheet-records.service';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 
 /**
@@ -49,7 +48,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Input() candidateId: number;
 
-  @Output() readonly openAddSideDialog: EventEmitter<number> = new EventEmitter<number>();
+  @Output() readonly openAddSideDialog: EventEmitter<void> = new EventEmitter<void>();
 
   @Output() readonly changesSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
 
@@ -85,7 +84,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     private store: Store,
     private confirmService: ConfirmService,
     private timesheetRecordsService: TimesheetRecordsService,
-    private apiService: TimesheetsApiService,
     private cd: ChangeDetectorRef,
   ) {
     super();
@@ -119,8 +117,15 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         }
       });
     } else {
+      if (this.isChangesSaved) {
+        this.setInitialTableState();
+      }
       this.selectTab(selectEvent.selectedIndex);
     }
+  }
+
+  public openAddDialog(): void {
+    this.openAddSideDialog.emit()
   }
 
   public editTimesheets(): void {
@@ -129,13 +134,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.setEditModeColDef();
   }
 
-  private selectTab(index: number): void {
-    this.changeColDefs(index);
-  }
-
   public onGridReady(params: GridReadyEvent): void {
     this.gridApi = params.api;
-    this.getFormOptions();
   }
 
   public cancelChanges(): void {
@@ -166,20 +166,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     return index;
   }
 
-  private getFormOptions(): void {
-    forkJoin([
-      this.apiService.getCandidateCostCenters(this.candidateId),
-      this.apiService.getCandidateBillRates(this.candidateId),
-    ])
-    .pipe(
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe(([costCenters, billRates]) => {
-      this.timesheetRecordsService.setCostOptions(this.timesheetColDef, costCenters);
-      this.timesheetRecordsService.setBillRatesOptions(this.timesheetColDef, billRates);
-
-      this.gridApi.setColumnDefs(this.timesheetColDef);
-    });
+  private selectTab(index: number): void {
+    this.changeColDefs(index);
   }
 
   private createForm(): void {
@@ -191,10 +179,17 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   private getRecords(): void {
     this.timesheetRecords$
     .pipe(
+      tap((res) => { this.records = res; }),
+      switchMap(() => this.timesheetRecordsService.getFormOptions(1,2,3, 4)),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe((res) => {
-      this.records = res;
+    .subscribe(([costCenters, billRates]) => {
+      this.timesheetRecordsService.setCostOptions(this.timesheetColDef, costCenters);
+      this.timesheetRecordsService.setBillRatesOptions(this.timesheetColDef, billRates);
+
+      if (this.gridApi) {
+        this.gridApi.setColumnDefs(this.timesheetColDef);
+      }
     });
   }
 
@@ -246,6 +241,4 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       }
     })
   }
-
-
 }

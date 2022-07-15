@@ -1,3 +1,4 @@
+import { switchMap } from 'rxjs/operators';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import {
   ChangeDetectionStrategy,
@@ -32,7 +33,6 @@ import {
   TimesheetDetailsModel, CandidateMilesData,
 } from '../../interface';
 import { DialogAction, SubmitBtnText } from '../../enums';
-import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
 import {
   ConfirmDeleteTimesheetDialogContent,
   ConfirmUnsavedChages,
@@ -47,9 +47,6 @@ import { CandidateService } from '@agency/services/candidates.service';
   templateUrl: './profile-details-container.component.html',
   styleUrls: ['./profile-details-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    DatePipe,
-  ]
 })
 export class ProfileDetailsContainerComponent extends Destroyable implements OnInit {
   @ViewChild('candidateDialog')
@@ -57,6 +54,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   @ViewChild('dnwDialog')
   public dnwDialog: DialogComponent;
+
 
   @ViewChild('uploader')
   public uploader: UploaderComponent;
@@ -102,9 +100,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     { text:'End Date', column: 'endDate'},
   ];
 
-  @Select(TimesheetsState.tmesheetRecords)
-  public readonly tmesheetRecords$: Observable<TimesheetRecordsDto>;
-
   @Select(TimesheetsState.isTimesheetOpen)
   public readonly isTimesheetOpen$: Observable<DialogActionPayload>;
 
@@ -130,7 +125,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   constructor(
     private store: Store,
     private route: ActivatedRoute,
-    private profileService: ProfileTimesheetService,
     private confirmService: ConfirmService,
     private datePipe: DatePipe,
     private candidateService: CandidateService,
@@ -234,9 +228,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.isTimesheetOpen$
     .pipe(
       throttleTime(100),
+      filter((data) => data.dialogState),
       distinctUntilChanged((prev, next) => JSON.stringify(prev) === JSON.stringify(next)),
-      tap(({ id, dialogState }) => {
+      tap(({ id }) => {
         this.candidateId = id;
+        this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(id));
         this.store.dispatch(new Timesheets.GetTimesheetDetails(id));
       }),
       takeUntil(this.componentDestroy())

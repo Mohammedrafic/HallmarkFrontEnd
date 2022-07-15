@@ -1,54 +1,19 @@
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { Injectable } from '@angular/core';
 
-import { TabComponent, TabItemModel } from '@syncfusion/ej2-angular-navigations';
 import { ColDef } from '@ag-grid-community/core';
-import { merge, Observable } from 'rxjs';
+import { forkJoin, merge, Observable } from 'rxjs';
 
 import { DropdownOption, TimesheetRecordsDto, RecordValue } from './../interface/common.interface';
+import { TimesheetsApiService } from './timesheets-api.service';
 import { RecordFields } from '../enums';
 
 @Injectable()
 export class TimesheetRecordsService {
   constructor(
     private fb: FormBuilder,
+    private apiService: TimesheetsApiService,
   ) {}
-
-  public createTabs(records: TimesheetRecordsDto, tabComp: TabComponent): void {
-    const config: TabItemModel[] = [];
-
-    if (records.timeRecords.length > 0) {
-      config.push({
-        header: {
-          text: 'Timesheet',
-        }
-      });
-    }
-
-    if (records.miles.length > 0) {
-      config.push({
-        header: {
-          text: 'Miles',
-        }
-      });
-    }
-
-    if (records.expenses.length > 0) {
-      config.push({
-        header: {
-          text: 'Expenses',
-        }
-      });
-    }
-
-    tabComp.addTab(config);
-  }
-
-  public controlTabsVisibility(records: TimesheetRecordsDto, tabComp: TabComponent): void {
-    tabComp.hideTab(0, !(records.timeRecords.length > 0));
-    tabComp.hideTab(1, !(records.miles.length > 0));
-    tabComp.hideTab(2, !(records.expenses.length > 0));
-  }
 
   public setCostOptions(defs: ColDef[], options: DropdownOption[]): void {
     const idx = defs.findIndex((item) => item.field === 'costCenter');
@@ -137,5 +102,16 @@ export class TimesheetRecordsService {
     }
 
     return RecordFields.Time;
+  }
+
+  public getFormOptions(
+    candId: number,
+    depId: number,
+    skillid: number,
+    orderType: number): Observable<[DropdownOption[], DropdownOption[]]> {
+    return forkJoin([
+      this.apiService.getCandidateCostCenters(candId),
+      this.apiService.getCandidateBillRates(depId, skillid, orderType),
+    ])
   }
 }

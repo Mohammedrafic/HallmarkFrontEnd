@@ -22,13 +22,10 @@ import { TimeSheetsPage } from '../store/model/timesheets.model';
 import {
   filterColumnDataSource,
   MokTabsCounts,
-  MokTimesheet,
   MockCandidateHoursAndMilesData,
-  MokTimesheet1,
 } from '../constants';
 import {
   CandidateMockInfo,
-  MockTimesheetRecords,
   CostCenterOptions,
 } from '../constants/timesheet-records-mock.constant';
 import { TimesheetsTableColumns } from '../enums';
@@ -51,7 +48,7 @@ export class TimesheetsApiService {
   }
 
   public getTimesheetRecords(id: number): Observable<TimesheetRecordsDto> {
-    return of(MockTimesheetRecords);
+    return this.http.get<TimesheetRecordsDto>(`/api/Timesheets/${id}/records`);
   }
 
   public postProfileTimesheets(body: TimesheetRecord): Observable<null> {
@@ -109,7 +106,11 @@ export class TimesheetsApiService {
     );
   }
 
-  public getCandidateBillRates(id: number): Observable<DropdownOption[]> {
+  public getCandidateBillRates(
+    depId: number,
+    skillId: number,
+    orderType: number,
+    ): Observable<DropdownOption[]> {
     return of (BillRatesOptions)
     .pipe(
       map((res) => res.map((item) => {

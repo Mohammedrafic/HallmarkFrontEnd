@@ -16,7 +16,7 @@
         </ejs-tab>
       </div>
 
-      <button class="add-action spaced">+ Add Record</button>
+      <button class="add-action spaced" (click)="openAddDialog()">+ Add Record</button>
       <button
         *ngIf="!isEditOn; else editHandlers"
         (click)="editTimesheets()"
@@ -33,12 +33,12 @@
 
     <div class="timesheet-table-container">
       <ag-grid-angular #grid
+        *ngIf="timesheetRecords$ | async as timesheetRec"
         [columnDefs]="timesheetColDef"
-        [rowData]="(timesheetRecords$ | async)?.[currentTab]"
+        [rowData]="timesheetRec[currentTab]"
         [rowHeight]="64"
         [modules]="modules"
         [pagination]="false"
-        [readOnlyEdit]="true"
         (gridReady)="onGridReady($event)"
         class="ag-theme-alpine app-grid__component"
         >

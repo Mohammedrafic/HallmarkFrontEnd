@@ -44,7 +44,6 @@ import { ProfileInvoicesComponent } from './components/profile-invoices/profile-
 import { TimesheetsService } from './services/timesheets.service';
 import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
 import { TimesheetDetailsApiService } from './services/timesheet-details-api.service';
-import { ProfileTimesheetService } from './services/profile-timesheet.service';
 import { TimesheetRecordsService } from './services/timesheet-records.service';
 import { DropdownEditorComponent } from './components/cell-editors/dropdown-editor/dropdown-editor.component';
 import { ActionsCellComponent } from './components/cell-editors/actions-cell/actions-cell.component';
@@ -149,7 +148,6 @@ const gridIcons = {
     EditTimesheetService,
     MaskedDateTimeService,
     TimesheetsService,
-    ProfileTimesheetService,
     CapitalizeFirstPipe,
     TimesheetDetailsApiService,
     ChipsCssClass,

@@ -37,6 +37,8 @@ export interface MileRecord {
   amount: number;
   rate: number;
   total: number;
+  billRate: number;
+  billRateConfigId: number;
   billRateConfigName: string;
 }
 
@@ -47,6 +49,8 @@ export interface ExpensesRecord {
   billRateType: number;
   description: string;
   amount: number;
+  billRate: number;
+  billRateConfigId: number;
   billRateConfigName: string;
 }
 
@@ -58,7 +62,9 @@ export interface TimesheetRecord {
   costCenter: number;
   billRateType: number;
   amount: number;
-  rate: number;
+  billRate: number;
+  billRateConfigId: number;
+  billRateConfigName: string;
   total: number;
 }
 

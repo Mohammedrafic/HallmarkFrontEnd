@@ -1,3 +1,4 @@
+import { RecordFields } from './../enums/timesheet-common.enum';
 import { TimesheetsModel } from '../store/model/timesheets.model';
 import { DefaultFilterColumns, DefaultFiltersState } from './timesheets-table.constant';
 
@@ -6,9 +7,9 @@ export const DefaultTimesheetState: TimesheetsModel = {
   timesheetsFilters: DefaultFiltersState,
   tabCounts: null,
   timeSheetRecords: {
-    timeRecords: [],
-    miles: [],
-    expenses: [],
+    [RecordFields.Time]: [],
+    [RecordFields.Miles]: [],
+    [RecordFields.Expenses]: [],
   },
   candidateInfo: null,
   candidateHoursAndMilesData: null,

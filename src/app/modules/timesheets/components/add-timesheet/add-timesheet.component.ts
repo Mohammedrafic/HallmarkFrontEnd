@@ -8,7 +8,6 @@ import {
   OnChanges,
   OnInit,
   Output,
-  SimpleChanges,
   ViewChild
 } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
@@ -151,6 +150,7 @@ export class AddTimesheetComponent extends Destroyable implements OnInit, OnChan
   }
 
   private getDialogState(): void {
+    
   }
 
   private createForm(): void {

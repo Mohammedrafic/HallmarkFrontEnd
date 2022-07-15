@@ -146,7 +146,6 @@
 
       <section class="profile-table-container">
         <app-profile-timesheet-table
-          *ngIf="tmesheetRecords$ | async as timesheetRecords"
           [candidateId]="candidateId"
           (openAddSideDialog)="openAddDialog()"
           (changesSaved)="handleEditChanges($event)"

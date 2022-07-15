@@ -46,13 +46,13 @@
         storeAuthStateInCookie: isIE, // Set this to "true" if you are having issues on IE11 or Edge
     },
     system: {
-        loggerOptions: {
-            loggerCallback(logLevel: LogLevel, message: string) {
-                console.log(message);
-            },
-            logLevel: LogLevel.Verbose,
-            piiLoggingEnabled: false
-        }
+        // loggerOptions: {
+        //     loggerCallback(logLevel: LogLevel, message: string) {
+        //         console.log(message);
+        //     },
+        //     logLevel: LogLevel.Verbose,
+        //     piiLoggingEnabled: false
+        // }
     }
 }
 

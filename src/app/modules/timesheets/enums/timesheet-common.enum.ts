@@ -10,7 +10,7 @@ export enum SubmitBtnText {
 }
 
 export enum RecordFields {
-  Time = 'timeRecords',
+  Time = 'timesheets',
   Miles = 'miles',
   Expenses = 'expenses',
 }
