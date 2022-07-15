@@ -10,13 +10,13 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Skill } from '@shared/models/skill.model';
 import { FilterService } from '@shared/services/filter.service';
-import { combineLatest, distinctUntilChanged, filter, map, Observable, takeUntil } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, map, Observable, skip, takeUntil } from 'rxjs';
 import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
 import { IFilterColumnsDataModel } from 'src/app/dashboard/models/widget-filter.model';
 import { SetDashboardFiltersState, SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
-import { UserState } from 'src/app/store/user.state';
+import { UserState, UserStateModel } from 'src/app/store/user.state';
 
 @Component({
   selector: 'app-widget-filter',
@@ -27,6 +27,7 @@ import { UserState } from 'src/app/store/user.state';
 
 export class WidgetFilterComponent extends DestroyableDirective implements OnInit {
   @Select(UserState.organizationStructure) private readonly organizationStructure$: Observable<OrganizationStructure>;
+  @Select(UserState.lastSelectedOrganizationId) private readonly organizationId$: Observable<UserStateModel['lastSelectedOrganizationId']>;
   @Select(DashboardState.filteredItems) public readonly filteredItems$: Observable<FilteredItem[]>;
   @Select(OrganizationManagementState.allOrganizationSkills) private readonly skills$: Observable<Skill[]>;
 
@@ -76,6 +77,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     this.widgetFilterColumnsSetup();
     this.isFilterDialogOpened();
     this.getFilterState();
+    this.changingOrganization();
   }
 
   private isFilterDialogOpened() {
@@ -256,5 +258,11 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   private setFilterState(): void {
     combineLatest([this.filteredItems$, this.organizationStructure$]).pipe(takeUntil(this.destroy$), filter(([items, orgs]) => !!orgs && items.length > 0), ).subscribe(() => Object.entries(this.filters).forEach(([key, value]) => this.widgetFilterFormGroup.get(key)?.setValue(value)))
+  }
+
+  private changingOrganization(): void{
+    this.organizationId$.pipe(takeUntil(this.destroy$), skip(1)).subscribe(() => {
+      this.store.dispatch(new SetFilteredItems([]));
+    })
   }
 }
