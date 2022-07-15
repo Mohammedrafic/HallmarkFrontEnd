@@ -172,12 +172,7 @@
         </ng-container>
       </ng-template>
     </e-column>
-    <e-column field="shiftCount" headerText="# of Shifts Next 90 Days " width="150" [visible]="false">
-      <!-- TODO: Pending BE -->
-      <ng-template #template let-data>
-        -
-      </ng-template>
-    </e-column>
+    <e-column field="shiftsNext90Days" headerText="# of Shifts Next 90 Days " width="150" [visible]="false"></e-column>
   </e-columns>
 
   <ng-template #detailTemplate let-data>

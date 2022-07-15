@@ -38,6 +38,11 @@ export class OrderManagement {
   reOrderCount?: number;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
   children: OrderManagementChild[];
+  reOrders?: OrderManagement[];
+  shiftsNext90Days?: number;
+  positions?: number;
+  agencies?: string[] | null;
+  allAgencies?: boolean;
 }
 
 export class OrderManagementFilter {
@@ -77,6 +82,11 @@ export type AgencyOrderManagement = {
   organizationId: number;
   organizationName: string;
   children: OrderManagementChild[];
+  reOrders?: OrderManagement[];
+  shiftsNext90Days?: number;
+  positions?: number;
+  agencies?: string[] | null;
+  allAgencies?: boolean;
 };
 
 export type OrderManagementChild = {
@@ -141,6 +151,7 @@ export type AgencyOrderFilters = {
   jobStartDate?: Date;
   jobEndDate?: Date;
   reOrderDate?: Date;
+  includeReOrders?: boolean;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -375,6 +386,7 @@ export class OrderFilter {
   candidatesCountTo?: number;
   agencyIds?: number[];
   agencyType?: string | number | null;
+  includeReOrders?: boolean;
 }
 
 export class OrderPartnerAgency {

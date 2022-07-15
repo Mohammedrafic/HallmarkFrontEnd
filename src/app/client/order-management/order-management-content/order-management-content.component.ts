@@ -285,6 +285,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       case OrganizationOrderManagementTabs.PerDiem:
         // TODO: perdiem
         this.filters.orderTypes = [OrderType.OpenPerDiem];
+        this.filters.includeReOrders = true;
         this.columnsToExport = perDiemColumnsToExport;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;

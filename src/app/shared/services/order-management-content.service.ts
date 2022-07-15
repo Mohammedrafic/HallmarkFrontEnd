@@ -4,6 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import {
   AcceptJobDTO,
   AgencyOrderFilters,
+  AgencyOrderManagement,
   AgencyOrderManagementPage,
   ApplicantStatus,
   CandidatesBasicInfo,
@@ -13,6 +14,7 @@ import {
   OrderCandidateJob,
   OrderCandidatesListPage,
   OrderFilterDataSource,
+  OrderManagement,
   OrderManagementFilter,
   OrderManagementPage,
   SuggestedDetails,
@@ -30,6 +32,27 @@ import { AgencyOrderManagementTabs, OrganizationOrderManagementTabs } from '@sha
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
   constructor(private http: HttpClient) {}
+
+  /**
+   * Counts number of shifts of reorders within specified period of time from current date
+   * @param orders list of orders
+   * @param period number of days counting of shifts should be performed 
+   */
+  public countShiftsWithinPeriod(orders: OrderManagementPage | AgencyOrderManagementPage, period = 90): void {
+    const today = new Date();
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + period);
+    orders.items.forEach((item: OrderManagement | AgencyOrderManagement) => {
+      let shiftsCount = 0;
+      item.reOrders?.forEach((reOrder: OrderManagement) => {
+        const reOrderStartDate = new Date(reOrder.startDate);
+        if (reOrderStartDate > today && reOrderStartDate < endDate) {
+          shiftsCount += reOrder.openPositions;
+        }
+      });
+      item.shiftsNext90Days = shiftsCount;
+    });
+  }
 
   /**
    * Get the incomplete order

@@ -189,6 +189,7 @@ export class OrderManagementState {
   ): Observable<AgencyOrderManagementPage> {
     return this.orderManagementContentService.getAgencyOrders(pageNumber, pageSize, filters).pipe(
       tap((payload) => {
+        this.orderManagementContentService.countShiftsWithinPeriod(payload);
         patchState({ ordersPage: payload });
         return payload;
       })

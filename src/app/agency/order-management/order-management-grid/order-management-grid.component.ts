@@ -243,6 +243,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         // TODO: pending BE
         this.columnsToExport = perDiemColumnsToExport;
         this.filters.orderTypes = [OrderType.OpenPerDiem];
+        this.filters.includeReOrders = true;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.ReOrders:

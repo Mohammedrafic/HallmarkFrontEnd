@@ -11,13 +11,18 @@
     </ejs-chiplist>
   </div>
   <div class="info">
-    <!--TODO: Pending BE accepted positions-->
-    <div class="data">{{reOrder.openPositions}} / {{reOrder.openPositions}}</div>
+    <div class="data">{{reOrder.positions}} / {{reOrder.openPositions}}</div>
     <div class="title">Open Positions</div>
   </div>
   <div class="info">
-    <!--TODO: Pending BE-->
-    <div class="data">Agency Name Mock</div>
+    <ejs-tooltip
+      *ngIf="tooltip"
+      [content]="tooltip"
+      target="#agencyLabel"
+    >
+      <div id="agencyLabel" class="data">{{agencyLabel}}</div>
+    </ejs-tooltip>
+    <div *ngIf="!tooltip" class="data">{{agencyLabel}}</div>
     <div class="title">Agency Name</div>
   </div>
   <div class="info">
@@ -29,8 +34,7 @@
     <div class="title">Re-Order Date</div>
   </div>
   <div class="info">
-    <!--TODO: Pending BE-->
-    <div class="data">07:00-18:30</div>
+    <div class="data">{{reOrder.shiftStartTime | date: 'HH:mm'}}-{{reOrder.shiftEndTime | date: 'HH:mm'}}</div>
     <div class="title">Re-Order Shift</div>
   </div>
   <div class="info">

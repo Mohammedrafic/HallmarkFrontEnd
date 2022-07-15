@@ -182,7 +182,7 @@ export const PerDiemColumnsConfig = [
     visible: false,
   },
   {
-    fieldName: 'shiftCount',
+    fieldName: 'shiftsNext90Days',
     visible: true,
   },
 ];
