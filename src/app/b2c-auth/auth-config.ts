@@ -5,6 +5,7 @@
  * in app.module.ts file.
  */
  import { LogLevel, Configuration, BrowserCacheLocation } from '@azure/msal-browser';
+import { environment } from 'src/environments/environment';
 
  const isIE = window.navigator.userAgent.indexOf("MSIE ") > -1 || window.navigator.userAgent.indexOf("Trident/") > -1;
 
@@ -39,7 +40,7 @@
         clientId: 'dc1107df-63f3-43ff-90f7-2c49d3afdf82', // This is the ONLY mandatory field that you need to supply.
         authority: b2cPolicies.authorities.signUpSignIn.authority, // Defaults to https://login.microsoftonline.com/common
         knownAuthorities: [b2cPolicies.authorityDomain], // Mark your B2C tenant's domain as trusted.
-        redirectUri: '/ui', // Points to window.location.origin. You must register this URI on Azure portal/App Registration.
+        redirectUri: environment.production ? '/ui' : '/', // Points to window.location.origin. You must register this URI on Azure portal/App Registration.
     },
     cache: {
         cacheLocation: BrowserCacheLocation.LocalStorage, // Configures cache location. "sessionStorage" is more secure, but "localStorage" gives you SSO between tabs.

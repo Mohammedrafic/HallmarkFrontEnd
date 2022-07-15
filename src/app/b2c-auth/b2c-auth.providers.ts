@@ -1,4 +1,4 @@
-import { Injector, Provider } from '@angular/core';
+import { Injector, Provider, StaticProvider } from '@angular/core';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import {
@@ -21,8 +21,9 @@ import { msalConfig, loginRequest, protectedResources } from './auth-config';
  * For more info, visit: https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-angular/docs/v2-docs/configuration.md
  */
 
-export function MSALInstanceFactory(): IPublicClientApplication {
-  return new PublicClientApplication(msalConfig);
+export function MSALInstanceFactory(config: any): () => IPublicClientApplication {
+  console.warn(config)
+  return () =>  new PublicClientApplication(msalConfig);
 }
 
 /**
@@ -52,15 +53,10 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
   };
 }
 
-export const MSAL_PROVIDERS: Provider[] = [
-  {
-    provide: HTTP_INTERCEPTORS,
-    useClass: MsalInterceptor,
-    multi: true,
-  },
+export const MSAL_STATIC_PROVIDERS = (config: any): StaticProvider[] => [
   {
     provide: MSAL_INSTANCE,
-    useFactory: MSALInstanceFactory,
+    useFactory: MSALInstanceFactory(config),
   },
   {
     provide: MSAL_GUARD_CONFIG,
@@ -69,6 +65,15 @@ export const MSAL_PROVIDERS: Provider[] = [
   {
     provide: MSAL_INTERCEPTOR_CONFIG,
     useFactory: MSALInterceptorConfigFactory
+  },
+
+];
+
+export const MSAL_PROVIDERS: Provider[] = [
+  {
+    provide: HTTP_INTERCEPTORS,
+    useClass: MsalInterceptor,
+    multi: true,
   },
   MsalService,
   MsalGuard,

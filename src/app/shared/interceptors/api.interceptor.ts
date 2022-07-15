@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import {
   HttpEvent,
   HttpInterceptor,
@@ -15,6 +15,7 @@ import { Store } from '@ngxs/store';
 import { AppState } from 'src/app/store/app.state';
 import { UserState } from 'src/app/store/user.state';
 import { LogoutUser } from 'src/app/store/user.actions';
+import { AppSettings, APP_SETTINGS } from 'src/app.settings';
 
 interface IAppSettings {
   API_BASE_URL: string;
@@ -25,7 +26,7 @@ export class ApiInterceptor implements HttpInterceptor {
   private apiUrl$: Observable<string>;
   private appSettingsUrl = './assets/app.settings.json';
 
-  constructor(private httpClient: HttpClient, private router: Router, private store: Store) {}
+  constructor(private httpClient: HttpClient, private router: Router, private store: Store, @Inject(APP_SETTINGS) private appSettings: AppSettings) {}
 
   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const userId = this.store.selectSnapshot(UserState.user)?.id;
@@ -33,6 +34,8 @@ export class ApiInterceptor implements HttpInterceptor {
     const lastSelectedAgencyId = this.store.selectSnapshot(UserState.lastSelectedAgencyId);
     const isAgency = this.store.selectSnapshot(UserState.lastSelectedOrganizationAgency) === 'Agency';
     const isOrganization = this.store.selectSnapshot(UserState.lastSelectedOrganizationAgency) === 'Organization';
+
+    console.warn(this.appSettings.host);
 
     if (userId) {
       const currentPage = this.store.selectSnapshot(AppState.headerState)?.title || 'Login';
