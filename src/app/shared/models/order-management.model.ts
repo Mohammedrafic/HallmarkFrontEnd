@@ -60,7 +60,7 @@ export type OrderManagementPage = PageOfCollections<OrderManagement>;
 
 export type AgencyOrderManagement = {
   orderId: number;
-  reOrderFromId?: number;
+  reOrderId?: number;
   statusText: string;
   status: OrderStatus;
   jobTitle: string;
@@ -134,7 +134,7 @@ export type AgencyOrderFilters = {
   locationIds?: number[];
   departmentsIds?: number[];
   orderId?: number;
-  reOrderFromId?: number;
+  reOrderId?: number;
   skillIds?: number[];
   candidateStatuses?: number[];
   candidatesCountFrom?: number;

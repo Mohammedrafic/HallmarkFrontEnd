@@ -389,7 +389,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onFilterClose() {
     this.OrderFilterFormGroup.setValue({
       orderId: this.filters.orderId || null,
-      reOrderFromId: this.filters.reOrderFromId || null,
+      reOrderId: this.filters.reOrderId || null,
       regionIds: this.filters.regionIds || [],
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
