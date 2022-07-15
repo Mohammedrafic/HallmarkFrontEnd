@@ -25,6 +25,7 @@ import type { WidgetsDataModel } from './models/widgets-data.model';
 import { GetCurrentUserPermissions } from '../store/user.actions';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
+import { DashboardFiltersModel } from './models/dashboard-filters.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -44,6 +45,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   @Select(DashboardState.widgets) public readonly widgets$: Observable<DashboardStateModel['widgets']>;
   @Select(DashboardState.isDashboardLoading) public readonly isLoading$: Observable<DashboardStateModel['isDashboardLoading']>;
   @Select(DashboardState.isMobile) private readonly isMobile$: Observable<DashboardStateModel['isMobile']>;
+  @Select(DashboardState.dashboardFiltersState) public readonly dashboardFiltersState$: Observable<DashboardFiltersModel>;
 
   @Select(UserState.lastSelectedOrganizationId) private readonly organizationId$: Observable<UserStateModel['lastSelectedOrganizationId']>;
   @Select(UserState.lastSelectedOrganizationAgency) private readonly lastSelectedOrganizationAgency$: Observable<string>;
@@ -77,6 +79,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     this.initOrganizationChangeListener();
     this.getCurrentUserPermissions();
     this.subscribeOnPermissions();
+    this.getDashboardFilterState();
   }
 
   private getCurrentUserPermissions(): void {
@@ -159,7 +162,12 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   private getFiltersGroup(): FormGroup {
-    return this.formBuilder.group({ region: [null], location: [null], department: [null], skill: [null] });
+    return this.formBuilder.group({
+      regionIds: [],
+      locationIds: [],
+      departmentsIds: [],
+      skillIds: [],
+    });
   }
 
   private initOrganizationChangeListener(): void {
@@ -232,5 +240,12 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
         return { ...panel, sizeX: 1, sizeY: 1, maxSizeY: 1, maxSizeX: 1, minSizeY: 1, minSizeX: 1 };
       }
     }, panels);
+  }
+
+  private getDashboardFilterState(): void {
+    this.dashboardFiltersState$.pipe(takeUntil(this.destroy$)).subscribe((filters: DashboardFiltersModel)=> {
+      this.filtersGroup.reset();
+      Object.entries(this.filtersGroup.controls).forEach(([field, control]) => control.setValue(filters[field as keyof DashboardFiltersModel] || []));
+    });
   }
 }
