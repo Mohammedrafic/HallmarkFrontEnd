@@ -6,7 +6,7 @@
     ></app-tab-navigation>
   </ng-container>
   <ng-container right>
-    <app-search #search (inputKeyUpEnter)="searchOrders($event)"></app-search>
+    <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
     <button ejs-button cssClass="e-outline button-filter" (click)="showFilters()">
       <div class="filter-button-content">
         <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
