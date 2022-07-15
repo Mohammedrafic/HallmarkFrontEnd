@@ -728,7 +728,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
     this.masterShifts$
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(() => this.generalInformationForm.controls['shiftRequirementId'].patchValue(order.shiftRequirementId));
+      .subscribe(() => this.generalInformationForm.controls['shiftRequirementId'].patchValue(order.shiftRequirementId, { emitEvent: false }));
 
     this.generalInformationForm.controls['hourlyRate'].patchValue(hourlyRate);
     this.generalInformationForm.controls['openPositions'].patchValue(order.openPositions);
