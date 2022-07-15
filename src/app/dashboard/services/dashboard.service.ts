@@ -56,19 +56,18 @@ export class DashboardService {
     WidgetTypeEnum,
     (filters: DashboardFiltersModel) => Observable<unknown>
   > = {
-    [WidgetTypeEnum.CANDIDATES]: (filters: DashboardFiltersModel) => this.getCandidatesWidgetData(filters),
-    [WidgetTypeEnum.APPLICANTS_BY_REGION]: (filters: DashboardFiltersModel) =>
-      this.getApplicantsByRegionWidgetData(filters),
-    [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboardFiltersModel) => this.getPositionsByTypes(filters),
-    [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.InProgress),
-    [WidgetTypeEnum.OPEN_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
-    [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
+    [WidgetTypeEnum.APPLICANTS_BY_REGION]: (filters: DashboardFiltersModel) => this.getApplicantsByRegionWidgetData(filters),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
-    [WidgetTypeEnum.TASKS]: (filters: DashboardFiltersModel) => this.getTasksWidgetData(),
-    [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filterd: DashboardFiltersModel) => this.getFilledPositionTrendWidgetData(),
+    [WidgetTypeEnum.CANDIDATES]: (filters: DashboardFiltersModel) => this.getCandidatesWidgetData(filters),
+    [WidgetTypeEnum.FILLED_POSITIONS_TREND]: () => this.getFilledPositionTrendWidgetData(),
+    [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: () => this.getOrderPositionWidgetData(OrderStatus.InProgress),
+    [WidgetTypeEnum.POSITIONS_BY_TYPES]: () => this.getPositionsByTypes(),
+    [WidgetTypeEnum.FILLED_POSITIONS]: () => this.getOrderPositionWidgetData(OrderStatus.Filled),
+    [WidgetTypeEnum.OPEN_POSITIONS]: () => this.getOrderPositionWidgetData(OrderStatus.Open),
+    [WidgetTypeEnum.INVOICES]: () => this.getInvocesWidgetData(),
+    [WidgetTypeEnum.TASKS]: () => this.getTasksWidgetData(),
     [WidgetTypeEnum.TASKS]: ()=> this.getTasksWidgetData(),
     [WidgetTypeEnum.CHAT]: () => this.getChatWidgetData(),
-    [WidgetTypeEnum.INVOICES]: (filters: DashboardFiltersModel) => this.getInvocesWidgetData(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -127,7 +126,7 @@ export class DashboardService {
   }
 
   private getCandidatesWidgetData(filter: DashboardFiltersModel): Observable<ChartAccumulation> {
-    return this.httpClient.post<CandidateTypeInfoModel[]>(`${this.baseUrl}/GetCandidatesByStatuses`, {}).pipe(
+    return this.httpClient.post<CandidateTypeInfoModel[]>(`${this.baseUrl}/GetCandidatesByStatuses`, { ...filter }).pipe(
       map((candidatesInfo: CandidateTypeInfoModel[]) => {
         return {
           id: WidgetTypeEnum.CANDIDATES,
@@ -147,15 +146,15 @@ export class DashboardService {
   private getApplicantsByRegionWidgetData(
     filters: DashboardFiltersModel
   ): Observable<CandidatesByStateWidgetAggregatedDataModel> {
-    return forkJoin({ mapData: this.mapData$, applicantsByRegion: this.getApplicantsByRegion() }).pipe(
+    return forkJoin({ mapData: this.mapData$, applicantsByRegion: this.getApplicantsByRegion(filters) }).pipe(
       map((data: ApplicantsByRegionDataModel) => {
         return this.getFormattedCandidatesByStatesWidgetAggregatedData(data);
       })
     );
   }
 
-  private getApplicantsByRegion(): Observable<CandidatesByStatesResponseModel> {
-    return this.httpClient.post<CandidatesByStatesResponseModel>(`${this.baseUrl}/GetCandidatesStatesAggregated`, {});
+  private getApplicantsByRegion(filter: DashboardFiltersModel): Observable<CandidatesByStatesResponseModel> {
+    return this.httpClient.post<CandidatesByStatesResponseModel>(`${this.baseUrl}/GetCandidatesStatesAggregated`, { ...filter });
   }
 
   private getMapData(): Observable<LayerSettingsModel> {
@@ -195,7 +194,7 @@ export class DashboardService {
       .pipe(map((panels) => JSON.parse(panels.state)));
   }
 
-  private getPositionsByTypes(filters: DashboardFiltersModel): Observable<PositionsByTypeAggregatedModel> {
+  private getPositionsByTypes(): Observable<PositionsByTypeAggregatedModel> {
     const timeRanges = this.calculateTimeRanges();
     return this.httpClient
       .post<PositionsByTypeResponseModel>(`${this.baseUrl}/getopenclosedonboardamount`, timeRanges)
@@ -228,14 +227,14 @@ export class DashboardService {
     }));
   }
 
-  private getOrderPositionWidgetData(filters: DashboardFiltersModel, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
+  private getOrderPositionWidgetData(orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
     return this.httpClient
       .post<CandidatesPositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { orderStatuses: [orderStatus] })
       .pipe(map((data) => data.orderStatusesDetails[0]));
   }
 
-  private getActivePositionWidgetData(filters: DashboardFiltersModel): Observable<AccumulationChartModel> {
-    return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { granulateInProgress: true }).pipe(
+  private getActivePositionWidgetData(filter: DashboardFiltersModel): Observable<AccumulationChartModel> {
+    return this.httpClient.post<ActivePositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { granulateInProgress: true, ...filter }).pipe(
       map(({ orderStatusesDetails }: ActivePositionsDto) => {
         return {
           id: WidgetTypeEnum.ACTIVE_POSITIONS,
@@ -281,7 +280,7 @@ export class DashboardService {
     );
   }
 
-  private getInvocesWidgetData(filters: DashboardFiltersModel): Observable<any> {
+  private getInvocesWidgetData(): Observable<any> {
     return of('temporary-widget-invoices');
   }
 }
