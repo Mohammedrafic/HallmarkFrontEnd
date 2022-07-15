@@ -76,7 +76,7 @@ export const perDiemColumnsToExport: ExportColumn[] = [
 
 export const ReOrdersColumnsConfig: GridColumn[] = [
   {
-    fieldName: 'reOrderId',
+    fieldName: 'reOrderFromId',
     visible: true,
   },
   {
@@ -88,7 +88,7 @@ export const ReOrdersColumnsConfig: GridColumn[] = [
     visible: true,
   },
   {
-    fieldName: 'agencyName',
+    fieldName: 'agencies',
     visible: true,
   },
   {
@@ -127,7 +127,7 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
     visible: true,
   },
   {
-    fieldName: 'reOrderId',
+    fieldName: 'reOrderFromId',
     visible: false,
   },
   {
@@ -139,7 +139,7 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
     visible: false,
   },
   {
-    fieldName: 'agencyName',
+    fieldName: 'agencies',
     visible: false,
   },
 ];
@@ -158,7 +158,7 @@ export const PerDiemColumnsConfig = [
     visible: false,
   },
   {
-    fieldName: 'reOrderId',
+    fieldName: 'reOrderFromId',
     visible: false,
   },
   {
@@ -170,7 +170,7 @@ export const PerDiemColumnsConfig = [
     visible: false,
   },
   {
-    fieldName: 'agencyName',
+    fieldName: 'agencies',
     visible: false,
   },
   {
