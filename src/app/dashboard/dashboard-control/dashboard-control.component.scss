@@ -6,44 +6,55 @@
   justify-content: space-between;
 
   .left-content {
+    display: flex;
+    font-size: 12px;
+    line-height: 16px;
+    color: $secondary-dark-blue-30;
+
     .applied-filters {
       display: flex;
-      align-items: center;
-      justify-content: center;
+      align-items: flex-start;
       height: 100%;
-      font-size: 12px;
-      line-height: 16px;
-      color: $secondary-dark-blue-30;
+      margin-top: 13px;
 
       &__title {
         margin-right: 5px;
       }
+    }
+    .chips-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      margin-left: 5px;
 
-      .chips-container {
+      .chips-title {
         display: flex;
-        max-height: 100px;
-        overflow: auto;
+        flex-direction: row;
+        align-items: center;
 
-        .e-chip-list {
-          .e-chip {
-            margin: 5px 10px 5px 0;
-            width: auto;
-            text-transform: initial;
-            font-variant: common-ligatures;
-            font-weight: normal;
-            font-size: 12px;
-            height: 24px;
-            background-color: $secondary-dark-blue-50;
-            color: $black;
-            border: 1px solid $secondary-dark-blue-40;
-            line-height: 14px;
+        .chips-container {
+          display: flex;
 
-            .e-chip-delete.e-dlt-btn {
+          .e-chip-list {
+            .e-chip {
+              margin: 5px 10px 5px 0;
+              width: auto;
+              text-transform: initial;
+              font-variant: common-ligatures;
+              font-weight: normal;
+              font-size: 12px;
+              height: 24px;
+              background-color: $secondary-dark-blue-50;
               color: $black;
-              font-weight: 600;
+              border: 1px solid $secondary-dark-blue-40;
+              line-height: 14px;
 
-              &::before {
-                content: "\e7e7";
+              .e-chip-delete.e-dlt-btn {
+                color: $black;
+                font-weight: 600;
+
+                &::before {
+                  content: "\e7e7";
+                }
               }
             }
           }
@@ -53,7 +64,7 @@
   }
 
   .right-content {
-    width: 40%;
+    width: 30%;
     display: flex;
     justify-content: flex-end;
     flex-grow: 1;

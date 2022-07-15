@@ -4,3 +4,7 @@ export interface DashboardFiltersModel {
   departmentsIds?: number[];
   skillIds?: number[];
 }
+
+export type FilterName = 'Region' | 'Location' | 'Department' | 'Skill';
+
+export type FilterColumn = 'regionIds' | 'locationIds' | 'departmentsIds' | 'skillIds';
