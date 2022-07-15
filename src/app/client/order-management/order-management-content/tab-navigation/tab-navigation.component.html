@@ -1,21 +1,13 @@
-<div class="order-tabs" [ngClass]="{ 'first-active': firstActive }">
-  <ejs-tab id="tab_default" #tabNavigation (selecting)="onSelect($event)" (created)="onTabCreated()">
-    <e-tabitems>
-      <e-tabitem [header]="{ 'text': tabTitle.AllOrders }"></e-tabitem>
-      <e-tabitem [header]="{ 'text': tabTitle.PerDiem }"></e-tabitem>
-      <e-tabitem>
-        <ng-template #headerText>
-          {{ tabTitle.ReOrders }}
-          <span class="tab-navigation e-badge e-badge-success e-badge-circle">{{ reOrderCount }}</span>
-        </ng-template>
-      </e-tabitem>
-      <e-tabitem>
-        <ng-template #headerText>
-          {{ tabTitle.Incomplete }}
-          <span *ngIf="incompleteCount" class="tab-navigation e-badge e-badge-success e-badge-circle">{{ incompleteCount }}</span>
-        </ng-template>
-      </e-tabitem>
-      <e-tabitem [header]="{ 'text': tabTitle.OrderTemplates }"></e-tabitem>
-    </e-tabitems>
-  </ejs-tab>
-</div>
+<ejs-tab id="tab_default" heightAdjustMode="Auto" #tabNavigation (selecting)="onSelect($event)">
+  <div class="e-tab-header">
+    <div>{{ tabTitle.AllOrders }}</div>
+    <div>{{ tabTitle.PerDiem }}</div>
+    <div>{{ tabTitle.ReOrders }}</div>
+    <div>
+      {{ tabTitle.Incomplete }}
+      <span *ngIf="incompleteCount" class="tab-navigation e-badge e-badge-success e-badge-circle">{{ incompleteCount }}</span>
+    </div>
+    <div>{{ tabTitle.OrderTemplates }}</div>
+  </div>
+  <div class="e-content"></div>
+</ejs-tab>

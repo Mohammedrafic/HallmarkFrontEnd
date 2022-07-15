@@ -11,7 +11,7 @@ import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-stat
 
 export class OrderManagement {
   id: number;
-  reOrderId?: number;
+  reOrderFromId?: number;
   organizationId: number;
   status: number;
   statusText: string;
@@ -22,9 +22,8 @@ export class OrderManagement {
   locationName: string;
   departmentId: number;
   departmentName: string;
-  agencyName?: string[]; // TODO: verify name after BE implementation
-  shiftStartTime?: string; // TODO: verify name after BE implementation
-  shiftEndTime?: string; // TODO: verify name after BE implementation
+  shiftStartTime?: string;
+  shiftEndTime?: string;
   shift?: string; // used only in UI to group and show shiftStartTime - shiftEndTime range
   skillId: number;
   skillName: string;
@@ -61,7 +60,7 @@ export type OrderManagementPage = PageOfCollections<OrderManagement>;
 
 export type AgencyOrderManagement = {
   orderId: number;
-  reOrderId?: number;
+  reOrderFromId?: number;
   statusText: string;
   status: OrderStatus;
   jobTitle: string;
@@ -69,9 +68,8 @@ export type AgencyOrderManagement = {
   location: string;
   numberOfPositions: number;
   department: string;
-  agencyName?: string[]; // TODO: verify name after BE implementation
-  shiftStartTime?: string; // TODO: verify name after BE implementation
-  shiftEndTime?: string; // TODO: verify name after BE implementation
+  shiftStartTime?: string;
+  shiftEndTime?: string;
   orderType: OrderType;
   billRate: number;
   candidatesCount: number;
@@ -136,11 +134,11 @@ export type AgencyOrderFilters = {
   locationIds?: number[];
   departmentsIds?: number[];
   orderId?: number;
-  reOrderId?: number;
+  reOrderFromId?: number;
   skillIds?: number[];
   candidateStatuses?: number[];
-  candidatesCountFrom?: number; // TODO: verify name after BE implementation
-  candidatesCountTo?: number; // TODO: verify name after BE implementation
+  candidatesCountFrom?: number;
+  candidatesCountTo?: number;
   organizationIds?: number[];
   orderTypes?: number[];
   orderStatuses?: number[];
@@ -371,7 +369,7 @@ export class OrderFilter {
   regionIds?: number[];
   locationIds?: number[];
   departmentsIds?: number[];
-  reOrderId?: number;
+  reOrderFromId?: number;
   orderId?: number;
   skillIds?: number[];
   orderTypes?: number[];

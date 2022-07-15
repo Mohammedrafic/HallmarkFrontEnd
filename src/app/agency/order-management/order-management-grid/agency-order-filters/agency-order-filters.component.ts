@@ -158,7 +158,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   static generateFiltersForm(): FormGroup {
     return new FormGroup({
       orderId: new FormControl(null),
-      reOrderId: new FormControl(null),
+      reOrderFromId: new FormControl(null),
       organizationIds: new FormControl([]),
       regionIds: new FormControl([]),
       locationIds: new FormControl([]),
@@ -182,7 +182,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   static generateFilterColumns(): any {
     return {
       orderId: { type: ControlTypes.Text, valueType: ValueType.Text },
-      reOrderId: { type: ControlTypes.Text, valueType: ValueType.Text },
+      reOrderFromId: { type: ControlTypes.Text, valueType: ValueType.Text },
       organizationIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,

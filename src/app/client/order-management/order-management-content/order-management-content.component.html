@@ -1,7 +1,6 @@
 <app-page-toolbar>
   <ng-container left>
     <app-tab-navigation
-      [reOrdersNumber$]="reOrderCount$"
       (selectedTab)="tabSelected($event)"
     ></app-tab-navigation>
   </ng-container>
@@ -108,18 +107,17 @@
           </ng-template>
         </ng-template>
       </e-column>
-      <e-column field="reOrderId" headerText="RE-ORDER ID" width="140" [visible]="false">
-        <!-- TODO: verify after BE implementation -->
+      <e-column field="reOrderFromId" headerText="RE-ORDER ID" width="140" [visible]="false">
         <ng-template #template let-data>
           <ng-container *ngIf="!data.children?.length; else withToggle">
             <div>
-              <b>{{ data.reOrderId }}</b>
+              <b>{{ data.reOrderFromId }}</b>
             </div>
           </ng-container>
 
           <ng-template #withToggle>
             <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-              <b>{{ data.reOrderId }}</b>
+              <b>{{ data.reOrderFromId }}</b>
               <i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
             </div>
           </ng-template>
@@ -166,41 +164,38 @@
         </ng-template>
       </e-column>
       <e-column field="reOrderDate" headerText="RE-ORDER DATE" width="150" [visible]="false">
-        <!-- TODO: verify after BE implementation -->
         <ng-template #template let-data>
           <span>{{ data.reOrderDate | date:'MM/dd/yyyy' }}</span>
         </ng-template>
       </e-column>
       <e-column field="shift" headerText="SHIFT" width="150" [visible]="false">
-        <!-- TODO: verify after BE implementation -->
         <ng-template #template let-data>
           <span>{{ data.shiftStartTime }}-{{ data.shiftEndTime }}</span>
         </ng-template>
       </e-column>
-      <e-column field="agencyName" headerText="AGENCY" width="150" [visible]="false">
-        <!-- TODO: verify after BE implementation -->
+      <e-column field="agencies" headerText="AGENCY" width="150" [visible]="false">
         <ng-template #template let-data>
-          <ng-container *ngIf="!data.agencyName?.length">
+          <ng-container *ngIf="!data.agencies?.length">
             <span>All</span>
           </ng-container>
 
-          <ng-container *ngIf="data.agencyName?.length === 2">
-            <span *ngFor="let agency of data.agencyName; let i = index" class="agency-name">
+          <ng-container *ngIf="data.agencies?.length === 2">
+            <span *ngFor="let agency of data.agencies; let i = index" class="agency-name">
               {{ agency }}
-              <span class="agency-name" *ngIf="i !== data.agencyName.length - 1">, </span>
+              <span class="agency-name" *ngIf="i !== data.agencies.length - 1">, </span>
             </span>
           </ng-container>
 
-          <ng-container *ngIf="data.agencyName?.length >= 3 && data.agencyName?.length <= 5">
+          <ng-container *ngIf="data.agencies?.length >= 3 && data.agencies?.length <= 5">
             <ejs-tooltip
-              content="{{ data.agencyName.length }}"
+              content="{{ data.agencies.length }}"
               target="#agencyName"
             >
               <span id="agencyName" class="agency-name">Multiple Agencies</span>
             </ejs-tooltip>
           </ng-container>
 
-          <ng-container *ngIf="data.agencyName?.length > 5">
+          <ng-container *ngIf="data.agencies?.length > 5">
             <span id="agencyName" class="agency-name">Multiple Agencies</span>
           </ng-container>
         </ng-template>
@@ -300,7 +295,7 @@
             class="e-input"
             type="text"
             maxlength="50"
-            formControlName="reOrderId"/>
+            formControlName="reOrderFromId"/>
         </div>
       </div>
     </div>

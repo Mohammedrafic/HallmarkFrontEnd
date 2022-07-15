@@ -1,7 +1,6 @@
 <app-page-toolbar>
   <ng-container left>
     <app-tab-navigation
-      [reOrdersNumber$]="reOrderCount$"
       (selectedTab)="onTabChanged($event)"></app-tab-navigation>
   </ng-container>
   <ng-container right>
@@ -34,7 +33,6 @@
         [selectedTab]="selectedTab"
         [onExportClicked$]="exportSelected$"
         [search$]="search$"
-        (reOrderNumber)="onReOrderGet($event)"
       ></app-order-management-grid>
         <div *ngSwitchCase="selectedTabCases.OtherAgencies">OtherAgencies</div>
         <div *ngSwitchCase="selectedTabCases.AllAgencies">AllAgencies</div>
@@ -45,7 +43,6 @@
         [selectedTab]="selectedTab"
         [onExportClicked$]="exportSelected$"
         [search$]="search$"
-        (reOrderNumber)="onReOrderGet($event)"
       ></app-order-management-grid>
       <app-order-management-grid
         *ngSwitchCase="selectedTabCases.ReOrders"
@@ -53,7 +50,6 @@
         [selectedTab]="selectedTab"
         [onExportClicked$]="exportSelected$"
         [search$]="search$"
-        (reOrderNumber)="onReOrderGet($event)"
       ></app-order-management-grid>
     </ng-container>
 </section>
