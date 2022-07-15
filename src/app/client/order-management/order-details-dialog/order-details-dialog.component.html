@@ -35,6 +35,7 @@
 
             <button ejs-button cssClass="e-outline edit-button" (click)="editOrder(order)"><i-feather name="edit" class="icon"></i-feather></button>
             <button ejs-button cssClass="e-outline" *ngIf="showCloseButton">Close Order</button>
+            <button ejs-button cssClass="e-outline" *ngIf="orderType.OpenPerDiem === order?.orderType" (click)="createReOrder()">Create Re-Order</button>
             <button ejs-button cssClass="e-primary delete-button" (click)="deleteOrder(order.id)" *ngIf="!showCloseButton">Delete</button>
             <button ejs-button [isPrimary]="true" (click)="lockOrder()" [disabled]="disabledLock">
               {{order?.isLocked ? "Unlock" : "Lock"}}
@@ -61,7 +62,7 @@
                 <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>
               </ng-template>
             </e-tabitem>
-            <e-tabitem>
+            <e-tabitem *ngIf="order?.orderType !== orderType.OpenPerDiem">
               <ng-template #headerText>Extensions</ng-template>
               <ng-template #content>
                 <!--Extensions tab goes here-->

@@ -148,6 +148,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       });
   }
 
+  createReOrder(): void {
+    // TODO: create re-order here
+  }
+
   public approveOrder(id: number): void {
     this.store.dispatch(new ApproveOrder(id));
   }

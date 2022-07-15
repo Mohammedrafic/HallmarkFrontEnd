@@ -25,7 +25,7 @@ export class TabNavigationComponent implements OnInit, OnDestroy {
     this.reOrdersNumber$
       .pipe(takeUntil(this.unsubscribe$)).subscribe((reorderNumber) => {
         this.reOrderCount = reorderNumber;
-      });
+    });
   }
 
   ngOnDestroy(): void {

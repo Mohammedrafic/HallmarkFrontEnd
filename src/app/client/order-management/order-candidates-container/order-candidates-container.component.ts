@@ -8,6 +8,7 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderCandidatesListPage } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
 import { Observable, Subject, takeUntil } from 'rxjs';
+import { OrderType } from "@shared/enums/order-type";
 
 @Component({
   selector: 'app-order-candidates-container',
@@ -22,6 +23,7 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
 
   public orderCandidatePage: OrderCandidatesListPage;
   public orderCandidates: any;
+  public orderType = OrderType;
 
   @Select(OrderManagementContentState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
