@@ -32,7 +32,11 @@ export class DashboardControlComponent extends DestroyableDirective implements O
   public readonly isDialogOpened$: Observable<boolean> = this.isDialogOpened();
   public appliedFilters: Record<string, FilteredItem[]>;
 
-  constructor(private readonly actions: Actions, private readonly store: Store, private readonly router: Router) {
+  constructor(
+    private readonly actions: Actions,
+    private readonly store: Store,
+    private readonly router: Router,
+    ) {
     super();
   }
 

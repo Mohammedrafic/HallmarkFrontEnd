@@ -163,10 +163,10 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   private getFiltersGroup(): FormGroup {
     return this.formBuilder.group({
-      regionIds: null,
-      locationIds: null,
-      departmentsIds: null,
-      skillIds: null,
+      regionIds: [],
+      locationIds: [],
+      departmentsIds: [],
+      skillIds: [],
     });
   }
 
@@ -245,7 +245,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   private getDashboardFilterState(): void {
     this.dashboardFiltersState$.pipe(takeUntil(this.destroy$)).subscribe((filters: DashboardFiltersModel)=> {
       this.filtersGroup.reset();
-      Object.entries(filters).forEach(([key, value]) => this.filtersGroup.get(key)?.setValue(value))
+      Object.entries(this.filtersGroup.controls).forEach(([field, control]) => control.setValue(filters[field as keyof DashboardFiltersModel] || []));
     });
   }
 }
