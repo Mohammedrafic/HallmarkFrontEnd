@@ -14,17 +14,17 @@ export const typeValueAccess = (_: string, { orderType }: AgencyOrderManagement)
 
 export const myAgencyColumnsToExport: ExportColumn[] = [
   { text: 'Order ID', column: 'OrderId' },
-  { text: 'Status', column: 'Status' },
+  { text: 'Status', column: 'OrderStatus' },
   { text: 'Job Title', column: 'JobTitle' },
-  { text: 'Organization', column: 'OrganizationName' },
+  { text: 'Organization', column: 'Organization' },
   { text: '# of Positions', column: 'NumberOfPositions' },
   { text: 'Candidates', column: 'CandidatesCount' },
   { text: 'Bill Rate', column: 'BillRate' },
-  { text: 'Skill', column: 'Skill' },
-  { text: 'Location', column: 'LocationName' },
-  { text: 'Department', column: 'DepartmentName' },
-  { text: 'Type', column: 'Type' },
-  { text: 'Start Date', column: 'JobStartDate' },
+  { text: 'Skill', column: 'OrderSkill' },
+  { text: 'Location', column: 'Location' },
+  { text: 'Department', column: 'Department' },
+  { text: 'Type', column: 'OrderType' },
+  { text: 'Start Date', column: 'StartDate' },
 ];
 
 export const myAgencyChildColumnsToExport: ExportColumn[] = [
@@ -44,23 +44,23 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Job Title', column: 'JobTitle' },
   { text: 'Skill', column: 'Skill' },
   { text: '# of Positions', column: 'CountOfPosition' },
-  { text: 'Location', column: 'Location'},
-  { text: 'Department', column: 'Department'},
-  { text: 'Candidates', column: 'Candidates'},
-  { text: 'Bill Rate', column: 'BillRate'},
+  { text: 'Location', column: 'Location' },
+  { text: 'Department', column: 'Department' },
+  { text: 'Candidates', column: 'Candidates' },
+  { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Re-Order Date', column: 'ReOrderDate' },
   { text: 'Shift', column: 'Shift' },
-  { text: 'Agency', column: 'Agency'},
+  { text: 'Agency', column: 'Agency' },
 ];
 
 export const reOrdersChildColumnToExport: ExportColumn[] = [
-  { text: 'Position ID', column: 'PositionID'},
-  { text: 'Position Status', column: 'PositionStatus'},
-  { text: 'Candidate Name', column: 'CandidateName'},
-  { text: 'Candidate Status', column: 'CandidateStatus'},
-  { text: 'Submission', column: 'Submission'},
-  { text: 'Onboarded', column: 'Onboarded'},
-]
+  { text: 'Position ID', column: 'PositionID' },
+  { text: 'Position Status', column: 'PositionStatus' },
+  { text: 'Candidate Name', column: 'CandidateName' },
+  { text: 'Candidate Status', column: 'CandidateStatus' },
+  { text: 'Submission', column: 'Submission' },
+  { text: 'Onboarded', column: 'Onboarded' },
+];
 
 export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Order ID', column: 'OrderId' },
