@@ -1,5 +1,6 @@
 <section class="job-details">
-  <app-general-order-info *ngIf="order" [orderInformation]="order"></app-general-order-info>
+  <app-general-order-info *ngIf="order?.orderType !== orderType.OpenPerDiem" [orderInformation]="order"></app-general-order-info>
+  <app-general-order-per-diem-info *ngIf="order?.orderType === orderType.OpenPerDiem" [orderInformation]="order"></app-general-order-per-diem-info>
 </section>
 <div class="separator"></div>
 <app-order-candidates-list *ngIf="orderCandidatePage" [candidatesList]="orderCandidatePage" [order]="orderCandidates" (getCandidatesList)="onGetCandidatesList($event)"></app-order-candidates-list>

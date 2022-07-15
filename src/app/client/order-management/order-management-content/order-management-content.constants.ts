@@ -70,7 +70,7 @@ export const reOrdersChildColumnToExport: ExportColumn[] = [
 
 export const ReOrdersColumnsConfig = [
   {
-    fieldName: 'reOrderId',
+    fieldName: 'reOrderFromId',
     visible: true
   },
   {
@@ -82,7 +82,7 @@ export const ReOrdersColumnsConfig = [
     visible: true
   },
   {
-    fieldName: 'agencyName',
+    fieldName: 'agencies',
     visible: true
   },
   {
@@ -117,7 +117,7 @@ export const AllOrdersColumnsConfig = [
     visible: true
   },
   {
-    fieldName: 'reOrderId',
+    fieldName: 'reOrderFromId',
     visible: false
   },
   {
@@ -129,7 +129,7 @@ export const AllOrdersColumnsConfig = [
     visible: false
   },
   {
-    fieldName: 'agencyName',
+    fieldName: 'agencies',
     visible: false
   },
   {
@@ -152,7 +152,7 @@ export const PerDiemColumnsConfig = [
     visible: false
   },
   {
-    fieldName: 'reOrderId',
+    fieldName: 'reOrderFromId',
     visible: false
   },
   {
@@ -164,7 +164,7 @@ export const PerDiemColumnsConfig = [
     visible: false
   },
   {
-    fieldName: 'agencyName',
+    fieldName: 'agencies',
     visible: false
   },
   {
@@ -176,7 +176,7 @@ export const PerDiemColumnsConfig = [
     visible: false
   },
   {
-    fieldName: 'shiftCount',
+    fieldName: 'shiftsNext90Days',
     visible: true
   },
 ];

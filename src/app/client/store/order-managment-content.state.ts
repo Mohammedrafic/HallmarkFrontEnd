@@ -268,6 +268,7 @@ export class OrderManagementContentState {
   @Action(GetOrders)
   GetOrders({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }: GetOrders): Observable<OrderManagementPage> {
     return this.orderManagementService.getOrders(payload).pipe(tap((payload) => {
+      this.orderManagementService.countShiftsWithinPeriod(payload);
       patchState({ ordersPage: payload });
       return payload;
     }));

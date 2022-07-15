@@ -97,6 +97,7 @@ import { SideMenuModule } from '@shared/components/side-menu/side-menu.module';
 import {SecurityState} from "../security/store/security.state";
 import { NavigationPanelComponent } from './components/navigation-panel/navigation-panel.component';
 import { GridSubrowReorderComponent } from './components/grid-subrow-reorder/grid-subrow-reorder.component';
+import {GeneralOrderPerDiemInfoComponent} from "@shared/components/general-order-per-diem-info/general-order-per-diem-info.component";
 
 const icons = {
   AlertCircle,
@@ -139,6 +140,7 @@ const COMPONENTS = [
   OrderDetailsComponent,
   SearchComponent,
   GeneralOrderInfoComponent,
+  GeneralOrderPerDiemInfoComponent,
   OrderCandidatesListComponent,
   CustomProgressBarComponent,
   ApplyCandidateComponent,

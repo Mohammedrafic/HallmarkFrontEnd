@@ -4,6 +4,7 @@ import { Select, Store } from '@ngxs/store';
 import { OrderManagement } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
 import { Subject, takeUntil } from 'rxjs';
+import {OrderType} from "@shared/enums/order-type";
 
 @Component({
   selector: 'app-order-details-container',
@@ -12,6 +13,7 @@ import { Subject, takeUntil } from 'rxjs';
 })
 export class OrderDetailsContainerComponent implements OnInit, OnDestroy {
   private unsubscribe$: Subject<void> = new Subject();
+  public orderType = OrderType;
 
   public order: Order;
   @Input() set currentOrder(value: Order) {
@@ -20,11 +22,11 @@ export class OrderDetailsContainerComponent implements OnInit, OnDestroy {
   }
 
   constructor(private store: Store) {
-   
+
   }
 
   ngOnInit(): void {
-    
+
   }
 
   ngOnDestroy(): void {

@@ -19,7 +19,6 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
   public filteredItems$ = new Subject<number>();
   public exportSelected$ = new Subject<any>();
   public search$ = new Subject<string>();
-  public reOrderCount$ = new Subject<number>();
 
   constructor(private store: Store) {
     super();
@@ -41,9 +40,5 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
 
   public searchOrders(event: KeyboardEvent): void {
     this.search$.next((event.target as HTMLInputElement).value);
-  }
-
-  public onReOrderGet(reOrderNumber: number): void {
-    this.reOrderCount$.next(reOrderNumber);
   }
 }
