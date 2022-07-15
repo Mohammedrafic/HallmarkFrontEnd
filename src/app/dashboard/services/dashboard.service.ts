@@ -59,14 +59,13 @@ export class DashboardService {
     [WidgetTypeEnum.APPLICANTS_BY_REGION]: (filters: DashboardFiltersModel) => this.getApplicantsByRegionWidgetData(filters),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
     [WidgetTypeEnum.CANDIDATES]: (filters: DashboardFiltersModel) => this.getCandidatesWidgetData(filters),
-    [WidgetTypeEnum.FILLED_POSITIONS_TREND]: () => this.getFilledPositionTrendWidgetData(),
-    [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: () => this.getOrderPositionWidgetData(OrderStatus.InProgress),
-    [WidgetTypeEnum.POSITIONS_BY_TYPES]: () => this.getPositionsByTypes(),
-    [WidgetTypeEnum.FILLED_POSITIONS]: () => this.getOrderPositionWidgetData(OrderStatus.Filled),
-    [WidgetTypeEnum.OPEN_POSITIONS]: () => this.getOrderPositionWidgetData(OrderStatus.Open),
+    [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filters: DashboardFiltersModel) => this.getFilledPositionTrendWidgetData(filters),
+    [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.InProgress),
+    [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboardFiltersModel) => this.getPositionsByTypes(filters),
+    [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
+    [WidgetTypeEnum.OPEN_POSITIONS]: (filters,) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
     [WidgetTypeEnum.INVOICES]: () => this.getInvocesWidgetData(),
     [WidgetTypeEnum.TASKS]: () => this.getTasksWidgetData(),
-    [WidgetTypeEnum.TASKS]: ()=> this.getTasksWidgetData(),
     [WidgetTypeEnum.CHAT]: () => this.getChatWidgetData(),
   };
 
@@ -194,10 +193,10 @@ export class DashboardService {
       .pipe(map((panels) => JSON.parse(panels.state)));
   }
 
-  private getPositionsByTypes(): Observable<PositionsByTypeAggregatedModel> {
+  private getPositionsByTypes(filter: DashboardFiltersModel): Observable<PositionsByTypeAggregatedModel> {
     const timeRanges = this.calculateTimeRanges();
     return this.httpClient
-      .post<PositionsByTypeResponseModel>(`${this.baseUrl}/getopenclosedonboardamount`, timeRanges)
+      .post<PositionsByTypeResponseModel>(`${this.baseUrl}/getopenclosedonboardamount`, { ...timeRanges, ...filter })
       .pipe(
         map((positions: PositionsByTypeResponseModel) => {
           return {
@@ -227,9 +226,9 @@ export class DashboardService {
     }));
   }
 
-  private getOrderPositionWidgetData(orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
+  private getOrderPositionWidgetData(filter: DashboardFiltersModel, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
     return this.httpClient
-      .post<CandidatesPositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { orderStatuses: [orderStatus] })
+      .post<CandidatesPositionsDto>(`${this.baseUrl}/OrdersPositionsStatus`, { orderStatuses: [orderStatus], ...filter })
       .pipe(map((data) => data.orderStatusesDetails[0]));
   }
 
@@ -264,8 +263,8 @@ export class DashboardService {
     return of('assets/icons/temporary-widget-chat.png');
   }
 
-  private getFilledPositionTrendWidgetData(): Observable<PositionTrend> {
-    return this.httpClient.post<PositionTrendDto>(`${this.baseUrl}/filledpositionstrend`, {}).pipe(
+  private getFilledPositionTrendWidgetData(filter: DashboardFiltersModel): Observable<PositionTrend> {
+    return this.httpClient.post<PositionTrendDto>(`${this.baseUrl}/filledpositionstrend`, { ...filter }).pipe(
       map((data: PositionTrendDto) => {
         const [previousValue, currentValue] = data.values.slice(-2);
         const coefficient = previousValue === 0 ? 1 : previousValue;
