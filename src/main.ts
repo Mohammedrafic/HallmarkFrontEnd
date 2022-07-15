@@ -6,8 +6,8 @@ import { environment } from './environments/environment';
 
 import { registerLicense } from '@syncfusion/ej2-base';
 import { LicenseManager, ModuleRegistry, AllModules } from '@ag-grid-enterprise/all-modules';
-import { MSAL_STATIC_PROVIDERS } from './app/b2c-auth/b2c-auth.providers';
-import { APP_SETTINGS } from './app.settings';
+import { MSAL_STATIC_PROVIDERS, APP_SETTINGS_B2C_CONFIG_URL } from './app/b2c-auth/b2c-auth.providers';
+import { APP_SETTINGS, APP_SETTINGS_URL } from './app.settings';
 
 // Registering AG-Grid enterprise license key
 LicenseManager.setLicenseKey(
@@ -23,19 +23,22 @@ if (environment.production) {
 }
 
 Promise.resolve()
-  .then(() => fetch('./assets/app.settings.json'))
+  .then(() => fetch(APP_SETTINGS_URL))
   .then((res) => res.json())
   .then((settings) => {
     const host = settings.API_BASE_URL;
-    return Promise.all([{ host }, fetch(`${host}/azuread`).then(res => res.json())]);
+    return Promise.all([{ host }, fetch(APP_SETTINGS_B2C_CONFIG_URL(host)).then((res) => res.json())]);
   })
   .then(([settings, config]) => {
-    const B2C_STATIC_PROVIDERS = MSAL_STATIC_PROVIDERS(config);
+    // ENV Debug Info
+    console.table(settings);
+    console.table(config);
+    //
+
+    const B2C_STATIC_PROVIDERS = MSAL_STATIC_PROVIDERS(settings.host, config);
 
     platformBrowserDynamic([{ provide: APP_SETTINGS, useValue: settings }, ...B2C_STATIC_PROVIDERS])
-    .bootstrapModule(AppModule)
-    .catch((err) => console.error(err));
+      .bootstrapModule(AppModule)
+      .catch((err) => console.error(err));
   });
-
-
 
