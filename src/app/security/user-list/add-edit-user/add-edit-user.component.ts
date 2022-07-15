@@ -49,12 +49,7 @@ export class AddEditUserComponent implements OnDestroy {
     this.tab.selected.pipe(takeUntil(this.unsubscribe$))
       .subscribe((event: SelectEventArgs) => {
         const visibilityTabIndex = 1;
-        if (event.selectedIndex === visibilityTabIndex) {
-          this.tab.refresh();
-          this.firstActive = false;
-        } else {
-          this.firstActive = true;
-        }
+        this.firstActive = event.selectedIndex !== visibilityTabIndex;
       });
   }
 
