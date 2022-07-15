@@ -1,0 +1,70 @@
+<section class="candidates-info">
+  <div class="container-row">
+    <div class="column">
+      <div class="icon">
+        <i-feather name="user" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{orderInformation.title}}</div>
+        <div class="sup-title">Job title</div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="icon">
+        <i-feather name="map-pin" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{orderInformation.locationName}}</div>
+        <div class="sup-title">Location</div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="icon">
+        <i-feather name="folder" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{orderInformation.departmentName}}</div>
+        <div class="sup-title">Department</div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="icon">
+        <i-feather name="briefcase" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{orderInformation?.skillName}}</div>
+        <div class="sup-title">Skill</div>
+      </div>
+    </div>
+    <div class="column" *ngIf="orderInformation.reasonForRequest">
+      <div>
+        <div class="title">{{orderInformation.reasonForRequest}}</div>
+        <div class="sup-title">Reason for Requisition</div>
+      </div>
+    </div>
+    <div class="column">
+      <div>
+        <div class="title">{{orderType[orderInformation.orderType]}}</div>
+        <div class="sup-title">Job Type</div>
+      </div>
+    </div>
+    <div class="column">
+      <div>
+        <div class="title">{{activeValue(orderInformation.onCallRequired)}}</div>
+        <div class="sup-title">Oncall</div>
+      </div>
+    </div>
+    <div class="column">
+      <div>
+        <div class="title">{{activeValue(orderInformation.nO_OT)}}</div>
+        <div class="sup-title">Do Not Consider OT</div>
+      </div>
+    </div>
+    <div class="column" *ngIf="orderInformation.orderOpenDate">
+      <div>
+        <div class="title">{{orderInformation.orderOpenDate | date: 'MM/dd/yyy'}}</div>
+        <div class="sup-title">Distributed On</div>
+      </div>
+    </div>
+  </div>
+</section>

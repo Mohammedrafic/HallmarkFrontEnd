@@ -15,6 +15,7 @@ import {
 } from '@organization-management/store/organization-management.actions';
 import {
   ClearSelectedOrder,
+  ClearSuggestions,
   GetAssociateAgencies,
   GetMasterShifts,
   GetOrganizationStatesWithKeyCode,
@@ -591,7 +592,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-    this.store.dispatch(new ClearSelectedOrder());
+    this.store.dispatch([new ClearSelectedOrder(), new ClearSuggestions()]);
   }
 
   public onRegionDropDownChanged(event: ChangeEventArgs): void {

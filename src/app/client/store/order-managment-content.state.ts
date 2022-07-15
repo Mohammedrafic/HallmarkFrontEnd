@@ -15,7 +15,7 @@ import {
   GetIncompleteOrders,
   GetMasterShifts,
   GetOrderById,
-  GetOrderFIlterDataSources,
+  GetOrderFilterDataSources,
   GetOrders,
   GetOrganisationCandidateJob,
   GetOrganizationStatesWithKeyCode,
@@ -36,7 +36,10 @@ import {
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
   GetHistoricalData,
-  ExportOrders
+  ExportOrders,
+  ClearSuggestions,
+  SetLock,
+  ClearOrders
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -265,9 +268,15 @@ export class OrderManagementContentState {
   @Action(GetOrders)
   GetOrders({ patchState }: StateContext<OrderManagementContentStateModel>, { payload }: GetOrders): Observable<OrderManagementPage> {
     return this.orderManagementService.getOrders(payload).pipe(tap((payload) => {
+      this.orderManagementService.countShiftsWithinPeriod(payload);
       patchState({ ordersPage: payload });
       return payload;
     }));
+  }
+
+  @Action(ClearOrders)
+  ClearOrders({ patchState }: StateContext<OrderManagementContentStateModel>, { }: ClearOrders): OrderManagementContentStateModel {
+    return  patchState({ ordersPage: null });
   }
 
   @Action(GetOrderById)
@@ -283,6 +292,21 @@ export class OrderManagementContentState {
         patchState({ selectedOrder: payload });
         return payload;
       })
+    );
+  }
+
+  @Action(SetLock)
+  SetLock({ dispatch }: StateContext<OrderManagementContentStateModel>, { id, lockStatus, filters, updateOpened }: SetLock): Observable<boolean | void> {
+    return this.orderManagementService.setLock(id, lockStatus).pipe(
+      tap(() => {
+        const message = lockStatus ? `The Order ${id} is locked` : `The Order ${id} is unlocked`;
+        const actions = [
+          new GetOrders(filters),
+          new ShowToast(MessageTypes.Success, message),
+        ];
+        dispatch(updateOpened ? [...actions, new GetSelectedOrderById(id)] : actions);
+      }),
+      catchError(error => dispatch(new ShowToast(MessageTypes.Error, error.error?.detail)))
     );
   }
 
@@ -389,6 +413,11 @@ export class OrderManagementContentState {
     return this.orderManagementService.getSuggestedDetails(locationId).pipe(tap(payload => {
       patchState({ suggestedDetails: payload });
     }));
+  }
+
+  @Action(ClearSuggestions)
+  ClearSuggestions({ patchState }: StateContext<OrderManagementContentStateModel>, { }: ClearSuggestions): OrderManagementContentStateModel {
+    return patchState({ suggestedDetails: null });
   }
 
   @Action(GetProjectNames)
@@ -522,8 +551,8 @@ export class OrderManagementContentState {
     );
   }
 
-  @Action(GetOrderFIlterDataSources)
-  GetOrderFIlterDataSources(
+  @Action(GetOrderFilterDataSources)
+  GetOrderFilterDataSources(
     { patchState }: StateContext<OrderManagementContentStateModel>
   ): Observable<OrderFilterDataSource> {
     return this.orderManagementService.getOrderFilterDataSources().pipe(

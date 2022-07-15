@@ -136,13 +136,26 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         let statuses = [];
         let candidateStatusesData = [];
         if (this.activeTab === AgencyOrderManagementTabs.ReOrders) {
-          statuses = orderStatuses.filter(status => [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status));
-          candidateStatusesData = candidateStatuses.filter(status => [CandidatesStatusText.Onboard, CandidatesStatusText.Offered].includes(status.status)) // TODO: after BE implementation also add Pending, Rejected
+          statuses = orderStatuses.filter((status) =>
+            [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status)
+          );
+          candidateStatusesData = candidateStatuses.filter((status) =>
+            [CandidatesStatusText.Onboard, CandidatesStatusText.Offered].includes(status.status)
+          ); // TODO: after BE implementation also add Pending, Rejected
         } else if (this.activeTab === AgencyOrderManagementTabs.PerDiem) {
-          statuses = orderStatuses.filter(status => [OrderStatusText.Open, OrderStatusText.Closed].includes(status.status));
-          candidateStatusesData = candidateStatuses.filter(status => [
-            CandidatStatus['Not Applied'], CandidatStatus.Applied, CandidatStatus.Offered, CandidatStatus.Accepted, CandidatStatus.OnBoard, CandidatStatus.Rejected
-          ].includes(status.status));
+          statuses = orderStatuses.filter((status) =>
+            [OrderStatusText.Open, OrderStatusText.Closed].includes(status.status)
+          );
+          candidateStatusesData = candidateStatuses.filter((status) =>
+            [
+              CandidatStatus['Not Applied'],
+              CandidatStatus.Applied,
+              CandidatStatus.Offered,
+              CandidatStatus.Accepted,
+              CandidatStatus.OnBoard,
+              CandidatStatus.Rejected,
+            ].includes(status.status)
+          );
         } else {
           statuses = orderStatuses;
           candidateStatusesData = candidateStatuses;
@@ -158,7 +171,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   static generateFiltersForm(): FormGroup {
     return new FormGroup({
       orderId: new FormControl(null),
-      reOrderId: new FormControl(null),
+      reOrderFromId: new FormControl(null),
       organizationIds: new FormControl([]),
       regionIds: new FormControl([]),
       locationIds: new FormControl([]),
@@ -182,7 +195,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   static generateFilterColumns(): any {
     return {
       orderId: { type: ControlTypes.Text, valueType: ValueType.Text },
-      reOrderId: { type: ControlTypes.Text, valueType: ValueType.Text },
+      reOrderFromId: { type: ControlTypes.Text, valueType: ValueType.Text },
       organizationIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
@@ -251,4 +264,3 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     };
   }
 }
-

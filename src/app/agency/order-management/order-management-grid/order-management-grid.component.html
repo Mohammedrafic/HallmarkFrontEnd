@@ -15,7 +15,7 @@
   [textWrapSettings]="wrapSettings"
   [enableVirtualization]="true"
   (rowSelected)="onRowClick($event)"
-  (rowDeselected)="rowDeselected($event, gridWithChildRow)"
+  (rowDeselected)="onRowDeselect($event, gridWithChildRow)"
   (dataBound)="onDataBound()"
   (actionBegin)="actionBegin($event)"
   (created)="onGridCreated()"
@@ -33,12 +33,12 @@
               <span><img src="assets/icons/menu-collapse.svg" alt="coll" class="icon c"></span>
             </button>
           </ng-template>
-          <button ejs-button cssClass="e-flat icon-button" *ngIf="isRowScaleUp; else onRowScaleDown">
-            <span><i-feather name="menu" class="icon" (click)="onRowScaleUpClick()"></i-feather></span>
+          <button ejs-button cssClass="e-flat icon-button" *ngIf="isRowScaleUp; else onRowScaleDown" (click)="onRowScaleUpClick()">
+            <span><i-feather name="menu" class="icon"></i-feather></span>
           </button>
           <ng-template #onRowScaleDown>
-            <button ejs-button cssClass="e-flat icon-button">
-              <span><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
+            <button ejs-button cssClass="e-flat icon-button" (click)="onRowScaleDownClick()">
+              <span><i-feather name="align-justify" class="icon"></i-feather></span>
             </button>
           </ng-template>
         </div>
@@ -56,7 +56,7 @@
     </e-column>
     <e-column field="orderId" headerText="ORDER ID" width="142">
       <ng-template #template let-data>
-        <ng-container *ngIf="!data.children?.length; else withToggle">
+        <ng-container *ngIf="showReOrders ? !data.reOrders?.length : !data.children?.length; else withToggle">
           <div>
             <b>{{ data.orderId }}</b>
           </div>
@@ -70,18 +70,17 @@
         </ng-template>
       </ng-template>
     </e-column>
-    <e-column field="reOrderId" headerText="RE-ORDER ID" width="140" [visible]="false">
-      <!-- TODO: verify after BE implementation -->
+    <e-column field="reOrderFromId" headerText="RE-ORDER ID" width="140" [visible]="false">
       <ng-template #template let-data>
         <ng-container *ngIf="!data.children?.length; else withToggle">
           <div>
-            <b>{{ data.reOrderId }}</b>
+            <b>{{ data.reOrderFromId }}</b>
           </div>
         </ng-container>
 
         <ng-template #withToggle>
           <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-            <b>{{ data.reOrderId }}</b>
+            <b>{{ data.reOrderFromId }}</b>
             <i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
           </div>
         </ng-template>
@@ -144,51 +143,55 @@
         <span>{{ data.shiftStartTime }}-{{ data.shiftEndTime }}</span>
       </ng-template>
     </e-column>
-    <e-column field="agencyName" headerText="AGENCY" width="150" [visible]="false">
+    <e-column field="agencies" headerText="AGENCY" width="150" [visible]="false">
       <!-- TODO: verify after BE implementation -->
       <ng-template #template let-data>
-        <ng-container *ngIf="!data.agencyName?.length">
+        <ng-container *ngIf="!data.agencies?.length">
           <span>All</span>
         </ng-container>
 
-        <ng-container *ngIf="data.agencyName?.length === 2">
-            <span *ngFor="let agency of data.agencyName; let i = index" class="agency-name">
+        <ng-container *ngIf="data.agencies?.length === 2">
+            <span *ngFor="let agency of data.agencies; let i = index" class="agency-name">
               {{ agency }}
-              <span class="agency-name" *ngIf="i !== data.agencyName.length - 1">, </span>
+              <span class="agency-name" *ngIf="i !== data.agencies.length - 1">, </span>
             </span>
         </ng-container>
 
-        <ng-container *ngIf="data.agencyName?.length >= 3 && data.agencyName?.length <= 5">
+        <ng-container *ngIf="data.agencies?.length >= 3 && data.agencies?.length <= 5">
           <ejs-tooltip
-            content="{{ data.agencyName.length }}"
+            content="{{ data.agencies.length }}"
             target="#agencyName"
           >
             <span id="agencyName" class="agency-name">Multiple Agencies</span>
           </ejs-tooltip>
         </ng-container>
 
-        <ng-container *ngIf="data.agencyName?.length > 5">
+        <ng-container *ngIf="data.agencies?.length > 5">
           <span id="agencyName" class="agency-name">Multiple Agencies</span>
         </ng-container>
       </ng-template>
     </e-column>
-    <e-column field="shiftCount" headerText="# of Shifts Next 90 Days " width="150" [visible]="false">
-      <!-- TODO: Pending BE -->
-      <ng-template #template let-data>
-        -
-      </ng-template>
-    </e-column>
+    <e-column field="shiftsNext90Days" headerText="# of Shifts Next 90 Days " width="150" [visible]="false"></e-column>
   </e-columns>
 
   <ng-template #detailTemplate let-data>
-    <div class="subrow-wrapper">
+    <div class="subrow-wrapper" *ngIf="!showReOrders">
       <app-grid-subrow-candidate
         *ngFor="let child of data.children"
         [candidat]="child"
         [order]="data"
-        [selected]="selectedCandidat?.selected.order === data.orderId && selectedCandidat?.selected.positionId === child.positionId"
+        [selected]="selectedCandidate?.selected.order === data.orderId && selectedCandidate?.selected.positionId === child.positionId"
         (clickEvent)="onOpenCandidateDialog($event, data)"
       ></app-grid-subrow-candidate>
+    </div>
+    <div class="subrow-wrapper" *ngIf="showReOrders">
+      <app-grid-subrow-reorder
+        *ngFor="let child of data.reOrders"
+        [reOrder]="child"
+        [order]="data"
+        [selected]="selectedReOrder?.selected.order === data.orderId && selectedReOrder?.selected.reOrder === child.orderId"
+        (clickEvent)="onOpenReorderDialog($event, data)"
+      ></app-grid-subrow-reorder>
     </div>
   </ng-template>
 
@@ -254,7 +257,7 @@
 
 <app-candidat-dialog [openEvent]="openCandidat"></app-candidat-dialog>
 
-<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>
+<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidate"  [openEvent]="openChildDialog"></app-child-order-dialog>
 
 <app-filter-dialog
   [items]="filteredItems"

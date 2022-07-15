@@ -1,5 +1,5 @@
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { AcceptJobDTO, CreateOrderDto, EditOrderDto, OrderManagementFilter } from '@shared/models/order-management.model';
+import {AcceptJobDTO, CreateOrderDto, EditOrderDto, OrderFilter, OrderManagementFilter} from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { RejectReasonPayload } from "@shared/models/reject-reason.model";
 import { ExportPayload } from '@shared/models/export.model';
@@ -15,9 +15,19 @@ export class GetOrders {
   constructor(public payload: OrderManagementFilter | object) { }
 }
 
+export class ClearOrders {
+  static readonly type = '[order management] Clear Orders';
+  constructor() { }
+}
+
 export class GetOrderById {
   static readonly type = '[order management] Get Order By Id';
   constructor(public id: number, public organizationId: number, public options: DialogNextPreviousOption) {}
+}
+
+export class SetLock {
+  static readonly type = '[order management] Set Lock';
+  constructor(public id: number, public lockStatus: boolean, public filters: OrderFilter = {}, public updateOpened = false) { }
 }
 
 export class GetAgencyOrderCandidatesList {
@@ -181,7 +191,7 @@ export class ApproveOrder {
   }
 }
 
-export class GetOrderFIlterDataSources {
+export class GetOrderFilterDataSources {
   static readonly type = '[order management] Get Order Filter Data Sources';
   constructor() {
   }
@@ -196,4 +206,9 @@ export class GetHistoricalData {
 export class ExportOrders {
   static readonly type = '[order management] Export Organization list';
   constructor(public payload: ExportPayload, public tab: OrganizationOrderManagementTabs) { }
+}
+
+export class ClearSuggestions {
+  static readonly type = '[order management] Clear Suggestions';
+  constructor() { }
 }

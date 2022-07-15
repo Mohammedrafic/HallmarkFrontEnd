@@ -73,6 +73,10 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
     return this.agencyForm.get('agencyPaymentDetails') as FormArray;
   }
 
+  get isAddMode(): boolean {
+    return this.title === 'Add'
+  }
+
   get billingControl(): AbstractControl | null {
     return this.agencyForm.get('agencyBillingDetails');
   }
@@ -80,7 +84,7 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   get isSeccondStepActive(): boolean {
     return this.tab?.selectedItem === 1;
   }
-  
+
   @Select(AgencyState.isAgencyCreated)
   public isAgencyCreated$: Observable<boolean>;
 

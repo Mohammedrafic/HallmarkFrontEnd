@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CurrentUserPermission } from "@shared/models/permission.model";
 import { Observable } from 'rxjs';
-import { UsersAssignedToRole, UsersPage } from 'src/app/shared/models/user.model';
+import { User, UsersAssignedToRole, UsersPage } from 'src/app/shared/models/user.model';
 import { BusinessUnitType } from '../enums/business-unit-type';
 import { Menu } from '../models/menu.model';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
@@ -17,6 +17,13 @@ export class UserService {
    */
   public getUsers(pageNumber: number, pageSize: number): Observable<UsersPage> {
     return this.http.get<UsersPage>(`/api/users`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
+  }
+
+  /**
+   * Get user
+   */
+  public getUser(): Observable<User> {
+    return this.http.get<User>(`/api/user`);
   }
 
   /**

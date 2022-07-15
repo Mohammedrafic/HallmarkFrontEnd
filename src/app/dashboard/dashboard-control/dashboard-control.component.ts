@@ -2,9 +2,8 @@ import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from 
 import { Router } from '@angular/router';
 
 import { Store, Actions, ofActionDispatched, Select } from '@ngxs/store';
-import { Observable, map, distinctUntilChanged } from 'rxjs';
-
 import { FilteredItem } from '@shared/models/filter.model';
+import { Observable, map, distinctUntilChanged } from 'rxjs';
 import { ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import { WidgetOptionModel } from '../models/widget-option.model';

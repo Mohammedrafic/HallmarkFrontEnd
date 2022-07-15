@@ -1,3 +1,4 @@
+import { FilteredItem } from '@shared/models/filter.model';
 import type { PanelModel } from '@syncfusion/ej2-angular-layouts';
 
 const dashboardStatePrefix: string = '[dashboard]';
@@ -27,5 +28,5 @@ export class IsMobile {
 
 export class SetFilteredItems {
   static readonly type = `${dashboardStatePrefix} Set Filtered Items`;
-  constructor(public payload: any) {}
+  constructor(public payload: FilteredItem[]) {}
 }

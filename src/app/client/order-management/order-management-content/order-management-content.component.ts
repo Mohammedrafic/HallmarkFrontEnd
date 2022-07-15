@@ -10,6 +10,7 @@ import { CandidatesStatusText, OrderStatusText, STATUS_COLOR_GROUP } from 'src/a
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import {
   ApproveOrder,
+  ClearOrders,
   ClearSelectedOrder,
   DeleteOrder,
   DeleteOrderSucceeded,
@@ -17,12 +18,20 @@ import {
   GetAgencyOrderCandidatesList,
   GetIncompleteOrders,
   GetOrderById,
-  GetOrderFIlterDataSources,
+  GetOrderFilterDataSources,
   GetOrders,
-  ReloadOrganisationOrderCandidatesLists
+  ReloadOrganisationOrderCandidatesLists,
+  SetLock,
 } from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { OrderManagementChild, Order, OrderFilter, OrderManagement, OrderManagementPage, OrderFilterDataSource } from '@shared/models/order-management.model';
+import {
+  OrderManagementChild,
+  Order,
+  OrderFilter,
+  OrderManagement,
+  OrderManagementPage,
+  OrderFilterDataSource,
+} from '@shared/models/order-management.model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { UserState } from '../../../store/user.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
@@ -48,12 +57,14 @@ import {
   perDiemColumnsToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
-  ROW_HEIGHT
+  reOrdersChildColumnToExport,
+  ROW_HEIGHT,
 } from './order-management-content.constants';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { SearchComponent } from '@shared/components/search/search.component';
+import { OrderStatus } from '@shared/enums/order-management';
 
 @Component({
   selector: 'app-order-management-content',
@@ -87,34 +98,30 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
   public isLockMenuButtonsShown = true;
+  public showReOrders = false;
   public moreMenuWithDeleteButton: ItemModel[] = [
     { text: MoreMenuType[0], id: '0' },
     { text: MoreMenuType[1], id: '1' },
-    { text: MoreMenuType[3], id: '3' }
+    { text: MoreMenuType[3], id: '3' },
   ];
   public moreMenuWithCloseButton: ItemModel[] = [
     { text: MoreMenuType[0], id: '0' },
     { text: MoreMenuType[1], id: '1' },
-    { text: MoreMenuType[2], id: '2' }
+    { text: MoreMenuType[2], id: '2' },
   ];
 
-  private openInProgressFilledStatuses = [
-    'open',
-    'in progress',
-    'filled',
-    'custom step'
-  ];
+  private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   public optionFields = {
     text: 'name',
     value: 'id',
   };
   public skillsFields = {
     text: 'skillDescription',
-    value: 'id'
+    value: 'id',
   };
   public statusFields = {
     text: 'statusText',
-    value: 'status'
+    value: 'status',
   };
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -124,18 +131,26 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public selectedOrder: Order;
   public openDetails = new Subject<boolean>();
-  public selectionOptions: SelectionSettingsModel = { type: 'Single', mode: 'Row', checkboxMode: 'ResetOnRowClick', persistSelection: true };
+  public selectionOptions: SelectionSettingsModel = {
+    type: 'Single',
+    mode: 'Row',
+    checkboxMode: 'ResetOnRowClick',
+    persistSelection: true,
+  };
   public OrderFilterFormGroup: FormGroup;
   public filters: OrderFilter = {};
   public filterColumns: any;
   public orgStructure: OrganizationStructure;
   public regions: OrganizationRegion[] = [];
   public previousSelectedOrderId: number | null;
-  public selectedCandidat: any | null;
+  public selectedCandidate: any | null;
+  public selectedReOrder: any | null;
   public openChildDialog = new Subject<any>();
   public isRowScaleUp: boolean = true;
   public isSubrowDisplay: boolean = false;
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
+  public orderStatus = OrderStatus;
+  public reOrderCount$ = new Subject<number>();
 
   private selectedIndex: number | null;
   private ordersPage: OrderManagementPage;
@@ -145,20 +160,22 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public fileName: string;
   public defaultFileName: string;
 
-  constructor(private store: Store,
-              private router: Router,
-              private route: ActivatedRoute,
-              private actions$: Actions,
-              private confirmService: ConfirmService,
-              private filterService: FilterService,
-              private fb: FormBuilder,
-              private datePipe: DatePipe,
-              private location: Location) {
+  constructor(
+    private store: Store,
+    private router: Router,
+    private route: ActivatedRoute,
+    private actions$: Actions,
+    private confirmService: ConfirmService,
+    private filterService: FilterService,
+    private fb: FormBuilder,
+    private datePipe: DatePipe,
+    private location: Location
+  ) {
     super();
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.fb.group({
       orderId: new FormControl(null),
-      reOrderId: new FormControl(null),
+      reOrderFromId: new FormControl(null),
       regionIds: new FormControl([]),
       locationIds: new FormControl([]),
       departmentsIds: new FormControl([]),
@@ -228,13 +245,22 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.defaultFileName = `Organization Management/${this.activeTab} ` + this.generateDateTime(this.datePipe);
-    this.store.dispatch(new ExportOrders(new ExportPayload(
-      fileType,
-      { ...this.filters, ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null },
-      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
-      null,
-      options?.fileName || this.defaultFileName
-    ), this.activeTab));
+    this.store.dispatch(
+      new ExportOrders(
+        new ExportPayload(
+          fileType,
+          {
+            ...this.filters,
+            isAgency: this.activeTab === OrganizationOrderManagementTabs.ReOrders ? false : null,
+            ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
+          },
+          options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
+          null,
+          options?.fileName || this.defaultFileName
+        ),
+        this.activeTab
+      )
+    );
     this.clearSelection(this.gridWithChildRow);
   }
 
@@ -256,7 +282,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private getOrders(): void {
     //this.filters.orderBy = this.orderBy; TODO: pending ordering fix on BE
     this.filters.orderId ? this.filters.orderId : null;
-    this.filters.reOrderId = this.filters.reOrderId ? this.filters.reOrderId : undefined;
+    this.filters.reOrderFromId = this.filters.reOrderFromId ? this.filters.reOrderFromId : undefined;
     this.filters.jobStartDate ? this.filters.jobStartDate : null;
     this.filters.jobEndDate ? this.filters.jobEndDate : null;
     this.filters.reOrderDate = this.filters.reOrderDate ? this.filters.reOrderDate : undefined;
@@ -269,18 +295,19 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
         this.columnsToExport = allOrdersColumnsToExport;
-        this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
+        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.PerDiem:
         // TODO: perdiem
         this.filters.orderTypes = [OrderType.OpenPerDiem];
+        this.filters.includeReOrders = true;
         this.columnsToExport = perDiemColumnsToExport;
-        this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
+        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.ReOrders:
         this.filters.orderTypes = [OrderType.ReOrder];
         this.columnsToExport = reOrdersColumnsToExport;
-        this.store.dispatch([new GetOrders(this.filters), new GetOrderFIlterDataSources()]);
+        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.Incomplete:
         this.columnsToExport = allOrdersColumnsToExport;
@@ -292,13 +319,16 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public onFilterClose() {
     this.OrderFilterFormGroup.setValue({
       orderId: this.filters.orderId || null,
-      reOrderId: this.filters.reOrderId || null,
+      reOrderFromId: this.filters.reOrderFromId || null,
       regionIds: this.filters.regionIds || [],
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
       skillIds: this.filters.skillIds || [],
-      orderTypes: this.activeTab === OrganizationOrderManagementTabs.PerDiem
-        || this.activeTab === OrganizationOrderManagementTabs.ReOrders ? [] : this.filters.orderTypes || [],
+      orderTypes:
+        this.activeTab === OrganizationOrderManagementTabs.PerDiem ||
+        this.activeTab === OrganizationOrderManagementTabs.ReOrders
+          ? []
+          : this.filters.orderTypes || [],
       jobTitle: this.filters.jobTitle || null,
       billRateFrom: this.filters.billRateFrom || null,
       billRateTo: this.filters.billRateTo || null,
@@ -332,6 +362,16 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.search?.clear();
   }
 
+  private checkSelectedChildrenItem(): void {
+    const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children.length !== 0);
+
+    if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
+      this.columnsToExport = hasSelectedItemChildren
+        ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
+        : reOrdersColumnsToExport;
+    }
+  }
+
   public onFilterClearAll(): void {
     this.clearFilters();
     this.getOrders();
@@ -361,12 +401,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       this.gridWithChildRow.selectRow(this.selectedIndex);
     }
 
-    if (this.selectedCandidat) {
+    if (this.selectedCandidate) {
       const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
         this.selectedDataRow.id
       );
-      const updatedCandidat = data?.children.find((child) => child.candidateId === this.selectedCandidat.candidateId);
-      this.selectedCandidat = updatedCandidat;
+      const updatedCandidate = data?.children.find((child) => child.candidateId === this.selectedCandidate.candidateId);
+      this.selectedCandidate = updatedCandidate;
     }
   }
 
@@ -384,16 +424,23 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       const options = this.getDialogNextPreviousOption(data);
       this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
       this.store.dispatch(new GetAgencyOrderCandidatesList(data.id, data.organizationId, this.currentPage, this.pageSize));
-      this.selectedCandidat = null;
+      this.selectedCandidate = this.selectedReOrder = null;
       this.openChildDialog.next(false);
       this.openDetails.next(true);
     }
+
+    this.checkSelectedChildrenItem();
+  }
+
+  public onRowDeselect(event: any, grid: any) {
+    this.rowDeselected(event, grid);
+    this.checkSelectedChildrenItem();
   }
 
   private onChildDialogChange(): void {
     this.openChildDialog.pipe(takeUntil(this.unsubscribe$)).subscribe((isOpen) => {
       if (!isOpen) {
-        this.selectedCandidat = null;
+        this.selectedCandidate = this.selectedReOrder = null;
       } else {
         this.openDetails.next(false);
         this.gridWithChildRow?.clearRowSelection();
@@ -419,17 +466,19 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public onRowScaleUpClick(): void {
     this.isRowScaleUp = false;
     this.rowHeight = ROW_HEIGHT.SCALE_UP_HEIGHT;
+    this.isSubrowDisplay = false;
   }
 
   public onRowScaleDownClick(): void {
     this.isRowScaleUp = true;
     this.rowHeight = ROW_HEIGHT.SCALE_DOWN_HEIGHT;
+    this.isSubrowDisplay = false;
   }
 
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
       this.pageSubject.next(event.currentPage || event.value);
-      this.isSubrowDisplay = false
+      this.isSubrowDisplay = false;
     }
   }
 
@@ -449,27 +498,34 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.activeTab = tabIndex;
     this.currentPage = 1;
     this.filters = {};
+    this.filteredItems = [];
     this.search?.clear();
+    this.store.dispatch(new ClearOrders());
 
     switch (tabIndex) {
       case OrganizationOrderManagementTabs.AllOrders:
+        this.showReOrders = false;
         this.isLockMenuButtonsShown = true;
         this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
         this.getOrders();
         break;
       case OrganizationOrderManagementTabs.PerDiem:
+        this.showReOrders = true;
         this.isLockMenuButtonsShown = true;
         this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
         this.getOrders();
         break;
       case OrganizationOrderManagementTabs.ReOrders:
+        this.showReOrders = false;
         this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
         this.getOrders();
         break;
       case OrganizationOrderManagementTabs.OrderTemplates:
+        this.showReOrders = false;
         // TODO: pending implementation
         break;
       case OrganizationOrderManagementTabs.Incomplete:
+        this.showReOrders = false;
         this.isLockMenuButtonsShown = false;
         this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
         this.store.dispatch(new GetIncompleteOrders({}));
@@ -481,30 +537,42 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     return OrderTypeName[OrderType[orderType] as OrderTypeName];
   }
 
-  public onOpenCandidateDialog(candidat: OrderManagementChild, order: OrderManagement): void {
-    this.selectedCandidat = candidat;
-    this.selectedCandidat.selected = {
+  public onOpenReorderDialog(reOrder: OrderManagement, order: OrderManagement): void {
+    this.selectedReOrder = reOrder;
+    this.selectedReOrder.selected = {
       order: order.id,
-      positionId: candidat.positionId
+      reOrder: reOrder.id
     };
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
     this.selectedDataRow = order as any;
-    this.openChildDialog.next([order, candidat]);
+    //this.openChildDialog.next([order, candidate]); TODO: pending reorder modal
+  }
+
+  public onOpenCandidateDialog(candidate: OrderManagementChild, order: OrderManagement): void {
+    this.selectedCandidate = candidate;
+    this.selectedCandidate.selected = {
+      order: order.id,
+      positionId: candidate.positionId
+    };
+    const options = this.getDialogNextPreviousOption(order);
+    this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
+    this.selectedDataRow = order as any;
+    this.openChildDialog.next([order, candidate]);
   }
 
   private deleteOrder(id: number): void {
     this.confirmService
-    .confirm(DELETE_RECORD_TEXT, {
-      title: DELETE_RECORD_TITLE,
-      okButtonLabel: 'Delete',
-      okButtonClass: 'delete-button'
-    })
-    .subscribe((confirm) => {
-      if (confirm) {
-        this.store.dispatch(new DeleteOrder(id));
-      }
-    });
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button',
+      })
+      .subscribe((confirm) => {
+        if (confirm) {
+          this.store.dispatch(new DeleteOrder(id));
+        }
+      });
   }
 
   public menuOptionSelected(event: any, data: OrderManagement): void {
@@ -525,45 +593,55 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public expandAll(): void {
-    this.isSubrowDisplay = true
+    this.isSubrowDisplay = true;
     this.ordersPage.items.forEach((item: OrderManagement, index: number): void => {
-      super.onSubrowAllToggle(index + 1)
-    })
-  }
-
-  public collapseAll(): void {
-    this.isSubrowDisplay = false
-    super.onSubrowAllToggle()
-  }
-
-  private onReloadOrderCandidatesLists(): void {
-    this.actions$.pipe(
-      ofActionSuccessful(ReloadOrganisationOrderCandidatesLists),
-      takeUntil(this.unsubscribe$)
-    ).subscribe(() => {
-      this.store.dispatch(new GetAgencyOrderCandidatesList(this.selectedDataRow.id, this.selectedDataRow.organizationId as number, this.currentPage, this.pageSize));
-      this.getOrders();
-      this.store.dispatch(new GetOrderById(this.selectedDataRow.id, this.selectedDataRow.organizationId as number, this.getDialogNextPreviousOption(this.selectedDataRow as any)));
+      super.onSubrowAllToggle(index + 1);
     });
   }
 
-  private onOrganizationChangedHandler(): void {
-    this.organizationId$
-      .pipe(takeUntil(this.unsubscribe$))
+  public collapseAll(): void {
+    this.isSubrowDisplay = false;
+    super.onSubrowAllToggle();
+  }
+
+  private onReloadOrderCandidatesLists(): void {
+    this.actions$
+      .pipe(ofActionSuccessful(ReloadOrganisationOrderCandidatesLists), takeUntil(this.unsubscribe$))
       .subscribe(() => {
-        this.clearFilters();
-        if (!this.previousSelectedOrderId) {
-          this.getOrders();
-        }
-        this.store.dispatch(new GetAllOrganizationSkills());
+        this.store.dispatch(
+          new GetAgencyOrderCandidatesList(
+            this.selectedDataRow.id,
+            this.selectedDataRow.organizationId as number,
+            this.currentPage,
+            this.pageSize
+          )
+        );
+        this.getOrders();
+        this.store.dispatch(
+          new GetOrderById(
+            this.selectedDataRow.id,
+            this.selectedDataRow.organizationId as number,
+            this.getDialogNextPreviousOption(this.selectedDataRow as any)
+          )
+        );
       });
   }
 
+  private onOrganizationChangedHandler(): void {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.clearFilters();
+      if (!this.previousSelectedOrderId) {
+        this.getOrders();
+      }
+      this.store.dispatch(new GetAllOrganizationSkills());
+    });
+  }
+
   private onOrdersDataLoadHandler(): void {
-    this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
-      this.ordersPage = data
+    this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      this.ordersPage = data;
       if (data && data.items) {
-        data.items.forEach(item => {
+        data.items.forEach((item) => {
           item.isMoreMenuWithDeleteButton = !this.openInProgressFilledStatuses.includes(item.statusText.toLowerCase());
           if (item.children && item.children.length) {
             item.children.sort((a, b) => a.positionId - b.positionId);
@@ -583,12 +661,42 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private orderFilterColumnsSetup(): void {
     this.filterColumns = {
       orderId: { type: ControlTypes.Text, valueType: ValueType.Text },
-      reOrderId: { type: ControlTypes.Text, valueType: ValueType.Text },
-      regionIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      departmentsIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      skillIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'skillDescription', valueId: 'id' },
-      orderTypes: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: OrderTypeOptions, valueField: 'name', valueId: 'id' },
+      reOrderFromId: { type: ControlTypes.Text, valueType: ValueType.Text },
+      regionIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      locationIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      departmentsIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      skillIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'skillDescription',
+        valueId: 'id',
+      },
+      orderTypes: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: OrderTypeOptions,
+        valueField: 'name',
+        valueId: 'id',
+      },
       jobTitle: { type: ControlTypes.Text, valueType: ValueType.Text },
       billRateFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
       billRateTo: { type: ControlTypes.Text, valueType: ValueType.Text },
@@ -596,49 +704,84 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       jobStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       jobEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       reOrderDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      orderStatuses: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'statusText', valueId: 'status' },
-      candidateStatuses: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'statusText', valueId: 'status' },
+      orderStatuses: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'statusText',
+        valueId: 'status',
+      },
+      candidateStatuses: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'statusText',
+        valueId: 'status',
+      },
       candidatesCountFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
       candidatesCountTo: { type: ControlTypes.Text, valueType: ValueType.Text },
-      agencyIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      agencyType: { type: ControlTypes.Radio, dataSource: {1: 'Yes', 2: 'No'}, default: '0' },
-    }
+      agencyIds: {
+        type: ControlTypes.Multiselect,
+        valueType: ValueType.Id,
+        dataSource: [],
+        valueField: 'name',
+        valueId: 'id',
+      },
+      agencyType: { type: ControlTypes.Radio, dataSource: { 1: 'Yes', 2: 'No' }, default: '0' },
+    };
     this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe(() => {
       this.onFilterApply();
     });
   }
 
   private onOrderFilterDataSourcesLoadHandler(): void {
-    this.orderFilterDataSources$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data: OrderFilterDataSource) => {
-      let statuses = [];
-      let candidateStatuses = [];
-      if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
-        statuses = data.orderStatuses.filter(status => [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status));
-        candidateStatuses = data.candidateStatuses.filter(status => [CandidatesStatusText.Onboard, CandidatesStatusText.Offered].includes(status.status)) // TODO: after BE implementation also add Pending, Rejected
-      } else if (this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
-        statuses = data.orderStatuses.filter(status => [OrderStatusText.Open, OrderStatusText.Closed].includes(status.status));
-        candidateStatuses = data.candidateStatuses.filter(status => [
-          CandidatStatus['Not Applied'], CandidatStatus.Applied, CandidatStatus.Offered, CandidatStatus.Accepted, CandidatStatus.OnBoard, CandidatStatus.Rejected
-        ].includes(status.status));
-      } else {
-        statuses = data.orderStatuses;
-        candidateStatuses = data.candidateStatuses;
-      }
-      this.filterColumns.orderStatuses.dataSource = statuses;
-      this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
-      this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
-    });
+    this.orderFilterDataSources$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .subscribe((data: OrderFilterDataSource) => {
+        let statuses = [];
+        let candidateStatuses = [];
+        if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
+          statuses = data.orderStatuses.filter((status) =>
+            [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status)
+          );
+          candidateStatuses = data.candidateStatuses.filter((status) =>
+            [CandidatesStatusText.Onboard, CandidatesStatusText.Offered].includes(status.status)
+          ); // TODO: after BE implementation also add Pending, Rejected
+        } else if (this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
+          statuses = data.orderStatuses.filter((status) =>
+            [OrderStatusText.Open, OrderStatusText.Closed].includes(status.status)
+          );
+          candidateStatuses = data.candidateStatuses.filter((status) =>
+            [
+              CandidatStatus['Not Applied'],
+              CandidatStatus.Applied,
+              CandidatStatus.Offered,
+              CandidatStatus.Accepted,
+              CandidatStatus.OnBoard,
+              CandidatStatus.Rejected,
+            ].includes(status.status)
+          );
+        } else {
+          statuses = data.orderStatuses;
+          candidateStatuses = data.candidateStatuses;
+        }
+        this.filterColumns.orderStatuses.dataSource = statuses;
+        this.filterColumns.agencyIds.dataSource = data.partneredAgencies;
+        this.filterColumns.candidateStatuses.dataSource = candidateStatuses;
+      });
   }
 
   private onOrderFilterControlValueChangedHandler(): void {
     this.OrderFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = [];
-        val.forEach(id => selectedRegions.push(this.regions.find(region => region.id === id) as OrganizationRegion));
+        val.forEach((id) =>
+          selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
+        );
         this.filterColumns.locationIds.dataSource = [];
-        selectedRegions.forEach(region => {
-          region.locations?.forEach(location => location.regionName = region.name);
-          this.filterColumns.locationIds.dataSource.push(...region.locations as [])
+        selectedRegions.forEach((region) => {
+          region.locations?.forEach((location) => (location.regionName = region.name));
+          this.filterColumns.locationIds.dataSource.push(...(region.locations as []));
         });
       } else {
         this.filterColumns.locationIds.dataSource = [];
@@ -649,10 +792,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.OrderFilterFormGroup.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
         const selectedLocations: OrganizationLocation[] = [];
-        val.forEach(id => selectedLocations.push(this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)));
+        val.forEach((id) =>
+          selectedLocations.push(
+            this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id)
+          )
+        );
         this.filterColumns.departmentsIds.dataSource = [];
-        selectedLocations.forEach(location => {
-          this.filterColumns.departmentsIds.dataSource.push(...location.departments as [])
+        selectedLocations.forEach((location) => {
+          this.filterColumns.departmentsIds.dataSource.push(...(location.departments as []));
         });
       } else {
         this.filterColumns.departmentsIds.dataSource = [];
@@ -677,7 +824,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private onSkillDataLoadHandler(): void {
-    this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe(skills => {
+    this.skills$.pipe(takeUntil(this.unsubscribe$)).subscribe((skills) => {
       if (skills && skills.length > 0) {
         this.filterColumns.skillIds.dataSource = skills;
       }
@@ -685,11 +832,13 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private onOrganizationStructureDataLoadHandler(): void {
-    this.organizationStructure$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((structure: OrganizationStructure) => {
-      this.orgStructure = structure;
-      this.regions = structure.regions;
-      this.filterColumns.regionIds.dataSource = this.regions;
-    });
+    this.organizationStructure$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .subscribe((structure: OrganizationStructure) => {
+        this.orgStructure = structure;
+        this.regions = structure.regions;
+        this.filterColumns.regionIds.dataSource = this.regions;
+      });
   }
 
   private onApproveOrderHandler(): void {
@@ -706,5 +855,15 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       this.getOrders();
       this.openDetails.next(false);
     });
+  }
+
+  public lockOrder(order: Order): void {
+    this.store.dispatch(new SetLock(order.id, !order.isLocked, this.filters));
+  }
+
+  disabledLock(status: OrderStatus): boolean {
+    const statuses = [this.orderStatus.Open, this.orderStatus.InProgress, this.orderStatus.Filled];
+
+    return !statuses.includes(status);
   }
 }

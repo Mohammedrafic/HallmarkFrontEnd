@@ -1,0 +1,44 @@
+<div class="reorder-row"  [ngClass]="{'selected': selected}" (click)="clickEvent.emit(reOrder)">
+  <div class="info">
+    <div class="data">{{ reOrder.id }}</div>
+    <div class="title">Re-Order ID</div>
+  </div>
+  <div class="info status">
+    <ejs-chiplist>
+      <e-chips>
+        <e-chip [text]="orderStatusText[reOrder.status]" [cssClass]="orderStatusText[reOrder.status] | chipsCssClass"></e-chip>
+      </e-chips>
+    </ejs-chiplist>
+  </div>
+  <div class="info">
+    <div class="data">{{reOrder.positions}} / {{reOrder.openPositions}}</div>
+    <div class="title">Open Positions</div>
+  </div>
+  <div class="info">
+    <ejs-tooltip
+      *ngIf="tooltip"
+      [content]="tooltip"
+      target="#agencyLabel"
+    >
+      <div id="agencyLabel" class="data">{{agencyLabel}}</div>
+    </ejs-tooltip>
+    <div *ngIf="!tooltip" class="data">{{agencyLabel}}</div>
+    <div class="title">Agency Name</div>
+  </div>
+  <div class="info">
+    <div class="data"> {{order.billRate | billRate: reOrder.billRate: reOrder.status: reOrder.billRate}}</div>
+    <div class="title">Bill Rate $</div>
+  </div>
+  <div class="info">
+    <div class="data">{{reOrder.reOrderDate | date: 'MM/dd/yyy'}}</div>
+    <div class="title">Re-Order Date</div>
+  </div>
+  <div class="info">
+    <div class="data">{{reOrder.shiftStartTime | date: 'HH:mm'}}-{{reOrder.shiftEndTime | date: 'HH:mm'}}</div>
+    <div class="title">Re-Order Shift</div>
+  </div>
+  <div class="info">
+    <div class="data">{{reOrder.candidates}}</div>
+    <div class="title">Candidates</div>
+  </div>
+</div>

@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
@@ -8,8 +8,9 @@ import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-
   styleUrls: ['./tab-navigation.component.scss'],
 })
 export class TabNavigationComponent {
+  @ViewChild('tabNavigation') tabNavigation: TabComponent;
+
   @Input() incompleteCount: number;
-  @Input() reOrdersCount: number;
   @Output() selectedTab = new EventEmitter<OrganizationOrderManagementTabs>();
 
   public tabTitle = OrganizationOrderManagementTabs;

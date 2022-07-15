@@ -1,5 +1,7 @@
-<section class="job-details">
-  <app-general-order-info *ngIf="order" [orderInformation]="order"></app-general-order-info>
+<section class="job-details" *ngIf="order">
+  <app-general-order-info *ngIf="order.orderType !== orderType.OpenPerDiem" [orderInformation]="order"></app-general-order-info>
+  <app-general-order-per-diem-info *ngIf="order.orderType === orderType.OpenPerDiem" [orderInformation]="order"></app-general-order-per-diem-info>
 </section>
 <div class="separator"></div>
+dsd
 <app-order-details [currentOrder]="order"></app-order-details>

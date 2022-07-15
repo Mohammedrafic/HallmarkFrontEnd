@@ -52,8 +52,15 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="skill" headerText="Skill" textAlign="Left" width="230">
+      <e-column field="skill" headerText="Skill" textAlign="Left" width="230" *ngIf="isAgency; else agencyColumn">
         </e-column>
+      <ng-template #agencyColumn>
+        <e-column field="agency" textAlign="Left" headerText="Agency" width="200" *ngIf="!isAgency">
+          <ng-template #template let-data>
+            {{data.agencyName}}
+          </ng-template>
+        </e-column>
+      </ng-template>
       <e-column field="hourlyBillRate" textAlign="Right" headerText="Bill Rate &dollar;" width="200">
         <ng-template #template let-data>
           <div class="align-right">
@@ -156,6 +163,7 @@
                          [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
                          [candidate]="candidate"
                          [isAgency]="isAgency"
+                         [isLocked]="(selectedOrder$ | async)?.isLocked"
     >
     </app-apply-candidate>
   </ng-template>

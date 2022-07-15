@@ -11,7 +11,7 @@ import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-stat
 
 export class OrderManagement {
   id: number;
-  reOrderId?: number; // TODO: verify name after BE implementation
+  reOrderFromId?: number;
   organizationId: number;
   status: number;
   statusText: string;
@@ -22,9 +22,8 @@ export class OrderManagement {
   locationName: string;
   departmentId: number;
   departmentName: string;
-  agencyName?: string[]; // TODO: verify name after BE implementation
-  shiftStartTime?: string; // TODO: verify name after BE implementation
-  shiftEndTime?: string; // TODO: verify name after BE implementation
+  shiftStartTime?: string;
+  shiftEndTime?: string;
   shift?: string; // used only in UI to group and show shiftStartTime - shiftEndTime range
   skillId: number;
   skillName: string;
@@ -33,10 +32,16 @@ export class OrderManagement {
   openPositions: number;
   candidates: number;
   startDate: string;
-  reOrderDate?: string; // TODO: verify name after BE implementation
+  reOrderDate?: string;
   isLocked?: boolean;
+  reOrderCount?: number;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
   children: OrderManagementChild[];
+  reOrders?: OrderManagement[];
+  shiftsNext90Days?: number;
+  positions?: number;
+  agencies?: string[] | null;
+  allAgencies?: boolean;
 }
 
 export class OrderManagementFilter {
@@ -55,7 +60,7 @@ export type OrderManagementPage = PageOfCollections<OrderManagement>;
 
 export type AgencyOrderManagement = {
   orderId: number;
-  reOrderId?: number; // TODO: verify name after BE implementation
+  reOrderFromId?: number;
   statusText: string;
   status: OrderStatus;
   jobTitle: string;
@@ -63,18 +68,23 @@ export type AgencyOrderManagement = {
   location: string;
   numberOfPositions: number;
   department: string;
-  agencyName?: string[]; // TODO: verify name after BE implementation
-  shiftStartTime?: string; // TODO: verify name after BE implementation
-  shiftEndTime?: string; // TODO: verify name after BE implementation
+  shiftStartTime?: string;
+  shiftEndTime?: string;
   orderType: OrderType;
   billRate: number;
   candidatesCount: number;
   isLocked: boolean;
   jobStartDate: string;
-  reOrderDate?: string; // TODO: verify name after BE implementation
+  reOrderDate?: string;
+  reOrderCount?: number;
   organizationId: number;
   organizationName: string;
   children: OrderManagementChild[];
+  reOrders?: OrderManagement[];
+  shiftsNext90Days?: number;
+  positions?: number;
+  agencies?: string[] | null;
+  allAgencies?: boolean;
 };
 
 export type OrderManagementChild = {
@@ -111,6 +121,7 @@ export type OrderCandidatesList = {
     organizationId: number;
   };
   candidateStatus?: CandidateStatus;
+  agencyName?: string;
 };
 
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;
@@ -123,11 +134,11 @@ export type AgencyOrderFilters = {
   locationIds?: number[];
   departmentsIds?: number[];
   orderId?: number;
-  reOrderId?: number; // TODO: verify name after BE implementation
+  reOrderFromId?: number;
   skillIds?: number[];
   candidateStatuses?: number[];
-  candidatesCountFrom?: number; // TODO: verify name after BE implementation
-  candidatesCountTo?: number; // TODO: verify name after BE implementation
+  candidatesCountFrom?: number;
+  candidatesCountTo?: number;
   organizationIds?: number[];
   orderTypes?: number[];
   orderStatuses?: number[];
@@ -137,7 +148,8 @@ export type AgencyOrderFilters = {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
-  reOrderDate?: Date; // TODO: verify name after BE implementation
+  reOrderDate?: Date;
+  includeReOrders?: boolean;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -191,8 +203,10 @@ export class Order {
   locationId: number;
   departmentId: number;
   skillId: number;
+  skillName?: number;
   orderType: OrderType;
   reasonForRequestId: number | null;
+  reasonForRequest?: string | null;
   poNumberId: number | null;
   projectTypeId: number | null;
   projectNameId: number | null;
@@ -340,7 +354,7 @@ export type CandidatesBasicInfo = {
   actualEndDate: string;
   clockId: string;
   guaranteedWorkWeek: string;
-}
+};
 
 export type ApplicantStatus = {
   applicantStatus: number;
@@ -355,7 +369,7 @@ export class OrderFilter {
   regionIds?: number[];
   locationIds?: number[];
   departmentsIds?: number[];
-  reOrderId?: number; // TODO: verify name after BE implementation
+  reOrderFromId?: number;
   orderId?: number;
   skillIds?: number[];
   orderTypes?: number[];
@@ -365,13 +379,14 @@ export class OrderFilter {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
-  reOrderDate?: Date; // TODO: verify name after BE implementation
+  reOrderDate?: Date;
   orderStatuses?: number[];
   candidateStatuses?: number[];
   candidatesCountFrom?: number;
   candidatesCountTo?: number;
   agencyIds?: number[];
   agencyType?: string | number | null;
+  includeReOrders?: boolean;
 }
 
 export class OrderPartnerAgency {
