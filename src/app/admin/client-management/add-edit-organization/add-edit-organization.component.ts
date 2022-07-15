@@ -25,19 +25,19 @@ import {
   SetBillingStatesByCountry,
   SetDirtyState,
   SetGeneralStatesByCountry,
-  UploadOrganizationLogo
+  UploadOrganizationLogo,
 } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
 
 @Component({
   selector: 'app-add-edit-organization',
   templateUrl: './add-edit-organization.component.html',
-  styleUrls: ['./add-edit-organization.component.scss']
+  styleUrls: ['./add-edit-organization.component.scss'],
 })
 export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   public allowExtensions: string = '.png, .jpg, .jpeg';
   public dropElement: HTMLElement;
-  public filesDetails : Blob[] = [];
+  public filesDetails: Blob[] = [];
   public filesName: string[] = [];
   public filesList: HTMLElement[] = [];
   public ContactFormArray: FormArray;
@@ -56,11 +56,13 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   public isMspUser = false;
 
   public createUnderFields = {
-    text: 'name', value: 'id'
+    text: 'name',
+    value: 'id',
   };
 
   public optionFields = {
-    text: 'text', value: 'id'
+    text: 'text',
+    value: 'id',
   };
 
   get showDataBaseControl(): boolean {
@@ -98,36 +100,39 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   dataBaseConnections$: Observable<string[]>;
 
   get isAddMode(): boolean {
-    return this.title === 'Add'
+    return this.title === 'Add';
   }
 
-  constructor(private actions$: Actions, private store: Store, private router: Router, private route: ActivatedRoute, private fb: FormBuilder) {
-    actions$.pipe(
-      takeUntil(this.unsubscribe$),
-      ofActionSuccessful(SaveOrganizationSucceeded)
-    ).subscribe((organization: { payload: Organization }) => {
-      this.currentBusinessUnitId = organization.payload.organizationId as number;
-      this.uploadImages(this.currentBusinessUnitId);
-      this.navigateBack();
-    });
-    actions$.pipe(
-      takeUntil(this.unsubscribe$),
-      ofActionSuccessful(GetOrganizationByIdSucceeded)
-    ).subscribe((organization: { payload: Organization }) => {
-      this.currentBusinessUnitId = organization.payload.organizationId as number;
-      this.initForms(organization.payload);
-      this.isSameAsOrg = organization.payload.billingDetails.sameAsOrganization;
-      if (this.isSameAsOrg) {
-        this.disableBillingForm();
-      }
-    });
-    actions$.pipe(
-      takeUntil(this.unsubscribe$),
-      ofActionSuccessful(GetOrganizationLogoSucceeded)
-    ).subscribe((logo: { payload: Blob }) => {
-      this.logo = logo.payload;
-    });
-    store.dispatch(new SetHeaderState({iconName: 'file-text', title: 'Organization List'}));
+  constructor(
+    private actions$: Actions,
+    private store: Store,
+    private router: Router,
+    private route: ActivatedRoute,
+    private fb: FormBuilder
+  ) {
+    actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveOrganizationSucceeded))
+      .subscribe((organization: { payload: Organization }) => {
+        this.currentBusinessUnitId = organization.payload.organizationId as number;
+        this.uploadImages(this.currentBusinessUnitId);
+        this.navigateBack();
+      });
+    actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetOrganizationByIdSucceeded))
+      .subscribe((organization: { payload: Organization }) => {
+        this.currentBusinessUnitId = organization.payload.organizationId as number;
+        this.initForms(organization.payload);
+        this.isSameAsOrg = organization.payload.billingDetails.sameAsOrganization;
+        if (this.isSameAsOrg) {
+          this.disableBillingForm();
+        }
+      });
+    actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetOrganizationLogoSucceeded))
+      .subscribe((logo: { payload: Blob }) => {
+        this.logo = logo.payload;
+      });
+    store.dispatch(new SetHeaderState({ iconName: 'file-text', title: 'Organization List' }));
     store.dispatch(new GetBusinessUnitList());
     store.dispatch(new GetDBConnections());
     if (route.snapshot.paramMap.get('organizationId')) {
@@ -160,21 +165,25 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     if (
       this.CreateUnderFormGroup.valid &&
       this.GeneralInformationFormGroup.valid &&
-      (this.BillingDetailsFormGroup.valid) &&
+      this.BillingDetailsFormGroup.valid &&
       this.ContactFormArray.valid &&
       this.PreferencesFormGroup.valid &&
       this.dataBaseConnectionsFormGroup.valid
     ) {
-      this.store.dispatch(new SaveOrganization(new Organization(
-        this.currentBusinessUnitId as number,
-        this.CreateUnderFormGroup.controls['createUnder'].value,
-        this.GeneralInformationFormGroup.getRawValue(),
-        this.BillingDetailsFormGroup.getRawValue(),
-        this.ContactFormArray.getRawValue(),
-        this.PreferencesFormGroup.getRawValue(),
-        this.isSameAsOrg,
-        this.dataBaseConnectionsFormGroup.controls['connectionName'].value
-      )));
+      this.store.dispatch(
+        new SaveOrganization(
+          new Organization(
+            this.currentBusinessUnitId as number,
+            this.CreateUnderFormGroup.controls['createUnder'].value,
+            this.GeneralInformationFormGroup.getRawValue(),
+            this.BillingDetailsFormGroup.getRawValue(),
+            this.ContactFormArray.getRawValue(),
+            this.PreferencesFormGroup.getRawValue(),
+            this.isSameAsOrg,
+            this.dataBaseConnectionsFormGroup.controls['connectionName'].value
+          )
+        )
+      );
       this.store.dispatch(new SetDirtyState(false));
     } else {
       this.CreateUnderFormGroup.markAllAsTouched();
@@ -186,7 +195,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     }
   }
 
-  public browse() : void {
+  public browse(): void {
     const wrapper = document.getElementsByClassName('e-file-select-wrap')[0];
     if (wrapper) {
       wrapper.querySelector('button')?.click();
@@ -207,17 +216,27 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
 
   private newContactFormGroup(contact?: ContactDetails): FormGroup {
     if (contact && contact.title) {
-      this.isEditTitle.push(!this.titles.find(val => val === contact.title));
+      this.isEditTitle.push(!this.titles.find((val) => val === contact.title));
     } else {
       this.isEditTitle.push(false);
     }
     return this.fb.group({
       id: new FormControl(contact ? contact.id : 0),
       title: new FormControl(contact ? contact.title : ''),
-      contactPerson: new FormControl(contact ? contact.contactPerson : '', [ Validators.required, Validators.maxLength(100) ]),
-      phoneNumberExt: new FormControl(contact ? contact.phoneNumberExt : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/) ]),
-      email: new FormControl(contact ? contact.email : '', [ Validators.pattern(/^\S+@\S+\.\S+$/) ])
-    })
+      contactPerson: new FormControl(contact ? contact.contactPerson : '', [
+        Validators.required,
+        Validators.maxLength(100),
+      ]),
+      phoneNumberExt: new FormControl(contact ? contact.phoneNumberExt : '', [
+        Validators.minLength(10),
+        Validators.pattern(/^[0-9]+$/),
+      ]),
+      email: new FormControl(contact ? contact.email : '', [
+        Validators.email,
+        Validators.maxLength(100),
+        Validators.pattern(/^\S+@\S+\.\S+$/),
+      ]),
+    });
   }
 
   private createContactForm(): void {
@@ -247,20 +266,24 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
       phone1: this.GeneralInformationFormGroup.controls['phone1Ext'].value,
       phone2: this.GeneralInformationFormGroup.controls['phone2Ext'].value,
       fax: this.GeneralInformationFormGroup.controls['fax'].value,
-      ext: ''
-    })
+      ext: '',
+    });
   }
 
   private enableBillingForm(): void {
-    Object.keys(this.BillingDetailsFormGroup.controls).filter((key: string) => key !== 'ext').forEach((key: string) => {
-      this.BillingDetailsFormGroup.get(key)?.enable();
-    });
+    Object.keys(this.BillingDetailsFormGroup.controls)
+      .filter((key: string) => key !== 'ext')
+      .forEach((key: string) => {
+        this.BillingDetailsFormGroup.get(key)?.enable();
+      });
   }
 
   private disableBillingForm(): void {
-    Object.keys(this.BillingDetailsFormGroup.controls).filter((key: string) => key !== 'ext').forEach((key: string) => {
-      this.BillingDetailsFormGroup.get(key)?.disable();
-    });
+    Object.keys(this.BillingDetailsFormGroup.controls)
+      .filter((key: string) => key !== 'ext')
+      .forEach((key: string) => {
+        this.BillingDetailsFormGroup.get(key)?.disable();
+      });
   }
 
   public sameAsOrgChange(event: any): void {
@@ -319,13 +342,15 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
       businessUnitId = 0;
     }
     this.CreateUnderFormGroup = this.fb.group({
-      createUnder: new FormControl(businessUnitId, [Validators.required])
+      createUnder: new FormControl(businessUnitId, [Validators.required]),
     });
 
     this.dataBaseConnectionsFormGroup = this.fb.group({
-      connectionName: new FormControl(organization?.createUnder?.dbConnectionName ?? '', this.showDataBaseControl ? [Validators.required] : [])
+      connectionName: new FormControl(
+        organization?.createUnder?.dbConnectionName ?? '',
+        this.showDataBaseControl ? [Validators.required] : []
+      ),
     });
-
 
     this.CreateUnderFormGroup.valueChanges.subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.CreateUnderFormGroup.dirty));
@@ -334,18 +359,36 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
       id: new FormControl(organization ? organization.generalInformation.id : 0),
       name: new FormControl(organization ? organization.generalInformation.name : '', [Validators.required]),
       externalId: new FormControl(organization ? organization.generalInformation.externalId : ''),
-      taxId: new FormControl(organization ? organization.generalInformation.taxId : '', [Validators.required, Validators.minLength(9), Validators.pattern(/^[0-9\s\-]+$/)]),
-      addressLine1: new FormControl(organization ? organization.generalInformation.addressLine1 : '', [Validators.required]),
+      taxId: new FormControl(organization ? organization.generalInformation.taxId : '', [
+        Validators.required,
+        Validators.minLength(9),
+        Validators.pattern(/^[0-9\s\-]+$/),
+      ]),
+      addressLine1: new FormControl(organization ? organization.generalInformation.addressLine1 : '', [
+        Validators.required,
+      ]),
       addressLine2: new FormControl(organization ? organization.generalInformation.addressLine2 : ''),
       country: new FormControl(organization ? organization.generalInformation.country : 0, [Validators.required]),
       state: new FormControl(organization ? organization.generalInformation.state : '', [Validators.required]),
       city: new FormControl(organization ? organization.generalInformation.city : '', [Validators.required]),
-      zipCode: new FormControl(organization ? organization.generalInformation.zipCode : '', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]),
-      phone1Ext: new FormControl(organization ? organization.generalInformation.phone1Ext : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
-      phone2Ext: new FormControl(organization ? organization.generalInformation.phone2Ext : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
-      fax: new FormControl(organization ? organization.generalInformation.fax : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
+      zipCode: new FormControl(organization ? organization.generalInformation.zipCode : '', [
+        Validators.minLength(5),
+        Validators.pattern(/^[0-9]+$/),
+      ]),
+      phone1Ext: new FormControl(organization ? organization.generalInformation.phone1Ext : '', [
+        Validators.minLength(10),
+        Validators.pattern(/^[0-9]+$/),
+      ]),
+      phone2Ext: new FormControl(organization ? organization.generalInformation.phone2Ext : '', [
+        Validators.minLength(10),
+        Validators.pattern(/^[0-9]+$/),
+      ]),
+      fax: new FormControl(organization ? organization.generalInformation.fax : '', [
+        Validators.minLength(10),
+        Validators.pattern(/^[0-9]+$/),
+      ]),
       status: new FormControl(organization ? organization.generalInformation.status : 0, [Validators.required]),
-      website: new FormControl(organization ? organization.generalInformation.website : '')
+      website: new FormControl(organization ? organization.generalInformation.website : ''),
     });
     this.GeneralInformationFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.GeneralInformationFormGroup.dirty));
@@ -357,22 +400,34 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
       country: new FormControl(organization ? organization.billingDetails.country : 0, [Validators.required]),
       state: new FormControl(organization ? organization.billingDetails.state : '', [Validators.required]),
       city: new FormControl(organization ? organization.billingDetails.city : '', [Validators.required]),
-      zipCode: new FormControl(organization ? organization.billingDetails.zipCode : '', [Validators.minLength(5), Validators.pattern(/^[0-9]+$/)]),
-      phone1: new FormControl(organization ? organization.billingDetails.phone1 : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
-      phone2: new FormControl(organization ? organization.billingDetails.phone2 : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
-      fax: new FormControl(organization ? organization.billingDetails.fax : '', [Validators.minLength(10), Validators.pattern(/^[0-9]+$/)]),
-      ext: new FormControl(organization ? organization.billingDetails.ext : '', [Validators.pattern(/^[0-9]{5}$/)])
+      zipCode: new FormControl(organization ? organization.billingDetails.zipCode : '', [
+        Validators.minLength(5),
+        Validators.pattern(/^[0-9]+$/),
+      ]),
+      phone1: new FormControl(organization ? organization.billingDetails.phone1 : '', [
+        Validators.minLength(10),
+        Validators.pattern(/^[0-9]+$/),
+      ]),
+      phone2: new FormControl(organization ? organization.billingDetails.phone2 : '', [
+        Validators.minLength(10),
+        Validators.pattern(/^[0-9]+$/),
+      ]),
+      fax: new FormControl(organization ? organization.billingDetails.fax : '', [
+        Validators.minLength(10),
+        Validators.pattern(/^[0-9]+$/),
+      ]),
+      ext: new FormControl(organization ? organization.billingDetails.ext : '', [Validators.pattern(/^[0-9]{5}$/)]),
     });
     this.BillingDetailsFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.BillingDetailsFormGroup.dirty));
     });
     if (organization) {
       this.ContactFormGroup = this.fb.group({
-        contacts: new FormArray(this.generateContactsFormArray(organization.contactDetails))
+        contacts: new FormArray(this.generateContactsFormArray(organization.contactDetails)),
       });
     } else {
       this.ContactFormGroup = this.fb.group({
-        contacts: new FormArray([this.newContactFormGroup()])
+        contacts: new FormArray([this.newContactFormGroup()]),
       });
     }
     this.ContactFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
@@ -381,13 +436,25 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
     this.ContactFormArray = this.ContactFormGroup.get('contacts') as FormArray;
     this.PreferencesFormGroup = this.fb.group({
       id: new FormControl(organization ? organization.preferences.id : 0),
-      purchaseOrderBy: new FormControl(organization ? organization.preferences.purchaseOrderBy.toString() : '0', [Validators.required]),
+      purchaseOrderBy: new FormControl(organization ? organization.preferences.purchaseOrderBy.toString() : '0', [
+        Validators.required,
+      ]),
       sendDocumentToAgency: new FormControl(organization ? organization.preferences.sendDocumentToAgency : null),
-      timesheetSubmittedBy: new FormControl(organization ? organization.preferences.timesheetSubmittedBy.toString() : '0', [Validators.required]),
+      timesheetSubmittedBy: new FormControl(
+        organization ? organization.preferences.timesheetSubmittedBy.toString() : '0',
+        [Validators.required]
+      ),
       weekStartsOn: new FormControl(organization ? organization.preferences.weekStartsOn : '', [Validators.required]),
-      paymentOptions: new FormControl(organization ? organization.preferences.paymentOptions.toString() : '0', [Validators.required]),
-      timePeriodInMins: new FormControl(organization ? organization.preferences.timePeriodInMins : '', [Validators.pattern(/^[0-9]+$/), Validators.min(1)]),
-      paymentDescription: new FormControl(organization ? organization.preferences.paymentDescription : '', [Validators.required])
+      paymentOptions: new FormControl(organization ? organization.preferences.paymentOptions.toString() : '0', [
+        Validators.required,
+      ]),
+      timePeriodInMins: new FormControl(organization ? organization.preferences.timePeriodInMins : '', [
+        Validators.pattern(/^[0-9]+$/),
+        Validators.min(1),
+      ]),
+      paymentDescription: new FormControl(organization ? organization.preferences.paymentDescription : '', [
+        Validators.required,
+      ]),
     });
     this.PreferencesFormGroup.valueChanges.pipe(debounceTime(500)).subscribe(() => {
       this.store.dispatch(new SetDirtyState(this.PreferencesFormGroup.dirty));
@@ -401,8 +468,8 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
   }
 
   private subscribeOnUser(): void {
-    this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe(user => {
+    this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user) => {
       this.user = user;
-    })
+    });
   }
 }
