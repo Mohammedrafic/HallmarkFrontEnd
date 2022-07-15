@@ -6,7 +6,7 @@ import { GRID_CONFIG } from '@shared/constants';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { Select, Store } from '@ngxs/store';
 import { SecurityState } from '../../store/security.state';
-import { Observable, Subject, takeWhile } from 'rxjs';
+import { map, Observable, Subject, takeWhile } from 'rxjs';
 import { ExportUserList, GetUsersPage } from '../../store/security.actions';
 import { CreateUserStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { User, UsersPage } from '@shared/models/user-managment-page.model';
@@ -35,11 +35,12 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   @ViewChild('usersGrid') grid: GridComponent;
 
   @Select(SecurityState.userGridData)
-  public userGridData$: Observable<User[]>;
+  private _userGridData$: Observable<User[]>;
 
   @Select(SecurityState.usersPage)
   public usersPage$: Observable<UsersPage>;
 
+  public userGridData$: Observable<User[]>;
   public hasVisibility = (_: string, { assigned }: User) => {
     return Visibility[Number(assigned)];
   };
@@ -69,6 +70,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.subscribeForFilterFormChange();
     this.setFileName();
     this.subscribeOnExportAction();
+    this.updateUsers();
   }
 
   ngAfterViewInit(): void {
@@ -137,6 +139,27 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
     this.dispatchNewPage();
+  }
+
+  private updateUsers(): void {
+    this.userGridData$ = this._userGridData$.pipe(map((value: User[]) => [...this.addRoleEllipsis(value)]));
+  }
+
+  private addRoleEllipsis(roles: User[]): any {
+    return (
+      roles &&
+      roles.map((role: User) => {
+        if (role.roles.length > 2) {
+          const [first, second] = role.roles;
+          return {
+            ...role,
+            roles: [first, second, { name: '...' }],
+          };
+        } else {
+          return role;
+        }
+      })
+    );
   }
 
   private subscribeForFilterFormChange(): void {
