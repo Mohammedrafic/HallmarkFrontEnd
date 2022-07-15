@@ -17,8 +17,6 @@ registerLicense('ORg4AjUWIQA/Gnt2VVhhQlFaclhJXGFWfVJpTGpQdk5xdV9DaVZUTWY/P1ZhSXx
 if (environment.production) {
   enableProdMode();
 }
-    
-platformBrowserDynamic()
-  .bootstrapModule(AppModule)
-  .catch((err) => console.error(err));
 
+platformBrowserDynamic().bootstrapModule(AppModule)
+  .catch(err => console.error(err));

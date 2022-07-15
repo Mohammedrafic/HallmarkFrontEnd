@@ -35,7 +35,7 @@
   </section>
   <section class="content-container">
     <div class="job-details">
-      <ejs-accordion #accordionElement expandMode="Single" (expanding)="toForbidExpandSecondRow($event)" (clicked)="clickedOnAccordion($event)">
+      <ejs-accordion expandMode="Single">
         <e-accordionitems>
           <e-accordionitem expanded="true">
             <ng-template #header>
@@ -51,15 +51,9 @@
                     </div>
                   </div>
                   <div class="input-container">
-                    <label>Bill Rate ($)</label>
+                    <label>Bill Rate</label>
                     <div class="input-group input-readonly">
-                      <input
-                        formControlName="orderBillRate"
-                        class="e-input"
-                        type="text"
-                        (focus)="priceUtils.setPriceMask(formGroup, 'orderBillRate', $event)"
-                        (blur)="priceUtils.setTwoDecimals(formGroup, 'orderBillRate', $event)"
-                        readonly/>
+                      <input formControlName="orderBillRate" class="e-input" type="text" readonly/>
                     </div>
                   </div>
                 </div>
@@ -73,27 +67,19 @@
                 </div>
                 <div class="d-flex bootstrap">
                   <div class="input-container">
-                    <label>Candidate Bill Rate ($)</label>
+                    <label>Candidate Bill Rate</label>
                     <div class="input-group input-readonly">
-                      <input
-                        formControlName="candidateBillRate"
-                        class="e-input"
-                        type="number"
-                        (focus)="priceUtils.setPriceMask(formGroup, 'candidateBillRate', $event)"
-                        (blur)="priceUtils.setTwoDecimals(formGroup, 'candidateBillRate', $event)"
-                        readonly/>
+                      <input formControlName="candidateBillRate" class="e-input" type="number" readonly/>
                     </div>
                   </div>
                   <div class="input-container">
-                    <label>Offered Bill Rate ($)<span *ngIf="!isRejected && !isReadOnly" class="required">*</span></label>
+                    <label>Offered Bill Rate<span *ngIf="!isRejected && !isReadOnly" class="required">*</span></label>
                     <div class="input-group" [ngClass]="{'input-readonly': isRejected || isReadOnly}">
                       <input appValidateWithMessage
                              [readonly]="isRejected || isReadOnly"
                              formControlName="offeredBillRate"
                              class="e-input"
-                             (focus)="priceUtils.setPriceMask(formGroup, 'offeredBillRate', $event)"
-                             (blur)="priceUtils.setTwoDecimals(formGroup, 'offeredBillRate', $event)"
-                             type="text"/>
+                             type="number"/>
                     </div>
                   </div>
                 </div>
@@ -187,7 +173,6 @@
     <app-bill-rates #billRates
                     [billRates]="billRatesData"
                     [isActive]="true"
-                    [readOnlyMode]="isReadOnlyBillRates"
                     (billRatesChanged)="onBillRatesChanged()">
     </app-bill-rates>
   </section>

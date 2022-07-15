@@ -1,7 +1,6 @@
 <app-bill-rates-grid
   [billRatesData]="billRatesControl.value"
   [billRateOptions]="billRatesOptions"
-  [readOnlyMode]="readOnlyMode"
   (add)="onAddBillRate()"
   (edit)="onEditBillRate($event)"
   (remove)="onRemoveBillRate($event)">

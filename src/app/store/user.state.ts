@@ -27,7 +27,6 @@ import {
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
-import { B2CAuthService } from "../b2c-auth/b2c-auth.service";
 
 export interface UserStateModel {
   user: User | null;
@@ -63,7 +62,6 @@ export class UserState {
   constructor(
     private userService: UserService,
     private organizationService: OrganizationService,
-    private b2CAuthService: B2CAuthService
   ) { }
 
   @Selector()
@@ -102,16 +100,14 @@ export class UserState {
 
   @Action(SetCurrentUser)
   SetCurrentUser({ patchState }: StateContext<UserStateModel>, { payload }: SetCurrentUser): void {
+    window.localStorage.setItem(AUTH_STORAGE_KEY, payload.id);
     window.localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(payload));
     patchState({ user: payload });
   }
 
   @Action(LogoutUser)
   LogoutUser({ patchState }: StateContext<UserStateModel>): void {
-    if (this.b2CAuthService.isLoggedIn()) {
-      this.b2CAuthService.logout();
-    }
-
+    window.localStorage.removeItem(AUTH_STORAGE_KEY);
     window.localStorage.removeItem(USER_STORAGE_KEY);
     window.localStorage.removeItem(ORG_ID_STORAGE_KEY);
     window.localStorage.removeItem(AGENCY_ID_STORAGE_KEY);

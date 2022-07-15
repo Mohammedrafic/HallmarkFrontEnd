@@ -8,7 +8,7 @@
         <h2>WELCOME!</h2>
         <p>Log In with your email....</p>
       </div>
-      <form [formGroup]="loginForm" #spiner>
+      <form *ngIf="usersDropDownData?.length" [formGroup]="loginForm" (ngSubmit)="onLogin()">
         <div class="input-container bootstrap">
           <label>Email</label>
           <div class="input-group">
@@ -50,7 +50,6 @@
             type="submit">
             Login
           </button>
-          <button class="e-control e-btn e-lib e-primary e-outline" type="button" (click)="loginWithSSO()">Login with SSO</button>
         </div>
       </form>
     </div>

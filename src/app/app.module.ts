@@ -1,22 +1,19 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core';
-import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgxsModule } from '@ngxs/store';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
-import { NgxMaskModule } from 'ngx-mask';
-
 import { environment } from '../environments/environment';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { AppState } from './store/app.state';
 
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ApiInterceptor } from './shared/interceptors/api.interceptor';
 import { UserState } from './store/user.state';
 import { LoginGuard, ShellGuard } from '@shared/guards';
-import { MsalModule, MsalRedirectComponent } from '@azure/msal-angular';
-import { MSAL_PROVIDERS } from './b2c-auth/b2c-auth.providers';
+import { NgxMaskModule } from 'ngx-mask';
 
 @NgModule({
   declarations: [AppComponent],
@@ -37,7 +34,6 @@ import { MSAL_PROVIDERS } from './b2c-auth/b2c-auth.providers';
       disabled: environment.production
     }),
     NgxMaskModule.forRoot(),
-    MsalModule
   ],
   providers: [
     {
@@ -46,9 +42,8 @@ import { MSAL_PROVIDERS } from './b2c-auth/b2c-auth.providers';
       multi: true
     },
     LoginGuard,
-    ShellGuard,
-    ...MSAL_PROVIDERS
+    ShellGuard
   ],
-  bootstrap: [AppComponent, MsalRedirectComponent],
+  bootstrap: [AppComponent],
 })
 export class AppModule {}

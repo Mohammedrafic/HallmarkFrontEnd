@@ -37,7 +37,7 @@ export class ApiInterceptor implements HttpInterceptor {
     if (userId) {
       const currentPage = this.store.selectSnapshot(AppState.headerState)?.title || 'Login';
       const headers: { [key: string]: string } = {
-        // Authorization: `UserId ${userId}`,
+        Authorization: `UserId ${userId}`,
         'Einstein-ScreenName': currentPage as string,
         'Einstein-ScreenUrl': this.router.url,
       };

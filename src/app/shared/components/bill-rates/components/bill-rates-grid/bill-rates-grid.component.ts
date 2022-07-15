@@ -17,7 +17,6 @@ export type BillRatesGridEvent = BillRate & { index: string };
 export class BillRatesGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
 
-  @Input() readOnlyMode: boolean;
   @Input() billRatesData: BillRate[];
   @Input() billRateOptions: BillRateOption[];
 

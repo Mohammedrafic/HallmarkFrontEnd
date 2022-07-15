@@ -3,7 +3,7 @@
     <div class="title">
       <h3>Bill Rates</h3>
     </div>
-    <div *ngIf="!readOnlyMode" class="actions">
+    <div class="actions">
       <span class="action-link" (click)="addNew()">
         <i-feather name="plus" class="icon"></i-feather>
         Add Bill Rate
@@ -47,7 +47,7 @@
         <ng-template #template let-data>{{data.effectiveDate | date:'M/d/y'}}</ng-template>
       </e-column>
 
-      <e-column [visible]="!readOnlyMode" textAlign="Right" width="120" freeze="Right">
+      <e-column textAlign="Right" width="120" freeze="Right">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit($event, data)">

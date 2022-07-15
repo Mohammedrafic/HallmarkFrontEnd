@@ -23,7 +23,7 @@
       <ng-template #content>
         <!-- General info step -->
         <form [formGroup]="agencyForm" id="agencyFormFirstStep">
-          <div class="dropdown-container bootstrap create-under" *ngIf="createUnderAvailable && isAddMode">
+          <div class="dropdown-container bootstrap create-under" *ngIf="createUnderAvailable">
             <label>Create Under<span class="required">*</span></label>
             <div class="input-group dropdown">
               <ejs-dropdownlist

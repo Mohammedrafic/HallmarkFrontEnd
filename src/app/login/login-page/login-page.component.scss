@@ -33,7 +33,6 @@
 
       form {
         margin-top: 80px;
-        position: relative;
 
         label {
           display: block;
@@ -63,10 +62,6 @@
           button {
             display: block;
             width: 100%;
-
-            &:not(:last-child) {
-              margin-bottom: 16px;
-            }
           }
         }
       }
