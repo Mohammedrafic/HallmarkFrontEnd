@@ -32,7 +32,7 @@ export class OrderManagement {
   openPositions: number;
   candidates: number;
   startDate: string;
-  reOrderDate?: string;
+  jobStartDate?: string;
   isLocked?: boolean;
   reOrderCount?: number;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
@@ -75,7 +75,6 @@ export type AgencyOrderManagement = {
   candidatesCount: number;
   isLocked: boolean;
   jobStartDate: string;
-  reOrderDate?: string;
   reOrderCount?: number;
   organizationId: number;
   organizationName: string;
@@ -149,7 +148,6 @@ export type AgencyOrderFilters = {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
-  reOrderDate?: Date;
   includeReOrders?: boolean;
 };
 
@@ -380,7 +378,6 @@ export class OrderFilter {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
-  reOrderDate?: Date;
   orderStatuses?: number[];
   candidateStatuses?: number[];
   candidatesCountFrom?: number;

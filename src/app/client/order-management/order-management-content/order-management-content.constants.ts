@@ -74,7 +74,7 @@ export const ReOrdersColumnsConfig = [
     visible: true
   },
   {
-    fieldName: 'reOrderDate',
+    fieldName: 'jobStartDate',
     visible: true
   },
   {
@@ -121,7 +121,7 @@ export const AllOrdersColumnsConfig = [
     visible: false
   },
   {
-    fieldName: 'reOrderDate',
+    fieldName: 'jobStartDate',
     visible: false
   },
   {
@@ -156,7 +156,7 @@ export const PerDiemColumnsConfig = [
     visible: false
   },
   {
-    fieldName: 'reOrderDate',
+    fieldName: 'jobStartDate',
     visible: false
   },
   {

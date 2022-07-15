@@ -80,7 +80,7 @@ export const ReOrdersColumnsConfig: GridColumn[] = [
     visible: true,
   },
   {
-    fieldName: 'reOrderDate',
+    fieldName: 'jobStartDate',
     visible: true,
   },
   {
@@ -97,10 +97,6 @@ export const ReOrdersColumnsConfig: GridColumn[] = [
   },
   {
     fieldName: 'type',
-    visible: false,
-  },
-  {
-    fieldName: 'jobStartDate',
     visible: false,
   },
   {
@@ -131,10 +127,6 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
     visible: false,
   },
   {
-    fieldName: 'reOrderDate',
-    visible: false,
-  },
-  {
     fieldName: 'shift',
     visible: false,
   },
@@ -159,10 +151,6 @@ export const PerDiemColumnsConfig = [
   },
   {
     fieldName: 'reOrderId',
-    visible: false,
-  },
-  {
-    fieldName: 'reOrderDate',
     visible: false,
   },
   {

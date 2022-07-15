@@ -187,7 +187,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       openPositions: new FormControl(null),
       jobStartDate: new FormControl(null),
       jobEndDate: new FormControl(null),
-      reOrderDate: new FormControl(null),
       orderStatuses: new FormControl([]),
       candidateStatuses: new FormControl([]),
       candidatesCountFrom: new FormControl(null),
@@ -285,7 +284,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filters.reOrderFromId = this.filters.reOrderFromId ? this.filters.reOrderFromId : undefined;
     this.filters.jobStartDate ? this.filters.jobStartDate : null;
     this.filters.jobEndDate ? this.filters.jobEndDate : null;
-    this.filters.reOrderDate = this.filters.reOrderDate ? this.filters.reOrderDate : undefined;
     this.filters.billRateFrom ? this.filters.billRateFrom : null;
     this.filters.billRateTo ? this.filters.billRateTo : null;
     this.filters.pageNumber = this.currentPage;
@@ -335,7 +333,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       openPositions: this.filters.openPositions || null,
       jobStartDate: this.filters.jobStartDate || null,
       jobEndDate: this.filters.jobEndDate || null,
-      reOrderDate: this.filters.reOrderDate || null,
       orderStatuses: this.filters.orderStatuses || [],
       candidateStatuses: this.filters.candidateStatuses || [],
       candidatesCountFrom: this.filters.candidatesCountFrom || null,
@@ -385,7 +382,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onDataBound(): void {
-    this.gridDataBound(this.gridWithChildRow);
+    if (this.gridWithChildRow && this.gridWithChildRow.dataSource) {
+      this.gridDataBound(this.gridWithChildRow);
+    }
     this.subrowsState.clear();
     if (this.previousSelectedOrderId) {
       const [data, index] = this.store.selectSnapshot(OrderManagementContentState.lastSelectedOrder)(
@@ -705,7 +704,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       openPositions: { type: ControlTypes.Text, valueType: ValueType.Text },
       jobStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       jobEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      reOrderDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       orderStatuses: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
