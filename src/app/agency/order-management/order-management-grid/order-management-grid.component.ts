@@ -1,4 +1,14 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  QueryList,
+  ViewChild,
+  ViewChildren,
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { debounceTime, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -322,11 +332,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onRowScaleUpClick(): void {
     this.isRowScaleUp = false;
     this.rowHeight = ROW_HEIGHT.SCALE_UP_HEIGHT;
+    this.isSubrowDisplay = false;
   }
 
   public onRowScaleDownClick(): void {
     this.isRowScaleUp = true;
     this.rowHeight = ROW_HEIGHT.SCALE_DOWN_HEIGHT;
+    this.isSubrowDisplay = false;
   }
 
   public onNextPreviousOrderEvent(next: boolean): void {
@@ -382,8 +394,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
       skillIds: this.filters.skillIds || [],
-      orderTypes: this.selectedTab === AgencyOrderManagementTabs.PerDiem
-        || this.selectedTab === AgencyOrderManagementTabs.ReOrders ? [] : this.filters.orderTypes || [],
+      orderTypes:
+        this.selectedTab === AgencyOrderManagementTabs.PerDiem ||
+        this.selectedTab === AgencyOrderManagementTabs.ReOrders
+          ? []
+          : this.filters.orderTypes || [],
       jobTitle: this.filters.jobTitle || null,
       billRateFrom: this.filters.billRateFrom || null,
       billRateTo: this.filters.billRateTo || null,
@@ -422,7 +437,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         : myAgencyColumnsToExport;
     }
 
-    if (this.selectedTab ===  AgencyOrderManagementTabs.ReOrders) {
+    if (this.selectedTab === AgencyOrderManagementTabs.ReOrders) {
       this.columnsToExport = hasSelectedItemChildren
         ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
         : reOrdersColumnsToExport;

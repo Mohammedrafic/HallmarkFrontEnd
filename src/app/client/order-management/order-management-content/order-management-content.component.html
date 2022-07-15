@@ -58,12 +58,12 @@
                 <span><img src="assets/icons/menu-collapse.svg" alt="coll" class="icon c"></span>
               </button>
             </ng-template>
-            <button ejs-button cssClass="e-flat icon-button" *ngIf="isRowScaleUp; else onRowScaleDown">
-              <span><i-feather name="menu" class="icon" (click)="onRowScaleUpClick()"></i-feather></span>
+            <button ejs-button cssClass="e-flat icon-button" *ngIf="isRowScaleUp; else onRowScaleDown" (click)="onRowScaleUpClick()">
+              <span><i-feather name="menu" class="icon"></i-feather></span>
             </button>
             <ng-template #onRowScaleDown>
-              <button ejs-button cssClass="e-flat icon-button">
-                <span><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
+              <button ejs-button cssClass="e-flat icon-button" (click)="onRowScaleDownClick()">
+                <span><i-feather name="align-justify" class="icon"></i-feather></span>
               </button>
             </ng-template>
           </div>
