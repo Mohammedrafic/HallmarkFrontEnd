@@ -102,6 +102,7 @@ export type OrderManagementChild = {
   positionId: number;
   statusName: string;
   submissionsPercentage: number;
+  agencyName: string;
 };
 
 export type OrderCandidatesList = {

@@ -178,6 +178,7 @@
         [candidat]="child"
         [order]="data"
         [selected]="selectedCandidate?.selected.order === data.orderId && selectedCandidate?.selected.positionId === child.positionId"
+        [isAgency]="false"
         (clickEvent)="onOpenCandidateDialog($event, data)"
       ></app-grid-subrow-candidate>
     </div>

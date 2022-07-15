@@ -423,7 +423,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       const data = event.data;
       const options = this.getDialogNextPreviousOption(data);
       this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
-      this.store.dispatch(new GetAgencyOrderCandidatesList(data.id, data.organizationId, this.currentPage, this.pageSize));
+      this.store.dispatch(
+        new GetAgencyOrderCandidatesList(data.id, data.organizationId, this.currentPage, this.pageSize)
+      );
       this.selectedCandidate = this.selectedReOrder = null;
       this.openChildDialog.next(false);
       this.openDetails.next(true);
