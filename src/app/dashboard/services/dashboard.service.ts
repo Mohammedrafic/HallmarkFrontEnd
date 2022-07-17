@@ -252,7 +252,7 @@ export class DashboardService {
   }
 
   public redirectToUrl(url: string): void {
-    this.router.navigateByUrl(url);
+    this.router.navigate([url], { state: { redirectedFromDashboard: true } });
   }
 
   private getTasksWidgetData(): Observable<string> {
