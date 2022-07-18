@@ -49,8 +49,6 @@ export class ApiInterceptor implements HttpInterceptor {
       }
 
       request = request.clone({ headers: new HttpHeaders(headers) });
-    } else {
-      this.store.dispatch(new LogoutUser());
     }
 
     if (request.url === APP_SETTINGS_URL) {

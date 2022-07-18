@@ -1,16 +1,12 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, Select, Store } from '@ngxs/store';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
-import {
-  ApplyOrderApplicants,
-  ApplyOrderApplicantsSucceed,
-  ReloadOrderCandidatesLists,
-} from '@agency/store/order-management.actions';
+import { ApplyOrderApplicants, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { OrderApplicantsInitialData } from '@shared/models/order-applicants.model';
@@ -55,13 +51,12 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   constructor(private store: Store, private actions$: Actions) {}
 
   ngOnChanges(): void {
-    if (this.candidate.deployedCandidateInfo && this.isAgency) {
-      this.readOnlyMode = true;
-    }
+    this.readOnlyMode = !!this.candidate.deployedCandidateInfo && this.isAgency;
   }
 
   ngOnInit(): void {
     this.today.setHours(0);
+    this.today.setMinutes(0);
     this.createForm();
     this.subscribeOnInitialData();
   }
@@ -145,9 +140,5 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
           this.setFormValue(data);
         }
       });
-
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(ApplyOrderApplicantsSucceed)).subscribe(() => {
-      this.readOnlyMode = true;
-    });
   }
 }

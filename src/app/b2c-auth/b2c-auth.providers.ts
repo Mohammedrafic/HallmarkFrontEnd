@@ -82,7 +82,7 @@ export function MSALInterceptorConfigFactory(
   protectedResourceMap.set(host, [config.apiScope]);
 
   return () => ({
-    interactionType: InteractionType.Popup,
+    interactionType: InteractionType.Redirect,
     protectedResourceMap,
   });
 }
@@ -103,7 +103,7 @@ export function MSALGuardConfigFactory(): MsalGuardConfiguration {
   };
 
   return {
-    interactionType: InteractionType.Popup,
+    interactionType: InteractionType.Redirect,
     authRequest: loginRequest,
   };
 }

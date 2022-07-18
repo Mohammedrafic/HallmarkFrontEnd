@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 
-import { AUTH_STORAGE_KEY, USER_STORAGE_KEY } from '@shared/constants/local-storage-keys';
+import { USER_STORAGE_KEY } from '@shared/constants/local-storage-keys';
 
 @Injectable({
   providedIn: 'root'
