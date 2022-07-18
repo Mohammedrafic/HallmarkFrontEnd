@@ -45,7 +45,22 @@
   width: 100%;
   padding-top: 20px;
 
+  &.long {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 1;
+    grid-row-end: 1;
+  }
+
   label {
     margin-bottom: 12px;
+  }
+}
+
+.bootstrap {
+  &.grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr 1fr;
   }
 }

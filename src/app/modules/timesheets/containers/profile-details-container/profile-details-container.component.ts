@@ -1,3 +1,4 @@
+import { RecordFields } from './../../enums/timesheet-common.enum';
 import { switchMap } from 'rxjs/operators';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import {
@@ -11,7 +12,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { take, filter, Observable, takeUntil, tap, throttleTime, distinctUntilChanged } from 'rxjs';
+import { take, filter, Observable, takeUntil, tap, throttleTime, distinctUntilChanged, forkJoin } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
@@ -29,7 +30,6 @@ import {
   CandidateHoursAndMilesData,
   CandidateInfo,
   DialogActionPayload,
-  TimesheetRecordsDto,
   TimesheetDetailsModel, CandidateMilesData,
 } from '../../interface';
 import { DialogAction, SubmitBtnText } from '../../enums';
@@ -161,8 +161,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public handleUpdateTable(): void {}
 
-  public openAddDialog(): void {
-    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open));
+  public openAddDialog(type: RecordFields): void {
+    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open, type));
   }
 
   public handleProfileClose(): void {
@@ -230,10 +230,10 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       throttleTime(100),
       filter((data) => data.dialogState),
       distinctUntilChanged((prev, next) => JSON.stringify(prev) === JSON.stringify(next)),
-      tap(({ id }) => {
-        this.candidateId = id;
-        this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(id));
-        this.store.dispatch(new Timesheets.GetTimesheetDetails(id));
+      tap((data) => {
+        this.candidateId = data.id;
+        this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(data.id));
+        this.store.dispatch(new Timesheets.GetTimesheetDetails(data.id));
       }),
       takeUntil(this.componentDestroy())
       )

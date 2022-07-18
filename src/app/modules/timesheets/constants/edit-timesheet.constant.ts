@@ -1,4 +1,4 @@
-import { FieldType, TableColumnAlign } from '../enums';
+import { FieldType, FieldWidthStyle, TableColumnAlign } from '../enums';
 import { DetailsTableConfig, DialogConfig } from '../interface';
 
 
@@ -14,67 +14,130 @@ export const WeekDaysOptions = [
 
 export const TimesheetEditDialogConfig: DialogConfig = {
   title: 'Add Record',
-  fields: [
-    [{
-      title: 'Day',
-      field: 'day',
+  timesheets: [
+    {
+      title: 'Time in',
+      field: 'timeIn',
+      type: FieldType.TimeCalendar,
+      disabled: false,
+      required: true,
+      widthStyle: FieldWidthStyle.Short,
+    },
+    {
+      title: 'Time out',
+      field: 'timeOut',
+      type: FieldType.TimeCalendar,
+      disabled: false,
+      required: true,
+      widthStyle: FieldWidthStyle.Short,
+    },
+    {
+      title: 'Cost center',
+      field: 'costCenter',
       type: FieldType.Dropdown,
       disabled: false,
       required: true,
-      options: WeekDaysOptions,
-    }],
-    [
-      {
-        title: 'Time in',
-        field: 'timeIn',
-        type: FieldType.Time,
-        disabled: false,
-        required: true,
-      },
-      {
-        title: 'Time out',
-        field: 'timeOut',
-        type: FieldType.Time,
-        disabled: false,
-        required: true,
-      },
-    ],
-    [
-      {
-        title: 'Cost center',
-        field: 'costCenter',
-        type: FieldType.Dropdown,
-        disabled: false,
-        required: true,
-        options: [{ text: 'FAV-871000', value: 1}, { text: 'DAS-965', value: 2}, { text: 'LES-1000', value: 3}],
-      },
-      {
-        title: 'Category',
-        field: 'category',
-        type: FieldType.Dropdown,
-        disabled: false,
-        required: true,
-        options: [{ text: 'Regular', value: 1}, { text: 'On-Call', value: 2}, { text: 'Temporary', value: 3}],
-      },
-    ],
-    [
-      {
-        title: 'Hours/Miles',
-        field: 'hours',
-        type: FieldType.Input,
-        disabled: false,
-        required: true,
-        valueType: 'number',
-      },
-      {
-        title: 'Rate',
-        field: 'rate',
-        type: FieldType.Input,
-        disabled: false,
-        required: true,
-        valueType: 'number',
-      },
-    ],
+      widthStyle: FieldWidthStyle.Short,
+      options: [],
+    },
+    {
+      title: 'Bill Rate Type',
+      field: 'billRateConfigId',
+      type: FieldType.Dropdown,
+      disabled: false,
+      required: true,
+      widthStyle: FieldWidthStyle.Short,
+      options: [],
+    },
+    {
+      title: 'Hours',
+      field: 'amount',
+      type: FieldType.Input,
+      disabled: false,
+      required: true,
+      valueType: 'number',
+      widthStyle: FieldWidthStyle.Short,
+    },
+  ],
+  miles: [
+    {
+      title: 'Day',
+      field: 'day',
+      type: FieldType.Date,
+      disabled: false,
+      required: true,
+      widthStyle: FieldWidthStyle.Long,
+    },
+    {
+      title: 'Cost center',
+      field: 'costCenter',
+      type: FieldType.Dropdown,
+      disabled: false,
+      required: true,
+      widthStyle: FieldWidthStyle.Short,
+      options: [],
+    },
+    {
+      title: 'Bill Rate Type',
+      field: 'billRateConfigId',
+      type: FieldType.Dropdown,
+      disabled: false,
+      required: true,
+      widthStyle: FieldWidthStyle.Short,
+      options: [],
+    },
+    {
+      title: 'Miles',
+      field: 'amount',
+      type: FieldType.Input,
+      disabled: false,
+      required: true,
+      widthStyle: FieldWidthStyle.Long,
+    },
+  ],
+  expenses: [
+    {
+      title: 'Day',
+      field: 'day',
+      type: FieldType.Date,
+      disabled: false,
+      required: true,
+      widthStyle: FieldWidthStyle.Long,
+    },
+    {
+      title: 'Cost center',
+      field: 'costCenter',
+      type: FieldType.Dropdown,
+      disabled: false,
+      required: true,
+      widthStyle: FieldWidthStyle.Short,
+      options: [],
+    },
+    {
+      title: 'Bill Rate Type',
+      field: 'billRateConfigId',
+      type: FieldType.Dropdown,
+      disabled: false,
+      required: true,
+      widthStyle: FieldWidthStyle.Short,
+      options: [],
+    },
+    {
+      title: 'Description',
+      field: 'description',
+      type: FieldType.Input,
+      disabled: false,
+      required: true,
+      widthStyle: FieldWidthStyle.Long,
+    },
+    {
+      title: 'Expenses',
+      field: 'amount',
+      type: FieldType.Input,
+      disabled: false,
+      required: true,
+      widthStyle: FieldWidthStyle.Long,
+    },
   ],
 };
 

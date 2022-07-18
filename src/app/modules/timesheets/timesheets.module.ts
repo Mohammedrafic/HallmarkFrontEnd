@@ -36,7 +36,7 @@ import { TimesheetsApiService } from './services/timesheets-api.service';
 import { ProfileDetailsContainerComponent } from './containers/profile-details-container/profile-details-container.component';
 import { ProfileTimesheetTableComponent } from './components/profile-timesheet-table/profile-timesheet-table.component';
 import { AddTimesheetComponent } from './components/add-timesheet/add-timesheet.component';
-import { EditTimesheetService } from './services/edit-timesheet.service';
+import { AddRecordService } from './services/add-record.service';
 import { ProfileDetailsJobInfoComponent } from './components/profile-details-job-info/profile-details-job-info.component';
 import { ProfileCumulativeHoursComponent } from './components/profile-cumulative-hours/profile-cumulative-hours.component';
 import { TimesheetAttachmentsComponent } from './components/profile-uploads/timesheet-attachments.component';
@@ -145,7 +145,7 @@ const gridIcons = {
   exports: [TimesheetsContainerComponent],
   providers: [
     TimesheetsApiService,
-    EditTimesheetService,
+    AddRecordService,
     MaskedDateTimeService,
     TimesheetsService,
     CapitalizeFirstPipe,

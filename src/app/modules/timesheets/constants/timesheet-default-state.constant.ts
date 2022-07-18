@@ -21,7 +21,10 @@ export const DefaultTimesheetState: TimesheetsModel = {
   selectedTimeSheetId: 0,
   billRateTypes: [],
   costCenterOptions: [],
-  isAddDialogOpen: false,
+  isAddDialogOpen: {
+    action: false,
+    dialogType: RecordFields.Time,
+  },
   timesheetsFiltersColumns: DefaultFilterColumns,
   timesheetDetails: null,
 }

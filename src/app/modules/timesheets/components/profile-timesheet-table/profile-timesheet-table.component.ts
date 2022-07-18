@@ -10,8 +10,8 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { Observable, takeUntil } from 'rxjs';
-import { filter, skip, take, tap, switchMap } from 'rxjs/operators';
+import { combineLatest, concat, forkJoin, Observable, takeUntil } from 'rxjs';
+import { filter, skip, take, tap, switchMap, concatAll } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { TabComponent, SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
@@ -25,7 +25,7 @@ import {
   RecordsTabConfig,
 } from './../../constants/timsheets-details.constant';
 import { ConfirmService } from './../../../../shared/services/confirm.service';
-import { TabConfig } from './../../interface/common.interface';
+import { TabConfig, DropdownOption } from './../../interface/common.interface';
 import { ConfirmTabChange } from './../../constants/confirm-delete-timesheet-dialog-content.const';
 import { DialogActionPayload, TimesheetRecordsDto } from '../../interface';
 import { TimesheetRecordsService } from '../../services/timesheet-records.service';
@@ -48,7 +48,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Input() candidateId: number;
 
-  @Output() readonly openAddSideDialog: EventEmitter<void> = new EventEmitter<void>();
+  @Output() readonly openAddSideDialog: EventEmitter<RecordFields> = new EventEmitter<RecordFields>();
 
   @Output() readonly changesSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
 
@@ -57,6 +57,12 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Select(TimesheetsState.isTimesheetOpen)
   public readonly isTimesheetOpen$: Observable<DialogActionPayload>;
+
+  @Select(TimesheetsState.billRateTypes)
+  private readonly billRates$: Observable<DropdownOption[]>;
+
+  @Select(TimesheetsState.costCenters)
+  private readonly costCenters$: Observable<DropdownOption[]>;
 
   public isEditOn = false;
 
@@ -125,7 +131,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public openAddDialog(): void {
-    this.openAddSideDialog.emit()
+    this.openAddSideDialog.emit(this.currentTab)
   }
 
   public editTimesheets(): void {
@@ -179,14 +185,16 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   private getRecords(): void {
     this.timesheetRecords$
     .pipe(
-      tap((res) => { this.records = res; }),
-      switchMap(() => this.timesheetRecordsService.getFormOptions(1,2,3, 4)),
+      tap((res) => { this.records = res;}),
+      switchMap(() => {
+        return combineLatest([
+          this.billRates$,
+          this.costCenters$,
+        ]);
+      }),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(([costCenters, billRates]) => {
-      this.timesheetRecordsService.setCostOptions(this.timesheetColDef, costCenters);
-      this.timesheetRecordsService.setBillRatesOptions(this.timesheetColDef, billRates);
-
+    .subscribe(() => {
       if (this.gridApi) {
         this.gridApi.setColumnDefs(this.timesheetColDef);
       }

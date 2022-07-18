@@ -1,6 +1,8 @@
+import { DropdownOption } from './../../interface/common.interface';
+import { RecordFields } from './../../enums/timesheet-common.enum';
 import { Injectable } from '@angular/core';
 
-import { filter, Observable, of, switchMap, take, tap, throttleTime, } from 'rxjs';
+import { filter, Observable, of, switchMap, take, tap, throttleTime, mergeMap, forkJoin } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -100,11 +102,6 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static costCenterOptions(state: TimesheetsModel): unknown {
-    return state.costCenterOptions;
-  }
-
-  @Selector([TimesheetsState])
   static billRateTypes(state: TimesheetsModel): unknown {
     return state.billRateTypes;
   }
@@ -152,6 +149,19 @@ export class TimesheetsState {
     return false;
   }
 
+  @Selector([TimesheetsState])
+  static addDialogOpen(state: TimesheetsModel): { state: boolean, type: RecordFields } {
+    return {
+      state: state.isAddDialogOpen.action,
+      type: state.isAddDialogOpen.dialogType,
+    };
+  }
+
+  @Selector([TimesheetsState])
+  static costCenters(state: TimesheetsModel): unknown {
+    return state.costCenterOptions;
+  }
+
   @Action(Timesheets.GetAll)
   GetTimesheets(
     { patchState, getState }: StateContext<TimesheetsModel>,
@@ -191,14 +201,14 @@ export class TimesheetsState {
   }
 
   @Action(TimesheetDetails.GetTimesheetRecords)
-  GetTimesheetRecords({ patchState }: StateContext<TimesheetsModel>, id: number): Observable<TimesheetRecordsDto> {
+  GetTimesheetRecords({ patchState }: StateContext<TimesheetsModel>, {id }: { id: number}): Observable<TimesheetRecordsDto> {
     return this.timesheetsApiService.getTimesheetRecords(id)
     .pipe(
       tap((res) => {
         patchState({
           timeSheetRecords: res,
         });
-      })
+      }),
     )
   }
 
@@ -239,27 +249,35 @@ export class TimesheetsState {
   }
 
   @Action(Timesheets.ToggleTimesheetAddDialog)
-  ToggleAddDialog({ patchState }: StateContext<TimesheetsModel>, action: DialogAction): void {
+  ToggleAddDialog({ patchState }: StateContext<TimesheetsModel>,
+    { action, type }: { action: DialogAction, type: RecordFields}): void {
     patchState({
-      isAddDialogOpen: action === DialogAction.Open,
+      isAddDialogOpen: {
+        action: action === DialogAction.Open,
+        dialogType: type,
+      },
     });
   }
 
   @Action(Timesheets.GetTimesheetDetails)
   GetTimesheetDetails(
-    { patchState }: StateContext<TimesheetsModel>,
+    ctx: StateContext<TimesheetsModel>,
     { timesheetId }: Timesheets.GetTimesheetDetails
-  ): Observable<TimesheetDetailsModel> {
+  ): Observable<[void, void]> {
     return this.timesheetDetailsApiService.getTimesheetDetails(timesheetId)
       .pipe(
-        tap((res: TimesheetDetailsModel) => patchState({
+        tap((res: TimesheetDetailsModel) => ctx.patchState({
             timesheetDetails: {
               ...res,
               // TODO: Remove
               candidateId: 8,
             },
-          })
-        )
+          }),
+        ),
+        mergeMap((res) => forkJoin([
+          ctx.dispatch(new TimesheetDetails.GetBillRates(res.departmentId, res.skillId, res.orderType)),
+          ctx.dispatch(new TimesheetDetails.GetCostCenters(res.jobId)),
+        ])),
       );
   }
 
@@ -372,7 +390,7 @@ export class TimesheetsState {
           patchState({
             timesheetDetails: {
               ...state.timesheetDetails as TimesheetDetailsModel,
-              rejectReason: reason,
+              rejectionReason: reason,
             },
             timesheets: {
               ...timesheets,
@@ -516,4 +534,28 @@ export class TimesheetsState {
         })
       );
   }
+
+  @Action(TimesheetDetails.GetBillRates)
+  GetBillRates({ patchState }: StateContext<TimesheetsModel>,
+    payload: { depId: number, skillId: number, orderType: number}): Observable<DropdownOption[]> {
+      return this.timesheetsApiService.getCandidateBillRates(payload.depId, payload.skillId, payload.orderType)
+      .pipe(
+        tap((res) => patchState({
+          billRateTypes: res,
+        })),
+      );
+    }
+
+  @Action(TimesheetDetails.GetCostCenters)
+  GetCostCenters({ patchState }: StateContext<TimesheetsModel>,
+    payload: { jobId: number}) {
+      return this.timesheetsApiService.getCandidateCostCenters(payload.jobId)
+      .pipe(
+        tap((res) => patchState({
+          costCenterOptions: res,
+        })),
+      );
+    }
+
+
 }

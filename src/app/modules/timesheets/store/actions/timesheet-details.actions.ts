@@ -83,4 +83,22 @@ export namespace TimesheetDetails {
     constructor(public id: number) {
     }
   }
+
+  export class GetBillRates {
+    static readonly type = TimesheetDetailsActions.GetCandidateBillRates;
+
+    constructor(
+      public depId: number,
+      public skillId: number,
+      public orderType: number,
+    ) {}
+  }
+
+  export class GetCostCenters {
+    static readonly type = TimesheetDetailsActions.GetCandidateCostCenters;
+
+    constructor(
+      public jobId: number,
+    ) {}
+  }
 }

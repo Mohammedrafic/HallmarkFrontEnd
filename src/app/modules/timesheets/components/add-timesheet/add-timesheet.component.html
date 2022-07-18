@@ -1,9 +1,8 @@
 <ejs-dialog
 id="edit-timesheet-dialog"
-#sideEditDialog
+#sideAddDialog
 cssClass="dialog"
 [width]="'434px'"
-[target]="targetElement"
 [visible]="false"
 [animationSettings]="{ effect: 'SlideRight' }"
 >
@@ -16,64 +15,79 @@ cssClass="dialog"
           <button (click)="saveForm()" ejs-button [isPrimary]="true">Save</button>
         </div>
       </div>
-      <div class="form">
-        <form [formGroup]="form" autocomplete="off" class="bootstrap">
-          <ng-container *ngFor="let fieldGroup of dialogConfig.fields; trackBy:trackByIndex">
-            <div class="row">
-              <ng-container *ngFor="let field of fieldGroup; trackBy:trackByField">
-                <ng-container [ngSwitch]="field.type">
 
-                  <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
-                    <div class="input-container">
-                      <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
-                      </label>
-                      <div class="input-group dropdown">
-                        <ejs-dropdownlist
-                          [formControlName]="field.field"
-                          [dataSource]="field.options"
-                          appValidateWithMessage
-                        ></ejs-dropdownlist>
-                      </div>
-                    </div>
-                  </ng-template>
+      <div class="form" *ngIf="form">
+        <form [formGroup]="form" autocomplete="off" class="bootstrap grid">
+          <ng-container *ngFor="let field of dialogConfig[formType]; trackBy:trackByIndex">
+            <ng-container [ngSwitch]="field.type">
 
-                  <ng-template [ngSwitchCase]="FieldTypes.Time">
-                    <div class="input-container">
-                      <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
-                      </label>
-                      <div class="input-group">
-                        <ejs-timepicker
-                          placeholder="HH:MM"
-                          [formControlName]="field.field"
-                          appValidateWithMessage
-                          format="hh:mm a"
-                          [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                          [enableMask]="true"
+              <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
+                <div class="input-container">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                  </label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist
+                      [formControlName]="field.field"
+                      [dataSource]="field.options"
+                      appValidateWithMessage
+                    ></ejs-dropdownlist>
+                  </div>
+                </div>
+              </ng-template>
 
-                          maskPlaceholder="HH:MM">
-                        </ejs-timepicker>
-                      </div>
-                    </div>
-                  </ng-template>
+              <ng-template [ngSwitchCase]="FieldTypes.Time">
+                <div class="input-container" [ngClass]="field.widthStyle || ''">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                  </label>
+                  <div class="input-group">
+                    <ejs-timepicker
+                      placeholder="HH:MM"
+                      [formControlName]="field.field"
+                      appValidateWithMessage
+                      format="hh:mm a"
+                      [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                      [enableMask]="true"
+                      (change)="updateValidity()"
+                      maskPlaceholder="HH:MM">
+                    </ejs-timepicker>
+                  </div>
+                </div>
+              </ng-template>
 
-                  <ng-template [ngSwitchCase]="FieldTypes.Input">
-                    <div class="input-container">
-                      <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
-                      </label>
-                      <div class="input-group">
-                        <input
-                          class="e-input"
-                          [name]="field.field"
-                          appValidateWithMessage
-                          [formControlName]="field.field"
-                        />
-                      </div>
-                    </div>
-                  </ng-template>
+              <ng-template [ngSwitchCase]="FieldTypes.TimeCalendar">
+                <div class="input-container" [ngClass]="field.widthStyle || ''">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                  </label>
+                  <div class="input-group">
+                    <ejs-datetimepicker
+                      name="startDateTime"
+                      [formControlName]="field.field"
+                      appValidateWithMessage
+                      [step]="30"
+                      placeholder="Select Date and Time"
+                      (change)="updateValidity()"
+                    >
+                    </ejs-datetimepicker>
+                  </div>
+                </div>
+              </ng-template>
 
-                </ng-container>
-              </ng-container>
-            </div>
+              <ng-template [ngSwitchCase]="FieldTypes.Input">
+                <div class="input-container">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                  </label>
+                  <div class="input-group">
+                    <input
+                      class="e-input"
+                      [name]="field.field"
+                      appValidateWithMessage
+                      [formControlName]="field.field"
+                    />
+                  </div>
+                </div>
+              </ng-template>
+
+            </ng-container>
           </ng-container>
 
         </form>

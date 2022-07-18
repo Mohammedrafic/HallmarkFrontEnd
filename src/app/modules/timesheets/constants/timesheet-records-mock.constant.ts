@@ -52,7 +52,7 @@ export const BillRatesOptions: BillRate[] = [
     billRateGroupId: 564,
     billRateConfigId: 272,
     billRateConfig: {
-      id: 444,
+      id: 3,
       category: BillRateCategory.BaseRate,
       title: 'Regular',
       type: BillRateType.Times,
@@ -90,7 +90,7 @@ export const BillRatesOptions: BillRate[] = [
     billRateGroupId: 565,
     billRateConfigId: 272,
     billRateConfig: {
-      id: 446,
+      id: 6,
       category: BillRateCategory.Overtime,
       title: 'Miles',
       type: BillRateType.Additional,

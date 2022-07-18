@@ -1,4 +1,4 @@
-import { TIMESHEETS_ACTIONS, DialogAction, TimesheetsTableColumns } from '../../enums';
+import { TIMESHEETS_ACTIONS, DialogAction, TimesheetsTableColumns, RecordFields } from '../../enums';
 import { TimesheetsFilterState } from '../../interface';
 
 export namespace Timesheets {
@@ -15,7 +15,7 @@ export namespace Timesheets {
   export class ToggleTimesheetAddDialog {
     static readonly type = TIMESHEETS_ACTIONS.OPEN_PROFILE_TIMESHEET_ADD_DIALOG;
 
-    constructor(public readonly action: DialogAction) {}
+    constructor(public readonly action: DialogAction, public readonly type: RecordFields) {}
   }
 
 

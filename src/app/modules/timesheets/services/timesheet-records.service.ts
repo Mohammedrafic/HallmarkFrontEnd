@@ -103,15 +103,4 @@ export class TimesheetRecordsService {
 
     return RecordFields.Time;
   }
-
-  public getFormOptions(
-    candId: number,
-    depId: number,
-    skillid: number,
-    orderType: number): Observable<[DropdownOption[], DropdownOption[]]> {
-    return forkJoin([
-      this.apiService.getCandidateCostCenters(candId),
-      this.apiService.getCandidateBillRates(depId, skillid, orderType),
-    ])
-  }
 }

@@ -1,3 +1,5 @@
+import { TimesheetsModel } from './../store/model/timesheets.model';
+import { FieldWidthStyle } from './../enums/add-edit-timesheet.enum';
 import { ColDef } from '@ag-grid-community/core';
 import { RecordFields } from './../enums/timesheet-common.enum';
 import { FormGroup } from '@angular/forms';
@@ -22,11 +24,15 @@ export interface DialogConfigField {
   required: boolean;
   options?: DropdownOption[];
   valueType?: string;
+  widthStyle?: FieldWidthStyle;
+  optionsStateKey?: keyof TimesheetsModel;
 }
 
 export interface DialogConfig {
   title: string;
-  fields: DialogConfigField[][];
+  timesheets: DialogConfigField[];
+  miles: DialogConfigField[];
+  expenses: DialogConfigField[];
 }
 
 export interface MileRecord {
@@ -38,6 +44,7 @@ export interface MileRecord {
   rate: number;
   total: number;
   billRate: number;
+  timeIn: string;
   billRateConfigId: number;
   billRateConfigName: string;
 }
@@ -50,6 +57,7 @@ export interface ExpensesRecord {
   description: string;
   amount: number;
   billRate: number;
+  timeIn: string;
   billRateConfigId: number;
   billRateConfigName: string;
 }
@@ -99,4 +107,16 @@ export interface TableSettingsConfig {
   isLockMenuButtonsShown: boolean;
   moreMenuWithDeleteButton: ItemModel[];
   moreMenuWithCloseButton: ItemModel[];
+}
+
+export interface CostCenter {
+  id: number;
+  name: string;
+  extDepartmentId: string;
+  formattedName: string;
+}
+
+
+export interface CostCentersDto {
+  [key: string]: CostCenter | CostCenter[];
 }

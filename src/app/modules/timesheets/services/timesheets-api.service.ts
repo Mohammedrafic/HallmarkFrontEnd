@@ -1,3 +1,6 @@
+import { BillRate } from '@shared/models/bill-rate.model';
+import { tap } from 'rxjs/internal/operators/tap';
+import { RecordValue, CostCentersDto, CostCenter } from './../interface/common.interface';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
@@ -23,6 +26,8 @@ import {
   filterColumnDataSource,
   MokTabsCounts,
   MockCandidateHoursAndMilesData,
+  MokTimesheet,
+  MokTimesheet1,
 } from '../constants';
 import {
   CandidateMockInfo,
@@ -30,6 +35,7 @@ import {
 } from '../constants/timesheet-records-mock.constant';
 import { TimesheetsTableColumns } from '../enums';
 import { CandidateHoursAndMilesData } from '../interface';
+import { CostCenterAdapter } from '../helpers/cost-centers.adapter';
 
 @Injectable()
 export class TimesheetsApiService {
@@ -40,7 +46,9 @@ export class TimesheetsApiService {
   ) {}
 
   public getTimesheets(filters: TimesheetsFilterState): Observable<TimeSheetsPage> {
-    return this.http.get<TimeSheetsPage>('/api/Timesheets');
+    return this.http.post<TimeSheetsPage>('/api/Timesheets', {
+      ...filters,
+    });
   }
 
   public getTabsCounts(): Observable<TabCountConfig> {
@@ -48,7 +56,20 @@ export class TimesheetsApiService {
   }
 
   public getTimesheetRecords(id: number): Observable<TimesheetRecordsDto> {
-    return this.http.get<TimesheetRecordsDto>(`/api/Timesheets/${id}/records`);
+    return this.http.get<TimesheetRecordsDto>(`/api/Timesheets/${id}/records`)
+    .pipe(
+      map((data) => {
+        data.timesheets.forEach((item: RecordValue) => {
+          item.day = item['timeIn'] as string
+          item.costCenter = 69;
+        });
+        data.miles.forEach((item: RecordValue) => {
+          item.day = item['timeIn'] as string;
+          item.costCenter = 69;
+        });
+        return data;
+      })
+    );
   }
 
   public postProfileTimesheets(body: TimesheetRecord): Observable<null> {
@@ -94,15 +115,10 @@ export class TimesheetsApiService {
     return of();
   }
 
-  public getCandidateCostCenters(id: number): Observable<DropdownOption[]> {
-    return of(CostCenterOptions)
+  public getCandidateCostCenters(jobId: number): Observable<DropdownOption[]>{
+    return this.http.get<CostCentersDto>(`/api/Jobs/${jobId}/costcenters`)
     .pipe(
-      map((res) => res.map((item) => {
-        return {
-          text: item.name,
-          value: item.id,
-        }
-      })),
+      map((res) => CostCenterAdapter(res)),
     );
   }
 
@@ -111,7 +127,14 @@ export class TimesheetsApiService {
     skillId: number,
     orderType: number,
     ): Observable<DropdownOption[]> {
-    return of (BillRatesOptions)
+    // return this.http.get<BillRate[]>(`/api/BillRates/predefined/forOrder`, {
+    //   params: {
+    //     DepartmentId: depId,
+    //     SkillId: skillId,
+    //     OrderType: orderType,
+    //   }
+    // })
+    return of(BillRatesOptions)
     .pipe(
       map((res) => res.map((item) => {
         return {

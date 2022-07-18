@@ -1,7 +1,9 @@
 import { PageOfCollections } from '@shared/models/page.model';
+import { RecordFields } from '../../enums';
 import {
   CandidateHoursAndMilesData,
   CandidateInfo,
+  DropdownOption,
   FilterColumns,
   TabCountConfig,
   Timesheet,
@@ -23,11 +25,14 @@ export interface TimesheetsModel {
   candidateAttachments: TimesheetAttachments;
   candidateInvoices: TimesheetInvoice[];
   timeSheetRecords: TimesheetRecordsDto;
-  costCenterOptions: unknown[];
-  billRateTypes: unknown[];
+  costCenterOptions: DropdownOption[];
+  billRateTypes: DropdownOption[];
   isTimeSheetOpen: boolean;
   selectedTimeSheetId: number;
-  isAddDialogOpen: boolean;
+  isAddDialogOpen: {
+    action: boolean,
+    dialogType: RecordFields,
+  };
   tabCounts: TabCountConfig | null;
   timesheetsFiltersColumns: FilterColumns;
   timesheetDetails: TimesheetDetailsModel | null;

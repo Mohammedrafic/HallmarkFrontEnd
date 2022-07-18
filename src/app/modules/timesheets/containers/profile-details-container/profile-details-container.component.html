@@ -15,7 +15,7 @@
 
         <div class="flex flex-column">
           <h3 class="username">
-            {{ timesheetDetails.candidateSurname }}, {{ timesheetDetails.candidateName}}
+            {{ timesheetDetails.candidateFirstName }}, {{ timesheetDetails.candidateLastName}}
           </h3>
 
           <ejs-chiplist #chipList class="events-off">
@@ -91,7 +91,7 @@
 
       <div class="order-header">
         <h2 class="order-id">Order ID {{ timesheetDetails?.orderId}}</h2>
-        <div class="bootstrap reject-reason-input" *ngIf="timesheetDetails?.rejectReason as rejectReason">
+        <div class="bootstrap reject-reason-input" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
           <div class="e-input input">{{rejectReason}}</div>
         </div>
 
@@ -99,7 +99,7 @@
           <div class="checkbox-block" *ngIf="isAgency">
             <ejs-switch #dnwSwitch
               class="toggle"
-              [checked]="timesheetDetails.isDidNotWork"
+              [checked]="timesheetDetails.noWorkPerformed"
               (change)="onDWNCheckboxSelectedChange($event, dnwSwitch)"
             ></ejs-switch>
             <span>DNW</span>
@@ -147,7 +147,7 @@
       <section class="profile-table-container">
         <app-profile-timesheet-table
           [candidateId]="candidateId"
-          (openAddSideDialog)="openAddDialog()"
+          (openAddSideDialog)="openAddDialog($event)"
           (changesSaved)="handleEditChanges($event)"
         >
         </app-profile-timesheet-table>

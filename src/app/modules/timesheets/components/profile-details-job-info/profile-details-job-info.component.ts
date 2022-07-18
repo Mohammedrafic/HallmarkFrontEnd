@@ -65,7 +65,7 @@ export class ProfileDetailsJobInfoComponent implements OnChanges {
       {
         title: !this.isAgency ? 'Agency' : 'Organization',
         icon: 'briefcase',
-        value: this.isAgency ? data.agencyName : data.organizationName,
+        value: data.unitName,
       },
     ];
   }

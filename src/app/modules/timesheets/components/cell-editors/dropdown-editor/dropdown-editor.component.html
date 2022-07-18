@@ -1,7 +1,7 @@
 <ng-container [ngSwitch]="editable">
 
   <ng-template [ngSwitchCase]="false">
-    <div class="init-value-wrapper">
+    <div class="init-value-wrapper" *ngIf="value?.text">
       <span>{{ value.text }}</span>
     </div>
   </ng-template>

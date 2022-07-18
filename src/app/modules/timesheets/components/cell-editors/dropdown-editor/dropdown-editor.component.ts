@@ -6,6 +6,7 @@ import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
 import { DropdownOption } from '../../../interface';
+import { Store } from '@ngxs/store';
 
 @Component({
   selector: 'app-dropdown-editor',
@@ -23,6 +24,7 @@ export class DropdownEditorComponent implements ICellRendererAngularComp {
   public control: AbstractControl;
 
   constructor(
+    private store: Store,
     private cd: ChangeDetectorRef,
   ) {}
 
@@ -42,14 +44,16 @@ export class DropdownEditorComponent implements ICellRendererAngularComp {
   }
 
   private setData(params: ICellRendererParams): void {
-    if ((params.colDef as ColDef).field === 'billRateType') {
+    const colDef = (params.colDef as ColDef);
+    const storeField = colDef.cellRendererParams.storeField as string
+    this.editable = colDef.cellRendererParams.isEditable;
+    
+    this.options = this.store.snapshot().timesheets[storeField];
 
+    if (this.options && this.options.length) {
+      this.value = this.options.find((item) => item.value === params.value) as DropdownOption;
     }
-    this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
-    this.options = (params.colDef as ColDef).cellRendererParams.options;
-
-    this.value = this.options.find((item) => item.value === params.value) as DropdownOption;
-
+    console.log(params, this.options)
     this.cd.markForCheck();
   }
 

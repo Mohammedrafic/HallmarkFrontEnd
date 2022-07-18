@@ -1,8 +1,9 @@
-import { TabConfig } from './../interface/common.interface';
 import { Validators } from '@angular/forms';
+
 import { ColDef } from '@ag-grid-community/core';
 
 import { RecordFields } from './../enums/timesheet-common.enum';
+import { TabConfig } from './../interface/common.interface';
 import { ActionsCellComponent } from './../components/cell-editors/actions-cell/actions-cell.component';
 import { DropdownEditorComponent } from '../components/cell-editors/dropdown-editor/dropdown-editor.component';
 import { GridDateEditorComponent } from '../components/cell-editors/grid-date-editor/grid-date-editor.component';
@@ -37,12 +38,12 @@ const editableCostCenterDef: ColDef = {
   cellRendererParams: {
     editMode: true,
     isEditable: false,
-    options: [],
+    storeField: 'costCenterOptions'
   }
 };
 
 const billRateColDef: ColDef = {
-  field: 'rate',
+  field: 'billRate',
   headerName: 'Bill rate',
   type: 'rightAligned',
   ...commonColumn,
@@ -56,7 +57,7 @@ const billRateColDef: ColDef = {
 
 const amountColdef = (headerText: string): ColDef => (
   {
-    field: 'amount',
+    field: 'value',
     headerName: headerText,
     type: 'rightAligned',
     ...commonColumn,
@@ -92,7 +93,7 @@ const totalCol: ColDef = {
 };
 
 const billRateTypeStatic: ColDef = {
-  field: 'billRateType',
+  field: 'billRateConfigName',
   headerName: 'Bill rate type',
   ...commonColumn,
   width: 180,
@@ -137,7 +138,7 @@ export const TimesheetRecordsColdef: ColDef[] = [
   },
   editableCostCenterDef,
   {
-    field: 'billRateType',
+    field: 'billRateId',
     headerName: 'Bill rate type',
     ...commonColumn,
     width: 180,
@@ -147,6 +148,7 @@ export const TimesheetRecordsColdef: ColDef[] = [
       editMode: true,
       isEditable: false,
       options: [],
+      storeField: 'billRateTypes',
     }
   },
   amountColdef('Hours'),
@@ -170,7 +172,6 @@ export const MilesRecordsColDef: ColDef[] = [
   },
   {
     ...billRateTypeStatic,
-    field: 'billRateConfigName',
     width: 200,
   },
   {
@@ -200,7 +201,6 @@ export const ExpensesRecordsColDef: ColDef[] = [
   editableCostCenterDef,
   {
     ...billRateTypeStatic,
-    field: 'billRateConfigName',
   },
   {
     field: 'description',

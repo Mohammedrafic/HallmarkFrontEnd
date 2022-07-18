@@ -54,11 +54,17 @@ export interface TimesheetDetailsModel {
   id: number;
   statusText: string
   status: number;
+  rejectionReason?: string;
   organizationId: number;
   candidateId: number;
-  candidateName: string;
-  candidateSurname: string;
-  isDidNotWork: boolean;
+  candidateFirstName: string;
+  candidateLastName: string;
+  candidateMiddleName: string;
+  noWorkPerformed: boolean;
+  departmentId: number;
+  skillId: number;
+  orderType: number;
+  jobId: number;
   orderId: number;
   orderTitle: string;
   orderRegionName: string | null;
@@ -67,11 +73,8 @@ export interface TimesheetDetailsModel {
   orderSkillAbbreviation: string | null;
   jobStartDate: string;
   jobEndDate: string;
-  organizationName: string | null;
-  agencyName: string | null;
+  unitName: string;
   timesheetStatistic: TimesheetStatistics;
   attachments: TimesheetAttachment[];
   invoices: TimesheetInvoice[];
-
-  rejectReason?: string;
 }
