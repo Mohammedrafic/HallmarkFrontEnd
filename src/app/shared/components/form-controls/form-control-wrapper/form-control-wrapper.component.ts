@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-form-control-wrapper',
@@ -9,4 +9,5 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 export class FormControlWrapperComponent {
   @Input() public id: string;
   @Input() public label: string;
+  @Input() public required: boolean;
 }

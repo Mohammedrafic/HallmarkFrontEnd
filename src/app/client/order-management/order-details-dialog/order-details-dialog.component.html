@@ -12,7 +12,7 @@
       <section class="header-container">
         <div class="e-card-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title">Order ID {{ order?.id }}</h3>
+            <h3 class="e-card-title">{{isReOrder ? 'Re-Order' : 'Order'}} ID {{ order?.id }}</h3>
             <div class="order-statuses">
               <ejs-chiplist #chipList>
                 <e-chips>
@@ -20,7 +20,7 @@
                 </e-chips>
               </ejs-chiplist>
               <div class="vertical-divider"></div>
-              <div *ngIf="order" class="order-other-statuses">
+              <div *ngIf="order && !isReOrder" class="order-other-statuses">
                 <span class="custom-chip">{{ order.orderType | orderTypeName }}</span>
                 <span class="custom-chip"> {{order.isLocked ? "Locked" : "Unlocked"}}</span>
               </div>
@@ -34,7 +34,7 @@
             </div>
 
             <button ejs-button cssClass="e-outline edit-button" (click)="editOrder(order)"><i-feather name="edit" class="icon"></i-feather></button>
-            <button ejs-button cssClass="e-outline" *ngIf="showCloseButton">Close Order</button>
+            <button ejs-button cssClass="e-outline" *ngIf="showCloseButton && !isReOrder">Close Order</button>
             <button ejs-button cssClass="e-outline" *ngIf="orderType.OpenPerDiem === order?.orderType" (click)="createReOrder()">Create Re-Order</button>
             <button ejs-button cssClass="e-primary delete-button" (click)="deleteOrder(order.id)" *ngIf="!showCloseButton">Delete</button>
             <button ejs-button [isPrimary]="true" (click)="lockOrder()" [disabled]="disabledLock">
@@ -51,7 +51,7 @@
         <ejs-tab #tab *ngIf="orderStatus.Incomplete !== order?.status" (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
           <e-tabitems>
             <e-tabitem>
-              <ng-template #headerText>Order Details</ng-template>
+              <ng-template #headerText>{{isReOrder ? 'Re-Order' : 'Order'}} Details</ng-template>
               <ng-template #content>
                 <app-order-details-container [currentOrder]="order"></app-order-details-container>
               </ng-template>
@@ -62,7 +62,7 @@
                 <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>
               </ng-template>
             </e-tabitem>
-            <e-tabitem *ngIf="order?.orderType !== orderType.OpenPerDiem">
+            <e-tabitem *ngIf="order?.orderType !== orderType.OpenPerDiem && isReOrder">
               <ng-template #headerText>Extensions</ng-template>
               <ng-template #content>
                 <!--Extensions tab goes here-->
@@ -86,6 +86,7 @@
             </e-tabitem>
           </e-tabitems>
         </ejs-tab>
+        <app-add-edit-reorder [order]="order" (saveEmitter)="saveEmitter.emit()"></app-add-edit-reorder>
       </div>
     </section>
   </ng-template>

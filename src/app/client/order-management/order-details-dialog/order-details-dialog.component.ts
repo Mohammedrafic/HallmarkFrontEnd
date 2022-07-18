@@ -1,4 +1,16 @@
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import isNil from 'lodash/fp/isNil';
+
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
@@ -14,11 +26,17 @@ import { OrderManagementContentState } from '@client/store/order-managment-conte
 import { Order, OrderCandidatesListPage } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
-import {ApproveOrder, DeleteOrder, SetLock} from '@client/store/order-managment-content.actions';
+import { ApproveOrder, DeleteOrder, SetLock } from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CANCEL_ORDER_CONFIRM_TEXT, CANCEL_ORDER_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import {
+  CANCEL_ORDER_CONFIRM_TEXT,
+  CANCEL_ORDER_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+} from '@shared/constants';
 import { Location } from '@angular/common';
-import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
+import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
+import { ShowSideDialog } from '../../../store/app.actions';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -29,7 +47,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() order: Order;
   @Input() openEvent: Subject<boolean>;
 
-  @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
+  @Output() nextPreviousOrderEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
+  @Output() saveEmitter: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
@@ -50,30 +69,26 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public candidatesCounter: number;
 
   public showCloseButton = false;
-  private openInProgressFilledStatuses = [
-    'open',
-    'in progress',
-    'filled',
-    'custom step'
-  ];
+  private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
 
   private secondHasOpenedOnes = false;
 
+  public get isReOrder(): boolean {
+    return !isNil(this.order?.reOrderFromId);
+  }
+
   get disabledLock(): boolean {
-    const statuses = [
-      this.orderStatus.Open,
-      this.orderStatus.InProgress,
-      this.orderStatus.Filled
-    ]
+    const statuses = [this.orderStatus.Open, this.orderStatus.InProgress, this.orderStatus.Filled];
     return !statuses.includes(this.order?.status);
   }
 
-  constructor(private chipsCssClass: ChipsCssClass,
-              private router: Router,
-              private route: ActivatedRoute,
-              private store: Store,
-              private confirmService: ConfirmService,
-              private location: Location,
+  constructor(
+    private chipsCssClass: ChipsCssClass,
+    private router: Router,
+    private route: ActivatedRoute,
+    private store: Store,
+    private confirmService: ConfirmService,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
@@ -83,7 +98,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   ngOnChanges(changes: SimpleChanges): void {
     if (this.chipList && changes['order'].currentValue) {
-      this.showCloseButton = this.openInProgressFilledStatuses.includes(changes['order'].currentValue.statusText.toLowerCase());
+      this.showCloseButton = this.openInProgressFilledStatuses.includes(
+        changes['order'].currentValue.statusText.toLowerCase()
+      );
       this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
       this.chipList.text = changes['order'].currentValue.statusText.toUpperCase();
     }
@@ -121,7 +138,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
         okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
+        okButtonClass: 'delete-button',
       })
       .subscribe((isConfirm: boolean) => {
         if (isConfirm) {
@@ -136,20 +153,18 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       title: CANCEL_ORDER_CONFIRM_TITLE,
       okButtonLabel: 'Yes',
       okButtonClass: 'delete-button',
-      cancelButtonLabel: 'No'
+      cancelButtonLabel: 'No',
     };
 
-    this.confirmService
-      .confirm(CANCEL_ORDER_CONFIRM_TEXT, options)
-      .subscribe((isConfirm: boolean) => {
-        if (isConfirm) {
-          this.store.dispatch(new DeleteOrder(id));
-        }
-      });
+    this.confirmService.confirm(CANCEL_ORDER_CONFIRM_TEXT, options).subscribe((isConfirm: boolean) => {
+      if (isConfirm) {
+        this.store.dispatch(new DeleteOrder(id));
+      }
+    });
   }
 
   createReOrder(): void {
-    // TODO: create re-order here
+    this.store.dispatch(new ShowSideDialog(true));
   }
 
   public approveOrder(id: number): void {
@@ -157,8 +172,13 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public editOrder(data: Order) {
-    this.router.navigate(['./edit', data.id], { relativeTo: this.route });
-    this.onClose();
+    if (this.isReOrder) {
+      this.store.dispatch(new ShowSideDialog(true));
+      this.order = { ...data };
+    } else {
+      this.router.navigate(['./edit', data.id], { relativeTo: this.route });
+      this.onClose();
+    }
   }
 
   public onClose(): void {
@@ -193,10 +213,12 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   private subscribeOnOrderCandidatePage(): void {
-    this.orderCandidatePage$.pipe(takeUntil((this.unsubscribe$))).subscribe((order: OrderCandidatesListPage) => {
-      this.candidatesCounter = order && order.items?.filter((candidate) =>
-        candidate.status !== ApplicantStatus.Rejected  && candidate.status !== ApplicantStatus.Withdraw
-      ).length;
+    this.orderCandidatePage$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: OrderCandidatesListPage) => {
+      this.candidatesCounter =
+        order &&
+        order.items?.filter(
+          (candidate) => candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
+        ).length;
     });
   }
 }

@@ -10,19 +10,18 @@ import {
   ViewChild,
 } from '@angular/core';
 import { Observable, Subject, takeWhile } from 'rxjs';
-import { Select } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
-import { AgencyOrderManagement } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, Order } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { Order } from '@shared/models/order-management.model';
 
 @Component({
   selector: 'app-preview-order-dialog',
@@ -56,7 +55,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
 
   private isAlive = true;
 
-  constructor(private chipsCssClass: ChipsCssClass) {}
+  constructor(private chipsCssClass: ChipsCssClass, private store: Store) {}
 
   ngOnInit(): void {
     this.onOpenEvent();
@@ -103,6 +102,8 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   public onCompare(): void {
     disabledBodyOverflow(false);
     this.compareEvent.emit();
+    // TODO temp solution for opening add reorder dialog
+    // this.store.dispatch(new ShowSideDialog(true));
   }
 
   private onOpenEvent(): void {
@@ -120,4 +121,3 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
     });
   }
 }
-

@@ -25,12 +25,12 @@ import {
 } from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
-  OrderManagementChild,
   Order,
   OrderFilter,
-  OrderManagement,
-  OrderManagementPage,
   OrderFilterDataSource,
+  OrderManagement,
+  OrderManagementChild,
+  OrderManagementPage,
 } from '@shared/models/order-management.model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { UserState } from '../../../store/user.state';
@@ -55,9 +55,9 @@ import {
   OrderTypeName,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
+  reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
-  reOrdersChildColumnToExport,
   ROW_HEIGHT,
 } from './order-management-content.constants';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
@@ -542,7 +542,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.selectedReOrder = reOrder;
     this.selectedReOrder.selected = {
       order: order.id,
-      reOrder: reOrder.id
+      reOrder: reOrder.id,
     };
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
@@ -550,11 +550,24 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     //this.openChildDialog.next([order, candidate]); TODO: pending reorder modal
   }
 
+  public triggerSelectOrder(): void {
+    const [index] = this.gridWithChildRow.getSelectedRowIndexes();
+    this.selectedIndex = index;
+    this.updatePage();
+    this.store.dispatch(
+      new GetOrderById(
+        this.selectedDataRow.id,
+        this.selectedDataRow.organizationId as number,
+        this.getDialogNextPreviousOption(this.selectedDataRow as any)
+      )
+    );
+  }
+
   public onOpenCandidateDialog(candidate: OrderManagementChild, order: OrderManagement): void {
     this.selectedCandidate = candidate;
     this.selectedCandidate.selected = {
       order: order.id,
-      positionId: candidate.positionId
+      positionId: candidate.positionId,
     };
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
