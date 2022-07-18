@@ -130,6 +130,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
   private excludeDeployed: boolean;
+  private pageSubject = new Subject<number>();
 
   constructor(
     private store: Store,
@@ -166,6 +167,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.ordersPage = data;
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
     });
+    this.subscribeOnPageChanges();
   }
 
   ngOnDestroy(): void {
@@ -236,7 +238,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.dispatchNewPage();
+      this.pageSubject.next(event.currentPage || event.value);
       this.isSubrowDisplay = false;
     }
   }
@@ -315,8 +317,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       const options = this.getDialogNextPreviousOption(event.data);
       this.store.dispatch(new GetOrderById(event.data.orderId, event.data.organizationId, options));
       this.openPreview.next(true);
-      this.store.dispatch(   
-        new GetAgencyOrderCandidatesList(event.data.orderId, event.data.organizationId, this.currentPage, this.pageSize, this.excludeDeployed)
+      this.store.dispatch(
+        new GetAgencyOrderCandidatesList(
+          event.data.orderId,
+          event.data.organizationId,
+          this.currentPage,
+          this.pageSize,
+          this.excludeDeployed
+        )
       );
       this.store.dispatch(new GetAgencyOrderGeneralInformation(event.data.orderId, event.data.organizationId));
       this.selectedIndex = Number(event.rowIndex);
@@ -534,5 +542,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
             }
           });
       });
+  }
+
+  private subscribeOnPageChanges(): void {
+    this.pageSubject.pipe(debounceTime(1)).subscribe((page: number) => {
+      this.currentPage = page;
+      this.dispatchNewPage();
+    });
   }
 }
