@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { GetAgencyOrderCandidatesList } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
@@ -20,6 +20,8 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
   @Input() set currentOrder(value: Order) {
     this.order = value;
   }
+
+  @Output() excludeDeployedEvent = new EventEmitter<boolean>();
 
   public orderCandidatePage: OrderCandidatesListPage;
   public orderCandidates: any;
@@ -43,6 +45,7 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
   }
 
   public onGetCandidatesList(event: CandidateListEvent) : void {
+    this.excludeDeployedEvent.emit(event.excludeDeployed);
     this.store.dispatch(new GetAgencyOrderCandidatesList(event.orderId, event.organizationId, event.currentPage, event.pageSize, event.excludeDeployed));
   }
 }

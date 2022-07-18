@@ -66,6 +66,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { SearchComponent } from '@shared/components/search/search.component';
 import { OrderStatus } from '@shared/enums/order-management';
+import { NextPreviousOrderEvent } from '../order-details-dialog/order-details-dialog.component';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
 
@@ -161,6 +162,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private selectedIndex: number | null;
   private ordersPage: OrderManagementPage;
+  private excludeDeployed: boolean;
 
   public columnsToExport: ExportColumn[];
 
@@ -424,21 +426,27 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
   }
 
-  public onNextPreviousOrderEvent(next: boolean): void {
+  public onNextPreviousOrderEvent(event: NextPreviousOrderEvent): void {
     const [index] = this.gridWithChildRow.getSelectedRowIndexes();
-    const nextIndex = next ? index + 1 : index - 1;
+    const nextIndex = event.next ? index + 1 : index - 1;
+    this.excludeDeployed = event.excludeDeployed;
     this.gridWithChildRow.selectRow(nextIndex);
   }
 
   public onRowClick(event: any): void {
+    if (event.target) {
+      this.excludeDeployed = false;
+    }
+
     this.rowSelected(event, this.gridWithChildRow);
+
     if (!event.isInteracted) {
       this.selectedDataRow = event.data;
       const data = event.data;
       const options = this.getDialogNextPreviousOption(data);
       this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
       this.store.dispatch(
-        new GetAgencyOrderCandidatesList(data.id, data.organizationId, this.currentPage, this.pageSize)
+        new GetAgencyOrderCandidatesList(data.id, data.organizationId, this.currentPage, this.pageSize, this.excludeDeployed)
       );
       this.selectedCandidate = this.selectedReOrder = null;
       this.openChildDialog.next(false);
@@ -646,7 +654,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
             this.selectedDataRow.id,
             this.selectedDataRow.organizationId as number,
             this.currentPage,
-            this.pageSize
+            this.pageSize,
+            this.excludeDeployed
           )
         );
         this.getOrders();

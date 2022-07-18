@@ -23,6 +23,11 @@ import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 
+export type NextPreviousOrderEvent = {
+  next: boolean;
+  excludeDeployed: boolean;
+};
+
 @Component({
   selector: 'app-preview-order-dialog',
   templateUrl: './preview-order-dialog.component.html',
@@ -34,7 +39,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() openCandidateTab: boolean;
 
   @Output() compareEvent = new EventEmitter<never>();
-  @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
+  @Output() nextPreviousOrderEvent = new EventEmitter<NextPreviousOrderEvent>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
@@ -53,6 +58,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
 
+  private excludeDeployed: boolean;
   private isAlive = true;
 
   constructor(private chipsCssClass: ChipsCssClass, private store: Store) {}
@@ -96,7 +102,11 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public onNextPreviousOrder(next: boolean): void {
-    this.nextPreviousOrderEvent.emit(next);
+    this.nextPreviousOrderEvent.emit({ next, excludeDeployed: this.excludeDeployed });
+  }
+
+  public onExcludeDeployed(event: boolean): void {
+    this.excludeDeployed = event;
   }
 
   public onCompare(): void {
@@ -121,3 +131,4 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
     });
   }
 }
+

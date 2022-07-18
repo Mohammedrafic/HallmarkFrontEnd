@@ -1,7 +1,7 @@
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { filter, forkJoin, Observable, takeUntil, tap } from 'rxjs';
 
 import { isEmpty } from 'lodash';
@@ -16,6 +16,12 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { CandidatesStatusText, OrderStatusText } from '@shared/enums/status';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+
+enum RLDLevel {
+  Orginization,
+  Region,
+  Location,
+}
 
 @Component({
   selector: 'app-agency-order-filters',
@@ -56,7 +62,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     return this.form.get('departmentsIds') as AbstractControl;
   }
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private actions$: Actions) {
     super();
   }
 
@@ -81,9 +87,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     return organizationIdsControl.valueChanges.pipe(
       tap((value: number[]) => {
         if (isEmpty(value)) {
-          this.regionIdsControl.reset();
-          this.locationIdsControl.reset();
-          this.departmentsIdsControl.reset();
+          this.clearRLDByLevel(RLDLevel.Orginization);
         } else {
           this.store.dispatch(new GetOrganizationStructure(value));
         }
@@ -95,8 +99,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     return this.regionIdsControl.valueChanges.pipe(
       tap((value: number[]) => {
         if (isEmpty(value)) {
-          this.locationIdsControl.reset();
-          this.departmentsIdsControl.reset();
+          this.clearRLDByLevel(RLDLevel.Region);
         } else {
           const regions: OrganizationRegion[] = this.filterColumns.regionIds.dataSource.filter(
             ({ id }: { id: number }) => value.includes(id)
@@ -111,7 +114,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     return this.locationIdsControl.valueChanges.pipe(
       tap((value: number[]) => {
         if (isEmpty(value)) {
-          this.departmentsIdsControl.reset();
+          this.clearRLDByLevel(RLDLevel.Location);
         } else {
           const locations: OrganizationLocation[] = this.filterColumns.locationIds.dataSource.filter(
             ({ id }: { id: number }) => value.includes(id)
@@ -123,7 +126,27 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   }
 
   private onGridFilterRegions(): Observable<unknown> {
-    return this.gridFilterRegions$.pipe(tap((regions) => (this.filterColumns.regionIds.dataSource = regions)));
+    return this.actions$.pipe(
+      ofActionSuccessful(GetOrganizationStructure),
+      tap(() => {
+        this.filterColumns.regionIds.dataSource = this.store.selectSnapshot(OrderManagementState.gridFilterRegions);
+      })
+    );
+  }
+
+  private clearRLDByLevel(level: RLDLevel): void {
+    this.departmentsIdsControl.reset();
+    this.filterColumns.departmentsIds.dataSource = [];
+
+    if (level === RLDLevel.Orginization || level === RLDLevel.Region) {
+      this.locationIdsControl.reset();
+      this.filterColumns.locationIds.dataSource = [];
+    }
+
+    if (level === RLDLevel.Orginization) {
+      this.regionIdsControl.reset();
+      this.filterColumns.regionIds.dataSource = [];
+    }
   }
 
   private onOrderFilteringOptionsChange(): void {
@@ -262,3 +285,4 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     };
   }
 }
+
