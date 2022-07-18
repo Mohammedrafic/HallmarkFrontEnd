@@ -516,6 +516,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filteredItems = [];
     this.search?.clear();
     this.store.dispatch(new ClearOrders());
+    this.openDetails.next(false);
+    this.selectedIndex = null;
+    this.clearSelection(this.gridWithChildRow);
 
     switch (tabIndex) {
       case OrganizationOrderManagementTabs.AllOrders:
@@ -558,10 +561,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       order: order.id,
       reOrder: reOrder.id,
     };
-    const options = this.getDialogNextPreviousOption(order);
-    this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
+    this.gridWithChildRow?.clearRowSelection();
+    this.selectedIndex = null;
+    this.store.dispatch(new GetOrderById(reOrder.id, order.organizationId));
     this.selectedDataRow = order as any;
-    //this.openChildDialog.next([order, candidate]); TODO: pending reorder modal
+    this.openDetails.next(true);
   }
 
   public triggerSelectOrder(): void {
@@ -842,6 +846,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.openDetails.pipe(takeUntil(this.unsubscribe$)).subscribe((isOpen) => {
       if (!isOpen) {
         this.gridWithChildRow.clearRowSelection();
+        this.selectedReOrder = null;
       }
     });
   }

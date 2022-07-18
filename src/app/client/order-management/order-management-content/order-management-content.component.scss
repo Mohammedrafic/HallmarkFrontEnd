@@ -106,7 +106,7 @@
 }
 
 .subrow-wrapper {
-  app-grid-subrow-candidate:not(:last-child) {
+  app-grid-subrow-candidate:not(:last-child), app-grid-subrow-reorder:not(:last-child) {
     display: block;
     border-bottom: 1px solid  $secondary-dark-blue-45;
   }

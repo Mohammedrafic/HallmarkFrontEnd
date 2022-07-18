@@ -386,7 +386,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.unsubscribe$),
         switchMap((locationId: number) => {
-          if (!locationId || this.isEditMode) {
+          if (!locationId || (this.isEditMode && this.order?.status !== OrderStatus.Incomplete)) {
             return of(null);
           }
 
@@ -575,16 +575,16 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.suggestedDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((suggesstedDetails) => {
-      if (!suggesstedDetails) {
+    this.suggestedDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((suggestedDetails) => {
+      if (!suggestedDetails) {
         return;
       }
 
       const contactDetailsFormArray = this.contactDetailsForm.controls['contactDetails'] as FormArray;
       const firstContactDetailsControl = contactDetailsFormArray.at(0) as FormGroup;
 
-      const { name, email, mobilePhone } = suggesstedDetails.contactDetails;
-      const { address, state, city, zipCode } = suggesstedDetails.workLocation;
+      const { name, email, mobilePhone } = suggestedDetails.contactDetails;
+      const { address, state, city, zipCode } = suggestedDetails.workLocation;
 
       firstContactDetailsControl.controls['name'].patchValue(name);
       firstContactDetailsControl.controls['email'].patchValue(email);

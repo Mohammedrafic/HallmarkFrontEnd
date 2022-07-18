@@ -22,7 +22,7 @@ export class ClearOrders {
 
 export class GetOrderById {
   static readonly type = '[order management] Get Order By Id';
-  constructor(public id: number, public organizationId: number, public options: DialogNextPreviousOption) {}
+  constructor(public id: number, public organizationId: number, public options?: DialogNextPreviousOption) {}
 }
 
 export class SetLock {
