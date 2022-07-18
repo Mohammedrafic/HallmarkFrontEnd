@@ -892,7 +892,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       this.dashboardFilterSubscription = this.actions
         .pipe(
           ofActionDispatched(ShowFilterDialog),
-          filter((data) => !!data.isDialogShown),
+          filter((data) => data.isDialogShown),
           takeUntil(this.unsubscribe$),
         )
         .subscribe(() => this.setFilterState());

@@ -10,7 +10,7 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Skill } from '@shared/models/skill.model';
 import { FilterService } from '@shared/services/filter.service';
-import { combineLatest, distinctUntilChanged, filter, map, Observable, skip, takeUntil } from 'rxjs';
+import { combineLatest, filter, Observable, skip, Subscription, takeUntil } from 'rxjs';
 import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
 import { IFilterColumnsDataModel } from 'src/app/dashboard/models/widget-filter.model';
 import { SetDashboardFiltersState, SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
@@ -31,12 +31,12 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   @Select(DashboardState.filteredItems) public readonly filteredItems$: Observable<FilteredItem[]>;
   @Select(OrganizationManagementState.allOrganizationSkills) private readonly skills$: Observable<Skill[]>;
 
+  private dialogSubscription: Subscription;
   public filteredItems: FilteredItem[] = [];
   public widgetFilterFormGroup: FormGroup;
   public filters: DashboardFiltersModel = {};
   public filterColumns: IFilterColumnsDataModel;
   public regions: OrganizationRegion[] = [];
-  public orgStructure: OrganizationStructure;
   public optionFields = {
     text: 'name',
     value: 'id',
@@ -81,19 +81,13 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   }
 
   private isFilterDialogOpened() {
-    this.actions
-      .pipe(ofActionDispatched(ShowFilterDialog), takeUntil(this.destroy$))
-      .pipe(
-        map((payload: ShowFilterDialog) => payload.isDialogShown),
-        distinctUntilChanged()
-      )
-      .subscribe((data) => {
-        if (data) {
+   this.dialogSubscription = this.actions
+      .pipe(ofActionDispatched(ShowFilterDialog), filter((data) => data.isDialogShown), takeUntil(this.destroy$))
+      .subscribe(() => {
           this.onOrganizationStructureDataLoadHandler();
           this.onOrderFilterControlValueChangedHandler();
           this.onSkillDataLoadHandler();
           this.setFilterState();
-        }
       });
   }
 
@@ -105,6 +99,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   public onFilterClearAll(): void {
     this.widgetFilterFormGroup.reset();
     this.filters = {};
+    this.filteredItems = [];
     this.saveFilteredItems(this.filteredItems);
   }
 
@@ -222,7 +217,6 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
       .pipe(takeUntil(this.destroy$), filter(Boolean))
       .subscribe((structure: OrganizationStructure) => {
         this.cdr.markForCheck();
-        this.orgStructure = structure;
         this.regions = structure.regions;
         this.filterColumns.regionIds.dataSource = this.regions;
       });
@@ -258,6 +252,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   private setFilterState(): void {
     combineLatest([this.filteredItems$, this.organizationStructure$]).pipe(takeUntil(this.destroy$), filter(([items, orgs]) => !!orgs && items.length > 0), ).subscribe(() => Object.entries(this.filters).forEach(([key, value]) => this.widgetFilterFormGroup.get(key)?.setValue(value)))
+    this.dialogSubscription.unsubscribe();
   }
 
   private changingOrganization(): void{
