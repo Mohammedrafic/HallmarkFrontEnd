@@ -32,7 +32,7 @@ export interface DashboardStateModel {
     widgets: [],
     isMobile: false,
     filteredItems: JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [],
-    dashboardFilterState: {}
+    dashboardFilterState: {} as DashboardFiltersModel
   },
 })
 @Injectable()
