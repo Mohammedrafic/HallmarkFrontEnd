@@ -45,7 +45,7 @@ export const perDiemColumnsToExport: ExportColumn[] = [
 ];
 
 export const reOrdersColumnsToExport: ExportColumn[] = [
-  { text:'Re-Order ID', column: 'ReOrderId'},
+  { text:'Re-Order ID', column: 'Id'},
   { text:'Status', column: 'Status'},
   { text:'Job Title', column: 'JobTitle'},
   { text:'Skill', column: 'Skill'},

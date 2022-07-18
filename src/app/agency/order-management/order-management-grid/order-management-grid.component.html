@@ -74,13 +74,13 @@
       <ng-template #template let-data>
         <ng-container *ngIf="!data.children?.length; else withToggle">
           <div>
-            <b>{{ data.reOrderId }}</b>
+            <b>{{ data.orderId }}</b>
           </div>
         </ng-container>
 
         <ng-template #withToggle>
           <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-            <b>{{ data.reOrderId }}</b>
+            <b>{{ data.orderId }}</b>
             <i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
           </div>
         </ng-template>
