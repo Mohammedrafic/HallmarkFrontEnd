@@ -41,7 +41,7 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text:'Location', column: 'LocationName'},
   { text:'Department', column: 'DepartmentName'},
   { text:'Candidates', column: 'Candidates'},
-  { text:'# of Shifts Next 90 Days', column: 'shiftCount'},
+  { text:'# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days'},
 ];
 
 export const reOrdersColumnsToExport: ExportColumn[] = [
@@ -98,7 +98,7 @@ export const ReOrdersColumnsConfig = [
     visible: false
   },
   {
-    fieldName: 'shiftCount',
+    fieldName: 'shiftsNext90Days',
     visible: false
   },
 ];
@@ -133,7 +133,7 @@ export const AllOrdersColumnsConfig = [
     visible: false
   },
   {
-    fieldName: 'shiftCount',
+    fieldName: 'shiftsNext90Days',
     visible: false
   },
 ];

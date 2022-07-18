@@ -191,7 +191,7 @@ export class UserState {
   ): Observable<LasSelectedOrganizationAgency> {
     return this.userService.saveLastSelectedOrganizationAgencyId(payload).pipe(map(() => {
       dispatch(new SetLastSelectedOrganizationAgencyId(payload));
-      if (isOrganizationId && getState().lastSelectedOrganisationAgency === 'Organization') {
+      if (isOrganizationId) {
         dispatch(new GetOrganizationStructure());
       }
       return payload;

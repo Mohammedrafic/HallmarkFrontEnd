@@ -71,7 +71,7 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: 'Skill', column: 'Skill' },
   { text: 'Location', column: 'LocationName' },
   { text: 'Department', column: 'DepartmentName' },
-  { text: '# of Shifts Next 90 Days', column: 'ShiftCount' },
+  { text: '# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days' },
 ];
 
 export const ReOrdersColumnsConfig: GridColumn[] = [
@@ -103,6 +103,10 @@ export const ReOrdersColumnsConfig: GridColumn[] = [
     fieldName: 'organizationName',
     visible: false,
   },
+  {
+    fieldName: 'shiftsNext90Days',
+    visible: false,
+  },
 ];
 
 export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
@@ -132,6 +136,10 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
   },
   {
     fieldName: 'agencies',
+    visible: false,
+  },
+  {
+    fieldName: 'shiftsNext90Days',
     visible: false,
   },
 ];
