@@ -14,7 +14,7 @@
         <div class="chips-title" *ngFor="let filter of appliedFilters | keyvalue">
           <span>{{ filter.key }}:</span>
           <div class="chips-container">
-            <ejs-chiplist [chips]="filter.value" enableDelete="true"></ejs-chiplist>
+            <ejs-chiplist [chips]="filter.value" enableDelete="true"(delete)="deleteChip($event)"></ejs-chiplist>
           </div>
         </div>
       </div>
