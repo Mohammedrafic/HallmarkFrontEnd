@@ -126,7 +126,12 @@
     <e-column field="department" headerText="DEPARTMENT" textAlign="Left" width="150"></e-column>
     <e-column field="type" headerText="TYPE" width="100" [valueAccessor]="typeValueAccess"></e-column>
     <e-column field="location" headerText="LOCATION" textAlign="Left" width="200"></e-column>
-    <e-column field="jobStartDate" [headerText]="selectedTab !== AgencyOrderManagementTabs.ReOrders ? 'START DATE' : 'RE-ORDER DATE'" width="150">
+    <e-column field="jobStartDate" width="150">
+      <ng-template #headerTemplate let-data>
+        <span class="e-headertext">
+          {{ selectedTab !== AgencyOrderManagementTabs.ReOrders ? 'START DATE' : 'RE-ORDER DATE' }}
+        </span>
+      </ng-template>
       <ng-template #template let-data>
         {{ data.jobStartDate | date: 'MM/dd/yyy' }}
       </ng-template>

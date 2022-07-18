@@ -264,6 +264,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           fileType,
           {
             ...this.filters,
+            offset: Math.abs(new Date().getTimezoneOffset()),
             isAgency: this.activeTab === OrganizationOrderManagementTabs.ReOrders ? false : null,
             ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
           },

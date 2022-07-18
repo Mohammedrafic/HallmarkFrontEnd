@@ -32,7 +32,6 @@ export class OrderManagement {
   openPositions: number;
   candidates: number;
   startDate: string;
-  jobStartDate?: string;
   isLocked?: boolean;
   reOrderCount?: number;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
