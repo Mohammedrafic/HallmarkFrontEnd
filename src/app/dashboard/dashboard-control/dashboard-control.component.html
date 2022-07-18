@@ -17,6 +17,7 @@
             <ejs-chiplist [chips]="filter.value" enableDelete="true"(delete)="deleteChip($event)"></ejs-chiplist>
           </div>
         </div>
+        <div class="clear-all" *ngIf="items.length" (click)="onClearFilters()">Clear all</div>
       </div>
     </div>
 

@@ -153,4 +153,8 @@ export class DashboardControlComponent extends DestroyableDirective implements O
       this.filteredItems = this.filteredItems.filter((item) => !isEqual(item, filteredItem));
     }
   }
+
+  public onClearFilters(): void {
+    this.store.dispatch(new SetFilteredItems([]));
+  }
 }

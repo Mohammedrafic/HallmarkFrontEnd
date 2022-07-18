@@ -8,7 +8,6 @@
   .left-content {
     display: flex;
     font-size: 12px;
-    line-height: 16px;
     color: $secondary-dark-blue-30;
 
     .applied-filters {
@@ -25,6 +24,14 @@
       display: flex;
       flex-wrap: wrap;
       margin-left: 5px;
+
+      .clear-all {
+        margin-top: 10px;
+        color: $primary-active-blue-10;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+      }
 
       .chips-title {
         display: flex;
