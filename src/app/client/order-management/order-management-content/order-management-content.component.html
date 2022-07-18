@@ -520,6 +520,7 @@
 <app-order-details-dialog
   [order]="selectedOrder"
   [openEvent]="openDetails"
+  (saveReOrderEmitter)="updateGrid()"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"></app-order-details-dialog>
 
 <app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidate"  [openEvent]="openChildDialog"></app-child-order-dialog>

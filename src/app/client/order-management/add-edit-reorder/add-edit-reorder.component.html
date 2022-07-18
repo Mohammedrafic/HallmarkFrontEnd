@@ -16,9 +16,10 @@
     <app-multiselect-dropdown
       [formGroupInstance]="reorderForm"
       [fields]="agenciesOptionFields"
-      [dataSource]="associateAgencies$ | async"
+      [dataSource]="agencies$ | async"
       [showSelectAll]="true"
       [required]="true"
+      (selectAllEmitter)="onSelectAllAgencies($event)"
       selectAllText="All"
       controlName="agencies"
       id="agencies"
@@ -32,7 +33,7 @@
       [maskPlaceholder]="datepickerMask"
       id="reorderDate"
       controlName="reorderDate"
-      label="Re-Order Data"
+      label="Re-Order Date"
       format="MM/dd/yyyy"
       placeholder="MM/DD/YYYY"
     ></app-datepicker>

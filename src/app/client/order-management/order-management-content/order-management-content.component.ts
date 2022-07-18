@@ -2,9 +2,8 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { combineLatest, debounceTime, filter, Observable, Subject, Subscription, takeUntil, throttleTime 
-} from 'rxjs';
-import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
+import { combineLatest, debounceTime, filter, Observable, Subject, Subscription, takeUntil, throttleTime } from 'rxjs';
+import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { CandidatesStatusText, OrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
@@ -182,10 +181,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     private fb: FormBuilder,
     private datePipe: DatePipe,
     private location: Location,
-    private readonly actions: Actions,
+    private readonly actions: Actions
   ) {
     super();
-    this.isRedirectedFromDashboard = this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromDashboard'] || false;
+    this.isRedirectedFromDashboard =
+      this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromDashboard'] || false;
 
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.fb.group({
@@ -304,7 +304,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filters.billRateFrom ? this.filters.billRateFrom : null;
     this.filters.billRateTo ? this.filters.billRateTo : null;
     this.filters.pageNumber = this.currentPage;
-    this.filters.agencyType = this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) || null : null;
+    this.filters.agencyType =
+      this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) || null : null;
     this.filters.pageSize = this.pageSize;
 
     switch (this.activeTab) {
@@ -619,7 +620,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public menuOptionSelected(event: any, data: OrderManagement): void {
     switch (Number(event.item.properties.id)) {
       case MoreMenuType['Edit']:
-        this.router.navigate(['./edit', data.id], { relativeTo: this.route });
+        if (data.reOrderFromId !== 0) {
+          this.store.dispatch([new ShowSideDialog(true), new GetOrderById(data.id, data.organizationId, {} as any)]);
+        } else {
+          this.router.navigate(['./edit', data.id], { relativeTo: this.route });
+        }
         break;
       case MoreMenuType['Duplicate']:
         // TODO: pending implementation
@@ -911,6 +916,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     return !statuses.includes(status);
   }
 
+  public updateGrid(): void {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetOrders)).subscribe(() => {
+      const [index] = this.gridWithChildRow.getSelectedRowIndexes();
+      this.selectedIndex = index;
+    });
+    this.getOrders();
+  }
+
   private handleDashboardFilters(): void {
     if (this.isRedirectedFromDashboard) {
       this.applyDashboardFilters();
@@ -919,12 +932,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         .pipe(
           ofActionDispatched(ShowFilterDialog),
           filter((data) => data.isDialogShown),
-          takeUntil(this.unsubscribe$),
+          takeUntil(this.unsubscribe$)
         )
         .subscribe(() => this.setFilterState());
     }
   }
- 
+
   private applyDashboardFilters(): void {
     combineLatest([this.dashboardFiltersState$, this.filteredItems$])
       .pipe(takeUntil(this.unsubscribe$))

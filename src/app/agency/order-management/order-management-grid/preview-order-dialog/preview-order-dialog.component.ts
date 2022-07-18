@@ -22,6 +22,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+import isNil from 'lodash/fp/isNil';
 
 export type NextPreviousOrderEvent = {
   next: boolean;
@@ -62,6 +63,14 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   private isAlive = true;
 
   constructor(private chipsCssClass: ChipsCssClass, private store: Store) {}
+
+  public get isReOrder(): boolean {
+    return !isNil(this.order?.reOrderId);
+  }
+
+  public get getTitle(): string {
+    return this.isReOrder ? `Re-Order ID ${this.order?.reOrderId}` : `Order ID ${this.order?.orderId}`;
+  }
 
   ngOnInit(): void {
     this.onOpenEvent();

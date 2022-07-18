@@ -1,6 +1,7 @@
 import type { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { ISelectAllEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
-import { Component, forwardRef, Input } from '@angular/core';
+import { Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
 
 import { BaseFormControlDirective } from '@shared/components/form-controls/base-form-control.directive';
 import { NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -19,4 +20,6 @@ export class MultiselectDropdownComponent<T> extends BaseFormControlDirective {
   @Input() public fields: FieldSettingsModel;
   @Input() public selectAllText: string;
   @Input() public showSelectAll: boolean;
+
+  @Output() public selectAllEmitter: EventEmitter<ISelectAllEventArgs> = new EventEmitter<ISelectAllEventArgs>();
 }

@@ -20,8 +20,8 @@
                 </e-chips>
               </ejs-chiplist>
               <div class="vertical-divider"></div>
-              <div *ngIf="order && !isReOrder" class="order-other-statuses">
-                <span class="custom-chip">{{ order.orderType | orderTypeName }}</span>
+              <div *ngIf="order" class="order-other-statuses">
+                <span class="custom-chip" *ngIf="!isReOrder">{{ order.orderType | orderTypeName }}</span>
                 <span class="custom-chip"> {{order.isLocked ? "Locked" : "Unlocked"}}</span>
               </div>
             </div>
@@ -86,14 +86,14 @@
             </e-tabitem>
           </e-tabitems>
         </ejs-tab>
-        <app-add-edit-reorder [order]="order" (saveEmitter)="saveEmitter.emit()"></app-add-edit-reorder>
+        <app-add-edit-reorder [order]="order" (saveEmitter)="saveReOrderEmitter.emit()"></app-add-edit-reorder>
       </div>
     </section>
   </ng-template>
   <ng-template #footerTemplate>
     <app-dialog-next-previous
       *ngIf="orderDialogOptions$ | async as options"
-      title="Order"
+      [title]="isReOrder ? 'Re-Order' : 'Order'"
       [options]="options"
       (nextEvent)="onNextPreviousOrder(true)"
       (previousEvent)="onNextPreviousOrder(false)"

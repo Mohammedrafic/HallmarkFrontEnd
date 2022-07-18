@@ -13,7 +13,7 @@ export interface ReorderRequestModel {
   reOrderId: number;
   reOrderFromId: number;
   candidateProfileIds: number[];
-  agencyIds: number[];
+  agencyIds: number[] | null;
   reorderDate: Date;
   shiftStartTime: Date;
   shiftEndTime: Date;

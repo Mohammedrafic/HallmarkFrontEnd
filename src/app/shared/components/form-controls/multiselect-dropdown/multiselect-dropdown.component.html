@@ -16,6 +16,7 @@
       [tabindex]="id"
       [selectAllText]="selectAllText"
       [showSelectAll]="showSelectAll"
+      (selectedAll)="selectAllEmitter.emit($event)"
       mode="CheckBox"
     ></ejs-multiselect>
     <app-error-message [control]="getControl()"></app-error-message>

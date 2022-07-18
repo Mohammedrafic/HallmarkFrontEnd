@@ -53,7 +53,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() openEvent: Subject<boolean>;
 
   @Output() nextPreviousOrderEvent = new EventEmitter<NextPreviousOrderEvent>();
-  @Output() saveEmitter: EventEmitter<void> = new EventEmitter<void>();
+  @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
@@ -79,7 +79,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   private secondHasOpenedOnes = false;
 
   public get isReOrder(): boolean {
-    return !isNil(this.order?.reOrderFromId);
+    return !isNil(this.order?.reOrderFromId) && this.order?.reOrderFromId !== 0;
   }
 
   get disabledLock(): boolean {
