@@ -111,13 +111,13 @@
         <ng-template #template let-data>
           <ng-container *ngIf="!data.children?.length; else withToggle">
             <div>
-              <b>{{ data.reOrderFromId }}</b>
+              <b>{{ data.id }}</b>
             </div>
           </ng-container>
 
           <ng-template #withToggle>
             <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-              <b>{{ data.reOrderFromId }}</b>
+              <b>{{ data.id }}</b>
               <i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
             </div>
           </ng-template>
@@ -520,6 +520,7 @@
 <app-order-details-dialog
   [order]="selectedOrder"
   [openEvent]="openDetails"
+  (saveReOrderEmitter)="updateGrid()"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"></app-order-details-dialog>
 
 <app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidate"  [openEvent]="openChildDialog"></app-child-order-dialog>

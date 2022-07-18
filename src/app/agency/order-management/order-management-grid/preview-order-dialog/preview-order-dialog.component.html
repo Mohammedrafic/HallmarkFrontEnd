@@ -12,7 +12,7 @@
       <section class="header-container">
         <div class="e-card-header preview-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title preview-title">Order ID {{ order?.orderId }}</h3>
+            <h3 class="e-card-title preview-title">{{getTitle}}</h3>
             <div class="order-statuses">
               <ejs-chiplist #chipList class="events-off">
                 <e-chips>
@@ -21,7 +21,7 @@
               </ejs-chiplist>
               <div class="vertical-divider"></div>
               <div *ngIf="order" class="order-other-statuses">
-                <span class="custom-chip">{{ orderType[order.orderType] }}</span>
+                <span class="custom-chip" *ngIf="!isReOrder">{{ orderType[order.orderType] }}</span>
                 <span class="custom-chip"> {{order.isLocked ? "Locked" : "Unlocked"}}</span>
               </div>
             </div>
@@ -42,7 +42,8 @@
               <ng-template #content>
                 <section class="order-details"  *ngIf="selectedOrder$ | async as currentOrder">
                   <section class="job-details">
-                    <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
+                    <app-general-order-info *ngIf="!isReOrder" [orderInformation]="currentOrder"></app-general-order-info>
+                    <app-general-reorder-info *ngIf="isReOrder" [orderInformation]="currentOrder"></app-general-reorder-info>
                   </section>
                   <hr />
                   <app-order-details [currentOrder]="currentOrder"></app-order-details>
@@ -52,7 +53,7 @@
             <e-tabitem>
               <ng-template #headerText>Candidates <span class="e-badge e-badge-success e-badge-circle">{{countOrderCandidates$ | async}}</span></ng-template>
               <ng-template #content>
-                <app-candidates-order></app-candidates-order>
+                <app-candidates-order (excludeDeployedEvent)="onExcludeDeployed($event)"></app-candidates-order>
               </ng-template>
             </e-tabitem>
             <e-tabitem>
@@ -67,7 +68,7 @@
   <ng-template #footerTemplate>
     <app-dialog-next-previous
       *ngIf="orderDialogOptions$ | async as options"
-      title="Order"
+      [title]="isReOrder ? 'Re-Order' : 'Order'"
       [options]="options"
       (nextEvent)="onNextPreviousOrder(true)"
       (previousEvent)="onNextPreviousOrder(false)"

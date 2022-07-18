@@ -1,21 +1,19 @@
 import isNil from 'lodash/fp/isNil';
 import uniq from 'lodash/fp/uniq';
 
-import { filter, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
-import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Select, Store } from '@ngxs/store';
+import { filter, first, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { FieldSettingsModel, ISelectAllEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { Store } from '@ngxs/store';
 
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
-import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { endTimeValidator, startTimeValidator } from '@shared/validators/date.validator';
 import { GetAssociateAgencies } from '@client/store/order-managment-content.actions';
 import { Order } from '@shared/models/order-management.model';
-import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ReorderModel, ReorderRequestModel } from '@client/order-management/add-edit-reorder/models/reorder.model';
 import { ShowSideDialog } from '../../../store/app.actions';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
@@ -29,8 +27,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   @Input() public order: Order;
   @Output() saveEmitter: EventEmitter<void> = new EventEmitter<void>();
 
-  @Select(OrderManagementContentState.associateAgencies) public associateAgencies$: Observable<AssociateAgency[]>;
-
   public readonly agenciesOptionFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   public readonly candidatesOptionFields: FieldSettingsModel = { text: 'candidateName', value: 'candidateId' };
   public readonly datepickerMask = { month: 'MM', day: 'DD', year: 'YYYY' };
@@ -39,8 +35,11 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public readonly currentDate: Date = new Date();
 
   public reorderForm: FormGroup;
-  public dialogTitle: string = 'Add Re-Reorder';
+  public dialogTitle: string = 'Add Re-Order';
   public candidates$: Observable<CandidateModel[]>;
+  public agencies$: Observable<any[]>;
+
+  private isSelectedAllAgencies: boolean;
 
   public constructor(
     private formBuilder: FormBuilder,
@@ -58,8 +57,9 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     const { order } = changes;
 
     if (order && !order?.isFirstChange()) {
-      const { id, organizationId } = order.currentValue;
-      this.candidates$ = this.reorderService.getCandidates(id, organizationId);
+      const { id, organizationId, orderId } = order.currentValue;
+      this.candidates$ = this.reorderService.getCandidates(id ?? orderId, organizationId);
+      this.agencies$ = this.reorderService.getAgencies(id ?? orderId, organizationId);
       this.handleEditMode(order.currentValue);
     }
   }
@@ -81,6 +81,10 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     } else {
       this.saveReorder();
     }
+  }
+
+  public onSelectAllAgencies(event: ISelectAllEventArgs): void {
+    this.isSelectedAllAgencies = event.isChecked!;
   }
 
   private initForm(reorder?: Order): void {
@@ -132,7 +136,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       reOrderId: this.isEditMode ? this.order.id : 0,
       reOrderFromId: this.isEditMode ? this.order.reOrderFromId! : this.order.id,
       candidateProfileIds: reorder.candidates,
-      agencyIds: reorder.agencies,
+      agencyIds: this.isSelectedAllAgencies ? null : reorder.agencies,
       reorderDate: reorder.reorderDate,
       shiftEndTime: reorder.shiftEndTime,
       shiftStartTime: reorder.shiftStartTime,
@@ -151,17 +155,29 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private handleEditMode(order: Order): void {
     if (this.isEditMode) {
       this.initForm(order);
-      this.dialogTitle = 'Edit Re-Reorder';
+      this.dialogTitle = 'Edit Re-Order';
     } else {
-      this.dialogTitle = 'Add Re-Reorder';
+      this.dialogTitle = 'Add Re-Order';
     }
   }
 
-  private getAgencyIds(jobDistributions: JobDistributionModel[]): (number | null)[] {
-    if (jobDistributions && jobDistributions.length) {
-      return jobDistributions.map(({ agencyId }: JobDistributionModel) => agencyId);
-    } else {
+  private getAgencyIds(jobDistributions: JobDistributionModel[]): (number | null)[] | void {
+    if (!jobDistributions?.length) {
       return [];
     }
+
+    if (jobDistributions?.[0].agencyId === null) {
+      this.selectAllAgencies();
+    } else {
+      return jobDistributions?.map(({ agencyId }: JobDistributionModel) => agencyId);
+    }
+  }
+
+  private selectAllAgencies(): void {
+    this.agencies$.pipe(first()).subscribe((agencyIds: JobDistributionModel[]) => {
+      this.reorderForm.patchValue({
+        agencies: agencyIds?.map(({ agencyId }: JobDistributionModel) => agencyId),
+      });
+    });
   }
 }

@@ -69,6 +69,7 @@ import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.e
 import { OrderType } from '@shared/enums/order-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { NextPreviousOrderEvent } from './preview-order-dialog/preview-order-dialog.component';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -128,6 +129,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private isAlive = true;
   private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
+  private excludeDeployed: boolean;
+  private pageSubject = new Subject<number>();
 
   constructor(
     private store: Store,
@@ -164,6 +167,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.ordersPage = data;
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
     });
+    this.subscribeOnPageChanges();
   }
 
   ngOnDestroy(): void {
@@ -234,7 +238,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public onGoToClick(event: any): void {
     if (event.currentPage || event.value) {
-      this.dispatchNewPage();
+      this.pageSubject.next(event.currentPage || event.value);
       this.isSubrowDisplay = false;
     }
   }
@@ -302,6 +306,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onRowClick(event: any): void {
+    if (event.target) {
+      this.excludeDeployed = false;
+    }
+
     this.rowSelected(event, this.gridWithChildRow);
 
     if (!event.isInteracted) {
@@ -310,7 +318,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.store.dispatch(new GetOrderById(event.data.orderId, event.data.organizationId, options));
       this.openPreview.next(true);
       this.store.dispatch(
-        new GetAgencyOrderCandidatesList(event.data.orderId, event.data.organizationId, this.currentPage, this.pageSize)
+        new GetAgencyOrderCandidatesList(
+          event.data.orderId,
+          event.data.organizationId,
+          this.currentPage,
+          this.pageSize,
+          this.excludeDeployed
+        )
       );
       this.store.dispatch(new GetAgencyOrderGeneralInformation(event.data.orderId, event.data.organizationId));
       this.selectedIndex = Number(event.rowIndex);
@@ -343,9 +357,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.isSubrowDisplay = false;
   }
 
-  public onNextPreviousOrderEvent(next: boolean): void {
+  public onNextPreviousOrderEvent(event: NextPreviousOrderEvent): void {
     const [index] = this.gridWithChildRow.getSelectedRowIndexes();
-    const nextIndex = next ? index + 1 : index - 1;
+    const nextIndex = event.next ? index + 1 : index - 1;
+    this.excludeDeployed = event.excludeDeployed;
     this.gridWithChildRow.selectRow(nextIndex);
   }
 
@@ -470,6 +485,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.openCandidat.next(false);
         this.gridWithChildRow?.clearRowSelection();
         this.previousSelectedOrderId = null;
+        this.selectedIndex = null;
       } else {
         this.openChildDialog.next(false);
         this.selectedCandidate = null;
@@ -526,5 +542,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
             }
           });
       });
+  }
+
+  private subscribeOnPageChanges(): void {
+    this.pageSubject.pipe(debounceTime(1)).subscribe((page: number) => {
+      this.currentPage = page;
+      this.dispatchNewPage();
+    });
   }
 }

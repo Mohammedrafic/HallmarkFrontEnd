@@ -54,26 +54,30 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public priceUtils = PriceUtils;
 
   get isRejected(): boolean {
-    return this.isReadOnly && this.candidate.status === ApplicantStatusEnum.Rejected;
+    return this.isReadOnly && this.candidateStatus === ApplicantStatusEnum.Rejected;
   }
 
   get isOnboard(): boolean {
-    return this.candidate.status === ApplicantStatusEnum.OnBoarded;
+    return this.candidateStatus === ApplicantStatusEnum.OnBoarded;
+  }
+
+  get candidateStatus(): ApplicantStatusEnum {
+    return this.candidate.status || this.candidate.candidateStatus as any;
   }
 
   get showGuaranteedWorkWeek(): boolean {
     return (
-      this.candidate.status === ApplicantStatusEnum.Shortlisted ||
-      this.candidate.status === ApplicantStatusEnum.PreOfferCustom ||
-      this.candidate.status === ApplicantStatusEnum.Offered ||
+      this.candidateStatus === ApplicantStatusEnum.Shortlisted ||
+      this.candidateStatus === ApplicantStatusEnum.PreOfferCustom ||
+      this.candidateStatus === ApplicantStatusEnum.Offered ||
       this.isOnboard
     );
   }
 
   get showWithdrawAction(): boolean {
     return (
-      (this.candidate.status === ApplicantStatusEnum.Shortlisted ||
-        this.candidate.status === ApplicantStatusEnum.PreOfferCustom) &&
+      (this.candidateStatus === ApplicantStatusEnum.Shortlisted ||
+        this.candidateStatus === ApplicantStatusEnum.PreOfferCustom) &&
       !this.isWithdraw &&
       !this.candidate.deployedCandidateInfo
     );
@@ -252,7 +256,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       ApplicantStatusEnum.OnBoarded,
       ApplicantStatusEnum.PreOfferCustom,
     ];
-    if (readOnlyStatuses.includes(this.candidate.status) || this.candidate.deployedCandidateInfo) {
+    if (readOnlyStatuses.includes(this.candidateStatus) || this.candidate.deployedCandidateInfo) {
       this.isReadOnly = true;
     }
   }

@@ -74,13 +74,13 @@
       <ng-template #template let-data>
         <ng-container *ngIf="!data.children?.length; else withToggle">
           <div>
-            <b>{{ data.reOrderId }}</b>
+            <b>{{ data.orderId }}</b>
           </div>
         </ng-container>
 
         <ng-template #withToggle>
           <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-            <b>{{ data.reOrderId }}</b>
+            <b>{{ data.orderId }}</b>
             <i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
           </div>
         </ng-template>
@@ -139,33 +139,6 @@
     <e-column field="shift" headerText="SHIFT" width="150" [visible]="false">
       <ng-template #template let-data>
         <span>{{ data.shiftStartTime | date: 'shortTime' }}-{{ data.shiftEndTime | date: 'shortTime' }}</span>
-      </ng-template>
-    </e-column>
-    <e-column field="agencies" headerText="AGENCY" width="150" [visible]="false">
-      <ng-template #template let-data>
-        <ng-container *ngIf="!data.agencies?.length">
-          <span>All</span>
-        </ng-container>
-
-        <ng-container *ngIf="data.agencies?.length === 2">
-            <span *ngFor="let agency of data.agencies; let i = index" class="agency-name">
-              {{ agency }}
-              <span class="agency-name" *ngIf="i !== data.agencies.length - 1">, </span>
-            </span>
-        </ng-container>
-
-        <ng-container *ngIf="data.agencies?.length >= 3 && data.agencies?.length <= 5">
-          <ejs-tooltip
-            content="{{ data.agencies.length }}"
-            target="#agencyName"
-          >
-            <span id="agencyName" class="agency-name">Multiple Agencies</span>
-          </ejs-tooltip>
-        </ng-container>
-
-        <ng-container *ngIf="data.agencies?.length > 5">
-          <span id="agencyName" class="agency-name">Multiple Agencies</span>
-        </ng-container>
       </ng-template>
     </e-column>
     <e-column field="shiftsNext90Days" headerText="# of Shifts Next 90 Days " width="150" [visible]="false"></e-column>
@@ -227,7 +200,7 @@
               [pageSize]="pageSize"
               [totalRecordsCount]="ordersPage?.totalCount"
               [enablePagerMessage]="false"
-              [currentPage]="currentPagerPage"
+              [currentPage]="currentPage"
               (click)="onGoToClick($event)"
             >
             </ejs-pager>
@@ -271,5 +244,3 @@
     [activeTab]="selectedTab"
   ></app-agency-order-filters>
 </app-filter-dialog>
-
-<app-add-edit-reorder [order]="$any(selectedOrder)"></app-add-edit-reorder>

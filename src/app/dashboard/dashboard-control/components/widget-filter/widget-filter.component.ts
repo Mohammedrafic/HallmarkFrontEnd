@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
+import { combineLatest, distinctUntilChanged, filter, Observable, skip, takeUntil } from 'rxjs';
+import { isEqual } from 'lodash';
 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -10,7 +12,6 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Skill } from '@shared/models/skill.model';
 import { FilterService } from '@shared/services/filter.service';
-import { combineLatest, filter, Observable, skip, Subscription, takeUntil } from 'rxjs';
 import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
 import { IFilterColumnsDataModel } from 'src/app/dashboard/models/widget-filter.model';
 import { SetDashboardFiltersState, SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
@@ -30,11 +31,11 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   @Select(UserState.lastSelectedOrganizationId) private readonly organizationId$: Observable<UserStateModel['lastSelectedOrganizationId']>;
   @Select(DashboardState.filteredItems) public readonly filteredItems$: Observable<FilteredItem[]>;
   @Select(OrganizationManagementState.allOrganizationSkills) private readonly skills$: Observable<Skill[]>;
+  @Select(DashboardState.dashboardFiltersState) private readonly dashboardFiltersState$: Observable<DashboardFiltersModel>;
 
-  private dialogSubscription: Subscription;
   public filteredItems: FilteredItem[] = [];
   public widgetFilterFormGroup: FormGroup;
-  public filters: DashboardFiltersModel = {};
+  public filters: DashboardFiltersModel = {} as DashboardFiltersModel;
   public filterColumns: IFilterColumnsDataModel;
   public regions: OrganizationRegion[] = [];
   public optionFields = {
@@ -81,13 +82,13 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   }
 
   private isFilterDialogOpened() {
-   this.dialogSubscription = this.actions
+    this.actions
       .pipe(ofActionDispatched(ShowFilterDialog), filter((data) => data.isDialogShown), takeUntil(this.destroy$))
       .subscribe(() => {
-          this.onOrganizationStructureDataLoadHandler();
-          this.onOrderFilterControlValueChangedHandler();
-          this.onSkillDataLoadHandler();
-          this.setFilterState();
+        this.onOrganizationStructureDataLoadHandler();
+        this.onOrderFilterControlValueChangedHandler();
+        this.onSkillDataLoadHandler();
+        this.setFilterState();
       });
   }
 
@@ -98,7 +99,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   public onFilterClearAll(): void {
     this.widgetFilterFormGroup.reset();
-    this.filters = {};
+    this.filters = {} as DashboardFiltersModel;
     this.filteredItems = [];
     this.saveFilteredItems(this.filteredItems);
   }
@@ -234,10 +235,11 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     this.filteredItems$
       .pipe(
         takeUntil(this.destroy$),
+        distinctUntilChanged((previous, current) => isEqual(previous, current))
       )
       .subscribe((filters) => {
         this.cdr.markForCheck();
-        this.filters = {};
+        this.filters = {} as DashboardFiltersModel; 
         filters.forEach((item: FilteredItem) => {
           const filterKey = item.column as keyof DashboardFiltersModel;
           if (filterKey in this.filters) {
@@ -246,18 +248,27 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
             this.filters[filterKey] = [item.value];
           }
         });
-          this.store.dispatch(new SetDashboardFiltersState(this.filters))
+        this.store.dispatch(new SetDashboardFiltersState(this.filters));
       });
   }
 
   private setFilterState(): void {
-    combineLatest([this.filteredItems$, this.organizationStructure$]).pipe(takeUntil(this.destroy$), filter(([items, orgs]) => !!orgs && items.length > 0), ).subscribe(() => Object.entries(this.filters).forEach(([key, value]) => this.widgetFilterFormGroup.get(key)?.setValue(value)))
-    this.dialogSubscription.unsubscribe();
+    combineLatest([this.dashboardFiltersState$, this.organizationStructure$])
+      .pipe(
+        takeUntil(this.destroy$),
+        filter(([filters, orgs]) => !!filters && !!orgs),
+        distinctUntilChanged((previous, current) => isEqual(previous, current))
+      )
+      .subscribe(([filters]) => {
+        Object.entries(this.widgetFilterFormGroup.controls).forEach(([field, control]) =>
+          control.setValue(filters[field as keyof DashboardFiltersModel] || [])
+        );
+      });
   }
 
-  private changingOrganization(): void{
+  private changingOrganization(): void {
     this.organizationId$.pipe(takeUntil(this.destroy$), skip(1)).subscribe(() => {
       this.store.dispatch(new SetFilteredItems([]));
-    })
+    });
   }
 }

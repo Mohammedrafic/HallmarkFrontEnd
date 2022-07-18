@@ -38,6 +38,11 @@ import { Location } from '@angular/common';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { ShowSideDialog } from '../../../store/app.actions';
 
+export type NextPreviousOrderEvent = {
+  next: boolean;
+  excludeDeployed: boolean;
+};
+
 @Component({
   selector: 'app-order-details-dialog',
   templateUrl: './order-details-dialog.component.html',
@@ -47,8 +52,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() order: Order;
   @Input() openEvent: Subject<boolean>;
 
-  @Output() nextPreviousOrderEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
-  @Output() saveEmitter: EventEmitter<void> = new EventEmitter<void>();
+  @Output() nextPreviousOrderEvent = new EventEmitter<NextPreviousOrderEvent>();
+  @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
@@ -70,11 +75,11 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public showCloseButton = false;
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
-
+  private excludeDeployed: boolean;
   private secondHasOpenedOnes = false;
 
   public get isReOrder(): boolean {
-    return !isNil(this.order?.reOrderFromId);
+    return !isNil(this.order?.reOrderFromId) && this.order?.reOrderFromId !== 0;
   }
 
   get disabledLock(): boolean {
@@ -187,7 +192,11 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public onNextPreviousOrder(next: boolean): void {
-    this.nextPreviousOrderEvent.emit(next);
+    this.nextPreviousOrderEvent.emit({ next, excludeDeployed: this.excludeDeployed });
+  }
+
+  public onExcludeDeployed(event: boolean): void {
+    this.excludeDeployed = event;
   }
 
   private selectCandidateOnOrderId(): void {

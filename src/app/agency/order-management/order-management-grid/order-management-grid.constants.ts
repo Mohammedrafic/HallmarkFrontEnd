@@ -50,7 +50,6 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text: 'Bill Rate', column: 'BillRate' },
   { text: 'Re-Order Date', column: 'ReOrderDate' },
   { text: 'Shift', column: 'Shift' },
-  { text: 'Agency', column: 'Agency' },
 ];
 
 export const reOrdersChildColumnToExport: ExportColumn[] = [
@@ -85,10 +84,6 @@ export const ReOrdersColumnsConfig: GridColumn[] = [
   },
   {
     fieldName: 'shift',
-    visible: true,
-  },
-  {
-    fieldName: 'agencies',
     visible: true,
   },
   {
@@ -135,10 +130,6 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
     visible: false,
   },
   {
-    fieldName: 'agencies',
-    visible: false,
-  },
-  {
     fieldName: 'shiftsNext90Days',
     visible: false,
   },
@@ -163,10 +154,6 @@ export const PerDiemColumnsConfig = [
   },
   {
     fieldName: 'shift',
-    visible: false,
-  },
-  {
-    fieldName: 'agencies',
     visible: false,
   },
   {

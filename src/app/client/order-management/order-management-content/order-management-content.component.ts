@@ -2,9 +2,8 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { combineLatest, debounceTime, filter, Observable, Subject, Subscription, takeUntil, throttleTime 
-} from 'rxjs';
-import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
+import { combineLatest, debounceTime, filter, Observable, Subject, Subscription, takeUntil, throttleTime } from 'rxjs';
+import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { CandidatesStatusText, OrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
@@ -66,6 +65,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { SearchComponent } from '@shared/components/search/search.component';
 import { OrderStatus } from '@shared/enums/order-management';
+import { NextPreviousOrderEvent } from '../order-details-dialog/order-details-dialog.component';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
 
@@ -161,6 +161,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private selectedIndex: number | null;
   private ordersPage: OrderManagementPage;
+  private excludeDeployed: boolean;
 
   public columnsToExport: ExportColumn[];
 
@@ -180,10 +181,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     private fb: FormBuilder,
     private datePipe: DatePipe,
     private location: Location,
-    private readonly actions: Actions,
+    private readonly actions: Actions
   ) {
     super();
-    this.isRedirectedFromDashboard = this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromDashboard'] || false;
+    this.isRedirectedFromDashboard =
+      this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromDashboard'] || false;
 
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.fb.group({
@@ -302,7 +304,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filters.billRateFrom ? this.filters.billRateFrom : null;
     this.filters.billRateTo ? this.filters.billRateTo : null;
     this.filters.pageNumber = this.currentPage;
-    this.filters.agencyType = this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) || null : null;
+    this.filters.agencyType =
+      this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) || null : null;
     this.filters.pageSize = this.pageSize;
 
     switch (this.activeTab) {
@@ -424,21 +427,27 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
   }
 
-  public onNextPreviousOrderEvent(next: boolean): void {
+  public onNextPreviousOrderEvent(event: NextPreviousOrderEvent): void {
     const [index] = this.gridWithChildRow.getSelectedRowIndexes();
-    const nextIndex = next ? index + 1 : index - 1;
+    const nextIndex = event.next ? index + 1 : index - 1;
+    this.excludeDeployed = event.excludeDeployed;
     this.gridWithChildRow.selectRow(nextIndex);
   }
 
   public onRowClick(event: any): void {
+    if (event.target) {
+      this.excludeDeployed = false;
+    }
+
     this.rowSelected(event, this.gridWithChildRow);
+
     if (!event.isInteracted) {
       this.selectedDataRow = event.data;
       const data = event.data;
       const options = this.getDialogNextPreviousOption(data);
       this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
       this.store.dispatch(
-        new GetAgencyOrderCandidatesList(data.id, data.organizationId, this.currentPage, this.pageSize)
+        new GetAgencyOrderCandidatesList(data.id, data.organizationId, this.currentPage, this.pageSize, this.excludeDeployed)
       );
       this.selectedCandidate = this.selectedReOrder = null;
       this.openChildDialog.next(false);
@@ -611,7 +620,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public menuOptionSelected(event: any, data: OrderManagement): void {
     switch (Number(event.item.properties.id)) {
       case MoreMenuType['Edit']:
-        this.router.navigate(['./edit', data.id], { relativeTo: this.route });
+        if (data.reOrderFromId !== 0) {
+          this.store.dispatch([new ShowSideDialog(true), new GetOrderById(data.id, data.organizationId, {} as any)]);
+        } else {
+          this.router.navigate(['./edit', data.id], { relativeTo: this.route });
+        }
         break;
       case MoreMenuType['Duplicate']:
         // TODO: pending implementation
@@ -646,7 +659,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
             this.selectedDataRow.id,
             this.selectedDataRow.organizationId as number,
             this.currentPage,
-            this.pageSize
+            this.pageSize,
+            this.excludeDeployed
           )
         );
         this.getOrders();
@@ -902,6 +916,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     return !statuses.includes(status);
   }
 
+  public updateGrid(): void {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetOrders)).subscribe(() => {
+      const [index] = this.gridWithChildRow.getSelectedRowIndexes();
+      this.selectedIndex = index;
+    });
+    this.getOrders();
+  }
+
   private handleDashboardFilters(): void {
     if (this.isRedirectedFromDashboard) {
       this.applyDashboardFilters();
@@ -910,12 +932,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         .pipe(
           ofActionDispatched(ShowFilterDialog),
           filter((data) => data.isDialogShown),
-          takeUntil(this.unsubscribe$),
+          takeUntil(this.unsubscribe$)
         )
         .subscribe(() => this.setFilterState());
     }
   }
- 
+
   private applyDashboardFilters(): void {
     combineLatest([this.dashboardFiltersState$, this.filteredItems$])
       .pipe(takeUntil(this.unsubscribe$))

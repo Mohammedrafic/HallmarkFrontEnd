@@ -19,6 +19,10 @@ section {
     font-family: 'Open Sans';
     font-style: normal;
     text-transform: capitalize;
+
+    &.link {
+      cursor: pointer;
+    }
   }
 
   .sup-title{

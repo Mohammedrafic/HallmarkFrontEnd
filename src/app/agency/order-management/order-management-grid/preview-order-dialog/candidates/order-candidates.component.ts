@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Select, Store } from "@ngxs/store";
 import { Observable, takeUntil } from "rxjs";
 
@@ -15,6 +15,8 @@ import { GetAgencyOrderCandidatesList } from '@agency/store/order-management.act
   styleUrls: ['./order-candidates.component.scss']
 })
 export class OrderCandidatesComponent extends DestroyableDirective implements OnInit {
+  @Output() excludeDeployedEvent = new EventEmitter<boolean>();
+
   public orderCandidateInformation: Order;
   public orderCandidates: AgencyOrder;
 
@@ -33,6 +35,7 @@ export class OrderCandidatesComponent extends DestroyableDirective implements On
   }
 
   public onGetCandidatesList(event: CandidateListEvent): void {
+    this.excludeDeployedEvent.emit(event.excludeDeployed);
     this.store.dispatch(
       new GetAgencyOrderCandidatesList(event.orderId, event.organizationId, event.currentPage, event.pageSize, event.excludeDeployed)
     );

@@ -139,9 +139,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
           );
           this.openDialog(this.apply);
         } else if (allowedAcceptStatuses.includes(this.candidate.status)) {
-          if (!this.candidate.deployedCandidateInfo) {
-            this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
-          }
+          this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
           this.openDialog(this.accept);
         }
       } else if (isOrganization) {

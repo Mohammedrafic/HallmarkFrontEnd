@@ -42,7 +42,7 @@
     </div>
     <div class="column">
       <div>
-        <div class="title">{{getAgencyNames}}</div>
+        <div class="title" [title]="agencies?.tooltip">{{agencies?.name}}</div>
         <div class="sup-title">Agency Name</div>
       </div>
     </div>
@@ -65,7 +65,7 @@
       </div>
     </div>
     <div class="column last-column">
-      <div class="accent">Order Per Diem ID: {{orderInformation?.reOrderFromId}}</div>
+      <div class="accent link" (click)="moveToPerDiem(orderInformation?.reOrderFromId!)">Order Per Diem ID: {{orderInformation?.reOrderFromId}}</div>
     </div>
   </div>
 </section>
