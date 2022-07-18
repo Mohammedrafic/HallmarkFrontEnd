@@ -1,0 +1,20 @@
+<app-form-control-wrapper
+  [formGroup]="formGroupInstance"
+  [label]="label"
+  [id]="id"
+  [required]="required"
+>
+  <div class="input-group datepicker">
+    <ejs-timepicker
+      [placeholder]="placeholder"
+      [formControlName]="controlName"
+      [format]="format"
+      [maskPlaceholder]="maskPlaceholder"
+      [enableMask]="enableMask"
+      [id]="id"
+    >
+    </ejs-timepicker>
+    <app-error-message [control]="getControl()"></app-error-message>
+  </div>
+
+</app-form-control-wrapper>

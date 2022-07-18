@@ -247,6 +247,7 @@ export class Order {
   acceptedPositions?: number;
   documents: Document[] | null;
   canApprove: boolean;
+  reOrderFromId?: number;
 }
 
 export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'status' | 'statusText' | 'documents'> {

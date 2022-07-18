@@ -5,19 +5,17 @@
   [required]="required"
 >
   <div class="input-group datepicker">
-    <ejs-multiselect
-      [allowFiltering]="true"
-      [attr.id]="id"
-      [dataSource]="dataSource"
-      [fields]="fields"
+    <ejs-datepicker
+      class="datepicker"
+      [format]="format"
       [formControlName]="controlName"
+      [enableMask]="enableMask"
+      [maskPlaceholder]="maskPlaceholder"
+      [min]="min"
+      [id]="id"
       [placeholder]="placeholder"
-      [showDropDownIcon]="true"
-      [tabindex]="id"
-      [selectAllText]="selectAllText"
-      [showSelectAll]="showSelectAll"
-      mode="CheckBox"
-    ></ejs-multiselect>
+    >
+    </ejs-datepicker>
     <app-error-message [control]="getControl()"></app-error-message>
   </div>
 </app-form-control-wrapper>

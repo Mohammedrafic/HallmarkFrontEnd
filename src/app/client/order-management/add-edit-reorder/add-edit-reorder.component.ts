@@ -1,0 +1,167 @@
+import isNil from 'lodash/fp/isNil';
+import uniq from 'lodash/fp/uniq';
+
+import { filter, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { Select, Store } from '@ngxs/store';
+
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
+import { AssociateAgency } from '@shared/models/associate-agency.model';
+import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { endTimeValidator, startTimeValidator } from '@shared/validators/date.validator';
+import { GetAssociateAgencies } from '@client/store/order-managment-content.actions';
+import { Order } from '@shared/models/order-management.model';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { ReorderModel, ReorderRequestModel } from '@client/order-management/add-edit-reorder/models/reorder.model';
+import { ShowSideDialog } from '../../../store/app.actions';
+import { JobDistributionModel } from '@shared/models/job-distribution.model';
+
+@Component({
+  selector: 'app-add-edit-reorder',
+  templateUrl: './add-edit-reorder.component.html',
+  styleUrls: ['./add-edit-reorder.component.scss'],
+})
+export class AddEditReorderComponent extends DestroyableDirective implements OnInit, OnChanges {
+  @Input() public order: Order;
+  @Output() saveEmitter: EventEmitter<void> = new EventEmitter<void>();
+
+  @Select(OrderManagementContentState.associateAgencies) public associateAgencies$: Observable<AssociateAgency[]>;
+
+  public readonly agenciesOptionFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
+  public readonly candidatesOptionFields: FieldSettingsModel = { text: 'candidateName', value: 'candidateId' };
+  public readonly datepickerMask = { month: 'MM', day: 'DD', year: 'YYYY' };
+  public readonly timepickerMask = { hour: 'HH', minute: 'MM' };
+  public readonly numericInputAttributes = { maxLength: '10' };
+  public readonly currentDate: Date = new Date();
+
+  public reorderForm: FormGroup;
+  public dialogTitle: string = 'Add Re-Reorder';
+  public candidates$: Observable<CandidateModel[]>;
+
+  public constructor(
+    private formBuilder: FormBuilder,
+    private store: Store,
+    private reorderService: AddEditReorderService
+  ) {
+    super();
+  }
+
+  public get isEditMode(): boolean {
+    return this.order?.reOrderFromId !== 0;
+  }
+
+  public ngOnChanges(changes: SimpleChanges): void {
+    const { order } = changes;
+
+    if (order && !order?.isFirstChange()) {
+      const { id, organizationId } = order.currentValue;
+      this.candidates$ = this.reorderService.getCandidates(id, organizationId);
+      this.handleEditMode(order.currentValue);
+    }
+  }
+
+  public ngOnInit(): void {
+    this.initForm();
+    this.getApplicantsStatuses();
+    this.subscribeOnChangesCandidateName();
+  }
+
+  public onCancel(): void {
+    this.closeDialog();
+    this.reorderForm.reset();
+  }
+
+  public onSave(): void {
+    if (this.reorderForm.invalid) {
+      this.reorderForm.markAllAsTouched();
+    } else {
+      this.saveReorder();
+    }
+  }
+
+  private initForm(reorder?: Order): void {
+    const { jobStartDate, shiftStartTime, shiftEndTime, hourlyRate, openPositions, jobDistributions } = reorder || {};
+    this.reorderForm = this.formBuilder.group({
+      candidates: [[]],
+      agencies: [this.getAgencyIds(jobDistributions!), Validators.required],
+      reorderDate: [jobStartDate ?? '', Validators.required],
+      shiftStartTime: [shiftStartTime ?? '', Validators.required],
+      shiftEndTime: [shiftEndTime ?? '', Validators.required],
+      billRate: [hourlyRate ?? '', Validators.required],
+      openPosition: [openPositions ?? '', [Validators.required, Validators.min(1)]],
+    });
+    this.reorderForm.get('shiftStartTime')?.addValidators(startTimeValidator(this.reorderForm, 'shiftEndTime'));
+    this.reorderForm.get('shiftEndTime')?.addValidators(endTimeValidator(this.reorderForm, 'shiftStartTime'));
+  }
+
+  private getApplicantsStatuses(): void {
+    this.store.dispatch(new GetAssociateAgencies());
+  }
+
+  private closeDialog(): void {
+    this.store.dispatch(new ShowSideDialog(false));
+  }
+
+  private subscribeOnChangesCandidateName(): void {
+    this.reorderForm
+      .get('candidates')
+      ?.valueChanges.pipe(
+        tap((candidateIds: number[]) => this.reorderForm.patchValue({ openPosition: candidateIds?.length || 1 })),
+        filter((candidateIds: number[]) => !isNil(candidateIds)),
+        switchMap(() => this.candidates$.pipe(map(this.getUniqueAgencies)))
+      )
+      .subscribe((agencies: number[]) => {
+        const selectedAgencies = this.reorderForm.get('agencies')?.value ?? [];
+        const uniqueAgencies = uniq([...selectedAgencies, ...agencies]);
+        this.reorderForm?.patchValue({ agencies: uniqueAgencies });
+      });
+  }
+
+  private getUniqueAgencies(candidates: CandidateModel[]): number[] {
+    const agencyIds = candidates.map(({ agencyId }: CandidateModel) => agencyId);
+    return uniq(agencyIds);
+  }
+
+  private saveReorder(): void {
+    const reorder: ReorderModel = this.reorderForm.getRawValue();
+    const orderForRequest: ReorderRequestModel = {
+      reOrderId: this.isEditMode ? this.order.id : 0,
+      reOrderFromId: this.isEditMode ? this.order.reOrderFromId! : this.order.id,
+      candidateProfileIds: reorder.candidates,
+      agencyIds: reorder.agencies,
+      reorderDate: reorder.reorderDate,
+      shiftEndTime: reorder.shiftEndTime,
+      shiftStartTime: reorder.shiftStartTime,
+      billRate: reorder.billRate,
+      openPositions: reorder.openPosition,
+    };
+    this.reorderService
+      .addReorder(orderForRequest)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.onCancel();
+        this.saveEmitter.emit();
+      });
+  }
+
+  private handleEditMode(order: Order): void {
+    if (this.isEditMode) {
+      this.initForm(order);
+      this.dialogTitle = 'Edit Re-Reorder';
+    } else {
+      this.dialogTitle = 'Add Re-Reorder';
+    }
+  }
+
+  private getAgencyIds(jobDistributions: JobDistributionModel[]): (number | null)[] {
+    if (jobDistributions && jobDistributions.length) {
+      return jobDistributions.map(({ agencyId }: JobDistributionModel) => agencyId);
+    } else {
+      return [];
+    }
+  }
+}

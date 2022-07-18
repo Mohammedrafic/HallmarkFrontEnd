@@ -520,6 +520,8 @@
 <app-order-details-dialog
   [order]="selectedOrder"
   [openEvent]="openDetails"
-  (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"></app-order-details-dialog>
+  (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
+  (saveEmitter)="triggerSelectOrder()"
+></app-order-details-dialog>
 
 <app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidate"  [openEvent]="openChildDialog"></app-child-order-dialog>

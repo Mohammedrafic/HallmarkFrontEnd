@@ -4,32 +4,32 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { FeatherModule } from 'angular-feather';
 import {
-  MessageSquare,
-  Lock,
+  AlertTriangle,
   Unlock,
-  ChevronDown,
   AlignJustify,
-  Menu,
-  Sliders,
-  Download,
-  Search,
-  MoreVertical,
-  Upload,
-  Plus,
-  Edit3,
-  Trash2,
-  Edit,
-  Copy,
-  XCircle,
-  X,
-  User,
-  MapPin,
   Briefcase,
   Calendar,
-  Folder,
   CheckCircle,
-  AlertTriangle,
-  ChevronRight
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  Download,
+  Edit,
+  Edit3,
+  Folder,
+  Lock,
+  MapPin,
+  Menu,
+  MessageSquare,
+  MoreVertical,
+  Plus,
+  Search,
+  Sliders,
+  Trash2,
+  Upload,
+  User,
+  X,
+  XCircle,
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -41,9 +41,9 @@ import {
   PageService,
   ResizeService,
   SortService,
-  ToolbarService
+  ToolbarService,
 } from '@syncfusion/ej2-angular-grids';
-import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxModule, ChipListModule, RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
@@ -71,6 +71,7 @@ import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { OrderDetailsContainerComponent } from './order-management/order-details-container/order-details-container.component';
 import { OrderCandidatesContainerComponent } from './order-management/order-candidates-container/order-candidates-container.component';
+import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
 
 const gridIcons = {
   MessageSquare,
@@ -98,7 +99,7 @@ const gridIcons = {
   Folder,
   CheckCircle,
   AlertTriangle,
-  ChevronRight
+  ChevronRight,
 };
 
 @NgModule({
@@ -114,7 +115,7 @@ const gridIcons = {
     OrderDetailsFormComponent,
     OrderDetailsDialogComponent,
     OrderDetailsContainerComponent,
-    OrderCandidatesContainerComponent
+    OrderCandidatesContainerComponent,
   ],
   imports: [
     CommonModule,
@@ -142,12 +143,10 @@ const gridIcons = {
     DropDownButtonModule,
     DialogModule,
     RadioButtonModule,
+    AddEditReorderModule,
 
     //STORE
-    NgxsModule.forFeature([
-      OrderManagementContentState,
-      OrganizationManagementState
-    ])
+    NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
   ],
   providers: [
     ResizeService,
@@ -159,7 +158,7 @@ const gridIcons = {
     ColumnMenuService,
     FilterService,
     ChipsCssClass,
-    MaskedDateTimeService
-  ]
+    MaskedDateTimeService,
+  ],
 })
 export class ClientModule {}

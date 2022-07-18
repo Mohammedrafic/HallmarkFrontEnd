@@ -19,6 +19,8 @@ export class ValidationErrorPipe implements PipeTransform {
         return `Min symbols entered should be ${value.minlength.requiredLength}`;
       case 'email' in value:
         return 'Please enter a valid email address';
+      case 'min' in value:
+        return `The minimum value should be ${value.min.min}`;
       case 'pattern' in value:
         if (!new RegExp(ONLY_LETTERS).test(value.pattern.actualValue)) {
           return 'Only letters are allowed';

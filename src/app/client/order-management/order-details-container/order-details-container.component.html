@@ -1,6 +1,8 @@
-<section class="job-details" *ngIf="order">
-  <app-general-order-info *ngIf="order.orderType !== orderType.OpenPerDiem" [orderInformation]="order"></app-general-order-info>
-  <app-general-order-per-diem-info *ngIf="order.orderType === orderType.OpenPerDiem" [orderInformation]="order"></app-general-order-per-diem-info>
+<section class="job-details" *ngIf="order" [ngSwitch]="order?.orderType">
+  <app-general-order-per-diem-info *ngSwitchCase="orderType.OpenPerDiem" [orderInformation]="order"></app-general-order-per-diem-info>
+  <app-general-reorder-info *ngSwitchCase="orderType.ReOrder" [orderInformation]="order"></app-general-reorder-info>
+  <app-general-order-info *ngSwitchDefault [orderInformation]="order"></app-general-order-info>
+
 </section>
 <div class="separator"></div>
 <app-order-details [currentOrder]="order"></app-order-details>

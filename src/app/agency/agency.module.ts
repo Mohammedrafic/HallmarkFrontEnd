@@ -6,44 +6,47 @@ import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigatio
 import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 import {
-  Sliders,
-  Plus,
-  Trash2,
-  Edit,
-  Copy,
-  Download,
   AlertCircle,
-  Search,
-  FileText,
-  MessageSquare,
-  Lock,
-  MoreVertical,
-  AlignJustify,
-  Menu,
-  X,
-  Filter,
-  Maximize2,
-  Minimize2,
-  Unlock,
   AlertTriangle,
+  AlignJustify,
   ChevronDown,
   ChevronRight,
+  Copy,
+  Download,
+  Edit,
+  FileText,
+  Filter,
+  Lock,
+  Maximize2,
+  Menu,
+  MessageSquare,
+  Minimize2,
+  MoreVertical,
+  Plus,
+  Search,
+  Sliders,
+  Trash2,
+  Unlock,
+  X,
 } from 'angular-feather/icons';
-import { UploaderModule } from '@syncfusion/ej2-angular-inputs';
+import {
+  MaskedTextBoxModule,
+  NumericTextBoxModule,
+  TextBoxModule,
+  UploaderModule,
+} from '@syncfusion/ej2-angular-inputs';
 import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
-import { ListBoxModule } from '@syncfusion/ej2-angular-dropdowns';
+import { DropDownListModule, ListBoxModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { AgencyComponent } from './agency.component';
 import { AgencyRoutingModule } from './agency-routing.module';
 import { AgencyListComponent } from './agency-list/agency-list.component';
 import { AddEditAgencyComponent } from './agency-list/add-edit-agency/add-edit-agency.component';
 import { SharedModule } from '@shared/shared.module';
 import { GeneralInfoGroupComponent } from './agency-list/add-edit-agency/general-info-group/general-info-group.component';
-import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { BillingDetailsGroupComponent } from './agency-list/add-edit-agency/billing-details-group/billing-details-group.component';
 import { ContactDetailsGroupComponent } from './agency-list/add-edit-agency/contact-details-group/contact-details-group.component';
 import { PaymentDetailsGridComponent } from './agency-list/add-edit-agency/payment-details-grid/payment-details-grid.component';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
-import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { CandidatesComponent } from './candidates/candidates.component';
 import { AddEditCandidateComponent } from './candidates/add-edit-candidate/add-edit-candidate.component';
 import { CandidateGeneralInfoComponent } from './candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
@@ -77,6 +80,7 @@ import { CandidatDetailsComponent } from './order-management/order-management-gr
 import { NgxMaskModule } from 'ngx-mask';
 import { AgencyOrderFiltersComponent } from './order-management/order-management-grid/agency-order-filters/agency-order-filters.component';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
 
 const sidebarIcons = {
   Sliders,
@@ -163,6 +167,7 @@ const sidebarIcons = {
     MultiSelectAllModule,
     MaskedTextBoxModule,
     DropDownButtonModule,
+    AddEditReorderModule,
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),
