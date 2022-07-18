@@ -32,7 +32,7 @@ export class OrderManagement {
   openPositions: number;
   candidates: number;
   startDate: string;
-  reOrderDate?: string;
+  jobStartDate?: string;
   isLocked?: boolean;
   reOrderCount?: number;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
@@ -60,7 +60,7 @@ export type OrderManagementPage = PageOfCollections<OrderManagement>;
 
 export type AgencyOrderManagement = {
   orderId: number;
-  reOrderFromId?: number;
+  reOrderId?: number;
   statusText: string;
   status: OrderStatus;
   jobTitle: string;
@@ -75,7 +75,6 @@ export type AgencyOrderManagement = {
   candidatesCount: number;
   isLocked: boolean;
   jobStartDate: string;
-  reOrderDate?: string;
   reOrderCount?: number;
   organizationId: number;
   organizationName: string;
@@ -102,6 +101,7 @@ export type OrderManagementChild = {
   positionId: number;
   statusName: string;
   submissionsPercentage: number;
+  agencyName: string;
 };
 
 export type OrderCandidatesList = {
@@ -134,7 +134,7 @@ export type AgencyOrderFilters = {
   locationIds?: number[];
   departmentsIds?: number[];
   orderId?: number;
-  reOrderFromId?: number;
+  reOrderId?: number;
   skillIds?: number[];
   candidateStatuses?: number[];
   candidatesCountFrom?: number;
@@ -148,7 +148,6 @@ export type AgencyOrderFilters = {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
-  reOrderDate?: Date;
   includeReOrders?: boolean;
 };
 
@@ -379,7 +378,6 @@ export class OrderFilter {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
-  reOrderDate?: Date;
   orderStatuses?: number[];
   candidateStatuses?: number[];
   candidatesCountFrom?: number;

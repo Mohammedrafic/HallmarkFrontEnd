@@ -24,10 +24,16 @@
       </e-chips>
     </ejs-chiplist>
   </div>
-  <div class="info">
+  <div class="info" *ngIf="!isAgency; else agencyColumn">
     <div class="data">{{ order.skill || order.skillName || '-' }}</div>
     <div class="title">Skill</div>
   </div>
+  <ng-template #agencyColumn>
+    <div class="info">
+      <div class="data">{{ candidat.agencyName }}</div>
+      <div class="title">Agency</div>
+    </div>
+  </ng-template>
   <div class="info">
     <div class="data"> {{order.billRate | billRate: candidat.candidateBillRate: candidat.candidateStatus: candidat.candidateBillRate}}</div>
     <div class="title">Bill Rate $</div>

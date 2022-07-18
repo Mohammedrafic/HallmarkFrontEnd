@@ -7,7 +7,7 @@ import { getAllErrors } from "@shared/utils/error.utils";
 import { catchError, map, Observable, tap } from 'rxjs';
 import { ShowToast } from "src/app/store/app.actions";
 import { MENU_CONFIG } from '@shared/constants';
-import { AUTH_STORAGE_KEY, USER_STORAGE_KEY, ORG_ID_STORAGE_KEY, AGENCY_ID_STORAGE_KEY, LAST_SELECTED_BUSINESS_UNIT_TYPE } from '@shared/constants/local-storage-keys';
+import { USER_STORAGE_KEY, ORG_ID_STORAGE_KEY, AGENCY_ID_STORAGE_KEY, LAST_SELECTED_BUSINESS_UNIT_TYPE } from '@shared/constants/local-storage-keys';
 import { ChildMenuItem, Menu, MenuItem } from '@shared/models/menu.model';
 
 import { User, UsersAssignedToRole } from '@shared/models/user.model';
@@ -191,7 +191,7 @@ export class UserState {
   ): Observable<LasSelectedOrganizationAgency> {
     return this.userService.saveLastSelectedOrganizationAgencyId(payload).pipe(map(() => {
       dispatch(new SetLastSelectedOrganizationAgencyId(payload));
-      if (isOrganizationId && getState().lastSelectedOrganisationAgency === 'Organization') {
+      if (isOrganizationId) {
         dispatch(new GetOrganizationStructure());
       }
       return payload;

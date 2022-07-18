@@ -220,32 +220,18 @@
       </div>
     </div>
   </div>
-  <div class="row" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders && activeTab !== AgencyOrderManagementTabs.PerDiem">
+  <div class="row" *ngIf="activeTab !== AgencyOrderManagementTabs.PerDiem">
     <div class="input-container calendar">
-      <label for="jobStartDate">Job Start Date</label>
+      <label for="jobStartDate">{{ activeTab !== AgencyOrderManagementTabs.ReOrders ? 'Job Start Date' : 'Re-Order Date' }}</label>
       <div class="input-group datepicker">
         <ejs-datepicker id="jobStartDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobStartDate">
         </ejs-datepicker>
       </div>
     </div>
-    <div class="input-container calendar">
+    <div class="input-container calendar" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders">
       <label for="jobEndDate">Job End Date</label>
       <div class="input-group datepicker">
         <ejs-datepicker id="jobEndDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobEndDate">
-        </ejs-datepicker>
-      </div>
-    </div>
-  </div>
-  <div class="calendar-container" *ngIf="activeTab === AgencyOrderManagementTabs.ReOrders">
-    <div class="input-container calendar">
-      <label for="reOrderDate">Re-Order Date</label>
-      <div class="input-group datepicker">
-        <ejs-datepicker
-          id="reOrderDate"
-          class="datepicker"
-          format="MM/dd/yyyy"
-          placeholder="MM/DD/YYYY"
-          formControlName="reOrderDate">
         </ejs-datepicker>
       </div>
     </div>

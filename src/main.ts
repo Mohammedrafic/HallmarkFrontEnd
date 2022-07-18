@@ -30,11 +30,6 @@ Promise.resolve()
     return Promise.all([{ host }, fetch(APP_SETTINGS_B2C_CONFIG_URL(host)).then((res) => res.json())]);
   })
   .then(([settings, config]) => {
-    // ENV Debug Info
-    console.table(settings);
-    console.table(config);
-    //
-
     const B2C_STATIC_PROVIDERS = MSAL_STATIC_PROVIDERS(settings.host, config);
 
     platformBrowserDynamic([{ provide: APP_SETTINGS, useValue: settings }, ...B2C_STATIC_PROVIDERS])

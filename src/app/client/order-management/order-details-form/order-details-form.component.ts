@@ -484,9 +484,20 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         }
 
         this.agencyControlEnabled = jobDistributionIds.includes(JobDistribution.Selected);
-
+        const selectedJobDistributions: JobDistributionModel[] = [];
         if (this.agencyControlEnabled) {
           agencyControl.addValidators(Validators.required);
+          const agencyIds = agencyControl.value;
+          if (agencyIds) {
+            agencyIds.forEach((agencyId: number) => {
+              selectedJobDistributions.push({
+                id: 0,
+                orderId: this.order?.id || 0,
+                jobDistributionOption: JobDistribution.Selected,
+                agencyId,
+              });
+            });
+          }
         } else {
           agencyControl.removeValidators(Validators.required);
           agencyControl.reset();
@@ -505,7 +516,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
             };
           });
 
-        jobDistributionsControl.patchValue(jobDistributions, { emitEvent: false });
+        jobDistributionsControl.patchValue([...jobDistributions, ...selectedJobDistributions], { emitEvent: false });
       });
 
     agencyControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((agencyIds: number[] | null) => {
@@ -728,7 +739,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
     this.masterShifts$
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(() => this.generalInformationForm.controls['shiftRequirementId'].patchValue(order.shiftRequirementId));
+      .subscribe(() => this.generalInformationForm.controls['shiftRequirementId'].patchValue(order.shiftRequirementId, { emitEvent: false }));
 
     this.generalInformationForm.controls['hourlyRate'].patchValue(hourlyRate);
     this.generalInformationForm.controls['openPositions'].patchValue(order.openPositions);

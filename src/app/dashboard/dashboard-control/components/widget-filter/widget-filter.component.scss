@@ -6,8 +6,16 @@
 
     .e-badge {
       position: absolute;
-      right: 26px;
+      right: 30px;
       top: 11px;
+    }
+  }
+}
+
+.bootstrap {
+  .e-multi-select-wrapper {
+    .e-close-hooker {
+      margin-right: 10px;
     }
   }
 }

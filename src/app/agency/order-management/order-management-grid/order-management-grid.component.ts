@@ -122,6 +122,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public isSubrowDisplay: boolean = false;
   public ordersPage: AgencyOrderManagementPage;
   public showReOrders = false;
+  public AgencyOrderManagementTabs = AgencyOrderManagementTabs;
 
   private statusSortDerection: SortDirection = 'Ascending';
   private isAlive = true;
@@ -389,7 +390,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onFilterClose() {
     this.OrderFilterFormGroup.setValue({
       orderId: this.filters.orderId || null,
-      reOrderFromId: this.filters.reOrderFromId || null,
+      reOrderId: this.filters.reOrderId || null,
       regionIds: this.filters.regionIds || [],
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
@@ -405,7 +406,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       openPositions: this.filters.openPositions || null,
       jobStartDate: this.filters.jobStartDate || null,
       jobEndDate: this.filters.jobEndDate || null,
-      reOrderDate: this.filters.reOrderDate || null,
       candidateStatuses: this.filters.candidateStatuses || [],
       candidatesCountFrom: this.filters.candidatesCountFrom || null,
       candidatesCountTo: this.filters.candidatesCountTo || null,

@@ -13,7 +13,7 @@ import { FilterService } from '@shared/services/filter.service';
 import { combineLatest, distinctUntilChanged, filter, map, Observable, takeUntil } from 'rxjs';
 import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
 import { IFilterColumnsDataModel } from 'src/app/dashboard/models/widget-filter.model';
-import { SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
+import { SetDashboardFiltersState, SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
@@ -75,6 +75,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     this.initForm();
     this.widgetFilterColumnsSetup();
     this.isFilterDialogOpened();
+    this.getFilterState();
   }
 
   private isFilterDialogOpened() {
@@ -233,13 +234,12 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     });
   }
 
-  private setFilterState(): void {
-    combineLatest([this.filteredItems$, this.organizationStructure$])
+  private getFilterState(): void {
+    this.filteredItems$
       .pipe(
         takeUntil(this.destroy$),
-        filter(([items, orgs]) => !!orgs && items.length > 0)
       )
-      .subscribe(([filters]) => {
+      .subscribe((filters) => {
         this.cdr.markForCheck();
         this.filters = {};
         filters.forEach((item: FilteredItem) => {
@@ -250,8 +250,11 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
             this.filters[filterKey] = [item.value];
           }
         });
-
-        Object.entries(this.filters).forEach(([key, value]) => this.widgetFilterFormGroup.get(key)?.setValue(value));
+          this.store.dispatch(new SetDashboardFiltersState(this.filters))
       });
+  }
+
+  private setFilterState(): void {
+    combineLatest([this.filteredItems$, this.organizationStructure$]).pipe(takeUntil(this.destroy$), filter(([items, orgs]) => !!orgs && items.length > 0), ).subscribe(() => Object.entries(this.filters).forEach(([key, value]) => this.widgetFilterFormGroup.get(key)?.setValue(value)))
   }
 }

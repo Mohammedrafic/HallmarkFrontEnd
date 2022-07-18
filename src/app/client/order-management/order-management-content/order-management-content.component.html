@@ -163,14 +163,14 @@
           <span>{{ data.startDate | date:'MM/dd/yyyy' }}</span>
         </ng-template>
       </e-column>
-      <e-column field="reOrderDate" headerText="RE-ORDER DATE" width="150" [visible]="false">
+      <e-column field="jobStartDate" headerText="RE-ORDER DATE" width="150" [visible]="false">
         <ng-template #template let-data>
-          <span>{{ data.reOrderDate | date:'MM/dd/yyyy' }}</span>
+          <span>{{ data.jobStartDate | date:'MM/dd/yyyy' }}</span>
         </ng-template>
       </e-column>
       <e-column field="shift" headerText="SHIFT" width="150" [visible]="false">
         <ng-template #template let-data>
-          <span>{{ data.shiftStartTime }}-{{ data.shiftEndTime }}</span>
+          <span>{{ data.shiftStartTime | date: 'shortTime' }}-{{ data.shiftEndTime | date: 'shortTime' }}</span>
         </ng-template>
       </e-column>
       <e-column field="agencies" headerText="AGENCY" width="150" [visible]="false">
@@ -210,6 +210,7 @@
           [candidat]="child"
           [order]="data"
           [selected]="selectedCandidate?.selected?.order === data.id && selectedCandidate?.selected.positionId === child.positionId"
+          [isAgency]="true"
           (clickEvent)="onOpenCandidateDialog($event, data)"
         ></app-grid-subrow-candidate>
       </div>
@@ -477,9 +478,9 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders && activeTab !== OrganizationOrderManagementTabs.PerDiem">
+    <div class="row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem">
       <div class="input-container calendar">
-        <label for="jobStartDate">Job Start Date</label>
+        <label for="jobStartDate">{{ activeTab !== OrganizationOrderManagementTabs.ReOrders ? 'Job Start Date' : 'Re-Order Date' }}</label>
         <div class="input-group datepicker">
           <ejs-datepicker
             id="jobStartDate"
@@ -491,7 +492,7 @@
           </ejs-datepicker>
         </div>
       </div>
-      <div class="input-container calendar">
+      <div class="input-container calendar" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders">
         <label for="jobEndDate">Job End Date</label>
         <div class="input-group datepicker">
           <ejs-datepicker
@@ -500,21 +501,6 @@
             format="MM/dd/yyyy"
             placeholder="MM/DD/YYYY"
             formControlName="jobEndDate"
-          >
-          </ejs-datepicker>
-        </div>
-      </div>
-    </div>
-    <div class="bootstrap calendar-container" *ngIf="activeTab === OrganizationOrderManagementTabs.ReOrders">
-      <div class="input-container calendar">
-        <label for="reOrderDate">Re-Order Date</label>
-        <div class="input-group datepicker">
-          <ejs-datepicker
-            id="reOrderDate"
-            class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
-            formControlName="reOrderDate"
           >
           </ejs-datepicker>
         </div>

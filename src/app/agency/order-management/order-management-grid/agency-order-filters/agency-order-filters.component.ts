@@ -171,7 +171,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   static generateFiltersForm(): FormGroup {
     return new FormGroup({
       orderId: new FormControl(null),
-      reOrderFromId: new FormControl(null),
+      reOrderId: new FormControl(null),
       organizationIds: new FormControl([]),
       regionIds: new FormControl([]),
       locationIds: new FormControl([]),
@@ -188,14 +188,13 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       openPositions: new FormControl(null),
       jobStartDate: new FormControl(null),
       jobEndDate: new FormControl(null),
-      reOrderDate: new FormControl(null),
     });
   }
 
   static generateFilterColumns(): any {
     return {
       orderId: { type: ControlTypes.Text, valueType: ValueType.Text },
-      reOrderFromId: { type: ControlTypes.Text, valueType: ValueType.Text },
+      reOrderId: { type: ControlTypes.Text, valueType: ValueType.Text },
       organizationIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
@@ -260,7 +259,6 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       openPositions: { type: ControlTypes.Text, valueType: ValueType.Text },
       jobStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       jobEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      reOrderDate: { type: ControlTypes.Date, valueType: ValueType.Text },
     };
   }
 }

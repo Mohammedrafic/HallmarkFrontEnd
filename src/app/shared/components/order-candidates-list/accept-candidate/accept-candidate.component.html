@@ -9,7 +9,7 @@
           </h3>
           <app-deploy-candidate-message *ngIf="candidate.deployedCandidateInfo" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
         </div>
-        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
+        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus && !candidate.deployedCandidateInfo">
           <e-chips>
             <e-chip [text]="candidatStatus[candidate.candidateStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
           </e-chips>

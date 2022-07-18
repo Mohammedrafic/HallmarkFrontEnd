@@ -70,17 +70,17 @@
         </ng-template>
       </ng-template>
     </e-column>
-    <e-column field="reOrderFromId" headerText="RE-ORDER ID" width="140" [visible]="false">
+    <e-column field="reOrderId" headerText="RE-ORDER ID" width="140" [visible]="false">
       <ng-template #template let-data>
         <ng-container *ngIf="!data.children?.length; else withToggle">
           <div>
-            <b>{{ data.reOrderFromId }}</b>
+            <b>{{ data.reOrderId }}</b>
           </div>
         </ng-container>
 
         <ng-template #withToggle>
           <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-            <b>{{ data.reOrderFromId }}</b>
+            <b>{{ data.reOrderId }}</b>
             <i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
           </div>
         </ng-template>
@@ -126,25 +126,17 @@
     <e-column field="department" headerText="DEPARTMENT" textAlign="Left" width="150"></e-column>
     <e-column field="type" headerText="TYPE" width="100" [valueAccessor]="typeValueAccess"></e-column>
     <e-column field="location" headerText="LOCATION" textAlign="Left" width="200"></e-column>
-    <e-column field="jobStartDate" headerText="START DATE" width="150">
+    <e-column field="jobStartDate" [headerText]="selectedTab !== AgencyOrderManagementTabs.ReOrders ? 'START DATE' : 'RE-ORDER DATE'" width="150">
       <ng-template #template let-data>
         {{ data.jobStartDate | date: 'MM/dd/yyy' }}
       </ng-template>
     </e-column>
-    <e-column field="reOrderDate" headerText="RE-ORDER DATE" width="150" [visible]="false">
-      <!-- TODO: verify after BE implementation -->
-      <ng-template #template let-data>
-        <span>{{ data.reOrderDate | date:'MM/dd/yyyy' }}</span>
-      </ng-template>
-    </e-column>
     <e-column field="shift" headerText="SHIFT" width="150" [visible]="false">
-      <!-- TODO: verify after BE implementation -->
       <ng-template #template let-data>
-        <span>{{ data.shiftStartTime }}-{{ data.shiftEndTime }}</span>
+        <span>{{ data.shiftStartTime | date: 'shortTime' }}-{{ data.shiftEndTime | date: 'shortTime' }}</span>
       </ng-template>
     </e-column>
     <e-column field="agencies" headerText="AGENCY" width="150" [visible]="false">
-      <!-- TODO: verify after BE implementation -->
       <ng-template #template let-data>
         <ng-container *ngIf="!data.agencies?.length">
           <span>All</span>
@@ -181,6 +173,7 @@
         [candidat]="child"
         [order]="data"
         [selected]="selectedCandidate?.selected.order === data.orderId && selectedCandidate?.selected.positionId === child.positionId"
+        [isAgency]="false"
         (clickEvent)="onOpenCandidateDialog($event, data)"
       ></app-grid-subrow-candidate>
     </div>
