@@ -897,7 +897,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
   }
  
-
   private applyDashboardFilters(): void {
     combineLatest([this.dashboardFiltersState$, this.filteredItems$])
       .pipe(takeUntil(this.unsubscribe$))
