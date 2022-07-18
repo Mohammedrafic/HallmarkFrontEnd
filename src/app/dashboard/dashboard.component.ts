@@ -45,7 +45,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   @Select(DashboardState.widgets) public readonly widgets$: Observable<DashboardStateModel['widgets']>;
   @Select(DashboardState.isDashboardLoading) public readonly isLoading$: Observable<DashboardStateModel['isDashboardLoading']>;
   @Select(DashboardState.isMobile) private readonly isMobile$: Observable<DashboardStateModel['isMobile']>;
-  @Select(DashboardState.dashboardFiltersState) public readonly dashboardFiltersState$: Observable<DashboardFiltersModel>;
+  @Select(DashboardState.dashboardFiltersState) private readonly dashboardFiltersState$: Observable<DashboardFiltersModel>;
 
   @Select(UserState.lastSelectedOrganizationId) private readonly organizationId$: Observable<UserStateModel['lastSelectedOrganizationId']>;
   @Select(UserState.lastSelectedOrganizationAgency) private readonly lastSelectedOrganizationAgency$: Observable<string>;
