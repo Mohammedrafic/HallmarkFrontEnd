@@ -170,7 +170,7 @@
       </e-column>
       <e-column field="shift" headerText="SHIFT" width="150" [visible]="false">
         <ng-template #template let-data>
-          <span>{{ data.shiftStartTime }}-{{ data.shiftEndTime }}</span>
+          <span>{{ data.shiftStartTime | date: 'shortTime' }}-{{ data.shiftEndTime | date: 'shortTime' }}</span>
         </ng-template>
       </e-column>
       <e-column field="agencies" headerText="AGENCY" width="150" [visible]="false">
