@@ -8,6 +8,17 @@
   &__rows-options,
   &__navigate-to-control {
     width: 140px;
+
+    ::ng-deep {
+      .e-control-wrapper {
+        border-color: transparent !important;
+      }
+
+      .e-input-group.e-numeric.e-control-wrapper.e-input-focus,
+      .e-control-wrapper.e-input-group:active {
+        border-width: 1px !important;
+      }
+    }
   }
 
   &__controls {

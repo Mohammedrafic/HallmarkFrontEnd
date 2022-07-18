@@ -20,6 +20,7 @@ export class FilterDialogComponent extends DestroyableDirective implements OnIni
   @Input() width: string = '532px';
   @Input() items: FilteredItem[] | null = [];
   @Input() count: number | undefined | null = 0;
+  @Input() showResultsCounter: boolean = true;
   @Output() clearAllFiltersClicked: EventEmitter<void> = new EventEmitter();
   @Output() applyFilterClicked: EventEmitter<void> = new EventEmitter();
   @Output() deleteFilter: EventEmitter<FilteredItem> = new EventEmitter();

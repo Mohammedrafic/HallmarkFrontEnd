@@ -202,6 +202,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           fileType,
           {
             ...this.filters,
+            offset: Math.abs(new Date().getTimezoneOffset()),
             isAgency: this.selectedTab === AgencyOrderManagementTabs.ReOrders ? true : null,
             ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
           },
@@ -247,7 +248,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private dispatchNewPage(): void {
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
-        this.columnsToExport = myAgencyColumnsToExport;
+        this.columnsToExport = [...myAgencyColumnsToExport, ...myAgencyChildColumnsToExport];
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.PerDiem:
@@ -352,7 +353,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.selectedReOrder = reOrder;
     this.selectedReOrder.selected = {
       order: order.orderId,
-      reOrder: reOrder.orderId
+      reOrder: reOrder.orderId,
     };
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.orderId, order.organizationId, options));
@@ -431,16 +432,21 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private checkSelectedChildrenItem(): void {
     const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children.length !== 0);
 
-    if (this.selectedTab === AgencyOrderManagementTabs.MyAgency) {
-      this.columnsToExport = hasSelectedItemChildren
-        ? [...myAgencyColumnsToExport, ...myAgencyChildColumnsToExport]
-        : myAgencyColumnsToExport;
-    }
-
-    if (this.selectedTab === AgencyOrderManagementTabs.ReOrders) {
-      this.columnsToExport = hasSelectedItemChildren
-        ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
-        : reOrdersColumnsToExport;
+    switch (this.selectedTab) {
+      case AgencyOrderManagementTabs.MyAgency:
+        if (this.selectedItems.length === 0) {
+          this.columnsToExport = [...myAgencyColumnsToExport, ...myAgencyChildColumnsToExport];
+          return;
+        }
+        this.columnsToExport = hasSelectedItemChildren
+          ? [...myAgencyColumnsToExport, ...myAgencyChildColumnsToExport]
+          : myAgencyColumnsToExport;
+        break;
+      case AgencyOrderManagementTabs.ReOrders:
+        this.columnsToExport = hasSelectedItemChildren
+          ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
+          : reOrdersColumnsToExport;
+        break;
     }
   }
 

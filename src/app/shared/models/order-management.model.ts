@@ -32,7 +32,6 @@ export class OrderManagement {
   openPositions: number;
   candidates: number;
   startDate: string;
-  jobStartDate?: string;
   isLocked?: boolean;
   reOrderCount?: number;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
@@ -247,6 +246,7 @@ export class Order {
   acceptedPositions?: number;
   documents: Document[] | null;
   canApprove: boolean;
+  reOrderFromId?: number;
 }
 
 export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'status' | 'statusText' | 'documents'> {

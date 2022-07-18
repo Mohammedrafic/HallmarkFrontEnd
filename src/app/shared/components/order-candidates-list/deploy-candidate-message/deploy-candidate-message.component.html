@@ -1,8 +1,8 @@
 <div class="warning-deployed-candidate">
   <ng-container *ngIf="isAgency; else orgMessage">
-    Employee is already working in Position ID: <span>{{candidateBasicInfo?.orderId}}/{{candidateBasicInfo?.positionId}}; {{candidateBasicInfo?.actualStartDate | date: 'dd/MM/yyyy'}} - {{candidateBasicInfo?.actualEndDate | date: 'dd/MM/yyyy'}} for the organization {{candidateBasicInfo?.organizationName}} </span>
+    Employee is already working in Position ID: <span>{{candidateBasicInfo?.orderId}}/{{candidateBasicInfo?.positionId}}; {{candidateBasicInfo?.actualStartDate | date: 'MM/dd/yyyy'}} - {{candidateBasicInfo?.actualEndDate | date: 'MM/dd/yyyy'}} for the organization {{candidateBasicInfo?.organizationName}} </span>
   </ng-container>
   <ng-template #orgMessage>
-    Employee is already working on an assignment till <span>{{candidateBasicInfo?.actualEndDate | date: 'dd/MM/yyyy'}}</span>
+    Employee is already working on an assignment till <span>{{candidateBasicInfo?.actualEndDate | date: 'MM/dd/yyyy'}}</span>
   </ng-template>
 </div>

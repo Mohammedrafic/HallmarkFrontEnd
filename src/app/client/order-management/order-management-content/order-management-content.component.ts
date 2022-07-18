@@ -2,7 +2,8 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { debounceTime, filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { combineLatest, debounceTime, filter, Observable, Subject, Subscription, takeUntil, throttleTime 
+} from 'rxjs';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
@@ -25,12 +26,12 @@ import {
 } from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
-  OrderManagementChild,
   Order,
   OrderFilter,
-  OrderManagement,
-  OrderManagementPage,
   OrderFilterDataSource,
+  OrderManagement,
+  OrderManagementChild,
+  OrderManagementPage,
 } from '@shared/models/order-management.model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { UserState } from '../../../store/user.state';
@@ -55,9 +56,9 @@ import {
   OrderTypeName,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
+  reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
-  reOrdersChildColumnToExport,
   ROW_HEIGHT,
 } from './order-management-content.constants';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
@@ -65,6 +66,8 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { SearchComponent } from '@shared/components/search/search.component';
 import { OrderStatus } from '@shared/enums/order-management';
+import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
+import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
 
 @Component({
   selector: 'app-order-management-content',
@@ -93,6 +96,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   @Select(OrganizationManagementState.allOrganizationSkills)
   skills$: Observable<Skill[]>;
+
+  @Select(DashboardState.filteredItems) private readonly filteredItems$: Observable<FilteredItem[]>;
+  @Select(DashboardState.dashboardFiltersState)
+  private readonly dashboardFiltersState$: Observable<DashboardFiltersModel>;
 
   public activeTab: OrganizationOrderManagementTabs = OrganizationOrderManagementTabs.AllOrders;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
@@ -160,6 +167,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public fileName: string;
   public defaultFileName: string;
 
+  private isRedirectedFromDashboard: boolean;
+  private dashboardFilterSubscription: Subscription;
+
   constructor(
     private store: Store,
     private router: Router,
@@ -169,9 +179,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     private filterService: FilterService,
     private fb: FormBuilder,
     private datePipe: DatePipe,
-    private location: Location
+    private location: Location,
+    private readonly actions: Actions,
   ) {
     super();
+    this.isRedirectedFromDashboard = this.router.getCurrentNavigation()?.extras?.state?.['redirectedFromDashboard'] || false;
+
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.fb.group({
       orderId: new FormControl(null),
@@ -197,6 +210,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   ngOnInit(): void {
+    this.handleDashboardFilters();
     this.orderFilterColumnsSetup();
     this.onOrderFilterDataSourcesLoadHandler();
 
@@ -250,6 +264,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           fileType,
           {
             ...this.filters,
+            offset: Math.abs(new Date().getTimezoneOffset()),
             isAgency: this.activeTab === OrganizationOrderManagementTabs.ReOrders ? false : null,
             ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
           },
@@ -287,7 +302,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filters.billRateFrom ? this.filters.billRateFrom : null;
     this.filters.billRateTo ? this.filters.billRateTo : null;
     this.filters.pageNumber = this.currentPage;
-    this.filters.agencyType = this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) : null;
+    this.filters.agencyType = this.filters.agencyType !== '0' ? parseInt(this.filters.agencyType as string, 10) || null : null;
     this.filters.pageSize = this.pageSize;
 
     switch (this.activeTab) {
@@ -502,6 +517,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filteredItems = [];
     this.search?.clear();
     this.store.dispatch(new ClearOrders());
+    this.openDetails.next(false);
+    this.selectedIndex = null;
+    this.clearSelection(this.gridWithChildRow);
 
     switch (tabIndex) {
       case OrganizationOrderManagementTabs.AllOrders:
@@ -542,19 +560,33 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.selectedReOrder = reOrder;
     this.selectedReOrder.selected = {
       order: order.id,
-      reOrder: reOrder.id
+      reOrder: reOrder.id,
     };
-    const options = this.getDialogNextPreviousOption(order);
-    this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
+    this.gridWithChildRow?.clearRowSelection();
+    this.selectedIndex = null;
+    this.store.dispatch(new GetOrderById(reOrder.id, order.organizationId));
     this.selectedDataRow = order as any;
-    //this.openChildDialog.next([order, candidate]); TODO: pending reorder modal
+    this.openDetails.next(true);
+  }
+
+  public triggerSelectOrder(): void {
+    const [index] = this.gridWithChildRow.getSelectedRowIndexes();
+    this.selectedIndex = index;
+    this.updatePage();
+    this.store.dispatch(
+      new GetOrderById(
+        this.selectedDataRow.id,
+        this.selectedDataRow.organizationId as number,
+        this.getDialogNextPreviousOption(this.selectedDataRow as any)
+      )
+    );
   }
 
   public onOpenCandidateDialog(candidate: OrderManagementChild, order: OrderManagement): void {
     this.selectedCandidate = candidate;
     this.selectedCandidate.selected = {
       order: order.id,
-      positionId: candidate.positionId
+      positionId: candidate.positionId,
     };
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
@@ -630,7 +662,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private onOrganizationChangedHandler(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
-      this.clearFilters();
+      if (!this.isRedirectedFromDashboard) {
+        this.clearFilters();
+      }
       if (!this.previousSelectedOrderId) {
         this.getOrders();
       }
@@ -813,6 +847,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.openDetails.pipe(takeUntil(this.unsubscribe$)).subscribe((isOpen) => {
       if (!isOpen) {
         this.gridWithChildRow.clearRowSelection();
+        this.selectedReOrder = null;
       }
     });
   }
@@ -865,5 +900,43 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     const statuses = [this.orderStatus.Open, this.orderStatus.InProgress, this.orderStatus.Filled];
 
     return !statuses.includes(status);
+  }
+
+  private handleDashboardFilters(): void {
+    if (this.isRedirectedFromDashboard) {
+      this.applyDashboardFilters();
+
+      this.dashboardFilterSubscription = this.actions
+        .pipe(
+          ofActionDispatched(ShowFilterDialog),
+          filter((data) => data.isDialogShown),
+          takeUntil(this.unsubscribe$),
+        )
+        .subscribe(() => this.setFilterState());
+    }
+  }
+ 
+  private applyDashboardFilters(): void {
+    combineLatest([this.dashboardFiltersState$, this.filteredItems$])
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(([filters, items]) => {
+        this.filters = filters;
+        this.filteredItems = items;
+      });
+  }
+
+  private setFilterState(): void {
+    combineLatest([this.filteredItems$, this.organizationStructure$])
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter(([items, orgs]) => !!orgs && items.length > 0)
+      )
+      .subscribe(() => {
+        Object.entries(this.filters).forEach(([key, value]) => {
+          this.OrderFilterFormGroup.get(key)?.setValue(value);
+        });
+        this.isRedirectedFromDashboard = false;
+        this.dashboardFilterSubscription.unsubscribe();
+      });
   }
 }

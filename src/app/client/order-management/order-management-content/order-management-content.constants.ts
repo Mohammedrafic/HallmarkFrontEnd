@@ -74,10 +74,6 @@ export const ReOrdersColumnsConfig = [
     visible: true
   },
   {
-    fieldName: 'jobStartDate',
-    visible: true
-  },
-  {
     fieldName: 'shift',
     visible: true
   },
@@ -95,7 +91,7 @@ export const ReOrdersColumnsConfig = [
   },
   {
     fieldName: 'startDate',
-    visible: false
+    visible: true
   },
   {
     fieldName: 'shiftsNext90Days',
@@ -118,10 +114,6 @@ export const AllOrdersColumnsConfig = [
   },
   {
     fieldName: 'reOrderFromId',
-    visible: false
-  },
-  {
-    fieldName: 'jobStartDate',
     visible: false
   },
   {
@@ -153,10 +145,6 @@ export const PerDiemColumnsConfig = [
   },
   {
     fieldName: 'reOrderFromId',
-    visible: false
-  },
-  {
-    fieldName: 'jobStartDate',
     visible: false
   },
   {

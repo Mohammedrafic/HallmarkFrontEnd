@@ -158,14 +158,14 @@
           <div class="align-right">{{ data.candidates }}</div>
         </ng-template>
       </e-column>
-      <e-column field="startDate" headerText="START DATE" width="150">
+      <e-column field="startDate" width="150">
+        <ng-template #headerTemplate let-data>
+          <span class="e-headertext">
+            {{ activeTab !== OrganizationOrderManagementTabs.ReOrders ? 'START DATE' : 'RE-ORDER DATE' }}
+          </span>
+        </ng-template>
         <ng-template #template let-data>
           <span>{{ data.startDate | date:'MM/dd/yyyy' }}</span>
-        </ng-template>
-      </e-column>
-      <e-column field="jobStartDate" headerText="RE-ORDER DATE" width="150" [visible]="false">
-        <ng-template #template let-data>
-          <span>{{ data.jobStartDate | date:'MM/dd/yyyy' }}</span>
         </ng-template>
       </e-column>
       <e-column field="shift" headerText="SHIFT" width="150" [visible]="false">
