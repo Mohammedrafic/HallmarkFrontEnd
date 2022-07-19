@@ -256,6 +256,7 @@ export class Order {
   canApprove: boolean;
   reOrders?: ReOrder[] | null;
   reOrderFrom?: Order;
+  reOrderId?: number;
   candidates?: CandidateModel[];
 }
 

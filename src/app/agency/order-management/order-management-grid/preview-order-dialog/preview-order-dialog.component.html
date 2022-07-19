@@ -41,14 +41,10 @@
               <ng-template #headerText>Order Details</ng-template>
               <ng-template #content>
                 <section class="order-details" *ngIf="selectedOrder$ | async as currentOrder">
-                  <section class="job-details">
-                    <app-general-order-info
-                      *ngIf="currentOrder?.orderType !== orderType.OpenPerDiem"
-                      [orderInformation]="currentOrder"></app-general-order-info>
-                    <app-general-order-per-diem-info
-                      *ngIf="currentOrder?.orderType === orderType.OpenPerDiem"
-                      [orderInformation]="currentOrder">
-                    </app-general-order-per-diem-info>
+                  <section class="job-details"  *ngIf="currentOrder" [ngSwitch]="currentOrder?.orderType">
+                    <app-general-order-per-diem-info *ngSwitchCase="orderType.OpenPerDiem" [orderInformation]="currentOrder"></app-general-order-per-diem-info>
+                    <app-general-reorder-info *ngSwitchCase="orderType.ReOrder" [orderInformation]="currentOrder"></app-general-reorder-info>
+                    <app-general-order-info *ngSwitchDefault [orderInformation]="currentOrder"></app-general-order-info>
                   </section>
                   <hr />
                   <app-order-details [currentOrder]="currentOrder"></app-order-details>
