@@ -64,6 +64,11 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     return this.permissions.map(permission => permission.permissionId).includes(manageOrderPermissionId);
   }
 
+  get hasWidgetPermission(): boolean {
+    const widgetPermissionId = 2000;
+    return this.permissions.map(permission => permission.permissionId).includes(widgetPermissionId);
+  }
+
   constructor(
     private readonly store: Store,
     private readonly dashboardService: DashboardService,
