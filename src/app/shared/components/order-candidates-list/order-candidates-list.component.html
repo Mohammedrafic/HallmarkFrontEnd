@@ -4,10 +4,11 @@
       <h3>Candidates List</h3>
     </div>
     <div class="input-container">
-      <div class="input-group switch" (click)="onSwitcher(); false;">
+      <div class="input-group switch" >
         <ejs-switch
           id="switcher"
           class="switch"
+          (change)="onSwitcher($event);"
           [checked]="includeDeployedCandidates"
         ></ejs-switch>
         <label class="switch-label" for="switcher">Include <br/>Deployed</label>
