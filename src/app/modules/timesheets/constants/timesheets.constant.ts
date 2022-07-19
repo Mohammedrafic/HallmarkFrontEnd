@@ -90,8 +90,8 @@ export const MockCandidateHoursAndMilesData: CandidateHoursAndMilesData = {
     }
   ],
   miles: {
-    week: 60,
-    cumulative: 120,
+    weekMiles: 60,
+    cumulativeMiles: 120,
     weekCharge: 120,
     cumulativeCharge: 240,
   }

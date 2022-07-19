@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input, OnChanges,
+  Output,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -11,7 +19,7 @@ import { rejectReasonMaxLength } from '../../constants';
   styleUrls: ['./timesheet-reject-reason-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimesheetRejectReasonDialogComponent {
+export class TimesheetRejectReasonDialogComponent implements OnChanges {
   @Input()
   public container: HTMLElement | null = null;
 
@@ -40,6 +48,20 @@ export class TimesheetRejectReasonDialogComponent {
       reason: ['', [Validators.required, Validators.maxLength(rejectReasonMaxLength)]],
     });
   }
+
+  // TODO: Remove after reject reason implemented on BE
+  public ngOnChanges(changes: SimpleChanges): void {
+    const visibleChanges = changes['visible'];
+
+    if (visibleChanges) {
+      const {currentValue} = visibleChanges;
+
+      if (!currentValue) {
+        this.form.reset();
+      }
+    }
+  }
+
 
   public onVisibleChange(value: boolean): void {
     this.visibleChange.emit(value);

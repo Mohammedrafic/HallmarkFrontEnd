@@ -12,6 +12,7 @@ export enum TIMESHEETS_ACTIONS {
   UPDATE_FILTERS_STATE = '[timesheets] UPDATE FILTERS STATE',
   AGENCY_SUBMIT_TIMESHEET = '[timesheets] AGENCY SUBMIT TIMESHEET',
   ORGANIZATION_APPROVE_TIMESHEET = '[timesheets] ORGANIZATION APPROVE TIMESHEET',
+  SUBMIT_TIMESHEET = '[timesheets] SUBMIT TIMESHEET',
   REJECT_TIMESHEET = '[timesheets] REJECT TIMESHEET',
   DELETE_TIMESHEET = '[timesheets] DELETE TIMESHEET',
   GET_TIMESHEET_DETAILS = '[timesheets] GET TIMESHEET DETAILS',
@@ -29,7 +30,9 @@ export enum TimesheetDetailsActions {
   PatchTimesheetRecords = '[timesheet details] Patch timesheet records',
   UploadFiles = '[timesheet details] Upload files',
   DeleteFile = '[timesheet details] Delete file',
+  DownloadAttachment = '[timesheet details] download attachment',
   AddTimesheetRecord = '[timesheet details] Add timesheet record',
+  NoWorkPerformed = '[timesheet details] No work performed',
 }
 
 export enum TIMETHEETS_STATUSES {
