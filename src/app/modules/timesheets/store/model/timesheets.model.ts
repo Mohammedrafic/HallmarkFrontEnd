@@ -19,7 +19,7 @@ export type TimeSheetsPage = PageOfCollections<Timesheet>;
 
 export interface TimesheetsModel {
   timesheets: TimeSheetsPage | null;
-  timesheetsFilters: TimesheetsFilterState,
+  timesheetsFilters: TimesheetsFilterState;
   candidateInfo: CandidateInfo | null;
   candidateHoursAndMilesData: CandidateHoursAndMilesData | null;
   candidateAttachments: TimesheetAttachments;
@@ -30,8 +30,9 @@ export interface TimesheetsModel {
   isTimeSheetOpen: boolean;
   selectedTimeSheetId: number;
   isAddDialogOpen: {
-    action: boolean,
-    dialogType: RecordFields,
+    action: boolean;
+    dialogType: RecordFields;
+    initTime: string;
   };
   tabCounts: TabCountConfig | null;
   timesheetsFiltersColumns: FilterColumns;

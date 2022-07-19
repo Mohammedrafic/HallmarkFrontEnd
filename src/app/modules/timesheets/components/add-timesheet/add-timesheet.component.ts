@@ -55,9 +55,16 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
 
   public formType: RecordFields;
 
+  public timeSettings = {
+    min: 0,
+    max: 0,
+  }
+
+  public initTime: string;
+
 
   @Select(TimesheetsState.addDialogOpen)
-  public readonly dialogState$: Observable<{ state: boolean, type: RecordFields }>
+  public readonly dialogState$: Observable<{ state: boolean, type: RecordFields, initDate: string }>
 
   constructor(
     private confirmService: ConfirmService,
@@ -99,7 +106,10 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
 
   public saveForm(): void {
     if (this.form.valid) {
-
+      this.sideAddDialog.hide();
+    } else {
+      this.form.updateValueAndValidity();
+      this.cd.detectChanges();
     }
   }
 
@@ -114,10 +124,13 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
       tap((value) => {
         this.form = this.addRecordService.createForm(value.type);
         this.formType = value.type;
+        this.initTime = value.initDate;
+        this.populateOptions();
       }),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
+      console.log(this.initTime)
       this.sideAddDialog.show();
       this.cd.markForCheck();
     })
@@ -126,6 +139,14 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
   private closeDialog(): void {
     this.form.reset();
     this.sideAddDialog.hide();
-    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Close, this.formType));
+    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Close, this.formType, ''));
+  }
+
+  private populateOptions(): void {
+    this.dialogConfig[this.formType].forEach((item) => {
+      if (item.optionsStateKey) {
+        item.options = this.store.snapshot().timesheets[item.optionsStateKey]
+      }
+    })
   }
 }

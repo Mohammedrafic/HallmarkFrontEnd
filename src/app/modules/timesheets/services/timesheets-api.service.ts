@@ -1,12 +1,9 @@
-import { BillRate } from '@shared/models/bill-rate.model';
-import { tap } from 'rxjs/internal/operators/tap';
-import { RecordValue, CostCentersDto, CostCenter } from './../interface/common.interface';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
 import { map, Observable, of } from 'rxjs';
-import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
 
+import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
 import {
   TimesheetsFilterState,
   TimesheetRecord,
@@ -17,6 +14,7 @@ import {
   DropdownOption,
 } from '../interface';
 import { BillRatesOptions } from './../constants/timesheet-records-mock.constant';
+import { BillRate } from '@shared/models/bill-rate.model';
 import {
   DataSourceItem,
   FilterDataSource,
@@ -31,10 +29,9 @@ import {
 } from '../constants';
 import {
   CandidateMockInfo,
-  CostCenterOptions,
 } from '../constants/timesheet-records-mock.constant';
 import { TimesheetsTableColumns } from '../enums';
-import { CandidateHoursAndMilesData } from '../interface';
+import { CandidateHoursAndMilesData, RecordValue, CostCentersDto } from '../interface';
 import { CostCenterAdapter } from '../helpers/cost-centers.adapter';
 
 @Injectable()

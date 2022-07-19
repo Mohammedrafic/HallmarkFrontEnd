@@ -155,10 +155,11 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static addDialogOpen(state: TimesheetsModel): { state: boolean, type: RecordFields } {
+  static addDialogOpen(state: TimesheetsModel): { state: boolean, type: RecordFields, initDate: string } {
     return {
       state: state.isAddDialogOpen.action,
       type: state.isAddDialogOpen.dialogType,
+      initDate: state.isAddDialogOpen.initTime,
     };
   }
 
@@ -263,6 +264,7 @@ export class TimesheetsState {
       isAddDialogOpen: {
         action: action === DialogAction.Open,
         dialogType: type,
+        initTime: '',
       },
     });
   }

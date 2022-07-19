@@ -24,6 +24,7 @@ export const DefaultTimesheetState: TimesheetsModel = {
   isAddDialogOpen: {
     action: false,
     dialogType: RecordFields.Time,
+    initTime: '',
   },
   timesheetsFiltersColumns: DefaultFilterColumns,
   timesheetDetails: null,

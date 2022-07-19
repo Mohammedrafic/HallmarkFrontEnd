@@ -1,3 +1,4 @@
+import { RecordFields } from './../enums/timesheet-common.enum';
 import { TableColumnAlign } from '../enums';
 import { TimesheetStatistics } from './timesheet-statistics.interface';
 import { TimesheetAttachment } from './timesheet-attachment.interface';
@@ -77,4 +78,9 @@ export interface TimesheetDetailsModel {
   timesheetStatistic: TimesheetStatistics;
   attachments: TimesheetAttachment[];
   invoices: TimesheetInvoice[];
+}
+
+export interface OpenAddDialogMeta {
+  currentTab: RecordFields;
+  initDate: string;
 }

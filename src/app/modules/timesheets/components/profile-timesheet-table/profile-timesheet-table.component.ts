@@ -27,7 +27,7 @@ import {
 import { ConfirmService } from './../../../../shared/services/confirm.service';
 import { TabConfig, DropdownOption } from './../../interface/common.interface';
 import { ConfirmTabChange } from './../../constants/confirm-delete-timesheet-dialog-content.const';
-import { DialogActionPayload, TimesheetRecordsDto } from '../../interface';
+import { DialogActionPayload, OpenAddDialogMeta, TimesheetRecordsDto } from '../../interface';
 import { TimesheetRecordsService } from '../../services/timesheet-records.service';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
@@ -48,7 +48,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Input() candidateId: number;
 
-  @Output() readonly openAddSideDialog: EventEmitter<RecordFields> = new EventEmitter<RecordFields>();
+  @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
 
   @Output() readonly changesSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
 
@@ -131,7 +131,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public openAddDialog(): void {
-    this.openAddSideDialog.emit(this.currentTab)
+    this.openAddSideDialog.emit({
+      currentTab: this.currentTab,
+      initDate: this.records.timesheets[0].timeIn,
+    })
   }
 
   public editTimesheets(): void {

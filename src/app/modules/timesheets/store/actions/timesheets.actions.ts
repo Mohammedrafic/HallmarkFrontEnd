@@ -15,7 +15,10 @@ export namespace Timesheets {
   export class ToggleTimesheetAddDialog {
     static readonly type = TIMESHEETS_ACTIONS.OPEN_PROFILE_TIMESHEET_ADD_DIALOG;
 
-    constructor(public readonly action: DialogAction, public readonly type: RecordFields) {}
+    constructor(
+      public readonly action: DialogAction,
+      public readonly type: RecordFields,
+      public readonly dateTime: string) {}
   }
 
 

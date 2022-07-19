@@ -4,7 +4,7 @@
     <div class="init-value-wrapper">
       <span class="value-block">
         <span class="value">{{ dateValue | date:'dd/MM/yyyy'}}</span>
-        <span class="value">{{ dateValue | date:'H:mm aa'}}</span>
+        <span class="value">{{ dateValue | date:'H:mm aa': 'UTC'}}</span>
       </span>
     </div>
   </ng-template>

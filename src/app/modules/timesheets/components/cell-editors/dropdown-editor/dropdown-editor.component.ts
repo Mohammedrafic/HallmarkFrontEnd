@@ -53,7 +53,6 @@ export class DropdownEditorComponent implements ICellRendererAngularComp {
     if (this.options && this.options.length) {
       this.value = this.options.find((item) => item.value === params.value) as DropdownOption;
     }
-    console.log(params, this.options)
     this.cd.markForCheck();
   }
 

@@ -22,7 +22,7 @@ cssClass="dialog"
             <ng-container [ngSwitch]="field.type">
 
               <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
-                <div class="input-container">
+                <div class="input-container" [ngClass]="field.widthStyle || ''">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
                   <div class="input-group dropdown">
@@ -65,6 +65,7 @@ cssClass="dialog"
                       appValidateWithMessage
                       [step]="30"
                       placeholder="Select Date and Time"
+                      [min]="initTime"
                       (change)="updateValidity()"
                     >
                     </ejs-datetimepicker>
@@ -73,7 +74,7 @@ cssClass="dialog"
               </ng-template>
 
               <ng-template [ngSwitchCase]="FieldTypes.Input">
-                <div class="input-container">
+                <div class="input-container" [ngClass]="field.widthStyle || ''">
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
                   </label>
                   <div class="input-group">
@@ -85,6 +86,22 @@ cssClass="dialog"
                     />
                   </div>
                 </div>
+              </ng-template>
+
+              <ng-template [ngSwitchCase]="FieldTypes.Date">
+                <div class="input-container" [ngClass]="field.widthStyle || ''">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                  </label>
+                  <div class="input-group">
+                    <ejs-datepicker
+                    class="datepicker"
+                    appValidateWithMessage
+                    [formControlName]="field.field"
+                    >
+                    </ejs-datepicker>
+                  </div>
+                </div>
+
               </ng-template>
 
             </ng-container>

@@ -24,6 +24,8 @@ export class GridDateEditorComponent implements ICellRendererAngularComp {
 
   public type: EditFieldTypes;
 
+  public offset = new Date().getTimezoneOffset().toString();
+
   constructor(
     private cd: ChangeDetectorRef,
   ) {}

@@ -1,3 +1,4 @@
+import { TimesheetsModel } from './../store/model/timesheets.model';
 import { FieldType, FieldWidthStyle, TableColumnAlign } from '../enums';
 import { DetailsTableConfig, DialogConfig } from '../interface';
 
@@ -38,6 +39,7 @@ export const TimesheetEditDialogConfig: DialogConfig = {
       disabled: false,
       required: true,
       widthStyle: FieldWidthStyle.Short,
+      optionsStateKey: 'costCenterOptions',
       options: [],
     },
     {
@@ -47,6 +49,7 @@ export const TimesheetEditDialogConfig: DialogConfig = {
       disabled: false,
       required: true,
       widthStyle: FieldWidthStyle.Short,
+      optionsStateKey: 'billRateTypes',
       options: [],
     },
     {
@@ -75,6 +78,7 @@ export const TimesheetEditDialogConfig: DialogConfig = {
       disabled: false,
       required: true,
       widthStyle: FieldWidthStyle.Short,
+      optionsStateKey: 'costCenterOptions',
       options: [],
     },
     {
@@ -84,6 +88,7 @@ export const TimesheetEditDialogConfig: DialogConfig = {
       disabled: false,
       required: true,
       widthStyle: FieldWidthStyle.Short,
+      optionsStateKey: 'billRateTypes',
       options: [],
     },
     {
@@ -92,7 +97,7 @@ export const TimesheetEditDialogConfig: DialogConfig = {
       type: FieldType.Input,
       disabled: false,
       required: true,
-      widthStyle: FieldWidthStyle.Long,
+      widthStyle: FieldWidthStyle.Short,
     },
   ],
   expenses: [
@@ -111,6 +116,7 @@ export const TimesheetEditDialogConfig: DialogConfig = {
       disabled: false,
       required: true,
       widthStyle: FieldWidthStyle.Short,
+      optionsStateKey: 'costCenterOptions',
       options: [],
     },
     {
@@ -120,6 +126,7 @@ export const TimesheetEditDialogConfig: DialogConfig = {
       disabled: false,
       required: true,
       widthStyle: FieldWidthStyle.Short,
+      optionsStateKey: 'billRateTypes',
       options: [],
     },
     {
@@ -136,7 +143,7 @@ export const TimesheetEditDialogConfig: DialogConfig = {
       type: FieldType.Input,
       disabled: false,
       required: true,
-      widthStyle: FieldWidthStyle.Long,
+      widthStyle: FieldWidthStyle.Short,
     },
   ],
 };

@@ -30,7 +30,7 @@ import {
   CandidateHoursAndMilesData,
   CandidateInfo,
   DialogActionPayload,
-  TimesheetDetailsModel, CandidateMilesData,
+  TimesheetDetailsModel, CandidateMilesData, OpenAddDialogMeta,
 } from '../../interface';
 import { DialogAction, SubmitBtnText } from '../../enums';
 import {
@@ -161,8 +161,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public handleUpdateTable(): void {}
 
-  public openAddDialog(type: RecordFields): void {
-    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open, type));
+  public openAddDialog(meta: OpenAddDialogMeta): void {
+    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open, meta.currentTab, meta.initDate));
   }
 
   public handleProfileClose(): void {
