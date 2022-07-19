@@ -7,7 +7,6 @@ import { DatepickerModule } from '@shared/components/form-controls/datepicker/da
 import { TimepickerModule } from '@shared/components/form-controls/timepicker/timepicker.module';
 import { NumericTextboxModule } from '@shared/components/form-controls/numeric-textbox/numeric-textbox.module';
 import { SharedModule } from '@shared/shared.module';
-import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [AddEditReorderComponent],
@@ -20,7 +19,6 @@ import { HttpClientModule } from '@angular/common/http';
     TimepickerModule,
     NumericTextboxModule,
     SharedModule,
-    HttpClientModule,
   ],
   exports: [AddEditReorderComponent],
 })
