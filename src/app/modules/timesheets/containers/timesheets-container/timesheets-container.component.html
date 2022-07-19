@@ -6,6 +6,16 @@
     </app-tabs-list>
   </ng-container>
   <ng-container right>
+    <div *ngIf="isAgency" class="bootstrap">
+      <div class="input-container">
+        <ejs-dropdownlist
+          *ngIf="organizations$ | async as organizations"
+          [dataSource]="organizations"
+          [fields]="unitOrganizationsFields"
+          [formControl]="organizationControl">
+        </ejs-dropdownlist>
+      </div>
+    </div>
     <app-search class="search"></app-search>
     <app-date-week-picker [dateControl]="dateControl"></app-date-week-picker>
     <button

@@ -24,6 +24,7 @@ import {
   CandidateHoursAndMilesData,
   CandidateInfo,
   CandidateMilesData,
+  DataSourceItem,
   FilterColumns,
   FilterDataSource,
   TabCountConfig,
@@ -164,6 +165,11 @@ export class TimesheetsState {
   @Selector([TimesheetsState])
   static costCenters(state: TimesheetsModel): unknown {
     return state.costCenterOptions;
+  }
+
+  @Selector([TimesheetsState])
+  static organizations(state: TimesheetsModel): DataSourceItem[] {
+    return state.organizations;
   }
 
   @Action(Timesheets.GetAll)
@@ -548,21 +554,29 @@ export class TimesheetsState {
 
   @Action(TimesheetDetails.GetCostCenters)
   GetCostCenters({ patchState }: StateContext<TimesheetsModel>,
-    payload: { jobId: number}) {
-      return this.timesheetsApiService.getCandidateCostCenters(payload.jobId)
-      .pipe(
-        tap((res) => patchState({
-          costCenterOptions: res,
-        })),
-      );
-    }
+    payload: { jobId: number}
+  ) {
+    return this.timesheetsApiService.getCandidateCostCenters(payload.jobId)
+    .pipe(
+      tap((res) => patchState({
+        costCenterOptions: res,
+      })),
+    );
+  }
 
+  @Action(Timesheets.GetOrganizations)
+  GetOrganizations({ patchState }: StateContext<TimesheetsModel>): Observable<DataSourceItem[]> {
+    return this.timesheetsApiService.getOrganizations()
+    .pipe(
+      tap((organizations) => patchState({ organizations })),
+    );
+  }
   // @Action(TimesheetDetails.AddTimesheetRecord)
   // AddTimesheetRecord(ctx: StateContext<TimesheetsModel>, payload: { timesheetId: number }) {
   //   return this.timesheetsApiService.AddTimesheetRecord(payload.timesheetId)
   //   .pipe(
   //     tap(() => {
-        
+
   //     })
   //   )
   // }

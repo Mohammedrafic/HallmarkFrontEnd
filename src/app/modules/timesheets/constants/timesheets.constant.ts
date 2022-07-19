@@ -42,6 +42,11 @@ export const MokTabsCounts: TabCountConfig = {
   rejected: 0,
 };
 
+export const UNIT_ORGANIZATIONS_FIELDS = {
+  text: 'name',
+  value: 'id',
+};
+
 export const MokTimesheet: Timesheet = {
   id: 1,
   name: 'Brooklyn Simm',

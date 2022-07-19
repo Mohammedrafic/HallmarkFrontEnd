@@ -15,6 +15,7 @@ export enum TIMESHEETS_ACTIONS {
   REJECT_TIMESHEET = '[timesheets] REJECT TIMESHEET',
   DELETE_TIMESHEET = '[timesheets] DELETE TIMESHEET',
   GET_TIMESHEET_DETAILS = '[timesheets] GET TIMESHEET DETAILS',
+  GET_ORGANIZATIONS = '[timesheets] GET ORGANIZATIONS',
 }
 
 export enum TimesheetDetailsActions {

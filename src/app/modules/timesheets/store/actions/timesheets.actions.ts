@@ -85,4 +85,8 @@ export namespace Timesheets {
     constructor(public timesheetId: number) {
     }
   }
+
+  export class GetOrganizations {
+    static readonly type = TIMESHEETS_ACTIONS.GET_ORGANIZATIONS;
+  }
 }

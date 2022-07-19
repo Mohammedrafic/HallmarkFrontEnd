@@ -2,7 +2,7 @@ import { PageOfCollections } from '@shared/models/page.model';
 import { RecordFields } from '../../enums';
 import {
   CandidateHoursAndMilesData,
-  CandidateInfo,
+  CandidateInfo, DataSourceItem,
   DropdownOption,
   FilterColumns,
   TabCountConfig,
@@ -37,5 +37,6 @@ export interface TimesheetsModel {
   tabCounts: TabCountConfig | null;
   timesheetsFiltersColumns: FilterColumns;
   timesheetDetails: TimesheetDetailsModel | null;
+  organizations: DataSourceItem[];
 }
 

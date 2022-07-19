@@ -1,5 +1,6 @@
-import { TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../enums';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+
+import { TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../enums';
 
 export interface Timesheet {
   id: number;
@@ -24,6 +25,7 @@ export interface TimesheetsFilterState {
   orderBy?: string;
   pageNumber?: number;
   pageSize?: number;
+  organizationId?: number;
   date?: string;
   search?: string;
   orderId?: string[];

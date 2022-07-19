@@ -117,6 +117,10 @@ export class TimesheetsApiService {
     );
   }
 
+  public getOrganizations(): Observable<DataSourceItem[]> {
+    return this.http.get<DataSourceItem[]>(`/api/Agency/partneredorganizations`);
+  }
+
   public getCandidateBillRates(
     depId: number,
     skillId: number,

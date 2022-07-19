@@ -9,15 +9,15 @@ import { FormControl } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
 import { filter } from 'rxjs/operators';
-import { Observable, switchMap, takeUntil } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { Destroyable } from '@core/helpers';
 import { User } from '@shared/models/user.model';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { TabConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
-import { TimesheetExportOptions, TAB_ADMIN_TIMESHEETS } from '../../constants';
+import { DataSourceItem, TabConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
+import { TimesheetExportOptions, TAB_ADMIN_TIMESHEETS, UNIT_ORGANIZATIONS_FIELDS } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { DialogAction, ExportType } from '../../enums';
@@ -37,14 +37,19 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   @Select(TimesheetsState.timesheetsFilters)
   readonly timesheetsFilters$!: Observable<TimesheetsFilterState>;
 
+  @Select(TimesheetsState.organizations)
+  readonly organizations$!: Observable<DataSourceItem[]>;
+
   @Select(UserState.user)
   readonly user$: Observable<User>;
 
   public readonly tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
   public activeTabIdx = 0;
   public readonly exportOptions: ItemModel[] = TimesheetExportOptions;
+  public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
   public filters: TimesheetsFilterState | undefined;
   public readonly dateControl: FormControl = new FormControl(null);
+  public readonly organizationControl: FormControl = new FormControl(null);
   public readonly currentSelectedTableRowIndex: Observable<number>
     = this.timesheetsService.getStream();
 
@@ -64,8 +69,13 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   ngOnInit(): void {
+    if (this.isAgency) {
+      this.initOrgz();
+    }
+
     this.initTabsCount();
     this.startFiltersWatching();
+    this.startOrganizationWatching();
     this.calcTabsChips();
   }
 
@@ -129,8 +139,30 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     ).subscribe();
   }
 
+  private startOrganizationWatching(): void {
+    this.organizationControl.valueChanges.pipe(
+      filter(Boolean),
+      distinctUntilChanged(),
+      switchMap((organizationId: number) => this.store.dispatch(
+        new Timesheets.UpdateFiltersState({ organizationId })
+      )),
+      takeUntil(this.componentDestroy()),
+    ).subscribe();
+  }
+
   private initTabsCount(): void {
     this.store.dispatch(new Timesheets.GetTabsCounts());
+  }
+
+  private initOrgz(): void {
+    this.store.dispatch(new Timesheets.GetOrganizations()).pipe(
+      filter((res) => res.length),
+      switchMap(() => this.organizations$),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(res => {
+      this.organizationControl.setValue(res[0].id, { emitEvent: false });
+      this.store.dispatch(new Timesheets.UpdateFiltersState({ organizationId: res[0].id }));
+    });
   }
 
   private calcTabsChips(): void {
