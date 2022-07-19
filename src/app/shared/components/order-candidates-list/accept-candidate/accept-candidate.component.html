@@ -5,11 +5,11 @@
         <div class="deploy-candidate-wrapper">
           <h3 class="e-card-title candidate-title">
             {{candidate?.lastName}}, {{candidate?.firstName}}
-            <i-feather name="briefcase" class="icon" *ngIf="candidate.deployedCandidateInfo"></i-feather>
+            <i-feather name="briefcase" class="icon" *ngIf="isDeployedCandidate"></i-feather>
           </h3>
-          <app-deploy-candidate-message *ngIf="candidate.deployedCandidateInfo" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
+          <app-deploy-candidate-message *ngIf="isDeployedCandidate" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
         </div>
-        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus && !candidate.deployedCandidateInfo">
+        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus && !isDeployedCandidate">
           <e-chips>
             <e-chip [text]="candidatStatus[candidate.candidateStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
           </e-chips>
@@ -18,7 +18,7 @@
       <div class="e-card-content">
         <button *ngIf="!isReadOnly" ejs-button cssClass="e-outline" (click)="onReject()">Reject</button>
         <button *ngIf="showWithdrawAction" ejs-button cssClass="e-outline" (click)="onWithdraw()">Withdraw</button>
-        <button ejs-button [isPrimary]="true" *ngIf="candidate?.statusName !== 'Accepted' && !isReadOnly && !candidate.deployedCandidateInfo" class="apply-button" (click)="onAccept()">Accept</button>
+        <button ejs-button [isPrimary]="true" *ngIf="candidate?.statusName !== 'Accepted' && !isReadOnly && !isDeployedCandidate" class="apply-button" (click)="onAccept()">Accept</button>
         <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
           <i-feather name="x" class="icon"></i-feather>
         </button>

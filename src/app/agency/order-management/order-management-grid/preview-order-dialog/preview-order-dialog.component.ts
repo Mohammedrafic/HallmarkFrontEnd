@@ -62,7 +62,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   private excludeDeployed: boolean;
   private isAlive = true;
 
-  @Output() selectReOrder = new EventEmitter<any>()
+  @Output() selectReOrder = new EventEmitter<any>();
 
   constructor(private chipsCssClass: ChipsCssClass) {}
 
@@ -71,7 +71,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public get getTitle(): string {
-    return this.isReOrder ? `Re-Order ID ${this.order?.reOrderId}` : `Order ID ${this.order?.orderId}`;
+    return this.isReOrder ? `Re-Order ID ${this.order?.orderId}` : `Order ID ${this.order?.orderId}`;
   }
 
   ngOnInit(): void {
@@ -142,4 +142,3 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
     });
   }
 }
-

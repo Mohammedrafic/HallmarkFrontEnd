@@ -62,7 +62,11 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get candidateStatus(): ApplicantStatusEnum {
-    return this.candidate.status || this.candidate.candidateStatus as any;
+    return this.candidate.status || (this.candidate.candidateStatus as any);
+  }
+
+  get isDeployedCandidate(): boolean {
+    return !!this.candidate.deployedCandidateInfo && this.candidate.status !== ApplicantStatusEnum.OnBoarded;
   }
 
   get showGuaranteedWorkWeek(): boolean {
@@ -79,7 +83,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       (this.candidateStatus === ApplicantStatusEnum.Shortlisted ||
         this.candidateStatus === ApplicantStatusEnum.PreOfferCustom) &&
       !this.isWithdraw &&
-      !this.candidate.deployedCandidateInfo
+      !this.isDeployedCandidate
     );
   }
 
@@ -256,7 +260,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
       ApplicantStatusEnum.OnBoarded,
       ApplicantStatusEnum.PreOfferCustom,
     ];
-    if (readOnlyStatuses.includes(this.candidateStatus) || this.candidate.deployedCandidateInfo) {
+    if (readOnlyStatuses.includes(this.candidateStatus) || this.isDeployedCandidate) {
       this.isReadOnly = true;
     }
   }

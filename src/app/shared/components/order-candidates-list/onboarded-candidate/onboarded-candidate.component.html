@@ -5,9 +5,9 @@
         <div class="deploy-candidate-wrapper">
           <h3 class="e-card-title candidate-title">
             {{candidate?.lastName}}, {{candidate?.firstName}}
-            <i-feather name="briefcase" class="icon" *ngIf="candidate.deployedCandidateInfo"></i-feather>
+            <i-feather name="briefcase" class="icon" *ngIf="isDeployedCandidate"></i-feather>
           </h3>
-          <app-deploy-candidate-message *ngIf="candidate.deployedCandidateInfo" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
+          <app-deploy-candidate-message *ngIf="isDeployedCandidate" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
         </div>
         <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
           <e-chips>
@@ -16,7 +16,7 @@
         </ejs-chiplist>
       </div>
       <div class="e-card-content button-container">
-        <div class="input-group dropdown bootstrap input-readonly" *ngIf="!isRejected && !candidate.deployedCandidateInfo">
+        <div class="input-group dropdown bootstrap input-readonly" *ngIf="!isRejected && !isDeployedCandidate">
           <ejs-dropdownlist
             *ngIf="isOnboarded"
             [fields]="optionFields"

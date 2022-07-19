@@ -1,23 +1,22 @@
 export interface EditTimsheetForm {
-  day: string;
+  day: Date;
   timeIn: Date;
   timeOut: Date;
   costCenter: string;
   category: string;
-  hours: number;
-  rate: number;
-  total: number;
+  amount: number;
+  description: string;
 }
 
 export interface TimsheetForm {
-  date: string;
   search: string;
-  orderId: string;
+  orderId: string[];
   status: string[];
   skill: string[];
   department: string[];
-  billRate: number;
   agencyName: string[];
-  totalHours: number;
+  orgName: string[];
+  region: string[];
+  location: string[];
 }
 

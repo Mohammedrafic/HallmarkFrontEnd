@@ -1,19 +1,28 @@
 <div class="app-grid">
   <ag-grid-angular
     (gridReady)="handleGridReadyEvent($event)"
+    (selectionChanged)="handleMultiSelectionChanged($event)"
+    (rowClicked)="handleSelectionChanged($event)"
+    (sortChanged)="handleSortChanged($event)"
     [columnDefs]="columnDefinitions"
     [defaultColDef]="defaultColumnDefinition"
     [modules]="modules"
     [rowData]="rowData"
     [rowHeight]="gridConfig.initialRowHeight"
     [headerHeight]="52"
+    [suppressRowClickSelection]="suppressRowClickSelection"
+    [rowSelection]="rowSelection"
     class="ag-theme-alpine app-grid__component"
   ></ag-grid-angular>
   <app-grid-pagination
     (navigateToPageEmitter)="navigateToPageEmitter.emit($event)"
     (pageSizeChangeEmitter)="pageSizeChangeEmitter.emit($event)"
+    (approveEmitter)="approveEmitter.emit(selectedTableRows)"
+    (exportEmitter)="exportEmitter.emit(selectedTableRows)"
     [currentPage]="currentPage"
     [pageSize]="pageSize"
     [totalRecordsCount]="totalRecordsCount"
+    [selectedTableRowsAmount]="selectedTableRows.length"
+    [allowBulkSelection]="allowBulkSelection"
   ></app-grid-pagination>
 </div>

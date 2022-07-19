@@ -103,6 +103,7 @@ import { ExBillRateNamesPipe } from '@shared/pipes/external-bill-rate-names.pipe
 import { SideMenuModule } from '@shared/components/side-menu/side-menu.module';
 import { SecurityState } from '../security/store/security.state';
 import { NavigationPanelComponent } from './components/navigation-panel/navigation-panel.component';
+import { CandidateAvatarPipe } from './pipes/candidate-avatar.pipe';
 import { GridSubrowReorderComponent } from './components/grid-subrow-reorder/grid-subrow-reorder.component';
 import { GeneralOrderPerDiemInfoComponent } from '@shared/components/general-order-per-diem-info/general-order-per-diem-info.component';
 import { GeneralReorderInfoComponent } from './components/general-reorder-info/general-reorder-info.component';
@@ -216,6 +217,7 @@ const COMPONENTS = [
     SideMenuModule,
     NavigationPanelComponent,
     ErrorMessageComponent,
+    CandidateAvatarPipe,
   ],
   declarations: [
     ...COMPONENTS,
@@ -224,6 +226,7 @@ const COMPONENTS = [
     BillRatesGridComponent,
     TabsListComponent,
     NavigationPanelComponent,
+    CandidateAvatarPipe,
   ],
   providers: [
     DatePipe,

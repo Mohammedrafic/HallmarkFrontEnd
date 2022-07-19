@@ -5,6 +5,41 @@
   border-bottom-left-radius: var(--grid-border-radius);
   border-bottom-right-radius: var(--grid-border-radius);
 
+  &.highlight {
+    background: #3e7fff;
+
+    .app-grid-pagination__pager.e-pager {
+      border-color: transparent;
+      background: transparent;
+
+      &::ng-deep {
+        .e-pagercontainer {
+          border-color: transparent;
+          background: transparent;
+        }
+
+        .e-numericitem {
+          border-color: #fff;
+          background: transparent;
+          color: #fff;
+
+          &.e-currentitem {
+            background: #fff;
+            color: #3e7fff;
+          }
+        }
+
+        .e-nextpage, .e-prevpage {
+          background: transparent;
+
+          &::before {
+            color: #fff;
+          }
+        }
+      }
+    }
+  }
+
   &__rows-options,
   &__navigate-to-control {
     width: 140px;
@@ -26,6 +61,24 @@
     justify-content: space-between;
     align-items: center;
     column-gap: 15px;
+  }
+
+  & .bulk-section {
+    display: flex;
+    align-items: center;
+
+    &__amount {
+      margin-right: 60px;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 28px;
+      letter-spacing: 0.015em;
+      color: #fff;
+    }
+
+    & .approve-button {
+      margin-right: 16px;
+    }
   }
 
   &__left-side-controls {

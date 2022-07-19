@@ -1,6 +1,9 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
-import { DialogComponent } from "@syncfusion/ej2-angular-popups";
-import { FormControl, FormGroup } from "@angular/forms";
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+
+import { rejectReasonMaxLength } from '../../constants';
 
 @Component({
   selector: 'app-timesheet-reject-reason-dialog',
@@ -15,27 +18,37 @@ export class TimesheetRejectReasonDialogComponent {
   @Input()
   public visible: boolean = false;
 
-  @ViewChild('rejectReasonDialog')
-  public rejectReasonDialog: DialogComponent;
-
-  public readonly form: FormGroup = new FormGroup({
-    reason: new FormControl(''),
-  });
-
   @Output()
   public readonly visibleChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   @Output()
   public readonly rejectReasonChange: EventEmitter<string> = new EventEmitter<string>();
 
+  @ViewChild('rejectReasonDialog')
+  public rejectReasonDialog: DialogComponent;
+
+  public readonly form: FormGroup;
+
+  public get reasonControl(): FormControl {
+    return this.form?.get('reason') as FormControl;
+  }
+
+  constructor(
+    private fb: FormBuilder,
+  ) {
+    this.form = this.fb.group({
+      reason: ['', [Validators.required, Validators.maxLength(rejectReasonMaxLength)]],
+    });
+  }
+
   public onVisibleChange(value: boolean): void {
     this.visibleChange.emit(value);
   }
 
   public submit(): void {
-    this.rejectReasonChange.emit(
-      this.form.get('reason')?.value
-    );
-    this.onVisibleChange(false);
+    if (this.form.valid) {
+      this.rejectReasonChange.emit(this.reasonControl.value);
+      this.onVisibleChange(false);
+    }
   }
 }

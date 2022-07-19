@@ -96,6 +96,9 @@ export class BillRatesComponent extends AbstractGridConfigurationComponent imple
 
   private setBillRateBtnText(tabIndex: number): void {
     switch (tabIndex) {
+      case BillRateNavigationTabs.BillRateSetup :
+        this.addBillRateBtnText = "Add Record";
+        break;
       case BillRateNavigationTabs.ExternalBillRateType :
         this.addBillRateBtnText = "Add External Bill Rate";
         break;

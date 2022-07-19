@@ -17,7 +17,7 @@ import { UserState } from './store/user.state';
 import { LoginGuard, UserGuard } from '@shared/guards';
 import { MsalModule, MsalRedirectComponent } from '@azure/msal-angular';
 import { MSAL_PROVIDERS } from './b2c-auth/b2c-auth.providers';
-import { B2cModule } from './b2c-auth/login.module';
+import { B2cModule } from './b2c-auth/b2c-auth.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -31,13 +31,15 @@ import { B2cModule } from './b2c-auth/login.module';
       AppState,
       UserState
     ]),
-    NgxsReduxDevtoolsPluginModule.forRoot({
-      disabled: environment.production
-    }),
-    NgxsLoggerPluginModule.forRoot({
-      disabled: environment.production
-    }),
+    // NgxsReduxDevtoolsPluginModule.forRoot({
+    //   disabled: environment.production
+    // }),
+    // NgxsLoggerPluginModule.forRoot({
+    //   disabled: environment.production
+    // }),
     NgxMaskModule.forRoot(),
+    
+    // B2C
     MsalModule,
     B2cModule,
   ],

@@ -1,45 +1,44 @@
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import { TIMETHEETS_STATUSES } from './../../enums/timesheets.enum';
-import { Router } from '@angular/router';
+import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import {
   ChangeDetectionStrategy,
-  Component,
-  Inject,
-  OnInit,
-  ViewChild,
-  ChangeDetectorRef,
-  Output,
+  Component, ElementRef,
   EventEmitter,
-  Input, OnChanges, SimpleChanges
+  Input,
+  OnInit,
+  Output,
+  ViewChild,
 } from '@angular/core';
+import { DatePipe } from '@angular/common';
 
-import { filter, Observable, takeUntil, throttleTime } from 'rxjs';
+import { take, filter, Observable, takeUntil, tap, throttleTime, forkJoin } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
+import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
+import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { Destroyable } from '@core/helpers';
-import { GlobalWindow } from '@core/tokens';
+import { FileSize } from '@core/enums';
+import { FileExtensionsString } from '@core/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { ExportColumn, ExportPayload } from '@shared/models/export.model';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import { ProfileTimeSheetDetail } from '../../store/model/timesheets.model';
-import { Status } from "@shared/enums/status";
-import { ONBOARDED_STATUS } from "@shared/components/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst";
-import { TimesheetDetails } from "../../store/actions/timesheet-details.actions";
-import { ExportPayload } from "@shared/models/export.model";
-import { ExportedFileType } from "@shared/enums/exported-file-type";
-import { ItemModel } from "@syncfusion/ej2-splitbuttons/src/common/common-model";
-import { Uploader } from "@syncfusion/ej2-angular-inputs";
-
-import { DialogActionPayload } from '../../interface';
-import { DialogAction } from '../../enums';
-import { ExportType } from "../../enums";
-import { Invoice, ProfileUploadedFile } from "../../interface";
-import { UploaderComponent } from "@syncfusion/ej2-angular-inputs";
-import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
-
-interface ExportOption extends ItemModel {
-  ext: string | null;
-}
+import {
+  CandidateHoursAndMilesData,
+  CandidateInfo,
+  DialogActionPayload,
+  TimesheetDetailsModel, CandidateMilesData, OpenAddDialogMeta, Timesheet
+} from '../../interface';
+import { DialogAction, SubmitBtnText } from '../../enums';
+import {
+  ConfirmDeleteTimesheetDialogContent,
+  ConfirmUnsavedChages,
+  TimesheetDetailsExportOptions,
+} from '../../constants';
+import { ShowExportDialog } from '../../../../store/app.actions';
+import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -47,317 +46,260 @@ interface ExportOption extends ItemModel {
   styleUrls: ['./profile-details-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileDetailsContainerComponent extends Destroyable implements OnInit, OnChanges {
-  public readonly status: typeof Status = Status;
-  public readonly onboardedStatus: string = ONBOARDED_STATUS;
-  public readonly allowedExtensions: string = '.pdf, .doc, .docx, .jpg, .jpeg, .png';
-  public readonly maxFileSize = 10485760;
-  public readonly  exportOptions: ExportOption[] = [
-    { text: ExportType.Excel_file, id: '0', ext: 'xlsx' },
-    { text: ExportType.CSV_file, id: '1', ext: 'csv' },
-    { text: ExportType.Custom, id: '2', ext: null },
-  ];
+export class ProfileDetailsContainerComponent extends Destroyable implements OnInit {
+  @ViewChild('candidateDialog')
+  public candidateDialog: DialogComponent;
 
-  @ViewChild('sideDialog') sideDialog: DialogComponent;
-  @ViewChild('dnwDialog') dnwDialog: DialogComponent;
-  @ViewChild('uploadTooltip') uploadTooltip: TooltipComponent;
+  @ViewChild('dnwDialog')
+  public dnwDialog: DialogComponent;
+
 
   @ViewChild('uploader')
   public uploader: UploaderComponent;
 
-  @ViewChild('chipList') chipList: ChipListComponent;
+  @ViewChild('chipList')
+  public chipList: ChipListComponent;
 
-  @Select(TimesheetsState.profileTimesheets)
-  timeSheetsProfile$: Observable<ProfileTimeSheetDetail[]>;
+  @ViewChild('dropEl')
+  public dropEl: HTMLDivElement;
 
-  @Select(TimesheetsState.isProfileOpen)
-  isProfileOpen$: Observable<DialogActionPayload>;
+  @ViewChild('uploadTooltip')
+  public uploadTooltip: TooltipComponent;
+
+  @ViewChild('uploadArea')
+  public uploadArea: ElementRef<HTMLDivElement>;
 
   @Input() currentSelectedRowIndex: number | null = null;
+
   @Input() maxRowIndex: number = 30;
 
-  @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
+  @Output() readonly nextPreviousOrderEvent = new EventEmitter<boolean>();
 
-  @Select(TimesheetsState.timeSheetDetailsUploads)
-  public uploadedFiles$: Observable<ProfileUploadedFile[]>;
-
-  @Select(TimesheetsState.timesheetDetailsInvoices)
-  public invoices$: Observable<Invoice[]>;
-
-  public targetElement: HTMLBodyElement;
-  public profileDetailsDialogsTarget: HTMLElement | null = null;
-  public dropElement: HTMLElement | null = null;
-  public dropAreaVisible: boolean = false;
   public rejectReasonDialogVisible: boolean = false;
-  public isNextDisabled = false;
-  isAgency: boolean;
-  submitText: string;
-  profileData: any;
-  profileId: number;
+
+  public isAgency: boolean;
+
+  public submitText: string;
+
+  public candidateId: number;
+
+  public fileName: string = '';
+
+  private isChangesSaved = true;
+
+  public readonly columnsToExport: ExportColumn[] = TimesheetDetailsExportOptions;
+
+  @Select(TimesheetsState.isTimesheetOpen)
+  public readonly isTimesheetOpen$: Observable<DialogActionPayload>;
+
+  @Select(TimesheetsState.selectedTimeSheet)
+  public readonly selectedTimeSheet$: Observable<Timesheet>;
+
+  @Select(TimesheetsState.candidateInfo)
+  public readonly candidateInfo$: Observable<CandidateInfo>;
+
+  @Select(TimesheetsState.candidateHoursAndMilesData)
+  public readonly hoursAndMilesData$: Observable<CandidateHoursAndMilesData>;
+
+  @Select(TimesheetsState.timesheetDetails)
+  public readonly timesheetDetails$: Observable<TimesheetDetailsModel>;
+
+  @Select(TimesheetsState.timesheetDetailsMilesStatistics)
+  public readonly milesData$: Observable<CandidateMilesData>
+
+ @Select(TimesheetsState.timesheetDetailsChartsVisible)
+  public readonly chartsVisible$: Observable<boolean>
+
+  public readonly exportedFileType: typeof ExportedFileType = ExportedFileType;
+  public readonly allowedFileExtensions: string = FileExtensionsString;
+  public readonly maxFileSize: number = FileSize.MB_10;
 
   constructor(
     private store: Store,
+    private route: ActivatedRoute,
+    private confirmService: ConfirmService,
+    private datePipe: DatePipe,
     private router: Router,
-    private cd: ChangeDetectorRef,
-    private chipPipe: ChipsCssClass,
-    @Inject(GlobalWindow) private readonly globalWindow: WindowProxy & typeof globalThis,
-    ) {
+  ) {
     super();
-    this.targetElement = this.globalWindow.document.body as HTMLBodyElement;
+    this.isAgency = this.route.snapshot.data['isAgencyArea'];
+    this.submitText = this.isAgency ? SubmitBtnText.Submit : SubmitBtnText.Approve;
+  }
 
-    /**
-     * TODO: remove this in a method, get rid of getElementById
-     */
-    this.isProfileOpen$.pipe(takeUntil(this.componentDestroy())).subscribe(() => {
-      this.profileDetailsDialogsTarget = document.getElementById('dialog_dialog-content') as HTMLElement;
-      this.dropElement = document.getElementById('timesheet-details-files-droparea') as HTMLElement;
-    });
-
-    this.isAgency = this.router.url.includes('agency');
-    this.submitText = this.isAgency ? 'Submit' : 'Approve';
+  public get isNextDisabled(): boolean {
+    return this.maxRowIndex - 1 === this.currentSelectedRowIndex;
   }
 
   public ngOnInit(): void {
-    this.getProfileTimesheets();
     this.getDialogState();
+    this.startSelectedTimesheetWatching();
+    this.closeDialogOnNavigationStart();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['currentSelectedRowIndex'] && !changes['currentSelectedRowIndex'].firstChange) {
-      this.isNextDisabled = this.currentSelectedRowIndex === (this.maxRowIndex - 1);
-    }
+  public closeDialogOnNavigationStart(): void {
+    this.router.events.pipe(
+      filter((e) => e instanceof NavigationStart),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(() => this.handleProfileClose());
   }
 
   public onNextPreviousOrder(next: boolean): void {
     this.nextPreviousOrderEvent.emit(next);
-    this.cd.detectChanges();
   }
 
-  public handleUpdateTable(): void {
-    this.getProfileTimesheets();
+  public handleEditChanges(event: boolean): void {
+    this.isChangesSaved = event;
   }
 
-  public handleDeleteItem({ profileId, tableItemId }: { profileId: number; tableItemId: number | any }): void {
-    this.store.dispatch(new Timesheets.DeleteProfileTimesheet(profileId, tableItemId)).pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.getProfileTimesheets();
-    });
-  }
+  public handleUpdateTable(): void {}
 
-  private getProfileTimesheets(): void {
-    this.store.dispatch(new Timesheets.GetProfileTimesheets())
-    .pipe(takeUntil(this.componentDestroy()));
-  }
-
-  private getDialogState(): void {
-    this.isProfileOpen$
-    .pipe(
-      throttleTime(100),
-      filter((val) => val.dialogState),
-      takeUntil(this.componentDestroy())
-      )
-    .subscribe((payload) => {
-      this.profileData = JSON.parse(localStorage.getItem('profile') as string);
-      this.chipList.cssClass = this.chipPipe.transform(this.profileData.status);
-
-      if (payload.dialogState && payload.rowId) {
-        this.sideDialog.show();
-      } else {
-        this.sideDialog.hide();
-      }
-      this.cd.detectChanges();
-    });
-  }
-
-  public browse(): void {
-    document.getElementsByClassName('e-file-select-wrap')[0]?.querySelector('button')?.click();
-  }
-
-  public handleOpenSideDialog(id: number): void {
-    this.profileId = id;
-    this.store.dispatch(new Timesheets.OpenProfileTimesheetAddDialog());
+  public openAddDialog(meta: OpenAddDialogMeta): void {
+    this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open, meta.currentTab, meta.initDate));
   }
 
   public handleProfileClose(): void {
-    this.store.dispatch(new Timesheets.ToggleProfileDialog(DialogAction.Close)).pipe(
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => {
-      this.sideDialog.hide();
-    });
+    if (!this.isChangesSaved) {
+      this.confirmService.confirm(ConfirmUnsavedChages, {
+        title: 'Unsaved Progress',
+        okButtonLabel: 'Proceed',
+        okButtonClass: 'delete-button',
+      })
+      .pipe(
+        take(1),
+        filter((submitted) => submitted)
+      )
+      .subscribe(() => {
+        this.closeDialog();
+      });
+    } else {
+      this.closeDialog();
+    }
   }
 
   public onRejectButtonClick(): void {
     this.rejectReasonDialogVisible = true;
   }
 
-  public onDWNCheckboxSelectedChange(show: boolean): void {
-    this.isProfileOpen$.pipe(
-      filter(() => !!this.dnwDialog && show),
-      takeUntil(this.componentDestroy())
-    ).subscribe(() => this.dnwDialog.show());
-  }
+  public onDWNCheckboxSelectedChange({checked}: {checked: boolean}, switchComponent: SwitchComponent): void {
+    checked && this.confirmService.confirm(ConfirmDeleteTimesheetDialogContent, {
+      title: 'Delete Timesheet',
+      okButtonLabel: 'Proceed',
+      okButtonClass: 'delete-button',
+    })
+      .pipe(
+        take(1),
+      )
+      .subscribe((submitted: boolean) => {
+        if (submitted) {
+          this.store.dispatch([
+            new Timesheets.ToggleCandidateDialog(DialogAction.Close),
+            new Timesheets.DeleteTimesheet(this.candidateId),
+          ]).subscribe(() => this.handleProfileClose());
+        }
 
-  public export(event: {item: {properties: ExportOption}}): void {
-    const fileTypeId = event.item.properties.id as unknown as ExportedFileType;
-
-    this.store.dispatch(new TimesheetDetails.Export(
-      new ExportPayload(fileTypeId)
-    ));
-  }
-
-  public onFileSelected(event: { filesData: File[]}): void {
-    const [{name, type}] = event.filesData;
-
-    this.store.dispatch(
-      new TimesheetDetails.AddFile({name, type})
-    ).subscribe(() => this.hideUploadArea());
-  }
-
-  public hideUploadArea(): void {
-    this.dropAreaVisible = false;
-    this.uploadTooltip.close();
-  }
-
-  public showUploadArea(container: HTMLElement): void {
-    if (this.dropAreaVisible) {
-      this.hideUploadArea();
-    } else {
-      this.dropAreaVisible = true;
-      this.uploadTooltip.open(container);
-    }
+        switchComponent.writeValue(false);
+      });
   }
 
   public handleReject(reason: string): void {
-    const profile = JSON.parse(localStorage.getItem('profile') as string);
-    profile.status = TIMETHEETS_STATUSES.REJECTED;
-
-    const timesheets = JSON.parse(localStorage.getItem('timesheets') as string);
-    const submitedTimesheets = JSON.parse(localStorage.getItem('submited-timsheets') as string);
-
-    const newTimesheets = this.patchStatus(timesheets, profile.id, TIMETHEETS_STATUSES.REJECTED);
-    const newSubmitedTimesheets = this.patchStatus(submitedTimesheets, profile.id, TIMETHEETS_STATUSES.REJECTED);
-
-    localStorage.setItem('profile', JSON.stringify(profile));
-    localStorage.setItem('timesheets', JSON.stringify(newTimesheets));
-    localStorage.setItem('submited-timsheets', JSON.stringify(newSubmitedTimesheets));
-
-    this.store.dispatch(new Timesheets.GetAll({
-      pageNumber: 1,
-      pageSize: 20,
-    }, this.isAgency));
+    this.store.dispatch(new TimesheetDetails.RejectTimesheet(this.candidateId, reason))
+      .subscribe(() => this.handleProfileClose());
   }
 
-  handleApprove(): void {
-    const profile = JSON.parse(localStorage.getItem('profile') as string);
-
-    if (this.isAgency) {
-      const profile = JSON.parse(localStorage.getItem('profile') as string);
-      profile.status = TIMETHEETS_STATUSES.PENDING_APPROVE;
-      localStorage.setItem('profile', JSON.stringify(profile));
-
-      const timesheets = JSON.parse(localStorage.getItem('timesheets') as string);
-
-      const updatedTimesheets = timesheets.items.map((item: any) => {
-        if (item.id === profile.id) {
-          item.status = TIMETHEETS_STATUSES.PENDING_APPROVE;
-        }
-        return item;
-      });
-
-      localStorage.setItem('timesheets', JSON.stringify(
-        {
-          ...timesheets,
-          items: updatedTimesheets,
-        }
-      ));
-
-      const timesheet = JSON.parse(localStorage.getItem('timesheet-details-tables') as string);
-      const temp = localStorage.getItem('submited-timsheets');
-      let submitted: any;
-
-      if (temp) {
-        submitted = JSON.parse(temp);
-      } else {
-        submitted = {
-          hasNextPage: false,
-          hasPreviousPage: false,
-          items: [],
-          pageNumber: 1,
-          totalCount: 1,
-          totalPages: 1,
-        };
-      }
-
-      submitted.items.push(
-        {
-          ...profile,
-          timesheets: timesheet,
-        },
-      );
-
-      localStorage.setItem('submited-timsheets', JSON.stringify(submitted));
-      this.store.dispatch(new Timesheets.GetAll({
-        pageNumber: 1,
-        pageSize: 20,
-      }, this.isAgency));
-
-    } else {
-
-      let approved: any;
-      profile.status = TIMETHEETS_STATUSES.ORG_APPROVED;
-      localStorage.setItem('profile', JSON.stringify(profile));
-
-      const timesheets = JSON.parse(localStorage.getItem('timesheets') as string);
-      const sheetIdx = timesheets.items.findIndex((item: any) => item.id === profile.id);
-      timesheets.items[sheetIdx].status = TIMETHEETS_STATUSES.ORG_APPROVED;
-
-      const subm = JSON.parse(localStorage.getItem('submited-timsheets') as string);
-      const idx = subm.items.findIndex((item: any) => item.id === profile.id);
-      subm.items[idx].status = TIMETHEETS_STATUSES.ORG_APPROVED;
-
-      localStorage.setItem('submited-timsheets', JSON.stringify(
-        {
-          ...subm,
-        }
-      ));
-
-      if (localStorage.getItem('APPROVED_TIMESHEETS')) {
-        approved = JSON.parse(localStorage.getItem('APPROVED_TIMESHEETS') as string);
-
-        approved.items.push(profile);
-      } else {
-        approved = {
-          hasNextPage: false,
-          hasPreviousPage: false,
-          items: [profile],
-          pageNumber: 1,
-          totalCount: 1,
-          totalPages: 1,
-        };
-
-      }
-      localStorage.setItem('APPROVED_TIMESHEETS', JSON.stringify(approved));
-      localStorage.setItem('timesheets', JSON.stringify(
-        {
-          ...timesheets,
-        }
-      ));
-      this.store.dispatch(new Timesheets.GetAll({
-        pageNumber: 1,
-        pageSize: 20,
-      }, this.isAgency));
-    }
+  public handleApprove(): void {
+    const id = this.candidateId;
+    this.store.dispatch(
+      this.isAgency ? new TimesheetDetails.AgencySubmitTimesheet(id) :
+        new TimesheetDetails.OrganizationApproveTimesheet(id)
+    ).pipe(
+      tap(() => this.handleProfileClose())
+    );
   }
 
-  private patchStatus(oldObject: any, profileId: number, status: TIMETHEETS_STATUSES): any {
-    return Object.assign({}, oldObject, {
-      items: oldObject.items.map((el: any) => ({
-        ...el,
-        ...(el.id === profileId && {
-          status
-        })
-      }))
+  private startSelectedTimesheetWatching(): void {
+    this.selectedTimeSheet$.pipe(
+      throttleTime(100),
+      filter(Boolean),
+      switchMap((timesheet: Timesheet) => {
+        this.candidateId = timesheet.id;
+
+        return forkJoin([
+          this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(this.candidateId)),
+          this.store.dispatch(new Timesheets.GetTimesheetDetails(this.candidateId))
+        ]);
+      }),
+      takeUntil(this.componentDestroy()),
+    ).subscribe();
+  }
+
+  private getDialogState(): void {
+    this.isTimesheetOpen$
+    .pipe(
+      throttleTime(100),
+      filter(Boolean),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      this.candidateDialog?.show();
     });
+  }
+
+  public closeExport(): void {
+    this.fileName = '';
+    this.store.dispatch(
+      new ShowExportDialog(false)
+    );
+  }
+
+  public exportProfileDetails(fileType: ExportedFileType): void {
+    this.store.dispatch(
+      new TimesheetDetails.Export(
+        new ExportPayload(fileType),
+      )
+    )
+  }
+
+  /**
+   * TODO: move event interface to interface folder and get rid of any
+   */
+  public customExport(event: {columns: any[]; fileName: string; fileType: ExportedFileType }): void {
+    this.closeExport();
+    this.exportProfileDetails(event.fileType);
+  }
+
+  public showCustomExportDialog(): void {
+    this.fileName = `Timesheet ${this.generateDateTime(this.datePipe)}`;
+
+    this.store.dispatch(
+      new ShowExportDialog(true)
+    );
+  }
+
+  public onFilesSelected(event: SelectedEventArgs): void {
+    const blobList: Blob[] = event.filesData.map(file => file.rawFile as Blob);
+    const names: string[] = event.filesData.map(file => file.name);
+
+    this.store.dispatch(new TimesheetDetails.UploadFiles(this.candidateId, blobList, names));
+    this.uploadTooltip?.close();
+  }
+
+  /**
+   * TODO: change this method
+   */
+  public browse() : void {
+    this.uploadArea.nativeElement
+      ?.getElementsByClassName('e-file-select-wrap')[0]
+      ?.querySelector('button')?.click();
+  }
+
+  private generateDateTime(datePipe: DatePipe): string {
+    return datePipe ? datePipe.transform(Date.now(), 'MM/dd/yyyy hh:mm a') as string : '';
+  }
+
+  private closeDialog(): void {
+    this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Close))
+    .pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => this.candidateDialog.hide());
   }
 }

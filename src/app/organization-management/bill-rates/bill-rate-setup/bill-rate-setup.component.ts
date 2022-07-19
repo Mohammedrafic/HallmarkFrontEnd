@@ -305,7 +305,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   ngOnChanges(changes: SimpleChanges): void {
     const isActive = changes['isActive'];
 
-    if (isActive.currentValue && !isActive.isFirstChange()) {
+    if (isActive?.currentValue && !isActive.isFirstChange()) {
       this.loadData();
     }
   }

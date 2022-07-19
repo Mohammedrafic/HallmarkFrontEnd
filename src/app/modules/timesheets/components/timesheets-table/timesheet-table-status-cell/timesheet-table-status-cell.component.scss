@@ -1,0 +1,10 @@
+:host {
+  width: 100%;
+  display: block;
+}
+
+.status-cell {
+  & .e-chip {
+    width: 100%;
+  }
+}

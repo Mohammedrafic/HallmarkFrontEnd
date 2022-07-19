@@ -96,6 +96,10 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     return this.candidate.status === ApplicantStatusEnum.Withdraw;
   }
 
+  get isDeployedCandidate(): boolean {
+    return !!this.candidate.deployedCandidateInfo && this.candidate.status !== ApplicantStatusEnum.OnBoarded;
+  }
+
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
   @Select(OrderManagementContentState.applicantStatuses)
@@ -263,7 +267,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((data: ApplicantStatus[]) => (this.nextApplicantStatuses = data));
 
-    if (this.candidate.deployedCandidateInfo) {
+    if (this.isDeployedCandidate) {
       this.formGroup.disable();
     }
   }

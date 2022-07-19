@@ -1,11 +1,15 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { profileDetailsHoursChartColorsMap } from "../../constants/timesheets.constant";
-import { HourOccupationType } from "../../enums/hour-occupation-type.enum";
-import { profileDetailsHoursChartSettings } from "../../constants/profile-details-hours-chart-settings.constant";
-import { CheckBoxChangeEventArgs } from "@syncfusion/ej2-angular-grids";
-import { mockedHoursChartData, ProfileHoursChartData } from "../../constants/mocked-hours-charts-data.constant";
-import { DonutChartData } from "../../interface/donut-chart-data.interface";
-import { ChartPointRenderEvent } from "../../interface/chart-point-render-event.interface";
+
+import { CheckBoxChangeEventArgs } from '@syncfusion/ej2-angular-grids';
+
+import {
+  ChartPointRenderEvent,
+  DonutChartData,
+  TimesheetStatisticsDetails
+} from '../../interface';
+import { profileDetailsHoursChartColorsMap, profileDetailsHoursChartSettings } from '../../constants';
+import { HourOccupationType } from '../../enums';
+import { CandidateBarChartHelper } from '../../helpers';
 
 @Component({
   selector: 'app-profile-cumulative-hours',
@@ -14,52 +18,61 @@ import { ChartPointRenderEvent } from "../../interface/chart-point-render-event.
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileCumulativeHoursComponent {
-  private _hoursData: ProfileHoursChartData[];
-
-  public readonly chartSettings = profileDetailsHoursChartSettings;
-  public readonly chartColorsMap: Record<HourOccupationType, string> = profileDetailsHoursChartColorsMap;
+  private _statisticsData: TimesheetStatisticsDetails[] | null = null;
 
   public weekHoursChartData: DonutChartData<HourOccupationType>[] = [];
   public cumulativeHoursChartData: DonutChartData<HourOccupationType>[] = [];
   public totalWeekHours: number = 0;
   public totalCumulativeHours: number = 0;
+  public legendItems: TimesheetStatisticsDetails[] = [];
+
+  public readonly chartSettings = profileDetailsHoursChartSettings;
+  public readonly chartColorsMap: Record<HourOccupationType, string> = profileDetailsHoursChartColorsMap;
 
   @Input()
-  public set hoursData(value: ProfileHoursChartData[]) {
-    this._hoursData = value;
+  public set statisticsData(statistics: TimesheetStatisticsDetails[] | null) {
+    this._statisticsData = statistics;
 
-    value = value.slice().reverse();
-    this.weekHoursChartData = value.map(toWeekHoursChartData);
-    this.cumulativeHoursChartData = value.map(toCumulativeHoursChartData);
+    // TODO: Remove after backend fixes
+    const chartItems: TimesheetStatisticsDetails[] = Object.keys(HourOccupationType).map((occupationTypeName: string) => {
+      const existing = (statistics || []).find((item: TimesheetStatisticsDetails) => item.billRateConfigName === occupationTypeName);
+
+      return existing || getEmptyHoursOccupationData(occupationTypeName);
+    }) || [];
+
+    this.legendItems = chartItems;
+    const reversedItems: TimesheetStatisticsDetails[] = chartItems.slice().reverse();
+
+    this.weekHoursChartData = reversedItems.map(CandidateBarChartHelper.toWeekHoursChartData);
+    this.cumulativeHoursChartData = reversedItems.map(CandidateBarChartHelper.toCumulativeHoursChartData);
+
     this.updateTotalHoursData();
   }
 
-  public get hoursData() {
-    return this._hoursData;
+  public get statisticsData() {
+    return this._statisticsData;
   }
 
-  constructor() {
-    this.hoursData = mockedHoursChartData;
-  }
-
-  public trackByName(_: number, item: ProfileHoursChartData): string {
-    return item.type;
+  public trackByName(_: number, item: TimesheetStatisticsDetails): string {
+    return item.billRateConfigName;
   }
 
   public onPointRender(event: ChartPointRenderEvent<HourOccupationType>): void {
     event.fill = profileDetailsHoursChartColorsMap[event.point.x];
   }
 
-  public toggleChartCategoryVisibility({checked}: CheckBoxChangeEventArgs, legendItem: ProfileHoursChartData): void {
-    const index = this.hoursData.findIndex((data: ProfileHoursChartData) => data.type === legendItem.type);
+  public toggleChartCategoryVisibility({checked}: CheckBoxChangeEventArgs, legendItem: TimesheetStatisticsDetails): void {
+    const index = this.legendItems.findIndex(
+      (data: TimesheetStatisticsDetails) => data.billRateConfigName === legendItem.billRateConfigName
+    );
 
     this.weekHoursChartData = this.weekHoursChartData.map(item => {
-      item.y = item.x === legendItem.type ? checked ? this.hoursData[index].weekly : 0 : item.y;
+      item.y = item.x === legendItem.billRateConfigName ? checked ? this.legendItems[index].weekHours : 0 : item.y;
       return item;
     });
 
     this.cumulativeHoursChartData = this.cumulativeHoursChartData.map(item => {
-      item.y = item.x === legendItem.type ? checked ? this.hoursData[index].total : 0 : item.y;
+      item.y = item.x === legendItem.billRateConfigName ? checked ? this.legendItems[index].cumulativeHours : 0 : item.y;
       return item;
     });
 
@@ -80,16 +93,11 @@ export class ProfileCumulativeHoursComponent {
   }
 }
 
-function toWeekHoursChartData({type, weekly}: ProfileHoursChartData): DonutChartData<HourOccupationType> {
+function getEmptyHoursOccupationData(name: string): TimesheetStatisticsDetails {
   return {
-    x: type,
-    y: weekly,
-  };
-}
-
-function toCumulativeHoursChartData({type, total}: ProfileHoursChartData): DonutChartData<HourOccupationType> {
-  return {
-    x: type,
-    y: total,
+    billRateConfigName: name as HourOccupationType,
+    cumulativeHours: 0,
+    weekHours: 0,
+    billRateConfigId: Math.random(),
   };
 }

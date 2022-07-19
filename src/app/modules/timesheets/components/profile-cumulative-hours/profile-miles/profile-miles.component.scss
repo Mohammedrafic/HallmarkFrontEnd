@@ -1,0 +1,21 @@
+@import "colors";
+
+:host {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px;
+}
+
+.mile-title {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  color: $secondary-dark-blue-30;
+}
+
+.mile-value {
+  font-weight: 700;
+  font-size: 14px;
+  color: $black;
+  margin-bottom: 12px;
+}

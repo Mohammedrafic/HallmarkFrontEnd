@@ -18,9 +18,13 @@ export class GridPaginationComponent extends DestroyableDirective implements OnI
   @Input() public currentPage: number;
   @Input() public pageSize: number;
   @Input() public totalRecordsCount: number;
+  @Input() public selectedTableRowsAmount: number = 0;
+  @Input() public allowBulkSelection: boolean = false;
 
   @Output() public navigateToPageEmitter: EventEmitter<number> = new EventEmitter<number>();
   @Output() public pageSizeChangeEmitter: EventEmitter<number> = new EventEmitter<number>();
+  @Output() public approveEmitter: EventEmitter<void> = new EventEmitter<void>();
+  @Output() public exportEmitter: EventEmitter<void> = new EventEmitter<void>();
 
   public paginationFormGroup: FormGroup;
 
