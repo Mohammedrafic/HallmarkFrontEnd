@@ -5,6 +5,7 @@ import {
   Output,
   EventEmitter,
   OnInit,
+  ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -24,6 +25,7 @@ import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetToggleModel } from '../models/widget-toggle.model';
 import { SetFilteredItems } from '../store/dashboard.actions';
 import { DashboardState } from '../store/dashboard.state';
+import { WidgetFilterComponent } from './components/widget-filter/widget-filter.component';
 
 @Component({
   selector: 'app-dashboard-control',
@@ -38,6 +40,8 @@ export class DashboardControlComponent extends DestroyableDirective implements O
   @Input() public hasOrderManagePermission: boolean;
 
   @Output() public widgetToggleEmitter: EventEmitter<WidgetToggleModel> = new EventEmitter();
+
+  @ViewChild('filter') private readonly filter: WidgetFilterComponent; 
 
   @Select(DashboardState.filteredItems) public readonly filteredItems$: Observable<FilteredItem[]>;
   @Select(UserState.organizationStructure) private readonly organizationStructure$: Observable<OrganizationStructure>;
@@ -130,6 +134,7 @@ export class DashboardControlComponent extends DestroyableDirective implements O
       this.filteredItems = this.filteredItems.filter((filter: FilteredItem) => !isEqual(filter, event.data));
     }
     this.store.dispatch(new SetFilteredItems(this.filteredItems));
+    this.filter.getFilterState();
   }
 
   private filterDataLoadHandler(): void {
@@ -156,5 +161,6 @@ export class DashboardControlComponent extends DestroyableDirective implements O
 
   public onClearFilters(): void {
     this.store.dispatch(new SetFilteredItems([]));
+    this.filter.getFilterState();
   }
 }
