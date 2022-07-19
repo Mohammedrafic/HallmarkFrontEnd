@@ -74,7 +74,7 @@
       <ng-template #template let-data>
         <ng-container *ngIf="!data.children?.length; else withToggle">
           <div>
-            <b>{{ data.orderId }}</b>
+            <b>{{ data.reOrderId }}</b>
           </div>
         </ng-container>
 
@@ -219,10 +219,12 @@
 ></app-export-dialog>
 
 <app-preview-order-dialog
+  #detailsDialog
   [order]="selectedOrder"
   [openEvent]="openPreview"
   [openCandidateTab]="!!previousSelectedOrderId"
   (compareEvent)="onCompare()"
+  (selectReOrder)="selectReOrder($event)"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-preview-order-dialog>
 

@@ -8,6 +8,7 @@ import { ReasonForRequisition } from '@shared/enums/reason-for-requisition';
 import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
 import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
+import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
 
 export class OrderManagement {
   id: number;
@@ -60,12 +61,14 @@ export type OrderManagementPage = PageOfCollections<OrderManagement>;
 export type AgencyOrderManagement = {
   orderId: number;
   reOrderId?: number;
+  reOrderFromId?: number;
   statusText: string;
   status: OrderStatus;
   jobTitle: string;
   skill: string;
   location: string;
   numberOfPositions: number;
+  numberOfOpenPositions: number;
   department: string;
   shiftStartTime?: string;
   shiftEndTime?: string;
@@ -196,6 +199,7 @@ export class GetPredefinedBillRatesData {
 
 export class Order {
   id: number;
+  reOrderFromId?: number;
   title: string;
   regionId: number;
   locationId: number;
@@ -246,7 +250,43 @@ export class Order {
   acceptedPositions?: number;
   documents: Document[] | null;
   canApprove: boolean;
-  reOrderFromId?: number;
+  reOrders?: ReOrder[] | null;
+  reOrderFrom?: Order;
+  candidates?: CandidateModel[];
+}
+
+export class ReOrder {
+  id: number;
+  reOrderFromId: number;
+  organizationId: number;
+  status: OrderStatus;
+  statusText: string;
+  jobTitle: string;
+  regionId: number;
+  regionName: string;
+  locationId: number;
+  locationName: string;
+  departmentId: number;
+  departmentName: string;
+  skillId:  number;
+  skillName:  string;
+  orderType: number;
+  billRate: number;
+  openPositions: number;
+  candidates: number;
+  startDate: string;
+  orderOpenDate: string;
+  orderFillDate: string;
+  children: OrderManagementChild[];
+  reOrderCount: number;
+  reOrders: string[];
+  isLocked: boolean;
+  agency: string[];
+  positions: number;
+  allAgencies: boolean;
+  agencies: string[];
+  shiftStartTime: string;
+  shiftEndTime: string;
 }
 
 export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'status' | 'statusText' | 'documents'> {

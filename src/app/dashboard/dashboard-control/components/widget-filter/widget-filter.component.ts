@@ -2,8 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
-import { combineLatest, distinctUntilChanged, filter, Observable, skip, takeUntil } from 'rxjs';
-import { isEqual } from 'lodash';
+import { combineLatest, filter, Observable, skip, take, takeUntil } from 'rxjs';
 
 import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
@@ -85,6 +84,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     this.actions
       .pipe(ofActionDispatched(ShowFilterDialog), filter((data) => data.isDialogShown), takeUntil(this.destroy$))
       .subscribe(() => {
+        this.getFilterState();
         this.onOrganizationStructureDataLoadHandler();
         this.onOrderFilterControlValueChangedHandler();
         this.onSkillDataLoadHandler();
@@ -99,15 +99,17 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   public onFilterClearAll(): void {
     this.widgetFilterFormGroup.reset();
-    this.filters = {} as DashboardFiltersModel;
+    this.filters = this.widgetFilterFormGroup.getRawValue();
     this.filteredItems = [];
     this.saveFilteredItems(this.filteredItems);
+    this.saveDashboardState(this.filters);
   }
 
   public onFilterApply(): void {
     this.filters = this.widgetFilterFormGroup.getRawValue();
     this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
     this.saveFilteredItems(this.filteredItems);
+    this.saveDashboardState(this.filters);
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
@@ -122,6 +124,10 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   private saveFilteredItems(items: FilteredItem[]): void {
     this.store.dispatch(new SetFilteredItems(items));
+  }
+
+  private saveDashboardState(filters: DashboardFiltersModel): void {
+    this.store.dispatch(new SetDashboardFiltersState(filters));
   }
 
   private initForm(): void {
@@ -183,7 +189,6 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
         this.filterColumns.locationIds.dataSource = [];
         this.widgetFilterFormGroup.get('locationIds')?.setValue([]);
         this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
-        this.saveFilteredItems(this.filteredItems);
       }
     });
 
@@ -204,7 +209,6 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
         this.filterColumns.departmentsIds.dataSource = [];
         this.widgetFilterFormGroup.get('departmentsIds')?.setValue([]);
         this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
-        this.saveFilteredItems(this.filteredItems);
       }
     });
 
@@ -231,11 +235,10 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     });
   }
 
-  private getFilterState(): void {
+  public getFilterState(): void {
     this.filteredItems$
       .pipe(
-        takeUntil(this.destroy$),
-        distinctUntilChanged((previous, current) => isEqual(previous, current))
+        take(1)
       )
       .subscribe((filters) => {
         this.cdr.markForCheck();
@@ -248,7 +251,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
             this.filters[filterKey] = [item.value];
           }
         });
-        this.store.dispatch(new SetDashboardFiltersState(this.filters));
+        this.saveDashboardState(this.filters);
       });
   }
 
@@ -257,7 +260,6 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
       .pipe(
         takeUntil(this.destroy$),
         filter(([filters, orgs]) => !!filters && !!orgs),
-        distinctUntilChanged((previous, current) => isEqual(previous, current))
       )
       .subscribe(([filters]) => {
         Object.entries(this.widgetFilterFormGroup.controls).forEach(([field, control]) =>

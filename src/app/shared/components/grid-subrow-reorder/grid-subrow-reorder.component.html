@@ -1,6 +1,6 @@
 <div class="reorder-row"  [ngClass]="{'selected': selected}" (click)="clickEvent.emit(reOrder)">
   <div class="info">
-    <div class="data">{{ reOrder.id }}</div>
+    <div class="data">{{ reOrder.id || reOrder.orderId}}</div>
     <div class="title">Re-Order ID</div>
   </div>
   <div class="info status">
@@ -11,7 +11,7 @@
     </ejs-chiplist>
   </div>
   <div class="info">
-    <div class="data">{{reOrder.positions}} / {{reOrder.openPositions}}</div>
+    <div class="data">{{reOrder.positions || reOrder.numberOfPositions}} / {{reOrder.openPositions || reOrder.numberOfOpenPositions}}</div>
     <div class="title">Open Positions</div>
   </div>
   <div class="info">
@@ -38,7 +38,7 @@
     <div class="title">Re-Order Shift</div>
   </div>
   <div class="info">
-    <div class="data">{{reOrder.candidates}}</div>
+    <div class="data">{{reOrder.candidates || reOrder.candidatesCount}}</div>
     <div class="title">Candidates</div>
   </div>
 </div>

@@ -1,16 +1,6 @@
 import isNil from 'lodash/fp/isNil';
 
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChanges,
-  ViewChild,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild, } from '@angular/core';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 
@@ -28,12 +18,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
 import { ApproveOrder, DeleteOrder, SetLock } from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
-import {
-  CANCEL_ORDER_CONFIRM_TEXT,
-  CANCEL_ORDER_CONFIRM_TITLE,
-  DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE,
-} from '@shared/constants';
+import { CANCEL_ORDER_CONFIRM_TEXT, CANCEL_ORDER_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, } from '@shared/constants';
 import { Location } from '@angular/common';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { ShowSideDialog } from '../../../store/app.actions';
@@ -54,6 +39,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   @Output() nextPreviousOrderEvent = new EventEmitter<NextPreviousOrderEvent>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
+  @Output() selectReOrder = new EventEmitter<any>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
@@ -177,7 +163,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public editOrder(data: Order) {
-    if (this.isReOrder) {
+    if (this.isReOrder && data.orderType !== OrderType.OpenPerDiem) {
       this.store.dispatch(new ShowSideDialog(true));
       this.order = { ...data };
     } else {

@@ -1,8 +1,9 @@
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { filter, forkJoin, Observable, takeUntil, tap } from 'rxjs';
+import { MultiSelectComponent } from "@syncfusion/ej2-angular-dropdowns";
+import { debounceTime, filter, forkJoin, Observable, takeUntil, tap } from 'rxjs';
 
 import { isEmpty } from 'lodash';
 
@@ -11,6 +12,7 @@ import { OrderTypeOptions } from '@shared/enums/order-type';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { GetOrganizationStructure } from '@agency/store/order-management.actions';
 import { OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
+import { ShowFilterDialog } from "src/app/store/app.actions";
 import { getDepartmentFromLocations, getLocationsFromRegions } from './agency-order-filters.utils';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
@@ -29,6 +31,8 @@ enum RLDLevel {
   styleUrls: ['./agency-order-filters.component.scss'],
 })
 export class AgencyOrderFiltersComponent extends DestroyableDirective implements OnInit, AfterViewInit {
+  @ViewChild('regionMultiselect') regionMultiselect: MultiSelectComponent;
+
   @Input() form: FormGroup;
   @Input() filterColumns: any;
   @Input() activeTab: AgencyOrderManagementTabs;
@@ -72,6 +76,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
 
   ngAfterViewInit(): void {
     forkJoin([
+      this.onShowFilterDialog(),
       this.onOrganizationIdsControlChange(),
       this.onGridFilterRegions(),
       this.onRegionIdsControlChange(),
@@ -130,6 +135,16 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       ofActionSuccessful(GetOrganizationStructure),
       tap(() => {
         this.filterColumns.regionIds.dataSource = this.store.selectSnapshot(OrderManagementState.gridFilterRegions);
+      })
+    );
+  }
+
+  private onShowFilterDialog(): Observable<unknown> {
+    return this.actions$.pipe(
+      ofActionSuccessful(ShowFilterDialog),
+      debounceTime(100),
+      tap(() => {
+        this.regionMultiselect.refresh();
       })
     );
   }

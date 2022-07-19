@@ -10,7 +10,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { Observable, Subject, takeWhile } from 'rxjs';
-import { Select, Store } from '@ngxs/store';
+import { Select } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -62,7 +62,9 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   private excludeDeployed: boolean;
   private isAlive = true;
 
-  constructor(private chipsCssClass: ChipsCssClass, private store: Store) {}
+  @Output() selectReOrder = new EventEmitter<any>()
+
+  constructor(private chipsCssClass: ChipsCssClass) {}
 
   public get isReOrder(): boolean {
     return !isNil(this.order?.reOrderId);

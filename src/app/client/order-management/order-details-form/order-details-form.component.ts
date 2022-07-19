@@ -65,6 +65,7 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { disableControls } from '@shared/utils/form.utils';
 import { AlertService } from '@shared/services/alert.service';
 import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
+import { ReasonForRequisitionList } from "@shared/models/reason-for-requisition-list";
 
 @Component({
   selector: 'app-order-details-form',
@@ -77,7 +78,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Input('disableOrderType') set disableOrderType(value: boolean) {
     if (value) {
       this.orderTypeForm.controls['orderType'].disable();
-    } 
+    }
   }
 
   @Output() orderTypeChanged = new EventEmitter<OrderType>();
@@ -159,14 +160,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   ];
   public jobClassificationFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  public reasonsForRequisition = [
-    { id: ReasonForRequisition.FmlaLoa, name: 'FMLA/LOA' },
-    { id: ReasonForRequisition.OpenPositions, name: 'Open Positions' },
-    { id: ReasonForRequisition.Orientation, name: 'Orientation' },
-    { id: ReasonForRequisition.Other, name: 'Other' },
-    { id: ReasonForRequisition.Pto, name: 'PTO' },
-    { id: ReasonForRequisition.ReplaceAgency, name: 'Replace Agency' },
-  ];
+  public reasonsForRequisition = ReasonForRequisitionList;
   public reasonForRequisitionFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   @Select(OrderManagementContentState.selectedOrder)

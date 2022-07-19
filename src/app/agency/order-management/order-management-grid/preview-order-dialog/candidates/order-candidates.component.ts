@@ -8,6 +8,7 @@ import { Order } from "@shared/models/order-management.model";
 import { CandidateListEvent } from '@shared/components/order-candidates-list/order-candidates-list.component';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { GetAgencyOrderCandidatesList } from '@agency/store/order-management.actions';
+import { OrderType } from "@shared/enums/order-type";
 
 @Component({
   selector: 'app-candidates-order',
@@ -19,6 +20,7 @@ export class OrderCandidatesComponent extends DestroyableDirective implements On
 
   public orderCandidateInformation: Order;
   public orderCandidates: AgencyOrder;
+  public orderType = OrderType;
 
   @Select(OrderManagementState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;

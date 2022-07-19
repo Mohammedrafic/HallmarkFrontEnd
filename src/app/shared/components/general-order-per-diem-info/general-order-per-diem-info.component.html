@@ -1,4 +1,4 @@
-<section class="candidates-info">
+<section class="candidates-info" *ngIf="orderInformation">
   <div class="container-row">
     <div class="column">
       <div class="icon">
@@ -36,9 +36,9 @@
         <div class="sup-title">Skill</div>
       </div>
     </div>
-    <div class="column" *ngIf="orderInformation.reasonForRequest">
+    <div class="column">
       <div>
-        <div class="title">{{orderInformation.reasonForRequest}}</div>
+        <div class="title">{{getReasonsForRequisition(orderInformation.reasonForRequisition)}}</div>
         <div class="sup-title">Reason for Requisition</div>
       </div>
     </div>

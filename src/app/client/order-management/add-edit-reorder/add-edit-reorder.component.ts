@@ -3,7 +3,7 @@ import uniq from 'lodash/fp/uniq';
 
 import { filter, first, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import { FieldSettingsModel, ISelectAllEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { Store } from '@ngxs/store';
+import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
 
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -12,7 +12,6 @@ import { AddEditReorderService } from '@client/order-management/add-edit-reorder
 import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { endTimeValidator, startTimeValidator } from '@shared/validators/date.validator';
-import { GetAssociateAgencies } from '@client/store/order-managment-content.actions';
 import { Order } from '@shared/models/order-management.model';
 import { ReorderModel, ReorderRequestModel } from '@client/order-management/add-edit-reorder/models/reorder.model';
 import { ShowSideDialog } from '../../../store/app.actions';
@@ -44,6 +43,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public constructor(
     private formBuilder: FormBuilder,
     private store: Store,
+    private actions: Actions,
     private reorderService: AddEditReorderService
   ) {
     super();
@@ -57,22 +57,20 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     const { order } = changes;
 
     if (order && !order?.isFirstChange()) {
-      const { id, organizationId, orderId } = order.currentValue;
-      this.candidates$ = this.reorderService.getCandidates(id ?? orderId, organizationId);
-      this.agencies$ = this.reorderService.getAgencies(id ?? orderId, organizationId);
+      const { id, organizationId, reOrderFromId } = order.currentValue;
+      const isReOrder = !isNil(reOrderFromId) && reOrderFromId !== 0;
+      this.candidates$ = this.reorderService.getCandidates(isReOrder ? reOrderFromId : id, organizationId);
+      this.agencies$ = this.reorderService.getAgencies(isReOrder ? reOrderFromId : id, organizationId);
       this.handleEditMode(order.currentValue);
     }
   }
 
   public ngOnInit(): void {
     this.initForm();
-    this.getApplicantsStatuses();
-    this.subscribeOnChangesCandidateName();
   }
 
   public onCancel(): void {
     this.closeDialog();
-    this.reorderForm.reset();
   }
 
   public onSave(): void {
@@ -88,9 +86,10 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private initForm(reorder?: Order): void {
-    const { jobStartDate, shiftStartTime, shiftEndTime, hourlyRate, openPositions, jobDistributions } = reorder || {};
+    const { candidates, jobStartDate, shiftStartTime, shiftEndTime, hourlyRate, openPositions, jobDistributions } =
+      reorder || {};
     this.reorderForm = this.formBuilder.group({
-      candidates: [[]],
+      candidates: [this.getCandidateIds(candidates!) ?? []],
       agencies: [this.getAgencyIds(jobDistributions!), Validators.required],
       reorderDate: [jobStartDate ?? '', Validators.required],
       shiftStartTime: [shiftStartTime ?? '', Validators.required],
@@ -100,10 +99,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     });
     this.reorderForm.get('shiftStartTime')?.addValidators(startTimeValidator(this.reorderForm, 'shiftEndTime'));
     this.reorderForm.get('shiftEndTime')?.addValidators(endTimeValidator(this.reorderForm, 'shiftStartTime'));
-  }
-
-  private getApplicantsStatuses(): void {
-    this.store.dispatch(new GetAssociateAgencies());
+    this.subscribeOnChangesCandidateName();
+    this.subscribeOnCloseSideBar();
   }
 
   private closeDialog(): void {
@@ -179,5 +176,15 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
         agencies: agencyIds?.map(({ agencyId }: JobDistributionModel) => agencyId),
       });
     });
+  }
+
+  private subscribeOnCloseSideBar(): void {
+    this.actions.pipe(ofActionSuccessful(ShowSideDialog), takeUntil(this.destroy$)).subscribe(() => {
+      this.reorderForm.reset();
+    });
+  }
+
+  private getCandidateIds(candidate: CandidateModel[]): number[] {
+    return candidate?.map(({ id }: CandidateModel) => id);
   }
 }

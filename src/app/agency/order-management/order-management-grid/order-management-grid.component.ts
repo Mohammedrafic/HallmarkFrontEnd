@@ -69,6 +69,9 @@ import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.e
 import { OrderType } from '@shared/enums/order-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import {
+  PreviewOrderDialogComponent
+} from "@agency/order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component";
 import { NextPreviousOrderEvent } from './preview-order-dialog/preview-order-dialog.component';
 
 @Component({
@@ -83,6 +86,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() exportButtonClicked: boolean;
   @Input() onExportClicked$: Subject<any>;
   @Input() search$: Subject<string>;
+  @Output() selectTab = new EventEmitter<number>()
 
   @Output() reOrderNumber = new EventEmitter<number>();
 
@@ -90,6 +94,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @ViewChild('gridPager') pager: PagerComponent;
 
   @ViewChildren('rowCheckbox') rowCheckboxes: QueryList<CheckBoxComponent>;
+  @ViewChild('detailsDialog') detailsDialog: PreviewOrderDialogComponent;
 
   @Select(OrderManagementState.ordersPage)
   public ordersPage$: Observable<AgencyOrderManagementPage>;
@@ -137,7 +142,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private location: Location,
     private actions$: Actions,
     private datePipe: DatePipe,
-    private filterService: FilterService
+    private filterService: FilterService,
   ) {
     super();
   }
@@ -370,23 +375,44 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       order: order.orderId,
       reOrder: reOrder.orderId,
     };
-    const options = this.getDialogNextPreviousOption(order);
-    this.store.dispatch(new GetOrderById(order.orderId, order.organizationId, options));
-    this.selectedOrder = order;
-    //this.openChildDialog.next([order, candidate]); TODO: pending reorder modal
+    this.gridWithChildRow?.clearRowSelection();
+    this.store.dispatch(new GetOrderById(reOrder.orderId, order.organizationId));
+    this.store.dispatch(
+      new GetAgencyOrderCandidatesList(
+        reOrder.orderId,
+        order.organizationId,
+        this.currentPage,
+        this.pageSize,
+        this.excludeDeployed
+      )
+    );
+    this.store.dispatch(new GetAgencyOrderGeneralInformation(reOrder.orderId, order.organizationId));
+    this.selectedOrder = reOrder;
     this.selectedIndex = null;
+    this.openPreview.next(true);
   }
 
-  public onOpenCandidateDialog(candidat: OrderManagementChild, order: AgencyOrderManagement): void {
-    this.selectedCandidate = candidat;
+  selectReOrder(event: {reOrder: AgencyOrderManagement, order: Order | AgencyOrderManagement}): void {
+    const tabSwitchAnimation = 400;
+    const {reOrder, order} = event;
+    const tabId = Object.values(AgencyOrderManagementTabs).indexOf(AgencyOrderManagementTabs.ReOrders);
+    this.selectTab.emit(tabId);
+    setTimeout(() => {
+      this.onOpenReorderDialog(reOrder, order as AgencyOrderManagement);
+      this.detailsDialog.tab.select(0);
+    }, tabSwitchAnimation);
+  }
+
+  public onOpenCandidateDialog(candidate: OrderManagementChild, order: AgencyOrderManagement): void {
+    this.selectedCandidate = candidate;
     this.selectedCandidate.selected = {
       order: order.orderId,
-      positionId: candidat.positionId,
+      positionId: candidate.positionId,
     };
     this.selectedOrder = order;
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.orderId, order.organizationId, options));
-    this.openChildDialog.next([order, candidat]);
+    this.openChildDialog.next([order, candidate]);
     this.selectedIndex = null;
   }
 
@@ -489,6 +515,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       } else {
         this.openChildDialog.next(false);
         this.selectedCandidate = null;
+        if (this.selectedReOrder?.selected.reOrder !== this.selectedOrder.orderId) {
+          this.selectedReOrder = null;
+        }
       }
     });
   }

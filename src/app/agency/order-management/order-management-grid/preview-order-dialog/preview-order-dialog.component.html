@@ -2,7 +2,7 @@
   id="dialog"
   #sideDialog
   cssClass="dialog"
-  width="50%"
+  width="52%"
   [target]="targetElement"
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
@@ -40,10 +40,15 @@
             <e-tabitem>
               <ng-template #headerText>Order Details</ng-template>
               <ng-template #content>
-                <section class="order-details"  *ngIf="selectedOrder$ | async as currentOrder">
+                <section class="order-details" *ngIf="selectedOrder$ | async as currentOrder">
                   <section class="job-details">
-                    <app-general-order-info *ngIf="!isReOrder" [orderInformation]="currentOrder"></app-general-order-info>
-                    <app-general-reorder-info *ngIf="isReOrder" [orderInformation]="currentOrder"></app-general-reorder-info>
+                    <app-general-order-info
+                      *ngIf="currentOrder?.orderType !== orderType.OpenPerDiem"
+                      [orderInformation]="currentOrder"></app-general-order-info>
+                    <app-general-order-per-diem-info
+                      *ngIf="currentOrder?.orderType === orderType.OpenPerDiem"
+                      [orderInformation]="currentOrder">
+                    </app-general-order-per-diem-info>
                   </section>
                   <hr />
                   <app-order-details [currentOrder]="currentOrder"></app-order-details>
@@ -56,7 +61,17 @@
                 <app-candidates-order (excludeDeployedEvent)="onExcludeDeployed($event)"></app-candidates-order>
               </ng-template>
             </e-tabitem>
-            <e-tabitem>
+            <ng-container *ngIf="selectedOrder$ | async as currentOrder">
+              <e-tabitem *ngIf="orderType.OpenPerDiem === currentOrder.orderType">
+                <ng-template #headerText>
+                  Re-Orders <span class="e-badge e-badge-success e-badge-circle">{{ order?.reOrders?.length || '0' }}</span>
+                </ng-template>
+                <ng-template #content>
+                  <app-order-reorders-container (selectReOrder)="selectReOrder.emit($event)" [isAgency]="true" [currentOrder]="order"></app-order-reorders-container>
+                </ng-template>
+              </e-tabitem>
+            </ng-container>
+            <e-tabitem *ngIf="orderType.OpenPerDiem !== (selectedOrder$ | async)?.orderType">
               <ng-template #headerText>Extensions</ng-template>
               <ng-template #content> </ng-template>
             </e-tabitem>
