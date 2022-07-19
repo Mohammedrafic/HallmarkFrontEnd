@@ -117,14 +117,14 @@ export class DashboardState {
   }
 
   @Action(SetFilteredItems)
-  private setFilteredItems({patchState}: StateContext<DashboardStateModel>, {payload}: SetFilteredItems) {
+  private setFilteredItems({patchState}: StateContext<DashboardStateModel>, { payload }: SetFilteredItems) {
     patchState({filteredItems: payload});
     window.localStorage.setItem(DASHBOARD_FILTER_STATE, JSON.stringify(payload));
     
   }
 
   @Action(SetDashboardFiltersState)
-  private setDashboardFiltersState({patchState}: StateContext<DashboardStateModel>, {payload}: SetDashboardFiltersState) {
-    patchState({dashboardFilterState: payload})
+  private setDashboardFiltersState({patchState}: StateContext<DashboardStateModel>, { payload }: SetDashboardFiltersState) {
+    patchState({ dashboardFilterState: payload })
   }
 }
