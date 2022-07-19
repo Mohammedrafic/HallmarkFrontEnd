@@ -30,7 +30,7 @@ import {
   CandidateHoursAndMilesData,
   CandidateInfo,
   DialogActionPayload,
-  TimesheetDetailsModel, CandidateMilesData, OpenAddDialogMeta,
+  TimesheetDetailsModel, CandidateMilesData, OpenAddDialogMeta, Timesheet
 } from '../../interface';
 import { DialogAction, SubmitBtnText } from '../../enums';
 import {
@@ -103,6 +103,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @Select(TimesheetsState.isTimesheetOpen)
   public readonly isTimesheetOpen$: Observable<DialogActionPayload>;
 
+  @Select(TimesheetsState.selectedTimeSheet)
+  public readonly selectedTimeSheet$: Observable<Timesheet>;
+
   @Select(TimesheetsState.candidateInfo)
   public readonly candidateInfo$: Observable<CandidateInfo>;
 
@@ -141,6 +144,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public ngOnInit(): void {
     this.getDialogState();
+    this.startSelectedTimesheetWatching();
     this.closeDialogOnNavigationStart();
   }
 
@@ -224,19 +228,27 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     );
   }
 
-  private getDialogState(): void {
-    this.isTimesheetOpen$
-    .pipe(
+  private startSelectedTimesheetWatching(): void {
+    this.selectedTimeSheet$.pipe(
       throttleTime(100),
       filter(Boolean),
-      switchMap(() => {
-        this.candidateId = this.store.selectSnapshot(TimesheetsState.timesheetId);
+      switchMap((timesheet: Timesheet) => {
+        this.candidateId = timesheet.id;
 
         return forkJoin([
           this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(this.candidateId)),
           this.store.dispatch(new Timesheets.GetTimesheetDetails(this.candidateId))
         ]);
       }),
+      takeUntil(this.componentDestroy()),
+    ).subscribe();
+  }
+
+  private getDialogState(): void {
+    this.isTimesheetOpen$
+    .pipe(
+      throttleTime(100),
+      filter(Boolean),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {

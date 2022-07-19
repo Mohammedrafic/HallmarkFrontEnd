@@ -28,7 +28,7 @@ export interface TimesheetsModel {
   costCenterOptions: DropdownOption[];
   billRateTypes: DropdownOption[];
   isTimeSheetOpen: boolean;
-  selectedTimeSheetId: number;
+  selectedTimeSheet: Timesheet | null;
   isAddDialogOpen: {
     action: boolean;
     dialogType: RecordFields;

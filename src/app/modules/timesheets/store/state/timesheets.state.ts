@@ -72,8 +72,8 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static timesheetId(state: TimesheetsModel): number {
-    return state.selectedTimeSheetId;
+  static selectedTimeSheet(state: TimesheetsModel): Timesheet | null {
+    return state.selectedTimeSheet;
   }
 
   @Selector([TimesheetsState])
@@ -250,10 +250,10 @@ export class TimesheetsState {
 
   @Action(Timesheets.ToggleCandidateDialog)
   ToggleCandidateDialog({ patchState }: StateContext<TimesheetsModel>,
-    { action, id }: { action: DialogAction, id: number}): void {
+    { action, timesheet }: Timesheets.ToggleCandidateDialog): void {
     patchState({
       isTimeSheetOpen: action === DialogAction.Open,
-      selectedTimeSheetId: id,
+      selectedTimeSheet: timesheet,
     });
   }
 

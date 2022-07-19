@@ -18,7 +18,7 @@ export const DefaultTimesheetState: TimesheetsModel = {
   },
   candidateInvoices: [],
   isTimeSheetOpen: false,
-  selectedTimeSheetId: 0,
+  selectedTimeSheet: null,
   billRateTypes: [],
   costCenterOptions: [],
   isAddDialogOpen: {

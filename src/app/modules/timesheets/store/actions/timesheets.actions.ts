@@ -1,5 +1,5 @@
 import { TIMESHEETS_ACTIONS, DialogAction, TimesheetsTableColumns, RecordFields } from '../../enums';
-import { TimesheetsFilterState } from '../../interface';
+import { Timesheet, TimesheetsFilterState } from '../../interface';
 
 export namespace Timesheets {
   export class GetAll {
@@ -9,7 +9,7 @@ export namespace Timesheets {
   export class ToggleCandidateDialog {
     static readonly type = TIMESHEETS_ACTIONS.OPEN_PROFILE;
 
-    constructor(public readonly action: DialogAction, public readonly id?: number) {}
+    constructor(public readonly action: DialogAction, public readonly timesheet?: Timesheet) {}
   }
 
   export class ToggleTimesheetAddDialog {
