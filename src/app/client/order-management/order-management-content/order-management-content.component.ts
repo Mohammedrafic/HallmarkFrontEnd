@@ -200,7 +200,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.fb.group({
       orderId: new FormControl(null),
-      reOrderFromId: new FormControl(null),
+      reOrderId: new FormControl(null),
       regionIds: new FormControl([]),
       locationIds: new FormControl([]),
       departmentsIds: new FormControl([]),
@@ -308,7 +308,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private getOrders(): void {
     //this.filters.orderBy = this.orderBy; TODO: pending ordering fix on BE
     this.filters.orderId ? this.filters.orderId : null;
-    this.filters.reOrderFromId = this.filters.reOrderFromId ? this.filters.reOrderFromId : undefined;
+    this.filters.reOrderId = this.filters.reOrderId ? this.filters.reOrderId : undefined;
     this.filters.jobStartDate ? this.filters.jobStartDate : null;
     this.filters.jobEndDate ? this.filters.jobEndDate : null;
     this.filters.billRateFrom ? this.filters.billRateFrom : null;
@@ -345,7 +345,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public onFilterClose() {
     this.OrderFilterFormGroup.setValue({
       orderId: this.filters.orderId || null,
-      reOrderFromId: this.filters.reOrderFromId || null,
+      reOrderId: this.filters.reOrderId || null,
       regionIds: this.filters.regionIds || [],
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
@@ -538,10 +538,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public tabSelected(tabIndex: OrganizationOrderManagementTabs): void {
     this.activeTab = tabIndex;
-    this.currentPage = 1;
-    this.filters = {};
-    this.filteredItems = [];
-    this.search?.clear();
+    this.clearFilters();
     this.store.dispatch(new ClearOrders());
     this.openDetails.next(false);
     this.selectedIndex = null;
@@ -738,7 +735,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private orderFilterColumnsSetup(): void {
     this.filterColumns = {
       orderId: { type: ControlTypes.Text, valueType: ValueType.Text },
-      reOrderFromId: { type: ControlTypes.Text, valueType: ValueType.Text },
+      reOrderId: { type: ControlTypes.Text, valueType: ValueType.Text },
       regionIds: {
         type: ControlTypes.Multiselect,
         valueType: ValueType.Id,
