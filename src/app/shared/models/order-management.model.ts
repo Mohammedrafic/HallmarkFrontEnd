@@ -121,6 +121,7 @@ export type OrderCandidatesList = {
   status: number;
   statusName: string;
   submissionsPercentage: number;
+  orderStatus: OrderStatus;
   candidateJobId: number;
   deployedCandidateInfo: null | {
     jobId: number;
@@ -273,8 +274,8 @@ export class ReOrder {
   locationName: string;
   departmentId: number;
   departmentName: string;
-  skillId:  number;
-  skillName:  string;
+  skillId: number;
+  skillName: string;
   orderType: number;
   billRate: number;
   openPositions: number;
