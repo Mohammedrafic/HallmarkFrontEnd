@@ -568,7 +568,7 @@ export class TimesheetsState {
   GetOrganizations({ patchState }: StateContext<TimesheetsModel>): Observable<DataSourceItem[]> {
     return this.timesheetsApiService.getOrganizations()
     .pipe(
-      tap((organizations) => patchState({ organizations })),
+      tap((organizations: DataSourceItem[]) => patchState({ organizations })),
     );
   }
   // @Action(TimesheetDetails.AddTimesheetRecord)

@@ -70,7 +70,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   ngOnInit(): void {
     if (this.isAgency) {
-      this.initOrgz();
+      this.initOrganizationsList();
     }
 
     this.initTabsCount();
@@ -154,7 +154,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.store.dispatch(new Timesheets.GetTabsCounts());
   }
 
-  private initOrgz(): void {
+  private initOrganizationsList(): void {
     this.store.dispatch(new Timesheets.GetOrganizations()).pipe(
       filter((res) => res.length),
       switchMap(() => this.organizations$),
