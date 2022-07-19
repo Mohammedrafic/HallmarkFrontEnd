@@ -1,0 +1,15 @@
+@import "colors";
+
+.add-reorder-link {
+  display: flex;
+  padding: 9px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: $primary-active-blue-10;
+}
+
+.link {
+  color: $primary-active-blue-10;
+  font-weight: bold;
+  cursor: pointer;
+}

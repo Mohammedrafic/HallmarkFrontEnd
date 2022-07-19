@@ -71,6 +71,7 @@ import {
   ToolbarService,
 } from '@syncfusion/ej2-angular-grids';
 import { OrderCandidatesListComponent } from './components/order-candidates-list/order-candidates-list.component';
+import { OrderReOrdersListComponent } from "./components/order-reorders-list/order-re-orders-list.component";
 import { CustomProgressBarComponent } from './components/custom-progress-bar/custom-progress-bar.component';
 import { ApplyCandidateComponent } from './components/order-candidates-list/apply-candidate/apply-candidate.component';
 import { AcceptCandidateComponent } from './components/order-candidates-list/accept-candidate/accept-candidate.component';
@@ -105,6 +106,7 @@ import { NavigationPanelComponent } from './components/navigation-panel/navigati
 import { GridSubrowReorderComponent } from './components/grid-subrow-reorder/grid-subrow-reorder.component';
 import { GeneralOrderPerDiemInfoComponent } from '@shared/components/general-order-per-diem-info/general-order-per-diem-info.component';
 import { GeneralReorderInfoComponent } from './components/general-reorder-info/general-reorder-info.component';
+import { OrderReOrdersContainerComponent } from "@client/order-management/order-reorders-container/order-reorders-container.component";
 
 const icons = {
   AlertCircle,
@@ -166,8 +168,10 @@ const COMPONENTS = [
   ChildOrderDialogComponent,
   ExportButtonComponent,
   DeployCandidateMessageComponent,
-  GridSubrowReorderComponent,
   GeneralReorderInfoComponent,
+  GridSubrowReorderComponent,
+  OrderReOrdersListComponent,
+  OrderReOrdersContainerComponent
 ];
 
 @NgModule({

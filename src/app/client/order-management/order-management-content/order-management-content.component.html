@@ -1,6 +1,7 @@
 <app-page-toolbar>
   <ng-container left>
     <app-tab-navigation
+      #tabNavigation
       (selectedTab)="tabSelected($event)"
     ></app-tab-navigation>
   </ng-container>
@@ -518,8 +519,10 @@
 </app-filter-dialog>
 
 <app-order-details-dialog
+  #detailsDialog
   [order]="selectedOrder"
   [openEvent]="openDetails"
+  (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid()"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"></app-order-details-dialog>
 

@@ -62,6 +62,12 @@
                 <app-order-candidates-container [currentOrder]="order" (excludeDeployedEvent)="onExcludeDeployed($event)"></app-order-candidates-container>
               </ng-template>
             </e-tabitem>
+            <e-tabitem *ngIf="orderType.OpenPerDiem === order?.orderType">
+              <ng-template #headerText>Re-Orders <span class="e-badge e-badge-success e-badge-circle">{{ order?.reOrders?.length || '0'}}</span></ng-template>
+              <ng-template #content>
+                <app-order-reorders-container (selectReOrder)="selectReOrder.emit($event)" [currentOrder]="order"></app-order-reorders-container>
+              </ng-template>
+            </e-tabitem>
             <e-tabitem *ngIf="order?.orderType !== orderType.OpenPerDiem && isReOrder">
               <ng-template #headerText>Extensions</ng-template>
               <ng-template #content>

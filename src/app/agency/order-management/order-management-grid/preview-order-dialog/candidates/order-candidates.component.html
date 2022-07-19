@@ -1,5 +1,12 @@
 <div class="general-info">
-  <app-general-order-info *ngIf="orderCandidateInformation" [orderInformation]="orderCandidateInformation"></app-general-order-info>
+  <app-general-order-info
+    *ngIf="orderCandidateInformation?.orderType !== orderType.OpenPerDiem"
+    [orderInformation]="orderCandidateInformation">
+  </app-general-order-info>
+  <app-general-order-per-diem-info
+    *ngIf="orderCandidateInformation?.orderType === orderType.OpenPerDiem"
+    [orderInformation]="orderCandidateInformation">
+  </app-general-order-per-diem-info>
 </div>
 <div class="line"></div>
 <div class="candidates-list">

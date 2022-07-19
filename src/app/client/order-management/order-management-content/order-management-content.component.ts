@@ -2,7 +2,8 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { combineLatest, debounceTime, filter, Observable, Subject, Subscription, takeUntil, throttleTime } from 'rxjs';
+import { filter, combineLatest, debounceTime, Observable, Subject, Subscription, takeUntil, throttleTime
+} from 'rxjs';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
@@ -68,6 +69,8 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { NextPreviousOrderEvent } from '../order-details-dialog/order-details-dialog.component';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
+import { TabNavigationComponent } from "@client/order-management/order-management-content/tab-navigation/tab-navigation.component";
+import { OrderDetailsDialogComponent } from "@client/order-management/order-details-dialog/order-details-dialog.component";
 import isNil from 'lodash/fp/isNil';
 
 @Component({
@@ -79,6 +82,8 @@ import isNil from 'lodash/fp/isNil';
 export class OrderManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') override gridWithChildRow: GridComponent;
   @ViewChild('search') search: SearchComponent;
+  @ViewChild('detailsDialog') detailsDialog: OrderDetailsDialogComponent;
+  @ViewChild('tabNavigation') tabNavigation: TabNavigationComponent;
 
   @Select(OrderManagementContentState.ordersPage)
   ordersPage$: Observable<OrderManagementPage>;
@@ -585,6 +590,17 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.openDetails.next(true);
   }
 
+  selectReOrder(event: {reOrder: OrderManagement, order: Order | OrderManagement}): void {
+    const tabSwitchAnimation = 400;
+    const {reOrder, order} = event;
+    const tabId = Object.values(OrganizationOrderManagementTabs).indexOf(OrganizationOrderManagementTabs.ReOrders);
+    this.tabNavigation.tabNavigation.select(tabId);
+    setTimeout(() => {
+      this.onOpenReorderDialog(reOrder, order as OrderManagement);
+      this.detailsDialog.tab.select(0);
+    }, tabSwitchAnimation);
+  }
+
   public triggerSelectOrder(): void {
     const [index] = this.gridWithChildRow.getSelectedRowIndexes();
     this.selectedIndex = index;
@@ -696,7 +712,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private onOrdersDataLoadHandler(): void {
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.ordersPage = data;
-      if (data && data.items) {
+      if (data?.items) {
         data.items.forEach((item) => {
           item.isMoreMenuWithDeleteButton = !this.openInProgressFilledStatuses.includes(item.statusText.toLowerCase());
           if (item.children && item.children.length) {
