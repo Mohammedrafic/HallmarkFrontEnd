@@ -32,7 +32,7 @@
         <i-feather name="briefcase" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{orderInformation?.skillName}}</div>
+        <div class="title">{{orderInformation?.skillName ?? orderInformation?.reOrderFrom?.skillName}}</div>
         <div class="sup-title">Skill</div>
       </div>
     </div>

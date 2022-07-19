@@ -39,6 +39,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public agencies$: Observable<any[]>;
 
   private isSelectedAllAgencies: boolean;
+  private numberOfAgencies: number;
 
   public constructor(
     private formBuilder: FormBuilder,
@@ -129,11 +130,13 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
 
   private saveReorder(): void {
     const reorder: ReorderModel = this.reorderForm.getRawValue();
+    const agencyIds =
+      this.isSelectedAllAgencies || this.numberOfAgencies === reorder.agencies.length ? null : reorder.agencies;
     const orderForRequest: ReorderRequestModel = {
       reOrderId: this.isEditMode ? this.order.id : 0,
       reOrderFromId: this.isEditMode ? this.order.reOrderFromId! : this.order.id,
       candidateProfileIds: reorder.candidates,
-      agencyIds: this.isSelectedAllAgencies ? null : reorder.agencies,
+      agencyIds: agencyIds,
       reorderDate: reorder.reorderDate,
       shiftEndTime: reorder.shiftEndTime,
       shiftStartTime: reorder.shiftStartTime,
@@ -153,6 +156,9 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     if (this.isEditMode) {
       this.initForm(order);
       this.dialogTitle = 'Edit Re-Order';
+      this.agencies$.pipe(first()).subscribe((agencyIds: JobDistributionModel[]) => {
+        this.numberOfAgencies = agencyIds.length;
+      });
     } else {
       this.dialogTitle = 'Add Re-Order';
     }
@@ -172,6 +178,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
 
   private selectAllAgencies(): void {
     this.agencies$.pipe(first()).subscribe((agencyIds: JobDistributionModel[]) => {
+      this.numberOfAgencies = agencyIds.length;
       this.reorderForm.patchValue({
         agencies: agencyIds?.map(({ agencyId }: JobDistributionModel) => agencyId),
       });

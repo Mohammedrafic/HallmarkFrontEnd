@@ -34,7 +34,7 @@ export class GeneralReorderInfoComponent implements OnChanges {
       ?.map(({ agencyName }: any) => agencyName)
       .join(', ');
     switch (true) {
-      case numberOfAgency === 1 && agenciesWithSeparator:
+      case numberOfAgency === 1 && this.orderInformation.jobDistributions[0].agencyId !== null:
         return { name: this.orderInformation.jobDistributions[0].agencyName!, tooltip: '' };
       case numberOfAgency === 2:
         return { name: agenciesWithSeparator, tooltip: '' };

@@ -73,6 +73,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     return !statuses.includes(this.order?.status);
   }
 
+  get sidebarWidth(): string {
+    return this.order?.orderType === OrderType.OpenPerDiem ? "60%" : "50%";
+  }
+
   constructor(
     private chipsCssClass: ChipsCssClass,
     private router: Router,

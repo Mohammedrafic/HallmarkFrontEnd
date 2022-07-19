@@ -24,6 +24,7 @@ import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations';
 import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
+import { SET_READONLY_STATUS } from '@shared/constants';
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -97,12 +98,11 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
-  public onDropDownChanged(event: { itemData: { applicantStatus: ApplicantStatus } }): void {
-    if (event.itemData?.applicantStatus === ApplicantStatusEnum.OnBoarded) {
-      this.onAccept();
+  public onDropDownChanged(event: { itemData: { applicantStatus: ApplicantStatus; isEnabled: boolean } }): void {
+    if (event.itemData?.isEnabled) {
+      this.handleOnboardedCandidate(event);
     } else {
-      this.store.dispatch(new GetRejectReasonsForOrganisation());
-      this.openRejectDialog.next(true);
+      this.store.dispatch(new ShowToast(MessageTypes.Error, SET_READONLY_STATUS));
     }
   }
 
@@ -275,6 +275,14 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       .subscribe((data: ApplicantStatus[]) => (this.nextApplicantStatuses = data));
   }
 
+  private handleOnboardedCandidate(event: { itemData: { applicantStatus: ApplicantStatus } }): void {
+    if (event.itemData?.applicantStatus === ApplicantStatusEnum.OnBoarded) {
+      this.onAccept();
+    } else {
+      this.store.dispatch(new GetRejectReasonsForOrganisation());
+      this.openRejectDialog.next(true);
+    }
+  }
   private createForm(): void {
     this.form = new FormGroup({
       jobId: new FormControl(''),
