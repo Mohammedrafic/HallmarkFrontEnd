@@ -61,7 +61,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   public billRatesData: BillRate[] = [];
   public formGroup: FormGroup;
   public nextApplicantStatuses: ApplicantStatus[];
-  public optionFields = { text: 'statusText', value: 'applicantStatus' };
+  public optionFields = { text: 'statusText', value: 'statusText' };
   public rejectReasons: RejectReason[] = [];
   public isRejected = false;
   public candidatStatus = CandidatStatus;
