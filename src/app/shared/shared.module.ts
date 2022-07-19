@@ -4,20 +4,20 @@ import { FeatherModule } from 'angular-feather';
 
 import {
   AlertCircle,
-  CheckCircle,
-  User,
-  Briefcase,
-  Download,
-  Folder,
-  MapPin,
-  Calendar,
   ArrowLeft,
   ArrowRight,
-  Mail,
-  Send,
+  Briefcase,
+  Calendar,
+  CheckCircle,
+  Download,
   Edit,
+  Folder,
+  Mail,
+  MapPin,
   Plus,
+  Send,
   Trash2,
+  User,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
@@ -37,7 +37,13 @@ import { ToastModule } from '@syncfusion/ej2-angular-notifications';
 import { ImageUploaderComponent } from './components/image-uploader/image-uploader.component';
 import { DocumentUploaderComponent } from './components/document-uploader/document-uploader.component';
 import { FileUploadDialogComponent } from './components/file-upload-dialog/file-upload-dialog.component';
-import { ButtonModule, ChipListAllModule, RadioButtonAllModule, CheckBoxModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
+import {
+  ButtonModule,
+  CheckBoxModule,
+  ChipListAllModule,
+  RadioButtonAllModule,
+  SwitchModule,
+} from '@syncfusion/ej2-angular-buttons';
 import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { SideDialogComponent } from './components/side-dialog/side-dialog.component';
 import { SearchComponent } from './components/search/search.component';
@@ -65,6 +71,7 @@ import {
   ToolbarService,
 } from '@syncfusion/ej2-angular-grids';
 import { OrderCandidatesListComponent } from './components/order-candidates-list/order-candidates-list.component';
+import { OrderReOrdersListComponent } from "./components/order-reorders-list/order-re-orders-list.component";
 import { CustomProgressBarComponent } from './components/custom-progress-bar/custom-progress-bar.component';
 import { ApplyCandidateComponent } from './components/order-candidates-list/apply-candidate/apply-candidate.component';
 import { AcceptCandidateComponent } from './components/order-candidates-list/accept-candidate/accept-candidate.component';
@@ -77,7 +84,7 @@ import { AddBackgroundForEmptyGridDirective } from '@shared/directives/add-backg
 import { FormatPhoneNumberPipe } from '@shared/pipes/format-phone-number.pipe';
 import { RateHourPipe } from '@shared/pipes/rate-hour.pipe';
 import { OfferDeploymentComponent } from './components/order-candidates-list/offer-deployment/offer-deployment.component';
-import { BillRatePipe } from "@shared/pipes/bill-rate.pipe";
+import { BillRatePipe } from '@shared/pipes/bill-rate.pipe';
 import { HistoricalEventsComponent } from './components/historical-events/historical-events.component';
 import { GridSubrowCandidateComponent } from './components/grid-subrow-candidate/grid-subrow-candidate.component';
 import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.component';
@@ -92,11 +99,15 @@ import { TabsListComponent } from './components/tabs-list/tabs-list.component';
 import { PageToolbarModule } from '@shared/components/page-toolbar/page-toolbar.module';
 import { FilterDialogModule } from '@shared/components/filter-dialog/filter-dialog.module';
 import { DeployCandidateMessageComponent } from './components/order-candidates-list/deploy-candidate-message/deploy-candidate-message.component';
-import {ExBillRateNamesPipe} from "@shared/pipes/external-bill-rate-names.pipe";
+import { ExBillRateNamesPipe } from '@shared/pipes/external-bill-rate-names.pipe';
 import { SideMenuModule } from '@shared/components/side-menu/side-menu.module';
-import {SecurityState} from "../security/store/security.state";
+import { SecurityState } from '../security/store/security.state';
 import { NavigationPanelComponent } from './components/navigation-panel/navigation-panel.component';
 import { CandidateAvatarPipe } from './pipes/candidate-avatar.pipe';
+import { GridSubrowReorderComponent } from './components/grid-subrow-reorder/grid-subrow-reorder.component';
+import { GeneralOrderPerDiemInfoComponent } from '@shared/components/general-order-per-diem-info/general-order-per-diem-info.component';
+import { GeneralReorderInfoComponent } from './components/general-reorder-info/general-reorder-info.component';
+import { OrderReOrdersContainerComponent } from "@client/order-management/order-reorders-container/order-reorders-container.component";
 
 const icons = {
   AlertCircle,
@@ -139,6 +150,7 @@ const COMPONENTS = [
   OrderDetailsComponent,
   SearchComponent,
   GeneralOrderInfoComponent,
+  GeneralOrderPerDiemInfoComponent,
   OrderCandidatesListComponent,
   CustomProgressBarComponent,
   ApplyCandidateComponent,
@@ -156,7 +168,11 @@ const COMPONENTS = [
   GridSubrowCandidateComponent,
   ChildOrderDialogComponent,
   ExportButtonComponent,
-  DeployCandidateMessageComponent
+  DeployCandidateMessageComponent,
+  GeneralReorderInfoComponent,
+  GridSubrowReorderComponent,
+  OrderReOrdersListComponent,
+  OrderReOrdersContainerComponent
 ];
 
 @NgModule({
@@ -193,8 +209,25 @@ const COMPONENTS = [
     SideMenuModule,
     SwitchModule,
   ],
-  exports: [...COMPONENTS, TabsListComponent, PageToolbarModule, FilterDialogModule, SideMenuModule, NavigationPanelComponent, CandidateAvatarPipe],
-  declarations: [...COMPONENTS, ErrorMessageComponent, BillRateFormComponent, BillRatesGridComponent, TabsListComponent, NavigationPanelComponent, CandidateAvatarPipe],
+  exports: [
+    ...COMPONENTS,
+    TabsListComponent,
+    PageToolbarModule,
+    FilterDialogModule,
+    SideMenuModule,
+    NavigationPanelComponent,
+    ErrorMessageComponent,
+    CandidateAvatarPipe,
+  ],
+  declarations: [
+    ...COMPONENTS,
+    ErrorMessageComponent,
+    BillRateFormComponent,
+    BillRatesGridComponent,
+    TabsListComponent,
+    NavigationPanelComponent,
+    CandidateAvatarPipe,
+  ],
   providers: [
     DatePipe,
     ColumnMenuService,

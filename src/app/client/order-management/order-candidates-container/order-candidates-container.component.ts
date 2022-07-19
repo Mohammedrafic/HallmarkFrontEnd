@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { GetAgencyOrderCandidatesList } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
@@ -8,6 +8,7 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderCandidatesListPage } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
 import { Observable, Subject, takeUntil } from 'rxjs';
+import { OrderType } from "@shared/enums/order-type";
 
 @Component({
   selector: 'app-order-candidates-container',
@@ -20,8 +21,11 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
     this.order = value;
   }
 
+  @Output() excludeDeployedEvent = new EventEmitter<boolean>();
+
   public orderCandidatePage: OrderCandidatesListPage;
   public orderCandidates: any;
+  public orderType = OrderType;
 
   @Select(OrderManagementContentState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
@@ -41,6 +45,7 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
   }
 
   public onGetCandidatesList(event: CandidateListEvent) : void {
+    this.excludeDeployedEvent.emit(event.excludeDeployed);
     this.store.dispatch(new GetAgencyOrderCandidatesList(event.orderId, event.organizationId, event.currentPage, event.pageSize, event.excludeDeployed));
   }
 }

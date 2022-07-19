@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 import { BaseFormControlDirective } from '@shared/components/form-controls/base-form-control.directive';
 
@@ -10,4 +10,5 @@ import { BaseFormControlDirective } from '@shared/components/form-controls/base-
 })
 export class InputComponent extends BaseFormControlDirective {
   @Input() public maxlength: number;
+  @Input() public override placeholder: string = '';
 }

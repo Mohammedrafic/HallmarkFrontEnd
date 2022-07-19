@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.isIframe = window !== window.parent && !window.opener;
 
-    // this.b2CAuthService.b2cStable().subscribe();
+    this.b2CAuthService.interactionStatusNone().subscribe();
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),

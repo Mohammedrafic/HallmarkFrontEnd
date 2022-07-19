@@ -44,7 +44,7 @@ export class OrderCredentialsComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     const { credentials } = changes;
     if (credentials) {
-      this.credentialsGroups = credentials.currentValue.map((cred: IOrderCredentialItem) => this.createGroup(cred));
+      credentials.currentValue.forEach((cred: IOrderCredentialItem) => this.updateGroups(cred));
     }
   }
 

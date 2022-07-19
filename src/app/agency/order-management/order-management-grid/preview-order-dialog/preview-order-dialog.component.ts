@@ -17,12 +17,17 @@ import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
-import { AgencyOrderManagement } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, Order } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { Order } from '@shared/models/order-management.model';
+import isNil from 'lodash/fp/isNil';
+
+export type NextPreviousOrderEvent = {
+  next: boolean;
+  excludeDeployed: boolean;
+};
 
 @Component({
   selector: 'app-preview-order-dialog',
@@ -35,7 +40,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() openCandidateTab: boolean;
 
   @Output() compareEvent = new EventEmitter<never>();
-  @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
+  @Output() nextPreviousOrderEvent = new EventEmitter<NextPreviousOrderEvent>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
@@ -54,9 +59,20 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
 
+  private excludeDeployed: boolean;
   private isAlive = true;
 
+  @Output() selectReOrder = new EventEmitter<any>()
+
   constructor(private chipsCssClass: ChipsCssClass) {}
+
+  public get isReOrder(): boolean {
+    return !isNil(this.order?.reOrderId);
+  }
+
+  public get getTitle(): string {
+    return this.isReOrder ? `Re-Order ID ${this.order?.reOrderId}` : `Order ID ${this.order?.orderId}`;
+  }
 
   ngOnInit(): void {
     this.onOpenEvent();
@@ -97,12 +113,18 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public onNextPreviousOrder(next: boolean): void {
-    this.nextPreviousOrderEvent.emit(next);
+    this.nextPreviousOrderEvent.emit({ next, excludeDeployed: this.excludeDeployed });
+  }
+
+  public onExcludeDeployed(event: boolean): void {
+    this.excludeDeployed = event;
   }
 
   public onCompare(): void {
     disabledBodyOverflow(false);
     this.compareEvent.emit();
+    // TODO temp solution for opening add reorder dialog
+    // this.store.dispatch(new ShowSideDialog(true));
   }
 
   private onOpenEvent(): void {

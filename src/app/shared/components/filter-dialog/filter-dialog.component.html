@@ -30,7 +30,7 @@
         <div class="chips-container">
           <ejs-chiplist (delete)="onChipDelete($event)" [chips]="items" enableDelete="true"></ejs-chiplist>
         </div>
-        <div class="results-counter">
+        <div *ngIf="showResultsCounter" class="results-counter">
           <span class="label">Results </span><span class="count">{{ count }}</span>
         </div>
       </section>

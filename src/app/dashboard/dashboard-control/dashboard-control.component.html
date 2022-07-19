@@ -6,13 +6,19 @@
 <ng-template #dashboardToolbar let-items="items">
   <div class="dashboard-toolbar">
     <div class="left-content">
-      <section class="applied-filters">
+      <div class="applied-filters">
         <span class="applied-filters__title">Applied Filters:</span>
         <span *ngIf="!items.length">None</span>
-        <div class="chips-container">
-          <ejs-chiplist [chips]="items" enableDelete="true"></ejs-chiplist>
+      </div>
+      <div class="chips-wrapper">
+        <div class="chips-title" *ngFor="let filter of appliedFilters | keyvalue">
+          <span>{{ filter.key }}:</span>
+          <div class="chips-container">
+            <ejs-chiplist [chips]="filter.value" enableDelete="true"(delete)="deleteChip($event)"></ejs-chiplist>
+          </div>
         </div>
-      </section>
+        <div class="clear-all" *ngIf="items.length" (click)="onClearFilters()">Clear all</div>
+      </div>
     </div>
 
     <div class="right-content">
@@ -40,5 +46,5 @@
     [isLoading]="isLoading"
   ></app-widget-list>
 
-  <app-widget-filter></app-widget-filter>
+  <app-widget-filter #filter></app-widget-filter>
 </ng-template>

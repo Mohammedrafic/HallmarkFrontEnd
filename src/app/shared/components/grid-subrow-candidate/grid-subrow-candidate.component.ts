@@ -15,10 +15,10 @@ export class GridSubrowCandidateComponent {
   @Input() selected: boolean;
   @Input() order: MergedOrder;
   @Input() candidat: OrderManagementChild;
+  @Input() isAgency: boolean;
 
   @Output() clickEvent = new EventEmitter<OrderManagementChild>();
 
   public orderStatusText = OrderStatusText;
   public candidatStatus = CandidatStatus;
 }
-

@@ -10,6 +10,7 @@
       padding: 70px;
       width: 20%;
       min-width: 400px;
+      position: relative;
 
       .text-box {
         margin-top: 180px;
@@ -33,6 +34,7 @@
 
       form {
         margin-top: 80px;
+        position: relative;
 
         label {
           display: block;
@@ -72,13 +74,23 @@
     }
 
     .right-column {
-      background-image: url("../../../assets/login.jpg");
+      // background-image: url("../../../assets/login.jpg");
       background-repeat: no-repeat;
       background-size: cover;
       background-position: center;
       height: 100vh;
       width: 100%;
     }
+  }
+}
+
+.sso-wrapper {
+  margin-top: 80px;
+  position: relative;
+
+  button {
+    display: block;
+    width: 100%;
   }
 }
 

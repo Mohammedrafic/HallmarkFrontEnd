@@ -21,6 +21,7 @@ import { BillRateState } from '@shared/components/bill-rates/store/bill-rate.sta
 })
 export class BillRatesComponent implements OnInit, OnDestroy {
   @Input() isActive = false;
+  @Input() readOnlyMode = false;
   @Input() set billRates(values: BillRate[]) {
     if (values) {
       this.billRatesControl = new FormArray([]);

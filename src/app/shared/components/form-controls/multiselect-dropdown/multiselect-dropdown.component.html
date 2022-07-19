@@ -1,13 +1,24 @@
-<app-form-control-wrapper [formGroup]="formGroupInstance" [label]="label" [id]="id">
-  <ejs-multiselect
-    [allowFiltering]="true"
-    [attr.id]="id"
-    [dataSource]="dataSource"
-    [fields]="fields"
-    [formControlName]="controlName"
-    [placeholder]="placeholder"
-    [showDropDownIcon]="true"
-    [tabindex]="id"
-    mode="CheckBox"
-  ></ejs-multiselect>
+<app-form-control-wrapper
+  [formGroup]="formGroupInstance"
+  [label]="label"
+  [id]="id"
+  [required]="required"
+>
+  <div class="input-group datepicker">
+    <ejs-multiselect
+      [allowFiltering]="true"
+      [attr.id]="id"
+      [dataSource]="dataSource"
+      [fields]="fields"
+      [formControlName]="controlName"
+      [placeholder]="placeholder"
+      [showDropDownIcon]="true"
+      [tabindex]="id"
+      [selectAllText]="selectAllText"
+      [showSelectAll]="showSelectAll"
+      (selectedAll)="selectAllEmitter.emit($event)"
+      mode="CheckBox"
+    ></ejs-multiselect>
+    <app-error-message [control]="getControl()"></app-error-message>
+  </div>
 </app-form-control-wrapper>

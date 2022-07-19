@@ -4,24 +4,25 @@
 >
   <div class="app-grid-pagination__controls">
     <section
-      *ngIf="!allowBulkSelection || !selectedTableRowsAmount; else bulkApproveTemplate"
-      class="app-grid-pagination__left-side-controls">
-        <app-dropdown
-          [dataSource]="gridConfig.rowsPerPageDropDownObject"
-          [fields]="perPageFieldsSettings"
-          [formGroupInstance]="paginationFormGroup"
-          class="app-grid-pagination__rows-options"
-          controlName="pageSize"
-        ></app-dropdown>
-        <app-numeric-textbox
-          (changeValueEmitter)="navigateToPageEmitter.emit($event)"
-          [formGroupInstance]="paginationFormGroup"
-          [max]="pagerComponent.totalPages || 1"
-          [min]="1"
-          controlName="navigateTo"
-          class="app-grid-pagination__navigate-to-control"
-          placeholder="Go to:"
-        ></app-numeric-textbox>
+    *ngIf="!allowBulkSelection || !selectedTableRowsAmount; else bulkApproveTemplate"
+    class="app-grid-pagination__left-side-controls">
+      <app-dropdown
+        [dataSource]="gridConfig.rowsPerPageDropDownObject"
+        [fields]="perPageFieldsSettings"
+        [formGroupInstance]="paginationFormGroup"
+        class="app-grid-pagination__rows-options"
+        controlName="pageSize"
+      ></app-dropdown>
+      <app-numeric-textbox
+        (changeValueEmitter)="navigateToPageEmitter.emit($event)"
+        [formGroupInstance]="paginationFormGroup"
+        [max]="pagerComponent.totalPages || 1"
+        [min]="1"
+        format="#"
+        controlName="navigateTo"
+        class="app-grid-pagination__navigate-to-control"
+        placeholder="Go to:"
+      ></app-numeric-textbox>
     </section>
     <ng-template #bulkApproveTemplate>
       <section class="bulk-section">

@@ -39,6 +39,10 @@
     .icon {
       margin: 0;
     }
+
+    .e-btn {
+      line-height: 0 !important;
+    }
   }
 
   .row-tool-buttons {
@@ -101,13 +105,13 @@
   }
 }
 
-.calendar-container {
-  width: 234px;
-}
-
 .subrow-wrapper {
-  app-grid-subrow-candidate:not(:last-child) {
+  app-grid-subrow-candidate:not(:last-child), app-grid-subrow-reorder:not(:last-child) {
     display: block;
     border-bottom: 1px solid  $secondary-dark-blue-45;
   }
+}
+
+.search {
+  width: 400px;
 }

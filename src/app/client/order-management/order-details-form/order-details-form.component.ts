@@ -15,6 +15,7 @@ import {
 } from '@organization-management/store/organization-management.actions';
 import {
   ClearSelectedOrder,
+  ClearSuggestions,
   GetAssociateAgencies,
   GetMasterShifts,
   GetOrganizationStatesWithKeyCode,
@@ -64,6 +65,7 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { disableControls } from '@shared/utils/form.utils';
 import { AlertService } from '@shared/services/alert.service';
 import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
+import { ReasonForRequisitionList } from "@shared/models/reason-for-requisition-list";
 
 @Component({
   selector: 'app-order-details-form',
@@ -76,7 +78,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Input('disableOrderType') set disableOrderType(value: boolean) {
     if (value) {
       this.orderTypeForm.controls['orderType'].disable();
-    } 
+    }
   }
 
   @Output() orderTypeChanged = new EventEmitter<OrderType>();
@@ -158,14 +160,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   ];
   public jobClassificationFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
-  public reasonsForRequisition = [
-    { id: ReasonForRequisition.FmlaLoa, name: 'FMLA/LOA' },
-    { id: ReasonForRequisition.OpenPositions, name: 'Open Positions' },
-    { id: ReasonForRequisition.Orientation, name: 'Orientation' },
-    { id: ReasonForRequisition.Other, name: 'Other' },
-    { id: ReasonForRequisition.Pto, name: 'PTO' },
-    { id: ReasonForRequisition.ReplaceAgency, name: 'Replace Agency' },
-  ];
+  public reasonsForRequisition = ReasonForRequisitionList;
   public reasonForRequisitionFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   @Select(OrderManagementContentState.selectedOrder)
@@ -385,7 +380,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.unsubscribe$),
         switchMap((locationId: number) => {
-          if (!locationId || this.isEditMode) {
+          if (!locationId || (this.isEditMode && this.order?.status !== OrderStatus.Incomplete)) {
             return of(null);
           }
 
@@ -483,9 +478,20 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         }
 
         this.agencyControlEnabled = jobDistributionIds.includes(JobDistribution.Selected);
-
+        const selectedJobDistributions: JobDistributionModel[] = [];
         if (this.agencyControlEnabled) {
           agencyControl.addValidators(Validators.required);
+          const agencyIds = agencyControl.value;
+          if (agencyIds) {
+            agencyIds.forEach((agencyId: number) => {
+              selectedJobDistributions.push({
+                id: 0,
+                orderId: this.order?.id || 0,
+                jobDistributionOption: JobDistribution.Selected,
+                agencyId,
+              });
+            });
+          }
         } else {
           agencyControl.removeValidators(Validators.required);
           agencyControl.reset();
@@ -504,7 +510,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
             };
           });
 
-        jobDistributionsControl.patchValue(jobDistributions, { emitEvent: false });
+        jobDistributionsControl.patchValue([...jobDistributions, ...selectedJobDistributions], { emitEvent: false });
       });
 
     agencyControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((agencyIds: number[] | null) => {
@@ -563,16 +569,16 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         }
       });
 
-    this.suggestedDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((suggesstedDetails) => {
-      if (!suggesstedDetails) {
+    this.suggestedDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((suggestedDetails) => {
+      if (!suggestedDetails) {
         return;
       }
 
       const contactDetailsFormArray = this.contactDetailsForm.controls['contactDetails'] as FormArray;
       const firstContactDetailsControl = contactDetailsFormArray.at(0) as FormGroup;
 
-      const { name, email, mobilePhone } = suggesstedDetails.contactDetails;
-      const { address, state, city, zipCode } = suggesstedDetails.workLocation;
+      const { name, email, mobilePhone } = suggestedDetails.contactDetails;
+      const { address, state, city, zipCode } = suggestedDetails.workLocation;
 
       firstContactDetailsControl.controls['name'].patchValue(name);
       firstContactDetailsControl.controls['email'].patchValue(email);
@@ -591,7 +597,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-    this.store.dispatch(new ClearSelectedOrder());
+    this.store.dispatch([new ClearSelectedOrder(), new ClearSuggestions()]);
   }
 
   public onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -727,7 +733,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
     this.masterShifts$
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(() => this.generalInformationForm.controls['shiftRequirementId'].patchValue(order.shiftRequirementId));
+      .subscribe(() => this.generalInformationForm.controls['shiftRequirementId'].patchValue(order.shiftRequirementId, { emitEvent: false }));
 
     this.generalInformationForm.controls['hourlyRate'].patchValue(hourlyRate);
     this.generalInformationForm.controls['openPositions'].patchValue(order.openPositions);

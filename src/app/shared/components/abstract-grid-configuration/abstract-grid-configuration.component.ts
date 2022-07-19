@@ -5,7 +5,7 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { GridComponent, PageEventArgs, SelectionSettingsModel } from '@syncfusion/ej2-angular-grids';
 import { ResizeSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
-import { GRID_CONFIG } from '../../constants/grid-config';
+import { GRID_CONFIG } from '@shared/constants';
 import { isNullOrUndefined } from '@syncfusion/ej2-base';
 import { GridColumn } from '@shared/models/grid-column.model';
 
@@ -209,7 +209,7 @@ export abstract class AbstractGridConfigurationComponent {
   }
 
   public refreshGridColumns(columns: GridColumn[], grid: GridComponent): void {
-    columns.forEach(g => {
+    columns.forEach((g) => {
       if (!isNullOrUndefined(grid.getColumnByField(g.fieldName))) {
         grid.getColumnByField(g.fieldName).visible = g.visible;
       }
@@ -218,12 +218,12 @@ export abstract class AbstractGridConfigurationComponent {
   }
 
   protected onSubrowAllToggle(index?: number): void {
-    if(index) {
+    if (index) {
       this.gridWithChildRow.detailRowModule.expandAll();
       this.subrowsState.add(index - 1);
     } else {
       this.gridWithChildRow.detailRowModule.collapseAll();
-      this.subrowsState.clear()
+      this.subrowsState.clear();
     }
   }
 }

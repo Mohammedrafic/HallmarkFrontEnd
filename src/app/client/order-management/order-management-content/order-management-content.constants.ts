@@ -41,17 +41,17 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text:'Location', column: 'LocationName'},
   { text:'Department', column: 'DepartmentName'},
   { text:'Candidates', column: 'Candidates'},
-  { text:'# of Shifts Next 90 Days', column: 'shiftCount'},
+  { text:'# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days'},
 ];
 
 export const reOrdersColumnsToExport: ExportColumn[] = [
   { text:'Re-Order ID', column: 'Id'},
-  { text:'Status', column: 'StatusText'},
+  { text:'Status', column: 'Status'},
   { text:'Job Title', column: 'JobTitle'},
-  { text:'Skill', column: 'SkillName'},
-  { text:'# of Positions', column: 'OpenPositions' },
-  { text:'Location', column: 'LocationName'},
-  { text:'Department', column: 'DepartmentName'},
+  { text:'Skill', column: 'Skill'},
+  { text:'# of Positions', column: 'CountOfPosition' },
+  { text:'Location', column: 'Location'},
+  { text:'Department', column: 'Department'},
   { text:'Candidates', column: 'Candidates'},
   { text:'Bill Rate', column: 'BillRate'},
   { text:'Re-Order Date', column: 'ReOrderDate'},
@@ -59,13 +59,18 @@ export const reOrdersColumnsToExport: ExportColumn[] = [
   { text:'Agency', column: 'Agency'},
 ];
 
+export const reOrdersChildColumnToExport: ExportColumn[] = [
+  { text: 'Position ID', column: 'PositionID'},
+  { text: 'Position Status', column: 'PositionStatus'},
+  { text: 'Candidate Name', column: 'CandidateName'},
+  { text: 'Candidate Status', column: 'CandidateStatus'},
+  { text: 'Submission', column: 'Submission'},
+  { text: 'Onboarded', column: 'Onboarded'},
+]
+
 export const ReOrdersColumnsConfig = [
   {
-    fieldName: 'reOrderId',
-    visible: true
-  },
-  {
-    fieldName: 'reOrderDate',
+    fieldName: 'reOrderFromId',
     visible: true
   },
   {
@@ -73,7 +78,7 @@ export const ReOrdersColumnsConfig = [
     visible: true
   },
   {
-    fieldName: 'agencyName',
+    fieldName: 'agencies',
     visible: true
   },
   {
@@ -86,10 +91,10 @@ export const ReOrdersColumnsConfig = [
   },
   {
     fieldName: 'startDate',
-    visible: false
+    visible: true
   },
   {
-    fieldName: 'shiftCount',
+    fieldName: 'shiftsNext90Days',
     visible: false
   },
 ];
@@ -108,11 +113,7 @@ export const AllOrdersColumnsConfig = [
     visible: true
   },
   {
-    fieldName: 'reOrderId',
-    visible: false
-  },
-  {
-    fieldName: 'reOrderDate',
+    fieldName: 'reOrderFromId',
     visible: false
   },
   {
@@ -120,11 +121,11 @@ export const AllOrdersColumnsConfig = [
     visible: false
   },
   {
-    fieldName: 'agencyName',
+    fieldName: 'agencies',
     visible: false
   },
   {
-    fieldName: 'shiftCount',
+    fieldName: 'shiftsNext90Days',
     visible: false
   },
 ];
@@ -143,11 +144,7 @@ export const PerDiemColumnsConfig = [
     visible: false
   },
   {
-    fieldName: 'reOrderId',
-    visible: false
-  },
-  {
-    fieldName: 'reOrderDate',
+    fieldName: 'reOrderFromId',
     visible: false
   },
   {
@@ -155,7 +152,7 @@ export const PerDiemColumnsConfig = [
     visible: false
   },
   {
-    fieldName: 'agencyName',
+    fieldName: 'agencies',
     visible: false
   },
   {
@@ -167,7 +164,7 @@ export const PerDiemColumnsConfig = [
     visible: false
   },
   {
-    fieldName: 'shiftCount',
+    fieldName: 'shiftsNext90Days',
     visible: true
   },
 ];

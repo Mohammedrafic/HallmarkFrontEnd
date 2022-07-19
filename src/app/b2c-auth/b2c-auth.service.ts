@@ -53,7 +53,7 @@ export class B2CAuthService {
     );
   }
 
-  public b2cStable(): Observable<InteractionStatus> {
+  public interactionStatusNone(): Observable<InteractionStatus> {
     return this.msalBroadcastService.inProgress$.pipe(
       filter((status: InteractionStatus) => status === InteractionStatus.None),
       tap(() => {
@@ -67,21 +67,23 @@ export class B2CAuthService {
   }
 
   public logout(): void {
-    this.authService.logout();
+    if (this.msalGuardConfig.interactionType === InteractionType.Popup) {
+      this.authService.logout();
+    } else {
+      this.authService.logoutRedirect();
+    }
   }
 
   public checkAndSetActiveAccount(): void {
     /**
      * If no active account set but there are accounts signed in, sets first account to active account
      * To use active account set here, subscribe to inProgress$ first in your component
-     * Note: Basic usage demonstrated. Your app may require more complicated account selection logic
      */
     let activeAccount = this.authService.instance.getActiveAccount();
 
     if (!activeAccount && this.authService.instance.getAllAccounts().length > 0) {
       let accounts = this.authService.instance.getAllAccounts();
       this.authService.instance.setActiveAccount(accounts[0]);
-      debugger
     }
   }
 }

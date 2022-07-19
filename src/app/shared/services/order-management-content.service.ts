@@ -4,6 +4,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import {
   AcceptJobDTO,
   AgencyOrderFilters,
+  AgencyOrderManagement,
   AgencyOrderManagementPage,
   ApplicantStatus,
   CandidatesBasicInfo,
@@ -13,6 +14,7 @@ import {
   OrderCandidateJob,
   OrderCandidatesListPage,
   OrderFilterDataSource,
+  OrderManagement,
   OrderManagementFilter,
   OrderManagementPage,
   SuggestedDetails,
@@ -32,6 +34,27 @@ export class OrderManagementContentService {
   constructor(private http: HttpClient) {}
 
   /**
+   * Counts number of shifts of reorders within specified period of time from current date
+   * @param orders list of orders
+   * @param period number of days counting of shifts should be performed 
+   */
+  public countShiftsWithinPeriod(orders: OrderManagementPage | AgencyOrderManagementPage, period = 90): void {
+    const today = new Date();
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + period);
+    orders.items.forEach((item: OrderManagement | AgencyOrderManagement) => {
+      let shiftsCount = 0;
+      item.reOrders?.forEach((reOrder: OrderManagement) => {
+        const reOrderStartDate = new Date(reOrder.startDate);
+        if (reOrderStartDate > today && reOrderStartDate < endDate) {
+          shiftsCount += reOrder.openPositions;
+        }
+      });
+      item.shiftsNext90Days = shiftsCount;
+    });
+  }
+
+  /**
    * Get the incomplete order
    @param payload filter with details we need to get
    */
@@ -45,6 +68,13 @@ export class OrderManagementContentService {
    */
   public getOrders(payload: OrderManagementFilter | object): Observable<OrderManagementPage> {
     return this.http.post<OrderManagementPage>(`/api/Orders/all`, payload);
+  }
+
+  /**
+   * Lock/Unlock the order
+   */
+  public setLock(orderId: number, lockStatus: boolean): Observable<boolean> {
+    return this.http.post<boolean>(`/api/Orders/setLock`, {orderId, lockStatus });
   }
 
   /**
@@ -305,7 +335,9 @@ export class OrderManagementContentService {
    @param jobId
    */
   public getCandidatesBasicInfo(organizationId: number, jobId: number): Observable<CandidatesBasicInfo> {
-    return this.http.get<CandidatesBasicInfo>(`/api/AppliedCandidates/basicInfo?OrganizationId=${organizationId}&JobId=${jobId}`);
+    return this.http.get<CandidatesBasicInfo>(
+      `/api/AppliedCandidates/basicInfo?OrganizationId=${organizationId}&JobId=${jobId}`
+    );
   }
 
   /**
@@ -314,7 +346,7 @@ export class OrderManagementContentService {
    * @param tab
    */
   public export(payload: ExportPayload, tab: OrganizationOrderManagementTabs): Observable<any> {
-    switch(tab) {
+    switch (tab) {
       case OrganizationOrderManagementTabs.PerDiem:
         return this.http.post(`/api/Orders/perdiem/export`, payload, { responseType: 'blob' });
       case OrganizationOrderManagementTabs.ReOrders:
@@ -330,12 +362,13 @@ export class OrderManagementContentService {
    * @param tab
    */
   public exportAgency(payload: ExportPayload, tab: AgencyOrderManagementTabs): Observable<any> {
-    switch(tab) {
+    switch (tab) {
       case AgencyOrderManagementTabs.ReOrders:
         return this.http.post(`/api/Agency/ReOrders/export`, payload, { responseType: 'blob' }); // TODO: modification pending after BE implementation
+      case AgencyOrderManagementTabs.MyAgency:
+        return this.http.post(`/api/agency/orders/export`, payload, { responseType: 'blob' });
       default:
         return this.http.post(`/api/Agency/export`, payload, { responseType: 'blob' });
     }
   }
 }
-

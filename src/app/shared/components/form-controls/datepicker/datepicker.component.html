@@ -1,0 +1,21 @@
+<app-form-control-wrapper
+  [formGroup]="formGroupInstance"
+  [label]="label"
+  [id]="id"
+  [required]="required"
+>
+  <div class="input-group datepicker">
+    <ejs-datepicker
+      class="datepicker"
+      [format]="format"
+      [formControlName]="controlName"
+      [enableMask]="enableMask"
+      [maskPlaceholder]="maskPlaceholder"
+      [min]="min"
+      [id]="id"
+      [placeholder]="placeholder"
+    >
+    </ejs-datepicker>
+    <app-error-message [control]="getControl()"></app-error-message>
+  </div>
+</app-form-control-wrapper>

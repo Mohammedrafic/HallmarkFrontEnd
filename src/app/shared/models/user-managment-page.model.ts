@@ -1,4 +1,4 @@
-import {PageOfCollections} from "@shared/models/page.model";
+import { PageOfCollections } from '@shared/models/page.model';
 
 export type User = {
   firstName: string;
@@ -19,7 +19,7 @@ export type User = {
   businessUnitType?: number;
   businessUnitName?: string;
   assigned: boolean;
-  roles?: Array<number>;
+  roles: Array<number> | [];
 };
 
 export type UserDTO = {
@@ -27,12 +27,11 @@ export type UserDTO = {
   metadata: User;
   roleIds: Array<number>;
   userId?: string;
-}
+};
 
 export type UsersPage = PageOfCollections<User>;
 
 export type RolesPerUser = {
   id: number;
   name: string;
-}
-
+};

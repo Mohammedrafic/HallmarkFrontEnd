@@ -1,6 +1,9 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tab-navigation (selectedTab)="onTabChanged($event)"></app-tab-navigation>
+    <app-tab-navigation
+      #tabNavigation
+      (selectedTab)="onTabChanged($event)">
+    </app-tab-navigation>
   </ng-container>
   <ng-container right>
     <div class="toolbar-actions">
@@ -42,6 +45,7 @@
         [selectedTab]="selectedTab"
         [onExportClicked$]="exportSelected$"
         [search$]="search$"
+        (selectTab)="onSelectTab($event)"
       ></app-order-management-grid>
       <app-order-management-grid
         *ngSwitchCase="selectedTabCases.ReOrders"

@@ -11,7 +11,7 @@
 </section>
 <section class="create-under-container bootstrap" *ngIf="!isMspUser">
   <div class="left-section">
-    <form *ngIf="CreateUnderFormGroup" [formGroup]="CreateUnderFormGroup" id="createUnder">
+    <form *ngIf="CreateUnderFormGroup && isAddMode" [formGroup]="CreateUnderFormGroup" id="createUnder">
       <label>Create Under<span class="required">*</span></label>
       <div class="input-group dropdown create-under-dropdown">
         <ejs-dropdownlist appValidateWithMessage [fields]="createUnderFields" formControlName="createUnder"

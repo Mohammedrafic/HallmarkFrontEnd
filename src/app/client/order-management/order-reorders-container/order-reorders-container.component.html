@@ -1,0 +1,6 @@
+<section class="job-details">
+  <app-general-order-per-diem-info [orderInformation]="order"></app-general-order-per-diem-info>
+</section>
+<div class="separator"></div>
+<app-order-reorders-list [isAgency]="isAgency" [reOrders]="order?.reOrders" [order]="order" (selectReOrder)="selectReOrder.emit($event)"></app-order-reorders-list>
+

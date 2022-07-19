@@ -6,12 +6,14 @@ import { Observable, tap } from 'rxjs';
 import lodashMap from 'lodash/fp/map';
 
 import { DashboardService } from '../services/dashboard.service';
-import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile, SetFilteredItems } from './dashboard.actions';
+import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile, SetFilteredItems, SetDashboardFiltersState } from './dashboard.actions';
 import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import { DashboardDataModel } from '../models/dashboard-data.model';
 import { widgetTypeToConfigurationMapper } from '../constants/widget-type-to-configuration-mapper';
 import { FilteredItem } from '@shared/models/filter.model';
+import { DASHBOARD_FILTER_STATE } from '@shared/constants';
+import { DashboardFiltersModel } from '../models/dashboard-filters.model';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
@@ -19,6 +21,7 @@ export interface DashboardStateModel {
   widgets: WidgetOptionModel[];
   isMobile: boolean;
   filteredItems: FilteredItem[];
+  dashboardFilterState: DashboardFiltersModel;
 }
 
 @State<DashboardStateModel>({
@@ -28,7 +31,8 @@ export interface DashboardStateModel {
     isDashboardLoading: false,
     widgets: [],
     isMobile: false,
-    filteredItems: []
+    filteredItems: JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [],
+    dashboardFilterState: {} as DashboardFiltersModel
   },
 })
 @Injectable()
@@ -61,6 +65,11 @@ export class DashboardState {
   @Selector()
   static filteredItems(state: DashboardStateModel): DashboardStateModel['filteredItems'] {
     return state.filteredItems;
+  }
+
+  @Selector()
+  static dashboardFiltersState(state: DashboardStateModel): DashboardStateModel['dashboardFilterState'] {
+    return state.dashboardFilterState;
   }
 
   public constructor(private readonly actions: Actions, private dashboardService: DashboardService) {}
@@ -108,7 +117,14 @@ export class DashboardState {
   }
 
   @Action(SetFilteredItems)
-  private setFilteredItems({patchState}: StateContext<DashboardStateModel>, {payload}: SetFilteredItems) {
-    patchState({filteredItems: payload})
+  private setFilteredItems({patchState}: StateContext<DashboardStateModel>, { payload }: SetFilteredItems) {
+    patchState({filteredItems: payload});
+    window.localStorage.setItem(DASHBOARD_FILTER_STATE, JSON.stringify(payload));
+    
+  }
+
+  @Action(SetDashboardFiltersState)
+  private setDashboardFiltersState({patchState}: StateContext<DashboardStateModel>, { payload }: SetDashboardFiltersState) {
+    patchState({ dashboardFilterState: payload })
   }
 }

@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AddEditUserComponent } from "src/app/security/user-list/add-edit-user/add-edit-user.component";
 import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, UNIT_FIELDS, DISABLED_GROUP } from './user-list.constants';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { SecurityState } from '../store/security.state';
@@ -26,6 +27,8 @@ const EDIT_DIALOG_TITLE = 'Edit User';
   styleUrls: ['./user-list.component.scss'],
 })
 export class UserListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
+  @ViewChild(AddEditUserComponent) addEditUserComponent: AddEditUserComponent;
+
   @Select(SecurityState.businessUserData)
   public businessUserData$: Observable<(type: number) => BusinessUnit[]>;
 
@@ -105,17 +108,9 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
           okButtonClass: 'delete-button',
         })
         .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
-          this.userSettingForm.reset();
-          this.userSettingForm.enable();
-          this.store.dispatch(new ShowSideDialog(false));
-          this.createdUser = null;
-        });
+        .subscribe(() => this.closeDialog());
     } else {
-      this.userSettingForm.reset();
-      this.userSettingForm.enable();
-      this.store.dispatch(new ShowSideDialog(false));
-      this.createdUser = null;
+      this.closeDialog();
     }
   }
 
@@ -142,28 +137,31 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
   }
 
   public onEdit(user: User): void {
-    this.isEditRole = true;
-    this.createdUser = user;
-    this.userSettingForm.reset();
-    this.userSettingForm.enable();
+    this.addEditUserComponent.tab.refresh();
+    setTimeout(() => {
+      this.isEditRole = true;
+      this.createdUser = user;
+      this.userSettingForm.reset();
+      this.userSettingForm.enable();
 
-    if (user.roles) {
-      const editedUser = {
-        ...user,
-        roles: [...user.roles],
-        isDeleted: !user.isDeleted,
-        businessUnitId: user.businessUnitId || 0,
-        emailConfirmation: user.email,
-      };
-      this.userSettingForm.patchValue({
-        ...editedUser,
-        roles: user.roles?.map((role: any) => role.id),
-      });
-    }
+      if (user.roles) {
+        const editedUser = {
+          ...user,
+          roles: [...user.roles],
+          isDeleted: !user.isDeleted,
+          businessUnitId: user.businessUnitId || 0,
+          emailConfirmation: user.email,
+        };
+        this.userSettingForm.patchValue({
+          ...editedUser,
+          roles: user.roles?.map((role: any) => role.id),
+        });
+      }
 
-    this.subscribeOnFieldsChanges(user);
-    this.disableBussinesUnitForRole();
-    this.store.dispatch(new ShowSideDialog(true));
+      this.subscribeOnFieldsChanges(user);
+      this.disableBussinesUnitForRole();
+      this.store.dispatch(new ShowSideDialog(true));
+    });
   }
 
   public override customExport(): void {
@@ -205,9 +203,7 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
         ofActionSuccessful(SaveUserSucceeded),
         takeWhile(() => this.isAlive)
       )
-      .subscribe(() => {
-        this.store.dispatch(new ShowSideDialog(false));
-      });
+      .subscribe(() => this.closeDialog());
   }
 
   private onBusinessUnitValueChanged(): void {
@@ -234,5 +230,12 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
       .subscribe(() => {
         this.userSettingForm.get('roles')?.setValue(user.roles?.map((role: any) => role.id));
       });
+  }
+
+  private closeDialog(): void {
+    this.store.dispatch(new ShowSideDialog(false));
+    this.userSettingForm.reset();
+    this.userSettingForm.enable();
+    this.createdUser = null;
   }
 }

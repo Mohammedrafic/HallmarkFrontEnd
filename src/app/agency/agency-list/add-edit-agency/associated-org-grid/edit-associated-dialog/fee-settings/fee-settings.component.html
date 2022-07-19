@@ -4,12 +4,12 @@
     <div class="input-group">
       <input
         appValidateWithMessage
-        mask="00.00"
-        [showMaskTyped]="true"
-        [dropSpecialCharacters]="false"
         formControlName="baseFee"
-        type="text"
         class="e-input"
+        type="text"
+        (focus)="priceUtils.setPriceMask(form, 'baseFee', $event)"
+        (blur)="priceUtils.setTwoDecimals(form, 'baseFee', $event)"
+        maxlength="5"
       />
     </div>
   </div>
@@ -46,7 +46,11 @@
         [valueAccessor]="classificationValueAccess"
       ></e-column>
       <e-column field="skillName" headerText="Skill" textAlign="left"></e-column>
-      <e-column field="fee" headerText="Fee %" textAlign="left"></e-column>
+      <e-column field="fee" headerText="Fee %" textAlign="left">
+        <ng-template #template let-data>
+          {{ priceUtils.formatNumbers(data.fee) }}
+        </ng-template>
+      </e-column>
 
       <e-column textAlign="Right" width="120" freeze="Right">
         <ng-template #template let-data>

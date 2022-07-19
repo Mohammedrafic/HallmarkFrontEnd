@@ -7,7 +7,7 @@ import { getAllErrors } from "@shared/utils/error.utils";
 import { catchError, map, Observable, tap } from 'rxjs';
 import { ShowToast } from "src/app/store/app.actions";
 import { MENU_CONFIG } from '@shared/constants';
-import { AUTH_STORAGE_KEY, USER_STORAGE_KEY, ORG_ID_STORAGE_KEY, AGENCY_ID_STORAGE_KEY, LAST_SELECTED_BUSINESS_UNIT_TYPE } from '@shared/constants/local-storage-keys';
+import { USER_STORAGE_KEY, ORG_ID_STORAGE_KEY, AGENCY_ID_STORAGE_KEY, LAST_SELECTED_BUSINESS_UNIT_TYPE } from '@shared/constants/local-storage-keys';
 import { ChildMenuItem, Menu, MenuItem } from '@shared/models/menu.model';
 
 import { User, UsersAssignedToRole } from '@shared/models/user.model';
@@ -102,7 +102,6 @@ export class UserState {
 
   @Action(SetCurrentUser)
   SetCurrentUser({ patchState }: StateContext<UserStateModel>, { payload }: SetCurrentUser): void {
-    window.localStorage.setItem(AUTH_STORAGE_KEY, payload.id);
     window.localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(payload));
     patchState({ user: payload });
   }
@@ -113,7 +112,6 @@ export class UserState {
       this.b2CAuthService.logout();
     }
 
-    window.localStorage.removeItem(AUTH_STORAGE_KEY);
     window.localStorage.removeItem(USER_STORAGE_KEY);
     window.localStorage.removeItem(ORG_ID_STORAGE_KEY);
     window.localStorage.removeItem(AGENCY_ID_STORAGE_KEY);
@@ -193,7 +191,7 @@ export class UserState {
   ): Observable<LasSelectedOrganizationAgency> {
     return this.userService.saveLastSelectedOrganizationAgencyId(payload).pipe(map(() => {
       dispatch(new SetLastSelectedOrganizationAgencyId(payload));
-      if (isOrganizationId && getState().lastSelectedOrganisationAgency === 'Organization') {
+      if (isOrganizationId) {
         dispatch(new GetOrganizationStructure());
       }
       return payload;

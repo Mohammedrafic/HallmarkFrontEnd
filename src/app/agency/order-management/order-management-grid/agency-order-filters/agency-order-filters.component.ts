@@ -1,8 +1,9 @@
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { AfterViewInit, Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import { Select, Store } from '@ngxs/store';
-import { filter, forkJoin, Observable, takeUntil, tap } from 'rxjs';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { MultiSelectComponent } from "@syncfusion/ej2-angular-dropdowns";
+import { debounceTime, filter, forkJoin, Observable, takeUntil, tap } from 'rxjs';
 
 import { isEmpty } from 'lodash';
 
@@ -11,11 +12,18 @@ import { OrderTypeOptions } from '@shared/enums/order-type';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { GetOrganizationStructure } from '@agency/store/order-management.actions';
 import { OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
+import { ShowFilterDialog } from "src/app/store/app.actions";
 import { getDepartmentFromLocations, getLocationsFromRegions } from './agency-order-filters.utils';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { CandidatesStatusText, OrderStatusText } from '@shared/enums/status';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+
+enum RLDLevel {
+  Orginization,
+  Region,
+  Location,
+}
 
 @Component({
   selector: 'app-agency-order-filters',
@@ -23,6 +31,8 @@ import { CandidatStatus } from '@shared/enums/applicant-status.enum';
   styleUrls: ['./agency-order-filters.component.scss'],
 })
 export class AgencyOrderFiltersComponent extends DestroyableDirective implements OnInit, AfterViewInit {
+  @ViewChild('regionMultiselect') regionMultiselect: MultiSelectComponent;
+
   @Input() form: FormGroup;
   @Input() filterColumns: any;
   @Input() activeTab: AgencyOrderManagementTabs;
@@ -56,7 +66,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     return this.form.get('departmentsIds') as AbstractControl;
   }
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private actions$: Actions) {
     super();
   }
 
@@ -66,6 +76,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
 
   ngAfterViewInit(): void {
     forkJoin([
+      this.onShowFilterDialog(),
       this.onOrganizationIdsControlChange(),
       this.onGridFilterRegions(),
       this.onRegionIdsControlChange(),
@@ -81,9 +92,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     return organizationIdsControl.valueChanges.pipe(
       tap((value: number[]) => {
         if (isEmpty(value)) {
-          this.regionIdsControl.reset();
-          this.locationIdsControl.reset();
-          this.departmentsIdsControl.reset();
+          this.clearRLDByLevel(RLDLevel.Orginization);
         } else {
           this.store.dispatch(new GetOrganizationStructure(value));
         }
@@ -95,8 +104,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     return this.regionIdsControl.valueChanges.pipe(
       tap((value: number[]) => {
         if (isEmpty(value)) {
-          this.locationIdsControl.reset();
-          this.departmentsIdsControl.reset();
+          this.clearRLDByLevel(RLDLevel.Region);
         } else {
           const regions: OrganizationRegion[] = this.filterColumns.regionIds.dataSource.filter(
             ({ id }: { id: number }) => value.includes(id)
@@ -111,7 +119,7 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     return this.locationIdsControl.valueChanges.pipe(
       tap((value: number[]) => {
         if (isEmpty(value)) {
-          this.departmentsIdsControl.reset();
+          this.clearRLDByLevel(RLDLevel.Location);
         } else {
           const locations: OrganizationLocation[] = this.filterColumns.locationIds.dataSource.filter(
             ({ id }: { id: number }) => value.includes(id)
@@ -123,7 +131,37 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
   }
 
   private onGridFilterRegions(): Observable<unknown> {
-    return this.gridFilterRegions$.pipe(tap((regions) => (this.filterColumns.regionIds.dataSource = regions)));
+    return this.actions$.pipe(
+      ofActionSuccessful(GetOrganizationStructure),
+      tap(() => {
+        this.filterColumns.regionIds.dataSource = this.store.selectSnapshot(OrderManagementState.gridFilterRegions);
+      })
+    );
+  }
+
+  private onShowFilterDialog(): Observable<unknown> {
+    return this.actions$.pipe(
+      ofActionSuccessful(ShowFilterDialog),
+      debounceTime(100),
+      tap(() => {
+        this.regionMultiselect.refresh();
+      })
+    );
+  }
+
+  private clearRLDByLevel(level: RLDLevel): void {
+    this.departmentsIdsControl.reset();
+    this.filterColumns.departmentsIds.dataSource = [];
+
+    if (level === RLDLevel.Orginization || level === RLDLevel.Region) {
+      this.locationIdsControl.reset();
+      this.filterColumns.locationIds.dataSource = [];
+    }
+
+    if (level === RLDLevel.Orginization) {
+      this.regionIdsControl.reset();
+      this.filterColumns.regionIds.dataSource = [];
+    }
   }
 
   private onOrderFilteringOptionsChange(): void {
@@ -136,13 +174,26 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
         let statuses = [];
         let candidateStatusesData = [];
         if (this.activeTab === AgencyOrderManagementTabs.ReOrders) {
-          statuses = orderStatuses.filter(status => [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status));
-          candidateStatusesData = candidateStatuses.filter(status => [CandidatesStatusText.Onboard, CandidatesStatusText.Offered].includes(status.status)) // TODO: after BE implementation also add Pending, Rejected
+          statuses = orderStatuses.filter((status) =>
+            [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status)
+          );
+          candidateStatusesData = candidateStatuses.filter((status) =>
+            [CandidatesStatusText.Onboard, CandidatesStatusText.Offered].includes(status.status)
+          ); // TODO: after BE implementation also add Pending, Rejected
         } else if (this.activeTab === AgencyOrderManagementTabs.PerDiem) {
-          statuses = orderStatuses.filter(status => [OrderStatusText.Open, OrderStatusText.Closed].includes(status.status));
-          candidateStatusesData = candidateStatuses.filter(status => [
-            CandidatStatus['Not Applied'], CandidatStatus.Applied, CandidatStatus.Offered, CandidatStatus.Accepted, CandidatStatus.OnBoard, CandidatStatus.Rejected
-          ].includes(status.status));
+          statuses = orderStatuses.filter((status) =>
+            [OrderStatusText.Open, OrderStatusText.Closed].includes(status.status)
+          );
+          candidateStatusesData = candidateStatuses.filter((status) =>
+            [
+              CandidatStatus['Not Applied'],
+              CandidatStatus.Applied,
+              CandidatStatus.Offered,
+              CandidatStatus.Accepted,
+              CandidatStatus.OnBoard,
+              CandidatStatus.Rejected,
+            ].includes(status.status)
+          );
         } else {
           statuses = orderStatuses;
           candidateStatusesData = candidateStatuses;
@@ -175,7 +226,6 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       openPositions: new FormControl(null),
       jobStartDate: new FormControl(null),
       jobEndDate: new FormControl(null),
-      reOrderDate: new FormControl(null),
     });
   }
 
@@ -247,7 +297,6 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       openPositions: { type: ControlTypes.Text, valueType: ValueType.Text },
       jobStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       jobEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
-      reOrderDate: { type: ControlTypes.Date, valueType: ValueType.Text },
     };
   }
 }

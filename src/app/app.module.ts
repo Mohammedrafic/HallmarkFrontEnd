@@ -14,9 +14,10 @@ import { AppState } from './store/app.state';
 
 import { ApiInterceptor } from './shared/interceptors/api.interceptor';
 import { UserState } from './store/user.state';
-import { LoginGuard, ShellGuard } from '@shared/guards';
+import { LoginGuard, UserGuard } from '@shared/guards';
 import { MsalModule, MsalRedirectComponent } from '@azure/msal-angular';
 import { MSAL_PROVIDERS } from './b2c-auth/b2c-auth.providers';
+import { B2cModule } from './b2c-auth/login.module';
 
 @NgModule({
   declarations: [AppComponent],
@@ -37,7 +38,8 @@ import { MSAL_PROVIDERS } from './b2c-auth/b2c-auth.providers';
     //   disabled: environment.production
     // }),
     NgxMaskModule.forRoot(),
-    MsalModule
+    MsalModule,
+    B2cModule,
   ],
   providers: [
     {
@@ -46,8 +48,8 @@ import { MSAL_PROVIDERS } from './b2c-auth/b2c-auth.providers';
       multi: true
     },
     LoginGuard,
-    ShellGuard,
-    ...MSAL_PROVIDERS
+    UserGuard,
+    ...MSAL_PROVIDERS,
   ],
   bootstrap: [AppComponent, MsalRedirectComponent],
 })

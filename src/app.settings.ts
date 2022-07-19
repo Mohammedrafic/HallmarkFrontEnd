@@ -1,7 +1,8 @@
-import { InjectionToken } from '@angular/core';
+import { InjectionToken } from "@angular/core";
 
-export class AppSettings {
-  API_BASE_URL: string;
+export type AppSettings = {
+    host: string;
 }
 
-export let APP_SETTINGS = new InjectionToken<AppSettings>('APP_SETTINGS');
+export const APP_SETTINGS = new InjectionToken<AppSettings>('APP_SETTINGS');
+export const APP_SETTINGS_URL = './assets/app.settings.json';

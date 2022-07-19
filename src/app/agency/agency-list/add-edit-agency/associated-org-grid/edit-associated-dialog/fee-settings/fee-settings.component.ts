@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject } from 'rxjs';
 
@@ -8,10 +8,15 @@ import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { GetFeeSettingByOrganizationId, RemoveFeeExceptionsById } from 'src/app/agency/store/agency.actions';
 import { AgencyState } from 'src/app/agency/store/agency.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { FeeExceptions, FeeExceptionsPage, FeeSettingsClassification } from 'src/app/shared/models/associate-organizations.model';
+import {
+  FeeExceptions,
+  FeeExceptionsPage,
+  FeeSettingsClassification,
+} from 'src/app/shared/models/associate-organizations.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TITLE, DELETE_RECORD_TEXT } from '@shared/constants/messages';
 import { GRID_CONFIG } from '@shared/constants/grid-config';
+import PriceUtils from '@shared/utils/price.utils';
 
 @Component({
   selector: 'app-fee-settings',
@@ -35,6 +40,8 @@ export class FeeSettingsComponent extends AbstractGridConfigurationComponent imp
 
   @Select(AgencyState.feeExceptionsPage)
   public feeExceptionsPage$: Observable<FeeExceptionsPage>;
+
+  public priceUtils = PriceUtils;
 
   private organizationId: number;
 

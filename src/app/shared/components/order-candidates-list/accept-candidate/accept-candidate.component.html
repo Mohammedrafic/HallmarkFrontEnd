@@ -9,7 +9,7 @@
           </h3>
           <app-deploy-candidate-message *ngIf="candidate.deployedCandidateInfo" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
         </div>
-        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
+        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus && !candidate.deployedCandidateInfo">
           <e-chips>
             <e-chip [text]="candidatStatus[candidate.candidateStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
           </e-chips>
@@ -27,7 +27,7 @@
   </section>
   <section class="content-container">
     <div class="candidate-info">
-      <ejs-accordion expandMode="Single">
+      <ejs-accordion #accordionElement expandMode="Single" (expanding)="toForbidExpandSecondRow($event)" (clicked)="clickedOnAccordion($event)">
         <e-accordionitems>
           <e-accordionitem expanded="true">
             <ng-template #header>
@@ -43,9 +43,16 @@
                     </div>
                   </div>
                   <div class="input-container bootstrap">
-                    <label class="input-group">Bill Rate</label>
+                    <label class="input-group">Bill Rate ($)</label>
                     <div>
-                      <input appValidateWithMessage formControlName="billRates" class="e-input" type="text"/>
+                      <input
+                        appValidateWithMessage
+                        formControlName="billRates"
+                        class="e-input"
+                        type="text"
+                        (focus)="priceUtils.setPriceMask(form, 'billRates', $event)"
+                        (blur)="priceUtils.setTwoDecimals(form, 'billRates', $event)"
+                      />
                     </div>
                   </div>
                 </div>
@@ -60,9 +67,16 @@
                     </div>
                   </div>
                   <div class="input-container bootstrap">
-                    <label class="input-group">Candidate Bill Rate</label>
+                    <label class="input-group">Candidate Bill Rate ($)</label>
                     <div>
-                      <input appValidateWithMessage formControlName="candidateBillRate" class="e-input" type="text"/>
+                      <input
+                        appValidateWithMessage
+                        formControlName="candidateBillRate"
+                        class="e-input"
+                        type="text"
+                        (focus)="priceUtils.setPriceMask(form, 'candidateBillRate', $event)"
+                        (blur)="priceUtils.setTwoDecimals(form, 'candidateBillRate', $event)"
+                      />
                     </div>
                   </div>
                 </div>
@@ -88,9 +102,15 @@
                     </div>
                   </div>
                   <div class="input-container bootstrap">
-                    <label class="input-group">Offered Bill Rate</label>
+                    <label class="input-group">Offered Bill Rate ($)</label>
                     <div>
-                      <input appValidateWithMessage formControlName="offeredBillRate" class="e-input" type="text"/>
+                      <input
+                        appValidateWithMessage
+                        formControlName="offeredBillRate"
+                        class="e-input"
+                        (focus)="priceUtils.setPriceMask(form, 'offeredBillRate', $event)"
+                        (blur)="priceUtils.setTwoDecimals(form, 'offeredBillRate', $event)"
+                        type="text"/>
                     </div>
                   </div>
                 </div>

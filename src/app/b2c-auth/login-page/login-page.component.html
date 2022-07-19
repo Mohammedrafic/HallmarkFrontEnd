@@ -1,15 +1,14 @@
-<section class="login-page">
+<section class="login-page" #spiner>
   <div class="row">
     <div class="left-column">
       <div class="logo">
         <img src="./assets/logo-login.svg" alt="einstein">
       </div>
-      <div class="text-box">
+      <!-- <div class="text-box">
         <h2>WELCOME!</h2>
         <p>Log In with your email....</p>
-        <!-- {{ isLoggedIn }} -->
       </div>
-      <form *ngIf="usersDropDownData?.length" [formGroup]="loginForm" (ngSubmit)="onLogin()">
+      <form [formGroup]="loginForm" >
         <div class="input-container bootstrap">
           <label>Email</label>
           <div class="input-group">
@@ -44,7 +43,7 @@
             </ejs-dropdownlist>
           </div>
         </div>
-        <div class="button-container">
+        <div class="button-container" #spiner>
           <button
             [disabled]="!loginForm.controls['user'].value"
             class="e-control e-btn e-lib e-primary"
@@ -54,6 +53,11 @@
           <button class="e-control e-btn e-lib e-primary e-outline" type="button" (click)="loginWithSSO()">Login with SSO</button>
         </div>
       </form>
+      <div class="sso-wrapper" >
+        <div class="button-container">
+          <button class="e-control e-btn e-lib e-primary e-outline" type="button" (click)="loginWithSSO()">Login with SSO</button>
+        </div>
+      </div> -->
     </div>
     <div class="right-column"></div>
   </div>

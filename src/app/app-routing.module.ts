@@ -1,7 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { MsalGuard } from '@azure/msal-angular';
+import { BrowserUtils } from '@azure/msal-browser';
 
-import { LoginGuard, ShellGuard } from '@shared/guards';
+import { LoginGuard, UserGuard } from '@shared/guards';
+import { AppComponent } from './app.component';
+import { LoginPageComponent } from './b2c-auth/login-page/login-page.component';
 
 const routes: Routes = [
   {
@@ -9,9 +13,7 @@ const routes: Routes = [
     children: [
       {
         path: 'login',
-        loadChildren: () =>
-          import('./login/login.module').then((m) => m.LoginModule),
-        // canLoad: [ LoginGuard ],
+        component: LoginPageComponent,
         canActivate: [ LoginGuard ],
       },
       {
@@ -19,14 +21,33 @@ const routes: Routes = [
         loadChildren: () =>
           import('./shell/shell.module').then((m) => m.ShellModule),
         // canLoad: [ LoginGuard ],
-        canActivate: [ ShellGuard ]
+        canActivate: [ MsalGuard, UserGuard ]
       },
     ],
+  },
+  {
+    // Needed for hash routing
+    path: 'error',
+    component: LoginPageComponent
+  },
+  {
+    // Needed for hash routing
+    path: 'state',
+    component: LoginPageComponent
+  },
+  {
+    // Needed for hash routing
+    path: 'code',
+    component: LoginPageComponent
   },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, {
+    useHash: true,
+    // Don't perform initial navigation in iframes or popups
+    initialNavigation: !BrowserUtils.isInIframe() && !BrowserUtils.isInPopup() ? 'enabled' : 'disabled'
+  })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}
