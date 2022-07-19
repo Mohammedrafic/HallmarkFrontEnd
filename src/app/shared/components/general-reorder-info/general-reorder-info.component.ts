@@ -4,27 +4,30 @@ import { OrderType } from '@shared/enums/order-type';
 import { Store } from '@ngxs/store';
 import { GetSelectedOrderById } from '@client/store/order-managment-content.actions';
 import { AppState } from '../../../store/app.state';
+import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
+import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 
 @Component({
   selector: 'app-general-reorder-info',
   templateUrl: './general-reorder-info.component.html',
   styleUrls: ['../general-order-info/general-order-info.component.scss'],
 })
-export class GeneralReorderInfoComponent implements OnChanges {
+export class GeneralReorderInfoComponent extends DestroyableDirective implements OnChanges {
   @Input() orderInformation: Order;
 
   public orderType = OrderType;
   public agencies: { name: string; tooltip: string };
   public orderPerDiemId: number;
 
-  constructor(private store: Store) {}
+  constructor(private store: Store, private orderManagementService: OrderManagementService) {
+    super();
+  }
 
   public ngOnChanges(changes: SimpleChanges): void {
     const { orderInformation } = changes;
 
     if (orderInformation) {
       this.agencies = this.getAgencyNames();
-      this.orderPerDiemId = this.getOrderPerDiemId(orderInformation.currentValue);
     }
   }
 
@@ -51,12 +54,8 @@ export class GeneralReorderInfoComponent implements OnChanges {
     if (isAgencyArea) {
       // this.store.dispatch(new GetOrderById(this.orderInformation.id, this.orderInformation.organizationId!, {} as any));
     } else {
+      // this.orderManagementService.selectTab$.next(OrganizationOrderManagementTabs.PerDiem);
       this.store.dispatch(new GetSelectedOrderById(this.orderInformation?.reOrderFromId!));
     }
-  }
-
-  private getOrderPerDiemId({ id, reOrderFromId }: Order): number {
-    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
-    return isAgencyArea ? id! : reOrderFromId!;
   }
 }
