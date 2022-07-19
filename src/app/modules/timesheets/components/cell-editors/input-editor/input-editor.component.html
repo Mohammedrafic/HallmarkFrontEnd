@@ -1,0 +1,21 @@
+
+<ng-container [ngSwitch]="editable">
+
+  <ng-template [ngSwitchCase]="false">
+    <div class="init-value-wrapper">
+      <span>{{ type === 'currency' ? (value | currency)  : value }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template [ngSwitchCase]="true">
+    <div *ngIf="group" [formGroup]="group">
+      <input
+      class="amount-input"
+      [formControl]="formControl"
+      [formControlName]="controlName"
+      type="text"
+      [value]="value"/>
+    </div>
+  </ng-template>
+
+</ng-container>

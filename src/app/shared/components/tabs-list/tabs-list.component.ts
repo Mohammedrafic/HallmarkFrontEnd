@@ -1,11 +1,13 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { SelectingEventArgs } from "@syncfusion/ej2-angular-navigations";
-import { TabsListConfig } from "@shared/components/tabs-list/tabs-list-config.model";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+
+import { SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 
 @Component({
   selector: 'app-tabs-list',
   templateUrl: './tabs-list.component.html',
-  styleUrls: ['./tabs-list.component.scss']
+  styleUrls: ['./tabs-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TabsListComponent {
   @Input()

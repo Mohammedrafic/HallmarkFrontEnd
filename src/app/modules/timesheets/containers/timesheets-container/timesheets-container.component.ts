@@ -1,31 +1,28 @@
-import { ORG_ID_STORAGE_KEY, AGENCY_ID_STORAGE_KEY } from './../../../../shared/constants/local-storage-keys';
-import { BusinessUnitType } from './../../../../shared/enums/business-unit-type';
-import { map, switchMap } from 'rxjs/operators';
-import { ChangeDetectionStrategy, Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { FormGroup } from '@angular/forms';
-import { Select, Store } from '@ngxs/store';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  ChangeDetectorRef,
+} from '@angular/core';
+import { Router } from '@angular/router';
+import { FormControl } from '@angular/forms';
 
-import { Observable, takeUntil, tap, throttleTime } from 'rxjs';
+import { Select, Store } from '@ngxs/store';
+import { filter } from 'rxjs/operators';
+import { distinctUntilChanged, Observable, switchMap, takeUntil } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
-import { BaseObservable, Destroyable } from '@core/helpers';
-import { FilteredItem } from '@shared/models/filter.model';
-import { FilterService } from '@shared/services/filter.service';
-
+import { Destroyable } from '@core/helpers';
+import { User } from '@shared/models/user.model';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
-import { ITabConfigInterface } from '../../interface';
-import { exportOptions, TAB_ADMIN_TIMESHEETS } from '../../constants';
+import { UserState } from 'src/app/store/user.state';
+import { DataSourceItem, TabConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
+import { TimesheetExportOptions, TAB_ADMIN_TIMESHEETS, UNIT_ORGANIZATIONS_FIELDS } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
-import { DialogAction, ExportType, TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../../enums';
-import { IFilterColumns, ITimesheetsFilter } from '../../interface';
+import { DialogAction, ExportType } from '../../enums';
 import { TimesheetsService } from '../../services/timesheets.service';
-import { filterOptionFields } from '../../constants';
 import { Timesheets } from '../../store/actions/timesheets.actions';
-import { DemoService } from '../../services/demo.service';
-import { UserState } from 'src/app/store/user.state';
-import { User } from '@shared/models/user.model';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-timesheets-container.ts',
@@ -35,60 +32,68 @@ import { Router } from '@angular/router';
 })
 export class TimesheetsContainerComponent extends Destroyable implements OnInit {
   @Select(TimesheetsState.timesheets)
-  timesheets$: Observable<TimeSheetsPage>;
+  readonly timesheets$: Observable<TimeSheetsPage>;
+
+  @Select(TimesheetsState.timesheetsFilters)
+  readonly timesheetsFilters$!: Observable<TimesheetsFilterState>;
+
+  @Select(TimesheetsState.organizations)
+  readonly organizations$!: Observable<DataSourceItem[]>;
 
   @Select(UserState.user)
-  user$: Observable<User>;
+  readonly user$: Observable<User>;
 
-  public tabConfig: ITabConfigInterface[] = TAB_ADMIN_TIMESHEETS;
-  public formGroup: FormGroup;
-  public exportOptions: ItemModel[] = exportOptions;
-  public filterOptionFields = filterOptionFields;
-  public filterColumns: IFilterColumns;
-  public filteredItems: FilteredItem[] = [];
-  public filters: ITimesheetsFilter;
-  public currentSelectedTableRowIndex: Observable<number>
+  public readonly tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
+  public activeTabIdx = 0;
+  public readonly exportOptions: ItemModel[] = TimesheetExportOptions;
+  public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
+  public filters: TimesheetsFilterState | undefined;
+  public readonly dateControl: FormControl = new FormControl(null);
+  public readonly organizationControl: FormControl = new FormControl(null);
+  public readonly currentSelectedTableRowIndex: Observable<number>
     = this.timesheetsService.getStream();
-  public pageSize = 30;
-  public currentTab = 0;
 
-  private pageNumberSubj: BaseObservable<number> = new BaseObservable<number>(1);
-  isAgency: boolean;
+  public isAgency: boolean;
 
   constructor(
     private store: Store,
-    private filterService: FilterService,
     private timesheetsService: TimesheetsService,
-    private demoService: DemoService,
     private cd: ChangeDetectorRef,
     private router: Router,
   ) {
     super();
     store.dispatch(new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }));
+
     this.isAgency = this.router.url.includes('agency');
+    this.store.dispatch(new Timesheets.UpdateFiltersState({ isAgency: this.isAgency }));
   }
 
   ngOnInit(): void {
-    this.initFilterColumn();
-    this.initFilterColumnDataSources();
-    this.initFormGroup();
-    this.startPageStateWatching();
-    this.calcTabsChips();
+    if (this.isAgency) {
+      this.initOrganizationsList();
+    }
 
+    this.initTabsCount();
+    this.startFiltersWatching();
+    this.startOrganizationWatching();
+    this.calcTabsChips();
   }
 
   public handleChangeTab(tabIndex: number): void {
-    this.currentTab = tabIndex;
-    this.pageSize = 30;
-    this.pageNumberSubj.set(1);
+    this.activeTabIdx = tabIndex;
+    this.store.dispatch(new Timesheets.UpdateFiltersState({
+      statusIds: this.tabConfig[tabIndex].value ?
+        [`${this.tabConfig[tabIndex].value}`] :
+        [],
+    }));
   }
 
   public handleChangePage(page: number): void {
-    this.pageNumberSubj.set(page);
+    this.store.dispatch(new Timesheets.UpdateFiltersState({ pageNumber: page }));
   }
 
   public handleChangePerPage(pageSize: number): void {
-    this.pageSize = pageSize;
+    this.store.dispatch(new Timesheets.UpdateFiltersState({ pageSize: pageSize }));
   }
 
   public exportSelected(event: any): void {
@@ -102,30 +107,18 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.store.dispatch(new ShowFilterDialog(true));
   }
 
-  public onFilterDelete(event: FilteredItem): void {
-    this.filterService.removeValue(event, this.formGroup, this.filterColumns);
+  public resetFilters(): void {
+    this.store.dispatch(new Timesheets.UpdateFiltersState());
   }
 
-  public onFilterClearAll(): void {
-    this.formGroup.reset();
-    this.filteredItems = [];
-    this.pageNumberSubj.set(1);
-  }
-
-  public onTabChange(status: TIMETHEETS_STATUSES): void {
-
-  }
-
-  public onFilterApply(): void {
-    this.filters = this.formGroup.getRawValue();
-    this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
-    this.initTimesheets();
+  public updateTableByFilters(filters: any): void {
+    this.store.dispatch(new Timesheets.UpdateFiltersState({ ...filters }));
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  public rowSelected(rowIndex: number): void {
-    this.timesheetsService.setCurrentSelectedIndexValue(rowIndex);
-    this.store.dispatch(new Timesheets.ToggleProfileDialog(DialogAction.Open, 12));
+  public rowSelected(selectedRow: TimesheetsSelectedRowEvent): void {
+    this.timesheetsService.setCurrentSelectedIndexValue(selectedRow.rowIndex);
+    this.store.dispatch(new Timesheets.ToggleCandidateDialog(DialogAction.Open, selectedRow.data));
     this.cd.markForCheck();
   }
 
@@ -134,48 +127,55 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.cd.markForCheck();
   }
 
-  private startPageStateWatching(): void {
-    this.pageNumberSubj.getStream()
-      .pipe(throttleTime(100), takeUntil(this.componentDestroy())).subscribe(() => {
-      this.initTimesheets();
+  public sortHandler(event: string): void {
+    this.store.dispatch(new Timesheets.UpdateFiltersState({ orderBy: event }));
+  }
+
+  private startFiltersWatching(): void {
+    this.timesheetsFilters$.pipe(
+      filter(Boolean),
+      switchMap(() => this.store.dispatch(new Timesheets.GetAll())),
+      takeUntil(this.componentDestroy()),
+    ).subscribe();
+  }
+
+  private startOrganizationWatching(): void {
+    this.organizationControl.valueChanges.pipe(
+      filter(Boolean),
+      distinctUntilChanged(),
+      switchMap((organizationId: number) => this.store.dispatch(
+        new Timesheets.UpdateFiltersState({ organizationId })
+      )),
+      takeUntil(this.componentDestroy()),
+    ).subscribe();
+  }
+
+  private initTabsCount(): void {
+    this.store.dispatch(new Timesheets.GetTabsCounts());
+  }
+
+  private initOrganizationsList(): void {
+    this.store.dispatch(new Timesheets.GetOrganizations()).pipe(
+      filter((res) => res.length),
+      switchMap(() => this.organizations$),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(res => {
+      this.organizationControl.setValue(res[0].id, { emitEvent: false });
+      this.store.dispatch(new Timesheets.UpdateFiltersState({ organizationId: res[0].id }));
     });
   }
 
-  private initTimesheets(): void {
-    this.store.dispatch(new Timesheets.GetAll(Object.assign({}, this.filters, {
-      pageNumber: this.pageNumberSubj.get(),
-      pageSize: this.pageSize,
-    }), this.isAgency)).pipe(takeUntil(this.componentDestroy()));
-  }
-
-  private initFormGroup(): void {
-    this.formGroup = this.timesheetsService.createForm();
-  }
-
-  private initFilterColumn(): void {
-    this.filterColumns = this.timesheetsService.createFilterColumns();
-  }
-
-  private initFilterColumnDataSources(): void {
-    this.filterColumns.statusText.dataSource = this.timesheetsService.setDataSources(TimesheetsTableColumns.StatusText);
-    this.filterColumns.skillName.dataSource = this.timesheetsService.setDataSources(TimesheetsTableColumns.SkillName);
-    this.filterColumns.departmentName.dataSource = this.timesheetsService.setDataSources(TimesheetsTableColumns.DepartmentName);
-    this.filterColumns.agencyName.dataSource = this.timesheetsService.setDataSources(TimesheetsTableColumns.AgencyName);
-  }
-
   private calcTabsChips(): void {
-    this.timesheets$.pipe(
+    this.store.select(TimesheetsState.tabCounts)
+    .pipe(
+      filter(Boolean),
       takeUntil(this.componentDestroy()),
     )
     .subscribe((data) => {
-      const pending = data.items.filter((item) => item.status === TIMETHEETS_STATUSES.PENDING_APPROVE).length;
-      const missing = data.items.filter((item) => item.status === TIMETHEETS_STATUSES.MISSING).length;
-      const rejected = data.items.filter((item) => item.status === TIMETHEETS_STATUSES.REJECTED).length;
-
-      this.tabConfig[1].amount = pending;
-      this.tabConfig[2].amount = missing;
-      this.tabConfig[3].amount = rejected;
+      this.tabConfig[1].amount = data.pending;
+      this.tabConfig[2].amount = data.missing;
+      this.tabConfig[3].amount = data.rejected;
       this.cd.markForCheck();
-    })
+    });
   }
 }

@@ -1,150 +1,84 @@
 import { Router } from '@angular/router';
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   EventEmitter,
-  Input, OnChanges, OnInit,
+  Input,
+  OnChanges,
   Output,
-  SimpleChanges,
-  ViewChild
 } from '@angular/core';
 
-import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
-import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
-import { GridComponent } from '@syncfusion/ej2-angular-grids';
+import { RowNode } from '@ag-grid-community/core';
 
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-
+import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
-import { MoreMenuType, TIMETHEETS_STATUSES } from '../../enums';
-import { ITimesheet, ITimesheetsColumnWidth } from '../../interface';
-import {
-  moreMenuWithClose,
-  moreMenuWithDelete,
-  ROW_HEIGHT,
-  tableSelectionModel, TIMESHEETS_GRID_CONFIG,
-  timesheetsTableColumnWidth
-} from '../../constants/timesheets-table.constant';
-import { Actions } from '@ngxs/store';
+import { TimesheetsSelectedRowEvent } from '../../interface';
+import { TimesheetsColumnsDefinition } from '../../constants';
+import { BehaviorSubject } from 'rxjs';
+import { GridReadyEventModel } from '@shared/components/grid/models/grid-ready-event.model';
+import { TimesheetsTableColumns } from '../../enums';
 
 @Component({
   selector: 'app-timesheets-table',
   templateUrl: './timesheets-table.component.html',
   styleUrls: ['./timesheets-table.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimesheetsTableComponent extends AbstractGridConfigurationComponent implements OnChanges {
-  @ViewChild('grid') grid: GridComponent;
-
+export class TimesheetsTableComponent implements OnChanges {
   @Input() tableData: TimeSheetsPage;
 
-  @Input() tabIndex: number;
+  @Input() newSelectedIndex: null | number;
+  @Input() activeTabIdx: number;
 
-  @Input() set changeTableItem(next: number | null) {
-    if (next !== null) {
-      this.grid.selectRow(next);
-    }
-  };
+  @Output() readonly changePage: EventEmitter<number> = new EventEmitter<number>();
 
-  @Output() changePage: EventEmitter<number> = new EventEmitter<number>();
+  @Output() readonly changePerPage: EventEmitter<number> = new EventEmitter<number>();
 
-  @Output() changePerPage: EventEmitter<number> = new EventEmitter<number>();
+  @Output() readonly sortHandler: EventEmitter<string> = new EventEmitter<string>();
 
-  @Output() sortHandler: EventEmitter<string> = new EventEmitter<string>();
+  @Output() readonly timesheetRowSelected: EventEmitter<TimesheetsSelectedRowEvent>
+  = new EventEmitter<TimesheetsSelectedRowEvent>();
 
-  @Output() timesheetRowSelected: EventEmitter<number> =  new EventEmitter<number>();
+  public readonly columnDefinitions: ColumnDefinitionModel[] =
+    TimesheetsColumnsDefinition(this.router.url.includes('agency'));
+  public currentPage = 1;
+  public pageSize = 30;
+  public isLoading = false;
+  public rowSelection: 'single' | 'multiple' = 'multiple';
 
-  /**
-   * TODO: combine all table settings in one settings constant.
-   */
-
-  public allowWrap = TIMESHEETS_GRID_CONFIG.isWordWrappingEnabled;
-
-  public wrapSettings: TextWrapSettingsModel = TIMESHEETS_GRID_CONFIG.wordWrapSettings;
-
-  public selectionOptions: SelectionSettingsModel = tableSelectionModel;
-
-  public isLockMenuButtonsShown = false;
-
-  public moreMenuWithDeleteButton: ItemModel[] = moreMenuWithDelete;
-
-  public moreMenuWithCloseButton: ItemModel[] = moreMenuWithClose;
-
-  public timesheetsTableColumnWidth: ITimesheetsColumnWidth = timesheetsTableColumnWidth;
-
-  public TIMESHEETS_STATUSES = TIMETHEETS_STATUSES;
-  isAgency: boolean;
-
-  filtredItems: ITimesheet[] = []
+  private readonly gridInstance$: BehaviorSubject<GridReadyEventModel | null> =
+    new BehaviorSubject<GridReadyEventModel | null>(null);
 
   constructor(
     private router: Router,
-    private cd: ChangeDetectorRef,
-  ) {
-    super();
-    this.isAgency = this.router.url.includes('agency');
-  }
+  ) {}
 
   ngOnChanges(): void {
-    if (this.tableData) {
-      this.filtredItems = this.tableData.items.filter((item) => {
-        if (this.tabIndex === 1) {
-          return item.status === TIMETHEETS_STATUSES.PENDING_APPROVE;
-        }
-        if (this.tabIndex === 2) {
-          return item.status === TIMETHEETS_STATUSES.MISSING;
-        }
-        if (this.tabIndex === 3) {
-          return item.status === TIMETHEETS_STATUSES.REJECTED;
-        }
-        return item;
-      });
-    }
+    this.gridInstance$.getValue()?.columnApi
+      .setColumnVisible(TimesheetsTableColumns.Approve, this.activeTabIdx === 1);
   }
 
-  public onRowClick(event: any): void {
-    if (!event.isInteracted) {
-      localStorage.setItem('profile', JSON.stringify(event.data))
-      this.timesheetRowSelected.emit(event.rowIndex);
-    }
+  public onRowsDropDownChanged(pageSize: number): void {
+    this.pageSize = pageSize;
+    this.changePerPage.emit(pageSize);
   }
 
-  public onRowScaleUpClick(): void {
-    this.rowHeight = ROW_HEIGHT.SCALE_UP_HEIGHT;
+  public onGoToClick(pageNumber: number): void {
+    this.currentPage = pageNumber;
+    this.changePage.emit(pageNumber);
   }
 
-  public onRowScaleDownClick(): void {
-    this.rowHeight = ROW_HEIGHT.SCALE_DOWN_HEIGHT;
+  public selectedRow(event: TimesheetsSelectedRowEvent): void {
+    this.timesheetRowSelected.emit(event);
   }
 
-  public menuOptionSelected(event: any, data: ITimesheet): void {
-    switch (event.item.properties.text) {
-      case MoreMenuType.Edit: {
-        break;
-      }
-      case MoreMenuType.Duplicate: {
-        break;
-      }
-      case MoreMenuType.Close: {
-        break;
-      }
-      case MoreMenuType.Delete: {
-        break;
-      }
-    }
+  public bulkApprove(event: RowNode[]): void {
   }
 
-  public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
-    this.changePerPage.emit(this.pageSize);
-    this.grid.pageSettings.pageSize = this.pageSize;
+  public bulkExport(event: RowNode[]): void {
   }
 
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.currentPage = event.currentPage || event.value;
-      this.changePage.emit(this.currentPage);
-    }
+  public gridReady(event: GridReadyEventModel): void {
+    this.gridInstance$.next(event);
   }
 }

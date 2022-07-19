@@ -45,7 +45,30 @@
   width: 100%;
   padding-top: 20px;
 
+  &.long {
+    grid-column-start: 1;
+    grid-column-end: 3;
+  }
+
   label {
     margin-bottom: 12px;
+  }
+}
+
+.bootstrap {
+  &.grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+::ng-deep {
+  body.light, body.dark {
+    .e-dialog.dialog {
+      &.short {
+        height: 580px!important;
+      }
+    }
   }
 }

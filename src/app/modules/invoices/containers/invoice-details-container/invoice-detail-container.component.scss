@@ -234,7 +234,6 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
 }
 
 .profile-table-block {
-  //height: 565px;
   overflow: auto;
 }
 
@@ -247,16 +246,6 @@ ejs-chiplist.e-control.e-chip-list .e-chip {
     section.container {
       overflow: auto;
       flex-grow: 1;
-    }
-
-    app-navigation-panel {
-      display: flex;
-      width: 100%;
-
-      .navigation-panel-container {
-        padding-top: 28px;
-        padding-bottom: 28px;
-      }
     }
   }
 }

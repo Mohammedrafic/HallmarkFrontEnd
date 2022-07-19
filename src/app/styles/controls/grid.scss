@@ -476,3 +476,54 @@ ejs-grid.e-control.e-grid {
     }
   }
 }
+
+.timesheet-table-container {
+  ag-grid-angular {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+
+    .ag-header {
+      background-color: var(--grid-background-color);
+    }
+
+    .ag-root-wrapper {
+      border-top: none;
+    }
+
+    .ag-root-wrapper,
+    .ag-row,
+    .ag-header {
+      border-color: var(--grid-border-color);
+    }
+
+    .ag-cell {
+      padding-top: 10px;
+      padding-bottom: 10px;
+
+      &.ag-cell-inline-editing {
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        margin-top: 12px;
+      }
+    }
+
+    .ag-row {
+      background-color: inherit;
+    }
+
+    .ag-row-hover {
+      background-color: var(--grid-row-background-color-hover);
+    }
+
+    .ag-header-cell-text {
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+  }
+
+}

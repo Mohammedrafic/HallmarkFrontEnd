@@ -1,5 +1,36 @@
 <div class="invoices-container">
-  <h3>Invoice</h3>
+  <h3>Invoices</h3>
 
-  <a href="#" [routerLink]="null" *ngFor="let invoice of invoices; trackBy: trackByName">{{invoice.name}}</a>
+  <a *ngFor="let invoice of invoices; trackBy: trackByName"
+     [href]="invoice.url"
+     target="_blank"
+     class="invoice"
+  >
+    {{invoice.fileName}}
+  </a>
 </div>
+
+<ejs-dialog
+        cssClass="dialog"
+        [width]="'1180px'"
+        [visible]="previewInvoice !== null"
+        [isModal]="true"
+        [showCloseIcon]="true"
+        [animationSettings]="{ effect: 'SlideRight' }"
+        (beforeClose)="previewInvoice = null"
+>
+  <ng-template #header>
+  </ng-template>
+  <ng-template #content>
+    <section class="container">
+      <ejs-pdfviewer
+              *ngIf="previewInvoice"
+              id="pdfViewer"
+              #pdfViewer
+              [serviceUrl]="serviceUrl"
+              [enableTextSelection]="true"
+      ></ejs-pdfviewer>
+    </section>
+  </ng-template>
+  <ng-template #footerTemplate></ng-template>
+</ejs-dialog>

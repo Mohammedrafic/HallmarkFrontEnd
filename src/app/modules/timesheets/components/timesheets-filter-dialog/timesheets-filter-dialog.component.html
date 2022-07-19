@@ -1,0 +1,115 @@
+<app-filter-dialog
+  [items]="filteredItems"
+  [count]="(timesheets$ | async)?.totalCount"
+  (deleteFilter)="deleteFilter($event)"
+  (clearAllFiltersClicked)="clearAllFilters()"
+  (applyFilterClicked)="applyFilters()">
+  <form class="bootstrap" [formGroup]="formGroup">
+    <div class="input-container">
+      <label for="orderId">Order ID</label>
+      <div class="input-group dropdown">
+        <ejs-multiselect
+          id="orderId"
+          mode="CheckBox"
+          [fields]="filterOptionFields"
+          [dataSource]="filterColumns.orderId?.dataSource"
+          [showDropDownIcon]="true"
+          formControlName="orderId"
+          placeholder=""></ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label for="status">Status</label>
+      <div class="input-group dropdown">
+        <ejs-multiselect
+          id="status"
+          mode="CheckBox"
+          [fields]="filterOptionFields"
+          [dataSource]="filterColumns.statusText?.dataSource"
+          [showDropDownIcon]="true"
+          formControlName="statusText"
+          placeholder=""></ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label for="department">Department</label>
+      <div class="input-group dropdown">
+        <ejs-multiselect
+          id="department"
+          mode="CheckBox"
+          [fields]="filterOptionFields"
+          [dataSource]="filterColumns.department?.dataSource"
+          [showDropDownIcon]="true"
+          formControlName="departmentName"
+          placeholder=""></ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label for="agencyName">Select Agency</label>
+      <div class="input-group dropdown">
+        <ejs-multiselect
+          id="agencyName"
+          mode="CheckBox"
+          [fields]="filterOptionFields"
+          [dataSource]="filterColumns.agencyName?.dataSource"
+          [showDropDownIcon]="true"
+          formControlName="agencyName"
+          placeholder=""></ejs-multiselect>
+      </div>
+    </div>
+    <div class="input-container">
+      <label for="orgName">Org Name</label>
+      <div class="input-group dropdown">
+        <ejs-multiselect
+          id="orgName"
+          mode="CheckBox"
+          [fields]="filterOptionFields"
+          [dataSource]="filterColumns.orgName?.dataSource"
+          [showDropDownIcon]="true"
+          formControlName="orgName"
+          placeholder=""></ejs-multiselect>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-container">
+        <label for="region">Region</label>
+        <div class="input-group dropdown">
+          <ejs-multiselect
+            id="region"
+            mode="CheckBox"
+            [fields]="filterOptionFields"
+            [dataSource]="filterColumns.region?.dataSource"
+            [showDropDownIcon]="true"
+            formControlName="region"
+            placeholder=""></ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label for="location">Location</label>
+        <div class="input-group dropdown">
+          <ejs-multiselect
+            id="location"
+            mode="CheckBox"
+            [fields]="filterOptionFields"
+            [dataSource]="filterColumns.location?.dataSource"
+            [showDropDownIcon]="true"
+            formControlName="location"
+            placeholder=""></ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="input-container">
+      <label for="skill">Skill</label>
+      <div class="input-group dropdown">
+        <ejs-multiselect
+          id="skill"
+          mode="CheckBox"
+          [fields]="filterOptionFields"
+          [dataSource]="filterColumns.skill?.dataSource"
+          [showDropDownIcon]="true"
+          formControlName="skillName"
+          placeholder=""></ejs-multiselect>
+      </div>
+    </div>
+  </form>
+</app-filter-dialog>

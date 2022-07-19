@@ -1,11 +1,5 @@
 @import '../../../../styles/variables/colors';
 
-.work-time-title {
-  font-weight: 400;
-  font-size: 8px;
-  color: #999999;
-}
-
 .work-time-value {
   font-weight: 700;
   font-size: 15px;
@@ -16,13 +10,9 @@
   display: flex;
 
   section {
-    padding: 10px 16px 0 14px;
+    padding: 13px 16px 0 14px;
     display: flex;
     flex-direction: column;
-
-    &:not(:last-of-type) {
-      border-right: 1px solid $secondary-dark-blue-40;
-    }
 
     h3 {
       margin-bottom: 15px;
@@ -38,8 +28,15 @@
     }
 
     &.charts-legend {
+      padding-left: 0;
+
       h3 {
         visibility: hidden;
+      }
+
+      .column {
+        display: flex;
+        flex-direction: column;
       }
 
       .marker {
@@ -50,10 +47,12 @@
 
       tr {
         th {
+          padding-bottom: 6px;
+
           &.week-title, &.total-title {
             font-weight: 400;
-            font-size: 10px;
-            color: $secondary-dark-blue-20;
+            font-size: 12px;
+            color: $secondary-dark-blue-30;
           }
 
           &.week-title {
@@ -63,6 +62,7 @@
 
           &.total-title {
             padding-right: 12px;
+            text-align: left;
           }
         }
 
@@ -77,20 +77,23 @@
             padding-right: 25px;
           }
 
-          &.value1, &.value2 {
+          &.week-hours-value, &.cumulative-hours-value {
             font-weight: 700;
             font-size: 12px;
             color: $title-black;
+          }
+
+          &.week-hours-value {
+            padding-right: 12px;
             text-align: right;
           }
 
-          &.value1 {
-            padding-right: 12px;
+          &.cumulative-hours-value {
+            text-align: left;
           }
 
-          &.value2 {
-            padding-left: 15px;
-            padding-right: 12px;
+          &.checkbox-cell {
+            padding-left: 10px;
           }
         }
       }
@@ -103,12 +106,5 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
-  .work-time-value {
-    margin-bottom: 4px;
-  }
-
-  .work-time-title {
-    text-align: center;
-  }
+  min-width: 110px;
 }

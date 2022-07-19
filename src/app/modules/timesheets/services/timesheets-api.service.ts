@@ -1,91 +1,146 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, Observable, of } from 'rxjs';
 
-import { ITimesheet, ITimesheetsFilter } from '../interface';
+import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
+import {
+  TimesheetsFilterState,
+  TimesheetRecord,
+  CandidateInfo,
+  TimesheetAttachments,
+  TabCountConfig,
+  TimesheetRecordsDto,
+  DropdownOption,
+  CandidateHoursAndMilesData,
+  RecordValue,
+  CostCentersDto,
+} from '../interface';
+import { BillRate } from '@shared/models/bill-rate.model';
+import {
+  DataSourceItem,
+  FilterDataSource,
+} from '../interface';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
-import { MOK_TIMESHEETS } from '../constants';
-// import { mockProfileTableData } from '../components/profile-timesheet-table/mock-table-data';
-import { ProfileTimeSheetDetail } from '../store/model/timesheets.model';
-import { DemoService } from './demo.service';
+import {
+  filterColumnDataSource,
+  MokTabsCounts,
+  MockCandidateHoursAndMilesData,
+  BillRatesOptions,
+  CandidateMockInfo,
+} from '../constants';
+import { TimesheetsTableColumns } from '../enums';
+import { CostCenterAdapter } from '../helpers';
 
 @Injectable()
 export class TimesheetsApiService {
-  private MOK_TIME_SHEETS: ITimesheet[] = MOK_TIMESHEETS;
-  // private MOK_PROFILES: ProfileTimeSheetDetail[] = mockProfileTableData;
 
   constructor(
-    private demoService: DemoService,
+    private http: HttpClient,
+    private capitalizeFirst: CapitalizeFirstPipe,
   ) {}
 
-  public getTimesheets(filters: ITimesheetsFilter): Observable<TimeSheetsPage> {
-    return this.demoService.getAgencyOrders(1, 30)
-    .pipe(
-      map((res) => {
-        return {
-          ...res,
-          items: this.demoService.createTimeSheets(res.items),
-        }
-      }),
-      map((res) => {
-        return {
-          ...res,
-          totalCount: res.items.length,
-          hasNextPage: false,
-          hasPreviousPage: false,
-          pageNumber: 1,
-        }
-      }),
-      map(res => ({
-        ...res,
-        items: this.filterArray(res.items, Object.assign({}, filters, { pageNumber: res.totalCount <= filters.pageSize ? 1 : res.pageNumber })),
-        pageNumber: res.totalCount <= filters.pageSize ? 1 : res.pageNumber
-      })
-    ))
-  }
-
-  private filterArray(arr: any[], filters: ITimesheetsFilter): any[] {
-    return arr.filter((el, idx) => {
-      return filters.pageNumber === 1 ?
-        idx < filters.pageSize * filters.pageNumber :
-        idx >= filters.pageSize && idx < filters.pageSize * filters.pageNumber;
+  public getTimesheets(filters: TimesheetsFilterState): Observable<TimeSheetsPage> {
+    return this.http.post<TimeSheetsPage>('/api/Timesheets', {
+      ...filters,
     });
   }
 
-  public getProfileTimesheets(): Observable<ProfileTimeSheetDetail[]> {
-    return of([]);
+  public getTabsCounts(): Observable<TabCountConfig> {
+    return of(MokTabsCounts);
   }
 
-  public postProfileTimesheets(body: ProfileTimeSheetDetail): Observable<null> {
-    // this.MOK_PROFILES = [...this.MOK_PROFILES, Object.assign({}, body, { total: body.hours * body.rate })];
+  public getTimesheetRecords(id: number): Observable<TimesheetRecordsDto> {
+    return this.http.get<TimesheetRecordsDto>(`/api/Timesheets/${id}/records`)
+    .pipe(
+      map((data) => {
+        data.timesheets.forEach((item: RecordValue) => {
+          item.day = item['timeIn'] as string
+          item.costCenter = 69;
+        });
+        data.miles.forEach((item: RecordValue) => {
+          item.day = item['timeIn'] as string;
+          item.costCenter = 69;
+        });
+        return data;
+      })
+    );
+  }
 
+  public AddTimesheetRecord(timesheetId: number, body: TimesheetRecord): Observable<null> {
     return of(null);
   }
 
-  public patchProfileTimesheets(profileId: number, profileTimesheetId: number, body: ProfileTimeSheetDetail): Observable<null> {
-    const tableLocalData = JSON.parse(`${localStorage.getItem('timesheet-details-tables')}`);
-
-    const newTableData = Object.assign({}, tableLocalData, {
-      [profileId]: tableLocalData[profileId].map((el: any) => ({
-        ...el,
-        ...(el.id === profileTimesheetId && body)
-      }))
-    });
-
-    localStorage.setItem('timesheet-details-tables', JSON.stringify(newTableData));
-
+  public patchTimesheetRecords(
+    id: number,
+    records: Record<string, string | number>[],
+  ): Observable<null> {
     return of(null);
   }
 
   public deleteProfileTimesheets(profileId: number, profileTimesheetId: number): Observable<null> {
-    const tableLocalData = JSON.parse(`${localStorage.getItem('timesheet-details-tables')}`);
-    const newTableData = Object.assign({}, tableLocalData, {
-      [profileId]: tableLocalData[profileId].filter((el: any) => el.id !== profileTimesheetId)
-    });
-
-    localStorage.setItem('timesheet-details-tables', JSON.stringify(newTableData));
-
     return of(null);
+  }
+
+  public deleteTimesheet(id: number): Observable<boolean> {
+    return of(true);
+  }
+
+  public setDataSources(filterKeys: TimesheetsTableColumns[]): Observable<FilterDataSource> {
+    const res = filterKeys.reduce((acc: any, key) => {
+      acc[key] = filterColumnDataSource[key].map((el: DataSourceItem) =>
+        ({...el, name: this.capitalizeFirst.transform(el.name)})
+      );
+
+      return acc;
+    }, {});
+
+    return of(res);
+  }
+
+  public getCandidateInfo(id: number): Observable<CandidateInfo> {
+    return of(CandidateMockInfo);
+  }
+
+  public getCandidateHoursAndMilesData(id: number): Observable<CandidateHoursAndMilesData> {
+    return of(MockCandidateHoursAndMilesData);
+  }
+
+  public getCandidateAttachments(id: number): Observable<TimesheetAttachments> {
+    return of();
+  }
+
+  public getCandidateCostCenters(jobId: number): Observable<DropdownOption[]>{
+    return this.http.get<CostCentersDto>(`/api/Jobs/${jobId}/costcenters`)
+    .pipe(
+      map((res) => CostCenterAdapter(res)),
+    );
+  }
+
+  public getOrganizations(): Observable<DataSourceItem[]> {
+    return this.http.get<DataSourceItem[]>(`/api/Agency/partneredorganizations`);
+  }
+
+  public getCandidateBillRates(
+    depId: number,
+    skillId: number,
+    orderType: number,
+    ): Observable<DropdownOption[]> {
+    // return this.http.get<BillRate[]>(`/api/BillRates/predefined/forOrder`, {
+    //   params: {
+    //     DepartmentId: depId,
+    //     SkillId: skillId,
+    //     OrderType: orderType,
+    //   }
+    // })
+    return of(BillRatesOptions)
+    .pipe(
+      map((res) => res.map((item) => {
+        return {
+          text: item.billRateConfig.title,
+          value: item.billRateConfig.id,
+        }
+      })),
+    );
   }
 }
