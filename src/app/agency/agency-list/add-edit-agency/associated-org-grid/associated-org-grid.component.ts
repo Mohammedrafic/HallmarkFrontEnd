@@ -13,17 +13,23 @@ import { AgencyState } from 'src/app/agency/store/agency.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { GRID_CONFIG } from 'src/app/shared/constants/grid-config';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
-import { AssociateOrganizations, AssociateOrganizationsPage } from 'src/app/shared/models/associate-organizations.model';
+import {
+  AssociateOrganizations,
+  AssociateOrganizationsPage,
+} from 'src/app/shared/models/associate-organizations.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { JOB_DISTRIBUTION_COLUMNS } from './associated-org-grid.constant';
-
+import PriceUtils from '@shared/utils/price.utils';
 
 @Component({
   selector: 'app-associated-org-grid',
   templateUrl: './associated-org-grid.component.html',
   styleUrls: ['./associated-org-grid.component.scss'],
 })
-export class AssociatedOrgGridComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AssociatedOrgGridComponent
+  extends AbstractGridConfigurationComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   @ViewChild('grid') grid: GridComponent;
 
   @Select(AgencyState.associateOrganizationsItems)
@@ -33,6 +39,7 @@ export class AssociatedOrgGridComponent extends AbstractGridConfigurationCompone
   public associateOrganizationsPages$: Observable<AssociateOrganizationsPage>;
 
   public openAssosiateOrgDialog = new EventEmitter<boolean>();
+  public priceUtils = PriceUtils;
   public openEditDialog = new EventEmitter<AssociateOrganizations>();
   public jobDistributionColumns = JOB_DISTRIBUTION_COLUMNS;
   public tierValueAccess = (_: string, { tier }: AssociateOrganizations) => {
@@ -56,7 +63,6 @@ export class AssociatedOrgGridComponent extends AbstractGridConfigurationCompone
         takeWhile(() => this.isAlive)
       )
       .subscribe(() => {
-
         this.dispatchNewPage();
       });
   }

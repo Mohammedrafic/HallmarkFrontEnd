@@ -72,9 +72,10 @@
               appValidateWithMessage
               formControlName="fee"
               class="e-input"
-              mask="00.00"
-              [showMaskTyped]="true"
-              [dropSpecialCharacters]="false"
+              type="text"
+              (focus)="priceUtils.setPriceMask(feeFormGroup, 'fee', $event)"
+              (blur)="priceUtils.setTwoDecimals(feeFormGroup, 'fee', $event)"
+              maxlength="5"
             />
           </div>
         </div>

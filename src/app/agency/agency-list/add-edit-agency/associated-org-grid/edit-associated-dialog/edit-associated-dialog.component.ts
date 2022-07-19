@@ -6,10 +6,7 @@ import { Actions, Select, Store } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
-import {
-  AssociateOrganizations,
-  FeeExceptionsPage,
-} from 'src/app/shared/models/associate-organizations.model';
+import { AssociateOrganizations, FeeExceptionsPage } from 'src/app/shared/models/associate-organizations.model';
 import { FeeSettingsComponent } from './fee-settings/fee-settings.component';
 import {
   GetFeeExceptionsInitialData,
@@ -22,6 +19,7 @@ import { AgencyState } from 'src/app/agency/store/agency.state';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import { PartnershipSettingsComponent } from './partnership-settings/partnership-settings.component';
+import PriceUtils from '@shared/utils/price.utils';
 
 enum Tabs {
   FeeSettings,
@@ -100,7 +98,9 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
         this.partnershipForm.markAllAsTouched();
         if (this.partnershipForm.valid) {
           const jobDistributionFormValue = this.partnershipForm.getRawValue();
-          this.store.dispatch(new SavePartnershipSettings({ ...jobDistributionFormValue, associateOrganizationId: this.editOrg.id }));
+          this.store.dispatch(
+            new SavePartnershipSettings({ ...jobDistributionFormValue, associateOrganizationId: this.editOrg.id })
+          );
           this.partnershipForm.markAsUntouched();
         }
         break;
@@ -128,7 +128,7 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
         this.sideDialog.show();
 
         if (org.id && org.organizationId) {
-          this.feeSettingsForm.patchValue({ id: org.id, baseFee: org.baseFee });
+          this.feeSettingsForm.patchValue({ id: org.id, baseFee: PriceUtils.formatNumbers(org.baseFee) });
           this.store.dispatch(new GetFeeExceptionsInitialData(org.organizationId));
           this.store.dispatch(new GetJobDistributionInitialData(org.organizationId));
           this.store.dispatch(new GetPartnershipSettings(org.id));
@@ -139,7 +139,7 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
 
   private onBaseFeeChanged(): void {
     this.baseFee$.pipe(takeWhile(() => this.isAlive)).subscribe((baseFee) => {
-      this.feeSettingsForm.patchValue({ baseFee });
+      this.feeSettingsForm.patchValue({ baseFee: PriceUtils.formatNumbers(baseFee) });
     });
   }
 
@@ -161,6 +161,6 @@ export class EditAssociatedDialogComponent implements OnInit, OnDestroy {
 
   private getDialogWidth(): string {
     const thirdPart = window.innerWidth / 3;
-    return `${thirdPart * 2}px`
+    return `${thirdPart * 2}px`;
   }
 }
