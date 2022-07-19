@@ -18,7 +18,17 @@
 </app-page-toolbar>
 
 <section>
-  <ejs-grid
+  <!-- (gridReady)="onGridReady($event)"
+   (cellClicked)="onCellClicked($event)" -->
+  <ag-grid-angular
+   style="width: 100%; height: 100%"
+   class="ag-theme-alpine"
+   [columnDefs]="columnDefs"
+   [rowData]="data"
+   [rowSelection]="'multiple'"
+   [animateRows]="true"
+ ></ag-grid-angular>
+  <!-- <ejs-grid
     #grid
     class="e-gridwithchildrow"
     (rowDataBound)="setRowHighlight($event)"
@@ -184,10 +194,10 @@
         </div>
       </div>
     </ng-template>
-  </ejs-grid>
+  </ejs-grid> -->
 </section>
 
-<app-filter-dialog [items]="filteredItems" [count]="(ordersPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
+<!-- <app-filter-dialog [items]="filteredItems" [count]="(ordersPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
   <form [formGroup]="OrderFilterFormGroup">
     <div class="bootstrap">
       <div class="input-container">
@@ -411,10 +421,10 @@
       </div>
     </div>
   </form>
-</app-filter-dialog>
+</app-filter-dialog> -->
 
-<app-order-details-dialog
+<!-- <app-order-details-dialog
   [order]="selectedOrder"
   [openEvent]="openDetails"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"></app-order-details-dialog>
-  <app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>
+  <app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog> -->

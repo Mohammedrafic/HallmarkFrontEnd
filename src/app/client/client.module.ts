@@ -70,7 +70,7 @@ import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { OrderDetailsContainerComponent } from './order-management/order-details-container/order-details-container.component';
 import { OrderCandidatesContainerComponent } from './order-management/order-candidates-container/order-candidates-container.component';
-
+import { AgGridModule } from '@ag-grid-community/angular';
 const gridIcons = {
   MessageSquare,
   Lock,
@@ -139,7 +139,7 @@ const gridIcons = {
     DropDownButtonModule,
     DialogModule,
     RadioButtonModule,
-
+    AgGridModule,
     //STORE
     NgxsModule.forFeature([
       OrderManagementContentState,

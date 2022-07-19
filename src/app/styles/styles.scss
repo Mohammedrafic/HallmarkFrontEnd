@@ -290,3 +290,15 @@ a, a:hover, a:focus, a:active {
 #Filled_Positions_Trend_ChartSeriesClipRect_0_Rect {
   transform: translate(0, 3px);
 }
+
+@import '@ag-grid-community/core/dist/styles/ag-grid.css';
+@import '@ag-grid-community/core/dist/styles/ag-theme-alpine.css';
+@import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
+
+html, body {
+   height: 100%;
+   width: 100%;
+   padding: 5px;
+   box-sizing: border-box;
+   -webkit-overflow-scrolling: touch;
+}

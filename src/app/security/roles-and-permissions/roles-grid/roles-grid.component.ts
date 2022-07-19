@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { filter, Observable, takeWhile } from 'rxjs';
+import { filter, Observable, takeWhile, takeUntil } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { GridComponent, RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
@@ -14,6 +14,11 @@ import { Role, RolesPage } from '@shared/models/roles.model';
 import { ShowSideDialog } from 'src/app/store/app.actions';
 import { GetRolesPage, RemoveRole } from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
+
+import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
+import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
+import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
+
 
 enum Active {
   No,
@@ -29,7 +34,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   @Input() filterForm: FormGroup;
   @Output() editRoleEvent = new EventEmitter();
 
-  @ViewChild('rolesGrid') grid: GridComponent;
+  // @ViewChild('rolesGrid') grid: GridComponent;
 
   @Select(SecurityState.roleGirdData)
   public roleGirdData$: Observable<Role[]>;
@@ -48,8 +53,83 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
 
   private isAlive = true;
 
+
+  itemList: Array<Role> | undefined;
+  private gridApi : any;
+  private gridColumnApi: any;
+  modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
+  rowModelType:any;
+  serverSideInfiniteScroll:any;
+  cacheBlockSize: any;
+  pagination: boolean;
+  paginationPageSize: number;
+
+  defaultColDef:any;
+  autoGroupColumnDef:any;
+  columnDefs: any;
+  filterText: string | undefined;
+  frameworkComponents: any;
   constructor(private actions$: Actions, private store: Store, private confirmService: ConfirmService) {
     super();
+    this.frameworkComponents = {
+      buttonRenderer: ButtonRendererComponent,
+    }
+    this.rowModelType = 'serverSide';
+    this.serverSideInfiniteScroll = true,
+    this.pagination = true;
+    this.paginationPageSize= 10,
+    this.cacheBlockSize = 10;
+    this.columnDefs = [
+      { 
+        field: 'id',
+        hide: true 
+      },
+      {
+        field: 'businessUnitName',
+        valueGetter: function(params: { data: { businessUnitName: string }; }) {
+          return params.data.businessUnitName || "All";
+        }
+      },
+      {
+        field: 'name',
+      },
+      {
+        field: 'isActive',
+        valueGetter : (params: { data: { isActive: boolean}}) => { return Active[Number(params.data.isActive)] }
+      },
+      {
+        headerName: '',
+        cellRenderer: 'buttonRenderer',
+        cellRendererParams: {
+          onClick: this.onEdit.bind(this),
+          label: 'Edit'
+        },
+        width: 100
+      },
+      {
+        headerName: '',
+        cellRenderer: 'buttonRenderer',
+        cellRendererParams: {
+          onClick: this.onRemove.bind(this),
+          label: 'Delete'
+        },
+        width: 100
+      }      
+    ];
+
+    this.defaultColDef = {
+      flex: 1,
+      minWidth: 120,
+      resizable: true,
+      sortable: true,
+      filter: false
+    };
+
+    this.autoGroupColumnDef = {
+      flex: 1,
+      minWidth: 280,
+      field: 'name',
+    };
   }
 
   ngOnInit(): void {
@@ -59,8 +139,38 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     this.filterForm.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => this.dispatchNewPage());
   }
 
+  onGridReady(params: any) {
+    this.gridApi = params.api;
+    this.gridColumnApi = params.columnApi;
+    var datasource = this.createServerSideDatasource();
+    console.log(datasource);
+    params.api.setServerSideDatasource(datasource);
+  }
+
+  createServerSideDatasource() {
+    let self = this;
+   
+    return {
+      getRows: function (params: any) {
+        setTimeout(()=> {
+          // let postData = {
+          //   name: "",
+          //   pageNumber: params.request.endRow / self.paginationPageSize,
+          //   pageSize: self.paginationPageSize,
+          //   sortFields: params.request.sortModel
+          // };
+          self.rolesPage$.pipe().subscribe((data: any) => {
+            self.itemList = data.items;
+            console.log(data.items);
+            params.successCallback(self.itemList, data.totalRecords);
+          });
+        }, 500);
+      }
+    }
+  }
+
   ngAfterViewInit(): void {
-    this.grid.rowHeight = GRID_CONFIG.initialRowHeight;
+    // this.grid.rowHeight = GRID_CONFIG.initialRowHeight;
   }
 
   public rowDataBound(args: RowDataBoundEventArgs): void {
@@ -71,7 +181,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   }
 
   dataBound() {
-    const a = this.grid.getRows();
+    // const a = this.grid.getRows();
   }
 
   ngOnDestroy(): void {
@@ -90,7 +200,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
         okButtonClass: 'delete-button',
       })
       .subscribe((confirm) => {
-        this.grid.clearRowSelection();
+        // this.grid.clearRowSelection();
         if (confirm && data.id) {
          this.store.dispatch(new RemoveRole(data.id))
         }
@@ -122,7 +232,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
         filter(({ isDialogShown }) => !!!isDialogShown)
       )
       .subscribe(() => {
-        this.grid.clearRowSelection();
+        // this.grid.clearRowSelection();
       });
   }
 }

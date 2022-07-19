@@ -1,4 +1,4 @@
-<ejs-grid
+<!-- <ejs-grid
   #usersGrid
   id="users-grid"
   class="users-grid"
@@ -95,5 +95,24 @@
       </div>
     </div>
   </ng-template>
-</ejs-grid>
+</ejs-grid> -->
 
+<ag-grid-angular #agGridPagination
+                style="width: 100%; height: 350px;"
+                class="ag-theme-alpine"
+                [animateRows]="true"
+                [columnDefs]="columnDefs"
+                [defaultColDef]="defaultColDef"
+                [suppressAggFuncInHeader]="true"
+                [modules]="modules"                
+                [cacheBlockSize]="cacheBlockSize"
+                [rowModelType]="rowModelType"
+                [frameworkComponents]="frameworkComponents"
+                [pagination]="true"
+                [paginationPageSize]="paginationPageSize"                    
+                (gridReady)="onGridReady($event)"
+                [sideBar]="sideBar"
+                serverSideInfiniteScroll="true"
+                serverSideFilterOnServer="true"
+                toolPanel="columns">
+</ag-grid-angular>

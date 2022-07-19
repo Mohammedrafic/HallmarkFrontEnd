@@ -1,13 +1,14 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { DetailRowService, FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { DetailRowService, FreezeService } from '@syncfusion/ej2-angular-grids';
+import { filter, Observable, Subject, takeUntil, throttleTime, of } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { CellClickedEvent, ColDef, GridReadyEvent } from '@ag-grid-community/core';
 import {
   ApproveOrder,
   ClearSelectedOrder,
@@ -40,6 +41,7 @@ import { OrderTypeOptions } from '@shared/enums/order-type';
 import { DatePipe, Location } from '@angular/common';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { MoreMenuType, OrderType, OrderTypeName, ROW_HEIGHT } from './order-management-content.constants';
+import { AgGridAngular } from '@ag-grid-community/angular';
 
 @Component({
   selector: 'app-order-management-content',
@@ -48,8 +50,9 @@ import { MoreMenuType, OrderType, OrderTypeName, ROW_HEIGHT } from './order-mana
   providers: [FreezeService, DetailRowService],
 })
 export class OrderManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
-  @ViewChild('grid') override gridWithChildRow: GridComponent;
-
+  // @ViewChild('grid') override gridWithChildRow: GridComponent;
+  @ViewChild(AgGridAngular) agGrid!: AgGridAngular;
+  
   @Select(OrderManagementContentState.ordersPage)
   ordersPage$: Observable<OrderManagementPage>;
 
@@ -116,16 +119,33 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public selectedCandidat: any | null;
   public openChildDialog = new Subject<any>();
   private selectedIndex: number | null;
-
+  public defaultColDef: ColDef = {
+    sortable: true,
+    filter: true,
+  };
+  public columnDefs: ColDef[] = [
+    { field: 'id' },
+    { field: 'statusText' },
+    { field: 'jobTitle' },
+    { field: 'skillName' },
+    { field: 'openPositions' },
+    { field: 'locationName' },
+    { field: 'departmentName' },
+    { field: 'orderType' },
+    { field: 'billRate' },
+    { field: 'candidates' },
+    { field: 'startDate' },
+  ];
+  public data: any[] = [];
   constructor(private store: Store,
-              private router: Router,
-              private route: ActivatedRoute,
-              private actions$: Actions,
-              private confirmService: ConfirmService,
-              private filterService: FilterService,
-              private fb: FormBuilder,
-              private datePipe: DatePipe,
-              private location: Location) {
+    private router: Router,
+    private route: ActivatedRoute,
+    private actions$: Actions,
+    private confirmService: ConfirmService,
+    private filterService: FilterService,
+    private fb: FormBuilder,
+    private datePipe: DatePipe,
+    private location: Location) {
     super();
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
     this.OrderFilterFormGroup = this.fb.group({
@@ -147,7 +167,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       candidatesCountTo: new FormControl(null),
       agencyIds: new FormControl([]),
       agencyType: new FormControl('0'),
-    });
+    });    
   }
 
   ngOnInit(): void {
@@ -398,16 +418,16 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private deleteOrder(id: number): void {
     this.confirmService
-    .confirm(DELETE_RECORD_TEXT, {
-      title: DELETE_RECORD_TITLE,
-      okButtonLabel: 'Delete',
-      okButtonClass: 'delete-button'
-    })
-    .subscribe((confirm) => {
-      if (confirm) {
-        this.store.dispatch(new DeleteOrder(id));
-      }
-    });
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button'
+      })
+      .subscribe((confirm) => {
+        if (confirm) {
+          this.store.dispatch(new DeleteOrder(id));
+        }
+      });
   }
 
   public menuOptionSelected(event: any, data: OrderManagement): void {
@@ -451,10 +471,15 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private onOrdersDataLoadHandler(): void {
+    debugger;
     this.ordersPage$.pipe(takeUntil(this.unsubscribe$)).subscribe(data => {
-      if (data && data.items) {
+      if (data && data.items) {            
+        this.data = data.items;      
+        if (this.agGrid.api) {
+          this.agGrid.api.setFilterModel(null);
+        }
         data.items.forEach(item => {
-          item.isMoreMenuWithDeleteButton = !this.openInProgressFilledStatuses.includes(item.statusText.toLowerCase());
+          // item.isMoreMenuWithDeleteButton = !this.openInProgressFilledStatuses.includes(item.statusText.toLowerCase());
           if (item.children && item.children.length) {
             item.children.sort((a, b) => a.positionId - b.positionId);
           }
@@ -489,7 +514,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       candidatesCountFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
       candidatesCountTo: { type: ControlTypes.Text, valueType: ValueType.Text },
       agencyIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, dataSource: [], valueField: 'name', valueId: 'id' },
-      agencyType: { type: ControlTypes.Radio, dataSource: {1: 'Yes', 2: 'No'}, default: '0' },
+      agencyType: { type: ControlTypes.Radio, dataSource: { 1: 'Yes', 2: 'No' }, default: '0' },
     }
   }
 
