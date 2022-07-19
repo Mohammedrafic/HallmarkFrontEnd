@@ -67,6 +67,7 @@ export type AgencyOrderManagement = {
   skill: string;
   location: string;
   numberOfPositions: number;
+  numberOfOpenPositions: number;
   department: string;
   shiftStartTime?: string;
   shiftEndTime?: string;

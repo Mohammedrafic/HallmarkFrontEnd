@@ -370,23 +370,33 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       order: order.orderId,
       reOrder: reOrder.orderId,
     };
-    const options = this.getDialogNextPreviousOption(order);
-    this.store.dispatch(new GetOrderById(order.orderId, order.organizationId, options));
-    this.selectedOrder = order;
-    //this.openChildDialog.next([order, candidate]); TODO: pending reorder modal
+    this.gridWithChildRow?.clearRowSelection();
+    this.store.dispatch(new GetOrderById(reOrder.orderId, order.organizationId));
+    this.store.dispatch(
+      new GetAgencyOrderCandidatesList(
+        reOrder.orderId,
+        order.organizationId,
+        this.currentPage,
+        this.pageSize,
+        this.excludeDeployed
+      )
+    );
+    this.store.dispatch(new GetAgencyOrderGeneralInformation(reOrder.orderId, order.organizationId));
+    this.selectedOrder = reOrder;
     this.selectedIndex = null;
+    this.openPreview.next(true);
   }
 
-  public onOpenCandidateDialog(candidat: OrderManagementChild, order: AgencyOrderManagement): void {
-    this.selectedCandidate = candidat;
+  public onOpenCandidateDialog(candidate: OrderManagementChild, order: AgencyOrderManagement): void {
+    this.selectedCandidate = candidate;
     this.selectedCandidate.selected = {
       order: order.orderId,
-      positionId: candidat.positionId,
+      positionId: candidate.positionId,
     };
     this.selectedOrder = order;
     const options = this.getDialogNextPreviousOption(order);
     this.store.dispatch(new GetOrderById(order.orderId, order.organizationId, options));
-    this.openChildDialog.next([order, candidat]);
+    this.openChildDialog.next([order, candidate]);
     this.selectedIndex = null;
   }
 
@@ -489,6 +499,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       } else {
         this.openChildDialog.next(false);
         this.selectedCandidate = null;
+        if (this.selectedReOrder?.selected.reOrder !== this.selectedOrder.orderId) {
+          this.selectedReOrder = null;
+        }
       }
     });
   }

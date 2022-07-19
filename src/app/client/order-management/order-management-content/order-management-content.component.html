@@ -175,27 +175,27 @@
       </e-column>
       <e-column field="agencies" headerText="AGENCY" width="150" [visible]="false">
         <ng-template #template let-data>
-          <ng-container *ngIf="!data.agencies?.length">
+          <ng-container *ngIf="!data.agency?.length">
             <span>All</span>
           </ng-container>
 
-          <ng-container *ngIf="data.agencies?.length === 2">
-            <span *ngFor="let agency of data.agencies; let i = index" class="agency-name">
+          <ng-container *ngIf="data.agency?.length === 2">
+            <span *ngFor="let agency of data.agency; let i = index" class="agency-name">
               {{ agency }}
-              <span class="agency-name" *ngIf="i !== data.agencies.length - 1">, </span>
+              <span class="agency-name" *ngIf="i !== data.agency.length - 1">, </span>
             </span>
           </ng-container>
 
-          <ng-container *ngIf="data.agencies?.length >= 3 && data.agencies?.length <= 5">
+          <ng-container *ngIf="data.agency?.length >= 3 && data.agency?.length <= 5">
             <ejs-tooltip
-              content="{{ data.agencies.length }}"
+              content="{{ data.agency.length }}"
               target="#agencyName"
             >
               <span id="agencyName" class="agency-name">Multiple Agencies</span>
             </ejs-tooltip>
           </ng-container>
 
-          <ng-container *ngIf="data.agencies?.length > 5">
+          <ng-container *ngIf="data.agency?.length > 5">
             <span id="agencyName" class="agency-name">Multiple Agencies</span>
           </ng-container>
         </ng-template>
