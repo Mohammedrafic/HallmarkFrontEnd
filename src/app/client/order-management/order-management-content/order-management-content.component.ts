@@ -122,6 +122,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     { text: MoreMenuType[1], id: '1' },
     { text: MoreMenuType[2], id: '2' },
   ];
+  public reOrdersMenu: ItemModel[] = [
+    { text: MoreMenuType[0], id: '0' },
+    { text: MoreMenuType[2], id: '2' },
+  ];
 
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   public optionFields = {
@@ -377,6 +381,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private clearFilters(): void {
     this.OrderFilterFormGroup.reset();
+    this.OrderFilterFormGroup.controls['agencyType'].setValue('0');
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {};

@@ -83,7 +83,7 @@
             </button>
             <button
               ejs-dropdownbutton
-              [items]="data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : moreMenuWithCloseButton"
+              [items]="(activeTab === OrganizationOrderManagementTabs.ReOrders && reOrdersMenu) || (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : moreMenuWithCloseButton)"
               (select)="menuOptionSelected($event, data)"
               cssClass="e-flat primary-icon-button"
             >
