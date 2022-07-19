@@ -26,6 +26,7 @@ import { GetCurrentUserPermissions } from '../store/user.actions';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
 import { DashboardFiltersModel } from './models/dashboard-filters.model';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 
 @Component({
   selector: 'app-dashboard',
@@ -60,12 +61,12 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   public readonly filtersGroup: FormGroup = this.getFiltersGroup();
 
   get hasOrderManagePermission(): boolean {
-    const manageOrderPermissionId = 1801;
+    const manageOrderPermissionId = PermissionTypes.CanOrganizationEditOrders;
     return this.permissions.map(permission => permission.permissionId).includes(manageOrderPermissionId);
   }
 
   get hasWidgetPermission(): boolean {
-    const widgetPermissionId = 2000;
+    const widgetPermissionId = PermissionTypes.DashboardWidgets;
     return this.permissions.map(permission => permission.permissionId).includes(widgetPermissionId);
   }
 

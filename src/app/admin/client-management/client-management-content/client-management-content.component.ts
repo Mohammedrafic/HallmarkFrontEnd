@@ -6,6 +6,7 @@ import { Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
@@ -72,7 +73,7 @@ export class ClientManagementContentComponent
   public filterColumns: any;
 
   get hasCreateOrganizationPermission(): boolean {
-    const createDeleteOrganizationPermissionId = 102;
+    const createDeleteOrganizationPermissionId = PermissionTypes.CanCreateDeleteOrganization;
     return this.permissions.map((permission) => permission.permissionId).includes(createDeleteOrganizationPermissionId);
   }
 
