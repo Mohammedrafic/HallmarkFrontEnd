@@ -1,5 +1,3 @@
-import { RecordFields } from './../../enums/timesheet-common.enum';
-import { switchMap } from 'rxjs/operators';
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import {
   ChangeDetectionStrategy,
@@ -12,7 +10,8 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { take, filter, Observable, takeUntil, tap, throttleTime, distinctUntilChanged, forkJoin } from 'rxjs';
+import { take, filter, Observable, takeUntil, tap, throttleTime, forkJoin } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
@@ -36,11 +35,10 @@ import { DialogAction, SubmitBtnText } from '../../enums';
 import {
   ConfirmDeleteTimesheetDialogContent,
   ConfirmUnsavedChages,
-} from '../../constants/confirm-delete-timesheet-dialog-content.const';
+  TimesheetDetailsExportOptions,
+} from '../../constants';
 import { ShowExportDialog } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
-import { CandidateService } from '@agency/services/candidates.service';
-
 
 @Component({
   selector: 'app-profile-details-container',
@@ -89,16 +87,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   private isChangesSaved = true;
 
-  public readonly columnsToExport: ExportColumn[] = [
-    { text:'First Name', column: 'firstName'},
-    { text:'Last Name', column: 'lastName'},
-    { text:'Job Title', column: 'jobTitle'},
-    { text:'Location', column: 'location'},
-    { text:'Department', column: 'department'},
-    { text:'Skill', column: 'skill'},
-    { text:'Start Date', column: 'startDate'},
-    { text:'End Date', column: 'endDate'},
-  ];
+  public readonly columnsToExport: ExportColumn[] = TimesheetDetailsExportOptions;
 
   @Select(TimesheetsState.isTimesheetOpen)
   public readonly isTimesheetOpen$: Observable<DialogActionPayload>;
@@ -130,7 +119,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     private route: ActivatedRoute,
     private confirmService: ConfirmService,
     private datePipe: DatePipe,
-    private candidateService: CandidateService,
     private router: Router,
   ) {
     super();
@@ -295,6 +283,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.uploadTooltip?.close();
   }
 
+  /**
+   * TODO: change this method
+   */
   public browse() : void {
     this.uploadArea.nativeElement
       ?.getElementsByClassName('e-file-select-wrap')[0]

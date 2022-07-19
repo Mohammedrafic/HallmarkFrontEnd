@@ -3,8 +3,8 @@
   <ng-template [ngSwitchCase]="false">
     <div class="init-value-wrapper">
       <span class="value-block">
-        <span class="value">{{ dateValue | date:'dd/MM/yyyy'}}</span>
-        <span class="value">{{ dateValue | date:'H:mm aa': 'UTC'}}</span>
+        <span class="value">{{ value | date:'dd/MM/yyyy'}}</span>
+        <span class="value">{{ value | date:'H:mm aa': 'UTC'}}</span>
       </span>
     </div>
   </ng-template>
@@ -31,6 +31,8 @@
           name="startDateTime"
           [step]="15"
           [value]="dateValue"
+          [min]="timeSettings.min"
+          [max]="timeSettings.max"
           >
           </ejs-datetimepicker>
         </ng-template>

@@ -48,8 +48,6 @@
   &.long {
     grid-column-start: 1;
     grid-column-end: 3;
-    // grid-row-start: 1;
-    // grid-row-end: 3;
   }
 
   label {
@@ -62,5 +60,15 @@
     display: grid;
     gap: 12px;
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+::ng-deep {
+  body.light, body.dark {
+    .e-dialog.dialog {
+      &.short {
+        height: 580px!important;
+      }
+    }
   }
 }

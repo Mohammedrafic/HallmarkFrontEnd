@@ -101,4 +101,12 @@ export namespace TimesheetDetails {
       public jobId: number,
     ) {}
   }
+
+  export class AddTimesheetRecord {
+    static readonly type = TimesheetDetailsActions.AddTimesheetRecord;
+
+    constructor(
+      public timesheetId: number,
+    ) {}
+  }
 }

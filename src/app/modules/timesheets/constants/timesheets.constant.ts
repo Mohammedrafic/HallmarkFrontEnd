@@ -30,7 +30,7 @@ export const MapTimesheetsStatuses: Map<TIMETHEETS_STATUSES, number> = new Map()
   .set(TIMETHEETS_STATUSES.REJECTED, 5)
   .set(TIMETHEETS_STATUSES.APPROVED, 6);
 
-export const exportOptions: ItemModel[] = [
+export const TimesheetExportOptions: ItemModel[] = [
   { text: ExportType.Excel_file, id: '0' },
   { text: ExportType.CSV_file, id: '1' },
   { text: ExportType.Custom, id: '2' }

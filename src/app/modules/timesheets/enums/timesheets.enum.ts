@@ -28,6 +28,7 @@ export enum TimesheetDetailsActions {
   PatchTimesheetRecords = '[timesheet details] Patch timesheet records',
   UploadFiles = '[timesheet details] Upload files',
   DeleteFile = '[timesheet details] Delete file',
+  AddTimesheetRecord = '[timesheet details] Add timesheet record',
 }
 
 export enum TIMETHEETS_STATUSES {

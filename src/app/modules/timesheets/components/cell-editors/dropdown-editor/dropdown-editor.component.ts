@@ -4,9 +4,9 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
+import { Store } from '@ngxs/store';
 
 import { DropdownOption } from '../../../interface';
-import { Store } from '@ngxs/store';
 
 @Component({
   selector: 'app-dropdown-editor',

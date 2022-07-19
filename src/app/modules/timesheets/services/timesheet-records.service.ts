@@ -2,9 +2,9 @@ import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { Injectable } from '@angular/core';
 
 import { ColDef } from '@ag-grid-community/core';
-import { forkJoin, merge, Observable } from 'rxjs';
+import { merge, Observable } from 'rxjs';
 
-import { DropdownOption, TimesheetRecordsDto, RecordValue } from './../interface/common.interface';
+import { DropdownOption, TimesheetRecordsDto, RecordValue } from './../interface';
 import { TimesheetsApiService } from './timesheets-api.service';
 import { RecordFields } from '../enums';
 

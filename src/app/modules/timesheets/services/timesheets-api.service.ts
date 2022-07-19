@@ -12,8 +12,10 @@ import {
   TabCountConfig,
   TimesheetRecordsDto,
   DropdownOption,
+  CandidateHoursAndMilesData,
+  RecordValue,
+  CostCentersDto,
 } from '../interface';
-import { BillRatesOptions } from './../constants/timesheet-records-mock.constant';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
   DataSourceItem,
@@ -24,15 +26,11 @@ import {
   filterColumnDataSource,
   MokTabsCounts,
   MockCandidateHoursAndMilesData,
-  MokTimesheet,
-  MokTimesheet1,
-} from '../constants';
-import {
+  BillRatesOptions,
   CandidateMockInfo,
-} from '../constants/timesheet-records-mock.constant';
+} from '../constants';
 import { TimesheetsTableColumns } from '../enums';
-import { CandidateHoursAndMilesData, RecordValue, CostCentersDto } from '../interface';
-import { CostCenterAdapter } from '../helpers/cost-centers.adapter';
+import { CostCenterAdapter } from '../helpers';
 
 @Injectable()
 export class TimesheetsApiService {
@@ -69,7 +67,7 @@ export class TimesheetsApiService {
     );
   }
 
-  public postProfileTimesheets(body: TimesheetRecord): Observable<null> {
+  public AddTimesheetRecord(timesheetId: number, body: TimesheetRecord): Observable<null> {
     return of(null);
   }
 

@@ -1,15 +1,15 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { CheckBoxChangeEventArgs } from "@syncfusion/ej2-angular-grids";
+import { CheckBoxChangeEventArgs } from '@syncfusion/ej2-angular-grids';
 
 import {
   ChartPointRenderEvent,
   DonutChartData,
   TimesheetStatisticsDetails
 } from '../../interface';
-import { profileDetailsHoursChartColorsMap, profileDetailsHoursChartSettings } from "../../constants";
-import { HourOccupationType } from "../../enums";
-import { CandidateBarChartHelper } from '../../helpers/candidate-bar-chart.helper';
+import { profileDetailsHoursChartColorsMap, profileDetailsHoursChartSettings } from '../../constants';
+import { HourOccupationType } from '../../enums';
+import { CandidateBarChartHelper } from '../../helpers';
 
 @Component({
   selector: 'app-profile-cumulative-hours',

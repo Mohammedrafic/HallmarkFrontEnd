@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
 
-import { GridValuesHelper } from '../../../helpers/grid-values.helper';
+import { GridValuesHelper } from '../../../helpers';
 
 @Component({
   selector: 'app-grid-day',

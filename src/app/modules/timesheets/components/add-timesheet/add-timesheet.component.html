@@ -1,9 +1,10 @@
 <ejs-dialog
 id="edit-timesheet-dialog"
 #sideAddDialog
-cssClass="dialog"
+cssClass="dialog short"
 [width]="'434px'"
 [visible]="false"
+[height]="450"
 [animationSettings]="{ effect: 'SlideRight' }"
 >
   <ng-template #content>
@@ -47,6 +48,7 @@ cssClass="dialog"
                       format="hh:mm a"
                       [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                       [enableMask]="true"
+                      [step]="15"
                       (change)="updateValidity()"
                       maskPlaceholder="HH:MM">
                     </ejs-timepicker>
@@ -63,9 +65,10 @@ cssClass="dialog"
                       name="startDateTime"
                       [formControlName]="field.field"
                       appValidateWithMessage
-                      [step]="30"
+                      [step]="15"
                       placeholder="Select Date and Time"
-                      [min]="initTime"
+                      [min]="timeSettings.min"
+                      [max]="timeSettings.max"
                       (change)="updateValidity()"
                     >
                     </ejs-datetimepicker>
@@ -96,6 +99,8 @@ cssClass="dialog"
                     <ejs-datepicker
                     class="datepicker"
                     appValidateWithMessage
+                    [min]="timeSettings.min"
+                    [max]="timeSettings.max"
                     [formControlName]="field.field"
                     >
                     </ejs-datepicker>

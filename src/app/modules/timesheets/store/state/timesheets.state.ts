@@ -1,5 +1,3 @@
-import { DropdownOption } from './../../interface/common.interface';
-import { RecordFields } from './../../enums/timesheet-common.enum';
 import { Injectable } from '@angular/core';
 
 import { filter, Observable, of, switchMap, take, tap, throttleTime, mergeMap, forkJoin } from 'rxjs';
@@ -7,11 +5,14 @@ import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
 import { downloadBlobFile } from '@shared/utils/file.utils';
+import { MessageTypes } from '@shared/enums/message-types';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { TimesheetsModel, TimeSheetsPage, } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
-import { DialogAction, TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../../enums';
+import { DialogAction, TimesheetsTableColumns, TIMETHEETS_STATUSES, RecordFields } from '../../enums';
 import {
   approveTimesheetDialogData,
   DefaultFiltersState,
@@ -23,7 +24,6 @@ import {
   CandidateHoursAndMilesData,
   CandidateInfo,
   CandidateMilesData,
-  DialogActionPayload,
   FilterColumns,
   FilterDataSource,
   TabCountConfig,
@@ -34,12 +34,10 @@ import {
   TimesheetInvoice,
   TimesheetRecordsDto,
   TimesheetsFilterState,
-  TimesheetStatistics
+  TimesheetStatistics,
+  DropdownOption,
 } from '../../interface';
-import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ShowToast } from '../../../../store/app.actions';
-import { MessageTypes } from '@shared/enums/message-types';
-import { ConfirmService } from '@shared/services/confirm.service';
 import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
 
 @State<TimesheetsModel>({
@@ -221,14 +219,6 @@ export class TimesheetsState {
     )
   }
 
-  @Action(Timesheets.PostProfileTimesheet)
-  PostProfileTimesheet(
-    ctx: StateContext<TimesheetsModel>,
-    { payload }: Timesheets.PostProfileTimesheet
-  ): Observable<null> {
-    return this.timesheetsApiService.postProfileTimesheets(payload);
-  }
-
   @Action(TimesheetDetails.PatchTimesheetRecords)
   PatchTimesheetRecords(
     ctx: StateContext<TimesheetsModel>,
@@ -259,12 +249,12 @@ export class TimesheetsState {
 
   @Action(Timesheets.ToggleTimesheetAddDialog)
   ToggleAddDialog({ patchState }: StateContext<TimesheetsModel>,
-    { action, type }: { action: DialogAction, type: RecordFields}): void {
+    { action, type, dateTime }: { action: DialogAction, type: RecordFields, dateTime: string}): void {
     patchState({
       isAddDialogOpen: {
         action: action === DialogAction.Open,
         dialogType: type,
-        initTime: '',
+        initTime: dateTime,
       },
     });
   }
@@ -567,5 +557,14 @@ export class TimesheetsState {
       );
     }
 
+  // @Action(TimesheetDetails.AddTimesheetRecord)
+  // AddTimesheetRecord(ctx: StateContext<TimesheetsModel>, payload: { timesheetId: number }) {
+  //   return this.timesheetsApiService.AddTimesheetRecord(payload.timesheetId)
+  //   .pipe(
+  //     tap(() => {
+        
+  //     })
+  //   )
+  // }
 
 }

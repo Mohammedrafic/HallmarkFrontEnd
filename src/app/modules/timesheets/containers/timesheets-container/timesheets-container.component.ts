@@ -9,7 +9,7 @@ import { FormControl } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
 import { filter } from 'rxjs/operators';
-import { Observable, of, switchMap, takeUntil, throttleTime } from 'rxjs';
+import { Observable, switchMap, takeUntil } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { Destroyable } from '@core/helpers';
@@ -17,7 +17,7 @@ import { User } from '@shared/models/user.model';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { TabConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
-import { exportOptions, TAB_ADMIN_TIMESHEETS } from '../../constants';
+import { TimesheetExportOptions, TAB_ADMIN_TIMESHEETS } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { DialogAction, ExportType } from '../../enums';
@@ -42,7 +42,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public readonly tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
   public activeTabIdx = 0;
-  public readonly exportOptions: ItemModel[] = exportOptions;
+  public readonly exportOptions: ItemModel[] = TimesheetExportOptions;
   public filters: TimesheetsFilterState | undefined;
   public readonly dateControl: FormControl = new FormControl(null);
   public readonly currentSelectedTableRowIndex: Observable<number>

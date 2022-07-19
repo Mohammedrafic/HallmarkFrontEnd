@@ -10,8 +10,8 @@ import {
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { combineLatest, concat, forkJoin, Observable, takeUntil } from 'rxjs';
-import { filter, skip, take, tap, switchMap, concatAll } from 'rxjs/operators';
+import { combineLatest, Observable, takeUntil } from 'rxjs';
+import { filter, skip, take, tap, switchMap } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { TabComponent, SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
@@ -131,10 +131,13 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public openAddDialog(): void {
+    const startDate = new Date(this.store.snapshot().timesheets.selectedTimeSheet.startDate);
+    startDate.setUTCHours(0, 0, 0, 0);
+    
     this.openAddSideDialog.emit({
       currentTab: this.currentTab,
-      initDate: this.records.timesheets[0].timeIn,
-    })
+      initDate: startDate.toUTCString(),
+    });
   }
 
   public editTimesheets(): void {

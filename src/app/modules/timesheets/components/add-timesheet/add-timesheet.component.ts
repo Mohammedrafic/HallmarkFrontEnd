@@ -1,4 +1,3 @@
-
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -20,7 +19,6 @@ import {
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { tap } from 'rxjs/operators';
 
-import { Destroyable } from '@core/helpers';
 import { GlobalWindow } from '@core/tokens';
 import { CustomFormGroup } from '@core/interface';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -28,9 +26,9 @@ import { TimesheetsState } from './../../store/state/timesheets.state';
 import { AddRecordService } from '../../services/add-record.service';
 import { EditTimsheetForm } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
-import { TimesheetEditDialogConfig } from '../../constants';
+import { TimesheetEditDialogConfig, ConfirmAddFormCancel } from '../../constants';
 import { DialogAction, FieldType, RecordFields } from '../../enums';
-import { ConfirmAddFormCancel } from '../../constants/confirm-delete-timesheet-dialog-content.const';
+import { TimesheetDateHelper } from '../../helpers';
 
 @Component({
   selector: 'app-add-timesheet',
@@ -38,7 +36,7 @@ import { ConfirmAddFormCancel } from '../../constants/confirm-delete-timesheet-d
   styleUrls: ['./add-timesheet.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddTimesheetComponent extends Destroyable implements OnInit {
+export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit {
   @ViewChild('sideAddDialog') protected sideAddDialog: DialogComponent;
 
   @Input() profileId: number;
@@ -54,14 +52,6 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
   public dialogConfig = TimesheetEditDialogConfig;
 
   public formType: RecordFields;
-
-  public timeSettings = {
-    min: 0,
-    max: 0,
-  }
-
-  public initTime: string;
-
 
   @Select(TimesheetsState.addDialogOpen)
   public readonly dialogState$: Observable<{ state: boolean, type: RecordFields, initDate: string }>
@@ -124,13 +114,12 @@ export class AddTimesheetComponent extends Destroyable implements OnInit {
       tap((value) => {
         this.form = this.addRecordService.createForm(value.type);
         this.formType = value.type;
-        this.initTime = value.initDate;
+        this.setDateBounds(value.initDate, 7);
         this.populateOptions();
       }),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
-      console.log(this.initTime)
       this.sideAddDialog.show();
       this.cd.markForCheck();
     })
