@@ -68,6 +68,7 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { NextPreviousOrderEvent } from '../order-details-dialog/order-details-dialog.component';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
+import isNil from 'lodash/fp/isNil';
 
 @Component({
   selector: 'app-order-management-content',
@@ -447,7 +448,13 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       const options = this.getDialogNextPreviousOption(data);
       this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
       this.store.dispatch(
-        new GetAgencyOrderCandidatesList(data.id, data.organizationId, this.currentPage, this.pageSize, this.excludeDeployed)
+        new GetAgencyOrderCandidatesList(
+          data.id,
+          data.organizationId,
+          this.currentPage,
+          this.pageSize,
+          this.excludeDeployed
+        )
       );
       this.selectedCandidate = this.selectedReOrder = null;
       this.openChildDialog.next(false);
@@ -620,7 +627,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public menuOptionSelected(event: any, data: OrderManagement): void {
     switch (Number(event.item.properties.id)) {
       case MoreMenuType['Edit']:
-        if (data.reOrderFromId !== 0) {
+        if (!isNil(data.reOrderFromId) && data.reOrderFromId !== 0) {
           this.store.dispatch([new ShowSideDialog(true), new GetOrderById(data.id, data.organizationId, {} as any)]);
         } else {
           this.router.navigate(['./edit', data.id], { relativeTo: this.route });

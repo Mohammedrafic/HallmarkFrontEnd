@@ -8,6 +8,7 @@ import { ReasonForRequisition } from '@shared/enums/reason-for-requisition';
 import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
 import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
+import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
 
 export class OrderManagement {
   id: number;
@@ -247,6 +248,8 @@ export class Order {
   documents: Document[] | null;
   canApprove: boolean;
   reOrderFromId?: number;
+  reOrderFrom?: Order;
+  candidates?: CandidateModel[];
 }
 
 export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'status' | 'statusText' | 'documents'> {
