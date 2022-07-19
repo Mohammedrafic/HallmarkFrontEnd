@@ -7,7 +7,7 @@ export const GlobalWindow: InjectionToken<Window> = new InjectionToken<Window>('
       const { defaultView } = inject(DOCUMENT);
 
       if (!defaultView) {
-        throw new Error('Window is not avaliable');
+        throw new Error('Window is not available');
       }
       return defaultView;
     },

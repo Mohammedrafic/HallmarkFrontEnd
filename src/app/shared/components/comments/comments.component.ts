@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-comments',
@@ -6,6 +6,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./comments.component.scss']
 })
 export class CommentsComponent {
+  @Input() useBackground: boolean = true;
 
   constructor() { }
 

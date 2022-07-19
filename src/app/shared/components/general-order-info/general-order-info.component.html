@@ -1,4 +1,4 @@
-<section class="candidates-info">
+<section class="candidates-info" *ngIf="orderInformation">
   <div class="container-row">
     <div class="column">
       <div class="icon">
@@ -51,7 +51,7 @@
     </div>
   </div>
 </section>
-<section class="candidates-additional-info">
+<section class="candidates-additional-info" *ngIf="orderInformation">
   <div class="container-row">
     <div class="column">
       <div class="title">{{orderType[orderInformation.orderType]}}</div>

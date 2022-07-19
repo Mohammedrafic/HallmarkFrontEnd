@@ -1,8 +1,11 @@
-import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+
+import { AgGridModule } from '@ag-grid-community/angular';
+import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
+import { PdfViewerModule } from '@syncfusion/ej2-angular-pdfviewer';
 import { NgxsModule } from '@ngxs/store';
 import { FeatherModule } from 'angular-feather';
 import { DialogAllModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
@@ -33,16 +36,26 @@ import { TimesheetsApiService } from './services/timesheets-api.service';
 import { ProfileDetailsContainerComponent } from './containers/profile-details-container/profile-details-container.component';
 import { ProfileTimesheetTableComponent } from './components/profile-timesheet-table/profile-timesheet-table.component';
 import { AddTimesheetComponent } from './components/add-timesheet/add-timesheet.component';
-import { EditTimesheetService } from './services/edit-timesheet.service';
+import { AddRecordService } from './services/add-record.service';
 import { ProfileDetailsJobInfoComponent } from './components/profile-details-job-info/profile-details-job-info.component';
 import { ProfileCumulativeHoursComponent } from './components/profile-cumulative-hours/profile-cumulative-hours.component';
-import { ProfileUploadsComponent } from './components/profile-uploads/profile-uploads.component';
+import { TimesheetAttachmentsComponent } from './components/profile-uploads/timesheet-attachments.component';
 import { ProfileInvoicesComponent } from './components/profile-invoices/profile-invoices.component';
 import { TimesheetsService } from './services/timesheets.service';
 import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
-import { TimesheetDetailsService } from "./services/timesheet-details.service";
-import { DemoService } from './services/demo.service';
-import { ProfileTimesheetService } from './services/profile-timesheet.service';
+import { TimesheetDetailsApiService } from './services/timesheet-details-api.service';
+import { TimesheetRecordsService } from './services/timesheet-records.service';
+import { DropdownEditorComponent } from './components/cell-editors/dropdown-editor/dropdown-editor.component';
+import { ActionsCellComponent } from './components/cell-editors/actions-cell/actions-cell.component';
+import { TimesheetsFilterDialogComponent } from './components/timesheets-filter-dialog/timesheets-filter-dialog.component';
+import { GridModule } from '@shared/components/grid/grid.module';
+import { TimesheetTableStatusCellComponent } from './components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
+import { ProfileMilesComponent } from './components/profile-cumulative-hours/profile-miles/profile-miles.component';
+import { InputEditorComponent } from './components/cell-editors/input-editor/input-editor.component';
+import { GridDateEditorComponent } from './components/cell-editors/grid-date-editor/grid-date-editor.component';
+import {
+  TimesheetTableApproveCellComponent
+} from './components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
 
 const gridIcons = {
   MessageSquare,
@@ -82,9 +95,17 @@ const gridIcons = {
     AddTimesheetComponent,
     ProfileDetailsJobInfoComponent,
     ProfileCumulativeHoursComponent,
-    ProfileUploadsComponent,
+    TimesheetAttachmentsComponent,
     ProfileInvoicesComponent,
     TimesheetRejectReasonDialogComponent,
+    GridDateEditorComponent,
+    DropdownEditorComponent,
+    ActionsCellComponent,
+    TimesheetsFilterDialogComponent,
+    TimesheetTableStatusCellComponent,
+    TimesheetTableApproveCellComponent,
+    ProfileMilesComponent,
+    InputEditorComponent,
   ],
   imports: [
     CommonModule,
@@ -117,18 +138,20 @@ const gridIcons = {
     TextBoxModule,
     TooltipModule,
     SwitchModule,
+    AgGridModule,
+    GridModule,
+    PdfViewerModule
   ],
   exports: [TimesheetsContainerComponent],
   providers: [
     TimesheetsApiService,
-    EditTimesheetService,
+    AddRecordService,
     MaskedDateTimeService,
     TimesheetsService,
-    ProfileTimesheetService,
     CapitalizeFirstPipe,
-    TimesheetDetailsService,
-    DemoService,
+    TimesheetDetailsApiService,
     ChipsCssClass,
+    TimesheetRecordsService,
   ]
 })
 export class TimesheetsModule {}

@@ -1,9 +1,10 @@
-@import '../../../../styles/variables/colors';
+@import "colors";
+@import "mixins";
 
 $chip-margin: 8px;
 
 .profile-table-container {
-  padding-bottom: 21px;
+  padding-bottom: 0;
 }
 
 .container {
@@ -33,6 +34,10 @@ $chip-margin: 8px;
 .tile-dark-blue {
   background-color: $secondary-dark-blue-50;
   border-radius: 8px;
+
+  &:not(:last-of-type) {
+    margin-right: 8px;
+  }
 }
 
 .profile-details-header {
@@ -52,18 +57,6 @@ $chip-margin: 8px;
     margin-bottom: 0;
   }
 
-  ejs-chiplist {
-    position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      height: 20px;
-      left: 125px;
-      border-left: 1px solid $secondary-dark-blue-40;
-    }
-  }
-
   .e-chip {
     &:first-child {
       margin-right: 20px;
@@ -72,6 +65,7 @@ $chip-margin: 8px;
 
   .header-controls {
     display: flex;
+    align-items: center;
     margin-top: 5px;
 
     .e-input-group {
@@ -141,7 +135,9 @@ $chip-margin: 8px;
 .order-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-top: 15px;
+  margin-bottom: 10px;
 
   .order-id {
     font-weight: 700;
@@ -162,13 +158,9 @@ $chip-margin: 8px;
   margin-top: 15px;
   margin-bottom: 10px;
 
-  .profile-uploads {
-    margin-left: 12px;
-  }
-
-  .profile-invoices {
-    margin-left: 12px;
+  .profile-invoices, .miles {
     flex-grow: 1;
+    min-width: 110px;
   }
 }
 
@@ -246,6 +238,28 @@ $chip-margin: 8px;
   margin-right: 12px;
 }
 
+.bootstrap.reject-reason-input {
+  margin-right: 16px;
+  display: flex;
+  justify-content: flex-end;
+  flex-grow: 1;
+
+  input {
+    flex-basis: 250px;
+  }
+
+  .input {
+    flex-basis: 250px;
+    background: $secondary-dark-blue-50;
+    border: 1px solid $secondary-dark-blue-40;
+    border-radius: 8px;
+    min-width: 200px;
+    max-width: 75%;
+
+    @include with-ellipsis();
+  }
+}
+
 .controls-block {
   display: flex;
   align-items: center;
@@ -254,4 +268,15 @@ $chip-margin: 8px;
 
 .e-switch-wrapper.e-wrapper {
   margin-right: 10px;
+}
+
+.timesheet-details-dialog {
+  .e-dlg-content {
+    display: flex;
+    flex-direction: column;
+
+    section.container {
+      overflow: auto;
+    }
+  }
 }

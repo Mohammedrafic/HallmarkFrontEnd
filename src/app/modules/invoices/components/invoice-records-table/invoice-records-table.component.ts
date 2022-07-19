@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { InvoiceRecord, InvoicesTable } from "../../interfaces";
 import { ItemModel } from "@syncfusion/ej2-splitbuttons/src/common/common-model";
 import { MoreMenuType } from "../../../timesheets/enums";
-import { ITimesheet } from "../../../timesheets/interface";
+import { Timesheet } from 'src/app/modules/timesheets/interface';
 
 @Component({
   selector: 'app-invoice-records-table',
@@ -27,7 +27,7 @@ export class InvoiceRecordsTableComponent extends InvoicesTable<InvoiceRecord> {
     super();
   }
 
-  public menuOptionSelected(event: any, data: ITimesheet): void {
+  public menuOptionSelected(event: any, data: Timesheet): void {
     switch (event.item.properties.text) {
       case MoreMenuType.Edit: {
         break;

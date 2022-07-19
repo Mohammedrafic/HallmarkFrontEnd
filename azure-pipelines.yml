@@ -13,6 +13,9 @@ trigger:
 
 pool:
   vmImage: ubuntu-latest
+  # name: prduse2
+  # demands:
+  #   - agent.name -equals softserve
 
 resources: 
 - repo: self
@@ -35,32 +38,34 @@ variables:
    imageVersionIdentifier: '-dev'
 
 steps:
-- task: Cache@2
-  inputs:
-    key: '"yarn" | "$(Agent.OS)" | yarn.lock'
-    restoreKeys: |
-       yarn | "$(Agent.OS)"
-       yarn
-    path: $(YARN_CACHE_FOLDER)
-  displayName: Cache Yarn packages
+# - task: Cache@2
+#   inputs:
+#     key: '"yarn" | "$(Agent.OS)" | yarn.lock'
+#     restoreKeys: |
+#        yarn | "$(Agent.OS)"
+#        yarn
+#     path: $(YARN_CACHE_FOLDER)
+#   displayName: Cache Yarn packages
 - task: NodeTool@0
   inputs:
     versionSpec: '16.x'
   displayName: 'Install Node.js'
+- task: PowerShell@2
+  displayName: Install yarn package
+  inputs:
+    targetType: 'inline'
+    script: 'npm install --global yarn'
+- task: PowerShell@2
+  displayName: Install packages
+  inputs:
+    targetType: 'inline'
+    script: 'yarn install --frozen-lockfile'
 
-- task: Bash@3
-  displayName: install yarn packages
+- task: PowerShell@2
+  displayName: Build angular
   inputs:
     targetType: 'inline'
-    script: |
-      yarn install --frozen-lockfile
-          
-- task: Bash@3
-  displayName: Build angular project
-  inputs:
-    targetType: 'inline'
-    script: |
-      yarn run build
+    script: 'yarn run build'
 
 - task: Docker@2
   displayName: Build an image
@@ -78,15 +83,20 @@ steps:
   inputs:
     helmVersion: '2.14.1'
     installKubectl: false
-- task: Bash@3
+
+- task: PowerShell@2
   displayName: Pack helm package
   inputs:
     targetType: 'inline'
     script: 'helm package $(Build.SourcesDirectory)/helm --app-version=$(buildId)$(imageVersionIdentifier) -d $(Build.ArtifactStagingDirectory)/helm'
-    failOnStderr: true
+
 - task: PublishBuildArtifacts@1
   displayName: publish helm package
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)/helm'
     ArtifactName: 'helm'
     publishLocation: 'Container'
+- task: PostBuildCleanup@3
+  displayName: Cleanup
+  inputs:
+    disableCertCheck: true

@@ -1,7 +1,9 @@
-<div class="general-info">
-  <app-general-order-info *ngIf="orderCandidateInformation" [orderInformation]="orderCandidateInformation"></app-general-order-info>
+<div class="general-info" *ngIf="orderCandidateInformation" [ngSwitch]="orderCandidateInformation?.orderType">
+    <app-general-order-per-diem-info *ngSwitchCase="orderType.OpenPerDiem" [orderInformation]="orderCandidateInformation"></app-general-order-per-diem-info>
+    <app-general-reorder-info *ngSwitchCase="orderType.ReOrder" [orderInformation]="orderCandidateInformation"></app-general-reorder-info>
+    <app-general-order-info *ngSwitchDefault [orderInformation]="orderCandidateInformation"></app-general-order-info>
 </div>
 <div class="line"></div>
 <div class="candidates-list">
-  <app-order-candidates-list *ngIf="orderCandidatePage" [candidatesList]="orderCandidatePage" [order]="orderCandidates"></app-order-candidates-list>
+  <app-order-candidates-list [candidatesList]="orderCandidatePage$ | async" [order]="orderCandidates" (getCandidatesList)="onGetCandidatesList($event)"></app-order-candidates-list>
 </div>

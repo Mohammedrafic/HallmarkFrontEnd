@@ -6,17 +6,23 @@ import { Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { FilteredItem } from '@shared/models/filter.model';
-import { CurrentUserPermission } from "@shared/models/permission.model";
+import { CurrentUserPermission } from '@shared/models/permission.model';
 import { FilterService } from '@shared/services/filter.service';
 import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
-import { Organization, OrganizationDataSource, OrganizationFilter, OrganizationPage } from 'src/app/shared/models/organization.model';
+import {
+  Organization,
+  OrganizationDataSource,
+  OrganizationFilter,
+  OrganizationPage,
+} from 'src/app/shared/models/organization.model';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
-import { GetCurrentUserPermissions } from "src/app/store/user.actions";
-import { UserState } from "src/app/store/user.state";
+import { GetCurrentUserPermissions } from 'src/app/store/user.actions';
+import { UserState } from 'src/app/store/user.state';
 import { ExportOrganizations, GetOrganizationDataSources, GetOrganizationsByPage } from '../../store/admin.actions';
 import { AdminState } from '../../store/admin.state';
 
@@ -24,19 +30,21 @@ import { AdminState } from '../../store/admin.state';
   selector: 'app-client-management-content',
   templateUrl: './client-management-content.component.html',
   styleUrls: ['./client-management-content.component.scss'],
-  providers: [SortService, FreezeService]
+  providers: [SortService, FreezeService],
 })
-export class ClientManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
-
+export class ClientManagementContentComponent
+  extends AbstractGridConfigurationComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
 
   public columnsToExport: ExportColumn[] = [
-    { text:'Organization Name', column: 'OrganizationName'},
-    { text:'Organization Status', column: 'OrganizationStatus'},
-    { text:'City', column: 'City'},
-    { text:'Contact', column: 'Contact'},
-    { text:'Phone', column: 'Phone'}
+    { text: 'Organization Name', column: 'OrganizationName' },
+    { text: 'Organization Status', column: 'OrganizationStatus' },
+    { text: 'City', column: 'City' },
+    { text: 'Contact', column: 'Contact' },
+    { text: 'Phone', column: 'Phone' },
   ];
   public fileName: string;
   public defaultFileName: string;
@@ -65,22 +73,23 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
   public filterColumns: any;
 
   get hasCreateOrganizationPermission(): boolean {
-    const createDeleteOrganizationPermissionId = 102;
-    return this.permissions.map(permission => permission.permissionId).includes(createDeleteOrganizationPermissionId);
+    const createDeleteOrganizationPermissionId = PermissionTypes.CanCreateDeleteOrganization;
+    return this.permissions.map((permission) => permission.permissionId).includes(createDeleteOrganizationPermissionId);
   }
 
   private permissions: CurrentUserPermission[] = [];
 
-  constructor(private store: Store,
-              private router: Router,
-              private route: ActivatedRoute,
-              private datePipe: DatePipe,
-              private filterService: FilterService,
-              private fb: FormBuilder,
-              ) {
+  constructor(
+    private store: Store,
+    private router: Router,
+    private route: ActivatedRoute,
+    private datePipe: DatePipe,
+    private filterService: FilterService,
+    private fb: FormBuilder
+  ) {
     super();
     this.idFieldName = 'organizationId';
-    this.fileName = 'Organizations ' + datePipe.transform(Date.now(),'MM/dd/yyyy');
+    this.fileName = 'Organizations ' + datePipe.transform(Date.now(), 'MM/dd/yyyy');
     store.dispatch(new SetHeaderState({ title: 'Organization List', iconName: 'file-text' }));
     this.OrganizationFilterFormGroup = this.fb.group({
       searchTerm: new FormControl(''),
@@ -101,12 +110,14 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
       statuses: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
       cities: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
       contacts: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
-    }
-    this.organizationDataSources$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data: OrganizationDataSource) => {
-      this.filterColumns.organizationNames.dataSource = data.organizationNames;
-      this.filterColumns.contacts.dataSource = data.contacts;
-      this.filterColumns.cities.dataSource = data.cities;
-    });
+    };
+    this.organizationDataSources$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .subscribe((data: OrganizationDataSource) => {
+        this.filterColumns.organizationNames.dataSource = data.organizationNames;
+        this.filterColumns.contacts.dataSource = data.contacts;
+        this.filterColumns.cities.dataSource = data.cities;
+      });
     this.statuses$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((data: string[]) => {
       this.filterColumns.statuses.dataSource = data;
     });
@@ -150,7 +161,11 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
       cities: this.filters.cities || [],
       contacts: this.filters.contacts || [],
     });
-    this.filteredItems = this.filterService.generateChips(this.OrganizationFilterFormGroup, this.filterColumns, this.datePipe);
+    this.filteredItems = this.filterService.generateChips(
+      this.OrganizationFilterFormGroup,
+      this.filterColumns,
+      this.datePipe
+    );
   }
 
   public onFilterDelete(event: FilteredItem): void {
@@ -190,13 +205,20 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
 
   public override defaultExport(fileType: ExportedFileType, options?: ExportOptions): void {
     this.defaultFileName = 'Organization List ' + this.generateDateTime(this.datePipe);
-    this.store.dispatch(new ExportOrganizations(new ExportPayload(
-      fileType,
-      { ...this.filters, ids: this.selectedItems.length ? this.selectedItems.map(val => val[this.idFieldName]) : null },
-      options ? options.columns.map(val => val.column) : this.columnsToExport.map(val => val.column),
-      null,
-      options?.fileName || this.defaultFileName
-    )));
+    this.store.dispatch(
+      new ExportOrganizations(
+        new ExportPayload(
+          fileType,
+          {
+            ...this.filters,
+            ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
+          },
+          options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
+          null,
+          options?.fileName || this.defaultFileName
+        )
+      )
+    );
     this.clearSelection(this.grid);
   }
 
@@ -217,7 +239,7 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
 
   //TODO: create a pipe
   public getChipCssClass(status: string): string {
-    const found = Object.entries(STATUS_COLOR_GROUP).find(item => item[1].includes(status));
+    const found = Object.entries(STATUS_COLOR_GROUP).find((item) => item[1].includes(status));
     return found ? found[0] : 'e-default';
   }
 
@@ -226,6 +248,8 @@ export class ClientManagementContentComponent extends AbstractGridConfigurationC
   }
 
   private subscribeOnPermissions(): void {
-    this.currentUserPermissions$.pipe(takeUntil(this.unsubscribe$)).subscribe(permissions => this.permissions = permissions);
+    this.currentUserPermissions$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((permissions) => (this.permissions = permissions));
   }
 }

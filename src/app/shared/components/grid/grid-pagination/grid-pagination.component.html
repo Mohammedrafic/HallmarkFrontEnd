@@ -1,6 +1,11 @@
-<div class="app-grid-pagination">
+<div
+  [class.highlight]="allowBulkSelection && selectedTableRowsAmount"
+  class="app-grid-pagination"
+>
   <div class="app-grid-pagination__controls">
-    <section class="app-grid-pagination__left-side-controls">
+    <section
+    *ngIf="!allowBulkSelection || !selectedTableRowsAmount; else bulkApproveTemplate"
+    class="app-grid-pagination__left-side-controls">
       <app-dropdown
         [dataSource]="gridConfig.rowsPerPageDropDownObject"
         [fields]="perPageFieldsSettings"
@@ -13,11 +18,33 @@
         [formGroupInstance]="paginationFormGroup"
         [max]="pagerComponent.totalPages || 1"
         [min]="1"
+        format="#"
         controlName="navigateTo"
         class="app-grid-pagination__navigate-to-control"
         placeholder="Go to:"
       ></app-numeric-textbox>
     </section>
+    <ng-template #bulkApproveTemplate>
+      <section class="bulk-section">
+        <h3 class="bulk-section__amount">
+          {{ selectedTableRowsAmount }} Rows Selected
+        </h3>
+
+        <button
+          (click)="approveEmitter.emit()"
+          class="approve-button"
+          ejs-button
+          cssClass="e-primary">
+          Approve
+        </button>
+        <button
+          (click)="exportEmitter.emit()"
+          ejs-button
+          cssClass="e-primary button-export button--no-wrap">
+          Export <i-feather name="download" class="icon"></i-feather>
+        </button>
+      </section>
+    </ng-template>
     <section class="right-side-pager-controls">
       <ejs-pager
         #pagerComponent

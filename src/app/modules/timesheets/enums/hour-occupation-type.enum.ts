@@ -3,7 +3,6 @@ export enum HourOccupationType {
   Callback = 'Callback',
   Regular = 'Regular',
   Holiday = 'Holiday',
-  Charge = 'Charge',
   Preceptor = 'Preceptor',
   Orientation = 'Orientation',
 }

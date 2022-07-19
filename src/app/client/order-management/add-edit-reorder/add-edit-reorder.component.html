@@ -1,0 +1,91 @@
+<app-side-dialog
+  [header]="dialogTitle"
+  (formCancelClicked)="onCancel()"
+  (formSaveClicked)="onSave()">
+  <form class="reorder">
+    <app-multiselect-dropdown
+      [formGroupInstance]="reorderForm"
+      [fields]="candidatesOptionFields"
+      [dataSource]="candidates$ | async"
+      [showSelectAll]="true"
+      controlName="candidates"
+      id="candidates"
+      label="Candidate Name"
+      selectAllText="All"
+    ></app-multiselect-dropdown>
+    <app-multiselect-dropdown
+      [formGroupInstance]="reorderForm"
+      [fields]="agenciesOptionFields"
+      [dataSource]="agencies$ | async"
+      [showSelectAll]="true"
+      [required]="true"
+      (selectAllEmitter)="onSelectAllAgencies($event)"
+      selectAllText="All"
+      controlName="agencies"
+      id="agencies"
+      label="Agency Name"
+    ></app-multiselect-dropdown>
+    <app-datepicker
+      [formGroupInstance]="reorderForm"
+      [enableMask]="true"
+      [min]="currentDate"
+      [required]="true"
+      [maskPlaceholder]="datepickerMask"
+      id="reorderDate"
+      controlName="reorderDate"
+      label="Re-Order Date"
+      format="MM/dd/yyyy"
+      placeholder="MM/DD/YYYY"
+    ></app-datepicker>
+    <div class="row-controls">
+      <app-timepicker
+        [formGroupInstance]="reorderForm"
+        [maskPlaceholder]="timepickerMask"
+        [enableMask]="true"
+        [required]="true"
+        class="control"
+        id="shiftStartTime"
+        label="Shift Start Time"
+        placeholder="HH:MM"
+        controlName="shiftStartTime"
+        format="hh:mm a"
+      ></app-timepicker>
+      <app-timepicker
+        [formGroupInstance]="reorderForm"
+        [maskPlaceholder]="timepickerMask"
+        [enableMask]="true"
+        [required]="true"
+        class="control"
+        id="shiftEndTime"
+        label="Shift End Time"
+        placeholder="HH:MM"
+        controlName="shiftEndTime"
+        format="hh:mm a"
+      ></app-timepicker>
+    </div>
+    <div class="row-controls">
+      <app-numeric-textbox
+        *ngIf="!isEditMode"
+        [formGroupInstance]="reorderForm"
+        [required]="true"
+        [htmlAttributes]="numericInputAttributes"
+        class="control"
+        id="billRate"
+        format="c"
+        controlName="billRate"
+        label="Bill Rate"
+      ></app-numeric-textbox>
+      <app-numeric-textbox
+        [formGroupInstance]="reorderForm"
+        [required]="true"
+        [htmlAttributes]="numericInputAttributes"
+        class="control"
+        id="openPosition"
+        format="#"
+        controlName="openPosition"
+        label="Open Positions"
+      ></app-numeric-textbox>
+    </div>
+    <app-comments [useBackground]="false"></app-comments>
+  </form>
+</app-side-dialog>

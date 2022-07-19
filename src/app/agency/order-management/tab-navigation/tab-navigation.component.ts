@@ -1,5 +1,5 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 
 @Component({
@@ -8,6 +8,7 @@ import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.e
   styleUrls: ['./tab-navigation.component.scss'],
 })
 export class TabNavigationComponent implements OnInit {
+  @ViewChild('tabNavigation') tabNavigation: TabComponent;
   @Output() selectedTab = new EventEmitter<AgencyOrderManagementTabs>();
 
   public tabTitle = AgencyOrderManagementTabs;

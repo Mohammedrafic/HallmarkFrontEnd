@@ -5,8 +5,11 @@
 
 @import "./variables/colors.scss";
 @import "./fusion";
+@import "./ag-grid-styles";
 
 @import "../../assets/fonts/open-sans.scss";
+@import '@ag-grid-community/core/dist/styles/ag-grid.scss';
+@import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
 
 html {
   height: 100%;
@@ -59,6 +62,12 @@ body {
 
   .full-screen-box {
     height: calc(100% - 80px) !important;
+  }
+
+  .hyperlink {
+    cursor: pointer;
+    color: $primary-active-blue-10;
+    font-weight: 700;
   }
 
   .input-group {

@@ -101,10 +101,21 @@ label {
   width: 60%;
 }
 
+.comments {
+  padding: 0;
+
+  .e-card-content {
+    padding: 0;
+    height: 356px;
+  }
+}
+
 .job-description-checkboxes-container {
   display: flex;
   align-items: center;
   padding-top: 18px;
+  padding-bottom: 14px;
+  
   ejs-checkbox:not(:first-child) {
     margin-left: 24px;
   }

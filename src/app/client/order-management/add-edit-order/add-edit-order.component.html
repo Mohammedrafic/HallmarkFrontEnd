@@ -34,7 +34,7 @@
       <ng-template #content>
         <ng-container>
           <section class="order-details-form-section">
-            <app-order-details-form #orderDetailsForm [isActive]="selectedTab === SelectedTab.OrderDetails"></app-order-details-form>
+            <app-order-details-form #orderDetailsForm (orderTypeChanged)="onOrderTypeChange($event)" [disableOrderType]="disableOrderType" [isActive]="selectedTab === SelectedTab.OrderDetails"></app-order-details-form>
           </section>
         </ng-container>
       </ng-template>

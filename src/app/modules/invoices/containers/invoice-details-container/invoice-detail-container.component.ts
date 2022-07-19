@@ -42,8 +42,8 @@ interface ExportOption extends ItemModel {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoiceDetailContainerComponent extends Destroyable implements OnInit, OnChanges {
-  @Select(InvoicesState.isInvoiceDetailDialogOpen)
-  isInvoiceDetailDialogOpen$: Observable<DialogActionPayload>;
+  // @Select(InvoicesState.isInvoiceDetailDialogOpen)
+  // isInvoiceDetailDialogOpen$: Observable<DialogActionPayload>;
 
   @ViewChild('chipList') chipList: ChipListComponent;
   @ViewChild('sideDialog') sideDialog: DialogComponent;
@@ -123,22 +123,22 @@ export class InvoiceDetailContainerComponent extends Destroyable implements OnIn
   }
 
   private getDialogState(): void {
-    this.isInvoiceDetailDialogOpen$
-      .pipe(
-        throttleTime(100),
-        filter((val) => val.dialogState),
-        takeUntil(this.componentDestroy())
-      )
-      .subscribe((payload) => {
-        this.invoiceData = JSON.parse(localStorage.getItem('selected_invoice_row') as string);
-        this.chipList.cssClass = this.chipPipe.transform(this.invoiceData.statusText);
+    // this.isInvoiceDetailDialogOpen$
+    //   .pipe(
+    //     throttleTime(100),
+    //     filter((val) => val.dialogState),
+    //     takeUntil(this.componentDestroy())
+    //   )
+    //   .subscribe((payload) => {
+    //     this.invoiceData = JSON.parse(localStorage.getItem('selected_invoice_row') as string);
+    //     this.chipList.cssClass = this.chipPipe.transform(this.invoiceData.statusText);
 
-        if (payload.dialogState && typeof payload.rowId === 'number') {
-          this.sideDialog.show();
-        } else {
-          this.sideDialog.hide();
-        }
-        this.cdr.detectChanges();
-      });
+    //     if (payload.dialogState && typeof payload.id === 'number') {
+    //       this.sideDialog.show();
+    //     } else {
+    //       this.sideDialog.hide();
+    //     }
+    //     this.cdr.detectChanges();
+    //   });
   }
 }

@@ -1,6 +1,6 @@
 <div class="profile-hours-statistics-container">
   <section class="cumulative-hours">
-    <h3>Cumulative Hours</h3>
+    <h3>Week Hours</h3>
 
     <ejs-accumulationchart style='display:block; top: -20px; left: -15px'
                            class="cumulative-hours-chart"
@@ -15,8 +15,7 @@
         <e-accumulation-annotation [content]="weekChartAnnotation"
                                    region="Series"
                                    coordinateUnits="Pixel"
-                                   x="30"
-                                   y="38"
+                                   y="46"
         ></e-accumulation-annotation>
       </e-accumulation-annotations>
 
@@ -34,7 +33,7 @@
   </section>
 
   <section class="cumulative-hours-otd">
-    <h3>Cumulative Hours OTD</h3>
+    <h3>Cumulative Hours</h3>
     <ejs-accumulationchart style='display:block; top: -20px; left: -15px'
                            class="cumulative-hours-chart"
                            selectionMode="Point"
@@ -51,8 +50,7 @@
         <e-accumulation-annotation [content]="cumulativeChartAnnotation"
                                    region="Series"
                                    coordinateUnits="Pixel"
-                                   x="30"
-                                   y="38"
+                                   y="46"
         ></e-accumulation-annotation>
       </e-accumulation-annotations>
 
@@ -71,25 +69,29 @@
   </section>
 
   <section class="charts-legend">
-    <h3></h3>
     <div>
       <table>
         <tr>
           <th></th>
           <th></th>
           <th class="week-title">Week</th>
-          <th class="total-title">Cumulative</th>
+          <th class="total-title" colspan="2">Cumulative</th>
         </tr>
-        <tr *ngFor="let legendItem of hoursData; let i = index; trackBy: trackByName">
+        <tr *ngFor="let legendItem of legendItems; let i = index; trackBy: trackByName">
           <td>
-            <div class="marker" [style.backgroundColor]="chartColorsMap[legendItem.type]"></div>
+            <div class="marker" [style.backgroundColor]="chartColorsMap[legendItem.billRateConfigName]"></div>
           </td>
-          <td class="name">{{legendItem.type}}</td>
-          <td class="value1">{{legendItem.weekly ? (legendItem.weekly | number : '1.2-2') : '-'}}</td>
-          <td class="value2">{{legendItem.total ? (legendItem.total | number : '1.2-2') : '-'}}</td>
-          <td>
-            <ejs-checkbox [checked]="true"
-                          (change)="toggleChartCategoryVisibility($event, legendItem)"
+          <td class="name">{{legendItem.billRateConfigName}}</td>
+          <td class="week-hours-value">
+            {{legendItem.weekHours ? (legendItem.weekHours | number : '1.2-2') : '-'}}
+          </td>
+          <td class="cumulative-hours-value">
+            {{legendItem.cumulativeHours ? (legendItem.cumulativeHours | number : '1.2-2') : '-'}}
+          </td>
+          <td class="checkbox-cell">
+            <ejs-checkbox
+                    [checked]="true"
+                    (change)="toggleChartCategoryVisibility($event, legendItem)"
             ></ejs-checkbox>
           </td>
         </tr>
@@ -98,20 +100,20 @@
   </section>
 
   <ng-template #weekChartAnnotation>
-    <ng-container [ngTemplateOutlet]="chartAnnotation" [ngTemplateOutletContext]="{title: 'Week Working', value: totalWeekHours}"></ng-container>
+    <ng-container [ngTemplateOutlet]="chartAnnotation"
+                  [ngTemplateOutletContext]="{value: totalWeekHours === 0 ? 'No Data' : totalWeekHours}"
+    ></ng-container>
   </ng-template>
 
   <ng-template #cumulativeChartAnnotation>
-    <ng-container [ngTemplateOutlet]="chartAnnotation" [ngTemplateOutletContext]="{title: 'Total Working', value: '740.4'}"></ng-container>
+    <ng-container [ngTemplateOutlet]="chartAnnotation"
+                  [ngTemplateOutletContext]="{value: totalCumulativeHours === 0 ? 'No Data' : totalCumulativeHours}"
+    ></ng-container>
   </ng-template>
 
-  <ng-template #chartAnnotation let-value="value" let-title="title">
+  <ng-template #chartAnnotation let-value="value">
     <div class="chart-annotation">
       <div class="work-time-value">{{value}}</div>
-      <div class="work-time-title">
-        {{title}}
-        <div>hrs.</div>
-      </div>
     </div>
   </ng-template>
 </div>

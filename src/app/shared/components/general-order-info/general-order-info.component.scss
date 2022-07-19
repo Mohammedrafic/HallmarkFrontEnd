@@ -1,10 +1,28 @@
-@import "../../../styles/variables/colors";
+@import "colors";
 
 section {
   .title {
     font-weight: 700;
     font-size: 12px;
     color: $black;
+
+    .accent {
+      color: $primary-active-blue-10;
+    }
+  }
+
+  .accent {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 20px;
+    color: $primary-active-blue-10;
+    font-family: 'Open Sans';
+    font-style: normal;
+    text-transform: capitalize;
+
+    &.link {
+      cursor: pointer;
+    }
   }
 
   .sup-title{
@@ -23,6 +41,10 @@ section {
     grid-template-columns: repeat(4, 1fr);
     background-color: $secondary-dark-blue-50;
     gap: 25px 38px;
+
+    &.reorders {
+      grid-template-columns: repeat(5, 1fr);
+    }
   }
 
   .column {
@@ -58,6 +80,18 @@ section {
     .column {
       display: flex;
       flex-direction: column;
+    }
+  }
+
+  .warning {
+    font-weight: 400;
+    font-size: 13px;
+    display: flex;
+    align-items: start;
+
+    .icon {
+      color: $supportive-red;
+      margin-right: 5px;
     }
   }
 }

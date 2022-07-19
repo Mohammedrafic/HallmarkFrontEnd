@@ -1,114 +1,115 @@
 <ejs-dialog
-  cssClass="dnw-dialog"
-  #dnwDialog
-  [target]="profileDetailsDialogsTarget"
-  [width]="'350px'"
-  [visible]="false"
->
-  <ng-template #content>
-    <div class="dnw-dialog-content-container">
-      <h2>You have selected DNW</h2>
-      <div class="content">Timesheet for the week will be deleted. Are you sure you want to proceed?</div>
-      <div class="actions">
-        <button ejs-button class="e-outline" (click)="dnwDialog.hide()">Cancel</button>
-        <button ejs-button class="e-danger">Proceed</button>
-      </div>
-    </div>
-  </ng-template>
-</ejs-dialog>
-
-<ejs-dialog
   id="dialog"
-  #sideDialog
-  cssClass="dialog"
+  #candidateDialog
+  cssClass="dialog timesheet-details-dialog"
   [width]="'1180px'"
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
   <ng-template #content>
-    <section class="container">
+    <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails">
       <div class="profile-details-header">
-      <span class="e-avatar e-avatar-xlarge"
-            style="background-size: cover; background-image: url(https://ej2.syncfusion.com/angular/documentation/samples/avatar/getting-started-cs1/pic01.png)"
-      ></span>
+        <img
+          class="e-avatar e-avatar-xlarge"
+          [src]="timesheetDetails.candidateId | candidateAvatar"/>
 
         <div class="flex flex-column">
-          <h3 class="username">{{ profileData?.firstName }}, {{profileData?.lastName}}</h3>
+          <h3 class="username">
+            {{ timesheetDetails.candidateFirstName }}, {{ timesheetDetails.candidateLastName}}
+          </h3>
+
           <ejs-chiplist #chipList class="events-off">
             <e-chips>
               <e-chip
-                *ngIf="profileData"
-                [text]="profileData?.status"
-                [cssClass]="profileData?.status | chipsCssClass">
+                [text]="timesheetDetails.statusText"
+                [cssClass]="timesheetDetails.statusText || '' | chipsCssClass">
               </e-chip>
-              <e-chip [text]="onboardedStatus" [cssClass]="onboardedStatus | chipsCssClass"></e-chip>
             </e-chips>
           </ejs-chiplist>
         </div>
-
         <div class="spacer"></div>
 
         <div class="header-controls">
-         <div style="display: flex; align-items: center" class="timesheet-details-upload-container" #uploadContainer>
-           <ejs-datepicker
-             [width]="200"
-             id="inactiveDate"
-             class="datepicker"
-             format="MM/dd/yyyy"
-             placeholder="MM/DD/YYYY"
-           ></ejs-datepicker>
+          <div
+          style="display: flex; align-items: center"
+          class="timesheet-details-upload-container"
+          #uploadContainer>
 
-           <button ejs-button cssClass="e-outline" class="upload-button" #uploadBtn (click)="showUploadArea(uploadContainer)">
-             Upload
-             <i-feather name="upload" class="icon"></i-feather>
-           </button>
+<!--            TODO: Remove after resolving issue with date filter. -->
+            <div class="date-filter-mock" style="width: 300px"></div>
 
-           <ejs-tooltip #uploadTooltip [container]="uploadContainer" [showTipPointer]="false"
-                        opensOn="Custom"
-                        position="TopLeft" width="100%">
-             <ng-template #content>
-               <div class="file-upload-area-container"
-                    appClickOutside
-                    (clickOutside)="hideUploadArea()"
-                    [exclude]="uploadBtn.element"
-               >
-                 <h2>Upload Documents</h2>
-                 <div class="upload-area">
-                   <div id="timesheet-details-files-droparea" class="droparea"(click)="browse()" #dropEl>
-                     <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
-                   </div>
-                   <ejs-uploader #uploader
-                                 [dropArea]="dropEl"
-                                 [allowedExtensions]="allowedExtensions"
-                                 [maxFileSize]="maxFileSize"
-                                 [multiple]="false"
-                                 [autoUpload]="false"
-                                 [showFileList]="false"
-                                 (selected)="onFileSelected($event)">
-                   </ejs-uploader>
-                 </div>
-               </div>
-             </ng-template>
-           </ejs-tooltip>
+            <button
+             ejs-button
+             cssClass="e-outline"
+             class="upload-button"
+             #uploadBtn
+             (click)="uploadTooltip.open(uploadContainer)"
+             >Upload
+              <i-feather name="upload" class="icon"></i-feather>
+            </button>
+
+            <ejs-tooltip #uploadTooltip
+                         [container]="uploadContainer"
+                         [showTipPointer]="false"
+                         opensOn="Custom"
+                         position="TopLeft" width="100%">
+              <ng-template #content>
+                <div class="file-upload-area-container"
+                     appClickOutside
+                     (clickOutside)="uploadTooltip.close()"
+                     [exclude]="uploadBtn.element"
+                >
+                  <h2>Upload Documents</h2>
+                  <div class="upload-area" #uploadArea>
+                    <div class="droparea" #dropEl (click)="browse()">
+                      <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
+                    </div>
+                    <ejs-uploader #uploader
+                                  [dropArea]="dropEl"
+                                  [allowedExtensions]="allowedFileExtensions"
+                                  [maxFileSize]="maxFileSize"
+                                  [multiple]="true"
+                                  [autoUpload]="false"
+                                  [showFileList]="false"
+                                  (selected)="onFilesSelected($event)">
+                    </ejs-uploader>
+                  </div>
+                </div>
+              </ng-template>
+            </ejs-tooltip>
+
+            <app-export-button
+                    (csvExport)="exportProfileDetails(exportedFileType.csv)"
+                    (excelExport)="exportProfileDetails(exportedFileType.excel)"
+                    (customExport)="showCustomExportDialog()"
+            ></app-export-button>
          </div>
 
-          <app-export-button (optionSelected)="export($event)"></app-export-button>
-        </div>
-
-        <i-feather name="x" class="icon close-button" (click)="handleProfileClose()"></i-feather>
+         <i-feather name="x" class="icon close-button" (click)="handleProfileClose()"></i-feather>
+       </div>
       </div>
 
       <div class="order-header">
-        <h2 class="order-id">Order ID {{ profileData?.orderId}}</h2>
+        <h2 class="order-id">Order ID {{ timesheetDetails?.orderId}}</h2>
+        <div class="bootstrap reject-reason-input" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
+          <div class="e-input input">{{rejectReason}}</div>
+        </div>
 
         <div class="controls-block">
-          <div class="checkbox-block">
-            <ejs-switch class="toggle" [checked]="false" (checkedChange)="onDWNCheckboxSelectedChange($event)"></ejs-switch>
+          <div class="checkbox-block" *ngIf="isAgency">
+            <ejs-switch #dnwSwitch
+              class="toggle"
+              [checked]="timesheetDetails.noWorkPerformed"
+              (change)="onDWNCheckboxSelectedChange($event, dnwSwitch)"
+            ></ejs-switch>
             <span>DNW</span>
           </div>
 
-          <button *ngIf="!isAgency" ejs-button cssClass="e-outline" class="reject-button" (click)="onRejectButtonClick()">
-            Reject
+          <button
+            *ngIf="!isAgency"
+            ejs-button cssClass="e-outline"
+            class="reject-button"
+            (click)="onRejectButtonClick()">Reject
           </button>
 
           <button ejs-button cssClass="e-primary" (click)="handleApprove()">
@@ -118,53 +119,65 @@
       </div>
 
       <div class="job-general-info tile-dark-blue">
-        <app-profile-details-job-info
-        [jobData]="profileData"></app-profile-details-job-info>
+          <app-profile-details-job-info
+                  [jobData]="timesheetDetails"
+          ></app-profile-details-job-info>
       </div>
 
       <div class="profile-hours-statistics">
-        <div class="tile-dark-blue">
-          <app-profile-cumulative-hours></app-profile-cumulative-hours>
-        </div>
-        <ng-container *ngIf="uploadedFiles$ | async as uploads">
-          <div class="tile-dark-blue profile-uploads" *ngIf="uploads.length">
-            <app-profile-uploads *ngIf="!uploads"></app-profile-uploads>
+          <div class="tile-dark-blue" *ngIf="chartsVisible$ | async">
+              <app-profile-cumulative-hours
+                      [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
+              ></app-profile-cumulative-hours>
           </div>
-        </ng-container>
 
-       <ng-container *ngIf="invoices$ | async as invoices">
-         <div class="tile-dark-blue profile-invoices" *ngIf="invoices.length">
-           <app-profile-invoices [invoices]="invoices"></app-profile-invoices>
+          <div class="tile-dark-blue miles" *ngIf="milesData$ | async as milesData">
+            <app-profile-miles [milesData]="milesData"></app-profile-miles>
+          </div>
+
+          <div class="tile-dark-blue profile-uploads" *ngIf="timesheetDetails?.attachments?.length">
+            <app-attachments-uploads [attachments]="timesheetDetails.attachments"></app-attachments-uploads>
+          </div>
+
+         <div class="tile-dark-blue profile-invoices" *ngIf="timesheetDetails?.invoices?.length">
+           <app-profile-invoices [invoices]="timesheetDetails.invoices"></app-profile-invoices>
          </div>
-       </ng-container>
       </div>
 
       <section class="profile-table-container">
         <app-profile-timesheet-table
-          *ngIf="timeSheetsProfile$ | async as timeSheetsProfile"
-          [timeSheetsProfile]="timeSheetsProfile"
-          [tempProfile]="profileData"
-          (openAddSideDialog)="handleOpenSideDialog($event)"
-          (updateTable)="handleUpdateTable()"
-          (deleteTableItemId)="handleDeleteItem($event)"
+          [candidateId]="candidateId"
+          (openAddSideDialog)="openAddDialog($event)"
+          (changesSaved)="handleEditChanges($event)"
         >
         </app-profile-timesheet-table>
       </section>
 
-      <app-navigation-panel prevLabel="Previous Timesheet"
-                            nextLabel="Next Timesheet"
-                            [prevDisabled]="currentSelectedRowIndex === 0"
-                            [nextDisabled]="isNextDisabled"
-                            (prevClick)="onNextPreviousOrder(false)"
-                            (nextClick)="onNextPreviousOrder(true)"
-      ></app-navigation-panel>
     </section>
+    <app-navigation-panel
+            prevLabel="Previous Timesheet"
+            nextLabel="Next Timesheet"
+            [prevDisabled]="currentSelectedRowIndex === 0"
+            [nextDisabled]="isNextDisabled"
+            (prevClick)="onNextPreviousOrder(false)"
+            (nextClick)="onNextPreviousOrder(true)"
+    ></app-navigation-panel>
   </ng-template>
 </ejs-dialog>
 
 <app-timesheet-reject-reason-dialog
   [(visible)]="rejectReasonDialogVisible"
-  [container]="profileDetailsDialogsTarget"
+  [container]="candidateDialog.element"
   (rejectReasonChange)="handleReject($event)"
 ></app-timesheet-reject-reason-dialog>
-<app-add-timesheet [profileId]="profileId" (updateTable)="handleUpdateTable()"></app-add-timesheet>
+
+<app-add-timesheet
+  (updateTable)="handleUpdateTable()">
+</app-add-timesheet>
+
+<app-export-dialog
+        [columns]="columnsToExport"
+        [fileName]="fileName"
+        (cancel)="closeExport()"
+        (export)="customExport($event)"
+></app-export-dialog>

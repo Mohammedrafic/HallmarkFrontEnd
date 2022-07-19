@@ -3,11 +3,11 @@ import { Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
+import { isDate, isEmpty } from 'lodash';
 
 @Injectable({ providedIn: 'root' })
 export class FilterService {
-
-  constructor() { }
+  constructor() {}
 
   /**
    * Remove value from form control
@@ -17,7 +17,7 @@ export class FilterService {
   public removeValue(event: FilteredItem, form: FormGroup, filterColumns: any): void {
     let val = form.controls[event.column].value;
     if (Array.isArray(val)) {
-      val = val.filter(item => {
+      val = val.filter((item) => {
         return item !== event.value;
       });
       form.controls[event.column].setValue(val);
@@ -38,30 +38,51 @@ export class FilterService {
    */
   public generateChips(form: FormGroup, filterColumns: any, datePipe?: DatePipe): FilteredItem[] {
     let chips: any[] = [];
-    Object.keys(form.controls).forEach(key => {
-      const val = form.controls[key].value;
-      if (!val) return;
-      if (filterColumns[key].type === ControlTypes.Multiselect) {
-        val.forEach((item: any) => {
-          chips.push({
-            text: filterColumns[key].valueType === ValueType.Id ? 
-            filterColumns[key].dataSource.find((data: any) => data[filterColumns[key].valueId] === item)[filterColumns[key].valueField] : item, 
-            column: key, 
-            value: item 
-          });
-        });
-      } else if (filterColumns[key].type === ControlTypes.Checkbox) {
-        chips.push({ text: filterColumns[key].checkBoxTitle, column: key, value: val });
-      } else if (filterColumns[key].type === ControlTypes.Date && datePipe) {
-        chips.push({ text: datePipe.transform(val,'MM/dd/yyyy'), column: key, value: val });
-      } else if (filterColumns[key].type === ControlTypes.Radio) {
-        if (filterColumns[key].dataSource[val]) {
-          chips.push({ text: filterColumns[key].dataSource[val], column: key, value: val });
+
+    Object.keys(form.controls)
+      .filter((key) => !isEmpty(form.controls[key].value) || isDate(form.controls[key].value))
+      .forEach((key) => {
+        const val = form.controls[key].value;
+
+        switch (filterColumns[key].type) {
+          case ControlTypes.Multiselect:
+            val.forEach((item: any) => {
+              chips.push({
+                text:
+                  filterColumns[key].valueType === ValueType.Id
+                    ? filterColumns[key].dataSource.find((data: any) => data[filterColumns[key].valueId] === item)[
+                        filterColumns[key].valueField
+                      ]
+                    : item,
+                column: key,
+                value: item,
+              });
+            });
+            break;
+
+          case ControlTypes.Checkbox:
+            chips.push({ text: filterColumns[key].checkBoxTitle, column: key, value: val });
+            break;
+
+          case ControlTypes.Date:
+            if (datePipe) {
+              chips.push({ text: datePipe.transform(val, 'MM/dd/yyyy'), column: key, value: val });
+            }
+            break;
+            
+          case ControlTypes.Radio:
+            if (filterColumns[key].dataSource[val]) {
+              chips.push({ text: filterColumns[key].dataSource[val], column: key, value: val });
+            }
+            break;
+
+          default:
+            chips.push({ text: val, column: key, value: val });
+            break;
         }
-      } else {
-        chips.push({ text: val, column: key, value: val });
-      }
-    });
+      });
+
     return chips;
   }
 }
+

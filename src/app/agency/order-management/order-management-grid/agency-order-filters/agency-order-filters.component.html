@@ -1,18 +1,27 @@
 <form class="bootstrap" [formGroup]="form" *ngIf="form">
   <div>
-    <div class="input-container">
-      <label for="externalId">Order ID</label>
+    <div class="input-container" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders">
+      <label for="orderId">Order ID</label>
       <div class="input-group">
-        <input class="e-input" type="text" maxlength="50" formControlName="orderId" />
+        <input id="orderId" class="e-input" type="text" maxlength="50" formControlName="orderId" />
+      </div>
+    </div>
+
+    <div class="input-container" *ngIf="activeTab === AgencyOrderManagementTabs.ReOrders">
+      <label for="reOrderId">Re-Order ID</label>
+      <div class="input-group">
+        <input id="reOrderId" class="e-input" type="text" maxlength="50" formControlName="reOrderId" />
       </div>
     </div>
   </div>
   <div>
     <div class="input-container">
       <label>Organization</label>
-      <div class="input-group multiselect">
+      <div class="input-group">
         <ejs-multiselect
           mode="CheckBox"
+          selectAllText="All"
+          [showSelectAll]="true"
           formControlName="organizationIds"
           placeholder="All"
           [fields]="optionFields"
@@ -24,49 +33,78 @@
       </div>
     </div>
   </div>
-  <!-- <div class="row">
-      <div class="input-container">
-        <label>Region</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="regionIds"
-                           placeholder="All"
-                           [fields]="optionFields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.regionIds.dataSource">
-          </ejs-multiselect>
-        </div>
+    <div class="input-container">
+      <label>Region</label>
+      <div class="input-group">
+        <ejs-multiselect
+          mode="CheckBox"
+          #regionMultiselect
+          selectAllText="All"
+          [showSelectAll]="true"
+          formControlName="regionIds"
+          placeholder="All"
+          [fields]="optionFields"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.regionIds.dataSource"
+        >
+          <ng-template #itemTemplate let-data>
+            <div class="order-filter-item">
+              <span>{{ data?.name }}</span>
+              <span class="order-filter-item_parent">{{ data?.orgName }}</span>
+            </div>
+          </ng-template>
+        </ejs-multiselect>
       </div>
-      <div class="input-container">
-        <label>Location</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="locationIds"
-                           placeholder="All"
-                           [fields]="optionFields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.locationIds.dataSource">
-          </ejs-multiselect>
-        </div>
+    </div>
+    <div class="input-container">
+      <label>Location</label>
+      <div class="input-group">
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="locationIds"
+          selectAllText="All"
+          [showSelectAll]="true"
+          placeholder="All"
+          [fields]="optionFields"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.locationIds.dataSource"
+        >
+          <ng-template #itemTemplate let-data>
+            <div class="order-filter-item">
+              <span>{{ data?.name }}</span>
+              <span class="order-filter-item_parent">{{ data?.regionName }}</span>
+            </div>
+          </ng-template>
+        </ejs-multiselect>
       </div>
-    </div> 
-    <div>
-      <div class="input-container">
-        <label>Department</label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="departmentsIds"
-                           placeholder="All"
-                           [fields]="optionFields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.departmentsIds.dataSource">
-          </ejs-multiselect>
-        </div>
+    </div>
+  <div>
+    <div class="input-container">
+      <label>Department</label>
+      <div class="input-group">
+        <ejs-multiselect
+          mode="CheckBox"
+          selectAllText="All"
+          [showSelectAll]="true"
+          formControlName="departmentsIds"
+          placeholder="All"
+          [fields]="optionFields"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.departmentsIds.dataSource"
+        >
+          <ng-template #itemTemplate let-data>
+            <div class="order-filter-item">
+              <span>{{ data?.name }}</span>
+              <span class="order-filter-item_parent">{{ data?.locationName }}</span>
+            </div>
+          </ng-template>
+        </ejs-multiselect>
       </div>
-    </div> -->
+    </div>
+  </div>
   <div class="row">
     <div class="input-container">
       <label>Skill</label>
@@ -78,12 +116,12 @@
           [fields]="optionFields"
           [allowFiltering]="true"
           [showDropDownIcon]="true"
-          [dataSource]="filterColumns.skillIds.dataSource "
+          [dataSource]="filterColumns.skillIds.dataSource"
         >
         </ejs-multiselect>
       </div>
     </div>
-    <div class="input-container">
+    <div class="input-container" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders && activeTab !== AgencyOrderManagementTabs.PerDiem">
       <label>Order Type</label>
       <div class="input-group multiselect">
         <ejs-multiselect
@@ -139,7 +177,7 @@
       </div>
     </div>
   </div>
-  <div class="row">
+  <div class="row" *ngIf="activeTab !== AgencyOrderManagementTabs.PerDiem">
     <div class="input-container">
       <label>Bill Rate From</label>
       <div class="input-group">
@@ -153,26 +191,48 @@
       </div>
     </div>
   </div>
-  <div>
+  <div class="row" *ngIf="activeTab === AgencyOrderManagementTabs.ReOrders || activeTab === AgencyOrderManagementTabs.PerDiem">
     <div class="input-container">
-      <label for="externalId"># of Positions</label>
+      <label>Candidates Count From</label>
       <div class="input-group">
-        <input class="e-input" type="text" maxlength="50" formControlName="openPositions" />
+        <input
+          class="e-input"
+          type="text"
+          maxlength="50"
+          formControlName="candidatesCountFrom"/>
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Candidates Count To</label>
+      <div class="input-group">
+        <input
+          class="e-input"
+          type="text"
+          maxlength="50"
+          formControlName="candidatesCountTo"/>
       </div>
     </div>
   </div>
-  <div class="row">
+  <div>
+    <div class="input-container">
+      <label for="numberOfPositions"># of Positions</label>
+      <div class="input-group">
+        <input id="numberOfPositions" class="e-input" type="text" maxlength="50" formControlName="openPositions" />
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="activeTab !== AgencyOrderManagementTabs.PerDiem">
     <div class="input-container calendar">
-      <label for="inactiveDate">Job Start Date</label>
+      <label for="jobStartDate">{{ activeTab !== AgencyOrderManagementTabs.ReOrders ? 'Job Start Date' : 'Re-Order Date' }}</label>
       <div class="input-group datepicker">
-        <ejs-datepicker class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobStartDate">
+        <ejs-datepicker id="jobStartDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobStartDate">
         </ejs-datepicker>
       </div>
     </div>
-    <div class="input-container calendar">
-      <label for="inactiveDate">Job End Date</label>
+    <div class="input-container calendar" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders">
+      <label for="jobEndDate">Job End Date</label>
       <div class="input-group datepicker">
-        <ejs-datepicker class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobEndDate">
+        <ejs-datepicker id="jobEndDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobEndDate">
         </ejs-datepicker>
       </div>
     </div>

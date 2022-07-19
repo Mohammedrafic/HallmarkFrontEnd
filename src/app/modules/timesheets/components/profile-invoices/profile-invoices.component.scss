@@ -1,4 +1,4 @@
-@import '../../../../styles/variables/colors';
+@import "colors";
 
 .invoices-container {
   padding: 10px 25px 10px 14px;
@@ -12,8 +12,10 @@
     color: $black;
   }
 
-  a {
-    text-decoration: underline;
+  .invoice {
+    display: block;
+    color: $primary-active-blue-10;
+    margin-bottom: 5px;
   }
 }
 

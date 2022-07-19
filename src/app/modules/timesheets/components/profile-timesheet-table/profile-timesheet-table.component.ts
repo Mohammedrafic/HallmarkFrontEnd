@@ -1,243 +1,258 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   EventEmitter,
   Input,
-  OnChanges,
-  OnDestroy,
   Output,
-  ViewChild
+  ViewChild,
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
-import { of, combineLatest, Subscription, filter, takeUntil, Observable } from 'rxjs';
-import { Store } from '@ngxs/store';
+import { combineLatest, Observable, takeUntil } from 'rxjs';
+import { filter, skip, take, tap, switchMap } from 'rxjs/operators';
+import { Select, Store } from '@ngxs/store';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
+import { TabComponent, SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
 
-import { GridComponent } from '@syncfusion/ej2-angular-grids';
+import { Destroyable } from '@core/helpers';
+import { RecordFields } from './../../enums/timesheet-common.enum';
+import {
+  TimesheetRecordsColdef,
+  TimesheetRecordsColConfig,
+  RecordsTabConfig,
+} from './../../constants/timsheets-details.constant';
+import { ConfirmService } from './../../../../shared/services/confirm.service';
+import { TabConfig, DropdownOption } from './../../interface/common.interface';
+import { ConfirmTabChange } from './../../constants/confirm-delete-timesheet-dialog-content.const';
+import { DialogActionPayload, OpenAddDialogMeta, TimesheetRecordsDto } from '../../interface';
+import { TimesheetRecordsService } from '../../services/timesheet-records.service';
+import { TimesheetsState } from '../../store/state/timesheets.state';
+import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { ProfileTimeSheetDetail } from '../../store/model/timesheets.model';
-import { ProfileTimesheetTableConfig } from '../../constants';
-import { Timesheets } from '../../store/actions/timesheets.actions';
-import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
-import { ConfirmService } from '@shared/services/confirm.service';
-import { ProfileTimesheetService } from '../../services/profile-timesheet.service';
-import { TakeUntilDestroy } from '@core/decorators';
-
-@TakeUntilDestroy
+/**
+ * TODO: move tabs into separate component if possible
+ */
 @Component({
   selector: 'app-profile-timesheet-table',
   templateUrl: './profile-timesheet-table.component.html',
   styleUrls: ['./profile-timesheet-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-
 })
-export class ProfileTimesheetTableComponent extends AbstractGridConfigurationComponent implements OnDestroy, OnChanges {
-  protected componentDestroy: () => Observable<unknown>;
+export class ProfileTimesheetTableComponent extends Destroyable implements AfterViewInit {
+  @ViewChild('tabs') readonly tabs: TabComponent;
 
-  @ViewChild('profileTable') readonly profileTable: GridComponent;
+  @ViewChild('grid') readonly grid: IClientSideRowModel;
 
-  @Input() timeSheetsProfile: ProfileTimeSheetDetail[];
+  @Input() candidateId: number;
 
-  @Input() tempProfile: any;
+  @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
 
-  @Output() openAddSideDialog: EventEmitter<number> = new EventEmitter<number>();
-  @Output() updateTable: EventEmitter<void> = new EventEmitter<void>();
-  @Output() deleteTableItemId: EventEmitter<{ profileId: number; tableItemId: number | any }>
-    = new EventEmitter<{ profileId: number; tableItemId: number | any }>();
+  @Output() readonly changesSaved: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-  public override readonly allowPaging = false;
+  @Select(TimesheetsState.tmesheetRecords)
+  public readonly timesheetRecords$: Observable<TimesheetRecordsDto>;
 
-  public readonly tableHeight = 220;
+  @Select(TimesheetsState.isTimesheetOpen)
+  public readonly isTimesheetOpen$: Observable<DialogActionPayload>;
 
-  public readonly tableConfig = ProfileTimesheetTableConfig;
+  @Select(TimesheetsState.billRateTypes)
+  private readonly billRates$: Observable<DropdownOption[]>;
 
-  tempData: any[]; // TODO change tempData everywhere to timeSheetsProfile
+  @Select(TimesheetsState.costCenters)
+  private readonly costCenters$: Observable<DropdownOption[]>;
 
-  profileId: number;
-
-  public initialSort = {
-    columns: [
-      { field: 'timeIn', direction: 'Ascending' },
-    ],
-  };
   public isEditOn = false;
-  public subscription: Subscription;
+
+  public timesheetColDef = TimesheetRecordsColdef;
+
+  public readonly modules: Module[] = [ClientSideRowModelModule];
+
+  public tabsConfig: TabConfig[] = RecordsTabConfig;
+
+  public records: TimesheetRecordsDto;
+
+  public currentTab: RecordFields = RecordFields.Time;
+
+  public isFirstSelected = true;
+
+  private isChangesSaved = true;
+
+  private formControls: Record<string, FormGroup> = {};
+
+  private gridApi: GridApi;
+
+  private slectingindex: number;
 
   constructor(
     private store: Store,
-    private cdr: ChangeDetectorRef,
     private confirmService: ConfirmService,
-    private profileTimesheetService: ProfileTimesheetService
+    private timesheetRecordsService: TimesheetRecordsService,
+    private cd: ChangeDetectorRef,
   ) {
     super();
-
   }
 
-  ngOnChanges() {
-    this.createTableData();
+  ngAfterViewInit(): void {
+    this.getRecords();
+    this.watchForDialogState();
   }
 
-  ngOnDestroy(): void {
-    this.handleSubscription();
-  }
+  onTabSelect(selectEvent: SelectingEventArgs): void {
+    this.isFirstSelected = false;
 
-  public editTimesheets(): void {
-    this.updateTableView(true);
-  }
-  /**
-   * Todo remove after demo
-   */
-  private createTableData(): void {
-    let profile;
-    const init = localStorage.getItem('profile');
-    if (init) {
-      profile = JSON.parse(init as string);
+    if (!this.isChangesSaved && (this.slectingindex !== selectEvent.selectedIndex)) {
+      this.confirmService.confirm(ConfirmTabChange, {
+        title: 'Unsaved Progress',
+        okButtonLabel: 'Proceed',
+        okButtonClass: 'delete-button',
+      })
+      .pipe(
+        take(1),
+      )
+      .subscribe((submitted) => {
+        if (submitted) {
+          this.isChangesSaved = true;
+          this.selectTab(selectEvent.selectedIndex);
+          this.setInitialTableState();
+        } else {
+          this.slectingindex = selectEvent.previousIndex;
+          this.tabs.select(selectEvent.previousIndex);
+        }
+      });
     } else {
-      profile = {}
-    }
-
-    this.profileId = profile.id;
-    this.tempData = [];
-    const data = localStorage.getItem('timesheet-details-tables');
-    let storageData;
-
-
-    if (data) {
-      storageData = JSON.parse(data)
-    } else {
-      storageData = {}
-    }
-
-    if (storageData && storageData[profile.id]) {
-      this.tempData = storageData[profile.id];
-    } else {
-      let initDate: Date = new Date(profile.startDate);
-
-      for (let i = 0; i < profile.totalDays; i++) {
-        const tableItem = {
-          id: 500 + i,
-          day: new Date(initDate),
-          timeIn: this.setInitTime(new Date(initDate)),
-          timeOut: this.setEndOfday(new Date(initDate)),
-          costCenter: '',
-          category: 'Regular',
-          hours: 8,
-          rate: profile.billRate,
-          total: profile.billRate * 8,
-        };
-
-
-        this.tempData.push(tableItem)
-        initDate = new Date(initDate.setDate(initDate.getDate() + 1));
+      if (this.isChangesSaved) {
+        this.setInitialTableState();
       }
-      const storageItem = {
-        [profile.id]: this.tempData,
-      };
-
-      localStorage.setItem('timesheet-details-tables', JSON.stringify({
-        ...storageData,
-        ...storageItem,
-      }));
-    }
-    this.tempData = this.tempData.map((el) => ({ ...el, form: this.profileTimesheetService.populateForm(el) }));
-  }
-
-  private setInitTime(time: Date) {
-    const clonedDate = new Date(time.getTime());
-    clonedDate.setHours(8, 0, 0);
-    return clonedDate;
-  }
-
-  private setEndOfday(time: Date) {
-    const clonedDate = new Date(time.getTime());
-    clonedDate.setHours(17, 0,  0);
-    return clonedDate;
-  }
-
-  public deleteTimesheet(timesheet: ProfileTimeSheetDetail): void {
-    this.deleteTableItemId.emit({ profileId: this.profileId, tableItemId: timesheet.id });
-  }
-
-  public cancelChanges(): void {
-    if (this.tempData.some(el => el.form?.dirty)) {
-      this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT, {
-          title: DELETE_CONFIRM_TITLE,
-          okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
-        }).pipe(filter(confirm => confirm))
-        .subscribe(() => {
-          this.resetForms();
-          this.updateTableView();
-        });
-    } else {
-      this.resetForms();
-      this.updateTableView();
+      this.selectTab(selectEvent.selectedIndex);
     }
   }
 
-  public saveChanges(): void {
-    if (!this.tempData.some(el => el.form?.invalid)) {
-      this.subscription = combineLatest(
-        this.tempData
-          .map((el) => {
-            return el.form?.valid && el.form?.touched
-            ? this.store.dispatch(new Timesheets.PatchProfileTimesheet(
-              this.profileId,
-              el.id,
-              {
-                ...el.form.getRawValue(),
-                hours: Math.abs(el.form.getRawValue().timeOut.getTime() - el.form.getRawValue().timeIn.getTime()) / 36e5,
-              }
-            )) :
-            of(null)
-          }
-          ),
-      ).pipe(takeUntil(this.componentDestroy()))
-      .subscribe(() => {
-        this.updateTable.emit();
-        this.updateTableView();
-      });
-    } else {
-      this.tempData.forEach(el => {
-        el.form?.markAllAsTouched();
-      });
-    }
-  }
-
-  public handleRowChange(form: FormGroup, key: string): void {
-    form.get(key)?.updateValueAndValidity({ onlySelf: true, emitEvent: false });
-    this.cdr.detectChanges();
-  }
-
-  private updateTableView(isEdit = false): void {
-    this.isEditOn = isEdit;
-    this.toggleColumn(isEdit);
-    this.profileTable.autoFitColumns();
-    this.cdr.detectChanges();
-  }
-
-  private handleSubscription(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-  }
-
-  private resetForms(): void {
-    this.tempData = this.tempData.map(el => {
-      el.form = this.profileTimesheetService.populateForm(el);
-
-      return el;
+  public openAddDialog(): void {
+    const startDate = new Date(this.store.snapshot().timesheets.selectedTimeSheet.startDate);
+    startDate.setUTCHours(0, 0, 0, 0);
+    
+    this.openAddSideDialog.emit({
+      currentTab: this.currentTab,
+      initDate: startDate.toUTCString(),
     });
   }
 
-  private toggleColumn(isShow = false): void {
-    if (isShow) {
-      this.profileTable.showColumns(this.tableConfig.actions.header);
-    } else {
-      this.profileTable.hideColumns(this.tableConfig.actions.header);
+  public editTimesheets(): void {
+    this.isEditOn = true;
+    this.createForm();
+    this.setEditModeColDef();
+  }
+
+  public onGridReady(params: GridReadyEvent): void {
+    this.gridApi = params.api;
+  }
+
+  public cancelChanges(): void {
+    this.changesSaved.emit(true);
+    this.isChangesSaved = true;
+    this.setInitialTableState();
+  }
+
+  public saveChanges(): void {
+    const diffs = this.timesheetRecordsService.findDiffs(
+      this.records[this.currentTab], this.formControls, this.timesheetColDef);
+
+    if (diffs.length) {
+
+      this.store.dispatch(new TimesheetDetails.PatchTimesheetRecords(this.candidateId, diffs))
+      .pipe(
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe(() => {
+        this.changesSaved.emit(true);
+        this.isChangesSaved = true;
+        this.setInitialTableState();
+      });
     }
+  }
+
+  public trackByIndex(index: number, item: TabConfig): number {
+    return index;
+  }
+
+  private selectTab(index: number): void {
+    this.changeColDefs(index);
+  }
+
+  private createForm(): void {
+    this.formControls = this.timesheetRecordsService.createEditForm(
+      this.records, this.currentTab, this.timesheetColDef);
+    this.watchFormChanges();
+  }
+
+  private getRecords(): void {
+    this.timesheetRecords$
+    .pipe(
+      tap((res) => { this.records = res;}),
+      switchMap(() => {
+        return combineLatest([
+          this.billRates$,
+          this.costCenters$,
+        ]);
+      }),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      if (this.gridApi) {
+        this.gridApi.setColumnDefs(this.timesheetColDef);
+      }
+    });
+  }
+
+  private setEditModeColDef(): void {
+    this.timesheetColDef = this.timesheetColDef.map((def) => {
+      if (def.cellRendererParams && def.cellRendererParams.editMode) {
+        def.cellRendererParams.isEditable = this.isEditOn;
+        def.cellRendererParams.formGroup = this.formControls;
+      }
+      return def;
+    });
+
+    this.gridApi.setColumnDefs(this.timesheetColDef);
+  }
+
+  private setInitialTableState(): void {
+    this.isEditOn = false;
+    this.formControls = {};
+    this.setEditModeColDef();
+  }
+
+  private changeColDefs(idx: number): void {
+    this.currentTab = this.timesheetRecordsService.getCurrentTabName(idx);
+    this.timesheetColDef = TimesheetRecordsColConfig[this.currentTab];
+    this.cd.markForCheck();
+  }
+
+  private watchForDialogState(): void {
+    this.isTimesheetOpen$
+    .pipe(
+      skip(1),
+      filter((payload) => !payload),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      this.cancelChanges();
+    })
+  }
+
+  private watchFormChanges(): void {
+    this.timesheetRecordsService.watchFormChanges(this.formControls)
+    .pipe(
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      if (this.timesheetRecordsService.checkIfFormTouched(this.formControls)) {
+        this.isChangesSaved = false;
+        this.changesSaved.emit(false);
+      }
+    })
   }
 }

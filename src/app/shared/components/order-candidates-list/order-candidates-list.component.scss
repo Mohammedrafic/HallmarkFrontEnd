@@ -23,8 +23,28 @@
     padding-left: 5px;
   }
 
+  .sort-header {
+    display: flex;
+
+    i-feather {
+      cursor: pointer;
+      margin-top: 2px;
+      margin-left: 5px;
+      color: $primary-active-blue;
+    }
+  }
 }
 
 .e-tooltip-wrap .e-arrow-tip .e-tip-bottom {
   display: none;
+}
+
+.input-group.switch {
+  display: flex;
+  align-items: center;
+}
+
+.switch-label {
+  display: flex;
+  cursor: pointer;
 }

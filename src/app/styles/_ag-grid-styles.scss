@@ -1,0 +1,47 @@
+@import "colors";
+
+.table-wrapper {
+  height: calc(98vh - 84px - 80px);
+
+  & .ag-header-cell-text {
+    color: $secondary-dark-blue-15;
+  }
+
+  & .ag-theme-alpine .ag-ltr .ag-cell {
+    &.status-cell {
+      display: flex;
+      align-items: center;
+    }
+
+    &.name {
+      font-weight: 700;
+      color: $primary-active-blue-10;
+      cursor: pointer;
+    }
+
+    &.approve-cell {
+      padding: 0 !important;
+      border: none !important;
+    }
+
+    & .approve {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      & p {
+        font-weight: 700;
+        text-align: center;
+        color: $supportive-green-10;
+        cursor: pointer;
+      }
+    }
+
+    &.bold {
+      font-weight: 700;
+      cursor: pointer;
+    }
+  }
+}

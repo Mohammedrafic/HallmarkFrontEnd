@@ -18,9 +18,12 @@ export const INACTIVE_USER_TEXT = 'Are you sure to inactivate the User?';
 export const AGENCY_ADDED = "Agency details saved successfully";
 export const ORDER_EDITS = "The recent changes may affect the data previously defined for this order." +
   "Please make sure that Workflows, Credentials, and Bill Rates are correct";
+export const ORDER_PER_DIEM_EDITS = "The recent changes may affect the data previously defined for this order." +
+  "Please make sure that Workflows and Credentials are correct";
 export const CANCEL_REJECTION_REASON = "Are you sure you want to cancel? All data will be deleted"
 export const CANCEL_ORDER_CONFIRM_TEXT = 'Are you sure you want to cancel this order? This order will be deleted';
 export const CANCEL_ORDER_CONFIRM_TITLE = 'Cancel Order';
+export const SET_READONLY_STATUS = "You don't have permissions for setting this status";
 
 export const usedByOrderErrorMessage = (val: string, entities: string) => `${val} cannot be deleted. This ${val} was used in ${entities}.`;
 export const usedInMappingMessage = ( mappingName: string ) => `This change has been affected ${mappingName} Mapping, please update it on the ${mappingName} Mapping tab`

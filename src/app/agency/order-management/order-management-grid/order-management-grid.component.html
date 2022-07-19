@@ -2,7 +2,7 @@
   #grid
   class="e-gridwithchildrow"
   (rowDataBound)="setRowHighlight($event)"
-  [dataSource]="(ordersPage$ | async)?.items || []"
+  [dataSource]="ordersPage?.items || []"
   [allowPaging]="allowPaging"
   [pageSettings]="pageSettings"
   [height]="gridHeight"
@@ -15,14 +15,48 @@
   [textWrapSettings]="wrapSettings"
   [enableVirtualization]="true"
   (rowSelected)="onRowClick($event)"
+  (rowDeselected)="onRowDeselect($event, gridWithChildRow)"
   (dataBound)="onDataBound()"
   (actionBegin)="actionBegin($event)"
+  (created)="onGridCreated()"
 >
   <e-columns>
     <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
+    <e-column headerTextAlign="Right" width="120">
+      <ng-template #headerTemplate let-data>
+        <div class="controls-header">
+          <button ejs-button cssClass="e-flat icon-button c" *ngIf="!isSubrowDisplay; else onSubrowToggle" (click)="expandAll()">
+            <span><img src="assets/icons/menu-expand.svg" alt="coll" class="icon"></span>
+          </button>
+          <ng-template #onSubrowToggle>
+            <button ejs-button cssClass="e-flat icon-button" (click)="collapseAll()">
+              <span><img src="assets/icons/menu-collapse.svg" alt="coll" class="icon c"></span>
+            </button>
+          </ng-template>
+          <button ejs-button cssClass="e-flat icon-button" *ngIf="isRowScaleUp; else onRowScaleDown" (click)="onRowScaleUpClick()">
+            <span><i-feather name="menu" class="icon"></i-feather></span>
+          </button>
+          <ng-template #onRowScaleDown>
+            <button ejs-button cssClass="e-flat icon-button" (click)="onRowScaleDownClick()">
+              <span><i-feather name="align-justify" class="icon"></i-feather></span>
+            </button>
+          </ng-template>
+        </div>
+      </ng-template>
+      <ng-template #template let-data>
+        <div class="row-tool-buttons">
+          <button ejs-button cssClass="e-flat" [disabled]="true">
+            <span><i-feather [name]="data.isLocked ? 'lock' : 'unlock'" class="icon"></i-feather></span>
+          </button>
+          <button ejs-button cssClass="e-flat default-icon-button">
+            <span><i-feather name="message-square" class="icon"></i-feather></span>
+          </button>
+        </div>
+      </ng-template>
+    </e-column>
     <e-column field="orderId" headerText="ORDER ID" width="142">
       <ng-template #template let-data>
-        <ng-container *ngIf="!data.children?.length; else withToggle">
+        <ng-container *ngIf="showReOrders ? !data.reOrders?.length : !data.children?.length; else withToggle">
           <div>
             <b>{{ data.orderId }}</b>
           </div>
@@ -32,6 +66,22 @@
           <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
             <b>{{ data.orderId }}</b
             ><i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
+          </div>
+        </ng-template>
+      </ng-template>
+    </e-column>
+    <e-column field="reOrderId" headerText="RE-ORDER ID" width="140" [visible]="false">
+      <ng-template #template let-data>
+        <ng-container *ngIf="!data.children?.length; else withToggle">
+          <div>
+            <b>{{ data.orderId }}</b>
+          </div>
+        </ng-container>
+
+        <ng-template #withToggle>
+          <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
+            <b>{{ data.orderId }}</b>
+            <i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
           </div>
         </ng-template>
       </ng-template>
@@ -67,7 +117,7 @@
         <div class="align-right">{{ data.candidatesCount }}</div>
       </ng-template>
     </e-column>
-    <e-column field="billRate" headerText="Bill Rate $" width="150">
+    <e-column field="billRate" headerText="Bill Rate" width="150">
       <ng-template #template let-data>
         <div class="align-right">{{ data.billRate }}</div>
       </ng-template>
@@ -76,45 +126,44 @@
     <e-column field="department" headerText="DEPARTMENT" textAlign="Left" width="150"></e-column>
     <e-column field="type" headerText="TYPE" width="100" [valueAccessor]="typeValueAccess"></e-column>
     <e-column field="location" headerText="LOCATION" textAlign="Left" width="200"></e-column>
-    <e-column field="jobStartDate" headerText="START DATE" width="150">
+    <e-column field="jobStartDate" width="150">
+      <ng-template #headerTemplate let-data>
+        <span class="e-headertext">
+          {{ selectedTab !== AgencyOrderManagementTabs.ReOrders ? 'START DATE' : 'RE-ORDER DATE' }}
+        </span>
+      </ng-template>
       <ng-template #template let-data>
         {{ data.jobStartDate | date: 'MM/dd/yyy' }}
       </ng-template>
     </e-column>
-
-    <e-column headerTextAlign="Right" width="120">
-      <ng-template #headerTemplate let-data>
-        <div class="controls-header">
-          <button ejs-button cssClass="e-flat icon-button">
-            <span><i-feather name="menu" class="icon" (click)="onRowScaleUpClick()"></i-feather></span>
-          </button>
-          <button ejs-button cssClass="e-flat icon-button">
-            <span><i-feather name="align-justify" class="icon" (click)="onRowScaleDownClick()"></i-feather></span>
-          </button>
-        </div>
-      </ng-template>
+    <e-column field="shift" headerText="SHIFT" width="150" [visible]="false">
       <ng-template #template let-data>
-        <div class="row-tool-buttons">
-          <button ejs-button cssClass="e-flat" [disabled]="true">
-            <span><i-feather [name]="data.isLocked ? 'lock' : 'unlock'" class="icon"></i-feather></span>
-          </button>
-          <button ejs-button cssClass="e-flat default-icon-button">
-            <span><i-feather name="message-square" class="icon"></i-feather></span>
-          </button>
-        </div>
+        <span>{{ data.shiftStartTime | date: 'shortTime' }}-{{ data.shiftEndTime | date: 'shortTime' }}</span>
       </ng-template>
     </e-column>
+    <e-column field="shiftsNext90Days" headerText="# of Shifts Next 90 Days " width="150" [visible]="false"></e-column>
   </e-columns>
 
   <ng-template #detailTemplate let-data>
-    <div class="subrow-wrapper">
+    <div class="subrow-wrapper" *ngIf="!showReOrders">
       <app-grid-subrow-candidate
         *ngFor="let child of data.children"
         [candidat]="child"
         [order]="data"
-        [selected]="selectedCandidat?.selected.order === data.orderId && selectedCandidat?.selected.positionId === child.positionId"
+        [selected]="selectedCandidate?.selected.order === data.orderId && selectedCandidate?.selected.positionId === child.positionId"
+        [isAgency]="false"
         (clickEvent)="onOpenCandidateDialog($event, data)"
       ></app-grid-subrow-candidate>
+    </div>
+    <div class="subrow-wrapper" *ngIf="showReOrders">
+      <app-grid-subrow-reorder
+        *ngFor="let child of data.reOrders"
+        [reOrder]="child"
+        [order]="data"
+        [hideAgency]="true"
+        [selected]="selectedReOrder?.selected.order === data.orderId && selectedReOrder?.selected.reOrder === child.orderId"
+        (clickEvent)="onOpenReorderDialog($event, data)"
+      ></app-grid-subrow-reorder>
     </div>
   </ng-template>
 
@@ -139,7 +188,7 @@
               [decimals]="decimals"
               placeholder="Go to:"
               min="1"
-              [max]="(ordersPage$ | async)?.totalPages"
+              [max]="ordersPage?.totalPages"
               [showSpinButton]="false"
               (change)="onGoToClick($event)"
             >
@@ -149,10 +198,10 @@
             <ejs-pager
               id="gridPager"
               #gridPager
-              [pageSize]="pageSizePager"
-              [totalRecordsCount]="(ordersPage$ | async)?.totalCount"
+              [pageSize]="pageSize"
+              [totalRecordsCount]="ordersPage?.totalCount"
               [enablePagerMessage]="false"
-              [currentPage]="currentPagerPage"
+              [currentPage]="currentPage"
               (click)="onGoToClick($event)"
             >
             </ejs-pager>
@@ -163,18 +212,38 @@
   </ng-template>
 </ejs-grid>
 
+<app-export-dialog
+  [columns]="columnsToExport"
+  [fileName]="fileName"
+  (cancel)="closeExport()"
+  (export)="export($event)"
+></app-export-dialog>
+
 <app-preview-order-dialog
+  #detailsDialog
   [order]="selectedOrder"
   [openEvent]="openPreview"
   [openCandidateTab]="!!previousSelectedOrderId"
   (compareEvent)="onCompare()"
+  (selectReOrder)="selectReOrder($event)"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-preview-order-dialog>
 
 <app-candidat-dialog [openEvent]="openCandidat"></app-candidat-dialog>
 
-<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidat"  [openEvent]="openChildDialog"></app-child-order-dialog>
+<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidate"  [openEvent]="openChildDialog"></app-child-order-dialog>
 
-<app-filter-dialog [items]="filteredItems" [count]="(ordersPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
-  <app-agency-order-filters [form]="OrderFilterFormGroup" [filterColumns]="filterColumns"></app-agency-order-filters>
+<app-filter-dialog
+  [items]="filteredItems"
+  [count]="ordersPage?.totalCount"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
+  <app-agency-order-filters
+    [form]="OrderFilterFormGroup"
+    [filterColumns]="filterColumns"
+    [activeTab]="selectedTab"
+  ></app-agency-order-filters>
 </app-filter-dialog>

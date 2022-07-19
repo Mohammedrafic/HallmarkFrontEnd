@@ -8,10 +8,11 @@ import { ReasonForRequisition } from '@shared/enums/reason-for-requisition';
 import { BillRate, OrderBillRateDto } from './bill-rate.model';
 import { JobDistributionModel } from './job-distribution.model';
 import { ApplicantStatus as CandidateStatus } from '@shared/enums/applicant-status.enum';
+import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
 
 export class OrderManagement {
-  // TODO: modification pending
   id: number;
+  reOrderFromId?: number;
   organizationId: number;
   status: number;
   statusText: string;
@@ -22,6 +23,9 @@ export class OrderManagement {
   locationName: string;
   departmentId: number;
   departmentName: string;
+  shiftStartTime?: string;
+  shiftEndTime?: string;
+  shift?: string; // used only in UI to group and show shiftStartTime - shiftEndTime range
   skillId: number;
   skillName: string;
   orderType: number;
@@ -30,8 +34,14 @@ export class OrderManagement {
   candidates: number;
   startDate: string;
   isLocked?: boolean;
+  reOrderCount?: number;
   isMoreMenuWithDeleteButton?: boolean; // used only in UI to show correct options in context menu
   children: OrderManagementChild[];
+  reOrders?: OrderManagement[];
+  shiftsNext90Days?: number;
+  positions?: number;
+  agencies?: string[] | null;
+  allAgencies?: boolean;
 }
 
 export class OrderManagementFilter {
@@ -49,23 +59,33 @@ export class OrderManagementFilter {
 export type OrderManagementPage = PageOfCollections<OrderManagement>;
 
 export type AgencyOrderManagement = {
-  // TODO: modification pending
   orderId: number;
+  reOrderId?: number;
+  reOrderFromId?: number;
   statusText: string;
   status: OrderStatus;
   jobTitle: string;
   skill: string;
   location: string;
   numberOfPositions: number;
+  numberOfOpenPositions: number;
   department: string;
+  shiftStartTime?: string;
+  shiftEndTime?: string;
   orderType: OrderType;
   billRate: number;
   candidatesCount: number;
   isLocked: boolean;
   jobStartDate: string;
+  reOrderCount?: number;
   organizationId: number;
   organizationName: string;
   children: OrderManagementChild[];
+  reOrders?: OrderManagement[];
+  shiftsNext90Days?: number;
+  positions?: number;
+  agencies?: string[] | null;
+  allAgencies?: boolean;
 };
 
 export type OrderManagementChild = {
@@ -83,6 +103,11 @@ export type OrderManagementChild = {
   positionId: number;
   statusName: string;
   submissionsPercentage: number;
+  agencyName: string;
+  deployedCandidateInfo: null | {
+    jobId: number;
+    organizationId: number;
+  };
 };
 
 export type OrderCandidatesList = {
@@ -96,12 +121,14 @@ export type OrderCandidatesList = {
   status: number;
   statusName: string;
   submissionsPercentage: number;
+  orderStatus: OrderStatus;
   candidateJobId: number;
   deployedCandidateInfo: null | {
     jobId: number;
     organizationId: number;
   };
   candidateStatus?: CandidateStatus;
+  agencyName?: string;
 };
 
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;
@@ -114,8 +141,11 @@ export type AgencyOrderFilters = {
   locationIds?: number[];
   departmentsIds?: number[];
   orderId?: number;
+  reOrderId?: number;
   skillIds?: number[];
   candidateStatuses?: number[];
+  candidatesCountFrom?: number;
+  candidatesCountTo?: number;
   organizationIds?: number[];
   orderTypes?: number[];
   orderStatuses?: number[];
@@ -125,6 +155,7 @@ export type AgencyOrderFilters = {
   openPositions?: number;
   jobStartDate?: Date;
   jobEndDate?: Date;
+  includeReOrders?: boolean;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -134,7 +165,7 @@ export type AgencyOrder = {
   organizationId: number;
 };
 
-export class SuggesstedDetails {
+export class SuggestedDetails {
   workLocation: {
     address: string;
     state: string;
@@ -173,13 +204,16 @@ export class GetPredefinedBillRatesData {
 
 export class Order {
   id: number;
+  reOrderFromId?: number;
   title: string;
   regionId: number;
   locationId: number;
   departmentId: number;
   skillId: number;
+  skillName?: number;
   orderType: OrderType;
   reasonForRequestId: number | null;
+  reasonForRequest?: string | null;
   poNumberId: number | null;
   projectTypeId: number | null;
   projectNameId: number | null;
@@ -221,6 +255,44 @@ export class Order {
   acceptedPositions?: number;
   documents: Document[] | null;
   canApprove: boolean;
+  reOrders?: ReOrder[] | null;
+  reOrderFrom?: Order;
+  reOrderId?: number;
+  candidates?: CandidateModel[];
+}
+
+export class ReOrder {
+  id: number;
+  reOrderFromId: number;
+  organizationId: number;
+  status: OrderStatus;
+  statusText: string;
+  jobTitle: string;
+  regionId: number;
+  regionName: string;
+  locationId: number;
+  locationName: string;
+  departmentId: number;
+  departmentName: string;
+  skillId: number;
+  skillName: string;
+  orderType: number;
+  billRate: number;
+  openPositions: number;
+  candidates: number;
+  startDate: string;
+  orderOpenDate: string;
+  orderFillDate: string;
+  children: OrderManagementChild[];
+  reOrderCount: number;
+  reOrders: string[];
+  isLocked: boolean;
+  agency: string[];
+  positions: number;
+  allAgencies: boolean;
+  agencies: string[];
+  shiftStartTime: string;
+  shiftEndTime: string;
 }
 
 export interface CreateOrderDto extends Omit<Order, 'id' | 'billRates' | 'status' | 'statusText' | 'documents'> {
@@ -246,6 +318,7 @@ export type AcceptJobDTO = {
   organizationId: number;
   requestComment: string;
   billRates: BillRate[];
+  offeredStartDate: string;
 };
 
 export type CandidateProfile = {
@@ -300,21 +373,48 @@ export type OrderCandidateJob = {
   positionId: number;
   allowDeployCredentials: boolean;
   hasAllRequiredOnboardedCredentials: boolean;
+  offeredStartDate: string;
+};
+
+export type CandidatesBasicInfo = {
+  jobId: number;
+  organizationId: number;
+  organizationName: string;
+  orderId: number;
+  candidateProfileId: number;
+  positionId: number;
+  billRatesGroupId: number;
+  workflowStepId: number;
+  candidateBillRate: number;
+  offeredBillRate: number;
+  expAsTravelers: number;
+  onBoardDate: string;
+  availableStartDate: string;
+  requestComment: string;
+  rejectDate: string;
+  rejectBy: string;
+  rejectReasonId: number;
+  allowDeployCredentials: boolean;
+  actualStartDate: string;
+  actualEndDate: string;
+  clockId: string;
+  guaranteedWorkWeek: string;
 };
 
 export type ApplicantStatus = {
   applicantStatus: number;
   statusText: string;
+  isEnabled?: boolean;
 };
 
 export class OrderFilter {
-  // TODO: modification pending
   orderBy?: string;
   pageNumber?: number;
   pageSize?: number;
   regionIds?: number[];
   locationIds?: number[];
   departmentsIds?: number[];
+  reOrderId?: number;
   orderId?: number;
   skillIds?: number[];
   orderTypes?: number[];
@@ -330,6 +430,7 @@ export class OrderFilter {
   candidatesCountTo?: number;
   agencyIds?: number[];
   agencyType?: string | number | null;
+  includeReOrders?: boolean;
 }
 
 export class OrderPartnerAgency {

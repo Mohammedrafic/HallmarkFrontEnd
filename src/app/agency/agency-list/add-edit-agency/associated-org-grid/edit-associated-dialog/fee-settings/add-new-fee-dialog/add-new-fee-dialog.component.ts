@@ -6,11 +6,16 @@ import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { AgencyState } from 'src/app/agency/store/agency.state';
-import { FeeExceptions, FeeExceptionsInitialData, FeeSettingsClassification } from 'src/app/shared/models/associate-organizations.model';
+import {
+  FeeExceptions,
+  FeeExceptionsInitialData,
+  FeeSettingsClassification,
+} from 'src/app/shared/models/associate-organizations.model';
 import { valuesOnly } from 'src/app/shared/utils/enum.utils';
 import { SaveFeeExceptions, SaveFeeExceptionsSucceeded } from '@agency/store/agency.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
+import PriceUtils from '@shared/utils/price.utils';
 
 type AddNewFeeExceptionFormValue = {
   region: number[];
@@ -44,6 +49,7 @@ export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
     text: 'skillDescription',
     value: 'id',
   };
+  public priceUtils = PriceUtils;
   public classification = Object.values(FeeSettingsClassification)
     .filter(valuesOnly)
     .map((name, id) => ({ name, id }));
@@ -118,7 +124,7 @@ export class AddNewFeeDialogComponent implements OnInit, OnDestroy {
           regionIds: [feeData.regionId],
           classifications: [feeData.classification],
           masterSkillIds: [feeData.skillId],
-          fee: feeData.fee,
+          fee: PriceUtils.formatNumbers(feeData.fee),
         });
       }
     });

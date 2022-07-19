@@ -1,0 +1,79 @@
+<section class="candidates-info">
+  <div class="container-row reorders">
+    <div class="column">
+      <div class="icon">
+        <i-feather name="user" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{orderInformation.title}}</div>
+        <div class="sup-title">Job title</div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="icon">
+        <i-feather name="map-pin" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{orderInformation.locationName}}</div>
+        <div class="sup-title">Location</div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="icon">
+        <i-feather name="folder" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{orderInformation.departmentName}}</div>
+        <div class="sup-title">Department</div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="icon">
+        <i-feather name="briefcase" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{orderInformation?.skillName ?? orderInformation?.reOrderFrom?.skillName}}</div>
+        <div class="sup-title">Skill</div>
+      </div>
+    </div>
+    <div class="column last-column">
+      <div class="cost">${{orderInformation.hourlyRate}}</div>
+      <div class="sup-title">Bill Rate</div>
+    </div>
+    <div class="column">
+      <div>
+        <div class="title" [title]="agencies?.tooltip">{{agencies?.name}}</div>
+        <div class="sup-title">Agency Name</div>
+      </div>
+    </div>
+    <div class="column">
+      <div>
+        <div class="title accent">{{orderInformation?.acceptedPositions}}/{{orderInformation?.openPositions}}</div>
+        <div class="sup-title">Open Positions</div>
+      </div>
+    </div>
+    <div class="column">
+      <div>
+        <div class="title">{{orderInformation?.shiftStartTime | date: 'hh:mm'}} - {{orderInformation?.shiftEndTime | date: 'hh:mm'}} </div>
+        <div class="sup-title">Shift</div>
+      </div>
+    </div>
+    <div class="column">
+      <div>
+        <div class="title">{{orderInformation?.jobStartDate | date: 'MM/dd/yyy'}}</div>
+        <div class="sup-title">Date</div>
+      </div>
+    </div>
+    <div class="column last-column">
+      <div class="accent link" (click)="moveToPerDiem()">Order Per Diem ID: {{orderInformation?.reOrderFromId}}</div>
+    </div>
+  </div>
+</section>
+<section class="candidates-additional-info">
+  <div class="warning">
+    <div class="icon">
+      <i-feather name="alert-triangle" class="icon"></i-feather>
+    </div>
+    <span>Candidates must apply and go through Onboarding process on the parent Open Per Diem order before they can accept a shift!</span>
+  </div>
+</section>

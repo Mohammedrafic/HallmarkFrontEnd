@@ -6,10 +6,18 @@
     </app-tabs-list>
   </ng-container>
   <ng-container right>
+    <div *ngIf="isAgency" class="bootstrap">
+      <div class="input-container">
+        <ejs-dropdownlist
+          *ngIf="organizations$ | async as organizations"
+          [dataSource]="organizations"
+          [fields]="unitOrganizationsFields"
+          [formControl]="organizationControl">
+        </ejs-dropdownlist>
+      </div>
+    </div>
     <app-search class="search"></app-search>
-    <app-date-week-picker
-      [dateControl]="formGroup.get('date') | controlConverter">
-    </app-date-week-picker>
+    <app-date-week-picker [dateControl]="dateControl"></app-date-week-picker>
     <button
       ejs-button
       cssClass="e-outline button-filter button--no-wrap"
@@ -20,115 +28,24 @@
   </ng-container>
 </app-page-toolbar>
 
-<section>
+<section class="table-wrapper">
   <app-timesheets-table
     *ngIf="timesheets$ | async as timesheets"
     [tableData]="timesheets"
-    [changeTableItem]="currentSelectedTableRowIndex | async"
-    [tabIndex]="currentTab"
+    [newSelectedIndex]="currentSelectedTableRowIndex | async"
+    [activeTabIdx]="activeTabIdx"
     (changePage)="handleChangePage($event)"
     (changePerPage)="handleChangePerPage($event)"
     (timesheetRowSelected)="rowSelected($event)"
+    (sortHandler)="sortHandler($event)"
   >
   </app-timesheets-table>
 </section>
 
-<app-filter-dialog
-  [items]="filteredItems"
-  [count]="(timesheets$ | async)?.totalCount"
-  (deleteFilter)="onFilterDelete($event)"
-  (clearAllFiltersClicked)="onFilterClearAll()"
-  (applyFilterClicked)="onFilterApply()">
-  <form class="bootstrap" [formGroup]="formGroup">
-    <div class="input-container">
-      <label for="orderId">Order ID</label>
-      <input
-        id="orderId"
-        class="e-input"
-        type="text"
-        appValidateWithMessage
-        formControlName="orderId"
-        maxlength="50"
-        placeholder="" />
-    </div>
-    <div class="input-container">
-      <label for="status">Status</label>
-      <div class="input-group dropdown">
-        <ejs-multiselect
-          id="status"
-          mode="CheckBox"
-          [fields]="filterOptionFields"
-          [dataSource]="filterColumns.statusText?.dataSource"
-          [showDropDownIcon]="true"
-          formControlName="status"
-          placeholder=""></ejs-multiselect>
-      </div>
-    </div>
-    <div class="input-container">
-      <label for="department">Department</label>
-      <div class="input-group dropdown">
-        <ejs-multiselect
-          id="department"
-          mode="CheckBox"
-          [fields]="filterOptionFields"
-          [dataSource]="filterColumns.departmentName?.dataSource"
-          [showDropDownIcon]="true"
-          formControlName="department"
-          placeholder=""></ejs-multiselect>
-      </div>
-    </div>
-    <div class="input-container">
-      <label for="agencyName">Select Agency</label>
-      <div class="input-group dropdown">
-        <ejs-multiselect
-          id="agencyName"
-          mode="CheckBox"
-          [fields]="filterOptionFields"
-          [dataSource]="filterColumns.agencyName?.dataSource"
-          [showDropDownIcon]="true"
-          formControlName="agencyName"
-          placeholder=""></ejs-multiselect>
-      </div>
-    </div>
-    <div class="row">
-      <div class="input-container">
-        <label for="totalHours">Total Hours</label>
-        <input
-          id="totalHours"
-          class="e-input"
-          type="number"
-          appValidateWithMessage
-          formControlName="totalHours"
-          maxlength="50"
-          placeholder="" />
-      </div>
-      <div class="input-container">
-        <label for="billRate">Bill Rate</label>
-        <input
-          id="billRate"
-          class="e-input"
-          type="number"
-          appValidateWithMessage
-          formControlName="billRate"
-          maxlength="50"
-          placeholder="" />
-      </div>
-    </div>
-    <div class="input-container">
-      <label for="skill">Skill</label>
-      <div class="input-group dropdown">
-        <ejs-multiselect
-          id="skill"
-          mode="CheckBox"
-          [fields]="filterOptionFields"
-          [dataSource]="filterColumns.skillName?.dataSource"
-          [showDropDownIcon]="true"
-          formControlName="skill"
-          placeholder=""></ejs-multiselect>
-      </div>
-    </div>
-  </form>
-</app-filter-dialog>
+<app-timesheets-filter-dialog
+  (resetFilters)="resetFilters()"
+  (updateTableByFilters)="updateTableByFilters($event)"
+></app-timesheets-filter-dialog>
 <app-profile-details-container
   [currentSelectedRowIndex]="currentSelectedTableRowIndex | async"
   [maxRowIndex]="(timesheets$ | async)?.items?.length || 0"

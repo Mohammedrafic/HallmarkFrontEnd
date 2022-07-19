@@ -1,4 +1,6 @@
+import { FilteredItem } from '@shared/models/filter.model';
 import type { PanelModel } from '@syncfusion/ej2-angular-layouts';
+import { DashboardFiltersModel } from '../models/dashboard-filters.model';
 
 const dashboardStatePrefix: string = '[dashboard]';
 
@@ -23,4 +25,14 @@ export class ResetState {
 export class IsMobile {
   static readonly type = `${dashboardStatePrefix} Is Mobile`;
   constructor(public payload: boolean) {}
+}
+
+export class SetFilteredItems {
+  static readonly type = `${dashboardStatePrefix} Set Filtered Items`;
+  constructor(public payload: FilteredItem[]) {}
+}
+
+export class SetDashboardFiltersState {
+  static readonly type = `${dashboardStatePrefix} Set Dashboard Filter State`;
+  constructor(public payload: DashboardFiltersModel) {}
 }

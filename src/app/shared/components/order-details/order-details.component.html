@@ -20,14 +20,14 @@
         <div class="contact-title">Supervisor Contacts</div>
         <div class="contact-details">
           <span>
-            <i-feather name="user" class="icon"></i-feather> {{ order.contactDetails[0]?.name }}
+            <i-feather name="user" class="icon"></i-feather> {{ contactDetails?.name }}
           </span>
           <span>
-            <i-feather name="mail" class="icon"></i-feather> {{ order.contactDetails[0]?.email }}
+            <i-feather name="mail" class="icon"></i-feather> {{ contactDetails?.email }}
           </span>
           <span>
-            <i-feather name="map-pin" class="icon"></i-feather> 
-            {{ order.workLocations[0]?.address }}, {{ order.workLocations[0]?.city }}, {{ order.workLocations[0]?.state }}, {{ order.workLocations[0]?.zipCode }}
+            <i-feather name="map-pin" class="icon"></i-feather>
+            {{ contactDetails?.address }}, {{ contactDetails?.city }}, {{ contactDetails?.state }}, {{ contactDetails?.zipCode }}
           </span>
         </div>
       </div>
@@ -62,6 +62,6 @@
     </div>
   </div>
 </section>
-<section class="bill-rates" *ngIf="order">
+<section class="bill-rates" *ngIf="order && order?.orderType !== orderType.OpenPerDiem">
   <app-bill-rates-view-grid [billRatesData]="order.billRates"></app-bill-rates-view-grid>
 </section>

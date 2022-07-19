@@ -23,7 +23,11 @@
   >
     <e-columns>
       <e-column field="organizationName" headerText="Organization" textAlign="Left"></e-column>
-      <e-column field="baseFee" headerText="Base Fee %" width="130" textAlign="left"></e-column>
+      <e-column field="baseFee" headerText="Base Fee %" width="130" textAlign="left">
+        <ng-template #template let-data>
+          {{ priceUtils.formatNumbers(data.baseFee) }}
+        </ng-template>
+      </e-column>
       <e-column field="tier" headerText="Tier" width="150" textAlign="left" [valueAccessor]="tierValueAccess"></e-column>
       <e-column field="exeptionFee" headerText="Exception Fee" width="150" textAlign="left"></e-column>
       <e-column headerText="Job Distribution" [columns]="jobDistributionColumns" textAlign="left"></e-column>

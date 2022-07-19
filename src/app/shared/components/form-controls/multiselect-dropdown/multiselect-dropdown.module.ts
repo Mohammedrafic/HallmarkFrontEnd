@@ -1,5 +1,4 @@
-import { MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
-import { CheckBoxSelectionService } from '@syncfusion/ej2-angular-dropdowns';
+import { CheckBoxSelectionService, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -7,11 +6,12 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { MultiselectDropdownComponent } from './multiselect-dropdown.component';
 import { FormControlWrapperModule } from '@shared/components/form-controls/form-control-wrapper/form-control-wrapper.module';
+import { SharedModule } from '@shared/shared.module';
 
 @NgModule({
   declarations: [MultiselectDropdownComponent],
-  imports: [CommonModule, MultiSelectModule, FormControlWrapperModule, ReactiveFormsModule],
+  imports: [CommonModule, MultiSelectModule, FormControlWrapperModule, ReactiveFormsModule, SharedModule],
   exports: [MultiselectDropdownComponent],
-  providers: [CheckBoxSelectionService]
+  providers: [CheckBoxSelectionService],
 })
 export class MultiselectDropdownModule {}

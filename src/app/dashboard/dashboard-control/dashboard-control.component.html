@@ -1,12 +1,42 @@
-<div class="dashboard-control">
-  <app-page-toolbar>
-    <ng-container right>
+<ng-container
+  [ngTemplateOutlet]="dashboardToolbar"
+  [ngTemplateOutletContext]="{ items: filteredItems$ | async }"
+></ng-container>
+
+<ng-template #dashboardToolbar let-items="items">
+  <div class="dashboard-toolbar">
+    <div class="left-content">
+      <div class="applied-filters">
+        <span class="applied-filters__title">Applied Filters:</span>
+        <span *ngIf="!items.length">None</span>
+      </div>
+      <div class="chips-wrapper">
+        <div class="chips-title" *ngFor="let filter of appliedFilters | keyvalue">
+          <span>{{ filter.key }}:</span>
+          <div class="chips-container">
+            <ejs-chiplist [chips]="filter.value" enableDelete="true"(delete)="deleteChip($event)"></ejs-chiplist>
+          </div>
+        </div>
+        <div class="clear-all" *ngIf="items.length" (click)="onClearFilters()">Clear all</div>
+      </div>
+    </div>
+
+    <div class="right-content">
+      <button *ngIf="hasWidgetPermission" ejs-button cssClass="e-outline" (click)="showFilterDialog()">
+        <div class="filter-button-content">
+          <span *ngIf="items.length" class="e-badge e-badge-success e-badge-circle">{{ items.length }}</span>
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
       <button ejs-button cssClass="e-outline" (click)="toggleDialog(true)">
         Manage Widgets <i-feather name="sliders" class="icon"></i-feather>
       </button>
-      <button ejs-button [isPrimary]="true" (click)="onCreateOrder()">Create Order</button>
-    </ng-container>
-  </app-page-toolbar>
+      <button *ngIf="hasOrderManagePermission" ejs-button [isPrimary]="true" (click)="onCreateOrder()">
+        Create Order
+      </button>
+    </div>
+  </div>
+
   <app-widget-list
     *ngIf="isDialogOpened$ | async"
     (closeDialogEmitter)="toggleDialog(false)"
@@ -15,4 +45,6 @@
     [widgets]="widgets"
     [isLoading]="isLoading"
   ></app-widget-list>
-</div>
+
+  <app-widget-filter #filter></app-widget-filter>
+</ng-template>

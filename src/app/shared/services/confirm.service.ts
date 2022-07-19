@@ -48,12 +48,4 @@ export class ConfirmService {
 
     return isAllowed$;
   }
-
-  public confirmDelete(): Observable<boolean> {
-    return this.confirm(DELETE_RECORD_TEXT, {
-      title: DELETE_RECORD_TITLE,
-      okButtonLabel: 'Delete',
-      okButtonClass: 'delete-button'
-    });
-  }
 }

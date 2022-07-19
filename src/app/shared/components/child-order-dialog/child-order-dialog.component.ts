@@ -116,9 +116,13 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
           ApplicantStatus.NotApplied,
           ApplicantStatus.Applied,
           ApplicantStatus.Shortlisted,
+        ];
+        const allowedAcceptStatuses = [
+          ApplicantStatus.Offered,
+          ApplicantStatus.Accepted,
+          ApplicantStatus.Rejected,
           ApplicantStatus.OnBoarded,
         ];
-        const allowedAcceptStatuses = [ApplicantStatus.Offered, ApplicantStatus.Accepted, ApplicantStatus.Rejected];
 
         if (allowedApplyStatuses.includes(this.candidate.candidateStatus)) {
           this.store.dispatch(

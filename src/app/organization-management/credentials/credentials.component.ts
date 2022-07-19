@@ -2,7 +2,7 @@ import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CredentialsState } from '../store/credentials.state';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { CredentialSetupFilter } from '@shared/models/credential-setup-filter.model';
@@ -34,6 +34,7 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
   public filteredItemsCount = 0;
 
   constructor(private router: Router,
+              private route: ActivatedRoute,
               private store: Store,
               private actions$: Actions) {
                 super();
@@ -67,11 +68,11 @@ export class CredentialsComponent extends AbstractGridConfigurationComponent imp
   public onTabSelected(selectedTab: any): void {
     if (selectedTab.selectedIndex === CredentialsNavigationTabs['Setup']) {
       this.navigationTabs.selectedItem = CredentialsNavigationTabs['Setup'];
-      this.router.navigateByUrl('admin/organization-management/credentials/setup');
+      this.router.navigate(['setup'], { relativeTo: this.route });
       this.isCredentialListActive = false;
     } else {
       this.navigationTabs.selectedItem = CredentialsNavigationTabs['CredentialsList'];
-      this.router.navigateByUrl('admin/organization-management/credentials/list');
+      this.router.navigate(['list'], { relativeTo: this.route });
       this.isCredentialListActive = true;
     }
 

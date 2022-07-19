@@ -1,0 +1,22 @@
+@import 'colors';
+
+.day-cell-block {
+  display: flex;
+  flex-direction: column;
+  padding-left: 17px;
+}
+
+.cell-value {
+  font-size: 14px;
+  font-weight: 400;
+  color: $black;
+  display: inline-block;
+  line-height: 20px;
+
+  &.main {
+    font-size: 12px;
+    font-weight: 700;
+    color: $secondary-dark-blue-20;
+    line-height: 16px;
+  }
+}

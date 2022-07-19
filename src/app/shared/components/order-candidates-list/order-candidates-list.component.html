@@ -3,12 +3,23 @@
     <div class="title">
       <h3>Candidates List</h3>
     </div>
+    <div class="input-container">
+      <div class="input-group switch" >
+        <ejs-switch
+          id="switcher"
+          class="switch"
+          (change)="onSwitcher($event);"
+          [checked]="includeDeployedCandidates"
+        ></ejs-switch>
+        <label class="switch-label" for="switcher">Include <br/>Deployed</label>
+      </div>
+    </div>
   </div>
   <ejs-grid
     #orderCandidatesGrid
     id="users-grid"
     class="users-grid e-gridwithheader"
-    [dataSource]="candidatesList.items"
+    [dataSource]="candidatesList?.items || []"
     [allowSorting]="false"
     [allowResizing]="true"
     [allowSelection]="false"
@@ -23,7 +34,7 @@
       <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
         <ng-template #template let-data>
           <div class="link" (click)="onViewNavigation(data)">{{data.lastName}}, {{data.firstName}}
-            <ng-container *ngIf="data.deployedCandidateInfo && isAgency()">
+            <ng-container *ngIf="data.deployedCandidateInfo && data.statusName !== 'Onboard'">
               <ejs-tooltip content="Deployed Candidate" position="TopRight">
                 <i-feather name="briefcase" class="icon" ></i-feather>
               </ejs-tooltip>
@@ -42,8 +53,15 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="skill" headerText="Skill" textAlign="Left" width="230">
+      <e-column field="skill" headerText="Skill" textAlign="Left" width="230" *ngIf="isAgency; else agencyColumn">
         </e-column>
+      <ng-template #agencyColumn>
+        <e-column field="agency" textAlign="Left" headerText="Agency" width="200" *ngIf="!isAgency">
+          <ng-template #template let-data>
+            {{data.agencyName}}
+          </ng-template>
+        </e-column>
+      </ng-template>
       <e-column field="hourlyBillRate" textAlign="Right" headerText="Bill Rate &dollar;" width="200">
         <ng-template #template let-data>
           <div class="align-right">
@@ -134,24 +152,25 @@
   <ng-container *ngTemplateOutlet="templateState | async"></ng-container>
 
   <ng-template #onboarded>
-    <app-onboarded-candidate (closeModalEvent)="onCloseDialog()" [candidate]="candidate" [isAgency]="isAgency()"></app-onboarded-candidate>
+    <app-onboarded-candidate (closeModalEvent)="onCloseDialog()" [candidate]="candidate" [isAgency]="isAgency"></app-onboarded-candidate>
   </ng-template>
 
   <ng-template #accept>
-    <app-accept-candidate (closeModalEvent)="onCloseDialog()" [candidate]="candidate" [isAgency]="isAgency()"></app-accept-candidate>
+    <app-accept-candidate (closeModalEvent)="onCloseDialog()" [candidate]="candidate" [isAgency]="isAgency"></app-accept-candidate>
   </ng-template>
 
   <ng-template #apply>
     <app-apply-candidate (closeDialogEmitter)="onCloseDialog()"
                          [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
                          [candidate]="candidate"
-                         [isAgency]="isAgency()"
+                         [isAgency]="isAgency"
+                         [isLocked]="(selectedOrder$ | async)?.isLocked"
     >
     </app-apply-candidate>
   </ng-template>
 
   <ng-template #offerDeployment>
-    <app-offer-deployment (closeDialogEmitter)="onCloseDialog()" [candidate]="candidate"></app-offer-deployment>
+    <app-offer-deployment (closeDialogEmitter)="onCloseDialog()" [candidate]="candidate" [isAgency]="isAgency"></app-offer-deployment>
   </ng-template>
   <ng-template #footerTemplate>
     <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>

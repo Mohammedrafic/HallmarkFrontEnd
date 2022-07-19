@@ -1,5 +1,7 @@
-<section class="job-details">
-  <app-general-order-info *ngIf="order" [orderInformation]="order"></app-general-order-info>
+<section class="job-details" *ngIf="order" [ngSwitch]="order?.orderType">
+  <app-general-order-per-diem-info *ngSwitchCase="orderType.OpenPerDiem" [orderInformation]="order"></app-general-order-per-diem-info>
+  <app-general-reorder-info *ngSwitchCase="orderType.ReOrder" [orderInformation]="order"></app-general-reorder-info>
+  <app-general-order-info *ngSwitchDefault [orderInformation]="order"></app-general-order-info>
 </section>
 <div class="separator"></div>
-<app-order-candidates-list *ngIf="orderCandidatePage" [candidatesList]="orderCandidatePage" [order]="orderCandidates"></app-order-candidates-list>
+<app-order-candidates-list *ngIf="orderCandidatePage" [candidatesList]="orderCandidatePage" [order]="orderCandidates" (getCandidatesList)="onGetCandidatesList($event)"></app-order-candidates-list>

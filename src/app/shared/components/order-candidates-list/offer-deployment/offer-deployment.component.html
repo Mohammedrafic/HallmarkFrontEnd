@@ -2,22 +2,32 @@
   <section class="header-container">
     <div class="e-card-header">
       <div class="e-card-header-caption candidat-status">
-        <h3 class="e-card-title">{{candidate?.lastName}}, {{candidate?.firstName}}</h3>
-        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
+        <div class="deploy-candidate-wrapper">
+          <h3 class="e-card-title candidate-title">
+            {{candidate?.lastName}}, {{candidate?.firstName}}
+            <i-feather name="briefcase" class="icon" *ngIf="isDeployedCandidate"></i-feather>
+          </h3>
+          <app-deploy-candidate-message *ngIf="isDeployedCandidate" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
+        </div>
+        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus && !isDeployedCandidate">
           <e-chips>
             <e-chip [text]="candidatStatus[candidate.candidateStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
           </e-chips>
         </ejs-chiplist>
       </div>
       <div class="e-card-content button-container">
-        <div class="input-group dropdown bootstrap" *ngIf="!isRejected">
+        <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isDeployedCandidate && !isReadOnly">
           <ejs-dropdownlist [fields]="optionFields"
                             [dataSource]="nextApplicantStatuses"
+                            [itemTemplate]="itemTemplate"
                             placeholder="Select Status"
-                            (change)="updateCandidateJob($event)">
+                            (select)="updateCandidateJob($event)">
+            <ng-template #itemTemplate let-data>
+              <span [ngClass]="{'disabled-item': !data.isEnabled}">{{data.statusText}}</span>
+            </ng-template>
           </ejs-dropdownlist>
         </div>
-        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>
@@ -25,7 +35,7 @@
   </section>
   <section class="content-container">
     <div class="job-details">
-      <ejs-accordion expandMode="Single">
+      <ejs-accordion #accordionElement expandMode="Single" (expanding)="toForbidExpandSecondRow($event)" (clicked)="clickedOnAccordion($event)">
         <e-accordionitems>
           <e-accordionitem expanded="true">
             <ng-template #header>
@@ -41,9 +51,15 @@
                     </div>
                   </div>
                   <div class="input-container">
-                    <label>Bill Rate</label>
+                    <label>Bill Rate ($)</label>
                     <div class="input-group input-readonly">
-                      <input formControlName="orderBillRate" class="e-input" type="text" readonly/>
+                      <input
+                        formControlName="orderBillRate"
+                        class="e-input"
+                        type="text"
+                        (focus)="priceUtils.setPriceMask(formGroup, 'orderBillRate', $event)"
+                        (blur)="priceUtils.setTwoDecimals(formGroup, 'orderBillRate', $event)"
+                        readonly/>
                     </div>
                   </div>
                 </div>
@@ -57,19 +73,27 @@
                 </div>
                 <div class="d-flex bootstrap">
                   <div class="input-container">
-                    <label>Candidate Bill Rate</label>
+                    <label>Candidate Bill Rate ($)</label>
                     <div class="input-group input-readonly">
-                      <input formControlName="candidateBillRate" class="e-input" type="number" readonly/>
+                      <input
+                        formControlName="candidateBillRate"
+                        class="e-input"
+                        type="number"
+                        (focus)="priceUtils.setPriceMask(formGroup, 'candidateBillRate', $event)"
+                        (blur)="priceUtils.setTwoDecimals(formGroup, 'candidateBillRate', $event)"
+                        readonly/>
                     </div>
                   </div>
                   <div class="input-container">
-                    <label>Offered Bill Rate<span *ngIf="!readOnlyMode" class="required">*</span></label>
-                    <div class="input-group" [ngClass]="{'input-readonly': readOnlyMode}">
+                    <label>Offered Bill Rate ($)<span *ngIf="!isRejected && !isReadOnly" class="required">*</span></label>
+                    <div class="input-group" [ngClass]="{'input-readonly': isRejected || isReadOnly}">
                       <input appValidateWithMessage
-                             [readonly]="readOnlyMode"
+                             [readonly]="isRejected || isReadOnly"
                              formControlName="offeredBillRate"
                              class="e-input"
-                             type="number"/>
+                             (focus)="priceUtils.setPriceMask(formGroup, 'offeredBillRate', $event)"
+                             (blur)="priceUtils.setTwoDecimals(formGroup, 'offeredBillRate', $event)"
+                             type="text"/>
                     </div>
                   </div>
                 </div>
@@ -82,6 +106,18 @@
                   </div>
                 </div>
                 <div class="d-flex bootstrap">
+                  <div *ngIf="showYearsOfExperience" class="input-container">
+                    <label>Yrs. of Exp.</label>
+                    <div class="input-group input-readonly">
+                      <input formControlName="yearsOfExperience" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                  <div *ngIf="showYearsOfExperience" class="input-container">
+                    <label>Exp. as Travelers</label>
+                    <div class="input-group input-readonly">
+                      <input formControlName="expAsTravelers" class="e-input" type="number" readonly/>
+                    </div>
+                  </div>
                   <div class="input-container">
                     <label>Available Start Date</label>
                     <div class="input-group input-readonly">
@@ -99,6 +135,25 @@
                     <label>Leave request comments</label>
                     <div class="input-group input-readonly">
                       <input formControlName="requestComment" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="showGuaranteedWorkWeek" class="d-flex">
+                  <div class="input-container bootstrap f-grow-2">
+                    <label class="input-group">Guaranteed Work Week</label>
+                    <div class="input-group">
+                      <input appValidateWithMessage formControlName="guaranteedWorkWeek" maxlength="200" class="e-input" type="text"/>
+                    </div>
+                  </div>
+                  <div class="input-container bootstrap">
+                    <label class="input-group">Offered Start Date</label>
+                    <div class="input-group">
+                      <ejs-datepicker appValidateWithMessage
+                                      class="datepicker"
+                                      format="MM/dd/yyyy"
+                                      [min]="today"
+                                      formControlName="offeredStartDate">
+                      </ejs-datepicker>
                     </div>
                   </div>
                 </div>
@@ -132,6 +187,7 @@
     <app-bill-rates #billRates
                     [billRates]="billRatesData"
                     [isActive]="true"
+                    [readOnlyMode]="isReadOnlyBillRates"
                     (billRatesChanged)="onBillRatesChanged()">
     </app-bill-rates>
   </section>

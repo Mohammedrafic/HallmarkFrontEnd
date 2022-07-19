@@ -1,14 +1,24 @@
-<app-form-control-wrapper [label]="label" [formGroup]="formGroupInstance" [id]="id" class="app-numeric-textbox">
-  <ejs-numerictextbox
-    (change)="handleChangeEvent($event)"
-    [decimals]="0"
-    [formControlName]="controlName"
-    [id]="id"
-    [max]="max"
-    [min]="min"
-    [placeholder]="placeholder"
-    [showSpinButton]="false"
-    [validateDecimalOnType]="true"
-    format="#"
-  ></ejs-numerictextbox>
+<app-form-control-wrapper
+  [label]="label"
+  [formGroup]="formGroupInstance"
+  [id]="id"
+  [required]="required"
+  class="app-numeric-textbox"
+>
+  <div class="input-group">
+    <ejs-numerictextbox
+      (change)="handleChangeEvent($event)"
+      [decimals]="0"
+      [formControlName]="controlName"
+      [id]="id"
+      [max]="max"
+      [min]="min"
+      [placeholder]="placeholder"
+      [showSpinButton]="false"
+      [validateDecimalOnType]="true"
+      [format]="format"
+      [htmlAttributes]="htmlAttributes"
+    ></ejs-numerictextbox>
+    <app-error-message [control]="getControl()"></app-error-message>
+  </div>
 </app-form-control-wrapper>

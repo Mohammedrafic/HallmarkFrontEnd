@@ -1,16 +1,32 @@
-import { ProfileTimeSheetActionType } from '../enums/timesheets.enum';
+import { RecordFields } from './../enums/timesheet-common.enum';
 import { TimesheetsModel } from '../store/model/timesheets.model';
+import { DefaultFilterColumns, DefaultFiltersState } from './timesheets-table.constant';
 
-export const DEFAULT_TIMESHEETS_STATE: TimesheetsModel = {
+export const DefaultTimesheetState: TimesheetsModel = {
   timesheets: null,
-  profileTimesheets: [],
-  profileOpen: false,
-  timeSheetDialogOpen: false,
-  selectedTimeSheetId: null,
-  editDialogType: ProfileTimeSheetActionType.Add,
-  profileDialogTimesheet: null,
-  timesheetDetails: {
-    uploads: [],
-    invoices: [],
+  timesheetsFilters: DefaultFiltersState,
+  tabCounts: null,
+  timeSheetRecords: {
+    [RecordFields.Time]: [],
+    [RecordFields.Miles]: [],
+    [RecordFields.Expenses]: [],
   },
+  candidateInfo: null,
+  candidateHoursAndMilesData: null,
+  candidateAttachments: {
+    attachments: [],
+  },
+  candidateInvoices: [],
+  isTimeSheetOpen: false,
+  selectedTimeSheet: null,
+  billRateTypes: [],
+  costCenterOptions: [],
+  isAddDialogOpen: {
+    action: false,
+    dialogType: RecordFields.Time,
+    initTime: '',
+  },
+  timesheetsFiltersColumns: DefaultFilterColumns,
+  timesheetDetails: null,
+  organizations: [],
 }

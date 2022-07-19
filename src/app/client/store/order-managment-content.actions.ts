@@ -1,7 +1,9 @@
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { AcceptJobDTO, CreateOrderDto, EditOrderDto, OrderManagementFilter } from '@shared/models/order-management.model';
+import {AcceptJobDTO, CreateOrderDto, EditOrderDto, OrderFilter, OrderManagementFilter} from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { RejectReasonPayload } from "@shared/models/reject-reason.model";
+import { ExportPayload } from '@shared/models/export.model';
+import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 
 export class GetIncompleteOrders {
   static readonly type = '[order management] Get Incomplete Orders';
@@ -13,14 +15,19 @@ export class GetOrders {
   constructor(public payload: OrderManagementFilter | object) { }
 }
 
-export class GetOrderById {
-  static readonly type = '[order management] Get Order By Id';
-  constructor(public id: number, public organizationId: number, public options: DialogNextPreviousOption) {}
+export class ClearOrders {
+  static readonly type = '[order management] Clear Orders';
+  constructor() { }
 }
 
-export class GetReOrders {
-  static readonly type = '[order management] Get ReOrders';
-  constructor(public payload: OrderManagementFilter | object) { }
+export class GetOrderById {
+  static readonly type = '[order management] Get Order By Id';
+  constructor(public id: number, public organizationId: number, public options?: DialogNextPreviousOption) {}
+}
+
+export class SetLock {
+  static readonly type = '[order management] Set Lock';
+  constructor(public id: number, public lockStatus: boolean, public filters: OrderFilter = {}, public updateOpened = false) { }
 }
 
 export class GetAgencyOrderCandidatesList {
@@ -29,7 +36,8 @@ export class GetAgencyOrderCandidatesList {
     public orderId: number,
     public organizationId: number,
     public pageNumber: number,
-    public pageSize: number
+    public pageSize: number,
+    public excludeDeployed?: boolean,
   ) {}
 }
 
@@ -183,14 +191,24 @@ export class ApproveOrder {
   }
 }
 
-export class GetOrderFIlterDataSources {
+export class GetOrderFilterDataSources {
   static readonly type = '[order management] Get Order Filter Data Sources';
   constructor() {
   }
 }
 
 export class GetHistoricalData {
-  static readonly type = '[agency order management] Get Historical Data';
+  static readonly type = '[order management] Get Historical Data';
   constructor(public organizationId: number, public candidateJobId: number) {
   }
+}
+
+export class ExportOrders {
+  static readonly type = '[order management] Export Organization list';
+  constructor(public payload: ExportPayload, public tab: OrganizationOrderManagementTabs) { }
+}
+
+export class ClearSuggestions {
+  static readonly type = '[order management] Clear Suggestions';
+  constructor() { }
 }

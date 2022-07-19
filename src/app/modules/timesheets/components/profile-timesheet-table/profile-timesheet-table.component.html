@@ -1,8 +1,22 @@
 <section class="table-container">
   <div class="table-block">
     <div class="table-header">
-      <h3>Timesheet</h3>
-      <button (click)="openAddSideDialog.emit(profileId)" class="add-action spaced">+ Add Record</button>
+
+      <div [ngClass]="{ 'first-tab': isFirstSelected}" class="tab-wrapper">
+        <ejs-tab id="tab_default" #tabs (selected)="onTabSelect($event)">
+          <e-tabitems>
+            <e-tabitem *ngFor="let tab of tabsConfig; trackBy: trackByIndex">
+              <ng-template #headerText >
+                <div >{{ tab.title }}</div>
+              </ng-template>
+              <ng-template #content>
+              </ng-template>
+            </e-tabitem>
+          </e-tabitems>
+        </ejs-tab>
+      </div>
+
+      <button class="add-action spaced" (click)="openAddDialog()">+ Add Record</button>
       <button
         *ngIf="!isEditOn; else editHandlers"
         (click)="editTimesheets()"
@@ -10,153 +24,26 @@
         <i-feather name="edit" class="icon"></i-feather>
         Edit
       </button>
+
       <ng-template #editHandlers>
         <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
         <button (click)="saveChanges()" ejs-button [isPrimary]="true">Save</button>
       </ng-template>
     </div>
-    <ejs-grid #profileTable
-    [dataSource]="tempData"
-    [allowSorting]="true"
-    [allowResizing]="true"
-    [resizeSettings]="resizeSettings"
-    [sortSettings]="initialSort"
-    [allowPaging]="false"
-    [enableVirtualization]="true"
-    allowTextWrap="true"
-    [height]="tableHeight"
-    >
-      <e-columns>
-        <e-column field="day"
-          [headerText]="tableConfig.day.header"
-          [textAlign]="tableConfig.day.align"
-          [width]="tableConfig.day.width">
-          <ng-template #template let-data>
 
-            <span>{{ data.day | date:'E' }}</span>
-          </ng-template>
-        </e-column>
-        <e-column field="timeIn" type="date"
-          [headerText]="tableConfig.timeIn.header"
-          [textAlign]="tableConfig.timeIn.align"
-          [width]="tableConfig.timeIn.width">
-            <ng-template #template let-data>
-              <form
-                *ngIf="isEditOn; else defaultView"
-                [formGroup]="data.form" autocomplete="off" class="bootstrap">
-                <ejs-timepicker
-                  placeholder="HH:MM"
-                  formControlName="timeIn"
-                  format="hh:mm a"
-                  [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                  [enableMask]="true"
-                  [max]="data.form.get('timeOut').value"
-                  (change)="handleRowChange(data.form, 'timeOut')"
-                  maskPlaceholder="HH:MM">
-                </ejs-timepicker>
-              </form>
-              <ng-template #defaultView>
-                <span>{{ data.timeIn | date: 'MM/dd/yy, HH:mm' }}</span>
-              </ng-template>
-            </ng-template>
-        </e-column>
-        <e-column field="timeOut"
-          [headerText]="tableConfig.timeOut.header"
-          [textAlign]="tableConfig.timeOut.align"
-          [width]="tableConfig.timeOut.width">
-          <ng-template #template let-data>
-            <form
-              *ngIf="isEditOn; else defaultView"
-              [formGroup]="data.form" autocomplete="off" class="bootstrap">
-              <ejs-timepicker
-                placeholder="HH:MM"
-                formControlName="timeOut"
-                format="hh:mm a"
-                [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-                [enableMask]="true"
-                [min]="data.form.get('timeIn').value"
-                (change)="handleRowChange(data.form, 'timeIn')"
-                maskPlaceholder="HH:MM">
-              </ejs-timepicker>
-            </form>
-            <ng-template #defaultView>
-              <span>{{ data.timeOut | date: 'MM/dd/yy, HH:mm' }}</span>
-            </ng-template>
-          </ng-template>
-        </e-column>
-        <e-column field="category"
-          [headerText]="tableConfig.category.header"
-          [textAlign]="tableConfig.category.align"
-          [width]="tableConfig.category.width">
-            <ng-template #template let-data>
-              <form
-                *ngIf="isEditOn; else defaultView"
-                [formGroup]="data.form" autocomplete="off" class="bootstrap">
-                <ejs-dropdownlist
-                  formControlName="category"
-                  [dataSource]="tableConfig.category.dataSource"
-                ></ejs-dropdownlist>
-              </form>
-              <ng-template #defaultView>
-                <span>{{ data.category }}</span>
-              </ng-template>
-            </ng-template>
-        </e-column>
-        <e-column field="costCenter"
-          [headerText]="tableConfig.costCenter.header"
-          [textAlign]="tableConfig.costCenter.align"
-          [width]="tableConfig.costCenter.width">
-          <ng-template #template let-data>
-            <form
-              *ngIf="isEditOn; else defaultView"
-              [formGroup]="data.form" autocomplete="off" class="bootstrap">
-              <ejs-dropdownlist
-                formControlName="costCenter"
-                [dataSource]="tableConfig.costCenter.dataSource"
-              ></ejs-dropdownlist>
-            </form>
-            <ng-template #defaultView>
-              <span>{{ data.costCenter }}</span>
-            </ng-template>
-          </ng-template>
-        </e-column>
-        <e-column field="hours"
-          [headerText]="tableConfig.hours.header"
-          [textAlign]="tableConfig.hours.align"
-          [width]="tableConfig.hours.width">
-        </e-column>
-        <e-column field="rate"
-          [headerText]="tableConfig.rate.header"
-          [textAlign]="tableConfig.rate.align"
-          [width]="tableConfig.rate.width">
-          <ng-template #template let-data>
-            <span>{{ data.rate | currency:'USD':'symbol':'1.0-2' }}</span>
-          </ng-template>
-        </e-column>
-        <e-column field="total"
-          [headerText]="tableConfig.total.header"
-          [textAlign]="tableConfig.total.align"
-          [width]="tableConfig.total.width">
-          <ng-template #template let-data>
-            <span>{{ data.total | currency:'USD':'symbol':'1.0-2' }}</span>
-          </ng-template>
-        </e-column>
-        <e-column
-          field=""
-          [visible]="false"
-          [headerText]="tableConfig.actions.header"
-          [textAlign]="tableConfig.actions.align"
-          [width]="tableConfig.actions.width">
-          <ng-template #template let-data>
-            <div class="row-tool-buttons">
-              <button ejs-button cssClass="e-flat default-icon-button" (click)="deleteTimesheet(data)">
-                <span><i-feather name="trash2" class="icon fill-red"></i-feather></span>
-              </button>
-            </div>
-          </ng-template>
-        </e-column>
-      </e-columns>
-    </ejs-grid>
+    <div class="timesheet-table-container">
+      <ag-grid-angular #grid
+        *ngIf="timesheetRecords$ | async as timesheetRec"
+        [columnDefs]="timesheetColDef"
+        [rowData]="timesheetRec[currentTab]"
+        [rowHeight]="64"
+        [modules]="modules"
+        [pagination]="false"
+        (gridReady)="onGridReady($event)"
+        class="ag-theme-alpine app-grid__component"
+        >
+      </ag-grid-angular>
+    </div>
   </div>
 </section>
 

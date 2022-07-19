@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants';
@@ -12,9 +12,9 @@ import { IOrderCredential, IOrderCredentialItem } from './types';
 @Component({
   selector: 'app-order-credentials',
   templateUrl: './order-credentials.component.html',
-  styleUrls: ['./order-credentials.component.scss']
+  styleUrls: ['./order-credentials.component.scss'],
 })
-export class OrderCredentialsComponent implements OnInit {
+export class OrderCredentialsComponent implements OnChanges {
   @ViewChild('addCred') addCred: AddOrderCredentialFormComponent;
   @ViewChild('editCred') editCred: EditOrderCredentialFormComponent;
   @Input() credentials: IOrderCredentialItem[];
@@ -32,8 +32,8 @@ export class OrderCredentialsComponent implements OnInit {
   constructor(private store: Store, private fb: FormBuilder, private confirmService: ConfirmService) {
     this.CredentialForm = this.fb.group({
       credentialId: new FormControl(0),
-      credentialType: new FormControl('', [ Validators.required ]),
-      credentialName: new FormControl('', [ Validators.required ]),
+      credentialType: new FormControl('', [Validators.required]),
+      credentialName: new FormControl('', [Validators.required]),
       comment: new FormControl(''),
       reqForSubmission: new FormControl(false),
       reqForOnboard: new FormControl(false),
@@ -41,10 +41,11 @@ export class OrderCredentialsComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.credentials.forEach(cred => {
-      this.updateGroups(cred);
-    });
+  ngOnChanges(changes: SimpleChanges): void {
+    const { credentials } = changes;
+    if (credentials) {
+      credentials.currentValue.forEach((cred: IOrderCredentialItem) => this.updateGroups(cred));
+    }
   }
 
   public addNew(): void {
@@ -57,15 +58,8 @@ export class OrderCredentialsComponent implements OnInit {
   public onEdit(credential: IOrderCredentialItem): void {
     this.credentialFormHeader = 'Edit Credential';
     this.isEditMode = true;
-    const {
-      credentialId,
-      credentialName,
-      credentialType,
-      comment,
-      reqForSubmission,
-      reqForOnboard,
-      optional
-    } = credential;
+    const { credentialId, credentialName, credentialType, comment, reqForSubmission, reqForOnboard, optional } =
+      credential;
     this.CredentialForm.setValue({
       credentialId,
       credentialName,
@@ -73,7 +67,7 @@ export class OrderCredentialsComponent implements OnInit {
       comment,
       reqForSubmission,
       reqForOnboard,
-      optional
+      optional,
     });
     this.CredentialForm.get('credentialType')?.disable();
     this.CredentialForm.get('credentialName')?.disable();
@@ -82,7 +76,7 @@ export class OrderCredentialsComponent implements OnInit {
   }
 
   public onDialogCancel(): void {
-    if (!this.isEditMode && this.addCred?.form.dirty || this.isEditMode && this.editCred?.form.dirty) {
+    if ((!this.isEditMode && this.addCred?.form.dirty) || (this.isEditMode && this.editCred?.form.dirty)) {
       this.confirmService
         .confirm(DELETE_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
@@ -91,7 +85,7 @@ export class OrderCredentialsComponent implements OnInit {
         })
         .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
-         this.handleOnCancel();
+          this.handleOnCancel();
         });
     } else {
       this.handleOnCancel();
@@ -122,19 +116,19 @@ export class OrderCredentialsComponent implements OnInit {
     if (credToDelete) {
       const index = this.credentials.indexOf(credToDelete);
       this.credentials.splice(index, 1);
-      this.credentialsGroups.forEach(element => {
+      this.credentialsGroups.forEach((element) => {
         element.items = [];
       });
-      this.credentials.forEach(cred => {
+      this.credentials.forEach((cred) => {
         this.updateGroups(cred);
       });
-      this.credentialsGroups = this.credentialsGroups.filter(element => element.items.length);
-      this.credentialDeleted.emit(Object.assign({}, {...credToDelete}));
+      this.credentialsGroups = this.credentialsGroups.filter((element) => element.items.length);
+      this.credentialDeleted.emit(Object.assign({}, { ...credToDelete }));
     }
   }
 
   private editExistedCred(data?: IOrderCredentialItem): void {
-    const cred = data || this.CredentialForm.getRawValue() as IOrderCredentialItem;
+    const cred = data || (this.CredentialForm.getRawValue() as IOrderCredentialItem);
     this.updateExistedCredInGrid(cred);
     this.credentialChanged.emit(Object.assign({}, { ...cred }));
     this.isEditMode = false;
@@ -155,14 +149,14 @@ export class OrderCredentialsComponent implements OnInit {
       comment: '',
       reqForSubmission: false,
       reqForOnboard: false,
-      optional: false
+      optional: false,
     });
   }
 
   private addNewCred(): void {
     const value = this.CredentialForm.getRawValue();
     this.updateGroups(value);
-    this.credentialChanged.emit(Object.assign({}, {...value}, { id: 0, orderId: 0 }));
+    this.credentialChanged.emit(Object.assign({}, { ...value }, { id: 0, orderId: 0 }));
     this.updateCredList(value);
   }
 
@@ -177,8 +171,7 @@ export class OrderCredentialsComponent implements OnInit {
   private updateGroups(cred: IOrderCredentialItem): void {
     const existedCredGroup = this.credentialsGroups.find(this.byType(cred)) as IOrderCredential;
     if (existedCredGroup) {
-      existedCredGroup.items.push(cred);
-      existedCredGroup.items = [...existedCredGroup.items];
+      existedCredGroup.items = [...existedCredGroup.items, cred];
       existedCredGroup.totalCount = existedCredGroup.items.length;
     } else {
       this.credentialsGroups.push(this.createGroup(cred));
@@ -190,7 +183,7 @@ export class OrderCredentialsComponent implements OnInit {
       type: value.credentialType,
       items: [value],
       totalCount: 1,
-      totalPages: 1
+      totalPages: 1,
     };
   }
 
@@ -211,4 +204,3 @@ export class OrderCredentialsComponent implements OnInit {
     return (iter: IOrderCredentialItem) => iter.credentialId === target.credentialId;
   }
 }
-

@@ -1,12 +1,12 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { ONLY_LETTERS, ONLY_NUMBER } from "@shared/constants";
+import { ONLY_LETTERS, ONLY_NUMBER } from '@shared/constants';
 
 @Pipe({
   name: 'validationError',
 })
 export class ValidationErrorPipe implements PipeTransform {
   transform(value: any): string {
-    if(!value) {
+    if (!value) {
       return '';
     }
 
@@ -17,10 +17,14 @@ export class ValidationErrorPipe implements PipeTransform {
         return `The max length of ${value.maxlength.requiredLength} characters is reached, you typed in ${value.maxlength.actualLength}`;
       case 'minlength' in value:
         return `Min symbols entered should be ${value.minlength.requiredLength}`;
+      case 'email' in value:
+        return 'Please enter a valid email address';
+      case 'min' in value:
+        return `The minimum value should be ${value.min.min}`;
       case 'pattern' in value:
-        if(!(new RegExp(ONLY_LETTERS).test(value.pattern.actualValue))) {
+        if (!new RegExp(ONLY_LETTERS).test(value.pattern.actualValue)) {
           return 'Only letters are allowed';
-        } else if(!(new RegExp(ONLY_NUMBER)).test(value.pattern.actualValue)) {
+        } else if (!new RegExp(ONLY_NUMBER).test(value.pattern.actualValue)) {
           return 'Only numbers are allowed';
         }
         return '';
@@ -29,4 +33,3 @@ export class ValidationErrorPipe implements PipeTransform {
     }
   }
 }
-

@@ -22,4 +22,8 @@ export class SearchComponent  {
   onKeyUp($event: any): void {
     this.inputKeyUpEnter.emit($event);
   }
+
+  clear(): void {
+    this.search.nativeElement.getElementsByTagName('input')[0].value = '';
+  }
 }

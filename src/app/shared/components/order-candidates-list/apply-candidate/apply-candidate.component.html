@@ -5,9 +5,9 @@
         <div class="deploy-candidate-wrapper">
           <h3 class="e-card-title candidate-title">
             {{candidate?.lastName}}, {{candidate?.firstName}}
-            <i-feather name="briefcase" class="icon" *ngIf="isDeployedAndAgency"></i-feather>
+            <i-feather name="briefcase" class="icon" *ngIf="isDeployedCandidate"></i-feather>
           </h3>
-          <app-deploy-candidate-message *ngIf="isDeployedAndAgency" [candidate]="candidate"></app-deploy-candidate-message>
+          <app-deploy-candidate-message *ngIf="isDeployedCandidate" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
         </div>
         <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
           <e-chips>
@@ -16,8 +16,16 @@
         </ejs-chiplist>
       </div>
       <div class="e-card-content">
-        <button *ngIf="!readOnlyMode" ejs-button [isPrimary]="true" class="apply-button" (click)="applyOrderApplicants()">Apply</button>
-        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
+        <button
+          *ngIf="!readOnlyMode"
+          ejs-button
+          [isPrimary]="true"
+          [disabled]="isLocked"
+          class="apply-button"
+          (click)="applyOrderApplicants()">
+          Apply
+        </button>
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
           <i-feather name="x" class="icon"></i-feather>
         </button>
       </div>
@@ -25,7 +33,7 @@
   </section>
   <section class="content-container">
     <div class="job-details">
-      <ejs-accordion expandMode="Single">
+      <ejs-accordion #accordionElement expandMode="Single" (expanding)="toForbidExpandSecondRow($event)" (clicked)="clickedOnAccordion($event)">
         <e-accordionitems>
           <e-accordionitem expanded="true">
             <ng-template #header>
@@ -41,9 +49,15 @@
                     </div>
                   </div>
                   <div class="input-container">
-                    <label>Bill Rate</label>
+                    <label>Bill Rate ($)</label>
                     <div class="input-group input-readonly">
-                      <input formControlName="orderBillRate" class="e-input" type="text" readonly/>
+                      <input
+                        formControlName="orderBillRate"
+                        class="e-input"
+                        type="text"
+                        (focus)="priceUtils.setPriceMask(formGroup, 'orderBillRate', $event)"
+                        (blur)="priceUtils.setTwoDecimals(formGroup, 'orderBillRate', $event)"
+                        readonly/>
                     </div>
                   </div>
                 </div>
@@ -80,19 +94,21 @@
                     </div>
                   </div>
                   <div class="input-container">
-                    <label>Candidate Bill Rate<span *ngIf="!readOnlyMode" class="required">*</span></label>
+                    <label>Candidate Bill Rate ($)<span *ngIf="!readOnlyMode" class="required">*</span></label>
                     <div class="input-group" [ngClass]="{'input-readonly': readOnlyMode}">
                       <input appValidateWithMessage
                              formControlName="candidateBillRate"
                              class="e-input"
-                             type="number"
+                             type="text"
+                             (focus)="priceUtils.setPriceMask(formGroup, 'candidateBillRate', $event)"
+                             (blur)="priceUtils.setTwoDecimals(formGroup, 'candidateBillRate', $event)"
                              [readonly]="readOnlyMode"/>
                     </div>
                   </div>
                 </div>
                 <div class="d-flex bootstrap">
                   <div class="input-container">
-                    <label>Yrs of Exp.</label>
+                    <label>Yrs. of Exp.</label>
                     <div class="input-group input-readonly">
                       <input formControlName="yearsOfExperience" class="e-input" type="text" readonly/>
                     </div>
