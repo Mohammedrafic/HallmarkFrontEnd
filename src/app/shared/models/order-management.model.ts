@@ -413,7 +413,7 @@ export class OrderFilter {
   regionIds?: number[];
   locationIds?: number[];
   departmentsIds?: number[];
-  reOrderFromId?: number;
+  reOrderId?: number;
   orderId?: number;
   skillIds?: number[];
   orderTypes?: number[];
