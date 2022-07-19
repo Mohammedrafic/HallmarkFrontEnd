@@ -20,10 +20,10 @@ export class GeneralOrderPerDiemInfoComponent {
   public orderType = OrderType;
 
   public activeValue(value: boolean): string {
-    return value ? Active[Number(value)] : '';
+    return value ? Active[Number(value)] : 'No';
   }
 
   public getReasonsForRequisition(reason: ReasonForRequisition): string {
-    return reason ? ReasonForRequisitionList.find(item => item.id ===reason)?.name as string : '';
+    return reason ? ReasonForRequisitionList.find(item => item.id ===reason)?.name as string : 'No';
   }
 }

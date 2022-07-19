@@ -163,6 +163,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
           this.store.dispatch(
             new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId)
           );
+          this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
           this.openDialog(this.onboarded);
         }
       }

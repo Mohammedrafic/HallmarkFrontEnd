@@ -177,14 +177,13 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   }
 
   private setFileName(): void {
-    const currentDateTime = this.datePipe.transform(Date.now(), 'MM/dd/yyyy');
+    const currentDateTime = this.generateDateTime(this.datePipe);
     this.fileName = `Security/User List ${currentDateTime}`;
   }
 
   private subscribeOnExportAction(): void {
     this.export$.pipe(takeWhile(() => this.isAlive)).subscribe((event: ExportedFileType) => {
-      const currentDateTime = this.datePipe.transform(Date.now(), 'MM/dd/yyyy');
-      this.defaultFileName = `Security/User List ${currentDateTime}`;
+      this.defaultFileName = `Security/User List ${this.generateDateTime(this.datePipe)}`;
       this.defaultExport(event);
     });
   }

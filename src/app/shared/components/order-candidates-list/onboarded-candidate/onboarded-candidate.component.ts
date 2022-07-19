@@ -1,11 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, merge, Observable, Subject, takeUntil } from 'rxjs';
-import {
-  JOB_STATUS,
-  ONBOARDED_STATUS,
-  OPTION_FIELDS,
-} from '@shared/components/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
+import { OPTION_FIELDS } from '@shared/components/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
@@ -44,6 +40,9 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
 
+  @Select(OrderManagementContentState.applicantStatuses)
+  applicantStatuses$: Observable<ApplicantStatus[]>;
+
   @Output() closeModalEvent = new EventEmitter<never>();
 
   @Input() candidate: OrderCandidatesList;
@@ -52,9 +51,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   public form: FormGroup;
   public jobStatusControl: FormControl;
-
   public optionFields = OPTION_FIELDS;
-  public jobStatus = JOB_STATUS;
   public candidateJob: OrderCandidateJob | null;
   public isOnboarded = true;
   public today = new Date();
@@ -66,6 +63,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public priceUtils = PriceUtils;
   public accordionClickElement: HTMLElement | null;
   public accordionOneField: AccordionOneField;
+  public nextApplicantStatuses: ApplicantStatus[];
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');
@@ -91,6 +89,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.checkRejectReason();
     this.subscribeOnSuccessRejection();
     this.subscribeOnUpdateOrganisationCandidateJobError();
+    this.subscribeOnGetStatus();
   }
 
   ngOnDestroy(): void {
@@ -98,8 +97,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.unsubscribe$.complete();
   }
 
-  public onDropDownChanged(event: { itemData: { text: string; id: number } }): void {
-    if (event.itemData?.text === ONBOARDED_STATUS) {
+  public onDropDownChanged(event: { itemData: { applicantStatus: ApplicantStatus } }): void {
+    if (event.itemData?.applicantStatus === ApplicantStatusEnum.OnBoarded) {
       this.onAccept();
     } else {
       this.store.dispatch(new GetRejectReasonsForOrganisation());
@@ -130,6 +129,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.jobStatusControl.reset();
     this.billRatesData = [];
     this.isRejected = false;
+    this.nextApplicantStatuses = [];
   }
 
   public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
@@ -267,6 +267,12 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
         takeUntil(this.unsubscribe$)
       )
       .subscribe(() => this.jobStatusControl.reset());
+  }
+
+  private subscribeOnGetStatus(): void {
+    this.applicantStatuses$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((data: ApplicantStatus[]) => (this.nextApplicantStatuses = data));
   }
 
   private createForm(): void {

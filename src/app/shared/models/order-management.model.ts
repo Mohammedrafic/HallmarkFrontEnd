@@ -104,6 +104,10 @@ export type OrderManagementChild = {
   statusName: string;
   submissionsPercentage: number;
   agencyName: string;
+  deployedCandidateInfo: null | {
+    jobId: number;
+    organizationId: number;
+  };
 };
 
 export type OrderCandidatesList = {

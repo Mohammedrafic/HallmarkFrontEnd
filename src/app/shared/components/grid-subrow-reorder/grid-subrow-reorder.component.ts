@@ -34,7 +34,7 @@ export class GridSubrowReorderComponent implements OnInit {
     } else if (length >= 3 && length <= 5) {
       this.agencyLabel = `Multiple Agencies (${length})`;
       this.tooltip = (this.reOrder.agencies as string[]).join(', ');
-    } else if (length < 5) {
+    } else if (length > 5) {
       this.agencyLabel = `Multiple Agencies`;
     }
   }
