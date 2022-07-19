@@ -34,7 +34,7 @@
       <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
         <ng-template #template let-data>
           <div class="link" (click)="onViewNavigation(data)">{{data.lastName}}, {{data.firstName}}
-            <ng-container *ngIf="data.deployedCandidateInfo">
+            <ng-container *ngIf="data.deployedCandidateInfo && data.statusName !== 'Onboard'">
               <ejs-tooltip content="Deployed Candidate" position="TopRight">
                 <i-feather name="briefcase" class="icon" ></i-feather>
               </ejs-tooltip>

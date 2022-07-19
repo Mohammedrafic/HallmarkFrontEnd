@@ -8,7 +8,11 @@ import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-man
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
+import {
+  ApplicantStatus,
+  ApplicantStatus as ApplicantStatusEnum,
+  CandidatStatus,
+} from '@shared/enums/applicant-status.enum';
 import {
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
@@ -16,7 +20,6 @@ import {
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
-import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -76,6 +79,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   get isAccepted(): boolean {
     return this.candidate.status === ApplicantStatusEnum.Accepted;
+  }
+
+  get isDeployedCandidate(): boolean {
+    return !!this.candidate.deployedCandidateInfo && this.candidate.status !== ApplicantStatus.OnBoarded;
   }
 
   private unsubscribe$: Subject<void> = new Subject();
@@ -232,7 +239,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       this.form.enable();
       this.isOnboarded = true;
     }
-    if (this.candidate.deployedCandidateInfo && !this.isAgency) {
+    if (this.isDeployedCandidate && !this.isAgency) {
       this.form.disable();
     }
   }
