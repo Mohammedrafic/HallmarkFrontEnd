@@ -3,6 +3,7 @@
     (gridReady)="handleGridReadyEvent($event)"
     (selectionChanged)="handleMultiSelectionChanged($event)"
     (rowClicked)="handleSelectionChanged($event)"
+    (sortChanged)="handleSortChanged($event)"
     [columnDefs]="columnDefinitions"
     [defaultColDef]="defaultColumnDefinition"
     [modules]="modules"

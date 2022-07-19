@@ -229,7 +229,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.isTimesheetOpen$
     .pipe(
       skip(1),
-      filter((payload) => !payload.dialogState),
+      filter((payload) => !payload),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {

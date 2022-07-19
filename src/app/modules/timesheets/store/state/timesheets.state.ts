@@ -67,8 +67,13 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static isTimesheetOpen(state: TimesheetsModel): DialogActionPayload {
-    return { dialogState: state.isTimeSheetOpen, id: state.selectedTimeSheetId };
+  static isTimesheetOpen(state: TimesheetsModel): boolean {
+    return state.isTimeSheetOpen;
+  }
+
+  @Selector([TimesheetsState])
+  static timesheetId(state: TimesheetsModel): number {
+    return state.selectedTimeSheetId;
   }
 
   @Selector([TimesheetsState])
@@ -201,7 +206,10 @@ export class TimesheetsState {
   }
 
   @Action(TimesheetDetails.GetTimesheetRecords)
-  GetTimesheetRecords({ patchState }: StateContext<TimesheetsModel>, {id }: { id: number}): Observable<TimesheetRecordsDto> {
+  GetTimesheetRecords(
+    { patchState }: StateContext<TimesheetsModel>,
+    { id }: TimesheetDetails.GetTimesheetRecords
+  ): Observable<TimesheetRecordsDto> {
     return this.timesheetsApiService.getTimesheetRecords(id)
     .pipe(
       tap((res) => {

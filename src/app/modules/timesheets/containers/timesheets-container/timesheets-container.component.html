@@ -8,12 +8,12 @@
   <ng-container right>
     <app-search class="search"></app-search>
     <app-date-week-picker [dateControl]="dateControl"></app-date-week-picker>
-<!--    <button-->
-<!--      ejs-button-->
-<!--      cssClass="e-outline button-filter button&#45;&#45;no-wrap"-->
-<!--      (click)="showFilters()">-->
-<!--      Filters <i-feather name="sliders" class="icon"></i-feather>-->
-<!--    </button>-->
+    <button
+      ejs-button
+      cssClass="e-outline button-filter button--no-wrap"
+      (click)="showFilters()">
+      Filters <i-feather name="sliders" class="icon"></i-feather>
+    </button>
    <app-export-button (optionSelected)="exportSelected($event)"></app-export-button>
   </ng-container>
 </app-page-toolbar>
@@ -27,14 +27,15 @@
     (changePage)="handleChangePage($event)"
     (changePerPage)="handleChangePerPage($event)"
     (timesheetRowSelected)="rowSelected($event)"
+    (sortHandler)="sortHandler($event)"
   >
   </app-timesheets-table>
 </section>
 
-<!--<app-timesheets-filter-dialog-->
-<!--  (resetFilters)="resetFilters()"-->
-<!--  (updateTableByFilters)="updateTableByFilters($event)"-->
-<!--&gt;</app-timesheets-filter-dialog>-->
+<app-timesheets-filter-dialog
+  (resetFilters)="resetFilters()"
+  (updateTableByFilters)="updateTableByFilters($event)"
+></app-timesheets-filter-dialog>
 <app-profile-details-container
   [currentSelectedRowIndex]="currentSelectedTableRowIndex | async"
   [maxRowIndex]="(timesheets$ | async)?.items?.length || 0"

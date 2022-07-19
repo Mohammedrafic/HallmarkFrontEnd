@@ -16,7 +16,6 @@ import {
 const valueHelper = new GridValuesHelper();
 
 const commonColumn: ColDef = {
-  filter: true,
   sortable: true,
   resizable: true,
 }

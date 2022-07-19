@@ -228,15 +228,17 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.isTimesheetOpen$
     .pipe(
       throttleTime(100),
-      filter((data) => data.dialogState),
-      distinctUntilChanged((prev, next) => JSON.stringify(prev) === JSON.stringify(next)),
-      tap((data) => {
-        this.candidateId = data.id;
-        this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(data.id));
-        this.store.dispatch(new Timesheets.GetTimesheetDetails(data.id));
+      filter(Boolean),
+      switchMap(() => {
+        this.candidateId = this.store.selectSnapshot(TimesheetsState.timesheetId);
+
+        return forkJoin([
+          this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(this.candidateId)),
+          this.store.dispatch(new Timesheets.GetTimesheetDetails(this.candidateId))
+        ]);
       }),
-      takeUntil(this.componentDestroy())
-      )
+      takeUntil(this.componentDestroy()),
+    )
     .subscribe(() => {
       this.candidateDialog?.show();
     });

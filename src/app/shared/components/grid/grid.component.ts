@@ -1,5 +1,5 @@
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import type { Module, SelectionChangedEvent } from '@ag-grid-community/core';
+import type { ColumnState, Module, SelectionChangedEvent, SortChangedEvent } from '@ag-grid-community/core';
 import { BehaviorSubject, combineLatest, filter, takeUntil, delay } from 'rxjs';
 
 import {
@@ -57,6 +57,7 @@ export class GridComponent<Data> extends DestroyableDirective implements OnChang
   @Output() public gridSelectedRow: EventEmitter<any> = new EventEmitter<any>();
   @Output() public approveEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
   @Output() public exportEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
+  @Output() public sortChanged: EventEmitter<string> = new EventEmitter<string>();
 
   public readonly defaultColumnDefinition: ColumnDefinitionModel = { minWidth: 100, resizable: true };
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
@@ -87,6 +88,11 @@ export class GridComponent<Data> extends DestroyableDirective implements OnChang
 
   public handleMultiSelectionChanged(event: SelectionChangedEvent): void {
     this.selectedTableRows = event.api.getSelectedNodes();
+  }
+
+  public handleSortChanged(event: SortChangedEvent): void {
+    const columnWithSort = event.columnApi.getColumnState().find(col => col.sort !== null);
+    this.sortChanged.emit(columnWithSort ? `${columnWithSort.colId} ${columnWithSort.sort}` : undefined);
   }
 
   private initLoadingStateChangesListener(): void {

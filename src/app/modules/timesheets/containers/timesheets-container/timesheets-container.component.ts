@@ -9,7 +9,7 @@ import { FormControl } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
 import { filter } from 'rxjs/operators';
-import { Observable, switchMap, takeUntil } from 'rxjs';
+import { Observable, of, switchMap, takeUntil, throttleTime } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { Destroyable } from '@core/helpers';
@@ -115,6 +115,10 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public onNextPreviousOrderEvent(next: boolean): void {
     this.timesheetsService.setNextValue(next);
     this.cd.markForCheck();
+  }
+
+  public sortHandler(event: string): void {
+    this.store.dispatch(new Timesheets.UpdateFiltersState({ orderBy: event }));
   }
 
   private startFiltersWatching(): void {
