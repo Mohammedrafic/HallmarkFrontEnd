@@ -16,11 +16,8 @@
   (actionBegin)="actionBegin($event)"
 >
   <e-columns>
-    <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="40"></e-column>
-    <e-column field="skillCategory.name" headerText="skill category" width=200></e-column>
-    <e-column field="skillAbbr" headerText="skill abbr" width=200></e-column>
-    <e-column field="skillDescription" headerText="skill description" width=300></e-column>
-    <e-column textAlign="Right" width=120>
+    <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
+    <e-column textAlign="Right" width="100">
       <ng-template #template let-data>
         <div class="row-tool-buttons">
           <button ejs-button cssClass="e-flat primary-icon-button" (click)="editSkill(data, $event)">
@@ -32,6 +29,9 @@
         </div>
       </ng-template>
     </e-column>
+    <e-column field="skillCategory.name" headerText="skill category" width="250"></e-column>
+    <e-column field="skillAbbr" headerText="skill abbr" width="250"></e-column>
+    <e-column field="skillDescription" headerText="skill description" width="400"></e-column>
   </e-columns>
   <ng-template #pagerTemplate let-data>
     <div class="e-pagertemplate">

@@ -41,6 +41,18 @@
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
+      <e-column textAlign="Right" width="100">
+        <ng-template #template let-data>
+          <div class="row-tool-buttons">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editSkill(data, $event)">
+              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteSkill(data, $event)">
+              <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
       <e-column field="skillCategory.name" headerText="skill category" width=200></e-column>
       <e-column field="masterSkill.skillAbbr" headerText="skill abbr" width=200></e-column>
       <e-column field="masterSkill.skillDescription" headerText="skill description" width=200></e-column>
@@ -53,18 +65,6 @@
         </ng-template>
       </e-column>
       <e-column field="inactiveDate" type="date" [format]="format" headerText="inactive date" width=140></e-column>
-      <e-column textAlign="Right" width=120 freeze="Right">
-        <ng-template #template let-data>
-          <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editSkill(data, $event)">
-              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
-            </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteSkill(data, $event)">
-              <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
-            </button>
-          </div>
-        </ng-template>
-      </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">

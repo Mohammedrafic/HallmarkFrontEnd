@@ -31,6 +31,15 @@
     [height]="300"
   >
     <e-columns>
+      <e-column textAlign="Right" width="80">
+        <ng-template #template let-data>
+          <div class="row-tool-buttons">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data, $event)">
+              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
       <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
         <ng-template #template let-data>
           <div class="link" (click)="onViewNavigation(data)">{{data.lastName}}, {{data.firstName}}
@@ -82,15 +91,6 @@
           <div class="progress-bar">
             <span>{{data.onboardedPercentage}}</span>
             <app-custom-progress-bar [value]="data.onboardedPercentage"></app-custom-progress-bar>
-          </div>
-        </ng-template>
-      </e-column>
-      <e-column textAlign="Right" freeze="Right" width="80">
-        <ng-template #template let-data>
-          <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data, $event)">
-              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
-            </button>
           </div>
         </ng-template>
       </e-column>

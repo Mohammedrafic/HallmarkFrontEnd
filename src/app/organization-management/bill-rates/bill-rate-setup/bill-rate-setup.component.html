@@ -18,6 +18,28 @@
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
+      <e-column textAlign="Right" width="100">
+        <ng-template #template let-data>
+          <div class="row-tool-buttons" (click)="stopPropagation($event)">
+            <button
+              ejs-button
+              cssClass="e-flat primary-icon-button"
+              [disabled]="isReadOnly"
+              (click)="onEditRecordButtonClick(data, $event)"
+            >
+              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+            <button
+              ejs-button
+              cssClass="e-flat secondary-icon-button"
+              [disabled]="isReadOnly"
+              (click)="onRemoveRecordButtonClick(data, $event)"
+            >
+              <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
       <e-column field="regionName" headerText="REGION" width=150>
         <ng-template #template let-data>
           <span *ngIf="data.regionId">{{ data.regionName }}</span>
@@ -137,28 +159,6 @@
               [checked]="data.displayInJob"
               [disabled]="isReadOnly"
               (change)="displayInJobChange(data, $event)"></ejs-checkbox>
-          </div>
-        </ng-template>
-      </e-column>
-      <e-column textAlign="Right" width=100 freeze="Right">
-        <ng-template #template let-data>
-          <div class="row-tool-buttons" (click)="stopPropagation($event)">
-            <button
-              ejs-button
-              cssClass="e-flat primary-icon-button"
-              [disabled]="isReadOnly"
-              (click)="onEditRecordButtonClick(data, $event)"
-            >
-              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
-            </button>
-            <button
-              ejs-button
-              cssClass="e-flat secondary-icon-button"
-              [disabled]="isReadOnly"
-              (click)="onRemoveRecordButtonClick(data, $event)"
-            >
-              <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
-            </button>
           </div>
         </ng-template>
       </e-column>

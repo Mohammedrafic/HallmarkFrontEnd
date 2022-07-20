@@ -11,7 +11,7 @@ import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/expor
 import { FilteredItem } from '@shared/models/filter.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { FilterService } from '@shared/services/filter.service';
-import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import {
@@ -30,7 +30,7 @@ import { AdminState } from '../../store/admin.state';
   selector: 'app-client-management-content',
   templateUrl: './client-management-content.component.html',
   styleUrls: ['./client-management-content.component.scss'],
-  providers: [SortService, FreezeService],
+  providers: [SortService],
 })
 export class ClientManagementContentComponent
   extends AbstractGridConfigurationComponent

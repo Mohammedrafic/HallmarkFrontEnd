@@ -37,9 +37,7 @@
     [height]="gridHeight"
   >
     <e-columns>
-      <e-column field="reason" headerText="Reason" textAlign="Left" ></e-column>
-
-      <e-column textAlign="Right" width="120" freeze="Right">
+      <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
@@ -51,6 +49,7 @@
           </div>
         </ng-template>
       </e-column>
+      <e-column field="reason" headerText="Reason" textAlign="Left" width="900"></e-column>
     </e-columns>
 
     <ng-template #pagerTemplate let-data>

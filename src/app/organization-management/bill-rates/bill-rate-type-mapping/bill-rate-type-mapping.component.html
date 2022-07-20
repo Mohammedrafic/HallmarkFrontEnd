@@ -18,17 +18,7 @@
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
-      <e-column field="billRateTitle" headerText="Bill Rate Title" width=200>
-        <ng-template #template let-data>
-          <span>{{ data.billRateTitle }}</span>
-        </ng-template>
-      </e-column>
-      <e-column field="externalBillRates" headerText="External Bill Rate" width=500>
-        <ng-template #template let-data>
-          <span>{{data.externalBillRates | exBillRateNames}}</span>
-        </ng-template>
-      </e-column>
-      <e-column textAlign="Right" width=100 freeze="Right">
+      <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
           <div class="row-tool-buttons" (click)="stopPropagation($event)">
             <button
@@ -48,6 +38,16 @@
               <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
             </button>
           </div>
+        </ng-template>
+      </e-column>
+      <e-column field="billRateTitle" headerText="Bill Rate Title" width=220>
+        <ng-template #template let-data>
+          <span>{{ data.billRateTitle }}</span>
+        </ng-template>
+      </e-column>
+      <e-column field="externalBillRates" headerText="External Bill Rate" width=530>
+        <ng-template #template let-data>
+          <span>{{data.externalBillRates | exBillRateNames}}</span>
         </ng-template>
       </e-column>
     </e-columns>

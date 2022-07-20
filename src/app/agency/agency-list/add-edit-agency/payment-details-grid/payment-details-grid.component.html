@@ -24,17 +24,7 @@
   class="e-gridwithheader"
 >
   <e-columns>
-    <e-column field="mode" headerText="Mode" textAlign="Left" [valueAccessor]="modeAccessor"></e-column>
-    <e-column field="payee" headerText="Payee" textAlign="left"></e-column>
-    <e-column field="address" headerText="Address" textAlign="left"></e-column>
-    <e-column field="city" headerText="City" textAlign="left"></e-column>
-    <e-column field="zip" headerText="Zip" textAlign="left"></e-column>
-    <e-column field="startDate" headerText="Start Date" textAlign="left">
-      <ng-template #template let-data>
-        {{ data.startDate | date:'MM/dd/yyy'}}
-      </ng-template>
-    </e-column>
-    <e-column textAlign="Right" width="120">
+    <e-column textAlign="Right" maxWidth="100">
       <ng-template #template let-data>
         <div class="row-tool-buttons">
           <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
@@ -44,6 +34,16 @@
             <span><i-feather name="trash-2" class="icon"></i-feather></span>
           </button>
         </div>
+      </ng-template>
+    </e-column>
+    <e-column field="mode" headerText="Mode" textAlign="Left" [valueAccessor]="modeAccessor"></e-column>
+    <e-column field="payee" headerText="Payee" textAlign="left"></e-column>
+    <e-column field="address" headerText="Address" textAlign="left"></e-column>
+    <e-column field="city" headerText="City" textAlign="left"></e-column>
+    <e-column field="zip" headerText="Zip" textAlign="left"></e-column>
+    <e-column field="startDate" headerText="Start Date" textAlign="left">
+      <ng-template #template let-data>
+        {{ data.startDate | date:'MM/dd/yyy'}}
       </ng-template>
     </e-column>
   </e-columns>
