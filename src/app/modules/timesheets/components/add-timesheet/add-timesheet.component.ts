@@ -96,6 +96,7 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
 
   public saveForm(): void {
     if (this.form.valid) {
+      console.log(this.form.value)
       this.sideAddDialog.hide();
     } else {
       this.form.updateValueAndValidity();

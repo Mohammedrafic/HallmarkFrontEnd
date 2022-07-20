@@ -81,7 +81,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public submitText: string;
 
-  public candidateId: number;
+  public timesheetId: number;
 
   public fileName: string = '';
 
@@ -193,7 +193,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
         if (submitted) {
           this.store.dispatch([
             new Timesheets.ToggleCandidateDialog(DialogAction.Close),
-            new Timesheets.DeleteTimesheet(this.candidateId),
+            new Timesheets.DeleteTimesheet(this.timesheetId),
           ]).subscribe(() => this.handleProfileClose());
         }
 
@@ -202,12 +202,12 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   }
 
   public handleReject(reason: string): void {
-    this.store.dispatch(new TimesheetDetails.RejectTimesheet(this.candidateId, reason))
+    this.store.dispatch(new TimesheetDetails.RejectTimesheet(this.timesheetId, reason))
       .subscribe(() => this.handleProfileClose());
   }
 
   public handleApprove(): void {
-    const id = this.candidateId;
+    const id = this.timesheetId;
     this.store.dispatch(
       this.isAgency ? new TimesheetDetails.AgencySubmitTimesheet(id) :
         new TimesheetDetails.OrganizationApproveTimesheet(id)
@@ -221,11 +221,13 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       throttleTime(100),
       filter(Boolean),
       switchMap((timesheet: Timesheet) => {
-        this.candidateId = timesheet.id;
+        this.timesheetId = timesheet.id;
 
         return forkJoin([
-          this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(this.candidateId)),
-          this.store.dispatch(new Timesheets.GetTimesheetDetails(this.candidateId))
+          this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(
+            timesheet.id, timesheet.organizationId, this.isAgency)),
+          this.store.dispatch(new Timesheets.GetTimesheetDetails(
+            timesheet.id, timesheet.organizationId, this.isAgency))
         ]);
       }),
       takeUntil(this.componentDestroy()),
@@ -279,7 +281,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     const blobList: Blob[] = event.filesData.map(file => file.rawFile as Blob);
     const names: string[] = event.filesData.map(file => file.name);
 
-    this.store.dispatch(new TimesheetDetails.UploadFiles(this.candidateId, blobList, names));
+    this.store.dispatch(new TimesheetDetails.UploadFiles(this.timesheetId, blobList, names));
     this.uploadTooltip?.close();
   }
 

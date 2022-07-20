@@ -216,9 +216,9 @@ export class TimesheetsState {
   @Action(TimesheetDetails.GetTimesheetRecords)
   GetTimesheetRecords(
     { patchState }: StateContext<TimesheetsModel>,
-    { id }: TimesheetDetails.GetTimesheetRecords
+    { id, orgId, isAgency }: TimesheetDetails.GetTimesheetRecords
   ): Observable<TimesheetRecordsDto> {
-    return this.timesheetsApiService.getTimesheetRecords(id)
+    return this.timesheetsApiService.getTimesheetRecords(id, orgId, isAgency)
     .pipe(
       tap((res) => {
         patchState({
@@ -231,11 +231,15 @@ export class TimesheetsState {
   @Action(TimesheetDetails.PatchTimesheetRecords)
   PatchTimesheetRecords(
     ctx: StateContext<TimesheetsModel>,
-    { id, recordsToUpdate }: TimesheetDetails.PatchTimesheetRecords,
+    { id, recordsToUpdate, isAgency }: TimesheetDetails.PatchTimesheetRecords,
   ): Observable<TimesheetRecordsDto> {
     return this.timesheetsApiService.patchTimesheetRecords(id, recordsToUpdate)
     .pipe(
-      switchMap(() => this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(id))),
+      switchMap(() => {
+        const state = ctx.getState();
+        const { id, organizationId } = state.selectedTimeSheet as Timesheet;
+        return this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
+      }),
     )
   }
 
@@ -271,21 +275,17 @@ export class TimesheetsState {
   @Action(Timesheets.GetTimesheetDetails)
   GetTimesheetDetails(
     ctx: StateContext<TimesheetsModel>,
-    { timesheetId }: Timesheets.GetTimesheetDetails
+    { timesheetId, orgId, isAgency }: Timesheets.GetTimesheetDetails
   ): Observable<[void, void]> {
-    return this.timesheetDetailsApiService.getTimesheetDetails(timesheetId)
+    return this.timesheetDetailsApiService.getTimesheetDetails(timesheetId, orgId, isAgency)
       .pipe(
         tap((res: TimesheetDetailsModel) => ctx.patchState({
-            timesheetDetails: {
-              ...res,
-              // TODO: Remove
-              candidateId: 8,
-            },
+            timesheetDetails: res,
           }),
         ),
         mergeMap((res) => forkJoin([
-          ctx.dispatch(new TimesheetDetails.GetBillRates(res.departmentId, res.skillId, res.orderType)),
-          ctx.dispatch(new TimesheetDetails.GetCostCenters(res.jobId)),
+          ctx.dispatch(new TimesheetDetails.GetBillRates(res.jobId, orgId, isAgency)),
+          ctx.dispatch(new TimesheetDetails.GetCostCenters(res.jobId, orgId, isAgency)),
         ])),
       );
   }
@@ -427,55 +427,6 @@ export class TimesheetsState {
       );
   }
 
-  @Action(TimesheetDetails.GetCandidateInfo)
-  GetCandidateInfo({ patchState }: StateContext<TimesheetsModel>, id: number): Observable<CandidateInfo> {
-    return this.timesheetsApiService.getCandidateInfo(id)
-    .pipe(
-      tap((res) => {
-        patchState({
-          candidateInfo: res,
-        });
-      })
-    )
-  }
-
-  @Action(TimesheetDetails.GetCandidateChartData)
-  GetCandidateChartData({ patchState }: StateContext<TimesheetsModel>, id: number): Observable<CandidateHoursAndMilesData> {
-    return this.timesheetDetailsApiService.getCandidateHoursAndMilesData(id)
-    .pipe(
-      tap((res) => {
-        patchState({
-          candidateHoursAndMilesData: res,
-        });
-      })
-    )
-  }
-
-  @Action(TimesheetDetails.GetCandidateAttachments)
-  GetCandidateAttachments({ patchState }: StateContext<TimesheetsModel>, id: number): Observable<TimesheetAttachments> {
-    return this.timesheetDetailsApiService.getCandidateAttachments(id)
-    .pipe(
-      tap((res) => {
-        patchState({
-          candidateAttachments: res,
-        });
-      })
-    )
-  }
-
-  @Action(TimesheetDetails.GetCandidateInvoices)
-  GetCandidateInvoices({ patchState }: StateContext<TimesheetsModel>, { id }: TimesheetDetails.GetCandidateInvoices)
-    : Observable<TimesheetInvoice[]> {
-    return this.timesheetDetailsApiService.getCandidateInvoices(id)
-      .pipe(
-        tap((res) => {
-          patchState({
-            candidateInvoices: res,
-          });
-        })
-      )
-  }
-
   @Action(TimesheetDetails.UploadFiles)
   UploadCandidateFiles({ getState, patchState }: StateContext<TimesheetsModel>, { id, files, names }: TimesheetDetails.UploadFiles)
     : Observable<TimesheetAttachment[]> {
@@ -546,8 +497,8 @@ export class TimesheetsState {
 
   @Action(TimesheetDetails.GetBillRates)
   GetBillRates({ patchState }: StateContext<TimesheetsModel>,
-    payload: { depId: number, skillId: number, orderType: number}): Observable<DropdownOption[]> {
-      return this.timesheetsApiService.getCandidateBillRates(payload.depId, payload.skillId, payload.orderType)
+      { jobId, orgId, isAgency }: TimesheetDetails.GetBillRates): Observable<DropdownOption[]> {
+      return this.timesheetsApiService.getCandidateBillRates(jobId, orgId, isAgency)
       .pipe(
         tap((res) => patchState({
           billRateTypes: res,
@@ -557,9 +508,9 @@ export class TimesheetsState {
 
   @Action(TimesheetDetails.GetCostCenters)
   GetCostCenters({ patchState }: StateContext<TimesheetsModel>,
-    payload: { jobId: number}
+    { jobId, orgId, isAgency}: TimesheetDetails.GetCostCenters,
   ) {
-    return this.timesheetsApiService.getCandidateCostCenters(payload.jobId)
+    return this.timesheetsApiService.getCandidateCostCenters(jobId, orgId, isAgency)
     .pipe(
       tap((res) => patchState({
         costCenterOptions: res,
@@ -583,5 +534,4 @@ export class TimesheetsState {
   //     })
   //   )
   // }
-
 }

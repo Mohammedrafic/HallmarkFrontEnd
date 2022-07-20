@@ -57,13 +57,13 @@ export function MSALInstanceFactory(config: B2CClientConfig): () => IPublicClien
       storeAuthStateInCookie: isIE, // Set this to "true" if you are having issues on IE11 or Edge
     },
     system: {
-      loggerOptions: {
-        loggerCallback(logLevel: LogLevel, message: string) {
-          console.log(message);
-        },
-        logLevel: LogLevel.Info,
-        piiLoggingEnabled: false,
-      },
+      // loggerOptions: {
+      //   loggerCallback(logLevel: LogLevel, message: string) {
+      //     console.log(message);
+      //   },
+      //   logLevel: LogLevel.Info,
+      //   piiLoggingEnabled: false,
+      // },
     },
   };
   return () => new PublicClientApplication(msalConfig);

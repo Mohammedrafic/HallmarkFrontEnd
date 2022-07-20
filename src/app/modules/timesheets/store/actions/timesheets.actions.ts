@@ -82,7 +82,11 @@ export namespace Timesheets {
   export class GetTimesheetDetails {
     static readonly type = TIMESHEETS_ACTIONS.GET_TIMESHEET_DETAILS;
 
-    constructor(public timesheetId: number) {
+    constructor(
+      public timesheetId: number,
+      public orgId: number,
+      public isAgency: boolean,
+      ) {
     }
   }
 

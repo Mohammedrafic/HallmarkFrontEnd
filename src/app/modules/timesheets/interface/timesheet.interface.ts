@@ -14,6 +14,8 @@ export interface Timesheet {
   startDate: string;
   department: string;
   agencyName: string;
+  organizationId: number;
+  organizationName: string;
   orgName: string;
   billRate: number;
   totalDays: number;

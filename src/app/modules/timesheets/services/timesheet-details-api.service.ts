@@ -5,13 +5,10 @@ import { Observable, of } from 'rxjs';
 
 import { ExportPayload } from '@shared/models/export.model';
 import {
-  CandidateHoursAndMilesData,
-  TimesheetAttachments,
   TimesheetInvoice,
-  TimesheetAttachment, TimesheetDetailsModel
+  TimesheetAttachment,
+  TimesheetDetailsModel,
 } from '../interface';
-import { MockCandidateHoursAndMilesData } from '../constants';
-import { CandidateMockInfo } from '../constants/timesheet-records-mock.constant';
 
 @Injectable()
 export class TimesheetDetailsApiService {
@@ -33,16 +30,7 @@ export class TimesheetDetailsApiService {
   }
 
   public rejectTimesheet(id: number, rejectReason: string | null): Observable<null> {
-    CandidateMockInfo.rejectReason = rejectReason;
     return of(null);
-  }
-
-  public getCandidateHoursAndMilesData(id: number): Observable<CandidateHoursAndMilesData> {
-    return of(MockCandidateHoursAndMilesData);
-  }
-
-  public getCandidateAttachments(id: number): Observable<TimesheetAttachments> {
-    return of();
   }
 
   public getCandidateInvoices(id: number): Observable<TimesheetInvoice[]> {
@@ -71,7 +59,12 @@ export class TimesheetDetailsApiService {
     return of(null);
   }
 
-  public getTimesheetDetails(id: number): Observable<TimesheetDetailsModel> {
-    return this.http.get<TimesheetDetailsModel>(`/api/Timesheets/${id}`);
+  public getTimesheetDetails(
+    id: number,
+    orgId: number,
+    isAgency: boolean,
+    ): Observable<TimesheetDetailsModel> {
+    const endpoint = !isAgency ? `/api/Timesheets/${id}` : `/api/Timesheets/${id}/organization/${orgId}`
+    return this.http.get<TimesheetDetailsModel>(endpoint);
   }
 }

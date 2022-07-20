@@ -120,3 +120,15 @@ export interface CostCenter {
 export interface CostCentersDto {
   [key: string]: CostCenter | CostCenter[];
 }
+
+export interface AddRecordDto {
+  timesheetId: number;
+  organizationId: number;
+  type: number;
+  timeIn: string;
+  timeOut: string;
+  billRateId: number;
+  departmentId: number;
+  description: string,
+  value: number;
+}

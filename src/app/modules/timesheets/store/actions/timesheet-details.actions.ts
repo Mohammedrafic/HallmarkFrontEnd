@@ -4,35 +4,22 @@ import { TimesheetDetailsActions, TIMESHEETS_ACTIONS } from '../../enums';
 export namespace TimesheetDetails {
   export class Export {
     static readonly type = '[timesheet details] Export';
-    constructor(public payload: ExportPayload) { }
+    constructor(public readonly payload: ExportPayload) { }
   }
 
   export class GetTimesheetRecords {
     static readonly type = TimesheetDetailsActions.GetTimesheetRecords;
 
-    constructor(public readonly id: number) {}
+    constructor(
+      public readonly id: number,
+      public readonly orgId: number,
+      public readonly isAgency: boolean,
+      ) {}
   }
 
   export class GetCandidateInfo {
     static readonly type = TimesheetDetailsActions.GetCandidateInfo;
-    constructor(public id: number) {}
-  }
-
-  export class GetCandidateChartData {
-    static readonly type = TimesheetDetailsActions.GetCandidateChartData;
-    constructor(public id: number) {}
-  }
-
-  export class GetCandidateAttachments {
-    static readonly type = TimesheetDetailsActions.GetCandidateAttachments;
-    constructor(public id: number) {}
-  }
-
-  export class GetCandidateInvoices {
-    static readonly type = TimesheetDetailsActions.GetCandidateInvoices;
-
-    constructor(public id: number) {
-    }
+    constructor(public readonly id: number) {}
   }
 
   export class AgencySubmitTimesheet {
@@ -66,21 +53,25 @@ export namespace TimesheetDetails {
   export class PatchTimesheetRecords {
     static readonly type = TimesheetDetailsActions.PatchTimesheetRecords;
 
-    constructor(public readonly id: number,public readonly recordsToUpdate: Record<string, string | number>[]) {}
+    constructor(
+      public readonly id: number,
+      public readonly recordsToUpdate: Record<string, string | number>[],
+      public readonly isAgency: boolean,
+      ) {}
   }
 
   export class UploadFiles {
     static readonly type = TimesheetDetailsActions.UploadFiles;
 
     // TODO: Remove names property after connection with API
-    constructor(public id: number, public files: Blob[], public names: string[]) {
+    constructor(public readonly id: number, public readonly files: Blob[], public readonly names: string[]) {
     }
   }
 
   export class DeleteFile {
     static readonly type = TimesheetDetailsActions.DeleteFile;
 
-    constructor(public id: number) {
+    constructor(public readonly id: number) {
     }
   }
 
@@ -88,9 +79,9 @@ export namespace TimesheetDetails {
     static readonly type = TimesheetDetailsActions.GetCandidateBillRates;
 
     constructor(
-      public depId: number,
-      public skillId: number,
-      public orderType: number,
+      public readonly jobId: number,
+      public readonly orgId: number,
+      public readonly isAgency: boolean,
     ) {}
   }
 
@@ -98,7 +89,9 @@ export namespace TimesheetDetails {
     static readonly type = TimesheetDetailsActions.GetCandidateCostCenters;
 
     constructor(
-      public jobId: number,
+      public readonly jobId: number,
+      public readonly orgId: number,
+      public readonly isAgency: boolean,
     ) {}
   }
 

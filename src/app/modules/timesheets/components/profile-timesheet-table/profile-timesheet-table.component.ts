@@ -1,3 +1,4 @@
+import { ActivatedRoute } from '@angular/router';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -46,7 +47,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @ViewChild('grid') readonly grid: IClientSideRowModel;
 
-  @Input() candidateId: number;
+  @Input() timesheetId: number;
+
+  @Input() isAgency: boolean;
 
   @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
 
@@ -100,7 +103,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.watchForDialogState();
   }
 
-  onTabSelect(selectEvent: SelectingEventArgs): void {
+  public onTabSelect(selectEvent: SelectingEventArgs): void {
     this.isFirstSelected = false;
 
     if (!this.isChangesSaved && (this.slectingindex !== selectEvent.selectedIndex)) {
@@ -115,8 +118,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       .subscribe((submitted) => {
         if (submitted) {
           this.isChangesSaved = true;
-          this.selectTab(selectEvent.selectedIndex);
           this.setInitialTableState();
+          this.selectTab(selectEvent.selectedIndex);
         } else {
           this.slectingindex = selectEvent.previousIndex;
           this.tabs.select(selectEvent.previousIndex);
@@ -131,12 +134,11 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public openAddDialog(): void {
-    const startDate = new Date(this.store.snapshot().timesheets.selectedTimeSheet.startDate);
-    startDate.setUTCHours(0, 0, 0, 0);
-    
+    const startDate = this.store.snapshot().timesheets.selectedTimeSheet.startDate;
+
     this.openAddSideDialog.emit({
       currentTab: this.currentTab,
-      initDate: startDate.toUTCString(),
+      initDate: startDate,
     });
   }
 
@@ -162,7 +164,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
     if (diffs.length) {
 
-      this.store.dispatch(new TimesheetDetails.PatchTimesheetRecords(this.candidateId, diffs))
+      this.store.dispatch(new TimesheetDetails.PatchTimesheetRecords(this.timesheetId, diffs, this.isAgency))
       .pipe(
         takeUntil(this.componentDestroy()),
       )

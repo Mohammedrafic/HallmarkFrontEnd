@@ -67,8 +67,8 @@ cssClass="dialog short"
                       appValidateWithMessage
                       [step]="15"
                       placeholder="Select Date and Time"
-                      [min]="timeSettings.min"
-                      [max]="timeSettings.max"
+                      [min]="field.field === 'timeIn' ? dateSettings.timeIn.min : dateSettings.timeOut.min"
+                      [max]="field.field === 'timeIn' ? dateSettings.timeIn.max : dateSettings.timeOut.max"
                       (change)="updateValidity()"
                     >
                     </ejs-datetimepicker>
@@ -99,8 +99,8 @@ cssClass="dialog short"
                     <ejs-datepicker
                     class="datepicker"
                     appValidateWithMessage
-                    [min]="timeSettings.min"
-                    [max]="timeSettings.max"
+                      [min]="dateSettings.timeIn.min"
+                      [max]="dateSettings.timeIn.max"
                     [formControlName]="field.field"
                     >
                     </ejs-datepicker>

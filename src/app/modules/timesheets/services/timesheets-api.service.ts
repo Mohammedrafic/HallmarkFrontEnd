@@ -7,8 +7,6 @@ import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-f
 import {
   TimesheetsFilterState,
   TimesheetRecord,
-  CandidateInfo,
-  TimesheetAttachments,
   TabCountConfig,
   TimesheetRecordsDto,
   DropdownOption,
@@ -26,8 +24,6 @@ import {
   filterColumnDataSource,
   MokTabsCounts,
   MockCandidateHoursAndMilesData,
-  BillRatesOptions,
-  CandidateMockInfo,
 } from '../constants';
 import { TimesheetsTableColumns } from '../enums';
 import { CostCenterAdapter } from '../helpers';
@@ -50,8 +46,14 @@ export class TimesheetsApiService {
     return of(MokTabsCounts);
   }
 
-  public getTimesheetRecords(id: number): Observable<TimesheetRecordsDto> {
-    return this.http.get<TimesheetRecordsDto>(`/api/Timesheets/${id}/records`)
+  public getTimesheetRecords(
+    id: number,
+    orgId: number,
+    isAgency: boolean,
+    ): Observable<TimesheetRecordsDto> {
+    const endpoint = !isAgency
+    ? `/api/Timesheets/${id}/records` : `/api/Timesheets/${id}/records/organization/${orgId}`;
+    return this.http.get<TimesheetRecordsDto>(endpoint)
     .pipe(
       map((data) => {
         data.timesheets.forEach((item: RecordValue) => {
@@ -68,7 +70,7 @@ export class TimesheetsApiService {
   }
 
   public AddTimesheetRecord(timesheetId: number, body: TimesheetRecord): Observable<null> {
-    return of(null);
+    return this.http.post<null>(`/api/Timesheets/${timesheetId}/records`, body);
   }
 
   public patchTimesheetRecords(
@@ -86,6 +88,9 @@ export class TimesheetsApiService {
     return of(true);
   }
 
+  /**
+   * TODO: move this to helpers
+   */
   public setDataSources(filterKeys: TimesheetsTableColumns[]): Observable<FilterDataSource> {
     const res = filterKeys.reduce((acc: any, key) => {
       acc[key] = filterColumnDataSource[key].map((el: DataSourceItem) =>
@@ -98,20 +103,15 @@ export class TimesheetsApiService {
     return of(res);
   }
 
-  public getCandidateInfo(id: number): Observable<CandidateInfo> {
-    return of(CandidateMockInfo);
-  }
-
   public getCandidateHoursAndMilesData(id: number): Observable<CandidateHoursAndMilesData> {
     return of(MockCandidateHoursAndMilesData);
   }
 
-  public getCandidateAttachments(id: number): Observable<TimesheetAttachments> {
-    return of();
-  }
+  public getCandidateCostCenters(jobId: number, orgId: number, isAgency: boolean): Observable<DropdownOption[]>{
+    const endpoint = isAgency ?
+    `/api/Jobs/${jobId}/costcenters/${orgId}` : `/api/Jobs/${jobId}/costcenters`;
 
-  public getCandidateCostCenters(jobId: number): Observable<DropdownOption[]>{
-    return this.http.get<CostCentersDto>(`/api/Jobs/${jobId}/costcenters`)
+    return this.http.get<CostCentersDto>(endpoint)
     .pipe(
       map((res) => CostCenterAdapter(res)),
     );
@@ -122,18 +122,13 @@ export class TimesheetsApiService {
   }
 
   public getCandidateBillRates(
-    depId: number,
-    skillId: number,
-    orderType: number,
+    jobId: number,
+    orgId: number,
+    isAgency: boolean,
     ): Observable<DropdownOption[]> {
-    // return this.http.get<BillRate[]>(`/api/BillRates/predefined/forOrder`, {
-    //   params: {
-    //     DepartmentId: depId,
-    //     SkillId: skillId,
-    //     OrderType: orderType,
-    //   }
-    // })
-    return of(BillRatesOptions)
+    const endpoint = isAgency ?
+    `/api/Jobs/${jobId}/billrates/${orgId}` : `/api/Jobs/${jobId}/billrates`;
+    return this.http.get<BillRate[]>(endpoint)
     .pipe(
       map((res) => res.map((item) => {
         return {
