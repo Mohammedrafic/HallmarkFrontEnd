@@ -258,6 +258,7 @@ export class Order {
   reOrders?: ReOrder[] | null;
   reOrderFrom?: Order;
   reOrderId?: number;
+  orderId?: number;
   candidates?: CandidateModel[];
 }
 

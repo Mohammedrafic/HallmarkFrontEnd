@@ -72,6 +72,7 @@ import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filter
 import { TabNavigationComponent } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
 import { OrderDetailsDialogComponent } from '@client/order-management/order-details-dialog/order-details-dialog.component';
 import isNil from 'lodash/fp/isNil';
+import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 
 @Component({
   selector: 'app-order-management-content',
@@ -180,6 +181,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private isRedirectedFromDashboard: boolean;
   private dashboardFilterSubscription: Subscription;
+  private orderPerDiemId: number | null;
 
   constructor(
     private store: Store,
@@ -191,7 +193,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     private fb: FormBuilder,
     private datePipe: DatePipe,
     private location: Location,
-    private readonly actions: Actions
+    private readonly actions: Actions,
+    private orderManagementService: OrderManagementService
   ) {
     super();
     this.isRedirectedFromDashboard =
@@ -244,6 +247,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.onSkillDataLoadHandler();
     this.onReloadOrderCandidatesLists();
     this.onChildDialogChange();
+    this.listenRedirectFromReOrder();
   }
 
   ngOnDestroy(): void {
@@ -436,6 +440,20 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       const updatedCandidate = data?.children.find((child) => child.candidateId === this.selectedCandidate.candidateId);
       this.selectedCandidate = updatedCandidate;
     }
+
+    this.openPerDiemDetails();
+  }
+
+  /* Trigger when user redirect to per diem order from re-order */
+  private openPerDiemDetails(): void {
+    if (this.orderPerDiemId && this.ordersPage) {
+      const orderPerDiem = this.ordersPage.items.find((order: OrderManagement) => order.id === this.orderPerDiemId);
+      const index = (this.gridWithChildRow.dataSource as Order[])?.findIndex(
+        (order: Order) => order.id === orderPerDiem?.id
+      );
+      this.onRowClick({ data: orderPerDiem });
+      this.gridWithChildRow.selectRow(index);
+    }
   }
 
   public onNextPreviousOrderEvent(event: NextPreviousOrderEvent): void {
@@ -542,6 +560,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.store.dispatch(new ClearOrders());
     this.openDetails.next(false);
     this.selectedIndex = null;
+    this.orderPerDiemId = null;
     this.clearSelection(this.gridWithChildRow);
 
     switch (tabIndex) {
@@ -991,5 +1010,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.isRedirectedFromDashboard = false;
         this.dashboardFilterSubscription.unsubscribe();
       });
+  }
+
+  private listenRedirectFromReOrder(): void {
+    this.orderManagementService.orderPerDiemId$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((orderId: number) => (this.orderPerDiemId = orderId));
   }
 }
