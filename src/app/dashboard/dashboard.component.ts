@@ -92,9 +92,13 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
         map((permissions) => permissions.map((permission) => permission.permissionId))
       )
       .subscribe((permissionsIds: number[]) => {
-        this.hasWidgetPermission = WIDGET_PERMISSION_TYPES.map((id) => permissionsIds.includes(id)).includes(true);
-        this.hasOrderManagePermission = permissionsIds.includes(PermissionTypes.CanOrganizationEditOrders);
+        this.hasWidgetPermission = WIDGET_PERMISSION_TYPES.map((id) => this.hasPermission(permissionsIds, id)).includes(true);
+        this.hasOrderManagePermission = this.hasPermission(permissionsIds, PermissionTypes.CanOrganizationEditOrders);
       });
+  }
+
+  private hasPermission(permissions: number[], id: number): boolean{
+    return permissions.includes(id);
   }
 
   private isUserOrganization(): void {
