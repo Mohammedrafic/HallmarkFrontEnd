@@ -2,8 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { filter, combineLatest, debounceTime, Observable, Subject, Subscription, takeUntil, throttleTime
-} from 'rxjs';
+import { filter, combineLatest, debounceTime, Observable, Subject, Subscription, takeUntil, throttleTime } from 'rxjs';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
@@ -17,6 +16,7 @@ import {
   DeleteOrderSucceeded,
   ExportOrders,
   GetAgencyOrderCandidatesList,
+  GetAvailableSteps,
   GetIncompleteOrders,
   GetOrderById,
   GetOrderFilterDataSources,
@@ -69,8 +69,8 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { NextPreviousOrderEvent } from '../order-details-dialog/order-details-dialog.component';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
-import { TabNavigationComponent } from "@client/order-management/order-management-content/tab-navigation/tab-navigation.component";
-import { OrderDetailsDialogComponent } from "@client/order-management/order-details-dialog/order-details-dialog.component";
+import { TabNavigationComponent } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
+import { OrderDetailsDialogComponent } from '@client/order-management/order-details-dialog/order-details-dialog.component';
 import isNil from 'lodash/fp/isNil';
 
 @Component({
@@ -592,9 +592,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.openDetails.next(true);
   }
 
-  selectReOrder(event: {reOrder: OrderManagement, order: Order | OrderManagement}): void {
+  selectReOrder(event: { reOrder: OrderManagement; order: Order | OrderManagement }): void {
     const tabSwitchAnimation = 400;
-    const {reOrder, order} = event;
+    const { reOrder, order } = event;
     const tabId = Object.values(OrganizationOrderManagementTabs).indexOf(OrganizationOrderManagementTabs.ReOrders);
     this.tabNavigation.tabNavigation.select(tabId);
     setTimeout(() => {
@@ -626,6 +626,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.store.dispatch(new GetOrderById(order.id, order.organizationId, options));
     this.selectedDataRow = order as any;
     this.openChildDialog.next([order, candidate]);
+    this.store.dispatch(new GetAvailableSteps(order.organizationId, candidate.jobId));
   }
 
   private deleteOrder(id: number): void {
@@ -819,10 +820,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           );
           candidateStatuses = data.candidateStatuses.filter((status) =>
             [
-              CandidatesStatusText['Bill Rate Pending'], 
-              CandidatesStatusText['Offered Bill Rate'], 
-              CandidatesStatusText.Onboard, 
-              CandidatesStatusText.Rejected
+              CandidatesStatusText['Bill Rate Pending'],
+              CandidatesStatusText['Offered Bill Rate'],
+              CandidatesStatusText.Onboard,
+              CandidatesStatusText.Rejected,
             ].includes(status.status)
           ); // TODO: after BE implementation also add Pending, Rejected
         } else if (this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
