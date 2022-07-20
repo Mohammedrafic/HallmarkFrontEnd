@@ -5,23 +5,13 @@
 }
 
 .container {
-  .apply-button {
-    margin-right: 8px;
+
+  .deployed-icon{
+    color: $primary-active-blue;
   }
 
-  .deploy-candidate-wrapper{
-    display: flex;
-    flex-direction: row;
-
-    @media(max-width: 2500px) {
-      flex-direction: column;
-      .candidate-title {
-        white-space: nowrap;
-      }
-    }
-    .icon {
-      color: $primary-active-blue;
-    }
+  .apply-button {
+    margin-right: 8px;
   }
 
   .content-container {

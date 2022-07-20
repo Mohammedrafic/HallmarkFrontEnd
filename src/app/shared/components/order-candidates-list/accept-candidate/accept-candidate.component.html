@@ -2,14 +2,11 @@
   <section class="header-container">
     <div class="e-card-header">
       <div class="e-card-header-caption candidat-status">
-        <div class="deploy-candidate-wrapper">
-          <h3 class="e-card-title candidate-title">
-            {{candidate?.lastName}}, {{candidate?.firstName}}
-            <i-feather name="briefcase" class="icon" *ngIf="candidate.deployedCandidateInfo && !isOnboard"></i-feather>
-          </h3>
-          <app-deploy-candidate-message *ngIf="candidate.deployedCandidateInfo && !isOnboard" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
-        </div>
-        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus" [text]="candidatStatus[candidate.candidateStatus]">
+        <h3 class="e-card-title candidate-title">
+          {{candidate?.lastName}}, {{candidate?.firstName}}
+          <i-feather name="briefcase" class="icon deployed-icon" *ngIf="candidate.deployedCandidateInfo && !isOnboard"></i-feather>
+        </h3>
+        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
           <e-chips>
             <e-chip [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
           </e-chips>
@@ -24,6 +21,7 @@
         </button>
       </div>
     </div>
+    <app-deploy-candidate-message *ngIf="candidate.deployedCandidateInfo && !isOnboard" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
   </section>
   <section class="content-container">
     <div class="candidate-info">

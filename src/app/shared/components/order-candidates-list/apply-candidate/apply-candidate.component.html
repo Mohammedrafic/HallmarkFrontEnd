@@ -2,19 +2,16 @@
   <section class="header-container">
     <div class="e-card-header">
       <div class="e-card-header-caption candidat-status">
-        <div class="deploy-candidate-wrapper">
-          <h3 class="e-card-title candidate-title">
-            {{candidate?.lastName}}, {{candidate?.firstName}}
-            <i-feather name="briefcase" class="icon" *ngIf="isDeployedCandidate"></i-feather>
-          </h3>
-          <app-deploy-candidate-message *ngIf="isDeployedCandidate" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
+        <h3 class="e-card-title candidate-title">
+          {{candidate?.lastName}}, {{candidate?.firstName}}
+          <i-feather name="briefcase" class="icon deployed-icon" *ngIf="isDeployedCandidate"></i-feather>
+        </h3>
         </div>
         <ejs-chiplist *ngIf="isTab && candidate.candidateStatus" [text]="candidatStatus[candidate.candidateStatus]">
           <e-chips>
             <e-chip [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
           </e-chips>
         </ejs-chiplist>
-      </div>
       <div class="e-card-content">
         <button
           *ngIf="!readOnlyMode"
@@ -30,6 +27,7 @@
         </button>
       </div>
     </div>
+    <app-deploy-candidate-message *ngIf="isDeployedCandidate" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
   </section>
   <section class="content-container">
     <div class="job-details">
