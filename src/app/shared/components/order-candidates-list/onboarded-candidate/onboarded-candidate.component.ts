@@ -78,6 +78,14 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     return this.candidate.status === ApplicantStatusEnum.Accepted;
   }
 
+  get isOnBoarded(): boolean {
+    return this.candidate.candidateStatus === ApplicantStatusEnum.OnBoarded;
+  }
+
+  get isDeployedCandidate(): boolean {
+    return !!this.candidate.deployedCandidateInfo && this.candidate.status !== ApplicantStatus.OnBoarded;
+  }
+
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private datePipe: DatePipe, private store: Store, private actions$: Actions) {}
@@ -232,7 +240,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
       this.form.enable();
       this.isOnboarded = true;
     }
-    if (this.candidate.deployedCandidateInfo && !this.isAgency) {
+    if (this.isDeployedCandidate && !this.isAgency) {
       this.form.disable();
     }
   }

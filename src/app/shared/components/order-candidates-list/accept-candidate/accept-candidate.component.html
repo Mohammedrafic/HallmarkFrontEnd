@@ -5,11 +5,11 @@
         <div class="deploy-candidate-wrapper">
           <h3 class="e-card-title candidate-title">
             {{candidate?.lastName}}, {{candidate?.firstName}}
-            <i-feather name="briefcase" class="icon" *ngIf="candidate.deployedCandidateInfo"></i-feather>
+            <i-feather name="briefcase" class="icon" *ngIf="candidate.deployedCandidateInfo && !isOnboard"></i-feather>
           </h3>
-          <app-deploy-candidate-message *ngIf="candidate.deployedCandidateInfo" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
+          <app-deploy-candidate-message *ngIf="candidate.deployedCandidateInfo && !isOnboard" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
         </div>
-        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus && !candidate.deployedCandidateInfo">
+        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
           <e-chips>
             <e-chip [text]="candidatStatus[candidate.candidateStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
           </e-chips>

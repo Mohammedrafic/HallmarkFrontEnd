@@ -73,8 +73,8 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
     this.subscribeOnPageChanges();
   }
 
-  public onSwitcher(): void {
-    this.includeDeployedCandidates = !this.includeDeployedCandidates;
+  public onSwitcher(event: { checked: boolean }): void {
+    this.includeDeployedCandidates = event.checked;
 
     this.getCandidatesList.emit({
       orderId: this.order.orderId,
@@ -183,7 +183,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
         organizationId: this.order.organizationId,
         currentPage: this.currentPage,
         pageSize: this.pageSize,
-        excludeDeployed: this.includeDeployedCandidates,
+        excludeDeployed: !this.includeDeployedCandidates,
       });
     });
   }

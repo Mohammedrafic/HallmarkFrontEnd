@@ -4,10 +4,11 @@
       <h3>Candidates List</h3>
     </div>
     <div class="input-container">
-      <div class="input-group switch" (click)="onSwitcher(); false;">
+      <div class="input-group switch" >
         <ejs-switch
           id="switcher"
           class="switch"
+          (change)="onSwitcher($event);"
           [checked]="includeDeployedCandidates"
         ></ejs-switch>
         <label class="switch-label" for="switcher">Include <br/>Deployed</label>
@@ -33,7 +34,7 @@
       <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
         <ng-template #template let-data>
           <div class="link" (click)="onViewNavigation(data)">{{data.lastName}}, {{data.firstName}}
-            <ng-container *ngIf="data.deployedCandidateInfo">
+            <ng-container *ngIf="data.deployedCandidateInfo && data.statusName !== 'Onboard'">
               <ejs-tooltip content="Deployed Candidate" position="TopRight">
                 <i-feather name="briefcase" class="icon" ></i-feather>
               </ejs-tooltip>

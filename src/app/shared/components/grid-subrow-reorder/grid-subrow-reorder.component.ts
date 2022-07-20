@@ -14,6 +14,7 @@ export class GridSubrowReorderComponent implements OnInit {
   @Input() selected: boolean;
   @Input() order: MergedOrder;
   @Input() reOrder: MergedOrder;
+  @Input() hideAgency: boolean = false;
 
   @Output() clickEvent = new EventEmitter<MergedOrder>();
 

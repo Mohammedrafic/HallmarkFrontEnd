@@ -160,6 +160,7 @@
         *ngFor="let child of data.reOrders"
         [reOrder]="child"
         [order]="data"
+        [hideAgency]="true"
         [selected]="selectedReOrder?.selected.order === data.orderId && selectedReOrder?.selected.reOrder === child.orderId"
         (clickEvent)="onOpenReorderDialog($event, data)"
       ></app-grid-subrow-reorder>
