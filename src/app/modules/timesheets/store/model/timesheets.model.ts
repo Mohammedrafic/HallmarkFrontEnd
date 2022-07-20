@@ -19,7 +19,7 @@ export type TimeSheetsPage = PageOfCollections<Timesheet>;
 
 export interface TimesheetsModel {
   timesheets: TimeSheetsPage | null;
-  timesheetsFilters: TimesheetsFilterState;
+  timesheetsFilters: TimesheetsFilterState | null;
   candidateInfo: CandidateInfo | null;
   candidateHoursAndMilesData: CandidateHoursAndMilesData | null;
   candidateAttachments: TimesheetAttachments;

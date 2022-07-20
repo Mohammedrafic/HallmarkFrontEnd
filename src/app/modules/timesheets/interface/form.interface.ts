@@ -11,7 +11,7 @@ export interface EditTimsheetForm {
 export interface TimsheetForm {
   search: string;
   orderId: string[];
-  status: string[];
+  statusText: string[];
   skill: string[];
   department: string[];
   agencyName: string[];

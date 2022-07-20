@@ -8,8 +8,7 @@ import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { filter } from 'rxjs/operators';
-import { distinctUntilChanged, Observable, switchMap, takeUntil } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { Destroyable } from '@core/helpers';
@@ -65,12 +64,13 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     store.dispatch(new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }));
 
     this.isAgency = this.router.url.includes('agency');
-    this.store.dispatch(new Timesheets.UpdateFiltersState({ isAgency: this.isAgency }));
   }
 
   ngOnInit(): void {
     if (this.isAgency) {
       this.initOrganizationsList();
+    } else {
+      this.store.dispatch(new Timesheets.UpdateFiltersState({ isAgency: this.isAgency }));
     }
 
     this.initTabsCount();
@@ -156,12 +156,16 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   private initOrganizationsList(): void {
     this.store.dispatch(new Timesheets.GetOrganizations()).pipe(
-      filter((res) => res.length),
-      switchMap(() => this.organizations$),
+      switchMap(() => this.organizations$.pipe(
+        filter((res: DataSourceItem[]) => !!res.length),
+      )),
       takeUntil(this.componentDestroy()),
     ).subscribe(res => {
       this.organizationControl.setValue(res[0].id, { emitEvent: false });
-      this.store.dispatch(new Timesheets.UpdateFiltersState({ organizationId: res[0].id }));
+      this.store.dispatch(new Timesheets.UpdateFiltersState({
+        organizationId: res[0].id,
+        isAgency: true,
+      }));
     });
   }
 

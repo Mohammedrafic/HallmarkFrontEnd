@@ -61,7 +61,7 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static timesheetsFilters(state: TimesheetsModel): TimesheetsFilterState {
+  static timesheetsFilters(state: TimesheetsModel): TimesheetsFilterState | null {
     return state.timesheetsFilters;
   }
 
@@ -176,7 +176,7 @@ export class TimesheetsState {
   GetTimesheets(
     { patchState, getState }: StateContext<TimesheetsModel>,
   ): Observable<TimeSheetsPage> {
-    const filters = getState().timesheetsFilters;
+    const filters = getState().timesheetsFilters || {};
 
     return this.timesheetsApiService.getTimesheets(filters)
       .pipe(
@@ -189,13 +189,16 @@ export class TimesheetsState {
 
   @Action(Timesheets.UpdateFiltersState)
   UpdateFiltersState(
-    { setState }: StateContext<TimesheetsModel>,
+    { setState, getState }: StateContext<TimesheetsModel>,
     { payload }: Timesheets.UpdateFiltersState,
   ): Observable<null> {
+    const filtersState = Object.assign({}, DefaultFiltersState, payload);
+
     return of(null).pipe(
-      throttleTime(100),
-      tap(() => setState(patch({
-        timesheetsFilters: payload ? patch(payload) : DefaultFiltersState,
+      throttleTime(200),
+      tap(() => setState(patch<TimesheetsModel>({
+        timesheetsFilters: payload && getState().timesheetsFilters ?
+          patch(filtersState) : filtersState,
       })))
     );
   }

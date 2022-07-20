@@ -10,6 +10,7 @@
       <div class="input-container">
         <ejs-dropdownlist
           *ngIf="organizations$ | async as organizations"
+          placeholder="Select organization"
           [dataSource]="organizations"
           [fields]="unitOrganizationsFields"
           [formControl]="organizationControl">
