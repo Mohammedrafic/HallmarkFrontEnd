@@ -27,6 +27,7 @@ import { CurrentUserPermission } from '@shared/models/permission.model';
 import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
 import { DashboardFiltersModel } from './models/dashboard-filters.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
+import { WIDGET_PERMISSION_TYPES } from './constants/widget-permissions-types';
 
 @Component({
   selector: 'app-dashboard',
@@ -53,22 +54,13 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   @Select(UserState.currentUserPermissions) private readonly currentUserPermissions$: Observable<CurrentUserPermission[]>;
 
   private panelsAreDragged = false;
-  private permissions: CurrentUserPermission[] = [];
+  public hasWidgetPermission: boolean;
+  public hasOrderManagePermission: boolean;
 
   public widgetsData$: Observable<WidgetsDataModel>;
   public isOrganization$: Observable<boolean>;
 
   public readonly filtersGroup: FormGroup = this.getFiltersGroup();
-
-  get hasOrderManagePermission(): boolean {
-    const manageOrderPermissionId = PermissionTypes.CanOrganizationEditOrders;
-    return this.permissions.map(permission => permission.permissionId).includes(manageOrderPermissionId);
-  }
-
-  get hasWidgetPermission(): boolean {
-    const widgetPermissionId = PermissionTypes.DashboardWidgets;
-    return this.permissions.map(permission => permission.permissionId).includes(widgetPermissionId);
-  }
 
   constructor(
     private readonly store: Store,
@@ -93,7 +85,20 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   private subscribeOnPermissions(): void {
-    this.currentUserPermissions$.pipe(takeUntil(this.destroy$)).subscribe(permissions => this.permissions = permissions);
+    this.currentUserPermissions$
+      .pipe(
+        takeUntil(this.destroy$),
+        filter((permissions) => !!permissions.length),
+        map((permissions) => permissions.map((permission) => permission.permissionId))
+      )
+      .subscribe((permissionsIds: number[]) => {
+        this.hasWidgetPermission = WIDGET_PERMISSION_TYPES.map((id) => this.hasPermission(permissionsIds, id)).includes(true);
+        this.hasOrderManagePermission = this.hasPermission(permissionsIds, PermissionTypes.CanOrganizationEditOrders);
+      });
+  }
+
+  private hasPermission(permissions: number[], id: number): boolean{
+    return permissions.includes(id);
   }
 
   private isUserOrganization(): void {
@@ -249,7 +254,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   private getDashboardFilterState(): void {
-    this.dashboardFiltersState$.pipe(takeUntil(this.destroy$)).subscribe((filters: DashboardFiltersModel)=> {
+    this.dashboardFiltersState$.pipe(takeUntil(this.destroy$)).subscribe((filters: DashboardFiltersModel) => {
       this.filtersGroup.reset();
       Object.entries(this.filtersGroup.controls).forEach(([field, control]) => control.setValue(filters[field as keyof DashboardFiltersModel] || []));
     });
