@@ -22,7 +22,8 @@ import {
   GetOrganizationStructure,
   LastSelectedOrganisationAgency,
   GetUsersAssignedToRole,
-  GetCurrentUserPermissions
+  GetCurrentUserPermissions,
+  GetUserOrganizations
 } from './user.actions';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
 import { OrganizationStructure } from '@shared/models/organization.model';
@@ -162,7 +163,7 @@ export class UserState {
     }));
   }
 
-  @Action(GetUserAgencies)
+  @Action(GetUserOrganizations)
   GetUserOrganizations({ patchState }: StateContext<UserStateModel>): Observable<UserAgencyOrganization> {
     return this.userService.getUserOrganizations().pipe(tap((organizations: UserAgencyOrganization) => {
       return patchState({ organizations });
