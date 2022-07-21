@@ -1,18 +1,17 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { debounceTime, Observable, Subject } from 'rxjs';
+import { debounceTime, filter, merge, Observable, Subject, takeUntil } from 'rxjs';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import {
   AgencyOrder,
   CandidateListEvent,
   Order,
+  OrderCandidateJob,
   OrderCandidatesList,
   OrderCandidatesListPage,
 } from '@shared/models/order-management.model';
@@ -20,15 +19,27 @@ import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
+import { GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
+import { GetCandidateJob } from '@agency/store/order-management.actions';
 
 @Component({
   selector: 'app-order-per-diem-candidates-list',
   templateUrl: './order-per-diem-candidates-list.component.html',
   styleUrls: ['./order-per-diem-candidates-list.component.scss'],
 })
-export class OrderPerDiemCandidatesListComponent extends AbstractGridConfigurationComponent implements OnInit {
+export class OrderPerDiemCandidatesListComponent
+  extends AbstractGridConfigurationComponent
+  implements OnInit, OnDestroy
+{
+  @Select(OrderManagementContentState.candidatesJob)
+  candidateJobOrganisationState$: Observable<OrderCandidateJob>;
+
+  @Select(OrderManagementState.candidatesJob)
+  candidateJobAgencyState$: Observable<OrderCandidateJob>;
+
   @ViewChild('orderCandidatesGrid') grid: GridComponent;
-  @ViewChild('sideDialog') sideDialog: DialogComponent;
 
   @Input() candidatesList: OrderCandidatesListPage | null;
   @Input() order: AgencyOrder;
@@ -40,12 +51,13 @@ export class OrderPerDiemCandidatesListComponent extends AbstractGridConfigurati
 
   public templateState: Subject<any> = new Subject();
   public includeDeployedCandidates: boolean = true;
-  public targetElement: HTMLElement | null = document.body.querySelector('#main');
-  public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public candidate: OrderCandidatesList;
   public isAgency: boolean;
+  public openDetails = new Subject<boolean>();
+  public candidateJob: OrderCandidateJob;
 
   private pageSubject = new Subject<number>();
+  private unsubscribe$: Subject<void> = new Subject();
 
   constructor(private store: Store, private router: Router) {
     super();
@@ -54,6 +66,13 @@ export class OrderPerDiemCandidatesListComponent extends AbstractGridConfigurati
   ngOnInit() {
     this.isAgency = this.router.url.includes('agency');
     this.subscribeOnPageChanges();
+    this.dialogOpenEventHandler();
+    this.subscribeOnChangeCandidateJob();
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 
   public onRowsDropDownChanged(): void {
@@ -69,7 +88,8 @@ export class OrderPerDiemCandidatesListComponent extends AbstractGridConfigurati
 
   public onViewNavigation(data: any): void {
     const user = this.store.selectSnapshot(UserState.user);
-    const url = user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
+    const url =
+      user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
     if (user?.businessUnitType === BusinessUnitType.Hallmark) {
       this.store.dispatch(
         new SetLastSelectedOrganizationAgencyId({
@@ -87,18 +107,39 @@ export class OrderPerDiemCandidatesListComponent extends AbstractGridConfigurati
     this.candidate = { ...data };
     this.addActiveCssClass(event);
 
+    //TODO: refactor it , when all modals will added
     if (this.order && this.candidate) {
       if (this.isAgency) {
-          // this.openDialog();
+        if ([ApplicantStatus.OnBoarded].includes(this.candidate.status)) {
+          this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
+          this.openDetails.next(true);
+        }
       } else {
-        // this.openDialog();
+        if ([ApplicantStatus.Accepted, ApplicantStatus.OnBoarded].includes(this.candidate.status)) {
+          this.store.dispatch(
+            new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId)
+          );
+          this.openDetails.next(true);
+        }
       }
     }
   }
 
-  public onCloseDialog(): void {
-    this.sideDialog.hide();
-    this.removeActiveCssClass();
+  private subscribeOnChangeCandidateJob(): void {
+    merge(this.candidateJobOrganisationState$, this.candidateJobAgencyState$)
+      .pipe(
+        filter((candidateJob) => !!candidateJob),
+        takeUntil(this.unsubscribe$)
+      )
+      .subscribe((candidateJob: OrderCandidateJob) => (this.candidateJob = candidateJob));
+  }
+
+  private dialogOpenEventHandler(): void {
+    this.openDetails.pipe(takeUntil(this.unsubscribe$)).subscribe((isOpen: boolean) => {
+      if (!isOpen) {
+        this.removeActiveCssClass();
+      }
+    });
   }
 
   private subscribeOnPageChanges(): void {
@@ -112,10 +153,5 @@ export class OrderPerDiemCandidatesListComponent extends AbstractGridConfigurati
         excludeDeployed: false,
       });
     });
-  }
-
-  private openDialog(template: any): void {
-    this.templateState.next(template);
-    this.sideDialog.show();
   }
 }

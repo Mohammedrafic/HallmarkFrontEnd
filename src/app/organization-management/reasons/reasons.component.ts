@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
-import { RemoveRejectReasons, SaveClosureReasons, SaveRejectReasons, SaveRejectReasonsSuccess, UpdateClosureReasonsSuccess, UpdateRejectReasons } from '@organization-management/store/reject-reason.actions';
+import { RemoveRejectReasons, SaveClosureReasons, SaveClosureReasonsError, SaveRejectReasons, SaveRejectReasonsError, SaveRejectReasonsSuccess, UpdateClosureReasonsSuccess, UpdateRejectReasons } from '@organization-management/store/reject-reason.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CANCEL_REJECTION_REASON, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, ONLY_LETTERS } from '@shared/constants';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
@@ -57,6 +57,10 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
       ofActionSuccessful(SaveRejectReasonsSuccess, UpdateClosureReasonsSuccess),
       takeWhile(() => this.isAlive)
     ).subscribe(() =>this.closeSideDialog());
+    this.actions$.pipe(
+      ofActionSuccessful(SaveRejectReasonsError, SaveClosureReasonsError),
+      takeWhile(() => this.isAlive)
+    ).subscribe(() => this.isSaving = false);
   }
 
   public saveReason(): void {
