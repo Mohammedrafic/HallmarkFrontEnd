@@ -12,12 +12,14 @@ import { TimesheetsModel, TimeSheetsPage, } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
-import { DialogAction, TimesheetsTableColumns, TIMETHEETS_STATUSES, RecordFields } from '../../enums';
+import { DialogAction, TIMETHEETS_STATUSES, RecordFields, TimesheetsTableFiltersColumns } from '../../enums';
 import {
   approveTimesheetDialogData,
   DefaultFiltersState,
+  DefaultTimesheetCollection,
   DefaultTimesheetState,
   rejectTimesheetDialogData,
+  SavedFiltersParams,
   submitTimesheetDialogData
 } from '../../constants';
 import {
@@ -40,6 +42,7 @@ import {
 } from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
+import { reduceFiltersState } from '../../helpers';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -176,6 +179,10 @@ export class TimesheetsState {
   GetTimesheets(
     { patchState, getState }: StateContext<TimesheetsModel>,
   ): Observable<TimeSheetsPage> {
+    patchState({
+      timesheets: DefaultTimesheetCollection,
+    });
+
     const filters = getState().timesheetsFilters || {};
 
     return this.timesheetsApiService.getTimesheets(filters)
@@ -192,13 +199,16 @@ export class TimesheetsState {
     { setState, getState }: StateContext<TimesheetsModel>,
     { payload }: Timesheets.UpdateFiltersState,
   ): Observable<null> {
-    const filtersState = Object.assign({}, DefaultFiltersState, payload);
+    const oldFilters: TimesheetsFilterState = getState().timesheetsFilters || {};
+    let filters: TimesheetsFilterState = reduceFiltersState(oldFilters, SavedFiltersParams);
+
+    filters = Object.assign({}, filters, payload);
 
     return of(null).pipe(
-      throttleTime(200),
+      throttleTime(100),
       tap(() => setState(patch<TimesheetsModel>({
         timesheetsFilters: payload && getState().timesheetsFilters ?
-          patch(filtersState) : filtersState,
+          filters : DefaultFiltersState,
       })))
     );
   }
@@ -486,7 +496,7 @@ export class TimesheetsState {
             setState(patch({
               timesheetsFiltersColumns: patch({
                 [key]: patch({
-                  dataSource: res[key as TimesheetsTableColumns],
+                  dataSource: res[key as TimesheetsTableFiltersColumns],
                 })
               })
             }))

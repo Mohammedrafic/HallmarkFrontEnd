@@ -74,6 +74,24 @@ export enum TimesheetsTableColumns {
   Controls = 'controls',
 }
 
+export enum TimesheetsTableFiltersColumns {
+  OrderBy = 'orderBy',
+  PageNumber = 'pageNumber',
+  PageSize = 'pageSize',
+  OrganizationId = 'organizationId',
+  Date = 'date',
+  Search = 'search',
+  OrderIds = 'orderIds',
+  LocationIds = 'locationIds',
+  RegionsIds = 'regionsIds',
+  DepartmentIds = 'departmentIds',
+  AgencyIds = 'agencyIds',
+  StatusIds = 'statusIds',
+  TotalHours = 'totalHours',
+  BillRate = 'billRate',
+  SkillIds = 'skillIds',
+}
+
 export enum DialogAction {
   Open = 'open',
   Close = 'close',

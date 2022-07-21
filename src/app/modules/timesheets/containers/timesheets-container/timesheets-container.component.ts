@@ -44,6 +44,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public readonly tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
   public activeTabIdx = 0;
+  public appliedFiltersAmount = 0;
   public readonly exportOptions: ItemModel[] = TimesheetExportOptions;
   public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
   public filters: TimesheetsFilterState | undefined;
@@ -70,7 +71,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     if (this.isAgency) {
       this.initOrganizationsList();
     } else {
-      this.store.dispatch(new Timesheets.UpdateFiltersState({ isAgency: this.isAgency }));
+      this.store.dispatch(new Timesheets.UpdateFiltersState());
     }
 
     this.initTabsCount();
@@ -131,6 +132,10 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.store.dispatch(new Timesheets.UpdateFiltersState({ orderBy: event }));
   }
 
+  public changeFiltersAmount(amount: number): void {
+    this.appliedFiltersAmount = amount;
+  }
+
   private startFiltersWatching(): void {
     this.timesheetsFilters$.pipe(
       filter(Boolean),
@@ -162,10 +167,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       takeUntil(this.componentDestroy()),
     ).subscribe(res => {
       this.organizationControl.setValue(res[0].id, { emitEvent: false });
-      this.store.dispatch(new Timesheets.UpdateFiltersState({
-        organizationId: res[0].id,
-        isAgency: true,
-      }));
+      this.store.dispatch(new Timesheets.UpdateFiltersState({ organizationId: res[0].id }));
     });
   }
 

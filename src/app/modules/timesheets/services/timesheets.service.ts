@@ -18,14 +18,13 @@ export class TimesheetsService {
   public createForm(): CustomFormGroup<TimsheetForm> {
     return this.fb.group({
       search: [''],
-      orderId: [[]],
-      statusText: [[]],
-      skill: [[]],
-      department: [[]],
-      agencyName: [[]],
-      orgName: [[]],
-      region: [[]],
-      location: [[]],
+      orderIds: [[]],
+      statusIds: [[]],
+      skillIds: [[]],
+      departmentIds: [[]],
+      agencyIds: [[]],
+      regionsIds: [[]],
+      locationIds: [[]],
     }) as CustomFormGroup<TimsheetForm>;
   }
 

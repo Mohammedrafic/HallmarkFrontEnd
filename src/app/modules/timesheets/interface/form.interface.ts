@@ -10,13 +10,12 @@ export interface EditTimsheetForm {
 
 export interface TimsheetForm {
   search: string;
-  orderId: string[];
-  statusText: string[];
-  skill: string[];
-  department: string[];
-  agencyName: string[];
-  orgName: string[];
-  region: string[];
-  location: string[];
+  orderIds: string[];
+  statusIds: string[];
+  skillIds: string[];
+  departmentIds: string[];
+  agencyIds: string[];
+  regionsIds: string[];
+  locationIds: string[];
 }
 

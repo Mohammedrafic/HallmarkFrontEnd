@@ -1,6 +1,6 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
-import { TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../enums';
+import { TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
 
 export interface Timesheet {
   id: number;
@@ -30,16 +30,15 @@ export interface TimesheetsFilterState {
   organizationId?: number;
   date?: string;
   search?: string;
-  orderId?: string[];
-  status?: string;
+  orderIds?: string[];
+  locationIds?: string[];
+  regionsIds?: string[];
+  departmentIds?: string[];
+  agencyIds?: string[];
   statusIds?: string[];
-  statusText?: string[];
-  skillName?: string[];
-  departmentName?: string[];
-  location?: string[];
-  region?: string[];
-  orgName?: string[];
-  agencyName?: string[];
+  totalHours?: number;
+  billRate?: number;
+  skillIds?: string[];
   isAgency?: boolean;
 }
 
@@ -49,20 +48,18 @@ export interface TimesheetsSelectedRowEvent {
   isInteracted?: boolean;
 }
 
-export type ITimesheetsColumnWidth = {
-  [key in TimesheetsTableColumns]?: number;
-};
-
 export type FilterColumns = {
-  [key in TimesheetsTableColumns]: {
+  [key in TimesheetsTableFiltersColumns]: {
     type: ControlTypes;
     valueType: ValueType;
     dataSource?: DataSourceItem[] | any;
+    valueField?: string;
+    valueId?: string;
   }
 }
 
 export type FilterDataSource = {
-  [key in TimesheetsTableColumns]?: DataSourceItem[] | any;
+  [key in TimesheetsTableFiltersColumns]?: DataSourceItem[] | any;
 }
 
 export interface DataSourceItem {

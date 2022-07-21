@@ -25,7 +25,7 @@ import {
   MokTabsCounts,
   MockCandidateHoursAndMilesData,
 } from '../constants';
-import { TimesheetsTableColumns } from '../enums';
+import { TimesheetsTableFiltersColumns } from '../enums';
 import { CostCenterAdapter } from '../helpers';
 
 @Injectable()
@@ -91,7 +91,7 @@ export class TimesheetsApiService {
   /**
    * TODO: move this to helpers
    */
-  public setDataSources(filterKeys: TimesheetsTableColumns[]): Observable<FilterDataSource> {
+  public setDataSources(filterKeys: TimesheetsTableFiltersColumns[]): Observable<FilterDataSource> {
     const res = filterKeys.reduce((acc: any, key) => {
       acc[key] = filterColumnDataSource[key].map((el: DataSourceItem) =>
         ({...el, name: this.capitalizeFirst.transform(el.name)})
