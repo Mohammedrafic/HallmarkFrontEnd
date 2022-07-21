@@ -64,7 +64,7 @@ export enum TimesheetsTableColumns {
   Skill = 'skill',
   Location = 'location',
   Region = 'region',
-  OrgName = 'orgName',
+  OrgName = 'organizationName',
   WorkWeek = 'workWeek',
   StartDate = 'startDate',
   Department = 'department',
