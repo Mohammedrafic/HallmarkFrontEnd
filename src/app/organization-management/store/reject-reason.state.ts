@@ -2,9 +2,14 @@ import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { Injectable } from "@angular/core";
 import { RejectReasonService } from "@shared/services/reject-reason.service";
 import {
+  GetClosureReasonsByPage,
   GetRejectReasonsByPage,
+  RemoveClosureReasons,
   RemoveRejectReasons,
+  SaveClosureReasons,
+  SaveClosureReasonsError,
   SaveRejectReasons, SaveRejectReasonsError, SaveRejectReasonsSuccess,
+  UpdateClosureReasonsSuccess,
   UpdateRejectReasons, UpdateRejectReasonsSuccess
 } from "@organization-management/store/reject-reason.actions";
 import { catchError, Observable, tap } from "rxjs";
@@ -17,6 +22,7 @@ import { RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from "@shared/constants"
 
 export interface RejectReasonStateModel {
   rejectReasonsPage: RejectReasonPage | null;
+  closureReasonsPage: RejectReasonPage | null;
   isReasonLoading: boolean
 }
 
@@ -24,6 +30,7 @@ export interface RejectReasonStateModel {
   name: 'rejectReason',
   defaults: {
     rejectReasonsPage: null,
+    closureReasonsPage: null,
     isReasonLoading: false
   }
 })
@@ -32,6 +39,11 @@ export class RejectReasonState {
   @Selector()
   static rejectReasonsPage(state: RejectReasonStateModel): RejectReasonPage | null {
     return state.rejectReasonsPage;
+  }
+
+  @Selector()
+  static closureReasonsPage(state: RejectReasonStateModel): RejectReasonPage | null {
+    return state.closureReasonsPage;
   }
 
   constructor(private rejectReasonService:RejectReasonService) {}
@@ -103,6 +115,52 @@ export class RejectReasonState {
       }),
       catchError((error: HttpErrorResponse) => {
         dispatch(new SaveRejectReasonsError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(RemoveClosureReasons)
+  RemoveClosureReasons(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { id }: RemoveClosureReasons
+  ): Observable<void> {
+    return this.rejectReasonService.removeClosureReason(id).pipe(
+      tap(() => {
+        dispatch(new UpdateClosureReasonsSuccess());
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_DELETE));
+      })
+    );
+  }
+
+  @Action(GetClosureReasonsByPage)
+  GetClosureReasonsByPage(
+    { patchState }: StateContext<RejectReasonStateModel>,
+    { pageNumber, pageSize, orderBy }: GetClosureReasonsByPage
+  ): Observable<RejectReasonPage> {
+    patchState({ isReasonLoading: true });
+
+    return this.rejectReasonService.getClosureReasonsByPage(pageNumber, pageSize, orderBy).pipe(
+      tap((payload) => {
+        patchState({closureReasonsPage: payload});
+        return payload;
+      })
+    );
+  }
+
+  @Action(SaveClosureReasons)
+  SaveClosureReasons(
+    { dispatch}: StateContext<RejectReasonStateModel>,
+    { payload }: SaveClosureReasons
+  ): Observable<RejectReason | void> {
+    return this.rejectReasonService.saveClosureReasons(payload).pipe(
+      tap(payload => {
+        dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
+        dispatch(new UpdateClosureReasonsSuccess());
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveClosureReasonsError());
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );

@@ -4,6 +4,13 @@
     <app-general-order-info *ngSwitchDefault [orderInformation]="orderCandidateInformation"></app-general-order-info>
 </div>
 <div class="line"></div>
-<div class="candidates-list">
-  <app-order-candidates-list [candidatesList]="orderCandidatePage$ | async" [order]="orderCandidates" (getCandidatesList)="onGetCandidatesList($event)"></app-order-candidates-list>
+<div class="candidates-list" [ngSwitch]="orderCandidateInformation?.orderType">
+  <app-order-per-diem-candidates-list *ngSwitchCase="orderType.OpenPerDiem" [candidatesList]="orderCandidatePage$ | async"
+                             (getCandidatesList)="onGetCandidatesList($event)"
+                             [order]="orderCandidates">
+  </app-order-per-diem-candidates-list>
+  <app-order-candidates-list *ngSwitchDefault [candidatesList]="orderCandidatePage$ | async"
+                             (getCandidatesList)="onGetCandidatesList($event)"
+                             [order]="orderCandidates">
+  </app-order-candidates-list>
 </div>

@@ -20,6 +20,14 @@
             [allowResizing]="allowResizing"
             (dataBound)="dataBound()">
     <e-columns>
+      <e-column textAlign="Right" minWidth="112" width="112">
+        <ng-template #template let-data>
+          <div class="e-grid-tool-buttons">
+            <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>
+            <span class="remove-button" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
+          </div>
+        </ng-template>
+      </e-column>
       <e-column headerText="Organization" width=157>
         <ng-template #template let-data>
           <span>{{data.organizationId === null ? 'All' : data.organizationName}}</span>
@@ -38,14 +46,6 @@
       <e-column headerText="Department" width=190>
         <ng-template #template let-data>
           <span>{{data.departmentId === null ? 'All' : data.departmentName}}</span>
-        </ng-template>
-      </e-column>
-      <e-column textAlign="Right" minWidth="112" width="112" freeze="Right">
-        <ng-template #template let-data>
-          <div class="e-grid-tool-buttons">
-            <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>
-            <span class="remove-button" (click)="onRemove(data)"><i-feather name="trash-2" class="icon"></i-feather></span>
-          </div>
         </ng-template>
       </e-column>
     </e-columns>
