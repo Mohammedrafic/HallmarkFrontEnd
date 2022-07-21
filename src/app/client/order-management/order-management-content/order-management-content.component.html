@@ -180,7 +180,7 @@
             <span>All</span>
           </ng-container>
 
-          <ng-container *ngIf="data.agency?.length === 2">
+          <ng-container *ngIf="data.agency?.length === 2 || data.agency?.length === 1">
             <span *ngFor="let agency of data.agency; let i = index" class="agency-name">
               {{ agency }}
               <span class="agency-name" *ngIf="i !== data.agency.length - 1">, </span>
@@ -189,7 +189,7 @@
 
           <ng-container *ngIf="data.agency?.length >= 3 && data.agency?.length <= 5">
             <ejs-tooltip
-              content="{{ data.agency.length }}"
+              content="{{ data.agency.join(', ') }}"
               target="#agencyName"
             >
               <span id="agencyName" class="agency-name">Multiple Agencies</span>
@@ -297,7 +297,7 @@
             class="e-input"
             type="text"
             maxlength="50"
-            formControlName="reOrderFromId"/>
+            formControlName="reOrderId"/>
         </div>
       </div>
     </div>

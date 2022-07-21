@@ -64,5 +64,8 @@ export enum CandidatesStatusText {
   Shortlisted = 20,
   Offered = 40,
   Accepted = 50,
-  Onboard = 60
+  Onboard = 60,
+  "Bill Rate Pending" = 120,
+  "Offered Bill Rate" = 110,
+  Rejected = 100
 }

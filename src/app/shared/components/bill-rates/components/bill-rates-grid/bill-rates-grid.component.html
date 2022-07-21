@@ -21,6 +21,19 @@
             [allowResizing]="allowResizing"
             (dataBound)="dataBound()">
     <e-columns>
+      <e-column [visible]="!readOnlyMode" textAlign="Right" width="120">
+        <ng-template #template let-data>
+          <div class="row-tool-buttons">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit($event, data)">
+              <span><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove($event, data)">
+              <span><i-feather name="trash-2" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
+
       <e-column headerText="Bill Rate Title">
         <ng-template #template let-data>{{data.billRateConfig.title}}</ng-template>
       </e-column>
@@ -45,19 +58,6 @@
 
       <e-column headerText="Effective Date" textAlign="Right">
         <ng-template #template let-data>{{data.effectiveDate | date:'M/d/y'}}</ng-template>
-      </e-column>
-
-      <e-column [visible]="!readOnlyMode" textAlign="Right" width="120" freeze="Right">
-        <ng-template #template let-data>
-          <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit($event, data)">
-              <span><i-feather name="edit" class="icon"></i-feather></span>
-            </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="onRemove($event, data)">
-              <span><i-feather name="trash-2" class="icon"></i-feather></span>
-            </button>
-          </div>
-        </ng-template>
       </e-column>
     </e-columns>
   </ejs-grid>

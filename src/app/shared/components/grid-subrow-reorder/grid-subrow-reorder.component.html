@@ -14,7 +14,7 @@
     <div class="data">{{reOrder.positions || reOrder.numberOfPositions}} / {{reOrder.openPositions || reOrder.numberOfOpenPositions}}</div>
     <div class="title">Open Positions</div>
   </div>
-  <div class="info">
+  <div class="info" *ngIf="!hideAgency">
     <ejs-tooltip
       *ngIf="tooltip"
       [content]="tooltip"

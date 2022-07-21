@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RejectReasonComponent } from './reject-reason.component';
+import { ReasonsComponent } from './reasons.component';
 
-describe('RejectReasonComponent', () => {
-  let component: RejectReasonComponent;
-  let fixture: ComponentFixture<RejectReasonComponent>;
+describe('ReasonsComponent', () => {
+  let component: ReasonsComponent;
+  let fixture: ComponentFixture<ReasonsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ RejectReasonComponent ]
+      declarations: [ ReasonsComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RejectReasonComponent);
+    fixture = TestBed.createComponent(ReasonsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

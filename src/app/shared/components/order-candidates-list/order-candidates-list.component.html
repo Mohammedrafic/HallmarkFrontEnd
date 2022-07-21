@@ -4,10 +4,11 @@
       <h3>Candidates List</h3>
     </div>
     <div class="input-container">
-      <div class="input-group switch" (click)="onSwitcher(); false;">
+      <div class="input-group switch" >
         <ejs-switch
           id="switcher"
           class="switch"
+          (change)="onSwitcher($event);"
           [checked]="includeDeployedCandidates"
         ></ejs-switch>
         <label class="switch-label" for="switcher">Include <br/>Deployed</label>
@@ -30,10 +31,19 @@
     [height]="300"
   >
     <e-columns>
+      <e-column textAlign="Right" width="80">
+        <ng-template #template let-data>
+          <div class="row-tool-buttons">
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data, $event)">
+              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
       <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
         <ng-template #template let-data>
           <div class="link" (click)="onViewNavigation(data)">{{data.lastName}}, {{data.firstName}}
-            <ng-container *ngIf="data.deployedCandidateInfo">
+            <ng-container *ngIf="data.deployedCandidateInfo && data.statusName !== 'Onboard'">
               <ejs-tooltip content="Deployed Candidate" position="TopRight">
                 <i-feather name="briefcase" class="icon" ></i-feather>
               </ejs-tooltip>
@@ -81,15 +91,6 @@
           <div class="progress-bar">
             <span>{{data.onboardedPercentage}}</span>
             <app-custom-progress-bar [value]="data.onboardedPercentage"></app-custom-progress-bar>
-          </div>
-        </ng-template>
-      </e-column>
-      <e-column textAlign="Right" freeze="Right" width="80">
-        <ng-template #template let-data>
-          <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data, $event)">
-              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
-            </button>
           </div>
         </ng-template>
       </e-column>

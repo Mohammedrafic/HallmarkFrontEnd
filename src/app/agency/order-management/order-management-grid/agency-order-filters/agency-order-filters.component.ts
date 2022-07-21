@@ -178,7 +178,12 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
             [OrderStatusText.Open, OrderStatusText.Filled, OrderStatusText.Closed].includes(status.status)
           );
           candidateStatusesData = candidateStatuses.filter((status) =>
-            [CandidatesStatusText.Onboard, CandidatesStatusText.Offered].includes(status.status)
+            [
+              CandidatesStatusText['Bill Rate Pending'], 
+              CandidatesStatusText['Offered Bill Rate'], 
+              CandidatesStatusText.Onboard, 
+              CandidatesStatusText.Rejected
+            ].includes(status.status)
           ); // TODO: after BE implementation also add Pending, Rejected
         } else if (this.activeTab === AgencyOrderManagementTabs.PerDiem) {
           statuses = orderStatuses.filter((status) =>

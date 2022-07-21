@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, V
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, Select, Store } from '@ngxs/store';
-import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
@@ -48,10 +48,14 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private unsubscribe$: Subject<void> = new Subject();
   private candidateId: number;
 
+  get isDeployedCandidate(): boolean {
+    return !!this.candidate.deployedCandidateInfo && this.candidate.candidateStatus !== ApplicantStatus.OnBoarded;
+  }
+
   constructor(private store: Store, private actions$: Actions) {}
 
   ngOnChanges(): void {
-    this.readOnlyMode = !!this.candidate.deployedCandidateInfo && this.isAgency;
+    this.readOnlyMode = !!this.isDeployedCandidate && this.isAgency;
   }
 
   ngOnInit(): void {

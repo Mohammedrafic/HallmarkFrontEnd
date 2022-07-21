@@ -13,7 +13,7 @@ import { CredentialsListComponent } from './credentials/credentials-list/credent
 import { CredentialsSetupComponent } from './credentials/credentials-setup/credentials-setup.component';
 import { JobOrderComponent } from './workflow/job-order/job-order.component';
 import { BillRatesComponent } from './bill-rates/bill-rates.component';
-import { RejectReasonComponent } from "@organization-management/reject-reason/reject-reason.component";
+import { ReasonsComponent } from './reasons/reasons.component';
 
 const routes: Routes = [
   {
@@ -103,8 +103,8 @@ const routes: Routes = [
         }
       },
       {
-        path: 'reject-reason',
-        component: RejectReasonComponent,
+        path: 'reasons',
+        component: ReasonsComponent,
         data: {
           isOrganizationArea: true
         }

@@ -22,7 +22,7 @@
     </div>
 
     <div class="right-content">
-      <button ejs-button cssClass="e-outline" (click)="showFilterDialog()">
+      <button *ngIf="hasWidgetPermission" ejs-button cssClass="e-outline" (click)="showFilterDialog()">
         <div class="filter-button-content">
           <span *ngIf="items.length" class="e-badge e-badge-success e-badge-circle">{{ items.length }}</span>
           Filters <i-feather name="sliders" class="icon"></i-feather>

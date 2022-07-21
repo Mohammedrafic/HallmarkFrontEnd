@@ -76,6 +76,28 @@
       </table>
     </ng-template>
     <e-columns>
+      <e-column textAlign="Right" width="100">
+        <ng-template #template let-data>
+          <div class="row-tool-buttons">
+            <button
+              ejs-button
+              cssClass="e-flat primary-icon-button"
+              (click)="onEditButtonClick(data, undefined, $event)"
+              [disabled]="!data.overridableByOrganization || !hasAccess"
+            >
+              <span class="edit-button" ><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+            <button
+              ejs-button
+              cssClass="e-flat default-icon-button"
+              (click)="onOverrideButtonClick(data)"
+              [disabled]="(!data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment) || !hasAccess"
+            >
+              <span class="edit-button" ><i-feather name="plus" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
       <e-column field="name" headerText="ATTRIBUTE" width=400></e-column>
       <e-column field="regionName" headerText="REGION" width=150></e-column>
       <e-column field="locationName" headerText="LOCATION" width=150></e-column>
@@ -90,28 +112,6 @@
           </span>
           <span *ngIf="data.controlType === organizationSettingControlType.Text">{{data.value}}</span>
           <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{data.value | date: 'MM/dd/yyyy'}}</span>
-        </ng-template>
-      </e-column>
-      <e-column textAlign="Right" width=120>
-        <ng-template #template let-data>
-          <div class="row-tool-buttons">
-            <button
-              ejs-button
-              cssClass="e-flat default-icon-button"
-              (click)="onOverrideButtonClick(data)"
-              [disabled]="(!data.overridableByRegion && !data.overridableByLocation && !data.overridableByDepartment) || !hasAccess"
-            >
-              <span class="edit-button" ><i-feather name="plus" class="icon"></i-feather></span>
-            </button>
-            <button
-              ejs-button
-              cssClass="e-flat primary-icon-button"
-              (click)="onEditButtonClick(data, undefined, $event)"
-              [disabled]="!data.overridableByOrganization || !hasAccess"
-            >
-              <span class="edit-button" ><i-feather name="edit" class="icon"></i-feather></span>
-            </button>
-          </div>
         </ng-template>
       </e-column>
     </e-columns>

@@ -69,10 +69,9 @@ import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.e
 import { OrderType } from '@shared/enums/order-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import {
-  PreviewOrderDialogComponent
-} from "@agency/order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component";
+import { PreviewOrderDialogComponent } from '@agency/order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
 import { NextPreviousOrderEvent } from './preview-order-dialog/preview-order-dialog.component';
+import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -86,7 +85,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() exportButtonClicked: boolean;
   @Input() onExportClicked$: Subject<any>;
   @Input() search$: Subject<string>;
-  @Output() selectTab = new EventEmitter<number>()
+  @Output() selectTab = new EventEmitter<number>();
 
   @Output() reOrderNumber = new EventEmitter<number>();
 
@@ -143,6 +142,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private actions$: Actions,
     private datePipe: DatePipe,
     private filterService: FilterService,
+    private orderManagementAgencyService: OrderManagementAgencyService
   ) {
     super();
   }
@@ -238,6 +238,27 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
     if (this.selectedIndex) {
       this.gridWithChildRow.selectRow(this.selectedIndex);
+    }
+
+    this.openPerDiemDetails();
+  }
+
+  /* Trigger when user redirect to per diem order from re-order */
+  private openPerDiemDetails(): void {
+    const { orderPerDiemId } = this.orderManagementAgencyService;
+    if (orderPerDiemId && this.ordersPage) {
+      const orderPerDiem = this.ordersPage.items.find(
+        (order: AgencyOrderManagement) => order.orderId === orderPerDiemId
+      );
+
+      if (orderPerDiem) {
+        const index = (this.gridWithChildRow.dataSource as Order[])?.findIndex(
+          (order: Order) => order.orderId === orderPerDiemId
+        );
+        this.onRowClick({ data: orderPerDiem });
+        this.gridWithChildRow.selectRow(index);
+        this.orderManagementAgencyService.orderPerDiemId = null;
+      }
     }
   }
 
@@ -392,9 +413,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.openPreview.next(true);
   }
 
-  selectReOrder(event: {reOrder: AgencyOrderManagement, order: Order | AgencyOrderManagement}): void {
+  selectReOrder(event: { reOrder: AgencyOrderManagement; order: Order | AgencyOrderManagement }): void {
     const tabSwitchAnimation = 400;
-    const {reOrder, order} = event;
+    const { reOrder, order } = event;
     const tabId = Object.values(AgencyOrderManagementTabs).indexOf(AgencyOrderManagementTabs.ReOrders);
     this.selectTab.emit(tabId);
     setTimeout(() => {

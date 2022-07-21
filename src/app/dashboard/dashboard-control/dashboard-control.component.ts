@@ -38,6 +38,7 @@ export class DashboardControlComponent extends DestroyableDirective implements O
   @Input() public selectedWidgets: WidgetTypeEnum[] | null;
   @Input() public widgets: WidgetOptionModel[] | null;
   @Input() public hasOrderManagePermission: boolean;
+  @Input() public hasWidgetPermission: boolean;
 
   @Output() public widgetToggleEmitter: EventEmitter<WidgetToggleModel> = new EventEmitter();
 

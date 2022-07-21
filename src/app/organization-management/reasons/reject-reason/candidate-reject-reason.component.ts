@@ -1,63 +1,54 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
 import { ConfirmService } from "@shared/services/confirm.service";
 import {
-  CANCEL_REJECTION_REASON,
-  DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
-  ONLY_LETTERS
 } from "@shared/constants";
 import { UserState } from "src/app/store/user.state";
-import { ShowSideDialog } from "../../store/app.actions";
 import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
-import { FormControl, FormGroup, Validators } from "@angular/forms";
-import { delay, filter, Observable, takeWhile } from "rxjs";
+import { FormGroup } from "@angular/forms";
+import { Observable, takeWhile } from "rxjs";
 import {
   GetRejectReasonsByPage,
   RemoveRejectReasons,
-  SaveRejectReasons,
   SaveRejectReasonsError,
-  SaveRejectReasonsSuccess,
-  UpdateRejectReasons,
   UpdateRejectReasonsSuccess
 } from "@organization-management/store/reject-reason.actions";
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
-import { RejectReasonPage } from "@shared/models/reject-reason.model";
+import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
 import { DialogMode } from "@shared/enums/dialog-mode.enum";
 
 @Component({
-  selector: 'app-reject-reason',
-  templateUrl: './reject-reason.component.html',
-  styleUrls: ['./reject-reason.component.scss']
+  selector: 'app-candidate-reject-reason',
+  templateUrl: './candidate-reject-reason.component.html',
+  styleUrls: ['./candidate-reject-reason.component.scss']
 })
-export class RejectReasonComponent extends AbstractGridConfigurationComponent implements OnInit,OnDestroy {
+export class CandidateRejectReasonComponent extends AbstractGridConfigurationComponent implements OnInit,OnDestroy {
+  @Input() form: FormGroup;
+
+  @Output() onEditReasons = new EventEmitter<RejectReason>();
+
   @Select(RejectReasonState.rejectReasonsPage)
   public rejectReasonPage$: Observable<RejectReasonPage>;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
 
-  public form: FormGroup;
-  public title: string = '';
-
-  private isEdit = false;
   private isAlive = true;
 
   constructor(
-    private confirmService: ConfirmService,
     private store: Store,
-    private actions$: Actions
+    private actions$: Actions,
+    private confirmService: ConfirmService
   ) {
     super();
   }
 
   ngOnInit(): void {
-    this.createForm();
     this.initGrid();
     this.subscribeOnSaveReasonError();
     this.subscribeOnUpdateReasonSuccess();
-    this.subscribeOnSaveReasonSuccess();
     this.subscribeOnOrganization();
   }
 
@@ -65,38 +56,8 @@ export class RejectReasonComponent extends AbstractGridConfigurationComponent im
     this.isAlive = false;
   }
 
-  public addReason(): void {
-    this.title = DialogMode.Add;
-    this.isEdit = false;
-    this.store.dispatch(new ShowSideDialog(true));
-  }
-
-  public saveReason(): void {
-    this.form.markAllAsTouched();
-    if(this.form.invalid) {
-      return;
-    }
-
-    if(!this.isEdit) {
-      this.store.dispatch(new SaveRejectReasons({ reason: this.form.value.reason }));
-    } else if(this.isEdit) {
-      const payload = {
-        id: this.form.value.id,
-        reason: this.form.value.reason
-      }
-
-      this.store.dispatch( new UpdateRejectReasons(payload));
-    }
-  }
-
-  public onEdit(data: {reason: string, id: number}): void {
-    this.isEdit = true;
-    this.title = DialogMode.Edit;
-      this.form.patchValue({
-      id: data.id,
-      reason: data.reason
-    });
-    this.store.dispatch(new ShowSideDialog(true));
+  public onEdit(data: RejectReason) {
+    this.onEditReasons.emit(data);
   }
 
   public onRemove(id: number): void {
@@ -111,23 +72,6 @@ export class RejectReasonComponent extends AbstractGridConfigurationComponent im
           this.store.dispatch(new RemoveRejectReasons(id));
         }
       });
-  }
-
-  public closeDialog(): void {
-    if (this.form.dirty) {
-      this.confirmService
-        .confirm(CANCEL_REJECTION_REASON, {
-          title: DELETE_CONFIRM_TITLE,
-          okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button',
-        })
-        .pipe(filter((confirm:boolean) => !!confirm))
-        .subscribe(() => {
-          this.closeSideDialog()
-        });
-    } else {
-      this.closeSideDialog()
-    }
   }
 
   public onRowsDropDownChanged(): void {
@@ -146,19 +90,6 @@ export class RejectReasonComponent extends AbstractGridConfigurationComponent im
     this.store.dispatch(new GetRejectReasonsByPage(this.currentPage, this.pageSize))
   }
 
-  private closeSideDialog(): void {
-    this.store.dispatch(new ShowSideDialog(false)).pipe(delay(500)).subscribe(() => {
-      this.form.reset();
-    });
-  }
-
-  private createForm(): void {
-    this.form = new FormGroup({
-      id: new FormControl(null),
-      reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ONLY_LETTERS)])
-    })
-  }
-
   private initGrid(): void {
     this.store.dispatch(new GetRejectReasonsByPage(this.currentPage, this.pageSize));
   }
@@ -168,13 +99,6 @@ export class RejectReasonComponent extends AbstractGridConfigurationComponent im
       ofActionSuccessful(SaveRejectReasonsError),
       takeWhile(() => this.isAlive)
     ).subscribe(() => this.form.controls['reason'].setErrors({'incorrect': true}));
-  }
-
-  private subscribeOnSaveReasonSuccess(): void {
-    this.actions$.pipe(
-      ofActionSuccessful(SaveRejectReasonsSuccess),
-      takeWhile(() => this.isAlive)
-    ).subscribe(() =>this.closeSideDialog());
   }
 
   private subscribeOnUpdateReasonSuccess(): void {

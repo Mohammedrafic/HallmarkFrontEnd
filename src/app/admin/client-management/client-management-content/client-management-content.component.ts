@@ -6,11 +6,12 @@ import { Select, Store } from '@ngxs/store';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { FilteredItem } from '@shared/models/filter.model';
 import { CurrentUserPermission } from '@shared/models/permission.model';
 import { FilterService } from '@shared/services/filter.service';
-import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { Status, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import {
@@ -29,7 +30,7 @@ import { AdminState } from '../../store/admin.state';
   selector: 'app-client-management-content',
   templateUrl: './client-management-content.component.html',
   styleUrls: ['./client-management-content.component.scss'],
-  providers: [SortService, FreezeService],
+  providers: [SortService],
 })
 export class ClientManagementContentComponent
   extends AbstractGridConfigurationComponent
@@ -72,7 +73,7 @@ export class ClientManagementContentComponent
   public filterColumns: any;
 
   get hasCreateOrganizationPermission(): boolean {
-    const createDeleteOrganizationPermissionId = 102;
+    const createDeleteOrganizationPermissionId = PermissionTypes.CanCreateDeleteOrganization;
     return this.permissions.map((permission) => permission.permissionId).includes(createDeleteOrganizationPermissionId);
   }
 
