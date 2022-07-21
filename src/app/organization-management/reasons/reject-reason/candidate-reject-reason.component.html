@@ -1,27 +1,4 @@
 <section class="flex-column">
-  <section class="toolbar">
-    <section>
-      <h3>Reasons for Rejection</h3>
-    </section>
-    <section>
-      <button
-        ejs-button
-        id="filterButton"
-        cssClass="e-outline button-filter">
-        <div class="filter-button-content">
-          Filters <i-feather name="sliders" class="icon"></i-feather>
-        </div>
-      </button>
-      <button
-        ejs-button
-        id="addDepartmentButton"
-        [isPrimary]="true"
-        (click)="addReason()"
-        >
-        Add Reason
-      </button>
-    </section>
-  </section>
   <ejs-grid
     #reasonGrid
     class="grid-component"
@@ -49,7 +26,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="reason" headerText="Reason" textAlign="Left" width="900"></e-column>
+      <e-column field="reason" headerText="Reason" textAlign="Left" width="100%"></e-column>
     </e-columns>
 
     <ng-template #pagerTemplate let-data>
@@ -95,23 +72,3 @@
     </ng-template>
   </ejs-grid>
 </section>
-
-<app-side-dialog
-  header="{{ title }} Reason"
-  (formSaveClicked)="saveReason()"
-  (formCancelClicked)="closeDialog()"
->
-  <form [formGroup]="form" class="reason-form">
-    <div class="input-container bootstrap">
-      <label>Reason<span class="required">*</span></label>
-      <div class="input-group">
-        <input class="e-input"
-               type="text"
-               appValidateWithMessage
-               placeholder="Reason"
-               maxlength="100"
-               formControlName="reason"/>
-      </div>
-    </div>
-  </form>
-</app-side-dialog>
