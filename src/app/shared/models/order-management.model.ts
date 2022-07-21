@@ -449,3 +449,11 @@ export class OrderFilterDataSource {
   orderStatuses: FilterStatus[];
   candidateStatuses: FilterStatus[];
 }
+
+export type CandidateListEvent = {
+  orderId: number;
+  organizationId: number;
+  currentPage: number;
+  pageSize: number;
+  excludeDeployed: boolean;
+};
