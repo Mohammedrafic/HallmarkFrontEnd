@@ -116,22 +116,9 @@
   </ejs-grid>
 </section>
 
-<ejs-dialog
-  id="dialog"
-  #sideDialog
-  cssClass="dialog"
-  width="45%"
-  [target]="targetElement"
-  [visible]="false"
-  [animationSettings]="{ effect: 'SlideRight' }"
->
-  <ng-container *ngTemplateOutlet="templateState | async"></ng-container>
-
-  <ng-template #basicStatusSideBar>
-    Status side bar
-  </ng-template>
-
-  <ng-template #footerTemplate>
-    <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>
-  </ng-template>
-</ejs-dialog>
+<app-candidates-status-modal
+  [openEvent]="openDetails"
+  [candidate]="candidate"
+  [candidateJob]="candidateJob"
+  [isAgency]="isAgency"
+></app-candidates-status-modal>
