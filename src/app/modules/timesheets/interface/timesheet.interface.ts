@@ -5,8 +5,10 @@ import { TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
 export interface Timesheet {
   id: number;
   name: string;
-  firstName: string;
-  lastName: string;
+  candidateFirstName: string;
+  candidateLastName: string;
+  candidateMiddleName: string;
+  candidateId: string;
   statusText: TIMETHEETS_STATUSES;
   orderId: string;
   skill: string;

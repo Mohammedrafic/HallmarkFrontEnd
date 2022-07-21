@@ -56,6 +56,7 @@ import { GridDateEditorComponent } from './components/cell-editors/grid-date-edi
 import {
   TimesheetTableApproveCellComponent
 } from './components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
+import { TimesheetTableLinkComponent } from './components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 
 const gridIcons = {
   MessageSquare,
@@ -104,6 +105,7 @@ const gridIcons = {
     TimesheetsFilterDialogComponent,
     TimesheetTableStatusCellComponent,
     TimesheetTableApproveCellComponent,
+    TimesheetTableLinkComponent,
     ProfileMilesComponent,
     InputEditorComponent,
   ],

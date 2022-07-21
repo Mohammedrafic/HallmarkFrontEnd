@@ -1,7 +1,8 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
+
 import { ColDef } from '@ag-grid-community/core';
+import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
 import { TimesheetsTableColumns, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
 import { FilterColumns, FilterDataSource, TimesheetsFilterState } from '../interface';
@@ -13,6 +14,7 @@ import {
   TimesheetTableApproveCellComponent
 } from '../components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
+import { TimesheetTableLinkComponent } from '../components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 
 const valueHelper = new GridValuesHelper();
 
@@ -49,7 +51,8 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       minWidth: 158,
       cellClass: 'name',
       ...commonColumn,
-      valueFormatter: (params: any) => `${params.data.firstName} ${params.data.lastName}`,
+      cellRenderer: TimesheetTableLinkComponent,
+      valueFormatter: (params: ValueFormatterParams) => `${params.data.candidateFirstName} ${params.data.candidateLastName}`,
     },
     {
       field: TimesheetsTableColumns.StatusText,
@@ -66,6 +69,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       minWidth: 140,
       cellClass: 'name',
       ...commonColumn,
+      cellRenderer: TimesheetTableLinkComponent,
     },
     {
       field: TimesheetsTableColumns.Skill,
@@ -89,7 +93,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       minWidth: 240,
       cellClass: 'bold',
       ...commonColumn,
-      valueFormatter: (params: any) => valueHelper.formatDate(params.value, 'W - ccc M/d/yy'),
+      valueFormatter: (params: ValueFormatterParams) => valueHelper.formatDate(params.value, 'W - ccc M/d/yy'),
     },
     {
       field: TimesheetsTableColumns.Department,

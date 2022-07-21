@@ -199,7 +199,7 @@ export class TimesheetsState {
     { setState, getState }: StateContext<TimesheetsModel>,
     { payload }: Timesheets.UpdateFiltersState,
   ): Observable<null> {
-    const oldFilters: TimesheetsFilterState = getState().timesheetsFilters || {};
+    const oldFilters: TimesheetsFilterState = getState().timesheetsFilters || DefaultFiltersState;
     let filters: TimesheetsFilterState = reduceFiltersState(oldFilters, SavedFiltersParams);
 
     filters = Object.assign({}, filters, payload);
@@ -207,8 +207,7 @@ export class TimesheetsState {
     return of(null).pipe(
       throttleTime(100),
       tap(() => setState(patch<TimesheetsModel>({
-        timesheetsFilters: payload && getState().timesheetsFilters ?
-          filters : DefaultFiltersState,
+        timesheetsFilters: payload ? filters : DefaultFiltersState,
       })))
     );
   }
