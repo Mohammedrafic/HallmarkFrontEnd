@@ -1,0 +1,15 @@
+<div class="filter-chip-list">
+  <div class="applied-filters">
+    <span class="applied-filters__title">Applied Filters:</span>
+    <span *ngIf="!items?.length">None</span>
+  </div>
+  <div class="chips-wrapper">
+    <div class="chips-title" *ngFor="let filter of appliedFilters | keyvalue">
+      <span>{{ filter.key }}:</span>
+      <div class="chips-container">
+        <ejs-chiplist [chips]="filter.value" enableDelete="true"(delete)="deleteChip($event)"></ejs-chiplist>
+      </div>
+    </div>
+    <div class="clear-all" *ngIf="items?.length" (click)="onClearFilters()">Clear all</div>
+  </div>
+</div>
