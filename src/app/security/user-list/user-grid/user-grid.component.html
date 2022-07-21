@@ -17,7 +17,16 @@
   (actionBegin)="actionBegin($event)"
 >
   <e-columns>
-    <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="40"></e-column>
+    <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
+    <e-column textAlign="Right" width="60">
+      <ng-template #template let-data>
+        <div class="row-tool-buttons">
+          <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
+            <span><i-feather name="edit" class="icon"></i-feather></span>
+          </button>
+        </div>
+      </ng-template>
+    </e-column>
     <e-column field="firstName" headerText="First Name" textAlign="Left" ></e-column>
     <e-column field="lastName" headerText="Last Name" textAlign="Left" ></e-column>
     <e-column field="isDeleted" headerText="Status" width=200>
@@ -47,15 +56,6 @@
       </ng-template>
     </e-column>
     <e-column *ngIf="!isAgencyUser" field="hasVisibility" headerText="Visibility" textAlign="Left" [valueAccessor]='hasVisibility'></e-column>
-    <e-column textAlign="Right" width="80" freeze="Right">
-      <ng-template #template let-data>
-        <div class="row-tool-buttons">
-          <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
-            <span><i-feather name="edit" class="icon"></i-feather></span>
-          </button>
-        </div>
-      </ng-template>
-    </e-column>
   </e-columns>
 
   <ng-template #pagerTemplate let-data>

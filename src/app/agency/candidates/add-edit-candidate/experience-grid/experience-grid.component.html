@@ -20,16 +20,7 @@
             [enableVirtualization]="true"
             (dataBound)="dataBound()">
     <e-columns>
-      <e-column field="employer" headerText="Employer" width=300></e-column>
-      <e-column field="jobTitle" headerText="Job Title" width=300></e-column>
-      <e-column headerText="Start Month/Year" width=200 textAlign="Right">
-        <ng-template #template let-data>{{data.startDate | date:"MM/yyyy"}}</ng-template>
-      </e-column>
-      <e-column headerText="End Month/Year" width=200 textAlign="Right">
-        <ng-template #template let-data>{{data.endDate | date:"MM/yyyy"}}</ng-template>
-      </e-column>
-      <e-column field="comments" headerText="Comments" width=500></e-column>
-      <e-column textAlign="Right" *ngIf="!readonlyMode" width="112"  freeze="Right">
+      <e-column textAlign="Right" *ngIf="!readonlyMode" width="100">
         <ng-template #template let-data>
           <div class="e-grid-tool-buttons">
             <span class="edit-button" (click)="onEdit(data)"><i-feather name="edit" class="icon"></i-feather></span>
@@ -37,6 +28,15 @@
           </div>
         </ng-template>
       </e-column>
+      <e-column field="employer" headerText="Employer" width="320"></e-column>
+      <e-column field="jobTitle" headerText="Job Title" width="320"></e-column>
+      <e-column headerText="Start Month/Year" width="220" textAlign="Right">
+        <ng-template #template let-data>{{data.startDate | date:"MM/yyyy"}}</ng-template>
+      </e-column>
+      <e-column headerText="End Month/Year" width="220" textAlign="Right">
+        <ng-template #template let-data>{{data.endDate | date:"MM/yyyy"}}</ng-template>
+      </e-column>
+      <e-column field="comments" headerText="Comments" width="520"></e-column>
     </e-columns>
   </ejs-grid>
 </section>

@@ -1,10 +1,10 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Actions, Select, Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { FreezeService, GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
@@ -52,7 +52,7 @@ export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
   selector: 'app-locations',
   templateUrl: './locations.component.html',
   styleUrls: ['./locations.component.scss'],
-  providers: [MaskedDateTimeService, FreezeService],
+  providers: [MaskedDateTimeService],
 })
 export class LocationsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;

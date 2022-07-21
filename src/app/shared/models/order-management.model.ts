@@ -121,6 +121,7 @@ export type OrderCandidatesList = {
   status: number;
   statusName: string;
   submissionsPercentage: number;
+  orderStatus: OrderStatus;
   candidateJobId: number;
   deployedCandidateInfo: null | {
     jobId: number;
@@ -257,6 +258,7 @@ export class Order {
   reOrders?: ReOrder[] | null;
   reOrderFrom?: Order;
   reOrderId?: number;
+  orderId?: number;
   candidates?: CandidateModel[];
 }
 
@@ -273,8 +275,8 @@ export class ReOrder {
   locationName: string;
   departmentId: number;
   departmentName: string;
-  skillId:  number;
-  skillName:  string;
+  skillId: number;
+  skillName: string;
   orderType: number;
   billRate: number;
   openPositions: number;
@@ -447,3 +449,11 @@ export class OrderFilterDataSource {
   orderStatuses: FilterStatus[];
   candidateStatuses: FilterStatus[];
 }
+
+export type CandidateListEvent = {
+  orderId: number;
+  organizationId: number;
+  currentPage: number;
+  pageSize: number;
+  excludeDeployed: boolean;
+};

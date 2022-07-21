@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 
-import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
+import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -11,8 +11,7 @@ export type BillRatesGridEvent = BillRate & { index: string };
 @Component({
   selector: 'app-bill-rates-grid',
   templateUrl: './bill-rates-grid.component.html',
-  styleUrls: ['./bill-rates-grid.component.scss'],
-  providers: [FreezeService],
+  styleUrls: ['./bill-rates-grid.component.scss']
 })
 export class BillRatesGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;

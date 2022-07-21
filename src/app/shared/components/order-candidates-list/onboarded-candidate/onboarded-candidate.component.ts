@@ -8,11 +8,7 @@ import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-man
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import {
-  ApplicantStatus,
-  ApplicantStatus as ApplicantStatusEnum,
-  CandidatStatus,
-} from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import {
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
@@ -20,6 +16,7 @@ import {
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
+import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { ShowToast } from '../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -79,6 +76,10 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   get isAccepted(): boolean {
     return this.candidate.status === ApplicantStatusEnum.Accepted;
+  }
+
+  get isOnBoarded(): boolean {
+    return this.candidate.candidateStatus === ApplicantStatusEnum.OnBoarded;
   }
 
   get isDeployedCandidate(): boolean {

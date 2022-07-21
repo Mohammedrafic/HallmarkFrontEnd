@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ExportSkills, GetAllSkillsCategories, GetAssignedSkillsByPage, GetSkillDataSources, RemoveAssignedSkill, RemoveAssignedSkillSucceeded, SaveAssignedSkill, SaveAssignedSkillSucceeded, SetDirtyState, SetImportFileDialogState } from '../store/organization-management.actions';
 import { OrganizationManagementState } from '../store/organization-management.state';
@@ -24,7 +24,7 @@ import { FilterService } from '@shared/services/filter.service';
   selector: 'app-skills',
   templateUrl: './skills.component.html',
   styleUrls: ['./skills.component.scss'],
-  providers: [SortService, FreezeService, MaskedDateTimeService]
+  providers: [SortService, MaskedDateTimeService]
 })
 export class SkillsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();

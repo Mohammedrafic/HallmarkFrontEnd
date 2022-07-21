@@ -108,6 +108,7 @@ import { GridSubrowReorderComponent } from './components/grid-subrow-reorder/gri
 import { GeneralOrderPerDiemInfoComponent } from '@shared/components/general-order-per-diem-info/general-order-per-diem-info.component';
 import { GeneralReorderInfoComponent } from './components/general-reorder-info/general-reorder-info.component';
 import { OrderReOrdersContainerComponent } from "@client/order-management/order-reorders-container/order-reorders-container.component";
+import { OrderPerDiemCandidatesListComponent } from "./components/order-per-diem-candidates-list/order-per-diem-candidates-list.component";
 
 const icons = {
   AlertCircle,
@@ -152,6 +153,7 @@ const COMPONENTS = [
   GeneralOrderInfoComponent,
   GeneralOrderPerDiemInfoComponent,
   OrderCandidatesListComponent,
+  OrderPerDiemCandidatesListComponent,
   CustomProgressBarComponent,
   ApplyCandidateComponent,
   AcceptCandidateComponent,

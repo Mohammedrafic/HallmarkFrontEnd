@@ -10,6 +10,7 @@ import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import {
   AgencyOrder,
+  CandidateListEvent,
   Order,
   OrderCandidatesList,
   OrderCandidatesListPage,
@@ -24,14 +25,6 @@ import { AcceptCandidateComponent } from './accept-candidate/accept-candidate.co
 import { ApplyCandidateComponent } from './apply-candidate/apply-candidate.component';
 import { OfferDeploymentComponent } from './offer-deployment/offer-deployment.component';
 import { OnboardedCandidateComponent } from './onboarded-candidate/onboarded-candidate.component';
-
-export type CandidateListEvent = {
-  orderId: number;
-  organizationId: number;
-  currentPage: number;
-  pageSize: number;
-  excludeDeployed: boolean;
-};
 
 @Component({
   selector: 'app-order-candidates-list',

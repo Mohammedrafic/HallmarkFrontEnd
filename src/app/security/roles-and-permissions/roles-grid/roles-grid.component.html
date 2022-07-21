@@ -16,11 +16,7 @@
   (dataBound)="dataBound()"
 >
   <e-columns>
-    <e-column field="businessUnitName" headerText="Business" textAlign="Left" [valueAccessor]='businessValueAccess'></e-column>
-    <e-column field="name" headerText="Role Name" textAlign="Left"></e-column>
-    <e-column field="isActive" headerText="Active" textAlign="Left" maxWidth=500 [valueAccessor]='activeValueAccess'></e-column>
-
-    <e-column textAlign="Right" width="80" maxWidth=111>
+    <e-column textAlign="Right" width="100">
       <ng-template #template let-data>
         <div class="row-tool-buttons">
           <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
@@ -32,6 +28,9 @@
         </div>
       </ng-template>
     </e-column>
+    <e-column field="businessUnitName" headerText="Business" textAlign="Left" [valueAccessor]="businessValueAccess" width="100%"></e-column>
+    <e-column field="name" headerText="Role Name" textAlign="Left" width="100%"></e-column>
+    <e-column field="isActive" headerText="Active" textAlign="Left" maxWidth=500 [valueAccessor]="activeValueAccess" width="100%"></e-column>
   </e-columns>
 
   <ng-template #pagerTemplate let-data>

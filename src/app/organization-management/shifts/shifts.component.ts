@@ -3,7 +3,7 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
-import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { SetDirtyState } from '../store/organization-management.actions';
 import { DeleteShift, DeleteShiftSucceeded, ExportShifts, GetShiftsByPage, SaveShift, SaveShiftSucceeded } from '../store/shifts.actions';
@@ -24,7 +24,7 @@ import { UserState } from 'src/app/store/user.state';
   selector: 'app-shifts',
   templateUrl: './shifts.component.html',
   styleUrls: ['./shifts.component.scss'],
-  providers: [SortService, FreezeService, MaskedDateTimeService]
+  providers: [SortService, MaskedDateTimeService]
 })
 export class ShiftsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();

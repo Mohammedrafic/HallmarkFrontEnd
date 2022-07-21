@@ -5,9 +5,7 @@
   [pageSettings]="pageSettings"
   [height]="gridHeight"
   [rowHeight]="rowHeight"
-  [resizeSettings]="resizeSettings"
   [allowSorting]="allowSorting"
-  [allowResizing]="allowResizing"
   [enableVirtualization]="true"
   (rowSelected)="rowSelected($event, grid)"
   (rowDeselected)="rowDeselected($event, grid)"
@@ -15,9 +13,8 @@
   [selectionSettings]="selectionSettings"
 >
   <e-columns>
-    <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="40"></e-column>
-    <e-column field="name" headerText="category name" width=600></e-column>
-    <e-column textAlign="Right" width=120>
+    <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
+    <e-column textAlign="Right" width="120">
       <ng-template #template let-data>
         <div class="row-tool-buttons">
           <button ejs-button cssClass="e-flat primary-icon-button" (click)="editCategory(data, $event)">
@@ -29,6 +26,7 @@
         </div>
       </ng-template>
     </e-column>
+    <e-column field="name" headerText="category name"></e-column>
   </e-columns>
   <ng-template #pagerTemplate let-data>
     <div class="e-pagertemplate">

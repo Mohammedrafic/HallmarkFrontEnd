@@ -3,9 +3,8 @@ import { GetAgencyOrderCandidatesList } from '@client/store/order-managment-cont
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 
 import { Select, Store } from '@ngxs/store';
-import { CandidateListEvent } from '@shared/components/order-candidates-list/order-candidates-list.component';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { OrderCandidatesListPage } from '@shared/models/order-management.model';
+import { CandidateListEvent, OrderCandidatesListPage } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { OrderType } from "@shared/enums/order-type";

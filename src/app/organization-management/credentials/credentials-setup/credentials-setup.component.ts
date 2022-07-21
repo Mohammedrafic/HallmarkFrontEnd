@@ -1,7 +1,7 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
+import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -41,7 +41,7 @@ import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
   selector: 'app-credentials-setup',
   templateUrl: './credentials-setup.component.html',
   styleUrls: ['./credentials-setup.component.scss'],
-  providers: [FreezeService, MaskedDateTimeService]
+  providers: [MaskedDateTimeService]
 })
 export class CredentialsSetupComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;

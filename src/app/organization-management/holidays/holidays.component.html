@@ -52,6 +52,21 @@
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
+      <e-column textAlign="Right" width="120">
+        <ng-template #template let-data>
+          <div class="row-tool-buttons">
+            <button ejs-button cssClass="e-flat default-icon-button" (click)="copyHoliday(data, $event)">
+              <span class="edit-button"><i-feather name="copy" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editHoliday(data, $event)">
+              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteHoliday(data, $event)">
+              <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
       <e-column field="regionId" headerText="region" width=200>
         <ng-template #template let-data>
           <ng-container *ngIf="!data.regionId">
@@ -75,21 +90,6 @@
       <e-column field="holidayName" headerText="holiday name" width=200></e-column>
       <e-column field="startDateTime" type="date" [format]="format" headerText="start date & time" width=200></e-column>
       <e-column field="endDateTime" type="date" [format]="format" headerText="end date & time" width=200></e-column>
-      <e-column textAlign="Right" width=150 freeze="Right">
-        <ng-template #template let-data>
-          <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat default-icon-button" (click)="copyHoliday(data, $event)">
-              <span class="edit-button"><i-feather name="copy" class="icon"></i-feather></span>
-            </button>
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="editHoliday(data, $event)">
-              <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
-            </button>
-            <button ejs-button cssClass="e-flat secondary-icon-button" (click)="deleteHoliday(data, $event)">
-              <span class="remove-button"><i-feather name="trash-2" class="icon"></i-feather></span>
-            </button>
-          </div>
-        </ng-template>
-      </e-column>
     </e-columns>
     <ng-template #pagerTemplate let-data>
       <div class="e-pagertemplate">

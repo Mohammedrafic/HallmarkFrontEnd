@@ -12,7 +12,7 @@ import { Holiday, HolidayFilters, OrganizationHoliday, OrganizationHolidaysPage 
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { FilterService } from '@shared/services/filter.service';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
-import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/admin.actions';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -27,7 +27,7 @@ import { HolidaysState } from '../store/holidays.state';
   selector: 'app-holidays',
   templateUrl: './holidays.component.html',
   styleUrls: ['./holidays.component.scss'],
-  providers: [SortService, FreezeService]
+  providers: [SortService]
 })
 export class HolidaysComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();

@@ -269,7 +269,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   }
 
   private changingOrganization(): void {
-    this.organizationId$.pipe(takeUntil(this.destroy$), skip(1)).subscribe(() => {
+    this.organizationId$.pipe(takeUntil(this.destroy$), filter(Boolean), skip(1)).subscribe(() => {
       this.store.dispatch(new SetFilteredItems([]));
     });
   }
