@@ -22,7 +22,8 @@ import {
   User,
   Package,
   Trello,
-  Lock
+  Lock,
+  HelpCircle
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
@@ -45,7 +46,8 @@ const sidebarIcons = {
   User,
   Package,
   Trello,
-  Lock
+  Lock,
+  HelpCircle
 };
 
 @NgModule({

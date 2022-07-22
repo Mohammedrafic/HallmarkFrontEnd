@@ -1,9 +1,10 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
-import { ColDef } from '@ag-grid-community/core';
 
-import { TimesheetsTableColumns, TIMETHEETS_STATUSES } from '../enums';
+import { ColDef } from '@ag-grid-community/core';
+import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
+
+import { TimesheetsTableColumns, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
 import { FilterColumns, FilterDataSource, TimesheetsFilterState } from '../interface';
 import {
   TimesheetTableStatusCellComponent
@@ -12,6 +13,8 @@ import { GridValuesHelper } from '../helpers/grid-values.helper';
 import {
   TimesheetTableApproveCellComponent
 } from '../components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
+import { TimeSheetsPage } from '../store/model/timesheets.model';
+import { TimesheetTableLinkComponent } from '../components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 
 const valueHelper = new GridValuesHelper();
 
@@ -48,7 +51,8 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       minWidth: 158,
       cellClass: 'name',
       ...commonColumn,
-      valueFormatter: (params: any) => `${params.data.firstName} ${params.data.lastName}`,
+      cellRenderer: TimesheetTableLinkComponent,
+      valueFormatter: (params: ValueFormatterParams) => `${params.data.candidateFirstName} ${params.data.candidateLastName}`,
     },
     {
       field: TimesheetsTableColumns.StatusText,
@@ -65,6 +69,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       minWidth: 140,
       cellClass: 'name',
       ...commonColumn,
+      cellRenderer: TimesheetTableLinkComponent,
     },
     {
       field: TimesheetsTableColumns.Skill,
@@ -88,7 +93,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       minWidth: 240,
       cellClass: 'bold',
       ...commonColumn,
-      valueFormatter: (params: any) => valueHelper.formatDate(params.value, 'W - ccc M/d/yy'),
+      valueFormatter: (params: ValueFormatterParams) => valueHelper.formatDate(params.value, 'W - ccc M/d/yy'),
     },
     {
       field: TimesheetsTableColumns.Department,
@@ -121,33 +126,55 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
   ];
 };
 
+const defaultColumnMapping = {
+  valueField: 'name',
+  valueId: 'id',
+};
+
 export const DefaultFilterColumns: FilterColumns = {
-  orderId: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
-  statusText: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
-  skill: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
-  department: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
-  agencyName: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
-  orgName: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
-  region: { type: ControlTypes.Multiselect, valueType: ValueType.Text },
-  location: { type: ControlTypes.Multiselect, valueType: ValueType.Text }
+  orderIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
+  statusIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
+  skillIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
+  departmentIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
+  agencyIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
+  regionsIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
+  locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping }
 } as FilterColumns;
+
+export const SavedFiltersParams: string[] = [
+  'pageNumber',
+  'pageSize',
+  'organizationId',
+  'orderBy',
+  'date',
+  'search',
+];
 
 export const DefaultFiltersState: TimesheetsFilterState = {
   pageNumber: 1,
   pageSize: 30
 };
 
+export const DefaultTimesheetCollection: TimeSheetsPage = {
+  items: [],
+  pageNumber: 1,
+  totalPages: 1,
+  totalCount: 0,
+  hasNextPage: false,
+  hasPreviousPage: false,
+};
+
 export const filterOptionFields = {
   text: 'name',
-  value: 'name'
+  value: 'id'
 };
 
 export const filterColumnDataSource: FilterDataSource = {
-  statusText: Object.values(TIMETHEETS_STATUSES).map((val, idx) => ({
+  [TimesheetsTableFiltersColumns.StatusIds]: Object.values(TIMETHEETS_STATUSES).map((val, idx) => ({
     id: idx + 1,
     name: val
   })),
-  skill: [
+  [TimesheetsTableFiltersColumns.SkillIds]: [
     {
       id: 1,
       name: 'Certified Nursed Assistant'
@@ -157,7 +184,7 @@ export const filterColumnDataSource: FilterDataSource = {
       name: 'Qualified Doctor'
     }
   ],
-  department: [
+  [TimesheetsTableFiltersColumns.DepartmentIds]: [
     {
       id: 1,
       name: 'Emergency'
@@ -167,7 +194,7 @@ export const filterColumnDataSource: FilterDataSource = {
       name: 'Surgery'
     }
   ],
-  agencyName: [
+  [TimesheetsTableFiltersColumns.AgencyIds]: [
     {
       id: 1,
       name: 'AB Staffing'
@@ -177,17 +204,7 @@ export const filterColumnDataSource: FilterDataSource = {
       name: 'SQIN'
     }
   ],
-  orgName: [
-    {
-      id: 1,
-      name: 'Org 1'
-    },
-    {
-      id: 2,
-      name: 'Org 2'
-    }
-  ],
-  region: [
+  [TimesheetsTableFiltersColumns.RegionsIds]: [
     {
       id: 1,
       name: 'AR region'
@@ -197,7 +214,7 @@ export const filterColumnDataSource: FilterDataSource = {
       name: 'AOP region'
     }
   ],
-  location: [
+  [TimesheetsTableFiltersColumns.LocationIds]: [
     {
       id: 1,
       name: 'Location 1'
@@ -207,7 +224,7 @@ export const filterColumnDataSource: FilterDataSource = {
       name: 'Location 2'
     }
   ],
-  orderId: [
+  [TimesheetsTableFiltersColumns.OrderIds]: [
     {
       id: 1,
       name: '20-30-01'

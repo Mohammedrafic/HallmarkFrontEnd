@@ -4,7 +4,7 @@ import { DefaultFilterColumns, DefaultFiltersState } from './timesheets-table.co
 
 export const DefaultTimesheetState: TimesheetsModel = {
   timesheets: null,
-  timesheetsFilters: DefaultFiltersState,
+  timesheetsFilters: null,
   tabCounts: null,
   timeSheetRecords: {
     [RecordFields.Time]: [],

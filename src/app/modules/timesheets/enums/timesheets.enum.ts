@@ -12,6 +12,7 @@ export enum TIMESHEETS_ACTIONS {
   UPDATE_FILTERS_STATE = '[timesheets] UPDATE FILTERS STATE',
   AGENCY_SUBMIT_TIMESHEET = '[timesheets] AGENCY SUBMIT TIMESHEET',
   ORGANIZATION_APPROVE_TIMESHEET = '[timesheets] ORGANIZATION APPROVE TIMESHEET',
+  SUBMIT_TIMESHEET = '[timesheets] SUBMIT TIMESHEET',
   REJECT_TIMESHEET = '[timesheets] REJECT TIMESHEET',
   DELETE_TIMESHEET = '[timesheets] DELETE TIMESHEET',
   GET_TIMESHEET_DETAILS = '[timesheets] GET TIMESHEET DETAILS',
@@ -29,7 +30,9 @@ export enum TimesheetDetailsActions {
   PatchTimesheetRecords = '[timesheet details] Patch timesheet records',
   UploadFiles = '[timesheet details] Upload files',
   DeleteFile = '[timesheet details] Delete file',
+  DownloadAttachment = '[timesheet details] download attachment',
   AddTimesheetRecord = '[timesheet details] Add timesheet record',
+  NoWorkPerformed = '[timesheet details] No work performed',
 }
 
 export enum TIMETHEETS_STATUSES {
@@ -64,7 +67,7 @@ export enum TimesheetsTableColumns {
   Skill = 'skill',
   Location = 'location',
   Region = 'region',
-  OrgName = 'orgName',
+  OrgName = 'organizationName',
   WorkWeek = 'workWeek',
   StartDate = 'startDate',
   Department = 'department',
@@ -72,6 +75,24 @@ export enum TimesheetsTableColumns {
   AgencyName = 'agencyName',
   TotalDays = 'totalDays',
   Controls = 'controls',
+}
+
+export enum TimesheetsTableFiltersColumns {
+  OrderBy = 'orderBy',
+  PageNumber = 'pageNumber',
+  PageSize = 'pageSize',
+  OrganizationId = 'organizationId',
+  Date = 'date',
+  Search = 'search',
+  OrderIds = 'orderIds',
+  LocationIds = 'locationIds',
+  RegionsIds = 'regionsIds',
+  DepartmentIds = 'departmentIds',
+  AgencyIds = 'agencyIds',
+  StatusIds = 'statusIds',
+  TotalHours = 'totalHours',
+  BillRate = 'billRate',
+  SkillIds = 'skillIds',
 }
 
 export enum DialogAction {

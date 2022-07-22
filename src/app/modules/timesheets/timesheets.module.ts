@@ -56,6 +56,9 @@ import { GridDateEditorComponent } from './components/cell-editors/grid-date-edi
 import {
   TimesheetTableApproveCellComponent
 } from './components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
+import { TimesheetTableLinkComponent } from './components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
+import { TimesheetDetailsService } from './services/timesheet-details.service';
+import { FileViewerModule } from './modules/file-viewer/file-viewer.module';
 
 const gridIcons = {
   MessageSquare,
@@ -104,6 +107,7 @@ const gridIcons = {
     TimesheetsFilterDialogComponent,
     TimesheetTableStatusCellComponent,
     TimesheetTableApproveCellComponent,
+    TimesheetTableLinkComponent,
     ProfileMilesComponent,
     InputEditorComponent,
   ],
@@ -140,7 +144,8 @@ const gridIcons = {
     SwitchModule,
     AgGridModule,
     GridModule,
-    PdfViewerModule
+    PdfViewerModule,
+    FileViewerModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [
@@ -152,6 +157,7 @@ const gridIcons = {
     TimesheetDetailsApiService,
     ChipsCssClass,
     TimesheetRecordsService,
+    TimesheetDetailsService,
   ]
 })
 export class TimesheetsModule {}

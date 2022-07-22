@@ -1,9 +1,10 @@
 @import "colors";
 
 .container {
-  .e-card-content {
-    button{
-      margin-left: 12px;
+  .header-container {
+    .button-container {
+      display: flex;
+      gap: 12px;
     }
   }
 

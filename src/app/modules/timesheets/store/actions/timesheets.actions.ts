@@ -1,4 +1,4 @@
-import { TIMESHEETS_ACTIONS, DialogAction, TimesheetsTableColumns, RecordFields } from '../../enums';
+import { TIMESHEETS_ACTIONS, DialogAction, TimesheetsTableColumns, RecordFields, TimesheetsTableFiltersColumns } from '../../enums';
 import { Timesheet, TimesheetsFilterState } from '../../interface';
 
 export namespace Timesheets {
@@ -61,7 +61,7 @@ export namespace Timesheets {
   export class SetFiltersDataSource {
     static readonly type = TIMESHEETS_ACTIONS.SET_FILTERS_DATA_SOURCE;
 
-    constructor(public readonly payload: TimesheetsTableColumns[]) {
+    constructor(public readonly payload: TimesheetsTableFiltersColumns[]) {
     }
   }
 
@@ -82,7 +82,11 @@ export namespace Timesheets {
   export class GetTimesheetDetails {
     static readonly type = TIMESHEETS_ACTIONS.GET_TIMESHEET_DETAILS;
 
-    constructor(public timesheetId: number) {
+    constructor(
+      public timesheetId: number,
+      public orgId: number,
+      public isAgency: boolean,
+      ) {
     }
   }
 

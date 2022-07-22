@@ -16,9 +16,9 @@
         </ejs-tab>
       </div>
 
-      <button class="add-action spaced" (click)="openAddDialog()">+ Add Record</button>
+      <button class="add-action spaced" *ngIf="actionsAvaliable" (click)="openAddDialog()">+ Add Record</button>
       <button
-        *ngIf="!isEditOn; else editHandlers"
+        *ngIf="!isEditOn && actionsAvaliable; else editHandlers"
         (click)="editTimesheets()"
         class="add-action">
         <i-feather name="edit" class="icon"></i-feather>

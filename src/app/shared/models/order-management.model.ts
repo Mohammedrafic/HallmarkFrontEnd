@@ -306,20 +306,20 @@ export interface EditOrderDto extends Omit<Order, 'billRates' | 'status' | 'stat
 }
 
 export type AcceptJobDTO = {
-  actualEndDate: string;
-  actualStartDate: string;
-  allowDeplayWoCredentials: boolean;
-  candidateBillRate: number;
-  clockId: number;
-  guaranteedWorkWeek: string;
+  actualEndDate?: string;
+  actualStartDate?: string;
+  allowDeplayWoCredentials?: boolean;
+  candidateBillRate?: number;
+  clockId?: number;
+  guaranteedWorkWeek?: string;
   jobId: number;
   orderId: number;
   nextApplicantStatus: ApplicantStatus;
-  offeredBillRate: number;
+  offeredBillRate?: number;
   organizationId: number;
-  requestComment: string;
-  billRates: BillRate[];
-  offeredStartDate: string;
+  requestComment?: string;
+  billRates?: BillRate[];
+  offeredStartDate?: string;
 };
 
 export type CandidateProfile = {

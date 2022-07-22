@@ -9,13 +9,15 @@
   <ng-template #content>
     <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails">
       <div class="profile-details-header">
-        <img
-          class="e-avatar e-avatar-xlarge"
-          [src]="timesheetDetails.candidateId | candidateAvatar"/>
+        <ng-container>
+<!--            TODO: Replace with default avatar placeholder-->
+            <img class="e-avatar e-avatar-xlarge"
+                 [src]="(timesheetDetails.candidateId | candidateAvatar) || 'https://thumbs.dreamstime.com/b/default-avatar-photo-placeholder-profile-icon-eps-file-easy-to-edit-default-avatar-photo-placeholder-profile-icon-124557887.jpg'"/>
+        </ng-container>
 
         <div class="flex flex-column">
           <h3 class="username">
-            {{ timesheetDetails.candidateFirstName }}, {{ timesheetDetails.candidateLastName}}
+            {{ timesheetDetails.candidateLastName }}, {{ timesheetDetails.candidateFirstName}}
           </h3>
 
           <ejs-chiplist #chipList class="events-off">
@@ -71,7 +73,7 @@
                                   [multiple]="true"
                                   [autoUpload]="false"
                                   [showFileList]="false"
-                                  (selected)="onFilesSelected($event)">
+                                  (selected)="onFilesSelected($event, timesheetDetails.organizationId)">
                     </ejs-uploader>
                   </div>
                 </div>
@@ -112,7 +114,7 @@
             (click)="onRejectButtonClick()">Reject
           </button>
 
-          <button ejs-button cssClass="e-primary" (click)="handleApprove()">
+          <button ejs-button cssClass="e-primary" [disabled]="!isChangesSaved" (click)="handleApprove()">
             {{submitText}}
           </button>
         </div>
@@ -120,6 +122,7 @@
 
       <div class="job-general-info tile-dark-blue">
           <app-profile-details-job-info
+                  [isAgency]="isAgency"
                   [jobData]="timesheetDetails"
           ></app-profile-details-job-info>
       </div>
@@ -136,7 +139,10 @@
           </div>
 
           <div class="tile-dark-blue profile-uploads" *ngIf="timesheetDetails?.attachments?.length">
-            <app-attachments-uploads [attachments]="timesheetDetails.attachments"></app-attachments-uploads>
+            <app-attachments-uploads [attachments]="timesheetDetails.attachments"
+                                     [organizationId]="timesheetDetails.organizationId"
+                                     [timesheetId]="timesheetDetails.id"
+            ></app-attachments-uploads>
           </div>
 
          <div class="tile-dark-blue profile-invoices" *ngIf="timesheetDetails?.invoices?.length">
@@ -146,7 +152,8 @@
 
       <section class="profile-table-container">
         <app-profile-timesheet-table
-          [candidateId]="candidateId"
+          [timesheetId]="timesheetId"
+          [isAgency]="isAgency"
           (openAddSideDialog)="openAddDialog($event)"
           (changesSaved)="handleEditChanges($event)"
         >
@@ -181,3 +188,5 @@
         (cancel)="closeExport()"
         (export)="customExport($event)"
 ></app-export-dialog>
+
+<app-file-viewer></app-file-viewer>

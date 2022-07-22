@@ -2,8 +2,7 @@
   <section class="cumulative-hours">
     <h3>Week Hours</h3>
 
-    <ejs-accumulationchart style='display:block; top: -20px; left: -15px'
-                           class="cumulative-hours-chart"
+    <ejs-accumulationchart class="week-hours-chart"
                            [background]="chartSettings.background"
                            [width]="chartSettings.donutChart.width"
                            [height]="chartSettings.donutChart.height"
@@ -34,9 +33,7 @@
 
   <section class="cumulative-hours-otd">
     <h3>Cumulative Hours</h3>
-    <ejs-accumulationchart style='display:block; top: -20px; left: -15px'
-                           class="cumulative-hours-chart"
-                           selectionMode="Point"
+    <ejs-accumulationchart class="cumulative-hours-chart"
                            [enableAnimation]="true"
                            [background]="chartSettings.background"
                            [width]="chartSettings.donutChart.width"

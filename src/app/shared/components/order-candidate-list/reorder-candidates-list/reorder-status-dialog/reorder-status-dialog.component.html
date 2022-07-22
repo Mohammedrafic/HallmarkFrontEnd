@@ -1,0 +1,20 @@
+<ejs-dialog
+  id="dialog"
+  #sideDialog
+  cssClass="dialog"
+  width="45%"
+  [target]="targetElement"
+  [visible]="false"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-container *ngTemplateOutlet="templateState">
+    <ng-template #ngSwitchDefault>
+      {{ templateState }}
+    </ng-template>
+  </ng-container>
+
+  <ng-template #footerTemplate>
+    <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>
+  </ng-template>
+</ejs-dialog>
+
