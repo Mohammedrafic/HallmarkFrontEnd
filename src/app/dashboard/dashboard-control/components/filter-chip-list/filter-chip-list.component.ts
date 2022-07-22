@@ -1,10 +1,26 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
+
 import { Store } from '@ngxs/store';
+import { isEqual } from 'lodash';
+import { DeleteEventArgs } from '@syncfusion/ej2-angular-buttons';
+
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
-import { DeleteEventArgs } from '@syncfusion/ej2-angular-buttons';
-import { isEqual } from 'lodash';
+import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { FilterKeys } from 'src/app/dashboard/constants/filter-keys';
 import { DashboardFiltersModel, FilterName, FilterColumn } from 'src/app/dashboard/models/dashboard-filters.model';
 import { SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
@@ -15,20 +31,51 @@ import { SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
   styleUrls: ['./filter-chip-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FilterChipListComponent extends DestroyableDirective implements OnChanges {
+export class FilterChipListComponent extends DestroyableDirective implements AfterViewInit, OnChanges, OnDestroy {
   @Input() public items: FilteredItem[];
   @Input() public filterState: DashboardFiltersModel;
   @Input() public allRegions: OrganizationRegion[];
 
   @Output() private filterModified: EventEmitter<boolean> = new EventEmitter();
 
+  @ViewChild('filterChips', { static: true }) private filterChipsContainer: ElementRef;
+  @ViewChild('resize', { static: true }) private resizeContainer: ElementRef;
+
   private filteredItems: FilteredItem[];
   private regions: OrganizationRegion[] = [];
+  private resizeObserver: ResizeObserverModel | null;
 
   public appliedFilters: Record<FilterName, FilteredItem[]>;
+  public isCollapsed: boolean = false;
+  public showMoreLessBtn: boolean = false;
+  public chipList: any[] = [];
 
-  constructor(private readonly store: Store) {
+  constructor(private readonly store: Store, private readonly cdr: ChangeDetectorRef) {
     super();
+  }
+
+  ngAfterViewInit(): void {
+    this.resizeObserver = ResizeObserverService.init(this.resizeContainer.nativeElement);
+    this.resizeObserver.resize$.subscribe((data) => {
+      const lastElementPosition = data[0].target.lastElementChild?.getBoundingClientRect().top;
+      this.cdr.markForCheck();
+      if (lastElementPosition && lastElementPosition === 142) {
+        this.showMoreLessBtn = true;
+      } else {
+        this.showMoreLessBtn = false;
+        this.isCollapsed = false;
+        this.filterChipsContainer.nativeElement.style.height = '42px';
+      }
+    });
+  }
+
+  onCollapseExpandList(): void {
+    this.isCollapsed = !this.isCollapsed;
+    if (this.isCollapsed) {
+      this.filterChipsContainer.nativeElement.style.height = 'auto';
+    } else {
+      this.filterChipsContainer.nativeElement.style.height = '42px';
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -61,9 +108,9 @@ export class FilterChipListComponent extends DestroyableDirective implements OnC
       });
     } else if (filteredItem.column === 'locationIds') {
       const regions = this.regions.find((region) =>
-        region.locations?.find((location) => location.id === filteredItem.value)
+        region.locations?.find((location: OrganizationLocation) => location.id === filteredItem.value)
       );
-      const location = regions?.locations?.find((location) => location.id === filteredItem.value);
+      const location = regions?.locations?.find((location: OrganizationLocation) => location.id === filteredItem.value);
       this.manageDashboardFilter('locationIds', location.id);
 
       location.departments.forEach((department: OrganizationDepartment) =>
@@ -99,5 +146,11 @@ export class FilterChipListComponent extends DestroyableDirective implements OnC
         this.appliedFilters[filterKey] = [filter];
       }
     });
+
+    this.chipList = Object.entries(this.appliedFilters).flat(2);
+  }
+
+  public override ngOnDestroy(): void {
+    this.resizeObserver?.detach();
   }
 }

@@ -4,11 +4,13 @@
   display: flex;
   justify-content: space-between;
 
+  .left-content {
+    flex: 1;    
+  }
+
   .right-content {
-    width: 30%;
     display: flex;
     justify-content: flex-end;
-    flex-grow: 1;
     margin-left: 15px;
 
     & > *:not(:first-child) {
