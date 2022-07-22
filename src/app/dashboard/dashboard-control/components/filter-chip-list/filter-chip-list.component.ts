@@ -59,7 +59,7 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
     this.resizeObserver.resize$.subscribe((data) => {
       const lastElementPosition = data[0].target.lastElementChild?.getBoundingClientRect().top;
       this.cdr.markForCheck();
-      if (lastElementPosition && lastElementPosition === 142) {
+      if (lastElementPosition && lastElementPosition > 100) {
         this.showMoreLessBtn = true;
       } else {
         this.showMoreLessBtn = false;

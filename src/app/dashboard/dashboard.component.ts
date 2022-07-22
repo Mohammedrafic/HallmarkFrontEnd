@@ -54,8 +54,8 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   @Select(UserState.currentUserPermissions) private readonly currentUserPermissions$: Observable<CurrentUserPermission[]>;
 
   private panelsAreDragged = false;
-  public hasWidgetPermission: boolean;
-  public hasOrderManagePermission: boolean;
+  public hasWidgetPermission: boolean = true;
+  public hasOrderManagePermission: boolean = true;
 
   public widgetsData$: Observable<WidgetsDataModel>;
   public isOrganization$: Observable<boolean>;
