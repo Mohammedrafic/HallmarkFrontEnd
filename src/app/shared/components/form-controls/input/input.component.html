@@ -1,16 +1,14 @@
-<app-form-control-wrapper
-  [formGroup]="formGroupInstance"
-  [label]="label"
-  [id]="id"
-  [required]="required"
->
-  <input
-    [attr.id]="id"
-    [attr.maxlength]="maxlength"
-    [formControlName]="controlName"
-    [placeholder]="placeholder"
-    [tabindex]="tabindex"
-    class="e-input"
-    type="text"
-  />
+<app-form-control-wrapper [formGroup]="formGroupInstance" [label]="label" [id]="id" [required]="required">
+  <div class="input-group">
+    <input
+      [attr.id]="id"
+      [attr.maxlength]="maxlength"
+      [formControlName]="controlName"
+      [placeholder]="placeholder"
+      [tabindex]="tabindex"
+      class="e-input"
+      type="text"
+      appValidateWithMessage
+    />
+  </div>
 </app-form-control-wrapper>

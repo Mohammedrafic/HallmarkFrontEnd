@@ -1,0 +1,14 @@
+.template-dialog {
+  .template-title {
+    max-width: 400px;
+    margin-bottom: 20px;
+  }
+
+  ::ng-deep {
+    .e-grid .e-headercell {
+      color: darkblue;
+    }
+  }
+}
+
+
