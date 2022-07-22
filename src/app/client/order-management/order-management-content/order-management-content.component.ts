@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { DetailRowService, GridComponent } from '@syncfusion/ej2-angular-grids';
-import { filter, combineLatest, debounceTime, Observable, Subject, Subscription, takeUntil, throttleTime } from 'rxjs';
+import { DetailRowService, FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
+import { combineLatest, debounceTime, filter, Observable, Subject, Subscription, takeUntil, throttleTime } from 'rxjs';
 import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
@@ -53,6 +53,7 @@ import {
   AllOrdersColumnsConfig,
   allOrdersColumnsToExport,
   MoreMenuType,
+  orderTemplateColumnsConfig,
   OrderTypeName,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
@@ -78,7 +79,7 @@ import { OrderManagementService } from '@client/order-management/order-managemen
   selector: 'app-order-management-content',
   templateUrl: './order-management-content.component.html',
   styleUrls: ['./order-management-content.component.scss'],
-  providers: [DetailRowService],
+  providers: [FreezeService, DetailRowService],
 })
 export class OrderManagementContentComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') override gridWithChildRow: GridComponent;
@@ -325,23 +326,31 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
         this.columnsToExport = allOrdersColumnsToExport;
+        this.filters.isTemplate = false;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.PerDiem:
         // TODO: perdiem
         this.filters.orderTypes = [OrderType.OpenPerDiem];
         this.filters.includeReOrders = true;
+        this.filters.isTemplate = false;
         this.columnsToExport = perDiemColumnsToExport;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.ReOrders:
         this.filters.orderTypes = [OrderType.ReOrder];
+        this.filters.isTemplate = false;
         this.columnsToExport = reOrdersColumnsToExport;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.Incomplete:
         this.columnsToExport = allOrdersColumnsToExport;
+        this.filters.isTemplate = false;
         this.store.dispatch(new GetIncompleteOrders({ pageNumber: this.currentPage, pageSize: this.pageSize }));
+        break;
+      case OrganizationOrderManagementTabs.OrderTemplates:
+        this.filters.isTemplate = true;
+        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
     }
   }
@@ -453,6 +462,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       );
       this.onRowClick({ data: orderPerDiem });
       this.gridWithChildRow.selectRow(index);
+      this.orderPerDiemId = null;
     }
   }
 
@@ -464,6 +474,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onRowClick(event: any): void {
+    if (event.data.isTemplate) {
+      return;
+    }
     if (event.target) {
       this.excludeDeployed = false;
     }
@@ -560,7 +573,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.store.dispatch(new ClearOrders());
     this.openDetails.next(false);
     this.selectedIndex = null;
-    this.orderPerDiemId = null;
     this.clearSelection(this.gridWithChildRow);
 
     switch (tabIndex) {
@@ -583,7 +595,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         break;
       case OrganizationOrderManagementTabs.OrderTemplates:
         this.showReOrders = false;
-        // TODO: pending implementation
+        this.refreshGridColumns(orderTemplateColumnsConfig, this.gridWithChildRow);
+        this.getOrders();
         break;
       case OrganizationOrderManagementTabs.Incomplete:
         this.showReOrders = false;

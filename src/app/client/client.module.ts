@@ -5,7 +5,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { FeatherModule } from 'angular-feather';
 import {
   AlertTriangle,
-  Unlock,
   AlignJustify,
   Briefcase,
   Calendar,
@@ -26,6 +25,7 @@ import {
   Search,
   Sliders,
   Trash2,
+  Unlock,
   Upload,
   User,
   X,
@@ -72,6 +72,7 @@ import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { OrderDetailsContainerComponent } from './order-management/order-details-container/order-details-container.component';
 import { OrderCandidatesContainerComponent } from './order-management/order-candidates-container/order-candidates-container.component';
 import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
+import { SaveTemplateDialogModule } from '@client/order-management/save-template-dialog/save-template-dialog.module';
 
 const gridIcons = {
   MessageSquare,
@@ -144,7 +145,7 @@ const gridIcons = {
     DialogModule,
     RadioButtonModule,
     AddEditReorderModule,
-
+    SaveTemplateDialogModule,
     //STORE
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
   ],
