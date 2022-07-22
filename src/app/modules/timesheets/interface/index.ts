@@ -9,3 +9,5 @@ export * from './candidate-hours-and-miles-data.interface';
 export * from './timesheet-invoice.interface';
 export * from './timesheet-statistics.interface';
 export * from './timesheet-attachment.interface';
+export * from './timesheet-upload-files-data.interface';
+export * from './change-status-data.interface';

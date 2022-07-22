@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
-  ChangeDetectorRef,
+  ChangeDetectorRef, ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
@@ -22,6 +22,7 @@ import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { DialogAction, ExportType } from '../../enums';
 import { TimesheetsService } from '../../services/timesheets.service';
 import { Timesheets } from '../../store/actions/timesheets.actions';
+import { ProfileDetailsContainerComponent } from '../profile-details-container/profile-details-container.component';
 
 @Component({
   selector: 'app-timesheets-container.ts',
@@ -30,6 +31,9 @@ import { Timesheets } from '../../store/actions/timesheets.actions';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TimesheetsContainerComponent extends Destroyable implements OnInit {
+  @ViewChild(ProfileDetailsContainerComponent)
+  public timesheetDetailsComponent: ProfileDetailsContainerComponent;
+
   @Select(TimesheetsState.timesheets)
   readonly timesheets$: Observable<TimeSheetsPage>;
 

@@ -12,8 +12,8 @@ export interface CandidateHoursData {
 }
 
 export interface CandidateMilesData {
-  week: number;
-  cumulative: number;
+  weekMiles: number;
+  cumulativeMiles: number;
   weekCharge: number;
   cumulativeCharge: number;
 }

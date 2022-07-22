@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { filter, Observable, of, switchMap, take, tap, throttleTime, mergeMap, forkJoin } from 'rxjs';
+import { catchError, filter, forkJoin, map, mergeMap, Observable, of, switchMap, take, tap, throttleTime } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -12,7 +12,14 @@ import { TimesheetsModel, TimeSheetsPage, } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
-import { DialogAction, TIMETHEETS_STATUSES, RecordFields, TimesheetsTableFiltersColumns } from '../../enums';
+import {
+  DialogAction,
+  TimesheetsTableColumns,
+  TIMETHEETS_STATUSES,
+  RecordFields,
+  TimesheetTargetStatus,
+  TimesheetsTableFiltersColumns,
+} from '../../enums';
 import {
   approveTimesheetDialogData,
   DefaultFiltersState,
@@ -43,6 +50,7 @@ import {
 import { ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
 import { reduceFiltersState } from '../../helpers';
+import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -126,31 +134,21 @@ export class TimesheetsState {
   @Selector([TimesheetsState])
   static timesheetDetailsMilesStatistics(state: TimesheetsModel): CandidateMilesData | null {
     const statistics: TimesheetStatistics | null = state?.timesheetDetails?.timesheetStatistic ?? null;
+    const { weekMiles = 0, cumulativeMiles = 0, weekCharge = 0, cumulativeCharge = 0 } = statistics || {};
 
-    if (!statistics) {
-      return null;
-    }
-
-    const {
-      weekMiles: week,
-      cumulativeMilesByOrder: cumulative,
-      weekCharge,
-      cumulativeChargeByOrder: cumulativeCharge
-    }: TimesheetStatistics = statistics;
-
-    return {
-      week,
-      cumulative,
+    return weekMiles || cumulativeMiles || weekCharge || cumulativeCharge ? {
+      weekMiles,
+      cumulativeMiles,
       weekCharge,
       cumulativeCharge
-    };
+    } : null;
   }
 
   @Selector([TimesheetsState])
   static timesheetDetailsChartsVisible(state: TimesheetsModel): boolean {
     if (state?.timesheetDetails) {
-      const { weekMiles = 0, cumulativeMilesByOrder = 0} = state.timesheetDetails.timesheetStatistic;
-      return weekMiles + cumulativeMilesByOrder > 0;
+      const { weekMiles = 0, cumulativeMiles = 0} = state.timesheetDetails.timesheetStatistic;
+      return weekMiles + cumulativeMiles > 0;
     }
 
     return false;
@@ -288,6 +286,16 @@ export class TimesheetsState {
   ): Observable<[void, void]> {
     return this.timesheetDetailsApiService.getTimesheetDetails(timesheetId, orgId, isAgency)
       .pipe(
+        map((data: TimesheetDetailsModel) =>{
+          // TODO: remove
+          data.attachments = [
+            {
+              id: 23,
+              fileName: 'Test',
+            }
+          ];
+          return data;
+        }),
         tap((res: TimesheetDetailsModel) => ctx.patchState({
             timesheetDetails: res,
           }),
@@ -299,131 +307,38 @@ export class TimesheetsState {
       );
   }
 
-  @Action(Timesheets.DeleteTimesheet)
-  DeleteTimesheet({ getState, patchState }: StateContext<TimesheetsModel>, {timesheetId}: Timesheets.DeleteTimesheet): Observable<boolean> {
-    const state = getState();
-    const timesheets = state.timesheets as TimeSheetsPage;
-
-    return this.timesheetsApiService.deleteTimesheet(timesheetId)
-      .pipe(
-        tap(() => patchState({
-            timesheets: {
-              ...timesheets,
-              items: (timesheets.items || []).filter(item => item.id !== timesheetId),
-            }
-          })
-        )
-      );
-  }
-
   @Action(TimesheetDetails.AgencySubmitTimesheet)
-  SubmitTimesheet({getState, patchState}: StateContext<TimesheetsModel>, { id }: TimesheetDetails.AgencySubmitTimesheet): Observable<{}> {
-    const {title, submitButtonText, confirmMessage, successMessage} = submitTimesheetDialogData;
-    const state = getState();
-    const timesheets = state.timesheets as TimeSheetsPage;
-
-    return this.confirmService.confirm(confirmMessage, {
-      title,
-      okButtonLabel: submitButtonText,
-      okButtonClass: 'delete-button'
-    })
-      .pipe(
-        take(1),
-        filter((submitted: boolean) => submitted),
-        switchMap(() => this.timesheetDetailsApiService.agencySubmitTimesheet(id)),
-        tap(() => {
-          this.store.dispatch([
-            new ShowToast(MessageTypes.Success, successMessage),
-          ]);
-
-          patchState({
-            timesheets: {
-              ...timesheets,
-              items: timesheets.items.map((item) => {
-                if (item.id === id) {
-                  item.statusText = TIMETHEETS_STATUSES.PENDING_APPROVE;
-                  item.status = TIMETHEETS_STATUSES.PENDING_APPROVE;
-                }
-
-                return item;
-              }),
-            }
-          });
-        })
-      );
+  SubmitTimesheet(
+    { getState, patchState }: StateContext<TimesheetsModel>,
+    { id, orgId }: TimesheetDetails.AgencySubmitTimesheet
+  ): Observable<void> {
+    return this.timesheetDetailsApiService.changeTimesheetStatus({
+      timesheetId: id,
+      organizationId: orgId,
+      targetStatus: TimesheetTargetStatus.Submitted,
+      reason: null,
+    });
   }
 
   @Action(TimesheetDetails.OrganizationApproveTimesheet)
-  ApproveTimesheet({getState, patchState}: StateContext<TimesheetsModel>, { id }: TimesheetDetails.OrganizationApproveTimesheet): Observable<{}> {
-    const {title, submitButtonText, confirmMessage, successMessage} = approveTimesheetDialogData;
-    const state = getState();
-    const timesheets = state.timesheets as TimeSheetsPage;
-
-    return this.confirmService.confirm(confirmMessage, {
-      title,
-      okButtonLabel: submitButtonText,
-      okButtonClass: 'delete-button'
-    })
-      .pipe(
-        take(1),
-        filter((submitted: boolean) => submitted),
-        switchMap(() => this.timesheetDetailsApiService.organizationApproveTimesheet(id)),
-        tap(() => {
-          this.store.dispatch([
-            new ShowToast(MessageTypes.Success, successMessage),
-          ]);
-
-          patchState({
-            timesheets: {
-              ...timesheets,
-              items: timesheets.items.map(item => {
-                if (item.id === id) {
-                  item.statusText = TIMETHEETS_STATUSES.ORG_APPROVED;
-                  item.status = TIMETHEETS_STATUSES.ORG_APPROVED;
-                }
-
-                return item;
-              })
-            }
-          });
-        })
-      );
+  ApproveTimesheet(
+    { getState, patchState }: StateContext<TimesheetsModel>,
+    { id, orgId }: TimesheetDetails.OrganizationApproveTimesheet
+  ): Observable<void> {
+    return this.timesheetDetailsApiService.changeTimesheetStatus({
+      timesheetId: id,
+      organizationId: orgId,
+      targetStatus: TimesheetTargetStatus.Approved,
+      reason: null,
+    });
   }
 
-  @Action(TimesheetDetails.RejectTimesheet)
-  RejectTimesheet(
-    {getState, patchState}: StateContext<TimesheetsModel>,
-    { id, reason }: TimesheetDetails.RejectTimesheet
-  ): Observable<null> {
-    const state = getState();
-    const timesheets = state.timesheets as TimeSheetsPage;
-
-    return this.timesheetDetailsApiService.rejectTimesheet(id, reason)
-      .pipe(
-        tap(() => {
-          this.store.dispatch([
-            new ShowToast(MessageTypes.Success, rejectTimesheetDialogData.successMessage),
-          ]);
-
-          patchState({
-            timesheetDetails: {
-              ...state.timesheetDetails as TimesheetDetailsModel,
-              rejectionReason: reason,
-            },
-            timesheets: {
-              ...timesheets,
-              items: timesheets.items.map((item: Timesheet) => {
-                if (item.id === id) {
-                  item.status = TIMETHEETS_STATUSES.REJECTED;
-                  item.statusText = TIMETHEETS_STATUSES.REJECTED;
-                }
-
-                return item;
-              }),
-            }
-          });
-        })
-      );
+  @Action(TimesheetDetails.ChangeTimesheetStatus)
+  ChangeTimesheetStatus(
+    {}: StateContext<TimesheetsModel>,
+    { payload }: TimesheetDetails.ChangeTimesheetStatus
+  ): Observable<void> {
+    return this.timesheetDetailsApiService.changeTimesheetStatus(payload);
   }
 
   @Action(TimesheetDetails.Export)
@@ -437,50 +352,20 @@ export class TimesheetsState {
   }
 
   @Action(TimesheetDetails.UploadFiles)
-  UploadCandidateFiles({ getState, patchState }: StateContext<TimesheetsModel>, { id, files, names }: TimesheetDetails.UploadFiles)
-    : Observable<TimesheetAttachment[]> {
-    return this.timesheetDetailsApiService.uploadCandidateFiles(id, files)
-      .pipe(
-        tap((res: any[]) => {
-          const details = getState().timesheetDetails as TimesheetDetailsModel;
-
-          patchState({
-            timesheetDetails: {
-              ...details,
-              attachments: [
-                ...files.map((item, index) => {
-                  return {
-                    id: Math.random(),
-                    fileName: names[index],
-                    blob: item,
-                  } as TimesheetAttachment
-                }),
-                ...(details?.attachments || []),
-              ],
-            }
-          });
-        })
-      )
+  TimesheetUploadAttachments(
+    { getState, patchState }: StateContext<TimesheetsModel>,
+    { payload: { timesheetId, files, organizationId } }: TimesheetDetails.UploadFiles
+  ): Observable<void> {
+    return (organizationId ? this.timesheetDetailsApiService.agencyUploadFiles(timesheetId, organizationId, files)
+      : this.timesheetDetailsApiService.organizationUploadFiles(timesheetId, files));
   }
 
-  @Action(TimesheetDetails.DeleteFile)
-  DeleteCandidateFiles(
+  @Action(TimesheetDetails.DeleteAttachment)
+  DeleteTimesheetAttachment(
     { getState, patchState }: StateContext<TimesheetsModel>,
-    { id }: TimesheetDetails.DeleteFile
-  ): Observable<null> {
-    return this.timesheetDetailsApiService.deleteCandidateFile(id)
-      .pipe(
-        tap(() => {
-          const details = getState()?.timesheetDetails as TimesheetDetailsModel;
-
-          patchState({
-            timesheetDetails: {
-              ...details,
-              attachments: (details.attachments || []).filter((attachment) => attachment.id !== id)
-            }
-          });
-        })
-      )
+    { payload }: TimesheetDetails.DeleteAttachment
+  ): Observable<void> {
+    return this.timesheetDetailsApiService.deleteAttachment(payload);
   }
 
   @Action(Timesheets.SetFiltersDataSource)
@@ -525,6 +410,28 @@ export class TimesheetsState {
         costCenterOptions: res,
       })),
     );
+  }
+
+  @Action(TimesheetDetails.DownloadAttachment)
+  DownloadAttachment(
+    { }: StateContext<TimesheetsModel>,
+    { payload }: TimesheetDetails.DownloadAttachment
+  ): Observable<Blob> {
+    return this.timesheetDetailsApiService.downloadAttachment(payload)
+      .pipe(
+        tap((file: Blob) => this.store.dispatch(new TimesheetDetails.FileLoaded(file))),
+        catchError(() => this.store.dispatch(
+          new ShowToast(MessageTypes.Error, 'File not found'))
+        ),
+      );
+  }
+
+  @Action(TimesheetDetails.NoWorkPerformed)
+  NoWorkPerformed(
+    { }: StateContext<TimesheetsModel>,
+    { timesheetId, organizationId }: TimesheetDetails.NoWorkPerformed
+  ): Observable<void> {
+    return this.timesheetDetailsApiService.noWorkPerformed(timesheetId, organizationId);
   }
 
   @Action(Timesheets.GetOrganizations)

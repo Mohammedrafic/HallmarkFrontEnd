@@ -1,0 +1,57 @@
+<ejs-dialog
+    #sideDialog
+    cssClass="dialog"
+    [width]="width"
+    [visible]="false"
+    [isModal]="true"
+    [animationSettings]="{ effect: 'SlideRight' }">
+    <ng-template #content>
+        <section class="container">
+            <section class="header-container">
+                <div class="e-card-header">
+                    <div class="e-card-header-caption">
+                        <h3 class="e-card-title">Document Preview</h3>
+                    </div>
+                    <div class="e-card-content">
+                        <button ejs-button cssClass="e-outline" (click)="resizeDialog()">
+                            <span *ngIf="!isFullScreen">
+                                <i-feather name="maximize-2" class="icon"></i-feather>
+                            </span>
+                            <span *ngIf="isFullScreen">
+                                <i-feather name="minimize-2" class="icon"></i-feather>
+                            </span>
+                        </button>
+                        <button ejs-button cssClass="e-outline" class="download-button" (click)="downloadFile()">
+                            Download <span><i-feather name="download" class="icon"></i-feather></span>
+                        </button>
+                        <button ejs-button cssClass="e-flat" (click)="onCancel()">
+                            <i-feather name="x" class="icon"></i-feather>
+                        </button>
+                    </div>
+                </div>
+            </section>
+            <section class="file-viewer-container">
+<!--                <div class="left">-->
+<!--                    <div class="side-menu">-->
+<!--                        <ng-content select=".sideMenu"></ng-content>-->
+<!--                    </div>-->
+<!--                </div>-->
+                <div class="right">
+                    <div class="file-viewer">
+<!--                        *ngIf="!imageMode"-->
+                        <ejs-pdfviewer id="pdfViewer"
+                                       style="width:100%; min-height:600px; display:block"
+                                       *ngIf="!imageMode"
+                                       #pdfViewer
+                                       [serviceUrl]="service"
+                                       [enableTextSelection]="false"
+                        ></ejs-pdfviewer>
+                        <div *ngIf="imageMode" class="image-container">
+                            <img class="image" [src]="imageSrs"/>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </ng-template>
+</ejs-dialog>

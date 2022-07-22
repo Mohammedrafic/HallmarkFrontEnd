@@ -84,10 +84,6 @@ export class TimesheetsApiService {
     return of(null);
   }
 
-  public deleteTimesheet(id: number): Observable<boolean> {
-    return of(true);
-  }
-
   /**
    * TODO: move this to helpers
    */
@@ -101,10 +97,6 @@ export class TimesheetsApiService {
     }, {});
 
     return of(res);
-  }
-
-  public getCandidateHoursAndMilesData(id: number): Observable<CandidateHoursAndMilesData> {
-    return of(MockCandidateHoursAndMilesData);
   }
 
   public getCandidateCostCenters(jobId: number, orgId: number, isAgency: boolean): Observable<DropdownOption[]>{
