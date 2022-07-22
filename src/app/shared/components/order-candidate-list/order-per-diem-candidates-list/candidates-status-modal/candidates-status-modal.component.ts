@@ -1,23 +1,25 @@
-import { ApplyOrderApplicants, ReloadOrderCandidatesLists } from '@agency/store/order-management.actions';
-import { OrderManagementState } from '@agency/store/order-management.state';
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ApplicantStatus as ApplicantStatusEnum, ApplicantStatus } from '@shared/enums/applicant-status.enum';
-import { OrderApplicantsInitialData } from '@shared/models/order-applicants.model';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
-import { Observable, Subject, takeUntil } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+import { Observable, Subject, takeUntil } from 'rxjs';
+import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+
+import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
+import { OrderApplicantsInitialData } from '@shared/models/order-applicants.model';
+import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import {
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
 } from '@client/store/order-managment-content.actions';
-import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { ApplyOrderApplicants, ReloadOrderCandidatesLists, UpdateAgencyCandidateJob } from '@agency/store/order-management.actions';
+import { OrderManagementState } from '@agency/store/order-management.state';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -38,7 +40,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   @Input() isAgency: boolean = false;
 
   @Input() set candidateJob(orderCandidateJob: OrderCandidateJob | null) {
-    this.candidateJobList = orderCandidateJob;
+    this.orderCandidateJob = orderCandidateJob;
     if (orderCandidateJob) {
       this.setValueForm(orderCandidateJob);
     } else {
@@ -47,30 +49,23 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   }
 
   get showRejectButton(): boolean {
-    return !this.isAgency && [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded].includes(this.candidate.status);
+    return [ApplicantStatusEnum.Offered].includes(this.candidate.status);
   }
 
   get isRejected(): boolean {
-    return [ApplicantStatus.Rejected].includes(this.candidate?.status);
+    return [ApplicantStatusEnum.Rejected].includes(this.candidate?.status);
   }
 
-  get showOnboardButton(): boolean {
-    return !this.isAgency && [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded].includes(this.candidate.status);
+  get showAcceptButton(): boolean {
+    return [ApplicantStatusEnum.Offered].includes(this.candidate.status);
   }
 
   get showApplyButton(): boolean {
-    return [ApplicantStatus.NotApplied].includes(this.candidate?.status);
+    return [ApplicantStatusEnum.NotApplied].includes(this.candidate?.status);
   }
 
   get showClockId(): boolean {
-    return ![
-      ApplicantStatus.NotApplied,
-      ApplicantStatus.Applied,
-      ApplicantStatus.Shortlisted,
-      ApplicantStatus.Offered,
-      ApplicantStatus.PreOfferCustom,
-      ApplicantStatus.Rejected,
-    ].includes(this.candidate?.status);
+    return [ApplicantStatusEnum.Accepted, ApplicantStatusEnum.OnBoarded].includes(this.candidate?.status);
   }
 
   @Select(OrderManagementState.orderApplicantsInitialData)
@@ -85,7 +80,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   public nextApplicantStatuses: ApplicantStatus[];
 
   private unsubscribe$: Subject<void> = new Subject();
-  private candidateJobList: OrderCandidateJob | null;
+  private orderCandidateJob: OrderCandidateJob | null;
   private orderApplicantsInitialData: OrderApplicantsInitialData | null;
 
   constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions) {}
@@ -111,7 +106,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   }
 
   public onOnboard(): void {
-    if (this.form.valid && this.candidateJobList) {
+    if (this.form.valid && this.orderCandidateJob) {
       const value = this.form.getRawValue();
       //TODO: uncomment code, whe be is done
       /*this.store.dispatch(new UpdateOrganisationCandidateJob({})).subscribe(() => {
@@ -120,18 +115,22 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
     }
   }
 
-  public onDropDownChanged(event: { itemData: { applicantStatus: ApplicantStatus } }): void {
+  public onReject(): void {
+    this.store.dispatch(new GetRejectReasonsForOrganisation());
+    this.openRejectDialog.next(true);
+  }
+
+  public onDropDownChanged(event: { itemData: { applicantStatus: ApplicantStatusEnum } }): void {
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
-      this.store.dispatch(new GetRejectReasonsForOrganisation());
-      this.openRejectDialog.next(true);
+      this.onReject();
     }
   }
 
-  public onRejectCandidate(event: { rejectReason: number }): void {
-    if (this.candidateJobList) {
+  public applyReject(event: { rejectReason: number }): void {
+    if (this.orderCandidateJob) {
       const payload = {
-        organizationId: this.candidateJobList.organizationId,
-        jobId: this.candidateJobList.jobId,
+        organizationId: this.orderCandidateJob.organizationId,
+        jobId: this.orderCandidateJob.jobId,
         rejectReasonId: event.rejectReason,
       };
 
@@ -150,6 +149,29 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
             orderId: this.orderApplicantsInitialData.orderId,
             organizationId: this.orderApplicantsInitialData.organizationId,
             candidateId: this.orderApplicantsInitialData.candidateId,
+          })
+        )
+        .subscribe(() => {
+          this.store.dispatch(new ReloadOrderCandidatesLists());
+        });
+      this.closeDialog();
+    }
+  }
+
+
+  public onAccept(): void {
+    this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
+  }
+
+  private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
+    if (this.orderCandidateJob) {
+      this.store
+        .dispatch(
+          new UpdateAgencyCandidateJob({
+            organizationId: this.orderCandidateJob.organizationId,
+            jobId: this.orderCandidateJob.jobId,
+            orderId: this.orderCandidateJob.orderId,
+            nextApplicantStatus: applicantStatus,
           })
         )
         .subscribe(() => {
