@@ -50,7 +50,7 @@
                 <section class="candidate">
                   <ng-container [ngSwitch]="selectedTemplate">
                     <ng-container *ngSwitchCase="template.onboarded">
-                      <app-onboarded-candidate [candidate]="$any(candidate)" [isTab]="true"></app-onboarded-candidate>
+                      <app-onboarded-candidate [candidate]="$any(candidate)" [isTab]="true" (closeModalEvent)="onClose()"></app-onboarded-candidate>
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.accept">

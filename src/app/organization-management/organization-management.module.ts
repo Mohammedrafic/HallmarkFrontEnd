@@ -69,6 +69,7 @@ import { RejectReasonState } from "@organization-management/store/reject-reason.
 import { FilteredCredentialsComponent } from './credentials/credentials-setup/filtered-credentials/filtered-credentials.component';
 import { MapCredentialsFormComponent } from './credentials/credentials-setup/map-credentials-form/map-credentials-form.component';
 import { ReasonsComponent } from './reasons/reasons.component';
+import { ClosureReasonComponent } from './reasons/closure-reason/closure-reason.component';
 
 const sidebarIcons = {
   Download,
@@ -113,7 +114,8 @@ const sidebarIcons = {
     CandidateRejectReasonComponent,
     FilteredCredentialsComponent,
     MapCredentialsFormComponent,
-    ReasonsComponent
+    ReasonsComponent,
+    ClosureReasonComponent
   ],
   imports: [
     CommonModule,

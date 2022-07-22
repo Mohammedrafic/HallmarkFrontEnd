@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
-import { RemoveRejectReasons, SaveRejectReasons, SaveRejectReasonsSuccess, UpdateRejectReasons } from '@organization-management/store/reject-reason.actions';
+import { RemoveRejectReasons, SaveClosureReasons, SaveClosureReasonsError, SaveRejectReasons, SaveRejectReasonsError, SaveRejectReasonsSuccess, UpdateClosureReasonsSuccess, UpdateRejectReasons } from '@organization-management/store/reject-reason.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { CANCEL_REJECTION_REASON, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, ONLY_LETTERS } from '@shared/constants';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
@@ -26,6 +26,7 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
   private isEdit = false;
   public title: string = '';
   private isAlive = true;
+  private isSaving = false;
 
   constructor(private store: Store, private confirmService: ConfirmService, private actions$: Actions) {
     super();
@@ -53,9 +54,13 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
 
   private subscribeOnSaveReasonSuccess(): void {
     this.actions$.pipe(
-      ofActionSuccessful(SaveRejectReasonsSuccess),
+      ofActionSuccessful(SaveRejectReasonsSuccess, UpdateClosureReasonsSuccess),
       takeWhile(() => this.isAlive)
     ).subscribe(() =>this.closeSideDialog());
+    this.actions$.pipe(
+      ofActionSuccessful(SaveRejectReasonsError, SaveClosureReasonsError),
+      takeWhile(() => this.isAlive)
+    ).subscribe(() => this.isSaving = false);
   }
 
   public saveReason(): void {
@@ -64,25 +69,32 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
       return;
     }
 
-    switch (this.selectedTab) {
-      case ReasonsNavigationTabs.Rejection:
-        if(!this.isEdit) {
-          this.store.dispatch(new SaveRejectReasons({ reason: this.form.value.reason }));
-        } else if(this.isEdit) {
+    if (!this.isSaving) {
+      this.isSaving = true;
+      switch (this.selectedTab) {
+        case ReasonsNavigationTabs.Rejection:
+          if(!this.isEdit) {
+            this.store.dispatch(new SaveRejectReasons({ reason: this.form.value.reason }));
+          } else if(this.isEdit) {
+            const payload = {
+              id: this.form.value.id,
+              reason: this.form.value.reason
+            }
+      
+            this.store.dispatch( new UpdateRejectReasons(payload));
+          }
+          break;
+        case ReasonsNavigationTabs.Requisition:
+          // TODO: pending US
+          break;
+        case ReasonsNavigationTabs.Closure:
           const payload = {
             id: this.form.value.id,
             reason: this.form.value.reason
           }
-    
-          this.store.dispatch( new UpdateRejectReasons(payload));
-        }
-        break;
-      case ReasonsNavigationTabs.Requisition:
-        // TODO: pending US
-        break;
-      case ReasonsNavigationTabs.Closure:
-        // TODO: pending US
-        break;
+          this.store.dispatch(new SaveClosureReasons(payload));
+          break;
+      }
     }
   }
 
@@ -90,6 +102,7 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
     this.title = DialogMode.Add;
     this.isEdit = false;
     this.store.dispatch(new ShowSideDialog(true));
+    this.isSaving = false;
   }
 
   public onEdit(data: {reason: string, id: number}): void {
@@ -100,6 +113,7 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
       reason: data.reason
     });
     this.store.dispatch(new ShowSideDialog(true));
+    this.isSaving = false;
   }
 
   private closeSideDialog(): void {

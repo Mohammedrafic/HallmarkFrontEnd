@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges } from '@angular/core';
-import { CandidatesBasicInfo, OrderCandidatesList } from '../../../models/order-management.model';
+import { CandidatesBasicInfo, OrderCandidatesList } from '../../../../models/order-management.model';
 import { Select, Store } from '@ngxs/store';
 import { GetCandidatesBasicInfo } from '@agency/store/order-management.actions';
 import { combineLatest, Observable, Subject, takeUntil } from 'rxjs';

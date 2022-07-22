@@ -26,12 +26,13 @@ export class LoginPageComponent extends DestroyableDirective implements OnInit, 
     combineLatest([
       this.b2CAuthService.onLoginSuccess().pipe(
         takeUntil(this.destroy$),
+        tap(() => showSpinner(this.spiner.nativeElement)),
         tap(() => this.router.navigate(['/']))
       ),
       this.b2CAuthService.interactionStatusNone().pipe(
         tap(() => {
           if (!this.b2CAuthService.isLoggedIn()) {
-            this.loginWithSSO();
+            // this.loginWithSSO();
           }
         })
       ),
@@ -44,11 +45,10 @@ export class LoginPageComponent extends DestroyableDirective implements OnInit, 
     createSpinner({
       target: this.spiner.nativeElement,
     });
-
-    showSpinner(this.spiner.nativeElement);
   }
 
   public loginWithSSO(): void {
+    showSpinner(this.spiner.nativeElement);
     this.b2CAuthService.loginSSO();
   }
 }

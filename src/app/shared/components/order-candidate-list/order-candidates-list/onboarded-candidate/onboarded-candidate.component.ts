@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { filter, merge, Observable, Subject, takeUntil } from 'rxjs';
-import { OPTION_FIELDS } from '@shared/components/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
+import { OPTION_FIELDS } from '@shared/components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidates.constanst';
 import { BillRate } from '@shared/models/bill-rate.model';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
@@ -18,7 +18,7 @@ import {
 } from '@client/store/order-managment-content.actions';
 import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
 import { RejectReason } from '@shared/models/reject-reason.model';
-import { ShowToast } from '../../../../store/app.actions';
+import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations';

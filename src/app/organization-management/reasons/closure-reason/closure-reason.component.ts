@@ -10,27 +10,26 @@ import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
 import { FormGroup } from "@angular/forms";
 import { Observable, Subject, takeWhile, throttleTime } from "rxjs";
 import {
-  GetRejectReasonsByPage,
-  RemoveRejectReasons,
-  SaveRejectReasonsError,
-  UpdateRejectReasonsSuccess
+  GetClosureReasonsByPage,
+  RemoveClosureReasons,
+  SaveClosureReasonsError,
+  UpdateClosureReasonsSuccess,
 } from "@organization-management/store/reject-reason.actions";
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
-import { DialogMode } from "@shared/enums/dialog-mode.enum";
 
 @Component({
-  selector: 'app-candidate-reject-reason',
-  templateUrl: './candidate-reject-reason.component.html',
-  styleUrls: ['./candidate-reject-reason.component.scss']
+  selector: 'app-closure-reason',
+  templateUrl: './closure-reason.component.html',
+  styleUrls: ['./closure-reason.component.scss']
 })
-export class CandidateRejectReasonComponent extends AbstractGridConfigurationComponent implements OnInit,OnDestroy {
+export class ClosureReasonComponent extends AbstractGridConfigurationComponent implements OnInit,OnDestroy {
   @Input() form: FormGroup;
 
   @Output() onEditReasons = new EventEmitter<RejectReason>();
 
-  @Select(RejectReasonState.rejectReasonsPage)
-  public rejectReasonPage$: Observable<RejectReasonPage>;
+  @Select(RejectReasonState.closureReasonsPage)
+  public closureReasonsPage$: Observable<RejectReasonPage>;
 
   @Select(UserState.lastSelectedOrganizationId)
   organizationId$: Observable<number>;
@@ -56,6 +55,10 @@ export class CandidateRejectReasonComponent extends AbstractGridConfigurationCom
     this.isAlive = false;
   }
 
+  public override updatePage(): void {
+    this.dispatchNewPage();
+  }
+
   public onEdit(data: RejectReason) {
     this.onEditReasons.emit(data);
   }
@@ -69,7 +72,7 @@ export class CandidateRejectReasonComponent extends AbstractGridConfigurationCom
       })
       .subscribe((confirm: boolean) => {
         if (confirm) {
-          this.store.dispatch(new RemoveRejectReasons(id));
+          this.store.dispatch(new RemoveClosureReasons(id));
         }
       });
   }
@@ -87,31 +90,27 @@ export class CandidateRejectReasonComponent extends AbstractGridConfigurationCom
   }
 
   private dispatchNewPage(): void {
-    this.store.dispatch(new GetRejectReasonsByPage(this.currentPage, this.pageSize))
-  }
-
-  private initGrid(): void {
-    this.store.dispatch(new GetRejectReasonsByPage(this.currentPage, this.pageSize));
+    this.store.dispatch(new GetClosureReasonsByPage(this.currentPage, this.pageSize, this.orderBy))
   }
 
   private subscribeOnSaveReasonError(): void {
     this.actions$.pipe(
-      ofActionSuccessful(SaveRejectReasonsError),
+      ofActionSuccessful(SaveClosureReasonsError),
       takeWhile(() => this.isAlive)
     ).subscribe(() => this.form.controls['reason'].setErrors({'incorrect': true}));
   }
 
   private subscribeOnUpdateReasonSuccess(): void {
     this.actions$.pipe(
-      ofActionSuccessful(UpdateRejectReasonsSuccess),
+      ofActionSuccessful(UpdateClosureReasonsSuccess),
       takeWhile(() => this.isAlive)
-    ).subscribe(() => this.initGrid());
+    ).subscribe(() => this.dispatchNewPage());
   }
 
   private subscribeOnOrganization(): void {
     this.organizationId$.pipe(takeWhile(() => this.isAlive)).subscribe(id => {
       this.currentPage = 1;
-      this.store.dispatch(new GetRejectReasonsByPage(this.currentPage, this.pageSize));
+      this.dispatchNewPage();
     });
     this.pageSubject.pipe(takeWhile(() => this.isAlive), throttleTime(100)).subscribe((page) => {
       this.currentPage = page;

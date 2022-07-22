@@ -1,109 +1,47 @@
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { Select, Store } from '@ngxs/store';
+import { Observable, Subject } from 'rxjs';
+
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
-import { Select, Store } from '@ngxs/store';
-import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import {
-  AgencyOrder,
-  CandidateListEvent,
   Order,
   OrderCandidatesList,
-  OrderCandidatesListPage,
 } from '@shared/models/order-management.model';
-import { disabledBodyOverflow } from '@shared/utils/styles.utils';
-import { GridComponent } from '@syncfusion/ej2-angular-grids';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { debounceTime, Observable, Subject } from 'rxjs';
-import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
-import { UserState } from 'src/app/store/user.state';
 import { AcceptCandidateComponent } from './accept-candidate/accept-candidate.component';
 import { ApplyCandidateComponent } from './apply-candidate/apply-candidate.component';
 import { OfferDeploymentComponent } from './offer-deployment/offer-deployment.component';
 import { OnboardedCandidateComponent } from './onboarded-candidate/onboarded-candidate.component';
+import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 
 @Component({
   selector: 'app-order-candidates-list',
   templateUrl: './order-candidates-list.component.html',
   styleUrls: ['./order-candidates-list.component.scss'],
 })
-export class OrderCandidatesListComponent extends AbstractGridConfigurationComponent implements OnInit {
-  @ViewChild('orderCandidatesGrid') grid: GridComponent;
+export class OrderCandidatesListComponent extends AbstractOrderCandidateListComponent implements OnInit {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('accept') accept: AcceptCandidateComponent;
   @ViewChild('apply') apply: ApplyCandidateComponent;
   @ViewChild('onboarded') onboarded: OnboardedCandidateComponent;
-  @ViewChild('offerDeployment') offerDeployment: OfferDeploymentComponent;
-
-  @Input() candidatesList: OrderCandidatesListPage | null;
-  @Input() order: AgencyOrder;
-
-  @Output() getCandidatesList = new EventEmitter<CandidateListEvent>();
+  @ViewChild('offerDeployment') offerDeployment: OfferDeploymentComponent
 
   @Select(OrderManagementState.selectedOrder)
   public selectedOrder$: Observable<Order>;
 
   public templateState: Subject<any> = new Subject();
-  public includeDeployedCandidates: boolean = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public candidate: OrderCandidatesList;
-  public isAgency: boolean;
 
-  private pageSubject = new Subject<number>();
-
-  constructor(private store: Store, private router: Router) {
-    super();
-  }
-
-  ngOnInit() {
-    this.isAgency = this.router.url.includes('agency');
-
-    this.subscribeOnPageChanges();
-  }
-
-  public onSwitcher(event: { checked: boolean }): void {
-    this.includeDeployedCandidates = event.checked;
-
-    this.getCandidatesList.emit({
-      orderId: this.order.orderId,
-      organizationId: this.order.organizationId,
-      currentPage: this.currentPage,
-      pageSize: this.pageSize,
-      excludeDeployed: !this.includeDeployedCandidates,
-    });
-  }
-
-  public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
-    this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
-  }
-
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-    }
-  }
-
-  public onViewNavigation(data: any): void {
-    const user = this.store.selectSnapshot(UserState.user);
-    const url =
-      user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
-    if (user?.businessUnitType === BusinessUnitType.Hallmark) {
-      this.store.dispatch(
-        new SetLastSelectedOrganizationAgencyId({
-          lastSelectedAgencyId: data.agencyId,
-          lastSelectedOrganizationId: null,
-        })
-      );
-    }
-    const pageToBack = this.router.url;
-    this.router.navigate([url, data.candidateId], { state: { orderId: this.order.orderId, pageToBack } });
-    disabledBodyOverflow(false);
+  constructor(protected override store: Store, protected override router: Router) {
+    super(store, router);
   }
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
@@ -111,9 +49,6 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
     this.addActiveCssClass(event);
 
     if (this.order && this.candidate) {
-      // TODO: find better approach
-      const isOrganization = this.router.url.includes('client');
-
       if (this.isAgency) {
         const allowedApplyStatuses = [ApplicantStatus.NotApplied, ApplicantStatus.Withdraw];
         const allowedAcceptStatuses = [
@@ -135,7 +70,7 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
           this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
           this.openDialog(this.accept);
         }
-      } else if (isOrganization) {
+      } else if (this.isOrganization) {
         const allowedOfferDeploymentStatuses = [
           ApplicantStatus.Withdraw,
           ApplicantStatus.Rejected,
@@ -166,19 +101,6 @@ export class OrderCandidatesListComponent extends AbstractGridConfigurationCompo
   public onCloseDialog(): void {
     this.sideDialog.hide();
     this.removeActiveCssClass();
-  }
-
-  private subscribeOnPageChanges(): void {
-    this.pageSubject.pipe(debounceTime(1)).subscribe((page) => {
-      this.currentPage = page;
-      this.getCandidatesList.emit({
-        orderId: this.order.orderId,
-        organizationId: this.order.organizationId,
-        currentPage: this.currentPage,
-        pageSize: this.pageSize,
-        excludeDeployed: !this.includeDeployedCandidates,
-      });
-    });
   }
 
   private openDialog(template: any): void {
