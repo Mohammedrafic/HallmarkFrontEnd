@@ -9,8 +9,21 @@
 .profile-hours-statistics-container {
   display: flex;
 
+  .week-hours-chart {
+    left: -35px;
+  }
+
+  .cumulative-hours-chart {
+    left: -15px;
+  }
+
+  .week-hours-chart, .cumulative-hours-chart {
+    top: -20px;
+    pointer-events: none;
+  }
+
   section {
-    padding: 13px 16px 0 14px;
+    padding: 13px 16px 0 16px;
     display: flex;
     flex-direction: column;
 
@@ -25,6 +38,10 @@
 
     &.cumulative-hours {
       padding-right: 0;
+    }
+
+    &.cumulative-hours-otd {
+      padding-left: 0;
     }
 
     &.charts-legend {

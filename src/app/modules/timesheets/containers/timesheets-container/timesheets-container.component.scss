@@ -1,5 +1,9 @@
 @import '../../styles/variables/colors';
 
+.input-container {
+  min-width: 180px;
+}
+
 .e-input-group.e-float-icon-left.search-with-icon {
   height: 38px;
 }

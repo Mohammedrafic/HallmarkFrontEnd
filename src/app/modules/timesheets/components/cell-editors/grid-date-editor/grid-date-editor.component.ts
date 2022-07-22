@@ -26,8 +26,6 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
 
   public type: EditFieldTypes;
 
-  public offset = new Date().getTimezoneOffset().toString();
-
   constructor(
     private cd: ChangeDetectorRef,
   ) {
@@ -43,12 +41,12 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
   }
 
   public refresh(params: ICellRendererParams): boolean {
-    this.dateValue = new Date(DateTimeHelper.convertDatetoUtc(params.value));
+    this.dateValue = new Date(DateTimeHelper.convertDateToUtc(params.value));
     this.value = params.value;
     this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
     this.type = (params.colDef as ColDef).cellRendererParams.type;
-    this.setDateBounds(params.value, 3);
 
+    this.setdateBoundsForDay(params.value);
     this.setFormControl(params);
     this.cd.markForCheck();
     return true;

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from
 import { FormGroup } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { Observable, takeUntil } from 'rxjs';
+import { Observable, switchMap, takeUntil } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import { FilteredItem } from '@shared/models/filter.model';
@@ -11,9 +11,9 @@ import { Destroyable } from '@core/helpers';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { filterOptionFields } from '../../constants';
-import { FilterColumns } from '../../interface';
+import { FilterColumns, TimesheetsFilterState } from '../../interface';
 import { TimesheetsService } from '../../services/timesheets.service';
-import { TimesheetsTableColumns } from '../../enums';
+import { TimesheetsTableFiltersColumns } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { leftOnlyValidValues } from '../../helpers/functions';
 
@@ -27,8 +27,12 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
   @Select(TimesheetsState.timesheets)
   readonly timesheets$: Observable<TimeSheetsPage>;
 
+  @Select(TimesheetsState.timesheetsFilters)
+  readonly timesheetsFilters$!: Observable<TimesheetsFilterState>;
+
   @Output() readonly updateTableByFilters: EventEmitter<any> = new EventEmitter<any>();
   @Output() readonly resetFilters: EventEmitter<void> = new EventEmitter<void>();
+  @Output() readonly appliedFiltersAmount: EventEmitter<number> = new EventEmitter<number>();
 
   public filteredItems: FilteredItem[] = [];
   public filterOptionFields = filterOptionFields;
@@ -47,16 +51,21 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
     this.initFormGroup();
     this.initFiltersColumns();
     this.initFilterColumnDataSources();
+    this.startFiltersWatching();
   }
 
   public deleteFilter(event: FilteredItem): void {
     this.filterService.removeValue(event, this.formGroup, this.filterColumns);
+    this.appliedFiltersAmount.emit(this.filteredItems.length);
   }
 
-  public clearAllFilters(): void {
+  public clearAllFilters(eventEmmit = true): void {
     this.formGroup.reset();
     this.filteredItems = [];
-    this.resetFilters.emit();
+    this.appliedFiltersAmount.emit(this.filteredItems.length);
+    if (eventEmmit) {
+      this.resetFilters.emit();
+    }
   }
 
   public applyFilters(): void {
@@ -64,18 +73,18 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
 
     this.updateTableByFilters.emit(filters);
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
+    this.appliedFiltersAmount.emit(this.filteredItems.length);
   }
 
   private initFilterColumnDataSources(): void {
     const statuses = [
-      TimesheetsTableColumns.StatusText,
-      TimesheetsTableColumns.Skill,
-      TimesheetsTableColumns.Department,
-      TimesheetsTableColumns.AgencyName,
-      TimesheetsTableColumns.Region,
-      TimesheetsTableColumns.Location,
-      TimesheetsTableColumns.OrderId,
-      TimesheetsTableColumns.OrgName,
+      TimesheetsTableFiltersColumns.StatusIds,
+      TimesheetsTableFiltersColumns.SkillIds,
+      TimesheetsTableFiltersColumns.DepartmentIds,
+      TimesheetsTableFiltersColumns.AgencyIds,
+      TimesheetsTableFiltersColumns.RegionsIds,
+      TimesheetsTableFiltersColumns.LocationIds,
+      TimesheetsTableFiltersColumns.OrderIds,
     ];
     this.store.dispatch(new Timesheets.SetFiltersDataSource(statuses));
   }
@@ -92,5 +101,14 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
 
   private initFormGroup(): void {
     this.formGroup = this.timesheetsService.createForm();
+  }
+
+  private startFiltersWatching(): void {
+    this.timesheetsFilters$.pipe(
+      filter((filters: TimesheetsFilterState) => filters && !filters.statusIds?.length),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(() => {
+        this.clearAllFilters(false);
+    });
   }
 }

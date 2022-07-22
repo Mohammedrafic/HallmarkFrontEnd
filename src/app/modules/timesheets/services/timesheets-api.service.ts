@@ -1,20 +1,19 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 
 import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
 import {
   TimesheetsFilterState,
-  TimesheetRecord,
-  CandidateInfo,
-  TimesheetAttachments,
   TabCountConfig,
   TimesheetRecordsDto,
   DropdownOption,
   CandidateHoursAndMilesData,
   RecordValue,
   CostCentersDto,
+  AddRecordDto,
+  PutRecordDto,
 } from '../interface';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
@@ -26,11 +25,10 @@ import {
   filterColumnDataSource,
   MokTabsCounts,
   MockCandidateHoursAndMilesData,
-  BillRatesOptions,
-  CandidateMockInfo,
 } from '../constants';
-import { TimesheetsTableColumns } from '../enums';
+import { TimesheetsTableFiltersColumns } from '../enums';
 import { CostCenterAdapter } from '../helpers';
+import { RecordsAdapter } from '../helpers/records.adapter';
 
 @Injectable()
 export class TimesheetsApiService {
@@ -50,43 +48,42 @@ export class TimesheetsApiService {
     return of(MokTabsCounts);
   }
 
-  public getTimesheetRecords(id: number): Observable<TimesheetRecordsDto> {
-    return this.http.get<TimesheetRecordsDto>(`/api/Timesheets/${id}/records`)
+  public getTimesheetRecords(
+    id: number,
+    orgId: number,
+    isAgency: boolean,
+    ): Observable<TimesheetRecordsDto> {
+    const endpoint = !isAgency
+    ? `/api/Timesheets/${id}/records` : `/api/Timesheets/${id}/records/organization/${orgId}`;
+    return this.http.get<TimesheetRecordsDto>(endpoint)
     .pipe(
-      map((data) => {
-        data.timesheets.forEach((item: RecordValue) => {
-          item.day = item['timeIn'] as string
-          item.costCenter = 69;
-        });
-        data.miles.forEach((item: RecordValue) => {
-          item.day = item['timeIn'] as string;
-          item.costCenter = 69;
-        });
-        return data;
-      })
+      map((data) => RecordsAdapter.adaptRecordsDto(data)),
+      catchError(() => of({
+        timesheets: [],
+        miles: [],
+        expenses: [],
+      }))
     );
   }
 
-  public AddTimesheetRecord(timesheetId: number, body: TimesheetRecord): Observable<null> {
-    return of(null);
+  public addTimesheetRecord(body: AddRecordDto): Observable<null> {
+    return this.http.post<null>(`/api/Timesheets/${body.timesheetId}/records`, body);
   }
 
-  public patchTimesheetRecords(
-    id: number,
-    records: Record<string, string | number>[],
-  ): Observable<null> {
-    return of(null);
+  public putTimesheetRecords(
+    dto: PutRecordDto,
+  ): Observable<void> {
+    return this.http.put<void>(`/api/Timesheets/${dto.timesheetId}/records`, dto);
   }
 
   public deleteProfileTimesheets(profileId: number, profileTimesheetId: number): Observable<null> {
     return of(null);
   }
 
-  public deleteTimesheet(id: number): Observable<boolean> {
-    return of(true);
-  }
-
-  public setDataSources(filterKeys: TimesheetsTableColumns[]): Observable<FilterDataSource> {
+  /**
+   * TODO: move this to helpers
+   */
+  public setDataSources(filterKeys: TimesheetsTableFiltersColumns[]): Observable<FilterDataSource> {
     const res = filterKeys.reduce((acc: any, key) => {
       acc[key] = filterColumnDataSource[key].map((el: DataSourceItem) =>
         ({...el, name: this.capitalizeFirst.transform(el.name)})
@@ -98,20 +95,11 @@ export class TimesheetsApiService {
     return of(res);
   }
 
-  public getCandidateInfo(id: number): Observable<CandidateInfo> {
-    return of(CandidateMockInfo);
-  }
+  public getCandidateCostCenters(jobId: number, orgId: number, isAgency: boolean): Observable<DropdownOption[]>{
+    const endpoint = isAgency ?
+    `/api/Jobs/${jobId}/costcenters/${orgId}` : `/api/Jobs/${jobId}/costcenters`;
 
-  public getCandidateHoursAndMilesData(id: number): Observable<CandidateHoursAndMilesData> {
-    return of(MockCandidateHoursAndMilesData);
-  }
-
-  public getCandidateAttachments(id: number): Observable<TimesheetAttachments> {
-    return of();
-  }
-
-  public getCandidateCostCenters(jobId: number): Observable<DropdownOption[]>{
-    return this.http.get<CostCentersDto>(`/api/Jobs/${jobId}/costcenters`)
+    return this.http.get<CostCentersDto>(endpoint)
     .pipe(
       map((res) => CostCenterAdapter(res)),
     );
@@ -122,18 +110,13 @@ export class TimesheetsApiService {
   }
 
   public getCandidateBillRates(
-    depId: number,
-    skillId: number,
-    orderType: number,
+    jobId: number,
+    orgId: number,
+    isAgency: boolean,
     ): Observable<DropdownOption[]> {
-    // return this.http.get<BillRate[]>(`/api/BillRates/predefined/forOrder`, {
-    //   params: {
-    //     DepartmentId: depId,
-    //     SkillId: skillId,
-    //     OrderType: orderType,
-    //   }
-    // })
-    return of(BillRatesOptions)
+    const endpoint = isAgency ?
+    `/api/Jobs/${jobId}/billrates/${orgId}` : `/api/Jobs/${jobId}/billrates`;
+    return this.http.get<BillRate[]>(endpoint)
     .pipe(
       map((res) => res.map((item) => {
         return {

@@ -12,9 +12,9 @@
           id="orderId"
           mode="CheckBox"
           [fields]="filterOptionFields"
-          [dataSource]="filterColumns.orderId?.dataSource"
+          [dataSource]="filterColumns.orderIds?.dataSource"
           [showDropDownIcon]="true"
-          formControlName="orderId"
+          formControlName="orderIds"
           placeholder=""></ejs-multiselect>
       </div>
     </div>
@@ -25,9 +25,9 @@
           id="status"
           mode="CheckBox"
           [fields]="filterOptionFields"
-          [dataSource]="filterColumns.statusText?.dataSource"
+          [dataSource]="filterColumns.statusIds?.dataSource"
           [showDropDownIcon]="true"
-          formControlName="statusText"
+          formControlName="statusIds"
           placeholder=""></ejs-multiselect>
       </div>
     </div>
@@ -38,9 +38,9 @@
           id="department"
           mode="CheckBox"
           [fields]="filterOptionFields"
-          [dataSource]="filterColumns.department?.dataSource"
+          [dataSource]="filterColumns.departmentIds?.dataSource"
           [showDropDownIcon]="true"
-          formControlName="departmentName"
+          formControlName="departmentIds"
           placeholder=""></ejs-multiselect>
       </div>
     </div>
@@ -51,22 +51,9 @@
           id="agencyName"
           mode="CheckBox"
           [fields]="filterOptionFields"
-          [dataSource]="filterColumns.agencyName?.dataSource"
+          [dataSource]="filterColumns.agencyIds?.dataSource"
           [showDropDownIcon]="true"
-          formControlName="agencyName"
-          placeholder=""></ejs-multiselect>
-      </div>
-    </div>
-    <div class="input-container">
-      <label for="orgName">Org Name</label>
-      <div class="input-group dropdown">
-        <ejs-multiselect
-          id="orgName"
-          mode="CheckBox"
-          [fields]="filterOptionFields"
-          [dataSource]="filterColumns.orgName?.dataSource"
-          [showDropDownIcon]="true"
-          formControlName="orgName"
+          formControlName="agencyIds"
           placeholder=""></ejs-multiselect>
       </div>
     </div>
@@ -78,9 +65,9 @@
             id="region"
             mode="CheckBox"
             [fields]="filterOptionFields"
-            [dataSource]="filterColumns.region?.dataSource"
+            [dataSource]="filterColumns.regionsIds?.dataSource"
             [showDropDownIcon]="true"
-            formControlName="region"
+            formControlName="regionsIds"
             placeholder=""></ejs-multiselect>
         </div>
       </div>
@@ -91,9 +78,9 @@
             id="location"
             mode="CheckBox"
             [fields]="filterOptionFields"
-            [dataSource]="filterColumns.location?.dataSource"
+            [dataSource]="filterColumns.locationIds?.dataSource"
             [showDropDownIcon]="true"
-            formControlName="location"
+            formControlName="locationIds"
             placeholder=""></ejs-multiselect>
         </div>
       </div>
@@ -105,9 +92,9 @@
           id="skill"
           mode="CheckBox"
           [fields]="filterOptionFields"
-          [dataSource]="filterColumns.skill?.dataSource"
+          [dataSource]="filterColumns.skillIds?.dataSource"
           [showDropDownIcon]="true"
-          formControlName="skillName"
+          formControlName="skillIds"
           placeholder=""></ejs-multiselect>
       </div>
     </div>
