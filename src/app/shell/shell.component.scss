@@ -298,3 +298,12 @@
     display: none;
   }
 }
+
+.other-icons {
+  margin-right: 30px;
+
+  .icon {
+    color: $secondary-dark-blue-30;
+    cursor: pointer;
+  }
+}
