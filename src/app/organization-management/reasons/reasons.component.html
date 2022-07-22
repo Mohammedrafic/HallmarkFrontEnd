@@ -28,7 +28,7 @@
       <e-tabitem>
         <ng-template #headerText><div>Order Closure</div></ng-template>
         <ng-template #content>
-
+          <app-closure-reason (onEditReasons)="onEdit($event)" [form]="form"></app-closure-reason>
         </ng-template>
       </e-tabitem>
     </e-tabitems>
