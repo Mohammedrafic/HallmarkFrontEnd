@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 
 import { CustomFormGroup } from '@core/interface';
 import { RecordFields } from '../enums';
-import { EditTimsheetForm } from '../interface';
+import { AddTimsheetForm } from '../interface';
 import { dateRangeValidator } from '@core/helpers';
 
 @Injectable()
@@ -12,7 +12,7 @@ export class AddRecordService {
     private fb: FormBuilder,
   ) {}
 
-  createForm(type: RecordFields): CustomFormGroup<EditTimsheetForm> {
+  createForm(type: RecordFields): CustomFormGroup<AddTimsheetForm> {
     if (type === RecordFields.Time) {
       const options: AbstractControlOptions = {
         validators: dateRangeValidator,
@@ -20,32 +20,31 @@ export class AddRecordService {
       return this.fb.group({
           timeIn: [null, [Validators.required]],
           timeOut: [null, [Validators.required]],
-          costCenter: [null, Validators.required],
-          billRateConfigId: [null, Validators.required],
-          amount: [null, [Validators.required, Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER)]],
-        }, options ) as CustomFormGroup<EditTimsheetForm>;
+          departmentId: [null, Validators.required],
+          billRateId: [null, Validators.required],
+        }, options ) as CustomFormGroup<AddTimsheetForm>;
     }
 
     if (type === RecordFields.Miles) {
       return this.fb.group(
         {
-          day: [null, [Validators.required]],
-          costCenter: [null, Validators.required],
-          billRateConfigId: [null, Validators.required],
-          amount: [null, [Validators.required, Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER)]],
+          timeIn: [null, [Validators.required]],
+          departmentId: [null, Validators.required],
+          billRateId: [null, Validators.required],
+          value: [null, [Validators.required, Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER)]],
         }
-      ) as CustomFormGroup<EditTimsheetForm>;
+      ) as CustomFormGroup<AddTimsheetForm>;
     }
 
     return this.fb.group(
       {
-        day: [null, [Validators.required]],
-        costCenter: [null, Validators.required],
-        billRateConfigId: [null, Validators.required],
+        timeIn: [null, [Validators.required]],
+        departmentId: [null, Validators.required],
+        billRateId: [null, Validators.required],
         description: [null, Validators.maxLength(250)],
-        amount: [null, [Validators.required, Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER)]],
+        value: [null, [Validators.required, Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER)]],
       }
-    ) as CustomFormGroup<EditTimsheetForm>;
+    ) as CustomFormGroup<AddTimsheetForm>;
 
   }
 }

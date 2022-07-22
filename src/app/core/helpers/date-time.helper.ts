@@ -25,4 +25,9 @@ export class DateTimeHelper {
 
     return new Date(day).toUTCString();
   }
+
+  public static toUtc(date: string | Date): string {
+    const init = date as Date;
+    return new Date(Date.UTC(init.getFullYear(), init.getMonth(), init.getDate(), init.getHours(), init.getMinutes())).toISOString();
+  }
 }

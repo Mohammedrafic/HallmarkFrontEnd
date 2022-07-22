@@ -1,5 +1,6 @@
 import { ExportPayload } from '@shared/models/export.model';
 import { TimesheetDetailsActions, TIMESHEETS_ACTIONS } from '../../enums';
+import { AddRecordDto, PutRecordDto } from '../../interface';
 import {
   ChangeStatusData,
   DeleteAttachmentData,
@@ -63,12 +64,11 @@ export namespace TimesheetDetails {
     }
   }
 
-  export class PatchTimesheetRecords {
+  export class PutTimesheetRecords {
     static readonly type = TimesheetDetailsActions.PatchTimesheetRecords;
 
     constructor(
-      public readonly id: number,
-      public readonly recordsToUpdate: Record<string, string | number>[],
+      public readonly body: PutRecordDto,
       public readonly isAgency: boolean,
       ) {}
   }
@@ -127,7 +127,8 @@ export namespace TimesheetDetails {
     static readonly type = TimesheetDetailsActions.AddTimesheetRecord;
 
     constructor(
-      public timesheetId: number,
+      public readonly body: AddRecordDto,
+      public readonly isAgency: boolean,
     ) {}
   }
 

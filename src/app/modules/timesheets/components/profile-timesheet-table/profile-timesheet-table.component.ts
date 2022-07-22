@@ -6,6 +6,7 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnInit,
   Output,
   ViewChild,
 } from '@angular/core';
@@ -32,6 +33,8 @@ import { DialogActionPayload, OpenAddDialogMeta, TimesheetRecordsDto } from '../
 import { TimesheetRecordsService } from '../../services/timesheet-records.service';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
+import { RecordsAdapter } from '../../helpers';
+import { TIMETHEETS_STATUSES } from '../../enums';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -42,7 +45,7 @@ import { TimesheetDetails } from '../../store/actions/timesheet-details.actions'
   styleUrls: ['./profile-timesheet-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileTimesheetTableComponent extends Destroyable implements AfterViewInit {
+export class ProfileTimesheetTableComponent extends Destroyable implements AfterViewInit, OnInit {
   @ViewChild('tabs') readonly tabs: TabComponent;
 
   @ViewChild('grid') readonly grid: IClientSideRowModel;
@@ -81,6 +84,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public isFirstSelected = true;
 
+  public actionsAvaliable = true;
+
   private isChangesSaved = true;
 
   private formControls: Record<string, FormGroup> = {};
@@ -96,6 +101,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     private cd: ChangeDetectorRef,
   ) {
     super();
+  }
+
+  ngOnInit(): void {
+    this.checkIfActionsAvaliable();
   }
 
   ngAfterViewInit(): void {
@@ -135,6 +144,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public openAddDialog(): void {
     const startDate = this.store.snapshot().timesheets.selectedTimeSheet.startDate;
+    console.log(this.store.snapshot().timesheets.selectedTimeSheet)
 
     this.openAddSideDialog.emit({
       currentTab: this.currentTab,
@@ -162,18 +172,25 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     const diffs = this.timesheetRecordsService.findDiffs(
       this.records[this.currentTab], this.formControls, this.timesheetColDef);
 
-    if (diffs.length) {
+    const recordsToUpdate = this.records[this.currentTab].map((record) => {
+      const updatedItem = diffs.find((item) => item.id === record.id);
+      if (updatedItem) {
+        return updatedItem
+      }
+      return record;
+    });
 
-      this.store.dispatch(new TimesheetDetails.PatchTimesheetRecords(this.timesheetId, diffs, this.isAgency))
-      .pipe(
-        takeUntil(this.componentDestroy()),
-      )
-      .subscribe(() => {
-        this.changesSaved.emit(true);
-        this.isChangesSaved = true;
-        this.setInitialTableState();
-      });
-    }
+    const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
+    const dto = RecordsAdapter.adaptRecordPutDto(recordsToUpdate, organizationId, id, this.currentTab);
+    this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
+    .pipe(
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(() => {
+      this.changesSaved.emit(true);
+      this.isChangesSaved = true;
+      this.setInitialTableState();
+    });
   }
 
   public trackByIndex(index: number, item: TabConfig): number {
@@ -200,12 +217,12 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
           this.costCenters$,
         ]);
       }),
+      filter(() => !!this.gridApi),
+      tap((data) => { this.controlTabsVisibility(data[0]) }),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
-      if (this.gridApi) {
-        this.gridApi.setColumnDefs(this.timesheetColDef);
-      }
+      this.gridApi.setColumnDefs(this.timesheetColDef);
     });
   }
 
@@ -256,5 +273,20 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         this.changesSaved.emit(false);
       }
     })
+  }
+
+  private controlTabsVisibility(billRates: DropdownOption[]): void {
+    const isMilageAvaliable = billRates.some((rate) => rate.text.includes('Mileage'));
+    const isExpensesAvaliable = billRates.some((rate) => rate.text.includes('Expenses'));
+
+    this.tabs.hideTab(1, !isMilageAvaliable);
+    this.tabs.hideTab(2, !isExpensesAvaliable);
+  }
+
+  private checkIfActionsAvaliable(): void {
+    const status = this.store.snapshot().timesheets.selectedTimeSheet.statusText;
+
+    this.actionsAvaliable = status !== TIMETHEETS_STATUSES.ORG_APPROVED
+    && status !== TIMETHEETS_STATUSES.APPROVED;
   }
 }

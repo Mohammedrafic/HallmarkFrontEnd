@@ -29,7 +29,7 @@ const dayColDef: ColDef = {
 };
 
 const editableCostCenterDef: ColDef = {
-  field: 'costCenter',
+  field: 'departmentId',
   headerName: 'Cost center',
   ...commonColumn,
   width: 180,

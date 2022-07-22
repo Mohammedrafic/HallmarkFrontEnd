@@ -1,18 +1,19 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 
 import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
 import {
   TimesheetsFilterState,
-  TimesheetRecord,
   TabCountConfig,
   TimesheetRecordsDto,
   DropdownOption,
   CandidateHoursAndMilesData,
   RecordValue,
   CostCentersDto,
+  AddRecordDto,
+  PutRecordDto,
 } from '../interface';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
@@ -27,6 +28,7 @@ import {
 } from '../constants';
 import { TimesheetsTableFiltersColumns } from '../enums';
 import { CostCenterAdapter } from '../helpers';
+import { RecordsAdapter } from '../helpers/records.adapter';
 
 @Injectable()
 export class TimesheetsApiService {
@@ -55,29 +57,23 @@ export class TimesheetsApiService {
     ? `/api/Timesheets/${id}/records` : `/api/Timesheets/${id}/records/organization/${orgId}`;
     return this.http.get<TimesheetRecordsDto>(endpoint)
     .pipe(
-      map((data) => {
-        data.timesheets.forEach((item: RecordValue) => {
-          item.day = item['timeIn'] as string
-          item.costCenter = 69;
-        });
-        data.miles.forEach((item: RecordValue) => {
-          item.day = item['timeIn'] as string;
-          item.costCenter = 69;
-        });
-        return data;
-      })
+      map((data) => RecordsAdapter.adaptRecordsDto(data)),
+      catchError(() => of({
+        timesheets: [],
+        miles: [],
+        expenses: [],
+      }))
     );
   }
 
-  public AddTimesheetRecord(timesheetId: number, body: TimesheetRecord): Observable<null> {
-    return this.http.post<null>(`/api/Timesheets/${timesheetId}/records`, body);
+  public addTimesheetRecord(body: AddRecordDto): Observable<null> {
+    return this.http.post<null>(`/api/Timesheets/${body.timesheetId}/records`, body);
   }
 
-  public patchTimesheetRecords(
-    id: number,
-    records: Record<string, string | number>[],
-  ): Observable<null> {
-    return of(null);
+  public putTimesheetRecords(
+    dto: PutRecordDto,
+  ): Observable<void> {
+    return this.http.put<void>(`/api/Timesheets/${dto.timesheetId}/records`, dto);
   }
 
   public deleteProfileTimesheets(profileId: number, profileTimesheetId: number): Observable<null> {

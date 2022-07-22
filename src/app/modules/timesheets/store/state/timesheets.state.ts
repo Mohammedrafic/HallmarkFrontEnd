@@ -21,6 +21,7 @@ import {
   TimesheetsTableFiltersColumns,
 } from '../../enums';
 import {
+  AddSuccessMessage,
   approveTimesheetDialogData,
   DefaultFiltersState,
   DefaultTimesheetCollection,
@@ -235,12 +236,12 @@ export class TimesheetsState {
     )
   }
 
-  @Action(TimesheetDetails.PatchTimesheetRecords)
-  PatchTimesheetRecords(
+  @Action(TimesheetDetails.PutTimesheetRecords)
+  PutTimesheetRecords(
     ctx: StateContext<TimesheetsModel>,
-    { id, recordsToUpdate, isAgency }: TimesheetDetails.PatchTimesheetRecords,
+    { body, isAgency }: TimesheetDetails.PutTimesheetRecords,
   ): Observable<TimesheetRecordsDto> {
-    return this.timesheetsApiService.patchTimesheetRecords(id, recordsToUpdate)
+    return this.timesheetsApiService.putTimesheetRecords(body)
     .pipe(
       switchMap(() => {
         const state = ctx.getState();
@@ -441,13 +442,19 @@ export class TimesheetsState {
       tap((organizations: DataSourceItem[]) => patchState({ organizations })),
     );
   }
-  // @Action(TimesheetDetails.AddTimesheetRecord)
-  // AddTimesheetRecord(ctx: StateContext<TimesheetsModel>, payload: { timesheetId: number }) {
-  //   return this.timesheetsApiService.AddTimesheetRecord(payload.timesheetId)
-  //   .pipe(
-  //     tap(() => {
-
-  //     })
-  //   )
-  // }
+  
+  @Action(TimesheetDetails.AddTimesheetRecord)
+  AddTimesheetRecord(ctx: StateContext<TimesheetsModel>, { body, isAgency }: TimesheetDetails.AddTimesheetRecord) {
+    return this.timesheetsApiService.addTimesheetRecord(body)
+    .pipe(
+      tap(() => {
+        this.store.dispatch([
+          new ShowToast(MessageTypes.Success, AddSuccessMessage.successMessage),
+        ]);
+        const state = ctx.getState();
+        const { id, organizationId } = state.selectedTimeSheet as Timesheet;
+        ctx.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
+      })
+    )
+  }
 }

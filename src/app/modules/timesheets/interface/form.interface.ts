@@ -1,9 +1,8 @@
-export interface EditTimsheetForm {
-  day: Date;
-  timeIn: Date;
-  timeOut: Date;
-  costCenter: string;
-  category: string;
+export interface AddTimsheetForm {
+  timeIn: string;
+  timeOut: string;
+  departmentId: number;
+  billRateId: number;
   amount: number;
   description: string;
 }

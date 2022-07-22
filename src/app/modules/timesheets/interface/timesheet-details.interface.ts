@@ -3,6 +3,7 @@ import { TableColumnAlign } from '../enums';
 import { TimesheetStatistics } from './timesheet-statistics.interface';
 import { TimesheetAttachment } from './timesheet-attachment.interface';
 import { TimesheetInvoice } from './timesheet-invoice.interface';
+import { RecordValue } from './common.interface';
 
 export interface DetailsColumnConfig {
   align: TableColumnAlign;
@@ -83,4 +84,42 @@ export interface TimesheetDetailsModel {
 export interface OpenAddDialogMeta {
   currentTab: RecordFields;
   initDate: string;
+}
+
+export interface RecordsPutDto {
+  timesheetId: number;
+  organizationId: number;
+  type: number;
+  deleteIds: number[];
+  records: RecordValue[];
+}
+
+export interface AddRecordDto {
+  timesheetId: number;
+  organizationId: number;
+  type: number;
+  timeIn: string;
+  timeOut?: string;
+  billRateId: number;
+  departmentId: number;
+  description?: string,
+  value?: number;
+}
+
+export interface PutRecord {
+  id: number;
+  timeIn: string;
+  timeOut?: string;
+  billRateId: number;
+  departmentId: number;
+  value: number;
+  description?: string;
+}
+
+export interface PutRecordDto {
+  timesheetId: number;
+  organizationId: number;
+  type: number;
+  deleteIds?: number[];
+  records?: PutRecord[];
 }
