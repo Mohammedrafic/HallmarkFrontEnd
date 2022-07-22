@@ -70,20 +70,20 @@ import {
   SortService,
   ToolbarService,
 } from '@syncfusion/ej2-angular-grids';
-import { OrderCandidatesListComponent } from './components/order-candidates-list/order-candidates-list.component';
+import { OrderCandidatesListComponent } from './components/order-candidate-list/order-candidates-list/order-candidates-list.component';
 import { OrderReOrdersListComponent } from './components/order-reorders-list/order-re-orders-list.component';
 import { CustomProgressBarComponent } from './components/custom-progress-bar/custom-progress-bar.component';
-import { ApplyCandidateComponent } from './components/order-candidates-list/apply-candidate/apply-candidate.component';
-import { AcceptCandidateComponent } from './components/order-candidates-list/accept-candidate/accept-candidate.component';
+import { ApplyCandidateComponent } from './components/order-candidate-list/order-candidates-list/apply-candidate/apply-candidate.component';
+import { AcceptCandidateComponent } from './components/order-candidate-list/order-candidates-list/accept-candidate/accept-candidate.component';
 import { DatePickerModule, DateRangePickerModule } from '@syncfusion/ej2-angular-calendars';
-import { OnboardedCandidateComponent } from './components/order-candidates-list/onboarded-candidate/onboarded-candidate.component';
+import { OnboardedCandidateComponent } from './components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidate.component';
 import { BillRatesViewGridComponent } from './components/bill-rates-view-grid/bill-rates-view-grid.component';
 import { CommentsComponent } from './components/comments/comments.component';
 import { HighlightGridRowDirective } from '@shared/directives/hightlight-grid-row.directive';
 import { AddBackgroundForEmptyGridDirective } from '@shared/directives/add-background-for-empty-grid.directive';
 import { FormatPhoneNumberPipe } from '@shared/pipes/format-phone-number.pipe';
 import { RateHourPipe } from '@shared/pipes/rate-hour.pipe';
-import { OfferDeploymentComponent } from './components/order-candidates-list/offer-deployment/offer-deployment.component';
+import { OfferDeploymentComponent } from './components/order-candidate-list/order-candidates-list/offer-deployment/offer-deployment.component';
 import { BillRatePipe } from '@shared/pipes/bill-rate.pipe';
 import { HistoricalEventsComponent } from './components/historical-events/historical-events.component';
 import { GridSubrowCandidateComponent } from './components/grid-subrow-candidate/grid-subrow-candidate.component';
@@ -98,7 +98,7 @@ import { ExportButtonComponent } from './components/export-button/export-button.
 import { TabsListComponent } from './components/tabs-list/tabs-list.component';
 import { PageToolbarModule } from '@shared/components/page-toolbar/page-toolbar.module';
 import { FilterDialogModule } from '@shared/components/filter-dialog/filter-dialog.module';
-import { DeployCandidateMessageComponent } from './components/order-candidates-list/deploy-candidate-message/deploy-candidate-message.component';
+import { DeployCandidateMessageComponent } from './components/order-candidate-list/order-candidates-list/deploy-candidate-message/deploy-candidate-message.component';
 import { ExBillRateNamesPipe } from '@shared/pipes/external-bill-rate-names.pipe';
 import { SideMenuModule } from '@shared/components/side-menu/side-menu.module';
 import { SecurityState } from '../security/store/security.state';
@@ -108,8 +108,10 @@ import { GridSubrowReorderComponent } from './components/grid-subrow-reorder/gri
 import { GeneralOrderPerDiemInfoComponent } from '@shared/components/general-order-per-diem-info/general-order-per-diem-info.component';
 import { GeneralReorderInfoComponent } from './components/general-reorder-info/general-reorder-info.component';
 import { OrderReOrdersContainerComponent } from '@client/order-management/order-reorders-container/order-reorders-container.component';
-import { OrderPerDiemCandidatesListComponent } from './components/order-per-diem-candidates-list/order-per-diem-candidates-list.component';
-import { CandidatesStatusModalComponent } from './components/order-per-diem-candidates-list/candidates-status-modal/candidates-status-modal.component';
+import { OrderPerDiemCandidatesListComponent } from './components/order-candidate-list/order-per-diem-candidates-list/order-per-diem-candidates-list.component';
+import { CandidatesStatusModalComponent } from './components/order-candidate-list/order-per-diem-candidates-list/candidates-status-modal/candidates-status-modal.component';
+import { ReorderCandidatesListComponent } from './components/order-candidate-list/reorder-candidates-list/reorder-candidates-list.component';
+import { ReorderStatusDialogComponent } from './components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/reorder-status-dialog.component';
 
 const icons = {
   AlertCircle,
@@ -176,6 +178,7 @@ const COMPONENTS = [
   GridSubrowReorderComponent,
   OrderReOrdersListComponent,
   OrderReOrdersContainerComponent,
+  ReorderCandidatesListComponent,
 ];
 
 @NgModule({
@@ -231,6 +234,7 @@ const COMPONENTS = [
     NavigationPanelComponent,
     CandidateAvatarPipe,
     CandidatesStatusModalComponent,
+    ReorderStatusDialogComponent,
   ],
   providers: [
     DatePipe,
