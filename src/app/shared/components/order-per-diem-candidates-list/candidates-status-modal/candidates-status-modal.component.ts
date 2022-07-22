@@ -1,4 +1,8 @@
+import { ApplyOrderApplicants, ReloadOrderCandidatesLists } from "@agency/store/order-management.actions";
+import { OrderManagementState } from "@agency/store/order-management.state";
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ApplicantStatus } from "@shared/enums/applicant-status.enum";
+import { OrderApplicantsInitialData } from "@shared/models/order-applicants.model";
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { Observable, Subject, takeUntil } from 'rxjs';
@@ -26,10 +30,33 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   @Input() openEvent: Subject<boolean>;
   @Input() isAgency: boolean = false;
 
-  @Input() set candidateJob(value: OrderCandidateJob) {
+  @Input() set candidateJob(value: OrderCandidateJob | null) {
     this.candidateJobList = value;
-    this.patchForm(value);
+    if (value) {
+      this.patchForm(value);
+    } else {
+      this.form.reset();
+    }
   }
+
+  get showRejectButton(): boolean {
+    return !this.isAgency && [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded].includes(this.candidate.status);
+  }
+
+  get showOnboardButton(): boolean {
+    return !this.isAgency && [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded].includes(this.candidate.status);
+  }
+
+  get showApplyButton(): boolean {
+    return [ApplicantStatus.NotApplied].includes(this.candidate.status);
+  }
+
+  get showClockId(): boolean {
+    return ![ApplicantStatus.NotApplied].includes(this.candidate.status);
+  }
+
+  @Select(OrderManagementState.orderApplicantsInitialData)
+  public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
 
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
@@ -38,13 +65,15 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   public rejectReasons: RejectReason[] = [];
 
   private unsubscribe$: Subject<void> = new Subject();
-  private candidateJobList: OrderCandidateJob;
+  private candidateJobList: OrderCandidateJob | null;
+  private orderApplicantsInitialData: OrderApplicantsInitialData | null;
 
   constructor(private fb: FormBuilder, private store: Store) {}
 
   ngOnInit(): void {
     this.onOpenEvent();
     this.createForm();
+    this.subscribeOnInitialData();
     this.subscribeOnReasonsList();
   }
 
@@ -54,6 +83,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   }
 
   public closeDialog(): void {
+    this.orderApplicantsInitialData = null;
     this.sideDialog.hide();
     this.openEvent.next(false);
   }
@@ -83,6 +113,19 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
 
       //TODO: uncomment code, whe be is done
       //this.store.dispatch(new RejectCandidateJob(payload));
+      this.closeDialog();
+    }
+  }
+
+  public onApply(): void {
+    if (this.orderApplicantsInitialData) {
+      this.store.dispatch(new ApplyOrderApplicants({
+        orderId: this.orderApplicantsInitialData.orderId,
+        organizationId: this.orderApplicantsInitialData.organizationId,
+        candidateId: this.orderApplicantsInitialData.candidateId
+      })).subscribe(() => {
+        this.store.dispatch(new ReloadOrderCandidatesLists());
+      });
       this.closeDialog();
     }
   }
@@ -123,5 +166,21 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
       clockId: value.clockId,
       allow: value.allowDeployCredentials,
     });
+  }
+
+  private subscribeOnInitialData(): void {
+    this.orderApplicantsInitialData$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((data: OrderApplicantsInitialData) => {
+        if (data) {
+          this.orderApplicantsInitialData = data;
+          // TODO: add skill when BE is ready
+          this.form?.patchValue({
+            jobId: data.orderId,
+            locationName: data.locationName,
+            department: data.departmentName,
+          });
+        }
+      });
   }
 }

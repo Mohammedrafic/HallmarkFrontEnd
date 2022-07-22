@@ -18,8 +18,9 @@
         </div>
         <div class="e-card-content">
           <!--TODO: create and use ReadOnly Mode for it-->
-          <button ejs-button cssClass="e-outline" (click)="onReject()" *ngIf="!isAgency">Reject</button>
-          <button ejs-button cssClass="e-primary" (click)="onOnboard()" *ngIf="!isAgency">Onboard</button>
+          <button ejs-button cssClass="e-outline" (click)="onReject()" *ngIf="showRejectButton">Reject</button>
+          <button ejs-button cssClass="e-primary" (click)="onOnboard()" *ngIf="showOnboardButton">Onboard</button>
+          <button ejs-button cssClass="e-primary" (click)="onApply()" *ngIf="showApplyButton">Apply</button>
           <button ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
             <i-feather name="x" class="icon"></i-feather>
           </button>
@@ -60,7 +61,7 @@
                       <input appValidateWithMessage formControlName="skill" class="e-input" type="text" readonly/>
                     </div>
                   </div>
-                  <div class="input-container bootstrap">
+                  <div *ngIf="showClockId" class="input-container bootstrap">
                     <label class="input-group">Clock ID</label>
                     <div class="input-group input-readonly">
                       <!--TODO: create and use ReadOnly Mode for it-->
@@ -68,7 +69,7 @@
                     </div>
                   </div>
                   <!--TODO: create and use ReadOnly Mode for it-->
-                  <div class="input-container bootstrap">
+                  <div *ngIf="showClockId" class="input-container bootstrap">
                     <ejs-checkbox [disabled]="isAgency" formControlName="allow" label="Allow deploy w/o credentials" maxlength="50"></ejs-checkbox>
                   </div>
                 </form>

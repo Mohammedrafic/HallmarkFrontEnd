@@ -22,7 +22,7 @@ import { UserState } from 'src/app/store/user.state';
 import { GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
-import { GetCandidateJob } from '@agency/store/order-management.actions';
+import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 
 @Component({
   selector: 'app-order-per-diem-candidates-list',
@@ -54,7 +54,7 @@ export class OrderPerDiemCandidatesListComponent
   public candidate: OrderCandidatesList;
   public isAgency: boolean;
   public openDetails = new Subject<boolean>();
-  public candidateJob: OrderCandidateJob;
+  public candidateJob: OrderCandidateJob | null;
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
@@ -107,21 +107,18 @@ export class OrderPerDiemCandidatesListComponent
     this.candidate = { ...data };
     this.addActiveCssClass(event);
 
-    //TODO: refactor it , when all modals will added
     if (this.order && this.candidate) {
       if (this.isAgency) {
-        if ([ApplicantStatus.OnBoarded].includes(this.candidate.status)) {
+        if ([ApplicantStatus.NotApplied].includes(this.candidate.status)) {
+          this.candidateJob = null;
+          this.store.dispatch(new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId));
+        } else {
           this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
-          this.openDetails.next(true);
         }
       } else {
-        if ([ApplicantStatus.Accepted, ApplicantStatus.OnBoarded].includes(this.candidate.status)) {
-          this.store.dispatch(
-            new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId)
-          );
-          this.openDetails.next(true);
-        }
+          this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
       }
+      this.openDetails.next(true);
     }
   }
 
