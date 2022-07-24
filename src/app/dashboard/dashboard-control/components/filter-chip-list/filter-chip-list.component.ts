@@ -38,8 +38,7 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
 
   @Output() private filterModified: EventEmitter<boolean> = new EventEmitter();
 
-  @ViewChild('filterChips', { static: true }) private filterChipsContainer: ElementRef;
-  @ViewChild('resize', { static: true }) private resizeContainer: ElementRef;
+  @ViewChild('resize', { static: true }) private resizeContainer: ElementRef<HTMLElement>;
 
   private filteredItems: FilteredItem[];
   private regions: OrganizationRegion[] = [];
@@ -64,24 +63,17 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
       } else {
         this.showMoreLessBtn = false;
         this.isCollapsed = false;
-        this.filterChipsContainer.nativeElement.style.height = '42px';
       }
     });
   }
 
   onCollapseExpandList(): void {
     this.isCollapsed = !this.isCollapsed;
-    if (this.isCollapsed) {
-      this.filterChipsContainer.nativeElement.style.height = 'auto';
-    } else {
-      this.filterChipsContainer.nativeElement.style.height = '42px';
-    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     changes['items'] && this.toPutInOrderFilters(this.items);
     this.regions = this.allRegions;
-    this.filteredItems = this.items;
   }
 
   public deleteChip(event: DeleteEventArgs): void {
@@ -90,11 +82,10 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
     const filteredItem = event.data as FilteredItem;
 
     if (filteredItem.column === 'regionIds') {
-      const regions = [];
-      regions.push(this.regions.find((region: OrganizationRegion) => region.id === filteredItem.value));
+      const regions = this.regions.filter((region: OrganizationRegion) => region.id === filteredItem.value);
 
-      regions.forEach((region: OrganizationRegion | undefined) => {
-        if (region?.id && region.id === filteredItem.value) {
+      regions.forEach((region: OrganizationRegion) => {
+        if (region.id && region.id === filteredItem.value) {
           this.manageDashboardFilter('regionIds', region.id);
 
           region.locations?.forEach((location: OrganizationLocation) => {
@@ -107,10 +98,8 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
         }
       });
     } else if (filteredItem.column === 'locationIds') {
-      const regions = this.regions.find((region) =>
-        region.locations?.find((location: OrganizationLocation) => location.id === filteredItem.value)
-      );
-      const location = regions?.locations?.find((location: OrganizationLocation) => location.id === filteredItem.value);
+      const region = this.regions.find((region) => region.locations?.find((location: OrganizationLocation) => location.id === filteredItem.value));
+      const location = region?.locations?.find((location: OrganizationLocation) => location.id === filteredItem.value);
       this.manageDashboardFilter('locationIds', location.id);
 
       location.departments.forEach((department: OrganizationDepartment) =>
@@ -137,6 +126,7 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
 
   private toPutInOrderFilters(filters: FilteredItem[]): void {
     this.appliedFilters = {} as Record<FilterName, FilteredItem[]>;
+    this.filteredItems = filters;
 
     filters.forEach((filter: FilteredItem) => {
       const filterKey: FilterName = FilterKeys[filter.column as FilterColumn];

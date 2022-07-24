@@ -1,5 +1,5 @@
 <div class="filter-chip-list">
-  <div class="chips-wrapper" #filterChips>
+  <div [ngClass]="['chips-wrapper', isCollapsed ? 'is-collapsed' : '']">
     <div class="chips-list" #resize>
       <div class="applied-filters">Applied Filters: {{ items.length ? '' : 'None' }}</div>
       <div class="chips-title" *ngFor="let filter of chipList">
