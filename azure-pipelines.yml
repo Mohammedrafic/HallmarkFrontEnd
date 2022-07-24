@@ -12,10 +12,10 @@ trigger:
 - strory*
 
 pool:
-  vmImage: ubuntu-latest
-  # name: prduse2
-  # demands:
-  #   - agent.name -equals softserve
+  # vmImage: ubuntu-latest
+  name: prduse2
+  demands:
+    - agent.name -equals softserve
 
 resources: 
 - repo: self
