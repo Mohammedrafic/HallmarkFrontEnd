@@ -12,7 +12,7 @@ import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import { DashboardDataModel } from '../models/dashboard-data.model';
 import { widgetTypeToConfigurationMapper } from '../constants/widget-type-to-configuration-mapper';
 import { FilteredItem } from '@shared/models/filter.model';
-import { DASHBOARD_FILTER_STATE } from '@shared/constants';
+import { DASHBOARD_FILTER_STATE, TIME_SELECTION_OF_CHART_LINE } from '@shared/constants';
 import { DashboardFiltersModel } from '../models/dashboard-filters.model';
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
 
@@ -23,7 +23,7 @@ export interface DashboardStateModel {
   isMobile: boolean;
   filteredItems: FilteredItem[];
   dashboardFilterState: DashboardFiltersModel;
-  positionTrendTimeSelection: TimeSelectionEnum | null;
+  positionTrendTimeSelection: TimeSelectionEnum;
 }
 
 @State<DashboardStateModel>({
@@ -35,7 +35,7 @@ export interface DashboardStateModel {
     isMobile: false,
     filteredItems: JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [],
     dashboardFilterState: {} as DashboardFiltersModel,
-    positionTrendTimeSelection: null,
+    positionTrendTimeSelection: JSON.parse(window.localStorage.getItem(TIME_SELECTION_OF_CHART_LINE) as string) || TimeSelectionEnum.Weekly,
   },
 })
 @Injectable()
@@ -137,7 +137,8 @@ export class DashboardState {
   }
 
   @Action(SwitchMonthWeekTimeSelection)
-  private weekMonth({patchState}: StateContext<DashboardStateModel>, { payload }: SwitchMonthWeekTimeSelection) {
+  private switchMonthWeekTimeSelection({patchState}: StateContext<DashboardStateModel>, { payload }: SwitchMonthWeekTimeSelection) {
     patchState({positionTrendTimeSelection: payload})
+    window.localStorage.setItem(TIME_SELECTION_OF_CHART_LINE, JSON.stringify(payload));
   }
 }

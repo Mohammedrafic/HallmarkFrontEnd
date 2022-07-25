@@ -32,6 +32,7 @@ import { SwitchMonthWeekTimeSelection } from '../../store/dashboard.actions';
 export class LineChartComponent extends AbstractSFComponentDirective<ChartComponent> implements OnChanges {
   @Input() public chartData: PositionsByTypeAggregatedModel | undefined;
   @Input() public isLoading: boolean;
+  @Input() public timeSelection: TimeSelectionEnum;
 
   public primaryYAxis: AxisModel = {
     minimum: 0,
@@ -79,6 +80,7 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
 
   public ngOnChanges(changes: SimpleChanges): void {
     changes['chartData'] && this.handleChartDataChange();
+    this.monthMode = this.timeSelection === TimeSelectionEnum.Monthly;
   }
 
   public trackByHandler(_: number, keyValue: KeyValue<string, PositionByTypeDataModel[]>): string {
