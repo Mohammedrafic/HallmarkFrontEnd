@@ -62,7 +62,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   }
 
   get showRejectButton(): boolean {
-    return [ApplicantStatusEnum.Offered, ApplicantStatusEnum.Accepted].includes(this.candidate?.status);
+    return this.isAgency && [ApplicantStatusEnum.Offered, ApplicantStatusEnum.Accepted].includes(this.candidate?.status);
   }
 
   get isRejected(): boolean {
@@ -70,11 +70,11 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   }
 
   get showAcceptButton(): boolean {
-    return [ApplicantStatusEnum.Offered].includes(this.candidate.status);
+    return this.isAgency && [ApplicantStatusEnum.Offered].includes(this.candidate?.status);
   }
 
   get showApplyButton(): boolean {
-    return [ApplicantStatusEnum.NotApplied].includes(this.candidate?.status);
+    return this.isAgency && [ApplicantStatusEnum.NotApplied].includes(this.candidate?.status);
   }
 
   get showClockId(): boolean {
