@@ -35,11 +35,6 @@ export const MENU_CONFIG: any = {
       icon: 'lock',
       route: '',
     },
-    //7: {
-    //  // Financial Module
-    //  icon: 'dollar-sign',
-    //  route: '',
-    //},
     8: {
       // Master Data
       icon: 'user',
@@ -170,11 +165,11 @@ export const MENU_CONFIG: any = {
       icon: 'lock',
       route: '',
     },
-    //7: {
-    //  // Financial Module
-    //  icon: 'dollar-sign',
-    //  route: '',
-    //},
+    7: {
+      // Financial Module
+      icon: 'dollar-sign',
+      route: '',
+    },
     8: {
       // Master Data
       icon: 'user',
@@ -300,11 +295,11 @@ export const MENU_CONFIG: any = {
       icon: 'lock',
       route: '',
     },
-    //7: {
-    //  // Financial Module
-    //  icon: 'dollar-sign',
-    //  route: '',
-    //},
+    7: {
+      // Financial Module
+      icon: 'dollar-sign',
+      route: '',
+    },
     8: {
       // Master Data
       icon: 'user',
