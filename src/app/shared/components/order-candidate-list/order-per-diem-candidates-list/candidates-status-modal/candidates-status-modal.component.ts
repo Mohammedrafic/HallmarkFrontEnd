@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { merge, Observable, Subject, takeUntil } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -18,7 +18,14 @@ import {
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
-import { ApplyOrderApplicants, ReloadOrderCandidatesLists, UpdateAgencyCandidateJob } from '@agency/store/order-management.actions';
+import {
+  ApplyOrderApplicants,
+  GetRejectReasonsForAgency,
+  RejectCandidateForAgencySuccess,
+  RejectCandidateJob as RejectAgencyCandidateJob,
+  ReloadOrderCandidatesLists,
+  UpdateAgencyCandidateJob
+} from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 
 @Component({
@@ -29,6 +36,10 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.rejectionReasonsList)
   rejectionReasonsList$: Observable<RejectReason[]>;
+
+  @Select(OrderManagementState.rejectionReasonsList)
+  agencyRejectionReasonsList$: Observable<RejectReason[]>;
+
   @Select(OrderManagementContentState.applicantStatuses)
   applicantStatuses$: Observable<ApplicantStatus[]>;
 
@@ -49,7 +60,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   }
 
   get showRejectButton(): boolean {
-    return [ApplicantStatusEnum.Offered].includes(this.candidate.status);
+    return [ApplicantStatusEnum.Offered, ApplicantStatusEnum.Accepted].includes(this.candidate.status);
   }
 
   get isRejected(): boolean {
@@ -116,7 +127,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   }
 
   public onReject(): void {
-    this.store.dispatch(new GetRejectReasonsForOrganisation());
+    this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
   }
 
@@ -136,7 +147,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
 
       const value = this.rejectReasons.find((reason: RejectReason) => reason.id === event.rejectReason)?.reason;
       this.form.patchValue({ rejectReason: value });
-      this.store.dispatch(new RejectCandidateJob(payload));
+      this.store.dispatch(this.isAgency ? new RejectAgencyCandidateJob(payload) : new RejectCandidateJob(payload));
       this.closeDialog();
     }
   }
@@ -204,17 +215,24 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   }
 
   private subscribeOnReasonsList(): void {
-    this.rejectionReasonsList$.pipe(takeUntil(this.unsubscribe$)).subscribe((reasons: RejectReason[]) => {
-      this.rejectReasons = reasons;
-    });
+    merge(this.rejectionReasonsList$, this.agencyRejectionReasonsList$)
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((reasons: RejectReason[]) => {
+        this.rejectReasons = reasons;
+      });
   }
 
   private subscribeOnSuccessRejection(): void {
     this.actions$
       .pipe(ofActionSuccessful(RejectCandidateForOrganisationSuccess), takeUntil(this.unsubscribe$))
       .subscribe(() => {
-        this.form.disable();
         this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+      });
+
+    this.actions$
+      .pipe(ofActionSuccessful(RejectCandidateForAgencySuccess), takeUntil(this.unsubscribe$))
+      .subscribe(() => {
+        this.store.dispatch(new ReloadOrderCandidatesLists());
       });
   }
 
@@ -242,11 +260,11 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
       .subscribe((data: OrderApplicantsInitialData) => {
         if (data) {
           this.orderApplicantsInitialData = data;
-          // TODO: add skill when BE is ready
           this.form?.patchValue({
             jobId: data.orderId,
             locationName: data.locationName,
             department: data.departmentName,
+            skill: data.skill
           });
         }
       });
