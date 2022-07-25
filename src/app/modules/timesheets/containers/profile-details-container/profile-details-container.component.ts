@@ -88,9 +88,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @Select(TimesheetsState.timesheetDetailsMilesStatistics)
   public readonly milesData$: Observable<CandidateMilesData>
 
-  @Select(TimesheetsState.timesheetDetailsChartsVisible)
-  public readonly chartsVisible$: Observable<boolean>
-
   public readonly exportedFileType: typeof ExportedFileType = ExportedFileType;
   public readonly allowedFileExtensions: string = FileExtensionsString;
   public readonly maxFileSize: number = FileSize.MB_10;

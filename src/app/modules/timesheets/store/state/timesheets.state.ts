@@ -146,16 +146,6 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static timesheetDetailsChartsVisible(state: TimesheetsModel): boolean {
-    if (state?.timesheetDetails) {
-      const { weekMiles = 0, cumulativeMiles = 0} = state.timesheetDetails.timesheetStatistic;
-      return weekMiles + cumulativeMiles > 0;
-    }
-
-    return false;
-  }
-
-  @Selector([TimesheetsState])
   static addDialogOpen(state: TimesheetsModel): { state: boolean, type: RecordFields, initDate: string } {
     return {
       state: state.isAddDialogOpen.action,
