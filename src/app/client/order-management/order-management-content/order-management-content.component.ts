@@ -474,9 +474,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onRowClick(event: any): void {
-    if (event.data.isTemplate) {
-      return;
-    }
     if (event.target) {
       this.excludeDeployed = false;
     }
@@ -661,7 +658,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.store.dispatch(new GetAvailableSteps(order.organizationId, candidate.jobId));
   }
 
-  private deleteOrder(id: number): void {
+  public deleteOrder(id: number): void {
     this.confirmService
       .confirm(DELETE_RECORD_TEXT, {
         title: DELETE_RECORD_TITLE,
@@ -678,11 +675,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public menuOptionSelected(event: any, data: OrderManagement): void {
     switch (Number(event.item.properties.id)) {
       case MoreMenuType['Edit']:
-        if (!isNil(data.reOrderFromId) && data.reOrderFromId !== 0) {
-          this.store.dispatch([new ShowSideDialog(true), new GetOrderById(data.id, data.organizationId, {} as any)]);
-        } else {
-          this.router.navigate(['./edit', data.id], { relativeTo: this.route });
-        }
+        this.editOrder(data);
         break;
       case MoreMenuType['Duplicate']:
         // TODO: pending implementation
@@ -706,6 +699,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public collapseAll(): void {
     this.isSubrowDisplay = false;
     super.onSubrowAllToggle();
+  }
+
+  public editOrder(data: OrderManagement): void {
+    if (!isNil(data.reOrderFromId) && data.reOrderFromId !== 0) {
+      this.store.dispatch([new ShowSideDialog(true), new GetOrderById(data.id, data.organizationId, {} as any)]);
+    } else {
+      this.router.navigate(['./edit', data.id], { relativeTo: this.route });
+    }
   }
 
   private onReloadOrderCandidatesLists(): void {
@@ -973,7 +974,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.store.dispatch(new SetLock(order.id, !order.isLocked, this.filters));
   }
 
-  disabledLock(status: OrderStatus): boolean {
+  public disabledLock(status: OrderStatus): boolean {
     const statuses = [this.orderStatus.Open, this.orderStatus.InProgress, this.orderStatus.Filled];
 
     return !statuses.includes(status);

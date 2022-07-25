@@ -9,10 +9,12 @@
   ></app-input>
   <ejs-grid
     *ngIf="templates$ | async as templates"
-    [dataSource]="templates?.items"
+    [dataSource]="templates"
     [columns]="gridConfig.columns"
     [allowSorting]="gridConfig.allowSorting"
     [resizeSettings]="gridConfig.resizeSettings"
     [allowResizing]="gridConfig.allowResizing"
+    [enableVirtualization]="gridConfig.enableVirtualization"
+    [height]="gridConfig.height"
   ></ejs-grid>
 </div>

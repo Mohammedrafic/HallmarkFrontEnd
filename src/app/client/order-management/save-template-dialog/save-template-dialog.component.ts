@@ -1,3 +1,7 @@
+import { Observable } from 'rxjs';
+import { Dialog, DialogUtility } from '@syncfusion/ej2-angular-popups';
+import { VirtualScrollService } from '@syncfusion/ej2-angular-grids';
+
 import {
   AfterViewInit,
   Component,
@@ -9,34 +13,31 @@ import {
   Output,
   ViewChild,
 } from '@angular/core';
-import { Select, Store } from '@ngxs/store';
-import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Observable } from 'rxjs';
-import { OrderManagementPage } from '@shared/models/order-management.model';
-import { Dialog, DialogUtility } from '@syncfusion/ej2-angular-popups';
-import { ClearOrders, GetOrders } from '@client/store/order-managment-content.actions';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
 import { gridConfig } from './tamplate-table-config';
+import { Order, OrderManagement } from '@shared/models/order-management.model';
+import { SaveTemplateDialogService } from '@client/order-management/save-template-dialog/save-template-dialog.service';
 
 @Component({
   selector: 'app-save-template-dialog',
   templateUrl: './save-template-dialog.component.html',
   styleUrls: ['./save-template-dialog.component.scss'],
+  providers: [VirtualScrollService],
 })
 export class SaveTemplateDialogComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() templateTitle: string;
+  @Input() order: Order;
   @Output() closeEmitter: EventEmitter<void> = new EventEmitter<void>();
   @Output() createEmitter: EventEmitter<{ templateTitle: string }> = new EventEmitter<{ templateTitle: string }>();
-
   @ViewChild('saveTemplate', { static: false }) saveTemplateElement: ElementRef<HTMLElement>;
 
-  @Select(OrderManagementContentState.ordersPage) templates$: Observable<OrderManagementPage>;
+  public readonly gridConfig = gridConfig;
 
   public templateForm: FormGroup;
   public dialog: Dialog;
-  public gridConfig = gridConfig;
+  public templates$: Observable<OrderManagement[]>;
 
-  public constructor(private store: Store, private formBuilder: FormBuilder) {}
+  public constructor(private formBuilder: FormBuilder, private saveTemplateDialogService: SaveTemplateDialogService) {}
 
   public ngOnInit(): void {
     this.initForm();
@@ -49,7 +50,6 @@ export class SaveTemplateDialogComponent implements OnInit, AfterViewInit, OnDes
 
   public ngOnDestroy(): void {
     this.dialog.destroy();
-    this.store.dispatch(new ClearOrders());
   }
 
   private onCancel(): void {
@@ -64,12 +64,12 @@ export class SaveTemplateDialogComponent implements OnInit, AfterViewInit, OnDes
 
   private initForm(): void {
     this.templateForm = this.formBuilder.group({
-      templateTitle: [this.templateTitle ?? '', Validators.required],
+      templateTitle: [this.order.title ?? '', Validators.required],
     });
   }
 
   private getTemplates(): void {
-    this.store.dispatch(new GetOrders({ isTemplate: true }));
+    this.templates$ = this.saveTemplateDialogService.getFilteredTemplates(this.order);
   }
 
   private initDialog(): void {
@@ -83,9 +83,7 @@ export class SaveTemplateDialogComponent implements OnInit, AfterViewInit, OnDes
       position: { X: 'center', Y: 'center' },
       animationSettings: { effect: 'Zoom' },
       cssClass: 'unsaved-changes-dialog save-template-dialog',
-      close: () => {
-        this.onCancel();
-      },
+      close: () => this.onCancel(),
     });
   }
 }

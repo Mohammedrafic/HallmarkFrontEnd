@@ -13,6 +13,7 @@
       </div>
     </button>
     <button
+      *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates"
       ejs-dropdownbutton
       [items]="exportOptions"
       (select)="exportSelected($event)"
@@ -113,8 +114,8 @@
 
           <ng-template #templateButtons>
             <div class="row-tool-buttons" (click)="stopPropagation($event)">
-              <span><i-feather name="edit" class="icon edit-template"></i-feather></span>
-              <span class="remove-button"><i-feather name="trash-2" class="icon delete-template"></i-feather></span>
+              <i-feather name="edit" class="icon edit-template" (click)="editOrder(data)"></i-feather>
+              <i-feather name="trash-2" class="icon delete-template" (click)="deleteOrder(data?.orderId)"></i-feather>
             </div>
           </ng-template>
         </ng-template>

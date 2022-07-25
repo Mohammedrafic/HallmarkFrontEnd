@@ -103,8 +103,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
   }
 
-  public get jobTitle(): string {
-    return this.orderDetailsFormComponent.generalInformationForm.get('title')?.value;
+  public get generalInformationForm(): Order {
+    return this.orderDetailsFormComponent.generalInformationForm.value;
   }
 
   public ngOnInit(): void {
@@ -472,21 +472,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private saveAsTemplate(): void {
-    const { selectedRegion, selectedLocation, selectedDepartment, selectedSkills } = this.orderDetailsFormComponent;
-    const requiredFields = [selectedRegion, selectedSkills, selectedDepartment, selectedLocation];
+    const { regionId, locationId, departmentId, skillId } = this.orderDetailsFormComponent.generalInformationForm.value;
+    const requiredFields = [regionId, skillId, departmentId, locationId];
     const isRequiredFieldsFilled = !some(isNil, requiredFields);
 
     if (isRequiredFieldsFilled) {
       this.isSaveForTemplate = true;
     } else {
-      this.getOrderDetailsControl('regionId')?.markAllAsTouched();
-      this.getOrderDetailsControl('skillId')?.markAllAsTouched();
-      if (this.orderDetailsFormComponent.isLocationsDropDownEnabled) {
-        this.getOrderDetailsControl('locationId')?.markAllAsTouched();
-      }
-      if (this.orderDetailsFormComponent.isDepartmentsDropDownEnabled) {
-        this.getOrderDetailsControl('departmentId')?.markAllAsTouched();
-      }
+      this.markControlsAsRequired();
     }
   }
 
@@ -506,5 +499,16 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     const documents = this.orderDetailsFormComponent.documents;
     this.store.dispatch(new SaveOrder(extendedOrder, documents));
     this.closeSaveTemplateDialog();
+  }
+
+  private markControlsAsRequired(): void {
+    this.getOrderDetailsControl('regionId')?.markAsTouched();
+    this.getOrderDetailsControl('skillId')?.markAsTouched();
+    if (this.orderDetailsFormComponent.isLocationsDropDownEnabled) {
+      this.getOrderDetailsControl('locationId')?.markAsTouched();
+    }
+    if (this.orderDetailsFormComponent.isDepartmentsDropDownEnabled) {
+      this.getOrderDetailsControl('departmentId')?.markAsTouched();
+    }
   }
 }
