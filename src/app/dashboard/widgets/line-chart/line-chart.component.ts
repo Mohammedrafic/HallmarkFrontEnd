@@ -1,3 +1,6 @@
+import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
+import type { KeyValue } from '@angular/common';
+
 import flow from 'lodash/fp/flow';
 import values from 'lodash/fp/values';
 import flatten from 'lodash/fp/flatten';
@@ -12,14 +15,13 @@ import type {
   CrosshairSettingsModel,
 } from '@syncfusion/ej2-charts';
 import type { ChartComponent } from '@syncfusion/ej2-angular-charts';
-
-import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
-import type { KeyValue } from '@angular/common';
+import { Store } from '@ngxs/store';
 
 import type { PositionByTypeDataModel, PositionsByTypeAggregatedModel } from '../../models/positions-by-type-aggregated.model';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
 import { PositionTypeEnum } from '../../enums/position-type.enum';
 import { TimeSelectionEnum } from '../../enums/time-selection.enum';
+import { SwitchMonthWeekTimeSelection } from '../../store/dashboard.actions';
 
 @Component({
   selector: 'app-line-chart',
@@ -71,6 +73,10 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
     visible: true,
   };
 
+  constructor(private readonly store: Store) {
+    super();
+  }
+
   public ngOnChanges(changes: SimpleChanges): void {
     changes['chartData'] && this.handleChartDataChange();
   }
@@ -103,6 +109,6 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
 
   public onSwicthTo(timeSelection: TimeSelectionEnum): void {
     this.monthMode = !this.monthMode;
-    console.error(timeSelection);
+    this.store.dispatch(new SwitchMonthWeekTimeSelection(timeSelection));
   }
 }

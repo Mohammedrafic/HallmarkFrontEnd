@@ -48,20 +48,21 @@ import { candidateLegendPalette } from '../constants/candidate-legend-palette';
 import { CandidateChartStatuses } from '../enums/candidate-legend-palette.enum';
 import { Router } from '@angular/router';
 import { PositionTrend, PositionTrendDto } from '../models/position-trend.model';
+import { TimeSelectionEnum } from '../enums/time-selection.enum';
 
 @Injectable()
 export class DashboardService {
   private readonly baseUrl = '/api/Dashboard';
   private readonly widgetTypeToDataMapper: Record<
     WidgetTypeEnum,
-    (filters: DashboardFiltersModel) => Observable<unknown>
+    (filters: DashboardFiltersModel, timeSelection: TimeSelectionEnum | null) => Observable<unknown>
   > = {
     [WidgetTypeEnum.APPLICANTS_BY_REGION]: (filters: DashboardFiltersModel) => this.getApplicantsByRegionWidgetData(filters),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
     [WidgetTypeEnum.CANDIDATES]: (filters: DashboardFiltersModel) => this.getCandidatesWidgetData(filters),
     [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filters: DashboardFiltersModel) => this.getFilledPositionTrendWidgetData(filters),
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.InProgress),
-    [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboardFiltersModel) => this.getPositionsByTypes(filters),
+    [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboardFiltersModel, timeSelection: TimeSelectionEnum | null) => this.getPositionsByTypes(filters, timeSelection),
     [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
     [WidgetTypeEnum.OPEN_POSITIONS]: (filters,) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
     [WidgetTypeEnum.INVOICES]: () => this.getInvocesWidgetData(),
@@ -95,6 +96,7 @@ export class DashboardService {
   public getWidgetsAggregatedData([
     panels,
     filters,
+    timeSelection
   ]: WidgetDataDependenciesAggregatedModel): Observable<WidgetsDataModel> {
     const data: Record<WidgetTypeEnum, Observable<WidgetsDataModel[keyof WidgetsDataModel]>> = reduce(
       panels,
@@ -103,7 +105,7 @@ export class DashboardService {
         panel: PanelModel
       ) => ({
         ...accumulator,
-        [panel.id as WidgetTypeEnum]: this.widgetTypeToDataMapper[panel.id as WidgetTypeEnum]?.(filters) ?? of(null),
+        [panel.id as WidgetTypeEnum]: this.widgetTypeToDataMapper[panel.id as WidgetTypeEnum]?.(filters, timeSelection) ?? of(null),
       }),
       {}
     ) as Record<WidgetTypeEnum, Observable<WidgetsDataModel[keyof WidgetsDataModel]>>;
@@ -193,7 +195,7 @@ export class DashboardService {
       .pipe(map((panels) => JSON.parse(panels.state)));
   }
 
-  private getPositionsByTypes(filter: DashboardFiltersModel): Observable<PositionsByTypeAggregatedModel> {
+  private getPositionsByTypes(filter: DashboardFiltersModel, timeSelection: TimeSelectionEnum | null): Observable<PositionsByTypeAggregatedModel> {
     const timeRanges = this.calculateTimeRanges();
     return this.httpClient
       .post<PositionsByTypeResponseModel>(`${this.baseUrl}/getopenclosedonboardamount`, { ...timeRanges, ...filter })
