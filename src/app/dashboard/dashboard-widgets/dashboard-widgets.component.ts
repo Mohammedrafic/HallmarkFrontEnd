@@ -5,6 +5,7 @@ import type { DashboardLayoutComponent, PanelModel } from '@syncfusion/ej2-angul
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import type { WidgetsDataModel } from '../models/widgets-data.model';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
+import { TimeSelectionEnum } from '../enums/time-selection.enum';
 
 @Component({
   selector: 'app-dashboard-widgets',
@@ -16,6 +17,7 @@ export class DashboardWidgetsComponent extends AbstractSFComponentDirective<Dash
   @Input() public isLoading: boolean;
   @Input() public panels: PanelModel[];
   @Input() public widgetsData: WidgetsDataModel | null;
+  @Input() public timeSelection: TimeSelectionEnum;
 
   @Output() public dashboardCreatedEmitter: EventEmitter<void> = new EventEmitter();
   @Output() public dragStopEmitter: EventEmitter<void> = new EventEmitter();
