@@ -48,6 +48,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   @Select(DashboardState.isDashboardLoading) public readonly isLoading$: Observable<DashboardStateModel['isDashboardLoading']>;
   @Select(DashboardState.isMobile) private readonly isMobile$: Observable<DashboardStateModel['isMobile']>;
   @Select(DashboardState.dashboardFiltersState) private readonly dashboardFiltersState$: Observable<DashboardFiltersModel>;
+  @Select(DashboardState.getTimeSelection) private readonly timeSelection$: Observable<DashboardStateModel['positionTrendTimeSelection']>
 
   @Select(UserState.lastSelectedOrganizationId) private readonly organizationId$: Observable<UserStateModel['lastSelectedOrganizationId']>;
   @Select(UserState.lastSelectedOrganizationAgency) private readonly lastSelectedOrganizationAgency$: Observable<string>;
@@ -199,7 +200,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     const formChanges$ = this.filtersGroup.valueChanges.pipe(startWith(this.filtersGroup.value));
     const panels$ = this.getPanels$();
 
-    this.widgetsData$ = combineLatest([panels$, formChanges$]).pipe(
+    this.widgetsData$ = combineLatest([panels$, formChanges$, this.timeSelection$]).pipe(
       distinctUntilChanged(
         (previous: WidgetDataDependenciesAggregatedModel, current: WidgetDataDependenciesAggregatedModel) =>
           isEqual(previous, current)
