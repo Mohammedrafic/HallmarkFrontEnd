@@ -7,6 +7,7 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 })
 export class OrderManagementAgencyService extends DestroyableDirective {
   public orderPerDiemId$: Subject<number> = new Subject<number>();
+  public excludeDeployed: boolean;
 
   private _orderPerDiemId: number | null;
 
