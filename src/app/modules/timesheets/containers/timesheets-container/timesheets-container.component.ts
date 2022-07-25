@@ -87,9 +87,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public handleChangeTab(tabIndex: number): void {
     this.activeTabIdx = tabIndex;
     this.store.dispatch(new Timesheets.UpdateFiltersState({
-      statusIds: this.tabConfig[tabIndex].value ?
-        [`${this.tabConfig[tabIndex].value}`] :
-        [],
+      statusIds: this.tabConfig[tabIndex].value
     }));
   }
 

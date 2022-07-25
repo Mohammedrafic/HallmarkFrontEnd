@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { catchError, filter, forkJoin, map, mergeMap, Observable, of, switchMap, take, tap, throttleTime } from 'rxjs';
+import { catchError, debounceTime, filter, forkJoin, map, mergeMap, Observable, of, switchMap, take, tap, throttleTime } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -78,6 +78,11 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
+  static timesheetsFiltersColumns(state: TimesheetsModel): FilterColumns {
+    return state.timesheetsFiltersColumns;
+  }
+
+  @Selector([TimesheetsState])
   static isTimesheetOpen(state: TimesheetsModel): boolean {
     return state.isTimeSheetOpen;
   }
@@ -120,11 +125,6 @@ export class TimesheetsState {
   @Selector([TimesheetsState])
   static billRateTypes(state: TimesheetsModel): unknown {
     return state.billRateTypes;
-  }
-
-  @Selector([TimesheetsState])
-  static timesheetsFiltersColumns(state: TimesheetsModel): FilterColumns {
-    return state.timesheetsFiltersColumns;
   }
 
   @Selector([TimesheetsState])
@@ -372,21 +372,20 @@ export class TimesheetsState {
   @Action(Timesheets.SetFiltersDataSource)
   SetFiltersDataSource(
     { setState }: StateContext<TimesheetsModel>,
-    { payload }: Timesheets.SetFiltersDataSource
-  ): Observable<FilterDataSource> {
-    return this.timesheetsApiService.setDataSources(payload)
+    { columnKey, dataSource }: Timesheets.SetFiltersDataSource
+  ): Observable<null> {
+    return of(null)
       .pipe(
-        tap((res: FilterDataSource) => {
-          Object.keys(res).forEach((key: string) => {
-            setState(patch({
-              timesheetsFiltersColumns: patch({
-                [key]: patch({
-                  dataSource: res[key as TimesheetsTableFiltersColumns],
-                })
+        debounceTime(100),
+        tap(() =>
+          setState(patch({
+            timesheetsFiltersColumns: patch({
+              [columnKey]: patch({
+                dataSource: dataSource,
               })
-            }))
-          });
-        })
+            })
+          }))
+        )
       );
   }
 
