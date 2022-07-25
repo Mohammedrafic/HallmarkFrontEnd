@@ -5,6 +5,10 @@
   </div>
 
   <div class="stick-right header-content">
+    <div class="other-icons">
+      <i-feather name="help-circle" class="icon" (click)="onGetHelp()"></i-feather>
+    </div>
+
     <div class="switcher-container" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea)">
       <app-organization-agency-selector></app-organization-agency-selector>
       <div class="devider"></div>

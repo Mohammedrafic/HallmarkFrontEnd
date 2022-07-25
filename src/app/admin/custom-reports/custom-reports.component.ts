@@ -15,7 +15,7 @@ export class CustomReportsComponent implements OnInit {
   constructor(private store: Store,
     private router: Router,
     private route: ActivatedRoute,sanitizer: DomSanitizer) {
-store.dispatch(new SetHeaderState({ title: 'Custom Reports', iconName: 'user' }));
+store.dispatch(new SetHeaderState({ title: 'Analytics', iconName: 'user' }));
 this._sanitizer=sanitizer;
 }
 

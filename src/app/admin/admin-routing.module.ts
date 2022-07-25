@@ -81,7 +81,7 @@ const routes: Routes = [
         loadChildren: () => import('../modules/invoices/invoices.module').then((m) => m.InvoicesModule),
       },
       {
-        path: 'custom-reports',
+        path: 'analytics',
         component: CustomReportsComponent
       }
     ],

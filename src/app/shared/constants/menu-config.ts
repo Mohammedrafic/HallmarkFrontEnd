@@ -139,7 +139,7 @@ export const MENU_CONFIG: any = {
     32: {
       // Custom Reports
       icon: 'Truck',
-      route: '/admin/custom-reports',
+      route: '/admin/analytics',
     },
   },
 
