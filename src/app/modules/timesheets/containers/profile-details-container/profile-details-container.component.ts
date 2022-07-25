@@ -4,7 +4,7 @@ import {
   Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { filter, Observable, take, takeUntil, switchMap, throttleTime, forkJoin, of, tap } from 'rxjs';
+import { filter, Observable, take, takeUntil, switchMap, throttleTime, forkJoin, of } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
@@ -318,6 +318,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       ?.querySelector('button')?.click();
   }
 
+  /**
+   * TODO: date pipe is always defined, needs check
+   */
   private generateDateTime(datePipe: DatePipe): string {
     return datePipe ? datePipe.transform(Date.now(), 'MM/dd/yyyy hh:mm a') as string : '';
   }

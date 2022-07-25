@@ -1,14 +1,6 @@
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges
-} from '@angular/core';
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
+  Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
@@ -18,7 +10,8 @@ import { filter } from 'rxjs/operators';
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
 import { Destroyable } from '@core/helpers';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion,
+  OrganizationStructure } from '@shared/models/organization.model';
 
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
