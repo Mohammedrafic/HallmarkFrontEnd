@@ -26,7 +26,7 @@ import {
   RejectCandidateForAgencySuccess,
   RejectCandidateJob as RejectAgencyCandidateJob,
   ReloadOrderCandidatesLists,
-  UpdateAgencyCandidateJob
+  UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
 
@@ -62,7 +62,9 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   }
 
   get showRejectButton(): boolean {
-    return this.isAgency && [ApplicantStatusEnum.Offered, ApplicantStatusEnum.Accepted].includes(this.candidate?.status);
+    return (
+      this.isAgency && [ApplicantStatusEnum.Offered, ApplicantStatusEnum.Accepted].includes(this.candidate?.status)
+    );
   }
 
   get isRejected(): boolean {
@@ -121,6 +123,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
     this.orderApplicantsInitialData = null;
     this.sideDialog.hide();
     this.openEvent.next(false);
+    this.nextApplicantStatuses = [];
   }
 
   public onReject(): void {
@@ -271,7 +274,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   private subscribeOnUpdateCandidateJobSucceed(): void {
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed))
-      .subscribe(() => this.sideDialog.hide());
+      .subscribe(() => this.closeDialog());
   }
 
   private subscribeOnGetStatus(): void {
@@ -290,7 +293,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
             jobId: data.orderId,
             locationName: data.locationName,
             department: data.departmentName,
-            skill: data.skill
+            skill: data.skill,
           });
         }
       });
