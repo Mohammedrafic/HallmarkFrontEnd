@@ -27,7 +27,14 @@ export class DateTimeHelper {
   }
 
   public static toUtc(date: string | Date): string {
-    const init = date as Date;
-    return new Date(Date.UTC(init.getFullYear(), init.getMonth(), init.getDate(), init.getHours(), init.getMinutes())).toISOString();
+
+    if (typeof date === 'string') {
+      const gmt = new Date(this.convertDateToUtc(date));
+      return new Date(Date.UTC(gmt.getFullYear(),
+      gmt.getMonth(), gmt.getDate(), gmt.getHours(), gmt.getMinutes())).toISOString();
+    }
+
+    return new Date(Date.UTC(date.getFullYear(),
+    date.getMonth(), date.getDate(), date.getHours(), date.getMinutes())).toISOString();
   }
 }

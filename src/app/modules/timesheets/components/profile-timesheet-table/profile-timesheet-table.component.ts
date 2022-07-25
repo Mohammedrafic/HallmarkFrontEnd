@@ -82,7 +82,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private idsToDelete: number[] = [];
 
-  context: { componentParent: ProfileTimesheetTableComponent };
+  public context: { componentParent: ProfileTimesheetTableComponent };
 
   constructor(
     private store: Store,
@@ -92,7 +92,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   ) {
     super();
     this.context = {
-      componentParent: this
+      componentParent: this,
     };
   }
 
@@ -158,6 +158,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.setInitialTableState();
   }
 
+  /**
+   * Commented for demo purposes only.
+   */
   public saveChanges(): void {
     // const diffs = this.timesheetRecordsService.findDiffs(
     //   this.records[this.currentTab], this.formControls, this.timesheetColDef);

@@ -332,9 +332,10 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   private setOrgId(): void {
     this.timesheetDetails$
     .pipe(
-      filter(Boolean)
+      filter(Boolean),
+      takeUntil(this.componentDestroy()),
     )
-    .subscribe(({id, organizationId}) => {
+    .subscribe(({ organizationId }) => {
       this.organizationId = this.isAgency ? organizationId : null;
     });
   }
