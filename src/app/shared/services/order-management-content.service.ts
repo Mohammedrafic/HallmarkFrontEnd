@@ -367,8 +367,19 @@ export class OrderManagementContentService {
         return this.http.post(`/api/Agency/ReOrders/export`, payload, { responseType: 'blob' }); // TODO: modification pending after BE implementation
       case AgencyOrderManagementTabs.MyAgency:
         return this.http.post(`/api/agency/orders/export`, payload, { responseType: 'blob' });
+      case AgencyOrderManagementTabs.PerDiem:
+        return this.http.post(`/api/agency/orders/perdiem/export`, payload, { responseType: 'blob' });
       default:
         return this.http.post(`/api/Agency/export`, payload, { responseType: 'blob' });
     }
+  }
+
+  /**
+   * Duplicate order by id
+   * @param payload order id to duplicate
+   * @return id of newly created order
+   */
+  public duplicate(payload: number): Observable<number> {
+    return this.http.post<number>(`/api/Orders/${payload}/duplicate`, {});
   }
 }

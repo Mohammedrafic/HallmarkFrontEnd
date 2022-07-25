@@ -1,20 +1,11 @@
+import { ActivatedRoute } from '@angular/router';
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Inject,
-  Input,
-  OnInit,
-  Output,
-  ViewChild
-} from '@angular/core';
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
+  Inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
 import {
-  filter,
-  takeUntil,
-  Observable,
+  filter, takeUntil, Observable,
 } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { tap } from 'rxjs/operators';
@@ -24,11 +15,13 @@ import { CustomFormGroup } from '@core/interface';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { TimesheetsState } from './../../store/state/timesheets.state';
 import { AddRecordService } from '../../services/add-record.service';
-import { EditTimsheetForm } from '../../interface';
+import { AddTimsheetForm } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
-import { TimesheetEditDialogConfig, ConfirmAddFormCancel } from '../../constants';
+import { RecordAddDialogConfig, ConfirmAddFormCancel } from '../../constants';
 import { DialogAction, FieldType, RecordFields } from '../../enums';
 import { TimesheetDateHelper } from '../../helpers';
+import { RecordsAdapter } from '../../helpers/records.adapter';
+import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 
 @Component({
   selector: 'app-add-timesheet',
@@ -41,17 +34,24 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
 
   @Input() profileId: number;
 
-  @Output() updateTable: EventEmitter<void> = new EventEmitter<void>();
+  @Output() readonly updateTable: EventEmitter<void> = new EventEmitter<void>();
 
   public targetElement: HTMLBodyElement;
 
-  public form: CustomFormGroup<EditTimsheetForm>;
+  public form: CustomFormGroup<AddTimsheetForm>;
 
   public readonly FieldTypes = FieldType;
 
-  public dialogConfig = TimesheetEditDialogConfig;
+  public readonly dialogConfig = RecordAddDialogConfig;
 
-  public formType: RecordFields;
+  public formType: RecordFields = RecordFields.Time;
+
+  public readonly dropDownFields = {
+    text: 'text',
+    value: 'value',
+  };
+
+  private isAgency: boolean;
 
   @Select(TimesheetsState.addDialogOpen)
   public readonly dialogState$: Observable<{ state: boolean, type: RecordFields, initDate: string }>
@@ -61,10 +61,12 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
     private store: Store,
     private addRecordService: AddRecordService,
     private cd: ChangeDetectorRef,
+    private route: ActivatedRoute,
     @Inject(GlobalWindow) private readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
     super();
     this.targetElement = this.globalWindow.document.body as HTMLBodyElement;
+    this.isAgency = this.route.snapshot.data['isAgencyArea'];
   }
 
   ngOnInit(): void {
@@ -96,7 +98,11 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
 
   public saveForm(): void {
     if (this.form.valid) {
-      this.sideAddDialog.hide();
+      const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
+
+      const body = RecordsAdapter.adaptRecordAddDto(this.form.value, organizationId, id, this.formType);
+      this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
+      this.closeDialog();
     } else {
       this.form.updateValueAndValidity();
       this.cd.detectChanges();
@@ -132,7 +138,7 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
   }
 
   private populateOptions(): void {
-    this.dialogConfig[this.formType].forEach((item) => {
+    this.dialogConfig[this.formType].fields.forEach((item) => {
       if (item.optionsStateKey) {
         item.options = this.store.snapshot().timesheets[item.optionsStateKey]
       }

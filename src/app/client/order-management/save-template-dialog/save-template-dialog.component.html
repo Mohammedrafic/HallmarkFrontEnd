@@ -1,0 +1,20 @@
+<div #saveTemplate class="template-dialog">
+  <app-input
+    [formGroupInstance]="templateForm"
+    [required]="true"
+    label="Template Name"
+    controlName="templateTitle"
+    id="templateTitle"
+    class="template-title"
+  ></app-input>
+  <ejs-grid
+    *ngIf="templates$ | async as templates"
+    [dataSource]="templates"
+    [columns]="gridConfig.columns"
+    [allowSorting]="gridConfig.allowSorting"
+    [resizeSettings]="gridConfig.resizeSettings"
+    [allowResizing]="gridConfig.allowResizing"
+    [enableVirtualization]="gridConfig.enableVirtualization"
+    [height]="gridConfig.height"
+  ></ejs-grid>
+</div>

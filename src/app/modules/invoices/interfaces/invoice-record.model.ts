@@ -1,4 +1,4 @@
-import { TimesheetRecord } from '../../timesheets/interface';
+import { RecordValue } from '../../timesheets/interface';
 
 
 export interface InvoiceRecord {
@@ -16,5 +16,5 @@ export interface InvoiceRecord {
   timesheetId: number;
   minRate?: number;
   maxRate?: number;
-  timesheets?: TimesheetRecord[];
+  timesheets?: RecordValue[];
 }

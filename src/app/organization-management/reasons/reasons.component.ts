@@ -3,7 +3,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
 import { RemoveRejectReasons, SaveClosureReasons, SaveClosureReasonsError, SaveRejectReasons, SaveRejectReasonsError, SaveRejectReasonsSuccess, UpdateClosureReasonsSuccess, UpdateRejectReasons } from '@organization-management/store/reject-reason.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CANCEL_REJECTION_REASON, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, ONLY_LETTERS } from '@shared/constants';
+import { CANCEL_REJECTION_REASON, CHARS_HYPHEN_APOSTROPHE, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, ONLY_LETTERS } from '@shared/constants';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { delay, filter, takeWhile } from 'rxjs';
@@ -48,7 +48,7 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
   private createForm(): void {
     this.form = new FormGroup({
       id: new FormControl(null),
-      reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(ONLY_LETTERS)])
+      reason: new FormControl('', [Validators.required, Validators.maxLength(100), Validators.minLength(3), Validators.pattern(CHARS_HYPHEN_APOSTROPHE)])
     })
   }
 

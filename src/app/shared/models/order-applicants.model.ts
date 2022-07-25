@@ -13,6 +13,7 @@ export type OrderApplicantsInitialData = {
   yearsOfExperience: number;
   expAsTravelers?: number;
   requestComment?: string;
+  skill?: string;
 }
 
 export type OrderApplicantsApplyData = {

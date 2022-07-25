@@ -10,6 +10,8 @@ import {
   ClearSuggestions,
   DeleteOrder,
   DeleteOrderSucceeded,
+  DuplicateOrder,
+  DuplicateOrderSuccess,
   EditOrder,
   ExportOrders,
   GetAgencyOrderCandidatesList,
@@ -663,6 +665,15 @@ export class OrderManagementContentState {
       tap((file) => {
         const url = window.URL.createObjectURL(file);
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      })
+    );
+  }
+
+  @Action(DuplicateOrder)
+  DuplicateOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { payload }: DuplicateOrder): Observable<number> {
+    return this.orderManagementService.duplicate(payload).pipe(
+      tap((id: number) => {
+        dispatch(new DuplicateOrderSuccess(id));
       })
     );
   }

@@ -13,7 +13,8 @@ import { CandidateInfoUIItem, TimesheetDetailsModel } from "../../interface";
 export class ProfileDetailsJobInfoComponent implements OnChanges {
   public items: CandidateInfoUIItem[] = [];
 
-  public isAgency: boolean;
+  @Input()
+  public isAgency: boolean = false;
 
   @Input()
   public jobData: TimesheetDetailsModel | null;

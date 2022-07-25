@@ -2,14 +2,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   OnInit,
-  ChangeDetectorRef,
+  ChangeDetectorRef, ViewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { filter } from 'rxjs/operators';
-import { distinctUntilChanged, Observable, switchMap, takeUntil } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { Destroyable } from '@core/helpers';
@@ -23,6 +22,9 @@ import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { DialogAction, ExportType } from '../../enums';
 import { TimesheetsService } from '../../services/timesheets.service';
 import { Timesheets } from '../../store/actions/timesheets.actions';
+import { ProfileDetailsContainerComponent } from '../profile-details-container/profile-details-container.component';
+import { AppState } from '../../../../store/app.state';
+import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 
 @Component({
   selector: 'app-timesheets-container.ts',
@@ -31,6 +33,9 @@ import { Timesheets } from '../../store/actions/timesheets.actions';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TimesheetsContainerComponent extends Destroyable implements OnInit {
+  @ViewChild(ProfileDetailsContainerComponent)
+  public timesheetDetailsComponent: ProfileDetailsContainerComponent;
+
   @Select(TimesheetsState.timesheets)
   readonly timesheets$: Observable<TimeSheetsPage>;
 
@@ -40,11 +45,15 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   @Select(TimesheetsState.organizations)
   readonly organizations$!: Observable<DataSourceItem[]>;
 
+  @Select(AppState.isOrganizationAgencyArea)
+  isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
+
   @Select(UserState.user)
   readonly user$: Observable<User>;
 
   public readonly tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
   public activeTabIdx = 0;
+  public appliedFiltersAmount = 0;
   public readonly exportOptions: ItemModel[] = TimesheetExportOptions;
   public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
   public filters: TimesheetsFilterState | undefined;
@@ -65,12 +74,13 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     store.dispatch(new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }));
 
     this.isAgency = this.router.url.includes('agency');
-    this.store.dispatch(new Timesheets.UpdateFiltersState({ isAgency: this.isAgency }));
   }
 
   ngOnInit(): void {
     if (this.isAgency) {
       this.initOrganizationsList();
+    } else {
+      this.store.dispatch(new Timesheets.UpdateFiltersState());
     }
 
     this.initTabsCount();
@@ -82,9 +92,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public handleChangeTab(tabIndex: number): void {
     this.activeTabIdx = tabIndex;
     this.store.dispatch(new Timesheets.UpdateFiltersState({
-      statusIds: this.tabConfig[tabIndex].value ?
-        [`${this.tabConfig[tabIndex].value}`] :
-        [],
+      statusIds: this.tabConfig[tabIndex].value
     }));
   }
 
@@ -131,6 +139,10 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.store.dispatch(new Timesheets.UpdateFiltersState({ orderBy: event }));
   }
 
+  public changeFiltersAmount(amount: number): void {
+    this.appliedFiltersAmount = amount;
+  }
+
   private startFiltersWatching(): void {
     this.timesheetsFilters$.pipe(
       filter(Boolean),
@@ -156,8 +168,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   private initOrganizationsList(): void {
     this.store.dispatch(new Timesheets.GetOrganizations()).pipe(
-      filter((res) => res.length),
-      switchMap(() => this.organizations$),
+      switchMap(() => this.organizations$.pipe(
+        filter((res: DataSourceItem[]) => !!res.length),
+      )),
       takeUntil(this.componentDestroy()),
     ).subscribe(res => {
       this.organizationControl.setValue(res[0].id, { emitEvent: false });
