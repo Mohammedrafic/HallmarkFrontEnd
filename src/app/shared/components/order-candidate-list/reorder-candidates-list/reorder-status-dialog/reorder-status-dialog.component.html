@@ -7,14 +7,72 @@
   [visible]="false"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
-  <ng-container *ngTemplateOutlet="templateState">
-    <ng-template #ngSwitchDefault>
-      {{ templateState }}
-    </ng-template>
-  </ng-container>
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption candidat-status">
+            <h3 class="e-card-title candidate-title">
+              {{ candidate?.lastName }}, {{ candidate?.firstName }}
+              <!-- <i-feather name="briefcase" class="icon deployed-icon" *ngIf="isDeployedCandidate"></i-feather> -->
+            </h3>
+          </div>
+          <div class="e-card-content">
+            <button ejs-button [isPrimary]="true" class="apply-button" (click)="onAccept()">Accept</button>
+            <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
+              <i-feather name="x" class="icon"></i-feather>
+            </button>
+          </div>
+        </div>
+      </section>
+      <section class="content-container">
+        <div class="job-details">
+          <ejs-accordion
+            #accordionElement
+            expandMode="Single"
+            (expanding)="toForbidExpandSecondRow($event)"
+            (clicked)="clickedOnAccordion($event)"
+          >
+            <e-accordionitems>
+              <e-accordionitem expanded="true">
+                <ng-template #header>
+                  <div>Job Details</div>
+                </ng-template>
+                <ng-template #content>
+                  <app-accept-form [formGroup]="acceptForm"></app-accept-form>
+                </ng-template>
+              </e-accordionitem>
+              <e-accordionitem>
+                <ng-template #header>
+                  <div>Historical Events</div>
+                </ng-template>
+                <ng-template #content>
+                  <!-- <app-historical-events [organizationId]="organizationId" [candidateJobId]="candidate.candidateJobId" [candidateId]='candidate.candidateId'></app-historical-events> -->
+                </ng-template>
+              </e-accordionitem>
+            </e-accordionitems>
+          </ejs-accordion>
+        </div>
+        <div class="comments">
+          <app-comments></app-comments>
+        </div>
+      </section>
+
+      <section class="bill-rates">
+        <app-bill-rates-view-grid
+          [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
+        ></app-bill-rates-view-grid>
+      </section>
+    </section>
+  </ng-template>
 
   <ng-template #footerTemplate>
-    <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>
+    <app-dialog-next-previous
+      title="Candidate"
+      [options]="dialogNextPreviousOption"
+      (nextEvent)="onNextPreviousOrder(true)"
+      (previousEvent)="onNextPreviousOrder(false)"
+    ></app-dialog-next-previous>
   </ng-template>
 </ejs-dialog>
 

@@ -75,7 +75,7 @@ import { OrderReOrdersListComponent } from './components/order-reorders-list/ord
 import { CustomProgressBarComponent } from './components/custom-progress-bar/custom-progress-bar.component';
 import { ApplyCandidateComponent } from './components/order-candidate-list/order-candidates-list/apply-candidate/apply-candidate.component';
 import { AcceptCandidateComponent } from './components/order-candidate-list/order-candidates-list/accept-candidate/accept-candidate.component';
-import { DatePickerModule, DateRangePickerModule } from '@syncfusion/ej2-angular-calendars';
+import { DatePickerModule, DateRangePickerModule, TimePickerAllModule } from '@syncfusion/ej2-angular-calendars';
 import { OnboardedCandidateComponent } from './components/order-candidate-list/order-candidates-list/onboarded-candidate/onboarded-candidate.component';
 import { BillRatesViewGridComponent } from './components/bill-rates-view-grid/bill-rates-view-grid.component';
 import { CommentsComponent } from './components/comments/comments.component';
@@ -112,6 +112,8 @@ import { OrderPerDiemCandidatesListComponent } from './components/order-candidat
 import { CandidatesStatusModalComponent } from './components/order-candidate-list/order-per-diem-candidates-list/candidates-status-modal/candidates-status-modal.component';
 import { ReorderCandidatesListComponent } from './components/order-candidate-list/reorder-candidates-list/reorder-candidates-list.component';
 import { ReorderStatusDialogComponent } from './components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/reorder-status-dialog.component';
+import { AcceptFormComponent } from './components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
+import { NgxMaskModule } from 'ngx-mask';
 
 const icons = {
   AlertCircle,
@@ -203,6 +205,7 @@ const COMPONENTS = [
     DatePickerModule,
     CheckBoxModule,
     TooltipModule,
+    TimePickerAllModule,
     GridModule,
     NumericTextBoxModule,
     PagerModule,
@@ -214,6 +217,7 @@ const COMPONENTS = [
     FilterDialogModule,
     SideMenuModule,
     SwitchModule,
+    NgxMaskModule.forChild(),
   ],
   exports: [
     ...COMPONENTS,
@@ -235,6 +239,7 @@ const COMPONENTS = [
     CandidateAvatarPipe,
     CandidatesStatusModalComponent,
     ReorderStatusDialogComponent,
+    AcceptFormComponent,
   ],
   providers: [
     DatePipe,

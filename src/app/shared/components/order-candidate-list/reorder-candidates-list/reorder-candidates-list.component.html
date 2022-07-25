@@ -143,5 +143,9 @@
 
 <app-reorder-status-dialog
   [openEvent]="openDetails"
-  [templateState]="templateState$ | async"
+  [candidate]="candidate"
+  [isAgency]="isAgency"
+  [dialogNextPreviousOption]="dialogNextPreviousOption"
+  (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-reorder-status-dialog>
+
