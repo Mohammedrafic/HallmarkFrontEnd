@@ -47,8 +47,8 @@
           </div>
         </div>
       </section>
-      <div class="order-tabs" [ngClass]="{ 'first-active': firstActive && orderStatus.Incomplete !== order?.status }">
-        <ejs-tab #tab *ngIf="orderStatus.Incomplete !== order?.status" (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
+      <div class="order-tabs">
+        <ejs-tab #tab *ngIf="orderStatus.Incomplete !== order?.status" (selecting)="onTabSelecting($event)">
           <e-tabitems>
             <e-tabitem>
               <ng-template #headerText>{{isReOrder ? 'Re-Order' : 'Order'}} Details</ng-template>
@@ -76,7 +76,7 @@
             </e-tabitem>
           </e-tabitems>
         </ejs-tab>
-        <ejs-tab #tab *ngIf="orderStatus.Incomplete === order?.status" (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
+        <ejs-tab #tab *ngIf="orderStatus.Incomplete === order?.status" (selecting)="onTabSelecting($event)">
           <e-tabitems>
             <e-tabitem>
               <ng-template #headerText>Order Details</ng-template>

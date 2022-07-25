@@ -52,11 +52,13 @@ import { OrderType, OrderTypeOptions } from '@shared/enums/order-type';
 import { DatePipe, Location } from '@angular/common';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import {
+  allOrdersChildColumnsToExport,
   AllOrdersColumnsConfig,
   allOrdersColumnsToExport,
   MoreMenuType,
   orderTemplateColumnsConfig,
   OrderTypeName,
+  perDiemChildColumnsToExport,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
   reOrdersChildColumnToExport,
@@ -328,22 +330,18 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
-        this.columnsToExport = allOrdersColumnsToExport;
         this.filters.isTemplate = false;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.PerDiem:
-        // TODO: perdiem
         this.filters.orderTypes = [OrderType.OpenPerDiem];
         this.filters.includeReOrders = true;
         this.filters.isTemplate = false;
-        this.columnsToExport = perDiemColumnsToExport;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.ReOrders:
         this.filters.orderTypes = [OrderType.ReOrder];
         this.filters.isTemplate = false;
-        this.columnsToExport = reOrdersColumnsToExport;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.Incomplete:
@@ -356,6 +354,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
     }
+    this.checkSelectedChildrenItem();
   }
 
   public onFilterClose() {
@@ -405,12 +404,33 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private checkSelectedChildrenItem(): void {
-    const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children.length !== 0);
+    const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children?.length !== 0);
+    const hasSelectedChildReorders = this.selectedItems.some((itm) => itm.reOrders?.length !== 0);
 
-    if (this.activeTab === OrganizationOrderManagementTabs.ReOrders) {
-      this.columnsToExport = hasSelectedItemChildren
-        ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
-        : reOrdersColumnsToExport;
+    switch (this.activeTab) {
+      case OrganizationOrderManagementTabs.AllOrders:
+        if (this.selectedItems.length === 0) {
+          this.columnsToExport = [...allOrdersColumnsToExport, ...allOrdersChildColumnsToExport];
+          return;
+        }
+        this.columnsToExport = hasSelectedItemChildren
+          ? [...allOrdersColumnsToExport, ...allOrdersChildColumnsToExport]
+          : allOrdersColumnsToExport;
+        break;
+      case OrganizationOrderManagementTabs.PerDiem:
+        if (this.selectedItems.length === 0) {
+          this.columnsToExport = [...perDiemColumnsToExport, ...perDiemChildColumnsToExport];
+          return;
+        }
+        this.columnsToExport = hasSelectedChildReorders
+          ? [...perDiemColumnsToExport, ...perDiemChildColumnsToExport]
+          : perDiemColumnsToExport;
+        break;
+      case OrganizationOrderManagementTabs.ReOrders:
+        this.columnsToExport = hasSelectedItemChildren
+          ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
+          : reOrdersColumnsToExport;
+        break;
     }
   }
 

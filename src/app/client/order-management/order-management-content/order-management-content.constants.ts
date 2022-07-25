@@ -68,6 +68,29 @@ export const reOrdersChildColumnToExport: ExportColumn[] = [
   { text: 'Onboarded', column: 'Onboarded' },
 ];
 
+export const allOrdersChildColumnsToExport: ExportColumn[] = [
+  { text: 'Position ID', column: 'PositionId' },
+  { text: 'Candidate Name', column: 'CandidateName' },
+  { text: 'Position Status', column: 'ChildOrderStatus' },
+  { text: 'Candidate Status', column: 'CandidateStatus' },
+  { text: 'Candidate Skill', column: 'ChildOrderSkill' },
+  { text: 'Candidate Bill Rate', column: 'CandidateBillRate' },
+  { text: 'Submission %', column: 'SubmissionsPercentage' },
+  { text: 'Onboard %', column: 'OnboardedPercentage' },
+];
+
+export const perDiemChildColumnsToExport: ExportColumn[] = [
+  { text: 'Re-Order ID', column: 'ReOrders.Id' },
+  { text: 'Re-Order Status', column: 'ReOrders.Status' },
+  { text: 'Open Positions', column: 'ReOrders.OpenPositions' },
+  { text: 'Agencies', column: 'ReOrders.Agencies' },
+  { text: 'Re-Order Bill Rate', column: 'ReOrders.BillRate' },
+  { text: 'Re-Order Date', column: 'ReOrders.StartDate' },
+  { text: 'Re-Order Shift Start Time', column: 'ReOrders.ShiftStartTime' },
+  { text: 'Re-Order Shift End Time', column: 'ReOrders.ShiftEndTime' },
+  { text: 'Candidates', column: 'ReOrders.Candidates' },
+];
+
 export const ReOrdersColumnsConfig = [
   {
     fieldName: 'reOrderFromId',
