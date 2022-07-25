@@ -1,15 +1,6 @@
-import { ActivatedRoute } from '@angular/router';
 import {
-  AfterViewInit,
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewChild,
-} from '@angular/core';
+  AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component,
+  EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { combineLatest, Observable, takeUntil } from 'rxjs';
@@ -22,19 +13,14 @@ import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-c
 import { Destroyable } from '@core/helpers';
 import { RecordFields } from './../../enums/timesheet-common.enum';
 import {
-  TimesheetRecordsColdef,
-  TimesheetRecordsColConfig,
-  RecordsTabConfig,
-} from './../../constants/timsheets-details.constant';
+  TimesheetRecordsColdef, TimesheetRecordsColConfig, RecordsTabConfig, ConfirmRecordDelete,
+  ConfirmTabChange,
+} from './../../constants';
 import { ConfirmService } from './../../../../shared/services/confirm.service';
 import { TabConfig, DropdownOption } from './../../interface/common.interface';
-import { ConfirmTabChange } from './../../constants/confirm-delete-timesheet-dialog-content.const';
 import { DialogActionPayload, OpenAddDialogMeta, TimesheetRecordsDto } from '../../interface';
 import { TimesheetRecordsService } from '../../services/timesheet-records.service';
 import { TimesheetsState } from '../../store/state/timesheets.state';
-import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
-import { RecordsAdapter } from '../../helpers';
-import { TIMETHEETS_STATUSES } from '../../enums';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -45,7 +31,7 @@ import { TIMETHEETS_STATUSES } from '../../enums';
   styleUrls: ['./profile-timesheet-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileTimesheetTableComponent extends Destroyable implements AfterViewInit, OnInit {
+export class ProfileTimesheetTableComponent extends Destroyable implements AfterViewInit {
   @ViewChild('tabs') readonly tabs: TabComponent;
 
   @ViewChild('grid') readonly grid: IClientSideRowModel;
@@ -76,15 +62,15 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public readonly modules: Module[] = [ClientSideRowModelModule];
 
-  public tabsConfig: TabConfig[] = RecordsTabConfig;
-
-  public records: TimesheetRecordsDto;
+  public readonly tabsConfig: TabConfig[] = RecordsTabConfig;
 
   public currentTab: RecordFields = RecordFields.Time;
 
   public isFirstSelected = true;
 
-  public actionsAvaliable = true;
+  public recordsToShow: TimesheetRecordsDto;
+
+  private records: TimesheetRecordsDto;
 
   private isChangesSaved = true;
 
@@ -94,6 +80,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private slectingindex: number;
 
+  private idsToDelete: number[] = [];
+
+  context: { componentParent: ProfileTimesheetTableComponent };
+
   constructor(
     private store: Store,
     private confirmService: ConfirmService,
@@ -101,10 +91,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     private cd: ChangeDetectorRef,
   ) {
     super();
-  }
-
-  ngOnInit(): void {
-    this.checkIfActionsAvaliable();
+    this.context = {
+      componentParent: this
+    };
   }
 
   ngAfterViewInit(): void {
@@ -144,7 +133,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public openAddDialog(): void {
     const startDate = this.store.snapshot().timesheets.selectedTimeSheet.startDate;
-    console.log(this.store.snapshot().timesheets.selectedTimeSheet)
 
     this.openAddSideDialog.emit({
       currentTab: this.currentTab,
@@ -165,36 +153,57 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   public cancelChanges(): void {
     this.changesSaved.emit(true);
     this.isChangesSaved = true;
+    this.recordsToShow = JSON.parse(JSON.stringify(this.records));
+    this.idsToDelete = [];
     this.setInitialTableState();
   }
 
   public saveChanges(): void {
-    const diffs = this.timesheetRecordsService.findDiffs(
-      this.records[this.currentTab], this.formControls, this.timesheetColDef);
+    // const diffs = this.timesheetRecordsService.findDiffs(
+    //   this.records[this.currentTab], this.formControls, this.timesheetColDef);
 
-    const recordsToUpdate = this.records[this.currentTab].map((record) => {
-      const updatedItem = diffs.find((item) => item.id === record.id);
-      if (updatedItem) {
-        return updatedItem
-      }
-      return record;
-    });
+    // const recordsToUpdate = this.records[this.currentTab].map((record) => {
+    //   const updatedItem = diffs.find((item) => item.id === record.id);
+    //   if (updatedItem) {
+    //     return updatedItem
+    //   }
+    //   return record;
+    // });
+    // const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
+    // const dto = RecordsAdapter.adaptRecordPutDto(
+    //   recordsToUpdate, organizationId, id, this.currentTab, this.idsToDelete);
 
-    const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
-    const dto = RecordsAdapter.adaptRecordPutDto(recordsToUpdate, organizationId, id, this.currentTab);
-    this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
-    .pipe(
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe(() => {
-      this.changesSaved.emit(true);
-      this.isChangesSaved = true;
-      this.setInitialTableState();
-    });
+    // this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
+    // .pipe(
+    //   takeUntil(this.componentDestroy()),
+    // )
+    // .subscribe(() => {
+    //   this.changesSaved.emit(true);
+    //   this.isChangesSaved = true;
+    //   this.setInitialTableState();
+    // });
+    this.cancelChanges();
   }
 
   public trackByIndex(index: number, item: TabConfig): number {
     return index;
+  }
+
+  public deleteRecord(id: number): void {
+    this.confirmService.confirm(ConfirmRecordDelete, {
+      title: 'Delete Record',
+      okButtonLabel: 'Proceed',
+      okButtonClass: 'delete-button',
+    })
+    .pipe(
+      filter(Boolean),
+      takeUntil(this.componentDestroy())
+    )
+    .subscribe(() => {
+      this.idsToDelete.push(id);
+      this.recordsToShow[this.currentTab] = this.recordsToShow[this.currentTab].filter((record) => record.id !== id);
+      this.cd.markForCheck();
+    });
   }
 
   private selectTab(index: number): void {
@@ -210,7 +219,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   private getRecords(): void {
     this.timesheetRecords$
     .pipe(
-      tap((res) => { this.records = res;}),
+      tap((res) => {
+        this.records = res;
+        this.recordsToShow = JSON.parse(JSON.stringify(res));
+      }),
       switchMap(() => {
         return combineLatest([
           this.billRates$,
@@ -218,11 +230,12 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         ]);
       }),
       filter(() => !!this.gridApi),
-      tap((data) => { this.controlTabsVisibility(data[0]) }),
+      tap((data) => { this.timesheetRecordsService.controlTabsVisibility(data[0], this.tabs) }),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
       this.gridApi.setColumnDefs(this.timesheetColDef);
+      this.cd.markForCheck();
     });
   }
 
@@ -273,20 +286,5 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         this.changesSaved.emit(false);
       }
     })
-  }
-
-  private controlTabsVisibility(billRates: DropdownOption[]): void {
-    const isMilageAvaliable = billRates.some((rate) => rate.text.includes('Mileage'));
-    const isExpensesAvaliable = billRates.some((rate) => rate.text.includes('Expenses'));
-
-    this.tabs.hideTab(1, !isMilageAvaliable);
-    this.tabs.hideTab(2, !isExpensesAvaliable);
-  }
-
-  private checkIfActionsAvaliable(): void {
-    const status = this.store.snapshot().timesheets.selectedTimeSheet.statusText;
-
-    this.actionsAvaliable = status !== TIMETHEETS_STATUSES.ORG_APPROVED
-    && status !== TIMETHEETS_STATUSES.APPROVED;
   }
 }

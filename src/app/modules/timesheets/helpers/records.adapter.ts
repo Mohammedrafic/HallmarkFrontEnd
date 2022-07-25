@@ -1,22 +1,22 @@
-import { RecordFields } from './../enums';
 import { DateTimeHelper } from '@core/helpers';
+import { RecordFields } from './../enums';
 import {
   AddRecordDto, AddTimsheetForm, PutRecord, PutRecordDto, RecordValue, TimesheetRecordsDto,
 } from '../interface';
 import { MapedRecordsType } from '../constants';
 
 export class RecordsAdapter {
-  static adaptRecordPutDto(diffs: RecordValue[], orgId: number, sheetId: number, type: RecordFields): PutRecordDto {
+  static adaptRecordPutDto(
+    diffs: RecordValue[], orgId: number, sheetId: number, type: RecordFields, delIds: number[]): PutRecordDto {
     return {
       timesheetId: sheetId,
       organizationId: orgId,
       type: MapedRecordsType[type],
-      deleteIds: [],
+      deleteIds: delIds,
       records: diffs.map((item) => this.adaptRecordsToPut(item)),
     }
   }
   
-
   static adaptRecordAddDto(
     data: AddTimsheetForm,
     orgId: number,
@@ -35,8 +35,6 @@ export class RecordsAdapter {
     }
   }
 
-  static adaptRecordDelete() {}
-
   static adaptRecordsDto(data: TimesheetRecordsDto): TimesheetRecordsDto {
     data.timesheets.forEach((item: RecordValue) => {
       item.day = item['timeIn'] as string
@@ -50,7 +48,7 @@ export class RecordsAdapter {
     return data;
   }
 
-  static adaptRecordsToPut(record: RecordValue): PutRecord {
+  private static adaptRecordsToPut(record: RecordValue): PutRecord {
     return {
       id: record.id,
       timeIn: record.timeIn,
