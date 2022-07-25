@@ -72,6 +72,10 @@ import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { OrderDetailsContainerComponent } from './order-management/order-details-container/order-details-container.component';
 import { OrderCandidatesContainerComponent } from './order-management/order-candidates-container/order-candidates-container.component';
 import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
+import { AgGridModule } from 'ag-grid-angular';
+import { ActionBtnCellRenderer } from './order-management/order-management-content/cell-render/action-btns-cellrender.component';
+import { StatusTextCellRenderer } from './order-management/order-management-content/cell-render/status-text-cellrender.component';
+import { DetailRowCellRenderer } from './order-management/order-management-content/cell-render/detail-cell-render.component';
 
 const gridIcons = {
   MessageSquare,
@@ -116,6 +120,9 @@ const gridIcons = {
     OrderDetailsDialogComponent,
     OrderDetailsContainerComponent,
     OrderCandidatesContainerComponent,
+    ActionBtnCellRenderer,
+    StatusTextCellRenderer,
+    DetailRowCellRenderer
   ],
   imports: [
     CommonModule,
@@ -144,7 +151,7 @@ const gridIcons = {
     DialogModule,
     RadioButtonModule,
     AddEditReorderModule,
-
+    AgGridModule,
     //STORE
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
   ],

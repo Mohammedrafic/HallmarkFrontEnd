@@ -12,4 +12,7 @@ export const widgetTypes: Record<string, WidgetTypeEnum> = {
   11: WidgetTypeEnum.INVOICES,
   12: WidgetTypeEnum.CHAT,
   13: WidgetTypeEnum.TASKS,
+  14: WidgetTypeEnum.APPLICANTS_BY_POSITIONS,
+
+
 };

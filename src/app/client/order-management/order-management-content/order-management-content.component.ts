@@ -73,6 +73,24 @@ import { TabNavigationComponent } from '@client/order-management/order-managemen
 import { OrderDetailsDialogComponent } from '@client/order-management/order-details-dialog/order-details-dialog.component';
 import isNil from 'lodash/fp/isNil';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
+import {
+  ColDef,
+  GridReadyEvent,
+  IServerSideDatasource,
+  IServerSideGetRowsRequest,
+  FirstDataRenderedEvent,
+  Module,
+} from 'ag-grid-community';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
+import 'ag-grid-enterprise';
+
+import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
+import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
+import { environment } from 'src/environments/environment';
+import { ActionBtnCellRenderer } from './cell-render/action-btns-cellrender.component';
+import { StatusTextCellRenderer } from './cell-render/status-text-cellrender.component';
+import { DetailRowCellRenderer } from './cell-render/detail-cell-render.component';
 
 @Component({
   selector: 'app-order-management-content',
@@ -182,6 +200,21 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private isRedirectedFromDashboard: boolean;
   private dashboardFilterSubscription: Subscription;
   private orderPerDiemId: number | null;
+  public gridApi: any;
+  public gridColumnApi: any;
+  public rowModelType: any;
+  public serverSideStoreType: any;
+  public paginationPageSize: any;
+  public cacheBlockSize: any;
+  public maxBlocksInCache: any;
+  public rowData: [];
+  modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
+  public rowGroupPanelShow = 'always';
+  public pivotPanelShow = 'none';
+  public noRowsTemplate: any;
+  public agRowHeight: number = 45;
+  public rowSelection: 'single' | 'multiple' = 'multiple';
+  public detailCellRenderer: any = DetailRowCellRenderer;
 
   constructor(
     private store: Store,
@@ -222,6 +255,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       agencyIds: new FormControl([]),
       agencyType: new FormControl('0'),
     });
+    this.rowModelType = 'serverSide';
+    this.serverSideStoreType = 'partial';
+    this.paginationPageSize = this.pageSize;
+    this.cacheBlockSize = this.pageSize;
+    this.maxBlocksInCache = 2;
+    this.noRowsTemplate = `"<span>no rows to show</span>"`;
   }
 
   ngOnInit(): void {
@@ -343,6 +382,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.columnsToExport = allOrdersColumnsToExport;
         this.store.dispatch(new GetIncompleteOrders({ pageNumber: this.currentPage, pageSize: this.pageSize }));
         break;
+    }
+    if (this.gridApi != null) {
+      var datasource = this.createServerSideDatasource();
+      this.gridApi.setServerSideDatasource(datasource);
     }
   }
 
@@ -1017,4 +1060,353 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((orderId: number) => (this.orderPerDiemId = orderId));
   }
+
+  isServerSideGroup = (dataItem: { group: any; }) => {
+    return dataItem.group;
+  };
+
+  getServerSideGroupKey = (dataItem: { id: any; }) => {
+    return dataItem.id;
+  };
+  columnDefs: ColDef[] = [
+    {
+      field: '',
+      filter: false,
+      sortable: false,
+      minWidth: 180,
+      pinned: 'left',
+      cellRenderer: ActionBtnCellRenderer,
+      cellRendererParams: {
+        clicked: (data: any) => {
+          this.lockOrder(data);
+        },
+        disabled: (data: any) => {
+          return this.disabledLock(data.status)
+        },
+        select: (event: any, data: any) => {
+          this.menuOptionSelected(event, data)
+        },
+        isLockMenuButtonsShown: this.isLockMenuButtonsShown,
+        moreMenuWithDeleteButton: this.moreMenuWithDeleteButton,
+        moreMenuWithCloseButton: this.moreMenuWithCloseButton
+      }
+    },
+    {
+      headerName: 'ORDER ID',
+      field: 'id',
+      pinned: 'left',
+      filter: 'agNumberColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        suppressAndOrCondition: true,
+      },
+      minWidth: 30,
+      cellRenderer: 'agGroupCellRenderer',
+      cellRendererParams: {
+        suppressCount: true,
+        suppressDoubleClickExpand: true,
+        innerRendererParams: { foo: 'bar' },
+        clicked: (data: any) => {
+          alert('hi details');
+        }
+      }
+    },
+    {
+      headerName: 'STATUS ID',
+      field: 'status',
+      filter: false,
+      hide: true
+    },
+    {
+      headerName: 'STATUS',
+      field: 'statusText',
+      minWidth: 180,
+      cellRenderer: StatusTextCellRenderer,
+      filter: 'agSetColumnFilter',
+      filterParams: {
+        values: (params: { success: (arg0: any) => void; }) => {
+          setTimeout(() => {
+            const values = this.getFilterOrderStatuses();
+            params.success(values);
+          }, 3000)
+        },
+        refreshValuesOnOpen: true,
+      }
+    },
+    {
+      headerName: 'JOB TITLE',
+      field: 'jobTitle',
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        suppressAndOrCondition: true,
+      }
+    },
+    {
+      headerName: 'SKILL ID',
+      field: 'skillId',
+      filter: false,
+      hide: true
+    },
+    {
+      headerName: 'SKILL',
+      field: 'skillName',
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        suppressAndOrCondition: true,
+      }
+    },
+    {
+      headerName: '# OF POSITIONS',
+      field: 'openPositions',
+      filter: 'agNumberColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        suppressAndOrCondition: true,
+      },
+    },
+    {
+      headerName: 'LOCATION ID',
+      field: 'locationId',
+      filter: false,
+      hide: true
+    },
+    {
+      headerName: 'LOCATION',
+      field: 'locationName',
+      filter: 'agSetColumnFilter',
+      filterParams: {
+        values: (params: { success: (arg0: any) => void; }) => {
+          setTimeout(() => {
+            const values = this.getFilterLocationValues();
+            params.success(values);
+          }, 3000)
+        },
+        refreshValuesOnOpen: true,
+      }
+    },
+    {
+      headerName: 'DEPARTMENT ID',
+      field: 'departmentId',
+      filter: false,
+      hide: true
+    },
+    {
+      headerName: 'DEPARTMENT',
+      field: 'departmentName',
+      filter: 'agSetColumnFilter',
+      filterParams: {
+        values: (params: { success: (arg0: any) => void; }) => {
+          setTimeout(() => {
+            const values = this.getFilterDepartmentValues();
+            params.success(values);
+          }, 3000)
+        },
+        refreshValuesOnOpen: true,
+      }
+    },
+    {
+      headerName: 'ORDER TYPE',
+      field: 'orderType',
+      cellRenderer: (params: { value: number; }) => {
+        return this.getOrderTypeName(params.value);
+      },
+      filter: 'agSetColumnFilter',
+      filterParams: {
+        values: (params: { success: (arg0: any) => void; }) => {
+          setTimeout(() => {
+            const values = this.getFilterOrderTypeValues();
+            params.success(values);
+          }, 3000)
+        },
+        refreshValuesOnOpen: true,
+      }
+    },
+    {
+      headerName: 'BILL RATE',
+      field: 'billRate',
+      filter: 'agNumberColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        suppressAndOrCondition: true,
+      },
+
+    },
+    {
+      headerName: 'CANDIDATES',
+      field: 'candidates',
+      filter: 'agNumberColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        suppressAndOrCondition: true,
+      },
+    },
+
+    {
+      headerName: 'START DATE',
+      field: 'startDate',
+      cellRenderer: (data: any) => {
+        const dateString = data.data.startDate;
+        const str = dateString.match(/\d+/g);
+        return str[1] + '/' + str[2] + '/' + str[0];
+      },
+      filter: 'agDateColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        suppressAndOrCondition: true,
+      },
+    },
+    {
+      headerName: 'REGION ID',
+      field: 'regionId',
+      filter: false,
+      hide: true
+    },
+    {
+      headerName: 'REGION NAME',
+      field: 'regionName',
+      filter: 'agSetColumnFilter',
+      filterParams: {
+        values: (params: { success: (arg0: any) => void; }) => {
+          setTimeout(() => {
+            const values = this.getFilterRegionValues();
+            params.success(values);
+          }, 3000)
+        },
+        refreshValuesOnOpen: true,
+      }
+    },
+
+    {
+      headerName: 'ORDER FILLDATE',
+      field: 'orderFillDate',
+      filter: false,
+      hide: true
+    },
+    {
+      headerName: 'ORDER OPENDATE',
+      field: 'orderOpenDate',
+      filter: false,
+      hide: true
+    },
+
+  ];
+
+  getFilterRegionValues() {
+    var values = this.filterColumns.regionIds.dataSource.map((a: any) => a.name);
+    return values;
+  }
+
+  getFilterOrderTypeValues() {
+    var values = this.filterColumns.orderTypes.dataSource.map((a: any) => a.name);
+    return values;
+  }
+  getFilterOrderStatuses() {
+    var values = this.filterColumns.orderStatuses.dataSource.map((a: any) => a.statusText);
+    return values;
+  }
+
+  getFilterLocationValues() {
+    var values = this.filterColumns.locationIds.dataSource.map((a: any) => a.name);
+    return values;
+  }
+
+  getFilterDepartmentValues() {
+    var values = this.filterColumns.departmentsIds.dataSource.map((a: any) => a.name);
+    return values;
+  }
+
+  defaultColDef: ColDef =
+    {
+      sortable: true,
+      filter: true,
+      flex: 1,
+      minWidth: 120,
+      resizable: true,
+      enablePivot: true
+    };
+
+  onPageSizeChanged(event: any) {
+    debugger;
+    this.cacheBlockSize = Number(event.value.toLowerCase().replace("rows", ""));
+    this.paginationPageSize = Number(event.value.toLowerCase().replace("rows", ""));
+    if (this.gridApi != null) {
+      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows", "")));
+      this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows", "")));
+      var datasource = this.createServerSideDatasource();
+      this.gridApi.setServerSideDatasource(datasource);
+    }
+  }
+
+  onFirstDataRendered(params: FirstDataRenderedEvent) {
+    params.api.forEachNode((node) => {
+      node.setExpanded(node.id === '1');
+    });
+  }
+
+  onGridReady(params: any) {
+    this.gridApi = params.api;
+    this.gridColumnApi = params.columnApi;
+    params.columnApi.autoSizeAllColumns();
+    var datasource = this.createServerSideDatasource();
+    params.api.setServerSideDatasource(datasource);
+  }
+
+  createServerSideDatasource() {
+    let self = this;
+    let unsubscribe = this.unsubscribe$;
+
+    return {
+      getRows: function (params: any) {
+        setTimeout(() => {
+          debugger;
+          self.filters.pageNumber = params.request.endRow / self.paginationPageSize;
+
+          self.filters.pageSize = self.paginationPageSize;
+          self.filters.sortModel = params.request.sortModel;
+          let jsonString = JSON.stringify(params.request.filterModel);
+          if (jsonString != "{}") {
+            var updatedJson = jsonString.replace("operator", "logicalOperator");
+            self.filters.filterModel = JSON.parse(updatedJson);
+          }
+          else {
+            self.filters.filterModel = null;
+          }
+
+          switch (self.activeTab) {
+            case OrganizationOrderManagementTabs.AllOrders:
+              self.columnsToExport = allOrdersColumnsToExport;
+              self.store.dispatch([new GetOrders(self.filters), new GetOrderFilterDataSources()]);
+              break;
+            case OrganizationOrderManagementTabs.PerDiem:
+              // TODO: perdiem
+              self.filters.orderTypes = [OrderType.OpenPerDiem];
+              self.filters.includeReOrders = true;
+              self.columnsToExport = perDiemColumnsToExport;
+              self.store.dispatch([new GetOrders(self.filters), new GetOrderFilterDataSources()]);
+              break;
+            case OrganizationOrderManagementTabs.ReOrders:
+              self.filters.orderTypes = [OrderType.ReOrder];
+              self.columnsToExport = reOrdersColumnsToExport;
+              self.store.dispatch([new GetOrders(self.filters), new GetOrderFilterDataSources()]);
+              break;
+            case OrganizationOrderManagementTabs.Incomplete:
+              self.columnsToExport = allOrdersColumnsToExport;
+              self.store.dispatch(new GetIncompleteOrders({ pageNumber: self.currentPage, pageSize: self.pageSize }));
+              break;
+          }
+          self.ordersPage$.pipe(takeUntil(unsubscribe)).subscribe(data => {
+            if (data && data.items) {
+              console.log(data.items);
+              params.successCallback(data.items, data.totalCount);
+            }
+          });
+        }, 200);
+      }
+    }
+  }
+  public autoGroupColumnDef: ColDef = {
+    width: 180,
+  };
 }

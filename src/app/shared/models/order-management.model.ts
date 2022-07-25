@@ -432,6 +432,8 @@ export class OrderFilter {
   agencyIds?: number[];
   agencyType?: string | number | null;
   includeReOrders?: boolean;
+  sortModel?: any = {};
+  filterModel?: any = {};
 }
 
 export class OrderPartnerAgency {

@@ -28,9 +28,18 @@
   }
 
   &__legend-text {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 17px;
     color: $secondary-dark-blue-15;
+  }
+
+  &__row_Text {
+    width: 43%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 40px;
+    position: absolute;
+    top: 35%;
   }
 
   &__point {

@@ -1,0 +1,21 @@
+<div class="app-widget-wrapper" [ngClass]="{ 'with-legend': legend }">
+  <div class="app-widget-wrapper__content">
+    <h3 *ngIf="title" class="app-widget-wrapper__title">{{ title }}</h3>
+    <ng-container [ngTemplateOutlet]="isLoading ? loadingTemplate : regularWidgetTemplate"></ng-container>
+  </div>
+</div>
+
+<ng-template #loadingTemplate>
+  <app-inline-loader class="app-widget-wrapper__loader"></app-inline-loader>
+</ng-template>
+
+<ng-template #regularWidgetTemplate>
+  <div class="app-widget-wrapper__projection-wrapper">
+    <div class="app-widget-wrapper__chart">
+      <ng-container [ngTemplateOutlet]="chart"></ng-container>
+    </div>
+    <div *ngIf="legend" class="app-widget-wrapper__legend">
+      <ng-container [ngTemplateOutlet]="legend"></ng-container>
+    </div>
+  </div>
+</ng-template>

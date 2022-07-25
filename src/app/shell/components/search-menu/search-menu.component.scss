@@ -1,0 +1,79 @@
+.search-menu-content {
+  color: var(--side-nav-text-color) !important;
+  background-color: white;
+  position: absolute;
+  z-index: 1100;
+  border-radius: 0 5px 5px 0;
+  width: 100%;
+  max-width: 300px;
+  box-shadow: 7px 4px 19px rgba(0, 0, 0, 0.25);
+
+  .center-align {
+    text-align: center;
+  }
+
+  .e-input-group {
+    margin-top: 10px;
+
+    .input-search {
+      margin-bottom: 0;
+    }
+  }
+
+  .search-menu-result-container {
+    margin: 0 0 20px 0;
+    padding: 0;
+    background-color: var(--side-nav-background-color);
+
+    .history-container {
+      background-color: var(--sidebarnav-search-history-background-color);
+    }
+
+    .section-label-container {
+      padding: 10px 0 10px 10px;
+    }
+
+    .list-item {
+      padding: 5px 0;
+
+      .list-icon {
+        font-family: 'Material Symbols Outlined';
+        font-weight: normal;
+        font-style: normal;
+        font-size: 20px;
+        height: 44px;
+        background-color: transparent;
+        display: inline-block;
+        margin: 0 0 0 5px;
+        vertical-align: middle;
+        width: 18px;
+        line-height: 45px;
+        margin-left: 20px;
+      }
+
+      &:hover {
+        box-shadow: 0 0 10px -5px rgb(0 0 0 / 0.5);
+        cursor: pointer !important;
+      }
+    }
+
+    .list-text {
+      display: inline-block;
+      padding: 0;
+      margin-left: 20px;
+      font-size: var(--font-size) !important;
+      display: inline-block;
+      line-height: 30px;
+      min-height: 30px;
+      vertical-align: middle;
+    }
+  }
+}
+
+.min-menu {
+  margin-left: 68px;
+}
+
+.max-menu {
+  margin-left: 260px;
+}

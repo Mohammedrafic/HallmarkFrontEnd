@@ -136,6 +136,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: 'security/user-list',
     },
+    32: {
+      // Custom Reports
+      icon: 'Truck',
+      route: '/admin/custom-reports',
+    },
   },
 
   [BusinessUnitType.MSP]: {

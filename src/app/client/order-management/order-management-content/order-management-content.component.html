@@ -1,9 +1,7 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tab-navigation
-      #tabNavigation
-      (selectedTab)="tabSelected($event)"
-    ></app-tab-navigation>
+    <app-tab-navigation #tabNavigation
+                        (selectedTab)="tabSelected($event)"></app-tab-navigation>
   </ng-container>
   <ng-container right>
     <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
@@ -13,38 +11,37 @@
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
     </button>
-    <button
-      ejs-dropdownbutton
-      [items]="exportOptions"
-      (select)="exportSelected($event)"
-      id="importButton"
-      cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+    <button ejs-dropdownbutton
+            [items]="exportOptions"
+            (select)="exportSelected($event)"
+            id="importButton"
+            cssClass="e-outline button-export">
+      Export <i-feather name="download" class="icon"></i-feather>
+    </button>
     <button ejs-button [isPrimary]="true" (click)="navigateToOrderForm()">Create Order</button>
   </ng-container>
 </app-page-toolbar>
 
 <section>
-  <ejs-grid
-    #grid
-    class="e-gridwithchildrow"
-    (rowDataBound)="setRowHighlight($event)"
-    [dataSource]="(ordersPage$ | async)?.items"
-    [allowPaging]="allowPaging"
-    [pageSettings]="pageSettings"
-    [height]="gridHeight"
-    [rowHeight]="rowHeight"
-    [resizeSettings]="resizeSettings"
-    [allowSorting]="allowSorting"
-    [allowResizing]="allowResizing"
-    [allowTextWrap]="allowWrap"
-    (actionBegin)="actionBegin($event)"
-    [enableVirtualization]="true"
-    [selectionSettings]="selectionOptions"
-    [textWrapSettings]="wrapSettings"
-    (rowSelected)="onRowClick($event)"
-    (rowDeselected)="onRowDeselect($event, gridWithChildRow)"
-    (dataBound)="onDataBound()"
-  >
+  <ejs-grid #grid
+            class="e-gridwithchildrow"
+            (rowDataBound)="setRowHighlight($event)"
+            [dataSource]="(ordersPage$ | async)?.items"
+            [allowPaging]="allowPaging"
+            [pageSettings]="pageSettings"
+            [height]="gridHeight"
+            [rowHeight]="rowHeight"
+            [resizeSettings]="resizeSettings"
+            [allowSorting]="allowSorting"
+            [allowResizing]="allowResizing"
+            [allowTextWrap]="allowWrap"
+            (actionBegin)="actionBegin($event)"
+            [enableVirtualization]="true"
+            [selectionSettings]="selectionOptions"
+            [textWrapSettings]="wrapSettings"
+            (rowSelected)="onRowClick($event)"
+            (rowDeselected)="onRowDeselect($event, gridWithChildRow)"
+            (dataBound)="onDataBound()">
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
       <e-column headerTextAlign="Right" width="130">
@@ -73,20 +70,17 @@
             <button ejs-button cssClass="e-flat default-icon-button">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
             </button>
-            <button
-              ejs-button
-              cssClass="e-flat secondary-icon-button"
-              [disabled]="disabledLock(data.status)"
-              (click)="lockOrder(data)"
-              *ngIf="isLockMenuButtonsShown">
+            <button ejs-button
+                    cssClass="e-flat secondary-icon-button"
+                    [disabled]="disabledLock(data.status)"
+                    (click)="lockOrder(data)"
+                    *ngIf="isLockMenuButtonsShown">
               <span><i-feather [name]="data.isLocked ? 'lock' : 'unlock'" class="icon"></i-feather></span>
             </button>
-            <button
-              ejs-dropdownbutton
-              [items]="(activeTab === OrganizationOrderManagementTabs.ReOrders && reOrdersMenu) || (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : moreMenuWithCloseButton)"
-              (select)="menuOptionSelected($event, data)"
-              cssClass="e-flat primary-icon-button"
-            >
+            <button ejs-dropdownbutton
+                    [items]="(activeTab === OrganizationOrderManagementTabs.ReOrders && reOrdersMenu) || (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : moreMenuWithCloseButton)"
+                    (select)="menuOptionSelected($event, data)"
+                    cssClass="e-flat primary-icon-button">
               <span><i-feather name="more-vertical" class="icon"></i-feather></span>
             </button>
           </div>
@@ -102,8 +96,7 @@
 
           <ng-template #withToggle>
             <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-              <b>{{ data.id }}</b
-              ><i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
+              <b>{{ data.id }}</b><i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
             </div>
           </ng-template>
         </ng-template>
@@ -188,10 +181,8 @@
           </ng-container>
 
           <ng-container *ngIf="data.agency?.length >= 3 && data.agency?.length <= 5">
-            <ejs-tooltip
-              content="{{ data.agency.join(', ') }}"
-              target="#agencyName"
-            >
+            <ejs-tooltip content="{{ data.agency.join(', ') }}"
+                         target="#agencyName">
               <span id="agencyName" class="agency-name">Multiple Agencies</span>
             </ejs-tooltip>
           </ng-container>
@@ -206,23 +197,19 @@
 
     <ng-template #detailTemplate let-data>
       <div class="subrow-wrapper" *ngIf="!showReOrders">
-        <app-grid-subrow-candidate
-          *ngFor="let child of data.children"
-          [candidat]="child"
-          [order]="data"
-          [selected]="selectedCandidate?.selected?.order === data.id && selectedCandidate?.selected.positionId === child.positionId"
-          [isAgency]="true"
-          (clickEvent)="onOpenCandidateDialog($event, data)"
-        ></app-grid-subrow-candidate>
+        <app-grid-subrow-candidate *ngFor="let child of data.children"
+                                   [candidat]="child"
+                                   [order]="data"
+                                   [selected]="selectedCandidate?.selected?.order === data.id && selectedCandidate?.selected.positionId === child.positionId"
+                                   [isAgency]="true"
+                                   (clickEvent)="onOpenCandidateDialog($event, data)"></app-grid-subrow-candidate>
       </div>
       <div class="subrow-wrapper" *ngIf="showReOrders">
-        <app-grid-subrow-reorder
-          *ngFor="let child of data.reOrders"
-          [reOrder]="child"
-          [order]="data"
-          [selected]="selectedReOrder?.selected?.order === data.id && selectedReOrder?.selected.reOrder === child.id"
-          (clickEvent)="onOpenReorderDialog($event, data)"
-        ></app-grid-subrow-reorder>
+        <app-grid-subrow-reorder *ngFor="let child of data.reOrders"
+                                 [reOrder]="child"
+                                 [order]="data"
+                                 [selected]="selectedReOrder?.selected?.order === data.id && selectedReOrder?.selected.reOrder === child.id"
+                                 (clickEvent)="onOpenReorderDialog($event, data)"></app-grid-subrow-reorder>
       </div>
     </ng-template>
 
@@ -231,38 +218,32 @@
         <div class="control-section">
           <div class="content-wrapper">
             <section class="left-side-pager-controls">
-              <ejs-dropdownlist
-                id="rowsPerPage"
-                class="dropdown-no-border"
-                [dataSource]="rowsPerPageDropDown"
-                [(value)]="activeRowsPerPageDropDown"
-                (change)="onRowsDropDownChanged()"
-              >
+              <ejs-dropdownlist id="rowsPerPage"
+                                class="dropdown-no-border"
+                                [dataSource]="rowsPerPageDropDown"
+                                [(value)]="activeRowsPerPageDropDown"
+                                (change)="onRowsDropDownChanged()">
               </ejs-dropdownlist>
-              <ejs-numerictextbox
-                id="goToPage"
-                class="numeric-input-no-border"
-                format="#"
-                [validateDecimalOnType]="validateDecimalOnType"
-                [decimals]="decimals"
-                placeholder="Go to:"
-                min="1"
-                [max]="(ordersPage$ | async)?.totalPages"
-                [showSpinButton]="false"
-                (change)="onGoToClick($event)"
-              >
+              <ejs-numerictextbox id="goToPage"
+                                  class="numeric-input-no-border"
+                                  format="#"
+                                  [validateDecimalOnType]="validateDecimalOnType"
+                                  [decimals]="decimals"
+                                  placeholder="Go to:"
+                                  min="1"
+                                  [max]="(ordersPage$ | async)?.totalPages"
+                                  [showSpinButton]="false"
+                                  (change)="onGoToClick($event)">
               </ejs-numerictextbox>
             </section>
             <section class="right-side-pager-controls">
-              <ejs-pager
-                id="gridPager"
-                #gridPager
-                [pageSize]="pageSize"
-                [totalRecordsCount]="(ordersPage$ | async)?.totalCount"
-                [enablePagerMessage]="false"
-                [currentPage]="currentPage"
-                (click)="onGoToClick($event)"
-              >
+              <ejs-pager id="gridPager"
+                         #gridPager
+                         [pageSize]="pageSize"
+                         [totalRecordsCount]="(ordersPage$ | async)?.totalCount"
+                         [enablePagerMessage]="false"
+                         [currentPage]="currentPage"
+                         (click)="onGoToClick($event)">
               </ejs-pager>
             </section>
           </div>
@@ -270,6 +251,47 @@
       </div>
     </ng-template>
   </ejs-grid>
+
+
+</section>
+<section>
+  <ag-grid-angular #agGrid
+                   style="width: 100%; height: 600px;"
+                   id="myGrid"
+                   class="ag-theme-alpine"
+                   [rowHeight]="agRowHeight"
+                   [columnDefs]="columnDefs"
+                   [defaultColDef]="defaultColDef"
+                   [suppressAggFuncInHeader]="true"
+                   [animateRows]="true"
+                   [rowModelType]="rowModelType"
+                   [serverSideStoreType]="serverSideStoreType"
+                   [pagination]="true"
+                   [paginationPageSize]="paginationPageSize"
+                   [cacheBlockSize]="cacheBlockSize"
+                   [sideBar]="{ toolPanels: ['columns', 'filters'] }"
+                   [pagination]="true"
+                   [paginationAutoPageSize]="false"
+                   [modules]="modules"
+                   (gridReady)="onGridReady($event)"
+                   [maxBlocksInCache]="maxBlocksInCache"
+                   [rowSelection]="rowSelection"
+                   (rowSelected)="onRowClick($event)"
+                   [masterDetail]="true"
+                   [detailCellRenderer]="detailCellRenderer"
+                   (firstDataRendered)="onFirstDataRendered($event)"></ag-grid-angular>
+
+<div class="row">
+  <div class="col-md-6"></div>
+  <div class="col-md-6">
+    <ejs-dropdownlist id="rowsPerPage"
+                      class="dropdown-no-border"
+                      [dataSource]="rowsPerPageDropDown"
+                      [(value)]="activeRowsPerPageDropDown"
+                      (change)="onPageSizeChanged($event)">
+    </ejs-dropdownlist>
+  </div>
+</div>
 </section>
 
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
@@ -280,24 +302,22 @@
       <div class="input-container" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders">
         <label for="orderId">Order ID</label>
         <div class="input-group">
-          <input
-            id="orderId"
-            class="e-input"
-            type="text"
-            maxlength="50"
-            formControlName="orderId"/>
+          <input id="orderId"
+                 class="e-input"
+                 type="text"
+                 maxlength="50"
+                 formControlName="orderId" />
         </div>
       </div>
 
       <div class="input-container" *ngIf="activeTab === OrganizationOrderManagementTabs.ReOrders">
         <label for="reOrderId">Re-Order ID</label>
         <div class="input-group">
-          <input
-            id="reOrderId"
-            class="e-input"
-            type="text"
-            maxlength="50"
-            formControlName="reOrderId"/>
+          <input id="reOrderId"
+                 class="e-input"
+                 type="text"
+                 maxlength="50"
+                 formControlName="reOrderId" />
         </div>
       </div>
     </div>
@@ -419,10 +439,10 @@
       <div class="input-container">
         <label>Job Title</label>
         <div class="input-group">
-          <input  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  formControlName="jobTitle"/>
+          <input class="e-input"
+                 type="text"
+                 maxlength="50"
+                 formControlName="jobTitle" />
         </div>
       </div>
     </div>
@@ -430,19 +450,19 @@
       <div class="input-container">
         <label>Bill Rate From</label>
         <div class="input-group">
-          <input  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  formControlName="billRateFrom"/>
+          <input class="e-input"
+                 type="text"
+                 maxlength="50"
+                 formControlName="billRateFrom" />
         </div>
       </div>
       <div class="input-container">
         <label>Bill Rate To</label>
         <div class="input-group">
-          <input  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  formControlName="billRateTo"/>
+          <input class="e-input"
+                 type="text"
+                 maxlength="50"
+                 formControlName="billRateTo" />
         </div>
       </div>
     </div>
@@ -450,19 +470,19 @@
       <div class="input-container">
         <label>Candidates Count From</label>
         <div class="input-group">
-          <input  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  formControlName="candidatesCountFrom"/>
+          <input class="e-input"
+                 type="text"
+                 maxlength="50"
+                 formControlName="candidatesCountFrom" />
         </div>
       </div>
       <div class="input-container">
         <label>Candidates Count To</label>
         <div class="input-group">
-          <input  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  formControlName="candidatesCountTo"/>
+          <input class="e-input"
+                 type="text"
+                 maxlength="50"
+                 formControlName="candidatesCountTo" />
         </div>
       </div>
     </div>
@@ -470,12 +490,11 @@
       <div class="input-container">
         <label for="numberOfPositions"># of Positions</label>
         <div class="input-group">
-          <input
-            id="numberOfPositions"
-            class="e-input"
-            type="text"
-            maxlength="50"
-            formControlName="openPositions"/>
+          <input id="numberOfPositions"
+                 class="e-input"
+                 type="text"
+                 maxlength="50"
+                 formControlName="openPositions" />
         </div>
       </div>
     </div>
@@ -483,26 +502,22 @@
       <div class="input-container calendar">
         <label for="jobStartDate">{{ activeTab !== OrganizationOrderManagementTabs.ReOrders ? 'Job Start Date' : 'Re-Order Date' }}</label>
         <div class="input-group datepicker">
-          <ejs-datepicker
-            id="jobStartDate"
-            class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
-            formControlName="jobStartDate"
-          >
+          <ejs-datepicker id="jobStartDate"
+                          class="datepicker"
+                          format="MM/dd/yyyy"
+                          placeholder="MM/DD/YYYY"
+                          formControlName="jobStartDate">
           </ejs-datepicker>
         </div>
       </div>
       <div class="input-container calendar" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders">
         <label for="jobEndDate">Job End Date</label>
         <div class="input-group datepicker">
-          <ejs-datepicker
-            id="jobEndDate"
-            class="datepicker"
-            format="MM/dd/yyyy"
-            placeholder="MM/DD/YYYY"
-            formControlName="jobEndDate"
-          >
+          <ejs-datepicker id="jobEndDate"
+                          class="datepicker"
+                          format="MM/dd/yyyy"
+                          placeholder="MM/DD/YYYY"
+                          formControlName="jobEndDate">
           </ejs-datepicker>
         </div>
       </div>
@@ -518,12 +533,11 @@
   </form>
 </app-filter-dialog>
 
-<app-order-details-dialog
-  #detailsDialog
-  [order]="selectedOrder"
-  [openEvent]="openDetails"
-  (selectReOrder)="selectReOrder($event)"
-  (saveReOrderEmitter)="updateGrid()"
-  (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"></app-order-details-dialog>
+<app-order-details-dialog #detailsDialog
+                          [order]="selectedOrder"
+                          [openEvent]="openDetails"
+                          (selectReOrder)="selectReOrder($event)"
+                          (saveReOrderEmitter)="updateGrid()"
+                          (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"></app-order-details-dialog>
 
-<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidate"  [openEvent]="openChildDialog"></app-child-order-dialog>
+<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidate" [openEvent]="openChildDialog"></app-child-order-dialog>
