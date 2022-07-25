@@ -14,6 +14,8 @@ import {
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
+  UpdateOrganisationCandidateJob,
+  UpdateOrganisationCandidateJobSucceed,
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
@@ -60,7 +62,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   }
 
   get showRejectButton(): boolean {
-    return [ApplicantStatusEnum.Offered, ApplicantStatusEnum.Accepted].includes(this.candidate.status);
+    return [ApplicantStatusEnum.Offered, ApplicantStatusEnum.Accepted].includes(this.candidate?.status);
   }
 
   get isRejected(): boolean {
@@ -77,6 +79,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
 
   get showClockId(): boolean {
     return [ApplicantStatusEnum.Accepted, ApplicantStatusEnum.OnBoarded].includes(this.candidate?.status);
+  }
+
+  get isOnboard(): boolean {
+    return [ApplicantStatusEnum.OnBoarded].includes(this.candidate?.status);
   }
 
   @Select(OrderManagementState.orderApplicantsInitialData)
@@ -103,6 +109,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
     this.subscribeOnInitialData();
     this.subscribeOnReasonsList();
     this.subscribeOnSuccessRejection();
+    this.subscribeOnUpdateCandidateJobSucceed();
   }
 
   ngOnDestroy(): void {
@@ -116,24 +123,16 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
     this.openEvent.next(false);
   }
 
-  public onOnboard(): void {
-    if (this.form.valid && this.orderCandidateJob) {
-      const value = this.form.getRawValue();
-      //TODO: uncomment code, whe be is done
-      /*this.store.dispatch(new UpdateOrganisationCandidateJob({})).subscribe(() => {
-        //add action to update list and grid
-      });*/
-    }
-  }
-
   public onReject(): void {
     this.store.dispatch(this.isAgency ? new GetRejectReasonsForAgency() : new GetRejectReasonsForOrganisation());
     this.openRejectDialog.next(true);
   }
 
-  public onDropDownChanged(event: { itemData: { applicantStatus: ApplicantStatusEnum } }): void {
+  public onDropDownChanged(event: { itemData: { applicantStatus: ApplicantStatusEnum; statusText: string } }): void {
     if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
       this.onReject();
+    } else {
+      this.updateOrganizationCandidateJob(event.itemData);
     }
   }
 
@@ -169,9 +168,30 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
     }
   }
 
-
   public onAccept(): void {
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
+  }
+
+  private updateOrganizationCandidateJob(status: { applicantStatus: ApplicantStatusEnum; statusText: string }): void {
+    if (this.form.valid && this.orderCandidateJob) {
+      const value = this.form.getRawValue();
+
+      this.store
+        .dispatch(
+          new UpdateOrganisationCandidateJob({
+            organizationId: this.orderCandidateJob.organizationId,
+            orderId: this.orderCandidateJob.orderId,
+            jobId: value.jobId,
+            clockId: value.clockId,
+            allowDeplayWoCredentials: value.allow,
+            nextApplicantStatus: {
+              applicantStatus: status.applicantStatus,
+              statusText: status.statusText,
+            },
+          })
+        )
+        .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
+    }
   }
 
   private updateAgencyCandidateJob(applicantStatus: ApplicantStatus): void {
@@ -238,7 +258,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
 
   private setValueForm(orderCandidateJob: OrderCandidateJob): void {
     this.form?.patchValue({
-      jobId: orderCandidateJob.orderId,
+      jobId: orderCandidateJob.jobId,
       locationName: orderCandidateJob.order.locationName,
       department: orderCandidateJob.order.departmentName,
       skill: orderCandidateJob.order.skillName,
@@ -246,6 +266,12 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
       allow: orderCandidateJob.allowDeployCredentials,
       rejectReason: orderCandidateJob.rejectReason,
     });
+  }
+
+  private subscribeOnUpdateCandidateJobSucceed(): void {
+    this.actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateOrganisationCandidateJobSucceed))
+      .subscribe(() => this.sideDialog.hide());
   }
 
   private subscribeOnGetStatus(): void {

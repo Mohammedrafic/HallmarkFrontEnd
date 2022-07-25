@@ -3,9 +3,9 @@ import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { filter, merge, Observable, Subject, takeUntil } from 'rxjs';
 
-import { Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
+import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
@@ -52,6 +52,7 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
         }
       } else {
         this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
+        this.store.dispatch(new GetAvailableSteps(this.order.organizationId, data.candidateJobId));
       }
       this.openDetails.next(true);
     }
@@ -74,5 +75,5 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
       pageSize: this.pageSize,
       excludeDeployed: false,
     });
-  };
+  }
 }

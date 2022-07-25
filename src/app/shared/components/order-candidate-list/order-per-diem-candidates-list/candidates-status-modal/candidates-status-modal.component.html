@@ -17,7 +17,7 @@
             </h3>
           </div>
           <div class="e-card-content button-container">
-            <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isAgency">
+            <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isAgency && !isOnboard">
               <ejs-dropdownlist
                 [fields]="optionFields"
                 [dataSource]="nextApplicantStatuses"
@@ -73,12 +73,12 @@
                       <label class="input-group">Clock ID</label>
                       <div class="input-group input-readonly">
                         <!--TODO: create and use ReadOnly Mode for it-->
-                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" [readonly]="isAgency"/>
+                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" [readonly]="isAgency || isOnboard"/>
                       </div>
                     </div>
                     <!--TODO: create and use ReadOnly Mode for it-->
                     <div *ngIf="showClockId" class="input-container bootstrap">
-                      <ejs-checkbox [disabled]="isAgency" formControlName="allow" label="Allow deploy w/o credentials"
+                      <ejs-checkbox [disabled]="isAgency || isOnboard" formControlName="allow" label="Allow deploy w/o credentials"
                                     maxlength="50"></ejs-checkbox>
                     </div>
                     <div class="input-container bootstrap" *ngIf="isRejected">
