@@ -1,0 +1,22 @@
+<div class="filter-chip-list">
+  <div [ngClass]="['chips-wrapper', isCollapsed && items.length ? 'chips-wrapper___expand' : '']">
+    <div class="chips-list" #resize>
+      <div class="applied-filters">Applied Filters: {{ items.length ? '' : 'None' }}</div>
+      <div class="chips-title" *ngFor="let filter of chipList">
+        <div class="chips-container" *ngIf="!!filter.value; else filterName">
+          <ejs-chiplist
+            [chips]="[filter]"
+            enableDelete="true"
+            (delete)="deleteChip($event)"
+          ></ejs-chiplist>
+        </div>
+        <ng-template #filterName><span>{{ filter }}</span></ng-template>
+      </div>
+    </div>
+    <div class="chips-button">
+      <div *ngIf="showMoreLessBtn && items.length" class="show-more-less" (click)="onCollapseExpandList()">{{ !isCollapsed ? 'Show more' : 'Show less' }}</div>
+      <div class="clear-all" *ngIf="items.length" (click)="onClearFilters()">Clear all</div>
+    </div>
+  </div>
+</div>
+
