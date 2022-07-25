@@ -1,27 +1,74 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { FactoryTarget } from '@angular/compiler';
+import { Component, OnInit } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { SetHeaderState } from 'src/app/store/app.actions';
+declare const com:any;
 @Component({
   selector: 'app-custom-reports',
   templateUrl: './custom-reports.component.html',
-  styleUrls: ['./custom-reports.component.scss'],
-  encapsulation: ViewEncapsulation.None
+  styleUrls: ['./custom-reports.component.scss']
 })
 export class CustomReportsComponent implements OnInit {
-  public iframeUrl:SafeResourceUrl;
-  private _sanitizer:DomSanitizer;
+
+  private factory:any;
   constructor(private store: Store,
     private router: Router,
     private route: ActivatedRoute,sanitizer: DomSanitizer) {
-store.dispatch(new SetHeaderState({ title: 'Analytics', iconName: 'user' }));
-this._sanitizer=sanitizer;
+    store.dispatch(new SetHeaderState({ title: 'Analytics', iconName: 'truck' }));
 }
 
   ngOnInit(): void {
-    //this.iframeUrl=this._sanitizer.bypassSecurityTrustUrl('https://10.20.1.4:6888/jinfonet/tryView.jsp?jrs.cmd=jrs.try_vw&jrs.page_style=1&jrs.report=%2FCPT%2FCPT_Initial.wls&paramPageDisabled=true&currTime=1658445444000&jrs.catalog=%2FCPT%2FSSRS.cat&jrs.cat_version=-1&catalog_last_modified=1655311407249&report_last_modified=1655394302527&jrd_studio_mode=view&jrs.path=%2FCPT%2FCPT_Initial.wls&jrs.result_type=8&jrs.engine_id=1658445447819-7&jrd_viewType=studio&profile_enable_default_nls=false');
-    this.iframeUrl=this._sanitizer.bypassSecurityTrustUrl('https://10.20.1.4:6888/webos/app/dashboard/index.jsp?j$vm_pid=_ZREvduRG@-1#');
+   this.factory=com.jinfonet.api.AppFactory;
+   this.ShowReport("reportIframe");
   }
 
-}
+  
+public ShowReport(entryId:string):void {
+        var params1 = {
+          
+          };
+          var server = {
+            url: "https://10.20.1.4:6888/jinfonet/tryView.jsp",
+        user: "admin",
+           pass: "admin",
+            jrd_prefer:{
+                // For page report
+                pagereport:{
+                    feature_UserInfoBar:true,
+                    feature_ToolBar: true,
+                    feature_Toolbox: true,
+                    feature_DSOTree: true,
+                    feature_TOCTree: true,
+                    feature_PopupMenu: true,
+                    feature_ADHOC: true
+                },
+                
+                // For web report
+                webreport:{
+                    viewMode:{
+                        hasToolbar: true,
+                        hasSideArea: true
+                    },
+                    editMode:{
+                      hasToolbar: true,
+                      hasSideArea: true
+                    }
+                }
+            },
+            jrd_studio_mode: "edit",
+            "jrs.param_page": true
+        };
+         
+         var prptRes = {name:"/Dashboard/DemoDashboard.cls"};
+         var catRes = {name:"/Dashboard/POC.cat"};
+      
+          
+          var test = this.factory.runReport(
+          server, prptRes, catRes, params1, entryId);
+          };
+
+  }
+
+
