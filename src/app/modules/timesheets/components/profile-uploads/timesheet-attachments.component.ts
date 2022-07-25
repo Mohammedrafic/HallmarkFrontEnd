@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
-import { filter, tap } from 'rxjs';
+import { filter, switchMap } from 'rxjs';
 
 import { downloadBlobFile } from '@shared/utils/file.utils';
 import { ConfirmService } from '@shared/services/confirm.service';
@@ -9,6 +9,7 @@ import { TimesheetAttachment } from '../../interface';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
 import { FileViewer } from '../../modules/file-viewer/file-viewer.actions';
+import { Timesheets } from '../../store/actions/timesheets.actions';
 import FileLoaded = TimesheetDetails.FileLoaded;
 
 @Component({
@@ -27,6 +28,9 @@ export class TimesheetAttachmentsComponent {
   @Input()
   public timesheetId: number;
 
+  @Input()
+  public isAgency: boolean = false;
+
   public downloadFileName: string;
 
   constructor(
@@ -36,9 +40,10 @@ export class TimesheetAttachmentsComponent {
     private actions$: Actions,
   ) {
     this.actions$.pipe(
-      ofActionSuccessful(FileLoaded)
-    ).subscribe((f: FileLoaded) => {
-      downloadBlobFile(f.file, this.downloadFileName);
+      ofActionSuccessful(TimesheetDetails.AttachmentLoaded),
+      filter(() => !!this.downloadFileName)
+    ).subscribe(({ file }: FileLoaded) => {
+      downloadBlobFile(file, this.downloadFileName);
     })
   }
 
@@ -53,13 +58,16 @@ export class TimesheetAttachmentsComponent {
       okButtonClass: 'delete-button',
     })
       .pipe(
-        filter(Boolean)
+        filter(Boolean),
+        switchMap(() => this.store.dispatch(new TimesheetDetails.DeleteAttachment({
+          fileId: item.id,
+          organizationId: this.organizationId,
+          timesheetId: this.timesheetId,
+        })))
       )
-      .subscribe(() => this.store.dispatch(new TimesheetDetails.DeleteAttachment({
-        fileId: item.id,
-        organizationId: this.organizationId,
-        timesheetId: this.timesheetId,
-      })));
+      .subscribe(() => {
+        this.store.dispatch(new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency))
+      });
   }
 
   public downloadFile(item: TimesheetAttachment): void {
@@ -68,19 +76,23 @@ export class TimesheetAttachmentsComponent {
     this.store.dispatch(new TimesheetDetails.DownloadAttachment({
       fileId: item.id,
       organizationId: this.organizationId,
-    }));
+    }))
+      .subscribe(() => this.downloadFileName = '');
   }
 
-  public preview(item: TimesheetAttachment): void {
-    this.timesheetDetailsApiService.downloadPDFAttachment({
-      fileId: item.id,
-      organizationId: this.organizationId,
-    })
-      .pipe(
-        tap((file: Blob) => this.store.dispatch(
-          new FileViewer.Open(item.fileName, file))
-        ),
-      )
-      .subscribe();
+  public preview({id: fileId, fileName}: TimesheetAttachment): void {
+    this.store.dispatch(
+      new FileViewer.Open({
+        fileName,
+        getPDF: () => this.timesheetDetailsApiService.downloadPDFAttachment({
+          fileId,
+          organizationId: this.organizationId,
+        }),
+        getOriginal: () => this.timesheetDetailsApiService.downloadAttachment({
+          fileId,
+          organizationId: this.organizationId
+        })
+      })
+    );
   }
 }

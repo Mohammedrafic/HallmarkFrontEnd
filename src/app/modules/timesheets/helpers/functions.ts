@@ -23,3 +23,7 @@ export const reduceFiltersState = <T>(oldFilters: T, saveFiltersKeys: string[]):
     return acc;
   }, {})
 }
+
+export const findItemById = <T>(arr: T[], id: number): T => {
+  return arr.find((el: any) => el.id === id) as T;
+}

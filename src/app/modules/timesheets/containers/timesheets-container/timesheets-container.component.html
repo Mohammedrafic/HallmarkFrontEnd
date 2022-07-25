@@ -47,6 +47,7 @@
 </section>
 
 <app-timesheets-filter-dialog
+  [activeTabIdx]="activeTabIdx"
   (appliedFiltersAmount)="changeFiltersAmount($event)"
   (resetFilters)="resetFilters()"
   (updateTableByFilters)="updateTableByFilters($event)"

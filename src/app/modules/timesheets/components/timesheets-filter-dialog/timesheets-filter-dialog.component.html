@@ -31,32 +31,6 @@
           placeholder=""></ejs-multiselect>
       </div>
     </div>
-    <div class="input-container">
-      <label for="department">Department</label>
-      <div class="input-group dropdown">
-        <ejs-multiselect
-          id="department"
-          mode="CheckBox"
-          [fields]="filterOptionFields"
-          [dataSource]="filterColumns.departmentIds?.dataSource"
-          [showDropDownIcon]="true"
-          formControlName="departmentIds"
-          placeholder=""></ejs-multiselect>
-      </div>
-    </div>
-    <div class="input-container">
-      <label for="agencyName">Select Agency</label>
-      <div class="input-group dropdown">
-        <ejs-multiselect
-          id="agencyName"
-          mode="CheckBox"
-          [fields]="filterOptionFields"
-          [dataSource]="filterColumns.agencyIds?.dataSource"
-          [showDropDownIcon]="true"
-          formControlName="agencyIds"
-          placeholder=""></ejs-multiselect>
-      </div>
-    </div>
     <div class="row">
       <div class="input-container">
         <label for="region">Region</label>
@@ -80,7 +54,37 @@
             [fields]="filterOptionFields"
             [dataSource]="filterColumns.locationIds?.dataSource"
             [showDropDownIcon]="true"
+            [noRecordsTemplate]="'Please select the Region'"
             formControlName="locationIds"
+            placeholder=""></ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-container">
+        <label for="department">Department</label>
+        <div class="input-group dropdown">
+          <ejs-multiselect
+            id="department"
+            mode="CheckBox"
+            [fields]="filterOptionFields"
+            [dataSource]="filterColumns.departmentIds?.dataSource"
+            [showDropDownIcon]="true"
+            formControlName="departmentIds"
+            [noRecordsTemplate]="'Please select the Region and Location'"
+            placeholder=""></ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label for="agencyName">Select Agency</label>
+        <div class="input-group dropdown">
+          <ejs-multiselect
+            id="agencyName"
+            mode="CheckBox"
+            [fields]="filterOptionFields"
+            [dataSource]="filterColumns.agencyIds?.dataSource"
+            [showDropDownIcon]="true"
+            formControlName="agencyIds"
             placeholder=""></ejs-multiselect>
         </div>
       </div>

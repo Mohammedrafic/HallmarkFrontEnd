@@ -128,7 +128,7 @@
       </div>
 
       <div class="profile-hours-statistics">
-          <div class="tile-dark-blue" *ngIf="chartsVisible$ | async">
+          <div class="tile-dark-blue">
               <app-profile-cumulative-hours
                       [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
               ></app-profile-cumulative-hours>
@@ -142,6 +142,7 @@
             <app-attachments-uploads [attachments]="timesheetDetails.attachments"
                                      [organizationId]="timesheetDetails.organizationId"
                                      [timesheetId]="timesheetDetails.id"
+                                     [isAgency]="isAgency"
             ></app-attachments-uploads>
           </div>
 
@@ -178,9 +179,7 @@
   (rejectReasonChange)="handleReject($event)"
 ></app-timesheet-reject-reason-dialog>
 
-<app-add-timesheet
-  (updateTable)="handleUpdateTable()">
-</app-add-timesheet>
+<app-add-timesheet></app-add-timesheet>
 
 <app-export-dialog
         [columns]="columnsToExport"

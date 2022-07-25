@@ -2,9 +2,10 @@ export class DateTimeHelper {
   public static getLastDayOfWeekFromFirstDay(startDate: string, days: number): string {
     const start = new Date(startDate);
     const offset = new Date().getTimezoneOffset() * 60 * 1000;
-    
-    const lastDay = new Date(start.setUTCDate(start.getDate() - start.getDay() + days))
-      .setUTCHours(23, 59, 59, 999) + offset;
+    // const initDate = new Date(start.setUTCDate(start.getDate() - start.getDay() + days));
+    // const dayToSet = initDate > new Date() ? new Date() : initDate;
+
+    const lastDay = new Date(start.setUTCDate(start.getDate() - start.getDay() + days)).setUTCHours(23, 59, 59, 999) + offset;
 
     return new Date(lastDay).toUTCString();
   }
@@ -27,7 +28,14 @@ export class DateTimeHelper {
   }
 
   public static toUtc(date: string | Date): string {
-    const init = date as Date;
-    return new Date(Date.UTC(init.getFullYear(), init.getMonth(), init.getDate(), init.getHours(), init.getMinutes())).toISOString();
+
+    if (typeof date === 'string') {
+      const gmt = new Date(this.convertDateToUtc(date));
+      return new Date(Date.UTC(gmt.getFullYear(),
+      gmt.getMonth(), gmt.getDate(), gmt.getHours(), gmt.getMinutes())).toISOString();
+    }
+
+    return new Date(Date.UTC(date.getFullYear(),
+    date.getMonth(), date.getDate(), date.getHours(), date.getMinutes())).toISOString();
   }
 }

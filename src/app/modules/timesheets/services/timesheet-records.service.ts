@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 
 import { ColDef } from '@ag-grid-community/core';
 import { merge, Observable } from 'rxjs';
+import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { DropdownOption, TimesheetRecordsDto, RecordValue } from './../interface';
 import { TimesheetsApiService } from './timesheets-api.service';
@@ -102,5 +103,13 @@ export class TimesheetRecordsService {
     }
 
     return RecordFields.Time;
+  }
+
+  public controlTabsVisibility(billRates: DropdownOption[], tabs: TabComponent): void {
+    const isMilageAvaliable = billRates.some((rate) => rate.text.includes('Mileage'));
+    const isExpensesAvaliable = billRates.some((rate) => rate.text.includes('Expenses'));
+
+    tabs.hideTab(1, !isMilageAvaliable);
+    tabs.hideTab(2, !isExpensesAvaliable);
   }
 }

@@ -21,6 +21,7 @@ const valueHelper = new GridValuesHelper();
 const commonColumn: ColDef = {
   sortable: true,
   resizable: true,
+  filter: true,
 }
 
 export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionModel[] => {
@@ -127,18 +128,20 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
 };
 
 const defaultColumnMapping = {
+  type: ControlTypes.Multiselect,
+  valueType: ValueType.Id,
   valueField: 'name',
   valueId: 'id',
 };
 
 export const DefaultFilterColumns: FilterColumns = {
-  orderIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
-  statusIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
-  skillIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
-  departmentIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
-  agencyIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
-  regionsIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
-  locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping }
+  orderIds: defaultColumnMapping,
+  statusIds: defaultColumnMapping,
+  skillIds: defaultColumnMapping,
+  departmentIds: defaultColumnMapping,
+  agencyIds: defaultColumnMapping,
+  regionsIds: defaultColumnMapping,
+  locationIds: defaultColumnMapping,
 } as FilterColumns;
 
 export const SavedFiltersParams: string[] = [
@@ -148,6 +151,7 @@ export const SavedFiltersParams: string[] = [
   'orderBy',
   'date',
   'search',
+  'statusIds',
 ];
 
 export const DefaultFiltersState: TimesheetsFilterState = {

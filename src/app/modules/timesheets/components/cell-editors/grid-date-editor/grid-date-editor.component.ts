@@ -33,21 +33,11 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
   }
 
   public agInit(params: ICellRendererParams): void {
-    const data = params.data as Record<string, string | number>;
-    this.value = params.value;
-    const day = data[params.colDef?.field as string] as string;
-    this.dateValue = new Date(day ? day : 0);
-    this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
+    this.setData(params)
   }
 
   public refresh(params: ICellRendererParams): boolean {
-    this.dateValue = new Date(DateTimeHelper.convertDateToUtc(params.value));
-    this.value = params.value;
-    this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
-    this.type = (params.colDef as ColDef).cellRendererParams.type;
-
-    this.setdateBoundsForDay(params.value);
-    this.setFormControl(params);
+    this.setData(params)
     this.cd.markForCheck();
     return true;
   }
@@ -62,5 +52,14 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
       const group = params.colDef?.cellRendererParams.formGroup[params.data.id] as FormGroup;
       this.control = group.get((params.colDef as ColDef).field as string) as AbstractControl;
     }
+  }
+
+  private setData(params: ICellRendererParams): void {
+    this.dateValue = new Date(DateTimeHelper.convertDateToUtc(params.value));
+    this.value = params.value;
+    this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
+    this.type = (params.colDef as ColDef).cellRendererParams.type;
+    this.setdateBoundsForDay(params.value);
+    this.setFormControl(params);
   }
 }

@@ -30,7 +30,6 @@ export class AddRecordService {
         {
           timeIn: [null, [Validators.required]],
           departmentId: [null, Validators.required],
-          billRateId: [null, Validators.required],
           value: [null, [Validators.required, Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER)]],
         }
       ) as CustomFormGroup<AddTimsheetForm>;
@@ -40,7 +39,6 @@ export class AddRecordService {
       {
         timeIn: [null, [Validators.required]],
         departmentId: [null, Validators.required],
-        billRateId: [null, Validators.required],
         description: [null, Validators.maxLength(250)],
         value: [null, [Validators.required, Validators.min(0), Validators.max(Number.MAX_SAFE_INTEGER)]],
       }

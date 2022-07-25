@@ -1,21 +1,11 @@
 import { ActivatedRoute } from '@angular/router';
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Inject,
-  Input,
-  OnInit,
-  Output,
-  ViewChild
-} from '@angular/core';
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
+  Inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
 import {
-  filter,
-  takeUntil,
-  Observable,
+  filter, takeUntil, Observable,
 } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { tap } from 'rxjs/operators';

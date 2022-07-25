@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { catchError, filter, forkJoin, map, mergeMap, Observable, of, switchMap, take, tap, throttleTime } from 'rxjs';
+import { catchError, debounceTime, filter, forkJoin, map, mergeMap, Observable, of, switchMap, take, tap, throttleTime } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -78,6 +78,11 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
+  static timesheetsFiltersColumns(state: TimesheetsModel): FilterColumns {
+    return state.timesheetsFiltersColumns;
+  }
+
+  @Selector([TimesheetsState])
   static isTimesheetOpen(state: TimesheetsModel): boolean {
     return state.isTimeSheetOpen;
   }
@@ -123,11 +128,6 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static timesheetsFiltersColumns(state: TimesheetsModel): FilterColumns {
-    return state.timesheetsFiltersColumns;
-  }
-
-  @Selector([TimesheetsState])
   static timesheetDetails(state: TimesheetsModel): TimesheetDetailsModel | null {
     return state.timesheetDetails;
   }
@@ -143,16 +143,6 @@ export class TimesheetsState {
       weekCharge,
       cumulativeCharge
     } : null;
-  }
-
-  @Selector([TimesheetsState])
-  static timesheetDetailsChartsVisible(state: TimesheetsModel): boolean {
-    if (state?.timesheetDetails) {
-      const { weekMiles = 0, cumulativeMiles = 0} = state.timesheetDetails.timesheetStatistic;
-      return weekMiles + cumulativeMiles > 0;
-    }
-
-    return false;
   }
 
   @Selector([TimesheetsState])
@@ -287,16 +277,6 @@ export class TimesheetsState {
   ): Observable<[void, void]> {
     return this.timesheetDetailsApiService.getTimesheetDetails(timesheetId, orgId, isAgency)
       .pipe(
-        map((data: TimesheetDetailsModel) =>{
-          // TODO: remove
-          data.attachments = [
-            {
-              id: 23,
-              fileName: 'Test',
-            }
-          ];
-          return data;
-        }),
         tap((res: TimesheetDetailsModel) => ctx.patchState({
             timesheetDetails: res,
           }),
@@ -366,27 +346,31 @@ export class TimesheetsState {
     { getState, patchState }: StateContext<TimesheetsModel>,
     { payload }: TimesheetDetails.DeleteAttachment
   ): Observable<void> {
-    return this.timesheetDetailsApiService.deleteAttachment(payload);
+    return this.timesheetDetailsApiService.deleteAttachment(payload)
+      .pipe(
+        catchError(() => this.store.dispatch(
+          new ShowToast(MessageTypes.Error, 'File not found')
+        ))
+      );
   }
 
   @Action(Timesheets.SetFiltersDataSource)
   SetFiltersDataSource(
     { setState }: StateContext<TimesheetsModel>,
-    { payload }: Timesheets.SetFiltersDataSource
-  ): Observable<FilterDataSource> {
-    return this.timesheetsApiService.setDataSources(payload)
+    { columnKey, dataSource }: Timesheets.SetFiltersDataSource
+  ): Observable<null> {
+    return of(null)
       .pipe(
-        tap((res: FilterDataSource) => {
-          Object.keys(res).forEach((key: string) => {
-            setState(patch({
-              timesheetsFiltersColumns: patch({
-                [key]: patch({
-                  dataSource: res[key as TimesheetsTableFiltersColumns],
-                })
+        debounceTime(100),
+        tap(() =>
+          setState(patch({
+            timesheetsFiltersColumns: patch({
+              [columnKey]: patch({
+                dataSource: dataSource,
               })
-            }))
-          });
-        })
+            })
+          }))
+        )
       );
   }
 
@@ -420,7 +404,7 @@ export class TimesheetsState {
   ): Observable<Blob> {
     return this.timesheetDetailsApiService.downloadAttachment(payload)
       .pipe(
-        tap((file: Blob) => this.store.dispatch(new TimesheetDetails.FileLoaded(file))),
+        tap((file: Blob) => this.store.dispatch(new TimesheetDetails.AttachmentLoaded(file))),
         catchError(() => this.store.dispatch(
           new ShowToast(MessageTypes.Error, 'File not found'))
         ),
