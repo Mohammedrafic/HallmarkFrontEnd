@@ -14,6 +14,8 @@ import {
   ClearSelectedOrder,
   DeleteOrder,
   DeleteOrderSucceeded,
+  DuplicateOrder,
+  DuplicateOrderSuccess,
   ExportOrders,
   GetAgencyOrderCandidatesList,
   GetAvailableSteps,
@@ -231,6 +233,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.onOrderFilterDataSourcesLoadHandler();
 
     this.onOrganizationStructureDataLoadHandler();
+    this.onDuplicateOrderSucceededHandler();
     this.onDeleteOrderSucceededHandler();
     this.onApproveOrderHandler();
 
@@ -678,7 +681,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.editOrder(data);
         break;
       case MoreMenuType['Duplicate']:
-        // TODO: pending implementation
+        this.store.dispatch(new DuplicateOrder(data.id));
         break;
       case MoreMenuType['Close']:
         // TODO: pending implementation
@@ -959,6 +962,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       const [index] = this.gridWithChildRow.getSelectedRowIndexes();
       this.selectedIndex = index;
       this.getOrders();
+    });
+  }
+
+  private onDuplicateOrderSucceededHandler(): void {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(DuplicateOrderSuccess)).subscribe((data: { payload: number }) => {
+      this.router.navigate(['./edit', data.payload], { relativeTo: this.route });
     });
   }
 

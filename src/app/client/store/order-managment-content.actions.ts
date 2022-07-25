@@ -212,3 +212,13 @@ export class ClearSuggestions {
   static readonly type = '[order management] Clear Suggestions';
   constructor() { }
 }
+
+export class DuplicateOrder {
+  static readonly type = '[order management] Duplicate Order';
+  constructor(public payload: number) { }
+}
+
+export class DuplicateOrderSuccess {
+  static readonly type = '[order management] Duplicate Order Success';
+  constructor(public payload: number) { }
+}

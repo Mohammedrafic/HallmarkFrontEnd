@@ -371,4 +371,13 @@ export class OrderManagementContentService {
         return this.http.post(`/api/Agency/export`, payload, { responseType: 'blob' });
     }
   }
+
+  /**
+   * Duplicate order by id
+   * @param payload order id to duplicate
+   * @return id of newly created order
+   */
+  public duplicate(payload: number): Observable<number> {
+    return this.http.post<number>(`/api/Orders/${payload}/duplicate`, {});
+  }
 }
