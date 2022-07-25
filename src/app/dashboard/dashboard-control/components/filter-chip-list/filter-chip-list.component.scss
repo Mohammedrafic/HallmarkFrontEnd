@@ -13,6 +13,10 @@
     height: 42px;
     overflow: hidden;
 
+    &___expand {
+      height: auto;
+    }
+
     .chips-button {
       display: flex;
       justify-content: flex-end;
@@ -80,9 +84,5 @@
         }
       }
     }
-  }
-
-  .is-collapsed {
-    height: auto;
   }
 }

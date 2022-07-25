@@ -1,5 +1,5 @@
 <div class="filter-chip-list">
-  <div [ngClass]="['chips-wrapper', isCollapsed ? 'is-collapsed' : '']">
+  <div [ngClass]="['chips-wrapper', isCollapsed && items.length ? 'chips-wrapper___expand' : '']">
     <div class="chips-list" #resize>
       <div class="applied-filters">Applied Filters: {{ items.length ? '' : 'None' }}</div>
       <div class="chips-title" *ngFor="let filter of chipList">
@@ -14,7 +14,7 @@
       </div>
     </div>
     <div class="chips-button">
-      <div *ngIf="showMoreLessBtn" class="show-more-less" (click)="onCollapseExpandList()">{{ !isCollapsed ? 'Show more' : 'Show less' }}</div>
+      <div *ngIf="showMoreLessBtn && items.length" class="show-more-less" (click)="onCollapseExpandList()">{{ !isCollapsed ? 'Show more' : 'Show less' }}</div>
       <div class="clear-all" *ngIf="items.length" (click)="onClearFilters()">Clear all</div>
     </div>
   </div>
