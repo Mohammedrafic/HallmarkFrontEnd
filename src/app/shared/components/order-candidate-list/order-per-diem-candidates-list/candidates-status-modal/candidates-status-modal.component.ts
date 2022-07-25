@@ -193,7 +193,11 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
             },
           })
         )
-        .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
+        .subscribe({
+          next: () => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()),
+          error: () => this.closeDialog(),
+          complete: () => this.closeDialog(),
+        });
     }
   }
 
