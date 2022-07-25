@@ -23,6 +23,8 @@ import { DialogAction, ExportType } from '../../enums';
 import { TimesheetsService } from '../../services/timesheets.service';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { ProfileDetailsContainerComponent } from '../profile-details-container/profile-details-container.component';
+import { AppState } from '../../../../store/app.state';
+import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 
 @Component({
   selector: 'app-timesheets-container.ts',
@@ -42,6 +44,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   @Select(TimesheetsState.organizations)
   readonly organizations$!: Observable<DataSourceItem[]>;
+
+  @Select(AppState.isOrganizationAgencyArea)
+  isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
 
   @Select(UserState.user)
   readonly user$: Observable<User>;

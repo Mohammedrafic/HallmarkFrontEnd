@@ -4,7 +4,7 @@ import {
   Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { filter, Observable, take, takeUntil, switchMap, throttleTime, forkJoin, of } from 'rxjs';
+import { filter, Observable, take, takeUntil, switchMap, throttleTime, forkJoin, of, tap } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
@@ -123,7 +123,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.router.events.pipe(
       filter((e) => e instanceof NavigationStart),
       takeUntil(this.componentDestroy()),
-    ).subscribe(() => this.handleProfileClose());
+    ).subscribe(() => this.closeDialog());
   }
 
   /**
@@ -185,6 +185,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public handleReject(reason: string): void {
     this.updateTimesheetStatus(TimesheetTargetStatus.Rejected, { reason })
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
       .subscribe(() => {
         this.store.dispatch([
           new ShowToast(MessageTypes.Success, rejectTimesheetDialogData.successMessage),
@@ -214,7 +217,13 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       this.timesheetDetailsService.submitTimesheet(timesheetId, organizationId) :
       this.timesheetDetailsService.approveTimesheet(timesheetId)
     )
-      .subscribe(() => this.handleProfileClose());
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(() => {
+        this.handleProfileClose();
+        this.store.dispatch(new Timesheets.GetAll());
+      });
   }
 
   private startSelectedTimesheetWatching(): void {
@@ -232,7 +241,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
         ]);
       }),
       takeUntil(this.componentDestroy()),
-    ).subscribe();
+    ).subscribe(
+      () => this.chipList?.refresh()
+    );
   }
 
   private getDialogState(): void {
@@ -288,7 +299,15 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
           fileName: fileData.name,
         }
       }),
-    }));
+    }))
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(() => {
+        this.store.dispatch(
+          new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
+        );
+      });
 
     this.uploadTooltip?.close();
   }

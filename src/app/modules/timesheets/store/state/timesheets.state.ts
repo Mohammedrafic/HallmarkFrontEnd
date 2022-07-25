@@ -287,16 +287,6 @@ export class TimesheetsState {
   ): Observable<[void, void]> {
     return this.timesheetDetailsApiService.getTimesheetDetails(timesheetId, orgId, isAgency)
       .pipe(
-        map((data: TimesheetDetailsModel) =>{
-          // TODO: remove
-          data.attachments = [
-            {
-              id: 23,
-              fileName: 'Test',
-            }
-          ];
-          return data;
-        }),
         tap((res: TimesheetDetailsModel) => ctx.patchState({
             timesheetDetails: res,
           }),
@@ -366,7 +356,12 @@ export class TimesheetsState {
     { getState, patchState }: StateContext<TimesheetsModel>,
     { payload }: TimesheetDetails.DeleteAttachment
   ): Observable<void> {
-    return this.timesheetDetailsApiService.deleteAttachment(payload);
+    return this.timesheetDetailsApiService.deleteAttachment(payload)
+      .pipe(
+        catchError(() => this.store.dispatch(
+          new ShowToast(MessageTypes.Error, 'File not found')
+        ))
+      );
   }
 
   @Action(Timesheets.SetFiltersDataSource)
@@ -419,7 +414,7 @@ export class TimesheetsState {
   ): Observable<Blob> {
     return this.timesheetDetailsApiService.downloadAttachment(payload)
       .pipe(
-        tap((file: Blob) => this.store.dispatch(new TimesheetDetails.FileLoaded(file))),
+        tap((file: Blob) => this.store.dispatch(new TimesheetDetails.AttachmentLoaded(file))),
         catchError(() => this.store.dispatch(
           new ShowToast(MessageTypes.Error, 'File not found'))
         ),

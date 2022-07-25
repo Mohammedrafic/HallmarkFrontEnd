@@ -1,7 +1,7 @@
 <ejs-dialog
     #sideDialog
     cssClass="dialog"
-    [width]="width"
+    [width]="850"
     [visible]="false"
     [isModal]="true"
     [animationSettings]="{ effect: 'SlideRight' }">
@@ -31,22 +31,16 @@
                 </div>
             </section>
             <section class="file-viewer-container">
-<!--                <div class="left">-->
-<!--                    <div class="side-menu">-->
-<!--                        <ng-content select=".sideMenu"></ng-content>-->
-<!--                    </div>-->
-<!--                </div>-->
                 <div class="right">
                     <div class="file-viewer">
-<!--                        *ngIf="!imageMode"-->
                         <ejs-pdfviewer id="pdfViewer"
-                                       style="width:100%; min-height:600px; display:block"
-                                       *ngIf="!imageMode"
+                                       style="display: block; height: 100%"
+                                       *ngIf="!isImage"
                                        #pdfViewer
                                        [serviceUrl]="service"
                                        [enableTextSelection]="false"
                         ></ejs-pdfviewer>
-                        <div *ngIf="imageMode" class="image-container">
+                        <div *ngIf="isImage" class="image-container">
                             <img class="image" [src]="imageSrs"/>
                         </div>
                     </div>
