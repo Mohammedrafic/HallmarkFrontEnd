@@ -19,6 +19,7 @@ import type { KeyValue } from '@angular/common';
 import type { PositionByTypeDataModel, PositionsByTypeAggregatedModel } from '../../models/positions-by-type-aggregated.model';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
 import { PositionTypeEnum } from '../../enums/position-type.enum';
+import { TimeSelectionEnum } from '../../enums/time-selection.enum';
 
 @Component({
   selector: 'app-line-chart',
@@ -44,6 +45,9 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
   public readonly xAxisName: keyof PositionByTypeDataModel = 'month';
   public readonly yAxisName: keyof PositionByTypeDataModel = 'value';
   public readonly type: string = 'Spline';
+  public readonly weeklySelection: TimeSelectionEnum = TimeSelectionEnum.Weekly;
+  public readonly monthlySelection: TimeSelectionEnum = TimeSelectionEnum.Monthly;
+  public monthMode: boolean = true;
 
   public readonly crosshairSettings: CrosshairSettingsModel = {
     enable: true,
@@ -95,5 +99,10 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
       max,
       thru((value: number) => Math.ceil(value / 10) * 10)
     )(this.chartData);
+  }
+
+  public onSwicthTo(timeSelection: TimeSelectionEnum): void {
+    this.monthMode = !this.monthMode;
+    console.error(timeSelection);
   }
 }
