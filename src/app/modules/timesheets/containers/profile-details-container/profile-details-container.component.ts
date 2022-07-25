@@ -1,24 +1,18 @@
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import {
-  ChangeDetectionStrategy,
-  Component, ElementRef,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewChild,
-} from '@angular/core';
+  ChangeDetectionStrategy, Component, ElementRef, EventEmitter,
+  Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { take, filter, Observable, takeUntil, tap, throttleTime, forkJoin } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { filter, Observable, take, takeUntil, switchMap, throttleTime, forkJoin, of } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
-import { SelectedEventArgs, UploaderComponent } from '@syncfusion/ej2-angular-inputs';
+import { SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { Destroyable } from '@core/helpers';
 import { FileSize } from '@core/enums';
+import { DialogAction, SubmitBtnText, TimesheetTargetStatus } from '../../enums';
 import { FileExtensionsString } from '@core/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
@@ -26,19 +20,15 @@ import { ExportColumn, ExportPayload } from '@shared/models/export.model';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import {
-  CandidateHoursAndMilesData,
-  CandidateInfo,
-  DialogActionPayload,
-  TimesheetDetailsModel, CandidateMilesData, OpenAddDialogMeta, Timesheet
-} from '../../interface';
-import { DialogAction, SubmitBtnText } from '../../enums';
+  CandidateMilesData, ChangeStatusData, DialogActionPayload, OpenAddDialogMeta,
+  Timesheet, TimesheetDetailsModel } from '../../interface';
 import {
-  ConfirmDeleteTimesheetDialogContent,
-  ConfirmUnsavedChages,
-  TimesheetDetailsExportOptions,
-} from '../../constants';
-import { ShowExportDialog } from '../../../../store/app.actions';
+  ConfirmDeleteTimesheetDialogContent, ConfirmUnsavedChages, rejectTimesheetDialogData,
+  TimesheetDetailsExportOptions } from '../../constants';
+import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { TimesheetDetailsService } from '../../services/timesheet-details.service';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -49,13 +39,6 @@ import { TimesheetDetails } from '../../store/actions/timesheet-details.actions'
 export class ProfileDetailsContainerComponent extends Destroyable implements OnInit {
   @ViewChild('candidateDialog')
   public candidateDialog: DialogComponent;
-
-  @ViewChild('dnwDialog')
-  public dnwDialog: DialogComponent;
-
-
-  @ViewChild('uploader')
-  public uploader: UploaderComponent;
 
   @ViewChild('chipList')
   public chipList: ChipListComponent;
@@ -81,11 +64,15 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public submitText: string;
 
-  public candidateId: number;
-
   public fileName: string = '';
 
-  private isChangesSaved = true;
+  public isChangesSaved = true;
+
+  public visible = false;
+
+  public timesheetId: number;
+
+  public organizationId: number | null = null;
 
   public readonly columnsToExport: ExportColumn[] = TimesheetDetailsExportOptions;
 
@@ -95,20 +82,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @Select(TimesheetsState.selectedTimeSheet)
   public readonly selectedTimeSheet$: Observable<Timesheet>;
 
-  @Select(TimesheetsState.candidateInfo)
-  public readonly candidateInfo$: Observable<CandidateInfo>;
-
-  @Select(TimesheetsState.candidateHoursAndMilesData)
-  public readonly hoursAndMilesData$: Observable<CandidateHoursAndMilesData>;
-
   @Select(TimesheetsState.timesheetDetails)
   public readonly timesheetDetails$: Observable<TimesheetDetailsModel>;
 
   @Select(TimesheetsState.timesheetDetailsMilesStatistics)
   public readonly milesData$: Observable<CandidateMilesData>
-
- @Select(TimesheetsState.timesheetDetailsChartsVisible)
-  public readonly chartsVisible$: Observable<boolean>
 
   public readonly exportedFileType: typeof ExportedFileType = ExportedFileType;
   public readonly allowedFileExtensions: string = FileExtensionsString;
@@ -120,6 +98,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     private confirmService: ConfirmService,
     private datePipe: DatePipe,
     private router: Router,
+    private timesheetDetailsService: TimesheetDetailsService,
   ) {
     super();
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
@@ -134,15 +113,19 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.getDialogState();
     this.startSelectedTimesheetWatching();
     this.closeDialogOnNavigationStart();
+    this.setOrgId();
   }
 
   public closeDialogOnNavigationStart(): void {
     this.router.events.pipe(
       filter((e) => e instanceof NavigationStart),
       takeUntil(this.componentDestroy()),
-    ).subscribe(() => this.handleProfileClose());
+    ).subscribe(() => this.closeDialog());
   }
 
+  /**
+   * TODO: add debouncer
+   */
   public onNextPreviousOrder(next: boolean): void {
     this.nextPreviousOrderEvent.emit(next);
   }
@@ -150,8 +133,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public handleEditChanges(event: boolean): void {
     this.isChangesSaved = event;
   }
-
-  public handleUpdateTable(): void {}
 
   public openAddDialog(meta: OpenAddDialogMeta): void {
     this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Open, meta.currentTab, meta.initDate));
@@ -188,32 +169,58 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     })
       .pipe(
         take(1),
+        switchMap((submitted: boolean) => submitted ?  this.store.dispatch([
+          new Timesheets.ToggleCandidateDialog(DialogAction.Close),
+          new TimesheetDetails.NoWorkPerformed(this.timesheetId, this.organizationId),
+        ]) : of(null))
       )
-      .subscribe((submitted: boolean) => {
-        if (submitted) {
-          this.store.dispatch([
-            new Timesheets.ToggleCandidateDialog(DialogAction.Close),
-            new Timesheets.DeleteTimesheet(this.candidateId),
-          ]).subscribe(() => this.handleProfileClose());
-        }
-
+      .subscribe(() => {
+        this.handleProfileClose();
         switchComponent.writeValue(false);
       });
   }
 
   public handleReject(reason: string): void {
-    this.store.dispatch(new TimesheetDetails.RejectTimesheet(this.candidateId, reason))
-      .subscribe(() => this.handleProfileClose());
+    this.updateTimesheetStatus(TimesheetTargetStatus.Rejected, { reason })
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(() => {
+        this.store.dispatch([
+          new ShowToast(MessageTypes.Success, rejectTimesheetDialogData.successMessage),
+          new Timesheets.GetAll(),
+        ]);
+
+        this.handleProfileClose();
+      });
+  }
+
+  public updateTimesheetStatus(status: TimesheetTargetStatus, data?: Partial<ChangeStatusData>): Observable<void> {
+    return this.store.dispatch(
+      new TimesheetDetails.ChangeTimesheetStatus({
+        timesheetId: this.timesheetId,
+        organizationId: this.organizationId,
+        targetStatus: status,
+        reason: null,
+        ...data
+      })
+    );
   }
 
   public handleApprove(): void {
-    const id = this.candidateId;
-    this.store.dispatch(
-      this.isAgency ? new TimesheetDetails.AgencySubmitTimesheet(id) :
-        new TimesheetDetails.OrganizationApproveTimesheet(id)
-    ).pipe(
-      tap(() => this.handleProfileClose())
-    );
+    const { timesheetId, organizationId } = this;
+
+    (organizationId ?
+      this.timesheetDetailsService.submitTimesheet(timesheetId, organizationId) :
+      this.timesheetDetailsService.approveTimesheet(timesheetId)
+    )
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(() => {
+        this.handleProfileClose();
+        this.store.dispatch(new Timesheets.GetAll());
+      });
   }
 
   private startSelectedTimesheetWatching(): void {
@@ -221,15 +228,19 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       throttleTime(100),
       filter(Boolean),
       switchMap((timesheet: Timesheet) => {
-        this.candidateId = timesheet.id;
+        this.timesheetId = timesheet.id;
 
         return forkJoin([
-          this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(this.candidateId)),
-          this.store.dispatch(new Timesheets.GetTimesheetDetails(this.candidateId))
+          this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(
+            timesheet.id, timesheet.organizationId, this.isAgency)),
+          this.store.dispatch(new Timesheets.GetTimesheetDetails(
+            timesheet.id, timesheet.organizationId, this.isAgency))
         ]);
       }),
       takeUntil(this.componentDestroy()),
-    ).subscribe();
+    ).subscribe(
+      () => this.chipList?.refresh()
+    );
   }
 
   private getDialogState(): void {
@@ -275,11 +286,26 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     );
   }
 
-  public onFilesSelected(event: SelectedEventArgs): void {
-    const blobList: Blob[] = event.filesData.map(file => file.rawFile as Blob);
-    const names: string[] = event.filesData.map(file => file.name);
+  public onFilesSelected(event: SelectedEventArgs, orgId: number): void {
+    this.store.dispatch(new TimesheetDetails.UploadFiles({
+      timesheetId: this.timesheetId,
+      organizationId: this.isAgency ? orgId : null,
+      files: event.filesData.map((fileData) => {
+        return {
+          blob: fileData.rawFile as Blob,
+          fileName: fileData.name,
+        }
+      }),
+    }))
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe(() => {
+        this.store.dispatch(
+          new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
+        );
+      });
 
-    this.store.dispatch(new TimesheetDetails.UploadFiles(this.candidateId, blobList, names));
     this.uploadTooltip?.close();
   }
 
@@ -292,6 +318,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       ?.querySelector('button')?.click();
   }
 
+  /**
+   * TODO: date pipe is always defined, needs check
+   */
   private generateDateTime(datePipe: DatePipe): string {
     return datePipe ? datePipe.transform(Date.now(), 'MM/dd/yyyy hh:mm a') as string : '';
   }
@@ -301,5 +330,16 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     .pipe(
       takeUntil(this.componentDestroy())
     ).subscribe(() => this.candidateDialog.hide());
+  }
+
+  private setOrgId(): void {
+    this.timesheetDetails$
+    .pipe(
+      filter(Boolean),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe(({ organizationId }) => {
+      this.organizationId = this.isAgency ? organizationId : null;
+    });
   }
 }

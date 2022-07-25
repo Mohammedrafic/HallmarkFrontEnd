@@ -31,6 +31,7 @@ import {
   myAgencyChildColumnsToExport,
   myAgencyColumnsToExport,
   MyAgencyOrdersColumnsConfig,
+  perDiemChildColumnsToExport,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
   reOrdersChildColumnToExport,
@@ -278,26 +279,22 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private dispatchNewPage(): void {
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
-        this.columnsToExport = [...myAgencyColumnsToExport, ...myAgencyChildColumnsToExport];
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.PerDiem:
-        // TODO: pending BE
-        this.columnsToExport = perDiemColumnsToExport;
         this.filters.orderTypes = [OrderType.OpenPerDiem];
         this.filters.includeReOrders = true;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.ReOrders:
-        this.columnsToExport = reOrdersColumnsToExport;
         this.filters.orderTypes = [OrderType.ReOrder];
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       default:
-        this.columnsToExport = myAgencyColumnsToExport;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
     }
+    this.checkSelectedChildrenItem();
   }
 
   public onGridCreated(): void {
@@ -493,6 +490,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   private checkSelectedChildrenItem(): void {
     const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children.length !== 0);
+    const hasSelectedChildReorders = this.selectedItems.some((itm) => itm.reOrders?.length !== 0);
 
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
@@ -503,6 +501,15 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.columnsToExport = hasSelectedItemChildren
           ? [...myAgencyColumnsToExport, ...myAgencyChildColumnsToExport]
           : myAgencyColumnsToExport;
+        break;
+      case AgencyOrderManagementTabs.PerDiem:
+        if (this.selectedItems.length === 0) {
+          this.columnsToExport = [...perDiemColumnsToExport, ...perDiemChildColumnsToExport];
+          return;
+        }
+        this.columnsToExport = hasSelectedChildReorders
+          ? [...perDiemColumnsToExport, ...perDiemChildColumnsToExport]
+          : perDiemColumnsToExport;
         break;
       case AgencyOrderManagementTabs.ReOrders:
         this.columnsToExport = hasSelectedItemChildren

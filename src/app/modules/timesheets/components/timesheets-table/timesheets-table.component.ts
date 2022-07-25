@@ -55,7 +55,10 @@ export class TimesheetsTableComponent implements OnChanges {
 
   ngOnChanges(): void {
     this.gridInstance$.getValue()?.columnApi
-      .setColumnVisible(TimesheetsTableColumns.Approve, this.activeTabIdx === 1);
+      .setColumnVisible(
+        TimesheetsTableColumns.Approve,
+        !this.router.url.includes('agency') && this.activeTabIdx === 1
+      );
   }
 
   public onRowsDropDownChanged(pageSize: number): void {

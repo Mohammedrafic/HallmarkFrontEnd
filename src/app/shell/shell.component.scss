@@ -72,6 +72,8 @@
       height: 34px;
       width: 127px;
       background-image: url(../../assets/icons/logo.svg);
+      background-size:100%;
+      background-repeat:no-repeat;
     }
 
     .small-logo {
@@ -378,3 +380,13 @@
   background: transparent;
   width:100%;
 }
+
+.other-icons {
+  margin-right: 30px;
+
+  .icon {
+    color: $secondary-dark-blue-30;
+    cursor: pointer;
+  }
+}
+

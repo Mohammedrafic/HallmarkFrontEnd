@@ -28,52 +28,15 @@ export interface DialogConfigField {
   optionsStateKey?: keyof TimesheetsModel;
 }
 
-export interface DialogConfig {
+export interface DialogConfigBlock {
   title: string;
-  timesheets: DialogConfigField[];
-  miles: DialogConfigField[];
-  expenses: DialogConfigField[];
+  fields: DialogConfigField[];
 }
 
-export interface MileRecord {
-  id: number;
-  day: string;
-  costCenter: number;
-  billRateType: number;
-  amount: number;
-  rate: number;
-  total: number;
-  billRate: number;
-  timeIn: string;
-  billRateConfigId: number;
-  billRateConfigName: string;
-}
-
-export interface ExpensesRecord {
-  id: number;
-  day: string;
-  costCenter: number;
-  billRateType: number;
-  description: string;
-  amount: number;
-  billRate: number;
-  timeIn: string;
-  billRateConfigId: number;
-  billRateConfigName: string;
-}
-
-export interface TimesheetRecord {
-  id: number;
-  day: string;
-  timeIn: string;
-  timeOut: string;
-  costCenter: number;
-  billRateType: number;
-  amount: number;
-  billRate: number;
-  billRateConfigId: number;
-  billRateConfigName: string;
-  total: number;
+export interface DialogConfig {
+  timesheets: DialogConfigBlock;
+  miles: DialogConfigBlock;
+  expenses: DialogConfigBlock;
 }
 
 export interface TimesheetRecordsDto {
@@ -82,7 +45,22 @@ export interface TimesheetRecordsDto {
   [RecordFields.Expenses]: RecordValue[];
 }
 
-export type RecordValue = TimesheetRecord | MileRecord | ExpensesRecord;
+export interface RecordValue {
+  id: number;
+  day: string;
+  timeIn: string;
+  timeOut?: string;
+  billRate: number;
+  billRateConfigName: string;
+  billRateId: number;
+  costCenterFormattedName: string;
+  costCenterName: string;
+  departmentId: number;
+  description?: string;
+  extDepartmentId: string;
+  total:  number;
+  value: 10;
+};
 
 export interface TimesheetAttachments {
   attachments: TimesheetAttachment[];
@@ -91,7 +69,7 @@ export interface TimesheetAttachments {
 export interface TabConfig {
   title: string;
   amount?: number;
-  value?: number;
+  value?: string[];
 }
 
 export interface TabCountConfig {

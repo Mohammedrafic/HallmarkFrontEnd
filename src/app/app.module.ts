@@ -31,12 +31,12 @@ import { B2cModule } from './b2c-auth/b2c-auth.module';
       AppState,
       UserState
     ]),
-    // NgxsReduxDevtoolsPluginModule.forRoot({
-    //   disabled: environment.production
-    // }),
-    // NgxsLoggerPluginModule.forRoot({
-    //   disabled: environment.production
-    // }),
+    NgxsReduxDevtoolsPluginModule.forRoot({
+      disabled: environment.production
+    }),
+    NgxsLoggerPluginModule.forRoot({
+      disabled: environment.production
+    }),
     NgxMaskModule.forRoot(),
     
     // B2C
