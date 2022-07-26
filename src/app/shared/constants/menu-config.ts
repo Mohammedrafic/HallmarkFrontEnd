@@ -138,7 +138,7 @@ export const MENU_CONFIG: any = {
     },
     32: {
       // Custom Reports
-      icon: 'Truck',
+      icon: 'pie-chart',
       route: '/analytics/state-wise-skills',
     },
     33: {
