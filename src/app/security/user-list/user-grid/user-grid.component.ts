@@ -98,6 +98,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   }
 
   public onGoToClick(event: any): void {
+    this.currentPage = event.currentPage || event.value;
     if (event.currentPage || event.value) {
       this.dispatchNewPage();
     }
