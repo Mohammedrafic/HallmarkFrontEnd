@@ -9,7 +9,9 @@ export enum TIMESHEETS_ACTIONS {
   DELETE_PROFILE_TIMESHEET = '[timesheets] DELETE PROFILE TIMESHEET',
   GET_TABS_COUNTS = '[timesheets] GET TABS COUNTS',
   SET_FILTERS_DATA_SOURCE = '[timesheets] SET FILTERS DATA SOURCE',
+  GET_FILTERS_DATA_SOURCE = '[timesheets] GET FILTERS DATA SOURCE',
   UPDATE_FILTERS_STATE = '[timesheets] UPDATE FILTERS STATE',
+  RESET_FILTERS_STATE = '[timesheets] RESET FILTERS STATE',
   AGENCY_SUBMIT_TIMESHEET = '[timesheets] AGENCY SUBMIT TIMESHEET',
   ORGANIZATION_APPROVE_TIMESHEET = '[timesheets] ORGANIZATION APPROVE TIMESHEET',
   SUBMIT_TIMESHEET = '[timesheets] SUBMIT TIMESHEET',
@@ -17,6 +19,7 @@ export enum TIMESHEETS_ACTIONS {
   DELETE_TIMESHEET = '[timesheets] DELETE TIMESHEET',
   GET_TIMESHEET_DETAILS = '[timesheets] GET TIMESHEET DETAILS',
   GET_ORGANIZATIONS = '[timesheets] GET ORGANIZATIONS',
+  SELECT_ORGANIZATION = '[timesheets] SELECT ORGANIZATION',
 }
 
 export enum TimesheetDetailsActions {
@@ -93,6 +96,14 @@ export enum TimesheetsTableFiltersColumns {
   TotalHours = 'totalHours',
   BillRate = 'billRate',
   SkillIds = 'skillIds',
+}
+
+export enum FilteringOptionsFields {
+  Agencies = 'agencies',
+  Orders = 'orders',
+  Regions = 'regions',
+  Skills = 'skills',
+  Statuses = 'statuses'
 }
 
 export enum DialogAction {

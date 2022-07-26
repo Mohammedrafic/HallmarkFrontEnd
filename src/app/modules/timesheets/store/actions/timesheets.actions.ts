@@ -59,6 +59,10 @@ export namespace Timesheets {
     static readonly type = TIMESHEETS_ACTIONS.GET_TABS_COUNTS;
   }
 
+  export class GetFiltersDataSource {
+    static readonly type = TIMESHEETS_ACTIONS.GET_FILTERS_DATA_SOURCE;
+  }
+
   export class SetFiltersDataSource {
     static readonly type = TIMESHEETS_ACTIONS.SET_FILTERS_DATA_SOURCE;
 
@@ -74,6 +78,10 @@ export namespace Timesheets {
 
     constructor(public readonly payload?: TimesheetsFilterState) {
     }
+  }
+
+  export class ResetFiltersState {
+    static readonly type = TIMESHEETS_ACTIONS.RESET_FILTERS_STATE;
   }
 
   export class DeleteTimesheet {
@@ -96,5 +104,12 @@ export namespace Timesheets {
 
   export class GetOrganizations {
     static readonly type = TIMESHEETS_ACTIONS.GET_ORGANIZATIONS;
+  }
+
+  export class SelectOrganization {
+    static readonly type = TIMESHEETS_ACTIONS.SELECT_ORGANIZATION;
+
+    constructor(public readonly id: number) {
+    }
   }
 }

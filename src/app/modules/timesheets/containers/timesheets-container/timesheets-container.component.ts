@@ -71,16 +71,23 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     private router: Router,
   ) {
     super();
-    store.dispatch(new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }));
+    store.dispatch([
+      new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }),
+      new Timesheets.ResetFiltersState(),
+    ]);
 
     this.isAgency = this.router.url.includes('agency');
   }
 
   ngOnInit(): void {
+
     if (this.isAgency) {
       this.initOrganizationsList();
     } else {
-      this.store.dispatch(new Timesheets.UpdateFiltersState());
+      this.store.dispatch([
+        new Timesheets.UpdateFiltersState(),
+        new Timesheets.GetFiltersDataSource()
+      ]);
     }
 
     this.initTabsCount();
@@ -156,7 +163,10 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       filter(Boolean),
       distinctUntilChanged(),
       switchMap((organizationId: number) => this.store.dispatch(
-        new Timesheets.UpdateFiltersState({ organizationId })
+        [
+          new Timesheets.UpdateFiltersState({ organizationId }),
+          new Timesheets.SelectOrganization(organizationId),
+        ]
       )),
       takeUntil(this.componentDestroy()),
     ).subscribe();
@@ -174,7 +184,10 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       takeUntil(this.componentDestroy()),
     ).subscribe(res => {
       this.organizationControl.setValue(res[0].id, { emitEvent: false });
-      this.store.dispatch(new Timesheets.UpdateFiltersState({ organizationId: res[0].id }));
+      this.store.dispatch([
+        new Timesheets.UpdateFiltersState({ organizationId: res[0].id }),
+        new Timesheets.GetFiltersDataSource()
+      ]);
     });
   }
 
