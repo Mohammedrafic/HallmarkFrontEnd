@@ -42,7 +42,7 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
 
     if (this.order && this.candidate) {
       if (this.isAgency) {
-        if ([ApplicantStatus.NotApplied].includes(this.candidate.status)) {
+        if ([ApplicantStatus.NotApplied, ApplicantStatus.Withdraw].includes(this.candidate.status)) {
           this.candidateJob = null;
           this.store.dispatch(
             new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId)
