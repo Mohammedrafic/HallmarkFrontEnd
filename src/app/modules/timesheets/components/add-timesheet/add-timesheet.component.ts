@@ -46,7 +46,7 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
 
   public formType: RecordFields = RecordFields.Time;
 
-  public readonly dropDownFields = {
+  public readonly dropDownFieldsConfig = {
     text: 'text',
     value: 'value',
   };
@@ -86,7 +86,7 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
       )
       .subscribe(() => {
         this.closeDialog();
-      })
+      });
     } else {
       this.closeDialog();
     }
@@ -96,11 +96,11 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
     return index;
   }
 
-  public saveForm(): void {
+  public saveRecord(): void {
     if (this.form.valid) {
       const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
-
       const body = RecordsAdapter.adaptRecordAddDto(this.form.value, organizationId, id, this.formType);
+
       this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
       this.closeDialog();
     } else {

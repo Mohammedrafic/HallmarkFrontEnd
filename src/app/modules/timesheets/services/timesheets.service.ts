@@ -10,6 +10,9 @@ import { TimsheetForm } from '../interface';
 
 @Injectable()
 export class TimesheetsService {
+  /**
+   * TODO: remove any.
+   */
   private currentSelectedTableRowIndex: BaseObservable<number> = new BaseObservable<number>(null as any);
 
   constructor(private capitalizeFirst: CapitalizeFirstPipe, private fb: FormBuilder,) {
