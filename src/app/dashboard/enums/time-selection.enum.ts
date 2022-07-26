@@ -1,4 +1,4 @@
 export enum TimeSelectionEnum {
-  Weekly,
-  Monthly,
+  Weekly = 1,
+  Monthly = 2,
 }
