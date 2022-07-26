@@ -107,7 +107,7 @@ export class TimesheetRecordsService {
 
   public controlTabsVisibility(billRates: DropdownOption[], tabs: TabComponent): void {
     const isMilageAvaliable = billRates.some((rate) => rate.text.includes('Mileage'));
-    const isExpensesAvaliable = billRates.some((rate) => rate.text.includes('Expenses'));
+    const isExpensesAvaliable = billRates.some((rate) => rate.text.includes('Charge'));
 
     tabs.hideTab(1, !isMilageAvaliable);
     tabs.hideTab(2, !isExpensesAvaliable);

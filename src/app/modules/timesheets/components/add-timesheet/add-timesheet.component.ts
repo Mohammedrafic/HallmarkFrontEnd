@@ -140,7 +140,11 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
   private populateOptions(): void {
     this.dialogConfig[this.formType].fields.forEach((item) => {
       if (item.optionsStateKey) {
-        item.options = this.store.snapshot().timesheets[item.optionsStateKey]
+        item.options = this.store.snapshot().timesheets[item.optionsStateKey];
+      }
+      
+      if (item.optionsStateKey === 'billRateTypes') {
+        item.options = item.options?.filter((rate) => rate.text !== 'Mileage' && rate.text !== 'Charge');
       }
     })
   }
