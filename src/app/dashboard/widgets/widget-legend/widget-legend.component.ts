@@ -8,9 +8,9 @@ import { WidgetLegengDataModel } from '../../models/widget-legend-data.model';
 })
 export class WidgetLegendComponent {
   @Input() legendData: WidgetLegengDataModel[];
-  @Input() showPercentRatio: boolean = true;
+  @Input() showPercentRatio: boolean = false;
 
-  @Output() onClickLegend: EventEmitter<boolean> = new EventEmitter();
+  @Output() onClickLegend: EventEmitter<MouseEvent> = new EventEmitter();
   @Output() changeCheckbox: EventEmitter<string> = new EventEmitter();
 
   private mousePosition = {
@@ -29,7 +29,7 @@ export class WidgetLegendComponent {
 
   public onClickLegendRow(event: MouseEvent): void {
     if (this.mousePosition.x === event.screenX && this.mousePosition.y === event.screenY) {
-      this.onClickLegend.emit(true);
+      this.onClickLegend.emit(event);
     }
   }
 

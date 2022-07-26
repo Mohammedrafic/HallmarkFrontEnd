@@ -4,24 +4,4 @@
   &__component {
     aspect-ratio: 1.65;
   }
-
-  &__legend-score {
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 24px;
-  }
-}
-
-.e-custom {
-  &.e-checkbox-wrapper {
-    .e-frame {
-      height: 16px;
-      width: 16px;
-    }
-
-    .e-check {
-      font-size: 10px;
-      line-height: 8px;
-    }
-  }
 }
