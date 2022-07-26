@@ -75,12 +75,7 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
     header: '',
   };
 
-  public readonly legendSettings: LegendSettingsModel = {
-    alignment: 'Near',
-    enablePages: false,
-    position: 'Top',
-    visible: true,
-  };
+  public readonly legendSettings: LegendSettingsModel = { visible: false };
 
   private readonly selectedEntries$: BehaviorSubject<string[] | null> = new BehaviorSubject<string[] | null>(null);
   private readonly chartData$: BehaviorSubject<PositionsByTypeAggregatedModel | null> = new BehaviorSubject<PositionsByTypeAggregatedModel | null>(null);

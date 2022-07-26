@@ -21,10 +21,6 @@ $headerHeight: 19px;
 
   &.with-legend {
     --chartHeight: 70%;
-
-    .app-widget-wrapper__chart {
-      border-bottom: 1px solid rgba($secondary-dark-blue-40, 0.32);
-    }
   }
 
   &__content {
@@ -48,7 +44,8 @@ $headerHeight: 19px;
   }
 
   &__chart {
-    height: var(--chartHeight);
+    max-height: var(--chartHeight);
+    border-bottom: 1px solid rgba($secondary-dark-blue-40, 0.32);
   }
 
   &__legend {
