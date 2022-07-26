@@ -16,11 +16,21 @@
         </ejs-tab>
       </div>
 
-      <button class="add-action spaced" (click)="openAddDialog()">+ Add Record</button>
+      <button class="add-action spaced"
+              cssClass="e-action-button"
+              ejs-button
+              (click)="openAddDialog()"
+              [disabled]="actionsDisabled"
+      >
+        <i-feather name="plus" class="icon"></i-feather> Add Record
+      </button>
       <ng-container *ngIf="recordsToShow?.[currentTab]?.length">
         <button
           *ngIf="!isEditOn; else editHandlers"
+          [disabled]="actionsDisabled"
           (click)="editTimesheets()"
+          ejs-button
+          cssClass="e-action-button"
           class="add-action">
           <i-feather name="edit" class="icon"></i-feather>
           Edit
@@ -29,7 +39,7 @@
 
       <ng-template #editHandlers>
         <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
-        <button (click)="saveChanges()" ejs-button [isPrimary]="true">Save</button>
+        <button (click)="saveChanges()" ejs-button [isPrimary]="true" [disabled]="actionsDisabled">Save</button>
       </ng-template>
     </div>
 

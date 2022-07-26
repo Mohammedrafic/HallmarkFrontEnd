@@ -449,9 +449,9 @@ export class TimesheetsState {
   @Action(TimesheetDetails.NoWorkPerformed)
   NoWorkPerformed(
     { }: StateContext<TimesheetsModel>,
-    { timesheetId, organizationId }: TimesheetDetails.NoWorkPerformed
+    { noWorkPerformed, timesheetId, organizationId }: TimesheetDetails.NoWorkPerformed
   ): Observable<void> {
-    return this.timesheetDetailsApiService.noWorkPerformed(timesheetId, organizationId);
+    return this.timesheetDetailsApiService.noWorkPerformed(noWorkPerformed, timesheetId, organizationId);
   }
 
   @Action(Timesheets.GetOrganizations)

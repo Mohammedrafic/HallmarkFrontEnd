@@ -72,11 +72,11 @@ export class TimesheetDetailsApiService {
     return this.http.post<void>(`/api/TimesheetState/setstatus`, data);
   }
 
-  public noWorkPerformed(timesheetId: number, organizationId: number | null): Observable<void> {
+  public noWorkPerformed(noWorkPerformed: boolean, timesheetId: number, organizationId: number | null): Observable<void> {
     return this.http.post<void>(`/api/Timesheets/noworkperformed`, {
       timesheetId,
       organizationId,
-      noWorkPerformed: true,
+      noWorkPerformed,
     });
   }
 
