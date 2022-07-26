@@ -76,7 +76,10 @@ export namespace Timesheets {
   export class UpdateFiltersState {
     static readonly type = TIMESHEETS_ACTIONS.UPDATE_FILTERS_STATE;
 
-    constructor(public readonly payload?: TimesheetsFilterState) {
+    constructor(
+      public readonly payload?: TimesheetsFilterState | null,
+      public readonly saveStatuses = false,
+    ) {
     }
   }
 

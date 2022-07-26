@@ -144,6 +144,7 @@ export namespace TimesheetDetails {
     static readonly type = TimesheetDetailsActions.NoWorkPerformed;
 
     constructor(
+      public noWorkPerformed: boolean,
       public timesheetId: number,
       public organizationId: number | null,
     ) {}

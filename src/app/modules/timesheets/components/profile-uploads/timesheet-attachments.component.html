@@ -1,13 +1,19 @@
-<div class="profile-uploads-container">
-  <h3>Attachments</h3>
+<h3>Attachments</h3>
 
-  <div class="uploads-list">
+<div class="uploads-list">
     <div *ngFor="let item of attachments; trackBy: trackById" class="attachment">
-      <i-feather name="download" class="icon file-icon" (click)="downloadFile(item)"></i-feather>
-      <div class="file-name" (click)="preview(item)">{{item.fileName}}</div>
-      <div class="delete-icon">
-        <i-feather name="trash-2" class="icon" (click)="deleteAttachment(item)"></i-feather>
-      </div>
+        <i-feather name="download" class="icon file-icon" (click)="downloadFile(item)"></i-feather>
+
+        <ejs-tooltip [content]="item.fileName"
+                     (click)="preview(item)"
+                     position="BottomCenter"
+                     class="file-name"
+        >
+          {{item.fileName}}
+        </ejs-tooltip>
+
+        <div class="delete-icon">
+            <i-feather name="trash-2" class="icon" (click)="deleteAttachment(item)"></i-feather>
+        </div>
     </div>
-  </div>
 </div>

@@ -4,7 +4,7 @@ import {
   Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { filter, Observable, take, takeUntil, switchMap, throttleTime, forkJoin, of } from 'rxjs';
+import { filter, Observable, take, takeUntil, switchMap, throttleTime, forkJoin, tap } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
@@ -29,6 +29,7 @@ import {
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';
+import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -51,6 +52,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   @ViewChild('uploadArea')
   public uploadArea: ElementRef<HTMLDivElement>;
+
+  @ViewChild('dnwSwitch')
+  public dnwSwitch: SwitchComponent;
 
   @Input() currentSelectedRowIndex: number | null = null;
 
@@ -91,6 +95,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public readonly exportedFileType: typeof ExportedFileType = ExportedFileType;
   public readonly allowedFileExtensions: string = FileExtensionsString;
   public readonly maxFileSize: number = FileSize.MB_10;
+  public readonly timesheetStatus: typeof TimesheetStatus = TimesheetStatus;
 
   constructor(
     private store: Store,
@@ -162,22 +167,29 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   }
 
   public onDWNCheckboxSelectedChange({checked}: {checked: boolean}, switchComponent: SwitchComponent): void {
-    checked && this.confirmService.confirm(ConfirmDeleteTimesheetDialogContent, {
+    checked ? this.confirmService.confirm(ConfirmDeleteTimesheetDialogContent, {
       title: 'Delete Timesheet',
       okButtonLabel: 'Proceed',
       okButtonClass: 'delete-button',
     })
       .pipe(
         take(1),
-        switchMap((submitted: boolean) => submitted ?  this.store.dispatch([
-          new Timesheets.ToggleCandidateDialog(DialogAction.Close),
-          new TimesheetDetails.NoWorkPerformed(this.timesheetId, this.organizationId),
-        ]) : of(null))
+        tap((submitted: boolean) => !submitted && switchComponent.writeValue(false)),
+        filter(Boolean),
+        switchMap(() => this.store.dispatch(
+          new TimesheetDetails.NoWorkPerformed(true, this.timesheetId, this.organizationId),
+        ))
       )
       .subscribe(() => {
-        this.handleProfileClose();
-        switchComponent.writeValue(false);
-      });
+        this.closeDialog();
+        this.refreshData();
+      }) : this.store.dispatch(
+      new TimesheetDetails.NoWorkPerformed(false, this.timesheetId, this.organizationId)
+    )
+      .pipe(
+        take(1),
+      )
+      .subscribe(() => this.refreshData());
   }
 
   public handleReject(reason: string): void {
@@ -318,6 +330,12 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       ?.querySelector('button')?.click();
   }
 
+  private refreshData(): Observable<unknown> {
+    return this.store.dispatch(
+      new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
+    );
+  }
+
   /**
    * TODO: date pipe is always defined, needs check
    */
@@ -343,3 +361,4 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     });
   }
 }
+
