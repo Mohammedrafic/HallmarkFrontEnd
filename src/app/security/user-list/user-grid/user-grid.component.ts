@@ -1,13 +1,13 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { GridComponent, RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
 import { FormGroup } from '@angular/forms';
-import { Role } from '@shared/models/roles.model';
+import { Role, RolesPage } from '@shared/models/roles.model';
 import { GRID_CONFIG } from '@shared/constants';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { Select, Store } from '@ngxs/store';
 import { SecurityState } from '../../store/security.state';
 import { map, Observable, Subject, takeWhile } from 'rxjs';
-import { ExportUserList, GetUsersPage } from '../../store/security.actions';
+import { ExportUserList, GetRolesPage, GetUsersPage } from '../../store/security.actions';
 import { CreateUserStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
 import { User, UsersPage } from '@shared/models/user-managment-page.model';
 import { UserState } from '../../../store/user.state';
@@ -19,6 +19,13 @@ import { DatePipe } from '@angular/common';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import { ButtonRendererComponent } from '@shared/components/button/button-renderer/button-renderer.component';
+import {
+  ColDef,
+  GridReadyEvent,
+  IServerSideDatasource,
+  IServerSideGetRowsRequest,
+  PaginationChangedEvent,
+} from '@ag-grid-enterprise/all-modules';
 
 enum Visibility {
   Unassigned,
@@ -43,6 +50,9 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   @Select(SecurityState.usersPage)
   public usersPage$: Observable<UsersPage>;
 
+  @Select(SecurityState.rolesPage)
+  public rolesPage$: Observable<RolesPage>;
+
   public userGridData$: Observable<User[]>;
   public hasVisibility = (_: string, { assigned }: User) => {
     return Visibility[Number(assigned)];
@@ -64,21 +74,24 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   public isAgencyUser = false;
   private isAlive = true;
   itemList: Array<User> | undefined;
-  private gridApi : any;
+  private gridApi: any;
   private gridColumnApi: any;
   modules: any[] = [ServerSideRowModelModule, RowGroupingModule];
-  rowModelType:any;
-  serverSideInfiniteScroll:any;
+  rowModelType: any;
+  serverSideInfiniteScroll: any;
+  serverSideFilterOnServer: any;
   cacheBlockSize: any;
   pagination: boolean;
   paginationPageSize: number;
 
-  defaultColDef:any;
-  autoGroupColumnDef:any;
+  defaultColDef: any;
+  autoGroupColumnDef: any;
   columnDefs: any;
   filterText: string | undefined;
   frameworkComponents: any;
   sideBar: any;
+  serverSideStoreType: any;
+  maxBlocksInCache: any;
 
   constructor(private store: Store, private datePipe: DatePipe) {
     super();
@@ -86,56 +99,102 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
       buttonRenderer: ButtonRendererComponent,
     }
     var self = this;
-    console.log(this.statusEnum[0]);
     this.rowModelType = 'serverSide';
+    this.serverSideStoreType = 'partial';
     this.serverSideInfiniteScroll = true,
-    this.pagination = true;
-    this.paginationPageSize= 10,
-    this.cacheBlockSize = 10;
+      this.serverSideFilterOnServer = true,
+      this.pagination = true;
+    this.paginationPageSize = this.pageSize,
+      this.cacheBlockSize = this.pageSize;
+    this.maxBlocksInCache = 2;
     this.columnDefs = [
-      { 
+      {
         field: 'id',
-        hide: true 
+        hide: true,
+        filter: false
       },
       {
-        field: 'firstName', filter: 'agTextColumnFilter'  
+        field: 'firstName',
+        pinned: 'left',
+        suppressMovable: true,
+        filter: 'agTextColumnFilter',
+        filterParams: {
+          buttons: ['reset'],
+          debounceMs: 1000,
+          suppressAndOrCondition: true,
+        }
       },
       {
         field: 'lastName',
+        pinned: 'left',
+        suppressMovable: true,
+        filter: 'agTextColumnFilter',
+        filterParams: {
+          buttons: ['reset'],
+          debounceMs: 1000,
+          suppressAndOrCondition: true,
+        }
       },
       {
         headerName: 'Status',
         field: 'isDeleted',
-        valueGetter: function(params: { data: { isDeleted: boolean} }){
+        valueGetter: function (params: { data: { isDeleted: boolean } }) {
           return self.statusEnum[+!params.data.isDeleted];
-        }   
+        },
+        pinned: 'left',
+        suppressMovable: true,
+        filter: false,
+        sortable: false
       },
       {
         field: 'email',
+        filter: 'agTextColumnFilter',
+        filterParams: {
+          buttons: ['reset'],
+          debounceMs: 1000,
+          suppressAndOrCondition: true,
+        }
       },
       {
-        field: 'roles',
-        cellRenderer: function(params:{ data: { roles: any}}) {
-          var roleNames = '';
-          params.data.roles.forEach((item: any) => {
-            roleNames += item.name + ',';
-          });
-          return roleNames.substring(0, roleNames.length - 1);
+        headerName: 'Roles',
+        field: 'roleNames',
+        // cellRenderer: function (params: { data: { roles: any } }) {
+        //   var roleNames = '';
+        //   params.data.roles.forEach((item: any) => {
+        //     roleNames += item.name + ',';
+        //   });
+        //   return roleNames.substring(0, roleNames.length - 1);
+        // },
+        sortable: false,
+        filter: 'agSetColumnFilter',
+        filterParams: {
+          values: (params: { success: (arg0: any) => void; }) => {
+            setTimeout(() => {                
+                this.rolesPage$.subscribe((data)=>{                  
+                  params.success(data.items.map(function(item){return item.name}));
+                });
+            }, 3000)
+          },
+          buttons: ['reset'],
+          refreshValuesOnOpen: true,
         }
       },
       {
         field: 'organisation',
-        valueGetter: function(params: { data: { businessUnitName: string }; }) {
+        valueGetter: function (params: { data: { businessUnitName: string }; }) {
           return params.data.businessUnitName || "All";
-        }
+        },
+        filter: false,
       },
       {
         headerName: 'Visibility',
         field: 'hasVisibility',
         hide: this.isAgencyUser,
-        valueGetter: function(params: { data: { hasVisibility: boolean} }){
+        valueGetter: function (params: { data: { hasVisibility: boolean } }) {
           return self.visibilityEnum[params.data.hasVisibility ? 0 : 1]
-        }  
+        },
+        filter: false,
+        sortable: false
       },
       {
         headerName: 'Action',
@@ -145,8 +204,12 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
           label: 'Edit'
         },
         width: 50,
-        pinned: 'right'
-      }   
+        pinned: 'right',
+        suppressMovable: true,
+        filter: false,
+        sortable: false,
+        menuTabs: []
+      }
     ];
 
     this.defaultColDef = {
@@ -154,8 +217,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
       minWidth: 120,
       resizable: true,
       sortable: true,
-      filter: true,
-      enablePivot: true
+      filter: true
     };
 
     this.autoGroupColumnDef = {
@@ -166,33 +228,50 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
     this.sideBar = {
       toolPanels: [
-          {
-            id: 'columns',
-            labelDefault: 'Columns',
-            labelKey: 'columns',
-            iconKey: 'columns',
-            toolPanel: 'agColumnsToolPanel',
-            toolPanelParams: {
-              suppressRowGroups: true,
-              suppressValues: true,
-              suppressPivots: true,
-              suppressPivotMode: true,
-              suppressColumnFilter: true,
-              suppressColumnSelectAll: true,
-              suppressColumnExpandAll: true,
-            },
+        {
+          id: 'columns',
+          labelDefault: 'Columns',
+          labelKey: 'columns',
+          iconKey: 'columns',
+          toolPanel: 'agColumnsToolPanel',
+          toolPanelParams: {
+            suppressRowGroups: true,
+            suppressValues: true,
+            suppressPivots: true,
+            suppressPivotMode: true,
+            suppressColumnFilter: true,
+            suppressColumnSelectAll: true,
+            suppressColumnExpandAll: true,
           },
-        ],
-        defaultToolPanel: 'columns',
+        },
+        {
+          id: 'filters',
+          labelDefault: 'Filters',
+          labelKey: 'filters',
+          iconKey: 'filters',
+          toolPanel: 'agFiltersToolPanel',
+          toolPanelParams: {
+            suppressRowGroups: true,
+            suppressValues: true,
+            suppressPivots: true,
+            suppressPivotMode: true,
+            suppressColumnFilter: true,
+            suppressColumnSelectAll: true,
+            suppressColumnExpandAll: true,
+          },
+        },
+      ],
+      //defaultToolPanel: 'columns',
     };
   }
 
   ngOnInit(): void {
-    this.checkAgencyUser();    
+    this.checkAgencyUser();
     this.subscribeForFilterFormChange();
     this.setFileName();
     this.subscribeOnExportAction();
     this.updateUsers();
+    this.loadRoles();
   }
 
   ngAfterViewInit(): void {
@@ -203,7 +282,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.isAlive = false;
   }
 
-  public onEdit(data: any): void {    
+  public onEdit(data: any): void {
     this.editUserEvent.emit(data?.rowData);
   }
 
@@ -231,6 +310,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   }
 
   public export(event: ExportOptions): void {
+    debugger;
     this.closeExport();
     this.defaultExport(event.fileType, event);
   }
@@ -263,6 +343,18 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.dispatchNewPage();
   }
 
+  onPageSizeChanged(event: any) {
+    this.cacheBlockSize=Number(event.value.toLowerCase().replace("rows",""));
+    this.paginationPageSize=Number(event.value.toLowerCase().replace("rows",""));
+    if(this.gridApi!=null)
+    {
+      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows","")));
+      this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows","")));
+      var datasource = this.createServerSideDatasource();
+      this.gridApi.setServerSideDatasource(datasource);
+    }
+  }
+
   private updateUsers(): void {
     this.userGridData$ = this._userGridData$.pipe(map((value: User[]) => [...this.addRoleEllipsis(value)]));
   }
@@ -285,12 +377,12 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   }
 
   private subscribeForFilterFormChange(): void {
-    this.filterForm.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => this.dispatchNewPage());
+    this.filterForm.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {this.dispatchNewPage(), this.loadRoles()});
   }
 
   private dispatchNewPage(): void {
     const { businessUnit, business } = this.filterForm.getRawValue();
-    this.store.dispatch(new GetUsersPage(businessUnit, business || '', this.currentPage, this.pageSize));
+    this.store.dispatch(new GetUsersPage(businessUnit, business || null, this.currentPage, this.pageSize, null, null));
   }
 
   private checkAgencyUser(): void {
@@ -308,25 +400,42 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
   createServerSideDatasource() {
     let self = this;
-    this.dispatchNewPage();
+    // this.dispatchNewPage();
     return {
       getRows: function (params: any) {
-        setTimeout(()=> {
-          // let postData = {
-          //   name: "",
-          //   pageNumber: params.request.endRow / self.paginationPageSize,
-          //   pageSize: self.paginationPageSize,
-          //   sortFields: params.request.sortModel
-          // };
+        setTimeout(() => {
+          let postData = {
+            pageNumber: params.request.endRow / self.paginationPageSize,
+            pageSize: self.paginationPageSize,
+            sortFields: params.request.sortModel,
+            filterModels: params.request.filterModel
+          };
+          var filter: any;
+          let jsonString = JSON.stringify(params.request.filterModel);
+          if (jsonString != "{}") {
+            var updatedJson = jsonString.replace("operator", "logicalOperator");
+            filter = JSON.parse(updatedJson);
+          }
+          else filter = null;
+
+          var sort = postData.sortFields.length > 0 ? postData.sortFields : null;
+          console.log(postData)
+          const { businessUnit, business } = self.filterForm.getRawValue();
+          self.store.dispatch(new GetUsersPage(businessUnit, business || null, isNaN(postData.pageNumber) ? self.currentPage : postData.pageNumber, postData.pageSize, sort, filter));
           self.usersPage$.pipe().subscribe((data: any) => {
-            self.itemList = data.items;            
-            params.successCallback(self.itemList, data.totalRecords);
+            self.itemList = data.items;
+            params.successCallback(self.itemList, data.totalCount);
           });
         }, 500);
       }
     }
   }
-  
+
+  loadRoles() {
+    const { businessUnit, business } = this.filterForm.getRawValue();
+    this.store.dispatch(new GetRolesPage(businessUnit, business || null, 1, 1000, null, null));
+  }
+
   private setFileName(): void {
     const currentDateTime = this.generateDateTime(this.datePipe);
     this.fileName = `Security/User List ${currentDateTime}`;

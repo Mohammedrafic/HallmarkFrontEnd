@@ -29,11 +29,11 @@ export class UsersService {
     BusinessUnitType: BusinessUnitType,
     BusinessUnitId: number,
     PageNumber: number,
-    PageSize: number
+    PageSize: number,
+    SortModel: any,
+    FilterModel: any
   ): Observable<UsersPage> {
-    return this.http.get<UsersPage>(`/api/Users/Filtered`, {
-      params: { BusinessUnitType, BusinessUnitId, PageNumber, PageSize },
-    });
+    return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitId, PageNumber, PageSize, SortModel, FilterModel });
   }
 
   /**

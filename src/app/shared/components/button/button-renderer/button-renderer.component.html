@@ -13,3 +13,12 @@
     Edit
   </fa-icon>
 </button>
+
+<button *ngIf="label=='Delete'" 
+  style='color:#dc3545; background-color: transparent; border: 0; border-radius: 4px; cursor: pointer;' 
+  [attr.title]="label"
+  (click)="onClick($event)">
+  <fa-icon [icon]='faTrash' class="pr-3">
+    Edit
+  </fa-icon>
+</button>

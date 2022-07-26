@@ -1,14 +1,16 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { Role, RoleDTO } from '@shared/models/roles.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { filter, Observable, takeWhile } from 'rxjs';
+import { filter, Observable, Subject, takeWhile } from 'rxjs';
 
-import { SetHeaderState, ShowSideDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowSideDialog, ShowExportDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { GetBusinessByUnitType, SaveRole, SaveRoleSucceeded } from '../store/security.actions';
 import { SecurityState } from '../store/security.state';
@@ -23,12 +25,13 @@ const EDIT_DIALOG_TITLE = 'Edit Role';
   templateUrl: './roles-and-permissions.component.html',
   styleUrls: ['./roles-and-permissions.component.scss'],
 })
-export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
+export class RolesAndPermissionsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('roleForm') roleForm: RoleFormComponent;
 
   @Select(SecurityState.bussinesData)
   public bussinesData$: Observable<BusinessUnit[]>;
 
+  public exportRoles$ = new Subject<ExportedFileType>();
   public businessForm: FormGroup;
   public roleFormGroup: FormGroup;
   public isEditRole = false;
@@ -54,7 +57,8 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
   private existingRoleName: string[];
 
   constructor(private store: Store, private actions$: Actions, private confirmService: ConfirmService) {
-    this.store.dispatch(new SetHeaderState({ title: 'Security', iconName: 'lock' }));
+    super();
+    this.store.dispatch(new SetHeaderState({ title: 'Security', iconName: 'lock' }));    
   }
 
   ngOnInit(): void {
@@ -185,5 +189,13 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
   private closeDialog(): void {
     this.store.dispatch(new ShowSideDialog(false));
     this.roleId = null;
+  }
+
+  public override customExport(): void {
+    this.store.dispatch(new ShowExportDialog(true));
+  }
+  
+  public override defaultExport(fileType: ExportedFileType): void {
+    this.exportRoles$.next(fileType);
   }
 }

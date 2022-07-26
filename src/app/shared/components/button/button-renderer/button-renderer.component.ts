@@ -1,4 +1,4 @@
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { Component } from '@angular/core';
 
@@ -11,6 +11,7 @@ export class ButtonRendererComponent implements ICellRendererAngularComp {
 
   constructor() { }
   faEdit = faEdit;
+  faTrash = faTrash;
   params: any;
   label: string;
 
