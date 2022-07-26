@@ -1,22 +1,23 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { WidgetLegengDataModel } from '../../models/widget-legend-data.model';
 
 @Component({
   selector: 'app-widget-legend',
   templateUrl: './widget-legend.component.html',
-  styleUrls: ['./widget-legend.component.scss']
+  styleUrls: ['./widget-legend.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WidgetLegendComponent {
   @Input() legendData: WidgetLegengDataModel[];
   @Input() showPercentRatio: boolean = false;
 
-  @Output() onClickLegend: EventEmitter<MouseEvent> = new EventEmitter();
+  @Output() onClickLegend: EventEmitter<void> = new EventEmitter();
   @Output() changeCheckbox: EventEmitter<string> = new EventEmitter();
 
   private mousePosition = {
     x: 0,
     y: 0,
-  };
+  }
 
   public trackByHandler(_: number, legendData: WidgetLegengDataModel): string {
     return legendData.label;
@@ -29,7 +30,7 @@ export class WidgetLegendComponent {
 
   public onClickLegendRow(event: MouseEvent): void {
     if (this.mousePosition.x === event.screenX && this.mousePosition.y === event.screenY) {
-      this.onClickLegend.emit(event);
+      this.onClickLegend.emit();
     }
   }
 
