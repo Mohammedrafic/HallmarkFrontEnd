@@ -255,10 +255,6 @@ export const PerDiemColumnsConfig = [
     visible: true,
   },
   {
-    fieldName: 'openPositions',
-    visible: true,
-  },
-  {
     fieldName: 'billRate',
     visible: true,
   },
