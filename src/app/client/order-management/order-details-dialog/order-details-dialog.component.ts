@@ -55,6 +55,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public orderType = OrderType;
   public orderStatus = OrderStatus;
   public candidatesCounter: number;
+  public reOrderToEdit: Order | null;
 
   public disabledCloseButton = true;
   public showCloseButton = false;
@@ -190,7 +191,21 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     }
   }
 
-  closeOrder(order: Order): void {
+  public editNestedReOrder(data: Order): void {
+    this.store.dispatch(new ShowSideDialog(true));
+    this.reOrderToEdit = { ...data };
+  }
+
+  public saveReOrder(): void {
+    this.saveReOrderEmitter.emit();
+    this.reOrderToEdit = null;
+  }
+
+  public clearEditReOrder(): void {
+    this.reOrderToEdit = null;
+  }
+
+  public closeOrder(order: Order): void {
     this.store.dispatch(new ShowCloseOrderDialog(true));
     this.order = { ...order };
   }

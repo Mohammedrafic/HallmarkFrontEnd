@@ -15,5 +15,6 @@ export class OrderReOrdersContainerComponent {
     this.order = value;
   }
   @Input() isAgency: boolean = false;
-  @Output() selectReOrder = new EventEmitter<{ reOrder: OrderManagement | AgencyOrderManagement, order: Order | OrderManagement | AgencyOrderManagement }>()
+  @Output() selectReOrder = new EventEmitter<{ reOrder: OrderManagement | AgencyOrderManagement, order: Order | OrderManagement | AgencyOrderManagement }>();
+  @Output() editReorder = new EventEmitter<Order>();
 }
