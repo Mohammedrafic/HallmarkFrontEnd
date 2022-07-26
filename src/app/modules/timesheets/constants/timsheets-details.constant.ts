@@ -33,6 +33,7 @@ const editableCostCenterDef: ColDef = {
   headerName: 'Cost center',
   ...commonColumn,
   width: 180,
+  filterValueGetter: (value) => {console.log(value); return value.data.costCenterFormattedName },
   cellRenderer: DropdownEditorComponent,
   type: 'rightAligned',
   cellRendererParams: {
@@ -134,6 +135,7 @@ export const TimesheetRecordsColdef: ColDef[] = [
     headerName: 'Bill rate type',
     ...commonColumn,
     width: 180,
+    filterValueGetter: (value) => { return value.data.billRateConfigName },
     cellRenderer: DropdownEditorComponent,
     type: 'rightAligned',
     cellRendererParams: {

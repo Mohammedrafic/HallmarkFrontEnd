@@ -17,14 +17,14 @@
       </div>
 
       <button class="add-action spaced"
-              cssClass="e-action-button"
-              ejs-button
-              (click)="openAddDialog()"
-              [disabled]="actionsDisabled"
+            cssClass="e-action-button"
+            ejs-button
+            (click)="openAddDialog()"
+            [disabled]="actionsDisabled"
       >
-        <i-feather name="plus" class="icon"></i-feather> Add Record
+      <i-feather name="plus" class="icon"></i-feather> Add Record
       </button>
-      <ng-container *ngIf="recordsToShow?.[currentTab]?.length">
+      <ng-container *ngIf="recordsToShow?.[currentTab]?.length || isEditOn">
         <button
           *ngIf="!isEditOn; else editHandlers"
           [disabled]="actionsDisabled"
