@@ -345,6 +345,6 @@ export class DashboardService {
   }
 
   private getInvocesWidgetData(): Observable<any> {
-    return of('temporary-widget-invoices');
+    return of('temporary-widget-invoices-chart');
   }
 }
