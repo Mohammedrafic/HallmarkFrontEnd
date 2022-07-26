@@ -1,5 +1,5 @@
 <div class="order-tabs">
-  <ejs-tab id="tab_default" #tabNavigation (selecting)="onSelect($event)" >
+  <ejs-tab id="tab_default" #tabNavigation (selecting)="onSelect($event)" (created)="onTabCreated()">
     <e-tabitems>
       <e-tabitem>
         <ng-template #headerText>

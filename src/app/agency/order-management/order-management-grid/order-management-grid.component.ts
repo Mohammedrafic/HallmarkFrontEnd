@@ -10,7 +10,7 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { debounceTime, filter, Observable, Subject, takeUntil, takeWhile } from 'rxjs';
+import { debounceTime, filter, Observable, skip, Subject, takeUntil, takeWhile, tap } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import {
@@ -41,6 +41,7 @@ import {
   typeValueAccess,
 } from './order-management-grid.constants';
 import {
+  ClearOrders,
   ExportAgencyOrders,
   GetAgencyFilterOptions,
   GetAgencyOrderCandidatesList,
@@ -100,6 +101,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   @Select(UserState.lastSelectedAgencyId)
   lastSelectedAgencyId$: Observable<number>;
+
+  @Select(OrderManagementState.ordersTab)
+  ordersTab$: Observable<AgencyOrderManagementTabs>;
 
   public wrapSettings: TextWrapSettingsModel = GRID_CONFIG.wordWrapSettings;
   public allowWrap = GRID_CONFIG.isWordWrappingEnabled;
@@ -172,6 +176,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       this.reOrderNumber.emit(data?.items[0]?.reOrderCount || 0);
     });
     this.subscribeOnPageChanges();
+    this.onTabChange();
   }
 
   ngOnDestroy(): void {
@@ -272,6 +277,16 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.pageSize = parseInt(this.activeRowsPerPageDropDown);
     this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
     this.dispatchNewPage();
+  }
+
+  private onTabChange(): void {
+    this.ordersTab$.pipe(takeUntil(this.unsubscribe$), tap((selected) => {
+      this.selectedTab = selected;
+      this.clearFilters();
+      this.store.dispatch(new ClearOrders());
+      this.selectedIndex = null;
+      this.dispatchNewPage();
+    })).subscribe()
   }
 
   private dispatchNewPage(): void {
@@ -569,7 +584,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private onAgencyChange(): void {
-    this.lastSelectedAgencyId$.pipe(takeWhile(() => this.isAlive)).subscribe(() => {
+    this.lastSelectedAgencyId$.pipe(takeWhile(() => this.isAlive), skip(1)).subscribe(() => {
       this.openPreview.next(false);
       this.openCandidat.next(false);
       this.clearFilters();
