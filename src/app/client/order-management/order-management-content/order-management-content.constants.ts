@@ -20,17 +20,17 @@ export enum OrderTypeName {
 }
 
 export const allOrdersColumnsToExport: ExportColumn[] = [
-  { text: 'Order ID', column: 'Id' },
-  { text: 'Status', column: 'StatusText' },
+  { text: 'Order ID', column: 'OrderId' },
+  { text: 'Status', column: 'Status' },
   { text: 'Job Title', column: 'JobTitle' },
-  { text: 'Skill', column: 'SkillName' },
-  { text: '# of Positions', column: 'OpenPositions' },
-  { text: 'Location', column: 'LocationName' },
-  { text: 'Department', column: 'DepartmentName' },
+  { text: 'Skill', column: 'Skill' },
+  { text: '# of Positions', column: 'NumberOfPositions' },
+  { text: 'Location', column: 'Location' },
+  { text: 'Department', column: 'Department' },
   { text: 'Type', column: 'OrderType' },
   { text: 'Bill Rate', column: 'BillRate' },
-  { text: 'Candidates', column: 'Candidates' },
-  { text: 'Start Date', column: 'StartDate' },
+  { text: 'Candidates', column: 'CandidatesCount' },
+  { text: 'Start Date', column: 'JobStartDate' },
 ];
 
 export const perDiemColumnsToExport: ExportColumn[] = [
@@ -69,14 +69,14 @@ export const reOrdersChildColumnToExport: ExportColumn[] = [
 ];
 
 export const allOrdersChildColumnsToExport: ExportColumn[] = [
-  { text: 'Position ID', column: 'PositionId' },
+  { text: 'Position ID', column: 'PositionID' },
   { text: 'Candidate Name', column: 'CandidateName' },
-  { text: 'Position Status', column: 'ChildOrderStatus' },
+  { text: 'Position Status', column: 'PositionStatus' },
   { text: 'Candidate Status', column: 'CandidateStatus' },
   { text: 'Candidate Skill', column: 'ChildOrderSkill' },
   { text: 'Candidate Bill Rate', column: 'CandidateBillRate' },
-  { text: 'Submission %', column: 'SubmissionsPercentage' },
-  { text: 'Onboard %', column: 'OnboardedPercentage' },
+  { text: 'Submission %', column: 'Submission' },
+  { text: 'Onboard %', column: 'Onboard' },
 ];
 
 export const perDiemChildColumnsToExport: ExportColumn[] = [

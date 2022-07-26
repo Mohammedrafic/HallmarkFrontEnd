@@ -1,3 +1,6 @@
+import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
+import type { KeyValue } from '@angular/common';
+
 import flow from 'lodash/fp/flow';
 import values from 'lodash/fp/values';
 import flatten from 'lodash/fp/flatten';
@@ -12,13 +15,13 @@ import type {
   CrosshairSettingsModel,
 } from '@syncfusion/ej2-charts';
 import type { ChartComponent } from '@syncfusion/ej2-angular-charts';
-
-import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
-import type { KeyValue } from '@angular/common';
+import { Store } from '@ngxs/store';
 
 import type { PositionByTypeDataModel, PositionsByTypeAggregatedModel } from '../../models/positions-by-type-aggregated.model';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
 import { PositionTypeEnum } from '../../enums/position-type.enum';
+import { TimeSelectionEnum } from '../../enums/time-selection.enum';
+import { SwitchMonthWeekTimeSelection } from '../../store/dashboard.actions';
 
 @Component({
   selector: 'app-line-chart',
@@ -29,6 +32,7 @@ import { PositionTypeEnum } from '../../enums/position-type.enum';
 export class LineChartComponent extends AbstractSFComponentDirective<ChartComponent> implements OnChanges {
   @Input() public chartData: PositionsByTypeAggregatedModel | undefined;
   @Input() public isLoading: boolean;
+  @Input() public timeSelection: TimeSelectionEnum;
 
   public primaryYAxis: AxisModel = {
     minimum: 0,
@@ -44,6 +48,9 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
   public readonly xAxisName: keyof PositionByTypeDataModel = 'month';
   public readonly yAxisName: keyof PositionByTypeDataModel = 'value';
   public readonly type: string = 'Spline';
+  public readonly weeklySelection: TimeSelectionEnum = TimeSelectionEnum.Weekly;
+  public readonly monthlySelection: TimeSelectionEnum = TimeSelectionEnum.Monthly;
+  public monthMode: boolean = true;
 
   public readonly crosshairSettings: CrosshairSettingsModel = {
     enable: true,
@@ -67,8 +74,13 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
     visible: true,
   };
 
+  constructor(private readonly store: Store) {
+    super();
+  }
+
   public ngOnChanges(changes: SimpleChanges): void {
     changes['chartData'] && this.handleChartDataChange();
+    this.monthMode = this.timeSelection === TimeSelectionEnum.Monthly;
   }
 
   public trackByHandler(_: number, keyValue: KeyValue<string, PositionByTypeDataModel[]>): string {
@@ -95,5 +107,10 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
       max,
       thru((value: number) => Math.ceil(value / 10) * 10)
     )(this.chartData);
+  }
+
+  public onSwicthTo(timeSelection: TimeSelectionEnum): void {
+    this.monthMode = !this.monthMode;
+    this.store.dispatch(new SwitchMonthWeekTimeSelection(timeSelection));
   }
 }

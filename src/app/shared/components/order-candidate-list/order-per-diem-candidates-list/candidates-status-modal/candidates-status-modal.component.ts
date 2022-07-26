@@ -29,6 +29,8 @@ import {
   UpdateAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
 import { OrderManagementState } from '@agency/store/order-management.state';
+import { AccordionOneField } from '../../../../models/accordion-one-field.model';
+import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations';
 
 @Component({
   selector: 'app-candidates-status-modal',
@@ -97,9 +99,11 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   public rejectReasons: RejectReason[] = [];
   public optionFields = { text: 'statusText', value: 'applicantStatus' };
   public nextApplicantStatuses: ApplicantStatus[];
+  public orderCandidateJob: OrderCandidateJob | null;
+  public accordionClickElement: HTMLElement | null;
+  public accordionOneField: AccordionOneField;
 
   private unsubscribe$: Subject<void> = new Subject();
-  private orderCandidateJob: OrderCandidateJob | null;
   private orderApplicantsInitialData: OrderApplicantsInitialData | null;
 
   constructor(private formBuilder: FormBuilder, private store: Store, private actions$: Actions) {}
@@ -175,6 +179,16 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
     this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Accepted, statusText: 'Accepted' });
   }
 
+  public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
+    this.accordionOneField = new AccordionOneField(this.accordionComponent);
+    this.accordionClickElement = this.accordionOneField.clickedOnAccordion(accordionClick);
+  }
+
+  public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
+    this.accordionOneField = new AccordionOneField(this.accordionComponent);
+    this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
+  }
+
   private updateOrganizationCandidateJob(status: { applicantStatus: ApplicantStatusEnum; statusText: string }): void {
     if (this.form.valid && this.orderCandidateJob) {
       const value = this.form.getRawValue();
@@ -193,7 +207,11 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
             },
           })
         )
-        .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
+        .subscribe({
+          next: () => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()),
+          error: () => this.closeDialog(),
+          complete: () => this.closeDialog(),
+        });
     }
   }
 

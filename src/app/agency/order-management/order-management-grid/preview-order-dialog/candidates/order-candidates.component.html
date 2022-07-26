@@ -10,9 +10,14 @@
   <app-general-order-info *ngSwitchDefault [orderInformation]="orderCandidateInformation"></app-general-order-info>
 </div>
 <div class="line"></div>
+<ng-container *ngIf="orderCandidateInformation?.reasonForClosing">
+  <app-order-close-reason-info [orderInformation]="orderCandidateInformation"></app-order-close-reason-info>
+  <div class="line"></div>
+</ng-container>
 <div class="candidates-list" [ngSwitch]="orderCandidateInformation?.orderType">
   <app-order-per-diem-candidates-list
     *ngSwitchCase="orderType.OpenPerDiem"
+    [includeDeployedCandidates]="!excludeDeployed"
     [candidatesList]="orderCandidatePage$ | async"
     (getCandidatesList)="onGetCandidatesList($event)"
     [order]="orderCandidates"
@@ -20,6 +25,7 @@
   </app-order-per-diem-candidates-list>
   <app-reorder-candidates-list
     *ngSwitchCase="orderType.ReOrder"
+    [includeDeployedCandidates]="!excludeDeployed"
     [candidatesList]="orderCandidatePage$ | async"
     (getCandidatesList)="onGetCandidatesList($event)"
     [order]="orderCandidates"
@@ -27,6 +33,7 @@
   <app-order-candidates-list
     *ngSwitchDefault
     [candidatesList]="orderCandidatePage$ | async"
+    [includeDeployedCandidates]="!excludeDeployed"
     (getCandidatesList)="onGetCandidatesList($event)"
     [order]="orderCandidates"
   >

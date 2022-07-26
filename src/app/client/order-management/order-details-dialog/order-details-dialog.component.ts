@@ -13,7 +13,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Order, OrderCandidatesListPage } from '@shared/models/order-management.model';
+import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
 import { ApproveOrder, DeleteOrder, SetLock } from '@client/store/order-managment-content.actions';
@@ -21,12 +21,8 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_ORDER_CONFIRM_TEXT, CANCEL_ORDER_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, } from '@shared/constants';
 import { Location } from '@angular/common';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
-import { ShowSideDialog } from '../../../store/app.actions';
+import { ShowCloseOrderDialog, ShowSideDialog } from '../../../store/app.actions';
 
-export type NextPreviousOrderEvent = {
-  next: boolean;
-  excludeDeployed: boolean;
-};
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -36,8 +32,9 @@ export type NextPreviousOrderEvent = {
 export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() order: Order;
   @Input() openEvent: Subject<boolean>;
+  @Input() children: OrderManagementChild[] | undefined;
 
-  @Output() nextPreviousOrderEvent = new EventEmitter<NextPreviousOrderEvent>();
+  @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
   @Output() selectReOrder = new EventEmitter<any>();
 
@@ -59,9 +56,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public orderStatus = OrderStatus;
   public candidatesCounter: number;
 
+  public disabledCloseButton = true;
   public showCloseButton = false;
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
-  private excludeDeployed: boolean;
   private secondHasOpenedOnes = false;
 
   public get isReOrder(): boolean {
@@ -92,18 +89,47 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.chipList && changes['order'].currentValue) {
+    if(changes['order']?.currentValue) {
+      this.setCloseOrderButtonState();
       this.showCloseButton = this.openInProgressFilledStatuses.includes(
         changes['order'].currentValue.statusText.toLowerCase()
       );
-      this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
-      this.chipList.text = changes['order'].currentValue.statusText.toUpperCase();
+      if (this.chipList) {
+        this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
+        this.chipList.text = changes['order'].currentValue.statusText.toUpperCase();
+      }
     }
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  setCloseOrderButtonState(): void {
+    if (
+      this.order?.orderType === null ||
+      this.order?.orderType === undefined ||
+      this.order?.status === OrderStatus.Incomplete
+    ) {
+      this.disabledCloseButton = true;
+      return;
+    }
+
+    if (this.order?.orderType === OrderType.OpenPerDiem) {
+      this.disabledCloseButton = false;
+      return;
+    }
+
+    if (!this.children?.length) {
+      this.disabledCloseButton = false;
+      return;
+    }
+
+    const orderStatuses = [OrderStatus.InProgressOfferAccepted, OrderStatus.Filled];
+    if (orderStatuses.includes(OrderStatus.InProgressOfferAccepted)) {
+      this.disabledCloseButton = Boolean(this.children?.some(child => orderStatuses.includes(child.orderStatus)));
+    }
   }
 
   public lockOrder(): void {
@@ -164,17 +190,18 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     }
   }
 
+  closeOrder(order: Order): void {
+    this.store.dispatch(new ShowCloseOrderDialog(true));
+    this.order = { ...order };
+  }
+
   public onClose(): void {
     this.sideDialog.hide();
     this.openEvent.next(false);
   }
 
   public onNextPreviousOrder(next: boolean): void {
-    this.nextPreviousOrderEvent.emit({ next, excludeDeployed: this.excludeDeployed });
-  }
-
-  public onExcludeDeployed(event: boolean): void {
-    this.excludeDeployed = event;
+    this.nextPreviousOrderEvent.emit(next);
   }
 
   private selectCandidateOnOrderId(): void {

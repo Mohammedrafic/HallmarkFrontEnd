@@ -47,6 +47,10 @@
                     <app-general-order-info *ngSwitchDefault [orderInformation]="currentOrder"></app-general-order-info>
                   </section>
                   <hr />
+                  <ng-container *ngIf="currentOrder?.reasonForClosing">
+                    <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
+                    <hr />
+                  </ng-container>
                   <app-order-details [currentOrder]="currentOrder"></app-order-details>
                 </section>
               </ng-template>
@@ -54,7 +58,7 @@
             <e-tabitem>
               <ng-template #headerText>Candidates <span class="e-badge e-badge-success e-badge-circle">{{countOrderCandidates$ | async}}</span></ng-template>
               <ng-template #content>
-                <app-candidates-order (excludeDeployedEvent)="onExcludeDeployed($event)"></app-candidates-order>
+                <app-candidates-order></app-candidates-order>
               </ng-template>
             </e-tabitem>
             <ng-container *ngIf="selectedOrder$ | async as currentOrder">

@@ -2,13 +2,13 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InvoicesContainerComponent } from './containers/invoices-container/invoices-container.component';
 import { InvoiceRecordsTableComponent } from './components/invoice-records-table/invoice-records-table.component';
-import { SharedModule } from "@shared/shared.module";
-import { DateWeekPickerModule } from "@shared/components/date-week-picker/date-week-picker.module";
-import { FeatherModule } from "angular-feather";
-import { TabModule } from "@syncfusion/ej2-angular-navigations";
-import { DropDownButtonModule } from "@syncfusion/ej2-angular-splitbuttons";
-import { InvoicesRoutingModule } from "./invoices-routing.module";
-import { ButtonModule, ChipListModule } from "@syncfusion/ej2-angular-buttons";
+import { SharedModule } from '@shared/shared.module';
+import { DateWeekPickerModule } from '@shared/components/date-week-picker/date-week-picker.module';
+import { FeatherModule } from 'angular-feather';
+import { TabModule } from '@syncfusion/ej2-angular-navigations';
+import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { InvoicesRoutingModule } from './invoices-routing.module';
+import { ButtonModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
 import {
   AlignJustify,
   ChevronDown,

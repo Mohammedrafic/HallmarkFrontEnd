@@ -37,7 +37,7 @@
       </section>
       <section class="content-container">
         <div class="candidate-info">
-          <ejs-accordion #accordionElement expandMode="Single">
+          <ejs-accordion #accordionElement expandMode="Single" (expanding)="toForbidExpandSecondRow($event)" (clicked)="clickedOnAccordion($event)">
             <e-accordionitems>
               <e-accordionitem expanded="true">
                 <ng-template #header>
@@ -95,7 +95,7 @@
                   <div>Historical Events</div>
                 </ng-template>
                 <ng-template #content>
-                  <div>Historical Events</div>
+                  <app-historical-events [organizationId]="orderCandidateJob?.organizationId || -1" [candidateJobId]="candidate.candidateJobId" [candidateId]="candidate.candidateId"></app-historical-events>
                 </ng-template>
               </e-accordionitem>
             </e-accordionitems>

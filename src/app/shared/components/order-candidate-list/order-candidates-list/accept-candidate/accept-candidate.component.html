@@ -6,7 +6,7 @@
           {{candidate?.lastName}}, {{candidate?.firstName}}
           <i-feather name="briefcase" class="icon deployed-icon" *ngIf="candidate.deployedCandidateInfo && !isOnboard"></i-feather>
         </h3>
-        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus">
+        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus" [text]="candidatStatus[candidate.candidateStatus]">
           <e-chips>
             <e-chip [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
           </e-chips>

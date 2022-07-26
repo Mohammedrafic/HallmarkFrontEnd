@@ -6,14 +6,15 @@ import { Observable, tap } from 'rxjs';
 import lodashMap from 'lodash/fp/map';
 
 import { DashboardService } from '../services/dashboard.service';
-import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile, SetFilteredItems, SetDashboardFiltersState } from './dashboard.actions';
+import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile, SetFilteredItems, SetDashboardFiltersState, SwitchMonthWeekTimeSelection } from './dashboard.actions';
 import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import { DashboardDataModel } from '../models/dashboard-data.model';
 import { widgetTypeToConfigurationMapper } from '../constants/widget-type-to-configuration-mapper';
 import { FilteredItem } from '@shared/models/filter.model';
-import { DASHBOARD_FILTER_STATE } from '@shared/constants';
+import { DASHBOARD_FILTER_STATE, TIME_SELECTION_OF_CHART_LINE } from '@shared/constants';
 import { DashboardFiltersModel } from '../models/dashboard-filters.model';
+import { TimeSelectionEnum } from '../enums/time-selection.enum';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
@@ -22,6 +23,7 @@ export interface DashboardStateModel {
   isMobile: boolean;
   filteredItems: FilteredItem[];
   dashboardFilterState: DashboardFiltersModel;
+  positionTrendTimeSelection: TimeSelectionEnum;
 }
 
 @State<DashboardStateModel>({
@@ -32,7 +34,8 @@ export interface DashboardStateModel {
     widgets: [],
     isMobile: false,
     filteredItems: JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [],
-    dashboardFilterState: {} as DashboardFiltersModel
+    dashboardFilterState: {} as DashboardFiltersModel,
+    positionTrendTimeSelection: JSON.parse(window.localStorage.getItem(TIME_SELECTION_OF_CHART_LINE) as string) || TimeSelectionEnum.Weekly,
   },
 })
 @Injectable()
@@ -71,6 +74,11 @@ export class DashboardState {
   static dashboardFiltersState(state: DashboardStateModel): DashboardStateModel['dashboardFilterState'] {
     return state.dashboardFilterState;
   }
+
+  @Selector()
+    static getTimeSelection(state: DashboardStateModel): DashboardStateModel['positionTrendTimeSelection'] {
+      return state.positionTrendTimeSelection;
+    }
 
   public constructor(private readonly actions: Actions, private dashboardService: DashboardService) {}
 
@@ -126,5 +134,11 @@ export class DashboardState {
   @Action(SetDashboardFiltersState)
   private setDashboardFiltersState({patchState}: StateContext<DashboardStateModel>, { payload }: SetDashboardFiltersState) {
     patchState({ dashboardFilterState: payload })
+  }
+
+  @Action(SwitchMonthWeekTimeSelection)
+  private switchMonthWeekTimeSelection({patchState}: StateContext<DashboardStateModel>, { payload }: SwitchMonthWeekTimeSelection) {
+    patchState({positionTrendTimeSelection: payload})
+    window.localStorage.setItem(TIME_SELECTION_OF_CHART_LINE, JSON.stringify(payload));
   }
 }

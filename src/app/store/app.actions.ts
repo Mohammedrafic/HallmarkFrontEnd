@@ -47,6 +47,12 @@ export class ShowExportDialog {
   constructor(public isDialogShown: boolean) { }
 }
 
+export class ShowCloseOrderDialog {
+  static readonly type = '[app] Set Close Order Dialog Showing state';
+  constructor(public isDialogShown: boolean, public isPosition: boolean = false) { }
+}
+
+
 export class SetIsOrganizationAgencyArea {
   static readonly type = '[app] Set Is Organization/Agency Area';
   constructor(public payload: IsOrganizationAgencyAreaStateModel) { }

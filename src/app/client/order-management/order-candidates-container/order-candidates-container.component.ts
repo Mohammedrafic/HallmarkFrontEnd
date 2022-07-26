@@ -8,6 +8,7 @@ import { CandidateListEvent, OrderCandidatesListPage } from '@shared/models/orde
 import { Order } from '@shared/models/order-management.model';
 import { Observable, takeUntil } from 'rxjs';
 import { OrderType } from "@shared/enums/order-type";
+import { OrderManagementService } from '../order-management-content/order-management.service';
 
 @Component({
   selector: 'app-order-candidates-container',
@@ -20,8 +21,6 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
     this.order = value;
   }
 
-  @Output() excludeDeployedEvent = new EventEmitter<boolean>();
-
   public orderCandidatePage: OrderCandidatesListPage;
   public orderCandidates: any;
   public orderType = OrderType;
@@ -29,7 +28,11 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
   @Select(OrderManagementContentState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
 
-  constructor(private store: Store) {
+  get excludeDeployed(): boolean {
+    return this.orderManagementService.excludeDeployed;
+  }
+
+  constructor(private store: Store, private orderManagementService: OrderManagementService) {
     super();
   }
 
@@ -44,7 +47,7 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
   }
 
   public onGetCandidatesList(event: CandidateListEvent) : void {
-    this.excludeDeployedEvent.emit(event.excludeDeployed);
+    this.orderManagementService.excludeDeployed = event.excludeDeployed;
     this.store.dispatch(new GetAgencyOrderCandidatesList(event.orderId, event.organizationId, event.currentPage, event.pageSize, event.excludeDeployed));
   }
 }

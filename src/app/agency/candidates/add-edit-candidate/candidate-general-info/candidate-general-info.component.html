@@ -69,14 +69,11 @@
           <div class="input-container f-grow-2">
             <label>SSN</label>
             <div class="input-group">
-              <ejs-maskedtextbox
-                promptChar="_"
-                mask='000-00-0000'
-                appValidateWithMessage
-                formControlName="ssn"
-                placeholder=" "
-                class="e-input">
-              </ejs-maskedtextbox>
+              <input appValidateWithMessage
+              formControlName="ssn"
+              class="e-input"
+              type="text"
+              mask='000-00-0000'/>
             </div>
           </div>
           <div class="input-container"></div>

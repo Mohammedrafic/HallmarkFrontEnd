@@ -9,7 +9,8 @@ export const militaryToStandard = (val: string /** HH:mm:ss */) => {
   let sM = m.toString().length === 1 ? '0' + m : m;
   return sH + ':' + sM + ' ' + suffix;
 };
-export const toCorrectTimezoneFormat = (value: Date): any => {
+export const toCorrectTimezoneFormat = (value: Date | string): any => {
+  const valueDate = new Date(value);
   const differentBetweenTimezone = new Date().getTimezoneOffset() * -1;
-  return new Date(value.getTime() + differentBetweenTimezone * 60000);
+  return new Date(valueDate.getTime() + differentBetweenTimezone * 60000);
 };

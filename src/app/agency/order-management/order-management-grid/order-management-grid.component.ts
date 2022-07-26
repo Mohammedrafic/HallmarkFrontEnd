@@ -71,7 +71,6 @@ import { OrderType } from '@shared/enums/order-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { PreviewOrderDialogComponent } from '@agency/order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
-import { NextPreviousOrderEvent } from './preview-order-dialog/preview-order-dialog.component';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 
 @Component({
@@ -134,7 +133,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private isAlive = true;
   private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
-  private excludeDeployed: boolean;
   private pageSubject = new Subject<number>();
 
   constructor(
@@ -330,7 +328,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public onRowClick(event: any): void {
     if (event.target) {
-      this.excludeDeployed = false;
+      this.orderManagementAgencyService.excludeDeployed = false;
     }
 
     this.rowSelected(event, this.gridWithChildRow);
@@ -346,7 +344,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           event.data.organizationId,
           this.currentPage,
           this.pageSize,
-          this.excludeDeployed
+          this.orderManagementAgencyService.excludeDeployed
         )
       );
       this.store.dispatch(new GetAgencyOrderGeneralInformation(event.data.orderId, event.data.organizationId));
@@ -380,10 +378,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.isSubrowDisplay = false;
   }
 
-  public onNextPreviousOrderEvent(event: NextPreviousOrderEvent): void {
+  public onNextPreviousOrderEvent(next: boolean): void {
     const [index] = this.gridWithChildRow.getSelectedRowIndexes();
-    const nextIndex = event.next ? index + 1 : index - 1;
-    this.excludeDeployed = event.excludeDeployed;
+    const nextIndex = next ? index + 1 : index - 1;
     this.gridWithChildRow.selectRow(nextIndex);
   }
 
@@ -401,7 +398,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         order.organizationId,
         this.currentPage,
         this.pageSize,
-        this.excludeDeployed
+        this.orderManagementAgencyService.excludeDeployed
       )
     );
     this.store.dispatch(new GetAgencyOrderGeneralInformation(reOrder.orderId, order.organizationId));

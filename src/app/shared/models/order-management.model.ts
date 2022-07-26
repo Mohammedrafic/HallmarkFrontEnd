@@ -260,6 +260,8 @@ export class Order {
   reOrderId?: number;
   orderId?: number;
   candidates?: CandidateModel[];
+  reasonForClosing?: string;
+  closingDate?: string;
 }
 
 export class ReOrder {

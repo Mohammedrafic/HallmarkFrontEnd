@@ -568,6 +568,7 @@
 <app-order-details-dialog
   #detailsDialog
   [order]="selectedOrder"
+  [children]="selectedDataRow?.children"
   [openEvent]="openDetails"
   (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid()"

@@ -21,11 +21,11 @@ export abstract class AbstractOrderCandidateListComponent
 
   @Input() candidatesList: OrderCandidatesListPage | null;
   @Input() order: AgencyOrder;
+  @Input() includeDeployedCandidates: boolean = true;
 
   @Output() getCandidatesList = new EventEmitter<CandidateListEvent>();
 
   public openDetails = new Subject<boolean>();
-  public includeDeployedCandidates: boolean = true;
   public isAgency: boolean;
   public isOrganization: boolean;
 

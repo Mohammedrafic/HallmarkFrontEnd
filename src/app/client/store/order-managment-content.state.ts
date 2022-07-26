@@ -670,7 +670,10 @@ export class OrderManagementContentState {
   }
 
   @Action(DuplicateOrder)
-  DuplicateOrder({ dispatch }: StateContext<OrderManagementContentStateModel>, { payload }: DuplicateOrder): Observable<number> {
+  DuplicateOrder(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { payload }: DuplicateOrder
+  ): Observable<number> {
     return this.orderManagementService.duplicate(payload).pipe(
       tap((id: number) => {
         dispatch(new DuplicateOrderSuccess(id));

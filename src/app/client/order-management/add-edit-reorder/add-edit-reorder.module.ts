@@ -17,7 +17,6 @@ import { SharedModule } from '@shared/shared.module';
     MultiselectDropdownModule,
     DatepickerModule,
     TimepickerModule,
-    NumericTextboxModule,
     SharedModule,
   ],
   exports: [AddEditReorderComponent],

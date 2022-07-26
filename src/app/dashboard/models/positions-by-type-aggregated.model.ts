@@ -6,3 +6,8 @@ export interface PositionByTypeDataModel {
   month: string;
   value: number;
 }
+
+export interface ITimeSlice {
+  startDate: string;
+  endDate: string;
+}

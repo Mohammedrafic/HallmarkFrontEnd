@@ -71,7 +71,6 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { SearchComponent } from '@shared/components/search/search.component';
 import { OrderStatus } from '@shared/enums/order-management';
-import { NextPreviousOrderEvent } from '../order-details-dialog/order-details-dialog.component';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
 import { TabNavigationComponent } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
@@ -150,7 +149,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private search$ = new Subject();
-  private selectedDataRow: Order;
+  public selectedDataRow: OrderManagement;
 
   public selectedOrder: Order;
   public openDetails = new Subject<boolean>();
@@ -177,7 +176,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   private selectedIndex: number | null;
   private ordersPage: OrderManagementPage;
-  private excludeDeployed: boolean;
 
   public columnsToExport: ExportColumn[];
 
@@ -489,16 +487,15 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
   }
 
-  public onNextPreviousOrderEvent(event: NextPreviousOrderEvent): void {
+  public onNextPreviousOrderEvent(next: boolean): void {
     const [index] = this.gridWithChildRow.getSelectedRowIndexes();
-    const nextIndex = event.next ? index + 1 : index - 1;
-    this.excludeDeployed = event.excludeDeployed;
+    const nextIndex = next ? index + 1 : index - 1;
     this.gridWithChildRow.selectRow(nextIndex);
   }
 
   public onRowClick(event: any): void {
     if (event.target) {
-      this.excludeDeployed = false;
+      this.orderManagementService.excludeDeployed = false;
     }
 
     this.rowSelected(event, this.gridWithChildRow);
@@ -514,7 +511,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           data.organizationId,
           this.currentPage,
           this.pageSize,
-          this.excludeDeployed
+          this.orderManagementService.excludeDeployed
         )
       );
       this.selectedCandidate = this.selectedReOrder = null;
@@ -742,7 +739,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
             this.selectedDataRow.organizationId as number,
             this.currentPage,
             this.pageSize,
-            this.excludeDeployed
+            this.orderManagementService.excludeDeployed
           )
         );
         this.getOrders();

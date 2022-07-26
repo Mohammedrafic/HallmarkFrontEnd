@@ -1,5 +1,6 @@
 import { FilteredItem } from '@shared/models/filter.model';
 import type { PanelModel } from '@syncfusion/ej2-angular-layouts';
+import { TimeSelectionEnum } from '../enums/time-selection.enum';
 import { DashboardFiltersModel } from '../models/dashboard-filters.model';
 
 const dashboardStatePrefix: string = '[dashboard]';
@@ -35,4 +36,9 @@ export class SetFilteredItems {
 export class SetDashboardFiltersState {
   static readonly type = `${dashboardStatePrefix} Set Dashboard Filter State`;
   constructor(public payload: DashboardFiltersModel) {}
+}
+
+export class SwitchMonthWeekTimeSelection {
+  static readonly type = `${dashboardStatePrefix} Switch Month Week Time Selection`;
+  constructor(public payload: TimeSelectionEnum) {}
 }
