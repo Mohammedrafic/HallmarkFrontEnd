@@ -1,25 +1,31 @@
 <app-widget-wrapper [title]="chartData?.title ?? ''" [isLoading]="isLoading">
   <ng-template #chart>
-    <ejs-accumulationchart
-      #sfComponent
-      [enableAnimation]="false"
-      [id]="chartData?.id"
-      [legendSettings]="legendSettings"
-      [tooltip]="tooltipSettings"
-      class="app-accumulation-chart__component"
-    >
+    <ejs-accumulationchart #sfComponent
+                           [enableAnimation]="false"
+                           [id]="chartData?.id"
+                           [legendSettings]="legendSettings"
+                           [tooltip]="tooltipSettings"
+                           class="app-accumulation-chart__component">
       <e-accumulation-series-collection>
-        <e-accumulation-series
-          [dataSource]="filteredChartData$ | async"
-          pointColorMapping="color"
-          innerRadius="70%"
-          radius="80%"
-          xName="label"
-          yName="value"
-        >
+        <e-accumulation-series [dataSource]="filteredChartData$ | async"
+                               pointColorMapping="color"
+                               innerRadius="70%"
+                               radius="80%"
+                               xName="label"
+                               yName="value">
         </e-accumulation-series>
       </e-accumulation-series-collection>
     </ejs-accumulationchart>
+
+    <div class="widget-legend__item-content">
+      
+      <div class="widget-legend__row-container" >
+        <div class="widget-legend__row_Text" >
+          <div class="pp-accumulation-chart__legend-Total-score">{{totalScore}}</div>
+        </div>
+       
+      </div>
+    </div>
   </ng-template>
 
   <ng-template #legend>

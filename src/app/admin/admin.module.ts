@@ -11,6 +11,7 @@ import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-
 import { DatePickerModule, TimePickerModule, DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
+import { CustomReportsComponent } from './custom-reports/custom-reports.component';
 import {
   Download,
   Upload,
@@ -78,6 +79,7 @@ const sidebarIcons = {
     MasterCredentialsTypesComponent,
     MasterHolidaysComponent,
     RejectReasonMasterComponent,
+    CustomReportsComponent,
   ],
   imports: [
     CommonModule,

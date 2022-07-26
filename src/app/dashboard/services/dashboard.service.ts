@@ -58,7 +58,8 @@ export class DashboardService {
     WidgetTypeEnum,
     (filters: DashboardFiltersModel, timeSelection: TimeSelectionEnum) => Observable<unknown>
   > = {
-    [WidgetTypeEnum.APPLICANTS_BY_REGION]: (filters: DashboardFiltersModel) => this.getApplicantsByRegionWidgetData(filters),
+      [WidgetTypeEnum.APPLICANTS_BY_REGION]: (filters: DashboardFiltersModel) => this.getApplicantsByRegionWidgetData(filters),
+      [WidgetTypeEnum.APPLICANTS_BY_POSITIONS]: (filters: DashboardFiltersModel) => this.getApplicantsByPositionsWidgetData(filters),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
     [WidgetTypeEnum.CANDIDATES]: (filters: DashboardFiltersModel) => this.getCandidatesWidgetData(filters),
     [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filters: DashboardFiltersModel) => this.getFilledPositionTrendWidgetData(filters),
@@ -155,8 +156,22 @@ export class DashboardService {
     );
   }
 
+  private getApplicantsByPositionsWidgetData(
+    filters: DashboardFiltersModel
+  ): Observable<CandidatesByStateWidgetAggregatedDataModel> {
+    return forkJoin({ mapData: this.mapData$, applicantsByRegion: this.getApplicantsByPositions(filters) }).pipe(
+      map((data: ApplicantsByRegionDataModel) => {
+        return this.getFormattedPostionsByStatesWidgetAggregatedData(data);
+      })
+    );
+  }
+
   private getApplicantsByRegion(filter: DashboardFiltersModel): Observable<CandidatesByStatesResponseModel> {
     return this.httpClient.post<CandidatesByStatesResponseModel>(`${this.baseUrl}/GetCandidatesStatesAggregated`, { ...filter });
+  }
+
+  private getApplicantsByPositions(filter: DashboardFiltersModel): Observable<CandidatesByStatesResponseModel> {
+    return this.httpClient.post<CandidatesByStatesResponseModel>(`${this.baseUrl}/GetPostionsStatesAggregated`, { ...filter });
   }
 
   private getMapData(): Observable<LayerSettingsModel> {
@@ -174,6 +189,8 @@ export class DashboardService {
     ])(applicantsByRegion);
     const maxCandidatesValue = flow(values, max)(candidatesWithState);
     const unknownStateCandidates = applicantsByRegion['Unknown'];
+    const title = "Applicants by Region";
+    const description = "";
     const combinedData = { ...mapData, ...USAMapCandidatesDataLayerSettings };
     const dataSource = lodashMap(
       (stateDefinition: Record<string, string>) => ({
@@ -187,7 +204,36 @@ export class DashboardService {
       colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
 
-    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates };
+    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates, title, description };
+  }
+  private getFormattedPostionsByStatesWidgetAggregatedData({
+    mapData,
+    applicantsByRegion,
+  }: ApplicantsByRegionDataModel): CandidatesByStateWidgetAggregatedDataModel {
+    const candidatesWithState = flow([
+      Object.entries,
+      (arr) => arr.filter(([key, value]: [key: string, value: number]) => key !== 'Unknown'),
+      Object.fromEntries,
+    ])(applicantsByRegion);
+    const maxCandidatesValue = flow(values, max)(candidatesWithState);
+    const unknownStateCandidates = applicantsByRegion['Unknown'];
+    const title = "Open Positions";
+    const description = "Open and in progress Position by  State";
+    
+    const combinedData = { ...mapData, ...USAMapCandidatesDataLayerSettings };
+    const dataSource = lodashMap(
+      (stateDefinition: Record<string, string>) => ({
+        ...stateDefinition,
+        candidates: applicantsByRegion[stateDefinition['code']] ?? 0,
+      }),
+      combinedData.dataSource
+    );
+    const shapeSettings = {
+      ...combinedData.shapeSettings,
+      colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
+    };
+
+    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates, title, description };
   }
 
   private getDashboardState(): Observable<PanelModel[]> {

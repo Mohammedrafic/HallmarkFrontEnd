@@ -8,25 +8,28 @@ $headerHeight: 19px;
 }
 
 .app-widget-wrapper {
-  display: inline;
+  display: flex;
   flex-direction: column;
   height: 100%;
   padding: 24px;
   box-sizing: border-box;
   --chartHeight: 100%;
-  
-  @media screen and (max-width: 1700px){
+
+  @media screen and (max-width: 1700px) {
     padding-left: 16px;
   }
 
   &.with-legend {
-    --chartHeight: 100%;
+    --chartHeight: 70%;
 
     .app-widget-wrapper__chart {
-      /*border-bottom: 1px solid rgba($secondary-dark-blue-40, 0.32);*/
-      float:left;
-      width:50%;
+      border-bottom: 1px solid rgba($secondary-dark-blue-40, 0.32);
+     
     }
+
+    
+
+   
   }
 
   &__content {
@@ -42,12 +45,12 @@ $headerHeight: 19px;
     font-weight: 700;
     color: #1a1b2e;
     height: $headerHeight;
-    padding-left:16px;
   }
 
   &__projection-wrapper {
     flex: 1;
     height: calc(100% - #{$headerHeight});
+   
   }
 
   &__chart {
@@ -55,13 +58,12 @@ $headerHeight: 19px;
   }
 
   &__legend {
-    height: 100%;
+    height: calc(100% - #{var(--chartHeight)});
     overflow: auto;
-    padding-top: 50px;
-    margin-right: 12px;
+    padding: 12px 12px 0 0;
+    margin-right: -12px;
     cursor: default;
     box-sizing: border-box;
-
   }
 
   &__loader {

@@ -1,0 +1,23 @@
+<div>
+    <div class="subrow-wrapper" *ngIf="!params.showReOrders">
+      <app-grid-subrow-candidate
+        *ngFor="let child of params.data.children"
+        [candidat]="child"
+        [order]="params.data"
+        [selected]="params.selectedCandidate?.selected?.order === params.data.id && params.selectedCandidate?.selected.positionId === child.positionId"
+        [isAgency]="true"
+        class="subrow-wrapper"
+        (clickEvent)="onOpenDialog($event)"
+      ></app-grid-subrow-candidate>
+    </div>
+    <div class="subrow-wrapper" *ngIf="params.showReOrders">
+      <app-grid-subrow-reorder
+        *ngFor="let child of params.data.reOrders"
+        [reOrder]="child"
+        [order]="params.data"
+        [selected]="params.selectedReOrder?.selected?.order === params.data.id && params.selectedReOrder?.selected.reOrder === child.id"
+        class="subrow-wrapper"
+        (clickEvent)="onOpenDialog($event)"
+      ></app-grid-subrow-reorder>
+    </div>
+</div>

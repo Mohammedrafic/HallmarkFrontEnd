@@ -165,4 +165,4 @@ const gridIcons = {
     MaskedDateTimeService,
   ],
 })
-export class ClientModule {}
+export class ClientModule { }

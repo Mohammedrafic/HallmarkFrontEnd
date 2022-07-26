@@ -31,6 +31,11 @@
   resolved "https://registry.yarnpkg.com/@ag-grid-community/core/-/core-27.3.0.tgz#04599cff5c35d26b970153ec3db66b945f053e57"
   integrity sha512-77/bE2KdFlFI/ywEP46aSspXtgBteY/OPQyzU/lWqYrG2wC6cLfPSUB60t9e0FiqElwM/Vdcjz0TAjRwhZOPkw==
 
+"@ag-grid-community/core@~28.0.0":
+  version "28.0.2"
+  resolved "https://registry.yarnpkg.com/@ag-grid-community/core/-/core-28.0.2.tgz#387db38de9c567cc0c969aaeddaf1968f013a2fe"
+  integrity sha512-RIg2BJ4iqSvh5bvWEXgPwdARjnOEkTuqQObSFmZp8tVi1a4tpnMKkgIqKO4pK5s1uUVI2bBkr30v2oirD0P32A==
+
 "@ag-grid-community/csv-export@~27.3.0":
   version "27.3.0"
   resolved "https://registry.yarnpkg.com/@ag-grid-community/csv-export/-/csv-export-27.3.0.tgz#6b2fc9090180aa00696b8f1aaf1f0b31f43088b0"
@@ -99,6 +104,13 @@
     "@ag-grid-enterprise/row-grouping" "~27.3.0"
     "@ag-grid-enterprise/side-bar" "~27.3.0"
 
+"@ag-grid-enterprise/core@^28.0.2", "@ag-grid-enterprise/core@~28.0.0":
+  version "28.0.2"
+  resolved "https://registry.yarnpkg.com/@ag-grid-enterprise/core/-/core-28.0.2.tgz#6c9eb867b81f390a1c6b3dcfe56c7f30996ee835"
+  integrity sha512-/ziMRRoOMILMkhSuZM657o2wtj/9jHVzTvnzys8ZDVoRmmIDLbMxwH82kAIJcSD72CodAs+yxnMlE5VPfr40Xg==
+  dependencies:
+    "@ag-grid-community/core" "~28.0.0"
+
 "@ag-grid-enterprise/core@~27.3.0":
   version "27.3.0"
   resolved "https://registry.yarnpkg.com/@ag-grid-enterprise/core/-/core-27.3.0.tgz#e80aa959be873fad5d5faad41ca89664e369194d"
@@ -165,6 +177,14 @@
     "@ag-grid-community/core" "~27.3.0"
     "@ag-grid-enterprise/core" "~27.3.0"
 
+"@ag-grid-enterprise/row-grouping@^28.0.2":
+  version "28.0.2"
+  resolved "https://registry.yarnpkg.com/@ag-grid-enterprise/row-grouping/-/row-grouping-28.0.2.tgz#e1a2fba9f53e6824fe04aadf6237538947df1e19"
+  integrity sha512-sQft73T18iYzKKVIRL4XFSCZwh1+PWAUT0yq1oY0QBL5mg82GUl21mstrQ25gcWAtiV+o++YGBNYVVYrPVAhBA==
+  dependencies:
+    "@ag-grid-community/core" "~28.0.0"
+    "@ag-grid-enterprise/core" "~28.0.0"
+
 "@ag-grid-enterprise/row-grouping@~27.3.0":
   version "27.3.0"
   resolved "https://registry.yarnpkg.com/@ag-grid-enterprise/row-grouping/-/row-grouping-27.3.0.tgz#bc185111c7cd4d8232bdfd7340dd96fdaebd9169"
@@ -172,6 +192,14 @@
   dependencies:
     "@ag-grid-community/core" "~27.3.0"
     "@ag-grid-enterprise/core" "~27.3.0"
+
+"@ag-grid-enterprise/server-side-row-model@^28.0.2":
+  version "28.0.2"
+  resolved "https://registry.yarnpkg.com/@ag-grid-enterprise/server-side-row-model/-/server-side-row-model-28.0.2.tgz#440c356958806b17ef0e574cf5d65c88bcbf10d1"
+  integrity sha512-8AK2qEOhpdZp2fsfssILZTppgnE5gxL7W36xb0x8t6rIj0DrHDjW6XNF4FvCcBg9S+f2Mw0yN4xQ5ncxT8UMzA==
+  dependencies:
+    "@ag-grid-community/core" "~28.0.0"
+    "@ag-grid-enterprise/core" "~28.0.0"
 
 "@ag-grid-enterprise/server-side-row-model@~27.3.0":
   version "27.3.0"
@@ -2750,6 +2778,23 @@ ag-charts-community@~5.3.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/ag-charts-community/-/ag-charts-community-5.3.0.tgz#25e5c11575a28bce442b0aa94e891a1ceaf651a7"
   integrity sha512-tj9ZeM3Mawk+Q1q7FbwmilGnImfKehXt6RdakD8tD+ll1oUlufS9qr1Ay9Xs9AHEisuk2Q4iJv3EOmu/y5p2lA==
+
+ag-grid-angular@^28.0.0:
+  version "28.0.0"
+  resolved "https://registry.yarnpkg.com/ag-grid-angular/-/ag-grid-angular-28.0.0.tgz#71b1626d3c96ddf05d7815902373bdc499e64ad6"
+  integrity sha512-r6+LGIGzArWHjxzqvDGaoTudBk49ti1+lGuVQhD1dzEhIjEdCtx7zXhj0+nLn35nrFU6xD7jkufSc6I2N5VPRA==
+  dependencies:
+    tslib "^2.3.0"
+
+ag-grid-community@^28.0.2:
+  version "28.0.2"
+  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-28.0.2.tgz#72ec5e47793f5fcb657be2c79bd94be57a75bd87"
+  integrity sha512-yMcDf6QhoKsuUBNklVOS2pAPzG697aNwffaCYr6HKCqEDBqhW7fTtX2iQPD4SZ7/fk/sNX8RSFAI+nTrrjDKFw==
+
+ag-grid-enterprise@^28.0.2:
+  version "28.0.2"
+  resolved "https://registry.yarnpkg.com/ag-grid-enterprise/-/ag-grid-enterprise-28.0.2.tgz#083e53ebd824eac1703f83a3e49fd764c00f0fb4"
+  integrity sha512-V1KEk3OuYKW4zARBRIplPpAX6vWYRpaiNDyqd9ZpzWk7Ms5X+xGMZLsjbSzI+9QX2HAcs2HvXO0+zQO1UkXe2w==
 
 agent-base@6, agent-base@^6.0.2:
   version "6.0.2"
@@ -7980,6 +8025,11 @@ yargs@^17.2.1, yargs@^17.4.0:
     string-width "^4.2.3"
     y18n "^5.0.5"
     yargs-parser "^21.0.0"
+
+yarn@^1.22.19:
+  version "1.22.19"
+  resolved "https://registry.yarnpkg.com/yarn/-/yarn-1.22.19.tgz#4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447"
+  integrity sha512-/0V5q0WbslqnwP91tirOvldvYISzaqhClxzyUKXYxs07yUILIs5jx/k6CFe8bvKSkds5w+eiOqta39Wk3WxdcQ==
 
 zone.js@^0.10.2:
   version "0.10.3"
