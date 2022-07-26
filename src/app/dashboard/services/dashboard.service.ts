@@ -211,6 +211,13 @@ export class DashboardService {
       );
   }
 
+  private convertDtoToPositionTypes(data: PositionByTypeDto[]): PositionByTypeDataModel[] {
+    return data.map(({ month, value }: PositionByTypeDto) => ({
+      month: MONTHS[month],
+      value,
+    }));
+  }
+
   private getWeeksTimeRanges(week: number): ITimeSlice {
     const numberWeek = week * 7;
     const today = new Date();
@@ -236,13 +243,6 @@ export class DashboardService {
 
   private getDateAsISOString(timestamp: number): string {
     return new Date(timestamp).toISOString();
-  }
-
-  private convertDtoToPositionTypes(data: PositionByTypeDto[]): PositionByTypeDataModel[] {
-    return data.map(({ month, value }: PositionByTypeDto) => ({
-      month: MONTHS[month],
-      value,
-    }));
   }
 
   private getOrderPositionWidgetData(filter: DashboardFiltersModel, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {

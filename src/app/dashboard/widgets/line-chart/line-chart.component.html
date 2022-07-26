@@ -1,10 +1,24 @@
 <app-widget-wrapper [isLoading]="isLoading">
   <ng-template #header>
     <div class="widget-header">
-      <h3 class="widget-header__title"> {{ 'Positions Trend' }} </h3>
+      <h3 class="widget-header__title">{{ 'Positions Trend' }}</h3>
       <div class="widget-header__actions">
-        <button ejs-button [isPrimary]="monthMode" [cssClass]="monthMode? 'e-small' : 'e-outline e-small'" (click)="onSwicthTo(monthlySelection)">Monthly</button>
-        <button ejs-button [isPrimary]="!monthMode" [cssClass]="!monthMode ? 'e-small' : 'e-outline e-small'" (click)="onSwicthTo(weeklySelection)">Weekly</button>
+        <button
+          ejs-button
+          [isPrimary]="monthMode"
+          [cssClass]="monthMode ? 'e-small' : 'e-outline e-small'"
+          (click)="onSwicthTo(monthlySelection)"
+        >
+          Monthly
+        </button>
+        <button
+          ejs-button
+          [isPrimary]="!monthMode"
+          [cssClass]="!monthMode ? 'e-small' : 'e-outline e-small'"
+          (click)="onSwicthTo(weeklySelection)"
+        >
+          Weekly
+        </button>
       </div>
     </div>
   </ng-template>
@@ -22,7 +36,7 @@
       <e-series-collection>
         <!-- ngFor structural directive can't be used due to an error in Syncfusion library v.20.1.57 during rendering -->
         <e-series
-          [dataSource]="chartData?.[positionTypeEnum.OPEN] ?? []"
+          [dataSource]="(filteredChartData$ | async)?.[positionTypeEnum.OPEN] ?? []"
           [name]="positionTypeEnum.OPEN"
           [width]="lineWidthInPixels"
           [xName]="xAxisName"
@@ -31,7 +45,7 @@
           [type]="type"
         ></e-series>
         <e-series
-          [dataSource]="chartData?.[positionTypeEnum.ONBOARD] ?? []"
+          [dataSource]="(filteredChartData$ | async)?.[positionTypeEnum.ONBOARD] ?? []"
           [name]="positionTypeEnum.ONBOARD"
           [width]="lineWidthInPixels"
           [xName]="xAxisName"
@@ -40,7 +54,7 @@
           [type]="type"
         ></e-series>
         <e-series
-          [dataSource]="chartData?.[positionTypeEnum.CLOSED] ?? []"
+          [dataSource]="(filteredChartData$ | async)?.[positionTypeEnum.CLOSED] ?? []"
           [name]="positionTypeEnum.CLOSED"
           [width]="lineWidthInPixels"
           [xName]="xAxisName"
@@ -50,5 +64,14 @@
         ></e-series>
       </e-series-collection>
     </ejs-chart>
+  </ng-template>
+
+  <ng-template #legend>
+    <app-widget-legend
+      [legendData]="chartLegend"
+      (changeCheckbox)="onClickLegend($event)"
+      (onClickLegend)="redirectToSourceContent()"
+      [showPercentRatio]="true"
+    ></app-widget-legend>
   </ng-template>
 </app-widget-wrapper>
