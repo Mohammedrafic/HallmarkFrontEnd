@@ -1,0 +1,20 @@
+@import "colors";
+.percentage-ratio {
+  font-weight: 700;
+
+  &__value {
+    font-size: 14px;
+    color: $supportive-red;
+    margin: 0 5px 0 15px;
+  }
+
+  &__value-decrease {
+    display: inline-block;
+    color: $supportive-red;
+    transform: rotate(180deg);
+  }
+
+  &__value-increase {
+    color: $supportive-green-10;
+  }
+}
