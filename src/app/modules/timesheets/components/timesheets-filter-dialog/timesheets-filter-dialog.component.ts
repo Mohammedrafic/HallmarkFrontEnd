@@ -20,7 +20,7 @@ import { DataSourceItem, FilterColumns, TimesheetsFilterState } from '../../inte
 import { TimesheetsService } from '../../services/timesheets.service';
 import { TimesheetsTableFiltersColumns } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
-import { findItemById, leftOnlyValidValues } from '../../helpers/functions';
+import { findItemById, leftOnlyValidValues } from '../../helpers';
 import { UserState } from '../../../../store/user.state';
 
 @Component({

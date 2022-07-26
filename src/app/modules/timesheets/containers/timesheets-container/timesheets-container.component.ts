@@ -123,7 +123,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public resetFilters(): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState());
+    this.store.dispatch(new Timesheets.UpdateFiltersState(null, this.activeTabIdx !== 0));
   }
 
   public updateTableByFilters(filters: any): void {
