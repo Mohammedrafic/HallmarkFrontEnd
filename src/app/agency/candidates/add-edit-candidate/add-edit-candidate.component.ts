@@ -1,5 +1,5 @@
 import { CandidateAgencyComponent } from '@agency/candidates/add-edit-candidate/candidate-agency/candidate-agency.component';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -29,13 +29,14 @@ import { Candidate } from 'src/app/shared/models/candidate.model';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { UserState } from 'src/app/store/user.state';
 import { Location } from '@angular/common';
+import { ComponentCanDeactivate } from '@shared/guards/pending-changes.guard';
 
 @Component({
   selector: 'app-add-edit-candidate',
   templateUrl: './add-edit-candidate.component.html',
   styleUrls: ['./add-edit-candidate.component.scss'],
 })
-export class AddEditCandidateComponent implements OnInit, OnDestroy {
+export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCanDeactivate {
   @ViewChild('stepper') tab: TabComponent;
 
   public showSaveProfileButtons = true;
@@ -108,21 +109,13 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy {
   }
 
   public navigateBack(): void {
-    if (this.candidateForm.dirty) {
-      this.confirmService
-        .confirm(DELETE_CONFIRM_TEXT, {
-          title: DELETE_CONFIRM_TITLE,
-          okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button',
-        })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
-          this.navigateToCandidates();
-        });
-    } else {
-      this.navigateToCandidates();
-    }
+    this.navigateToCandidates();
   }
+
+  @HostListener('window:beforeunload')
+  public canDeactivate(): boolean | Observable<boolean> {
+    return !this.candidateForm.dirty;
+  };
 
   public save(): void {
     if (this.candidateForm.valid) {
