@@ -73,6 +73,7 @@ import { OrderDetailsContainerComponent } from './order-management/order-details
 import { OrderCandidatesContainerComponent } from './order-management/order-candidates-container/order-candidates-container.component';
 import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
 import { SaveTemplateDialogModule } from '@client/order-management/save-template-dialog/save-template-dialog.module';
+import { CloseOrderModule } from '@client/order-management/close-order/close-order.module';
 
 const gridIcons = {
   MessageSquare,
@@ -146,6 +147,8 @@ const gridIcons = {
     RadioButtonModule,
     AddEditReorderModule,
     SaveTemplateDialogModule,
+    CloseOrderModule,
+
     //STORE
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
   ],

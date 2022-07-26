@@ -149,7 +149,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
   private search$ = new Subject();
-  private selectedDataRow: Order;
+  public selectedDataRow: OrderManagement;
 
   public selectedOrder: Order;
   public openDetails = new Subject<boolean>();

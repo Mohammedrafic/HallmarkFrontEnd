@@ -10,6 +10,10 @@
   <app-general-order-info *ngSwitchDefault [orderInformation]="orderCandidateInformation"></app-general-order-info>
 </div>
 <div class="line"></div>
+<ng-container *ngIf="orderCandidateInformation?.reasonForClosing">
+  <app-order-close-reason-info [orderInformation]="orderCandidateInformation"></app-order-close-reason-info>
+  <div class="line"></div>
+</ng-container>
 <div class="candidates-list" [ngSwitch]="orderCandidateInformation?.orderType">
   <app-order-per-diem-candidates-list
     *ngSwitchCase="orderType.OpenPerDiem"

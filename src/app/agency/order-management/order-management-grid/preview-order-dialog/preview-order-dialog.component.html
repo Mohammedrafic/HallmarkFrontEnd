@@ -47,6 +47,10 @@
                     <app-general-order-info *ngSwitchDefault [orderInformation]="currentOrder"></app-general-order-info>
                   </section>
                   <hr />
+                  <ng-container *ngIf="currentOrder?.reasonForClosing">
+                    <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
+                    <hr />
+                  </ng-container>
                   <app-order-details [currentOrder]="currentOrder"></app-order-details>
                 </section>
               </ng-template>
