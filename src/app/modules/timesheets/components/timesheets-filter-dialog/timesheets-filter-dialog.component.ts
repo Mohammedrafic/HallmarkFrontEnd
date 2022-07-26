@@ -51,6 +51,7 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
   public filterOptionFields = filterOptionFields;
   public filterColumns: FilterColumns;
   public formGroup: FormGroup;
+  public showStatuses = true;
 
   constructor(
     private store: Store,
@@ -64,13 +65,13 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
   ngOnInit(): void {
     this.initFormGroup();
     this.initFiltersColumns();
-    this.initFilterColumnDataSources();
     this.startRegionsWatching();
     this.startLocationsWatching();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (!changes['activeTabIdx'].firstChange) {
+      this.showStatuses = this.activeTabIdx === 0;
       this.clearAllFilters(false);
     }
   }
@@ -97,41 +98,14 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
     this.appliedFiltersAmount.emit(this.filteredItems.length);
   }
 
-  private initFilterColumnDataSources(): void {
-    this.organizationStructure$.pipe(
-      takeUntil(this.componentDestroy()),
-      filter(Boolean)
-    ).subscribe((structure: OrganizationStructure) => {
-      this.orgRegions = structure.regions;
-      this.allRegions = [...this.orgRegions];
-      this.store.dispatch(
-        new Timesheets.SetFiltersDataSource(
-          TimesheetsTableFiltersColumns.RegionsIds,
-          this.allRegions
-        )
-      );
-    });
-    /**
-     * TODO: remove when would be BE for datasources
-     * */
-    // const statuses = [
-    //   TimesheetsTableFiltersColumns.StatusIds,
-    //   TimesheetsTableFiltersColumns.SkillIds,
-    //   TimesheetsTableFiltersColumns.DepartmentIds,
-    //   TimesheetsTableFiltersColumns.AgencyIds,
-    //   TimesheetsTableFiltersColumns.RegionsIds,
-    //   TimesheetsTableFiltersColumns.LocationIds,
-    //   TimesheetsTableFiltersColumns.OrderIds,
-    // ];
-    // this.store.dispatch(new Timesheets.SetFiltersDataSource(statuses));
-  }
-
   private initFiltersColumns(): void {
     this.store.select(TimesheetsState.timesheetsFiltersColumns)
       .pipe(
         filter(Boolean),
         takeUntil(this.componentDestroy()),
       ).subscribe((filters) => {
+      this.orgRegions = filters.regionsIds?.dataSource || [];
+      this.allRegions = [...this.orgRegions];
       this.filterColumns = filters;
       this.cdr.detectChanges();
     });

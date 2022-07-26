@@ -18,7 +18,7 @@
           placeholder=""></ejs-multiselect>
       </div>
     </div>
-    <div class="input-container">
+    <div *ngIf="showStatuses" class="input-container">
       <label for="status">Status</label>
       <div class="input-group dropdown">
         <ejs-multiselect

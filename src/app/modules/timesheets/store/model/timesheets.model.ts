@@ -38,5 +38,6 @@ export interface TimesheetsModel {
   timesheetsFiltersColumns: FilterColumns;
   timesheetDetails: TimesheetDetailsModel | null;
   organizations: DataSourceItem[];
+  selectedOrganizationId: number;
 }
 

@@ -1,6 +1,6 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
-import { TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
+import { FilteringOptionsFields, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
 
 export interface Timesheet {
   id: number;
@@ -58,6 +58,10 @@ export type FilterColumns = {
     valueField?: string;
     valueId?: string;
   }
+}
+
+export type TimesheetsFilteringOptions = {
+  [key in FilteringOptionsFields]: DataSourceItem[];
 }
 
 export type FilterDataSource = {

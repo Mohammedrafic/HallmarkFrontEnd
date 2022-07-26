@@ -13,7 +13,7 @@ import {
   RecordValue,
   CostCentersDto,
   AddRecordDto,
-  PutRecordDto,
+  PutRecordDto, TimesheetsFilteringOptions
 } from '../interface';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
@@ -78,6 +78,12 @@ export class TimesheetsApiService {
 
   public deleteProfileTimesheets(profileId: number, profileTimesheetId: number): Observable<null> {
     return of(null);
+  }
+
+  public getFiltersDataSource(
+    organizationId: number | null = null
+  ): Observable<TimesheetsFilteringOptions> {
+    return this.http.get<TimesheetsFilteringOptions>(`/api/Timesheets/filteringOptions${organizationId ? `/${organizationId}` : ''}`);
   }
 
   /**
