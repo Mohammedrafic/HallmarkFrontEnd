@@ -69,7 +69,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedRegion: Region;
-  public defaultValue: any;
+ 
 
   @Select(OrganizationManagementState.locationsByRegionId)
   locations$: Observable<LocationsPage>;
@@ -161,10 +161,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     });
     this.organization$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
-      this.store.dispatch(new GetRegions()).pipe(take(1))
-        .subscribe((data) => {
-          this.defaultValue = data.organizationManagement.regions[0].id;
-        });;
+      this.store.dispatch(new GetRegions());
     });
   }
 
