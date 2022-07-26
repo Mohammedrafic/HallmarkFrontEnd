@@ -28,6 +28,7 @@ import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, map, Obse
 import { positionTrendLegendPalette } from '../../constants/position-trend-legend-palette';
 import { PositionTrendChartStatuses } from '../../enums/position-trend-legend-palette.enum';
 import { WidgetLegengDataModel } from '../../models/widget-legend-data.model';
+import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-line-chart',
@@ -80,7 +81,10 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
   private readonly selectedEntries$: BehaviorSubject<string[] | null> = new BehaviorSubject<string[] | null>(null);
   private readonly chartData$: BehaviorSubject<PositionsByTypeAggregatedModel | null> = new BehaviorSubject<PositionsByTypeAggregatedModel | null>(null);
 
-  constructor(private readonly store: Store) {
+  constructor(
+    private readonly store: Store,
+    private readonly dashboardService: DashboardService
+    ) {
     super();
   }
 
@@ -131,7 +135,7 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
   }
 
   public redirectToSourceContent(): void {
-    // TODO implement this method in scope ein-2623
+    this.dashboardService.redirectToUrl('client/order-management');
   }
 
   public generateLegendData(chartData: PositionsByTypeAggregatedModel): WidgetLegengDataModel[] {
