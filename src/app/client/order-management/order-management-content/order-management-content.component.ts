@@ -23,7 +23,9 @@ import {
   GetOrderById,
   GetOrderFilterDataSources,
   GetOrders,
+  GetSelectedOrderById,
   ReloadOrganisationOrderCandidatesLists,
+  SelectNavigationTab,
   SetLock,
 } from '@client/store/order-managment-content.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -472,18 +474,26 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
 
     this.openPerDiemDetails();
+    this.selectNavigationTab();
   }
 
   /* Trigger when user redirect to per diem order from re-order */
   private openPerDiemDetails(): void {
-    if (this.orderPerDiemId && this.ordersPage) {
+    if (this.orderPerDiemId && this.ordersPage.items) {
       const orderPerDiem = this.ordersPage.items.find((order: OrderManagement) => order.id === this.orderPerDiemId);
       const index = (this.gridWithChildRow.dataSource as Order[])?.findIndex(
         (order: Order) => order.id === orderPerDiem?.id
       );
-      this.onRowClick({ data: orderPerDiem });
       this.gridWithChildRow.selectRow(index);
       this.orderPerDiemId = null;
+    }
+  }
+
+  /* Check if some pending tab is present and set it as active */
+  private selectNavigationTab(): void {
+    const { pending } = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
+    if (pending && this.ordersPage.items) {
+      this.store.dispatch(new SelectNavigationTab(null, pending));
     }
   }
 
@@ -494,32 +504,37 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onRowClick(event: any): void {
-    if (event.target) {
-      this.orderManagementService.excludeDeployed = false;
+    if (event.data.isTemplate) {
+      this.navigateToOrderForm();
+      this.store.dispatch(new GetSelectedOrderById(event.data.id));
+    } else {
+      if (event.target) {
+        this.orderManagementService.excludeDeployed = false;
+      }
+
+      this.rowSelected(event, this.gridWithChildRow);
+
+      if (!event.isInteracted) {
+        this.selectedDataRow = event.data;
+        const data = event.data;
+        const options = this.getDialogNextPreviousOption(data);
+        this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
+        this.store.dispatch(
+          new GetAgencyOrderCandidatesList(
+            data.id,
+            data.organizationId,
+            this.currentPage,
+            this.pageSize,
+            this.orderManagementService.excludeDeployed
+          )
+        );
+        this.selectedCandidate = this.selectedReOrder = null;
+        this.openChildDialog.next(false);
+        this.openDetails.next(true);
+      }
+
+      this.checkSelectedChildrenItem();
     }
-
-    this.rowSelected(event, this.gridWithChildRow);
-
-    if (!event.isInteracted) {
-      this.selectedDataRow = event.data;
-      const data = event.data;
-      const options = this.getDialogNextPreviousOption(data);
-      this.store.dispatch(new GetOrderById(data.id, data.organizationId, options));
-      this.store.dispatch(
-        new GetAgencyOrderCandidatesList(
-          data.id,
-          data.organizationId,
-          this.currentPage,
-          this.pageSize,
-          this.orderManagementService.excludeDeployed
-        )
-      );
-      this.selectedCandidate = this.selectedReOrder = null;
-      this.openChildDialog.next(false);
-      this.openDetails.next(true);
-    }
-
-    this.checkSelectedChildrenItem();
   }
 
   public onRowDeselect(event: any, grid: any) {
@@ -983,9 +998,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private onDuplicateOrderSucceededHandler(): void {
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(DuplicateOrderSuccess)).subscribe((data: { payload: number }) => {
-      this.router.navigate(['./edit', data.payload], { relativeTo: this.route });
-    });
+    this.actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionDispatched(DuplicateOrderSuccess))
+      .subscribe((data: { payload: number }) => {
+        this.router.navigate(['./edit', data.payload], { relativeTo: this.route });
+      });
   }
 
   private onDeleteOrderSucceededHandler(): void {

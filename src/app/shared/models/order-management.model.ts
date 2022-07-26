@@ -262,6 +262,7 @@ export class Order {
   candidates?: CandidateModel[];
   reasonForClosing?: string;
   closingDate?: string;
+  isTemplate?: boolean;
 }
 
 export class ReOrder {

@@ -220,3 +220,11 @@ export class DuplicateOrderSuccess {
   static readonly type = '[order management] Duplicate Order Success';
   constructor(public payload: number) {}
 }
+
+export class SelectNavigationTab {
+  static readonly type = '[order management] Select Navigation Tab';
+  constructor(
+    public pending: OrganizationOrderManagementTabs | null,
+    public active?: OrganizationOrderManagementTabs
+  ) {}
+}

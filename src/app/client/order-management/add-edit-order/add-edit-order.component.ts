@@ -16,6 +16,7 @@ import {
   GetSelectedOrderById,
   SaveOrder,
   SaveOrderSucceeded,
+  SelectNavigationTab,
   SetIsDirtyOrderForm,
 } from '@client/store/order-managment-content.actions';
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
@@ -31,6 +32,7 @@ import { OrderType } from '@shared/enums/order-type';
 import some from 'lodash/fp/some';
 import isNil from 'lodash/fp/isNil';
 import { AbstractControl } from '@angular/forms';
+import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 
 enum SelectedTab {
   OrderDetails,
@@ -387,7 +389,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       workflowId,
       isSubmit,
       canApprove,
+      isTemplate: false,
     };
+
+    if (this.orderDetailsFormComponent.order?.isTemplate) {
+      order.contactDetails = order.contactDetails.map((contact) => ({ ...contact, id: 0 }));
+      order.jobDistributions = order.jobDistributions.map((job) => ({ ...job, orderId: 0, id: 0 }));
+      order.workLocations = order.workLocations.map((workLocation) => ({ ...workLocation, id: 0 }));
+    }
 
     if (!order.hourlyRate) {
       order.hourlyRate = null;
@@ -489,15 +498,16 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public createTemplate(event: { templateTitle: string }): void {
     const order = this.collectOrderData(false);
-    const title = order.title ?? event.templateTitle;
+    const { templateTitle } = event;
     const extendedOrder = {
       ...order,
-      title: title,
-      templateTitle: title,
+      title: order.title ? order.title : templateTitle,
+      templateTitle,
       isTemplate: true,
     };
     const documents = this.orderDetailsFormComponent.documents;
     this.store.dispatch(new SaveOrder(extendedOrder, documents));
+    this.selectOrderTemplatesTab();
     this.closeSaveTemplateDialog();
   }
 
@@ -510,5 +520,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (this.orderDetailsFormComponent.isDepartmentsDropDownEnabled) {
       this.getOrderDetailsControl('departmentId')?.markAsTouched();
     }
+  }
+
+  private selectOrderTemplatesTab(): void {
+    this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.OrderTemplates));
   }
 }

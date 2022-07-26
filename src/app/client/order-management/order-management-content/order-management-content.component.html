@@ -114,13 +114,17 @@
 
           <ng-template #templateButtons>
             <div class="row-tool-buttons" (click)="stopPropagation($event)">
-              <i-feather name="edit" class="icon edit-template" (click)="editOrder(data)"></i-feather>
-              <i-feather name="trash-2" class="icon delete-template" (click)="deleteOrder(data?.orderId)"></i-feather>
+              <i-feather name="trash-2" class="icon delete-template" (click)="deleteOrder(data?.id)"></i-feather>
             </div>
           </ng-template>
         </ng-template>
       </e-column>
-      <e-column field="id" headerText="ORDER ID" width="120">
+      <e-column field="id" width="120">
+        <ng-template #headerTemplate let-data>
+          <span class="e-headertext">
+            {{ activeTab !== OrganizationOrderManagementTabs.OrderTemplates ? 'ORDER ID' : 'TEMPLATE ID' }}
+          </span>
+        </ng-template>
         <ng-template #template let-data>
           <ng-container *ngIf="showReOrders ? !data.reOrders?.length : !data.children?.length; else withToggle">
             <div>

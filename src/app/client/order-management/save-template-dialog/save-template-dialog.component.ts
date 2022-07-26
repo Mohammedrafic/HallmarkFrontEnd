@@ -83,7 +83,7 @@ export class SaveTemplateDialogComponent implements OnInit, AfterViewInit, OnDes
       position: { X: 'center', Y: 'center' },
       animationSettings: { effect: 'Zoom' },
       cssClass: 'unsaved-changes-dialog save-template-dialog',
-      close: () => this.onCancel(),
+      close: this.onCancel.bind(this),
     });
   }
 }
