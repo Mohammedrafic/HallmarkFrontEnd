@@ -9,9 +9,9 @@
         </div>
         <div *ngIf="!showPercentRatio" class="widget-legend__score">{{ legend.value }}</div>
         <app-percentage-ratio-indicator
-          class="widget-legend__percentage-ratio"
           *ngIf="showPercentRatio"
           [percentageRatio]="legend.value"
+          class="widget-legend__percentage-ratio"
         ></app-percentage-ratio-indicator>
       </div>
     </div>

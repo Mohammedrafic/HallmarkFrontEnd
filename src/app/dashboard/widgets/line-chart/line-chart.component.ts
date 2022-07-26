@@ -57,7 +57,7 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
   public readonly weeklySelection: TimeSelectionEnum = TimeSelectionEnum.Weekly;
   public readonly monthlySelection: TimeSelectionEnum = TimeSelectionEnum.Monthly;
   public monthMode: boolean = true;
-  public chartLegend: any[];
+  public chartLegend: WidgetLegengDataModel[];
   public filteredChartData$: Observable<any>;
 
   public readonly crosshairSettings: CrosshairSettingsModel = {
