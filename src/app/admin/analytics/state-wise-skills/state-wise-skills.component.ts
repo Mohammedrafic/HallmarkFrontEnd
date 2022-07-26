@@ -5,26 +5,29 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { SetHeaderState } from 'src/app/store/app.actions';
 declare const com:any;
-@Component({
-  selector: 'app-custom-reports',
-  templateUrl: './custom-reports.component.html',
-  styleUrls: ['./custom-reports.component.scss']
-})
-export class CustomReportsComponent implements OnInit {
 
+@Component({
+  selector: 'app-state-wise-skills',
+  templateUrl: './state-wise-skills.component.html',
+  styleUrls: ['./state-wise-skills.component.scss']
+})
+export class StateWiseSkillsComponent implements OnInit {
+
+  private _sanitizer:DomSanitizer;
   private factory:any;
   constructor(private store: Store,
     private router: Router,
     private route: ActivatedRoute,sanitizer: DomSanitizer) {
-    store.dispatch(new SetHeaderState({ title: 'Analytics', iconName: 'truck' }));
+store.dispatch(new SetHeaderState({ title: 'State Wise Skills', iconName: '' }));
+this._sanitizer=sanitizer;
 }
 
   ngOnInit(): void {
+  
+   
    this.factory=com.jinfonet.api.AppFactory;
    this.ShowReport("reportIframe");
   }
-
-  
 public ShowReport(entryId:string):void {
         var params1 = {
           
@@ -70,5 +73,6 @@ public ShowReport(entryId:string):void {
           };
 
   }
+
 
 

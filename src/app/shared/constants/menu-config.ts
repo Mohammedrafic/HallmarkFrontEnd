@@ -35,7 +35,7 @@ export const MENU_CONFIG: any = {
       icon: 'lock',
       route: '',
     },
-     7: {
+    7: {
       // Financial Module
       icon: 'dollar-sign',
       route: '',
@@ -139,7 +139,17 @@ export const MENU_CONFIG: any = {
     32: {
       // Custom Reports
       icon: 'Truck',
-      route: '/admin/analytics',
+      route: '/analytics/state-wise-skills',
+    },
+    33: {
+      // state wise skills
+      icon: '',
+      route: '/analytics/state-wise-skills',
+    },
+    34: {
+      // Candidate Statistics
+      icon: '',
+      route: '/analytics/candidate-stats',
     },
   },
 

@@ -253,14 +253,40 @@ export class ShellPageComponent implements OnInit, OnDestroy {
 
   public onSearchChange(): void {
 
-    this.searchResult= this.sideBarMenu.filter((element) => {
-      return element.title.toLowerCase().includes(this.searchString.toLowerCase()) ;
-    });
-    if (this.searchResult.length == 0) {
-      this.searchResult = this.sideBarMenu. filter((element) => {
-        element.children.filter((childElement) => { return childElement.title.toLowerCase().includes(this.searchString.toLowerCase()); }) 
-      });
+    this.searchResult = this.getData(this.searchString.toLowerCase())  
+ 
+  }
+
+  getData(searchText: string) {
+
+    const menuItems = [...this.sideBarMenu];
+
+    return this.getValueLogic(menuItems, searchText)
+
+  }
+
+  getValueLogic(data: any, filterText: string) {
+
+    const arr: any = [];
+
+    if (data && Array.isArray(data)) {
+
+      for (let i = 0; i < data.length; i++) {
+
+        const ele = data[i];
+
+        ele && ele.title.toLowerCase().includes(filterText.toLocaleLowerCase())
+
+          ? arr.push(ele)
+
+          : arr.push(...this.getValueLogic(ele.children, filterText));
+
+      }
+
     }
+
+    return arr;
+
   }
 
   public onSearchFocusOut(): void {
