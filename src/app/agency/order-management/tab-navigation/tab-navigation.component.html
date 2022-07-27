@@ -1,17 +1,16 @@
-<div class="order-tabs">
-  <ejs-tab id="tab_default" #tabNavigation (selecting)="onSelect($event)" >
-    <e-tabitems>
-      <e-tabitem>
-        <ng-template #headerText>
-          {{ tabTitle.MyAgency }}
-          <!-- TBI: total count -->
-          <!-- <span class="tab-navigation e-badge e-badge-success e-badge-circle">2</span> -->
-        </ng-template>
-      </e-tabitem>
-      <e-tabitem [header]="{ 'text': tabTitle.OtherAgencies }"></e-tabitem>
-      <e-tabitem [header]="{ 'text': tabTitle.AllAgencies }"></e-tabitem>
-      <e-tabitem [header]="{ 'text': tabTitle.PerDiem }"></e-tabitem>
-      <e-tabitem [header]="{ 'text': tabTitle.ReOrders }"></e-tabitem>
-    </e-tabitems>
-  </ejs-tab>
-</div>
+<ejs-tab id="tab_default" heightAdjustMode="Auto" #tabNavigation (selecting)="onSelect($event)" (created)="onTabCreated()">
+  <div class="e-tab-header">
+    <div>
+      {{ tabTitle.MyAgency }}
+      <!-- TBI: total count -->
+      <!-- <span class="tab-navigation e-badge e-badge-success e-badge-circle">2</span> -->
+    </div>
+    <div>{{ tabTitle.OtherAgencies }}</div>
+    <div>
+      {{ tabTitle.AllAgencies }}
+    </div>
+    <div>{{ tabTitle.PerDiem }}</div>
+    <div>{{ tabTitle.ReOrders }}</div>
+  </div>
+  <div class="e-content"></div>
+</ejs-tab>

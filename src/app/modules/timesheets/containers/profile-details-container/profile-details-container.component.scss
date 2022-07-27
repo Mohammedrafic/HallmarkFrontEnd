@@ -160,8 +160,13 @@ $chip-margin: 8px;
     min-width: 110px;
   }
 
+  .miles {
+    flex-shrink: 0;
+  }
+
   .profile-uploads {
     min-width: 150px;
+    flex-grow: 1;
   }
 
   .tile-dark-blue {

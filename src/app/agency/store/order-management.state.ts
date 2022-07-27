@@ -28,6 +28,7 @@ import { ShowToast } from 'src/app/store/app.actions';
 import {
   ApplyOrderApplicants,
   ApplyOrderApplicantsSucceed,
+  ClearOrders,
   ExportAgencyOrders,
   GetAgencyFilterOptions,
   GetAgencyOrderCandidatesList,
@@ -384,5 +385,13 @@ export class OrderManagementState {
   @Action(SetOrdersTab)
   setOrdersTab({ patchState }: StateContext<OrderManagementModel>, { tabName }: SetOrdersTab): void {
     patchState({ ordersTab: tabName });
+  }
+
+  @Action(ClearOrders)
+  ClearOrders(
+    { patchState }: StateContext<OrderManagementModel>,
+    {}: ClearOrders
+  ): OrderManagementModel {
+    return patchState({ ordersPage: null });
   }
 }

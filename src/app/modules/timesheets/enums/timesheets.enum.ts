@@ -39,12 +39,12 @@ export enum TimesheetDetailsActions {
 }
 
 export enum TIMETHEETS_STATUSES {
-  PENDING_APPROVE = 'pending apr.',
-  PENDING_APPROVE_ASTERIX = 'pending apr.*',
-  MISSING = 'missing',
-  ORG_APPROVED = 'org. approved',
-  REJECTED = 'rejected',
   INCOMPLETE = 'incomplete',
+  PENDING_APPROVE = 'pending approval',
+  PENDING_APPROVE_ASTERIX = 'pending approval*',
+  ORG_APPROVED = 'org. approved',
+  MISSING = 'missing',
+  REJECTED = 'rejected',
   APPROVED = 'approved',
 }
 

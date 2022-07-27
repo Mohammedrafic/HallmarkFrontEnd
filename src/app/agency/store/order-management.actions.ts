@@ -99,3 +99,8 @@ export class SetOrdersTab {
   static readonly type = '[order management] Set Orders Type';
   constructor(public tabName: AgencyOrderManagementTabs) {}
 }
+
+export class ClearOrders {
+  static readonly type = '[agency order management] Clear Orders';
+  constructor() {}
+}

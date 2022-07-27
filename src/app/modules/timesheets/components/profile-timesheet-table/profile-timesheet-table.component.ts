@@ -42,6 +42,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @Input() isAgency: boolean;
 
+  @Input()
+  public actionsDisabled: boolean = false;
+
   @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
 
   @Output() readonly changesSaved: EventEmitter<boolean> = new EventEmitter<boolean>();

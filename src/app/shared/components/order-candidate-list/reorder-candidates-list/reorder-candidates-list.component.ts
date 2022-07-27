@@ -1,11 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngxs/store';
-import { Subject} from 'rxjs';
 
 import { OrderCandidatesList } from '@shared/models/order-management.model';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
+
+enum ReorderCandidateStutuses {
+  BillRatePending = 44,
+  OfferedBR = 47,
+}
 
 @Component({
   selector: 'app-reorder-candidates-list',
@@ -15,6 +19,7 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 export class ReorderCandidatesListComponent extends AbstractOrderCandidateListComponent implements OnInit {
   public candidate: OrderCandidatesList;
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
+  public candidateStatuses = ReorderCandidateStutuses;
 
   private selectedIndex: number;
 
@@ -31,12 +36,12 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
       
 
       if (this.isAgency) {
+        this.dialogNextPreviousOption = this.getDialogNextPreviousOption(this.candidate);
+        this.openDetails.next(true);
         
       } else if (this.isOrganization) {
       }
 
-      this.dialogNextPreviousOption = this.getDialogNextPreviousOption(this.candidate);
-      this.openDetails.next(true);
     }
   }
 
