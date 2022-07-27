@@ -32,6 +32,7 @@
       [legendSettings]="legendSettings"
       [tooltip]="tooltipSettings"
       class="app-line-chart__component"
+      [palettes]="palettes"
     >
       <e-series-collection>
         <!-- ngFor structural directive can't be used due to an error in Syncfusion library v.20.1.57 during rendering -->
@@ -56,6 +57,15 @@
         <e-series
           [dataSource]="(filteredChartData$ | async)?.[positionTypeEnum.CLOSED] ?? []"
           [name]="positionTypeEnum.CLOSED"
+          [width]="lineWidthInPixels"
+          [xName]="xAxisName"
+          [yName]="yAxisName"
+          [legendShape]="legendShape"
+          [type]="type"
+        ></e-series>
+        <e-series
+          [dataSource]="(filteredChartData$ | async)?.[positionTypeEnum.IN_PROGRESS] ?? []"
+          [name]="positionTypeEnum.IN_PROGRESS"
           [width]="lineWidthInPixels"
           [xName]="xAxisName"
           [yName]="yAxisName"

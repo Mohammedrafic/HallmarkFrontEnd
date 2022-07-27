@@ -21,14 +21,13 @@ import { Store } from '@ngxs/store';
 
 import type { PositionByTypeDataModel, PositionsByTypeAggregatedModel } from '../../models/positions-by-type-aggregated.model';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
-import { PositionTypeEnum } from '../../enums/position-type.enum';
 import { TimeSelectionEnum } from '../../enums/time-selection.enum';
 import { SwitchMonthWeekTimeSelection } from '../../store/dashboard.actions';
 import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, map, Observable } from 'rxjs';
 import { positionTrendLegendPalette } from '../../constants/position-trend-legend-palette';
-import { PositionTrendChartStatuses } from '../../enums/position-trend-legend-palette.enum';
 import { WidgetLegengDataModel } from '../../models/widget-legend-data.model';
 import { DashboardService } from '../../services/dashboard.service';
+import { PositionTrendTypeEnum } from '../../enums/position-trend-type.enum';
 
 @Component({
   selector: 'app-line-chart',
@@ -50,7 +49,7 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
   public readonly chartArea: ChartAreaModel = { border: { width: 0 } };
   public readonly legendShape: string = 'Circle';
   public readonly lineWidthInPixels: number = 3;
-  public readonly positionTypeEnum: typeof PositionTypeEnum = PositionTypeEnum;
+  public readonly positionTypeEnum: typeof PositionTrendTypeEnum = PositionTrendTypeEnum;
   public readonly primaryXAxis: AxisModel = { valueType: 'Category', majorGridLines: { width: 0 } };
   public readonly xAxisName: keyof PositionByTypeDataModel = 'month';
   public readonly yAxisName: keyof PositionByTypeDataModel = 'value';
@@ -60,6 +59,7 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
   public monthMode: boolean = true;
   public chartLegend: WidgetLegengDataModel[];
   public filteredChartData$: Observable<any>;
+  public palettes: string[] = [];
 
   public readonly crosshairSettings: CrosshairSettingsModel = {
     enable: true,
@@ -83,7 +83,7 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
 
   constructor(
     private readonly store: Store,
-    private readonly dashboardService: DashboardService
+    private readonly dashboardService: DashboardService,
     ) {
     super();
   }
@@ -103,10 +103,11 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
     this.chartLegend = this.generateLegendData(this.chartData);
     this.handleChartDataChanges(this.chartData);
     const maximumDataValue = this.getMaximumDataValue();
-
+    const correctorChartHeight = Math.floor(maximumDataValue * 0.03);
+    
     this.primaryYAxis = {
       ...this.primaryYAxis,
-      maximum: maximumDataValue + this.lineWidthInPixels,
+      maximum: maximumDataValue + correctorChartHeight,
       interval: maximumDataValue / 2,
     };
   }
@@ -142,10 +143,14 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
     return Object.entries(chartData).map(([key, value]) => {
       const [previousValue, currentValue] = value.slice(-2);
       const coefficient = previousValue.value === 0 ? 1 : previousValue.value;
+
+      const paletteColor = positionTrendLegendPalette[key as PositionTrendTypeEnum];
+      this.palettes.push(paletteColor);
+
       return {
         label: key,
         value: ((currentValue.value - previousValue.value) / coefficient) * 100,
-        color: positionTrendLegendPalette[key as PositionTrendChartStatuses],
+        color: paletteColor,
       };
     });
   }

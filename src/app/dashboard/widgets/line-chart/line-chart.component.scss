@@ -1,20 +1,12 @@
 .app-line-chart {
   &__component {
-    aspect-ratio: 1.7;
+    aspect-ratio: 1.75;
   }
 }
 
 .widget-header {
   display: flex;
   justify-content: space-between;
-
-  &__title {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 700;
-    color: #1a1b2e;
-    line-height: 16px;
-  }
 
   &__actions {
     display: flex;

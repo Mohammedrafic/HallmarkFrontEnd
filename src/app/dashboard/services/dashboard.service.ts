@@ -29,7 +29,7 @@ import { AvailableWidgetsResponseModel, WidgetOptionModel } from '../models/widg
 import { DashboardDataModel } from '../models/dashboard-data.model';
 import type { ApplicantsByRegionDataModel } from '../models/applicants-by-region-data.model';
 import type { WidgetsDataModel } from '../models/widgets-data.model';
-import { PositionTypeEnum } from '../enums/position-type.enum';
+import { PositionTrendTypeEnum } from '../enums/position-trend-type.enum';
 import type {
   ITimeSlice,
   PositionByTypeDataModel,
@@ -199,21 +199,22 @@ export class DashboardService {
   private getPositionsByTypes(filter: DashboardFiltersModel, timeSelection: TimeSelectionEnum): Observable<PositionsByTypeAggregatedModel> {
     const timeRanges = this.calculateTimeRanges(timeSelection);
     return this.httpClient
-      .post<PositionsByTypeResponseModel>(`${this.baseUrl}/getopenclosedonboardamount`, { ...timeRanges, ...filter })
+      .post<PositionsByTypeResponseModel>(`${this.baseUrl}/getopenclosedonboardamount`, { ...timeRanges, ...filter, rangeType: timeSelection})
       .pipe(
         map((positions: PositionsByTypeResponseModel) => {
           return {
-            [PositionTypeEnum.OPEN]: this.convertDtoToPositionTypes(positions.openJobs),
-            [PositionTypeEnum.ONBOARD]: this.convertDtoToPositionTypes(positions.onboardCandidates),
-            [PositionTypeEnum.CLOSED]: this.convertDtoToPositionTypes(positions.closedJobs),
+            [PositionTrendTypeEnum.OPEN]: this.convertDtoToPositionTypes(positions.openJobs, timeSelection),
+            [PositionTrendTypeEnum.ONBOARD]: this.convertDtoToPositionTypes(positions.onboardCandidates, timeSelection),
+            [PositionTrendTypeEnum.CLOSED]: this.convertDtoToPositionTypes(positions.closedJobs, timeSelection),
+            [PositionTrendTypeEnum.IN_PROGRESS]: this.convertDtoToPositionTypes(positions.inProgressJobs, timeSelection),
           };
         })
       );
   }
 
-  private convertDtoToPositionTypes(data: PositionByTypeDto[]): PositionByTypeDataModel[] {
-    return data.map(({ month, value }: PositionByTypeDto) => ({
-      month: MONTHS[month],
+  private convertDtoToPositionTypes(data: PositionByTypeDto[], timeSelection: TimeSelectionEnum): PositionByTypeDataModel[] {
+    return data.map(({ dateIndex, value }: PositionByTypeDto) => ({
+      month: timeSelection === TimeSelectionEnum.Monthly ? MONTHS[dateIndex] : `W${dateIndex}`,
       value,
     }));
   }
@@ -221,23 +222,23 @@ export class DashboardService {
   private getWeeksTimeRanges(week: number): ITimeSlice {
     const numberWeek = week * 7;
     const today = new Date();
-    const startDate = this.getDateAsISOString(new Date(today.getFullYear(), today.getMonth(), today.getDate() - numberWeek).getTime());
-    const endDate = this.getDateAsISOString(new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime());
-    return {startDate, endDate};
+    const dateFrom = this.getDateAsISOString(new Date(today.getFullYear(), today.getMonth(), today.getDate() - numberWeek).getTime());
+    const dateTo = this.getDateAsISOString(new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime());
+    return {dateFrom, dateTo};
   }
 
   private getMonthTimeRanges(month: number): ITimeSlice{
     const date = new Date();
-    const startDate = this.getDateAsISOString(date.setMonth(date.getMonth() - month + 1));
-    const endDate = this.getDateAsISOString(date.setMonth(date.getMonth() + month));
-    return { startDate, endDate };
+    const dateFrom = this.getDateAsISOString(date.setMonth(date.getMonth() - month + 1));
+    const dateTo = this.getDateAsISOString(date.setMonth(date.getMonth() + month));
+    return { dateFrom, dateTo };
   }
 
   private calculateTimeRanges(timeSelection: TimeSelectionEnum) {
     if(timeSelection === TimeSelectionEnum.Weekly) {
-      return this.getWeeksTimeRanges(5);
+      return this.getWeeksTimeRanges(6);
     } else {
-      return this.getMonthTimeRanges(5);
+      return this.getMonthTimeRanges(6);
     }  
   }
 
