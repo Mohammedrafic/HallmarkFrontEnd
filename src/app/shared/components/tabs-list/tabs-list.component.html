@@ -1,4 +1,9 @@
-<ejs-tab #timesheetTabs id="tab_default" heightAdjustMode="Auto" (selecting)="onSelect($event)">
+<ejs-tab
+  #timesheetTabs
+  id="tab_default"
+  heightAdjustMode="Auto"
+  (selecting)="onSelect($event)"
+>
   <e-tabitems>
     <e-tabitem *ngFor="let tab of tabConfig; trackBy: trackByFn">
       <ng-template #headerText>

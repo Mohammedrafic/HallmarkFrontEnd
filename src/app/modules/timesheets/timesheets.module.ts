@@ -59,6 +59,7 @@ import {
 import { TimesheetTableLinkComponent } from './components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 import { TimesheetDetailsService } from './services/timesheet-details.service';
 import { FileViewerModule } from './modules/file-viewer/file-viewer.module';
+import { TimesheetsTabsComponent } from './components/timesheets-tabs/timesheets-tabs.component';
 
 const gridIcons = {
   MessageSquare,
@@ -110,6 +111,7 @@ const gridIcons = {
     TimesheetTableLinkComponent,
     ProfileMilesComponent,
     InputEditorComponent,
+    TimesheetsTabsComponent,
   ],
   imports: [
     CommonModule,
