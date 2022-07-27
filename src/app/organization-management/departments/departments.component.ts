@@ -45,6 +45,7 @@ import { OrganizationRegion, OrganizationStructure } from '@shared/models/organi
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
 
+
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 
 @Component({
@@ -98,6 +99,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   ];
   public fileName: string;
   public defaultFileName: string;
+    defaultLocationValue: any;
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
@@ -246,7 +248,12 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion?.id) {
-      this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
+      this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id)).pipe(takeUntil(this.unsubscribe$))
+        .subscribe((data) => {
+          if (data.organizationManagement.locations.length > 0) {
+            this.defaultLocationValue = data.organizationManagement.locations[0].id;
+          }
+        });
       this.isLocationsDropDownEnabled = true;
     } else {
       this.store.dispatch(new ClearLocationList());

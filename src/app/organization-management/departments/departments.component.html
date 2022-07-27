@@ -18,6 +18,7 @@
         [dataSource]="locations$ | async"
         [fields]="locationFields"
         (change)="onLocationDropDownChanged($event)"
+        [value]="defaultLocationValue"             
       ></ejs-dropdownlist>
     </section>
     <section>
