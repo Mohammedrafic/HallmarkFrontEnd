@@ -8,6 +8,7 @@
         [dataSource]="regions$ | async"
         [fields]="regionFields"
         (change)="onRegionDropDownChanged($event)"
+        [value]="defaultValue"
       ></ejs-dropdownlist>
       <ejs-dropdownlist
         id="locationsDropDown"

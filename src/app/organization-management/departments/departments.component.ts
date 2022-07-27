@@ -76,6 +76,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedRegion: Region;
+  defaultValue: any;
 
   @Select(OrganizationManagementState.locationsByRegionId)
   locations$: Observable<Location[]>;
@@ -146,7 +147,10 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     });
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.clearFilters();
-      this.store.dispatch(new GetRegions());
+      this.store.dispatch(new GetRegions()).pipe(takeUntil(this.unsubscribe$))
+        .subscribe((data) => {
+          this.defaultValue = data.organizationManagement.regions[0].id;
+        });;
     });
   }
 
