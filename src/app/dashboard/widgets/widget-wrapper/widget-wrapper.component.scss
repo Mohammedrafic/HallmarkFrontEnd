@@ -51,6 +51,11 @@ $headerHeight: 19px;
     max-height: var(--chartHeight);
   }
 
+  &__position-chat {
+    height: 100%;
+    margin-right: -16px;
+  }
+
   &__legend {
     height: calc(100% - #{var(--chartHeight)});
     overflow: auto;
