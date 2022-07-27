@@ -11,7 +11,7 @@
 
 <ng-template #regularWidgetTemplate>
   <div class="app-widget-wrapper__projection-wrapper">
-    <div class="app-widget-wrapper__header">
+    <div *ngIf="header" class="app-widget-wrapper__header">
       <ng-container [ngTemplateOutlet]="header"></ng-container>
     </div>
     <div class="app-widget-wrapper__chart">
