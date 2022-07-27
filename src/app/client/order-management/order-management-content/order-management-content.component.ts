@@ -228,6 +228,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       candidatesCountTo: new FormControl(null),
       agencyIds: new FormControl([]),
       agencyType: new FormControl('0'),
+      templateTitle: new FormControl(null),
     });
   }
 
@@ -308,12 +309,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public searchOrders(event: KeyboardEvent): void {
-    const value = (event.target as HTMLInputElement).value;
+    const { value } = event.target as HTMLInputElement;
+    const controlName =
+      this.activeTab === OrganizationOrderManagementTabs.OrderTemplates ? 'templateTitle' : 'jobTitle';
     if (value.length >= 2) {
-      this.OrderFilterFormGroup.controls['jobTitle'].setValue(value);
+      this.OrderFilterFormGroup.controls[controlName].setValue(value);
       this.search$.next(value);
-    } else if (value.length === 0 && this.filters.jobTitle?.length) {
-      this.OrderFilterFormGroup.controls['jobTitle'].setValue('');
+    } else if (value.length === 0 && this.filters[controlName]?.length) {
+      this.OrderFilterFormGroup.controls[controlName].setValue('');
       this.search$.next(value);
     }
   }
@@ -385,6 +388,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       candidatesCountTo: this.filters.candidatesCountTo || null,
       agencyIds: this.filters.agencyIds || [],
       agencyType: this.filters.agencyType ? String(this.filters.agencyType) : '0',
+      templateTitle: this.filters.templateTitle || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
   }
@@ -882,6 +886,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         valueId: 'id',
       },
       agencyType: { type: ControlTypes.Radio, dataSource: { 1: 'Yes', 2: 'No' }, default: '0' },
+      templateTitle: { type: ControlTypes.Text, valueType: ValueType.Text },
     };
     this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe(() => {
       this.onFilterApply();

@@ -437,6 +437,7 @@ export class OrderFilter {
   agencyType?: string | number | null;
   includeReOrders?: boolean;
   isTemplate?: boolean;
+  templateTitle?: string;
 }
 
 export class OrderPartnerAgency {

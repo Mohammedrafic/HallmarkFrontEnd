@@ -190,6 +190,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
       case SubmitButtonItem.SaveForLater:
         this.saveForLater();
+        this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.Incomplete));
         break;
 
       case SubmitButtonItem.SaveAsTemplate:
@@ -504,7 +505,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     const { templateTitle } = event;
     const extendedOrder = {
       ...this.saveTemplateDialogService.resetOrderPropertyIds(order),
-      title: order.title ? order.title : templateTitle,
       templateTitle,
       isTemplate: true,
     };
