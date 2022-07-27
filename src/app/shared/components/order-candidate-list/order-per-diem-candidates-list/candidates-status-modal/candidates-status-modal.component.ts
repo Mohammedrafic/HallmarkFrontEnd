@@ -53,6 +53,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   @Input() candidate: OrderCandidatesList;
   @Input() openEvent: Subject<boolean>;
   @Input() isAgency: boolean = false;
+  @Input() isLocked: boolean | undefined = false;
 
   @Input() set candidateJob(orderCandidateJob: OrderCandidateJob | null) {
     this.orderCandidateJob = orderCandidateJob;

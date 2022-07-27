@@ -209,6 +209,7 @@ export abstract class AbstractGridConfigurationComponent {
   }
 
   public refreshGridColumns(columns: GridColumn[], grid: GridComponent): void {
+    if (!grid) { return; }
     columns.forEach((g) => {
       if (!isNullOrUndefined(grid.getColumnByField(g.fieldName))) {
         grid.getColumnByField(g.fieldName).visible = g.visible;

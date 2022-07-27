@@ -24,6 +24,7 @@ import {
   GetOrderFilterDataSources,
   GetOrders,
   GetSelectedOrderById,
+  LockUpdatedSuccessfully,
   ReloadOrganisationOrderCandidatesLists,
   SelectNavigationTab,
   SetLock,
@@ -253,6 +254,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.onSkillDataLoadHandler();
     this.onReloadOrderCandidatesLists();
     this.onChildDialogChange();
+    this.onLockUpdatedSucceededHandler();
     this.listenRedirectFromReOrder();
   }
 
@@ -622,6 +624,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         break;
       case OrganizationOrderManagementTabs.ReOrders:
         this.showReOrders = false;
+        this.isLockMenuButtonsShown = false;
         this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
         this.getOrders();
         break;
@@ -1002,6 +1005,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       .pipe(takeUntil(this.unsubscribe$), ofActionDispatched(DuplicateOrderSuccess))
       .subscribe((data: { payload: number }) => {
         this.router.navigate(['./edit', data.payload], { relativeTo: this.route });
+      });
+  }
+
+  private onLockUpdatedSucceededHandler(): void {
+    this.actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionDispatched(LockUpdatedSuccessfully))
+      .subscribe(() => {
+        this.getOrders();
       });
   }
 

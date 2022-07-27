@@ -163,6 +163,7 @@ export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
 export type AgencyOrder = {
   orderId: number;
   organizationId: number;
+  isLocked: boolean;
 };
 
 export class SuggestedDetails {

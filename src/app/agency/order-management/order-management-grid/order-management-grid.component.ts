@@ -138,6 +138,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
+  public isLockMenuButtonsShown = true;
 
   constructor(
     private store: Store,
@@ -282,6 +283,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private onTabChange(): void {
     this.ordersTab$.pipe(takeUntil(this.unsubscribe$), tap((selected) => {
       this.selectedTab = selected;
+      this.onGridCreated();
       this.clearFilters();
       this.store.dispatch(new ClearOrders());
       this.selectedIndex = null;
@@ -314,17 +316,21 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
         this.showReOrders = false;
+        this.isLockMenuButtonsShown = true;
         this.refreshGridColumns(MyAgencyOrdersColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.PerDiem:
+        this.isLockMenuButtonsShown = true;
         this.showReOrders = true;
         this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.ReOrders:
+        this.isLockMenuButtonsShown = false;
         this.showReOrders = false;
         this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
         break;
       default:
+        this.isLockMenuButtonsShown = true;
         this.showReOrders = false;
         this.refreshGridColumns(MyAgencyOrdersColumnsConfig, this.gridWithChildRow);
         break;

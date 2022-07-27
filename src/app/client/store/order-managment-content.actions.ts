@@ -41,6 +41,11 @@ export class SetLock {
   ) {}
 }
 
+export class LockUpdatedSuccessfully {
+  static readonly type = '[order management] Lock Updated Successfully';
+  constructor() {}
+}
+
 export class GetAgencyOrderCandidatesList {
   static readonly type = '[order management] Get Order Candidates Page';
   constructor(

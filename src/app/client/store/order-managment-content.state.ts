@@ -33,6 +33,7 @@ import {
   GetSelectedOrderById,
   GetSuggestedDetails,
   GetWorkflows,
+  LockUpdatedSuccessfully,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   SaveOrder,
@@ -329,7 +330,7 @@ export class OrderManagementContentState {
     return this.orderManagementService.setLock(id, lockStatus).pipe(
       tap(() => {
         const message = lockStatus ? `The Order ${id} is locked` : `The Order ${id} is unlocked`;
-        const actions = [new GetOrders(filters), new ShowToast(MessageTypes.Success, message)];
+        const actions = [new LockUpdatedSuccessfully(), new ShowToast(MessageTypes.Success, message)];
         dispatch(updateOpened ? [...actions, new GetSelectedOrderById(id)] : actions);
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error?.detail)))

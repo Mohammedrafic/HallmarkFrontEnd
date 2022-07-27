@@ -22,7 +22,7 @@
               <div class="vertical-divider"></div>
               <div *ngIf="order" class="order-other-statuses">
                 <span class="custom-chip" *ngIf="!isReOrder">{{ order.orderType | orderTypeName }}</span>
-                <span class="custom-chip"> {{order.isLocked ? "Locked" : "Unlocked"}}</span>
+                <span *ngIf="orderType.ReOrder !== order?.orderType" class="custom-chip"> {{order.isLocked ? "Locked" : "Unlocked"}}</span>
               </div>
             </div>
           </div>
@@ -41,7 +41,7 @@
             </button>
             <button ejs-button cssClass="e-outline" *ngIf="orderType.OpenPerDiem === order?.orderType" (click)="createReOrder()">Create Re-Order</button>
             <button ejs-button cssClass="e-primary delete-button" (click)="deleteOrder(order.id)" *ngIf="!showCloseButton">Delete</button>
-            <button ejs-button [isPrimary]="true" (click)="lockOrder()" [disabled]="disabledLock">
+            <button ejs-button *ngIf="orderType.ReOrder !== order?.orderType" [isPrimary]="true" (click)="lockOrder()" [disabled]="disabledLock">
               {{order?.isLocked ? "Unlock" : "Lock"}}
               <i-feather [name]="order?.isLocked ? 'unlock' : 'lock'" class="icon"></i-feather>
             </button>

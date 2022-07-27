@@ -45,7 +45,7 @@
       </ng-template>
       <ng-template #template let-data>
         <div class="row-tool-buttons">
-          <button ejs-button cssClass="e-flat" [disabled]="true">
+          <button *ngIf="isLockMenuButtonsShown" ejs-button cssClass="e-flat" [disabled]="true">
             <span><i-feather [name]="data.isLocked ? 'lock' : 'unlock'" class="icon"></i-feather></span>
           </button>
           <button ejs-button cssClass="e-flat default-icon-button">
