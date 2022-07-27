@@ -13,6 +13,7 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 
 import { Destroyable } from '@core/helpers';
 import { User } from '@shared/models/user.model';
+import { RowNode } from '@ag-grid-community/core';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { DataSourceItem, TabConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
@@ -80,7 +81,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   ngOnInit(): void {
-
     if (this.isAgency) {
       this.initOrganizationsList();
     } else {
@@ -90,7 +90,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       ]);
     }
 
-    this.initTabsCount();
     this.startFiltersWatching();
     this.startOrganizationWatching();
     this.calcTabsChips();
@@ -150,6 +149,12 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.appliedFiltersAmount = amount;
   }
 
+  public bulkApprove(data: RowNode[]): void {
+  }
+
+  public bulkExport(data: RowNode[]): void {
+  }
+
   private startFiltersWatching(): void {
     this.timesheetsFilters$.pipe(
       filter(Boolean),
@@ -170,10 +175,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       )),
       takeUntil(this.componentDestroy()),
     ).subscribe();
-  }
-
-  private initTabsCount(): void {
-    this.store.dispatch(new Timesheets.GetTabsCounts());
   }
 
   private initOrganizationsList(): void {
