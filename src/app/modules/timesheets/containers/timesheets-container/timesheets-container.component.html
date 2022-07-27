@@ -1,9 +1,9 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tabs-list
+    <app-timesheets-tabs
       [tabConfig]="tabConfig"
       (changeTab)="handleChangeTab($event)">
-    </app-tabs-list>
+    </app-timesheets-tabs>
   </ng-container>
   <ng-container right>
     <div *ngIf="isAgency" class="bootstrap">

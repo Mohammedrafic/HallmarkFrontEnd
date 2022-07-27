@@ -52,7 +52,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   @Select(UserState.user)
   readonly user$: Observable<User>;
 
-  public readonly tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
+  public tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
   public activeTabIdx = 0;
   public appliedFiltersAmount = 0;
   public readonly exportOptions: ItemModel[] = TimesheetExportOptions;
@@ -199,10 +199,18 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       takeUntil(this.componentDestroy()),
     )
     .subscribe((data) => {
-      this.tabConfig[1].amount = data.pending;
-      this.tabConfig[2].amount = data.missing;
-      this.tabConfig[3].amount = data.rejected;
-      this.cd.markForCheck();
+      this.tabConfig = this.tabConfig.map((el, idx) => {
+        if (idx === 1) {
+          el.amount = data.pending;
+        } else if (idx === 2) {
+          el.amount = data.missing;
+        } else if (idx === 3) {
+          el.amount = data.rejected;
+        }
+
+        return el;
+      });
+      this.cd.detectChanges();
     });
   }
 }

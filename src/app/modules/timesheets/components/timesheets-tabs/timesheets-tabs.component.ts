@@ -1,17 +1,15 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
+import { SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 
 @Component({
-  selector: 'app-tabs-list',
-  templateUrl: './tabs-list.component.html',
-  styleUrls: ['./tabs-list.component.scss'],
+  selector: 'app-timesheets-tabs',
+  templateUrl: './timesheets-tabs.component.html',
+  styleUrls: ['./timesheets-tabs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TabsListComponent {
-  @ViewChild('timesheetTabs') tab: TabComponent;
-
+export class TimesheetsTabsComponent {
   @Input()
   public tabConfig: TabsListConfig[];
 
