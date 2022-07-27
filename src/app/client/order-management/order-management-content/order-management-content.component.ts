@@ -80,6 +80,7 @@ import { TabNavigationComponent } from '@client/order-management/order-managemen
 import { OrderDetailsDialogComponent } from '@client/order-management/order-details-dialog/order-details-dialog.component';
 import isNil from 'lodash/fp/isNil';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
+import { isArray } from 'lodash';
 
 @Component({
   selector: 'app-order-management-content',
@@ -443,6 +444,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public onFilterApply(): void {
     this.filters = this.OrderFilterFormGroup.getRawValue();
+    this.filters.orderId = this.filters.orderId || null;
+    this.filters.billRateFrom = this.filters.billRateFrom || null;
+    this.filters.billRateTo = this.filters.billRateTo || null;
+    this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
+    this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
+    this.filters.openPositions = this.filters.openPositions || null;
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     this.getOrders();
     this.store.dispatch(new ShowFilterDialog(false));
@@ -532,7 +539,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         );
         this.selectedCandidate = this.selectedReOrder = null;
         this.openChildDialog.next(false);
-        this.openDetails.next(true);
+        if (!isArray(event.data)) {
+          this.openDetails.next(true);
+        }
       }
 
       this.checkSelectedChildrenItem();
@@ -962,7 +971,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private onOrderDetailsDialogOpenEventHandler(): void {
     this.openDetails.pipe(takeUntil(this.unsubscribe$)).subscribe((isOpen) => {
       if (!isOpen) {
-        this.gridWithChildRow.clearRowSelection();
+        this.clearSelection(this.gridWithChildRow);
         this.selectedReOrder = null;
       }
     });

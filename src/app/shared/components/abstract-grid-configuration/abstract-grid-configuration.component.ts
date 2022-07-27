@@ -93,6 +93,10 @@ export abstract class AbstractGridConfigurationComponent {
     if (closest) {
       return;
     }
+    if (event.isHeaderCheckboxClicked) {
+      this.selectedItems = [];
+      return;
+    }
     if (event.data?.length === 0) {
       grid.dataSource.forEach((element: any) => {
         const index = this.selectedItems.map((e) => e[this.idFieldName]).indexOf(element[this.idFieldName]);

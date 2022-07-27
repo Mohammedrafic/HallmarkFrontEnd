@@ -411,7 +411,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       order: order.orderId,
       reOrder: reOrder.orderId,
     };
-    this.gridWithChildRow?.clearRowSelection();
+    this.clearSelection(this.gridWithChildRow);
     this.store.dispatch(new GetOrderById(reOrder.orderId, order.organizationId));
     this.store.dispatch(
       new GetAgencyOrderCandidatesList(
@@ -544,6 +544,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public onFilterApply(): void {
     this.filters = this.OrderFilterFormGroup.getRawValue();
+    this.filters.orderId = this.filters.orderId || null;
+    this.filters.billRateFrom = this.filters.billRateFrom || null;
+    this.filters.billRateTo = this.filters.billRateTo || null;
+    this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
+    this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
+    this.filters.openPositions = this.filters.openPositions || null;
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
     this.dispatchNewPage();
     this.store.dispatch(new ShowFilterDialog(false));
@@ -555,7 +561,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.openPreview.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (!isOpen) {
         this.openCandidat.next(false);
-        this.gridWithChildRow?.clearRowSelection();
+        this.clearSelection(this.gridWithChildRow);
         this.previousSelectedOrderId = null;
         this.selectedIndex = null;
       } else {
@@ -574,7 +580,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.selectedCandidate = null;
       } else {
         this.openPreview.next(false);
-        this.gridWithChildRow?.clearRowSelection();
+        this.clearSelection(this.gridWithChildRow);
       }
     });
   }
