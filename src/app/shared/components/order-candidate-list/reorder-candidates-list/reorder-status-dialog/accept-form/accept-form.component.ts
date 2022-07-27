@@ -13,15 +13,15 @@ export class AcceptFormComponent {
   static generateFormGroup(): FormGroup {
     return  new FormGroup({
       jobId: new FormControl({value: '', disabled: true }),
-      billRates: new FormControl({value: '', disabled: true }),
-      candidateBillRates: new FormControl({value: '' }),
-      location: new FormControl({value: '', disabled: true }),
-      department: new FormControl({value: '', disabled: true }),
-      skill: new FormControl({value: '', disabled: true }),
-      reorderDate: new FormControl({value: '', disabled: true }),
+      offeredBillRate: new FormControl({value: '', disabled: true }),
+      candidateBillRate: new FormControl({value: '' }),
+      locationName: new FormControl({value: '', disabled: true }),
+      departmentName: new FormControl({value: '', disabled: true }),
+      skillName: new FormControl({value: '', disabled: true }),
+      orderOpenDate: new FormControl({value: '', disabled: true }),
       shiftStartTime: new FormControl({value: '', disabled: true }),
       shiftEndTime: new FormControl({value: '', disabled: true }),
-      openPosition: new FormControl({value: '', disabled: true }),
+      openPositions: new FormControl({value: '', disabled: true }),
     });
   }
 

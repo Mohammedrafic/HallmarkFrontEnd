@@ -64,7 +64,15 @@
                   <ng-container *ngSwitchCase="candidateStatuses.OfferedBR">
                     <e-chip text="Offered B.R." cssClass="e-pending"></e-chip>
                   </ng-container>
-                  <ng-container *ngSwitchDefault> </ng-container>
+                  <ng-container *ngSwitchCase="candidateStatuses.Onboard">
+                    <e-chip [text]="data.statusName" cssClass="e-filled"></e-chip>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="candidateStatuses.Rejected">
+                    <e-chip [text]="data.statusName" cssClass="e-default"></e-chip>
+                  </ng-container>
+                  <ng-container *ngSwitchDefault>
+                    <!-- blank statuses -->
+                  </ng-container>
                 </ng-container>
               </e-chips>
             </ejs-chiplist>
@@ -153,6 +161,7 @@
   [openEvent]="openDetails"
   [candidate]="candidate"
   [isAgency]="isAgency"
+  [candidateJob]="candidateJob"
   [dialogNextPreviousOption]="dialogNextPreviousOption"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-reorder-status-dialog>

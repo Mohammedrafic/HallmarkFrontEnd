@@ -60,7 +60,7 @@
 
       <section class="bill-rates">
         <app-bill-rates-view-grid
-          [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
+          [billRatesData]="orderCandidateJob?.billRates || []"
         ></app-bill-rates-view-grid>
       </section>
     </section>
