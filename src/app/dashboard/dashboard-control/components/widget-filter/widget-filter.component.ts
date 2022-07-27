@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
@@ -17,6 +17,7 @@ import { SetDashboardFiltersState, SetFilteredItems } from 'src/app/dashboard/st
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState, UserStateModel } from 'src/app/store/user.state';
+import { Organisation } from '@shared/models/visibility-settings.model';
 
 @Component({
   selector: 'app-widget-filter',
@@ -26,6 +27,9 @@ import { UserState, UserStateModel } from 'src/app/store/user.state';
 })
 
 export class WidgetFilterComponent extends DestroyableDirective implements OnInit {
+  @Input() public allOrganizations: Organisation[];
+  @Input() public userIsAdmin: boolean;
+
   @Select(UserState.organizationStructure) private readonly organizationStructure$: Observable<OrganizationStructure>;
   @Select(UserState.lastSelectedOrganizationId) private readonly organizationId$: Observable<UserStateModel['lastSelectedOrganizationId']>;
   @Select(DashboardState.filteredItems) public readonly filteredItems$: Observable<FilteredItem[]>;

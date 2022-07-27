@@ -15,6 +15,7 @@ import { WidgetFilterComponent } from './components/widget-filter/widget-filter.
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationStructure } from '@shared/models/organization.model';
+import { Organisation } from '@shared/models/visibility-settings.model';
 
 @Component({
   selector: 'app-dashboard-control',
@@ -28,6 +29,8 @@ export class DashboardControlComponent extends DestroyableDirective {
   @Input() public widgets: WidgetOptionModel[] | null;
   @Input() public hasOrderManagePermission: boolean;
   @Input() public hasWidgetPermission: boolean;
+  @Input() public allOrganizations: Organisation[];
+  @Input() public userIsAdmin: boolean;
 
   @Output() public widgetToggleEmitter: EventEmitter<WidgetToggleModel> = new EventEmitter();
 

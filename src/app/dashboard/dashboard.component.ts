@@ -28,6 +28,8 @@ import { GetAllOrganizationSkills } from '@organization-management/store/organiz
 import { DashboardFiltersModel } from './models/dashboard-filters.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { WIDGET_PERMISSION_TYPES } from './constants/widget-permissions-types';
+import { SecurityState } from '../security/store/security.state';
+import { GetOrganizationsStructureAll } from '../security/store/security.actions';
 
 @Component({
   selector: 'app-dashboard',
@@ -50,13 +52,15 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   @Select(DashboardState.dashboardFiltersState) private readonly dashboardFiltersState$: Observable<DashboardFiltersModel>;
   @Select(DashboardState.getTimeSelection) public readonly timeSelection$: Observable<DashboardStateModel['positionTrendTimeSelection']>
 
-  @Select(UserState.lastSelectedOrganizationId) private readonly organizationId$: Observable<UserStateModel['lastSelectedOrganizationId']>;
   @Select(UserState.lastSelectedOrganizationAgency) private readonly lastSelectedOrganizationAgency$: Observable<string>;
   @Select(UserState.currentUserPermissions) private readonly currentUserPermissions$: Observable<CurrentUserPermission[]>;
+
+  @Select(SecurityState.organisations) public readonly allOrganizations$: Observable<UserStateModel['organizations']>;
 
   private panelsAreDragged = false;
   public hasWidgetPermission: boolean = true;
   public hasOrderManagePermission: boolean = true;
+  public userIsAdmin: boolean = false;
 
   public widgetsData$: Observable<WidgetsDataModel>;
   public isOrganization$: Observable<boolean>;
@@ -75,10 +79,21 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   public ngOnInit(): void {
     this.isUserOrganization();
-    this.initOrganizationChangeListener();
     this.getCurrentUserPermissions();
     this.subscribeOnPermissions();
     this.getDashboardFilterState();
+    this.getAdminOrganizationsStructureAll();
+    this.setWidgetsData();
+    this.store.dispatch(new GetDashboardData());
+    this.store.dispatch(new GetAllOrganizationSkills());
+  }
+
+  private getAdminOrganizationsStructureAll(): void {
+    const user = this.store.selectSnapshot(UserState.user);
+    this.userIsAdmin = user?.businessUnitType === BusinessUnitType.MSP || user?.businessUnitType === BusinessUnitType.Hallmark;
+    if(user && this.userIsAdmin) {
+      this.store.dispatch(new GetOrganizationsStructureAll(user.id));
+    }
   }
 
   private getCurrentUserPermissions(): void {
@@ -182,19 +197,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     });
   }
 
-  private initOrganizationChangeListener(): void {
-    combineLatest([this.organizationId$, this.isOrganization$])
-      .pipe(
-        filter(([organizationId, isOrganization]: [number | null, boolean]) => !!organizationId && isOrganization),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(() => {
-        this.resetDashboardState();
-        this.setWidgetsData();
-        this.store.dispatch(new GetDashboardData());
-        this.store.dispatch(new GetAllOrganizationSkills());
-      });
-  }
 
   private setWidgetsData(): void {
     const formChanges$ = this.filtersGroup.valueChanges.pipe(startWith(this.filtersGroup.value));

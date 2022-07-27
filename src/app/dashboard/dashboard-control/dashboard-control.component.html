@@ -47,5 +47,9 @@
     [isLoading]="isLoading"
   ></app-widget-list>
 
-  <app-widget-filter #filter></app-widget-filter>
+  <app-widget-filter
+    #filter
+    [allOrganizations]="allOrganizations"
+    [userIsAdmin]="userIsAdmin"
+  ></app-widget-filter>
 </ng-template>
