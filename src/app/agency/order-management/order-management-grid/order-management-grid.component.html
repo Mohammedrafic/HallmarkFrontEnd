@@ -87,12 +87,6 @@
       </ng-template>
     </e-column>
     <e-column field="status" headerText="STATUS" width="152">
-      <ng-template #headerTemplate let-data>
-        <div class="sort-header">
-          <span class="e-headertext">STATUS</span>
-          <i-feather name="filter" class="icon" (click)="onSortStatus()"></i-feather>
-        </div>
-      </ng-template>
       <ng-template #template let-data>
         <div class="status-cell">
           <ejs-chiplist>

@@ -341,12 +341,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.openCandidat.next(true);
   }
 
-  public onSortStatus(): void {
-    const direction: SortDirection = this.statusSortDerection === 'Ascending' ? 'Descending' : 'Ascending';
-    this.gridWithChildRow.sortColumn('status', direction);
-    this.statusSortDerection = direction;
-  }
-
   public onRowClick(event: any): void {
     if (event.target) {
       this.orderManagementAgencyService.excludeDeployed = false;
