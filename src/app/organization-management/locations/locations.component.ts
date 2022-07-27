@@ -2,7 +2,7 @@ import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { filter, Observable, Subject, takeUntil, throttleTime, take } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, throttleTime ,take} from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -69,7 +69,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedRegion: Region;
- 
+  defaultValue:any;
 
   @Select(OrganizationManagementState.locationsByRegionId)
   locations$: Observable<LocationsPage>;
@@ -98,15 +98,15 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   public columnsToExport: ExportColumn[] = [
-    { text: 'Ext Location ID', column: 'ExternalId' },
-    { text: 'Invoice Location ID', column: 'InvoiceId' },
-    { text: 'Location Name', column: 'Name' },
-    { text: 'Address 1', column: 'Address1' },
-    { text: 'Address 2', column: 'Address2' },
-    { text: 'City', column: 'City' },
-    { text: 'State', column: 'State' },
-    { text: 'Zip', column: 'Zip' },
-    { text: 'Contact Person', column: 'ContactPerson' }
+    { text:'Ext Location ID', column: 'ExternalId'},
+    { text:'Invoice Location ID', column: 'InvoiceId'},
+    { text:'Location Name', column: 'Name'},
+    { text:'Address 1', column: 'Address1'},
+    { text:'Address 2', column: 'Address2'},
+    { text:'City', column: 'City'},
+    { text:'State', column: 'State'},
+    { text:'Zip', column: 'Zip'},
+    { text:'Contact Person', column: 'ContactPerson'}
   ];
   public fileName: string;
   public defaultFileName: string;
@@ -119,10 +119,10 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   public filterColumns: any;
 
   constructor(private store: Store,
-    @Inject(FormBuilder) private builder: FormBuilder,
-    private confirmService: ConfirmService,
-    private datePipe: DatePipe,
-    private filterService: FilterService) {
+              @Inject(FormBuilder) private builder: FormBuilder,
+              private confirmService: ConfirmService,
+              private datePipe: DatePipe,
+              private filterService: FilterService) {
     super();
 
     this.formBuilder = builder;
@@ -161,7 +161,10 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     });
     this.organization$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
-      this.store.dispatch(new GetRegions());
+      this.store.dispatch(new GetRegions()).pipe(takeUntil(this.unsubscribe$))
+      .subscribe((data) => {
+        this.defaultValue=data.organizationManagement.regions[0].id;
+      });;
     });
   }
 
@@ -258,12 +261,12 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     this.clearFilters();
     this.getLocations();
   }
-
+  
   public onFilterApply(): void {
     this.filters = this.LocationFilterFormGroup.getRawValue();
     this.filters.regionId = this.selectedRegion.id,
-      this.filters.pageNumber = this.currentPage,
-      this.filters.pageSize = this.pageSizePager
+    this.filters.pageNumber = this.currentPage,
+    this.filters.pageSize = this.pageSizePager
     this.filteredItems = this.filterService.generateChips(this.LocationFilterFormGroup, this.filterColumns);
     this.getLocations();
     this.store.dispatch(new ShowFilterDialog(false));
@@ -435,7 +438,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   }
 
   onAllowDeployWOCreadentialsCheck(event: any): void {
-    //  TODO: add functionality after BE implementation
+  //  TODO: add functionality after BE implementation
   }
 
   private createLocationForm(): void {
@@ -459,7 +462,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     });
 
     this.regionFormGroup = this.formBuilder.group({
-      newRegionName: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(50)]]
+      newRegionName: ['', [Validators.required,  Validators.minLength(1),  Validators.maxLength(50)]]
     });
 
     this.LocationFilterFormGroup = this.formBuilder.group({
