@@ -20,7 +20,7 @@ import {
   DataSourceItem,
   FilterDataSource,
 } from '../interface';
-import { TimeSheetsPage } from '../store/model/timesheets.model';
+import { TimeSheetsPage, TimrsheetsDto } from '../store/model/timesheets.model';
 import {
   filterColumnDataSource,
   MokTabsCounts,
@@ -38,8 +38,8 @@ export class TimesheetsApiService {
     private capitalizeFirst: CapitalizeFirstPipe,
   ) {}
 
-  public getTimesheets(filters: TimesheetsFilterState): Observable<TimeSheetsPage> {
-    return this.http.post<TimeSheetsPage>('/api/Timesheets', {
+  public getTimesheets(filters: TimesheetsFilterState): Observable<TimrsheetsDto> {
+    return this.http.post<TimrsheetsDto>('/api/Timesheets', {
       ...filters,
     });
   }
@@ -84,21 +84,6 @@ export class TimesheetsApiService {
     organizationId: number | null = null
   ): Observable<TimesheetsFilteringOptions> {
     return this.http.get<TimesheetsFilteringOptions>(`/api/Timesheets/filteringOptions${organizationId ? `/${organizationId}` : ''}`);
-  }
-
-  /**
-   * TODO: move this to helpers
-   */
-  public setDataSources(filterKeys: TimesheetsTableFiltersColumns[]): Observable<FilterDataSource> {
-    const res = filterKeys.reduce((acc: any, key) => {
-      acc[key] = filterColumnDataSource[key].map((el: DataSourceItem) =>
-        ({...el, name: this.capitalizeFirst.transform(el.name)})
-      );
-
-      return acc;
-    }, {});
-
-    return of(res);
   }
 
   public getCandidateCostCenters(jobId: number, orgId: number, isAgency: boolean): Observable<DropdownOption[]>{

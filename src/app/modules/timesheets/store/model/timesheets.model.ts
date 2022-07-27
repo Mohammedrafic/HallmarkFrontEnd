@@ -17,6 +17,11 @@ import {
 
 export type TimeSheetsPage = PageOfCollections<Timesheet>;
 
+export type TimrsheetsDto = {
+  items: TimeSheetsPage,
+  tabsCounts: TabCountConfig,
+};
+
 export interface TimesheetsModel {
   timesheets: TimeSheetsPage | null;
   timesheetsFilters: TimesheetsFilterState | null;
