@@ -479,7 +479,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   /* Trigger when user redirect to per diem order from re-order */
   private openPerDiemDetails(): void {
-    if (this.orderPerDiemId && this.ordersPage.items) {
+    if (this.orderPerDiemId && this.ordersPage?.items) {
       const orderPerDiem = this.ordersPage.items.find((order: OrderManagement) => order.id === this.orderPerDiemId);
       const index = (this.gridWithChildRow.dataSource as Order[])?.findIndex(
         (order: Order) => order.id === orderPerDiem?.id
