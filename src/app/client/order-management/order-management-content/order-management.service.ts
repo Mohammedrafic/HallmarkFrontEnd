@@ -5,5 +5,6 @@ import { Subject } from 'rxjs';
   providedIn: 'root',
 })
 export class OrderManagementService {
-  public orderPerDiemId$: Subject<number> = new Subject<number>();
+  public readonly orderPerDiemId$: Subject<number> = new Subject<number>();
+  public excludeDeployed: boolean;
 }

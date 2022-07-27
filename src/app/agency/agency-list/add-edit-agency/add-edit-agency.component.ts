@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -6,7 +6,7 @@ import { filter, Observable, Subscription, takeWhile } from 'rxjs';
 
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT } from '@shared/constants/messages';
+import { DELETE_RECORD_TEXT } from '@shared/constants/messages';
 import {
   Agency,
   AgencyBillingDetails,
@@ -37,6 +37,7 @@ import { User } from '@shared/models/user.model';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { PaymentDetailsGridComponent } from '@agency/agency-list/add-edit-agency/payment-details-grid/payment-details-grid.component';
+import { ComponentCanDeactivate } from '@shared/guards/pending-changes.guard';
 
 type AgencyFormValue = {
   parentBusinessUnitId: number;
@@ -52,7 +53,7 @@ type AgencyFormValue = {
   templateUrl: './add-edit-agency.component.html',
   styleUrls: ['./add-edit-agency.component.scss'],
 })
-export class AddEditAgencyComponent implements OnInit, OnDestroy {
+export class AddEditAgencyComponent implements OnInit, OnDestroy, ComponentCanDeactivate {
   @ViewChild('stepper') tab: TabComponent;
 
   public agencyForm: FormGroup;
@@ -194,21 +195,13 @@ export class AddEditAgencyComponent implements OnInit, OnDestroy {
   }
 
   public onBack(): void {
-    if (this.agencyForm.dirty) {
-      this.confirmService
-        .confirm(DELETE_CONFIRM_TEXT, {
-          title: DELETE_CONFIRM_TITLE,
-          okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button',
-        })
-        .pipe(filter((confirm) => !!confirm))
-        .subscribe(() => {
-          this.navigateToAgencyList();
-        });
-    } else {
-      this.navigateToAgencyList();
-    }
+    this.navigateToAgencyList();
   }
+
+  @HostListener('window:beforeunload')
+  public canDeactivate(): Observable<boolean> | boolean {
+    return !this.agencyForm.dirty;
+  } ;
 
   public onImageSelect(event: Blob | null) {
     this.agencyForm.markAsDirty();

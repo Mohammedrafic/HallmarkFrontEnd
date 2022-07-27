@@ -1,5 +1,6 @@
-import { TIMESHEETS_ACTIONS, DialogAction, TimesheetsTableColumns, RecordFields } from '../../enums';
-import { Timesheet, TimesheetsFilterState } from '../../interface';
+import { TIMESHEETS_ACTIONS, DialogAction, TimesheetsTableColumns, RecordFields, TimesheetsTableFiltersColumns } from '../../enums';
+import { DataSourceItem, Timesheet, TimesheetsFilterState } from '../../interface';
+import { OrganizationRegion } from '@shared/models/organization.model';
 
 export namespace Timesheets {
   export class GetAll {
@@ -58,18 +59,32 @@ export namespace Timesheets {
     static readonly type = TIMESHEETS_ACTIONS.GET_TABS_COUNTS;
   }
 
+  export class GetFiltersDataSource {
+    static readonly type = TIMESHEETS_ACTIONS.GET_FILTERS_DATA_SOURCE;
+  }
+
   export class SetFiltersDataSource {
     static readonly type = TIMESHEETS_ACTIONS.SET_FILTERS_DATA_SOURCE;
 
-    constructor(public readonly payload: TimesheetsTableColumns[]) {
+    constructor(
+      public readonly columnKey: TimesheetsTableFiltersColumns,
+      public readonly dataSource: DataSourceItem[] | OrganizationRegion[]
+    ) {
     }
   }
 
   export class UpdateFiltersState {
     static readonly type = TIMESHEETS_ACTIONS.UPDATE_FILTERS_STATE;
 
-    constructor(public readonly payload?: TimesheetsFilterState) {
+    constructor(
+      public readonly payload?: TimesheetsFilterState | null,
+      public readonly saveStatuses = false,
+    ) {
     }
+  }
+
+  export class ResetFiltersState {
+    static readonly type = TIMESHEETS_ACTIONS.RESET_FILTERS_STATE;
   }
 
   export class DeleteTimesheet {
@@ -82,11 +97,22 @@ export namespace Timesheets {
   export class GetTimesheetDetails {
     static readonly type = TIMESHEETS_ACTIONS.GET_TIMESHEET_DETAILS;
 
-    constructor(public timesheetId: number) {
+    constructor(
+      public timesheetId: number,
+      public orgId: number,
+      public isAgency: boolean,
+      ) {
     }
   }
 
   export class GetOrganizations {
     static readonly type = TIMESHEETS_ACTIONS.GET_ORGANIZATIONS;
+  }
+
+  export class SelectOrganization {
+    static readonly type = TIMESHEETS_ACTIONS.SELECT_ORGANIZATION;
+
+    constructor(public readonly id: number) {
+    }
   }
 }

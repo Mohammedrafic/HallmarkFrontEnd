@@ -7,3 +7,5 @@ export const ConfirmUnsavedChages = 'Are you sure you want to close timesheet wi
 export const ConfirmTabChange = 'Are you sure you want to change tab without saving changes?';
 
 export const ConfirmAddFormCancel = 'Are you sure you want to exit without saving changes?';
+
+export const ConfirmRecordDelete = 'Are you sure you want to delete this record?'

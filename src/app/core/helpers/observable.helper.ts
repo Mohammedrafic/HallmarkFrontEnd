@@ -5,7 +5,7 @@ export class ObservableHelper {
     return new Observable<string>((subscriber: Subscriber<string>) => {
       const reader = new FileReader();
 
-      reader.onload = () => {
+      reader.onloadend = () => {
         subscriber.next(reader.result as string);
         subscriber.complete();
       };

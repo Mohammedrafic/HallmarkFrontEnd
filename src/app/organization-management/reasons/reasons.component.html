@@ -1,0 +1,56 @@
+<section class="container">
+  <div class="toolbar-buttons">
+    <button
+      ejs-button
+      [isPrimary]="true"
+      (click)="addReason()"
+      >Add Reason</button>
+  </div>
+
+  <ejs-tab
+    (selected)="onTabSelected($event)"
+  >
+    <e-tabitems>
+      <e-tabitem>
+        <ng-template #headerText><div>Candidate Rejection</div></ng-template>
+        <ng-template #content>
+          <app-candidate-reject-reason (onEditReasons)="onEdit($event)" [form]="form"></app-candidate-reject-reason>
+        </ng-template>
+      </e-tabitem>
+
+      <e-tabitem>
+        <ng-template #headerText><div>Order Requisition</div></ng-template>
+        <ng-template #content>
+
+        </ng-template>
+      </e-tabitem>
+
+      <e-tabitem>
+        <ng-template #headerText><div>Order Closure</div></ng-template>
+        <ng-template #content>
+          <app-closure-reason (onEditReasons)="onEdit($event)" [form]="form"></app-closure-reason>
+        </ng-template>
+      </e-tabitem>
+    </e-tabitems>
+  </ejs-tab>
+</section>
+
+<app-side-dialog
+  header="{{ title }} Reason"
+  (formSaveClicked)="saveReason()"
+  (formCancelClicked)="closeDialog()"
+>
+  <form [formGroup]="form" class="reason-form">
+    <div class="input-container bootstrap">
+      <label>Reason<span class="required">*</span></label>
+      <div class="input-group">
+        <input class="e-input"
+               type="text"
+               appValidateWithMessage
+               placeholder="Reason"
+               maxlength="100"
+               formControlName="reason"/>
+      </div>
+    </div>
+  </form>
+</app-side-dialog>

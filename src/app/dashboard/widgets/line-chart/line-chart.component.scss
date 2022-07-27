@@ -1,5 +1,26 @@
 .app-line-chart {
   &__component {
-    aspect-ratio: 2;
+    aspect-ratio: 1.75;
+  }
+}
+
+.widget-header {
+  display: flex;
+  justify-content: space-between;
+
+  &__actions {
+    display: flex;
+
+    & button {
+      height: 28px;
+
+      &:nth-child(odd) {
+        border-radius: 8px 0px 0px 8px;
+      }
+
+      &:nth-child(even) {
+        border-radius: 0px 8px 8px 0px;
+      }
+    }
   }
 }

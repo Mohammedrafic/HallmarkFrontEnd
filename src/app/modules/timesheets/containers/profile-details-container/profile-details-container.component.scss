@@ -9,6 +9,7 @@ $chip-margin: 8px;
 
 .container {
   padding: 12px 24px;
+  padding-bottom: 0!important;
 }
 
 .d-flex {
@@ -34,10 +35,6 @@ $chip-margin: 8px;
 .tile-dark-blue {
   background-color: $secondary-dark-blue-50;
   border-radius: 8px;
-
-  &:not(:last-of-type) {
-    margin-right: 8px;
-  }
 }
 
 .profile-details-header {
@@ -162,6 +159,23 @@ $chip-margin: 8px;
     flex-grow: 1;
     min-width: 110px;
   }
+
+  .miles {
+    flex-shrink: 0;
+  }
+
+  .profile-uploads {
+    min-width: 150px;
+    flex-grow: 1;
+  }
+
+  .tile-dark-blue {
+    height: 210px;
+
+    &:not(:last-of-type) {
+      margin-right: 8px;
+    }
+  }
 }
 
 .timesheet-navigation {
@@ -255,6 +269,7 @@ $chip-margin: 8px;
     border-radius: 8px;
     min-width: 200px;
     max-width: 75%;
+    padding: 10px 16px;
 
     @include with-ellipsis();
   }

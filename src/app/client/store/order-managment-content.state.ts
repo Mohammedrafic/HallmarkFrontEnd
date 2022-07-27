@@ -10,6 +10,8 @@ import {
   ClearSuggestions,
   DeleteOrder,
   DeleteOrderSucceeded,
+  DuplicateOrder,
+  DuplicateOrderSuccess,
   EditOrder,
   ExportOrders,
   GetAgencyOrderCandidatesList,
@@ -35,6 +37,7 @@ import {
   RejectCandidateJob,
   SaveOrder,
   SaveOrderSucceeded,
+  SelectNavigationTab,
   SetIsDirtyOrderForm,
   SetLock,
   SetPredefinedBillRatesData,
@@ -74,6 +77,7 @@ import { RejectReason, RejectReasonPage } from '@shared/models/reject-reason.mod
 import { HistoricalEvent } from '@shared/models/historical-event.model';
 import { GetCandidatesBasicInfo } from '@agency/store/order-management.actions';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
+import { NavigationTabModel } from '@shared/models/navigation-tab.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -100,6 +104,7 @@ export interface OrderManagementContentStateModel {
   rejectionReasonsList: RejectReason[] | null;
   orderFilterDataSources: OrderFilterDataSource | null;
   historicalEvents: HistoricalEvent[] | null;
+  navigationTab: NavigationTabModel;
 }
 
 @State<OrderManagementContentStateModel>({
@@ -129,6 +134,10 @@ export interface OrderManagementContentStateModel {
     rejectionReasonsList: null,
     orderFilterDataSources: null,
     historicalEvents: null,
+    navigationTab: {
+      active: null,
+      pending: null,
+    },
   },
 })
 @Injectable()
@@ -248,6 +257,11 @@ export class OrderManagementContentState {
   @Selector()
   static candidateBasicInfo(state: OrderManagementContentStateModel): CandidatesBasicInfo | null {
     return state.candidatesBasicInfo;
+  }
+
+  @Selector()
+  static navigationTab(state: OrderManagementContentStateModel): any | null {
+    return state.navigationTab;
   }
 
   constructor(
@@ -665,5 +679,25 @@ export class OrderManagementContentState {
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
       })
     );
+  }
+
+  @Action(DuplicateOrder)
+  DuplicateOrder(
+    { dispatch }: StateContext<OrderManagementContentStateModel>,
+    { payload }: DuplicateOrder
+  ): Observable<number> {
+    return this.orderManagementService.duplicate(payload).pipe(
+      tap((id: number) => {
+        dispatch(new DuplicateOrderSuccess(id));
+      })
+    );
+  }
+
+  @Action(SelectNavigationTab)
+  SelectNavigationTab(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { active, pending }: SelectNavigationTab
+  ): void {
+    patchState({ navigationTab: { active, pending } });
   }
 }

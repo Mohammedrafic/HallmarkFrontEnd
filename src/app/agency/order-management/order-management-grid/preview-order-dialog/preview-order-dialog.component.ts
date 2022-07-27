@@ -24,11 +24,6 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import isNil from 'lodash/fp/isNil';
 
-export type NextPreviousOrderEvent = {
-  next: boolean;
-  excludeDeployed: boolean;
-};
-
 @Component({
   selector: 'app-preview-order-dialog',
   templateUrl: './preview-order-dialog.component.html',
@@ -40,7 +35,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() openCandidateTab: boolean;
 
   @Output() compareEvent = new EventEmitter<never>();
-  @Output() nextPreviousOrderEvent = new EventEmitter<NextPreviousOrderEvent>();
+  @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
@@ -113,7 +108,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public onNextPreviousOrder(next: boolean): void {
-    this.nextPreviousOrderEvent.emit({ next, excludeDeployed: this.excludeDeployed });
+    this.nextPreviousOrderEvent.emit(next);
   }
 
   public onExcludeDeployed(event: boolean): void {

@@ -2,17 +2,7 @@
   <div class="widget-data">
     <div *ngIf="widget" class="widget-value">
       <span class="widget-value-number">{{ widget.total }}</span>
-      <span class="widget-value-percent" [ngClass]="{ 'widget-data-grow': widget.percentRatio >= 0 }"
-        >{{ widget.percentRatio | number: '1.2-2' }} %</span
-      >
-      <span
-        *ngIf="widget.percentRatio"
-        class="e-icons e-arrow-right-up"
-        [ngClass]="{
-          'widget-data-grow': widget.percentRatio > 0,
-          'widget-data-down': widget.percentRatio < 0
-        }"
-      ></span>
+      <app-percentage-ratio-indicator [percentageRatio]="widget.percentRatio"></app-percentage-ratio-indicator>
     </div>
 
     <div class="widget-chart">

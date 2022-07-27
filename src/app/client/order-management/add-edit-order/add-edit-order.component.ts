@@ -16,6 +16,7 @@ import {
   GetSelectedOrderById,
   SaveOrder,
   SaveOrderSucceeded,
+  SelectNavigationTab,
   SetIsDirtyOrderForm,
 } from '@client/store/order-managment-content.actions';
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
@@ -28,6 +29,10 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { OrderCandidatesCredentialsState } from '@order-credentials/store/credentials.state';
 import { UpdatePredefinedCredentials } from '@order-credentials/store/credentials.actions';
 import { OrderType } from '@shared/enums/order-type';
+import some from 'lodash/fp/some';
+import isNil from 'lodash/fp/isNil';
+import { AbstractControl } from '@angular/forms';
+import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 
 enum SelectedTab {
   OrderDetails,
@@ -80,8 +85,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public isPerDiem = false;
   public disableOrderType = false;
+  public isSaveForTemplate = false;
 
-  constructor(private store: Store, private router: Router, private route: ActivatedRoute, private actions$: Actions) {
+  public constructor(
+    private store: Store,
+    private router: Router,
+    private route: ActivatedRoute,
+    private actions$: Actions
+  ) {
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
 
     this.orderId = Number(this.route.snapshot.paramMap.get('orderId'));
@@ -94,7 +105,11 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
   }
 
-  ngOnInit(): void {
+  public get generalInformationForm(): Order {
+    return this.orderDetailsFormComponent.generalInformationForm.value;
+  }
+
+  public ngOnInit(): void {
     if (this.orderId > 0) {
       this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
         if (order?.credentials) {
@@ -137,7 +152,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     this.subscribeOnPredefinedBillRates();
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.store.dispatch(new ClearPredefinedBillRates());
@@ -278,7 +293,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (this.isPerDiem) {
       orderBillRates = null;
     } else {
-      orderBillRates = this.billRatesComponent?.billRatesControl.value || this.orderBillRates
+      orderBillRates = this.billRatesComponent?.billRatesControl.value || this.orderBillRates;
     }
     const allValues = {
       ...this.orderDetailsFormComponent.orderTypeForm.getRawValue(),
@@ -290,7 +305,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       ...this.orderDetailsFormComponent.workflowForm.getRawValue(),
       ...this.orderDetailsFormComponent.specialProject.getRawValue(),
       ...{ credentials: this.orderCredentials },
-      ...{ billRates: orderBillRates }
+      ...{ billRates: orderBillRates },
     };
 
     const {
@@ -374,7 +389,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       workflowId,
       isSubmit,
       canApprove,
+      isTemplate: false,
     };
+
+    if (this.orderDetailsFormComponent.order?.isTemplate) {
+      order.contactDetails = order.contactDetails.map((contact) => ({ ...contact, id: 0 }));
+      order.jobDistributions = order.jobDistributions.map((job) => ({ ...job, orderId: 0, id: 0 }));
+      order.workLocations = order.workLocations.map((workLocation) => ({ ...workLocation, id: 0 }));
+    }
 
     if (!order.hourlyRate) {
       order.hourlyRate = null;
@@ -454,5 +476,53 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     });
   }
 
-  private saveAsTemplate(): void {}
+  private getOrderDetailsControl(name: string): AbstractControl {
+    return this.orderDetailsFormComponent.generalInformationForm.get(name) as AbstractControl;
+  }
+
+  private saveAsTemplate(): void {
+    const { regionId, locationId, departmentId, skillId } = this.orderDetailsFormComponent.generalInformationForm.value;
+    const requiredFields = [regionId, skillId, departmentId, locationId];
+    const isRequiredFieldsFilled = !some(isNil, requiredFields);
+
+    if (isRequiredFieldsFilled) {
+      this.isSaveForTemplate = true;
+    } else {
+      this.markControlsAsRequired();
+    }
+  }
+
+  public closeSaveTemplateDialog(): void {
+    this.isSaveForTemplate = false;
+  }
+
+  public createTemplate(event: { templateTitle: string }): void {
+    const order = this.collectOrderData(false);
+    const { templateTitle } = event;
+    const extendedOrder = {
+      ...order,
+      title: order.title ? order.title : templateTitle,
+      templateTitle,
+      isTemplate: true,
+    };
+    const documents = this.orderDetailsFormComponent.documents;
+    this.store.dispatch(new SaveOrder(extendedOrder, documents));
+    this.selectOrderTemplatesTab();
+    this.closeSaveTemplateDialog();
+  }
+
+  private markControlsAsRequired(): void {
+    this.getOrderDetailsControl('regionId')?.markAsTouched();
+    this.getOrderDetailsControl('skillId')?.markAsTouched();
+    if (this.orderDetailsFormComponent.isLocationsDropDownEnabled) {
+      this.getOrderDetailsControl('locationId')?.markAsTouched();
+    }
+    if (this.orderDetailsFormComponent.isDepartmentsDropDownEnabled) {
+      this.getOrderDetailsControl('departmentId')?.markAsTouched();
+    }
+  }
+
+  private selectOrderTemplatesTab(): void {
+    this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.OrderTemplates));
+  }
 }

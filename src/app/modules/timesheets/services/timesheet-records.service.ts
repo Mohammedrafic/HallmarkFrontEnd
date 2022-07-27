@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 
 import { ColDef } from '@ag-grid-community/core';
 import { merge, Observable } from 'rxjs';
+import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
 import { DropdownOption, TimesheetRecordsDto, RecordValue } from './../interface';
 import { TimesheetsApiService } from './timesheets-api.service';
@@ -40,7 +41,7 @@ export class TimesheetRecordsService {
         const field = column.field as keyof RecordValue;
         const value = record[field];
 
-        controls[field] = [value, Validators.required];
+        controls[field] = [value as string | number, Validators.required];
       });
 
       formGroups[record.id] = this.fb.group(controls);
@@ -50,7 +51,7 @@ export class TimesheetRecordsService {
 
   public findDiffs(
     data: RecordValue[], forms: Record<string, FormGroup>, defs: ColDef[],
-    ): Record<string, string | number>[] {
+    ): RecordValue[] {
     const diffs: Record<string, string | number>[] = [];
     const filedsToCompare = defs.filter((def) => def.cellRendererParams?.editMode).map((def) => def.field);
 
@@ -65,7 +66,7 @@ export class TimesheetRecordsService {
           const keyValue = key as keyof RecordValue;
 
           if (dataItem[keyValue] !== values[keyValue]) {
-            diffValues[keyValue] = values[keyValue];
+            diffValues[keyValue] = values[keyValue] as string | number;
           }
 
         }
@@ -73,14 +74,14 @@ export class TimesheetRecordsService {
 
       if (Object.keys(diffValues).length) {
         diffs.push({
-          id: dataItem.id,
+          ...dataItem,
           ...diffValues,
         });
 
       }
     });
 
-    return diffs;
+    return diffs as unknown as RecordValue[];
   }
 
   public watchFormChanges(controls: Record<string, FormGroup>): Observable<unknown> {
@@ -102,5 +103,13 @@ export class TimesheetRecordsService {
     }
 
     return RecordFields.Time;
+  }
+
+  public controlTabsVisibility(billRates: DropdownOption[], tabs: TabComponent): void {
+    const isMilageAvaliable = billRates.some((rate) => rate.text.includes('Mileage'));
+    const isExpensesAvaliable = billRates.some((rate) => rate.text.includes('Charge'));
+
+    tabs.hideTab(1, !isMilageAvaliable);
+    tabs.hideTab(2, !isExpensesAvaliable);
   }
 }

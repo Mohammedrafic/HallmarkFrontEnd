@@ -4,7 +4,7 @@
   </div>
   <div class="form-title">
     <h3>{{ title }} Order</h3>
-    <span *ngIf="orderId > 0" class="order-id">ID: {{orderId}}</span>
+    <span *ngIf="orderId > 0" class="order-id">ID: {{ orderId }}</span>
   </div>
   <div class="controls-form stick-right">
     <button ejs-button cssClass="e-outline button-import" (click)="onImportDataClick()">
@@ -17,7 +17,8 @@
       cssClass="e-primary"
       [items]="submitMenuItems"
       (click)="save()"
-      (select)="onSplitButtonSelect($event)">
+      (select)="onSplitButtonSelect($event)"
+    >
     </ejs-splitbutton>
   </div>
 </section>
@@ -34,7 +35,12 @@
       <ng-template #content>
         <ng-container>
           <section class="order-details-form-section">
-            <app-order-details-form #orderDetailsForm (orderTypeChanged)="onOrderTypeChange($event)" [disableOrderType]="disableOrderType" [isActive]="selectedTab === SelectedTab.OrderDetails"></app-order-details-form>
+            <app-order-details-form
+              #orderDetailsForm
+              (orderTypeChanged)="onOrderTypeChange($event)"
+              [disableOrderType]="disableOrderType"
+              [isActive]="selectedTab === SelectedTab.OrderDetails"
+            ></app-order-details-form>
           </section>
         </ng-container>
       </ng-template>
@@ -53,7 +59,7 @@
           [credentials]="orderCredentials"
           (credentialChanged)="onCredentialChanged($event)"
           (credentialDeleted)="onCredentialDeleted($event)"
-          ></app-order-credentials>
+        ></app-order-credentials>
       </ng-template>
     </e-tabitem>
 
@@ -70,10 +76,18 @@
             #billRates
             [billRates]="orderBillRates"
             [isActive]="selectedTab === SelectedTab.BillRates"
-            (billRatesChanged)="onBillRatesChanged()">
+            (billRatesChanged)="onBillRatesChanged()"
+          >
           </app-bill-rates>
         </section>
       </ng-template>
     </e-tabitem>
   </e-tabitems>
 </ejs-tab>
+
+<app-save-template-dialog
+  *ngIf="isSaveForTemplate"
+  [order]="generalInformationForm"
+  (closeEmitter)="closeSaveTemplateDialog()"
+  (createEmitter)="createTemplate($event)"
+></app-save-template-dialog>

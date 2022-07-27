@@ -1,0 +1,88 @@
+@import "colors";
+.filter-chip-list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: $secondary-dark-blue-30;
+
+  .chips-wrapper {
+    display: flex;
+    justify-content: space-between;
+    flex: 1;
+    height: 42px;
+    overflow: hidden;
+
+    &___expand {
+      height: auto;
+    }
+
+    .chips-button {
+      display: flex;
+      justify-content: flex-end;
+      flex: 1;
+      min-width: 200px;
+
+      .show-more-less,
+      .clear-all {
+        margin-top: 10px;
+        color: $primary-active-blue-10;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .show-more-less {
+        margin-right: 30px;
+      }
+    }
+
+    .chips-list {
+      display: flex;
+      margin-left: 5px;
+      flex-wrap: wrap;
+
+      .applied-filters {
+        display: flex;
+        align-items: center;
+        margin-right: 5px;
+      }
+
+      .chips-title {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        .chips-container {
+          display: flex;
+          flex-wrap: wrap;
+
+          .e-chip-list {
+            .e-chip {
+              margin: 5px 10px 5px 0;
+              width: auto;
+              text-transform: initial;
+              font-variant: common-ligatures;
+              font-weight: normal;
+              font-size: 12px;
+              height: 24px;
+              background-color: $secondary-dark-blue-50;
+              color: $black;
+              border: 1px solid $secondary-dark-blue-40;
+              line-height: 14px;
+
+              .e-chip-delete.e-dlt-btn {
+                color: $black;
+                font-weight: 600;
+
+                &::before {
+                  content: "\e7e7";
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

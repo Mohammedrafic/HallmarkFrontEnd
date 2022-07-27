@@ -1,4 +1,4 @@
-@import '../../../styles/variables/colors';
+@import 'colors';
 
 .e-grid {
   border-radius: 12px;
@@ -48,6 +48,10 @@
   .row-tool-buttons {
     display: flex;
     cursor: pointer;
+
+    .edit-template {
+      margin-right: 20px;
+    }
   }
 
   .e-item-active {
@@ -114,4 +118,12 @@
 
 .search {
   width: 400px;
+}
+
+.edit-template {
+  color: $primary-active-blue-10;
+}
+
+.delete-template {
+  color: $supportive-red;
 }

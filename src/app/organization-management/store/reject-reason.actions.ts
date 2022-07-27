@@ -32,3 +32,26 @@ export class UpdateRejectReasonsSuccess {
 export class SaveRejectReasonsSuccess {
   static readonly type = '[reject reason] Save Reject Reason Success';
 }
+
+export class UpdateClosureReasonsSuccess {
+  static readonly type = '[reject reason] Update Closure Reason Success';
+}
+
+export class RemoveClosureReasons {
+  static readonly type = '[reject reason] Remove Closure Reason';
+  constructor(public id: number){}
+}
+
+export class GetClosureReasonsByPage {
+  static readonly type = '[reject reason] Get Closure reason by Page';
+  constructor(public pageNumber: number, public pageSize: number, public orderBy: string) { }
+}
+
+export class SaveClosureReasons {
+  static readonly type = '[reject reason] Save Closure Reason';
+  constructor(public payload: RejectReason){}
+}
+
+export class SaveClosureReasonsError {
+  static readonly type = '[reject reason] Save Closure Reason Error';
+}

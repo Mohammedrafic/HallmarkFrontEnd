@@ -1,0 +1,12 @@
+@import 'colors.scss';
+
+.container {
+  padding-top: 24px;
+
+  .toolbar-buttons {
+    float: right;
+    position: relative;
+    z-index: 99;
+    display: flex;
+  }
+}

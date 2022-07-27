@@ -10,6 +10,7 @@
       <div class="input-container">
         <ejs-dropdownlist
           *ngIf="organizations$ | async as organizations"
+          placeholder="Select organization"
           [dataSource]="organizations"
           [fields]="unitOrganizationsFields"
           [formControl]="organizationControl">
@@ -22,7 +23,10 @@
       ejs-button
       cssClass="e-outline button-filter button--no-wrap"
       (click)="showFilters()">
-      Filters <i-feather name="sliders" class="icon"></i-feather>
+      <div class="filter-button-content">
+        <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-circle">{{ appliedFiltersAmount }}</span>
+        Filters <i-feather name="sliders" class="icon"></i-feather>
+      </div>
     </button>
    <app-export-button (optionSelected)="exportSelected($event)"></app-export-button>
   </ng-container>
@@ -43,6 +47,8 @@
 </section>
 
 <app-timesheets-filter-dialog
+  [activeTabIdx]="activeTabIdx"
+  (appliedFiltersAmount)="changeFiltersAmount($event)"
   (resetFilters)="resetFilters()"
   (updateTableByFilters)="updateTableByFilters($event)"
 ></app-timesheets-filter-dialog>

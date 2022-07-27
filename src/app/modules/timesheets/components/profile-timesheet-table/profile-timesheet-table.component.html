@@ -16,26 +16,39 @@
         </ejs-tab>
       </div>
 
-      <button class="add-action spaced" (click)="openAddDialog()">+ Add Record</button>
-      <button
-        *ngIf="!isEditOn; else editHandlers"
-        (click)="editTimesheets()"
-        class="add-action">
-        <i-feather name="edit" class="icon"></i-feather>
-        Edit
+      <button class="add-action spaced"
+            cssClass="e-action-button"
+            ejs-button
+            (click)="openAddDialog()"
+            [disabled]="actionsDisabled"
+      >
+      <i-feather name="plus" class="icon"></i-feather> Add Record
       </button>
+      <ng-container *ngIf="recordsToShow?.[currentTab]?.length || isEditOn">
+        <button
+          *ngIf="!isEditOn; else editHandlers"
+          [disabled]="actionsDisabled"
+          (click)="editTimesheets()"
+          ejs-button
+          cssClass="e-action-button"
+          class="add-action">
+          <i-feather name="edit" class="icon"></i-feather>
+          Edit
+        </button>
+      </ng-container>
 
       <ng-template #editHandlers>
         <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
-        <button (click)="saveChanges()" ejs-button [isPrimary]="true">Save</button>
+        <button (click)="saveChanges()" ejs-button [isPrimary]="true" [disabled]="actionsDisabled">Save</button>
       </ng-template>
     </div>
 
     <div class="timesheet-table-container">
       <ag-grid-angular #grid
-        *ngIf="timesheetRecords$ | async as timesheetRec"
+        *ngIf="recordsToShow"
         [columnDefs]="timesheetColDef"
-        [rowData]="timesheetRec[currentTab]"
+        [rowData]="recordsToShow[currentTab]"
+        [context]="context"
         [rowHeight]="64"
         [modules]="modules"
         [pagination]="false"

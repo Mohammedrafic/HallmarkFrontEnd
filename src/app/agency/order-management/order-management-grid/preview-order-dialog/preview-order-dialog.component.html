@@ -27,7 +27,6 @@
             </div>
           </div>
           <div class="e-card-content">
-            <button ejs-button cssClass="e-outline button-cancel" (click)="onCompare()">Compare</button>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>
             </button>
@@ -38,7 +37,7 @@
         <ejs-tab #tab (selecting)="onTabSelecting($event)" (created)="onTabCreated()">
           <e-tabitems>
             <e-tabitem>
-              <ng-template #headerText>Order Details</ng-template>
+              <ng-template #headerText>{{isReOrder ? 'Re-Order Details' : 'Order Details'}}</ng-template>
               <ng-template #content>
                 <section class="order-details" *ngIf="selectedOrder$ | async as currentOrder">
                   <section class="job-details"  *ngIf="currentOrder" [ngSwitch]="currentOrder?.orderType">
@@ -47,6 +46,10 @@
                     <app-general-order-info *ngSwitchDefault [orderInformation]="currentOrder"></app-general-order-info>
                   </section>
                   <hr />
+                  <ng-container *ngIf="currentOrder?.reasonForClosing">
+                    <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
+                    <hr />
+                  </ng-container>
                   <app-order-details [currentOrder]="currentOrder"></app-order-details>
                 </section>
               </ng-template>
@@ -54,23 +57,24 @@
             <e-tabitem>
               <ng-template #headerText>Candidates <span class="e-badge e-badge-success e-badge-circle">{{countOrderCandidates$ | async}}</span></ng-template>
               <ng-template #content>
-                <app-candidates-order (excludeDeployedEvent)="onExcludeDeployed($event)"></app-candidates-order>
+                <app-candidates-order></app-candidates-order>
               </ng-template>
             </e-tabitem>
             <ng-container *ngIf="selectedOrder$ | async as currentOrder">
               <e-tabitem *ngIf="orderType.OpenPerDiem === currentOrder.orderType">
                 <ng-template #headerText>
-                  Re-Orders <span class="e-badge e-badge-success e-badge-circle">{{ order?.reOrders?.length || '0' }}</span>
+                  Re-Orders <span class="e-badge e-badge-success e-badge-circle">{{ currentOrder?.reOrders?.length || '0' }}</span>
                 </ng-template>
                 <ng-template #content>
-                  <app-order-reorders-container (selectReOrder)="selectReOrder.emit($event)" [isAgency]="true" [currentOrder]="order"></app-order-reorders-container>
+                  <app-order-reorders-container (selectReOrder)="selectReOrder.emit($event)" [isAgency]="true" [currentOrder]="currentOrder"></app-order-reorders-container>
                 </ng-template>
               </e-tabitem>
-            </ng-container>
-            <e-tabitem *ngIf="orderType.OpenPerDiem !== (selectedOrder$ | async)?.orderType">
+
+            <e-tabitem *ngIf="orderType.OpenPerDiem !== currentOrder.orderType && orderType.ReOrder !== currentOrder.orderType">
               <ng-template #headerText>Extensions</ng-template>
               <ng-template #content> </ng-template>
             </e-tabitem>
+          </ng-container>
           </e-tabitems>
         </ejs-tab>
       </div>

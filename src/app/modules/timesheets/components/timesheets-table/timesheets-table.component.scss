@@ -1,5 +1,20 @@
 @import '../../../../styles/variables/colors';
 
+:host::ng-deep {
+  .app-grid {
+    .ag-header-cell-text {
+      font-weight: 600;
+      color: $secondary-dark-blue-15;
+    }
+  }
+
+  .inactive {
+    .ag-center-cols-viewport {
+      background: $secondary-dark-blue-45;
+    }
+  }
+}
+
 .e-btn-icon.e-icons.e-icon-right.e-caret {
   display: none;
 }

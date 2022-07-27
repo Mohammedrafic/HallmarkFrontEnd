@@ -15,11 +15,12 @@ import type {
 import { ChartAccumulation, DonutChartData } from '../../models/chart-accumulation-widget.model';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
 import { DashboardService } from '../../services/dashboard.service';
+import { WidgetLegengDataModel } from '../../models/widget-legend-data.model';
 
 @Component({
   selector: 'app-accumulation-chart',
   templateUrl: './accumulation-chart.component.html',
-  styleUrls: ['../widget-legend.component.scss', './accumulation-chart.component.scss'],
+  styleUrls: ['./accumulation-chart.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AccumulationChartComponent
@@ -31,36 +32,25 @@ export class AccumulationChartComponent
 
   public toggleLegend: number[] = [];
   public filteredChartData$: Observable<DonutChartData[]>;
+  public legendData: WidgetLegengDataModel[] = [];
 
   public readonly tooltipSettings: TooltipSettingsModel = {
     enable: true,
     template: '<div class="widget-tooltip"><div>${x}</div><b>${y}</b></div>',
-  };
+  }
+
   public readonly legendSettings: LegendSettingsModel = { visible: false };
 
-  private readonly chartData$: BehaviorSubject<ChartAccumulation | null> =
-    new BehaviorSubject<ChartAccumulation | null>(null);
+  private readonly chartData$: BehaviorSubject<ChartAccumulation | null> = new BehaviorSubject<ChartAccumulation | null>(null);
 
   private readonly selectedEntries$: BehaviorSubject<string[] | null> = new BehaviorSubject<string[] | null>(null);
-
-  private mousePosition = {
-    x: 0,
-    y: 0,
-  };
 
   constructor(private readonly dashboardService: DashboardService) {
     super();
   }
 
-  public defineMousePosition($event: MouseEvent): void {
-    this.mousePosition.x = $event.screenX;
-    this.mousePosition.y = $event.screenY;
-  }
-
-  public redirectToSourceContent(event: MouseEvent): void {
-    if (this.mousePosition.x === event.screenX && this.mousePosition.y === event.screenY) {
+  public redirectToSourceContent(): void {
       this.dashboardService.redirectToUrl('client/order-management');
-    }
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -85,6 +75,7 @@ export class AccumulationChartComponent
   }
 
   private handleChartDataChanges(): void {
+    this.legendData = this.chartData?.chartData as WidgetLegengDataModel[];
     this.chartData$.next(this.chartData ?? null);
     this.chartData?.chartData &&
       !this.selectedEntries$.value &&

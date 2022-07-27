@@ -9,13 +9,14 @@
   <ng-template #content>
     <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails">
       <div class="profile-details-header">
-        <img
-          class="e-avatar e-avatar-xlarge"
-          [src]="timesheetDetails.candidateId | candidateAvatar"/>
+        <ng-container>
+<!--            TODO: Replace with default avatar placeholder-->
+            <img class="e-avatar e-avatar-xlarge" [src]="timesheetDetails.candidateId | candidateAvatar"/>
+        </ng-container>
 
         <div class="flex flex-column">
           <h3 class="username">
-            {{ timesheetDetails.candidateFirstName }}, {{ timesheetDetails.candidateLastName}}
+            {{ timesheetDetails.candidateLastName }}, {{ timesheetDetails.candidateFirstName}}
           </h3>
 
           <ejs-chiplist #chipList class="events-off">
@@ -71,7 +72,7 @@
                                   [multiple]="true"
                                   [autoUpload]="false"
                                   [showFileList]="false"
-                                  (selected)="onFilesSelected($event)">
+                                  (selected)="onFilesSelected($event, timesheetDetails.organizationId)">
                     </ejs-uploader>
                   </div>
                 </div>
@@ -112,7 +113,11 @@
             (click)="onRejectButtonClick()">Reject
           </button>
 
-          <button ejs-button cssClass="e-primary" (click)="handleApprove()">
+          <button ejs-button cssClass="e-primary"
+                  [disabled]="!isChangesSaved ||
+                  (isAgency ? timesheetDetails.status === timesheetStatus.PendingApproval :
+                  timesheetDetails.status === timesheetStatus.Approved)"
+                  (click)="handleApprove()">
             {{submitText}}
           </button>
         </div>
@@ -120,23 +125,29 @@
 
       <div class="job-general-info tile-dark-blue">
           <app-profile-details-job-info
+                  [isAgency]="isAgency"
                   [jobData]="timesheetDetails"
           ></app-profile-details-job-info>
       </div>
 
       <div class="profile-hours-statistics">
-          <div class="tile-dark-blue" *ngIf="chartsVisible$ | async">
+          <div class="tile-dark-blue">
               <app-profile-cumulative-hours
                       [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
               ></app-profile-cumulative-hours>
           </div>
 
-          <div class="tile-dark-blue miles" *ngIf="milesData$ | async as milesData">
-            <app-profile-miles [milesData]="milesData"></app-profile-miles>
+          <div class="tile-dark-blue miles">
+
+            <app-profile-miles [milesData]="{weekMiles: 0, cumulativeMiles: 0, weekCharge: 0, cumulativeCharge: 0}"></app-profile-miles>
           </div>
 
           <div class="tile-dark-blue profile-uploads" *ngIf="timesheetDetails?.attachments?.length">
-            <app-attachments-uploads [attachments]="timesheetDetails.attachments"></app-attachments-uploads>
+            <app-attachments-uploads [attachments]="timesheetDetails.attachments"
+                                     [organizationId]="timesheetDetails.organizationId"
+                                     [timesheetId]="timesheetDetails.id"
+                                     [isAgency]="isAgency"
+            ></app-attachments-uploads>
           </div>
 
          <div class="tile-dark-blue profile-invoices" *ngIf="timesheetDetails?.invoices?.length">
@@ -146,7 +157,9 @@
 
       <section class="profile-table-container">
         <app-profile-timesheet-table
-          [candidateId]="candidateId"
+          [timesheetId]="timesheetId"
+          [isAgency]="isAgency"
+          [actionsDisabled]="timesheetDetails.noWorkPerformed"
           (openAddSideDialog)="openAddDialog($event)"
           (changesSaved)="handleEditChanges($event)"
         >
@@ -171,9 +184,7 @@
   (rejectReasonChange)="handleReject($event)"
 ></app-timesheet-reject-reason-dialog>
 
-<app-add-timesheet
-  (updateTable)="handleUpdateTable()">
-</app-add-timesheet>
+<app-add-timesheet></app-add-timesheet>
 
 <app-export-dialog
         [columns]="columnsToExport"
@@ -181,3 +192,5 @@
         (cancel)="closeExport()"
         (export)="customExport($event)"
 ></app-export-dialog>
+
+<app-file-viewer></app-file-viewer>

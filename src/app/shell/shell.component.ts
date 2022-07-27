@@ -184,6 +184,10 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     this.store.dispatch(new LogoutUser());
   }
 
+  public onGetHelp(): void {
+    window.open('https://helpdocumentation.azurewebsites.net/', "_blank");
+  }
+
   private setSideBarForFirstLoad(route: string): void {
     if (this.isFirstLoad && route !== this.router.url) {
       this.store.dispatch(new ToggleSidebarState(true));

@@ -64,10 +64,12 @@ import { BillRateSetupComponent } from './bill-rates/bill-rate-setup/bill-rate-s
 import { ExternalBillRateComponent } from './bill-rates/external-bill-rate/external-bill-rate.component';
 import { BillRateTypeMappingComponent } from './bill-rates/bill-rate-type-mapping/bill-rate-type-mapping.component';
 import { BillRatesState } from '@organization-management/store/bill-rates.state';
-import { RejectReasonComponent } from './reject-reason/reject-reason.component';
+import { CandidateRejectReasonComponent } from './reasons/reject-reason/candidate-reject-reason.component';
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { FilteredCredentialsComponent } from './credentials/credentials-setup/filtered-credentials/filtered-credentials.component';
 import { MapCredentialsFormComponent } from './credentials/credentials-setup/map-credentials-form/map-credentials-form.component';
+import { ReasonsComponent } from './reasons/reasons.component';
+import { ClosureReasonComponent } from './reasons/closure-reason/closure-reason.component';
 
 const sidebarIcons = {
   Download,
@@ -109,9 +111,11 @@ const sidebarIcons = {
     BillRateSetupComponent,
     ExternalBillRateComponent,
     BillRateTypeMappingComponent,
-    RejectReasonComponent,
+    CandidateRejectReasonComponent,
     FilteredCredentialsComponent,
-    MapCredentialsFormComponent
+    MapCredentialsFormComponent,
+    ReasonsComponent,
+    ClosureReasonComponent
   ],
   imports: [
     CommonModule,

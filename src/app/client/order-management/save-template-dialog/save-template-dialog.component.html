@@ -1,0 +1,29 @@
+<div #saveTemplate class="template-dialog">
+  <app-input
+    [formGroupInstance]="templateForm"
+    [required]="true"
+    label="Template Name"
+    controlName="templateTitle"
+    id="templateTitle"
+    class="template-title"
+  ></app-input>
+  <div class="grid">
+    <ng-container *ngIf="templates$ | async as templates">
+      <div class="grid-header" *ngIf="templates?.length" [ngPlural]="templates.length">
+        <ng-template ngPluralCase="=1">1 Template</ng-template>
+        <ng-template ngPluralCase="other">{{ templates?.length }} Templates</ng-template>
+      </div>
+    </ng-container>
+    <ejs-grid
+      class="grid-body"
+      *ngIf="templates$ | async as templates"
+      [dataSource]="templates"
+      [columns]="gridConfig.columns"
+      [allowSorting]="gridConfig.allowSorting"
+      [resizeSettings]="gridConfig.resizeSettings"
+      [allowResizing]="gridConfig.allowResizing"
+      [enableVirtualization]="gridConfig.enableVirtualization"
+      [height]="gridConfig.height"
+    ></ejs-grid>
+  </div>
+</div>

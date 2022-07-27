@@ -12,61 +12,22 @@
           id="orderId"
           mode="CheckBox"
           [fields]="filterOptionFields"
-          [dataSource]="filterColumns.orderId?.dataSource"
+          [dataSource]="filterColumns.orderIds?.dataSource"
           [showDropDownIcon]="true"
-          formControlName="orderId"
+          formControlName="orderIds"
           placeholder=""></ejs-multiselect>
       </div>
     </div>
-    <div class="input-container">
+    <div *ngIf="showStatuses" class="input-container">
       <label for="status">Status</label>
       <div class="input-group dropdown">
         <ejs-multiselect
           id="status"
           mode="CheckBox"
           [fields]="filterOptionFields"
-          [dataSource]="filterColumns.statusText?.dataSource"
+          [dataSource]="filterColumns.statusIds?.dataSource"
           [showDropDownIcon]="true"
-          formControlName="statusText"
-          placeholder=""></ejs-multiselect>
-      </div>
-    </div>
-    <div class="input-container">
-      <label for="department">Department</label>
-      <div class="input-group dropdown">
-        <ejs-multiselect
-          id="department"
-          mode="CheckBox"
-          [fields]="filterOptionFields"
-          [dataSource]="filterColumns.department?.dataSource"
-          [showDropDownIcon]="true"
-          formControlName="departmentName"
-          placeholder=""></ejs-multiselect>
-      </div>
-    </div>
-    <div class="input-container">
-      <label for="agencyName">Select Agency</label>
-      <div class="input-group dropdown">
-        <ejs-multiselect
-          id="agencyName"
-          mode="CheckBox"
-          [fields]="filterOptionFields"
-          [dataSource]="filterColumns.agencyName?.dataSource"
-          [showDropDownIcon]="true"
-          formControlName="agencyName"
-          placeholder=""></ejs-multiselect>
-      </div>
-    </div>
-    <div class="input-container">
-      <label for="orgName">Org Name</label>
-      <div class="input-group dropdown">
-        <ejs-multiselect
-          id="orgName"
-          mode="CheckBox"
-          [fields]="filterOptionFields"
-          [dataSource]="filterColumns.orgName?.dataSource"
-          [showDropDownIcon]="true"
-          formControlName="orgName"
+          formControlName="statusIds"
           placeholder=""></ejs-multiselect>
       </div>
     </div>
@@ -78,9 +39,9 @@
             id="region"
             mode="CheckBox"
             [fields]="filterOptionFields"
-            [dataSource]="filterColumns.region?.dataSource"
+            [dataSource]="filterColumns.regionsIds?.dataSource"
             [showDropDownIcon]="true"
-            formControlName="region"
+            formControlName="regionsIds"
             placeholder=""></ejs-multiselect>
         </div>
       </div>
@@ -91,9 +52,39 @@
             id="location"
             mode="CheckBox"
             [fields]="filterOptionFields"
-            [dataSource]="filterColumns.location?.dataSource"
+            [dataSource]="filterColumns.locationIds?.dataSource"
             [showDropDownIcon]="true"
-            formControlName="location"
+            [noRecordsTemplate]="'Please select the Region'"
+            formControlName="locationIds"
+            placeholder=""></ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="input-container">
+        <label for="department">Department</label>
+        <div class="input-group dropdown">
+          <ejs-multiselect
+            id="department"
+            mode="CheckBox"
+            [fields]="filterOptionFields"
+            [dataSource]="filterColumns.departmentIds?.dataSource"
+            [showDropDownIcon]="true"
+            formControlName="departmentIds"
+            [noRecordsTemplate]="'Please select the Region and Location'"
+            placeholder=""></ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label for="agencyName">Select Agency</label>
+        <div class="input-group dropdown">
+          <ejs-multiselect
+            id="agencyName"
+            mode="CheckBox"
+            [fields]="filterOptionFields"
+            [dataSource]="filterColumns.agencyIds?.dataSource"
+            [showDropDownIcon]="true"
+            formControlName="agencyIds"
             placeholder=""></ejs-multiselect>
         </div>
       </div>
@@ -105,9 +96,9 @@
           id="skill"
           mode="CheckBox"
           [fields]="filterOptionFields"
-          [dataSource]="filterColumns.skill?.dataSource"
+          [dataSource]="filterColumns.skillIds?.dataSource"
           [showDropDownIcon]="true"
-          formControlName="skillName"
+          formControlName="skillIds"
           placeholder=""></ejs-multiselect>
       </div>
     </div>

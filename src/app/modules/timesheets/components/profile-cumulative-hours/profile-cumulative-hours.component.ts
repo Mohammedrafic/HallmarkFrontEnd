@@ -33,7 +33,6 @@ export class ProfileCumulativeHoursComponent {
   public set statisticsData(statistics: TimesheetStatisticsDetails[] | null) {
     this._statisticsData = statistics;
 
-    // TODO: Remove after backend fixes
     const chartItems: TimesheetStatisticsDetails[] = Object.keys(HourOccupationType).map((occupationTypeName: string) => {
       const existing = (statistics || []).find((item: TimesheetStatisticsDetails) => item.billRateConfigName === occupationTypeName);
 

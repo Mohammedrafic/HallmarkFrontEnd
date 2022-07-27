@@ -10,6 +10,9 @@ import { TimsheetForm } from '../interface';
 
 @Injectable()
 export class TimesheetsService {
+  /**
+   * TODO: remove any.
+   */
   private currentSelectedTableRowIndex: BaseObservable<number> = new BaseObservable<number>(null as any);
 
   constructor(private capitalizeFirst: CapitalizeFirstPipe, private fb: FormBuilder,) {
@@ -18,14 +21,13 @@ export class TimesheetsService {
   public createForm(): CustomFormGroup<TimsheetForm> {
     return this.fb.group({
       search: [''],
-      orderId: [[]],
-      statusText: [[]],
-      skillName: [[]],
-      departmentName: [[]],
-      agencyName: [[]],
-      orgName: [[]],
-      region: [[]],
-      location: [[]],
+      orderIds: [[]],
+      statusIds: [[]],
+      skillIds: [[]],
+      departmentIds: [[]],
+      agencyIds: [[]],
+      regionsIds: [[]],
+      locationIds: [[]],
     }) as CustomFormGroup<TimsheetForm>;
   }
 

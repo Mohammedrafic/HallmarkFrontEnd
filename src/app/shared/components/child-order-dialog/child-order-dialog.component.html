@@ -21,7 +21,12 @@
               </ejs-chiplist>
             </div>
           </div>
-          <div class="e-card-content">
+          <div class="e-card-content dialog-controls">
+            <button ejs-button cssClass="e-outline"
+                    [disabled]="disabledCloseButton"
+                    (click)="closeOrder(order)">
+              Close Position
+            </button>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>
             </button>
@@ -39,6 +44,10 @@
                       <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
                     </section>
                     <hr />
+                    <ng-container *ngIf="currentOrder?.reasonForClosing">
+                      <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
+                      <hr />
+                    </ng-container>
                     <app-order-details [currentOrder]="currentOrder"></app-order-details>
                   </section>
               </ng-template>
@@ -50,11 +59,11 @@
                 <section class="candidate">
                   <ng-container [ngSwitch]="selectedTemplate">
                     <ng-container *ngSwitchCase="template.onboarded">
-                      <app-onboarded-candidate [candidate]="$any(candidate)" [isTab]="true"></app-onboarded-candidate>
+                      <app-onboarded-candidate [candidate]="$any(candidate)" [isTab]="true" (closeModalEvent)="onClose()"></app-onboarded-candidate>
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.accept">
-                      <app-accept-candidate [candidate]="$any(candidate)" [isTab]="true"></app-accept-candidate>
+                      <app-accept-candidate [candidate]="$any(candidate)" [isTab]="true" (closeModalEvent)="onClose()"></app-accept-candidate>
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.apply">
