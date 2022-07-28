@@ -316,7 +316,7 @@ export interface EditOrderDto extends Omit<Order, 'billRates' | 'status' | 'stat
 export type AcceptJobDTO = {
   actualEndDate?: string;
   actualStartDate?: string;
-  allowDeplayWoCredentials?: boolean;
+  allowDeployWoCredentials?: boolean;
   candidateBillRate?: number;
   clockId?: number;
   guaranteedWorkWeek?: string;

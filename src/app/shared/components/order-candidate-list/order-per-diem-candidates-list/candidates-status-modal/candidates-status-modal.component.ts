@@ -214,7 +214,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
             orderId: this.orderCandidateJob.orderId,
             jobId: value.jobId,
             clockId: value.clockId,
-            allowDeplayWoCredentials: value.allow,
+            allowDeployWoCredentials: value.allow,
             nextApplicantStatus: {
               applicantStatus: status.applicantStatus,
               statusText: status.statusText,

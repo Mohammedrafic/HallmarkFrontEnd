@@ -143,7 +143,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
         actualEndDate: this.orderCandidateJob.actualEndDate,
         clockId: this.orderCandidateJob.clockId,
         guaranteedWorkWeek: this.orderCandidateJob.guaranteedWorkWeek,
-        allowDeplayWoCredentials: false,
+        allowDeployWoCredentials: false,
         billRates: this.orderCandidateJob.billRates,
         offeredStartDate: this.orderCandidateJob.offeredStartDate,
       })
@@ -340,4 +340,3 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     );
   }
 }
-
