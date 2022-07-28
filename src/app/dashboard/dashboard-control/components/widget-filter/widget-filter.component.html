@@ -1,5 +1,5 @@
 <app-filter-dialog
-  [items]="filteredItems$ | async"
+  [items]="savedFilterItems"
   [showResultsCounter]="false"
   (deleteFilter)="onFilterDelete($event)"
   (clearAllFiltersClicked)="onFilterClearAll()"

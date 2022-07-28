@@ -1,10 +1,9 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
-import { combineLatest, filter, Observable, skip, take, takeUntil } from 'rxjs';
+import { filter, Observable, takeUntil } from 'rxjs';
 
-import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
@@ -14,9 +13,8 @@ import { FilterService } from '@shared/services/filter.service';
 import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
 import { IFilterColumnsDataModel } from 'src/app/dashboard/models/widget-filter.model';
 import { SetDashboardFiltersState, SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
-import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
-import { UserState, UserStateModel } from 'src/app/store/user.state';
+import { UserState } from 'src/app/store/user.state';
 import { Organisation } from '@shared/models/visibility-settings.model';
 
 @Component({
@@ -26,15 +24,15 @@ import { Organisation } from '@shared/models/visibility-settings.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class WidgetFilterComponent extends DestroyableDirective implements OnInit {
+export class WidgetFilterComponent extends DestroyableDirective implements OnInit, OnChanges {
   @Input() public allOrganizations: Organisation[];
   @Input() public userIsAdmin: boolean;
+  @Input() public savedFilterItems: FilteredItem[];
+  @Input() public dashboardFilterState: DashboardFiltersModel;
+  @Input() public organizationStructure: OrganizationStructure;
+  @Input() public allSkills: Skill[];
 
   @Select(UserState.organizationStructure) private readonly organizationStructure$: Observable<OrganizationStructure>;
-  @Select(UserState.lastSelectedOrganizationId) private readonly organizationId$: Observable<UserStateModel['lastSelectedOrganizationId']>;
-  @Select(DashboardState.filteredItems) public readonly filteredItems$: Observable<FilteredItem[]>;
-  @Select(OrganizationManagementState.allOrganizationSkills) private readonly skills$: Observable<Skill[]>;
-  @Select(DashboardState.dashboardFiltersState) private readonly dashboardFiltersState$: Observable<DashboardFiltersModel>;
 
   public filteredItems: FilteredItem[] = [];
   public widgetFilterFormGroup: FormGroup;
@@ -50,19 +48,19 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     value: 'id',
   };
 
-  get skills(): number[] {
+  get skills(): number {
     return this.widgetFilterFormGroup.get('skillIds')?.value?.length;
   }
 
-  get region(): number[] {
+  get region(): number {
     return this.widgetFilterFormGroup.get('regionIds')?.value?.length;
   }
 
-  get locations(): number[] {
+  get locations(): number {
     return this.widgetFilterFormGroup.get('locationIds')?.value?.length;
   }
 
-  get departments(): number[] {
+  get departments(): number {
     return this.widgetFilterFormGroup.get('departmentsIds')?.value?.length;
   }
 
@@ -81,7 +79,12 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     this.widgetFilterColumnsSetup();
     this.isFilterDialogOpened();
     this.getFilterState();
-    this.changingOrganization();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    changes['savedFilterItems'] && this.getFilterState();
+    changes['allSkils'] && this.onSkillDataLoadHandler();
+    changes['organizationStructure'] && this.onOrganizationStructureDataLoadHandler();
   }
 
   private isFilterDialogOpened() {
@@ -90,7 +93,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
       .subscribe(() => {
         this.getFilterState();
         this.onOrganizationStructureDataLoadHandler();
-        this.onOrderFilterControlValueChangedHandler();
+        this.onFilterControlValueChangedHandler();
         this.onSkillDataLoadHandler();
         this.setFilterState();
       });
@@ -176,7 +179,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     };
   }
 
-  private onOrderFilterControlValueChangedHandler(): void {
+  private onFilterControlValueChangedHandler(): void {
     this.widgetFilterFormGroup.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
       this.cdr.markForCheck();
       if (val?.length) {
@@ -222,32 +225,23 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   }
 
   private onOrganizationStructureDataLoadHandler(): void {
-    this.organizationStructure$
-      .pipe(takeUntil(this.destroy$), filter(Boolean))
-      .subscribe((structure: OrganizationStructure) => {
+    if(this.organizationStructure) {
         this.cdr.markForCheck();
-        this.regions = structure.regions;
+        this.regions = this.organizationStructure?.regions;
         this.filterColumns.regionIds.dataSource = this.regions;
-      });
+    }  
   }
 
   private onSkillDataLoadHandler(): void {
-    this.skills$.pipe(takeUntil(this.destroy$)).subscribe((skills) => {
-      if (skills && skills.length > 0) {
-        this.filterColumns.skillIds.dataSource = skills;
-      }
-    });
+    if(this.allSkills) {
+      this.filterColumns.skillIds.dataSource = this.allSkills;
+    }
   }
 
-  public getFilterState(): void {
-    this.filteredItems$
-      .pipe(
-        take(1)
-      )
-      .subscribe((filters) => {
+  private getFilterState(): void {
         this.cdr.markForCheck();
         this.filters = {} as DashboardFiltersModel; 
-        filters.forEach((item: FilteredItem) => {
+        this.savedFilterItems.forEach((item: FilteredItem) => {
           const filterKey = item.column as keyof DashboardFiltersModel;
           if (filterKey in this.filters) {
             this.filters[filterKey]?.push(item.value);
@@ -256,25 +250,13 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
           }
         });
         this.saveDashboardState(this.filters);
-      });
   }
 
   private setFilterState(): void {
-    combineLatest([this.dashboardFiltersState$, this.organizationStructure$])
-      .pipe(
-        takeUntil(this.destroy$),
-        filter(([filters, orgs]) => !!filters && !!orgs),
-      )
-      .subscribe(([filters]) => {
+    this.organizationStructure$.pipe(takeUntil(this.destroy$), filter((org) => !!org)).subscribe((orgs) => {
         Object.entries(this.widgetFilterFormGroup.controls).forEach(([field, control]) =>
-          control.setValue(filters[field as keyof DashboardFiltersModel] || [])
+          control.setValue(this.dashboardFilterState[field as keyof DashboardFiltersModel] || [])
         );
       });
-  }
-
-  private changingOrganization(): void {
-    this.organizationId$.pipe(takeUntil(this.destroy$), filter(Boolean), skip(1)).subscribe(() => {
-      this.store.dispatch(new SetFilteredItems([]));
-    });
   }
 }

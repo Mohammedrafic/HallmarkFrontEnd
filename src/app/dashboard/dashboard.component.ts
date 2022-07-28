@@ -30,6 +30,8 @@ import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { WIDGET_PERMISSION_TYPES } from './constants/widget-permissions-types';
 import { SecurityState } from '../security/store/security.state';
 import { GetOrganizationsStructureAll } from '../security/store/security.actions';
+import { OrganizationManagementState } from '@organization-management/store/organization-management.state';
+import { Skill } from '@shared/models/skill.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -49,11 +51,13 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   @Select(DashboardState.widgets) public readonly widgets$: Observable<DashboardStateModel['widgets']>;
   @Select(DashboardState.isDashboardLoading) public readonly isLoading$: Observable<DashboardStateModel['isDashboardLoading']>;
   @Select(DashboardState.isMobile) private readonly isMobile$: Observable<DashboardStateModel['isMobile']>;
-  @Select(DashboardState.dashboardFiltersState) private readonly dashboardFiltersState$: Observable<DashboardFiltersModel>;
+  @Select(DashboardState.dashboardFiltersState) public readonly dashboardFiltersState$: Observable<DashboardFiltersModel>;
   @Select(DashboardState.getTimeSelection) public readonly timeSelection$: Observable<DashboardStateModel['positionTrendTimeSelection']>
 
   @Select(UserState.lastSelectedOrganizationAgency) private readonly lastSelectedOrganizationAgency$: Observable<string>;
   @Select(UserState.currentUserPermissions) private readonly currentUserPermissions$: Observable<CurrentUserPermission[]>;
+  
+  @Select(OrganizationManagementState.allOrganizationSkills) public readonly skills$: Observable<Skill[]>;
 
   @Select(SecurityState.organisations) public readonly allOrganizations$: Observable<UserStateModel['organizations']>;
 
@@ -91,7 +95,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   private getAdminOrganizationsStructureAll(): void {
     const user = this.store.selectSnapshot(UserState.user);
     this.userIsAdmin = user?.businessUnitType === BusinessUnitType.MSP || user?.businessUnitType === BusinessUnitType.Hallmark;
-    if(user && this.userIsAdmin) {
+    if(user) {
       this.store.dispatch(new GetOrganizationsStructureAll(user.id));
     }
   }
@@ -257,9 +261,14 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   private getDashboardFilterState(): void {
-    this.dashboardFiltersState$.pipe(takeUntil(this.destroy$)).subscribe((filters: DashboardFiltersModel) => {
-      this.filtersGroup.reset();
-      Object.entries(this.filtersGroup.controls).forEach(([field, control]) => control.setValue(filters[field as keyof DashboardFiltersModel] || []));
-    });
+    this.dashboardFiltersState$
+      .pipe(
+        takeUntil(this.destroy$),
+        distinctUntilChanged((previous: DashboardFiltersModel, current: DashboardFiltersModel) => isEqual(previous, current))
+      )
+      .subscribe((filters: DashboardFiltersModel) => {
+        this.filtersGroup.reset();
+        Object.entries(this.filtersGroup.controls).forEach(([field, control]) => control.setValue(filters[field as keyof DashboardFiltersModel] || []));
+      });
   }
 }
