@@ -534,8 +534,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           new GetAgencyOrderCandidatesList(
             data.id,
             data.organizationId,
-            this.currentPage,
-            this.pageSize,
+            1,
+            30,
             this.orderManagementService.excludeDeployed
           )
         );
@@ -1019,11 +1019,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private onLockUpdatedSucceededHandler(): void {
-    this.actions$
-      .pipe(takeUntil(this.unsubscribe$), ofActionDispatched(LockUpdatedSuccessfully))
-      .subscribe(() => {
-        this.getOrders();
-      });
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionDispatched(LockUpdatedSuccessfully)).subscribe(() => {
+      this.getOrders();
+    });
   }
 
   private onDeleteOrderSucceededHandler(): void {
