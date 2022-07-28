@@ -46,7 +46,9 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
         }
       } else {
         this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
-        this.store.dispatch(new GetAvailableSteps(this.order.organizationId, data.candidateJobId));
+        if (!this.isOnboardOrRejectStatus() && !this.isAgency) {
+          this.store.dispatch(new GetAvailableSteps(this.order.organizationId, data.candidateJobId));
+        }
       }
       this.openDetails.next(true);
     }
@@ -59,6 +61,10 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
         takeUntil(this.unsubscribe$)
       )
       .subscribe((candidateJob: OrderCandidateJob) => (this.candidateJob = candidateJob));
+  }
+
+  private isOnboardOrRejectStatus(): boolean {
+    return [ApplicantStatus.OnBoarded, ApplicantStatus.Rejected].includes(this.candidate?.status);
   }
 
   protected override emitGetCandidatesList(): void {
