@@ -73,7 +73,6 @@ export const allOrdersChildColumnsToExport: ExportColumn[] = [
   { text: 'Candidate Name', column: 'CandidateName' },
   { text: 'Position Status', column: 'PositionStatus' },
   { text: 'Candidate Status', column: 'CandidateStatus' },
-  { text: 'Candidate Skill', column: 'ChildOrderSkill' },
   { text: 'Candidate Bill Rate', column: 'CandidateBillRate' },
   { text: 'Submission %', column: 'Submission' },
   { text: 'Onboard %', column: 'Onboard' },
