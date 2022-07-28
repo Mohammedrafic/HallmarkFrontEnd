@@ -21,7 +21,7 @@ export class AddRecordService {
           timeIn: [null, [Validators.required]],
           timeOut: [null, [Validators.required]],
           departmentId: [null, Validators.required],
-          billRateId: [null, Validators.required],
+          billRateConfigId: [null, Validators.required],
         }, options ) as CustomFormGroup<AddTimsheetForm>;
     }
 

@@ -35,7 +35,6 @@ export class TimesheetsApiService {
 
   constructor(
     private http: HttpClient,
-    private capitalizeFirst: CapitalizeFirstPipe,
   ) {}
 
   public getTimesheets(filters: TimesheetsFilterState): Observable<TimrsheetsDto> {

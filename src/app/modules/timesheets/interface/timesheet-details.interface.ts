@@ -79,6 +79,8 @@ export interface TimesheetDetailsModel {
   timesheetStatistic: TimesheetStatistics;
   attachments: TimesheetAttachment[];
   invoices: TimesheetInvoice[];
+  weekEndDate: string;
+  weekStartDate: string;
 }
 
 export interface OpenAddDialogMeta {
@@ -100,7 +102,7 @@ export interface AddRecordDto {
   type: number;
   timeIn: string;
   timeOut?: string;
-  billRateId: number;
+  billRateConfigId: number;
   departmentId: number;
   description?: string,
   value?: number;
@@ -110,7 +112,7 @@ export interface PutRecord {
   id: number;
   timeIn: string;
   timeOut?: string;
-  billRateId: number;
+  billRateConfigId: number;
   departmentId: number;
   value: number;
   description?: string;
