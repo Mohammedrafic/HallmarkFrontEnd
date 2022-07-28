@@ -472,7 +472,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       }
     }
 
-    if (this.selectedIndex) {
+    if (!isNil(this.selectedIndex)) {
       this.gridWithChildRow.selectRow(this.selectedIndex);
     }
 
@@ -515,17 +515,17 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onRowClick(event: any): void {
-    if (event.data.isTemplate) {
-      this.navigateToOrderForm();
-      this.store.dispatch(new GetSelectedOrderById(event.data.id));
-    } else {
-      if (event.target) {
-        this.orderManagementService.excludeDeployed = false;
-      }
+    if (event.target) {
+      this.orderManagementService.excludeDeployed = false;
+    }
 
-      this.rowSelected(event, this.gridWithChildRow);
+    this.rowSelected(event, this.gridWithChildRow);
 
-      if (!event.isInteracted) {
+    if (!event.isInteracted) {
+      if (event.data.isTemplate) {
+        this.navigateToOrderForm();
+        this.store.dispatch(new GetSelectedOrderById(event.data.id));
+      } else {
         this.selectedDataRow = event.data;
         const data = event.data;
         const options = this.getDialogNextPreviousOption(data);
@@ -545,9 +545,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           this.openDetails.next(true);
         }
       }
-
-      this.checkSelectedChildrenItem();
     }
+
+    this.checkSelectedChildrenItem();
   }
 
   public onRowDeselect(event: any, grid: any) {
@@ -665,7 +665,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.openDetails.next(true);
   }
 
-  selectReOrder(event: { reOrder: OrderManagement; order: Order | OrderManagement }): void {
+  public selectReOrder(event: { reOrder: OrderManagement; order: Order | OrderManagement }): void {
     const tabSwitchAnimation = 400;
     const { reOrder, order } = event;
     const tabId = Object.values(OrganizationOrderManagementTabs).indexOf(OrganizationOrderManagementTabs.ReOrders);
@@ -1043,11 +1043,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public updateGrid(): void {
+    this.getOrders();
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetOrders)).subscribe(() => {
       const [index] = this.gridWithChildRow.getSelectedRowIndexes();
       this.selectedIndex = index;
     });
-    this.getOrders();
   }
 
   private handleDashboardFilters(): void {

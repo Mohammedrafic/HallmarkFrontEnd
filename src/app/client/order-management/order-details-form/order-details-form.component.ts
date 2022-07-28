@@ -422,7 +422,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       });
 
     combineLatest([departmentIdControl.valueChanges, skillIdControl.valueChanges])
-      .pipe(takeUntil(this.unsubscribe$))
+      .pipe(
+        filter(() => !this.isEditMode),
+        takeUntil(this.unsubscribe$)
+      )
       .subscribe(([departmentId, skillId]) => {
         if (!departmentId || !skillId) {
           return;
