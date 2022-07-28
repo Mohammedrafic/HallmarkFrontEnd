@@ -8,7 +8,7 @@ import { downloadBlobFile } from '@shared/utils/file.utils';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { TimesheetsModel, TimeSheetsPage, } from '../model/timesheets.model';
+import { TimesheetsModel, TimeSheetsPage, TimrsheetsDto } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
@@ -173,7 +173,7 @@ export class TimesheetsState {
   @Action(Timesheets.GetAll)
   GetTimesheets(
     { patchState, getState }: StateContext<TimesheetsModel>,
-  ): Observable<TimeSheetsPage> {
+  ): Observable<TimrsheetsDto> {
     patchState({
       timesheets: DefaultTimesheetCollection,
     });
@@ -182,9 +182,10 @@ export class TimesheetsState {
 
     return this.timesheetsApiService.getTimesheets(filters)
       .pipe(
-        tap((res) => {
+        tap((res: TimrsheetsDto) => {
           patchState({
-            timesheets: res,
+            timesheets: res.items,
+            tabCounts: res.tabsCounts,
           });
         }));
   }
@@ -216,16 +217,6 @@ export class TimesheetsState {
         timesheetsFilters: null
       })))
     );
-  }
-
-  @Action(Timesheets.GetTabsCounts)
-  GetTabsCounts({ patchState }: StateContext<TimesheetsModel>): Observable<TabCountConfig> {
-    return this.timesheetsApiService.getTabsCounts()
-      .pipe(
-        tap((res) => patchState({
-          tabCounts: res,
-        }))
-      );
   }
 
   @Action(TimesheetDetails.GetTimesheetRecords)

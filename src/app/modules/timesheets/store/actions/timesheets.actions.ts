@@ -55,10 +55,6 @@ export namespace Timesheets {
     }
   }
 
-  export class GetTabsCounts {
-    static readonly type = TIMESHEETS_ACTIONS.GET_TABS_COUNTS;
-  }
-
   export class GetFiltersDataSource {
     static readonly type = TIMESHEETS_ACTIONS.GET_FILTERS_DATA_SOURCE;
   }

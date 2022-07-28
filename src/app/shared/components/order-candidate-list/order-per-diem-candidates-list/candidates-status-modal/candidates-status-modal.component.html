@@ -28,7 +28,7 @@
             <!--TODO: create and use ReadOnly Mode for it-->
             <button ejs-button cssClass="e-outline" (click)="onReject()" *ngIf="showRejectButton">Reject</button>
             <button ejs-button cssClass="e-outline" (click)="onWithdraw()" *ngIf="showWithdrawButton">Withdraw</button>
-            <button ejs-button cssClass="e-primary" (click)="onApply()" *ngIf="showApplyButton">Apply</button>
+            <button ejs-button cssClass="e-primary" (click)="onApply()" [disabled]="isLocked" *ngIf="showApplyButton">Apply</button>
             <button ejs-button cssClass="e-primary" (click)="onAccept()" *ngIf="showAcceptButton">Accept</button>
             <button ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
               <i-feather name="x" class="icon"></i-feather>

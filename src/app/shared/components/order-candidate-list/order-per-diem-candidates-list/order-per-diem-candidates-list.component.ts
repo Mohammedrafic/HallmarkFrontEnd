@@ -17,12 +17,6 @@ import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate
   styleUrls: ['./order-per-diem-candidates-list.component.scss'],
 })
 export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateListComponent implements OnInit {
-  @Select(OrderManagementContentState.candidatesJob)
-  candidateJobOrganisationState$: Observable<OrderCandidateJob>;
-
-  @Select(OrderManagementState.candidatesJob)
-  candidateJobAgencyState$: Observable<OrderCandidateJob>;
-
   public templateState: Subject<any> = new Subject();
   public candidate: OrderCandidatesList;
   public candidateJob: OrderCandidateJob | null;

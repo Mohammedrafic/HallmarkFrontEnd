@@ -20,8 +20,8 @@
                 </e-chips>
               </ejs-chiplist>
               <div class="vertical-divider"></div>
-              <div *ngIf="order" class="order-other-statuses">
-                <span class="custom-chip" *ngIf="!isReOrder">{{ orderType[order.orderType] }}</span>
+              <div *ngIf="order && !isReOrder" class="order-other-statuses">
+                <span class="custom-chip">{{ orderType[order.orderType] }}</span>
                 <span class="custom-chip"> {{order.isLocked ? "Locked" : "Unlocked"}}</span>
               </div>
             </div>

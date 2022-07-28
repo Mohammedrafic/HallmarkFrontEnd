@@ -26,7 +26,7 @@ Promise.resolve()
   .then(() => fetch(APP_SETTINGS_URL))
   .then((res) => res.json())
   .then((settings) => {
-    const host = settings.API_BASE_URL;
+    const host = environment.production ? settings.API_BASE_URL : environment.host;
     return Promise.all([{ host }, fetch(APP_SETTINGS_B2C_CONFIG_URL(host)).then((res) => res.json())]);
   })
   .then(([settings, config]) => {

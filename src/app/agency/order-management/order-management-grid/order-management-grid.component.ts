@@ -138,6 +138,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
+  public isLockMenuButtonsShown = true;
 
   constructor(
     private store: Store,
@@ -282,6 +283,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private onTabChange(): void {
     this.ordersTab$.pipe(takeUntil(this.unsubscribe$), tap((selected) => {
       this.selectedTab = selected;
+      this.onGridCreated();
       this.clearFilters();
       this.store.dispatch(new ClearOrders());
       this.selectedIndex = null;
@@ -314,17 +316,21 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
         this.showReOrders = false;
+        this.isLockMenuButtonsShown = true;
         this.refreshGridColumns(MyAgencyOrdersColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.PerDiem:
+        this.isLockMenuButtonsShown = true;
         this.showReOrders = true;
         this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.ReOrders:
+        this.isLockMenuButtonsShown = false;
         this.showReOrders = false;
         this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
         break;
       default:
+        this.isLockMenuButtonsShown = true;
         this.showReOrders = false;
         this.refreshGridColumns(MyAgencyOrdersColumnsConfig, this.gridWithChildRow);
         break;
@@ -333,12 +339,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public onCompare(): void {
     this.openCandidat.next(true);
-  }
-
-  public onSortStatus(): void {
-    const direction: SortDirection = this.statusSortDerection === 'Ascending' ? 'Descending' : 'Ascending';
-    this.gridWithChildRow.sortColumn('status', direction);
-    this.statusSortDerection = direction;
   }
 
   public onRowClick(event: any): void {
@@ -405,7 +405,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       order: order.orderId,
       reOrder: reOrder.orderId,
     };
-    this.gridWithChildRow?.clearRowSelection();
+    this.clearSelection(this.gridWithChildRow);
     this.store.dispatch(new GetOrderById(reOrder.orderId, order.organizationId));
     this.store.dispatch(
       new GetAgencyOrderCandidatesList(
@@ -462,7 +462,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onFilterClose() {
     this.OrderFilterFormGroup.setValue({
       orderId: this.filters.orderId || null,
-      reOrderId: this.filters.reOrderId || null,
       regionIds: this.filters.regionIds || [],
       locationIds: this.filters.locationIds || [],
       departmentsIds: this.filters.departmentsIds || [],
@@ -538,6 +537,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public onFilterApply(): void {
     this.filters = this.OrderFilterFormGroup.getRawValue();
+    this.filters.orderId = this.filters.orderId || null;
+    this.filters.billRateFrom = this.filters.billRateFrom || null;
+    this.filters.billRateTo = this.filters.billRateTo || null;
+    this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
+    this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
+    this.filters.openPositions = this.filters.openPositions || null;
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
     this.dispatchNewPage();
     this.store.dispatch(new ShowFilterDialog(false));
@@ -549,7 +554,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.openPreview.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (!isOpen) {
         this.openCandidat.next(false);
-        this.gridWithChildRow?.clearRowSelection();
+        this.clearSelection(this.gridWithChildRow);
         this.previousSelectedOrderId = null;
         this.selectedIndex = null;
       } else {
@@ -568,7 +573,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.selectedCandidate = null;
       } else {
         this.openPreview.next(false);
-        this.gridWithChildRow?.clearRowSelection();
+        this.clearSelection(this.gridWithChildRow);
       }
     });
   }

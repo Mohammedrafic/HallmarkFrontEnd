@@ -33,6 +33,7 @@ import some from 'lodash/fp/some';
 import isNil from 'lodash/fp/isNil';
 import { AbstractControl } from '@angular/forms';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { SaveTemplateDialogService } from '@client/order-management/save-template-dialog/save-template-dialog.service';
 
 enum SelectedTab {
   OrderDetails,
@@ -91,7 +92,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     private store: Store,
     private router: Router,
     private route: ActivatedRoute,
-    private actions$: Actions
+    private actions$: Actions,
+    private saveTemplateDialogService: SaveTemplateDialogService
   ) {
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
 
@@ -106,7 +108,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   public get generalInformationForm(): Order {
-    return this.orderDetailsFormComponent.generalInformationForm.value;
+    return this.orderDetailsFormComponent.generalInformationForm.getRawValue();
   }
 
   public ngOnInit(): void {
@@ -188,6 +190,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
       case SubmitButtonItem.SaveForLater:
         this.saveForLater();
+        this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.Incomplete));
         break;
 
       case SubmitButtonItem.SaveAsTemplate:
@@ -481,7 +484,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private saveAsTemplate(): void {
-    const { regionId, locationId, departmentId, skillId } = this.orderDetailsFormComponent.generalInformationForm.value;
+    const { regionId, locationId, departmentId, skillId } =
+      this.orderDetailsFormComponent.generalInformationForm.getRawValue();
     const requiredFields = [regionId, skillId, departmentId, locationId];
     const isRequiredFieldsFilled = !some(isNil, requiredFields);
 
@@ -500,8 +504,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     const order = this.collectOrderData(false);
     const { templateTitle } = event;
     const extendedOrder = {
-      ...order,
-      title: order.title ? order.title : templateTitle,
+      ...this.saveTemplateDialogService.resetOrderPropertyIds(order),
       templateTitle,
       isTemplate: true,
     };

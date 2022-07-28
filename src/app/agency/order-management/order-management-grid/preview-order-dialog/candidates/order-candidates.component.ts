@@ -55,6 +55,7 @@ export class OrderCandidatesComponent extends DestroyableDirective implements On
       this.orderCandidates = {
         orderId: order?.id,
         organizationId: order?.organizationId as number,
+        isLocked: order?.isLocked as boolean,
       };
     });
   }

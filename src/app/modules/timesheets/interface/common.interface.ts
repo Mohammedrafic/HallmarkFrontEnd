@@ -69,7 +69,7 @@ export interface TimesheetAttachments {
 export interface TabConfig {
   title: string;
   amount?: number;
-  value?: string[];
+  value?: number[];
 }
 
 export interface TabCountConfig {

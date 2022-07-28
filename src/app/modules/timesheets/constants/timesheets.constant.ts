@@ -11,15 +11,15 @@ export const TAB_ADMIN_TIMESHEETS: TabConfig[] = [
   },
   {
     title: 'Pending Approval',
-    value: ['2', '3'],
+    value: [2, 3],
   },
   {
     title: 'Missing',
-    value: ['4'],
+    value: [4],
   },
   {
     title: 'Rejected',
-    value: ['5'],
+    value: [5],
   }
 ];
 

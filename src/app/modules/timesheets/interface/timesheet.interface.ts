@@ -37,7 +37,7 @@ export interface TimesheetsFilterState {
   regionsIds?: string[];
   departmentIds?: string[];
   agencyIds?: string[];
-  statusIds?: string[];
+  statusIds?: string[] | number[];
   totalHours?: number;
   billRate?: number;
   skillIds?: string[];
