@@ -10,9 +10,9 @@ spec:
   http:
   - match:
     - uri:
-        exact: /ui
+        exact: "{{ .Values.istio.uriExact }}"
     - uri:
-        prefix: /ui/
+        prefix: "{{ .Values.istio.uriPrefix }}"
     rewrite:
       uri: /
     route:
