@@ -5,7 +5,6 @@ import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { SearchComponent } from '@shared/components/search/search.component';
-import { ActivatedRoute, Router } from "@angular/router";
 import { TabNavigationComponent } from "@client/order-management/order-management-content/tab-navigation/tab-navigation.component";
 
 @Component({
@@ -26,9 +25,7 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
   private unsubscribe$: Subject<void> = new Subject();
 
   constructor(
-    private store: Store,
-    private router: Router,
-    private route: ActivatedRoute
+    private store: Store
   ) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));

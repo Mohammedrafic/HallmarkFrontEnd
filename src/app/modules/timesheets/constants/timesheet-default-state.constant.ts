@@ -29,4 +29,5 @@ export const DefaultTimesheetState: TimesheetsModel = {
   timesheetsFiltersColumns: DefaultFilterColumns,
   timesheetDetails: null,
   organizations: [],
+  selectedOrganizationId: 0,
 }

@@ -4,7 +4,7 @@ import { ColumnDefinitionModel } from '@shared/components/grid/models/column-def
 import { ColDef } from '@ag-grid-community/core';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
-import { TimesheetsTableColumns, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
+import { FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
 import { FilterColumns, FilterDataSource, TimesheetsFilterState } from '../interface';
 import {
   TimesheetTableStatusCellComponent
@@ -21,6 +21,7 @@ const valueHelper = new GridValuesHelper();
 const commonColumn: ColDef = {
   sortable: true,
   resizable: true,
+  filter: true,
 }
 
 export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionModel[] => {
@@ -127,18 +128,20 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
 };
 
 const defaultColumnMapping = {
+  type: ControlTypes.Multiselect,
+  valueType: ValueType.Id,
   valueField: 'name',
   valueId: 'id',
 };
 
 export const DefaultFilterColumns: FilterColumns = {
-  orderIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
-  statusIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
-  skillIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
-  departmentIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
-  agencyIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
-  regionsIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping },
-  locationIds: { type: ControlTypes.Multiselect, valueType: ValueType.Id, ...defaultColumnMapping }
+  orderIds: defaultColumnMapping,
+  statusIds: defaultColumnMapping,
+  skillIds: defaultColumnMapping,
+  departmentIds: defaultColumnMapping,
+  agencyIds: defaultColumnMapping,
+  regionsIds: defaultColumnMapping,
+  locationIds: defaultColumnMapping,
 } as FilterColumns;
 
 export const SavedFiltersParams: string[] = [
@@ -148,6 +151,7 @@ export const SavedFiltersParams: string[] = [
   'orderBy',
   'date',
   'search',
+  'statusIds',
 ];
 
 export const DefaultFiltersState: TimesheetsFilterState = {
@@ -168,6 +172,14 @@ export const filterOptionFields = {
   text: 'name',
   value: 'id'
 };
+
+export const filteringOptionsMapping: Map<FilteringOptionsFields, TimesheetsTableFiltersColumns> = new Map()
+  .set(FilteringOptionsFields.Agencies, TimesheetsTableFiltersColumns.AgencyIds)
+  .set(FilteringOptionsFields.Orders, TimesheetsTableFiltersColumns.OrderIds)
+  .set(FilteringOptionsFields.Regions, TimesheetsTableFiltersColumns.RegionsIds)
+  .set(FilteringOptionsFields.Skills, TimesheetsTableFiltersColumns.SkillIds)
+  .set(FilteringOptionsFields.Statuses, TimesheetsTableFiltersColumns.StatusIds);
+
 
 export const filterColumnDataSource: FilterDataSource = {
   [TimesheetsTableFiltersColumns.StatusIds]: Object.values(TIMETHEETS_STATUSES).map((val, idx) => ({

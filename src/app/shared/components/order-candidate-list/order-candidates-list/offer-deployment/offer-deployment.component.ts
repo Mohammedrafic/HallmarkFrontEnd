@@ -37,6 +37,7 @@ import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations
 import { ShowToast } from 'src/app/store/app.actions';
 import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
+import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 
 @Component({
   selector: 'app-offer-deployment',
@@ -179,7 +180,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                 actualEndDate: this.candidateJob.actualEndDate,
                 clockId: this.candidateJob.clockId,
                 guaranteedWorkWeek: value.guaranteedWorkWeek,
-                offeredStartDate: value.offeredStartDate,
+                offeredStartDate: toCorrectTimezoneFormat(value.offeredStartDate),
                 allowDeplayWoCredentials: true,
                 billRates: this.billRatesComponent.billRatesControl.value,
               })

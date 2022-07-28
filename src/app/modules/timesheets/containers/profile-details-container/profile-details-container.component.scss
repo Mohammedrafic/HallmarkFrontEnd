@@ -136,14 +136,23 @@ $chip-margin: 8px;
   margin-top: 15px;
   margin-bottom: 10px;
 
-  .order-id {
+  .order-id, .week-dates {
     font-weight: 700;
     font-size: 16px;
+  }
+  
+  .week-dates {
+    margin-left: 20px;
   }
 
   .reject-button {
     margin-right: 12px;
   }
+}
+
+.order-meta {
+  display: flex;
+  align-items: center;
 }
 
 .job-general-info {
@@ -160,8 +169,13 @@ $chip-margin: 8px;
     min-width: 110px;
   }
 
+  .miles {
+    flex-shrink: 0;
+  }
+
   .profile-uploads {
     min-width: 150px;
+    flex-grow: 1;
   }
 
   .tile-dark-blue {

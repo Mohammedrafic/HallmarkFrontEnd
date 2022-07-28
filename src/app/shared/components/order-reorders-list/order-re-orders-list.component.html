@@ -31,7 +31,7 @@
             <button ejs-button cssClass="e-flat default-icon-button">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="edit(data)">
+            <button ejs-button cssClass="e-flat primary-icon-button" *ngIf="!isAgency" (click)="edit(data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
           </div>

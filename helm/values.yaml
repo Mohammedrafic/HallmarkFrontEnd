@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: shruse2acr.azurecr.io/einsteinui
+  repository: shruse2e2cr.azurecr.io/einsteinui
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -85,3 +85,5 @@ env:
   backendurl: "https://dev.einstein2.com/einsteinapi"
 istio:
   domain: dev.einstein2.com
+  uriPrefix: "/einsteinapi/"
+  uriExact: "/einsteinapi"

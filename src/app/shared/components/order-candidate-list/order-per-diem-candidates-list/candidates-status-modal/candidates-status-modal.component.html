@@ -17,7 +17,7 @@
             </h3>
           </div>
           <div class="e-card-content button-container">
-            <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isAgency">
+            <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isAgency && !isOnboard">
               <ejs-dropdownlist
                 [fields]="optionFields"
                 [dataSource]="nextApplicantStatuses"
@@ -27,7 +27,8 @@
             </div>
             <!--TODO: create and use ReadOnly Mode for it-->
             <button ejs-button cssClass="e-outline" (click)="onReject()" *ngIf="showRejectButton">Reject</button>
-            <button ejs-button cssClass="e-primary" (click)="onApply()" *ngIf="showApplyButton">Apply</button>
+            <button ejs-button cssClass="e-outline" (click)="onWithdraw()" *ngIf="showWithdrawButton">Withdraw</button>
+            <button ejs-button cssClass="e-primary" (click)="onApply()" [disabled]="isLocked" *ngIf="showApplyButton">Apply</button>
             <button ejs-button cssClass="e-primary" (click)="onAccept()" *ngIf="showAcceptButton">Accept</button>
             <button ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
               <i-feather name="x" class="icon"></i-feather>
@@ -37,7 +38,7 @@
       </section>
       <section class="content-container">
         <div class="candidate-info">
-          <ejs-accordion #accordionElement expandMode="Single">
+          <ejs-accordion #accordionElement expandMode="Single" (expanding)="toForbidExpandSecondRow($event)" (clicked)="clickedOnAccordion($event)">
             <e-accordionitems>
               <e-accordionitem expanded="true">
                 <ng-template #header>
@@ -73,16 +74,16 @@
                       <label class="input-group">Clock ID</label>
                       <div class="input-group input-readonly">
                         <!--TODO: create and use ReadOnly Mode for it-->
-                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" [readonly]="isAgency"/>
+                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" [readonly]="isAgency || isOnboard"/>
                       </div>
                     </div>
                     <!--TODO: create and use ReadOnly Mode for it-->
                     <div *ngIf="showClockId" class="input-container bootstrap">
-                      <ejs-checkbox [disabled]="isAgency" formControlName="allow" label="Allow deploy w/o credentials"
+                      <ejs-checkbox [disabled]="isAgency || isOnboard" formControlName="allow" label="Allow deploy w/o credentials"
                                     maxlength="50"></ejs-checkbox>
                     </div>
                     <div class="input-container bootstrap" *ngIf="isRejected">
-                      <label>Reason</label>
+                      <label>Rejection Reason</label>
                       <div class="input-group input-readonly">
                         <input formControlName="rejectReason" class="e-input" type="text" readonly/>
                       </div>
@@ -95,7 +96,7 @@
                   <div>Historical Events</div>
                 </ng-template>
                 <ng-template #content>
-                  <div>Historical Events</div>
+                  <app-historical-events [organizationId]="orderCandidateJob?.organizationId!" [candidateJobId]="candidate.candidateJobId" [candidateId]="candidate.candidateId" [isAgency]="isAgency"></app-historical-events>
                 </ng-template>
               </e-accordionitem>
             </e-accordionitems>

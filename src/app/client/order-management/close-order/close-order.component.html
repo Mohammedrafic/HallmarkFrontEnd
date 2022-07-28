@@ -1,0 +1,38 @@
+<app-close-order-side-dialog
+  header="Close {{dialogTitleType}}"
+  (formCancelClicked)="onCancel()"
+  (formSaveClicked)="onSave()">
+  <form class="close-form" [formGroup]="closeForm">
+    <div class="input-container bootstrap">
+      <label for="reason">Reason <span class="required">*</span></label>
+      <div class="input-group dropdown">
+        <ejs-dropdownlist
+          id="reason"
+          appValidateWithMessage
+          [dataSource]="rejectionReasonsList$ | async"
+          [fields]="reasonFields"
+          formControlName="reason">
+        </ejs-dropdownlist>
+      </div>
+    </div>
+    <app-datepicker
+      [formGroupInstance]="closeForm"
+      [enableMask]="true"
+      [min]="startDate"
+      [required]="true"
+      [maskPlaceholder]="datepickerMask"
+      id="date"
+      controlName="date"
+      label="Closing Date"
+      format="MM/dd/yyyy"
+      placeholder="MM/DD/YYYY"
+    ></app-datepicker>
+    <app-comments [useBackground]="false"></app-comments>
+    <p class="warning">
+      <i-feather name="alert-circle" class="icon"></i-feather>
+      <span>
+        Closing a position will permanently close it without the ability to reverse the action!
+      </span>
+    </p>
+  </form>
+</app-close-order-side-dialog>

@@ -36,7 +36,7 @@ export class OrderManagementContentService {
   /**
    * Counts number of shifts of reorders within specified period of time from current date
    * @param orders list of orders
-   * @param period number of days counting of shifts should be performed 
+   * @param period number of days counting of shifts should be performed
    */
   public countShiftsWithinPeriod(orders: OrderManagementPage | AgencyOrderManagementPage, period = 90): void {
     const today = new Date();
@@ -74,7 +74,7 @@ export class OrderManagementContentService {
    * Lock/Unlock the order
    */
   public setLock(orderId: number, lockStatus: boolean): Observable<boolean> {
-    return this.http.post<boolean>(`/api/Orders/setLock`, {orderId, lockStatus });
+    return this.http.post<boolean>(`/api/Orders/setLock`, { orderId, lockStatus });
   }
 
   /**
@@ -367,8 +367,19 @@ export class OrderManagementContentService {
         return this.http.post(`/api/Agency/ReOrders/export`, payload, { responseType: 'blob' }); // TODO: modification pending after BE implementation
       case AgencyOrderManagementTabs.MyAgency:
         return this.http.post(`/api/agency/orders/export`, payload, { responseType: 'blob' });
+      case AgencyOrderManagementTabs.PerDiem:
+        return this.http.post(`/api/agency/orders/perdiem/export`, payload, { responseType: 'blob' });
       default:
         return this.http.post(`/api/Agency/export`, payload, { responseType: 'blob' });
     }
+  }
+
+  /**
+   * Duplicate order by id
+   * @param payload order id to duplicate
+   * @return id of newly created order
+   */
+  public duplicate(payload: number): Observable<number> {
+    return this.http.post<number>(`/api/Orders/${payload}/duplicate`, {});
   }
 }

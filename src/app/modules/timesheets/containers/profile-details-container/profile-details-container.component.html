@@ -11,8 +11,7 @@
       <div class="profile-details-header">
         <ng-container>
 <!--            TODO: Replace with default avatar placeholder-->
-            <img class="e-avatar e-avatar-xlarge"
-                 [src]="(timesheetDetails.candidateId | candidateAvatar) || 'https://thumbs.dreamstime.com/b/default-avatar-photo-placeholder-profile-icon-eps-file-easy-to-edit-default-avatar-photo-placeholder-profile-icon-124557887.jpg'"/>
+            <img class="e-avatar e-avatar-xlarge" [src]="timesheetDetails.candidateId | candidateAvatar"/>
         </ng-container>
 
         <div class="flex flex-column">
@@ -92,7 +91,12 @@
       </div>
 
       <div class="order-header">
-        <h2 class="order-id">Order ID {{ timesheetDetails?.orderId}}</h2>
+        <div class="order-meta">
+          <h2 class="order-id">Order ID {{ timesheetDetails?.orderId}}</h2>
+          <h2 class="week-dates">Week Period:
+            {{ timesheetDetails?.weekStartDate | date:'MM/dd/yyyy': 'UTC' }}
+            - {{ timesheetDetails?.weekEndDate | date:'MM/dd/yyyy': 'UTC' }}</h2>
+        </div>
         <div class="bootstrap reject-reason-input" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
           <div class="e-input input">{{rejectReason}}</div>
         </div>
@@ -114,7 +118,11 @@
             (click)="onRejectButtonClick()">Reject
           </button>
 
-          <button ejs-button cssClass="e-primary" [disabled]="!isChangesSaved" (click)="handleApprove()">
+          <button ejs-button cssClass="e-primary"
+                  [disabled]="!isChangesSaved ||
+                  (isAgency ? timesheetDetails.status === timesheetStatus.PendingApproval :
+                  timesheetDetails.status === timesheetStatus.Approved)"
+                  (click)="handleApprove()">
             {{submitText}}
           </button>
         </div>
@@ -128,20 +136,22 @@
       </div>
 
       <div class="profile-hours-statistics">
-          <div class="tile-dark-blue" *ngIf="chartsVisible$ | async">
+          <div class="tile-dark-blue">
               <app-profile-cumulative-hours
                       [statisticsData]="timesheetDetails.timesheetStatistic.timesheetStatisticDetails"
               ></app-profile-cumulative-hours>
           </div>
 
-          <div class="tile-dark-blue miles" *ngIf="milesData$ | async as milesData">
-            <app-profile-miles [milesData]="milesData"></app-profile-miles>
+          <div class="tile-dark-blue miles">
+
+            <app-profile-miles [milesData]="{weekMiles: 0, cumulativeMiles: 0, weekCharge: 0, cumulativeCharge: 0}"></app-profile-miles>
           </div>
 
           <div class="tile-dark-blue profile-uploads" *ngIf="timesheetDetails?.attachments?.length">
             <app-attachments-uploads [attachments]="timesheetDetails.attachments"
                                      [organizationId]="timesheetDetails.organizationId"
                                      [timesheetId]="timesheetDetails.id"
+                                     [isAgency]="isAgency"
             ></app-attachments-uploads>
           </div>
 
@@ -154,6 +164,7 @@
         <app-profile-timesheet-table
           [timesheetId]="timesheetId"
           [isAgency]="isAgency"
+          [actionsDisabled]="timesheetDetails.noWorkPerformed"
           (openAddSideDialog)="openAddDialog($event)"
           (changesSaved)="handleEditChanges($event)"
         >
@@ -178,9 +189,7 @@
   (rejectReasonChange)="handleReject($event)"
 ></app-timesheet-reject-reason-dialog>
 
-<app-add-timesheet
-  (updateTable)="handleUpdateTable()">
-</app-add-timesheet>
+<app-add-timesheet></app-add-timesheet>
 
 <app-export-dialog
         [columns]="columnsToExport"

@@ -48,6 +48,10 @@
   .row-tool-buttons {
     display: flex;
     cursor: pointer;
+
+    .edit-template {
+      margin-right: 20px;
+    }
   }
 
   .e-item-active {

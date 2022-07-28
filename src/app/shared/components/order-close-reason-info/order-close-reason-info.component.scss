@@ -1,0 +1,11 @@
+:host {
+  display: block;
+  margin-bottom: 18px;
+}
+
+.candidates-additional-info .container-row {
+  justify-content: flex-start;
+  .column {
+    margin-right: 20px;
+  }
+}

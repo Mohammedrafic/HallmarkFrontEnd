@@ -16,6 +16,7 @@ import {
   GetSelectedOrderById,
   SaveOrder,
   SaveOrderSucceeded,
+  SelectNavigationTab,
   SetIsDirtyOrderForm,
 } from '@client/store/order-managment-content.actions';
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
@@ -31,6 +32,8 @@ import { OrderType } from '@shared/enums/order-type';
 import some from 'lodash/fp/some';
 import isNil from 'lodash/fp/isNil';
 import { AbstractControl } from '@angular/forms';
+import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { SaveTemplateDialogService } from '@client/order-management/save-template-dialog/save-template-dialog.service';
 
 enum SelectedTab {
   OrderDetails,
@@ -89,7 +92,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     private store: Store,
     private router: Router,
     private route: ActivatedRoute,
-    private actions$: Actions
+    private actions$: Actions,
+    private saveTemplateDialogService: SaveTemplateDialogService
   ) {
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
 
@@ -103,8 +107,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     }
   }
 
-  public get jobTitle(): string {
-    return this.orderDetailsFormComponent.generalInformationForm.get('title')?.value;
+  public get generalInformationForm(): Order {
+    return this.orderDetailsFormComponent.generalInformationForm.getRawValue();
   }
 
   public ngOnInit(): void {
@@ -186,6 +190,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
       case SubmitButtonItem.SaveForLater:
         this.saveForLater();
+        this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.Incomplete));
         break;
 
       case SubmitButtonItem.SaveAsTemplate:
@@ -387,7 +392,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       workflowId,
       isSubmit,
       canApprove,
+      isTemplate: false,
     };
+
+    if (this.orderDetailsFormComponent.order?.isTemplate) {
+      order.contactDetails = order.contactDetails.map((contact) => ({ ...contact, id: 0 }));
+      order.jobDistributions = order.jobDistributions.map((job) => ({ ...job, orderId: 0, id: 0 }));
+      order.workLocations = order.workLocations.map((workLocation) => ({ ...workLocation, id: 0 }));
+    }
 
     if (!order.hourlyRate) {
       order.hourlyRate = null;
@@ -472,21 +484,15 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private saveAsTemplate(): void {
-    const { selectedRegion, selectedLocation, selectedDepartment, selectedSkills } = this.orderDetailsFormComponent;
-    const requiredFields = [selectedRegion, selectedSkills, selectedDepartment, selectedLocation];
+    const { regionId, locationId, departmentId, skillId } =
+      this.orderDetailsFormComponent.generalInformationForm.getRawValue();
+    const requiredFields = [regionId, skillId, departmentId, locationId];
     const isRequiredFieldsFilled = !some(isNil, requiredFields);
 
     if (isRequiredFieldsFilled) {
       this.isSaveForTemplate = true;
     } else {
-      this.getOrderDetailsControl('regionId')?.markAllAsTouched();
-      this.getOrderDetailsControl('skillId')?.markAllAsTouched();
-      if (this.orderDetailsFormComponent.isLocationsDropDownEnabled) {
-        this.getOrderDetailsControl('locationId')?.markAllAsTouched();
-      }
-      if (this.orderDetailsFormComponent.isDepartmentsDropDownEnabled) {
-        this.getOrderDetailsControl('departmentId')?.markAllAsTouched();
-      }
+      this.markControlsAsRequired();
     }
   }
 
@@ -496,15 +502,30 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public createTemplate(event: { templateTitle: string }): void {
     const order = this.collectOrderData(false);
-    const title = order.title ?? event.templateTitle;
+    const { templateTitle } = event;
     const extendedOrder = {
-      ...order,
-      title: title,
-      templateTitle: title,
+      ...this.saveTemplateDialogService.resetOrderPropertyIds(order),
+      templateTitle,
       isTemplate: true,
     };
     const documents = this.orderDetailsFormComponent.documents;
     this.store.dispatch(new SaveOrder(extendedOrder, documents));
+    this.selectOrderTemplatesTab();
     this.closeSaveTemplateDialog();
+  }
+
+  private markControlsAsRequired(): void {
+    this.getOrderDetailsControl('regionId')?.markAsTouched();
+    this.getOrderDetailsControl('skillId')?.markAsTouched();
+    if (this.orderDetailsFormComponent.isLocationsDropDownEnabled) {
+      this.getOrderDetailsControl('locationId')?.markAsTouched();
+    }
+    if (this.orderDetailsFormComponent.isDepartmentsDropDownEnabled) {
+      this.getOrderDetailsControl('departmentId')?.markAsTouched();
+    }
+  }
+
+  private selectOrderTemplatesTab(): void {
+    this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.OrderTemplates));
   }
 }

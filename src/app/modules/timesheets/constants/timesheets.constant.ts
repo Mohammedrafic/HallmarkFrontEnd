@@ -1,24 +1,25 @@
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { ExportType, HourOccupationType, TIMETHEETS_STATUSES } from '../enums';
-import { CandidateHoursAndMilesData, TabConfig, TabCountConfig, Timesheet } from '../interface';
+import { CandidateHoursAndMilesData, TabConfig, TabCountConfig } from '../interface';
 
 
 export const TAB_ADMIN_TIMESHEETS: TabConfig[] = [
   {
     title: 'All Timesheets',
+    value: [],
   },
   {
     title: 'Pending Approval',
-    value: 2,
+    value: [2, 3],
   },
   {
     title: 'Missing',
-    value: 4,
+    value: [4],
   },
   {
     title: 'Rejected',
-    value: 5,
+    value: [5],
   }
 ];
 

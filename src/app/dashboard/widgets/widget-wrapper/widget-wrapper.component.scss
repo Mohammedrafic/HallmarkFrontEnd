@@ -1,4 +1,4 @@
-@import 'mixins';
+@import "mixins";
 
 $headerHeight: 19px;
 
@@ -14,7 +14,8 @@ $headerHeight: 19px;
   padding: 24px;
   box-sizing: border-box;
   --chartHeight: 100%;
-  @media screen and (max-width: 1700px){
+
+  @media screen and (max-width: 1700px) {
     padding-left: 16px;
   }
 
@@ -47,7 +48,12 @@ $headerHeight: 19px;
   }
 
   &__chart {
-    height: var(--chartHeight);
+    max-height: var(--chartHeight);
+  }
+
+  &__position-chat {
+    height: 100%;
+    margin-right: -16px;
   }
 
   &__legend {
@@ -63,5 +69,18 @@ $headerHeight: 19px;
     display: grid;
     height: 100%;
     place-items: center;
+  }
+
+  &__header {
+    &::ng-deep {
+      h3 {
+        @include with-ellipsis;
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #1a1b2e;
+        line-height: 16px;
+      }
+    }
   }
 }

@@ -116,7 +116,15 @@ export namespace TimesheetDetails {
   }
 
   export class FileLoaded {
-    static readonly type = '[timesheet details] file loaded';
+    static readonly type = '[file viewer] file loaded';
+
+    constructor(
+      public file: Blob,
+    ) {}
+  }
+
+  export class AttachmentLoaded {
+    static readonly type = '[timesheet details] attachment loaded';
 
     constructor(
       public file: Blob,
@@ -136,6 +144,7 @@ export namespace TimesheetDetails {
     static readonly type = TimesheetDetailsActions.NoWorkPerformed;
 
     constructor(
+      public noWorkPerformed: boolean,
       public timesheetId: number,
       public organizationId: number | null,
     ) {}

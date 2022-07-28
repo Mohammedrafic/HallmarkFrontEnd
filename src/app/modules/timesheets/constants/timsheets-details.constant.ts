@@ -33,6 +33,7 @@ const editableCostCenterDef: ColDef = {
   headerName: 'Cost center',
   ...commonColumn,
   width: 180,
+  filterValueGetter: (value) => {console.log(value); return value.data.costCenterFormattedName },
   cellRenderer: DropdownEditorComponent,
   type: 'rightAligned',
   cellRendererParams: {
@@ -50,7 +51,7 @@ const billRateColDef: ColDef = {
   cellClass: 'common-cell',
   width: 110,
   valueFormatter: (data) => {
-    if(!data.value) return 'ERROR'
+    if(!data.value) return '0'
     return valueHelper.formatCurrency(data.value)
   },
 };
@@ -71,7 +72,7 @@ const actionCol: ColDef = {
   headerName: '',
   type: 'rightAligned',
   resizable: false,
-  width: 40,
+  width: 60,
   cellRenderer: ActionsCellComponent,
   cellRendererParams: {
     editMode: true,
@@ -87,7 +88,7 @@ const totalCol: ColDef = {
   cellClass: 'common-cell',
   width: 140,
   valueFormatter: (data) => {
-    if(!data.value) return 'ERROR'
+    if(!data.value) return '0'
     return valueHelper.formatCurrency(data.value)
   },
 };
@@ -106,7 +107,7 @@ export const TimesheetRecordsColdef: ColDef[] = [
     field: 'timeIn',
     headerName: 'Time in',
     ...commonColumn,
-    width: 135,
+    width: 125,
     cellRenderer: GridDateEditorComponent,
     type: 'rightAligned',
     cellRendererParams: {
@@ -114,16 +115,12 @@ export const TimesheetRecordsColdef: ColDef[] = [
       isEditable: false,
       type: EditFieldTypes.Time,
     },
-    valueFormatter: (data) => {
-      if(!data.value) return 'ERROR'
-      return valueHelper.formatDate(data.value, 'HH:mm')
-    },
   },
   {
     field: 'timeOut',
     headerName: 'Time out',
     ...commonColumn,
-    width: 135,
+    width: 125,
     cellRenderer: GridDateEditorComponent,
     type: 'rightAligned',
     cellRendererParams: {
@@ -131,17 +128,14 @@ export const TimesheetRecordsColdef: ColDef[] = [
       isEditable: false,
       type: EditFieldTypes.DateTime,
     },
-    valueFormatter: (data) => {
-      if(!data.value) return 'ERROR'
-      return valueHelper.formatDate(data.value, 'HH:mm')
-    },
   },
   editableCostCenterDef,
   {
-    field: 'billRateId',
+    field: 'billRateConfigId',
     headerName: 'Bill rate type',
     ...commonColumn,
     width: 180,
+    filterValueGetter: (value) => { return value.data.billRateConfigName },
     cellRenderer: DropdownEditorComponent,
     type: 'rightAligned',
     cellRendererParams: {

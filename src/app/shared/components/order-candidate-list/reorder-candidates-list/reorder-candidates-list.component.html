@@ -52,12 +52,28 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="statusName" headerText="Status" textAlign="Left" width="150">
+      <e-column field="statusName" headerText="Status" textAlign="Left" width="180">
         <ng-template #template let-data>
           <div class="status-cell">
             <ejs-chiplist>
               <e-chips>
-                <e-chip [text]="data.statusName" [cssClass]="data.statusName | chipsCssClass"></e-chip>
+                <ng-container [ngSwitch]="data.status">
+                  <ng-container *ngSwitchCase="candidateStatuses.BillRatePending">
+                    <e-chip text="Bill Rate Pending" cssClass="e-pending"></e-chip>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="candidateStatuses.OfferedBR">
+                    <e-chip text="Offered B.R." cssClass="e-pending"></e-chip>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="candidateStatuses.Onboard">
+                    <e-chip [text]="data.statusName" cssClass="e-filled"></e-chip>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="candidateStatuses.Rejected">
+                    <e-chip [text]="data.statusName" cssClass="e-default"></e-chip>
+                  </ng-container>
+                  <ng-container *ngSwitchDefault>
+                    <!-- blank statuses -->
+                  </ng-container>
+                </ng-container>
               </e-chips>
             </ejs-chiplist>
           </div>
@@ -143,5 +159,10 @@
 
 <app-reorder-status-dialog
   [openEvent]="openDetails"
-  [templateState]="templateState$ | async"
+  [candidate]="candidate"
+  [isAgency]="isAgency"
+  [candidateJob]="candidateJob"
+  [dialogNextPreviousOption]="dialogNextPreviousOption"
+  (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-reorder-status-dialog>
+

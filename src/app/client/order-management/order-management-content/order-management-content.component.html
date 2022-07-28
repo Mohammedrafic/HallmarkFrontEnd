@@ -13,6 +13,7 @@
       </div>
     </button>
     <button
+      *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates"
       ejs-dropdownbutton
       [items]="exportOptions"
       (select)="exportSelected($event)"
@@ -54,7 +55,7 @@
           <div class="controls-header">
             <button
               ejs-button
-              cssClass="e-flat icon-button c"
+              cssClass="e-flat icon-button"
               *ngIf="!isSubrowDisplay; else onSubrowToggle"
               (click)="expandAll()"
             >
@@ -113,13 +114,17 @@
 
           <ng-template #templateButtons>
             <div class="row-tool-buttons" (click)="stopPropagation($event)">
-              <span><i-feather name="edit" class="icon edit-template"></i-feather></span>
-              <span class="remove-button"><i-feather name="trash-2" class="icon delete-template"></i-feather></span>
+              <i-feather name="trash-2" class="icon delete-template" (click)="deleteOrder(data?.id)"></i-feather>
             </div>
           </ng-template>
         </ng-template>
       </e-column>
-      <e-column field="id" headerText="ORDER ID" width="120">
+      <e-column field="id" width="120">
+        <ng-template #headerTemplate let-data>
+          <span class="e-headertext">
+            {{ activeTab !== OrganizationOrderManagementTabs.OrderTemplates ? 'ORDER ID' : 'TEMPLATE ID' }}
+          </span>
+        </ng-template>
         <ng-template #template let-data>
           <ng-container *ngIf="showReOrders ? !data.reOrders?.length : !data.children?.length; else withToggle">
             <div>
@@ -320,6 +325,7 @@
 ></app-export-dialog>
 
 <app-filter-dialog
+  *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
   (deleteFilter)="onFilterDelete($event)"
@@ -329,17 +335,10 @@
 >
   <form [formGroup]="OrderFilterFormGroup">
     <div class="bootstrap">
-      <div class="input-container" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders">
-        <label for="orderId">Order ID</label>
+      <div class="input-container">
+        <label for="orderId">{{ activeTab === OrganizationOrderManagementTabs.ReOrders ? 'Re-Order ID' : 'Order ID' }}</label>
         <div class="input-group">
           <input id="orderId" class="e-input" type="text" maxlength="50" formControlName="orderId" />
-        </div>
-      </div>
-
-      <div class="input-container" *ngIf="activeTab === OrganizationOrderManagementTabs.ReOrders">
-        <label for="reOrderId">Re-Order ID</label>
-        <div class="input-group">
-          <input id="reOrderId" class="e-input" type="text" maxlength="50" formControlName="reOrderId" />
         </div>
       </div>
     </div>
@@ -564,9 +563,97 @@
   </form>
 </app-filter-dialog>
 
+<app-filter-dialog
+  *ngIf="activeTab === OrganizationOrderManagementTabs.OrderTemplates"
+  [items]="filteredItems"
+  [count]="(ordersPage$ | async)?.totalCount"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
+  <form [formGroup]="OrderFilterFormGroup">
+    <div class="bootstrap">
+      <div class="input-container">
+        <label for="templateId">Template ID</label>
+        <div class="input-group">
+          <input id="templateId" class="e-input" type="text" maxlength="50" formControlName="orderId" />
+        </div>
+      </div>
+    </div>
+    <div class="row bootstrap">
+      <div class="input-container">
+        <label>Region</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="regionIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.regionIds.dataSource"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Location</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="locationIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.locationIds.dataSource"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Department</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="departmentsIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.departmentsIds.dataSource"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Skill</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="skillIds"
+            placeholder="All"
+            [fields]="skillsFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.skillIds.dataSource"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+  </form>
+</app-filter-dialog>
+
 <app-order-details-dialog
   #detailsDialog
   [order]="selectedOrder"
+  [children]="selectedDataRow?.children"
   [openEvent]="openDetails"
   (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid()"

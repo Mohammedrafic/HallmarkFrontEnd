@@ -15,6 +15,7 @@ import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { ExpandEventArgs, AccordionClickArgs } from '@syncfusion/ej2-navigations';
 import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
+import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 
 @Component({
   selector: 'app-apply-candidate',
@@ -85,7 +86,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
             candidateId: this.candidateId,
             candidateBillRate: value.candidateBillRate,
             expAsTravelers: value.expAsTravelers,
-            availableStartDate: value.availableStartDate,
+            availableStartDate: toCorrectTimezoneFormat(value.availableStartDate),
             requestComment: value.requestComment,
           })
         )

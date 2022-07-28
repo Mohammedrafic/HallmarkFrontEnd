@@ -1,21 +1,11 @@
 import { ActivatedRoute } from '@angular/router';
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Inject,
-  Input,
-  OnInit,
-  Output,
-  ViewChild
-} from '@angular/core';
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
+  Inject, Input, OnInit, Output, ViewChild } from '@angular/core';
 
 import { Select, Store } from '@ngxs/store';
 import {
-  filter,
-  takeUntil,
-  Observable,
+  filter, takeUntil, Observable,
 } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { tap } from 'rxjs/operators';
@@ -56,7 +46,7 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
 
   public formType: RecordFields = RecordFields.Time;
 
-  public readonly dropDownFields = {
+  public readonly dropDownFieldsConfig = {
     text: 'text',
     value: 'value',
   };
@@ -96,7 +86,7 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
       )
       .subscribe(() => {
         this.closeDialog();
-      })
+      });
     } else {
       this.closeDialog();
     }
@@ -106,11 +96,11 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
     return index;
   }
 
-  public saveForm(): void {
+  public saveRecord(): void {
     if (this.form.valid) {
       const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
-
       const body = RecordsAdapter.adaptRecordAddDto(this.form.value, organizationId, id, this.formType);
+
       this.store.dispatch(new TimesheetDetails.AddTimesheetRecord(body, this.isAgency));
       this.closeDialog();
     } else {
@@ -150,7 +140,11 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
   private populateOptions(): void {
     this.dialogConfig[this.formType].fields.forEach((item) => {
       if (item.optionsStateKey) {
-        item.options = this.store.snapshot().timesheets[item.optionsStateKey]
+        item.options = this.store.snapshot().timesheets[item.optionsStateKey];
+      }
+      
+      if (item.optionsStateKey === 'billRateTypes') {
+        item.options = item.options?.filter((rate) => rate.text !== 'Mileage' && rate.text !== 'Charge');
       }
     })
   }

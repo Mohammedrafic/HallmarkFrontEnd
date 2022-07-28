@@ -3,9 +3,9 @@ import { Router } from '@angular/router';
 import { Select, Store } from '@ngxs/store';
 import { filter, merge, Observable, Subject, takeUntil } from 'rxjs';
 
-import { Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
+import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { OrderManagementState } from '@agency/store/order-management.state';
-import { GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
+import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
@@ -17,12 +17,6 @@ import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate
   styleUrls: ['./order-per-diem-candidates-list.component.scss'],
 })
 export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateListComponent implements OnInit {
-  @Select(OrderManagementContentState.candidatesJob)
-  candidateJobOrganisationState$: Observable<OrderCandidateJob>;
-
-  @Select(OrderManagementState.candidatesJob)
-  candidateJobAgencyState$: Observable<OrderCandidateJob>;
-
   public templateState: Subject<any> = new Subject();
   public candidate: OrderCandidatesList;
   public candidateJob: OrderCandidateJob | null;
@@ -42,7 +36,7 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
 
     if (this.order && this.candidate) {
       if (this.isAgency) {
-        if ([ApplicantStatus.NotApplied].includes(this.candidate.status)) {
+        if ([ApplicantStatus.NotApplied, ApplicantStatus.Withdraw].includes(this.candidate.status)) {
           this.candidateJob = null;
           this.store.dispatch(
             new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId)
@@ -52,6 +46,7 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
         }
       } else {
         this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
+        this.store.dispatch(new GetAvailableSteps(this.order.organizationId, data.candidateJobId));
       }
       this.openDetails.next(true);
     }
@@ -74,5 +69,5 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
       pageSize: this.pageSize,
       excludeDeployed: false,
     });
-  };
+  }
 }

@@ -1,9 +1,9 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tabs-list
+    <app-timesheets-tabs
       [tabConfig]="tabConfig"
       (changeTab)="handleChangeTab($event)">
-    </app-tabs-list>
+    </app-timesheets-tabs>
   </ng-container>
   <ng-container right>
     <div *ngIf="isAgency" class="bootstrap">
@@ -42,11 +42,14 @@
     (changePerPage)="handleChangePerPage($event)"
     (timesheetRowSelected)="rowSelected($event)"
     (sortHandler)="sortHandler($event)"
+    (bulkApproveEmitter)="bulkApprove($event)"
+    (bulkExportEmitter)="bulkExport($event)"
   >
   </app-timesheets-table>
 </section>
 
 <app-timesheets-filter-dialog
+  [activeTabIdx]="activeTabIdx"
   (appliedFiltersAmount)="changeFiltersAmount($event)"
   (resetFilters)="resetFilters()"
   (updateTableByFilters)="updateTableByFilters($event)"

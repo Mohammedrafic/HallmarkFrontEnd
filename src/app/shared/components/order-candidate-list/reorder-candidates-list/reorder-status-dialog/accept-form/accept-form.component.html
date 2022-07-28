@@ -1,0 +1,108 @@
+<form [formGroup]="formGroup">
+  <div class="wrapper">
+    <div>
+      <div class="input-container bootstrap f-grow-2">
+        <label>Job ID</label>
+        <div class="input-group">
+          <input appValidateWithMessage formControlName="jobId" class="e-input" type="text" />
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="input-container bootstrap">
+        <label>Bill Rate</label>
+        <div class="input-group">
+          <input appValidateWithMessage formControlName="offeredBillRate" class="e-input" type="text" mask="00.00" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wrapper">
+    <div>
+      <div class="input-container bootstrap f-grow-2">
+        <label>Location</label>
+        <div class="input-group">
+          <input appValidateWithMessage formControlName="locationName" class="e-input" type="text" />
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="input-container bootstrap">
+        <label>Candidate Bill Rate</label>
+        <div class="input-group">
+          <input appValidateWithMessage formControlName="candidateBillRate" class="e-input" type="text" mask="00.00" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wrapper">
+    <div>
+      <div class="input-container bootstrap f-grow-2">
+        <label>Department</label>
+        <div class="input-group">
+          <input appValidateWithMessage formControlName="departmentName" class="e-input" type="text" />
+        </div>
+      </div>
+      <div class="input-container bootstrap f-grow-2">
+        <label>Skill</label>
+        <div class="input-group">
+          <input appValidateWithMessage formControlName="skillName" class="e-input" type="text" />
+        </div>
+      </div>
+      <div class="input-container bootstrap">
+        <label>Re-Order Date</label>
+        <div class="input-group datepicker">
+          <ejs-datepicker
+            id="startDate"
+            class="datepicker"
+            format="MM/dd/yyyy"
+            appValidateWithMessage
+            placeholder="MM/DD/YYYY"
+            [enableMask]="true"
+            [maskPlaceholder]="{ day: 'DD', month: 'MM', year: 'YYYY' }"
+            formControlName="orderOpenDate"
+          >
+          </ejs-datepicker>
+        </div>
+      </div>
+    </div>
+    <div></div>
+  </div>
+  <div class="wrapper cl-3">
+    <div class="input-container bootstrap">
+      <label>Shift Start Time</label>
+      <div class="input-group">
+        <ejs-timepicker
+          placeholder="HH:MM"
+          format="hh:mm a"
+          [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+          [enableMask]="true"
+          formControlName="shiftStartTime"
+          maskPlaceholder="HH:MM"
+        >
+        </ejs-timepicker>
+      </div>
+    </div>
+    <div class="input-container bootstrap">
+      <label>Shift End Time</label>
+      <div class="input-group">
+        <ejs-timepicker
+          placeholder="HH:MM"
+          format="hh:mm a"
+          [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+          [enableMask]="true"
+          formControlName="shiftEndTime"
+          maskPlaceholder="HH:MM"
+        >
+        </ejs-timepicker>
+      </div>
+    </div>
+    <div class="input-container bootstrap">
+      <label>Open Positions</label>
+      <div class="input-group">
+        <input appValidateWithMessage formControlName="openPositions" class="e-input" type="text" />
+      </div>
+    </div>
+  </div>
+</form>
+

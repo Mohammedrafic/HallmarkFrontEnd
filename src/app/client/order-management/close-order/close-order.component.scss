@@ -1,0 +1,19 @@
+@import "colors";
+
+.close-form {
+  margin-top: 34px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 12px;
+
+  .warning {
+    color: $supportive-red;
+    display: flex;
+    flex-direction: row;
+    i-feather {
+      margin-right: 5px;
+    }
+  }
+}
+
+

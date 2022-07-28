@@ -29,8 +29,9 @@ import { AvailableWidgetsResponseModel, WidgetOptionModel } from '../models/widg
 import { DashboardDataModel } from '../models/dashboard-data.model';
 import type { ApplicantsByRegionDataModel } from '../models/applicants-by-region-data.model';
 import type { WidgetsDataModel } from '../models/widgets-data.model';
-import { PositionTypeEnum } from '../enums/position-type.enum';
+import { PositionTrendTypeEnum } from '../enums/position-trend-type.enum';
 import type {
+  ITimeSlice,
   PositionByTypeDataModel,
   PositionsByTypeAggregatedModel,
 } from '../models/positions-by-type-aggregated.model';
@@ -48,20 +49,21 @@ import { candidateLegendPalette } from '../constants/candidate-legend-palette';
 import { CandidateChartStatuses } from '../enums/candidate-legend-palette.enum';
 import { Router } from '@angular/router';
 import { PositionTrend, PositionTrendDto } from '../models/position-trend.model';
+import { TimeSelectionEnum } from '../enums/time-selection.enum';
 
 @Injectable()
 export class DashboardService {
   private readonly baseUrl = '/api/Dashboard';
   private readonly widgetTypeToDataMapper: Record<
     WidgetTypeEnum,
-    (filters: DashboardFiltersModel) => Observable<unknown>
+    (filters: DashboardFiltersModel, timeSelection: TimeSelectionEnum) => Observable<unknown>
   > = {
     [WidgetTypeEnum.APPLICANTS_BY_REGION]: (filters: DashboardFiltersModel) => this.getApplicantsByRegionWidgetData(filters),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
     [WidgetTypeEnum.CANDIDATES]: (filters: DashboardFiltersModel) => this.getCandidatesWidgetData(filters),
     [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filters: DashboardFiltersModel) => this.getFilledPositionTrendWidgetData(filters),
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.InProgress),
-    [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboardFiltersModel) => this.getPositionsByTypes(filters),
+    [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboardFiltersModel, timeSelection: TimeSelectionEnum) => this.getPositionsByTypes(filters, timeSelection),
     [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
     [WidgetTypeEnum.OPEN_POSITIONS]: (filters,) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
     [WidgetTypeEnum.INVOICES]: () => this.getInvocesWidgetData(),
@@ -95,6 +97,7 @@ export class DashboardService {
   public getWidgetsAggregatedData([
     panels,
     filters,
+    timeSelection
   ]: WidgetDataDependenciesAggregatedModel): Observable<WidgetsDataModel> {
     const data: Record<WidgetTypeEnum, Observable<WidgetsDataModel[keyof WidgetsDataModel]>> = reduce(
       panels,
@@ -103,7 +106,7 @@ export class DashboardService {
         panel: PanelModel
       ) => ({
         ...accumulator,
-        [panel.id as WidgetTypeEnum]: this.widgetTypeToDataMapper[panel.id as WidgetTypeEnum]?.(filters) ?? of(null),
+        [panel.id as WidgetTypeEnum]: this.widgetTypeToDataMapper[panel.id as WidgetTypeEnum]?.(filters, timeSelection) ?? of(null),
       }),
       {}
     ) as Record<WidgetTypeEnum, Observable<WidgetsDataModel[keyof WidgetsDataModel]>>;
@@ -193,37 +196,54 @@ export class DashboardService {
       .pipe(map((panels) => JSON.parse(panels.state)));
   }
 
-  private getPositionsByTypes(filter: DashboardFiltersModel): Observable<PositionsByTypeAggregatedModel> {
-    const timeRanges = this.calculateTimeRanges();
+  private getPositionsByTypes(filter: DashboardFiltersModel, timeSelection: TimeSelectionEnum): Observable<PositionsByTypeAggregatedModel> {
+    const timeRanges = this.calculateTimeRanges(timeSelection);
     return this.httpClient
-      .post<PositionsByTypeResponseModel>(`${this.baseUrl}/getopenclosedonboardamount`, { ...timeRanges, ...filter })
+      .post<PositionsByTypeResponseModel>(`${this.baseUrl}/getopenclosedonboardamount`, { ...timeRanges, ...filter, rangeType: timeSelection})
       .pipe(
         map((positions: PositionsByTypeResponseModel) => {
           return {
-            [PositionTypeEnum.OPEN]: this.convertDtoToPositionTypes(positions.openJobs),
-            [PositionTypeEnum.ONBOARD]: this.convertDtoToPositionTypes(positions.onboardCandidates),
-            [PositionTypeEnum.CLOSED]: this.convertDtoToPositionTypes(positions.closedJobs),
+            [PositionTrendTypeEnum.OPEN]: this.convertDtoToPositionTypes(positions.openJobs, timeSelection),
+            [PositionTrendTypeEnum.ONBOARD]: this.convertDtoToPositionTypes(positions.onboardCandidates, timeSelection),
+            [PositionTrendTypeEnum.CLOSED]: this.convertDtoToPositionTypes(positions.closedJobs, timeSelection),
+            [PositionTrendTypeEnum.IN_PROGRESS]: this.convertDtoToPositionTypes(positions.inProgressJobs, timeSelection),
           };
         })
       );
   }
 
-  private calculateTimeRanges(): { startDate: string; endDate: string } {
+  private convertDtoToPositionTypes(data: PositionByTypeDto[], timeSelection: TimeSelectionEnum): PositionByTypeDataModel[] {
+    return data.map(({ dateIndex, value }: PositionByTypeDto) => ({
+      month: timeSelection === TimeSelectionEnum.Monthly ? MONTHS[dateIndex] : `W${dateIndex}`,
+      value,
+    }));
+  }
+
+  private getWeeksTimeRanges(week: number): ITimeSlice {
+    const numberWeek = week * 7;
+    const today = new Date();
+    const dateFrom = this.getDateAsISOString(new Date(today.getFullYear(), today.getMonth(), today.getDate() - numberWeek).getTime());
+    const dateTo = this.getDateAsISOString(new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime());
+    return {dateFrom, dateTo};
+  }
+
+  private getMonthTimeRanges(month: number): ITimeSlice{
     const date = new Date();
-    const startDate = this.getDateAsISOString(date.setMonth(date.getMonth() - 3));
-    const endDate = this.getDateAsISOString(date.setMonth(date.getMonth() + 6));
-    return { startDate, endDate };
+    const dateFrom = this.getDateAsISOString(date.setMonth(date.getMonth() - month + 1));
+    const dateTo = this.getDateAsISOString(date.setMonth(date.getMonth() + month));
+    return { dateFrom, dateTo };
+  }
+
+  private calculateTimeRanges(timeSelection: TimeSelectionEnum) {
+    if(timeSelection === TimeSelectionEnum.Weekly) {
+      return this.getWeeksTimeRanges(6);
+    } else {
+      return this.getMonthTimeRanges(6);
+    }  
   }
 
   private getDateAsISOString(timestamp: number): string {
     return new Date(timestamp).toISOString();
-  }
-
-  private convertDtoToPositionTypes(data: PositionByTypeDto[]): PositionByTypeDataModel[] {
-    return data.map(({ month, value }: PositionByTypeDto) => ({
-      month: MONTHS[month],
-      value,
-    }));
   }
 
   private getOrderPositionWidgetData(filter: DashboardFiltersModel, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {

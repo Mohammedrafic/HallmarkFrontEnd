@@ -14,7 +14,7 @@
     <div class="data">{{reOrder.positions || reOrder.numberOfPositions}} / {{reOrder.openPositions || reOrder.numberOfOpenPositions}}</div>
     <div class="title">Open Positions</div>
   </div>
-  <div class="info" *ngIf="!hideAgency">
+  <div class="info agency-name" *ngIf="!hideAgency">
     <ejs-tooltip
       *ngIf="tooltip"
       [content]="tooltip"
@@ -25,20 +25,20 @@
     <div *ngIf="!tooltip" class="data">{{agencyLabel}}</div>
     <div class="title">Agency Name</div>
   </div>
-  <div class="info">
+  <div class="info general-info">
     <div class="data"> {{order.billRate | billRate: reOrder.billRate: reOrder.status: reOrder.billRate}}</div>
     <div class="title">Bill Rate $</div>
   </div>
-  <div class="info">
+  <div class="info general-info">
     <div class="data">{{reOrder.jobStartDate || reOrder.startDate | date: 'MM/dd/yyy'}}</div>
     <div class="title">Re-Order Date</div>
   </div>
-  <div class="info">
+  <div class="info general-info">
     <div class="data">{{reOrder.shiftStartTime | date: 'HH:mm'}}-{{reOrder.shiftEndTime | date: 'HH:mm'}}</div>
     <div class="title">Re-Order Shift</div>
   </div>
   <div class="info">
-    <div class="data">{{reOrder.candidates || reOrder.candidatesCount}}</div>
+    <div class="data">{{reOrder.candidates || reOrder.candidatesCount || 0}}</div>
     <div class="title">Candidates</div>
   </div>
 </div>

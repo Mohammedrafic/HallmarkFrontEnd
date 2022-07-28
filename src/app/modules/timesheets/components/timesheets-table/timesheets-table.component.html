@@ -1,9 +1,10 @@
 <app-grid
+  [class.inactive]="!tableData?.items?.length"
   (gridReadyEmitter)="gridReady($event)"
   (navigateToPageEmitter)="onGoToClick($event)"
   (pageSizeChangeEmitter)="onRowsDropDownChanged($event)"
-  (approveEmitter)="bulkApprove($event)"
-  (exportEmitter)="bulkExport($event)"
+  (approveEmitter)="bulkApproveEmitter.emit($event)"
+  (exportEmitter)="bulkExportEmitter.emit($event)"
   (gridSelectedRow)="selectedRow($event)"
   (sortChanged)="sortHandler.emit($event)"
   [suppressRowClickSelection]="false"
@@ -16,5 +17,6 @@
   [totalRecordsCount]="tableData?.totalCount || 0"
   [changeTableSelectedIndex]="newSelectedIndex"
   [allowBulkSelection]="true"
+  [allowBulkButton]="!isAgency"
 >
 </app-grid>

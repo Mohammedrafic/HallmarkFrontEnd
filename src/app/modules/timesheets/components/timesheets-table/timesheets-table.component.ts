@@ -17,6 +17,7 @@ import { TimesheetsColumnsDefinition } from '../../constants';
 import { BehaviorSubject } from 'rxjs';
 import { GridReadyEventModel } from '@shared/components/grid/models/grid-ready-event.model';
 import { TimesheetsTableColumns } from '../../enums';
+import { logBase } from '@syncfusion/ej2-angular-charts';
 
 @Component({
   selector: 'app-timesheets-table',
@@ -39,11 +40,16 @@ export class TimesheetsTableComponent implements OnChanges {
   @Output() readonly timesheetRowSelected: EventEmitter<TimesheetsSelectedRowEvent>
   = new EventEmitter<TimesheetsSelectedRowEvent>();
 
+  @Output() readonly bulkApproveEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
+
+  @Output() readonly bulkExportEmitter: EventEmitter<RowNode[]> = new EventEmitter<RowNode[]>();
+
   public readonly columnDefinitions: ColumnDefinitionModel[] =
     TimesheetsColumnsDefinition(this.router.url.includes('agency'));
   public currentPage = 1;
   public pageSize = 30;
   public isLoading = false;
+  public isAgency = false;
   public rowSelection: 'single' | 'multiple' = 'multiple';
 
   private readonly gridInstance$: BehaviorSubject<GridReadyEventModel | null> =
@@ -51,11 +57,13 @@ export class TimesheetsTableComponent implements OnChanges {
 
   constructor(
     private router: Router,
-  ) {}
+  ) {
+    this.isAgency = this.router.url.includes('agency');
+  }
 
   ngOnChanges(): void {
-    this.gridInstance$.getValue()?.columnApi
-      .setColumnVisible(TimesheetsTableColumns.Approve, this.activeTabIdx === 1);
+    this.columnVisibility();
+    this.resetSelectedRows();
   }
 
   public onRowsDropDownChanged(pageSize: number): void {
@@ -72,13 +80,21 @@ export class TimesheetsTableComponent implements OnChanges {
     this.timesheetRowSelected.emit(event);
   }
 
-  public bulkApprove(event: RowNode[]): void {
-  }
-
-  public bulkExport(event: RowNode[]): void {
-  }
-
   public gridReady(event: GridReadyEventModel): void {
     this.gridInstance$.next(event);
+  }
+
+  private resetSelectedRows(): void {
+    this.gridInstance$.getValue()?.api.forEachNode((node) => {
+      node.setSelected(false);
+    });
+  }
+
+  private columnVisibility(): void {
+    this.gridInstance$.getValue()?.columnApi
+      .setColumnVisible(
+        TimesheetsTableColumns.Approve,
+        !this.isAgency && this.activeTabIdx === 1
+      );
   }
 }

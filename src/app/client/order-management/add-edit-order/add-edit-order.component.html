@@ -87,7 +87,7 @@
 
 <app-save-template-dialog
   *ngIf="isSaveForTemplate"
-  [templateTitle]="jobTitle"
+  [order]="generalInformationForm"
   (closeEmitter)="closeSaveTemplateDialog()"
   (createEmitter)="createTemplate($event)"
 ></app-save-template-dialog>

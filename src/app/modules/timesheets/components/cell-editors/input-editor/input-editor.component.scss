@@ -16,3 +16,10 @@
     border-bottom: none;
   }
 }
+
+.init-value {
+  width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: inline-block;
+}

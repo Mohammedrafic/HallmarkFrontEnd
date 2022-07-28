@@ -20,17 +20,17 @@ export enum OrderTypeName {
 }
 
 export const allOrdersColumnsToExport: ExportColumn[] = [
-  { text: 'Order ID', column: 'Id' },
-  { text: 'Status', column: 'StatusText' },
+  { text: 'Order ID', column: 'OrderId' },
+  { text: 'Status', column: 'Status' },
   { text: 'Job Title', column: 'JobTitle' },
-  { text: 'Skill', column: 'SkillName' },
-  { text: '# of Positions', column: 'OpenPositions' },
-  { text: 'Location', column: 'LocationName' },
-  { text: 'Department', column: 'DepartmentName' },
+  { text: 'Skill', column: 'Skill' },
+  { text: '# of Positions', column: 'NumberOfPositions' },
+  { text: 'Location', column: 'Location' },
+  { text: 'Department', column: 'Department' },
   { text: 'Type', column: 'OrderType' },
   { text: 'Bill Rate', column: 'BillRate' },
-  { text: 'Candidates', column: 'Candidates' },
-  { text: 'Start Date', column: 'StartDate' },
+  { text: 'Candidates', column: 'CandidatesCount' },
+  { text: 'Start Date', column: 'JobStartDate' },
 ];
 
 export const perDiemColumnsToExport: ExportColumn[] = [
@@ -66,6 +66,28 @@ export const reOrdersChildColumnToExport: ExportColumn[] = [
   { text: 'Candidate Status', column: 'CandidateStatus' },
   { text: 'Submission', column: 'Submission' },
   { text: 'Onboarded', column: 'Onboarded' },
+];
+
+export const allOrdersChildColumnsToExport: ExportColumn[] = [
+  { text: 'Position ID', column: 'PositionID' },
+  { text: 'Candidate Name', column: 'CandidateName' },
+  { text: 'Position Status', column: 'PositionStatus' },
+  { text: 'Candidate Status', column: 'CandidateStatus' },
+  { text: 'Candidate Bill Rate', column: 'CandidateBillRate' },
+  { text: 'Submission %', column: 'Submission' },
+  { text: 'Onboard %', column: 'Onboard' },
+];
+
+export const perDiemChildColumnsToExport: ExportColumn[] = [
+  { text: 'Re-Order ID', column: 'ReOrders.Id' },
+  { text: 'Re-Order Status', column: 'ReOrders.Status' },
+  { text: 'Open Positions', column: 'ReOrders.OpenPositions' },
+  { text: 'Agencies', column: 'ReOrders.Agencies' },
+  { text: 'Re-Order Bill Rate', column: 'ReOrders.BillRate' },
+  { text: 'Re-Order Date', column: 'ReOrders.StartDate' },
+  { text: 'Re-Order Shift Start Time', column: 'ReOrders.ShiftStartTime' },
+  { text: 'Re-Order Shift End Time', column: 'ReOrders.ShiftEndTime' },
+  { text: 'Candidates', column: 'ReOrders.Candidates' },
 ];
 
 export const ReOrdersColumnsConfig = [
@@ -229,14 +251,6 @@ export const PerDiemColumnsConfig = [
   },
   {
     fieldName: 'jobTitle',
-    visible: true,
-  },
-  {
-    fieldName: 'openPositions',
-    visible: true,
-  },
-  {
-    fieldName: 'billRate',
     visible: true,
   },
   {

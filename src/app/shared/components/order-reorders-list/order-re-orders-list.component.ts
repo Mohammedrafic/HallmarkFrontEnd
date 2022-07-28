@@ -2,8 +2,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
 import { Store } from "@ngxs/store";
 import { debounceTime, Subject } from "rxjs";
-import { AgencyOrderManagement, Order, OrderManagement, ReOrder } from "@shared/models/order-management.model";
-import { Router } from "@angular/router";
+import { AgencyOrderManagement, Order, OrderManagement, ReOrder } from '@shared/models/order-management.model';
+import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 
 @Component({
   selector: 'app-order-reorders-list',
@@ -20,8 +20,9 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
   @Input() isAgency: boolean = false;
   @Input() order: Order | OrderManagement | AgencyOrderManagement;
   @Output() selectReOrder = new EventEmitter<{ reOrder: OrderManagement | AgencyOrderManagement, order: Order | OrderManagement | AgencyOrderManagement }>()
+  @Output() editReorder = new EventEmitter();
 
-  constructor(private store: Store, private router: Router) {
+  constructor(private store: Store, private orderManagementService: OrderManagementContentService) {
     super();
   }
 
@@ -51,7 +52,6 @@ export class OrderReOrdersListComponent extends AbstractGridConfigurationCompone
   }
 
   edit(order: OrderManagement): void {
-    const parentRoute = this.isAgency ? 'agency' : 'client';
-    this.router.navigate([`${parentRoute}/order-management/edit/${order?.id}`])
+    this.orderManagementService.getOrderById(order.id).subscribe(order => this.editReorder.emit(order));
   }
 }

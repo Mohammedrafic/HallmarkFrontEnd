@@ -26,4 +26,6 @@ export const gridConfig = {
   resizeSettings: { mode: 'Auto' } as ResizeSettingsModel,
   allowSorting: true,
   allowResizing: true,
+  enableVirtualization: true,
+  height: 185,
 };

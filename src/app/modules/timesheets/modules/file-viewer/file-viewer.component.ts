@@ -1,34 +1,40 @@
-import { ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { PdfViewerComponent } from '@syncfusion/ej2-angular-pdfviewer';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import {
+  MagnificationService,
+  NavigationService,
+  PdfViewerComponent,
+  TextSelectionService,
+  ToolbarService
+} from '@syncfusion/ej2-angular-pdfviewer';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
 import { FileViewer } from './file-viewer.actions';
-import { debounceTime } from 'rxjs';
+import { Observable, of, switchMap, takeUntil, tap } from 'rxjs';
+import { Destroyable } from '@core/helpers';
+import { downloadBlobFile } from '@shared/utils/file.utils';
+import { ObservableHelper } from '@core/helpers/observable.helper';
+import { FileHelper } from '@core/helpers/file.helper';
 
 @Component({
   selector: 'app-file-viewer',
   templateUrl: './file-viewer.component.html',
-  styleUrls: ['./file-viewer.component.scss']
+  styleUrls: ['./file-viewer.component.scss'],
+  providers: [ToolbarService, NavigationService, TextSelectionService, MagnificationService],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FileViewerComponent implements OnInit {
-  private _fileData: unknown;
-
+export class FileViewerComponent extends Destroyable implements OnInit {
   @ViewChild('pdfViewer')
   public readonly pdfViewerControl: PdfViewerComponent;
 
   @ViewChild('sideDialog')
   public readonly sideDialog: DialogComponent;
 
-  @Input()
-  public visible: boolean = false;
-
   public isFullScreen: boolean;
   public width = `${window.innerWidth * 0.6}px`;
   public imageSrs = '';
-  public imageMode = false;
-  public isDownloading: boolean = false;
-  public base64Data: string;
-  public openEvent: FileViewer.Open | null = null;
+  public isImage: boolean = false;
+  public fileName: string;
+  public getOriginalFile: (() => Observable<Blob>) | null;
 
   public readonly service = 'https://ej2services.syncfusion.com/production/web-services/api/pdfviewer';
 
@@ -37,25 +43,35 @@ export class FileViewerComponent implements OnInit {
     private actions$: Actions,
     private cdr: ChangeDetectorRef,
   ) {
+    super();
   }
 
   public ngOnInit(): void {
     this.actions$.pipe(
       ofActionSuccessful(FileViewer.Open),
-    ).subscribe((openEvent: FileViewer.Open) => {
-      const reader = new FileReader();
+      takeUntil(this.componentDestroy()),
+      switchMap(({ payload: { fileName, getPDF, getOriginal } }: FileViewer.Open) => {
+        this.fileName = fileName;
+        this.getOriginalFile = getOriginal;
+        this.sideDialog?.show();
 
-      this.sideDialog.show();
-      this.imageMode = isBlobImage(openEvent.blob);
-      this.openEvent = openEvent;
+        const image: boolean = this.isImage = FileHelper.isImage(fileName);
 
-      reader.onloadend = () => {
-        this.base64Data = reader.result as string;
-        this.pdfViewerControl?.load(this.base64Data, '');
-      }
+        const pdfObs = getPDF?.().pipe(
+          switchMap((file: Blob) => ObservableHelper.blobToBase64Observable(file)),
+          tap((base64Str: string) => this.pdfViewerControl?.load(base64Str, '')),
+        );
 
-      reader.readAsDataURL(openEvent.blob);
-    });
+        const originalObs = getOriginal?.().pipe(
+          switchMap((file: Blob) => ObservableHelper.blobToBase64Observable(file)),
+          tap((base64Str: string) => this.imageSrs = base64Str),
+        );
+
+        return (image ? originalObs : pdfObs) || of(null);
+      })
+    ).subscribe(
+      () => this.cdr.markForCheck()
+    );
   }
 
   public resizeDialog(): void {
@@ -66,17 +82,16 @@ export class FileViewerComponent implements OnInit {
   public onCancel(): void {
     this.sideDialog.hide();
     this.isFullScreen = false;
-    // this.pdfViewerControl?.unload();
-    // this.previewFile = null;
-    // this.data = [];
+    this.pdfViewerControl?.unload();
+    this.isImage = false;
   }
 
   public downloadFile(): void {
-    this.isDownloading = true;
-    // this.getOriginalFileById((this.previewFile as ListBoxItem).id);
+    this.getOriginalFile?.()
+      .pipe(
+        takeUntil(this.componentDestroy())
+      )
+      .subscribe((file: Blob) => downloadBlobFile(file, this.fileName));
   }
 }
 
-function isBlobImage(file: Blob): boolean {
-  return file?.type ? file.type.includes('image/') : false;
-}

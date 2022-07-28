@@ -22,7 +22,7 @@ export class GetAgencyOrderCandidatesList {
     public organizationId: number,
     public pageNumber: number,
     public pageSize: number,
-    public excludeDeployed?: boolean,
+    public excludeDeployed?: boolean
   ) {}
 }
 
@@ -87,14 +87,29 @@ export class GetOrganizationStructure {
 }
 export class ExportAgencyOrders {
   static readonly type = '[order management] Export Agency Orders list';
-  constructor(public payload: ExportPayload, public tab: AgencyOrderManagementTabs) { }
+  constructor(public payload: ExportPayload, public tab: AgencyOrderManagementTabs) {}
 }
 
-
 export class GetCandidatesBasicInfo {
-  static readonly type = '[order management] Get Candidates Basic Info'
-  constructor(
-    public organizationId: number,
-    public jobId: number
-  ) {}
+  static readonly type = '[order management] Get Candidates Basic Info';
+  constructor(public organizationId: number, public jobId: number) {}
+}
+
+export class SetOrdersTab {
+  static readonly type = '[order management] Set Orders Type';
+  constructor(public tabName: AgencyOrderManagementTabs) {}
+}
+
+export class ClearOrders {
+  static readonly type = '[agency order management] Clear Orders';
+  constructor() {}
+}
+
+export class GetAgencyHistoricalData {
+  static readonly type = '[agency order management] Get Historical Data';
+  constructor(public organizationId: number, public candidateJobId: number) {}
+}
+
+export class ClearAgencyHistoricalData {
+  static readonly type = '[agency order management] Clear Historical Data';
 }
