@@ -254,10 +254,6 @@ export const PerDiemColumnsConfig = [
     visible: true,
   },
   {
-    fieldName: 'billRate',
-    visible: true,
-  },
-  {
     fieldName: 'candidates',
     visible: true,
   },
