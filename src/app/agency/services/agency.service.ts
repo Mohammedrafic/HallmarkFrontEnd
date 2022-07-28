@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Agency, AgencyPage } from 'src/app/shared/models/agency.model';
+import { Agency, AgencyFilteringOptions, AgencyPage } from 'src/app/shared/models/agency.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({
@@ -69,5 +69,9 @@ export class AgencyService {
    */
   public export(payload: ExportPayload): Observable<Blob> {
     return this.http.post(`/api/Agency/export`, payload, { responseType: 'blob' });
+  }
+
+  public getAgencyFilteringOptions(): Observable<AgencyFilteringOptions> {
+    return this.http.get<AgencyFilteringOptions>(`/api/Agency/filteringOptions`);
   }
 }

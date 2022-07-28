@@ -6,7 +6,8 @@ import { AgencyState } from 'src/app/agency/store/agency.state';
 
 import { CanadaStates, Country, UsaStates } from 'src/app/shared/enums/states';
 import { AgencyStatus } from "src/app/shared/enums/status";
-import { valuesOnly } from 'src/app/shared/utils/enum.utils';
+
+import { agencyStatusOptions } from "../../agency-list.constants";
 
 @Component({
   selector: 'app-general-info-group',
@@ -22,9 +23,7 @@ export class GeneralInfoGroupComponent implements OnInit, OnDestroy {
     { id: Country.Canada, text: Country[1] },
   ];
   public states$ = new Subject();
-  public statuses = Object.values(AgencyStatus)
-    .filter(valuesOnly)
-    .map((text, id) => ({ text, id }));
+  public statuses = agencyStatusOptions;
   public optionFields = {
     text: 'text',
     value: 'id',
