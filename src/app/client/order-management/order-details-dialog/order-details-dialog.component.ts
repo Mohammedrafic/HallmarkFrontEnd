@@ -13,10 +13,10 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
+import { Order, OrderCandidatesListPage, OrderManagement, OrderManagementChild } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ApproveOrder, DeleteOrder, SetLock } from '@client/store/order-managment-content.actions';
+import { ApproveOrder, DeleteOrder, GetOrderById, GetOrders, SetLock } from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_ORDER_CONFIRM_TEXT, CANCEL_ORDER_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, } from '@shared/constants';
 import { Location } from '@angular/common';
@@ -37,6 +37,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
   @Output() selectReOrder = new EventEmitter<any>();
+  @Output() updateOrders = new EventEmitter();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
@@ -245,5 +246,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           (candidate) => candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
         ).length;
     });
+  }
+
+  updateOrderDetails(order: Order | OrderManagement): void {
+    this.store.dispatch(new GetOrderById(order.id, order.organizationId as number));
+    this.updateOrders.emit();
   }
 }

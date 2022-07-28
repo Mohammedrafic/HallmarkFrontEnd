@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
 
@@ -61,8 +61,12 @@ export class RejectReasonService {
    * @param pageSize
    * @param orderBy
    */
-   public getClosureReasonsByPage(pageNumber: number, pageSize: number, orderBy: string): Observable<RejectReasonPage> {
-    return this.http.get<RejectReasonPage>(`/api/orderclosurereasons`, { params: { pageNumber: pageNumber, pageSize: pageSize, orderBy: orderBy } });
+   public getClosureReasonsByPage(pageNumber?: number, pageSize?: number, orderBy?: string, getAll?: boolean): Observable<RejectReasonPage> {
+     const params = this.getCloseReasonsParams(pageNumber, pageSize, orderBy, getAll);
+
+    return this.http.get<RejectReasonPage>(`/api/orderclosurereasons`,
+      { params }
+    );
   }
 
   /**
@@ -72,5 +76,15 @@ export class RejectReasonService {
   public saveClosureReasons(payload: RejectReason): Observable<RejectReason> {
     payload.id = payload.id || 0;
     return this.http.put<RejectReason>('/api/orderclosurereasons', payload);
+  }
+
+  private getCloseReasonsParams(pageNumber?: number, pageSize?: number, orderBy?: string, getAll?: boolean): HttpParams {
+    let params = {};
+    if (pageNumber) params = {...params, pageNumber};
+    if (pageSize) params = {...params, pageSize};
+    if (orderBy) params = {...params, orderBy};
+    if (getAll) params = {...params, getAll};
+
+    return <HttpParams>params;
   }
 }

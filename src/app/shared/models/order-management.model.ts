@@ -42,6 +42,7 @@ export class OrderManagement {
   positions?: number;
   agencies?: string[] | null;
   allAgencies?: boolean;
+  jobStartDate?: Date;
 }
 
 export class OrderManagementFilter {
@@ -164,6 +165,7 @@ export type AgencyOrder = {
   orderId: number;
   organizationId: number;
   isLocked: boolean;
+  isClosed?: boolean;
 };
 
 export class SuggestedDetails {
@@ -261,8 +263,9 @@ export class Order {
   reOrderId?: number;
   orderId?: number;
   candidates?: CandidateModel[];
-  reasonForClosing?: string;
-  closingDate?: string;
+  orderCloseDate?: string;
+  orderClosureReason?: string;
+  orderClosureReasonId?: string;
   isTemplate?: boolean;
 }
 

@@ -33,8 +33,9 @@
               <div class="vertical-divider"></div>
             </div>
 
-            <button ejs-button cssClass="e-outline edit-button" (click)="editOrder(order)"><i-feather name="edit" class="icon"></i-feather></button>
+            <button ejs-button cssClass="e-outline edit-button" [disabled]="!!order?.orderClosureReason" (click)="editOrder(order)"><i-feather name="edit" class="icon"></i-feather></button>
             <button ejs-button cssClass="e-outline"
+                    *ngIf="!order?.orderClosureReason"
                     [disabled]="disabledCloseButton"
                     (click)="closeOrder(order)">
               Close Order
@@ -100,7 +101,7 @@
             </e-tabitem>
           </e-tabitems>
         </ejs-tab>
-        <app-close-order [order]="order"></app-close-order>
+        <app-close-order [order]="order" (closeOrderSuccess)="updateOrderDetails($event)"></app-close-order>
         <app-add-edit-reorder
           [order]="reOrderToEdit || order"
           (saveEmitter)="saveReOrder()"

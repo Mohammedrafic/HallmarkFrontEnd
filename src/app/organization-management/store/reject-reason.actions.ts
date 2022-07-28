@@ -44,7 +44,7 @@ export class RemoveClosureReasons {
 
 export class GetClosureReasonsByPage {
   static readonly type = '[reject reason] Get Closure reason by Page';
-  constructor(public pageNumber: number, public pageSize: number, public orderBy: string) { }
+  constructor(public pageNumber?: number, public pageSize?: number, public orderBy?: string, public getAll?: boolean) { }
 }
 
 export class SaveClosureReasons {

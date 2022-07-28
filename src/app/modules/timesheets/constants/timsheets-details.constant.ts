@@ -33,7 +33,7 @@ const editableCostCenterDef: ColDef = {
   headerName: 'Cost center',
   ...commonColumn,
   width: 180,
-  filterValueGetter: (value) => {console.log(value); return value.data.costCenterFormattedName },
+  filterValueGetter: (value) => value.data.costCenterFormattedName,
   cellRenderer: DropdownEditorComponent,
   type: 'rightAligned',
   cellRendererParams: {

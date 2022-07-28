@@ -320,7 +320,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
   }
 
-  private getOrders(): void {
+  public getOrders(): void {
     this.filters.orderBy = this.orderBy;
     this.filters.orderId ? this.filters.orderId : null;
     this.filters.jobStartDate ? this.filters.jobStartDate : null;
