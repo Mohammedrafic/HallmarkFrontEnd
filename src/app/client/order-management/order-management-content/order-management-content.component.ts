@@ -120,7 +120,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
   public wrapSettings: TextWrapSettingsModel = ORDERS_GRID_CONFIG.wordWrapSettings;
   public isLockMenuButtonsShown = true;
-  public showReOrders = false;
   public moreMenuWithDeleteButton: ItemModel[] = [
     { text: MoreMenuType[0], id: '0' },
     { text: MoreMenuType[1], id: '1' },
@@ -177,6 +176,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public OrganizationOrderManagementTabs = OrganizationOrderManagementTabs;
   public orderStatus = OrderStatus;
   public reOrderCount$ = new Subject<number>();
+  public orderTypes = OrderType;
 
   private selectedIndex: number | null;
   private ordersPage: OrderManagementPage;
@@ -335,6 +335,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     switch (this.activeTab) {
       case OrganizationOrderManagementTabs.AllOrders:
         this.filters.isTemplate = false;
+        this.filters.includeReOrders = true;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.PerDiem:
@@ -621,30 +622,25 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     switch (tabIndex) {
       case OrganizationOrderManagementTabs.AllOrders:
-        this.showReOrders = false;
         this.isLockMenuButtonsShown = true;
         this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
         this.getOrders();
         break;
       case OrganizationOrderManagementTabs.PerDiem:
-        this.showReOrders = true;
         this.isLockMenuButtonsShown = true;
         this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
         this.getOrders();
         break;
       case OrganizationOrderManagementTabs.ReOrders:
-        this.showReOrders = false;
         this.isLockMenuButtonsShown = false;
         this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
         this.getOrders();
         break;
       case OrganizationOrderManagementTabs.OrderTemplates:
-        this.showReOrders = false;
         this.refreshGridColumns(orderTemplateColumnsConfig, this.gridWithChildRow);
         this.getOrders();
         break;
       case OrganizationOrderManagementTabs.Incomplete:
-        this.showReOrders = false;
         this.isLockMenuButtonsShown = false;
         this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
         this.store.dispatch(new GetIncompleteOrders({}));
