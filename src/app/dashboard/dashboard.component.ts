@@ -95,7 +95,7 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   private getAdminOrganizationsStructureAll(): void {
     const user = this.store.selectSnapshot(UserState.user);
     this.userIsAdmin = user?.businessUnitType === BusinessUnitType.MSP || user?.businessUnitType === BusinessUnitType.Hallmark;
-    if(user) {
+    if(user && this.userIsAdmin) {
       this.store.dispatch(new GetOrganizationsStructureAll(user.id));
     }
   }
