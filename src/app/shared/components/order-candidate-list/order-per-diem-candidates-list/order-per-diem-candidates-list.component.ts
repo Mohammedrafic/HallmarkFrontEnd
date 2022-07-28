@@ -1,12 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
-import { filter, merge, Observable, Subject, takeUntil } from 'rxjs';
+import { Store } from '@ngxs/store';
+import { filter, merge, Subject, takeUntil } from 'rxjs';
 
 import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
-import { OrderManagementState } from '@agency/store/order-management.state';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
-import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';

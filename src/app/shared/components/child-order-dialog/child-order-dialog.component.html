@@ -23,6 +23,7 @@
           </div>
           <div class="e-card-content dialog-controls">
             <button ejs-button cssClass="e-outline"
+                    *ngIf="!isAgency"
                     [disabled]="disabledCloseButton"
                     (click)="closeOrder(order)">
               Close Position
@@ -44,7 +45,7 @@
                       <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
                     </section>
                     <hr />
-                    <ng-container *ngIf="currentOrder?.reasonForClosing">
+                    <ng-container *ngIf="currentOrder?.orderClosureReason">
                       <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
                       <hr />
                     </ng-container>

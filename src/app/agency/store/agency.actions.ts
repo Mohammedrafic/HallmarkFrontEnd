@@ -156,3 +156,8 @@ export class ExportAgencyList {
   static readonly type = '[agency] Export Agency List';
   constructor(public payload: ExportPayload) {}
 }
+
+export class GetAgencyFilteringOptions {
+  static readonly type = '[agency] Get Agency Filtering Options';
+  constructor() { }
+}

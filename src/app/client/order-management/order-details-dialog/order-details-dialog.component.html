@@ -12,7 +12,7 @@
       <section class="header-container">
         <div class="e-card-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title">{{isReOrder ? 'Re-Order' : 'Order'}} ID {{ order?.id }}</h3>
+            <h3 class="e-card-title">{{ isReOrder ? 'Re-Order' : 'Order' }} ID {{ order?.id }}</h3>
             <div class="order-statuses">
               <ejs-chiplist #chipList>
                 <e-chips>
@@ -22,27 +22,53 @@
               <div class="vertical-divider"></div>
               <div *ngIf="order" class="order-other-statuses">
                 <span class="custom-chip" *ngIf="!isReOrder">{{ order.orderType | orderTypeName }}</span>
-                <span *ngIf="orderType.ReOrder !== order?.orderType" class="custom-chip"> {{order.isLocked ? "Locked" : "Unlocked"}}</span>
+                <span *ngIf="orderType.ReOrder !== order?.orderType" class="custom-chip">
+                  {{ order.isLocked ? 'Locked' : 'Unlocked' }}</span
+                >
               </div>
             </div>
           </div>
           <div class="e-card-content dialog-controls">
-            <div class="order-actions" *ngIf="order?.canApprove && !order?.orderOpenDate && order?.status === orderStatus.PreOpen">
+            <div
+              class="order-actions"
+              *ngIf="order?.canApprove && !order?.orderOpenDate && order?.status === orderStatus.PreOpen"
+            >
               <button ejs-button cssClass="e-outline" (click)="cancelOrder(order.id)">Cancel</button>
               <button ejs-button cssClass="e-primary" (click)="approveOrder(order.id)">Approve</button>
               <div class="vertical-divider"></div>
             </div>
 
-            <button ejs-button cssClass="e-outline edit-button" (click)="editOrder(order)"><i-feather name="edit" class="icon"></i-feather></button>
+            <button ejs-button cssClass="e-outline edit-button" [disabled]="!!order?.orderClosureReason" (click)="editOrder(order)"><i-feather name="edit" class="icon"></i-feather></button>
             <button ejs-button cssClass="e-outline"
+                    *ngIf="!order?.orderClosureReason"
                     [disabled]="disabledCloseButton"
                     (click)="closeOrder(order)">
               Close Order
             </button>
-            <button ejs-button cssClass="e-outline" *ngIf="orderType.OpenPerDiem === order?.orderType" (click)="createReOrder()">Create Re-Order</button>
-            <button ejs-button cssClass="e-primary delete-button" (click)="deleteOrder(order.id)" *ngIf="!showCloseButton">Delete</button>
-            <button ejs-button *ngIf="orderType.ReOrder !== order?.orderType" [isPrimary]="true" (click)="lockOrder()" [disabled]="disabledLock">
-              {{order?.isLocked ? "Unlock" : "Lock"}}
+            <button
+              ejs-button
+              cssClass="e-outline"
+              *ngIf="orderType.OpenPerDiem === order?.orderType"
+              (click)="createReOrder()"
+            >
+              Create Re-Order
+            </button>
+            <button
+              ejs-button
+              cssClass="e-primary delete-button"
+              (click)="deleteOrder(order.id)"
+              *ngIf="!showCloseButton"
+            >
+              Delete
+            </button>
+            <button
+              ejs-button
+              *ngIf="orderType.ReOrder !== order?.orderType"
+              [isPrimary]="true"
+              (click)="lockOrder()"
+              [disabled]="disabledLock"
+            >
+              {{ order?.isLocked ? 'Unlock' : 'Lock' }}
               <i-feather [name]="order?.isLocked ? 'unlock' : 'lock'" class="icon"></i-feather>
             </button>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
@@ -55,24 +81,31 @@
         <ejs-tab #tab *ngIf="orderStatus.Incomplete !== order?.status" (selecting)="onTabSelecting($event)">
           <e-tabitems>
             <e-tabitem>
-              <ng-template #headerText>{{isReOrder ? 'Re-Order' : 'Order'}} Details</ng-template>
+              <ng-template #headerText>{{ isReOrder ? 'Re-Order' : 'Order' }} Details</ng-template>
               <ng-template #content>
                 <app-order-details-container [currentOrder]="order"></app-order-details-container>
               </ng-template>
             </e-tabitem>
             <e-tabitem>
-              <ng-template #headerText>Candidates <span class="e-badge e-badge-success e-badge-circle">{{ candidatesCounter }}</span></ng-template>
+              <ng-template #headerText>
+                Candidates
+                <span class="e-badge e-badge-success e-badge-circle">{{ candidatesCounter }}</span>
+              </ng-template>
               <ng-template #content>
                 <app-order-candidates-container [currentOrder]="order"></app-order-candidates-container>
               </ng-template>
             </e-tabitem>
             <e-tabitem *ngIf="orderType.OpenPerDiem === order?.orderType">
-              <ng-template #headerText>Re-Orders <span class="e-badge e-badge-success e-badge-circle">{{ order?.reOrders?.length || '0'}}</span></ng-template>
+              <ng-template #headerText>
+                Re-Orders
+                <span class="e-badge e-badge-success e-badge-circle"> {{ order?.reOrders?.length || '0' }}</span>
+              </ng-template>
               <ng-template #content>
                 <app-order-reorders-container
                   (selectReOrder)="selectReOrder.emit($event)"
                   (editReorder)="editNestedReOrder($event)"
-                  [currentOrder]="order">
+                  [currentOrder]="order"
+                >
                 </app-order-reorders-container>
               </ng-template>
             </e-tabitem>
@@ -100,11 +133,12 @@
             </e-tabitem>
           </e-tabitems>
         </ejs-tab>
-        <app-close-order [order]="order"></app-close-order>
+        <app-close-order [order]="order" (closeOrderSuccess)="updateOrderDetails($event)"></app-close-order>
         <app-add-edit-reorder
           [order]="reOrderToEdit || order"
           (saveEmitter)="saveReOrder()"
-          (close)="clearEditReOrder()">
+          (closeEmitter)="clearEditReOrder()"
+        >
         </app-add-edit-reorder>
       </div>
     </section>

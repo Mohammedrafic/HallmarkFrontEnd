@@ -170,7 +170,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
             actualEndDate: value.endDate,
             clockId: value.clockId,
             guaranteedWorkWeek: value.workWeek,
-            allowDeplayWoCredentials: value.allow,
+            allowDeployWoCredentials: value.allow,
             billRates: this.billRatesData,
             offeredStartDate: this.candidateJob.offeredStartDate,
           })

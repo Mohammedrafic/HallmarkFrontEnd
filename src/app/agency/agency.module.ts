@@ -81,6 +81,8 @@ import { NgxMaskModule } from 'ngx-mask';
 import { AgencyOrderFiltersComponent } from './order-management/order-management-grid/agency-order-filters/agency-order-filters.component';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
+import { AgencyListFiltersComponent } from './agency-list/agency-list-filters/agency-list-filters.component';
+import { MultiselectDropdownModule } from "@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module";
 
 const sidebarIcons = {
   Sliders,
@@ -141,6 +143,7 @@ const sidebarIcons = {
     CandidatDialogComponent,
     CandidatDetailsComponent,
     AgencyOrderFiltersComponent,
+    AgencyListFiltersComponent,
   ],
   imports: [
     CommonModule,
@@ -165,6 +168,7 @@ const sidebarIcons = {
     TabAllModule,
     DialogAllModule,
     MultiSelectAllModule,
+    MultiselectDropdownModule,
     MaskedTextBoxModule,
     DropDownButtonModule,
     AddEditReorderModule,

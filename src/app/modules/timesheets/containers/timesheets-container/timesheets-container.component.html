@@ -17,7 +17,7 @@
         </ejs-dropdownlist>
       </div>
     </div>
-    <app-search class="search"></app-search>
+    <app-search #search ngDefaultControl [formControl]="searchControl" class="search"></app-search>
     <app-date-week-picker [dateControl]="dateControl"></app-date-week-picker>
     <button
       ejs-button

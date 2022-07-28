@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { FormControl, FormGroup } from "@angular/forms";
+import { FormGroup } from "@angular/forms";
 
 import { FilterColumnsModel } from "@shared/models/filter.model";
 
@@ -16,10 +16,4 @@ export class RolesFiltersComponent {
     text: 'name',
     value: 'id',
   };
-
-  static generateFiltersForm(): FormGroup {
-    return new FormGroup({
-      permissionsIds: new FormControl([]),
-    });
-  }
 }

@@ -122,7 +122,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public selectedCandidate: any | null;
   public selectedReOrder: any | null;
   public filters: AgencyOrderFilters = {
-   includeReOrders: true
+    includeReOrders: true,
   };
   public filterColumns = AgencyOrderFiltersComponent.generateFilterColumns();
   public OrderFilterFormGroup: FormGroup = AgencyOrderFiltersComponent.generateFiltersForm();
@@ -282,14 +282,19 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private onTabChange(): void {
-    this.ordersTab$.pipe(takeUntil(this.unsubscribe$), tap((selected) => {
-      this.selectedTab = selected;
-      this.onGridCreated();
-      this.clearFilters();
-      this.store.dispatch(new ClearOrders());
-      this.selectedIndex = null;
-      this.dispatchNewPage();
-    })).subscribe()
+    this.ordersTab$
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        tap((selected) => {
+          this.selectedTab = selected;
+          this.onGridCreated();
+          this.clearFilters();
+          this.store.dispatch(new ClearOrders());
+          this.selectedIndex = null;
+          this.dispatchNewPage();
+        })
+      )
+      .subscribe();
   }
 
   private dispatchNewPage(): void {
@@ -357,8 +362,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         new GetAgencyOrderCandidatesList(
           event.data.orderId,
           event.data.organizationId,
-          this.currentPage,
-          this.pageSize,
+          1,
+          30,
           this.orderManagementAgencyService.excludeDeployed
         )
       );
@@ -496,7 +501,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.filteredItems = [];
     this.currentPage = 1;
     this.filters = {
-      includeReOrders: true
+      includeReOrders: true,
     };
     this.filteredItems$.next(this.filteredItems.length);
   }
@@ -595,13 +600,18 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private onAgencyChange(): void {
-    this.lastSelectedAgencyId$.pipe(takeWhile(() => this.isAlive), skip(1)).subscribe(() => {
-      this.openPreview.next(false);
-      this.openCandidat.next(false);
-      this.clearFilters();
-      this.dispatchNewPage();
-      this.store.dispatch(new GetAgencyFilterOptions());
-    });
+    this.lastSelectedAgencyId$
+      .pipe(
+        takeWhile(() => this.isAlive),
+        skip(1)
+      )
+      .subscribe(() => {
+        this.openPreview.next(false);
+        this.openCandidat.next(false);
+        this.clearFilters();
+        this.dispatchNewPage();
+        this.store.dispatch(new GetAgencyFilterOptions());
+      });
   }
 
   private onReloadOrderCandidatesLists(): void {

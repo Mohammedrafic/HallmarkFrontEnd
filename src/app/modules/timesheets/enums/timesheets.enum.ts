@@ -20,6 +20,7 @@ export enum TIMESHEETS_ACTIONS {
   GET_TIMESHEET_DETAILS = '[timesheets] GET TIMESHEET DETAILS',
   GET_ORGANIZATIONS = '[timesheets] GET ORGANIZATIONS',
   SELECT_ORGANIZATION = '[timesheets] SELECT ORGANIZATION',
+  BULK_APPROVE = '[timesheets] BULK APPROVE',
 }
 
 export enum TimesheetDetailsActions {

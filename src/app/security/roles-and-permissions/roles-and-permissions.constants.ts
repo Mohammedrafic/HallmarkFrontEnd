@@ -19,7 +19,7 @@ export const BUSSINES_DATA_FIELDS = {
   value: 'id',
 };
 
-export const RolesFilterColumns: FilterColumnsModel = {
+export const rolesFilterColumns: FilterColumnsModel = {
   permissionsIds: {
     type: ControlTypes.Multiselect,
     valueType: ValueType.Id,

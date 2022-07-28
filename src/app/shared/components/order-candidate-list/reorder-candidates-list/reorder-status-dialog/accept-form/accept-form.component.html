@@ -12,7 +12,14 @@
       <div class="input-container bootstrap">
         <label>Bill Rate</label>
         <div class="input-group">
-          <input appValidateWithMessage formControlName="offeredBillRate" class="e-input" type="text" mask="00.00" />
+          <input
+            appValidateWithMessage
+            formControlName="offeredBillRate"
+            class="e-input"
+            type="text"
+            [mask]="billRateMask"
+            [dropSpecialCharacters]="false"
+          />
         </div>
       </div>
     </div>
@@ -30,7 +37,14 @@
       <div class="input-container bootstrap">
         <label>Candidate Bill Rate</label>
         <div class="input-group">
-          <input appValidateWithMessage formControlName="candidateBillRate" class="e-input" type="text" mask="00.00" />
+          <input
+            appValidateWithMessage
+            formControlName="candidateBillRate"
+            class="e-input"
+            type="text"
+            [mask]="billRateMask"
+            [dropSpecialCharacters]="false"
+          />
         </div>
       </div>
     </div>
@@ -44,11 +58,18 @@
         </div>
       </div>
     </div>
-    <div *ngIf="isBillRatePending">
+    <div *ngIf="showHourlyRate">
       <div class="input-container bootstrap">
         <label class="input-group">Offered Bill Rate</label>
         <div class="input-group">
-          <input appValidateWithMessage formControlName="hourlyRate" class="e-input" type="text" mask="00.00"/>
+          <input
+            appValidateWithMessage
+            formControlName="hourlyRate"
+            class="e-input"
+            type="text"
+            [mask]="billRateMask"
+            [dropSpecialCharacters]="false"
+          />
         </div>
       </div>
     </div>

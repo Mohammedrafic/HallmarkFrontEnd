@@ -451,7 +451,7 @@ export class TimesheetsState {
     .pipe(
       tap((organizations: DataSourceItem[]) => patchState({
         organizations,
-        selectedOrganizationId: organizations[0].id,
+        selectedOrganizationId: organizations[0]?.id,
       })),
     );
   }
@@ -467,6 +467,14 @@ export class TimesheetsState {
         selectedOrganizationId: id,
       }))
     );
+  }
+
+  @Action(Timesheets.BulkApprove)
+  BulkApprove(
+    { patchState }: StateContext<TimesheetsModel>,
+    { timesheetIds }: Timesheets.BulkApprove
+  ): Observable<void> | any {
+    return this.timesheetsApiService.postBulkApprove(timesheetIds);
   }
 
   @Action(TimesheetDetails.AddTimesheetRecord)

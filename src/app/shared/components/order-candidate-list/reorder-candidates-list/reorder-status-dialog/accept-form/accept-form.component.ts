@@ -1,6 +1,10 @@
 import { Component, Input } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+
+const showHourlyRateForStatuses: CandidatStatus[] = [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR, CandidatStatus.OnBoard];
+
 @Component({
   selector: 'app-accept-form',
   templateUrl: './accept-form.component.html',
@@ -8,7 +12,13 @@ import { FormControl, FormGroup } from '@angular/forms';
 })
 export class AcceptFormComponent {
   @Input() formGroup: FormGroup;
-  @Input() isBillRatePending: boolean;
+  @Input() status: CandidatStatus;
+
+  public billRateMask = '00||00.00';
+
+  get showHourlyRate(): boolean {
+    return showHourlyRateForStatuses.includes(this.status);
+  }
 
   static generateFormGroup(): FormGroup {
     return new FormGroup({
@@ -26,3 +36,4 @@ export class AcceptFormComponent {
     });
   }
 }
+

@@ -65,7 +65,6 @@ import { ExternalBillRateComponent } from './bill-rates/external-bill-rate/exter
 import { BillRateTypeMappingComponent } from './bill-rates/bill-rate-type-mapping/bill-rate-type-mapping.component';
 import { BillRatesState } from '@organization-management/store/bill-rates.state';
 import { CandidateRejectReasonComponent } from './reasons/reject-reason/candidate-reject-reason.component';
-import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { FilteredCredentialsComponent } from './credentials/credentials-setup/filtered-credentials/filtered-credentials.component';
 import { MapCredentialsFormComponent } from './credentials/credentials-setup/map-credentials-form/map-credentials-form.component';
 import { ReasonsComponent } from './reasons/reasons.component';
@@ -158,7 +157,6 @@ const sidebarIcons = {
       ShiftsState,
       HolidaysState,
       BillRatesState,
-      RejectReasonState
     ]),
   ],
   providers: [
