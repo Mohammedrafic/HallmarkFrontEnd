@@ -59,6 +59,7 @@ import {
 import { TimesheetTableLinkComponent } from './components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 import { TimesheetDetailsService } from './services/timesheet-details.service';
 import { FileViewerModule } from './modules/file-viewer/file-viewer.module';
+import { DateRangeWeekPickerModule } from '@shared/components/date-range-week-picker/date-range-week-picker.module';
 import { TimesheetsTabsComponent } from './components/timesheets-tabs/timesheets-tabs.component';
 
 const gridIcons = {
@@ -140,6 +141,7 @@ const gridIcons = {
     ControlConverterModule,
     CapitalizeFirstModule,
     DateWeekPickerModule,
+    DateRangeWeekPickerModule,
     UploaderModule,
     TextBoxModule,
     TooltipModule,

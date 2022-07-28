@@ -1,3 +1,5 @@
+import { formatDate } from '@angular/common';
+
 export class DateTimeHelper {
   public static getLastDayOfWeekFromFirstDay(startDate: string, days: number): Date {
     const start = new Date(startDate);
@@ -36,5 +38,58 @@ export class DateTimeHelper {
 
     return new Date(Date.UTC(date.getFullYear(),
     date.getMonth(), date.getDate(), date.getHours(), date.getMinutes())).toISOString();
+  }
+
+  public static geFirstDayofWeek(date: Date): Date {
+    return new Date(date.setDate(date.getDate() - date.getDay()));
+  }
+
+  public static getLastDayOfWeek(date: Date): Date {
+    const today = new Date(new Date().setHours(12, 0, 0, 0));
+    const endWeek = new Date(date.setDate(date.getDate() - date.getDay() + 6));
+    if (endWeek.getTime() > today.getTime()) {
+      return today;
+    }
+    return endWeek;
+  }
+
+  public static isDateBetween(date: Date | undefined, fromDate: Date, toDate: Date): boolean {
+    return (date?.getTime() || 0) <= toDate.getTime() && (date?.getTime() || 0) >= fromDate.getTime();
+  }
+
+  public static isDateBefore(date: Date, toDate: Date): boolean {
+    return date.getTime() <= toDate.getTime();
+  }
+
+  public static getWeekDate(date: string, isStart = false, dayNum?: number): Date {
+    const curr = new Date(date);
+    const firstDay = curr.getTime() - curr.getDay() * 24 * 60 * 60 * 1000;
+    const lastDay = firstDay + (dayNum ? dayNum : 6) * 24 * 60 * 60 * 1000;
+    let last = new Date(lastDay).getTime();
+    let first = firstDay;
+
+    if (lastDay > new Date().getTime()) {
+      last = new Date().getTime();
+      first = last - 6 * 24 * 60 * 60 * 1000;
+    }
+
+    return new Date(isStart ? first : last);
+  }
+
+  public static getWeekStartEnd(date: string): [Date, Date] {
+    const splitValue = date.split(' - ');
+    const from = DateTimeHelper.getWeekDate(splitValue[0], true);
+    const to = DateTimeHelper.getWeekDate(splitValue[1]);
+
+    return [from, to];
+  }
+
+  public static getRange(date: string | Date | any): string {
+    let startWeekDay, endWeekDay;
+
+    startWeekDay = formatDate(DateTimeHelper.getWeekDate(date, true), 'MM/dd/YYYY', 'en-US');
+    endWeekDay = formatDate(DateTimeHelper.getWeekDate(date), 'MM/dd/YYYY', 'en-US');
+
+    return `${startWeekDay} - ${endWeekDay}`;
   }
 }

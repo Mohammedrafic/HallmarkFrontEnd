@@ -43,10 +43,6 @@ export class TimesheetsApiService {
     });
   }
 
-  public getTabsCounts(): Observable<TabCountConfig> {
-    return of(MokTabsCounts);
-  }
-
   public getTimesheetRecords(
     id: number,
     orgId: number,
@@ -63,6 +59,10 @@ export class TimesheetsApiService {
         expenses: [],
       }))
     );
+  }
+
+  public postBulkApprove(timesheetIds: number[]): Observable<void> {
+    return this.http.post<void>('/api/TimesheetState/bulkapprove', { timesheetIds });
   }
 
   public addTimesheetRecord(body: AddRecordDto): Observable<null> {

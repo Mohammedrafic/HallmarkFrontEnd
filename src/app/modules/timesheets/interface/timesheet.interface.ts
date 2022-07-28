@@ -31,7 +31,7 @@ export interface TimesheetsFilterState {
   pageSize?: number;
   organizationId?: number;
   date?: string;
-  search?: string;
+  searchTerm?: string;
   orderIds?: string[];
   locationIds?: string[];
   regionsIds?: string[];

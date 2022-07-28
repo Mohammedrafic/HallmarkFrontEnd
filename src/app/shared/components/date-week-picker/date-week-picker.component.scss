@@ -1,0 +1,21 @@
+@import 'colors';
+
+.timesheet-picker-container {
+  display: flex;
+
+  button.e-control.e-btn i-feather {
+    margin-left: 0;
+  }
+}
+
+.datepicker {
+  margin: 0 4px;
+}
+
+::ng-deep {
+  .timesheet-picker-container {
+    ejs-datepicker.datepicker .e-input-group.e-control-wrapper.e-date-wrapper.e-error {
+      border-color: $grey!important;
+    }
+  }
+}
