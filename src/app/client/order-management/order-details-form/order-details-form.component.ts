@@ -402,7 +402,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       .pipe(
         takeUntil(this.unsubscribe$),
         switchMap((locationId: number) => {
-          if (!locationId || (this.isEditMode && this.order?.status !== OrderStatus.Incomplete)) {
+          if (!locationId || this.isEditMode) {
             return of(null);
           }
 
