@@ -324,6 +324,7 @@ export type AcceptJobDTO = {
   requestComment?: string;
   billRates?: BillRate[];
   offeredStartDate?: string;
+  skillName?: string;
 };
 
 export type CandidateProfile = {

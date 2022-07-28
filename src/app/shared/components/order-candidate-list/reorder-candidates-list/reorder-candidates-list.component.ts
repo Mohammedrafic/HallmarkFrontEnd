@@ -85,4 +85,3 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     );
   }
 }
-
