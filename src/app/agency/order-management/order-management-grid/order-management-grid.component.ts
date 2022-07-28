@@ -559,6 +559,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.clearSelection(this.gridWithChildRow);
         this.previousSelectedOrderId = null;
         this.selectedIndex = null;
+        const table = document.getElementsByClassName('e-virtualtable')[0] as HTMLElement;
+        if (table) {
+          table.style.transform = 'translate(0px, 0px)';
+        }
       } else {
         this.openChildDialog.next(false);
         this.selectedCandidate = null;
