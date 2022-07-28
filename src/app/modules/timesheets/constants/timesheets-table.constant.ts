@@ -247,3 +247,7 @@ export const filterColumnDataSource: FilterDataSource = {
     }
   ]
 };
+
+export const BulkApproveSuccessMessage = {
+  successMessage: 'Success. Timesheets Approved',
+};

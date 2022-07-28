@@ -111,4 +111,11 @@ export namespace Timesheets {
     constructor(public readonly id: number) {
     }
   }
+
+  export class BulkApprove {
+    static readonly type = TIMESHEETS_ACTIONS.BULK_APPROVE;
+
+    constructor(public readonly timesheetIds: number[]) {
+    }
+  }
 }

@@ -13,11 +13,18 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 
 import { Destroyable } from '@core/helpers';
 import { User } from '@shared/models/user.model';
+import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
+import { MessageTypes } from '@shared/enums/message-types';
 import { RowNode } from '@ag-grid-community/core';
-import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { DataSourceItem, TabConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
-import { TimesheetExportOptions, TAB_ADMIN_TIMESHEETS, UNIT_ORGANIZATIONS_FIELDS } from '../../constants';
+import {
+  TimesheetExportOptions,
+  TAB_ADMIN_TIMESHEETS,
+  UNIT_ORGANIZATIONS_FIELDS,
+  BulkApproveSuccessMessage
+} from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { DialogAction, ExportType } from '../../enums';
@@ -25,7 +32,6 @@ import { TimesheetsService } from '../../services/timesheets.service';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { ProfileDetailsContainerComponent } from '../profile-details-container/profile-details-container.component';
 import { AppState } from '../../../../store/app.state';
-import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 
 @Component({
   selector: 'app-timesheets-container.ts',
@@ -150,6 +156,16 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public bulkApprove(data: RowNode[]): void {
+    const timesheetIds = data.map((el: RowNode) => el.data.id);
+
+    this.store.dispatch(new Timesheets.BulkApprove(timesheetIds)).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.store.dispatch([
+        new ShowToast(MessageTypes.Success, BulkApproveSuccessMessage.successMessage),
+        new Timesheets.GetAll()
+      ]);
+    });
   }
 
   public bulkExport(data: RowNode[]): void {

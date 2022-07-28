@@ -469,6 +469,14 @@ export class TimesheetsState {
     );
   }
 
+  @Action(Timesheets.BulkApprove)
+  BulkApprove(
+    { patchState }: StateContext<TimesheetsModel>,
+    { timesheetIds }: Timesheets.BulkApprove
+  ): Observable<void> | any {
+    return this.timesheetsApiService.postBulkApprove(timesheetIds);
+  }
+
   @Action(TimesheetDetails.AddTimesheetRecord)
   AddTimesheetRecord(ctx: StateContext<TimesheetsModel>, { body, isAgency }: TimesheetDetails.AddTimesheetRecord) {
     return this.timesheetsApiService.addTimesheetRecord(body)
