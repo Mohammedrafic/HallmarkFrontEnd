@@ -1,0 +1,20 @@
+::ng-deep {
+  .e-calendar .e-content .e-range-hover {
+    background-color: #2368EE!important;
+    color: white!important;
+
+    .e-day {
+      background-color: #2368EE!important;
+      color: white!important;
+      font-weight: 700!important;
+    }
+  }
+
+  .week-picker-container {
+    .e-input-group input.e-input, .e-input-group.e-control-wrapper input.e-input,
+    .e-input-group input.e-input, .e-input-group.e-control-wrapper {
+      background-color: #fff!important;
+      width: 247px!important;
+    }
+  }
+}
