@@ -18,6 +18,7 @@ import {
   GetAssociateAgencies,
   GetAvailableSteps,
   GetHistoricalData,
+  ClearHistoricalData,
   GetIncompleteOrders,
   GetMasterShifts,
   GetOrderById,
@@ -657,6 +658,11 @@ export class OrderManagementContentState {
         return of();
       })
     );
+  }
+
+  @Action(ClearHistoricalData)
+  ClearHistoricalData({ patchState }: StateContext<OrderManagementContentStateModel>): void {
+    patchState({ historicalEvents: [] });
   }
 
   @Action(GetCandidatesBasicInfo)
