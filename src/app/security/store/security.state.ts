@@ -140,6 +140,11 @@ export class SecurityState {
   }
 
   @Selector()
+  static permissionsTree(state: SecurityStateModel): PermissionsTree {
+    return state.permissionsTree;
+  }
+
+  @Selector()
   static isNewRoleDataLoading(state: SecurityStateModel): boolean {
     return state.isNewRoleDataLoading;
   }
@@ -207,9 +212,9 @@ export class SecurityState {
   @Action(GetRolesPage)
   GetRolesPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitId, businessUnitType, pageNumber, pageSize }: GetRolesPage
+    { businessUnitId, businessUnitType, pageNumber, pageSize, filters }: GetRolesPage
   ): Observable<RolesPage> {
-    return this.roleService.getRolesPage(businessUnitType, businessUnitId, pageNumber, pageSize).pipe(
+    return this.roleService.getRolesPage(businessUnitType, businessUnitId, pageNumber, pageSize, filters).pipe(
       tap((payload) => {
         patchState({ rolesPage: payload });
         return payload;

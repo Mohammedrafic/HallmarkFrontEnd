@@ -1,17 +1,6 @@
 import { FieldType, FieldWidthStyle, RecordFields, TableColumnAlign } from '../enums';
 import { DetailsTableConfig, DialogConfig } from '../interface';
 
-
-export const WeekDaysOptions = [
-  { text: 'Monday', value: 1 },
-  { text: 'Tuesday', value: 2 },
-  { text: 'Wednesday', value: 3 },
-  { text: 'Thursday', value: 4 },
-  { text: 'Friday', value: 5 },
-  { text: 'Saturday', value: 6 },
-  { text: 'Sunday', value: 0 },
-];
-
 export const RecordAddDialogConfig: DialogConfig = {
   timesheets: {
     title: 'Add Timesheet Record',
@@ -44,7 +33,7 @@ export const RecordAddDialogConfig: DialogConfig = {
       },
       {
         title: 'Bill Rate Type',
-        field: 'billRateId',
+        field: 'billRateConfigId',
         type: FieldType.Dropdown,
         disabled: false,
         required: true,

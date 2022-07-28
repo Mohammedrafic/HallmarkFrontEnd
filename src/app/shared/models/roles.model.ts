@@ -16,3 +16,7 @@ export type Role = {
 export type RoleDTO = Omit<Role, 'isDefault' | 'businessUnitName'>;
 
 export type RolesPage = PageOfCollections<Role>;
+
+export type RolesFilters = {
+  permissionsIds?: number[];
+};

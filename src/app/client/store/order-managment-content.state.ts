@@ -18,6 +18,7 @@ import {
   GetAssociateAgencies,
   GetAvailableSteps,
   GetHistoricalData,
+  ClearHistoricalData,
   GetIncompleteOrders,
   GetMasterShifts,
   GetOrderById,
@@ -33,10 +34,12 @@ import {
   GetSelectedOrderById,
   GetSuggestedDetails,
   GetWorkflows,
+  LockUpdatedSuccessfully,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
   SaveOrder,
   SaveOrderSucceeded,
+  SelectNavigationTab,
   SetIsDirtyOrderForm,
   SetLock,
   SetPredefinedBillRatesData,
@@ -76,6 +79,7 @@ import { RejectReason, RejectReasonPage } from '@shared/models/reject-reason.mod
 import { HistoricalEvent } from '@shared/models/historical-event.model';
 import { GetCandidatesBasicInfo } from '@agency/store/order-management.actions';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
+import { NavigationTabModel } from '@shared/models/navigation-tab.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -102,6 +106,7 @@ export interface OrderManagementContentStateModel {
   rejectionReasonsList: RejectReason[] | null;
   orderFilterDataSources: OrderFilterDataSource | null;
   historicalEvents: HistoricalEvent[] | null;
+  navigationTab: NavigationTabModel;
 }
 
 @State<OrderManagementContentStateModel>({
@@ -131,6 +136,10 @@ export interface OrderManagementContentStateModel {
     rejectionReasonsList: null,
     orderFilterDataSources: null,
     historicalEvents: null,
+    navigationTab: {
+      active: null,
+      pending: null,
+    },
   },
 })
 @Injectable()
@@ -252,6 +261,11 @@ export class OrderManagementContentState {
     return state.candidatesBasicInfo;
   }
 
+  @Selector()
+  static navigationTab(state: OrderManagementContentStateModel): any | null {
+    return state.navigationTab;
+  }
+
   constructor(
     private orderManagementService: OrderManagementContentService,
     private projectsService: ProjectsService,
@@ -317,7 +331,7 @@ export class OrderManagementContentState {
     return this.orderManagementService.setLock(id, lockStatus).pipe(
       tap(() => {
         const message = lockStatus ? `The Order ${id} is locked` : `The Order ${id} is unlocked`;
-        const actions = [new GetOrders(filters), new ShowToast(MessageTypes.Success, message)];
+        const actions = [new LockUpdatedSuccessfully(), new ShowToast(MessageTypes.Success, message)];
         dispatch(updateOpened ? [...actions, new GetSelectedOrderById(id)] : actions);
       }),
       catchError((error) => dispatch(new ShowToast(MessageTypes.Error, error.error?.detail)))
@@ -646,6 +660,11 @@ export class OrderManagementContentState {
     );
   }
 
+  @Action(ClearHistoricalData)
+  ClearHistoricalData({ patchState }: StateContext<OrderManagementContentStateModel>): void {
+    patchState({ historicalEvents: [] });
+  }
+
   @Action(GetCandidatesBasicInfo)
   GetCandidatesBasicInfo(
     { patchState }: StateContext<OrderManagementContentStateModel>,
@@ -679,5 +698,13 @@ export class OrderManagementContentState {
         dispatch(new DuplicateOrderSuccess(id));
       })
     );
+  }
+
+  @Action(SelectNavigationTab)
+  SelectNavigationTab(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { active, pending }: SelectNavigationTab
+  ): void {
+    patchState({ navigationTab: { active, pending } });
   }
 }

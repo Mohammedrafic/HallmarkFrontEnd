@@ -1,4 +1,7 @@
-<app-widget-wrapper [title]="chartData?.title ?? ''" [isLoading]="isLoading">
+<app-widget-wrapper [isLoading]="isLoading">
+  <ng-template #header>
+      <h3 class="widget-header__title">{{ chartData?.title ?? '' }}</h3>
+  </ng-template>
   <ng-template #chart>
     <ejs-accumulationchart #sfComponent
                            [enableAnimation]="false"
@@ -21,7 +24,7 @@
       
       <div class="widget-legend__row-container" >
         <div class="widget-legend__row_Text" >
-          <div class="pp-accumulation-chart__legend-Total-score">{{totalScore}}</div>
+          <div class="app-accumulation-chart__legend-Total-score">{{totalScore}}</div>
         </div>
        
       </div>
@@ -29,20 +32,10 @@
   </ng-template>
 
   <ng-template #legend>
-    <div
-      *ngFor="let legend of chartData?.chartData; trackBy: trackByHandler; let idx = index"
-      class="widget-legend__item"
-    >
-      <div class="widget-legend__item-content">
-        <ejs-checkbox [checked]="true" [cssClass]="'e-custom'" (change)="onClickLegend(legend.label)"></ejs-checkbox>
-        <div class="widget-legend__row-container" (click)="redirectToSourceContent($event)" (mousedown)="defineMousePosition($event)">
-          <div class="widget-legend__row">
-            <div [ngStyle]="{ backgroundColor: legend.color }" class="widget-legend__point"></div>
-            <div class="widget-legend__legend-text">{{ legend.label }}</div>
-          </div>
-          <div class="app-accumulation-chart__legend-score">{{ legend.value }}</div>
-        </div>
-      </div>
-    </div>
+    <app-widget-legend
+      [legendData]="legendData"
+      (changeCheckbox)="onClickLegend($event)"
+      (onClickLegend)="redirectToSourceContent()"
+    ></app-widget-legend>
   </ng-template>
 </app-widget-wrapper>

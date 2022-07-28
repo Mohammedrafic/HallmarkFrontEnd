@@ -9,6 +9,7 @@ import { AddEditCandidateComponent } from "./candidates/add-edit-candidate/add-e
 import { ClearAgencyGuard } from './guards/clear-agency.guard';
 import { ProfileComponent } from "@agency/profile/profile.component";
 import { OrderManagementComponent } from './order-management/order-management.component';
+import { PendingChangesGuard } from '@shared/guards/pending-changes.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -35,12 +36,12 @@ const routes: Routes = [
       {
         path: 'agency-list/add',
         component: AddEditAgencyComponent,
-        canDeactivate: [ClearAgencyGuard]
+        canDeactivate: [PendingChangesGuard, ClearAgencyGuard]
       },
       {
         path: 'agency-list/edit/:id',
         component: AddEditAgencyComponent,
-        canDeactivate: [ClearAgencyGuard]
+        canDeactivate: [PendingChangesGuard, ClearAgencyGuard]
       },
       {
         path: 'profile',
@@ -59,6 +60,7 @@ const routes: Routes = [
       {
         path: 'candidates/add',
         component: AddEditCandidateComponent,
+        canDeactivate: [PendingChangesGuard],
         data: {
           isAgencyArea: true
         }
@@ -66,6 +68,7 @@ const routes: Routes = [
       {
         path: 'candidates/edit/:id',
         component: AddEditCandidateComponent,
+        canDeactivate: [PendingChangesGuard],
         data: {
           isAgencyArea: true
         }

@@ -1,3 +1,6 @@
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+
 import {
   ChartModule,
   SplineSeriesService,
@@ -6,16 +9,14 @@ import {
   TooltipService,
   CrosshairService,
 } from '@syncfusion/ej2-angular-charts';
-
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
+import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 
 import { LineChartComponent } from './line-chart.component';
 import { WidgetWrapperModule } from '../widget-wrapper/widget-wrapper.module';
-import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
+import { WidgetLegendModule } from '../widget-legend/widget-legend.module';
 
 @NgModule({
-  imports: [CommonModule, ChartModule, WidgetWrapperModule, ButtonModule],
+  imports: [CommonModule, ChartModule, WidgetWrapperModule, ButtonModule, WidgetLegendModule],
   exports: [LineChartComponent],
   declarations: [LineChartComponent],
   providers: [SplineSeriesService, CategoryService, LegendService, TooltipService, CrosshairService],

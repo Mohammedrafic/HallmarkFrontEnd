@@ -1,6 +1,6 @@
-import type { PositionTypeEnum } from '../enums/position-type.enum';
+import type { PositionTrendTypeEnum } from '../enums/position-trend-type.enum';
 
-export type PositionsByTypeAggregatedModel = Record<PositionTypeEnum, PositionByTypeDataModel[]>;
+export type PositionsByTypeAggregatedModel = Record<PositionTrendTypeEnum, PositionByTypeDataModel[]>;
 
 export interface PositionByTypeDataModel {
   month: string;
@@ -8,6 +8,6 @@ export interface PositionByTypeDataModel {
 }
 
 export interface ITimeSlice {
-  startDate: string;
-  endDate: string;
+  dateFrom: string;
+  dateTo: string;
 }

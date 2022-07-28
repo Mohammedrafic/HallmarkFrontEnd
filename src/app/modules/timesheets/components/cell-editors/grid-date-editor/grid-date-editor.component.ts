@@ -57,9 +57,10 @@ export class GridDateEditorComponent extends TimesheetDateHelper implements ICel
   private setData(params: ICellRendererParams): void {
     this.dateValue = new Date(DateTimeHelper.convertDateToUtc(params.value));
     this.value = params.value;
+
     this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
     this.type = (params.colDef as ColDef).cellRendererParams.type;
-    this.setdateBoundsForDay(params.value);
+    this.setdateBoundsForDay(DateTimeHelper.convertDateToUtc(params.value).toISOString());
     this.setFormControl(params);
   }
 }

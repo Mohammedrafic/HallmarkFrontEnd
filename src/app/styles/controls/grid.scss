@@ -377,8 +377,9 @@ ejs-grid.e-control.e-grid {
     .e-detailrowcollapse, .e-detailrowexpand, .e-detailheadercell {
       visibility: hidden;
     }
-    .e-table {
-      margin-left: -30px;
+
+    .e-detail-intent {
+      width: 0 !important;
     }
   }
 

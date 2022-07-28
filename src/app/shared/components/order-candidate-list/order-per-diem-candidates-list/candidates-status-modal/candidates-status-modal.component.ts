@@ -53,6 +53,7 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   @Input() candidate: OrderCandidatesList;
   @Input() openEvent: Subject<boolean>;
   @Input() isAgency: boolean = false;
+  @Input() isLocked: boolean | undefined = false;
 
   @Input() set candidateJob(orderCandidateJob: OrderCandidateJob | null) {
     this.orderCandidateJob = orderCandidateJob;
@@ -69,6 +70,13 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
     );
   }
 
+  get showWithdrawButton(): boolean {
+    return (
+      this.isAgency &&
+      [ApplicantStatusEnum.Shortlisted, ApplicantStatusEnum.PreOfferCustom].includes(this.candidate?.status)
+    );
+  }
+
   get isRejected(): boolean {
     return [ApplicantStatusEnum.Rejected].includes(this.candidate?.status);
   }
@@ -78,7 +86,9 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   }
 
   get showApplyButton(): boolean {
-    return this.isAgency && [ApplicantStatusEnum.NotApplied].includes(this.candidate?.status);
+    return (
+      this.isAgency && [ApplicantStatusEnum.NotApplied, ApplicantStatusEnum.Withdraw].includes(this.candidate?.status)
+    );
   }
 
   get showClockId(): boolean {
@@ -187,6 +197,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
     this.accordionOneField = new AccordionOneField(this.accordionComponent);
     this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
+  }
+
+  public onWithdraw(): void {
+    this.updateAgencyCandidateJob({ applicantStatus: ApplicantStatusEnum.Withdraw, statusText: 'Withdraw' });
   }
 
   private updateOrganizationCandidateJob(status: { applicantStatus: ApplicantStatusEnum; statusText: string }): void {

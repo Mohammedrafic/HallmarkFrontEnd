@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { filter, Observable, takeWhile } from 'rxjs';
+import { filter, Observable, Subject, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { GridComponent, RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
@@ -9,11 +9,16 @@ import { AbstractGridConfigurationComponent } from '@shared/components/abstract-
 import { GRID_CONFIG } from '@shared/constants/grid-config';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants/messages';
-import { Role, RolesPage } from '@shared/models/roles.model';
+import { Role, RolesFilters, RolesPage } from '@shared/models/roles.model';
+import { FilteredItem } from "@shared/models/filter.model";
+import { FilterService } from "@shared/services/filter.service";
+import { PermissionsTree } from "@shared/models/permission.model";
+import { RolesFilterColumns } from "src/app/security/roles-and-permissions/roles-and-permissions.constants";
 
-import { ShowSideDialog } from 'src/app/store/app.actions';
+import { ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { GetRolesPage, RemoveRole } from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
+import { RolesFiltersComponent } from "./roles-filters/roles-filters.component";
 
 enum Active {
   No,
@@ -27,6 +32,8 @@ enum Active {
 })
 export class RolesGridComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() filterForm: FormGroup;
+  @Input() filteredItems$: Subject<number>;
+
   @Output() editRoleEvent = new EventEmitter();
 
   @ViewChild('rolesGrid') grid: GridComponent;
@@ -37,6 +44,9 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   @Select(SecurityState.rolesPage)
   public rolesPage$: Observable<RolesPage>;
 
+  @Select(SecurityState.permissionsTree)
+  public permissionsTree$: Observable<PermissionsTree>;
+
   public activeValueAccess = (_: string, { isActive }: Role) => {
     return Active[Number(isActive)];
   };
@@ -45,16 +55,23 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   };
   public selIndex: number[] = [];
   public sortOptions = { columns: [{ field: 'businessUnitName', direction: 'Descending' }] };
+  public filterColumns = RolesFilterColumns;
+  public rolesFilterFormGroup: FormGroup = RolesFiltersComponent.generateFiltersForm();
 
+  private filters: RolesFilters = {};
   private isAlive = true;
 
-  constructor(private actions$: Actions, private store: Store, private confirmService: ConfirmService) {
+  constructor(private actions$: Actions,
+              private store: Store,
+              private confirmService: ConfirmService,
+              private filterService: FilterService) {
     super();
   }
 
   ngOnInit(): void {
     this.onDialogClose();
     this.dispatchNewPage();
+    this.onPermissionsTreeChanged();
 
     this.filterForm.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => this.dispatchNewPage());
   }
@@ -109,9 +126,42 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     this.dispatchNewPage();
   }
 
+  public onFilterApply(): void {
+    this.filters = this.rolesFilterFormGroup.getRawValue();
+    this.filteredItems = this.filterService.generateChips(this.rolesFilterFormGroup, this.filterColumns);
+    this.dispatchNewPage();
+    this.store.dispatch(new ShowFilterDialog(false));
+    this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  public onFilterClose(): void {
+    this.rolesFilterFormGroup.setValue({
+      permissionsIds: this.filters.permissionsIds || [],
+    });
+    this.filteredItems = this.filterService.generateChips(this.rolesFilterFormGroup, this.filterColumns);
+    this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.rolesFilterFormGroup, this.filterColumns);
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
+    this.dispatchNewPage();
+  }
+
+  private clearFilters(): void {
+    this.rolesFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {};
+    this.filteredItems$.next(this.filteredItems.length);
+  }
+
   private dispatchNewPage(): void {
     const { businessUnit, business } = this.filterForm.getRawValue();
-    this.store.dispatch(new GetRolesPage(businessUnit, business || '', this.currentPage, this.pageSize));
+    this.store.dispatch(new GetRolesPage(businessUnit, business || null, this.currentPage, this.pageSize, this.filters));
   }
 
   private onDialogClose(): void {
@@ -124,5 +174,11 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
       .subscribe(() => {
         this.grid.clearRowSelection();
       });
+  }
+
+  private onPermissionsTreeChanged(): void {
+    this.permissionsTree$.pipe(takeWhile(() => this.isAlive)).subscribe((permissions: PermissionsTree) => {
+      this.filterColumns['permissionsIds'].dataSource = permissions;
+    });
   }
 }

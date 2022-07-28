@@ -75,3 +75,14 @@
     </div>
   </ng-template>
 </ejs-grid>
+
+<app-filter-dialog
+  [items]="filteredItems"
+  [count]="(rolesPage$ | async)?.totalCount"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
+  <app-roles-filters [form]="rolesFilterFormGroup" [filterColumns]="filterColumns"></app-roles-filters>
+</app-filter-dialog>

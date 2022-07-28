@@ -36,7 +36,7 @@ export class OrderManagementContentService {
   /**
    * Counts number of shifts of reorders within specified period of time from current date
    * @param orders list of orders
-   * @param period number of days counting of shifts should be performed 
+   * @param period number of days counting of shifts should be performed
    */
   public countShiftsWithinPeriod(orders: OrderManagementPage | AgencyOrderManagementPage, period = 90): void {
     const today = new Date();
@@ -74,7 +74,7 @@ export class OrderManagementContentService {
    * Lock/Unlock the order
    */
   public setLock(orderId: number, lockStatus: boolean): Observable<boolean> {
-    return this.http.post<boolean>(`/api/Orders/setLock`, {orderId, lockStatus });
+    return this.http.post<boolean>(`/api/Orders/setLock`, { orderId, lockStatus });
   }
 
   /**

@@ -1,34 +1,33 @@
 export class DateTimeHelper {
-  public static getLastDayOfWeekFromFirstDay(startDate: string, days: number): string {
+  public static getLastDayOfWeekFromFirstDay(startDate: string, days: number): Date {
     const start = new Date(startDate);
     const offset = new Date().getTimezoneOffset() * 60 * 1000;
-    // const initDate = new Date(start.setUTCDate(start.getDate() - start.getDay() + days));
-    // const dayToSet = initDate > new Date() ? new Date() : initDate;
+    const initDate = new Date(start.setUTCDate(start.getDate() - start.getDay() + days));
+    const dayToSet = initDate > new Date() ? new Date() : initDate;
 
-    const lastDay = new Date(start.setUTCDate(start.getDate() - start.getDay() + days)).setUTCHours(23, 59, 59, 999) + offset;
+    const lastDay = dayToSet.setUTCHours(23, 59, 59, 999) + offset;
 
-    return new Date(lastDay).toUTCString();
+    return new Date(lastDay);
   }
 
-  public static getFirstDayOfWeekUtc(date: string): string {
+  public static getFirstDayOfWeekUtc(date: string): Date {
     const start = new Date(date);
     const offset = new Date().getTimezoneOffset() * 60 * 1000;
     const day = new Date(start.setUTCDate(start.getDate()))
       .setUTCHours(0, 0, 0, 0) + offset;
 
-    return new Date(day).toUTCString();
+    return new Date(day);
   }
 
-  public static convertDateToUtc(date: string): string {
+  public static convertDateToUtc(date: string): Date {
     const init = new Date(date);
     const offset = new Date().getTimezoneOffset() * 60 * 1000;
-    const day = new Date(init.setUTCDate(init.getDate()) + offset);
+    const day = new Date(init.setUTCDate(init.getUTCDate()) + offset);
 
-    return new Date(day).toUTCString();
+    return day;
   }
 
-  public static toUtc(date: string | Date): string {
-
+  public static toUtcFormat(date: string | Date): string {
     if (typeof date === 'string') {
       const gmt = new Date(this.convertDateToUtc(date));
       return new Date(Date.UTC(gmt.getFullYear(),

@@ -6,11 +6,11 @@ import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { Role, RoleDTO } from '@shared/models/roles.model';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { filter, Observable, takeWhile } from 'rxjs';
+import { filter, Observable, Subject, takeWhile } from 'rxjs';
 
-import { SetHeaderState, ShowSideDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { GetBusinessByUnitType, SaveRole, SaveRoleSucceeded } from '../store/security.actions';
+import { GetBusinessByUnitType, GetPermissionsTree, SaveRole, SaveRoleSucceeded } from '../store/security.actions';
 import { SecurityState } from '../store/security.state';
 import { RoleFormComponent } from './role-form/role-form.component';
 import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, DISABLED_GROUP, OPRION_FIELDS } from './roles-and-permissions.constants';
@@ -37,6 +37,7 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
   public optionFields = OPRION_FIELDS;
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public roleId: number | null;
+  public filteredItems$ = new Subject<number>();
 
   get dialogTitle(): string {
     return this.isEditRole ? EDIT_DIALOG_TITLE : DEFAULT_DIALOG_TITLE;
@@ -156,6 +157,11 @@ export class RolesAndPermissionsComponent implements OnInit, OnDestroy {
     this.roleFormGroup.get('businessUnitType')?.disable();
     this.roleFormGroup.get('businessUnitId')?.disable();
     this.store.dispatch(new ShowSideDialog(true));
+  }
+
+  public showFilters(): void {
+    this.store.dispatch(new GetPermissionsTree(this.businessUnitControl.value));
+    this.store.dispatch(new ShowFilterDialog(true));
   }
 
   private generateBusinessForm(): FormGroup {

@@ -13,6 +13,7 @@ import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model'
 
 import { Destroyable } from '@core/helpers';
 import { User } from '@shared/models/user.model';
+import { RowNode } from '@ag-grid-community/core';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { DataSourceItem, TabConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
@@ -51,7 +52,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   @Select(UserState.user)
   readonly user$: Observable<User>;
 
-  public readonly tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
+  public tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
   public activeTabIdx = 0;
   public appliedFiltersAmount = 0;
   public readonly exportOptions: ItemModel[] = TimesheetExportOptions;
@@ -71,7 +72,10 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     private router: Router,
   ) {
     super();
-    store.dispatch(new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }));
+    store.dispatch([
+      new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }),
+      new Timesheets.ResetFiltersState(),
+    ]);
 
     this.isAgency = this.router.url.includes('agency');
   }
@@ -80,10 +84,12 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     if (this.isAgency) {
       this.initOrganizationsList();
     } else {
-      this.store.dispatch(new Timesheets.UpdateFiltersState());
+      this.store.dispatch([
+        new Timesheets.UpdateFiltersState(),
+        new Timesheets.GetFiltersDataSource()
+      ]);
     }
 
-    this.initTabsCount();
     this.startFiltersWatching();
     this.startOrganizationWatching();
     this.calcTabsChips();
@@ -116,7 +122,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public resetFilters(): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState());
+    this.store.dispatch(new Timesheets.UpdateFiltersState(null, this.activeTabIdx !== 0));
   }
 
   public updateTableByFilters(filters: any): void {
@@ -143,6 +149,12 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.appliedFiltersAmount = amount;
   }
 
+  public bulkApprove(data: RowNode[]): void {
+  }
+
+  public bulkExport(data: RowNode[]): void {
+  }
+
   private startFiltersWatching(): void {
     this.timesheetsFilters$.pipe(
       filter(Boolean),
@@ -156,14 +168,13 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       filter(Boolean),
       distinctUntilChanged(),
       switchMap((organizationId: number) => this.store.dispatch(
-        new Timesheets.UpdateFiltersState({ organizationId })
+        [
+          new Timesheets.UpdateFiltersState({ organizationId }),
+          new Timesheets.SelectOrganization(organizationId),
+        ]
       )),
       takeUntil(this.componentDestroy()),
     ).subscribe();
-  }
-
-  private initTabsCount(): void {
-    this.store.dispatch(new Timesheets.GetTabsCounts());
   }
 
   private initOrganizationsList(): void {
@@ -174,7 +185,10 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       takeUntil(this.componentDestroy()),
     ).subscribe(res => {
       this.organizationControl.setValue(res[0].id, { emitEvent: false });
-      this.store.dispatch(new Timesheets.UpdateFiltersState({ organizationId: res[0].id }));
+      this.store.dispatch([
+        new Timesheets.UpdateFiltersState({ organizationId: res[0].id }),
+        new Timesheets.GetFiltersDataSource()
+      ]);
     });
   }
 
@@ -185,10 +199,18 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       takeUntil(this.componentDestroy()),
     )
     .subscribe((data) => {
-      this.tabConfig[1].amount = data.pending;
-      this.tabConfig[2].amount = data.missing;
-      this.tabConfig[3].amount = data.rejected;
-      this.cd.markForCheck();
+      this.tabConfig = this.tabConfig.map((el, idx) => {
+        if (idx === 1) {
+          el.amount = data.pending;
+        } else if (idx === 2) {
+          el.amount = data.missing;
+        } else if (idx === 3) {
+          el.amount = data.rejected;
+        }
+
+        return el;
+      });
+      this.cd.detectChanges();
     });
   }
 }

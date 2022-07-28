@@ -2,7 +2,7 @@ export interface AddTimsheetForm {
   timeIn: string;
   timeOut: string;
   departmentId: number;
-  billRateId: number;
+  billRateConfigId: number;
   amount: number;
   description: string;
 }

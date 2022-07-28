@@ -25,7 +25,7 @@
     <e-column headerTextAlign="Right" width="120">
       <ng-template #headerTemplate let-data>
         <div class="controls-header">
-          <button ejs-button cssClass="e-flat icon-button c" *ngIf="!isSubrowDisplay; else onSubrowToggle" (click)="expandAll()">
+          <button ejs-button cssClass="e-flat icon-button" *ngIf="!isSubrowDisplay; else onSubrowToggle" (click)="expandAll()">
             <span><img src="assets/icons/menu-expand.svg" alt="coll" class="icon"></span>
           </button>
           <ng-template #onSubrowToggle>
@@ -45,7 +45,7 @@
       </ng-template>
       <ng-template #template let-data>
         <div class="row-tool-buttons">
-          <button ejs-button cssClass="e-flat" [disabled]="true">
+          <button *ngIf="isLockMenuButtonsShown" ejs-button cssClass="e-flat" [disabled]="true">
             <span><i-feather [name]="data.isLocked ? 'lock' : 'unlock'" class="icon"></i-feather></span>
           </button>
           <button ejs-button cssClass="e-flat default-icon-button">
@@ -56,7 +56,14 @@
     </e-column>
     <e-column field="orderId" headerText="ORDER ID" width="142">
       <ng-template #template let-data>
-        <ng-container *ngIf="showReOrders ? !data.reOrders?.length : !data.children?.length; else withToggle">
+        <ng-container
+        *ngIf="
+          data.orderType === orderTypes.OpenPerDiem
+            ? !data.reOrders?.length
+            : !data.children?.length;
+          else withToggle
+        "
+      >
           <div>
             <b>{{ data.orderId }}</b>
           </div>
@@ -87,12 +94,6 @@
       </ng-template>
     </e-column>
     <e-column field="status" headerText="STATUS" width="152">
-      <ng-template #headerTemplate let-data>
-        <div class="sort-header">
-          <span class="e-headertext">STATUS</span>
-          <i-feather name="filter" class="icon" (click)="onSortStatus()"></i-feather>
-        </div>
-      </ng-template>
       <ng-template #template let-data>
         <div class="status-cell">
           <ejs-chiplist>
@@ -145,26 +146,31 @@
   </e-columns>
 
   <ng-template #detailTemplate let-data>
-    <div class="subrow-wrapper" *ngIf="!showReOrders">
+    <div class="subrow-wrapper">
+      <ng-container *ngIf="data.orderType === orderTypes.OpenPerDiem; else defaultSubRow">
+        <app-grid-subrow-reorder
+          *ngFor="let child of data.reOrders"
+          [reOrder]="child"
+          [order]="data"
+          [selected]="selectedReOrder?.selected?.order === data.id && selectedReOrder?.selected.reOrder === child.id"
+          (clickEvent)="onOpenReorderDialog($event, data)"
+        ></app-grid-subrow-reorder>
+      </ng-container>
+    </div>
+
+    <ng-template #defaultSubRow>
       <app-grid-subrow-candidate
         *ngFor="let child of data.children"
         [candidat]="child"
         [order]="data"
-        [selected]="selectedCandidate?.selected.order === data.orderId && selectedCandidate?.selected.positionId === child.positionId"
-        [isAgency]="false"
+        [selected]="
+          selectedCandidate?.selected?.order === data.id &&
+          selectedCandidate?.selected.positionId === child.positionId
+        "
+        [isAgency]="true"
         (clickEvent)="onOpenCandidateDialog($event, data)"
       ></app-grid-subrow-candidate>
-    </div>
-    <div class="subrow-wrapper" *ngIf="showReOrders">
-      <app-grid-subrow-reorder
-        *ngFor="let child of data.reOrders"
-        [reOrder]="child"
-        [order]="data"
-        [hideAgency]="true"
-        [selected]="selectedReOrder?.selected.order === data.orderId && selectedReOrder?.selected.reOrder === child.orderId"
-        (clickEvent)="onOpenReorderDialog($event, data)"
-      ></app-grid-subrow-reorder>
-    </div>
+    </ng-template>
   </ng-template>
 
   <ng-template #pagerTemplate let-data>
