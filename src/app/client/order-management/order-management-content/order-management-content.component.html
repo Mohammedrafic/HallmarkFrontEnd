@@ -126,7 +126,14 @@
           </span>
         </ng-template>
         <ng-template #template let-data>
-          <ng-container *ngIf="showReOrders ? !data.reOrders?.length : !data.children?.length; else withToggle">
+          <ng-container
+            *ngIf="
+              data.orderType === orderTypes.OpenPerDiem
+                ? !data.reOrders?.length
+                : !data.children?.length;
+              else withToggle
+            "
+          >
             <div>
               <b>{{ data.id }}</b>
             </div>
@@ -247,7 +254,19 @@
     </e-columns>
 
     <ng-template #detailTemplate let-data>
-      <div class="subrow-wrapper" *ngIf="!showReOrders">
+      <div class="subrow-wrapper">
+        <ng-container *ngIf="data.orderType === orderTypes.OpenPerDiem; else defaultSubRow">
+          <app-grid-subrow-reorder
+            *ngFor="let child of data.reOrders"
+            [reOrder]="child"
+            [order]="data"
+            [selected]="selectedReOrder?.selected?.order === data.id && selectedReOrder?.selected.reOrder === child.id"
+            (clickEvent)="onOpenReorderDialog($event, data)"
+          ></app-grid-subrow-reorder>
+        </ng-container>
+      </div>
+
+      <ng-template #defaultSubRow>
         <app-grid-subrow-candidate
           *ngFor="let child of data.children"
           [candidat]="child"
@@ -259,16 +278,7 @@
           [isAgency]="true"
           (clickEvent)="onOpenCandidateDialog($event, data)"
         ></app-grid-subrow-candidate>
-      </div>
-      <div class="subrow-wrapper" *ngIf="showReOrders">
-        <app-grid-subrow-reorder
-          *ngFor="let child of data.reOrders"
-          [reOrder]="child"
-          [order]="data"
-          [selected]="selectedReOrder?.selected?.order === data.id && selectedReOrder?.selected.reOrder === child.id"
-          (clickEvent)="onOpenReorderDialog($event, data)"
-        ></app-grid-subrow-reorder>
-      </div>
+      </ng-template>
     </ng-template>
 
     <ng-template #pagerTemplate let-data>
@@ -336,7 +346,9 @@
   <form [formGroup]="OrderFilterFormGroup">
     <div class="bootstrap">
       <div class="input-container">
-        <label for="orderId">{{ activeTab === OrganizationOrderManagementTabs.ReOrders ? 'Re-Order ID' : 'Order ID' }}</label>
+        <label for="orderId">{{
+          activeTab === OrganizationOrderManagementTabs.ReOrders ? 'Re-Order ID' : 'Order ID'
+        }}</label>
         <div class="input-group">
           <input id="orderId" class="e-input" type="text" maxlength="50" formControlName="orderId" />
         </div>
@@ -665,3 +677,4 @@
   [candidate]="selectedCandidate"
   [openEvent]="openChildDialog"
 ></app-child-order-dialog>
+

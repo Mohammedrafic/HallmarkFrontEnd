@@ -24,6 +24,7 @@ import { UserSettingsComponent } from './user-list/add-edit-user/user-settings/u
 import { VisibilitySettingsComponent } from './user-list/add-edit-user/visibility-settings/visibility-settings.component';
 import { AddEditVisibilityComponent } from './user-list/add-edit-user/visibility-settings/add-edit-visibility/add-edit-visibility.component';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { RolesFiltersComponent } from './roles-and-permissions/roles-grid/roles-filters/roles-filters.component';
 
 const scurityIcons = {
   Sliders,
@@ -44,6 +45,7 @@ const scurityIcons = {
     UserSettingsComponent,
     VisibilitySettingsComponent,
     AddEditVisibilityComponent,
+    RolesFiltersComponent,
   ],
   imports: [
     CommonModule,
