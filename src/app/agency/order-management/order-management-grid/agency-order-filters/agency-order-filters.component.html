@@ -1,16 +1,9 @@
 <form class="bootstrap" [formGroup]="form" *ngIf="form">
   <div>
-    <div class="input-container" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders">
-      <label for="orderId">Order ID</label>
+    <div class="input-container">
+      <label for="orderId">{{ activeTab === AgencyOrderManagementTabs.ReOrders ? 'Re-Order ID' : 'Order ID' }}</label>
       <div class="input-group">
         <input id="orderId" class="e-input" type="text" maxlength="50" formControlName="orderId" />
-      </div>
-    </div>
-
-    <div class="input-container" *ngIf="activeTab === AgencyOrderManagementTabs.ReOrders">
-      <label for="reOrderId">Re-Order ID</label>
-      <div class="input-group">
-        <input id="reOrderId" class="e-input" type="text" maxlength="50" formControlName="reOrderId" />
       </div>
     </div>
   </div>
