@@ -150,7 +150,7 @@ export const SavedFiltersParams: string[] = [
   'organizationId',
   'orderBy',
   'date',
-  'search',
+  'searchTerm',
   'statusIds',
 ];
 

@@ -451,7 +451,7 @@ export class TimesheetsState {
     .pipe(
       tap((organizations: DataSourceItem[]) => patchState({
         organizations,
-        selectedOrganizationId: organizations[0].id,
+        selectedOrganizationId: organizations[0]?.id,
       })),
     );
   }
