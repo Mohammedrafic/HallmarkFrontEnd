@@ -130,6 +130,7 @@ export type OrderCandidatesList = {
   };
   candidateStatus?: CandidateStatus;
   agencyName?: string;
+  organizationId?: number;
 };
 
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;
