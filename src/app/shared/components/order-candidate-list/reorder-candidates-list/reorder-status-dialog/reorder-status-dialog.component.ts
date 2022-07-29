@@ -198,15 +198,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   private setValueForm({
-    order: { locationName, departmentName, skillName, orderOpenDate, shiftStartTime, shiftEndTime, openPositions },
-    jobId,
-    offeredBillRate,
-    candidateBillRate,
-  }: OrderCandidateJob) {
-    this.acceptForm.patchValue({
-      jobId,
-      offeredBillRate,
-      candidateBillRate,
+    order: {
+      reOrderFromId,
+      hourlyRate,
       locationName,
       departmentName,
       skillName,
@@ -214,7 +208,22 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       shiftStartTime,
       shiftEndTime,
       openPositions,
-      hourlyRate: candidateBillRate,
+    },
+    candidateBillRate,
+  }: OrderCandidateJob) {
+    const candidateBillRateValue = candidateBillRate ?? hourlyRate;
+    this.acceptForm.patchValue({
+      reOrderFromId,
+      offeredBillRate: hourlyRate,
+      candidateBillRate: candidateBillRateValue,
+      locationName,
+      departmentName,
+      skillName,
+      orderOpenDate,
+      shiftStartTime,
+      shiftEndTime,
+      openPositions,
+      hourlyRate: candidateBillRateValue,
     });
     this.enableFields();
   }
@@ -332,3 +341,4 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     );
   }
 }
+
