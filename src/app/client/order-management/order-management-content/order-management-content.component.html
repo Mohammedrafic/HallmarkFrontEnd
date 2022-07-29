@@ -50,7 +50,7 @@
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
-      <e-column headerTextAlign="Right" width="130">
+      <e-column headerTextAlign="Right" width="145">
         <ng-template #headerTemplate let-data>
           <div class="controls-header">
             <button
@@ -89,6 +89,9 @@
           >
             <button ejs-button cssClass="e-flat default-icon-button">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
+            </button>
+            <button *ngIf="activeTab === OrganizationOrderManagementTabs.PerDiem" (click)="createReorder(data)" ejs-button cssClass="e-flat default-icon-button">
+              <span><i-feather name="calendar" class="icon"></i-feather></span>
             </button>
             <button
               ejs-button
@@ -670,6 +673,7 @@
   [openEvent]="openDetails"
   (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid()"
+  (closeReOrderEmitter)="onAddReorderClose()"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
   (updateOrders)="getOrders()"
 ></app-order-details-dialog>

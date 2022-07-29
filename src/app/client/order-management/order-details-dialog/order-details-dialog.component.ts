@@ -36,6 +36,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
+  @Output() closeReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
   @Output() selectReOrder = new EventEmitter<any>();
   @Output() updateOrders = new EventEmitter();
 
@@ -199,6 +200,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public clearEditReOrder(): void {
+    this.closeReOrderEmitter.emit();
     this.reOrderToEdit = null;
   }
 

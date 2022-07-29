@@ -194,6 +194,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private isRedirectedFromDashboard: boolean;
   private dashboardFilterSubscription: Subscription;
   private orderPerDiemId: number | null;
+  private creatingReorder = false;
 
   constructor(
     private store: Store,
@@ -311,6 +312,16 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public override updatePage(): void {
     this.getOrders();
+  }
+
+  public onAddReorderClose(): void {
+    this.clearSelection(this.gridWithChildRow);
+  }
+
+  public createReorder(data: any): void {
+    this.store.dispatch([new ShowSideDialog(true), new GetOrderById(data.id, data.organizationId, {} as any)]);
+    this.creatingReorder = true;
+    this.gridWithChildRow.selectRow(parseInt(data.index));
   }
 
   public searchOrders(event: KeyboardEvent): void {
@@ -525,6 +536,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       this.orderManagementService.excludeDeployed = false;
     }
 
+    if (this.creatingReorder) {
+      this.creatingReorder = false;
+      return;
+    }
+    
     this.rowSelected(event, this.gridWithChildRow);
 
     if (!event.isInteracted) {
