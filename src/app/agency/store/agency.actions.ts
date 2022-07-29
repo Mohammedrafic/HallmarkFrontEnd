@@ -1,4 +1,4 @@
-import { Agency } from 'src/app/shared/models/agency.model';
+import { Agency, AgencyListFilters } from 'src/app/shared/models/agency.model';
 import {
   AssociateOrganizations,
   FeeExceptionsDTO,
@@ -50,7 +50,7 @@ export class DeleteAssociateOrganizationsByIdSucceeded {
 
 export class GetAgencyByPage {
   static readonly type = '[agency] Get Agency by Page';
-  constructor(public pageNumber: number, public pageSize: number) {}
+  constructor(public pageNumber: number, public pageSize: number, public filters: AgencyListFilters) {}
 }
 
 export class GetAgencyById {

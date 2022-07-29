@@ -137,7 +137,7 @@ export class OrganizationStructure {
 
 export class OrganizationFilter {
   searchTerm?: string;
-  organizationNames?: string[];
+  businessUnitNames?: string[];
   statuses?: string[];
   cities?: string[];
   contacts?: string[];
@@ -147,7 +147,7 @@ export class OrganizationFilter {
 }
 
 export class OrganizationDataSource {
-  organizationNames: string[];
+  businessUnitNames: string[];
   statuses: string[];
   cities: string[];
   contacts: string[];
