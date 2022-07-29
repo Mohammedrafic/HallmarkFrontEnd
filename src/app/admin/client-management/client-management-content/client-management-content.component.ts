@@ -93,7 +93,7 @@ export class ClientManagementContentComponent
     store.dispatch(new SetHeaderState({ title: 'Organization List', iconName: 'file-text' }));
     this.OrganizationFilterFormGroup = this.fb.group({
       searchTerm: new FormControl(''),
-      organizationNames: new FormControl([]),
+      businessUnitNames: new FormControl([]),
       statuses: new FormControl([]),
       cities: new FormControl([]),
       contacts: new FormControl([]),
@@ -106,7 +106,7 @@ export class ClientManagementContentComponent
     this.idFieldName = 'organizationId';
     this.filterColumns = {
       searchTerm: { type: ControlTypes.Text },
-      organizationNames: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+      businessUnitNames: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
       statuses: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
       cities: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
       contacts: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
@@ -114,7 +114,7 @@ export class ClientManagementContentComponent
     this.organizationDataSources$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
       .subscribe((data: OrganizationDataSource) => {
-        this.filterColumns.organizationNames.dataSource = data.organizationNames;
+        this.filterColumns.businessUnitNames.dataSource = data.businessUnitNames;
         this.filterColumns.contacts.dataSource = data.contacts;
         this.filterColumns.cities.dataSource = data.cities;
       });
@@ -156,7 +156,7 @@ export class ClientManagementContentComponent
   public onFilterClose() {
     this.OrganizationFilterFormGroup.setValue({
       searchTerm: this.filters.searchTerm || '',
-      organizationNames: this.filters.organizationNames || [],
+      businessUnitNames: this.filters.businessUnitNames || [],
       statuses: this.filters.statuses || [],
       cities: this.filters.cities || [],
       contacts: this.filters.contacts || [],

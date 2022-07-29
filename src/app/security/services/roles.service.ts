@@ -14,7 +14,7 @@ export class RolesService {
   /**
    * Get the list of roles by BusinessUnitType and BusinessUnitId
    * @param BusinessUnitType
-   * @param BusinessUnitId
+   * @param BusinessUnitIds
    * @param PageNumber
    * @param PageSize
    * @param Filters
@@ -23,12 +23,12 @@ export class RolesService {
    */
   public getRolesPage(
     BusinessUnitType: BusinessUnitType,
-    BusinessUnitId: number,
+    BusinessUnitIds: number[],
     PageNumber: number,
     PageSize: number,
     Filters: RolesFilters
   ): Observable<RolesPage> {
-    return this.http.post<RolesPage>(`/api/Roles/filtered`, { BusinessUnitType, BusinessUnitId, PageNumber, PageSize, ...Filters });
+    return this.http.post<RolesPage>(`/api/Roles/filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, ...Filters });
   }
 
   /**

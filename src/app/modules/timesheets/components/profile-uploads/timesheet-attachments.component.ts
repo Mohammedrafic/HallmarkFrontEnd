@@ -8,7 +8,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { TimesheetAttachment } from '../../interface';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
-import { FileViewer } from '../../modules/file-viewer/file-viewer.actions';
+import { FileViewer } from '../../../../shared/modules/file-viewer/file-viewer.actions';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import FileLoaded = TimesheetDetails.FileLoaded;
 

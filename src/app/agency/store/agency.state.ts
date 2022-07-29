@@ -244,10 +244,10 @@ export class AgencyState {
   @Action(GetAgencyByPage)
   GetAgencyByPage(
     { patchState }: StateContext<AgencyStateModel>,
-    { pageNumber, pageSize }: GetAgencyByPage
+    { pageNumber, pageSize, filters }: GetAgencyByPage
   ): Observable<AgencyPage> {
     patchState({ isAgencyLoading: true });
-    return this.agencyService.getAgencies(pageNumber, pageSize).pipe(
+    return this.agencyService.getAgencies(pageNumber, pageSize, filters).pipe(
       tap((payload) => {
         patchState({ isAgencyLoading: false, agencyPage: payload });
         return payload;

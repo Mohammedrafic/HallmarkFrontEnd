@@ -22,7 +22,7 @@ export class AcceptFormComponent {
 
   static generateFormGroup(): FormGroup {
     return new FormGroup({
-      jobId: new FormControl({ value: '', disabled: true }),
+      reOrderFromId: new FormControl({ value: '', disabled: true }),
       offeredBillRate: new FormControl({ value: '', disabled: true }),
       candidateBillRate: new FormControl({ value: '', disabled: true }),
       locationName: new FormControl({ value: '', disabled: true }),

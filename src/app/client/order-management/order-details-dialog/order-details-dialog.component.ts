@@ -36,6 +36,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
+  @Output() closeReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
   @Output() selectReOrder = new EventEmitter<any>();
   @Output() updateOrders = new EventEmitter();
 
@@ -89,9 +90,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   ngOnChanges(changes: SimpleChanges): void {
     if(changes['order']?.currentValue) {
       this.setCloseOrderButtonState();
-      this.showCloseButton = this.openInProgressFilledStatuses.includes(
-        changes['order'].currentValue.statusText.toLowerCase()
-      );
+      const order = changes['order']?.currentValue;
+      const hasStatus = this.openInProgressFilledStatuses.includes(order.statusText.toLowerCase());
+      this.showCloseButton = hasStatus || (!hasStatus && order?.orderClosureReason);
       if (this.chipList) {
         this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
         this.chipList.text = changes['order'].currentValue.statusText.toUpperCase();
@@ -199,6 +200,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public clearEditReOrder(): void {
+    this.closeReOrderEmitter.emit();
     this.reOrderToEdit = null;
   }
 

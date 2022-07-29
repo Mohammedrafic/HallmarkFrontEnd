@@ -199,6 +199,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   private setValueForm({
     order: {
+      reOrderFromId,
+      hourlyRate,
       locationName,
       departmentName,
       skillName,
@@ -206,16 +208,14 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       shiftStartTime,
       shiftEndTime,
       openPositions,
-      hourlyRate,
     },
-    jobId,
-    offeredBillRate,
     candidateBillRate,
   }: OrderCandidateJob) {
+    const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     this.acceptForm.patchValue({
-      jobId,
-      offeredBillRate,
-      candidateBillRate,
+      reOrderFromId,
+      offeredBillRate: hourlyRate,
+      candidateBillRate: candidateBillRateValue,
       locationName,
       departmentName,
       skillName,
@@ -223,7 +223,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       shiftStartTime,
       shiftEndTime,
       openPositions,
-      hourlyRate,
+      hourlyRate: candidateBillRateValue,
     });
     this.enableFields();
   }
@@ -306,7 +306,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
           tap((value: number) => {
             if (this.hourlyRate?.valid) {
               this.jobStatus$.next(
-                this.orderCandidateJob.order.hourlyRate === value ? ReOrderBillRate : ReOrderOfferedBillRate
+                this.orderCandidateJob.candidateBillRate === value ? ReOrderBillRate : ReOrderOfferedBillRate
               );
             }
           })
@@ -319,6 +319,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     switch (this.currentCandidateApplicantStatus) {
       case !this.isAgency && CandidatStatus.BillRatePending:
         this.acceptForm.get('hourlyRate')?.enable();
+        this.acceptForm.get('candidateBillRate')?.disable();
         break;
       case CandidatStatus.OfferedBR:
       case CandidatStatus.OnBoard:
@@ -340,3 +341,4 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     );
   }
 }
+

@@ -13,15 +13,15 @@
         </div>
       </div>
       <div class="dropdown-container">
-        <div class="input-group dropdown">
-          <ejs-dropdownlist
-            appValidateWithMessage
-            formControlName="business"
-            [fields]="bussinesDataFields"
-            [dataSource]="bussinesData$ | async"
-            placeholder="Business"
-          ></ejs-dropdownlist>
-        </div>
+        <app-multiselect-dropdown
+          [formGroupInstance]="businessForm"
+          [fields]="bussinesDataFields"
+          [dataSource]="bussinesData$ | async"
+          [showSelectAll]="true"
+          controlName="business"
+          placeholder="Business"
+          selectAllText="All"
+        ></app-multiselect-dropdown>
       </div>
     </div>
   </ng-container>

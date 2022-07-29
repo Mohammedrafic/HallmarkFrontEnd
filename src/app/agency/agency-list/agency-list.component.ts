@@ -192,18 +192,18 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
 
   public onFilterClose() {
     this.agencyListFilterFormGroup.setValue({
-      name: this.filters.name || null,
-      status: this.filters.status || [],
-      city: this.filters.city || null,
-      contactPerson: this.filters.contactPerson || null,
+      searchTerm: this.filters.searchTerm || null,
+      businessUnitNames: this.filters.businessUnitNames || [],
+      statuses: this.filters.statuses || [],
+      cities: this.filters.cities || [],
+      contacts: this.filters.contacts || []
     });
     this.filteredItems = this.filterService.generateChips(this.agencyListFilterFormGroup, this.filterColumns);
     this.filteredItems$.next(this.filteredItems.length);
   }
 
   private dispatchNewPage(): void {
-    // TODO: add filters to parameters
-    this.store.dispatch(new GetAgencyByPage(this.currentPage, this.pageSize));
+    this.store.dispatch(new GetAgencyByPage(this.currentPage, this.pageSize, this.filters));
   }
 
   private getDefaultFileName(): string {

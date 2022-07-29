@@ -4,6 +4,7 @@
   cssClass="dialog timesheet-details-dialog"
   [width]="'1180px'"
   [visible]="false"
+  [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
   <ng-template #content>
@@ -141,9 +142,8 @@
               ></app-profile-cumulative-hours>
           </div>
 
-          <div class="tile-dark-blue miles">
-
-            <app-profile-miles [milesData]="{weekMiles: 0, cumulativeMiles: 0, weekCharge: 0, cumulativeCharge: 0}"></app-profile-miles>
+          <div class="tile-dark-blue miles" *ngIf="milesData$ | async as milesData">
+            <app-profile-miles [milesData]="milesData"></app-profile-miles>
           </div>
 
           <div class="tile-dark-blue profile-uploads" *ngIf="timesheetDetails?.attachments?.length">
