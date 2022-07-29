@@ -43,4 +43,20 @@
       background-color: $secondary-dark-blue-50;
     }
   }
+
+  .custom-button {
+    .icon {
+      padding: 7px 0 9px;
+    }
+    &:hover {
+      border-radius: 8px;
+      background-color: $supportive-red-40;
+    }
+
+    i-feather {
+      cursor: pointer;
+      color: $supportive-red;
+    }
+
+  }
 }

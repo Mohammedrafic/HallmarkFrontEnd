@@ -30,8 +30,6 @@ export class OrderPerDiemCandidatesListComponent extends AbstractOrderCandidateL
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
     this.candidate = { ...data };
-    this.addActiveCssClass(event);
-
     if (this.order && this.candidate) {
       if (this.isAgency) {
         if ([ApplicantStatus.NotApplied, ApplicantStatus.Withdraw].includes(this.candidate.status)) {
