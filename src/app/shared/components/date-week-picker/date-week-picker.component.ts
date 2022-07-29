@@ -36,10 +36,10 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     this.setInitDate();
   }
 
-  public onRenderCell(args: RenderDayCellEventArgs): void {
+  public renderCell(args: RenderDayCellEventArgs): void {
     if (this.dateControl.value && typeof this.dateControl.value === 'string') {
       const [from, to] = DateTimeHelper.getWeekStartEnd(this.dateControl.value);
-
+      
       if (DateTimeHelper.isDateBetween(args.date, from, to)) {
         args.element?.classList.add('e-highlightselectedrange');
       }
@@ -48,21 +48,20 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     }
   }
 
-  prevWeek(): void {
+  public prevWeek(): void {
     const weekStart = new Date(new Date(this.startDateValue).getTime() - 7 * 24 * 60 * 60 * 1000);
     const dateRange = DateTimeHelper.getRange(weekStart);
 
     this.startDateValue = weekStart.toDateString();
-    this.dateControl.patchValue(dateRange, { emitEvent: false });
+    this.setWeekPeriod(dateRange);
   }
 
-  nextWeek(): void {
+  public nextWeek(): void {
     const weekStart = new Date(new Date(this.startDateValue).getTime() + 7 * 24 * 60 * 60 * 1000);
-    
     const dateRange = DateTimeHelper.getRange(weekStart);
-    this.startDateValue = DateTimeHelper.getWeekStartEnd(dateRange)[0].toDateString();
 
-    this.dateControl.patchValue(dateRange, { emitEvent: false });
+    this.startDateValue = DateTimeHelper.getWeekStartEnd(dateRange)[0].toDateString();
+    this.setWeekPeriod(dateRange);
   }
 
   public clearControl(): void {
@@ -83,10 +82,12 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
   }
 
   private setInitDate(): void {
-    this.startDateValue = this.initDates[0].toDateString();
-    this.dateControl.patchValue(
-      DateTimeHelper.getRange(this.initDates[0]),
-      { emitEvent: false });
+    if (this.initDates) {
+      this.startDateValue = this.initDates[0].toDateString();
+      this.dateControl.patchValue(
+        DateTimeHelper.getRange(this.initDates[0]),
+        { emitEvent: false });
+    }
   }
 
   private setControlValue(value: string): void {
@@ -97,6 +98,15 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     this.dateChanged.emit([
       DateTimeHelper.toUtcFormat(value),
       DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(value))
+    ]);
+  }
+
+  private setWeekPeriod(range: string,): void {
+    this.dateControl.setValue(range, { emitEvent: false });
+
+    this.dateChanged.emit([
+      DateTimeHelper.toUtcFormat(new Date(this.startDateValue)),
+      DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(this.startDateValue)),
     ]);
   }
 }
