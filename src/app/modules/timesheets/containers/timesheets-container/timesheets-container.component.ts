@@ -75,7 +75,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
   public filters: TimesheetsFilterState | undefined;
   public readonly searchControl: FormControl = new FormControl('');
-  public readonly dateControl: FormControl = new FormControl(null);
   public readonly organizationControl: FormControl = new FormControl(null);
   public readonly currentSelectedTableRowIndex: Observable<number>
     = this.timesheetsService.getStream();
@@ -161,6 +160,15 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public changeFiltersAmount(amount: number): void {
     this.appliedFiltersAmount = amount;
+  }
+
+  public setRange(range: string[]): void {
+    this.store.dispatch(new Timesheets.UpdateFiltersState({
+      dateTimeOffset: {
+        startDate: range[0] || '',
+        endDate: range[1] || '',
+      }
+    }));
   }
 
   public bulkApprove(data: RowNode[]): void {
