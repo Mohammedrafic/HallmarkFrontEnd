@@ -42,3 +42,7 @@ export class SwitchMonthWeekTimeSelection {
   static readonly type = `${dashboardStatePrefix} Switch Month Week Time Selection`;
   constructor(public payload: TimeSelectionEnum) {}
 }
+
+export class GetAllSkills {
+  static readonly type = `${dashboardStatePrefix} Get All Skills`;
+}

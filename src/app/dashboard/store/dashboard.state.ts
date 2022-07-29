@@ -6,7 +6,7 @@ import { Observable, tap } from 'rxjs';
 import lodashMap from 'lodash/fp/map';
 
 import { DashboardService } from '../services/dashboard.service';
-import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile, SetFilteredItems, SetDashboardFiltersState, SwitchMonthWeekTimeSelection } from './dashboard.actions';
+import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile, SetFilteredItems, SetDashboardFiltersState, SwitchMonthWeekTimeSelection, GetAllSkills } from './dashboard.actions';
 import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import { DashboardDataModel } from '../models/dashboard-data.model';
@@ -15,6 +15,7 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { DASHBOARD_FILTER_STATE, TIME_SELECTION_OF_CHART_LINE } from '@shared/constants';
 import { DashboardFiltersModel } from '../models/dashboard-filters.model';
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
+import { Skill } from '@shared/models/skill.model';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
@@ -24,6 +25,7 @@ export interface DashboardStateModel {
   filteredItems: FilteredItem[];
   dashboardFilterState: DashboardFiltersModel;
   positionTrendTimeSelection: TimeSelectionEnum;
+  skills: Skill[];
 }
 
 @State<DashboardStateModel>({
@@ -36,6 +38,7 @@ export interface DashboardStateModel {
     filteredItems: JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [],
     dashboardFilterState: {} as DashboardFiltersModel,
     positionTrendTimeSelection: JSON.parse(window.localStorage.getItem(TIME_SELECTION_OF_CHART_LINE) as string) || TimeSelectionEnum.Monthly,
+    skills: [],
   },
 })
 @Injectable()
@@ -79,6 +82,11 @@ export class DashboardState {
     static getTimeSelection(state: DashboardStateModel): DashboardStateModel['positionTrendTimeSelection'] {
       return state.positionTrendTimeSelection;
     }
+
+  @Selector()
+    static getAllSkills(state: DashboardStateModel): DashboardStateModel['skills'] {
+      return state.skills;
+  }
 
   public constructor(private readonly actions: Actions, private dashboardService: DashboardService) {}
 
@@ -140,5 +148,14 @@ export class DashboardState {
   private switchMonthWeekTimeSelection({patchState}: StateContext<DashboardStateModel>, { payload }: SwitchMonthWeekTimeSelection) {
     patchState({positionTrendTimeSelection: payload})
     window.localStorage.setItem(TIME_SELECTION_OF_CHART_LINE, JSON.stringify(payload));
+  }
+
+  @Action(GetAllSkills)
+  private getAllSkills({patchState}: StateContext<DashboardStateModel>) {
+    return this.dashboardService.getAllSkills().pipe(
+      tap((payload: Skill[]) => {
+        patchState({ skills: payload });
+      })
+    )
   }
 }
