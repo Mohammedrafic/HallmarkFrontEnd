@@ -29,9 +29,7 @@
     <ng-container>
       <button ejs-button cssClass="e-outline" (click)="showFilters()">
         <div class="filter-button-content">
-          <span *ngIf="(filteredItems$ | async) as filteredItems" class="e-badge e-badge-success e-badge-circle">{{
-            filteredItems
-            }}</span>
+          <span *ngIf="(filteredItems$ | async) as filteredItems" class="e-badge e-badge-success e-badge-circle">{{filteredItems}}</span>
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>

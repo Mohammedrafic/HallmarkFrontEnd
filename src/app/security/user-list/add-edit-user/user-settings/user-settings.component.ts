@@ -29,7 +29,7 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
   statesGeneral$: Observable<string[]>;
 
   @Select(SecurityState.rolesPerUsers)
-  rolesPerUsers$: Observable<RolesPerUser>;
+  rolesPerUsers$: Observable<RolesPerUser[]>;
 
   public countryState$ = new Subject();
 
@@ -111,7 +111,10 @@ export class UserSettingsComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         this.form.get('roles')?.reset();
         this.businessUnitControl?.value &&
-        this.store.dispatch(new GetRolePerUser(this.businessUnitIdControl?.value || 0,this.businessUnitControl?.value || ''));
+        this.store.dispatch(new GetRolePerUser(
+          this.businessUnitControl?.value || 0,
+          this.businessUnitIdControl?.value ? [this.businessUnitIdControl?.value] : []
+        ));
       });
   }
 
