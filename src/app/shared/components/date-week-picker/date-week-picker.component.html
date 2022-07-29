@@ -1,12 +1,24 @@
-<ejs-datepicker
-  id="startDate"
-  #datePicker
-  class="datepicker datepicker--custom"
-  format="dd/MM/yyyy"
-  placeholder="From: DD/MM/YYYY - To: DD/MM/YYYY"
-  [formControl]="dateControl"
-  [allowEdit]="false"
-  (renderDayCell)="onRenderCell($event)"
-  (cleared)="clearControl()"
->
-</ejs-datepicker>
+<div class="timesheet-picker-container">
+  <button ejs-button cssClass="e-outline" (click)="prevWeek()">
+    <i-feather name="chevron-left" class="icon"></i-feather>
+  </button>
+  <ejs-datepicker
+      id="startDate"
+      #datePicker
+      class="datepicker datepicker--custom"
+      format="dd/MM/yyyy"
+      placeholder="From:DD/MM/YYYY - To:DD/MM/YYYY"
+      [formControl]="dateControl"
+      [showClearButton]="false"
+      [showTodayButton]="false"
+      [allowEdit]="false"
+      [max]="maxDate"
+      (renderDayCell)="renderCell($event)"
+      (cleared)="clearControl()"
+    >
+  </ejs-datepicker>
+  <button ejs-button cssClass="e-outline" (click)="nextWeek()">
+    <i-feather name="chevron-right" class="icon"></i-feather>
+  </button>
+</div>
+

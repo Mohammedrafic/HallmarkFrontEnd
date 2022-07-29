@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
 import { combineLatest, debounceTime, filter, Observable, Subject, Subscription, takeUntil, throttleTime } from 'rxjs';
-import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowCloseOrderDialog, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { CandidatesStatusText, OrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
@@ -81,6 +81,7 @@ import { OrderDetailsDialogComponent } from '@client/order-management/order-deta
 import isNil from 'lodash/fp/isNil';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { isArray } from 'lodash';
+import { OrderManagementContentService } from "@shared/services/order-management-content.service";
 
 @Component({
   selector: 'app-order-management-content',
@@ -133,6 +134,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public reOrdersMenu: ItemModel[] = [
     { text: MoreMenuType[0], id: '0' },
     { text: MoreMenuType[2], id: '2' },
+  ];
+
+  public closedOrderMenu: ItemModel[] = [
+    { text: MoreMenuType[1], id: '1' },
   ];
 
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
@@ -189,6 +194,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   private isRedirectedFromDashboard: boolean;
   private dashboardFilterSubscription: Subscription;
   private orderPerDiemId: number | null;
+  private creatingReorder = false;
 
   constructor(
     private store: Store,
@@ -201,7 +207,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     private datePipe: DatePipe,
     private location: Location,
     private readonly actions: Actions,
-    private orderManagementService: OrderManagementService
+    private orderManagementService: OrderManagementService,
+    private orderManagementContentService: OrderManagementContentService
   ) {
     super();
     this.isRedirectedFromDashboard =
@@ -307,6 +314,16 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.getOrders();
   }
 
+  public onAddReorderClose(): void {
+    this.clearSelection(this.gridWithChildRow);
+  }
+
+  public createReorder(data: any): void {
+    this.store.dispatch([new ShowSideDialog(true), new GetOrderById(data.id, data.organizationId, {} as any)]);
+    this.creatingReorder = true;
+    this.gridWithChildRow.selectRow(parseInt(data.index));
+  }
+
   public searchOrders(event: KeyboardEvent): void {
     const { value } = event.target as HTMLInputElement;
     const controlName =
@@ -320,7 +337,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     }
   }
 
-  private getOrders(): void {
+  public getOrders(): void {
     this.filters.orderBy = this.orderBy;
     this.filters.orderId ? this.filters.orderId : null;
     this.filters.jobStartDate ? this.filters.jobStartDate : null;
@@ -472,7 +489,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       }
     }
 
-    if (this.selectedIndex) {
+    if (!isNil(this.selectedIndex)) {
       this.gridWithChildRow.selectRow(this.selectedIndex);
     }
 
@@ -515,17 +532,22 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onRowClick(event: any): void {
-    if (event.data.isTemplate) {
-      this.navigateToOrderForm();
-      this.store.dispatch(new GetSelectedOrderById(event.data.id));
-    } else {
-      if (event.target) {
-        this.orderManagementService.excludeDeployed = false;
-      }
+    if (event.target) {
+      this.orderManagementService.excludeDeployed = false;
+    }
 
-      this.rowSelected(event, this.gridWithChildRow);
+    if (this.creatingReorder) {
+      this.creatingReorder = false;
+      return;
+    }
+    
+    this.rowSelected(event, this.gridWithChildRow);
 
-      if (!event.isInteracted) {
+    if (!event.isInteracted) {
+      if (event.data.isTemplate) {
+        this.navigateToOrderForm();
+        this.store.dispatch(new GetSelectedOrderById(event.data.id));
+      } else {
         this.selectedDataRow = event.data;
         const data = event.data;
         const options = this.getDialogNextPreviousOption(data);
@@ -545,9 +567,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           this.openDetails.next(true);
         }
       }
-
-      this.checkSelectedChildrenItem();
     }
+
+    this.checkSelectedChildrenItem();
   }
 
   public onRowDeselect(event: any, grid: any) {
@@ -665,7 +687,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.openDetails.next(true);
   }
 
-  selectReOrder(event: { reOrder: OrderManagement; order: Order | OrderManagement }): void {
+  public selectReOrder(event: { reOrder: OrderManagement; order: Order | OrderManagement }): void {
     const tabSwitchAnimation = 400;
     const { reOrder, order } = event;
     const tabId = Object.values(OrganizationOrderManagementTabs).indexOf(OrganizationOrderManagementTabs.ReOrders);
@@ -725,7 +747,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.store.dispatch(new DuplicateOrder(data.id));
         break;
       case MoreMenuType['Close']:
-        // TODO: pending implementation
+        this.orderManagementContentService.getOrderById(data.id).subscribe(order => {
+          this.selectedOrder = {...order};
+          this.store.dispatch(new ShowCloseOrderDialog(true));
+        });
         break;
       case MoreMenuType['Delete']:
         this.deleteOrder(data.id);
@@ -1043,11 +1068,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public updateGrid(): void {
+    this.getOrders();
     this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(GetOrders)).subscribe(() => {
       const [index] = this.gridWithChildRow.getSelectedRowIndexes();
       this.selectedIndex = index;
     });
-    this.getOrders();
   }
 
   private handleDashboardFilters(): void {

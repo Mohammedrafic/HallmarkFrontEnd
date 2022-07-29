@@ -150,7 +150,7 @@ export const SavedFiltersParams: string[] = [
   'organizationId',
   'orderBy',
   'date',
-  'search',
+  'searchTerm',
   'statusIds',
 ];
 
@@ -246,4 +246,8 @@ export const filterColumnDataSource: FilterDataSource = {
       name: '20-30-02'
     }
   ]
+};
+
+export const BulkApproveSuccessMessage = {
+  successMessage: 'Success. Timesheets Approved',
 };

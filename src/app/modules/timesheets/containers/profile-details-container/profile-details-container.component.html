@@ -4,6 +4,7 @@
   cssClass="dialog timesheet-details-dialog"
   [width]="'1180px'"
   [visible]="false"
+  [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
   <ng-template #content>
@@ -36,8 +37,9 @@
           class="timesheet-details-upload-container"
           #uploadContainer>
 
-<!--            TODO: Remove after resolving issue with date filter. -->
-            <div class="date-filter-mock" style="width: 300px"></div>
+            <app-date-week-picker [initDates]="weekPeriod">
+
+            </app-date-week-picker>
 
             <button
              ejs-button
@@ -119,9 +121,7 @@
           </button>
 
           <button ejs-button cssClass="e-primary"
-                  [disabled]="!isChangesSaved ||
-                  (isAgency ? timesheetDetails.status === timesheetStatus.PendingApproval :
-                  timesheetDetails.status === timesheetStatus.Approved)"
+                  [disabled]="actionButtonDisabled"
                   (click)="handleApprove()">
             {{submitText}}
           </button>

@@ -90,3 +90,18 @@ export type AgencyOrderFilteringOptions = {
     name: string;
   }[];
 };
+
+export type AgencyListFilters = {
+  searchTerm?: string;
+  businessUnitNames?: string[];
+  statuses?: string[];
+  cities?: string[];
+  contacts?: string[];
+};
+
+export class AgencyFilteringOptions {
+  businessUnitNames: string[];
+  statuses: string[];
+  cities: string[];
+  contacts: string[];
+}

@@ -13,12 +13,12 @@ import { Role, RolesFilters, RolesPage } from '@shared/models/roles.model';
 import { FilteredItem } from "@shared/models/filter.model";
 import { FilterService } from "@shared/services/filter.service";
 import { PermissionsTree } from "@shared/models/permission.model";
-import { RolesFilterColumns } from "src/app/security/roles-and-permissions/roles-and-permissions.constants";
+import { rolesFilterColumns } from "src/app/security/roles-and-permissions/roles-and-permissions.constants";
 
 import { ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { GetRolesPage, RemoveRole } from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
-import { RolesFiltersComponent } from "./roles-filters/roles-filters.component";
+import { RolesFilterService } from "./roles-filter.service";
 
 enum Active {
   No,
@@ -29,6 +29,7 @@ enum Active {
   selector: 'app-roles-grid',
   templateUrl: './roles-grid.component.html',
   styleUrls: ['./roles-grid.component.scss'],
+  providers: [RolesFilterService]
 })
 export class RolesGridComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() filterForm: FormGroup;
@@ -55,8 +56,8 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   };
   public selIndex: number[] = [];
   public sortOptions = { columns: [{ field: 'businessUnitName', direction: 'Descending' }] };
-  public filterColumns = RolesFilterColumns;
-  public rolesFilterFormGroup: FormGroup = RolesFiltersComponent.generateFiltersForm();
+  public filterColumns = rolesFilterColumns;
+  public rolesFilterFormGroup: FormGroup = this.rolesFilterService.generateFiltersForm();
 
   private filters: RolesFilters = {};
   private isAlive = true;
@@ -64,7 +65,8 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   constructor(private actions$: Actions,
               private store: Store,
               private confirmService: ConfirmService,
-              private filterService: FilterService) {
+              private filterService: FilterService,
+              private rolesFilterService: RolesFilterService) {
     super();
   }
 

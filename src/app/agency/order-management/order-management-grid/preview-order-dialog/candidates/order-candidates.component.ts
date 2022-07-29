@@ -56,6 +56,7 @@ export class OrderCandidatesComponent extends DestroyableDirective implements On
         orderId: order?.id,
         organizationId: order?.organizationId as number,
         isLocked: order?.isLocked as boolean,
+        isClosed: Boolean(order?.orderCloseDate) || Boolean(order?.orderClosureReason),
       };
     });
   }

@@ -48,3 +48,16 @@
   display: flex;
   cursor: pointer;
 }
+
+.custom-button {
+  .icon {
+    padding-left: 0;
+  }
+  &:hover {
+    border-radius: 8px;
+  }
+}
+
+.e-active{
+  border-radius: 8px !important;
+}

@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
+import { MultiselectDropdownModule } from "@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module";
 import { SharedModule } from '@shared/shared.module';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { Sliders, Edit, Trash2, Plus } from 'angular-feather/icons';
@@ -66,6 +67,7 @@ const scurityIcons = {
     MultiSelectAllModule,
     ChipListModule,
     DropDownButtonModule,
+    MultiselectDropdownModule,
 
     FeatherModule.pick(scurityIcons),
   ],

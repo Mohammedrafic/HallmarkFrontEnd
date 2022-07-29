@@ -30,9 +30,9 @@
             <button ejs-button cssClass="e-outline" (click)="onWithdraw()" *ngIf="showWithdrawButton">Withdraw</button>
             <button ejs-button cssClass="e-primary" (click)="onApply()" [disabled]="isLocked" *ngIf="showApplyButton">Apply</button>
             <button ejs-button cssClass="e-primary" (click)="onAccept()" *ngIf="showAcceptButton">Accept</button>
-            <button ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
+            <div ejs-button cssClass="e-flat close-button custom-button" (click)="closeDialog()">
               <i-feather name="x" class="icon"></i-feather>
-            </button>
+            </div>
           </div>
         </div>
       </section>
@@ -96,7 +96,7 @@
                   <div>Historical Events</div>
                 </ng-template>
                 <ng-template #content>
-                  <app-historical-events [organizationId]="orderCandidateJob?.organizationId!" [candidateJobId]="candidate.candidateJobId" [candidateId]="candidate.candidateId" [isAgency]="isAgency"></app-historical-events>
+                  <app-historical-events [organizationId]="candidate?.organizationId!" [candidateJobId]="candidate.candidateJobId" [candidateId]="candidate.candidateId" [isAgency]="isAgency"></app-historical-events>
                 </ng-template>
               </e-accordionitem>
             </e-accordionitems>

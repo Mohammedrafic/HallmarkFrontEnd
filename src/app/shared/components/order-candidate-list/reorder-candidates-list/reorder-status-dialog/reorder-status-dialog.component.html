@@ -28,7 +28,8 @@
                 (change)="onJobStatusChange($event)"
               ></ejs-dropdownlist>
             </div>
-            <button ejs-button [isPrimary]="true" class="apply-button" (click)="onAccept()" *ngIf="!isBillRatePending">Accept</button>
+            <button ejs-button class="e-outline" (click)="onReject()" *ngIf="isOfferedBillRate">Reject</button>
+            <button ejs-button [isPrimary]="true" class="apply-button" (click)="onAccept()" *ngIf="showAccept">Accept</button>
             <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
               <i-feather name="x" class="icon"></i-feather>
             </button>
@@ -51,7 +52,7 @@
                 <ng-template #content>
                   <app-accept-form
                     [formGroup]="acceptForm"
-                    [isBillRatePending]="isBillRatePending"
+                    [status]="currentCandidateApplicantStatus"
                   ></app-accept-form>
                 </ng-template>
               </e-accordionitem>
@@ -60,7 +61,7 @@
                   <div>Historical Events</div>
                 </ng-template>
                 <ng-template #content>
-                  <!-- <app-historical-events [organizationId]="organizationId" [candidateJobId]="candidate.candidateJobId" [candidateId]='candidate.candidateId'></app-historical-events> -->
+                  <app-historical-events [organizationId]="orderCandidateJob?.organizationId!" [candidateJobId]="candidate.candidateJobId" [candidateId]="candidate.candidateId" [isAgency]="isAgency"></app-historical-events>
                 </ng-template>
               </e-accordionitem>
             </e-accordionitems>

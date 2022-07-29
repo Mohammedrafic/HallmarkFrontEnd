@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { Agency, AgencyPage } from 'src/app/shared/models/agency.model';
+import { Agency, AgencyFilteringOptions, AgencyListFilters, AgencyPage } from 'src/app/shared/models/agency.model';
 import { ExportPayload } from '@shared/models/export.model';
 
 @Injectable({
@@ -13,12 +13,13 @@ export class AgencyService {
 
   /**
    * Get agencies by page number
-   * @param pageNumber
-   * @param pageSize
+   * @param PageNumber
+   * @param PageSize
+   * @param Filters
    * @return list of agencies
    */
-  public getAgencies(pageNumber: number, pageSize: number): Observable<AgencyPage> {
-    return this.http.get<AgencyPage>(`/api/agency`, { params: { PageNumber: pageNumber, PageSize: pageSize } });
+  public getAgencies(PageNumber: number, PageSize: number, Filters: AgencyListFilters): Observable<AgencyPage> {
+    return this.http.post<AgencyPage>(`/api/Agency/filtered`, { PageNumber, PageSize, ...Filters });
   }
 
   /**
@@ -69,5 +70,9 @@ export class AgencyService {
    */
   public export(payload: ExportPayload): Observable<Blob> {
     return this.http.post(`/api/Agency/export`, payload, { responseType: 'blob' });
+  }
+
+  public getAgencyFilteringOptions(): Observable<AgencyFilteringOptions> {
+    return this.http.get<AgencyFilteringOptions>(`/api/Agency/filteringOptions`);
   }
 }

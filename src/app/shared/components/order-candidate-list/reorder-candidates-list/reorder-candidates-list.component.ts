@@ -40,7 +40,6 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
 
   public onEdit(data: OrderCandidatesList & { index: string }, event: MouseEvent): void {
     this.candidate = { ...data };
-    this.addActiveCssClass(event);
     this.selectedIndex = Number(data.index);
 
     this.getCandidateJobData();

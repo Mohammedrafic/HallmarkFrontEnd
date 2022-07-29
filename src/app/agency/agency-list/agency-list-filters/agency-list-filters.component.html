@@ -1,0 +1,49 @@
+<form class="bootstrap" [formGroup]="form" *ngIf="form">
+  <div class="input-container">
+    <label>Search</label>
+    <div class="input-group">
+      <input class="e-input" type="text" maxlength="50" formControlName="searchTerm"/>
+    </div>
+  </div>
+  <app-multiselect-dropdown
+    [formGroupInstance]="form"
+    [fields]="optionFields"
+    [dataSource]="filterColumns['businessUnitNames'].dataSource"
+    [showSelectAll]="true"
+    controlName="businessUnitNames"
+    id="businessUnitNames"
+    label="Agency Name"
+    selectAllText="All"
+  ></app-multiselect-dropdown>
+  <app-multiselect-dropdown
+    [formGroupInstance]="form"
+    [fields]="optionFields"
+    [dataSource]="filterColumns['statuses'].dataSource"
+    [showSelectAll]="true"
+    controlName="statuses"
+    id="statuses"
+    label="Status"
+    selectAllText="All"
+  ></app-multiselect-dropdown>
+  <app-multiselect-dropdown
+    [formGroupInstance]="form"
+    [fields]="optionFields"
+    [dataSource]="filterColumns['cities'].dataSource"
+    [showSelectAll]="true"
+    controlName="cities"
+    id="cities"
+    label="City"
+    selectAllText="All"
+  ></app-multiselect-dropdown>
+  <app-multiselect-dropdown
+    [formGroupInstance]="form"
+    [fields]="optionFields"
+    [dataSource]="filterColumns['contacts'].dataSource"
+    [showSelectAll]="true"
+    controlName="contacts"
+    id="contacts"
+    label="Contact Person"
+    selectAllText="All"
+  ></app-multiselect-dropdown>
+</form>
+
