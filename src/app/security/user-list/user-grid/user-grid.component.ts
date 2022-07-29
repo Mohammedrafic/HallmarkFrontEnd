@@ -1,4 +1,3 @@
-
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { GridComponent, RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
 import { FormGroup } from '@angular/forms';
@@ -93,7 +92,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   sideBar: any;
   serverSideStoreType: any;
   maxBlocksInCache: any;
-  filter: RolesFilters;
+  filters: RolesFilters;
 
   constructor(private store: Store, private datePipe: DatePipe) {
     super();
@@ -171,10 +170,10 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
         filter: 'agSetColumnFilter',
         filterParams: {
           values: (params: { success: (arg0: any) => void; }) => {
-            setTimeout(() => {
-              this.rolesPage$.subscribe((data) => {
-                params.success(data.items.map(function (item) { return item.name }));
-              });
+            setTimeout(() => {                
+                this.rolesPage$.subscribe((data)=>{                  
+                  params.success(data.items.map(function(item){return item.name}));
+                });
             }, 3000)
           },
           buttons: ['reset'],
@@ -347,11 +346,12 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   }
 
   onPageSizeChanged(event: any) {
-    this.cacheBlockSize = Number(event.value.toLowerCase().replace("rows", ""));
-    this.paginationPageSize = Number(event.value.toLowerCase().replace("rows", ""));
-    if (this.gridApi != null) {
-      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows", "")));
-      this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows", "")));
+    this.cacheBlockSize=Number(event.value.toLowerCase().replace("rows",""));
+    this.paginationPageSize=Number(event.value.toLowerCase().replace("rows",""));
+    if(this.gridApi!=null)
+    {
+      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows","")));
+      this.gridApi.gridOptionsWrapper.setProperty('cacheBlockSize', Number(event.value.toLowerCase().replace("rows","")));
       var datasource = this.createServerSideDatasource();
       this.gridApi.setServerSideDatasource(datasource);
     }
@@ -379,7 +379,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   }
 
   private subscribeForFilterFormChange(): void {
-    this.filterForm.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => { this.dispatchNewPage(), this.loadRoles() });
+    this.filterForm.valueChanges.pipe(takeWhile(() => this.isAlive)).subscribe(() => {this.dispatchNewPage(), this.loadRoles()});
   }
 
   private dispatchNewPage(): void {
@@ -435,7 +435,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
   loadRoles() {
     const { businessUnit, business } = this.filterForm.getRawValue();
-    this.store.dispatch(new GetRolesPage(businessUnit, business || null, 1, 1000, null, null, this.filter));
+    this.store.dispatch(new GetRolesPage(businessUnit, business || null, 1, 1000, null, null, this.filters));
   }
 
   private setFileName(): void {

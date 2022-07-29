@@ -3,10 +3,10 @@ import { AddEditUserComponent } from "src/app/security/user-list/add-edit-user/a
 import { BUSINESS_UNITS_VALUES, BUSSINES_DATA_FIELDS, UNIT_FIELDS, DISABLED_GROUP } from './user-list.constants';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { SecurityState } from '../store/security.state';
-import { filter, Observable, Subject, takeWhile } from 'rxjs';
+import { filter, map, Observable, Subject, takeWhile } from 'rxjs';
 import { BusinessUnit } from '@shared/models/business-unit.model';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
-import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
+import { SetHeaderState, ShowExportDialog, ShowSideDialog } from '../../store/app.actions';
 import { GetBusinessByUnitType, GetRolePerUser, SaveUser, SaveUserSucceeded } from '../store/security.actions';
 import { UserState } from '../../store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
@@ -30,7 +30,7 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
   @ViewChild(AddEditUserComponent) addEditUserComponent: AddEditUserComponent;
 
   @Select(SecurityState.businessUserData)
-  public businessUserData$: Observable<BusinessUnit[]>;
+  public businessUserData$: Observable<(type: number) => BusinessUnit[]>;
 
   @Select(SecurityState.newBusinessDataPerUser)
   public newBusinessDataPerUser$: Observable<(type: number) => BusinessUnit[]>;
@@ -44,7 +44,6 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
   public bussinesDataFields = BUSSINES_DATA_FIELDS;
   public isBusinessFormDisabled = false;
   public createdUser: User | null;
-  public filteredItems$ = new Subject<number>();
 
   get businessUnitControl(): AbstractControl {
     return this.businessForm.get('businessUnit') as AbstractControl;
@@ -73,13 +72,17 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
     const user = this.store.selectSnapshot(UserState.user) as User;
     this.disableBusinessControls(user);
     this.businessUnitControl.patchValue(user?.businessUnitType);
-    this.businessControl.patchValue(this.isBusinessFormDisabled ? [user?.businessUnitId] : [0]);
+    this.businessControl.patchValue(this.isBusinessFormDisabled ? user?.businessUnitId : 0);
     this.subscribeOnSucceededUserCreation();
   }
 
   ngOnDestroy(): void {
     this.isAlive = false;
     this.createdUser = null;
+  }
+
+  get bussinesUserData$(): Observable<BusinessUnit[]> {
+    return this.businessUserData$.pipe(map((fn) => fn(this.businessUnitControl?.value)));
   }
 
   public onAddNewUser() {
@@ -89,7 +92,7 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
     this.userSettingForm.enable();
     this.userSettingForm.patchValue({
       businessUnitType: this.businessUnitControl.value,
-      businessUnitId: this.businessControl.value[0],
+      businessUnitId: this.businessControl.value,
       isDeleted: true,
     });
     this.disableBussinesUnitForRole();
@@ -169,15 +172,10 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
     this.exportUsers$.next(fileType);
   }
 
-  public showFilters(): void {
-    this.store.dispatch(new GetRolePerUser(this.businessUnitControl?.value || 0,this.businessControl?.value || []));
-    this.store.dispatch(new ShowFilterDialog(true));
-  }
-
   private generateBusinessForm(): FormGroup {
     return new FormGroup({
       businessUnit: new FormControl(),
-      business: new FormControl([0]),
+      business: new FormControl(0),
     });
   }
 
@@ -213,7 +211,7 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
       value && this.store.dispatch(new GetBusinessByUnitType(value));
 
       if (!this.isBusinessFormDisabled) {
-        this.businessControl.patchValue([0]);
+        this.businessControl.patchValue(0);
       }
     });
   }
@@ -227,7 +225,7 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
 
     this.store
       .dispatch(
-        new GetRolePerUser(user.businessUnitType || 0, user.businessUnitId ? [user.businessUnitId] : [])
+        new GetRolePerUser((user.businessUnitId as BusinessUnitType) || 0, user.businessUnitType as BusinessUnitType)
       )
       .subscribe(() => {
         this.userSettingForm.get('roles')?.setValue(user.roles?.map((role: any) => role.id));
