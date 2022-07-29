@@ -10,7 +10,8 @@
     timeSelection: timeSelection$ | async,
     allOrganizations: allOrganizations$ | async,
     skills: skills$ | async,
-    dashboardFiltersState: dashboardFiltersState$| async
+    dashboardFiltersState: dashboardFiltersState$| async,
+    userIsAdmin: userIsAdmin$ | async
   }"
 ></ng-container>
 
@@ -25,6 +26,7 @@
   let-allOrganizations="allOrganizations"
   let-skills="skills"
   let-dashboardFiltersState="dashboardFiltersState"
+  let-userIsAdmin="userIsAdmin"
 >
   <app-dashboard-control
     (widgetToggleEmitter)="handleWidgetToggleEvent($event)"
