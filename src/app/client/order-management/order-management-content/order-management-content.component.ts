@@ -540,7 +540,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       this.creatingReorder = false;
       return;
     }
-    
+
     this.rowSelected(event, this.gridWithChildRow);
 
     if (!event.isInteracted) {
