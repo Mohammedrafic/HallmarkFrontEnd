@@ -39,6 +39,10 @@ import { InvoiceDetailContainerComponent } from './containers/invoice-details-co
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { InvoiceDetailInvoiceInfoComponent } from './components/invoice-detail-invoice-info/invoice-detail-invoice-info.component';
 import { InvoiceDetailTableComponent } from './components/invoice-detail-table/invoice-detail-table.component';
+import { AgGridModule } from '@ag-grid-community/angular';
+import { GridModule } from '../../shared/components/grid/grid.module';
+import { InvoiceRecordsTableRowDetailsComponent } from './components/invoice-records-table-row-details/invoice-records-table-row-details.component';
+import { ToggleRowExpansionHeaderCellComponent } from './components/grid-icon-cell/toggle-row-expansion-header-cell.component';
 
 @NgModule({
   declarations: [
@@ -51,6 +55,8 @@ import { InvoiceDetailTableComponent } from './components/invoice-detail-table/i
     InvoiceDetailContainerComponent,
     InvoiceDetailInvoiceInfoComponent,
     InvoiceDetailTableComponent,
+    InvoiceRecordsTableRowDetailsComponent,
+    ToggleRowExpansionHeaderCellComponent,
   ],
   imports: [
     CommonModule,
@@ -81,7 +87,9 @@ import { InvoiceDetailTableComponent } from './components/invoice-detail-table/i
     DialogModule,
     TimePickerModule,
     ChipListModule,
-    PagerModule
+    PagerModule,
+    AgGridModule,
+    GridModule
   ],
   providers: [
     InvoicesService,

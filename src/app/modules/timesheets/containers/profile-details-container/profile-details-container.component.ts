@@ -1,10 +1,18 @@
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import {
-  ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter,
-  Input, OnInit, Output, ViewChild } from '@angular/core';
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { filter, Observable, take, takeUntil, switchMap, throttleTime, forkJoin, tap } from 'rxjs';
+import { filter, forkJoin, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
@@ -21,11 +29,19 @@ import { ExportColumn, ExportPayload } from '@shared/models/export.model';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import {
-  CandidateMilesData, ChangeStatusData, DialogActionPayload, OpenAddDialogMeta,
-  Timesheet, TimesheetDetailsModel } from '../../interface';
+  CandidateMilesData,
+  ChangeStatusData,
+  DialogActionPayload,
+  OpenAddDialogMeta,
+  Timesheet,
+  TimesheetDetailsModel
+} from '../../interface';
 import {
-  ConfirmDeleteTimesheetDialogContent, ConfirmUnsavedChages, rejectTimesheetDialogData,
-  TimesheetDetailsExportOptions } from '../../constants';
+  ConfirmDeleteTimesheetDialogContent,
+  ConfirmUnsavedChages,
+  rejectTimesheetDialogData,
+  TimesheetDetailsExportOptions
+} from '../../constants';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';

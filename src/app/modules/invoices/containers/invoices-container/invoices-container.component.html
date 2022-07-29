@@ -16,18 +16,16 @@
     </button>
     <app-export-button (optionSelected)="onExportOptionSelect($event)"></app-export-button>
     <button ejs-button class="e-primary"
-            [disabled]="!invoiceRecordsTable?.selectedItems?.length"
             (click)="createInvoiceDialog.show()">
       Create Invoice
     </button>
   </ng-container>
 </app-page-toolbar>
 
-<section>
+<section class="invoices-table-container">
   <ng-container [ngSwitch]="selectedTabIdx">
     <ng-container *ngSwitchCase="0">
       <app-invoice-records-table [tableData]="invoiceRecordsData$ | async"
-                                 [config]="tableConfig"
                                  #invoiceRecordsTable
       ></app-invoice-records-table>
     </ng-container>

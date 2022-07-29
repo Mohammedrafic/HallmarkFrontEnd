@@ -8,7 +8,7 @@ export interface Invoice extends InvoiceRecord {
   groupName: string;
   id: string;
   amount: number;
-  type: 'Interfaced';
+  type: 'Timesheet';
   invoices: InvoiceRecord[];
   issuedDate: Date;
   dueDate: Date;

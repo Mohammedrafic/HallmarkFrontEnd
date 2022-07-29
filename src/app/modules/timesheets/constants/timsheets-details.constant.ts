@@ -12,8 +12,6 @@ import { GridValuesHelper } from '../helpers/grid-values.helper';
 import { InputEditorComponent } from '../components/cell-editors/input-editor/input-editor.component';
 import { EditFieldTypes } from '../enums';
 
-const valueHelper = new GridValuesHelper();
-
 const commonColumn: ColDef = {
   filter: true,
   sortable: true,
@@ -52,7 +50,7 @@ const billRateColDef: ColDef = {
   width: 110,
   valueFormatter: (data) => {
     if(!data.value) return '0'
-    return valueHelper.formatCurrency(data.value)
+    return GridValuesHelper.formatCurrency(data.value)
   },
 };
 
@@ -89,7 +87,7 @@ const totalCol: ColDef = {
   width: 140,
   valueFormatter: (data) => {
     if(!data.value) return '0'
-    return valueHelper.formatCurrency(data.value)
+    return GridValuesHelper.formatCurrency(data.value)
   },
 };
 
@@ -218,7 +216,7 @@ export const ExpensesRecordsColDef: ColDef[] = [
     cellRenderer: InputEditorComponent,
     valueFormatter: (data) => {
       if(!data.value) return 'ERROR'
-      return valueHelper.formatCurrency(data.value)
+      return GridValuesHelper.formatCurrency(data.value)
     },
     cellRendererParams: {
       editMode: true,
