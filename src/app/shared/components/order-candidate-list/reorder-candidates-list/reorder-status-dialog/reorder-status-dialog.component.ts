@@ -198,16 +198,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   private setValueForm({
-    order: {
-      locationName,
-      departmentName,
-      skillName,
-      orderOpenDate,
-      shiftStartTime,
-      shiftEndTime,
-      openPositions,
-      hourlyRate,
-    },
+    order: { locationName, departmentName, skillName, orderOpenDate, shiftStartTime, shiftEndTime, openPositions },
     jobId,
     offeredBillRate,
     candidateBillRate,
@@ -223,7 +214,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       shiftStartTime,
       shiftEndTime,
       openPositions,
-      hourlyRate,
+      hourlyRate: candidateBillRate,
     });
     this.enableFields();
   }
@@ -306,7 +297,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
           tap((value: number) => {
             if (this.hourlyRate?.valid) {
               this.jobStatus$.next(
-                this.orderCandidateJob.order.hourlyRate === value ? ReOrderBillRate : ReOrderOfferedBillRate
+                this.orderCandidateJob.candidateBillRate === value ? ReOrderBillRate : ReOrderOfferedBillRate
               );
             }
           })
@@ -319,6 +310,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     switch (this.currentCandidateApplicantStatus) {
       case !this.isAgency && CandidatStatus.BillRatePending:
         this.acceptForm.get('hourlyRate')?.enable();
+        this.acceptForm.get('candidateBillRate')?.disable();
         break;
       case CandidatStatus.OfferedBR:
       case CandidatStatus.OnBoard:
