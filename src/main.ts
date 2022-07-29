@@ -27,7 +27,8 @@ Promise.resolve()
   .then((res) => res.json())
   .then((settings) => {
     const host = environment.production ? settings.API_BASE_URL : environment.host;
-    return Promise.all([{ host }, fetch(APP_SETTINGS_B2C_CONFIG_URL(host)).then((res) => res.json())]);
+    const reportServerUrl = settings.LOGIREPORT_BASE_URL;
+    return Promise.all([{ host, reportServerUrl }, fetch(APP_SETTINGS_B2C_CONFIG_URL(host)).then((res) => res.json())]);
   })
   .then(([settings, config]) => {
     const B2C_STATIC_PROVIDERS = MSAL_STATIC_PROVIDERS(settings.host, config);

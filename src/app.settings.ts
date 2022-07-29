@@ -1,7 +1,8 @@
 import { InjectionToken } from "@angular/core";
 
 export type AppSettings = {
-    host: string;
+  host: string;
+  reportServerUrl: string;
 }
 
 export const APP_SETTINGS = new InjectionToken<AppSettings>('APP_SETTINGS');
