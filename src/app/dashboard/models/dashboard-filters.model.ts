@@ -1,5 +1,5 @@
-export type DashboardFiltersModel = Record<FilterColumn, number[]>;
+import { FilterColumnTypeEnum } from "../enums/dashboard-filter-fields.enum";
+
+export type DashboardFiltersModel = Record<FilterColumnTypeEnum, number[]>;
 
 export type FilterName = 'Organization' | 'Region' | 'Location' | 'Department' | 'Skill';
-
-export type FilterColumn = 'organizationIds' | 'regionIds' | 'locationIds' | 'departmentsIds' | 'skillIds';

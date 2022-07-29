@@ -22,8 +22,9 @@ import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { FilterKeys } from 'src/app/dashboard/constants/filter-keys';
-import { DashboardFiltersModel, FilterName, FilterColumn } from 'src/app/dashboard/models/dashboard-filters.model';
+import { DashboardFiltersModel, FilterName } from 'src/app/dashboard/models/dashboard-filters.model';
 import { SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
+import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
 
 @Component({
   selector: 'app-filter-chip-list',
@@ -81,29 +82,29 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
 
     const filteredItem = event.data as FilteredItem;
 
-    if (filteredItem.column === 'regionIds') {
+    if (filteredItem.column === FilterColumnTypeEnum.REGION) {
       const regions = this.regions.filter((region: OrganizationRegion) => region.id === filteredItem.value);
 
       regions.forEach((region: OrganizationRegion) => {
         if (region.id && region.id === filteredItem.value) {
-          this.manageDashboardFilter('regionIds', region.id);
+          this.manageDashboardFilter(FilterColumnTypeEnum.REGION, region.id);
 
           region.locations?.forEach((location: OrganizationLocation) => {
-            this.manageDashboardFilter('locationIds', location.id);
+            this.manageDashboardFilter(FilterColumnTypeEnum.LOCATION, location.id);
 
             location.departments.forEach((department: OrganizationDepartment) => {
-              this.manageDashboardFilter('departmentsIds', department.id);
+              this.manageDashboardFilter(FilterColumnTypeEnum.DEPARTMENT, department.id);
             });
           });
         }
       });
-    } else if (filteredItem.column === 'locationIds') {
+    } else if (filteredItem.column === FilterColumnTypeEnum.LOCATION) {
       const region = this.regions.find((region) => region.locations?.find((location: OrganizationLocation) => location.id === filteredItem.value));
       const location = region?.locations?.find((location: OrganizationLocation) => location.id === filteredItem.value);
-      this.manageDashboardFilter('locationIds', location.id);
+      this.manageDashboardFilter(FilterColumnTypeEnum.LOCATION, location.id);
 
       location.departments.forEach((department: OrganizationDepartment) =>
-        this.manageDashboardFilter('departmentsIds', department.id)
+        this.manageDashboardFilter(FilterColumnTypeEnum.DEPARTMENT, department.id)
       );
     } else {
       this.filteredItems = this.filteredItems.filter((filter: FilteredItem) => !isEqual(filter, event.data));
@@ -112,7 +113,7 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
     this.filterModified.emit(true);
   }
 
-  private manageDashboardFilter(column: FilterColumn, id: number): void {
+  private manageDashboardFilter(column: FilterColumnTypeEnum, id: number): void {
     if (this.filterState[column]?.includes(id)) {
       const filteredItem = this.filteredItems.find((item) => item.column === column && item.value === id);
       this.filteredItems = this.filteredItems.filter((item) => !isEqual(item, filteredItem));
@@ -129,7 +130,7 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
     this.filteredItems = filters;
 
     filters.forEach((filter: FilteredItem) => {
-      const filterKey: FilterName = FilterKeys[filter.column as FilterColumn];
+      const filterKey: FilterName = FilterKeys[filter.column as FilterColumnTypeEnum];
       if (filterKey in this.appliedFilters) {
         this.appliedFilters[filterKey].push(filter);
       } else {
