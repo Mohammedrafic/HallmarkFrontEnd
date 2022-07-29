@@ -70,7 +70,7 @@ export class DateTimeHelper {
 
     if (lastDay > new Date().getTime()) {
       last = new Date().getTime();
-      first = last - 6 * 24 * 60 * 60 * 1000;
+      first = last - new Date(last).getDay() * 24 * 60 * 60 * 1000;
     }
 
     return new Date(isStart ? first : last);
@@ -78,8 +78,8 @@ export class DateTimeHelper {
 
   public static getWeekStartEnd(date: string): [Date, Date] {
     const splitValue = date.split(' - ');
-    const from = DateTimeHelper.getWeekDate(splitValue[0], true);
-    const to = DateTimeHelper.getWeekDate(splitValue[1]);
+    const from = new Date(splitValue[0]);
+    const to = new Date(splitValue[1]);
 
     return [from, to];
   }
