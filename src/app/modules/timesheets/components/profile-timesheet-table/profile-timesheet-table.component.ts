@@ -1,6 +1,6 @@
 import {
   AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component,
-  EventEmitter, Input, Output, ViewChild } from '@angular/core';
+  EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { combineLatest, Observable, takeUntil } from 'rxjs';
@@ -11,7 +11,7 @@ import { TabComponent, SelectingEventArgs } from '@syncfusion/ej2-angular-naviga
 import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
 
 import { Destroyable } from '@core/helpers';
-import { RecordFields } from './../../enums/timesheet-common.enum';
+import { RecordFields } from './../../enums';
 import {
   TimesheetRecordsColdef, TimesheetRecordsColConfig, RecordsTabConfig, ConfirmRecordDelete,
   ConfirmTabChange,
@@ -21,6 +21,8 @@ import { TabConfig, DropdownOption } from './../../interface/common.interface';
 import { DialogActionPayload, OpenAddDialogMeta, TimesheetRecordsDto } from '../../interface';
 import { TimesheetRecordsService } from '../../services/timesheet-records.service';
 import { TimesheetsState } from '../../store/state/timesheets.state';
+import { RecordsAdapter } from '../../helpers';
+import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -31,7 +33,7 @@ import { TimesheetsState } from '../../store/state/timesheets.state';
   styleUrls: ['./profile-timesheet-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileTimesheetTableComponent extends Destroyable implements AfterViewInit {
+export class ProfileTimesheetTableComponent extends Destroyable implements AfterViewInit, OnChanges {
   @ViewChild('tabs') readonly tabs: TabComponent;
 
   @ViewChild('grid') readonly grid: IClientSideRowModel;
@@ -39,6 +41,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   @Input() timesheetId: number;
 
   @Input() isAgency: boolean;
+
+  @Input()
+  public actionsDisabled: boolean = false;
 
   @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
 
@@ -96,6 +101,12 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     };
   }
 
+  ngOnChanges(): void {
+    if (this.gridApi) {
+      this.gridApi.showLoadingOverlay();
+    }
+  }
+
   ngAfterViewInit(): void {
     this.getRecords();
     this.watchForDialogState();
@@ -148,6 +159,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public onGridReady(params: GridReadyEvent): void {
     this.gridApi = params.api;
+    this.gridApi.showLoadingOverlay();
   }
 
   public cancelChanges(): void {
@@ -158,34 +170,35 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.setInitialTableState();
   }
 
-  /**
-   * Commented for demo purposes only.
-   */
   public saveChanges(): void {
-    // const diffs = this.timesheetRecordsService.findDiffs(
-    //   this.records[this.currentTab], this.formControls, this.timesheetColDef);
+    const diffs = this.timesheetRecordsService.findDiffs(
+      this.records[this.currentTab], this.formControls, this.timesheetColDef);
 
-    // const recordsToUpdate = this.records[this.currentTab].map((record) => {
-    //   const updatedItem = diffs.find((item) => item.id === record.id);
-    //   if (updatedItem) {
-    //     return updatedItem
-    //   }
-    //   return record;
-    // });
-    // const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
-    // const dto = RecordsAdapter.adaptRecordPutDto(
-    //   recordsToUpdate, organizationId, id, this.currentTab, this.idsToDelete);
+    const recordsToUpdate = this.records[this.currentTab]
+      .map((record) => {
+        const updatedItem = diffs.find((item) => item.id === record.id);
 
-    // this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
-    // .pipe(
-    //   takeUntil(this.componentDestroy()),
-    // )
-    // .subscribe(() => {
-    //   this.changesSaved.emit(true);
-    //   this.isChangesSaved = true;
-    //   this.setInitialTableState();
-    // });
-    this.cancelChanges();
+        if (updatedItem) {
+          return updatedItem
+        }
+          return record;
+      });
+  
+    if (diffs.length || this.idsToDelete.length) {
+      const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
+      const dto = RecordsAdapter.adaptRecordPutDto(
+        recordsToUpdate, organizationId, id, this.currentTab, this.idsToDelete);
+  
+      this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
+      .pipe(
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe(() => {
+        this.changesSaved.emit(true);
+        this.isChangesSaved = true;
+        this.setInitialTableState();
+      });
+    }
   }
 
   public trackByIndex(index: number, item: TabConfig): number {
@@ -233,10 +246,16 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         ]);
       }),
       filter(() => !!this.gridApi),
-      tap((data) => { this.timesheetRecordsService.controlTabsVisibility(data[0], this.tabs) }),
+      tap((data) => { 
+        this.timesheetRecordsService.controlTabsVisibility(data[0], this.tabs);
+        this.gridApi.hideOverlay();
+       }),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
+      if (!this.records[this.currentTab].length) {
+        this.gridApi.showNoRowsOverlay();
+      }
       this.gridApi.setColumnDefs(this.timesheetColDef);
       this.cd.markForCheck();
     });

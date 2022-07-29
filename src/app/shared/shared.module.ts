@@ -184,7 +184,7 @@ const COMPONENTS = [
   OrderReOrdersListComponent,
   ReorderCandidatesListComponent,
   OrderReOrdersContainerComponent,
-  OrderCloseReasonInfoComponent
+  OrderCloseReasonInfoComponent,
 ];
 
 @NgModule({

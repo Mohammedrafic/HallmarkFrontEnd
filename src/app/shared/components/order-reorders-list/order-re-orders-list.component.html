@@ -3,12 +3,6 @@
     <div class="title">
       <h3>Re-Orders</h3>
     </div>
-    <div class="input-container" *ngIf="!isAgency">
-      <div class="stick-right add-reorder-link">
-        <i-feather name="plus" class="icon"></i-feather>
-        Add New Re-Order
-      </div>
-    </div>
   </div>
   <ejs-grid
     id="users-grid"
@@ -31,7 +25,7 @@
             <button ejs-button cssClass="e-flat default-icon-button">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="edit(data)">
+            <button ejs-button cssClass="e-flat primary-icon-button" *ngIf="!isAgency" (click)="edit(data)">
               <span><i-feather name="edit" class="icon"></i-feather></span>
             </button>
           </div>

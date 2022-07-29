@@ -1,5 +1,5 @@
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { Role, RoleDTO } from '@shared/models/roles.model';
+import { Role, RoleDTO, RolesFilters } from '@shared/models/roles.model';
 import { User, UserDTO } from '@shared/models/user-managment-page.model';
 import { UserVisibilitySettingBody } from '@shared/models/visibility-settings.model';
 import { ExportPayload } from '@shared/models/export.model';
@@ -13,11 +13,12 @@ export class GetRolesPage {
   static readonly type = '[security] Get Roles Page';
   constructor(
     public businessUnitType: BusinessUnitType,
-    public businessUnitId: number,
+    public businessUnitIds: number[],
     public pageNumber: number,
     public pageSize: number,
     public sortModel: any,
-    public filterModel: any
+    public filterModel: any,
+    public filters: RolesFilters
   ) {}
 }
 

@@ -1,5 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
-import type { KeyValue } from '@angular/common';
+import { Component, Input, ChangeDetectionStrategy, OnChanges, SimpleChanges, OnInit } from '@angular/core';
 
 import flow from 'lodash/fp/flow';
 import values from 'lodash/fp/values';
@@ -7,6 +6,9 @@ import flatten from 'lodash/fp/flatten';
 import lodashMap from 'lodash/fp/map';
 import thru from 'lodash/fp/thru';
 import max from 'lodash/fp/max';
+import includes from 'lodash/fp/includes';
+import lodashFilter from 'lodash/fp/filter';
+import { isEqual } from 'lodash';
 import type {
   AxisModel,
   ChartAreaModel,
@@ -19,9 +21,13 @@ import { Store } from '@ngxs/store';
 
 import type { PositionByTypeDataModel, PositionsByTypeAggregatedModel } from '../../models/positions-by-type-aggregated.model';
 import { AbstractSFComponentDirective } from '@shared/directives/abstract-sf-component.directive';
-import { PositionTypeEnum } from '../../enums/position-type.enum';
 import { TimeSelectionEnum } from '../../enums/time-selection.enum';
 import { SwitchMonthWeekTimeSelection } from '../../store/dashboard.actions';
+import { BehaviorSubject, combineLatest, distinctUntilChanged, filter, map, Observable } from 'rxjs';
+import { positionTrendLegendPalette } from '../../constants/position-trend-legend-palette';
+import { WidgetLegengDataModel } from '../../models/widget-legend-data.model';
+import { DashboardService } from '../../services/dashboard.service';
+import { PositionTrendTypeEnum } from '../../enums/position-trend-type.enum';
 
 @Component({
   selector: 'app-line-chart',
@@ -29,7 +35,7 @@ import { SwitchMonthWeekTimeSelection } from '../../store/dashboard.actions';
   styleUrls: ['./line-chart.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LineChartComponent extends AbstractSFComponentDirective<ChartComponent> implements OnChanges {
+export class LineChartComponent extends AbstractSFComponentDirective<ChartComponent> implements OnChanges, OnInit {
   @Input() public chartData: PositionsByTypeAggregatedModel | undefined;
   @Input() public isLoading: boolean;
   @Input() public timeSelection: TimeSelectionEnum;
@@ -43,7 +49,7 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
   public readonly chartArea: ChartAreaModel = { border: { width: 0 } };
   public readonly legendShape: string = 'Circle';
   public readonly lineWidthInPixels: number = 3;
-  public readonly positionTypeEnum: typeof PositionTypeEnum = PositionTypeEnum;
+  public readonly positionTypeEnum: typeof PositionTrendTypeEnum = PositionTrendTypeEnum;
   public readonly primaryXAxis: AxisModel = { valueType: 'Category', majorGridLines: { width: 0 } };
   public readonly xAxisName: keyof PositionByTypeDataModel = 'month';
   public readonly yAxisName: keyof PositionByTypeDataModel = 'value';
@@ -51,6 +57,9 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
   public readonly weeklySelection: TimeSelectionEnum = TimeSelectionEnum.Weekly;
   public readonly monthlySelection: TimeSelectionEnum = TimeSelectionEnum.Monthly;
   public monthMode: boolean = true;
+  public chartLegend: WidgetLegengDataModel[];
+  public filteredChartData$: Observable<any>;
+  public palettes: string[] = [];
 
   public readonly crosshairSettings: CrosshairSettingsModel = {
     enable: true,
@@ -67,15 +76,20 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
     header: '',
   };
 
-  public readonly legendSettings: LegendSettingsModel = {
-    alignment: 'Near',
-    enablePages: false,
-    position: 'Top',
-    visible: true,
-  };
+  public readonly legendSettings: LegendSettingsModel = { visible: false };
 
-  constructor(private readonly store: Store) {
+  private readonly selectedEntries$: BehaviorSubject<string[] | null> = new BehaviorSubject<string[] | null>(null);
+  private readonly chartData$: BehaviorSubject<PositionsByTypeAggregatedModel | null> = new BehaviorSubject<PositionsByTypeAggregatedModel | null>(null);
+
+  constructor(
+    private readonly store: Store,
+    private readonly dashboardService: DashboardService,
+    ) {
     super();
+  }
+
+  ngOnInit(): void {
+    this.filteredChartData$ = this.getFilteredChartData();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -83,18 +97,17 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
     this.monthMode = this.timeSelection === TimeSelectionEnum.Monthly;
   }
 
-  public trackByHandler(_: number, keyValue: KeyValue<string, PositionByTypeDataModel[]>): string {
-    return keyValue.key;
-  }
-
   private handleChartDataChange(): void {
     if (!this.chartData) return;
 
+    this.chartLegend = this.generateLegendData(this.chartData);
+    this.handleChartDataChanges(this.chartData);
     const maximumDataValue = this.getMaximumDataValue();
-
+    const correctorChartHeight = Math.floor(maximumDataValue * 0.03);
+    
     this.primaryYAxis = {
       ...this.primaryYAxis,
-      maximum: maximumDataValue + this.lineWidthInPixels,
+      maximum: maximumDataValue + correctorChartHeight,
       interval: maximumDataValue / 2,
     };
   }
@@ -110,7 +123,56 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
   }
 
   public onSwicthTo(timeSelection: TimeSelectionEnum): void {
-    this.monthMode = !this.monthMode;
+    this.monthMode = timeSelection === TimeSelectionEnum.Monthly;
     this.store.dispatch(new SwitchMonthWeekTimeSelection(timeSelection));
+  }
+
+  public onClickLegend(label: string): void {
+    const currentValue = this.selectedEntries$.value;
+    const nextValue = includes(label, currentValue)
+      ? lodashFilter((currentValueLabel: string) => currentValueLabel !== label, currentValue)
+      : [...(currentValue ?? []), label];
+    this.selectedEntries$.next(nextValue);
+  }
+
+  public redirectToSourceContent(): void {
+    this.dashboardService.redirectToUrl('client/order-management');
+  }
+
+  public generateLegendData(chartData: PositionsByTypeAggregatedModel): WidgetLegengDataModel[] {
+    return Object.entries(chartData).map(([key, value]) => {
+      const [previousValue, currentValue] = value.slice(-2);
+      const coefficient = previousValue.value === 0 ? 1 : previousValue.value;
+
+      const paletteColor = positionTrendLegendPalette[key as PositionTrendTypeEnum];
+      this.palettes.push(paletteColor);
+
+      return {
+        label: key,
+        value: ((currentValue.value - previousValue.value) / coefficient) * 100,
+        color: paletteColor,
+      };
+    });
+  }
+
+  private getFilteredChartData(): Observable<PositionsByTypeAggregatedModel> {
+    return combineLatest([this.chartData$, this.selectedEntries$]).pipe(
+      filter(([chartData]) => !!chartData),
+      map(([chartData, selectedEntries]: [PositionsByTypeAggregatedModel | null, string[] | null]) =>
+        flow([
+          Object.entries,
+          (arr) => arr.filter(([key, value]: [key: string, value: number]) => includes(key, selectedEntries)),
+          Object.fromEntries,
+        ])(chartData)
+      ),
+      distinctUntilChanged((previous: any, current: any) => isEqual(previous, current))
+    );
+  }
+
+  private handleChartDataChanges(chartData: PositionsByTypeAggregatedModel): void {
+    this.chartData$.next(chartData ?? null);
+    this.chartData &&
+      !this.selectedEntries$.value &&
+      this.selectedEntries$.next(lodashMap(([key, value]) => key, Object.entries(this.chartData)));
   }
 }

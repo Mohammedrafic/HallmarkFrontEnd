@@ -35,7 +35,7 @@ export interface DashboardStateModel {
     isMobile: false,
     filteredItems: JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [],
     dashboardFilterState: {} as DashboardFiltersModel,
-    positionTrendTimeSelection: JSON.parse(window.localStorage.getItem(TIME_SELECTION_OF_CHART_LINE) as string) || TimeSelectionEnum.Weekly,
+    positionTrendTimeSelection: JSON.parse(window.localStorage.getItem(TIME_SELECTION_OF_CHART_LINE) as string) || TimeSelectionEnum.Monthly,
   },
 })
 @Injectable()

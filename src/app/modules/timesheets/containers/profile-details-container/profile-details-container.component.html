@@ -4,6 +4,7 @@
   cssClass="dialog timesheet-details-dialog"
   [width]="'1180px'"
   [visible]="false"
+  [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
   <ng-template #content>
@@ -11,8 +12,7 @@
       <div class="profile-details-header">
         <ng-container>
 <!--            TODO: Replace with default avatar placeholder-->
-            <img class="e-avatar e-avatar-xlarge"
-                 [src]="(timesheetDetails.candidateId | candidateAvatar) || 'https://thumbs.dreamstime.com/b/default-avatar-photo-placeholder-profile-icon-eps-file-easy-to-edit-default-avatar-photo-placeholder-profile-icon-124557887.jpg'"/>
+            <img class="e-avatar e-avatar-xlarge" [src]="timesheetDetails.candidateId | candidateAvatar"/>
         </ng-container>
 
         <div class="flex flex-column">
@@ -37,8 +37,9 @@
           class="timesheet-details-upload-container"
           #uploadContainer>
 
-<!--            TODO: Remove after resolving issue with date filter. -->
-            <div class="date-filter-mock" style="width: 300px"></div>
+            <app-date-week-picker [initDates]="weekPeriod">
+
+            </app-date-week-picker>
 
             <button
              ejs-button
@@ -92,7 +93,12 @@
       </div>
 
       <div class="order-header">
-        <h2 class="order-id">Order ID {{ timesheetDetails?.orderId}}</h2>
+        <div class="order-meta">
+          <h2 class="order-id">Order ID {{ timesheetDetails?.orderId}}</h2>
+          <h2 class="week-dates">Week Period:
+            {{ timesheetDetails?.weekStartDate | date:'MM/dd/yyyy': 'UTC' }}
+            - {{ timesheetDetails?.weekEndDate | date:'MM/dd/yyyy': 'UTC' }}</h2>
+        </div>
         <div class="bootstrap reject-reason-input" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
           <div class="e-input input">{{rejectReason}}</div>
         </div>
@@ -114,7 +120,9 @@
             (click)="onRejectButtonClick()">Reject
           </button>
 
-          <button ejs-button cssClass="e-primary" [disabled]="!isChangesSaved" (click)="handleApprove()">
+          <button ejs-button cssClass="e-primary"
+                  [disabled]="actionButtonDisabled"
+                  (click)="handleApprove()">
             {{submitText}}
           </button>
         </div>
@@ -155,6 +163,7 @@
         <app-profile-timesheet-table
           [timesheetId]="timesheetId"
           [isAgency]="isAgency"
+          [actionsDisabled]="timesheetDetails.noWorkPerformed"
           (openAddSideDialog)="openAddDialog($event)"
           (changesSaved)="handleEditChanges($event)"
         >

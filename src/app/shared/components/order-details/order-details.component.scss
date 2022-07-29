@@ -15,6 +15,10 @@
 
 .job-description-accordion {
   margin-right: 12px;
+
+  .description {
+    font-size: 14px;
+  }
 }
 
 .separator {
@@ -41,6 +45,7 @@
     display: flex;
     flex-direction: column;
     color: $black;
+    font-size: 14px;
 
     i-feather {
       width: 14px;
@@ -63,6 +68,7 @@
   .credential-item {
     display: flex;
     padding: 4px 0;
+    font-size: 14px;
 
     i-feather {
       color: $supportive-red;

@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 
-import { SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
+import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 
 @Component({
@@ -10,6 +10,8 @@ import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.mo
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TabsListComponent {
+  @ViewChild('timesheetTabs') tab: TabComponent;
+
   @Input()
   public tabConfig: TabsListConfig[];
 

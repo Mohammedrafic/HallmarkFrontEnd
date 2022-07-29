@@ -1,6 +1,6 @@
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 
-import { TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
+import { FilteringOptionsFields, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
 
 export interface Timesheet {
   id: number;
@@ -30,18 +30,23 @@ export interface TimesheetsFilterState {
   pageNumber?: number;
   pageSize?: number;
   organizationId?: number;
-  date?: string;
-  search?: string;
+  dateTimeOffset?: TimesheetWeekFilter;
+  searchTerm?: string;
   orderIds?: string[];
   locationIds?: string[];
   regionsIds?: string[];
   departmentIds?: string[];
   agencyIds?: string[];
-  statusIds?: string[];
+  statusIds?: string[] | number[];
   totalHours?: number;
   billRate?: number;
   skillIds?: string[];
   isAgency?: boolean;
+}
+
+export interface TimesheetWeekFilter {
+  startDate: string;
+  endDate: string;
 }
 
 export interface TimesheetsSelectedRowEvent {
@@ -58,6 +63,10 @@ export type FilterColumns = {
     valueField?: string;
     valueId?: string;
   }
+}
+
+export type TimesheetsFilteringOptions = {
+  [key in FilteringOptionsFields]: DataSourceItem[];
 }
 
 export type FilterDataSource = {

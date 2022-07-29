@@ -60,12 +60,12 @@
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
-      <e-column headerTextAlign="Right" width="130">
+      <e-column headerTextAlign="Right" width="145">
         <ng-template #headerTemplate let-data>
           <div class="controls-header">
             <button
               ejs-button
-              cssClass="e-flat icon-button c"
+              cssClass="e-flat icon-button"
               *ngIf="!isSubrowDisplay; else onSubrowToggle"
               (click)="expandAll()"
             >
@@ -100,6 +100,9 @@
             <button ejs-button cssClass="e-flat default-icon-button">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
             </button>
+            <button *ngIf="activeTab === OrganizationOrderManagementTabs.PerDiem" (click)="createReorder(data)" ejs-button cssClass="e-flat default-icon-button">
+              <span><i-feather name="calendar" class="icon"></i-feather></span>
+            </button>
             <button
               ejs-button
               cssClass="e-flat secondary-icon-button"
@@ -112,6 +115,7 @@
             <button
               ejs-dropdownbutton
               [items]="
+                (data.orderCloseDate && closedOrderMenu) ||
                 (activeTab === OrganizationOrderManagementTabs.ReOrders && reOrdersMenu) ||
                 (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : moreMenuWithCloseButton)
               "
@@ -124,15 +128,26 @@
 
           <ng-template #templateButtons>
             <div class="row-tool-buttons" (click)="stopPropagation($event)">
-              <i-feather name="edit" class="icon edit-template" (click)="editOrder(data)"></i-feather>
-              <i-feather name="trash-2" class="icon delete-template" (click)="deleteOrder(data?.orderId)"></i-feather>
+              <i-feather name="trash-2" class="icon delete-template" (click)="deleteOrder(data?.id)"></i-feather>
             </div>
           </ng-template>
         </ng-template>
       </e-column>
-      <e-column field="id" headerText="ORDER ID" width="120">
+      <e-column field="id" width="120">
+        <ng-template #headerTemplate let-data>
+          <span class="e-headertext">
+            {{ activeTab !== OrganizationOrderManagementTabs.OrderTemplates ? 'ORDER ID' : 'TEMPLATE ID' }}
+          </span>
+        </ng-template>
         <ng-template #template let-data>
-          <ng-container *ngIf="showReOrders ? !data.reOrders?.length : !data.children?.length; else withToggle">
+          <ng-container
+            *ngIf="
+              data.orderType === orderTypes.OpenPerDiem
+                ? !data.reOrders?.length
+                : !data.children?.length;
+              else withToggle
+            "
+          >
             <div>
               <b>{{ data.id }}</b>
             </div>
@@ -253,7 +268,19 @@
     </e-columns>
 
     <ng-template #detailTemplate let-data>
-      <div class="subrow-wrapper" *ngIf="!showReOrders">
+      <div class="subrow-wrapper">
+        <ng-container *ngIf="data.orderType === orderTypes.OpenPerDiem; else defaultSubRow">
+          <app-grid-subrow-reorder
+            *ngFor="let child of data.reOrders"
+            [reOrder]="child"
+            [order]="data"
+            [selected]="selectedReOrder?.selected?.order === data.id && selectedReOrder?.selected.reOrder === child.id"
+            (clickEvent)="onOpenReorderDialog($event, data)"
+          ></app-grid-subrow-reorder>
+        </ng-container>
+      </div>
+
+      <ng-template #defaultSubRow>
         <app-grid-subrow-candidate
           *ngFor="let child of data.children"
           [candidat]="child"
@@ -265,16 +292,7 @@
           [isAgency]="true"
           (clickEvent)="onOpenCandidateDialog($event, data)"
         ></app-grid-subrow-candidate>
-      </div>
-      <div class="subrow-wrapper" *ngIf="showReOrders">
-        <app-grid-subrow-reorder
-          *ngFor="let child of data.reOrders"
-          [reOrder]="child"
-          [order]="data"
-          [selected]="selectedReOrder?.selected?.order === data.id && selectedReOrder?.selected.reOrder === child.id"
-          (clickEvent)="onOpenReorderDialog($event, data)"
-        ></app-grid-subrow-reorder>
-      </div>
+      </ng-template>
     </ng-template>
 
     <ng-template #pagerTemplate let-data>
@@ -331,6 +349,7 @@
 ></app-export-dialog>
 
 <app-filter-dialog
+  *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates"
   [items]="filteredItems"
   [count]="(ordersPage$ | async)?.totalCount"
   (deleteFilter)="onFilterDelete($event)"
@@ -340,17 +359,12 @@
 >
   <form [formGroup]="OrderFilterFormGroup">
     <div class="bootstrap">
-      <div class="input-container" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders">
-        <label for="orderId">Order ID</label>
+      <div class="input-container">
+        <label for="orderId">{{
+          activeTab === OrganizationOrderManagementTabs.ReOrders ? 'Re-Order ID' : 'Order ID'
+        }}</label>
         <div class="input-group">
           <input id="orderId" class="e-input" type="text" maxlength="50" formControlName="orderId" />
-        </div>
-      </div>
-
-      <div class="input-container" *ngIf="activeTab === OrganizationOrderManagementTabs.ReOrders">
-        <label for="reOrderId">Re-Order ID</label>
-        <div class="input-group">
-          <input id="reOrderId" class="e-input" type="text" maxlength="50" formControlName="reOrderId" />
         </div>
       </div>
     </div>
@@ -575,6 +589,93 @@
   </form>
 </app-filter-dialog>
 
+<app-filter-dialog
+  *ngIf="activeTab === OrganizationOrderManagementTabs.OrderTemplates"
+  [items]="filteredItems"
+  [count]="(ordersPage$ | async)?.totalCount"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
+  <form [formGroup]="OrderFilterFormGroup">
+    <div class="bootstrap">
+      <div class="input-container">
+        <label for="templateId">Template ID</label>
+        <div class="input-group">
+          <input id="templateId" class="e-input" type="text" maxlength="50" formControlName="orderId" />
+        </div>
+      </div>
+    </div>
+    <div class="row bootstrap">
+      <div class="input-container">
+        <label>Region</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="regionIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.regionIds.dataSource"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Location</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="locationIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.locationIds.dataSource"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Department</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="departmentsIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.departmentsIds.dataSource"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Skill</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="skillIds"
+            placeholder="All"
+            [fields]="skillsFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.skillIds.dataSource"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+  </form>
+</app-filter-dialog>
+
 <app-order-details-dialog
   #detailsDialog
   [order]="selectedOrder"
@@ -582,7 +683,9 @@
   [openEvent]="openDetails"
   (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid()"
+  (closeReOrderEmitter)="onAddReorderClose()"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
+  (updateOrders)="getOrders()"
 ></app-order-details-dialog>
 
 <app-child-order-dialog
@@ -590,3 +693,4 @@
   [candidate]="selectedCandidate"
   [openEvent]="openChildDialog"
 ></app-child-order-dialog>
+

@@ -34,7 +34,7 @@
       <e-column textAlign="Right" width="80">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data, $event)">
+            <button ejs-button cssClass="e-flat primary-icon-button custom-button" [disabled]="order?.isClosed" (click)="onEdit(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </button>
           </div>
@@ -52,12 +52,28 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="statusName" headerText="Status" textAlign="Left" width="150">
+      <e-column field="statusName" headerText="Status" textAlign="Left" width="180">
         <ng-template #template let-data>
           <div class="status-cell">
             <ejs-chiplist>
               <e-chips>
-                <e-chip [text]="data.statusName" [cssClass]="data.statusName | chipsCssClass"></e-chip>
+                <ng-container [ngSwitch]="data.status">
+                  <ng-container *ngSwitchCase="candidateStatuses.BillRatePending">
+                    <e-chip text="B.R.Pending" cssClass="e-pending"></e-chip>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="candidateStatuses.OfferedBR">
+                    <e-chip text="Offered B.R." cssClass="e-pending"></e-chip>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="candidateStatuses.Onboard">
+                    <e-chip [text]="data.statusName" cssClass="e-filled"></e-chip>
+                  </ng-container>
+                  <ng-container *ngSwitchCase="candidateStatuses.Rejected">
+                    <e-chip [text]="data.statusName" cssClass="e-default"></e-chip>
+                  </ng-container>
+                  <ng-container *ngSwitchDefault>
+                    <!-- blank statuses -->
+                  </ng-container>
+                </ng-container>
               </e-chips>
             </ejs-chiplist>
           </div>
@@ -127,7 +143,7 @@
                 id="gridPager"
                 #gridPager
                 [pageSize]="pageSize"
-                [totalRecordsCount]="candidatesList?.totalPages"
+                [totalRecordsCount]="candidatesList?.totalCount"
                 [enablePagerMessage]="false"
                 [currentPage]="currentPage"
                 (click)="onGoToClick($event)"
@@ -145,6 +161,7 @@
   [openEvent]="openDetails"
   [candidate]="candidate"
   [isAgency]="isAgency"
+  [candidateJob]="candidateJob"
   [dialogNextPreviousOption]="dialogNextPreviousOption"
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
 ></app-reorder-status-dialog>

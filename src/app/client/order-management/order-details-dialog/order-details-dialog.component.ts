@@ -13,10 +13,10 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
+import { Order, OrderCandidatesListPage, OrderManagement, OrderManagementChild } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ApproveOrder, DeleteOrder, SetLock } from '@client/store/order-managment-content.actions';
+import { ApproveOrder, DeleteOrder, GetOrderById, GetOrders, SetLock } from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { CANCEL_ORDER_CONFIRM_TEXT, CANCEL_ORDER_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, } from '@shared/constants';
 import { Location } from '@angular/common';
@@ -36,7 +36,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
   @Output() saveReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
+  @Output() closeReOrderEmitter: EventEmitter<void> = new EventEmitter<void>();
   @Output() selectReOrder = new EventEmitter<any>();
+  @Output() updateOrders = new EventEmitter();
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
@@ -55,6 +57,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public orderType = OrderType;
   public orderStatus = OrderStatus;
   public candidatesCounter: number;
+  public reOrderToEdit: Order | null;
 
   public disabledCloseButton = true;
   public showCloseButton = false;
@@ -68,10 +71,6 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   get disabledLock(): boolean {
     const statuses = [this.orderStatus.Open, this.orderStatus.InProgress, this.orderStatus.Filled];
     return !statuses.includes(this.order?.status);
-  }
-
-  get sidebarWidth(): string {
-    return this.order?.orderType === OrderType.OpenPerDiem ? "60%" : "50%";
   }
 
   constructor(
@@ -91,9 +90,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   ngOnChanges(changes: SimpleChanges): void {
     if(changes['order']?.currentValue) {
       this.setCloseOrderButtonState();
-      this.showCloseButton = this.openInProgressFilledStatuses.includes(
-        changes['order'].currentValue.statusText.toLowerCase()
-      );
+      const order = changes['order']?.currentValue;
+      const hasStatus = this.openInProgressFilledStatuses.includes(order.statusText.toLowerCase());
+      this.showCloseButton = hasStatus || (!hasStatus && order?.orderClosureReason);
       if (this.chipList) {
         this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
         this.chipList.text = changes['order'].currentValue.statusText.toUpperCase();
@@ -190,7 +189,22 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     }
   }
 
-  closeOrder(order: Order): void {
+  public editNestedReOrder(data: Order): void {
+    this.store.dispatch(new ShowSideDialog(true));
+    this.reOrderToEdit = { ...data };
+  }
+
+  public saveReOrder(): void {
+    this.saveReOrderEmitter.emit();
+    this.reOrderToEdit = null;
+  }
+
+  public clearEditReOrder(): void {
+    this.closeReOrderEmitter.emit();
+    this.reOrderToEdit = null;
+  }
+
+  public closeOrder(order: Order): void {
     this.store.dispatch(new ShowCloseOrderDialog(true));
     this.order = { ...order };
   }
@@ -234,5 +248,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           (candidate) => candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
         ).length;
     });
+  }
+
+  updateOrderDetails(order: Order | OrderManagement): void {
+    this.store.dispatch(new GetOrderById(order.id, order.organizationId as number));
+    this.updateOrders.emit();
   }
 }

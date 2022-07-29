@@ -24,7 +24,8 @@ import { startEndTimeValidator } from '@shared/validators/time.validator';
 })
 export class AddEditReorderComponent extends DestroyableDirective implements OnInit, OnChanges {
   @Input() public order: Order;
-  @Output() saveEmitter: EventEmitter<void> = new EventEmitter<void>();
+  @Output() public saveEmitter: EventEmitter<void> = new EventEmitter<void>();
+  @Output() public closeEmitter: EventEmitter<void> = new EventEmitter<void>();
 
   public readonly agenciesOptionFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   public readonly candidatesOptionFields: FieldSettingsModel = { text: 'candidateName', value: 'candidateId' };
@@ -72,6 +73,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
 
   public onCancel(): void {
     this.closeDialog();
+    this.closeEmitter.emit();
   }
 
   public onSave(): void {

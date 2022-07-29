@@ -12,7 +12,7 @@
       <section class="header-container">
         <div class="e-card-header preview-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title preview-title"> here Position ID {{ order?.orderId || order?.id }}/{{ candidate?.positionId }}</h3>
+            <h3 class="e-card-title preview-title">Position ID {{ order?.orderId || order?.id }}/{{ candidate?.positionId }}</h3>
             <div class="order-statuses">
               <ejs-chiplist #chipList class="events-off" *ngIf="candidate">
                 <e-chips>
@@ -23,6 +23,7 @@
           </div>
           <div class="e-card-content dialog-controls">
             <button ejs-button cssClass="e-outline"
+                    *ngIf="!isAgency"
                     [disabled]="disabledCloseButton"
                     (click)="closeOrder(order)">
               Close Position
@@ -44,7 +45,7 @@
                       <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
                     </section>
                     <hr />
-                    <ng-container *ngIf="currentOrder?.reasonForClosing">
+                    <ng-container *ngIf="currentOrder?.orderClosureReason">
                       <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
                       <hr />
                     </ng-container>
@@ -63,7 +64,7 @@
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.accept">
-                      <app-accept-candidate [candidate]="$any(candidate)" [isTab]="true"></app-accept-candidate>
+                      <app-accept-candidate [candidate]="$any(candidate)" [isTab]="true" (closeModalEvent)="onClose()"></app-accept-candidate>
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.apply">

@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RejectReasonDialogComponent } from './reject-reason-dialog.component';
+import { WidgetLegendComponent } from './widget-legend.component';
 
-describe('RejectReasonDialogComponent', () => {
-  let component: RejectReasonDialogComponent;
-  let fixture: ComponentFixture<RejectReasonDialogComponent>;
+describe('WidgetLegendComponent', () => {
+  let component: WidgetLegendComponent;
+  let fixture: ComponentFixture<WidgetLegendComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ RejectReasonDialogComponent ]
+      declarations: [ WidgetLegendComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RejectReasonDialogComponent);
+    fixture = TestBed.createComponent(WidgetLegendComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

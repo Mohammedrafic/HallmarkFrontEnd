@@ -20,14 +20,13 @@
                 </e-chips>
               </ejs-chiplist>
               <div class="vertical-divider"></div>
-              <div *ngIf="order" class="order-other-statuses">
-                <span class="custom-chip" *ngIf="!isReOrder">{{ orderType[order.orderType] }}</span>
+              <div *ngIf="order && !isReOrder" class="order-other-statuses">
+                <span class="custom-chip">{{ orderType[order.orderType] }}</span>
                 <span class="custom-chip"> {{order.isLocked ? "Locked" : "Unlocked"}}</span>
               </div>
             </div>
           </div>
           <div class="e-card-content">
-            <button ejs-button cssClass="e-outline button-cancel" (click)="onCompare()">Compare</button>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>
             </button>
@@ -47,7 +46,7 @@
                     <app-general-order-info *ngSwitchDefault [orderInformation]="currentOrder"></app-general-order-info>
                   </section>
                   <hr />
-                  <ng-container *ngIf="currentOrder?.reasonForClosing">
+                  <ng-container *ngIf="currentOrder?.orderClosureReason">
                     <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
                     <hr />
                   </ng-container>
@@ -64,13 +63,13 @@
             <ng-container *ngIf="selectedOrder$ | async as currentOrder">
               <e-tabitem *ngIf="orderType.OpenPerDiem === currentOrder.orderType">
                 <ng-template #headerText>
-                  Re-Orders <span class="e-badge e-badge-success e-badge-circle">{{ order?.reOrders?.length || '0' }}</span>
+                  Re-Orders <span class="e-badge e-badge-success e-badge-circle">{{ currentOrder?.reOrders?.length || '0' }}</span>
                 </ng-template>
                 <ng-template #content>
-                  <app-order-reorders-container (selectReOrder)="selectReOrder.emit($event)" [isAgency]="true" [currentOrder]="order"></app-order-reorders-container>
+                  <app-order-reorders-container (selectReOrder)="selectReOrder.emit($event)" [isAgency]="true" [currentOrder]="currentOrder"></app-order-reorders-container>
                 </ng-template>
               </e-tabitem>
-            
+
             <e-tabitem *ngIf="orderType.OpenPerDiem !== currentOrder.orderType && orderType.ReOrder !== currentOrder.orderType">
               <ng-template #headerText>Extensions</ng-template>
               <ng-template #content> </ng-template>

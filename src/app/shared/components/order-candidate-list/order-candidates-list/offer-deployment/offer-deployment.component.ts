@@ -181,7 +181,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                 clockId: this.candidateJob.clockId,
                 guaranteedWorkWeek: value.guaranteedWorkWeek,
                 offeredStartDate: toCorrectTimezoneFormat(value.offeredStartDate),
-                allowDeplayWoCredentials: true,
+                allowDeployWoCredentials: true,
                 billRates: this.billRatesComponent.billRatesControl.value,
               })
             )

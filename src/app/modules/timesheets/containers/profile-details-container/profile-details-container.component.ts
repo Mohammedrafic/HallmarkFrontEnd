@@ -1,21 +1,22 @@
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import {
-  ChangeDetectionStrategy, Component, ElementRef, EventEmitter,
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter,
   Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { filter, Observable, take, takeUntil, switchMap, throttleTime, forkJoin, of } from 'rxjs';
+import { filter, Observable, take, takeUntil, switchMap, throttleTime, forkJoin, tap } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 
-import { Destroyable } from '@core/helpers';
+import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { FileSize } from '@core/enums';
 import { DialogAction, SubmitBtnText, TimesheetTargetStatus } from '../../enums';
 import { FileExtensionsString } from '@core/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { MessageTypes } from '@shared/enums/message-types';
 import { ExportColumn, ExportPayload } from '@shared/models/export.model';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
@@ -27,8 +28,8 @@ import {
   TimesheetDetailsExportOptions } from '../../constants';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
-import { MessageTypes } from '@shared/enums/message-types';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';
+import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -52,6 +53,9 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @ViewChild('uploadArea')
   public uploadArea: ElementRef<HTMLDivElement>;
 
+  @ViewChild('dnwSwitch')
+  public dnwSwitch: SwitchComponent;
+
   @Input() currentSelectedRowIndex: number | null = null;
 
   @Input() maxRowIndex: number = 30;
@@ -74,7 +78,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public organizationId: number | null = null;
 
+  public weekPeriod: [Date, Date] = [new Date(), new Date()];
+
   public readonly columnsToExport: ExportColumn[] = TimesheetDetailsExportOptions;
+
+  public actionButtonDisabled = false;
 
   @Select(TimesheetsState.isTimesheetOpen)
   public readonly isTimesheetOpen$: Observable<DialogActionPayload>;
@@ -91,6 +99,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public readonly exportedFileType: typeof ExportedFileType = ExportedFileType;
   public readonly allowedFileExtensions: string = FileExtensionsString;
   public readonly maxFileSize: number = FileSize.MB_10;
+  public readonly timesheetStatus: typeof TimesheetStatus = TimesheetStatus;
 
   constructor(
     private store: Store,
@@ -99,6 +108,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     private datePipe: DatePipe,
     private router: Router,
     private timesheetDetailsService: TimesheetDetailsService,
+    private cd: ChangeDetectorRef,
   ) {
     super();
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
@@ -162,22 +172,29 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   }
 
   public onDWNCheckboxSelectedChange({checked}: {checked: boolean}, switchComponent: SwitchComponent): void {
-    checked && this.confirmService.confirm(ConfirmDeleteTimesheetDialogContent, {
+    checked ? this.confirmService.confirm(ConfirmDeleteTimesheetDialogContent, {
       title: 'Delete Timesheet',
       okButtonLabel: 'Proceed',
       okButtonClass: 'delete-button',
     })
       .pipe(
         take(1),
-        switchMap((submitted: boolean) => submitted ?  this.store.dispatch([
-          new Timesheets.ToggleCandidateDialog(DialogAction.Close),
-          new TimesheetDetails.NoWorkPerformed(this.timesheetId, this.organizationId),
-        ]) : of(null))
+        tap((submitted: boolean) => !submitted && switchComponent.writeValue(false)),
+        filter(Boolean),
+        switchMap(() => this.store.dispatch(
+          new TimesheetDetails.NoWorkPerformed(true, this.timesheetId, this.organizationId),
+        ))
       )
       .subscribe(() => {
-        this.handleProfileClose();
-        switchComponent.writeValue(false);
-      });
+        this.closeDialog();
+        this.refreshData();
+      }) : this.store.dispatch(
+      new TimesheetDetails.NoWorkPerformed(false, this.timesheetId, this.organizationId)
+    )
+      .pipe(
+        take(1),
+      )
+      .subscribe(() => this.refreshData());
   }
 
   public handleReject(reason: string): void {
@@ -318,6 +335,12 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       ?.querySelector('button')?.click();
   }
 
+  private refreshData(): Observable<unknown> {
+    return this.store.dispatch(
+      new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
+    );
+  }
+
   /**
    * TODO: date pipe is always defined, needs check
    */
@@ -336,10 +359,26 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.timesheetDetails$
     .pipe(
       filter(Boolean),
+      tap((details) => { this.setActionBtnState(details)}),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(({ organizationId }) => {
+    .subscribe(({ organizationId, weekStartDate, weekEndDate }) => {
       this.organizationId = this.isAgency ? organizationId : null;
+      this.weekPeriod = [
+        new Date(DateTimeHelper.convertDateToUtc(weekStartDate)),
+        new Date(DateTimeHelper.convertDateToUtc(weekEndDate)),
+      ]
+      this.cd.markForCheck();
     });
   }
+
+  private setActionBtnState(details: TimesheetDetailsModel): void {
+    if (this.isAgency) {
+      this.actionButtonDisabled = details.status === this.timesheetStatus.PendingApproval
+      || details.status === this.timesheetStatus.Approved;
+    } else {
+      this.actionButtonDisabled = details.status === this.timesheetStatus.Approved
+    }
+  }
 }
+

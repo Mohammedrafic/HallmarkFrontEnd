@@ -4,7 +4,7 @@ import { ColumnDefinitionModel } from '@shared/components/grid/models/column-def
 import { ColDef } from '@ag-grid-community/core';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
-import { TimesheetsTableColumns, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
+import { FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
 import { FilterColumns, FilterDataSource, TimesheetsFilterState } from '../interface';
 import {
   TimesheetTableStatusCellComponent
@@ -149,8 +149,8 @@ export const SavedFiltersParams: string[] = [
   'pageSize',
   'organizationId',
   'orderBy',
-  'date',
-  'search',
+  'dateTimeOffset',
+  'searchTerm',
   'statusIds',
 ];
 
@@ -172,6 +172,14 @@ export const filterOptionFields = {
   text: 'name',
   value: 'id'
 };
+
+export const filteringOptionsMapping: Map<FilteringOptionsFields, TimesheetsTableFiltersColumns> = new Map()
+  .set(FilteringOptionsFields.Agencies, TimesheetsTableFiltersColumns.AgencyIds)
+  .set(FilteringOptionsFields.Orders, TimesheetsTableFiltersColumns.OrderIds)
+  .set(FilteringOptionsFields.Regions, TimesheetsTableFiltersColumns.RegionsIds)
+  .set(FilteringOptionsFields.Skills, TimesheetsTableFiltersColumns.SkillIds)
+  .set(FilteringOptionsFields.Statuses, TimesheetsTableFiltersColumns.StatusIds);
+
 
 export const filterColumnDataSource: FilterDataSource = {
   [TimesheetsTableFiltersColumns.StatusIds]: Object.values(TIMETHEETS_STATUSES).map((val, idx) => ({
@@ -238,4 +246,8 @@ export const filterColumnDataSource: FilterDataSource = {
       name: '20-30-02'
     }
   ]
+};
+
+export const BulkApproveSuccessMessage = {
+  successMessage: 'Success. Timesheets Approved',
 };

@@ -33,6 +33,7 @@ const editableCostCenterDef: ColDef = {
   headerName: 'Cost center',
   ...commonColumn,
   width: 180,
+  filterValueGetter: (value) => value.data.costCenterFormattedName,
   cellRenderer: DropdownEditorComponent,
   type: 'rightAligned',
   cellRendererParams: {
@@ -71,7 +72,7 @@ const actionCol: ColDef = {
   headerName: '',
   type: 'rightAligned',
   resizable: false,
-  width: 40,
+  width: 60,
   cellRenderer: ActionsCellComponent,
   cellRendererParams: {
     editMode: true,
@@ -106,7 +107,7 @@ export const TimesheetRecordsColdef: ColDef[] = [
     field: 'timeIn',
     headerName: 'Time in',
     ...commonColumn,
-    width: 135,
+    width: 125,
     cellRenderer: GridDateEditorComponent,
     type: 'rightAligned',
     cellRendererParams: {
@@ -119,7 +120,7 @@ export const TimesheetRecordsColdef: ColDef[] = [
     field: 'timeOut',
     headerName: 'Time out',
     ...commonColumn,
-    width: 135,
+    width: 125,
     cellRenderer: GridDateEditorComponent,
     type: 'rightAligned',
     cellRendererParams: {
@@ -130,10 +131,11 @@ export const TimesheetRecordsColdef: ColDef[] = [
   },
   editableCostCenterDef,
   {
-    field: 'billRateId',
+    field: 'billRateConfigId',
     headerName: 'Bill rate type',
     ...commonColumn,
     width: 180,
+    filterValueGetter: (value) => { return value.data.billRateConfigName },
     cellRenderer: DropdownEditorComponent,
     type: 'rightAligned',
     cellRendererParams: {

@@ -5,6 +5,7 @@ cssClass="dialog short"
 [width]="'540px'"
 [visible]="false"
 [height]="450"
+[isModal]="true"
 [animationSettings]="{ effect: 'SlideRight' }"
 >
   <ng-template #content>
@@ -13,7 +14,7 @@ cssClass="dialog short"
         <h3 class="title">{{ dialogConfig[formType].title | titlecase }}</h3>
         <div class="controls">
           <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
-          <button (click)="saveForm()" ejs-button [isPrimary]="true">Save</button>
+          <button (click)="saveRecord()" ejs-button [isPrimary]="true">Save</button>
         </div>
       </div>
 
@@ -28,7 +29,7 @@ cssClass="dialog short"
                   </label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
-                      [fields]="dropDownFields"
+                      [fields]="dropDownFieldsConfig"
                       [formControlName]="field.field"
                       [dataSource]="field.options"
                       appValidateWithMessage

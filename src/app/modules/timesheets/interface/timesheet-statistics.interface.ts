@@ -11,7 +11,6 @@ export interface TimesheetStatistics {
 }
 
 export interface TimesheetStatisticsDetails {
-  // TODO: Rename to billRateId
   billRateConfigId: number;
   billRateConfigName: HourOccupationType;
   weekHours: number;

@@ -23,7 +23,7 @@ export class CandidateAgencyComponent implements AfterViewInit {
   agencies$: Observable<any>;
 
   constructor(private store: Store) {
-    store.dispatch(new GetAgencyByPage(1, 100)); // TODO: needed until we dont have agency switcher in the header
+    store.dispatch(new GetAgencyByPage(1, 100, {})); // TODO: needed until we dont have agency switcher in the header
   }
 
   ngAfterViewInit(): void {

@@ -23,9 +23,9 @@ export class RecordsAdapter {
     sheetId: number,
     type: RecordFields,
     ): AddRecordDto {
-    data.timeIn = DateTimeHelper.toUtc(data.timeIn);
+    data.timeIn = DateTimeHelper.toUtcFormat(data.timeIn);
     if (data.timeOut) {
-      data.timeOut = DateTimeHelper.toUtc(data.timeOut);
+      data.timeOut = DateTimeHelper.toUtcFormat(data.timeOut);
     }
     return {
       timesheetId: sheetId,
@@ -51,12 +51,12 @@ export class RecordsAdapter {
   private static adaptRecordsToPut(record: RecordValue): PutRecord {
     return {
       id: record.id,
-      timeIn: DateTimeHelper.toUtc(record.timeIn),
-      billRateId: record.billRateId,
+      timeIn: DateTimeHelper.toUtcFormat(record.timeIn),
+      billRateConfigId: record.billRateConfigId,
       departmentId: record.departmentId,
       value: record.value,
       description: record.description,
-      ...record.timeOut ? { timeOut: DateTimeHelper.toUtc(record.timeOut)  } : { timeOut: new Date().toISOString()},
+      ...record.timeOut ? { timeOut: DateTimeHelper.toUtcFormat(record.timeOut)  } : { timeOut: new Date().toISOString()},
       ...record.description ? { description: record.description } : {},
     }; 
   }

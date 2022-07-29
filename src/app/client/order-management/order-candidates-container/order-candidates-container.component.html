@@ -4,11 +4,16 @@
   <app-general-order-info *ngSwitchDefault [orderInformation]="order"></app-general-order-info>
 </section>
 <div class="separator"></div>
-<ng-container *ngIf="order?.reasonForClosing">
+<ng-container *ngIf="order?.orderClosureReason">
   <app-order-close-reason-info [orderInformation]="order"></app-order-close-reason-info>
   <div class="separator"></div>
 </ng-container>
 <div class="candidates-list" *ngIf="orderCandidatePage" [ngSwitch]="order?.orderType">
+  <app-reorder-candidates-list *ngSwitchCase="orderType.ReOrder" [candidatesList]="orderCandidatePage$ | async"
+                                      (getCandidatesList)="onGetCandidatesList($event)"
+                                      [includeDeployedCandidates]="!excludeDeployed"
+                                      [order]="orderCandidates">
+  </app-reorder-candidates-list>
   <app-order-per-diem-candidates-list *ngSwitchCase="orderType.OpenPerDiem" [candidatesList]="orderCandidatePage$ | async"
                                       (getCandidatesList)="onGetCandidatesList($event)"
                                       [includeDeployedCandidates]="!excludeDeployed"

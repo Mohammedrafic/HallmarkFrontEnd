@@ -17,6 +17,11 @@ import {
 
 export type TimeSheetsPage = PageOfCollections<Timesheet>;
 
+export type TimrsheetsDto = {
+  items: TimeSheetsPage,
+  tabsCounts: TabCountConfig,
+};
+
 export interface TimesheetsModel {
   timesheets: TimeSheetsPage | null;
   timesheetsFilters: TimesheetsFilterState | null;
@@ -38,5 +43,6 @@ export interface TimesheetsModel {
   timesheetsFiltersColumns: FilterColumns;
   timesheetDetails: TimesheetDetailsModel | null;
   organizations: DataSourceItem[];
+  selectedOrganizationId: number;
 }
 

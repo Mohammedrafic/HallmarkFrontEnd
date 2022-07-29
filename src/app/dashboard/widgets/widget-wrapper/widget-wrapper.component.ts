@@ -12,5 +12,6 @@ export class WidgetWrapperComponent {
 
   @ContentChild('header') public readonly header: TemplateRef<HTMLElement>;
   @ContentChild('chart') public readonly chart: TemplateRef<HTMLElement>;
+  @ContentChild('positionChat') public readonly positionChat: TemplateRef<HTMLElement>;
   @ContentChild('legend') public readonly legend: TemplateRef<HTMLElement>;
 }

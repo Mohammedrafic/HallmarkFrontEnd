@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
+import { MultiselectDropdownModule } from "@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module";
 import { SharedModule } from '@shared/shared.module';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { Sliders, Edit, Trash2, Plus } from 'angular-feather/icons';
@@ -27,6 +28,7 @@ import { AddEditVisibilityComponent } from './user-list/add-edit-user/visibility
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
+import { RolesFiltersComponent } from './roles-and-permissions/roles-grid/roles-filters/roles-filters.component';
 
 const scurityIcons = {
   Sliders,
@@ -47,6 +49,7 @@ ModuleRegistry.registerModules([ServerSideRowModelModule]);
     UserSettingsComponent,
     VisibilitySettingsComponent,
     AddEditVisibilityComponent,
+    RolesFiltersComponent,
   ],
   imports: [
     CommonModule,
@@ -68,6 +71,8 @@ ModuleRegistry.registerModules([ServerSideRowModelModule]);
     ChipListModule,
     AgGridModule,
     DropDownButtonModule,
+    MultiselectDropdownModule,
+
     FeatherModule.pick(scurityIcons),
   ],
 })

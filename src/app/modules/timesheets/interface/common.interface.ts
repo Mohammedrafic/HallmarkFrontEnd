@@ -52,11 +52,12 @@ export interface RecordValue {
   timeOut?: string;
   billRate: number;
   billRateConfigName: string;
-  billRateId: number;
+  billRateConfigId: number;
   costCenterFormattedName: string;
   costCenterName: string;
   departmentId: number;
   description?: string;
+  isGenerated?: boolean;
   extDepartmentId: string;
   total:  number;
   value: 10;
@@ -69,7 +70,7 @@ export interface TimesheetAttachments {
 export interface TabConfig {
   title: string;
   amount?: number;
-  value?: string[];
+  value?: number[];
 }
 
 export interface TabCountConfig {

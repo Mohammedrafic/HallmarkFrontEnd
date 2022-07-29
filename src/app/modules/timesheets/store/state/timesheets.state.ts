@@ -8,7 +8,7 @@ import { downloadBlobFile } from '@shared/utils/file.utils';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { TimesheetsModel, TimeSheetsPage, } from '../model/timesheets.model';
+import { TimesheetsModel, TimeSheetsPage, TimrsheetsDto } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
@@ -18,14 +18,14 @@ import {
   TIMETHEETS_STATUSES,
   RecordFields,
   TimesheetTargetStatus,
-  TimesheetsTableFiltersColumns,
+  TimesheetsTableFiltersColumns, FilteringOptionsFields
 } from '../../enums';
 import {
   AddSuccessMessage,
   approveTimesheetDialogData,
   DefaultFiltersState,
   DefaultTimesheetCollection,
-  DefaultTimesheetState,
+  DefaultTimesheetState, filteringOptionsMapping,
   rejectTimesheetDialogData,
   SavedFiltersParams,
   submitTimesheetDialogData
@@ -47,6 +47,7 @@ import {
   TimesheetsFilterState,
   TimesheetStatistics,
   DropdownOption,
+  TimesheetsFilteringOptions,
 } from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
@@ -164,10 +165,15 @@ export class TimesheetsState {
     return state.organizations;
   }
 
+  @Selector([TimesheetsState])
+  static selectedOrganization(state: TimesheetsModel): number {
+    return state.selectedOrganizationId;
+  }
+
   @Action(Timesheets.GetAll)
   GetTimesheets(
     { patchState, getState }: StateContext<TimesheetsModel>,
-  ): Observable<TimeSheetsPage> {
+  ): Observable<TimrsheetsDto> {
     patchState({
       timesheets: DefaultTimesheetCollection,
     });
@@ -176,9 +182,10 @@ export class TimesheetsState {
 
     return this.timesheetsApiService.getTimesheets(filters)
       .pipe(
-        tap((res) => {
+        tap((res: TimrsheetsDto) => {
           patchState({
-            timesheets: res,
+            timesheets: res.items,
+            tabCounts: res.tabsCounts,
           });
         }));
   }
@@ -186,29 +193,30 @@ export class TimesheetsState {
   @Action(Timesheets.UpdateFiltersState)
   UpdateFiltersState(
     { setState, getState }: StateContext<TimesheetsModel>,
-    { payload }: Timesheets.UpdateFiltersState,
+    { payload, saveStatuses }: Timesheets.UpdateFiltersState,
   ): Observable<null> {
     const oldFilters: TimesheetsFilterState = getState().timesheetsFilters || DefaultFiltersState;
     let filters: TimesheetsFilterState = reduceFiltersState(oldFilters, SavedFiltersParams);
-
     filters = Object.assign({}, filters, payload);
 
     return of(null).pipe(
       throttleTime(100),
       tap(() => setState(patch<TimesheetsModel>({
-        timesheetsFilters: payload ? filters : DefaultFiltersState,
+        timesheetsFilters: payload || saveStatuses ? filters : DefaultFiltersState,
       })))
     );
   }
 
-  @Action(Timesheets.GetTabsCounts)
-  GetTabsCounts({ patchState }: StateContext<TimesheetsModel>): Observable<TabCountConfig> {
-    return this.timesheetsApiService.getTabsCounts()
-      .pipe(
-        tap((res) => patchState({
-          tabCounts: res,
-        }))
-      );
+  @Action(Timesheets.ResetFiltersState)
+  ResetFiltersState(
+    { setState }: StateContext<TimesheetsModel>,
+  ): Observable<null> {
+    return of(null).pipe(
+      throttleTime(100),
+      tap(() => setState(patch<TimesheetsModel>({
+        timesheetsFilters: null
+      })))
+    );
   }
 
   @Action(TimesheetDetails.GetTimesheetRecords)
@@ -354,6 +362,24 @@ export class TimesheetsState {
       );
   }
 
+  @Action(Timesheets.GetFiltersDataSource)
+  GetFiltersDataSource({ setState, getState }: StateContext<TimesheetsModel>): Observable<TimesheetsFilteringOptions> {
+    const selectedOrganizationId = getState().selectedOrganizationId;
+
+    return this.timesheetsApiService.getFiltersDataSource(selectedOrganizationId).pipe(
+      tap((res) => {
+        setState(patch({
+          timesheetsFiltersColumns: patch(Object.keys(res).reduce((acc: any, key) => {
+            acc[filteringOptionsMapping.get((key as FilteringOptionsFields)) as TimesheetsTableFiltersColumns] = patch({
+              dataSource: res[key as FilteringOptionsFields],
+            });
+            return acc;
+          }, {})),
+        }));
+      })
+    );
+  }
+
   @Action(Timesheets.SetFiltersDataSource)
   SetFiltersDataSource(
     { setState }: StateContext<TimesheetsModel>,
@@ -414,19 +440,43 @@ export class TimesheetsState {
   @Action(TimesheetDetails.NoWorkPerformed)
   NoWorkPerformed(
     { }: StateContext<TimesheetsModel>,
-    { timesheetId, organizationId }: TimesheetDetails.NoWorkPerformed
+    { noWorkPerformed, timesheetId, organizationId }: TimesheetDetails.NoWorkPerformed
   ): Observable<void> {
-    return this.timesheetDetailsApiService.noWorkPerformed(timesheetId, organizationId);
+    return this.timesheetDetailsApiService.noWorkPerformed(noWorkPerformed, timesheetId, organizationId);
   }
 
   @Action(Timesheets.GetOrganizations)
   GetOrganizations({ patchState }: StateContext<TimesheetsModel>): Observable<DataSourceItem[]> {
     return this.timesheetsApiService.getOrganizations()
     .pipe(
-      tap((organizations: DataSourceItem[]) => patchState({ organizations })),
+      tap((organizations: DataSourceItem[]) => patchState({
+        organizations,
+        selectedOrganizationId: organizations[0]?.id,
+      })),
     );
   }
-  
+
+  @Action(Timesheets.SelectOrganization)
+  SelectOrganization(
+    { patchState }: StateContext<TimesheetsModel>,
+    { id }: Timesheets.SelectOrganization
+  ): Observable<null> {
+    return of(null).pipe(
+      debounceTime(100),
+      tap(() => patchState({
+        selectedOrganizationId: id,
+      }))
+    );
+  }
+
+  @Action(Timesheets.BulkApprove)
+  BulkApprove(
+    { patchState }: StateContext<TimesheetsModel>,
+    { timesheetIds }: Timesheets.BulkApprove
+  ): Observable<void> | any {
+    return this.timesheetsApiService.postBulkApprove(timesheetIds);
+  }
+
   @Action(TimesheetDetails.AddTimesheetRecord)
   AddTimesheetRecord(ctx: StateContext<TimesheetsModel>, { body, isAgency }: TimesheetDetails.AddTimesheetRecord) {
     return this.timesheetsApiService.addTimesheetRecord(body)

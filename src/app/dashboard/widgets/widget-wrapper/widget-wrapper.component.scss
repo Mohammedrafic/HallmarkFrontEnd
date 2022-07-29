@@ -1,4 +1,4 @@
-@import 'mixins';
+@import "mixins";
 
 $headerHeight: 19px;
 
@@ -14,13 +14,13 @@ $headerHeight: 19px;
   padding: 24px;
   box-sizing: border-box;
   --chartHeight: 100%;
-  
-  @media screen and (max-width: 1700px){
+
+  @media screen and (max-width: 1700px) {
     padding-left: 16px;
   }
 
   &.with-legend {
-    --chartHeight: 100%;
+    --chartHeight: 60%;
 
     .app-widget-wrapper__chart {
       /*border-bottom: 1px solid rgba($secondary-dark-blue-40, 0.32);*/
@@ -51,13 +51,19 @@ $headerHeight: 19px;
   }
 
   &__chart {
-    height: var(--chartHeight);
+    max-height: var(--chartHeight);
+    padding-top:10%;
+  }
+
+  &__position-chat {
+    height: 100%;
+    margin-right: -16px;
   }
 
   &__legend {
-    height: 100%;
+    height: 80%;
     overflow: auto;
-    padding-top: 50px;
+    padding-top: 25px;
     margin-right: 12px;
     cursor: default;
     box-sizing: border-box;
@@ -68,5 +74,20 @@ $headerHeight: 19px;
     display: grid;
     height: 100%;
     place-items: center;
+  }
+
+  &__header {
+    &::ng-deep {
+      h3 {
+        @include with-ellipsis;
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #1a1b2e;
+        line-height: 16px;
+        padding-left:12px;
+        padding-top:12px;
+      }
+    }
   }
 }

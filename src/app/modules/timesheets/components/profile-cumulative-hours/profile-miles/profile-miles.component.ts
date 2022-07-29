@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { CandidateMilesData, TimesheetStatistics } from '../../../interface';
+import { CandidateMilesData } from '../../../interface';
 
 @Component({
   selector: 'app-profile-miles',
@@ -10,5 +10,5 @@ import { CandidateMilesData, TimesheetStatistics } from '../../../interface';
 })
 export class ProfileMilesComponent {
   @Input()
-  public milesData: CandidateMilesData | null;
+  public milesData: CandidateMilesData;
 }

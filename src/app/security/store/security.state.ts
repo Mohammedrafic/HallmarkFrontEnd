@@ -79,7 +79,7 @@ interface SecurityStateModel {
 export class SecurityState {
   @Selector()
   static bussinesData(state: SecurityStateModel): BusinessUnit[] {
-    return [BUSINNESS_DATA_DEFAULT_VALUE, ...state.bussinesData] as BusinessUnit[];
+    return state.bussinesData;
   }
 
   @Selector()
@@ -138,6 +138,11 @@ export class SecurityState {
       text: 'name',
       hasChildren: 'hasChild',
     };
+  }
+
+  @Selector()
+  static permissionsTree(state: SecurityStateModel): PermissionsTree {
+    return state.permissionsTree;
   }
 
   @Selector()
@@ -208,9 +213,9 @@ export class SecurityState {
   @Action(GetRolesPage)
   GetRolesPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitId, businessUnitType, pageNumber, pageSize, sortModel, filterModel }: GetRolesPage
+    { businessUnitIds, businessUnitType, pageNumber, pageSize, sortModel, filterModel, filters }: GetRolesPage
   ): Observable<RolesPage> {
-    return this.roleService.getRolesPage(businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel).pipe(
+    return this.roleService.getRolesPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel, filters).pipe(
       tap((payload) => {
         patchState({ rolesPage: payload });
         return payload;

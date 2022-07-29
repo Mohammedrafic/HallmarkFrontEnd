@@ -55,8 +55,8 @@ export namespace Timesheets {
     }
   }
 
-  export class GetTabsCounts {
-    static readonly type = TIMESHEETS_ACTIONS.GET_TABS_COUNTS;
+  export class GetFiltersDataSource {
+    static readonly type = TIMESHEETS_ACTIONS.GET_FILTERS_DATA_SOURCE;
   }
 
   export class SetFiltersDataSource {
@@ -72,8 +72,15 @@ export namespace Timesheets {
   export class UpdateFiltersState {
     static readonly type = TIMESHEETS_ACTIONS.UPDATE_FILTERS_STATE;
 
-    constructor(public readonly payload?: TimesheetsFilterState) {
+    constructor(
+      public readonly payload?: TimesheetsFilterState | null,
+      public readonly saveStatuses = false,
+    ) {
     }
+  }
+
+  export class ResetFiltersState {
+    static readonly type = TIMESHEETS_ACTIONS.RESET_FILTERS_STATE;
   }
 
   export class DeleteTimesheet {
@@ -96,5 +103,19 @@ export namespace Timesheets {
 
   export class GetOrganizations {
     static readonly type = TIMESHEETS_ACTIONS.GET_ORGANIZATIONS;
+  }
+
+  export class SelectOrganization {
+    static readonly type = TIMESHEETS_ACTIONS.SELECT_ORGANIZATION;
+
+    constructor(public readonly id: number) {
+    }
+  }
+
+  export class BulkApprove {
+    static readonly type = TIMESHEETS_ACTIONS.BULK_APPROVE;
+
+    constructor(public readonly timesheetIds: number[]) {
+    }
   }
 }

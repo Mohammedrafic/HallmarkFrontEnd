@@ -33,6 +33,7 @@ export class GridComponent<Data> extends DestroyableDirective implements OnChang
   @Input() public isLoading: boolean | null = false;
   @Input() public suppressRowClickSelection: boolean = false;
   @Input() public allowBulkSelection: boolean = false;
+  @Input() public allowBulkButton: boolean = false;
   @Input() public rowSelection: 'single' | 'multiple' = 'single';
   @Input() public pageSize: number = GRID_CONFIG.rowsPerPageDropDownObject[0].value;
   @Input() public rowData: Data[] | null | undefined;

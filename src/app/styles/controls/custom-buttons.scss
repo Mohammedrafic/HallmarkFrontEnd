@@ -1,0 +1,24 @@
+@import "colors";
+
+button.e-btn.e-control {
+  &.e-action-button {
+    background-color: transparent;
+    color: $primary-active-blue-10;
+
+    &:disabled {
+      color: $primary-active-blue-60;
+      background-color: transparent;
+    }
+
+    &:not([disabled]) {
+      &:hover {
+        color: $primary-active-blue-10;
+      }
+
+      &:hover, &:focus {
+        color: $primary-active-blue-10;
+        background-color: $primary-active-blue-70;
+      }
+    }
+  }
+}

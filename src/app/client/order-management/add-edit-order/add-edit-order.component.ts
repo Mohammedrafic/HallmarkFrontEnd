@@ -16,6 +16,7 @@ import {
   GetSelectedOrderById,
   SaveOrder,
   SaveOrderSucceeded,
+  SelectNavigationTab,
   SetIsDirtyOrderForm,
 } from '@client/store/order-managment-content.actions';
 import { OrderDetailsFormComponent } from '../order-details-form/order-details-form.component';
@@ -31,6 +32,8 @@ import { OrderType } from '@shared/enums/order-type';
 import some from 'lodash/fp/some';
 import isNil from 'lodash/fp/isNil';
 import { AbstractControl } from '@angular/forms';
+import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { SaveTemplateDialogService } from '@client/order-management/save-template-dialog/save-template-dialog.service';
 
 enum SelectedTab {
   OrderDetails,
@@ -89,7 +92,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     private store: Store,
     private router: Router,
     private route: ActivatedRoute,
-    private actions$: Actions
+    private actions$: Actions,
+    private saveTemplateDialogService: SaveTemplateDialogService
   ) {
     store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
 
@@ -104,7 +108,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   public get generalInformationForm(): Order {
-    return this.orderDetailsFormComponent.generalInformationForm.value;
+    return this.orderDetailsFormComponent.generalInformationForm.getRawValue();
   }
 
   public ngOnInit(): void {
@@ -186,6 +190,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
       case SubmitButtonItem.SaveForLater:
         this.saveForLater();
+        this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.Incomplete));
         break;
 
       case SubmitButtonItem.SaveAsTemplate:
@@ -387,7 +392,14 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       workflowId,
       isSubmit,
       canApprove,
+      isTemplate: false,
     };
+
+    if (this.orderDetailsFormComponent.order?.isTemplate) {
+      order.contactDetails = order.contactDetails.map((contact) => ({ ...contact, id: 0 }));
+      order.jobDistributions = order.jobDistributions.map((job) => ({ ...job, orderId: 0, id: 0 }));
+      order.workLocations = order.workLocations.map((workLocation) => ({ ...workLocation, id: 0 }));
+    }
 
     if (!order.hourlyRate) {
       order.hourlyRate = null;
@@ -472,7 +484,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   }
 
   private saveAsTemplate(): void {
-    const { regionId, locationId, departmentId, skillId } = this.orderDetailsFormComponent.generalInformationForm.value;
+    const { regionId, locationId, departmentId, skillId } =
+      this.orderDetailsFormComponent.generalInformationForm.getRawValue();
     const requiredFields = [regionId, skillId, departmentId, locationId];
     const isRequiredFieldsFilled = !some(isNil, requiredFields);
 
@@ -489,15 +502,16 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public createTemplate(event: { templateTitle: string }): void {
     const order = this.collectOrderData(false);
-    const title = order.title ?? event.templateTitle;
+    const { templateTitle } = event;
     const extendedOrder = {
-      ...order,
-      title: title,
-      templateTitle: title,
+      ...this.saveTemplateDialogService.resetOrderPropertyIds(order),
+      templateTitle,
+      title: isNil(order.title) ? '' : order.title,
       isTemplate: true,
     };
     const documents = this.orderDetailsFormComponent.documents;
     this.store.dispatch(new SaveOrder(extendedOrder, documents));
+    this.selectOrderTemplatesTab();
     this.closeSaveTemplateDialog();
   }
 
@@ -510,5 +524,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (this.orderDetailsFormComponent.isDepartmentsDropDownEnabled) {
       this.getOrderDetailsControl('departmentId')?.markAsTouched();
     }
+  }
+
+  private selectOrderTemplatesTab(): void {
+    this.store.dispatch(new SelectNavigationTab(OrganizationOrderManagementTabs.OrderTemplates));
   }
 }

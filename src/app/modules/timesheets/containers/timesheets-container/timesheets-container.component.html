@@ -1,9 +1,9 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tabs-list
+    <app-timesheets-tabs
       [tabConfig]="tabConfig"
       (changeTab)="handleChangeTab($event)">
-    </app-tabs-list>
+    </app-timesheets-tabs>
   </ng-container>
   <ng-container right>
     <div *ngIf="isAgency" class="bootstrap">
@@ -17,8 +17,8 @@
         </ejs-dropdownlist>
       </div>
     </div>
-    <app-search class="search"></app-search>
-    <app-date-week-picker [dateControl]="dateControl"></app-date-week-picker>
+    <app-search #search ngDefaultControl [formControl]="searchControl" class="search"></app-search>
+    <app-date-range-week-picker (range)="setRange($event)"></app-date-range-week-picker>
     <button
       ejs-button
       cssClass="e-outline button-filter button--no-wrap"
@@ -42,6 +42,8 @@
     (changePerPage)="handleChangePerPage($event)"
     (timesheetRowSelected)="rowSelected($event)"
     (sortHandler)="sortHandler($event)"
+    (bulkApproveEmitter)="bulkApprove($event)"
+    (bulkExportEmitter)="bulkExport($event)"
   >
   </app-timesheets-table>
 </section>

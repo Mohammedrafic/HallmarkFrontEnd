@@ -17,8 +17,19 @@
               <!-- <i-feather name="briefcase" class="icon deployed-icon" *ngIf="isDeployedCandidate"></i-feather> -->
             </h3>
           </div>
-          <div class="e-card-content">
-            <button ejs-button [isPrimary]="true" class="apply-button" (click)="onAccept()">Accept</button>
+          <div class="e-card-content button-container">
+            <div class="input-group dropdown bootstrap" *ngIf="isBillRatePending">
+              <ejs-dropdownlist
+                appValidateWithMessage
+                placeholder="Select Status"
+                [formControl]="jobStatusControl"
+                [fields]="optionFields"
+                [dataSource]="jobStatus$ | async"
+                (change)="onJobStatusChange($event)"
+              ></ejs-dropdownlist>
+            </div>
+            <button ejs-button class="e-outline" (click)="onReject()" *ngIf="isOfferedBillRate">Reject</button>
+            <button ejs-button [isPrimary]="true" class="apply-button" (click)="onAccept()" *ngIf="showAccept">Accept</button>
             <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="onCloseDialog()">
               <i-feather name="x" class="icon"></i-feather>
             </button>
@@ -39,7 +50,10 @@
                   <div>Job Details</div>
                 </ng-template>
                 <ng-template #content>
-                  <app-accept-form [formGroup]="acceptForm"></app-accept-form>
+                  <app-accept-form
+                    [formGroup]="acceptForm"
+                    [status]="currentCandidateApplicantStatus"
+                  ></app-accept-form>
                 </ng-template>
               </e-accordionitem>
               <e-accordionitem>
@@ -47,7 +61,7 @@
                   <div>Historical Events</div>
                 </ng-template>
                 <ng-template #content>
-                  <!-- <app-historical-events [organizationId]="organizationId" [candidateJobId]="candidate.candidateJobId" [candidateId]='candidate.candidateId'></app-historical-events> -->
+                  <app-historical-events [organizationId]="orderCandidateJob?.organizationId!" [candidateJobId]="candidate.candidateJobId" [candidateId]="candidate.candidateId" [isAgency]="isAgency"></app-historical-events>
                 </ng-template>
               </e-accordionitem>
             </e-accordionitems>
@@ -60,7 +74,7 @@
 
       <section class="bill-rates">
         <app-bill-rates-view-grid
-          [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
+          [billRatesData]="orderCandidateJob?.billRates || []"
         ></app-bill-rates-view-grid>
       </section>
     </section>
@@ -76,3 +90,8 @@
   </ng-template>
 </ejs-dialog>
 
+<app-reject-reason-dialog
+  [rejectReasonsList]="rejectReasons"
+  [openEvent]="openRejectDialog"
+  (applyReject)="applyReject($event)"
+></app-reject-reason-dialog>

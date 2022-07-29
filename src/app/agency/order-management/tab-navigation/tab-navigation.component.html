@@ -1,4 +1,4 @@
-<ejs-tab id="tab_default" heightAdjustMode="Auto" #tabNavigation (selecting)="onSelect($event)">
+<ejs-tab id="tab_default" heightAdjustMode="Auto" #tabNavigation (selecting)="onSelect($event)" (created)="onTabCreated()">
   <div class="e-tab-header">
     <div>
       {{ tabTitle.MyAgency }}

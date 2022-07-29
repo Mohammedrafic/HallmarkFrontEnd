@@ -1,16 +1,18 @@
 import { Directive, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { combineLatest, debounceTime, filter, Observable, Subject, takeUntil, tap } from 'rxjs';
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
 
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { AgencyOrder, CandidateListEvent, OrderCandidatesListPage } from '@shared/models/order-management.model';
+import { AgencyOrder, CandidateListEvent, OrderCandidateJob, OrderCandidatesListPage } from '@shared/models/order-management.model';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { SetLastSelectedOrganizationAgencyId } from 'src/app/store/user.actions';
 import { UserState } from 'src/app/store/user.state';
 import { AbstractGridConfigurationComponent } from '../abstract-grid-configuration/abstract-grid-configuration.component';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { OrderManagementState } from '@agency/store/order-management.state';
 
 @Directive()
 export abstract class AbstractOrderCandidateListComponent
@@ -24,6 +26,12 @@ export abstract class AbstractOrderCandidateListComponent
   @Input() includeDeployedCandidates: boolean = true;
 
   @Output() getCandidatesList = new EventEmitter<CandidateListEvent>();
+
+  @Select(OrderManagementContentState.candidatesJob)
+  candidateJobOrganisationState$: Observable<OrderCandidateJob>;
+
+  @Select(OrderManagementState.candidatesJob)
+  candidateJobAgencyState$: Observable<OrderCandidateJob>;
 
   public openDetails = new Subject<boolean>();
   public isAgency: boolean;

@@ -3,7 +3,7 @@
 
   <ng-template [ngSwitchCase]="false">
     <div class="init-value-wrapper">
-      <span>{{ type === 'currency' ? (value | currency)  : value }}</span>
+      <span class="init-value">{{ type === 'currency' ? (value | currency)  : value }}</span>
     </div>
   </ng-template>
 

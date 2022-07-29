@@ -8,15 +8,24 @@ import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, debounceTime } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { Destroyable } from '@core/helpers';
 import { User } from '@shared/models/user.model';
-import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
+import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
+import { SearchComponent } from '@shared/components/search/search.component';
+import { MessageTypes } from '@shared/enums/message-types';
+import { RowNode } from '@ag-grid-community/core';
+import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { DataSourceItem, TabConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
-import { TimesheetExportOptions, TAB_ADMIN_TIMESHEETS, UNIT_ORGANIZATIONS_FIELDS } from '../../constants';
+import {
+  TimesheetExportOptions,
+  TAB_ADMIN_TIMESHEETS,
+  UNIT_ORGANIZATIONS_FIELDS,
+  BulkApproveSuccessMessage
+} from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { DialogAction, ExportType } from '../../enums';
@@ -24,7 +33,6 @@ import { TimesheetsService } from '../../services/timesheets.service';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { ProfileDetailsContainerComponent } from '../profile-details-container/profile-details-container.component';
 import { AppState } from '../../../../store/app.state';
-import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 
 @Component({
   selector: 'app-timesheets-container.ts',
@@ -35,6 +43,9 @@ import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organizati
 export class TimesheetsContainerComponent extends Destroyable implements OnInit {
   @ViewChild(ProfileDetailsContainerComponent)
   public timesheetDetailsComponent: ProfileDetailsContainerComponent;
+
+  @ViewChild('search')
+  public search: SearchComponent;
 
   @Select(TimesheetsState.timesheets)
   readonly timesheets$: Observable<TimeSheetsPage>;
@@ -51,13 +62,19 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   @Select(UserState.user)
   readonly user$: Observable<User>;
 
-  public readonly tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
+  @Select(UserState.lastSelectedOrganizationId)
+  organizationId$: Observable<number>;
+
+  @Select(UserState.lastSelectedAgencyId)
+  agencyId$: Observable<number>;
+
+  public tabConfig: TabConfig[] = TAB_ADMIN_TIMESHEETS;
   public activeTabIdx = 0;
   public appliedFiltersAmount = 0;
   public readonly exportOptions: ItemModel[] = TimesheetExportOptions;
   public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
   public filters: TimesheetsFilterState | undefined;
-  public readonly dateControl: FormControl = new FormControl(null);
+  public readonly searchControl: FormControl = new FormControl('');
   public readonly organizationControl: FormControl = new FormControl(null);
   public readonly currentSelectedTableRowIndex: Observable<number>
     = this.timesheetsService.getStream();
@@ -71,28 +88,30 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     private router: Router,
   ) {
     super();
-    store.dispatch(new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }));
+    store.dispatch([
+      new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }),
+      new Timesheets.ResetFiltersState(),
+    ]);
 
     this.isAgency = this.router.url.includes('agency');
   }
 
   ngOnInit(): void {
-    if (this.isAgency) {
-      this.initOrganizationsList();
-    } else {
-      this.store.dispatch(new Timesheets.UpdateFiltersState());
-    }
-
-    this.initTabsCount();
+    this.initComponentState();
     this.startFiltersWatching();
     this.startOrganizationWatching();
+    this.startSearchWatching();
     this.calcTabsChips();
+    this.onOrganizationChangedHandler();
   }
 
   public handleChangeTab(tabIndex: number): void {
     this.activeTabIdx = tabIndex;
+    this.searchControl.setValue('', { emitEvent: false });
+    this.search?.clear();
     this.store.dispatch(new Timesheets.UpdateFiltersState({
-      statusIds: this.tabConfig[tabIndex].value
+      statusIds: this.tabConfig[tabIndex].value,
+      searchTerm: ''
     }));
   }
 
@@ -116,7 +135,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public resetFilters(): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState());
+    this.store.dispatch(new Timesheets.UpdateFiltersState(null, this.activeTabIdx !== 0));
   }
 
   public updateTableByFilters(filters: any): void {
@@ -143,6 +162,40 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     this.appliedFiltersAmount = amount;
   }
 
+  public setRange(range: string[]): void {
+    this.store.dispatch(new Timesheets.UpdateFiltersState({
+      dateTimeOffset: {
+        startDate: range[0] || '',
+        endDate: range[1] || '',
+      }
+    }));
+  }
+
+  public bulkApprove(data: RowNode[]): void {
+    const timesheetIds = data.map((el: RowNode) => el.data.id);
+
+    this.store.dispatch(new Timesheets.BulkApprove(timesheetIds)).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.store.dispatch([
+        new ShowToast(MessageTypes.Success, BulkApproveSuccessMessage.successMessage),
+        new Timesheets.GetAll()
+      ]);
+    });
+  }
+
+  public bulkExport(data: RowNode[]): void {
+  }
+
+  private onOrganizationChangedHandler(): void {
+    (this.isAgency ? this.agencyId$ : this.organizationId$).pipe(
+      takeUntil(this.componentDestroy())
+    ).subscribe(() => {
+      this.store.dispatch(new Timesheets.ResetFiltersState());
+      this.initComponentState();
+    });
+  }
+
   private startFiltersWatching(): void {
     this.timesheetsFilters$.pipe(
       filter(Boolean),
@@ -156,14 +209,24 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       filter(Boolean),
       distinctUntilChanged(),
       switchMap((organizationId: number) => this.store.dispatch(
-        new Timesheets.UpdateFiltersState({ organizationId })
+        [
+          new Timesheets.UpdateFiltersState({ organizationId }),
+          new Timesheets.SelectOrganization(organizationId),
+        ]
       )),
       takeUntil(this.componentDestroy()),
     ).subscribe();
   }
 
-  private initTabsCount(): void {
-    this.store.dispatch(new Timesheets.GetTabsCounts());
+  private startSearchWatching(): void {
+    this.searchControl.valueChanges.pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      switchMap((searchTerm) =>
+        this.store.dispatch(new Timesheets.UpdateFiltersState({ searchTerm }))
+      ),
+      takeUntil(this.componentDestroy()),
+    ).subscribe();
   }
 
   private initOrganizationsList(): void {
@@ -174,7 +237,10 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       takeUntil(this.componentDestroy()),
     ).subscribe(res => {
       this.organizationControl.setValue(res[0].id, { emitEvent: false });
-      this.store.dispatch(new Timesheets.UpdateFiltersState({ organizationId: res[0].id }));
+      this.store.dispatch([
+        new Timesheets.UpdateFiltersState({ organizationId: res[0].id }),
+        new Timesheets.GetFiltersDataSource()
+      ]);
     });
   }
 
@@ -185,10 +251,29 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
       takeUntil(this.componentDestroy()),
     )
     .subscribe((data) => {
-      this.tabConfig[1].amount = data.pending;
-      this.tabConfig[2].amount = data.missing;
-      this.tabConfig[3].amount = data.rejected;
-      this.cd.markForCheck();
+      this.tabConfig = this.tabConfig.map((el, idx) => {
+        if (idx === 1) {
+          el.amount = data.pending;
+        } else if (idx === 2) {
+          el.amount = data.missing;
+        } else if (idx === 3) {
+          el.amount = data.rejected;
+        }
+
+        return el;
+      });
+      this.cd.detectChanges();
     });
+  }
+
+  private initComponentState(): void {
+    if (this.isAgency) {
+      this.initOrganizationsList();
+    } else {
+      this.store.dispatch([
+        new Timesheets.UpdateFiltersState(),
+        new Timesheets.GetFiltersDataSource()
+      ]);
+    }
   }
 }

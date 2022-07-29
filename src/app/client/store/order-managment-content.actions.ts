@@ -41,6 +41,11 @@ export class SetLock {
   ) {}
 }
 
+export class LockUpdatedSuccessfully {
+  static readonly type = '[order management] Lock Updated Successfully';
+  constructor() {}
+}
+
 export class GetAgencyOrderCandidatesList {
   static readonly type = '[order management] Get Order Candidates Page';
   constructor(
@@ -201,6 +206,10 @@ export class GetHistoricalData {
   constructor(public organizationId: number, public candidateJobId: number) {}
 }
 
+export class ClearHistoricalData {
+  static readonly type = '[order management] Clear Historical Data';
+}
+
 export class ExportOrders {
   static readonly type = '[order management] Export Organization list';
   constructor(public payload: ExportPayload, public tab: OrganizationOrderManagementTabs) {}
@@ -219,4 +228,12 @@ export class DuplicateOrder {
 export class DuplicateOrderSuccess {
   static readonly type = '[order management] Duplicate Order Success';
   constructor(public payload: number) {}
+}
+
+export class SelectNavigationTab {
+  static readonly type = '[order management] Select Navigation Tab';
+  constructor(
+    public pending: OrganizationOrderManagementTabs | null,
+    public active?: OrganizationOrderManagementTabs
+  ) {}
 }

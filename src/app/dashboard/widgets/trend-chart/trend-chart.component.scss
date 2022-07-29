@@ -16,27 +16,12 @@
     .widget-value {
       display: flex;
       align-items: center;
-      font-weight: 700;
+      font-size: 14px;
 
       .widget-value-number {
         font-size: 24px;
         color: $black;
-      }
-
-      .widget-value-percent {
-        font-size: 14px;
-        color: $supportive-red;
-        margin: 0 5px 0 15px;
-      }
-
-      .widget-data-down {
-        display: inline-block;
-        color: $supportive-red;
-        transform: rotate(180deg);
-      }
-
-      .widget-data-grow {
-        color: $supportive-green-10;
+        font-weight: 700;
       }
     }
 
@@ -55,7 +40,7 @@
       }
     }
   }
-  
+
   .widget-text {
     display: flex;
     justify-content: space-between;

@@ -10,10 +10,7 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
-import {
-  Order,
-  OrderCandidatesList,
-} from '@shared/models/order-management.model';
+import { Order, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AcceptCandidateComponent } from './accept-candidate/accept-candidate.component';
 import { ApplyCandidateComponent } from './apply-candidate/apply-candidate.component';
 import { OfferDeploymentComponent } from './offer-deployment/offer-deployment.component';
@@ -30,7 +27,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   @ViewChild('accept') accept: AcceptCandidateComponent;
   @ViewChild('apply') apply: ApplyCandidateComponent;
   @ViewChild('onboarded') onboarded: OnboardedCandidateComponent;
-  @ViewChild('offerDeployment') offerDeployment: OfferDeploymentComponent
+  @ViewChild('offerDeployment') offerDeployment: OfferDeploymentComponent;
 
   @Select(OrderManagementState.selectedOrder)
   public selectedOrder$: Observable<Order>;
@@ -46,7 +43,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
     this.candidate = { ...data };
-    this.addActiveCssClass(event);
 
     if (this.order && this.candidate) {
       if (this.isAgency) {
@@ -100,7 +96,6 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
 
   public onCloseDialog(): void {
     this.sideDialog.hide();
-    this.removeActiveCssClass();
   }
 
   private openDialog(template: any): void {

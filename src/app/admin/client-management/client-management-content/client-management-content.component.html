@@ -8,20 +8,28 @@
     <ng-container right>
       <section class="org-controls-container">
         <div>
-          <button *ngIf="hasCreateOrganizationPermission" ejs-button [isPrimary]="true" (click)="navigateToOrganizationForm()">Add Organization</button>
+          <button
+            *ngIf="hasCreateOrganizationPermission"
+            ejs-button
+            [isPrimary]="true"
+            (click)="navigateToOrganizationForm()"
+          >
+            Add Organization
+          </button>
           <button
             ejs-dropdownbutton
             [items]="exportOptions"
             (select)="exportSelected($event)"
             id="importButton"
-            cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
-          <button
-            ejs-button
-            id="filterButton"
-            cssClass="e-outline button-filter"
-            (click)="showFilters()">
+            cssClass="e-outline button-export"
+          >
+            Export <i-feather name="download" class="icon"></i-feather>
+          </button>
+          <button ejs-button id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
             <div class="filter-button-content">
-              <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+              <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{
+                filteredItems.length
+              }}</span>
               Filters <i-feather name="sliders" class="icon"></i-feather>
             </div>
           </button>
@@ -31,7 +39,8 @@
   </app-page-toolbar>
 
   <section class="grid-component">
-    <ejs-grid #grid
+    <ejs-grid
+      #grid
       [dataSource]="(organizations$ | async)?.items"
       [allowSorting]="true"
       [allowResizing]="true"
@@ -44,7 +53,8 @@
       (rowDeselected)="rowDeselected($event, grid)"
       (dataBound)="gridDataBound(grid)"
       [selectionSettings]="selectionSettings"
-      (actionBegin)="actionBegin($event)">
+      (actionBegin)="actionBegin($event)"
+    >
       <e-columns>
         <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="40"></e-column>
         <e-column textAlign="Right" field="actions" width="120">
@@ -71,7 +81,10 @@
             <div class="status-cell">
               <ejs-chiplist>
                 <e-chips>
-                  <e-chip [text]="statusEnum[data.generalInformation.status]" [cssClass]="getChipCssClass(statusEnum[data.generalInformation.status])"></e-chip>
+                  <e-chip
+                    [text]="statusEnum[data.generalInformation.status]"
+                    [cssClass]="getChipCssClass(statusEnum[data.generalInformation.status])"
+                  ></e-chip>
                 </e-chips>
               </ejs-chiplist>
             </div>
@@ -79,7 +92,13 @@
         </e-column>
         <e-column field="generalInformation.city" headerText="City" textAlign="Left" width="150"></e-column>
         <e-column field="contactDetails.0.contactPerson" headerText="Contact" textAlign="Left" width="150"></e-column>
-        <e-column field="contactDetails.0.phoneNumberExt" headerText="Phone" textAlign="Left" width="130" [allowSorting]="false">
+        <e-column
+          field="contactDetails.0.phoneNumberExt"
+          headerText="Phone"
+          textAlign="Left"
+          width="130"
+          [allowSorting]="false"
+        >
           <ng-template #template let-data>
             <span>{{ data.contactDetails[0].phoneNumberExt | formatPhoneNumber }}</span>
           </ng-template>
@@ -131,66 +150,83 @@
   </section>
 </section>
 
-<app-filter-dialog [items]="filteredItems" [count]="(organizations$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
+<app-filter-dialog
+  [items]="filteredItems"
+  [count]="(organizations$ | async)?.totalCount"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
   <form class="bootstrap" [formGroup]="OrganizationFilterFormGroup">
     <div class="input-container">
       <label for="externalId">Search</label>
       <div class="input-group">
-        <input  class="e-input"
-                type="text"
-                maxlength="50"
-                formControlName="searchTerm"/>
+        <input class="e-input" type="text" maxlength="50" formControlName="searchTerm" />
       </div>
     </div>
     <div class="input-container">
       <label>Organization Name</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="organizationNames"
-                         placeholder="All"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.organizationNames.dataSource">
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="businessUnitNames"
+          placeholder="All"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.businessUnitNames.dataSource"
+        >
         </ejs-multiselect>
       </div>
     </div>
     <div class="input-container">
       <label>Status</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="statuses"
-                         placeholder="All"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.statuses.dataSource">
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="statuses"
+          placeholder="All"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.statuses.dataSource"
+        >
         </ejs-multiselect>
       </div>
     </div>
     <div class="input-container">
       <label>City</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="cities"
-                         placeholder="All"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.cities.dataSource">
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="cities"
+          placeholder="All"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.cities.dataSource"
+        >
         </ejs-multiselect>
       </div>
     </div>
     <div class="input-container">
       <label>Contact</label>
       <div class="input-group multiselect">
-        <ejs-multiselect mode="CheckBox"
-                         formControlName="contacts"
-                         placeholder="All"
-                         [allowFiltering]="true"
-                         [showDropDownIcon]="true"
-                         [dataSource]="filterColumns.contacts.dataSource">
+        <ejs-multiselect
+          mode="CheckBox"
+          formControlName="contacts"
+          placeholder="All"
+          [allowFiltering]="true"
+          [showDropDownIcon]="true"
+          [dataSource]="filterColumns.contacts.dataSource"
+        >
         </ejs-multiselect>
       </div>
     </div>
   </form>
 </app-filter-dialog>
 
-<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+<app-export-dialog
+  [columns]="columnsToExport"
+  [fileName]="fileName"
+  (cancel)="closeExport()"
+  (export)="export($event)"
+></app-export-dialog>

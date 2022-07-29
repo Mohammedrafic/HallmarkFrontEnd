@@ -24,6 +24,6 @@ export class GeneralOrderPerDiemInfoComponent {
   }
 
   public getReasonsForRequisition(reason: ReasonForRequisition): string {
-    return reason ? ReasonForRequisitionList.find(item => item.id ===reason)?.name as string : 'No';
+    return (reason !== null || true) ? ReasonForRequisitionList.find(item => item.id ===reason)?.name as string : 'No';
   }
 }

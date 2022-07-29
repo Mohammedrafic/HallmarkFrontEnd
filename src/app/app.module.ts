@@ -18,6 +18,7 @@ import { LoginGuard, UserGuard } from '@shared/guards';
 import { MsalModule, MsalRedirectComponent } from '@azure/msal-angular';
 import { MSAL_PROVIDERS } from './b2c-auth/b2c-auth.providers';
 import { B2cModule } from './b2c-auth/b2c-auth.module';
+import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 
 @NgModule({
   declarations: [AppComponent],
@@ -29,7 +30,8 @@ import { B2cModule } from './b2c-auth/b2c-auth.module';
     //STORE
     NgxsModule.forRoot([
       AppState,
-      UserState
+      UserState,
+      RejectReasonState
     ]),
     NgxsReduxDevtoolsPluginModule.forRoot({
       disabled: environment.production
@@ -38,7 +40,7 @@ import { B2cModule } from './b2c-auth/b2c-auth.module';
       disabled: environment.production
     }),
     NgxMaskModule.forRoot(),
-    
+
     // B2C
     MsalModule,
     B2cModule,

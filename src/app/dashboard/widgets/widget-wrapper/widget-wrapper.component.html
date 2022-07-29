@@ -11,11 +11,14 @@
 
 <ng-template #regularWidgetTemplate>
   <div class="app-widget-wrapper__projection-wrapper">
-    <div class="app-widget-wrapper__header">
+    <div *ngIf="header" class="app-widget-wrapper__header">
       <ng-container [ngTemplateOutlet]="header"></ng-container>
     </div>
-    <div class="app-widget-wrapper__chart">
+    <div *ngIf="chart" class="app-widget-wrapper__chart">
       <ng-container [ngTemplateOutlet]="chart"></ng-container>
+    </div>
+    <div *ngIf="positionChat" class="app-widget-wrapper__position-chat">
+      <ng-container [ngTemplateOutlet]="positionChat"></ng-container>
     </div>
     <div *ngIf="legend" class="app-widget-wrapper__legend">
       <ng-container [ngTemplateOutlet]="legend"></ng-container>
