@@ -13,21 +13,26 @@
         </div>
       </div>
       <div class="dropdown-container">
-        <div class="input-group dropdown">
-          <ejs-dropdownlist
-            appValidateWithMessage
-            formControlName="business"
-            [fields]="bussinesDataFields"
-            [dataSource]="bussinesUserData$ | async"
-            placeholder="Business"
-          ></ejs-dropdownlist>
-        </div>
+        <app-multiselect-dropdown
+          [formGroupInstance]="businessForm"
+          [fields]="bussinesDataFields"
+          [dataSource]="businessUserData$ | async"
+          [showSelectAll]="true"
+          controlName="business"
+          placeholder="Business"
+          selectAllText="All"
+        ></app-multiselect-dropdown>
       </div>
     </div>
   </ng-container>
   <ng-container right>
     <ng-container>
-      <button ejs-button cssClass="e-outline">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+      <button ejs-button cssClass="e-outline" (click)="showFilters()">
+        <div class="filter-button-content">
+          <span *ngIf="(filteredItems$ | async) as filteredItems" class="e-badge e-badge-success e-badge-circle">{{filteredItems}}</span>
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
       <button
         ejs-dropdownbutton
         [items]="exportOptions"
@@ -40,7 +45,12 @@
 </app-page-toolbar>
 
 <section class="last-content-section-padding">
-  <app-user-grid [filterForm]="businessForm" [export$]="exportUsers$" (editUserEvent)="onEdit($event)"></app-user-grid>
+  <app-user-grid
+    [filterForm]="businessForm"
+    [export$]="exportUsers$"
+    (editUserEvent)="onEdit($event)"
+    [filteredItems$]="filteredItems$"
+  ></app-user-grid>
 </section>
 
 <app-side-dialog width="832" [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()">

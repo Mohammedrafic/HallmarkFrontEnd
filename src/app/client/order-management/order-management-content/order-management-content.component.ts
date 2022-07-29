@@ -450,6 +450,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           : perDiemColumnsToExport;
         break;
       case OrganizationOrderManagementTabs.ReOrders:
+        if (this.selectedItems.length === 0) {
+          this.columnsToExport = [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport];
+          return;
+        }
         this.columnsToExport = hasSelectedItemChildren
           ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
           : reOrdersColumnsToExport;
@@ -541,7 +545,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       this.creatingReorder = false;
       return;
     }
-    
+
     this.rowSelected(event, this.gridWithChildRow);
 
     if (!event.isInteracted) {

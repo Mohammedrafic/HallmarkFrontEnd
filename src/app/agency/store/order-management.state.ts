@@ -28,9 +28,11 @@ import { ShowToast } from 'src/app/store/app.actions';
 import {
   ApplyOrderApplicants,
   ApplyOrderApplicantsSucceed,
+  ClearAgencyHistoricalData,
   ClearOrders,
   ExportAgencyOrders,
   GetAgencyFilterOptions,
+  GetAgencyHistoricalData,
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
   GetAgencyOrdersPage,
@@ -44,8 +46,6 @@ import {
   RejectCandidateJob,
   SetOrdersTab,
   UpdateAgencyCandidateJob,
-  ClearAgencyHistoricalData,
-  GetAgencyHistoricalData,
 } from './order-management.actions';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { OrderFilteringOptionsService } from '@shared/services/order-filtering-options.service';
@@ -243,7 +243,7 @@ export class OrderManagementState {
     patchState({ orderDialogOptions: options });
     return this.orderManagementContentService.getAgencyOrderById(id, organizationId).pipe(
       tap((payload) => {
-        const groupedCredentials = getGroupedCredentials(payload.credentials);
+        const groupedCredentials = getGroupedCredentials(payload.credentials ?? payload.reOrderFrom?.credentials);
         payload.groupedCredentials = groupedCredentials;
         patchState({ selectedOrder: payload });
         return payload;

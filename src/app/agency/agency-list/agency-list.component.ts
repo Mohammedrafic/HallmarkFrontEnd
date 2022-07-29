@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { FormGroup } from "@angular/forms";
+import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
 import { Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
@@ -23,14 +23,12 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DatePipe } from '@angular/common';
 import { FilteredItem } from "@shared/models/filter.model";
 import { FilterService } from "@shared/services/filter.service";
-import { AgencyListFilterService } from "./agency-list-filter.service";
 import { agencyListFilterColumns } from "@agency/agency-list/agency-list.constants";
 
 @Component({
   selector: 'app-agency-list',
   templateUrl: './agency-list.component.html',
-  styleUrls: ['./agency-list.component.scss'],
-  providers: [AgencyListFilterService]
+  styleUrls: ['./agency-list.component.scss']
 })
 export class AgencyListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
@@ -48,7 +46,7 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
   public fileName: string;
   public defaultFileName: string;
   public filterColumns = agencyListFilterColumns;
-  public agencyListFilterFormGroup: FormGroup = this.agencyListFilterService.generateFiltersForm();
+  public agencyListFilterFormGroup: FormGroup;
   public filteredItems$ = new Subject<number>();
 
   private filters: AgencyListFilters = {};
@@ -68,13 +66,14 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
     private confirmService: ConfirmService,
     private datePipe: DatePipe,
     private filterService: FilterService,
-    private agencyListFilterService: AgencyListFilterService
+    private formBuilder: FormBuilder
   ) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Agency List', iconName: 'clock' }));
   }
 
   ngOnInit(): void {
+    this.initAgencyListFilterFormGroup();
     this.dispatchNewPage();
     this.subscribeOnPageChanges();
     this.subscribeOnAgencyFilteringOptions();
@@ -255,5 +254,15 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
         this.filterColumns['cities'].dataSource = data.cities;
         this.filterColumns['contacts'].dataSource = data.contacts;
       });
+  }
+
+  private initAgencyListFilterFormGroup(): void {
+  this.agencyListFilterFormGroup = this.formBuilder.group({
+      searchTerm: new FormControl(null),
+      businessUnitNames: new FormControl([]),
+      statuses: new FormControl([]),
+      cities: new FormControl([]),
+      contacts: new FormControl([]),
+    });
   }
 }

@@ -139,3 +139,14 @@
   </div>
 </div>
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+
+<app-filter-dialog
+  [items]="filteredItems"
+  [count]="(usersPage$ | async)?.totalCount"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
+  <app-users-filters [form]="usersFilterFormGroup" [filterColumns]="filterColumns"></app-users-filters>
+</app-filter-dialog>

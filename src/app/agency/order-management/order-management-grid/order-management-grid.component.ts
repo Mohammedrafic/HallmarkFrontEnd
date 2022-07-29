@@ -530,6 +530,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           : perDiemColumnsToExport;
         break;
       case AgencyOrderManagementTabs.ReOrders:
+        if (this.selectedItems.length === 0) {
+          this.columnsToExport = [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport];
+          return;
+        }
         this.columnsToExport = hasSelectedItemChildren
           ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
           : reOrdersColumnsToExport;

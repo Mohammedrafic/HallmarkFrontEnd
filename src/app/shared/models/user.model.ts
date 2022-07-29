@@ -24,3 +24,10 @@ export type UsersAssignedToRole = {
   userNames: Partial<User>[];
   hasUsersOutsideVisibility: boolean;
 }
+
+export type UsersFilters = {
+  firstName?: string;
+  lastName?: string;
+  roleIds?: number[];
+  status?: boolean
+};
