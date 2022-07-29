@@ -50,7 +50,7 @@
   >
     <e-columns>
       <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
-      <e-column headerTextAlign="Right" width="145">
+      <e-column headerTextAlign="Right" width="155">
         <ng-template #headerTemplate let-data>
           <div class="controls-header">
             <button
@@ -90,7 +90,9 @@
             <button ejs-button cssClass="e-flat default-icon-button">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
             </button>
-            <button *ngIf="activeTab === OrganizationOrderManagementTabs.PerDiem" (click)="createReorder(data)" ejs-button cssClass="e-flat default-icon-button">
+            <button *ngIf="activeTab !== OrganizationOrderManagementTabs.Incomplete && orderTypes.OpenPerDiem === data.orderType"
+                    (click)="createReorder(data)" ejs-button cssClass="e-flat default-icon-button"
+                    [disabled]="data.status === orderStatus.PreOpen">
               <span><i-feather name="calendar" class="icon"></i-feather></span>
             </button>
             <button

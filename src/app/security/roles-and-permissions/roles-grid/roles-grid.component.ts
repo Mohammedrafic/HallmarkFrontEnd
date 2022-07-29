@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { filter, Observable, Subject, takeWhile } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
@@ -18,7 +18,6 @@ import { rolesFilterColumns } from "src/app/security/roles-and-permissions/roles
 import { ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { GetRolesPage, RemoveRole } from '../../store/security.actions';
 import { SecurityState } from '../../store/security.state';
-import { RolesFilterService } from "./roles-filter.service";
 
 enum Active {
   No,
@@ -28,8 +27,7 @@ enum Active {
 @Component({
   selector: 'app-roles-grid',
   templateUrl: './roles-grid.component.html',
-  styleUrls: ['./roles-grid.component.scss'],
-  providers: [RolesFilterService]
+  styleUrls: ['./roles-grid.component.scss']
 })
 export class RolesGridComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() filterForm: FormGroup;
@@ -57,7 +55,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   public selIndex: number[] = [];
   public sortOptions = { columns: [{ field: 'businessUnitName', direction: 'Descending' }] };
   public filterColumns = rolesFilterColumns;
-  public rolesFilterFormGroup: FormGroup = this.rolesFilterService.generateFiltersForm();
+  public rolesFilterFormGroup: FormGroup;
 
   private filters: RolesFilters = {};
   private isAlive = true;
@@ -66,11 +64,12 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
               private store: Store,
               private confirmService: ConfirmService,
               private filterService: FilterService,
-              private rolesFilterService: RolesFilterService) {
+              private formBuilder: FormBuilder) {
     super();
   }
 
   ngOnInit(): void {
+    this.initRolesFilterFormGroup();
     this.onDialogClose();
     this.dispatchNewPage();
     this.onPermissionsTreeChanged();
@@ -181,6 +180,12 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
   private onPermissionsTreeChanged(): void {
     this.permissionsTree$.pipe(takeWhile(() => this.isAlive)).subscribe((permissions: PermissionsTree) => {
       this.filterColumns['permissionsIds'].dataSource = permissions;
+    });
+  }
+
+  private initRolesFilterFormGroup(): void {
+  this.rolesFilterFormGroup = this.formBuilder.group({
+      permissionsIds: new FormControl([]),
     });
   }
 }

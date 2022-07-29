@@ -1,20 +1,24 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { FilteredItem } from "@shared/models/filter.model";
+import { UsersFilters } from "@shared/models/user.model";
+import { FilterService } from "@shared/services/filter.service";
 import { GridComponent, RowDataBoundEventArgs } from '@syncfusion/ej2-angular-grids';
-import { FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Role } from '@shared/models/roles.model';
 import { GRID_CONFIG } from '@shared/constants';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { Select, Store } from '@ngxs/store';
+import { usersFilterColumns } from "src/app/security/user-list/user-list.constants";
 import { SecurityState } from '../../store/security.state';
 import { map, Observable, Subject, takeWhile } from 'rxjs';
 import { ExportUserList, GetUsersPage } from '../../store/security.actions';
 import { CreateUserStatus, STATUS_COLOR_GROUP } from '@shared/enums/status';
-import { User, UsersPage } from '@shared/models/user-managment-page.model';
-import { UserState } from '../../../store/user.state';
+import { RolesPerUser, User, UsersPage } from '@shared/models/user-managment-page.model';
+import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
-import { ShowExportDialog } from '../../../store/app.actions';
+import { ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { DatePipe } from '@angular/common';
 
 enum Visibility {
@@ -25,11 +29,12 @@ enum Visibility {
 @Component({
   selector: 'app-user-grid',
   templateUrl: './user-grid.component.html',
-  styleUrls: ['./user-grid.component.scss'],
+  styleUrls: ['./user-grid.component.scss']
 })
 export class UserGridComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() filterForm: FormGroup;
   @Input() export$: Subject<ExportedFileType>;
+  @Input() filteredItems$: Subject<number>;
   @Output() editUserEvent = new EventEmitter();
 
   @ViewChild('usersGrid') grid: GridComponent;
@@ -39,6 +44,9 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
   @Select(SecurityState.usersPage)
   public usersPage$: Observable<UsersPage>;
+
+  @Select(SecurityState.rolesPerUsers)
+  rolesPerUsers$: Observable<RolesPerUser[]>;
 
   public userGridData$: Observable<User[]>;
   public hasVisibility = (_: string, { assigned }: User) => {
@@ -58,18 +66,27 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   public defaultFileName: string;
   public readonly statusEnum = CreateUserStatus;
   public isAgencyUser = false;
+  public filterColumns = usersFilterColumns;
+  public usersFilterFormGroup: FormGroup;
+
+  private filters: UsersFilters = {};
   private isAlive = true;
 
-  constructor(private store: Store, private datePipe: DatePipe) {
+  constructor(private store: Store,
+              private datePipe: DatePipe,
+              private filterService: FilterService,
+              private formBuilder: FormBuilder) {
     super();
   }
 
   ngOnInit(): void {
+    this.initUsersFilterFormGroup();
     this.checkAgencyUser();
     this.dispatchNewPage();
     this.subscribeForFilterFormChange();
     this.setFileName();
     this.subscribeOnExportAction();
+    this.subscribeOnRolesPerUsers();
     this.updateUsers();
   }
 
@@ -142,6 +159,42 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.dispatchNewPage();
   }
 
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.usersFilterFormGroup, this.filterColumns);
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
+    this.dispatchNewPage();
+  }
+
+  private clearFilters(): void {
+    this.usersFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {};
+    this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  public onFilterApply(): void {
+    this.filters = this.usersFilterFormGroup.getRawValue();
+    this.filteredItems = this.filterService.generateChips(this.usersFilterFormGroup, this.filterColumns);
+    this.dispatchNewPage();
+    this.store.dispatch(new ShowFilterDialog(false));
+    this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  public onFilterClose(): void {
+    this.usersFilterFormGroup.setValue({
+      firstName: this.filters.firstName || '',
+      lastName: this.filters.lastName || '',
+      roleIds: this.filters.roleIds || [],
+      status: this.filters.status || null
+    });
+    this.filteredItems = this.filterService.generateChips(this.usersFilterFormGroup, this.filterColumns);
+    this.filteredItems$.next(this.filteredItems.length);
+  }
+
   private updateUsers(): void {
     this.userGridData$ = this._userGridData$.pipe(map((value: User[]) => [...this.addRoleEllipsis(value)]));
   }
@@ -169,7 +222,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
   private dispatchNewPage(): void {
     const { businessUnit, business } = this.filterForm.getRawValue();
-    this.store.dispatch(new GetUsersPage(businessUnit, business || '', this.currentPage, this.pageSize));
+    this.store.dispatch(new GetUsersPage(businessUnit, business || [], this.currentPage, this.pageSize, this.filters));
   }
 
   private checkAgencyUser(): void {
@@ -186,6 +239,21 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
     this.export$.pipe(takeWhile(() => this.isAlive)).subscribe((event: ExportedFileType) => {
       this.defaultFileName = `Security/User List ${this.generateDateTime(this.datePipe)}`;
       this.defaultExport(event);
+    });
+  }
+
+  private subscribeOnRolesPerUsers(): void {
+    this.rolesPerUsers$.pipe(takeWhile(() => this.isAlive)).subscribe((roles: RolesPerUser[]) => {
+      this.filterColumns['roleIds'].dataSource = roles;
+    });
+  }
+
+  private initUsersFilterFormGroup(): void {
+  this.usersFilterFormGroup = this.formBuilder.group({
+      firstName: new FormControl(''),
+      lastName: new FormControl(''),
+      roleIds: new FormControl([]),
+      status: new FormControl(null),
     });
   }
 }

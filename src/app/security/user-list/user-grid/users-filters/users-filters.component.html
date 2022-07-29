@@ -1,0 +1,37 @@
+<form class="bootstrap" [formGroup]="form" *ngIf="form">
+  <app-input
+    [formGroupInstance]="form"
+    [maxlength]="50"
+    controlName="firstName"
+    id="firstName"
+    label="First Name"
+  ></app-input>
+  <app-input
+    [formGroupInstance]="form"
+    [maxlength]="50"
+    controlName="lastName"
+    id="lastName"
+    label="Last Name"
+  ></app-input>
+  <app-multiselect-dropdown
+    [formGroupInstance]="form"
+    [fields]="rolesFields"
+    [dataSource]="filterColumns['roleIds'].dataSource"
+    [showSelectAll]="true"
+    controlName="roleIds"
+    id="roleIds"
+    label="Role"
+    selectAllText="All"
+  ></app-multiselect-dropdown>
+  <div class="dropdown-container">
+    <label>Status</label>
+    <div class="input-group dropdown">
+      <ejs-dropdownlist
+        formControlName="status"
+        [showClearButton]="true"
+        [fields]="statusFields"
+        [dataSource]="filterColumns['status'].dataSource"
+      ></ejs-dropdownlist>
+    </div>
+  </div>
+</form>
