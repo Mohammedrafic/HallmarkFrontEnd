@@ -10,5 +10,5 @@ import { CandidateMilesData } from '../../../interface';
 })
 export class ProfileMilesComponent {
   @Input()
-  public milesData: CandidateMilesData | null;
+  public milesData: CandidateMilesData;
 }
