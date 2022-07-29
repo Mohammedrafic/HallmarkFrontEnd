@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
 import { combineLatest, debounceTime, filter, Observable, Subject, Subscription, takeUntil, throttleTime } from 'rxjs';
-import { SetHeaderState, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowCloseOrderDialog, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { CandidatesStatusText, OrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
@@ -81,6 +81,7 @@ import { OrderDetailsDialogComponent } from '@client/order-management/order-deta
 import isNil from 'lodash/fp/isNil';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { isArray } from 'lodash';
+import { OrderManagementContentService } from "@shared/services/order-management-content.service";
 
 @Component({
   selector: 'app-order-management-content',
@@ -133,6 +134,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public reOrdersMenu: ItemModel[] = [
     { text: MoreMenuType[0], id: '0' },
     { text: MoreMenuType[2], id: '2' },
+  ];
+
+  public closedOrderMenu: ItemModel[] = [
+    { text: MoreMenuType[1], id: '1' },
   ];
 
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
@@ -201,7 +206,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     private datePipe: DatePipe,
     private location: Location,
     private readonly actions: Actions,
-    private orderManagementService: OrderManagementService
+    private orderManagementService: OrderManagementService,
+    private orderManagementContentService: OrderManagementContentService
   ) {
     super();
     this.isRedirectedFromDashboard =
@@ -725,7 +731,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.store.dispatch(new DuplicateOrder(data.id));
         break;
       case MoreMenuType['Close']:
-        // TODO: pending implementation
+        this.orderManagementContentService.getOrderById(data.id).subscribe(order => {
+          this.selectedOrder = {...order};
+          this.store.dispatch(new ShowCloseOrderDialog(true));
+        });
         break;
       case MoreMenuType['Delete']:
         this.deleteOrder(data.id);

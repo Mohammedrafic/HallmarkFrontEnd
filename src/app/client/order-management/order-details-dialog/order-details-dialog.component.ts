@@ -89,9 +89,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   ngOnChanges(changes: SimpleChanges): void {
     if(changes['order']?.currentValue) {
       this.setCloseOrderButtonState();
-      this.showCloseButton = this.openInProgressFilledStatuses.includes(
-        changes['order'].currentValue.statusText.toLowerCase()
-      );
+      const order = changes['order']?.currentValue;
+      const hasStatus = this.openInProgressFilledStatuses.includes(order.statusText.toLowerCase());
+      this.showCloseButton = hasStatus || (!hasStatus && order?.orderClosureReason);
       if (this.chipList) {
         this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
         this.chipList.text = changes['order'].currentValue.statusText.toUpperCase();

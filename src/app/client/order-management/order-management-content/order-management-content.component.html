@@ -102,6 +102,7 @@
             <button
               ejs-dropdownbutton
               [items]="
+                (data.orderCloseDate && closedOrderMenu) ||
                 (activeTab === OrganizationOrderManagementTabs.ReOrders && reOrdersMenu) ||
                 (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : moreMenuWithCloseButton)
               "
