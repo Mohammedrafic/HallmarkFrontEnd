@@ -78,7 +78,7 @@ interface SecurityStateModel {
 export class SecurityState {
   @Selector()
   static bussinesData(state: SecurityStateModel): BusinessUnit[] {
-    return [BUSINNESS_DATA_DEFAULT_VALUE, ...state.bussinesData] as BusinessUnit[];
+    return state.bussinesData;
   }
 
   @Selector()
@@ -212,9 +212,9 @@ export class SecurityState {
   @Action(GetRolesPage)
   GetRolesPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitId, businessUnitType, pageNumber, pageSize, filters }: GetRolesPage
+    { businessUnitIds, businessUnitType, pageNumber, pageSize, filters }: GetRolesPage
   ): Observable<RolesPage> {
-    return this.roleService.getRolesPage(businessUnitType, businessUnitId, pageNumber, pageSize, filters).pipe(
+    return this.roleService.getRolesPage(businessUnitType, businessUnitIds, pageNumber, pageSize, filters).pipe(
       tap((payload) => {
         patchState({ rolesPage: payload });
         return payload;
