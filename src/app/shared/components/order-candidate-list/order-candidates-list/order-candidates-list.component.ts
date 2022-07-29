@@ -37,6 +37,10 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public candidate: OrderCandidatesList;
 
+  get isShowDropdown(): boolean {
+    return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
+  }
+
   constructor(protected override store: Store, protected override router: Router) {
     super(store, router);
   }
@@ -81,13 +85,17 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           this.store.dispatch(
             new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId)
           );
-          this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
+          if (!this.isShowDropdown && !this.candidate.deployedCandidateInfo) {
+            this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
+          }
           this.openDialog(this.offerDeployment);
         } else if (allowedOnboardedStatuses.includes(this.candidate.status)) {
           this.store.dispatch(
             new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId)
           );
-          this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
+          if (!this.isShowDropdown && !this.candidate.deployedCandidateInfo) {
+            this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
+          }
           this.openDialog(this.onboarded);
         }
       }
