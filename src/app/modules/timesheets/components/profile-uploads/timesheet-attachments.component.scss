@@ -32,12 +32,14 @@
 
       .file-name {
         padding-left: 10px;
-        margin-right: 30px;
-        flex-grow: 1;
       }
 
       .delete-icon {
+        display: flex;
+        margin-left: auto;
+
         i-feather {
+          margin-left: 30px;
           cursor: pointer;
         }
       }

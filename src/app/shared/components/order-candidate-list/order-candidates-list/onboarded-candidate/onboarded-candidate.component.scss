@@ -1,0 +1,107 @@
+@import "colors";
+
+:host {
+  overflow-y: auto;
+}
+
+.header-container {
+  .button-container {
+    display: flex;
+    gap: 12px;
+  }
+}
+
+.container {
+
+  .deployed-icon{
+    color: $primary-active-blue;
+  }
+
+  .apply-button {
+    margin: 0 8px 0 12px;
+  }
+
+  .content-container {
+    display: flex;
+    margin-top: 24px;
+
+    .input-group.input-readonly {
+      .e-input[readonly] {
+        background-color: $secondary-dark-blue-50;
+        color: $secondary-dark-blue-30;
+        border: 1px solid $secondary-dark-blue-40 !important;
+      }
+
+      ejs-daterangepicker {
+        .e-input-group {
+          background-color: $secondary-dark-blue-50;
+          color: $secondary-dark-blue-30;
+          border: 1px solid $secondary-dark-blue-40 !important;
+        }
+      }
+    }
+    .candidate-info {
+      width: 55%;
+      margin-right: 12px;
+
+      ejs-accordion {
+        margin-bottom: 10px;
+
+        .form-container {
+          display: flex;
+          flex-direction: row;
+
+          .input-container {
+            margin-bottom: 12px;
+
+            label {
+              white-space: nowrap;
+            }
+          }
+
+          .left-column {
+            width: 64%;
+            margin-right: 12px;
+          }
+
+          .right-column {
+            width: 36%;
+          }
+        }
+
+        .offered-start-date {
+          margin-top: 12px;
+        }
+
+        .row {
+          margin-top: 12px;
+          justify-content: space-between;
+          gap: 10px;
+        }
+
+        .date-container {
+          margin-top: 12px;
+          gap: 10px;
+        }
+      }
+    }
+
+    .comments {
+      width: 45%;
+      height: 710px;
+      background-color: $secondary-dark-blue-50;
+      border-radius: 8px;
+    }
+  }
+
+  .warning-deployed-candidate {
+    color: $supportive-red-00;
+    padding: 15px 5px 5px;
+    font-size: 1rem;
+  }
+}
+
+.candidat-status {
+  display: flex;
+  align-items: center;
+}

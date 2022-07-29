@@ -73,6 +73,18 @@ export const perDiemColumnsToExport: ExportColumn[] = [
   { text: '# of Shifts Next 90 Days', column: 'NumberOfShiftsNext90Days' },
 ];
 
+export const perDiemChildColumnsToExport: ExportColumn[] = [
+  { text: 'Re-Order ID', column: 'ReOrders.Id' },
+  { text: 'Re-Order Status', column: 'ReOrders.Status' },
+  { text: 'Open Positions', column: 'ReOrders.OpenPositions' },
+  { text: 'Agencies', column: 'ReOrders.Agencies' },
+  { text: 'Re-Order Bill Rate', column: 'ReOrders.BillRate' },
+  { text: 'Re-Order Date', column: 'ReOrders.StartDate' },
+  { text: 'Re-Order Shift Start Time', column: 'ReOrders.ShiftStartTime' },
+  { text: 'Re-Order Shift End Time', column: 'ReOrders.ShiftEndTime' },
+  { text: 'Candidates', column: 'ReOrders.Candidates' },
+];
+
 export const ReOrdersColumnsConfig: GridColumn[] = [
   {
     fieldName: 'reOrderId',

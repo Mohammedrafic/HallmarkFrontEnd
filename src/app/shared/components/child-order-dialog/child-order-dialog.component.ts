@@ -9,11 +9,7 @@ import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigatio
 
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { OrderType } from '@shared/enums/order-type';
-import {
-  AgencyOrderManagement,
-  OrderManagementChild,
-  Order,
-} from '@shared/models/order-management.model';
+import { AgencyOrderManagement, Order, OrderManagementChild, } from '@shared/models/order-management.model';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
@@ -21,6 +17,8 @@ import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/or
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrderStatusText } from '@shared/enums/status';
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
+import { ShowCloseOrderDialog } from '../../../store/app.actions';
+import { OrderStatus } from '@shared/enums/order-management';
 
 enum Template {
   accept,
@@ -60,6 +58,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   public isOrganization: boolean;
   public selectedOrder$: Observable<Order>;
   public orderStatusText = OrderStatusText;
+  public disabledCloseButton = true;
 
   private isAlive = true;
 
@@ -73,13 +72,25 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.chipList && changes['candidate']?.currentValue) {
-      this.chipList.cssClass = this.chipsCssClass.transform(this.orderStatusText[changes['candidate'].currentValue.orderStatus]);
+    if (changes['candidate']?.currentValue) {
+      this.setCloseOrderButtonState();
+      if (this.chipList) {
+        this.chipList.cssClass = this.chipsCssClass.transform(this.orderStatusText[changes['candidate'].currentValue.orderStatus]);
+      }
     }
   }
 
   ngOnDestroy(): void {
     this.isAlive = false;
+  }
+
+  setCloseOrderButtonState(): void {
+    this.disabledCloseButton = this.candidate.orderStatus !== OrderStatus.Filled;
+  }
+
+  closeOrder(order: MergedOrder): void {
+    this.store.dispatch(new ShowCloseOrderDialog(true, true));
+    this.order = { ...order };
   }
 
   public onTabSelecting(event: SelectEventArgs): void {

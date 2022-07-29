@@ -2,10 +2,10 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { Order } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
 import { Store } from '@ngxs/store';
-import { GetSelectedOrderById } from '@client/store/order-managment-content.actions';
 import { AppState } from '../../../store/app.state';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
+import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 
 @Component({
   selector: 'app-general-reorder-info',
@@ -19,7 +19,11 @@ export class GeneralReorderInfoComponent extends DestroyableDirective implements
   public agencies: { name: string; tooltip: string };
   public orderPerDiemId: number;
 
-  constructor(private store: Store, private orderManagementService: OrderManagementService) {
+  constructor(
+    private store: Store,
+    private orderManagementService: OrderManagementService,
+    private orderManagementAgencyService: OrderManagementAgencyService
+  ) {
     super();
   }
 
@@ -52,10 +56,9 @@ export class GeneralReorderInfoComponent extends DestroyableDirective implements
     const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
 
     if (isAgencyArea) {
-      // this.store.dispatch(new GetOrderById(this.orderInformation.id, this.orderInformation.organizationId!, {} as any));
+      this.orderManagementAgencyService.orderPerDiemId$.next(this.orderInformation.reOrderFromId!);
     } else {
-      // this.orderManagementService.selectTab$.next(OrganizationOrderManagementTabs.PerDiem);
-      this.store.dispatch(new GetSelectedOrderById(this.orderInformation?.reOrderFromId!));
+      this.orderManagementService.orderPerDiemId$.next(this.orderInformation.reOrderFromId!);
     }
   }
 }

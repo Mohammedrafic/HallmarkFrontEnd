@@ -1,6 +1,7 @@
 export enum WidgetTypeEnum {
   CANDIDATES = 'Candidates',
   APPLICANTS_BY_REGION = 'Applicants_by_Region',
+  APPLICANTS_BY_POSITIONS = 'Applicants_by_Positions',
   POSITIONS_BY_TYPES = 'Open_Onboard_and_Closed_Positions',
   IN_PROGRESS_POSITIONS = 'In_Progress_Positions',
   OPEN_POSITIONS = 'Open_Positions',

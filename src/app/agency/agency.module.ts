@@ -172,5 +172,8 @@ const sidebarIcons = {
     NgxMaskModule.forChild(),
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),
   ],
+  exports: [
+    FileViewerComponent
+  ]
 })
 export class AgencyModule {}

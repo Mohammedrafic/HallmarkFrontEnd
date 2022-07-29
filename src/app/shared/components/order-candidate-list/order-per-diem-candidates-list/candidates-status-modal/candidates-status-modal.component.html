@@ -1,0 +1,119 @@
+<ejs-dialog
+  id="dialog"
+  #sideDialog
+  cssClass="dialog"
+  width="45%"
+  [target]="targetElement"
+  [visible]="false"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption candidat-status">
+            <h3 class="e-card-title candidate-title">
+              {{candidate?.lastName}}, {{candidate?.firstName}}
+            </h3>
+          </div>
+          <div class="e-card-content button-container">
+            <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isAgency && !isOnboard">
+              <ejs-dropdownlist
+                [fields]="optionFields"
+                [dataSource]="nextApplicantStatuses"
+                placeholder="Select Status"
+                (select)="onDropDownChanged($event)"
+              ></ejs-dropdownlist>
+            </div>
+            <!--TODO: create and use ReadOnly Mode for it-->
+            <button ejs-button cssClass="e-outline" (click)="onReject()" *ngIf="showRejectButton">Reject</button>
+            <button ejs-button cssClass="e-primary" (click)="onApply()" *ngIf="showApplyButton">Apply</button>
+            <button ejs-button cssClass="e-primary" (click)="onAccept()" *ngIf="showAcceptButton">Accept</button>
+            <button ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
+              <i-feather name="x" class="icon"></i-feather>
+            </button>
+          </div>
+        </div>
+      </section>
+      <section class="content-container">
+        <div class="candidate-info">
+          <ejs-accordion #accordionElement expandMode="Single" (expanding)="toForbidExpandSecondRow($event)" (clicked)="clickedOnAccordion($event)">
+            <e-accordionitems>
+              <e-accordionitem expanded="true">
+                <ng-template #header>
+                  <div>Job Details</div>
+                </ng-template>
+                <ng-template #content>
+                  <form [formGroup]="form">
+                    <div class="input-container bootstrap">
+                      <label class="input-group">Job ID</label>
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="jobId" class="e-input" type="text" readonly/>
+                      </div>
+                    </div>
+                    <div class="input-container bootstrap">
+                      <label class="input-group">Location</label>
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="locationName" class="e-input" type="text" readonly/>
+                      </div>
+                    </div>
+                    <div class="input-container bootstrap">
+                      <label class="input-group">Department</label>
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="department" class="e-input" type="text" readonly/>
+                      </div>
+                    </div>
+                    <div class="input-container bootstrap">
+                      <label class="input-group">Skill</label>
+                      <div class="input-group input-readonly">
+                        <input appValidateWithMessage formControlName="skill" class="e-input" type="text" readonly/>
+                      </div>
+                    </div>
+                    <div *ngIf="showClockId" class="input-container bootstrap">
+                      <label class="input-group">Clock ID</label>
+                      <div class="input-group input-readonly">
+                        <!--TODO: create and use ReadOnly Mode for it-->
+                        <input appValidateWithMessage formControlName="clockId" class="e-input" type="text" [readonly]="isAgency || isOnboard"/>
+                      </div>
+                    </div>
+                    <!--TODO: create and use ReadOnly Mode for it-->
+                    <div *ngIf="showClockId" class="input-container bootstrap">
+                      <ejs-checkbox [disabled]="isAgency || isOnboard" formControlName="allow" label="Allow deploy w/o credentials"
+                                    maxlength="50"></ejs-checkbox>
+                    </div>
+                    <div class="input-container bootstrap" *ngIf="isRejected">
+                      <label>Rejection Reason</label>
+                      <div class="input-group input-readonly">
+                        <input formControlName="rejectReason" class="e-input" type="text" readonly/>
+                      </div>
+                    </div>
+                  </form>
+                </ng-template>
+              </e-accordionitem>
+              <e-accordionitem>
+                <ng-template #header>
+                  <div>Historical Events</div>
+                </ng-template>
+                <ng-template #content>
+                  <app-historical-events [organizationId]="orderCandidateJob?.organizationId || -1" [candidateJobId]="candidate.candidateJobId" [candidateId]="candidate.candidateId"></app-historical-events>
+                </ng-template>
+              </e-accordionitem>
+            </e-accordionitems>
+          </ejs-accordion>
+        </div>
+        <div class="comments">
+          <app-comments></app-comments>
+        </div>
+      </section>
+    </section>
+  </ng-template>
+  <ng-template #footerTemplate>
+    <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>
+  </ng-template>
+</ejs-dialog>
+
+<app-reject-reason-dialog
+  [rejectReasonsList]="rejectReasons"
+  [openEvent]="openRejectDialog"
+  (applyReject)="applyReject($event)"
+></app-reject-reason-dialog>

@@ -5,7 +5,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { FeatherModule } from 'angular-feather';
 import {
   AlertTriangle,
-  Unlock,
   AlignJustify,
   Briefcase,
   Calendar,
@@ -26,6 +25,7 @@ import {
   Search,
   Sliders,
   Trash2,
+  Unlock,
   Upload,
   User,
   X,
@@ -73,6 +73,8 @@ import { OrderDetailsContainerComponent } from './order-management/order-details
 import { OrderCandidatesContainerComponent } from './order-management/order-candidates-container/order-candidates-container.component';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
+import { SaveTemplateDialogModule } from '@client/order-management/save-template-dialog/save-template-dialog.module';
+import { CloseOrderModule } from '@client/order-management/close-order/close-order.module';
 
 const gridIcons = {
   MessageSquare,
@@ -146,6 +148,8 @@ const gridIcons = {
     RadioButtonModule,
     AgGridModule,
     AddEditReorderModule,
+    SaveTemplateDialogModule,
+    CloseOrderModule,
 
     //STORE
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
@@ -163,4 +167,4 @@ const gridIcons = {
     MaskedDateTimeService,
   ],
 })
-export class ClientModule {}
+export class ClientModule { }

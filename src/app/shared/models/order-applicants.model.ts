@@ -7,18 +7,21 @@ export type OrderApplicantsInitialData = {
   orderBillRate: number;
   locationId: number;
   locationName: string;
+  departmentId: number;
+  departmentName: string;
   availableStartDate: string;
   yearsOfExperience: number;
   expAsTravelers?: number;
-  requestComment?: number;
+  requestComment?: string;
+  skill?: string;
 }
 
 export type OrderApplicantsApplyData = {
   orderId: number;
   organizationId: number;
   candidateId: number;
-  candidateBillRate: number;
-  expAsTravelers: number;
-  availableStartDate: string;
-  requestComment: string;
+  candidateBillRate?: number;
+  expAsTravelers?: number;
+  availableStartDate?: string;
+  requestComment?: string;
 }

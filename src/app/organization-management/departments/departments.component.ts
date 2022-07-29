@@ -4,7 +4,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { FreezeService, GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog, ShowToast } from '../../store/app.actions';
@@ -51,7 +51,7 @@ export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location wer
   selector: 'app-departments',
   templateUrl: './departments.component.html',
   styleUrls: ['./departments.component.scss'],
-  providers: [MaskedDateTimeService, FreezeService],
+  providers: [MaskedDateTimeService],
 })
 export class DepartmentsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   private unsubscribe$: Subject<void> = new Subject();

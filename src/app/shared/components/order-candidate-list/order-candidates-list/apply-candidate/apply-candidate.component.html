@@ -1,0 +1,150 @@
+<section class="container">
+  <section class="header-container">
+    <div class="e-card-header">
+      <div class="e-card-header-caption candidat-status">
+        <h3 class="e-card-title candidate-title">
+          {{candidate?.lastName}}, {{candidate?.firstName}}
+          <i-feather name="briefcase" class="icon deployed-icon" *ngIf="isDeployedCandidate"></i-feather>
+        </h3>
+        </div>
+        <ejs-chiplist *ngIf="isTab && candidate.candidateStatus" [text]="candidatStatus[candidate.candidateStatus]">
+          <e-chips>
+            <e-chip [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
+          </e-chips>
+        </ejs-chiplist>
+      <div class="e-card-content">
+        <button
+          *ngIf="!readOnlyMode"
+          ejs-button
+          [isPrimary]="true"
+          [disabled]="isLocked"
+          class="apply-button"
+          (click)="applyOrderApplicants()">
+          Apply
+        </button>
+        <button *ngIf="!isTab" ejs-button cssClass="e-flat close-button" (click)="closeDialog()">
+          <i-feather name="x" class="icon"></i-feather>
+        </button>
+      </div>
+    </div>
+    <app-deploy-candidate-message *ngIf="isDeployedCandidate" [candidate]="candidate" [isAgency]="isAgency"></app-deploy-candidate-message>
+  </section>
+  <section class="content-container">
+    <div class="job-details">
+      <ejs-accordion #accordionElement expandMode="Single" (expanding)="toForbidExpandSecondRow($event)" (clicked)="clickedOnAccordion($event)">
+        <e-accordionitems>
+          <e-accordionitem expanded="true">
+            <ng-template #header>
+              <div>Job Details</div>
+            </ng-template>
+            <ng-template #content>
+              <form [formGroup]="formGroup">
+                <div class="d-flex bootstrap">
+                  <div class="input-container f-grow-2">
+                    <label>Job ID</label>
+                    <div class="input-group input-readonly">
+                      <input formControlName="orderId" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>Bill Rate ($)</label>
+                    <div class="input-group input-readonly">
+                      <input
+                        formControlName="orderBillRate"
+                        class="e-input"
+                        type="text"
+                        (focus)="priceUtils.setPriceMask(formGroup, 'orderBillRate', $event)"
+                        (blur)="priceUtils.setTwoDecimals(formGroup, 'orderBillRate', $event)"
+                        readonly/>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex bootstrap">
+                  <div class="input-container">
+                    <label>Job Date</label>
+                    <div class="input-group input-readonly">
+                      <ejs-daterangepicker formControlName="jobDate" readonly="true"></ejs-daterangepicker>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex bootstrap">
+                  <div class="input-container">
+                    <label>Location</label>
+                    <div class="input-group input-readonly">
+                      <input formControlName="locationName" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex bootstrap">
+                  <div class="datepicker-container">
+                    <label>Available Start Date</label>
+                    <div class="input-group datepicker" [ngClass]="{'input-readonly': readOnlyMode}">
+                      <ejs-datepicker appValidateWithMessage
+                                      class="datepicker"
+                                      format="MM/dd/yyyy"
+                                      placeholder="MM/DD/YYYY"
+                                      [readonly]="readOnlyMode"
+                                      [enableMask]="true"
+                                      [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
+                                      [min]="today"
+                                      formControlName="availableStartDate">
+                      </ejs-datepicker>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>Candidate Bill Rate ($)<span *ngIf="!readOnlyMode" class="required">*</span></label>
+                    <div class="input-group" [ngClass]="{'input-readonly': readOnlyMode}">
+                      <input appValidateWithMessage
+                             formControlName="candidateBillRate"
+                             class="e-input"
+                             type="text"
+                             (focus)="priceUtils.setPriceMask(formGroup, 'candidateBillRate', $event)"
+                             (blur)="priceUtils.setTwoDecimals(formGroup, 'candidateBillRate', $event)"
+                             [readonly]="readOnlyMode"/>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex bootstrap">
+                  <div class="input-container">
+                    <label>Yrs. of Exp.</label>
+                    <div class="input-group input-readonly">
+                      <input formControlName="yearsOfExperience" class="e-input" type="text" readonly/>
+                    </div>
+                  </div>
+                  <div class="input-container">
+                    <label>Exp. as Travelers</label>
+                    <div class="input-group" [ngClass]="{'input-readonly': readOnlyMode}">
+                      <input formControlName="expAsTravelers" class="e-input" type="number" [readonly]="readOnlyMode"/>
+                    </div>
+                  </div>
+                </div>
+                <div class="d-flex bootstrap">
+                  <div class="input-container">
+                    <label>Leave request comments</label>
+                    <div class="input-group" [ngClass]="{'input-readonly': readOnlyMode}">
+                      <input formControlName="requestComment" class="e-input" type="text" maxlength="2000" [readonly]="readOnlyMode"/>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </ng-template>
+          </e-accordionitem>
+          <e-accordionitem>
+            <ng-template #header>
+              <div>Historical Events</div>
+            </ng-template>
+            <ng-template #content>
+              <app-historical-events [organizationId]="organizationId" [candidateJobId]="candidate.candidateJobId" [candidateId]='candidate.candidateId'></app-historical-events>
+            </ng-template>
+          </e-accordionitem>
+        </e-accordionitems>
+      </ejs-accordion>
+    </div>
+    <div class="comments">
+      <app-comments></app-comments>
+    </div>
+  </section>
+  <section class="bill-rates">
+    <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
+  </section>
+</section>

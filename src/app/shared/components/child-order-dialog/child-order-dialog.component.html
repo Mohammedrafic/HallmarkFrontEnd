@@ -12,7 +12,7 @@
       <section class="header-container">
         <div class="e-card-header preview-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title preview-title">Position ID {{ order?.orderId || order?.id }}/{{ candidate?.positionId }}</h3>
+            <h3 class="e-card-title preview-title"> here Position ID {{ order?.orderId || order?.id }}/{{ candidate?.positionId }}</h3>
             <div class="order-statuses">
               <ejs-chiplist #chipList class="events-off" *ngIf="candidate">
                 <e-chips>
@@ -21,7 +21,12 @@
               </ejs-chiplist>
             </div>
           </div>
-          <div class="e-card-content">
+          <div class="e-card-content dialog-controls">
+            <button ejs-button cssClass="e-outline"
+                    [disabled]="disabledCloseButton"
+                    (click)="closeOrder(order)">
+              Close Position
+            </button>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
               <i-feather name="x" class="icon"></i-feather>
             </button>
@@ -39,6 +44,10 @@
                       <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
                     </section>
                     <hr />
+                    <ng-container *ngIf="currentOrder?.reasonForClosing">
+                      <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
+                      <hr />
+                    </ng-container>
                     <app-order-details [currentOrder]="currentOrder"></app-order-details>
                   </section>
               </ng-template>
@@ -50,7 +59,7 @@
                 <section class="candidate">
                   <ng-container [ngSwitch]="selectedTemplate">
                     <ng-container *ngSwitchCase="template.onboarded">
-                      <app-onboarded-candidate [candidate]="$any(candidate)" [isTab]="true"></app-onboarded-candidate>
+                      <app-onboarded-candidate [candidate]="$any(candidate)" [isTab]="true" (closeModalEvent)="onClose()"></app-onboarded-candidate>
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.accept">

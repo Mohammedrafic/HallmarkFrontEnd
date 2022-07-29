@@ -5,13 +5,12 @@ import { Observable, of } from 'rxjs';
 
 import { ExportPayload } from '@shared/models/export.model';
 import {
-  CandidateHoursAndMilesData,
-  TimesheetAttachments,
-  TimesheetInvoice,
-  TimesheetAttachment, TimesheetDetailsModel
+  ChangeStatusData,
+  DeleteAttachmentData,
+  DownloadAttachmentData,
+  TimesheetDetailsModel,
+  TimesheetFileData
 } from '../interface';
-import { MockCandidateHoursAndMilesData } from '../constants';
-import { CandidateMockInfo } from '../constants/timesheet-records-mock.constant';
 
 @Injectable()
 export class TimesheetDetailsApiService {
@@ -24,54 +23,92 @@ export class TimesheetDetailsApiService {
     );
   }
 
-  public agencySubmitTimesheet(id: number): Observable<{}> {
-    return of({});
-  }
-
-  public organizationApproveTimesheet(id: number): Observable<{}> {
-    return of({});
-  }
-
-  public rejectTimesheet(id: number, rejectReason: string | null): Observable<null> {
-    CandidateMockInfo.rejectReason = rejectReason;
-    return of(null);
-  }
-
-  public getCandidateHoursAndMilesData(id: number): Observable<CandidateHoursAndMilesData> {
-    return of(MockCandidateHoursAndMilesData);
-  }
-
-  public getCandidateAttachments(id: number): Observable<TimesheetAttachments> {
-    return of();
-  }
-
-  public getCandidateInvoices(id: number): Observable<TimesheetInvoice[]> {
-    return of([
-      {
-        id: 1,
-        fileName: 'Example',
-        url: 'http://www.africau.edu/images/default/sample.pdf',
-      }
-    ]);
-  }
-
   public loadInvoiceBlob(url: string): Observable<Blob> {
     return this.http.get(url, { responseType: 'blob' });
   }
 
-  public uploadCandidateFiles(candidateId: number, files: Blob[]): Observable<TimesheetAttachment[]> {
+  public getTimesheetDetails(
+    id: number,
+    orgId: number,
+    isAgency: boolean,
+  ): Observable<TimesheetDetailsModel> {
+    const endpoint = !isAgency ? `/api/Timesheets/${id}` : `/api/Timesheets/${id}/organization/${orgId}`
+    return this.http.get<TimesheetDetailsModel>(endpoint);
+  }
+
+  public organizationUploadFiles(timesheetId: number, files: TimesheetFileData[]): Observable<void> {
     const formData = new FormData();
-    files.forEach((file) => formData.append('file', file))
+    files.forEach((file) => formData.append('files', file.blob, file.fileName))
 
-    return of([]);
-    // return this.http.post<TimesheetUploadedFile[]>('', formData);
+    return this.http.post<void>(`/api/Timesheets/${timesheetId}/files`, formData);
   }
 
-  public deleteCandidateFile(id: number): Observable<null> {
-    return of(null);
+  public agencyUploadFiles(timesheetId: number, organizationId: number, files: TimesheetFileData[]): Observable<void> {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('files', file.blob, file.fileName))
+
+    return this.http.post<void>(`/api/Timesheets/${timesheetId}/organization/${organizationId}/files`, formData);
   }
 
-  public getTimesheetDetails(id: number): Observable<TimesheetDetailsModel> {
-    return this.http.get<TimesheetDetailsModel>(`/api/Timesheets/${id}`);
+  public deleteAttachment({fileId, timesheetId, organizationId}: DeleteAttachmentData): Observable<void> {
+    return organizationId === null ?
+      this.organizationDeleteAttachment(fileId, timesheetId) :
+      this.agencyDeleteAttachment(fileId, timesheetId, organizationId)
+  }
+
+  public downloadAttachment({fileId, organizationId}: DownloadAttachmentData): Observable<Blob> {
+    return organizationId === null ?
+      this.organizationDownloadAttachment(fileId) :
+      this.agencyDownloadAttachment(fileId, organizationId);
+  }
+
+  public downloadPDFAttachment({fileId, organizationId}: DownloadAttachmentData): Observable<Blob> {
+    return organizationId === null ?
+      this.organizationDownloadPDFAttachment(fileId) :
+      this.agencyDownloadPDFAttachment(fileId, organizationId);
+  }
+
+  public changeTimesheetStatus(data: ChangeStatusData): Observable<void> {
+    return this.http.post<void>(`/api/TimesheetState/setstatus`, data);
+  }
+
+  public noWorkPerformed(timesheetId: number, organizationId: number | null): Observable<void> {
+    return this.http.post<void>(`/api/Timesheets/noworkperformed`, {
+      timesheetId,
+      organizationId,
+      noWorkPerformed: true,
+    });
+  }
+
+  private organizationDownloadAttachment(fileId: number): Observable<Blob> {
+    return this.http.get(`/api/Timesheets/files/${fileId}`, {
+      responseType: 'blob',
+    });
+  }
+
+  private organizationDownloadPDFAttachment(fileId: number): Observable<Blob> {
+    return this.http.get(`/api/Timesheets/files/${fileId}/pdf`, {
+      responseType: 'blob'
+    });
+  }
+
+  private agencyDownloadAttachment(fileId: number, organizationId: number): Observable<Blob> {
+    return this.http.get(`/api/Timesheets/organization/${organizationId}/files/${fileId}`, {
+      responseType: 'blob'
+    });
+  }
+
+  private agencyDownloadPDFAttachment(fileId: number, organizationId: number): Observable<Blob> {
+    return this.http.get(`/api/Timesheets/organization/${organizationId}/files/${fileId}/pdf`, {
+      responseType: 'blob',
+    });
+  }
+
+  private organizationDeleteAttachment(fileId: number, timesheetId: number): Observable<void> {
+    return this.http.delete<void>(`/api/Timesheets/${timesheetId}/files/${fileId}`);
+  }
+
+  private agencyDeleteAttachment(fileId: number, timesheetId: number, organizationId: number): Observable<void> {
+    return this.http.delete<void>(`/api/Timesheets/${timesheetId}/organization/${organizationId}/files/${fileId}`);
   }
 }

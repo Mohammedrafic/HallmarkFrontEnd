@@ -1,10 +1,10 @@
 import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { Actions, Select, Store } from '@ngxs/store';
-import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { Select, Store } from '@ngxs/store';
+import { filter, Observable, Subject, takeUntil, throttleTime ,take} from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { FreezeService, GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
@@ -52,7 +52,7 @@ export const MESSAGE_REGIONS_NOT_SELECTED = 'Region was not selected';
   selector: 'app-locations',
   templateUrl: './locations.component.html',
   styleUrls: ['./locations.component.scss'],
-  providers: [MaskedDateTimeService, FreezeService],
+  providers: [MaskedDateTimeService],
 })
 export class LocationsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
@@ -69,6 +69,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedRegion: Region;
+  defaultValue:any;
 
   @Select(OrganizationManagementState.locationsByRegionId)
   locations$: Observable<LocationsPage>;
@@ -160,7 +161,10 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     });
     this.organization$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
-      this.store.dispatch(new GetRegions());
+      this.store.dispatch(new GetRegions()).pipe(takeUntil(this.unsubscribe$))
+      .subscribe((data) => {
+        this.defaultValue=data.organizationManagement.regions[0].id;
+      });;
     });
   }
 

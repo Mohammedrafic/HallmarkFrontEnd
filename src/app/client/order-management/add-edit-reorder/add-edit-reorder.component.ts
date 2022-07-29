@@ -11,11 +11,11 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
 import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { endTimeValidator, startTimeValidator } from '@shared/validators/date.validator';
 import { Order } from '@shared/models/order-management.model';
 import { ReorderModel, ReorderRequestModel } from '@client/order-management/add-edit-reorder/models/reorder.model';
 import { ShowSideDialog } from '../../../store/app.actions';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
+import { startEndTimeValidator } from '@shared/validators/time.validator';
 
 @Component({
   selector: 'app-add-edit-reorder',
@@ -89,17 +89,18 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private initForm(reorder?: Order): void {
     const { candidates, jobStartDate, shiftStartTime, shiftEndTime, hourlyRate, openPositions, jobDistributions } =
       reorder || {};
-    this.reorderForm = this.formBuilder.group({
-      candidates: [this.getCandidateIds(candidates!) ?? []],
-      agencies: [this.getAgencyIds(jobDistributions!), Validators.required],
-      reorderDate: [jobStartDate ?? '', Validators.required],
-      shiftStartTime: [shiftStartTime ?? '', Validators.required],
-      shiftEndTime: [shiftEndTime ?? '', Validators.required],
-      billRate: [hourlyRate ?? '', Validators.required],
-      openPosition: [openPositions ?? '', [Validators.required, Validators.min(1)]],
-    });
-    this.reorderForm.get('shiftStartTime')?.addValidators(startTimeValidator(this.reorderForm, 'shiftEndTime'));
-    this.reorderForm.get('shiftEndTime')?.addValidators(endTimeValidator(this.reorderForm, 'shiftStartTime'));
+    this.reorderForm = this.formBuilder.group(
+      {
+        candidates: [this.getCandidateIds(candidates!) ?? []],
+        agencies: [this.getAgencyIds(jobDistributions!), Validators.required],
+        reorderDate: [jobStartDate ?? '', Validators.required],
+        shiftStartTime: [shiftStartTime ?? '', Validators.required],
+        shiftEndTime: [shiftEndTime ?? '', Validators.required],
+        billRate: [hourlyRate ?? '', Validators.required],
+        openPosition: [openPositions ?? '', [Validators.required, Validators.min(1)]],
+      },
+      { validators: startEndTimeValidator('shiftStartTime', 'shiftEndTime') }
+    );
     this.subscribeOnChangesCandidateName();
     this.subscribeOnCloseSideBar();
   }

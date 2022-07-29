@@ -9,7 +9,7 @@ import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/expor
 import { FilteredItem } from '@shared/models/filter.model';
 import { SkillCategoriesPage } from '@shared/models/skill-category.model';
 import { FilterService } from '@shared/services/filter.service';
-import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, delay, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ExportSkills, GetMasterSkillDataSources, GetMasterSkillsByPage, RemoveMasterSkill, RemoveMasterSkillSucceeded, SaveMasterSkill, SaveMasterSkillSucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
@@ -23,7 +23,7 @@ import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/stor
   selector: 'app-skills-grid',
   templateUrl: './skills-grid.component.html',
   styleUrls: ['./skills-grid.component.scss'],
-  providers: [SortService, FreezeService]
+  providers: [SortService]
 })
 export class SkillsGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();

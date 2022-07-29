@@ -1,5 +1,4 @@
-import { TimesheetsModel } from './../store/model/timesheets.model';
-import { FieldType, FieldWidthStyle, TableColumnAlign } from '../enums';
+import { FieldType, FieldWidthStyle, RecordFields, TableColumnAlign } from '../enums';
 import { DetailsTableConfig, DialogConfig } from '../interface';
 
 
@@ -13,139 +12,118 @@ export const WeekDaysOptions = [
   { text: 'Sunday', value: 0 },
 ];
 
-export const TimesheetEditDialogConfig: DialogConfig = {
-  title: 'Add Record',
-  timesheets: [
-    {
-      title: 'Time in',
-      field: 'timeIn',
-      type: FieldType.TimeCalendar,
-      disabled: false,
-      required: true,
-      widthStyle: FieldWidthStyle.Short,
-    },
-    {
-      title: 'Time out',
-      field: 'timeOut',
-      type: FieldType.TimeCalendar,
-      disabled: false,
-      required: true,
-      widthStyle: FieldWidthStyle.Short,
-    },
-    {
-      title: 'Cost center',
-      field: 'costCenter',
-      type: FieldType.Dropdown,
-      disabled: false,
-      required: true,
-      widthStyle: FieldWidthStyle.Short,
-      optionsStateKey: 'costCenterOptions',
-      options: [],
-    },
-    {
-      title: 'Bill Rate Type',
-      field: 'billRateConfigId',
-      type: FieldType.Dropdown,
-      disabled: false,
-      required: true,
-      widthStyle: FieldWidthStyle.Short,
-      optionsStateKey: 'billRateTypes',
-      options: [],
-    },
-    {
-      title: 'Hours',
-      field: 'amount',
-      type: FieldType.Input,
-      disabled: false,
-      required: true,
-      valueType: 'number',
-      widthStyle: FieldWidthStyle.Short,
-    },
-  ],
-  miles: [
-    {
-      title: 'Day',
-      field: 'day',
-      type: FieldType.Date,
-      disabled: false,
-      required: true,
-      widthStyle: FieldWidthStyle.Long,
-    },
-    {
-      title: 'Cost center',
-      field: 'costCenter',
-      type: FieldType.Dropdown,
-      disabled: false,
-      required: true,
-      widthStyle: FieldWidthStyle.Short,
-      optionsStateKey: 'costCenterOptions',
-      options: [],
-    },
-    {
-      title: 'Bill Rate Type',
-      field: 'billRateConfigId',
-      type: FieldType.Dropdown,
-      disabled: false,
-      required: true,
-      widthStyle: FieldWidthStyle.Short,
-      optionsStateKey: 'billRateTypes',
-      options: [],
-    },
-    {
-      title: 'Miles',
-      field: 'amount',
-      type: FieldType.Input,
-      disabled: false,
-      required: true,
-      widthStyle: FieldWidthStyle.Short,
-    },
-  ],
-  expenses: [
-    {
-      title: 'Day',
-      field: 'day',
-      type: FieldType.Date,
-      disabled: false,
-      required: true,
-      widthStyle: FieldWidthStyle.Long,
-    },
-    {
-      title: 'Cost center',
-      field: 'costCenter',
-      type: FieldType.Dropdown,
-      disabled: false,
-      required: true,
-      widthStyle: FieldWidthStyle.Short,
-      optionsStateKey: 'costCenterOptions',
-      options: [],
-    },
-    {
-      title: 'Bill Rate Type',
-      field: 'billRateConfigId',
-      type: FieldType.Dropdown,
-      disabled: false,
-      required: true,
-      widthStyle: FieldWidthStyle.Short,
-      optionsStateKey: 'billRateTypes',
-      options: [],
-    },
-    {
-      title: 'Description',
-      field: 'description',
-      type: FieldType.Input,
-      disabled: false,
-      required: true,
-      widthStyle: FieldWidthStyle.Long,
-    },
-    {
-      title: 'Expenses',
-      field: 'amount',
-      type: FieldType.Input,
-      disabled: false,
-      required: true,
-      widthStyle: FieldWidthStyle.Short,
-    },
-  ],
+export const RecordAddDialogConfig: DialogConfig = {
+  timesheets: {
+    title: 'Add Timesheet Record',
+    fields: [
+      {
+        title: 'Time in',
+        field: 'timeIn',
+        type: FieldType.TimeCalendar,
+        disabled: false,
+        required: true,
+        widthStyle: FieldWidthStyle.Short,
+      },
+      {
+        title: 'Time out',
+        field: 'timeOut',
+        type: FieldType.TimeCalendar,
+        disabled: false,
+        required: true,
+        widthStyle: FieldWidthStyle.Short,
+      },
+      {
+        title: 'Cost center',
+        field: 'departmentId',
+        type: FieldType.Dropdown,
+        disabled: false,
+        required: true,
+        widthStyle: FieldWidthStyle.Short,
+        optionsStateKey: 'costCenterOptions',
+        options: [],
+      },
+      {
+        title: 'Bill Rate Type',
+        field: 'billRateId',
+        type: FieldType.Dropdown,
+        disabled: false,
+        required: true,
+        widthStyle: FieldWidthStyle.Short,
+        optionsStateKey: 'billRateTypes',
+        options: [],
+      },
+    ],
+  },
+  miles: {
+    title: 'Add Miles Record',
+    fields: [
+      {
+        title: 'Day',
+        field: 'timeIn',
+        type: FieldType.Date,
+        disabled: false,
+        required: true,
+        widthStyle: FieldWidthStyle.Short,
+      },
+      {
+        title: 'Cost center',
+        field: 'departmentId',
+        type: FieldType.Dropdown,
+        disabled: false,
+        required: true,
+        widthStyle: FieldWidthStyle.Short,
+        optionsStateKey: 'costCenterOptions',
+        options: [],
+      },
+      {
+        title: 'Miles',
+        field: 'value',
+        type: FieldType.Input,
+        disabled: false,
+        required: true,
+        widthStyle: FieldWidthStyle.Short,
+      },
+    ],
+  },
+  expenses: {
+    title: 'Add Expenses Record',
+    fields: [
+      {
+        title: 'Day',
+        field: 'timeIn',
+        type: FieldType.Date,
+        disabled: false,
+        required: true,
+        widthStyle: FieldWidthStyle.Short,
+      },
+      {
+        title: 'Cost center',
+        field: 'departmentId',
+        type: FieldType.Dropdown,
+        disabled: false,
+        required: true,
+        widthStyle: FieldWidthStyle.Short,
+        optionsStateKey: 'costCenterOptions',
+        options: [],
+      },
+      {
+        title: 'Description',
+        field: 'description',
+        type: FieldType.Input,
+        disabled: false,
+        required: true,
+        widthStyle: FieldWidthStyle.Long,
+      },
+      {
+        title: 'Expenses',
+        field: 'value',
+        type: FieldType.Input,
+        disabled: false,
+        required: true,
+        widthStyle: FieldWidthStyle.Short,
+      },
+    ],
+  }
 };
 
 export const ProfileTimesheetTableConfig: DetailsTableConfig = {
@@ -214,4 +192,14 @@ export const ProfileTimesheetTableConfig: DetailsTableConfig = {
     width: 88,
     header: '',
   }
+}
+
+export const MapedRecordsType = {
+  [RecordFields.Time]: 1,
+  [RecordFields.Miles]: 2,
+  [RecordFields.Expenses]: 3,
+}
+
+export const AddSuccessMessage = {
+  successMessage: 'Record was added successfully',
 }

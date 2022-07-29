@@ -38,6 +38,12 @@ const shellRoutes: Routes = [
           import('../reports/reports.module').then((m: typeof import('../reports/reports.module')) => m.ReportsModule),
         data: { isOrganizationArea: true },
       },
+      {
+        path: 'analytics',
+        loadChildren: () => import('../admin/analytics/analytics.module').then((m) => m.AnalyticsModule),
+        //     canLoad: [ AdminGuard ],
+        //     canActivate: [ AdminGuard ]
+      },
     ],
   },
 ];

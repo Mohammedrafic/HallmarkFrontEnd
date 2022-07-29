@@ -1,38 +1,27 @@
 import { ExportPayload } from '@shared/models/export.model';
 import { TimesheetDetailsActions, TIMESHEETS_ACTIONS } from '../../enums';
+import { AddRecordDto, PutRecordDto } from '../../interface';
+import {
+  ChangeStatusData,
+  DeleteAttachmentData,
+  DownloadAttachmentData,
+  TimesheetUploadFilesData
+} from '../../interface';
 
 export namespace TimesheetDetails {
   export class Export {
     static readonly type = '[timesheet details] Export';
-    constructor(public payload: ExportPayload) { }
+    constructor(public readonly payload: ExportPayload) { }
   }
 
   export class GetTimesheetRecords {
     static readonly type = TimesheetDetailsActions.GetTimesheetRecords;
 
-    constructor(public readonly id: number) {}
-  }
-
-  export class GetCandidateInfo {
-    static readonly type = TimesheetDetailsActions.GetCandidateInfo;
-    constructor(public id: number) {}
-  }
-
-  export class GetCandidateChartData {
-    static readonly type = TimesheetDetailsActions.GetCandidateChartData;
-    constructor(public id: number) {}
-  }
-
-  export class GetCandidateAttachments {
-    static readonly type = TimesheetDetailsActions.GetCandidateAttachments;
-    constructor(public id: number) {}
-  }
-
-  export class GetCandidateInvoices {
-    static readonly type = TimesheetDetailsActions.GetCandidateInvoices;
-
-    constructor(public id: number) {
-    }
+    constructor(
+      public readonly id: number,
+      public readonly orgId: number,
+      public readonly isAgency: boolean,
+      ) {}
   }
 
   export class AgencySubmitTimesheet {
@@ -40,6 +29,7 @@ export namespace TimesheetDetails {
 
     constructor(
       public readonly id: number,
+      public readonly orgId: number,
     ) {
     }
   }
@@ -49,38 +39,51 @@ export namespace TimesheetDetails {
 
     constructor(
       public readonly id: number,
+      public readonly orgId: number | null,
     ) {
     }
   }
 
-  export class RejectTimesheet {
-    static readonly type = TIMESHEETS_ACTIONS.REJECT_TIMESHEET;
+  // for organization/agency submit/approve
+  export class SubmitTimesheet {
+    static readonly type = TIMESHEETS_ACTIONS.ORGANIZATION_APPROVE_TIMESHEET;
 
     constructor(
       public readonly id: number,
-      public readonly reason: string,
+      public readonly orgId: number | null,
     ) {
     }
   }
 
-  export class PatchTimesheetRecords {
+  export class ChangeTimesheetStatus {
+    static readonly type = TIMESHEETS_ACTIONS.REJECT_TIMESHEET;
+
+    constructor(
+      public readonly payload: ChangeStatusData
+    ) {
+    }
+  }
+
+  export class PutTimesheetRecords {
     static readonly type = TimesheetDetailsActions.PatchTimesheetRecords;
 
-    constructor(public readonly id: number,public readonly recordsToUpdate: Record<string, string | number>[]) {}
+    constructor(
+      public readonly body: PutRecordDto,
+      public readonly isAgency: boolean,
+      ) {}
   }
 
   export class UploadFiles {
     static readonly type = TimesheetDetailsActions.UploadFiles;
 
-    // TODO: Remove names property after connection with API
-    constructor(public id: number, public files: Blob[], public names: string[]) {
+    constructor(public payload: TimesheetUploadFilesData) {
     }
   }
 
-  export class DeleteFile {
+  export class DeleteAttachment {
     static readonly type = TimesheetDetailsActions.DeleteFile;
 
-    constructor(public id: number) {
+    constructor(public payload: DeleteAttachmentData) {
     }
   }
 
@@ -88,9 +91,9 @@ export namespace TimesheetDetails {
     static readonly type = TimesheetDetailsActions.GetCandidateBillRates;
 
     constructor(
-      public depId: number,
-      public skillId: number,
-      public orderType: number,
+      public readonly jobId: number,
+      public readonly orgId: number,
+      public readonly isAgency: boolean,
     ) {}
   }
 
@@ -98,7 +101,33 @@ export namespace TimesheetDetails {
     static readonly type = TimesheetDetailsActions.GetCandidateCostCenters;
 
     constructor(
-      public jobId: number,
+      public readonly jobId: number,
+      public readonly orgId: number,
+      public readonly isAgency: boolean,
+    ) {}
+  }
+
+  export class DownloadAttachment {
+    static readonly type = TimesheetDetailsActions.DownloadAttachment;
+
+    constructor(
+      public payload: DownloadAttachmentData,
+    ) {}
+  }
+
+  export class FileLoaded {
+    static readonly type = '[file viewer] file loaded';
+
+    constructor(
+      public file: Blob,
+    ) {}
+  }
+
+  export class AttachmentLoaded {
+    static readonly type = '[timesheet details] attachment loaded';
+
+    constructor(
+      public file: Blob,
     ) {}
   }
 
@@ -106,7 +135,17 @@ export namespace TimesheetDetails {
     static readonly type = TimesheetDetailsActions.AddTimesheetRecord;
 
     constructor(
+      public readonly body: AddRecordDto,
+      public readonly isAgency: boolean,
+    ) {}
+  }
+
+  export class NoWorkPerformed {
+    static readonly type = TimesheetDetailsActions.NoWorkPerformed;
+
+    constructor(
       public timesheetId: number,
+      public organizationId: number | null,
     ) {}
   }
 }

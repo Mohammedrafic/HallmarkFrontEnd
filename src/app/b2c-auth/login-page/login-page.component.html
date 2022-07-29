@@ -1,14 +1,14 @@
-<section class="login-page" #spiner>
+<section class="login-page">
   <div class="row">
     <div class="left-column">
       <div class="logo">
         <img src="./assets/logo-login.svg" alt="einstein">
       </div>
-      <!-- <div class="text-box">
+      <div class="text-box">
         <h2>WELCOME!</h2>
         <p>Log In with your email....</p>
       </div>
-      <form [formGroup]="loginForm" >
+      <!-- <form [formGroup]="loginForm" >
         <div class="input-container bootstrap">
           <label>Email</label>
           <div class="input-group">
@@ -52,12 +52,12 @@
           </button>
           <button class="e-control e-btn e-lib e-primary e-outline" type="button" (click)="loginWithSSO()">Login with SSO</button>
         </div>
-      </form>
-      <div class="sso-wrapper" >
+      </form> -->
+      <div class="sso-wrapper" #spiner>
         <div class="button-container">
           <button class="e-control e-btn e-lib e-primary e-outline" type="button" (click)="loginWithSSO()">Login with SSO</button>
         </div>
-      </div> -->
+      </div>
     </div>
     <div class="right-column"></div>
   </div>

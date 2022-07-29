@@ -1,24 +1,27 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tab-navigation
-      #tabNavigation
-      (selectedTab)="tabSelected($event)"
-    ></app-tab-navigation>
+    <app-tab-navigation #tabNavigation (selectedTab)="tabSelected($event)"></app-tab-navigation>
   </ng-container>
   <ng-container right>
     <app-search #search class="search" (inputKeyUpEnter)="searchOrders($event)"></app-search>
     <button ejs-button cssClass="e-outline button-filter" (click)="showFilters()">
       <div class="filter-button-content">
-        <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{ filteredItems.length }}</span>
+        <span *ngIf="filteredItems.length" class="e-badge e-badge-success e-badge-circle">{{
+          filteredItems.length
+        }}</span>
         Filters <i-feather name="sliders" class="icon"></i-feather>
       </div>
     </button>
     <button
+      *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates"
       ejs-dropdownbutton
       [items]="exportOptions"
       (select)="exportSelected($event)"
       id="importButton"
-      cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
+      cssClass="e-outline button-export"
+    >
+      Export <i-feather name="download" class="icon"></i-feather>
+    </button>
     <button ejs-button [isPrimary]="true" (click)="navigateToOrderForm()">Create Order</button>
   </ng-container>
 </app-page-toolbar>
@@ -60,15 +63,25 @@
       <e-column headerTextAlign="Right" width="130">
         <ng-template #headerTemplate let-data>
           <div class="controls-header">
-            <button ejs-button cssClass="e-flat icon-button c" *ngIf="!isSubrowDisplay; else onSubrowToggle" (click)="expandAll()">
-              <span><img src="assets/icons/menu-expand.svg" alt="coll" class="icon"></span>
+            <button
+              ejs-button
+              cssClass="e-flat icon-button c"
+              *ngIf="!isSubrowDisplay; else onSubrowToggle"
+              (click)="expandAll()"
+            >
+              <span><img src="assets/icons/menu-expand.svg" alt="coll" class="icon" /></span>
             </button>
             <ng-template #onSubrowToggle>
               <button ejs-button cssClass="e-flat icon-button" (click)="collapseAll()">
-                <span><img src="assets/icons/menu-collapse.svg" alt="coll" class="icon c"></span>
+                <span><img src="assets/icons/menu-collapse.svg" alt="coll" class="icon c" /></span>
               </button>
             </ng-template>
-            <button ejs-button cssClass="e-flat icon-button" *ngIf="isRowScaleUp; else onRowScaleDown" (click)="onRowScaleUpClick()">
+            <button
+              ejs-button
+              cssClass="e-flat icon-button"
+              *ngIf="isRowScaleUp; else onRowScaleDown"
+              (click)="onRowScaleUpClick()"
+            >
               <span><i-feather name="menu" class="icon"></i-feather></span>
             </button>
             <ng-template #onRowScaleDown>
@@ -79,7 +92,11 @@
           </div>
         </ng-template>
         <ng-template #template let-data>
-          <div class="row-tool-buttons" (click)="stopPropagation($event)">
+          <div
+            *ngIf="!data?.isTemplate; else templateButtons"
+            class="row-tool-buttons"
+            (click)="stopPropagation($event)"
+          >
             <button ejs-button cssClass="e-flat default-icon-button">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
             </button>
@@ -88,18 +105,29 @@
               cssClass="e-flat secondary-icon-button"
               [disabled]="disabledLock(data.status)"
               (click)="lockOrder(data)"
-              *ngIf="isLockMenuButtonsShown">
+              *ngIf="isLockMenuButtonsShown"
+            >
               <span><i-feather [name]="data.isLocked ? 'lock' : 'unlock'" class="icon"></i-feather></span>
             </button>
             <button
               ejs-dropdownbutton
-              [items]="(activeTab === OrganizationOrderManagementTabs.ReOrders && reOrdersMenu) || (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : moreMenuWithCloseButton)"
+              [items]="
+                (activeTab === OrganizationOrderManagementTabs.ReOrders && reOrdersMenu) ||
+                (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : moreMenuWithCloseButton)
+              "
               (select)="menuOptionSelected($event, data)"
               cssClass="e-flat primary-icon-button"
             >
               <span><i-feather name="more-vertical" class="icon"></i-feather></span>
             </button>
           </div>
+
+          <ng-template #templateButtons>
+            <div class="row-tool-buttons" (click)="stopPropagation($event)">
+              <i-feather name="edit" class="icon edit-template" (click)="editOrder(data)"></i-feather>
+              <i-feather name="trash-2" class="icon delete-template" (click)="deleteOrder(data?.orderId)"></i-feather>
+            </div>
+          </ng-template>
         </ng-template>
       </e-column>
       <e-column field="id" headerText="ORDER ID" width="120">
@@ -118,6 +146,13 @@
           </ng-template>
         </ng-template>
       </e-column>
+      <e-column
+        field="templateTitle"
+        headerText="TEMPLATE TITLE"
+        width="200"
+        textAlign="Left"
+        [visible]="false"
+      ></e-column>
       <e-column field="reOrderFromId" headerText="RE-ORDER ID" width="140" [visible]="false">
         <ng-template #template let-data>
           <ng-container *ngIf="!data.children?.length; else withToggle">
@@ -139,7 +174,7 @@
           <div class="status-cell">
             <ejs-chiplist>
               <e-chips>
-                <e-chip [text]="data.statusText" [cssClass]="(data.statusText | chipsCssClass)"></e-chip>
+                <e-chip [text]="data.statusText" [cssClass]="data.statusText | chipsCssClass"></e-chip>
               </e-chips>
             </ejs-chiplist>
           </div>
@@ -147,6 +182,7 @@
       </e-column>
       <e-column field="jobTitle" headerText="JOB TITLE" width="200"></e-column>
       <e-column field="skillName" headerText="SKILL" textAlign="Left" width="200"></e-column>
+      <e-column field="regionName" headerText="REGION" textAlign="Left" width="200" [visible]="false"></e-column>
       <e-column field="openPositions" headerText="# OF POSITIONS" width="180">
         <ng-template #template let-data>
           <div class="align-right">{{ data.openPositions }}</div>
@@ -176,7 +212,7 @@
           </span>
         </ng-template>
         <ng-template #template let-data>
-          <span>{{ data.startDate | date:'MM/dd/yyyy' }}</span>
+          <span>{{ data.startDate | date: 'MM/dd/yyyy' }}</span>
         </ng-template>
       </e-column>
       <e-column field="shift" headerText="SHIFT" width="150" [visible]="false">
@@ -198,10 +234,7 @@
           </ng-container>
 
           <ng-container *ngIf="data.agency?.length >= 3 && data.agency?.length <= 5">
-            <ejs-tooltip
-              content="{{ data.agency.join(', ') }}"
-              target="#agencyName"
-            >
+            <ejs-tooltip content="{{ data.agency.join(', ') }}" target="#agencyName">
               <span id="agencyName" class="agency-name">Multiple Agencies</span>
             </ejs-tooltip>
           </ng-container>
@@ -211,7 +244,12 @@
           </ng-container>
         </ng-template>
       </e-column>
-      <e-column field="shiftsNext90Days" headerText="# of Shifts Next 90 Days " width="150" [visible]="false"></e-column>
+      <e-column
+        field="shiftsNext90Days"
+        headerText="# of Shifts Next 90 Days "
+        width="150"
+        [visible]="false"
+      ></e-column>
     </e-columns>
 
     <ng-template #detailTemplate let-data>
@@ -220,7 +258,10 @@
           *ngFor="let child of data.children"
           [candidat]="child"
           [order]="data"
-          [selected]="selectedCandidate?.selected?.order === data.id && selectedCandidate?.selected.positionId === child.positionId"
+          [selected]="
+            selectedCandidate?.selected?.order === data.id &&
+            selectedCandidate?.selected.positionId === child.positionId
+          "
           [isAgency]="true"
           (clickEvent)="onOpenCandidateDialog($event, data)"
         ></app-grid-subrow-candidate>
@@ -282,32 +323,34 @@
   </ejs-grid>
 </section>
 
-<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+<app-export-dialog
+  [columns]="columnsToExport"
+  [fileName]="fileName"
+  (cancel)="closeExport()"
+  (export)="export($event)"
+></app-export-dialog>
 
-<app-filter-dialog [items]="filteredItems" [count]="(ordersPage$ | async)?.totalCount" (deleteFilter)="onFilterDelete($event)" (clearAllFiltersClicked)="onFilterClearAll()" (applyFilterClicked)="onFilterApply()" (closeDialogClicked)="onFilterClose()">
+<app-filter-dialog
+  [items]="filteredItems"
+  [count]="(ordersPage$ | async)?.totalCount"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
   <form [formGroup]="OrderFilterFormGroup">
     <div class="bootstrap">
       <div class="input-container" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders">
         <label for="orderId">Order ID</label>
         <div class="input-group">
-          <input
-            id="orderId"
-            class="e-input"
-            type="text"
-            maxlength="50"
-            formControlName="orderId"/>
+          <input id="orderId" class="e-input" type="text" maxlength="50" formControlName="orderId" />
         </div>
       </div>
 
       <div class="input-container" *ngIf="activeTab === OrganizationOrderManagementTabs.ReOrders">
         <label for="reOrderId">Re-Order ID</label>
         <div class="input-group">
-          <input
-            id="reOrderId"
-            class="e-input"
-            type="text"
-            maxlength="50"
-            formControlName="reOrderId"/>
+          <input id="reOrderId" class="e-input" type="text" maxlength="50" formControlName="reOrderId" />
         </div>
       </div>
     </div>
@@ -315,26 +358,30 @@
       <div class="input-container">
         <label>Region</label>
         <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="regionIds"
-                           placeholder="All"
-                           [fields]="optionFields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.regionIds.dataSource">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="regionIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.regionIds.dataSource"
+          >
           </ejs-multiselect>
         </div>
       </div>
       <div class="input-container">
         <label>Location</label>
         <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="locationIds"
-                           placeholder="All"
-                           [fields]="optionFields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.locationIds.dataSource">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="locationIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.locationIds.dataSource"
+          >
           </ejs-multiselect>
         </div>
       </div>
@@ -343,13 +390,15 @@
       <div class="input-container">
         <label>Department</label>
         <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="departmentsIds"
-                           placeholder="All"
-                           [fields]="optionFields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.departmentsIds.dataSource">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="departmentsIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.departmentsIds.dataSource"
+          >
           </ejs-multiselect>
         </div>
       </div>
@@ -358,13 +407,15 @@
       <div class="input-container">
         <label>Select Agency</label>
         <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="agencyIds"
-                           placeholder="All"
-                           [fields]="optionFields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.agencyIds.dataSource">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="agencyIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.agencyIds.dataSource"
+          >
           </ejs-multiselect>
         </div>
       </div>
@@ -373,26 +424,36 @@
       <div class="input-container">
         <label>Skill</label>
         <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="skillIds"
-                           placeholder="All"
-                           [fields]="skillsFields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.skillIds.dataSource">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="skillIds"
+            placeholder="All"
+            [fields]="skillsFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.skillIds.dataSource"
+          >
           </ejs-multiselect>
         </div>
       </div>
-      <div class="input-container" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders && activeTab !== OrganizationOrderManagementTabs.PerDiem">
+      <div
+        class="input-container"
+        *ngIf="
+          activeTab !== OrganizationOrderManagementTabs.ReOrders &&
+          activeTab !== OrganizationOrderManagementTabs.PerDiem
+        "
+      >
         <label>Order Type</label>
         <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="orderTypes"
-                           placeholder="All"
-                           [fields]="optionFields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.orderTypes.dataSource">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="orderTypes"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.orderTypes.dataSource"
+          >
           </ejs-multiselect>
         </div>
       </div>
@@ -401,26 +462,30 @@
       <div class="input-container">
         <label>Order Status</label>
         <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="orderStatuses"
-                           placeholder="All"
-                           [fields]="statusFields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.orderStatuses.dataSource">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="orderStatuses"
+            placeholder="All"
+            [fields]="statusFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.orderStatuses.dataSource"
+          >
           </ejs-multiselect>
         </div>
       </div>
       <div class="input-container">
         <label>Candidate Status</label>
         <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="candidateStatuses"
-                           placeholder="All"
-                           [fields]="statusFields"
-                           [allowFiltering]="true"
-                           [showDropDownIcon]="true"
-                           [dataSource]="filterColumns.candidateStatuses.dataSource">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="candidateStatuses"
+            placeholder="All"
+            [fields]="statusFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.candidateStatuses.dataSource"
+          >
           </ejs-multiselect>
         </div>
       </div>
@@ -429,10 +494,7 @@
       <div class="input-container">
         <label>Job Title</label>
         <div class="input-group">
-          <input  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  formControlName="jobTitle"/>
+          <input class="e-input" type="text" maxlength="50" formControlName="jobTitle" />
         </div>
       </div>
     </div>
@@ -440,19 +502,13 @@
       <div class="input-container">
         <label>Bill Rate From</label>
         <div class="input-group">
-          <input  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  formControlName="billRateFrom"/>
+          <input class="e-input" type="text" maxlength="50" formControlName="billRateFrom" />
         </div>
       </div>
       <div class="input-container">
         <label>Bill Rate To</label>
         <div class="input-group">
-          <input  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  formControlName="billRateTo"/>
+          <input class="e-input" type="text" maxlength="50" formControlName="billRateTo" />
         </div>
       </div>
     </div>
@@ -460,19 +516,13 @@
       <div class="input-container">
         <label>Candidates Count From</label>
         <div class="input-group">
-          <input  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  formControlName="candidatesCountFrom"/>
+          <input class="e-input" type="text" maxlength="50" formControlName="candidatesCountFrom" />
         </div>
       </div>
       <div class="input-container">
         <label>Candidates Count To</label>
         <div class="input-group">
-          <input  class="e-input"
-                  type="text"
-                  maxlength="50"
-                  formControlName="candidatesCountTo"/>
+          <input class="e-input" type="text" maxlength="50" formControlName="candidatesCountTo" />
         </div>
       </div>
     </div>
@@ -480,18 +530,15 @@
       <div class="input-container">
         <label for="numberOfPositions"># of Positions</label>
         <div class="input-group">
-          <input
-            id="numberOfPositions"
-            class="e-input"
-            type="text"
-            maxlength="50"
-            formControlName="openPositions"/>
+          <input id="numberOfPositions" class="e-input" type="text" maxlength="50" formControlName="openPositions" />
         </div>
       </div>
     </div>
     <div class="row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem">
       <div class="input-container calendar">
-        <label for="jobStartDate">{{ activeTab !== OrganizationOrderManagementTabs.ReOrders ? 'Job Start Date' : 'Re-Order Date' }}</label>
+        <label for="jobStartDate">{{
+          activeTab !== OrganizationOrderManagementTabs.ReOrders ? 'Job Start Date' : 'Re-Order Date'
+        }}</label>
         <div class="input-group datepicker">
           <ejs-datepicker
             id="jobStartDate"
@@ -531,9 +578,15 @@
 <app-order-details-dialog
   #detailsDialog
   [order]="selectedOrder"
+  [children]="selectedDataRow?.children"
   [openEvent]="openDetails"
   (selectReOrder)="selectReOrder($event)"
   (saveReOrderEmitter)="updateGrid()"
-  (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"></app-order-details-dialog>
+  (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
+></app-order-details-dialog>
 
-<app-child-order-dialog [order]="$any(selectedOrder)" [candidate]="selectedCandidate"  [openEvent]="openChildDialog"></app-child-order-dialog>
+<app-child-order-dialog
+  [order]="$any(selectedOrder)"
+  [candidate]="selectedCandidate"
+  [openEvent]="openChildDialog"
+></app-child-order-dialog>

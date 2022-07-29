@@ -31,6 +31,7 @@ import type { ApplicantsByRegionDataModel } from '../models/applicants-by-region
 import type { WidgetsDataModel } from '../models/widgets-data.model';
 import { PositionTypeEnum } from '../enums/position-type.enum';
 import type {
+  ITimeSlice,
   PositionByTypeDataModel,
   PositionsByTypeAggregatedModel,
 } from '../models/positions-by-type-aggregated.model';
@@ -48,20 +49,22 @@ import { candidateLegendPalette } from '../constants/candidate-legend-palette';
 import { CandidateChartStatuses } from '../enums/candidate-legend-palette.enum';
 import { Router } from '@angular/router';
 import { PositionTrend, PositionTrendDto } from '../models/position-trend.model';
+import { TimeSelectionEnum } from '../enums/time-selection.enum';
 
 @Injectable()
 export class DashboardService {
   private readonly baseUrl = '/api/Dashboard';
   private readonly widgetTypeToDataMapper: Record<
     WidgetTypeEnum,
-    (filters: DashboardFiltersModel) => Observable<unknown>
+    (filters: DashboardFiltersModel, timeSelection: TimeSelectionEnum) => Observable<unknown>
   > = {
-    [WidgetTypeEnum.APPLICANTS_BY_REGION]: (filters: DashboardFiltersModel) => this.getApplicantsByRegionWidgetData(filters),
+      [WidgetTypeEnum.APPLICANTS_BY_REGION]: (filters: DashboardFiltersModel) => this.getApplicantsByRegionWidgetData(filters),
+      [WidgetTypeEnum.APPLICANTS_BY_POSITIONS]: (filters: DashboardFiltersModel) => this.getApplicantsByPositionsWidgetData(filters),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboardFiltersModel) => this.getActivePositionWidgetData(filters),
     [WidgetTypeEnum.CANDIDATES]: (filters: DashboardFiltersModel) => this.getCandidatesWidgetData(filters),
     [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filters: DashboardFiltersModel) => this.getFilledPositionTrendWidgetData(filters),
     [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.InProgress),
-    [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboardFiltersModel) => this.getPositionsByTypes(filters),
+    [WidgetTypeEnum.POSITIONS_BY_TYPES]: (filters: DashboardFiltersModel, timeSelection: TimeSelectionEnum) => this.getPositionsByTypes(filters, timeSelection),
     [WidgetTypeEnum.FILLED_POSITIONS]: (filters: DashboardFiltersModel) => this.getOrderPositionWidgetData(filters, OrderStatus.Filled),
     [WidgetTypeEnum.OPEN_POSITIONS]: (filters,) => this.getOrderPositionWidgetData(filters, OrderStatus.Open),
     [WidgetTypeEnum.INVOICES]: () => this.getInvocesWidgetData(),
@@ -95,6 +98,7 @@ export class DashboardService {
   public getWidgetsAggregatedData([
     panels,
     filters,
+    timeSelection
   ]: WidgetDataDependenciesAggregatedModel): Observable<WidgetsDataModel> {
     const data: Record<WidgetTypeEnum, Observable<WidgetsDataModel[keyof WidgetsDataModel]>> = reduce(
       panels,
@@ -103,7 +107,7 @@ export class DashboardService {
         panel: PanelModel
       ) => ({
         ...accumulator,
-        [panel.id as WidgetTypeEnum]: this.widgetTypeToDataMapper[panel.id as WidgetTypeEnum]?.(filters) ?? of(null),
+        [panel.id as WidgetTypeEnum]: this.widgetTypeToDataMapper[panel.id as WidgetTypeEnum]?.(filters, timeSelection) ?? of(null),
       }),
       {}
     ) as Record<WidgetTypeEnum, Observable<WidgetsDataModel[keyof WidgetsDataModel]>>;
@@ -152,8 +156,22 @@ export class DashboardService {
     );
   }
 
+  private getApplicantsByPositionsWidgetData(
+    filters: DashboardFiltersModel
+  ): Observable<CandidatesByStateWidgetAggregatedDataModel> {
+    return forkJoin({ mapData: this.mapData$, applicantsByRegion: this.getApplicantsByPositions(filters) }).pipe(
+      map((data: ApplicantsByRegionDataModel) => {
+        return this.getFormattedPostionsByStatesWidgetAggregatedData(data);
+      })
+    );
+  }
+
   private getApplicantsByRegion(filter: DashboardFiltersModel): Observable<CandidatesByStatesResponseModel> {
     return this.httpClient.post<CandidatesByStatesResponseModel>(`${this.baseUrl}/GetCandidatesStatesAggregated`, { ...filter });
+  }
+
+  private getApplicantsByPositions(filter: DashboardFiltersModel): Observable<CandidatesByStatesResponseModel> {
+    return this.httpClient.post<CandidatesByStatesResponseModel>(`${this.baseUrl}/GetPostionsStatesAggregated`, { ...filter });
   }
 
   private getMapData(): Observable<LayerSettingsModel> {
@@ -171,6 +189,8 @@ export class DashboardService {
     ])(applicantsByRegion);
     const maxCandidatesValue = flow(values, max)(candidatesWithState);
     const unknownStateCandidates = applicantsByRegion['Unknown'];
+    const title = "Applicants by Region";
+    const description = "";
     const combinedData = { ...mapData, ...USAMapCandidatesDataLayerSettings };
     const dataSource = lodashMap(
       (stateDefinition: Record<string, string>) => ({
@@ -184,7 +204,36 @@ export class DashboardService {
       colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
 
-    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates };
+    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates, title, description };
+  }
+  private getFormattedPostionsByStatesWidgetAggregatedData({
+    mapData,
+    applicantsByRegion,
+  }: ApplicantsByRegionDataModel): CandidatesByStateWidgetAggregatedDataModel {
+    const candidatesWithState = flow([
+      Object.entries,
+      (arr) => arr.filter(([key, value]: [key: string, value: number]) => key !== 'Unknown'),
+      Object.fromEntries,
+    ])(applicantsByRegion);
+    const maxCandidatesValue = flow(values, max)(candidatesWithState);
+    const unknownStateCandidates = applicantsByRegion['Unknown'];
+    const title = "Open Positions";
+    const description = "Open and in progress Position by  State";
+    
+    const combinedData = { ...mapData, ...USAMapCandidatesDataLayerSettings };
+    const dataSource = lodashMap(
+      (stateDefinition: Record<string, string>) => ({
+        ...stateDefinition,
+        candidates: applicantsByRegion[stateDefinition['code']] ?? 0,
+      }),
+      combinedData.dataSource
+    );
+    const shapeSettings = {
+      ...combinedData.shapeSettings,
+      colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
+    };
+
+    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates, title, description };
   }
 
   private getDashboardState(): Observable<PanelModel[]> {
@@ -193,8 +242,8 @@ export class DashboardService {
       .pipe(map((panels) => JSON.parse(panels.state)));
   }
 
-  private getPositionsByTypes(filter: DashboardFiltersModel): Observable<PositionsByTypeAggregatedModel> {
-    const timeRanges = this.calculateTimeRanges();
+  private getPositionsByTypes(filter: DashboardFiltersModel, timeSelection: TimeSelectionEnum): Observable<PositionsByTypeAggregatedModel> {
+    const timeRanges = this.calculateTimeRanges(timeSelection);
     return this.httpClient
       .post<PositionsByTypeResponseModel>(`${this.baseUrl}/getopenclosedonboardamount`, { ...timeRanges, ...filter })
       .pipe(
@@ -208,11 +257,27 @@ export class DashboardService {
       );
   }
 
-  private calculateTimeRanges(): { startDate: string; endDate: string } {
+  private getWeeksTimeRanges(week: number): ITimeSlice {
+    const numberWeek = week * 7;
+    const today = new Date();
+    const startDate = this.getDateAsISOString(new Date(today.getFullYear(), today.getMonth(), today.getDate() - numberWeek).getTime());
+    const endDate = this.getDateAsISOString(new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime());
+    return {startDate, endDate};
+  }
+
+  private getMonthTimeRanges(month: number): ITimeSlice{
     const date = new Date();
-    const startDate = this.getDateAsISOString(date.setMonth(date.getMonth() - 3));
-    const endDate = this.getDateAsISOString(date.setMonth(date.getMonth() + 6));
+    const startDate = this.getDateAsISOString(date.setMonth(date.getMonth() - month + 1));
+    const endDate = this.getDateAsISOString(date.setMonth(date.getMonth() + month));
     return { startDate, endDate };
+  }
+
+  private calculateTimeRanges(timeSelection: TimeSelectionEnum) {
+    if(timeSelection === TimeSelectionEnum.Weekly) {
+      return this.getWeeksTimeRanges(5);
+    } else {
+      return this.getMonthTimeRanges(5);
+    }  
   }
 
   private getDateAsISOString(timestamp: number): string {
@@ -280,6 +345,6 @@ export class DashboardService {
   }
 
   private getInvocesWidgetData(): Observable<any> {
-    return of('temporary-widget-invoices');
+    return of('temporary-widget-invoices-chart');
   }
 }

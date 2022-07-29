@@ -1,7 +1,7 @@
 import {Component, Inject, Input, OnChanges, OnDestroy, OnInit, SimpleChanges, ViewChild} from '@angular/core';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
-import { FreezeService, GridComponent } from '@syncfusion/ej2-angular-grids';
+import { GridComponent } from '@syncfusion/ej2-angular-grids';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
@@ -57,8 +57,7 @@ import { valuesOnly } from '@shared/utils/enum.utils';
 @Component({
   selector: 'app-bill-rate-setup',
   templateUrl: './bill-rate-setup.component.html',
-  styleUrls: ['./bill-rate-setup.component.scss'],
-  providers: [FreezeService]
+  styleUrls: ['./bill-rate-setup.component.scss']
 })
 export class BillRateSetupComponent extends AbstractGridConfigurationComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('grid') grid: GridComponent;

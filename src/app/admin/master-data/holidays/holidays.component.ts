@@ -9,7 +9,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { Holiday } from '@shared/models/holiday.model';
 import { endDateValidator, startDateValidator } from '@shared/validators/date.validator';
-import { FreezeService, GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, SortService } from '@syncfusion/ej2-angular-grids';
 import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 import { SetDirtyState, SetImportFileDialogState } from 'src/app/admin/store/admin.actions';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -21,7 +21,7 @@ import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
   selector: 'app-holidays',
   templateUrl: './holidays.component.html',
   styleUrls: ['./holidays.component.scss'],
-  providers: [SortService, FreezeService]
+  providers: [SortService]
 })
 export class MasterHolidaysComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   private pageSubject = new Subject<number>();

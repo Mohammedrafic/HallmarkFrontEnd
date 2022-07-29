@@ -5,29 +5,69 @@
   </div>
 
   <div class="stick-right header-content">
+    <div class="other-icons">
+      <i-feather name="help-circle" class="icon" (click)="onGetHelp()"></i-feather>
+    </div>
+
     <div class="switcher-container" [class.hidden]="!((isOrganizationAgencyArea$ | async)?.isOrganizationArea || (isOrganizationAgencyArea$ | async)?.isAgencyArea)">
       <app-organization-agency-selector></app-organization-agency-selector>
       <div class="devider"></div>
     </div>
-    <div class="header-item">{{userLogin.firstName}} {{userLogin.lastName}}</div>
+    <div class="bell-button">
+
+      <i-feather name="bell" class="bell-icon"></i-feather>
+
+      <span class="bell-button__badge">2</span>
+
+    </div>
+
+    <div class="devider"></div>
 
     <!-- Temporary solution to log out from the application -->
-    <button class="logout-button" ejs-button cssClass="e-primary" (click)="logout()">Logout</button>
+
+    <div class="header-item">
+
+      <button ejs-dropdownbutton [items]='profileDatasource'
+              (select)="onSelectProfileMenu($event)">
+
+        <span>{{userLogin.firstName}} {{userLogin.lastName}}</span>
+
+      </button>
+
+    </div>
+    <!-- Temporary solution to log out from the application -->
+    <!--<button class="logout-button" ejs-button cssClass="e-primary" (click)="logout()">Logout</button>-->
   </div>
 </div>
 <section class="shell">
   <ejs-sidebar id="sidebar" #sidebar [enableGestures]="false" [enableDock]="enableDock" [width]="width" [dockSize]="dockSize" [type]="sideBarType"
-    (created)="onSideBarCreated()">
+               (created)="onSideBarCreated()">
     <section class="primary-container">
       <section class="logo-container">
         <div class="logo" *ngIf="sidebar.isOpen"></div>
         <div class="small-logo" *ngIf="!sidebar.isOpen"></div>
       </section>
-
+      <section class="collapse">
+        <a class="icon-container"  #searchInputContainer>
+          <i-feather name="search" class="icon"></i-feather>
+          <span class="e-text">
+            <input #searchInput
+                   id="sidebar-nav-search-input"
+                   class="nav-search-input"
+                  [(ngModel)]="searchString"
+                   placeholder="Start typing"
+                  [value]="searchString"
+                   (ngModelChange)="onSearchChange()"
+                   (focus)="onSearchFocus()"
+                   (focusout)="onSearchFocusOut()"
+                   />
+          </span>
+        </a>
+      </section>
       <section class="menu">
         <section class="sidebar-menu">
           <ejs-treeview id="template" #treevalidate [fields]="sideBarMenuField" (nodeClicked)='nodeSelect($event)'
-            [fullRowSelect]="true" [loadOnDemand]="false">
+                        [fullRowSelect]="true" [loadOnDemand]="false">
             <ng-template #nodeTemplate="" let-data="">
               <section class="icon-container"
                        (click)="onMenuItemClick(data)"
@@ -75,6 +115,14 @@
 
     <div class="content">
       <router-outlet></router-outlet>
+      <dashboard-search-menu #searchMenuInstance class="dashboardSearchMenus"
+                             *ngIf="isSearching"
+                             [isMaximized]="isMaximized"
+                             [searchResult]="searchResult"
+                             [searchString]="searchString"
+                             (searchFocusOut)="onSearchFocusOut()"
+                             [searchHeight]="searchHeight">
+      </dashboard-search-menu>
     </div>
   </section>
 </section>

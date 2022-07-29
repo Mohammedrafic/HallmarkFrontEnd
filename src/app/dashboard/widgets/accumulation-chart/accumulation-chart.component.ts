@@ -31,6 +31,7 @@ export class AccumulationChartComponent
 
   public toggleLegend: number[] = [];
   public filteredChartData$: Observable<DonutChartData[]>;
+  public totalScore: number = 0;
 
   public readonly tooltipSettings: TooltipSettingsModel = {
     enable: true,
@@ -65,10 +66,16 @@ export class AccumulationChartComponent
 
   public ngOnChanges(changes: SimpleChanges): void {
     changes['chartData'] && this.handleChartDataChanges();
+    this.totalScore = 0;
+    this.chartData?.chartData.forEach(obj => {
+      this.totalScore += obj.value;
+    });
   }
 
   public ngOnInit(): void {
     this.filteredChartData$ = this.getFilteredChartData();
+
+    
   }
 
   public onClickLegend(label: string): void {

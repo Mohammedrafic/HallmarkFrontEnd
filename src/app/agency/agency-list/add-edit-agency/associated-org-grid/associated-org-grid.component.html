@@ -22,18 +22,7 @@
     class="e-gridwithheader e-gridsubheader"
   >
     <e-columns>
-      <e-column field="organizationName" headerText="Organization" textAlign="Left"></e-column>
-      <e-column field="baseFee" headerText="Base Fee %" width="130" textAlign="left">
-        <ng-template #template let-data>
-          {{ priceUtils.formatNumbers(data.baseFee) }}
-        </ng-template>
-      </e-column>
-      <e-column field="tier" headerText="Tier" width="150" textAlign="left" [valueAccessor]="tierValueAccess"></e-column>
-      <e-column field="exeptionFee" headerText="Exception Fee" width="150" textAlign="left"></e-column>
-      <e-column headerText="Job Distribution" [columns]="jobDistributionColumns" textAlign="left"></e-column>
-      <e-column field="partnershipStatus" headerText="Partnership Status" textAlign="left" [valueAccessor]="partnershipStatusValueAccess"></e-column>
-
-      <e-column textAlign="Right" width="120" freeze="Right">
+      <e-column textAlign="Right" width="100">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data); (false)">
@@ -45,6 +34,16 @@
           </div>
         </ng-template>
       </e-column>
+      <e-column field="organizationName" headerText="Organization" textAlign="Left"></e-column>
+      <e-column field="baseFee" headerText="Base Fee %" width="130" textAlign="left">
+        <ng-template #template let-data>
+          {{ priceUtils.formatNumbers(data.baseFee) }}
+        </ng-template>
+      </e-column>
+      <e-column field="tier" headerText="Tier" width="150" textAlign="left" [valueAccessor]="tierValueAccess"></e-column>
+      <e-column field="exeptionFee" headerText="Exception Fee" width="150" textAlign="left"></e-column>
+      <e-column headerText="Job Distribution" [columns]="jobDistributionColumns" textAlign="left"></e-column>
+      <e-column field="partnershipStatus" headerText="Partnership Status" textAlign="left" [valueAccessor]="partnershipStatusValueAccess"></e-column>
     </e-columns>
 
     <ng-template #pagerTemplate let-data>

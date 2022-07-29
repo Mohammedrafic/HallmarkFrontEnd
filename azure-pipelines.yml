@@ -10,12 +10,13 @@ trigger:
 - release.*
 - task*
 - strory*
+- demo*
 
 pool:
-  vmImage: ubuntu-latest
-  # name: prduse2
-  # demands:
-  #   - agent.name -equals softserve
+  # vmImage: ubuntu-latest
+  name: prduse2
+  demands:
+    - agent.name -equals LinuxAgentforBuildE2
 
 resources: 
 - repo: self

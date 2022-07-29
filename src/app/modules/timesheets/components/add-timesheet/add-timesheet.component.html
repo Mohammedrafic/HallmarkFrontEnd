@@ -2,7 +2,7 @@
 id="edit-timesheet-dialog"
 #sideAddDialog
 cssClass="dialog short"
-[width]="'434px'"
+[width]="'540px'"
 [visible]="false"
 [height]="450"
 [animationSettings]="{ effect: 'SlideRight' }"
@@ -10,7 +10,7 @@ cssClass="dialog short"
   <ng-template #content>
     <div class="dialog-container">
       <div class="dialog-header">
-        <h3 class="title">{{ dialogConfig.title }}</h3>
+        <h3 class="title">{{ dialogConfig[formType].title | titlecase }}</h3>
         <div class="controls">
           <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
           <button (click)="saveForm()" ejs-button [isPrimary]="true">Save</button>
@@ -19,7 +19,7 @@ cssClass="dialog short"
 
       <div class="form" *ngIf="form">
         <form [formGroup]="form" autocomplete="off" class="bootstrap grid">
-          <ng-container *ngFor="let field of dialogConfig[formType]; trackBy:trackByIndex">
+          <ng-container *ngFor="let field of dialogConfig[formType].fields; trackBy:trackByIndex">
             <ng-container [ngSwitch]="field.type">
 
               <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
@@ -28,6 +28,7 @@ cssClass="dialog short"
                   </label>
                   <div class="input-group dropdown">
                     <ejs-dropdownlist
+                      [fields]="dropDownFields"
                       [formControlName]="field.field"
                       [dataSource]="field.options"
                       appValidateWithMessage
@@ -48,7 +49,7 @@ cssClass="dialog short"
                       format="hh:mm a"
                       [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                       [enableMask]="true"
-                      [step]="15"
+                      [step]="30"
                       (change)="updateValidity()"
                       maskPlaceholder="HH:MM">
                     </ejs-timepicker>
@@ -65,10 +66,10 @@ cssClass="dialog short"
                       name="startDateTime"
                       [formControlName]="field.field"
                       appValidateWithMessage
-                      [step]="15"
+                      [step]="30"
                       placeholder="Select Date and Time"
-                      [min]="timeSettings.min"
-                      [max]="timeSettings.max"
+                      [min]="field.field === 'timeIn' ? dateSettings.timeIn.min : dateSettings.timeOut.min"
+                      [max]="field.field === 'timeIn' ? dateSettings.timeIn.max : dateSettings.timeOut.max"
                       (change)="updateValidity()"
                     >
                     </ejs-datetimepicker>
@@ -99,8 +100,8 @@ cssClass="dialog short"
                     <ejs-datepicker
                     class="datepicker"
                     appValidateWithMessage
-                    [min]="timeSettings.min"
-                    [max]="timeSettings.max"
+                      [min]="dateSettings.timeIn.min"
+                      [max]="dateSettings.timeIn.max"
                     [formControlName]="field.field"
                     >
                     </ejs-datepicker>

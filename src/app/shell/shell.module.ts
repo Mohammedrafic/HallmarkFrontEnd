@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { ContextMenuModule, MenuModule, SidebarModule, TreeViewModule } from '@syncfusion/ej2-angular-navigations';
 import { ButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
@@ -22,7 +22,12 @@ import {
   User,
   Package,
   Trello,
-  Lock
+  Lock,
+  Truck,
+  Bell,
+  Search,
+  HelpCircle,
+  PieChart
 } from 'angular-feather/icons';
 
 import { ShellRoutingModule } from './shell-routing.module';
@@ -30,6 +35,8 @@ import { ShellPageComponent } from './shell.component';
 import { SharedModule } from '../shared/shared.module';
 
 import { OrganizationAgencySelectorComponent } from './components/organization-agency-selector/organization-agency-selector.component';
+import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { SearchMenuComponent } from './components/search-menu/search-menu.component'; 
 
 const sidebarIcons = {
   Sidebar,
@@ -45,13 +52,19 @@ const sidebarIcons = {
   User,
   Package,
   Trello,
-  Lock
+  Lock,
+  Truck,
+  Bell,
+  Search,
+  HelpCircle,
+  PieChart
 };
 
 @NgModule({
   declarations: [
     OrganizationAgencySelectorComponent,
-    ShellPageComponent
+    ShellPageComponent,
+    SearchMenuComponent
   ],
   imports: [
     CommonModule,
@@ -66,7 +79,9 @@ const sidebarIcons = {
     SharedModule,
     FeatherModule.pick(sidebarIcons),
     DropDownListModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    DropDownButtonModule,
+    FormsModule
   ],
   providers: [],
 })

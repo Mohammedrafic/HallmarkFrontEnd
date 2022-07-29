@@ -38,6 +38,20 @@ body.light, body.dark {
       .delete-button {
         background-color: $supportive-red;
       }
+
+      .confirm-button {
+        background-color: $primary-active-blue-10;
+        color: $white;
+
+        &:hover {
+          background-color: $primary-btn-hover;
+        }
+      }
+    }
+
+    &.save-template-dialog {
+      height: 500px;
+      width: 50%;
     }
   }
 }

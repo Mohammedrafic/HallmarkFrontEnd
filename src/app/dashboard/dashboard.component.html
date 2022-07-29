@@ -6,7 +6,8 @@
     panels: panels$ | async,
     selectedWidgets: selectedWidgets$ | async,
     widgets: widgets$ | async,
-    widgetsData: widgetsData$ | async
+    widgetsData: widgetsData$ | async,
+    timeSelection: timeSelection$ | async
   }"
 ></ng-container>
 
@@ -17,6 +18,7 @@
   let-selectedWidgets="selectedWidgets"
   let-widgets="widgets"
   let-widgetsData="widgetsData"
+  let-timeSelection="timeSelection"
 >
   <app-dashboard-control
     (widgetToggleEmitter)="handleWidgetToggleEvent($event)"
@@ -37,6 +39,7 @@
         [isLoading]="isLoading"
         [panels]="panels"
         [widgetsData]="widgetsData"
+        [timeSelection]="timeSelection"
       ></app-dashboard-widgets>
     </div>
   </ng-template>

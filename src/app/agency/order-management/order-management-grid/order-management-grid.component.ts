@@ -31,6 +31,7 @@ import {
   myAgencyChildColumnsToExport,
   myAgencyColumnsToExport,
   MyAgencyOrdersColumnsConfig,
+  perDiemChildColumnsToExport,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
   reOrdersChildColumnToExport,
@@ -69,10 +70,8 @@ import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.e
 import { OrderType } from '@shared/enums/order-type';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import {
-  PreviewOrderDialogComponent
-} from "@agency/order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component";
-import { NextPreviousOrderEvent } from './preview-order-dialog/preview-order-dialog.component';
+import { PreviewOrderDialogComponent } from '@agency/order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
+import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -86,7 +85,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   @Input() exportButtonClicked: boolean;
   @Input() onExportClicked$: Subject<any>;
   @Input() search$: Subject<string>;
-  @Output() selectTab = new EventEmitter<number>()
+  @Output() selectTab = new EventEmitter<number>();
 
   @Output() reOrderNumber = new EventEmitter<number>();
 
@@ -134,7 +133,6 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private isAlive = true;
   private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
-  private excludeDeployed: boolean;
   private pageSubject = new Subject<number>();
 
   constructor(
@@ -143,6 +141,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     private actions$: Actions,
     private datePipe: DatePipe,
     private filterService: FilterService,
+    private orderManagementAgencyService: OrderManagementAgencyService
   ) {
     super();
   }
@@ -239,6 +238,27 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     if (this.selectedIndex) {
       this.gridWithChildRow.selectRow(this.selectedIndex);
     }
+
+    this.openPerDiemDetails();
+  }
+
+  /* Trigger when user redirect to per diem order from re-order */
+  private openPerDiemDetails(): void {
+    const { orderPerDiemId } = this.orderManagementAgencyService;
+    if (orderPerDiemId && this.ordersPage) {
+      const orderPerDiem = this.ordersPage.items.find(
+        (order: AgencyOrderManagement) => order.orderId === orderPerDiemId
+      );
+
+      if (orderPerDiem) {
+        const index = (this.gridWithChildRow.dataSource as Order[])?.findIndex(
+          (order: Order) => order.orderId === orderPerDiemId
+        );
+        this.onRowClick({ data: orderPerDiem });
+        this.gridWithChildRow.selectRow(index);
+        this.orderManagementAgencyService.orderPerDiemId = null;
+      }
+    }
   }
 
   public onGoToClick(event: any): void {
@@ -257,26 +277,22 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private dispatchNewPage(): void {
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
-        this.columnsToExport = [...myAgencyColumnsToExport, ...myAgencyChildColumnsToExport];
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.PerDiem:
-        // TODO: pending BE
-        this.columnsToExport = perDiemColumnsToExport;
         this.filters.orderTypes = [OrderType.OpenPerDiem];
         this.filters.includeReOrders = true;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.ReOrders:
-        this.columnsToExport = reOrdersColumnsToExport;
         this.filters.orderTypes = [OrderType.ReOrder];
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       default:
-        this.columnsToExport = myAgencyColumnsToExport;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
     }
+    this.checkSelectedChildrenItem();
   }
 
   public onGridCreated(): void {
@@ -312,7 +328,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   public onRowClick(event: any): void {
     if (event.target) {
-      this.excludeDeployed = false;
+      this.orderManagementAgencyService.excludeDeployed = false;
     }
 
     this.rowSelected(event, this.gridWithChildRow);
@@ -328,7 +344,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           event.data.organizationId,
           this.currentPage,
           this.pageSize,
-          this.excludeDeployed
+          this.orderManagementAgencyService.excludeDeployed
         )
       );
       this.store.dispatch(new GetAgencyOrderGeneralInformation(event.data.orderId, event.data.organizationId));
@@ -362,10 +378,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.isSubrowDisplay = false;
   }
 
-  public onNextPreviousOrderEvent(event: NextPreviousOrderEvent): void {
+  public onNextPreviousOrderEvent(next: boolean): void {
     const [index] = this.gridWithChildRow.getSelectedRowIndexes();
-    const nextIndex = event.next ? index + 1 : index - 1;
-    this.excludeDeployed = event.excludeDeployed;
+    const nextIndex = next ? index + 1 : index - 1;
     this.gridWithChildRow.selectRow(nextIndex);
   }
 
@@ -383,7 +398,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         order.organizationId,
         this.currentPage,
         this.pageSize,
-        this.excludeDeployed
+        this.orderManagementAgencyService.excludeDeployed
       )
     );
     this.store.dispatch(new GetAgencyOrderGeneralInformation(reOrder.orderId, order.organizationId));
@@ -392,9 +407,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.openPreview.next(true);
   }
 
-  selectReOrder(event: {reOrder: AgencyOrderManagement, order: Order | AgencyOrderManagement}): void {
+  selectReOrder(event: { reOrder: AgencyOrderManagement; order: Order | AgencyOrderManagement }): void {
     const tabSwitchAnimation = 400;
-    const {reOrder, order} = event;
+    const { reOrder, order } = event;
     const tabId = Object.values(AgencyOrderManagementTabs).indexOf(AgencyOrderManagementTabs.ReOrders);
     this.selectTab.emit(tabId);
     setTimeout(() => {
@@ -472,6 +487,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
 
   private checkSelectedChildrenItem(): void {
     const hasSelectedItemChildren = this.selectedItems.some((itm) => itm.children.length !== 0);
+    const hasSelectedChildReorders = this.selectedItems.some((itm) => itm.reOrders?.length !== 0);
 
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
@@ -482,6 +498,15 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.columnsToExport = hasSelectedItemChildren
           ? [...myAgencyColumnsToExport, ...myAgencyChildColumnsToExport]
           : myAgencyColumnsToExport;
+        break;
+      case AgencyOrderManagementTabs.PerDiem:
+        if (this.selectedItems.length === 0) {
+          this.columnsToExport = [...perDiemColumnsToExport, ...perDiemChildColumnsToExport];
+          return;
+        }
+        this.columnsToExport = hasSelectedChildReorders
+          ? [...perDiemColumnsToExport, ...perDiemChildColumnsToExport]
+          : perDiemColumnsToExport;
         break;
       case AgencyOrderManagementTabs.ReOrders:
         this.columnsToExport = hasSelectedItemChildren

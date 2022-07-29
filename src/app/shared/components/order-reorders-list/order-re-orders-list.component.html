@@ -25,6 +25,18 @@
     [height]="300"
   >
     <e-columns>
+      <e-column width="100">
+        <ng-template #template let-data>
+          <div class="row-tool-buttons">
+            <button ejs-button cssClass="e-flat default-icon-button">
+              <span><i-feather name="message-square" class="icon"></i-feather></span>
+            </button>
+            <button ejs-button cssClass="e-flat primary-icon-button" (click)="edit(data)">
+              <span><i-feather name="edit" class="icon"></i-feather></span>
+            </button>
+          </div>
+        </ng-template>
+      </e-column>
       <e-column field="id" headerText="re-order id" textAlign="Left" width="100">
         <ng-template #template let-data>
           <div class="link" (click)="onViewNavigation(data)">
@@ -67,18 +79,6 @@
         <ng-template #template let-data>
           <span>{{ data.positions }}/{{ data.openPositions }}</span>
         </ng-template>
-      </e-column>
-      <e-column width="100">
-      <ng-template #template let-data>
-        <div class="row-tool-buttons">
-          <button ejs-button cssClass="e-flat default-icon-button">
-            <span><i-feather name="message-square" class="icon"></i-feather></span>
-          </button>
-          <button ejs-button cssClass="e-flat primary-icon-button" (click)="edit(data)">
-            <span><i-feather name="edit" class="icon"></i-feather></span>
-          </button>
-        </div>
-      </ng-template>
       </e-column>
     </e-columns>
 
