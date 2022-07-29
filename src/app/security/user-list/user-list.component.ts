@@ -168,7 +168,7 @@ export class UserListComponent extends AbstractGridConfigurationComponent implem
     this.store.dispatch(new ShowExportDialog(true));
   }
 
-  public override defaultExport(fileType: ExportedFileType): void {
+  public override defaultExport(fileType: ExportedFileType): void {    
     this.exportUsers$.next(fileType);
   }
 

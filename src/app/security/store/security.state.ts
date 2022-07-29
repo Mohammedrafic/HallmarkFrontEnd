@@ -28,6 +28,7 @@ import {
   GetOrganizationsStructureAll,
   GetNewRoleBusinessByUnitTypeSucceeded,
   ExportUserList,
+  ExportRoleList,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -212,9 +213,9 @@ export class SecurityState {
   @Action(GetRolesPage)
   GetRolesPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitIds, businessUnitType, pageNumber, pageSize, filters }: GetRolesPage
+    { businessUnitIds, businessUnitType, pageNumber, pageSize, sortModel, filterModel, filters }: GetRolesPage
   ): Observable<RolesPage> {
-    return this.roleService.getRolesPage(businessUnitType, businessUnitIds, pageNumber, pageSize, filters).pipe(
+    return this.roleService.getRolesPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel, filters).pipe(
       tap((payload) => {
         patchState({ rolesPage: payload });
         return payload;
@@ -238,9 +239,9 @@ export class SecurityState {
   @Action(GetUsersPage)
   GetUsersPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitId, businessUnitType, pageNumber, pageSize }: GetUsersPage
+    { businessUnitId, businessUnitType, pageNumber, pageSize, sortModel, filterModel }: GetUsersPage
   ): Observable<UsersPage> {
-    return this.userService.getUsersPage(businessUnitType, businessUnitId, pageNumber, pageSize).pipe(
+    return this.userService.getUsersPage(businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel).pipe(
       tap((payload) => {
         patchState({ usersPage: payload });
         return payload;
@@ -404,6 +405,16 @@ export class SecurityState {
   @Action(ExportUserList)
   ExportUserList({}: StateContext<SecurityStateModel>, { payload }: ExportUserList): Observable<Blob> {
     return this.userService.export(payload).pipe(
+      tap((file: Blob) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      })
+    );
+  }
+
+  @Action(ExportRoleList)
+  ExportRoleList({}: StateContext<SecurityStateModel>, { payload }: ExportRoleList): Observable<Blob> {
+    return this.roleService.export(payload).pipe(
       tap((file: Blob) => {
         const url = window.URL.createObjectURL(file);
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);

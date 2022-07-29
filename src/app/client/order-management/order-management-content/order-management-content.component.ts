@@ -8,6 +8,7 @@ import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { CandidatesStatusText, OrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { CellClickedEvent, ColDef, GridReadyEvent } from '@ag-grid-community/core';
 import {
   ApproveOrder,
   ClearOrders,

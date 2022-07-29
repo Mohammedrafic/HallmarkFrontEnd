@@ -71,6 +71,7 @@ import { DialogModule, TooltipModule } from '@syncfusion/ej2-angular-popups';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { OrderDetailsContainerComponent } from './order-management/order-details-container/order-details-container.component';
 import { OrderCandidatesContainerComponent } from './order-management/order-candidates-container/order-candidates-container.component';
+import { AgGridModule } from '@ag-grid-community/angular';
 import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
 import { SaveTemplateDialogModule } from '@client/order-management/save-template-dialog/save-template-dialog.module';
 import { CloseOrderModule } from '@client/order-management/close-order/close-order.module';
@@ -145,6 +146,7 @@ const gridIcons = {
     DropDownButtonModule,
     DialogModule,
     RadioButtonModule,
+    AgGridModule,
     AddEditReorderModule,
     SaveTemplateDialogModule,
     CloseOrderModule,
