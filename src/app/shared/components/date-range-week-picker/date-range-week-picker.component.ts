@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormControl } from '@angular/forms';
 
@@ -13,10 +13,12 @@ import { DateTimeHelper, Destroyable } from '@core/helpers';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DateWeekPickerComponent extends Destroyable implements OnInit {
-  @Input() dateControl: FormControl = new FormControl('');
+  @Output() range: EventEmitter<string[]> = new EventEmitter<string[]>();
+
+  public dateControl: FormControl = new FormControl('');
 
   public readonly maxDate = new Date(new Date().setHours(23, 59, 59));
-  
+
   constructor(
     private datePipe: DatePipe,
   ) {
@@ -40,8 +42,13 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit {
         .transform(this.maxDate, 'MM/dd/yyyy') ? to : DateTimeHelper.getLastDayOfWeek(to);
 
         this.dateControl.setValue([correctedStart, correctedEnd], { onlySelf: true, emitEvent: false });
+        this.range.emit([
+          DateTimeHelper.toUtcFormat(correctedStart),
+          DateTimeHelper.toUtcFormat(correctedEnd)
+        ]);
       } else {
-        this.dateControl.reset();
+        this.dateControl.reset(null, { onlySelf: true, emitEvent: false });
+        this.range.emit([]);
       }
     });
   }

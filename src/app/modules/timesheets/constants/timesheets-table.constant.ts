@@ -149,7 +149,7 @@ export const SavedFiltersParams: string[] = [
   'pageSize',
   'organizationId',
   'orderBy',
-  'date',
+  'dateTimeOffset',
   'searchTerm',
   'statusIds',
 ];
