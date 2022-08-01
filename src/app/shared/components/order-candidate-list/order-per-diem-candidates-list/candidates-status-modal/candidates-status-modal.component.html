@@ -17,7 +17,7 @@
             </h3>
           </div>
           <div class="e-card-content button-container">
-            <div class="input-group dropdown bootstrap" *ngIf="!isRejected && !isAgency && !isOnboard">
+            <div class="input-group dropdown bootstrap" *ngIf="showDropdown">
               <ejs-dropdownlist
                 [fields]="optionFields"
                 [dataSource]="nextApplicantStatuses"
