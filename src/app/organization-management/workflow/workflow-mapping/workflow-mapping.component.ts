@@ -10,7 +10,7 @@ import { Region } from '@shared/models/region.model';
 import { FieldSettingsModel, MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
 import { Skill } from '@shared/models/skill.model';
-import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { WorkflowState } from '../../store/workflow.state';
 import { Step, Workflow, WorkflowFilters, WorkflowWithDetails } from '@shared/models/workflow.model';
@@ -445,7 +445,7 @@ export class WorkflowMappingComponent extends AbstractGridConfigurationComponent
   public onCancelFormClick(): void {
     if (this.workflowMappingFormGroup.dirty) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT, {
+        .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'

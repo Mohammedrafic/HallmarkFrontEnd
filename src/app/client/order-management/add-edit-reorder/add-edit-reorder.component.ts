@@ -3,7 +3,7 @@ import uniq from 'lodash/fp/uniq';
 
 import { filter, first, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
-import { Actions, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -16,6 +16,9 @@ import { ReorderModel, ReorderRequestModel } from '@client/order-management/add-
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { startEndTimeValidator } from '@shared/validators/time.validator';
 import { shareReplay } from 'rxjs/operators';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 
 @Component({
   selector: 'app-add-edit-reorder',
@@ -43,7 +46,6 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public constructor(
     private formBuilder: FormBuilder,
     private store: Store,
-    private actions: Actions,
     private reorderService: AddEditReorderService
   ) {
     super();
@@ -145,6 +147,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       .addReorder(orderForRequest)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
+        this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED));
         this.saveEmitter.emit();
       });
   }

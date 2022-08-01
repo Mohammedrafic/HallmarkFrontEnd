@@ -11,7 +11,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { distinctUntilChanged, map, Observable, Subject, takeUntil } from 'rxjs';
+import { distinctUntilChanged, filter, map, Observable, Subject, takeUntil } from 'rxjs';
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
@@ -34,8 +34,10 @@ import { OrderStatus } from '@shared/enums/order-management';
 import { ApproveOrder, DeleteOrder, GetOrderById, SetLock } from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import {
+  CANCEL_CONFIRM_TEXT,
   CANCEL_ORDER_CONFIRM_TEXT,
   CANCEL_ORDER_CONFIRM_TITLE,
+  DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
 } from '@shared/constants';
@@ -232,9 +234,23 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public clearEditReOrder(): void {
-    this.closeReOrderEmitter.emit();
-    this.reOrderToEdit = null;
-    this.store.dispatch(new ShowSideDialog(false));
+    if (this.addEditReOrder.reorderForm.dirty) {
+      this.confirmService
+        .confirm(CANCEL_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button'
+        }).pipe(filter(confirm => !!confirm))
+        .subscribe(() => {
+          this.closeReOrderEmitter.emit();
+          this.reOrderToEdit = null;
+          this.store.dispatch(new ShowSideDialog(false));
+        });
+    } else {
+      this.closeReOrderEmitter.emit();
+      this.reOrderToEdit = null;
+      this.store.dispatch(new ShowSideDialog(false));
+    }
   }
 
   public closeOrder(order: Order): void {

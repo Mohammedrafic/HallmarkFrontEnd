@@ -9,7 +9,7 @@ import { SetDirtyState } from '../store/organization-management.actions';
 import { DeleteShift, DeleteShiftSucceeded, ExportShifts, GetShiftsByPage, SaveShift, SaveShiftSucceeded } from '../store/shifts.actions';
 import { ShiftsState } from '../store/shifts.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { Shift } from 'src/app/shared/models/shift.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowSideDialog } from 'src/app/store/app.actions';
@@ -187,7 +187,7 @@ export class ShiftsComponent extends AbstractGridConfigurationComponent implemen
   public closeDialog(): void {
     if (this.ShiftFormGroup.dirty) {
       this.confirmService
-      .confirm(CANCEL_COFIRM_TEXT, {
+      .confirm(CANCEL_CONFIRM_TEXT, {
         title: DELETE_CONFIRM_TITLE,
         okButtonLabel: 'Leave',
         okButtonClass: 'delete-button'
