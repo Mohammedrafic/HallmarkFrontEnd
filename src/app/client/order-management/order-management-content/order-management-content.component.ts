@@ -145,6 +145,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     { text: MoreMenuType[1], id: '1' },
     { text: MoreMenuType[2], id: '2' },
   ];
+
+  public moreMenu: ItemModel[] = [
+    { text: MoreMenuType[0], id: '0' },
+    { text: MoreMenuType[1], id: '1' },
+  ];
+
   public reOrdersMenu: ItemModel[] = [
     { text: MoreMenuType[0], id: '0' },
     { text: MoreMenuType[2], id: '2' },
@@ -1111,6 +1117,16 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       const [index] = this.gridWithChildRow.getSelectedRowIndexes();
       this.selectedIndex = index;
     });
+  }
+
+  public getMoreMenu(order: OrderManagement): ItemModel[] {
+    const orderStatuses = [OrderStatus.InProgressOfferAccepted, OrderStatus.Filled];
+    if (orderStatuses.includes(OrderStatus.InProgressOfferAccepted)) {
+      if (Boolean(order.children?.some((child) => orderStatuses.includes(child.orderStatus)))) {
+        return this.moreMenu;
+      }
+    }
+    return this.moreMenuWithCloseButton;
   }
 
   private handleDashboardFilters(): void {

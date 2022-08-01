@@ -45,7 +45,7 @@
                       <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
                     </section>
                     <hr />
-                    <ng-container *ngIf="currentOrder?.orderClosureReason">
+                    <ng-container *ngIf="currentOrder?.orderClosureReasonId">
                       <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
                       <hr />
                     </ng-container>

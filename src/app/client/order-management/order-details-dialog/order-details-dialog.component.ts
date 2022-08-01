@@ -123,7 +123,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       this.setCloseOrderButtonState();
       const order = changes['order']?.currentValue;
       const hasStatus = this.openInProgressFilledStatuses.includes(order.statusText.toLowerCase());
-      this.showCloseButton = hasStatus || (!hasStatus && order?.orderClosureReason);
+      this.showCloseButton = hasStatus || (!hasStatus && (order?.orderClosureReasonId || order?.orderCloseDate));
       if (this.chipList) {
         this.chipList.cssClass = this.chipsCssClass.transform(changes['order'].currentValue.statusText);
         this.chipList.text = changes['order'].currentValue.statusText.toUpperCase();

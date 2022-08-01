@@ -109,7 +109,7 @@
               [items]="
                 (data.orderCloseDate && closedOrderMenu) ||
                 (activeTab === OrganizationOrderManagementTabs.ReOrders && reOrdersMenu) ||
-                (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : moreMenuWithCloseButton)
+                (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : getMoreMenu(data))
               "
               (select)="menuOptionSelected($event, data)"
               cssClass="e-flat primary-icon-button"
