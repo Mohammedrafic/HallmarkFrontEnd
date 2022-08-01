@@ -22,7 +22,13 @@ export const BUSSINES_DATA_FIELDS = {
 export const usersFilterColumns: FilterColumnsModel = {
   firstName: { type: ControlTypes.Text, valueType: ValueType.Text },
   lastName: { type: ControlTypes.Text, valueType: ValueType.Text },
-  roleIds: { type: ControlTypes.Multiselect, valueType: ValueType.Text, dataSource: [] },
+  roleIds: {
+    type: ControlTypes.Multiselect,
+    valueType: ValueType.Id,
+    dataSource: [],
+    valueField: 'name',
+    valueId: 'id',
+  },
   status: {
     type: ControlTypes.Dropdown,
     valueType: ValueType.Text,

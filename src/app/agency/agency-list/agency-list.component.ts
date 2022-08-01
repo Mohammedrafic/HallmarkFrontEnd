@@ -143,7 +143,10 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
       new ExportAgencyList(
         new ExportPayload(
           fileType,
-          { ids: this.selectedItems.length ? this.selectedItems.map((val) => val.createUnder.id) : null },
+          {
+            ids: this.selectedItems.length ? this.selectedItems.map((val) => val.createUnder.id) : null,
+            ...this.filters
+          },
           options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
           null,
           options?.fileName || this.defaultFileName

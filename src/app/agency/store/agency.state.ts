@@ -56,6 +56,7 @@ import {
 } from './agency.actions';
 import { AdminStateModel } from '@admin/store/admin.state';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
+import { UserOrganizationsAgenciesChanged } from 'src/app/store/user.actions';
 
 export interface AgencyStateModel {
   isAgencyLoading: boolean;
@@ -177,7 +178,7 @@ export class AgencyState {
     return this.agencyService.saveAgency(payload).pipe(
       tap((agency) => {
         patchState({ isAgencyLoading: false, agency });
-        dispatch(new SaveAgencySucceeded(agency));
+        dispatch([new SaveAgencySucceeded(agency), new UserOrganizationsAgenciesChanged()]);
         if (payload.agencyDetails.id) {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
         } else {

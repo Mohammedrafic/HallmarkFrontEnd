@@ -47,6 +47,11 @@ export default class PriceUtils {
   }
 
   static formatNumbers(value: number | string | null): string {
-    return value ? parseFloat(value.toString()).toFixed(2) : '';
+    if (value) {
+      const updatedValue = parseFloat(value.toString()).toFixed(2);
+      return Math.trunc(+updatedValue) >= 10 ? updatedValue : `0${updatedValue}`;
+    }
+
+    return '';
   }
 }

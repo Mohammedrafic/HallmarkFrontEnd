@@ -1,8 +1,18 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, ofActionCompleted, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
-import { combineLatest, debounceTime, filter, Observable, Subject, Subscription, takeUntil, throttleTime } from 'rxjs';
+import {
+  combineLatest,
+  debounceTime,
+  filter,
+  first,
+  Observable,
+  Subject,
+  Subscription,
+  takeUntil,
+  throttleTime,
+} from 'rxjs';
 import {
   SetHeaderState,
   ShowCloseOrderDialog,
@@ -81,12 +91,12 @@ import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { SearchComponent } from '@shared/components/search/search.component';
 import { OrderStatus } from '@shared/enums/order-management';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
-import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
 import { TabNavigationComponent } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
 import { OrderDetailsDialogComponent } from '@client/order-management/order-details-dialog/order-details-dialog.component';
 import isNil from 'lodash/fp/isNil';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { isArray } from 'lodash';
+import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 
 @Component({
@@ -120,8 +130,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   skills$: Observable<Skill[]>;
 
   @Select(DashboardState.filteredItems) private readonly filteredItems$: Observable<FilteredItem[]>;
-  @Select(DashboardState.dashboardFiltersState)
-  private readonly dashboardFiltersState$: Observable<DashboardFiltersModel>;
 
   public activeTab: OrganizationOrderManagementTabs = OrganizationOrderManagementTabs.AllOrders;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
@@ -319,7 +327,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onAddReorderClose(): void {
-    this.clearSelection(this.gridWithChildRow);
+    if (
+      this.activeTab === OrganizationOrderManagementTabs.AllOrders ||
+      this.activeTab === OrganizationOrderManagementTabs.PerDiem
+    ) {
+      this.clearSelection(this.gridWithChildRow);
+    }
   }
 
   public createReorder(data: any): void {
@@ -695,6 +708,15 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.gridWithChildRow?.clearRowSelection();
     this.selectedIndex = null;
     this.store.dispatch(new GetOrderById(reOrder.id, order.organizationId));
+    this.store.dispatch(
+      new GetAgencyOrderCandidatesList(
+        reOrder.id,
+        reOrder.organizationId,
+        1,
+        30,
+        this.orderManagementService.excludeDeployed
+      )
+    );
     this.selectedDataRow = order as any;
     this.openDetails.next(true);
   }
@@ -784,7 +806,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public editOrder(data: OrderManagement): void {
     if (!isNil(data.reOrderFromId) && data.reOrderFromId !== 0) {
-      this.store.dispatch([new ShowSideDialog(true), new GetOrderById(data.id, data.organizationId, {} as any)]);
+      this.store.dispatch(new GetOrderById(data.id, data.organizationId, {} as any));
+      this.actions$
+        .pipe(first(), ofActionCompleted(GetOrderById))
+        .subscribe(() => this.store.dispatch(new ShowSideDialog(true)));
     } else {
       this.router.navigate(['./edit', data.id], { relativeTo: this.route });
     }
@@ -1103,21 +1128,27 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private applyDashboardFilters(): void {
-    combineLatest([this.dashboardFiltersState$, this.filteredItems$])
+    combineLatest([this.organizationId$, this.filteredItems$])
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(([filters, items]) => {
-        this.filters = filters;
-        this.filteredItems = items;
+      .subscribe(([organizationId, items]) => {
+        this.filteredItems = items.filter((item: FilteredItem) => (item.organizationId === organizationId && item.column !== FilterColumnTypeEnum.ORGANIZATION) || item.column === FilterColumnTypeEnum.SKILL);
+
+        this.filteredItems.forEach((item: FilteredItem) => {
+          const filterKey = item.column as keyof OrderFilter;
+          if (filterKey in this.filters) {
+            (this.filters[filterKey] as number[]).push(item.value);
+          } else {
+            (this.filters[filterKey] as number[]) = [item.value];
+          }
+        });
       });
   }
 
   private setFilterState(): void {
-    combineLatest([this.filteredItems$, this.organizationStructure$])
-      .pipe(
+    this.organizationStructure$.pipe(
         takeUntil(this.unsubscribe$),
-        filter(([items, orgs]) => !!orgs && items.length > 0)
-      )
-      .subscribe(() => {
+        filter((orgs) => !!orgs)
+      ).subscribe(() => {
         Object.entries(this.filters).forEach(([key, value]) => {
           this.OrderFilterFormGroup.get(key)?.setValue(value);
         });

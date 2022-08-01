@@ -1,16 +1,15 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation, ChangeDetectionStrategy, ViewContainerRef, TemplateRef } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
 import { BreakpointObserver, BreakpointState } from '@angular/cdk/layout';
 
 import { Select, Store } from '@ngxs/store';
 import type { PanelModel, DashboardLayoutComponent } from '@syncfusion/ej2-angular-layouts';
-import { Observable, takeUntil, startWith, distinctUntilChanged, switchMap, combineLatest, map, filter } from 'rxjs';
+import { Observable, takeUntil, distinctUntilChanged, switchMap, combineLatest, map, filter, BehaviorSubject } from 'rxjs';
 import isEqual from 'lodash/fp/isEqual';
 import lodashMap from 'lodash/fp/map';
 
 import { SetHeaderState } from '../store/app.actions';
 import { DashboardService } from './services/dashboard.service';
-import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile } from './store/dashboard.actions';
+import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile, GetAllSkills } from './store/dashboard.actions';
 import { DashboardState, DashboardStateModel } from './store/dashboard.state';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { WidgetDataDependenciesAggregatedModel } from './models/widget-data-dependencies-aggregated.model';
@@ -24,10 +23,18 @@ import { DashboardWidgetsComponent } from './dashboard-widgets/dashboard-widgets
 import type { WidgetsDataModel } from './models/widgets-data.model';
 import { GetCurrentUserPermissions } from '../store/user.actions';
 import { CurrentUserPermission } from '@shared/models/permission.model';
-import { GetAllOrganizationSkills } from '@organization-management/store/organization-management.actions';
-import { DashboardFiltersModel } from './models/dashboard-filters.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { WIDGET_PERMISSION_TYPES } from './constants/widget-permissions-types';
+import { SecurityState } from '../security/store/security.state';
+import { GetOrganizationsStructureAll } from '../security/store/security.actions';
+import { Skill } from '@shared/models/skill.model';
+import { FilteredDataByOrganizationId } from './models/group-by-organization-filter-data.model';
+import { OrganizationStructure } from '@shared/models/organization.model';
+import { FilterColumnTypeEnum } from './enums/dashboard-filter-fields.enum';
+import { FilteredItem } from '@shared/models/filter.model';
+import { DashboartFilterDto } from './models/dashboard-filter-dto.model';
+import { User } from '@shared/models/user.model';
+import { AllOrganizationsSkill } from './models/all-organization-skill.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -47,26 +54,29 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   @Select(DashboardState.widgets) public readonly widgets$: Observable<DashboardStateModel['widgets']>;
   @Select(DashboardState.isDashboardLoading) public readonly isLoading$: Observable<DashboardStateModel['isDashboardLoading']>;
   @Select(DashboardState.isMobile) private readonly isMobile$: Observable<DashboardStateModel['isMobile']>;
-  @Select(DashboardState.dashboardFiltersState) private readonly dashboardFiltersState$: Observable<DashboardFiltersModel>;
   @Select(DashboardState.getTimeSelection) public readonly timeSelection$: Observable<DashboardStateModel['positionTrendTimeSelection']>
+  @Select(DashboardState.filteredItems) public readonly fileredItem$: Observable<DashboardStateModel['filteredItems']>;
+  @Select(DashboardState.getAllOrganizationSkills) public readonly allOrganizationsSkills$: Observable<AllOrganizationsSkill[]>;
 
-  @Select(UserState.lastSelectedOrganizationId) private readonly organizationId$: Observable<UserStateModel['lastSelectedOrganizationId']>;
   @Select(UserState.lastSelectedOrganizationAgency) private readonly lastSelectedOrganizationAgency$: Observable<string>;
   @Select(UserState.currentUserPermissions) private readonly currentUserPermissions$: Observable<CurrentUserPermission[]>;
+  @Select(UserState.organizationStructure) public readonly organizationStructure$: Observable<OrganizationStructure>;
+  @Select(UserState.user) public readonly user$: Observable<User | null>;
+
+  @Select(SecurityState.organisations) public readonly allOrganizations$: Observable<UserStateModel['organizations']>;
 
   private panelsAreDragged = false;
+  private readonly filterData$: BehaviorSubject<DashboartFilterDto> = new BehaviorSubject<DashboartFilterDto>({organizationFilter: []});
+  public readonly userIsAdmin$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public hasWidgetPermission: boolean = true;
   public hasOrderManagePermission: boolean = true;
 
   public widgetsData$: Observable<WidgetsDataModel>;
   public isOrganization$: Observable<boolean>;
 
-  public readonly filtersGroup: FormGroup = this.getFiltersGroup();
-
   constructor(
     private readonly store: Store,
     private readonly dashboardService: DashboardService,
-    private readonly formBuilder: FormBuilder,
     private readonly breakpointObserver: BreakpointObserver
   ) {
     super();
@@ -74,11 +84,25 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   public ngOnInit(): void {
+    this.getAdminOrganizationsStructureAll();
     this.isUserOrganization();
-    this.initOrganizationChangeListener();
     this.getCurrentUserPermissions();
     this.subscribeOnPermissions();
     this.getDashboardFilterState();
+    this.setWidgetsData();
+    this.store.dispatch(new GetDashboardData());
+    this.store.dispatch(new GetAllSkills());
+  }
+
+  private getAdminOrganizationsStructureAll(): void {
+    this.user$.pipe(takeUntil(this.destroy$), filter(Boolean)).subscribe((user: User) => {
+      const userIsAdmin = user.businessUnitType === BusinessUnitType.MSP || user.businessUnitType === BusinessUnitType.Hallmark;
+      this.userIsAdmin$.next(userIsAdmin);
+
+      if (user && userIsAdmin) {
+        this.store.dispatch(new GetOrganizationsStructureAll(user.id));
+      }
+    });
   }
 
   private getCurrentUserPermissions(): void {
@@ -173,36 +197,12 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
     this.panelsAreDragged = true;
   }
 
-  private getFiltersGroup(): FormGroup {
-    return this.formBuilder.group({
-      regionIds: [],
-      locationIds: [],
-      departmentsIds: [],
-      skillIds: [],
-    });
-  }
-
-  private initOrganizationChangeListener(): void {
-    combineLatest([this.organizationId$, this.isOrganization$])
-      .pipe(
-        filter(([organizationId, isOrganization]: [number | null, boolean]) => !!organizationId && isOrganization),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(() => {
-        this.resetDashboardState();
-        this.setWidgetsData();
-        this.store.dispatch(new GetDashboardData());
-        this.store.dispatch(new GetAllOrganizationSkills());
-      });
-  }
-
   private setWidgetsData(): void {
-    const formChanges$ = this.filtersGroup.valueChanges.pipe(startWith(this.filtersGroup.value));
     const panels$ = this.getPanels$();
 
-    this.widgetsData$ = combineLatest([panels$, formChanges$, this.timeSelection$]).pipe(
+    this.widgetsData$ = combineLatest([panels$, this.filterData$, this.timeSelection$]).pipe(
       distinctUntilChanged(
-        (previous: WidgetDataDependenciesAggregatedModel, current: WidgetDataDependenciesAggregatedModel) =>
+        (previous, current) =>
           isEqual(previous, current)
       ),
       switchMap((data: WidgetDataDependenciesAggregatedModel) => this.dashboardService.getWidgetsAggregatedData(data))
@@ -255,9 +255,45 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   }
 
   private getDashboardFilterState(): void {
-    this.dashboardFiltersState$.pipe(takeUntil(this.destroy$)).subscribe((filters: DashboardFiltersModel) => {
-      this.filtersGroup.reset();
-      Object.entries(this.filtersGroup.controls).forEach(([field, control]) => control.setValue(filters[field as keyof DashboardFiltersModel] || []));
-    });
+    combineLatest([this.fileredItem$, this.userIsAdmin$, this.organizationStructure$]).pipe(
+        distinctUntilChanged((previous, current) => isEqual(previous, current)),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(([filteredItems, userIsAdmin, orgStructure]) => {
+        if (userIsAdmin) {
+          const organizationFilter: FilteredDataByOrganizationId[] = filteredItems
+            .filter((item) => item.column === FilterColumnTypeEnum.ORGANIZATION)
+            .map((item) => new FilteredDataByOrganizationId(item.value));
+
+          this.groupFilterDataByOrganization(filteredItems, organizationFilter);
+
+        } else {
+          if(!orgStructure) return;
+          const organizationFilter: FilteredDataByOrganizationId[] = [new FilteredDataByOrganizationId(orgStructure.organizationId)];
+          this.groupFilterDataByOrganization(filteredItems, organizationFilter);
+        }
+      });
+  }
+
+  private groupFilterDataByOrganization(filteredItems: FilteredItem[], organizationFilter: FilteredDataByOrganizationId[]) {
+    const skillIds: Skill[] = [];
+
+    filteredItems.forEach((item) => {
+      if(item.column === FilterColumnTypeEnum.ORGANIZATION) return;
+
+      if(item.column === FilterColumnTypeEnum.SKILL) {
+        skillIds.push(item.value);
+        return;
+      }
+
+      if (item.organizationId) {
+        const organization = organizationFilter.find((organization) => organization.organizationId === item.organizationId);
+        organization && (organization[item.column as keyof FilteredDataByOrganizationId] as number[]).push(item.value);
+        return;
+      }
+
+      (organizationFilter[0][item.column as keyof FilteredDataByOrganizationId] as number[]).push(item.value);
+    })
+    this.filterData$.next({ organizationFilter, skillIds });
   }
 }

@@ -35,6 +35,7 @@ import {
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import PriceUtils from '@shared/utils/price.utils';
 
 const hideAcceptActionForStatuses: CandidatStatus[] = [
   CandidatStatus.OnBoard,
@@ -210,12 +211,17 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       openPositions,
     },
     candidateBillRate,
+    offeredBillRate,
   }: OrderCandidateJob) {
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
+    const isBillRatePending =
+      this.orderCandidateJob.applicantStatus.applicantStatus === CandidatStatus.BillRatePending
+        ? candidateBillRate
+        : offeredBillRate;
     this.acceptForm.patchValue({
       reOrderFromId,
-      offeredBillRate: hourlyRate,
-      candidateBillRate: candidateBillRateValue,
+      offeredBillRate: PriceUtils.formatNumbers(hourlyRate),
+      candidateBillRate: PriceUtils.formatNumbers(candidateBillRateValue),
       locationName,
       departmentName,
       skillName,
@@ -223,7 +229,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       shiftStartTime,
       shiftEndTime,
       openPositions,
-      hourlyRate: candidateBillRateValue,
+      hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
     });
     this.enableFields();
   }
@@ -306,8 +312,10 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
           tap((value: number) => {
             if (this.hourlyRate?.valid) {
               this.jobStatus$.next(
-                this.orderCandidateJob.candidateBillRate === value ? ReOrderBillRate : ReOrderOfferedBillRate
+                this.orderCandidateJob.candidateBillRate === +value ? ReOrderBillRate : ReOrderOfferedBillRate
               );
+            } else {
+              this.jobStatus$.next(ReOrderBillRate);
             }
           })
         )
