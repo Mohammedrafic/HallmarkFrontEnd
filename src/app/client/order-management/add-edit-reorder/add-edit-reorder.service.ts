@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { AppState } from '../../../store/app.state';
 import { AgencyModel, CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
 import { ReorderRequestModel } from '@client/order-management/add-edit-reorder/models/reorder.model';
+import { getTimeFromDate, setTimeToDate } from '@shared/utils/date-time.utils';
 
 @Injectable({
   providedIn: 'root',
@@ -38,7 +39,18 @@ export class AddEditReorderService {
     }
   }
 
-  public addReorder(reorder: ReorderRequestModel): Observable<void> {
-    return this.http.put<void>('/api/reorders', reorder);
+  public saveReorder({ reOrderId, reOrderFromId, agencyIds, reorder }: ReorderRequestModel): Observable<void> {
+    const prepareFields = {
+      reOrderId,
+      reOrderFromId,
+      agencyIds,
+      candidateProfileIds: reorder.candidates,
+      reorderDate: reorder.reorderDate,
+      shiftEndTime: setTimeToDate(getTimeFromDate(reorder.shiftEndTime)),
+      shiftStartTime: setTimeToDate(getTimeFromDate(reorder.shiftStartTime)),
+      billRate: reorder.billRate,
+      openPositions: reorder.openPosition,
+    };
+    return this.http.put<void>('/api/reorders', prepareFields);
   }
 }

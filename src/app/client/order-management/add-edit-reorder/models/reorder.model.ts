@@ -10,6 +10,7 @@ export interface ReorderModel {
 }
 
 export interface ReorderRequestModel {
+  reorder: ReorderModel;
   reOrderId: number;
   reOrderFromId: number;
   candidateProfileIds: number[];

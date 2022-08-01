@@ -14,3 +14,23 @@ export const toCorrectTimezoneFormat = (value: Date | string): any => {
   const differentBetweenTimezone = new Date().getTimezoneOffset() * -1;
   return new Date(valueDate.getTime() + differentBetweenTimezone * 60000);
 };
+
+export const getTimeFromDate = (date: Date): string | null => {
+  if (!date) {
+    return null;
+  }
+
+  return new Date(date).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
+export const setTimeToDate = (time: string | null): Date | null => {
+  if (!time) {
+    return null;
+  }
+
+  const todayDate = new Date().toLocaleDateString('en-US');
+  return new Date(`${todayDate} ${time}`);
+};
