@@ -23,7 +23,6 @@ import { DashboardWidgetsComponent } from './dashboard-widgets/dashboard-widgets
 import type { WidgetsDataModel } from './models/widgets-data.model';
 import { GetCurrentUserPermissions } from '../store/user.actions';
 import { CurrentUserPermission } from '@shared/models/permission.model';
-import { DashboardFiltersModel } from './models/dashboard-filters.model';
 import { PermissionTypes } from '@shared/enums/permissions-types.enum';
 import { WIDGET_PERMISSION_TYPES } from './constants/widget-permissions-types';
 import { SecurityState } from '../security/store/security.state';
@@ -35,6 +34,7 @@ import { FilterColumnTypeEnum } from './enums/dashboard-filter-fields.enum';
 import { FilteredItem } from '@shared/models/filter.model';
 import { DashboartFilterDto } from './models/dashboard-filter-dto.model';
 import { User } from '@shared/models/user.model';
+import { AllOrganizationsSkill } from './models/all-organization-skill.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -54,10 +54,9 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   @Select(DashboardState.widgets) public readonly widgets$: Observable<DashboardStateModel['widgets']>;
   @Select(DashboardState.isDashboardLoading) public readonly isLoading$: Observable<DashboardStateModel['isDashboardLoading']>;
   @Select(DashboardState.isMobile) private readonly isMobile$: Observable<DashboardStateModel['isMobile']>;
-  @Select(DashboardState.dashboardFiltersState) public readonly dashboardFiltersState$: Observable<DashboardFiltersModel>;
   @Select(DashboardState.getTimeSelection) public readonly timeSelection$: Observable<DashboardStateModel['positionTrendTimeSelection']>
   @Select(DashboardState.filteredItems) public readonly fileredItem$: Observable<DashboardStateModel['filteredItems']>;
-  @Select(DashboardState.getAllSkills) public readonly skills$: Observable<Skill[]>;
+  @Select(DashboardState.getAllOrganizationSkills) public readonly allOrganizationsSkills$: Observable<AllOrganizationsSkill[]>;
 
   @Select(UserState.lastSelectedOrganizationAgency) private readonly lastSelectedOrganizationAgency$: Observable<string>;
   @Select(UserState.currentUserPermissions) private readonly currentUserPermissions$: Observable<CurrentUserPermission[]>;
@@ -287,8 +286,8 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
         return;
       }
 
-      if (item.organizationsId) {
-        const organization = organizationFilter.find((organization) => organization.organizationId === item.organizationsId);
+      if (item.organizationId) {
+        const organization = organizationFilter.find((organization) => organization.organizationId === item.organizationId);
         organization && (organization[item.column as keyof FilteredDataByOrganizationId] as number[]).push(item.value);
         return;
       }

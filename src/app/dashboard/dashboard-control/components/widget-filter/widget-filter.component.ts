@@ -8,16 +8,16 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { Skill } from '@shared/models/skill.model';
 import { FilterService } from '@shared/services/filter.service';
 import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
 import { IFilterColumnsDataModel } from 'src/app/dashboard/models/widget-filter.model';
-import { SetDashboardFiltersState, SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
+import { SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState, UserStateModel } from 'src/app/store/user.state';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
+import { AllOrganizationsSkill } from 'src/app/dashboard/models/all-organization-skill.model';
 
 
 @Component({
@@ -33,7 +33,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   @Input() public savedFilterItems: FilteredItem[];
   @Input() public dashboardFilterState: DashboardFiltersModel;
   @Input() public organizationStructure: OrganizationStructure;
-  @Input() public allSkills: Skill[];
+  @Input() public allSkills: AllOrganizationsSkill[];
 
   @Select(UserState.organizationStructure) private readonly organizationStructure$: Observable<OrganizationStructure>;
 
@@ -91,7 +91,6 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   public ngOnInit(): void {
     this.isFilterDialogOpened();
-    this.getFilterState();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -141,23 +140,17 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     this.filters = this.widgetFilterFormGroup.getRawValue();
     this.filteredItems = [];
     this.saveFilteredItems(this.filteredItems);
-    this.saveDashboardState(this.filters);
   }
 
   public onFilterApply(): void {
     this.filters = this.widgetFilterFormGroup.getRawValue();
     this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
     this.saveFilteredItems(this.filteredItems);
-    this.saveDashboardState(this.filters);
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
   private saveFilteredItems(items: FilteredItem[]): void {
     this.store.dispatch(new SetFilteredItems(items));
-  }
-
-  private saveDashboardState(filters: DashboardFiltersModel): void {
-    this.store.dispatch(new SetDashboardFiltersState(filters));
   }
 
   private initForm(): void {
@@ -273,17 +266,16 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
         this.savedFilterItems.forEach((item: FilteredItem) => {
           const filterKey = item.column as keyof DashboardFiltersModel;
           if (filterKey in this.filters) {
-            this.filters[filterKey]?.push(item.value);
+            this.filters[filterKey].push(item.value);
           } else {
             this.filters[filterKey] = [item.value];
           }
         });
-        this.saveDashboardState(this.filters);
   }
 
   private setFormControlValue(): void {
     const formControls = Object.entries(this.widgetFilterFormGroup.controls);
-    formControls.forEach(([field, control]) => control.setValue(this.dashboardFilterState[field as keyof DashboardFiltersModel] || []));
+    formControls.forEach(([field, control]) => control.setValue(this.filters[field as keyof DashboardFiltersModel] || []));
   }
 
   public setFilterState(): void {

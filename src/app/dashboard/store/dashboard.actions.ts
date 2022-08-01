@@ -33,11 +33,6 @@ export class SetFilteredItems {
   constructor(public payload: FilteredItem[]) {}
 }
 
-export class SetDashboardFiltersState {
-  static readonly type = `${dashboardStatePrefix} Set Dashboard Filter State`;
-  constructor(public payload: DashboardFiltersModel) {}
-}
-
 export class SwitchMonthWeekTimeSelection {
   static readonly type = `${dashboardStatePrefix} Switch Month Week Time Selection`;
   constructor(public payload: TimeSelectionEnum) {}
