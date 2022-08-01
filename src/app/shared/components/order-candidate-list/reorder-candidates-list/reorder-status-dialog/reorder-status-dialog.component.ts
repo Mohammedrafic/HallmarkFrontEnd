@@ -211,8 +211,13 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       openPositions,
     },
     candidateBillRate,
+    offeredBillRate,
   }: OrderCandidateJob) {
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
+    const isBillRatePending =
+      this.orderCandidateJob.applicantStatus.applicantStatus === CandidatStatus.BillRatePending
+        ? candidateBillRate
+        : offeredBillRate;
     this.acceptForm.patchValue({
       reOrderFromId,
       offeredBillRate: PriceUtils.formatNumbers(hourlyRate),
@@ -224,7 +229,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       shiftStartTime,
       shiftEndTime,
       openPositions,
-      hourlyRate: PriceUtils.formatNumbers(candidateBillRateValue),
+      hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
     });
     this.enableFields();
   }
@@ -307,7 +312,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
           tap((value: number) => {
             if (this.hourlyRate?.valid) {
               this.jobStatus$.next(
-                this.orderCandidateJob.candidateBillRate === value ? ReOrderBillRate : ReOrderOfferedBillRate
+                this.orderCandidateJob.candidateBillRate === +value ? ReOrderBillRate : ReOrderOfferedBillRate
               );
             } else {
               this.jobStatus$.next(ReOrderBillRate);
