@@ -4,11 +4,9 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  EventEmitter,
   Input,
   OnChanges,
   OnDestroy,
-  Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
@@ -19,7 +17,7 @@ import { DeleteEventArgs } from '@syncfusion/ej2-angular-buttons';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { FilteredItem } from '@shared/models/filter.model';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
+import { OrganizationRegion } from '@shared/models/organization.model';
 import { ResizeObserverModel, ResizeObserverService } from '@shared/services/resize-observer.service';
 import { FilterKeys } from 'src/app/dashboard/constants/filter-keys';
 import { DashboardFiltersModel, FilterName } from 'src/app/dashboard/models/dashboard-filters.model';
@@ -37,13 +35,10 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
   @Input() public filterState: DashboardFiltersModel;
   @Input() public allRegions: OrganizationRegion[];
 
-  @Output() private filterModified: EventEmitter<boolean> = new EventEmitter();
-
   @ViewChild('resize', { static: true }) private resizeContainer: ElementRef<HTMLElement>;
 
   private filteredItems: FilteredItem[];
-  private regions: OrganizationRegion[] = [];
-  private resizeObserver: ResizeObserverModel | null;
+  private resizeObserver: ResizeObserverModel;
 
   public appliedFilters: Record<FilterName, FilteredItem[]>;
   public isCollapsed: boolean = false;
@@ -54,7 +49,7 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
     super();
   }
 
-  ngAfterViewInit(): void {
+  public ngAfterViewInit(): void {
     this.resizeObserver = ResizeObserverService.init(this.resizeContainer.nativeElement);
     this.resizeObserver.resize$.subscribe((data) => {
       const lastElementPosition = data[0].target.lastElementChild?.getBoundingClientRect().top;
@@ -68,61 +63,34 @@ export class FilterChipListComponent extends DestroyableDirective implements Aft
     });
   }
 
-  onCollapseExpandList(): void {
+  public onCollapseExpandList(): void {
     this.isCollapsed = !this.isCollapsed;
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  public ngOnChanges(changes: SimpleChanges): void {
     changes['items'] && this.toPutInOrderFilters(this.items);
-    this.regions = this.allRegions;
   }
 
   public deleteChip(event: DeleteEventArgs): void {
-    if (!this.filteredItems) return;
-
     const filteredItem = event.data as FilteredItem;
+    this.cdr.markForCheck();
 
-    if (filteredItem.column === FilterColumnTypeEnum.REGION) {
-      const regions = this.regions.filter((region: OrganizationRegion) => region.id === filteredItem.value);
-
-      regions.forEach((region: OrganizationRegion) => {
-        if (region.id && region.id === filteredItem.value) {
-          this.manageDashboardFilter(FilterColumnTypeEnum.REGION, region.id);
-
-          region.locations?.forEach((location: OrganizationLocation) => {
-            this.manageDashboardFilter(FilterColumnTypeEnum.LOCATION, location.id);
-
-            location.departments.forEach((department: OrganizationDepartment) => {
-              this.manageDashboardFilter(FilterColumnTypeEnum.DEPARTMENT, department.id);
-            });
-          });
-        }
-      });
+    if (filteredItem.column === FilterColumnTypeEnum.ORGANIZATION) {
+      this.filteredItems = this.filteredItems.filter((item) => item.organizationId !== filteredItem.organizationId);
+    } else if (filteredItem.column === FilterColumnTypeEnum.REGION) {
+      this.filteredItems = this.filteredItems.filter(
+        (item) => !(item.organizationId === filteredItem.organizationId && item.regionId === filteredItem.regionId));
     } else if (filteredItem.column === FilterColumnTypeEnum.LOCATION) {
-      const region = this.regions.find((region) => region.locations?.find((location: OrganizationLocation) => location.id === filteredItem.value));
-      const location = region?.locations?.find((location: OrganizationLocation) => location.id === filteredItem.value);
-      this.manageDashboardFilter(FilterColumnTypeEnum.LOCATION, location.id);
-
-      location.departments.forEach((department: OrganizationDepartment) =>
-        this.manageDashboardFilter(FilterColumnTypeEnum.DEPARTMENT, department.id)
-      );
+      this.filteredItems = this.filteredItems.filter(
+        (item) => !(item.organizationId === filteredItem.organizationId && item.locationId === filteredItem.locationId));
     } else {
-      this.filteredItems = this.filteredItems.filter((filter: FilteredItem) => !isEqual(filter, event.data));
+      this.filteredItems = this.filteredItems.filter((filterItem: FilteredItem) => !isEqual(filterItem, filteredItem));
     }
     this.store.dispatch(new SetFilteredItems(this.filteredItems));
-    this.filterModified.emit(true);
-  }
-
-  private manageDashboardFilter(column: FilterColumnTypeEnum, id: number): void {
-    if (this.filterState[column]?.includes(id)) {
-      const filteredItem = this.filteredItems.find((item) => item.column === column && item.value === id);
-      this.filteredItems = this.filteredItems.filter((item) => !isEqual(item, filteredItem));
-    }
   }
 
   public onClearFilters(): void {
     this.store.dispatch(new SetFilteredItems([]));
-    this.filterModified.emit(true);
   }
 
   private toPutInOrderFilters(filters: FilteredItem[]): void {

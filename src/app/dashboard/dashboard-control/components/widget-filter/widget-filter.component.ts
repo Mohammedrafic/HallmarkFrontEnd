@@ -62,7 +62,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   }
 
   get organization(): number {
-    return this.widgetFilterFormGroup.get('organizationIds')?.value?.length;
+    return this.widgetFilterFormGroup.get(FilterColumnTypeEnum.ORGANIZATION)?.value?.length;
   }
 
   get region(): number {
@@ -91,7 +91,6 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   public ngOnInit(): void {
     this.isFilterDialogOpened();
-    this.getFilterState();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -242,7 +241,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
       }
     });
 
-    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.DEPARTMENT)?.valueChanges.subscribe((val: number[]) => this.cdr.markForCheck());
+    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.DEPARTMENT)?.valueChanges.subscribe(() => this.cdr.markForCheck());
 
     this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.valueChanges.subscribe(() => this.cdr.markForCheck());
   }
@@ -273,7 +272,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
         this.savedFilterItems.forEach((item: FilteredItem) => {
           const filterKey = item.column as keyof DashboardFiltersModel;
           if (filterKey in this.filters) {
-            this.filters[filterKey]?.push(item.value);
+            this.filters[filterKey].push(item.value);
           } else {
             this.filters[filterKey] = [item.value];
           }

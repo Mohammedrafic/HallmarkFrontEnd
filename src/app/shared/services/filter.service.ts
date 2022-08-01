@@ -55,7 +55,9 @@ export class FilterService {
                     : item,
                 column: key,
                 value: item,
-                organizationsId: filteredItem.organizationsId
+                organizationId: filteredItem?.organizationId || null,
+                regionId: filteredItem?.regionId || null,
+                locationId: filteredItem?.locationId || null,
               });
             });
             break;
