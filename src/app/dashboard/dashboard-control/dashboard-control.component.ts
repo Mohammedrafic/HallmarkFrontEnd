@@ -28,7 +28,6 @@ export class DashboardControlComponent extends DestroyableDirective {
   @Input() public selectedWidgets: WidgetTypeEnum[] | null;
   @Input() public widgets: WidgetOptionModel[] | null;
   @Input() public hasOrderManagePermission: boolean;
-  @Input() public dashboardFiltersState: DashboardFiltersModel;
   @Input() public hasWidgetPermission: boolean;
   @Input() public allOrganizations: Organisation[];
   @Input() public userIsAdmin: boolean;

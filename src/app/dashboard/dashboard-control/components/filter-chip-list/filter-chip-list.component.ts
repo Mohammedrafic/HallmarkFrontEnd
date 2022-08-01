@@ -32,7 +32,6 @@ import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-f
 })
 export class FilterChipListComponent extends DestroyableDirective implements AfterViewInit, OnChanges, OnDestroy {
   @Input() public items: FilteredItem[];
-  @Input() public filterState: DashboardFiltersModel;
   @Input() public allRegions: OrganizationRegion[];
 
   @ViewChild('resize', { static: true }) private resizeContainer: ElementRef<HTMLElement>;

@@ -12,7 +12,7 @@ import { Skill } from '@shared/models/skill.model';
 import { FilterService } from '@shared/services/filter.service';
 import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
 import { IFilterColumnsDataModel } from 'src/app/dashboard/models/widget-filter.model';
-import { SetDashboardFiltersState, SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
+import { SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { UserState, UserStateModel } from 'src/app/store/user.state';
 import { Organisation } from '@shared/models/visibility-settings.model';
@@ -140,23 +140,17 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     this.filters = this.widgetFilterFormGroup.getRawValue();
     this.filteredItems = [];
     this.saveFilteredItems(this.filteredItems);
-    this.saveDashboardState(this.filters);
   }
 
   public onFilterApply(): void {
     this.filters = this.widgetFilterFormGroup.getRawValue();
     this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
     this.saveFilteredItems(this.filteredItems);
-    this.saveDashboardState(this.filters);
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
   private saveFilteredItems(items: FilteredItem[]): void {
     this.store.dispatch(new SetFilteredItems(items));
-  }
-
-  private saveDashboardState(filters: DashboardFiltersModel): void {
-    this.store.dispatch(new SetDashboardFiltersState(filters));
   }
 
   private initForm(): void {
@@ -277,12 +271,11 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
             this.filters[filterKey] = [item.value];
           }
         });
-        this.saveDashboardState(this.filters);
   }
 
   private setFormControlValue(): void {
     const formControls = Object.entries(this.widgetFilterFormGroup.controls);
-    formControls.forEach(([field, control]) => control.setValue(this.dashboardFilterState[field as keyof DashboardFiltersModel] || []));
+    formControls.forEach(([field, control]) => control.setValue(this.filters[field as keyof DashboardFiltersModel] || []));
   }
 
   public setFilterState(): void {

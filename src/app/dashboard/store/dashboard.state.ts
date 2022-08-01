@@ -6,14 +6,13 @@ import { Observable, tap } from 'rxjs';
 import lodashMap from 'lodash/fp/map';
 
 import { DashboardService } from '../services/dashboard.service';
-import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile, SetFilteredItems, SetDashboardFiltersState, SwitchMonthWeekTimeSelection, GetAllSkills } from './dashboard.actions';
+import { GetDashboardData, SetPanels, SaveDashboard, ResetState, IsMobile, SetFilteredItems, SwitchMonthWeekTimeSelection, GetAllSkills } from './dashboard.actions';
 import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
 import { DashboardDataModel } from '../models/dashboard-data.model';
 import { widgetTypeToConfigurationMapper } from '../constants/widget-type-to-configuration-mapper';
 import { FilteredItem } from '@shared/models/filter.model';
 import { DASHBOARD_FILTER_STATE, TIME_SELECTION_OF_CHART_LINE } from '@shared/constants';
-import { DashboardFiltersModel } from '../models/dashboard-filters.model';
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
 import { Skill } from '@shared/models/skill.model';
 
@@ -23,7 +22,6 @@ export interface DashboardStateModel {
   widgets: WidgetOptionModel[];
   isMobile: boolean;
   filteredItems: FilteredItem[];
-  dashboardFilterState: DashboardFiltersModel;
   positionTrendTimeSelection: TimeSelectionEnum;
   skills: Skill[];
 }
@@ -36,7 +34,6 @@ export interface DashboardStateModel {
     widgets: [],
     isMobile: false,
     filteredItems: JSON.parse(window.localStorage.getItem(DASHBOARD_FILTER_STATE) as string) || [],
-    dashboardFilterState: {} as DashboardFiltersModel,
     positionTrendTimeSelection: JSON.parse(window.localStorage.getItem(TIME_SELECTION_OF_CHART_LINE) as string) || TimeSelectionEnum.Monthly,
     skills: [],
   },
@@ -71,11 +68,6 @@ export class DashboardState {
   @Selector()
   static filteredItems(state: DashboardStateModel): DashboardStateModel['filteredItems'] {
     return state.filteredItems;
-  }
-
-  @Selector()
-  static dashboardFiltersState(state: DashboardStateModel): DashboardStateModel['dashboardFilterState'] {
-    return state.dashboardFilterState;
   }
 
   @Selector()
@@ -137,11 +129,6 @@ export class DashboardState {
     patchState({filteredItems: payload});
     window.localStorage.setItem(DASHBOARD_FILTER_STATE, JSON.stringify(payload));
     
-  }
-
-  @Action(SetDashboardFiltersState)
-  private setDashboardFiltersState({patchState}: StateContext<DashboardStateModel>, { payload }: SetDashboardFiltersState) {
-    patchState({ dashboardFilterState: payload })
   }
 
   @Action(SwitchMonthWeekTimeSelection)
