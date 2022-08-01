@@ -329,7 +329,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onAddReorderClose(): void {
-    if (this.activeTab === OrganizationOrderManagementTabs.AllOrders || this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
+    if (
+      this.activeTab === OrganizationOrderManagementTabs.AllOrders ||
+      this.activeTab === OrganizationOrderManagementTabs.PerDiem
+    ) {
       this.clearSelection(this.gridWithChildRow);
     }
   }
@@ -707,6 +710,15 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.gridWithChildRow?.clearRowSelection();
     this.selectedIndex = null;
     this.store.dispatch(new GetOrderById(reOrder.id, order.organizationId));
+    this.store.dispatch(
+      new GetAgencyOrderCandidatesList(
+        reOrder.id,
+        reOrder.organizationId,
+        1,
+        30,
+        this.orderManagementService.excludeDeployed
+      )
+    );
     this.selectedDataRow = order as any;
     this.openDetails.next(true);
   }
