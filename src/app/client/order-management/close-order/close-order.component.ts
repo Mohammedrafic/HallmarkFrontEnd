@@ -1,4 +1,4 @@
-import { Observable, takeUntil } from 'rxjs';
+import { filter, Observable, takeUntil } from 'rxjs';
 import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
@@ -14,6 +14,8 @@ import { CloseOrderService } from '@client/order-management/close-order/close-or
 import { GetClosureReasonsByPage } from "@organization-management/store/reject-reason.actions";
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
 import { CloseOrderPayload } from "@client/order-management/close-order/models/closeOrderPayload.model";
+import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
+import { ConfirmService } from "@shared/services/confirm.service";
 
 @Component({
   selector: 'app-close-order',
@@ -39,7 +41,8 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     private formBuilder: FormBuilder,
     private store: Store,
     private actions: Actions,
-    private closeOrderService: CloseOrderService
+    private closeOrderService: CloseOrderService,
+    private confirmService: ConfirmService,
   ) {
     super();
   }
@@ -58,7 +61,20 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   }
 
   public onCancel(): void {
-    this.closeDialog();
+    if (this.closeForm.dirty) {
+      this.confirmService
+        .confirm(DELETE_CONFIRM_TEXT, {
+          title: DELETE_CONFIRM_TITLE,
+          okButtonLabel: 'Leave',
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => !!confirm))
+        .subscribe(() => {
+          this.closeDialog();
+        });
+    } else {
+      this.closeDialog();
+    }
   }
 
   public onSave(): void {

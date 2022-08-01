@@ -3,4 +3,5 @@ import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-
 export interface NavigationTabModel {
   active?: OrganizationOrderManagementTabs | null;
   pending: OrganizationOrderManagementTabs | null;
+  current?: OrganizationOrderManagementTabs | null;
 }

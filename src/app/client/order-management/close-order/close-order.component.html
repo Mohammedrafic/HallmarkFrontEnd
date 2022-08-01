@@ -1,5 +1,5 @@
 <app-close-order-side-dialog
-  header="Close {{dialogTitleType}}"
+  header="Close {{isPosition ? 'Position' : 'Order'}}"
   (isPositionEmitter)="setCloseDateAvailability($event)"
   (formCancelClicked)="onCancel()"
   (formSaveClicked)="onSave()">
