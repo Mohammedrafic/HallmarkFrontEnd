@@ -40,6 +40,7 @@
 
             <button ejs-button cssClass="e-outline edit-button" [disabled]="!!order?.orderClosureReason" (click)="editOrder(order)"><i-feather name="edit" class="icon"></i-feather></button>
             <button ejs-button cssClass="e-outline"
+                    *ngIf="!canCloseOrder"
                     [disabled]="!!order?.orderClosureReason || disabledCloseButton"
                     (click)="closeOrder(order)">
               Close Order

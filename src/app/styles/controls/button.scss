@@ -32,25 +32,25 @@ button.e-control.e-btn {
       i-feather {
         margin: 0;
       }
-      
+
       &.e-ripple {
         overflow: initial;
         position: initial;
         transform: none;
       }
-    
+
       color: $supportive-red;
-    
+
       &.e-active,
       &:focus {
         color: $white;
         background-color: $supportive-red-00;
       }
-    
+
       &:hover {
         background-color: $supportive-red-40;
       }
-    
+
       &[disabled] {
         pointer-events: none;
         background-color: transparent;
@@ -99,12 +99,18 @@ button.e-control.e-btn.e-dropdown-btn {
 
     &:disabled {
       color: $secondary-dark-blue-30 !important;
-      border-color: $secondary-dark-blue-40;
-      background-color:$secondary-dark-blue-50;
+      border-color: $secondary-dark-blue-40 !important;
+      background-color:$secondary-dark-blue-50 !important;
     }
   }
 
   .e-control.e-btn.e-danger {
     background-color: $supportive-red;
   }
+}
+
+.btn-icon__disabled {
+  pointer-events: none;
+  background-color: transparent !important;
+  color: $primary-active-blue-50 !important;
 }

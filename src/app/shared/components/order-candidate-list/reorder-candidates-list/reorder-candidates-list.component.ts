@@ -39,6 +39,10 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
   }
 
   public onEdit(data: OrderCandidatesList & { index: string }, event: MouseEvent): void {
+    if (this.order?.isClosed) {
+      return;
+    }
+
     this.candidate = { ...data };
     this.selectedIndex = Number(data.index);
 
