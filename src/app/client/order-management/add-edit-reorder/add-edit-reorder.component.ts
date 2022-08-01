@@ -2,30 +2,29 @@ import isNil from 'lodash/fp/isNil';
 import uniq from 'lodash/fp/uniq';
 
 import { filter, first, map, Observable, switchMap, takeUntil, tap } from 'rxjs';
-import { FieldSettingsModel, ISelectAllEventArgs } from '@syncfusion/ej2-angular-dropdowns';
-import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
+import { FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
+import { Actions, Store } from '@ngxs/store';
 
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
-import { CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
+import { AgencyModel, CandidateModel } from '@client/order-management/add-edit-reorder/models/candidate.model';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { Order } from '@shared/models/order-management.model';
 import { ReorderModel, ReorderRequestModel } from '@client/order-management/add-edit-reorder/models/reorder.model';
-import { ShowSideDialog } from '../../../store/app.actions';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { startEndTimeValidator } from '@shared/validators/time.validator';
+import { shareReplay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-add-edit-reorder',
   templateUrl: './add-edit-reorder.component.html',
   styleUrls: ['./add-edit-reorder.component.scss'],
 })
-export class AddEditReorderComponent extends DestroyableDirective implements OnInit, OnChanges {
+export class AddEditReorderComponent extends DestroyableDirective implements OnInit, OnDestroy {
   @Input() public order: Order;
   @Output() public saveEmitter: EventEmitter<void> = new EventEmitter<void>();
-  @Output() public closeEmitter: EventEmitter<void> = new EventEmitter<void>();
 
   public readonly agenciesOptionFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
   public readonly candidatesOptionFields: FieldSettingsModel = { text: 'candidateName', value: 'candidateId' };
@@ -37,9 +36,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public reorderForm: FormGroup;
   public dialogTitle: string = 'Add Re-Order';
   public candidates$: Observable<CandidateModel[]>;
-  public agencies$: Observable<any[]>;
+  public agencies$: Observable<AgencyModel[]>;
 
-  private isSelectedAllAgencies: boolean;
   private numberOfAgencies: number;
 
   public constructor(
@@ -55,25 +53,14 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     return this.order?.reOrderFromId !== 0;
   }
 
-  public ngOnChanges(changes: SimpleChanges): void {
-    const { order } = changes;
-
-    if (order && !order?.isFirstChange()) {
-      const { id, organizationId, reOrderFromId } = order.currentValue;
-      const isReOrder = !isNil(reOrderFromId) && reOrderFromId !== 0;
-      this.candidates$ = this.reorderService.getCandidates(isReOrder ? reOrderFromId : id, organizationId);
-      this.agencies$ = this.reorderService.getAgencies(isReOrder ? reOrderFromId : id, organizationId);
-      this.handleEditMode(order.currentValue);
-    }
-  }
-
   public ngOnInit(): void {
-    this.initForm();
+    this.initAgenciesAndCandidates();
+    this.createReorderForm();
+    this.listenCandidateChanges();
   }
 
-  public onCancel(): void {
-    this.closeDialog();
-    this.closeEmitter.emit();
+  public override ngOnDestroy(): void {
+    super.ngOnDestroy();
   }
 
   public onSave(): void {
@@ -84,8 +71,23 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     }
   }
 
-  public onSelectAllAgencies(event: ISelectAllEventArgs): void {
-    this.isSelectedAllAgencies = event.isChecked!;
+  private createReorderForm(): void {
+    if (this.isEditMode) {
+      this.initForm(this.order);
+    } else {
+      this.initForm();
+    }
+  }
+
+  private initAgenciesAndCandidates(): void {
+    const { id, organizationId, reOrderFromId } = this.order;
+    const isReOrder = !isNil(reOrderFromId) && reOrderFromId !== 0;
+    const orderId = isReOrder ? reOrderFromId : id;
+    this.candidates$ = this.reorderService.getCandidates(orderId, organizationId!).pipe(shareReplay());
+    this.agencies$ = this.reorderService.getAgencies(orderId, organizationId!).pipe(
+      tap((agencyIds: AgencyModel[]) => (this.numberOfAgencies = agencyIds.length)),
+      shareReplay()
+    );
   }
 
   private initForm(reorder?: Order): void {
@@ -93,7 +95,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       reorder || {};
     this.reorderForm = this.formBuilder.group(
       {
-        candidates: [this.getCandidateIds(candidates!) ?? []],
+        candidates: [this.getCandidateIds(candidates!)],
         agencies: [this.getAgencyIds(jobDistributions!), Validators.required],
         reorderDate: [jobStartDate ?? '', Validators.required],
         shiftStartTime: [shiftStartTime ?? '', Validators.required],
@@ -103,21 +105,15 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       },
       { validators: startEndTimeValidator('shiftStartTime', 'shiftEndTime') }
     );
-    this.subscribeOnChangesCandidateName();
-    this.subscribeOnCloseSideBar();
   }
 
-  private closeDialog(): void {
-    this.store.dispatch(new ShowSideDialog(false));
-  }
-
-  private subscribeOnChangesCandidateName(): void {
+  private listenCandidateChanges(): void {
     this.reorderForm
       .get('candidates')
       ?.valueChanges.pipe(
         tap((candidateIds: number[]) => this.reorderForm.patchValue({ openPosition: candidateIds?.length || 1 })),
         filter((candidateIds: number[]) => !isNil(candidateIds)),
-        switchMap(() => this.candidates$.pipe(map(this.getUniqueAgencies)))
+        switchMap(() => this.candidates$.pipe(map(this.getAgenciesBelongToCandidates)))
       )
       .subscribe((agencies: number[]) => {
         const selectedAgencies = this.reorderForm.get('agencies')?.value ?? [];
@@ -126,15 +122,14 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       });
   }
 
-  private getUniqueAgencies(candidates: CandidateModel[]): number[] {
+  private getAgenciesBelongToCandidates(candidates: CandidateModel[]): number[] {
     const agencyIds = candidates.map(({ agencyId }: CandidateModel) => agencyId);
     return uniq(agencyIds);
   }
 
   private saveReorder(): void {
     const reorder: ReorderModel = this.reorderForm.getRawValue();
-    const agencyIds =
-      this.isSelectedAllAgencies || this.numberOfAgencies === reorder.agencies.length ? null : reorder.agencies;
+    const agencyIds = this.numberOfAgencies === reorder.agencies.length ? null : reorder.agencies;
     const orderForRequest: ReorderRequestModel = {
       reOrderId: this.isEditMode ? this.order.id : 0,
       reOrderFromId: this.isEditMode ? this.order.reOrderFromId! : this.order.id,
@@ -150,21 +145,8 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
       .addReorder(orderForRequest)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
-        this.onCancel();
         this.saveEmitter.emit();
       });
-  }
-
-  private handleEditMode(order: Order): void {
-    if (this.isEditMode) {
-      this.initForm(order);
-      this.dialogTitle = 'Edit Re-Order';
-      this.agencies$.pipe(first()).subscribe((agencyIds: JobDistributionModel[]) => {
-        this.numberOfAgencies = agencyIds.length;
-      });
-    } else {
-      this.dialogTitle = 'Add Re-Order';
-    }
   }
 
   private getAgencyIds(jobDistributions: JobDistributionModel[]): (number | null)[] | void {
@@ -180,17 +162,10 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private selectAllAgencies(): void {
-    this.agencies$.pipe(first()).subscribe((agencyIds: JobDistributionModel[]) => {
-      this.numberOfAgencies = agencyIds.length;
+    this.agencies$.pipe(first()).subscribe((agencyIds: AgencyModel[]) => {
       this.reorderForm.patchValue({
-        agencies: agencyIds?.map(({ agencyId }: JobDistributionModel) => agencyId),
+        agencies: agencyIds?.map(({ agencyId }: AgencyModel) => agencyId),
       });
-    });
-  }
-
-  private subscribeOnCloseSideBar(): void {
-    this.actions.pipe(ofActionSuccessful(ShowSideDialog), takeUntil(this.destroy$)).subscribe(() => {
-      this.reorderForm.reset();
     });
   }
 

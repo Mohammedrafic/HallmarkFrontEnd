@@ -1,8 +1,18 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, ofActionCompleted, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
-import { combineLatest, debounceTime, filter, Observable, Subject, Subscription, takeUntil, throttleTime } from 'rxjs';
+import {
+  combineLatest,
+  debounceTime,
+  filter,
+  first,
+  Observable,
+  Subject,
+  Subscription,
+  takeUntil,
+  throttleTime,
+} from 'rxjs';
 import {
   SetHeaderState,
   ShowCloseOrderDialog,
@@ -786,7 +796,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public editOrder(data: OrderManagement): void {
     if (!isNil(data.reOrderFromId) && data.reOrderFromId !== 0) {
-      this.store.dispatch([new ShowSideDialog(true), new GetOrderById(data.id, data.organizationId, {} as any)]);
+      this.store.dispatch(new GetOrderById(data.id, data.organizationId, {} as any));
+      this.actions$
+        .pipe(first(), ofActionCompleted(GetOrderById))
+        .subscribe(() => this.store.dispatch(new ShowSideDialog(true)));
     } else {
       this.router.navigate(['./edit', data.id], { relativeTo: this.route });
     }

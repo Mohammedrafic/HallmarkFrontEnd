@@ -1,8 +1,18 @@
 import isNil from 'lodash/fp/isNil';
 
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild, } from '@angular/core';
-import { Observable, Subject, takeUntil } from 'rxjs';
-import { Select, Store } from '@ngxs/store';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
+import { distinctUntilChanged, map, Observable, Subject, takeUntil } from 'rxjs';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -13,16 +23,26 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import { Order, OrderCandidatesListPage, OrderManagement, OrderManagementChild } from '@shared/models/order-management.model';
+import {
+  Order,
+  OrderCandidatesListPage,
+  OrderManagement,
+  OrderManagementChild,
+} from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ApproveOrder, DeleteOrder, GetOrderById, GetOrders, SetLock } from '@client/store/order-managment-content.actions';
+import { ApproveOrder, DeleteOrder, GetOrderById, SetLock } from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CANCEL_ORDER_CONFIRM_TEXT, CANCEL_ORDER_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, } from '@shared/constants';
+import {
+  CANCEL_ORDER_CONFIRM_TEXT,
+  CANCEL_ORDER_CONFIRM_TITLE,
+  DELETE_RECORD_TEXT,
+  DELETE_RECORD_TITLE,
+} from '@shared/constants';
 import { Location } from '@angular/common';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { ShowCloseOrderDialog, ShowSideDialog } from '../../../store/app.actions';
-
+import { AddEditReorderComponent } from '@client/order-management/add-edit-reorder/add-edit-reorder.component';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -43,12 +63,15 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
   @ViewChild('tab') tab: TabComponent;
+  @ViewChild(AddEditReorderComponent) addEditReOrder: AddEditReorderComponent;
 
   @Select(OrderManagementContentState.orderDialogOptions)
   public orderDialogOptions$: Observable<DialogNextPreviousOption>;
 
   @Select(OrderManagementContentState.orderCandidatePage)
   public orderCandidatePage$: Observable<OrderCandidatesListPage>;
+
+  public readonly isReOrderDialogOpened$: Observable<boolean> = this.isDialogOpened();
 
   private unsubscribe$: Subject<void> = new Subject();
 
@@ -58,6 +81,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public orderStatus = OrderStatus;
   public candidatesCounter: number;
   public reOrderToEdit: Order | null;
+  public reOrderDialogTitle: string;
 
   public disabledCloseButton = true;
   public showCloseButton = false;
@@ -73,7 +97,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     return !statuses.includes(this.order?.status);
   }
   get canCloseOrder(): boolean {
-    const canNotClose = [ this.orderStatus.PreOpen, this.orderStatus.Incomplete ];
+    const canNotClose = [this.orderStatus.PreOpen, this.orderStatus.Incomplete];
     return canNotClose.includes(this.order?.status);
   }
 
@@ -83,7 +107,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     private route: ActivatedRoute,
     private store: Store,
     private confirmService: ConfirmService,
-    private location: Location
+    private location: Location,
+    private actions: Actions
   ) {}
 
   ngOnInit(): void {
@@ -92,7 +117,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if(changes['order']?.currentValue) {
+    if (changes['order']?.currentValue) {
       this.setCloseOrderButtonState();
       const order = changes['order']?.currentValue;
       const hasStatus = this.openInProgressFilledStatuses.includes(order.statusText.toLowerCase());
@@ -110,10 +135,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   setCloseOrderButtonState(): void {
-    if (
-      this.order?.orderType === null ||
-      this.order?.orderType === undefined
-    ) {
+    if (this.order?.orderType === null || this.order?.orderType === undefined) {
       this.disabledCloseButton = true;
       return;
     }
@@ -130,7 +152,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
     const orderStatuses = [OrderStatus.InProgressOfferAccepted, OrderStatus.Filled];
     if (orderStatuses.includes(OrderStatus.InProgressOfferAccepted)) {
-      this.disabledCloseButton = Boolean(this.children?.some(child => orderStatuses.includes(child.orderStatus)));
+      this.disabledCloseButton = Boolean(this.children?.some((child) => orderStatuses.includes(child.orderStatus)));
     }
   }
 
@@ -175,6 +197,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   createReOrder(): void {
+    this.reOrderDialogTitle = 'Add Re-Order';
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -184,8 +207,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
 
   public editOrder(data: Order) {
     if (this.isReOrder && data.orderType !== OrderType.OpenPerDiem) {
-      this.store.dispatch(new ShowSideDialog(true));
       this.order = { ...data };
+      this.reOrderDialogTitle = 'Edit Re-Order';
+      this.store.dispatch(new ShowSideDialog(true));
     } else {
       this.router.navigate(['./edit', data.id], { relativeTo: this.route });
       this.onClose();
@@ -200,11 +224,17 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public saveReOrder(): void {
     this.saveReOrderEmitter.emit();
     this.reOrderToEdit = null;
+    this.store.dispatch(new ShowSideDialog(false));
+  }
+
+  public onSaveReOrder(): void {
+    this.addEditReOrder.onSave();
   }
 
   public clearEditReOrder(): void {
     this.closeReOrderEmitter.emit();
     this.reOrderToEdit = null;
+    this.store.dispatch(new ShowSideDialog(false));
   }
 
   public closeOrder(order: Order): void {
@@ -251,6 +281,13 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
           (candidate) => candidate.status !== ApplicantStatus.Rejected && candidate.status !== ApplicantStatus.Withdraw
         ).length;
     });
+  }
+
+  private isDialogOpened(): Observable<boolean> {
+    return this.actions.pipe(ofActionDispatched(ShowSideDialog)).pipe(
+      map((payload: ShowSideDialog) => payload.isDialogShown),
+      distinctUntilChanged()
+    );
   }
 
   updateOrderDetails(order: Order | OrderManagement): void {
