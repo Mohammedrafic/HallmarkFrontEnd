@@ -308,6 +308,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
               this.jobStatus$.next(
                 this.orderCandidateJob.candidateBillRate === value ? ReOrderBillRate : ReOrderOfferedBillRate
               );
+            } else {
+              this.jobStatus$.next(ReOrderBillRate);
             }
           })
         )
