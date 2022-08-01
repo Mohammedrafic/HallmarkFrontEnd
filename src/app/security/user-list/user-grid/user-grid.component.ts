@@ -141,6 +141,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
             businessUnitType: businessUnit,
             businessUnitId: business ? business : null,
             ids: this.selectedItems.length ? this.selectedItems.map((val) => val[this.idFieldName]) : null,
+            ...this.filters
           },
           options
             ? options.columns.map((val: ExportColumn) => val.column)
