@@ -27,6 +27,11 @@ export class GetUserOrganizations {
   constructor() { }
 }
 
+export class UserOrganizationsAgenciesChanged {
+  static readonly type = '[user] User Organizations/Agencies Changed';
+  constructor() { }
+}
+
 export class SetLastSelectedOrganizationAgencyId {
   static readonly type = '[user] Set Last Selected Organization Or Agency Id';
   constructor(public payload: LasSelectedOrganizationAgency) { }

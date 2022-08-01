@@ -46,6 +46,10 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   }
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
+    if (this.order?.isClosed) {
+      return;
+    }
+
     this.candidate = { ...data };
 
     if (this.order && this.candidate) {

@@ -8,7 +8,7 @@ import {
   AbstractGridConfigurationComponent
 } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from '../../../store/app.actions';
-import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import {
   GetCredential,
   GetCredentialTypes,
@@ -266,7 +266,7 @@ export class CredentialsListComponent extends AbstractGridConfigurationComponent
   public onFormCancelClick(): void {
     if (this.credentialsFormGroup.dirty) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT, {
+        .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'

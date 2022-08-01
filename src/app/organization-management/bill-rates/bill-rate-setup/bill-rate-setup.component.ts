@@ -12,7 +12,7 @@ import { OrganizationManagementState } from '@organization-management/store/orga
 import { Skill } from '@shared/models/skill.model';
 import { ConfirmService } from '@shared/services/confirm.service';
 import {
-  CANCEL_COFIRM_TEXT,
+  CANCEL_CONFIRM_TEXT,
   DATA_OVERRIDE_TEXT,
   DATA_OVERRIDE_TITLE,
   DELETE_CONFIRM_TITLE,
@@ -348,7 +348,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public onFormCancelClick(): void {
     if (this.billRatesFormGroup.dirty) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT, {
+        .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'

@@ -164,10 +164,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public setRange(range: string[]): void {
     this.store.dispatch(new Timesheets.UpdateFiltersState({
-      dateTimeOffset: {
-        startDate: range[0] || '',
-        endDate: range[1] || '',
-      }
+      ...(range[0] && range[1] && { startDate: range[0], endDate: range[1] }),
     }));
   }
 

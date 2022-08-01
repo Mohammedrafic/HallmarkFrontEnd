@@ -14,7 +14,7 @@ import { debounceTime, delay, filter, Observable, Subject, takeUntil } from 'rxj
 import { ExportSkills, GetMasterSkillDataSources, GetMasterSkillsByPage, RemoveMasterSkill, RemoveMasterSkillSucceeded, SaveMasterSkill, SaveMasterSkillSucceeded, SetDirtyState } from 'src/app/admin/store/admin.actions';
 import { AdminState } from 'src/app/admin/store/admin.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from 'src/app/shared/constants/messages';
 import { MasterSkillDataSources, MasterSkillFilters, Skill, SkillsPage } from 'src/app/shared/models/skill.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
@@ -222,7 +222,7 @@ export class SkillsGridComponent extends AbstractGridConfigurationComponent impl
   public closeDialog(): void {
     if (this.SkillFormGroup.dirty) {
       this.confirmService
-      .confirm(CANCEL_COFIRM_TEXT, {
+      .confirm(CANCEL_CONFIRM_TEXT, {
         title: DELETE_CONFIRM_TITLE,
         okButtonLabel: 'Leave',
         okButtonClass: 'delete-button'

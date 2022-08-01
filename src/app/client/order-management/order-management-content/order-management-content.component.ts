@@ -1,9 +1,25 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { Actions, ofActionCompleted, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
-import { combineLatest, debounceTime, filter, Observable, Subject, Subscription, takeUntil, throttleTime } from 'rxjs';
-import { SetHeaderState, ShowCloseOrderDialog, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import {
+  combineLatest,
+  debounceTime,
+  filter,
+  first,
+  Observable,
+  Subject,
+  Subscription,
+  takeUntil,
+  throttleTime,
+} from 'rxjs';
+import {
+  SetHeaderState,
+  ShowCloseOrderDialog,
+  ShowExportDialog,
+  ShowFilterDialog,
+  ShowSideDialog,
+} from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { CandidatesStatusText, OrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
@@ -76,13 +92,13 @@ import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { SearchComponent } from '@shared/components/search/search.component';
 import { OrderStatus } from '@shared/enums/order-management';
 import { DashboardState } from 'src/app/dashboard/store/dashboard.state';
-import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
 import { TabNavigationComponent } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
 import { OrderDetailsDialogComponent } from '@client/order-management/order-details-dialog/order-details-dialog.component';
 import isNil from 'lodash/fp/isNil';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { isArray } from 'lodash';
-import { OrderManagementContentService } from "@shared/services/order-management-content.service";
+import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
+import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 
 @Component({
   selector: 'app-order-management-content',
@@ -115,8 +131,6 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   skills$: Observable<Skill[]>;
 
   @Select(DashboardState.filteredItems) private readonly filteredItems$: Observable<FilteredItem[]>;
-  @Select(DashboardState.dashboardFiltersState)
-  private readonly dashboardFiltersState$: Observable<DashboardFiltersModel>;
 
   public activeTab: OrganizationOrderManagementTabs = OrganizationOrderManagementTabs.AllOrders;
   public allowWrap = ORDERS_GRID_CONFIG.isWordWrappingEnabled;
@@ -137,9 +151,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     { text: MoreMenuType[2], id: '2' },
   ];
 
-  public closedOrderMenu: ItemModel[] = [
-    { text: MoreMenuType[1], id: '1' },
-  ];
+  public closedOrderMenu: ItemModel[] = [{ text: MoreMenuType[1], id: '1' }];
 
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   public optionFields = {
@@ -316,7 +328,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onAddReorderClose(): void {
-    this.clearSelection(this.gridWithChildRow);
+    if (
+      this.activeTab === OrganizationOrderManagementTabs.AllOrders ||
+      this.activeTab === OrganizationOrderManagementTabs.PerDiem
+    ) {
+      this.clearSelection(this.gridWithChildRow);
+    }
   }
 
   public createReorder(data: any): void {
@@ -642,36 +659,40 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public tabSelected(tabIndex: OrganizationOrderManagementTabs): void {
     this.activeTab = tabIndex;
     this.clearFilters();
-    this.store.dispatch(new ClearOrders());
-    this.openDetails.next(false);
-    this.selectedIndex = null;
-    this.clearSelection(this.gridWithChildRow);
 
-    switch (tabIndex) {
-      case OrganizationOrderManagementTabs.AllOrders:
-        this.isLockMenuButtonsShown = true;
-        this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
-        this.getOrders();
-        break;
-      case OrganizationOrderManagementTabs.PerDiem:
-        this.isLockMenuButtonsShown = true;
-        this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
-        this.getOrders();
-        break;
-      case OrganizationOrderManagementTabs.ReOrders:
-        this.isLockMenuButtonsShown = false;
-        this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
-        this.getOrders();
-        break;
-      case OrganizationOrderManagementTabs.OrderTemplates:
-        this.refreshGridColumns(orderTemplateColumnsConfig, this.gridWithChildRow);
-        this.getOrders();
-        break;
-      case OrganizationOrderManagementTabs.Incomplete:
-        this.isLockMenuButtonsShown = false;
-        this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
-        this.store.dispatch(new GetIncompleteOrders({}));
-        break;
+    // Don’t need reload orders if we go back from the candidate page
+    if (!this.previousSelectedOrderId) {
+      this.openDetails.next(false);
+      this.store.dispatch(new ClearOrders());
+      this.selectedIndex = null;
+      this.clearSelection(this.gridWithChildRow);
+
+      switch (tabIndex) {
+        case OrganizationOrderManagementTabs.AllOrders:
+          this.isLockMenuButtonsShown = true;
+          this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
+          this.getOrders();
+          break;
+        case OrganizationOrderManagementTabs.PerDiem:
+          this.isLockMenuButtonsShown = true;
+          this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
+          this.getOrders();
+          break;
+        case OrganizationOrderManagementTabs.ReOrders:
+          this.isLockMenuButtonsShown = false;
+          this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
+          this.getOrders();
+          break;
+        case OrganizationOrderManagementTabs.OrderTemplates:
+          this.refreshGridColumns(orderTemplateColumnsConfig, this.gridWithChildRow);
+          this.getOrders();
+          break;
+        case OrganizationOrderManagementTabs.Incomplete:
+          this.isLockMenuButtonsShown = false;
+          this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
+          this.store.dispatch(new GetIncompleteOrders({}));
+          break;
+      }
     }
   }
 
@@ -688,6 +709,15 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.gridWithChildRow?.clearRowSelection();
     this.selectedIndex = null;
     this.store.dispatch(new GetOrderById(reOrder.id, order.organizationId));
+    this.store.dispatch(
+      new GetAgencyOrderCandidatesList(
+        reOrder.id,
+        reOrder.organizationId,
+        1,
+        30,
+        this.orderManagementService.excludeDeployed
+      )
+    );
     this.selectedDataRow = order as any;
     this.openDetails.next(true);
   }
@@ -752,8 +782,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.store.dispatch(new DuplicateOrder(data.id));
         break;
       case MoreMenuType['Close']:
-        this.orderManagementContentService.getOrderById(data.id).subscribe(order => {
-          this.selectedOrder = {...order};
+        this.orderManagementContentService.getOrderById(data.id).subscribe((order) => {
+          this.selectedOrder = { ...order };
           this.store.dispatch(new ShowCloseOrderDialog(true));
         });
         break;
@@ -777,7 +807,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public editOrder(data: OrderManagement): void {
     if (!isNil(data.reOrderFromId) && data.reOrderFromId !== 0) {
-      this.store.dispatch([new ShowSideDialog(true), new GetOrderById(data.id, data.organizationId, {} as any)]);
+      this.store.dispatch(new GetOrderById(data.id, data.organizationId, {} as any));
+      this.actions$
+        .pipe(first(), ofActionCompleted(GetOrderById))
+        .subscribe(() => this.store.dispatch(new ShowSideDialog(true)));
     } else {
       this.router.navigate(['./edit', data.id], { relativeTo: this.route });
     }
@@ -1000,6 +1033,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       if (!isOpen) {
         this.clearSelection(this.gridWithChildRow);
         this.selectedReOrder = null;
+        this.previousSelectedOrderId = null;
         const table = document.getElementsByClassName('e-virtualtable')[0] as HTMLElement;
         if (table) {
           table.style.transform = 'translate(0px, 0px)';
@@ -1095,21 +1129,27 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private applyDashboardFilters(): void {
-    combineLatest([this.dashboardFiltersState$, this.filteredItems$])
+    combineLatest([this.organizationId$, this.filteredItems$])
       .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(([filters, items]) => {
-        this.filters = filters;
-        this.filteredItems = items;
+      .subscribe(([organizationId, items]) => {
+        this.filteredItems = items.filter((item: FilteredItem) => (item.organizationId === organizationId && item.column !== FilterColumnTypeEnum.ORGANIZATION) || item.column === FilterColumnTypeEnum.SKILL);
+
+        this.filteredItems.forEach((item: FilteredItem) => {
+          const filterKey = item.column as keyof OrderFilter;
+          if (filterKey in this.filters) {
+            (this.filters[filterKey] as number[]).push(item.value);
+          } else {
+            (this.filters[filterKey] as number[]) = [item.value];
+          }
+        });
       });
   }
 
   private setFilterState(): void {
-    combineLatest([this.filteredItems$, this.organizationStructure$])
-      .pipe(
+    this.organizationStructure$.pipe(
         takeUntil(this.unsubscribe$),
-        filter(([items, orgs]) => !!orgs && items.length > 0)
-      )
-      .subscribe(() => {
+        filter((orgs) => !!orgs)
+      ).subscribe(() => {
         Object.entries(this.filters).forEach(([key, value]) => {
           this.OrderFilterFormGroup.get(key)?.setValue(value);
         });

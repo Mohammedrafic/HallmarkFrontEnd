@@ -4,7 +4,7 @@ import { ShowSideDialog, ShowToast } from '../../../store/app.actions';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { filter, Observable, Subject, takeUntil } from 'rxjs';
 import { ConfirmService } from '@shared/services/confirm.service';
-import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE } from '@shared/constants';
 import {
   GetRolesForWorkflowMapping, GetUsersForWorkflowMapping,
   GetWorkflowMappingPages,
@@ -140,7 +140,7 @@ export class JobOrderComponent implements OnInit, OnDestroy {
   public onCancelFormClick(): void {
     if (this.workflowFormGroup.dirty) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT, {
+        .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'

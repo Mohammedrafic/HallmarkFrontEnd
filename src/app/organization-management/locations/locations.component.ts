@@ -29,7 +29,7 @@ import { Location, LocationFilter, LocationFilterOptions, LocationsPage } from '
 
 import { PhoneTypes } from '@shared/enums/phone-types';
 import {
-  CANCEL_COFIRM_TEXT,
+  CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
@@ -369,7 +369,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   onFormCancelClick(): void {
     if (this.locationDetailsFormGroup.dirty) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT, {
+        .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'

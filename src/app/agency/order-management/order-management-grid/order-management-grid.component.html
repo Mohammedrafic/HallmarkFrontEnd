@@ -108,7 +108,7 @@
     <e-column field="organizationName" headerText="Organization" width="200"></e-column>
     <e-column field="numberOfPositions" headerText="{{ '# of positions' | uppercase }}" width="160">
       <ng-template #template let-data>
-        <div class="align-right">
+        <div class="align-right" *ngIf="data.orderType !== orderTypes.OpenPerDiem">
           {{ data.numberOfOpenPositions }}/{{ data.numberOfPositions }}
         </div>
       </ng-template>

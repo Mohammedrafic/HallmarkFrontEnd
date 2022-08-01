@@ -113,6 +113,9 @@ export class OrganizationPage {
 export class OrganizationDepartment {
   id: number;
   name: string;
+  organizationId?: number;
+  regionId?: number | null;
+  locationId?: number
 }
 
 export class OrganizationLocation {
@@ -120,13 +123,18 @@ export class OrganizationLocation {
   name: string;
   regionName?: string;
   departments: OrganizationDepartment[];
+  organizationId?: number;
+  regionId?: number | null;
+  locationId?: number
 }
 
 export class OrganizationRegion {
   id: number | null;
   name?: string;
   orgName?: string;
-  locations: any[] | null;
+  locations: OrganizationLocation[] | null;
+  organizationId?: number;
+  regionId?: number | null;
 }
 
 export class OrganizationStructure {
