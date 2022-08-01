@@ -3,7 +3,7 @@ import { FormControl } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { OrganizationService } from '@shared/services/organization.service';
 
-import { Select, Store } from '@ngxs/store';
+import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
 import { BehaviorSubject, catchError, combineLatest, debounceTime, distinctUntilChanged, mergeMap, Observable, of, Subject, switchMap, takeUntil, tap } from 'rxjs';
 
 import {
@@ -11,6 +11,7 @@ import {
   GetUserOrganizations,
   SaveLastSelectedOrganizationAgencyId,
   LastSelectedOrganisationAgency,
+  UserOrganizationsAgenciesChanged,
 } from 'src/app/store/user.actions';
 
 import { AppState } from 'src/app/store/app.state';
@@ -71,7 +72,11 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private store: Store, private cd: ChangeDetectorRef, private domSanitizer: DomSanitizer, private organizationService: OrganizationService) {}
+  constructor(private store: Store, 
+              private cd: ChangeDetectorRef, 
+              private domSanitizer: DomSanitizer, 
+              private organizationService: OrganizationService,
+              private actions$: Actions) {}
 
   ngOnInit(): void {
     this.subscribeUserChange();
@@ -143,6 +148,10 @@ export class OrganizationAgencySelectorComponent implements OnInit, OnDestroy {
   }
 
   private subscribeUserChange(): void {
+    this.actions$.pipe(ofActionDispatched(UserOrganizationsAgenciesChanged)).subscribe(() => {
+      this.store.dispatch(new GetUserOrganizations());
+      this.store.dispatch(new GetUserAgencies());
+    });
     this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe(user => {
       if (!user) {
         return;

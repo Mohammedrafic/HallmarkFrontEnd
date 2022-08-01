@@ -319,7 +319,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onAddReorderClose(): void {
-    this.clearSelection(this.gridWithChildRow);
+    if (this.activeTab === OrganizationOrderManagementTabs.AllOrders || this.activeTab === OrganizationOrderManagementTabs.PerDiem) {
+      this.clearSelection(this.gridWithChildRow);
+    }
   }
 
   public createReorder(data: any): void {
