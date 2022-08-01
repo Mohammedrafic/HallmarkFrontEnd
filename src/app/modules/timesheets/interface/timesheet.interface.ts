@@ -30,7 +30,8 @@ export interface TimesheetsFilterState {
   pageNumber?: number;
   pageSize?: number;
   organizationId?: number;
-  dateTimeOffset?: TimesheetWeekFilter;
+  startDate?: string;
+  endDate?: string;
   searchTerm?: string;
   orderIds?: string[];
   locationIds?: string[];
