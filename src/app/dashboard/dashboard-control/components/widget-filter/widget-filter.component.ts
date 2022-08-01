@@ -8,7 +8,6 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
-import { Skill } from '@shared/models/skill.model';
 import { FilterService } from '@shared/services/filter.service';
 import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
 import { IFilterColumnsDataModel } from 'src/app/dashboard/models/widget-filter.model';
@@ -18,6 +17,7 @@ import { UserState, UserStateModel } from 'src/app/store/user.state';
 import { Organisation } from '@shared/models/visibility-settings.model';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
+import { AllOrganizationsSkill } from 'src/app/dashboard/models/all-organization-skill.model';
 
 
 @Component({
@@ -33,7 +33,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   @Input() public savedFilterItems: FilteredItem[];
   @Input() public dashboardFilterState: DashboardFiltersModel;
   @Input() public organizationStructure: OrganizationStructure;
-  @Input() public allSkills: Skill[];
+  @Input() public allSkills: AllOrganizationsSkill[];
 
   @Select(UserState.organizationStructure) private readonly organizationStructure$: Observable<OrganizationStructure>;
 
@@ -57,24 +57,24 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     value: 'organizationId',
   };
 
-  get skills(): number {
-    return this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.value?.length;
+  get selectedSkills(): number {
+    return this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.value?.length || 0;
   }
 
-  get organization(): number {
-    return this.widgetFilterFormGroup.get(FilterColumnTypeEnum.ORGANIZATION)?.value?.length;
+  get selectedOrganizations(): number {
+    return this.widgetFilterFormGroup.get('organizationIds')?.value?.length || 0;
   }
 
-  get region(): number {
-    return this.widgetFilterFormGroup.get(FilterColumnTypeEnum.REGION)?.value?.length;
+  get selectedRegions(): number {
+    return this.widgetFilterFormGroup.get(FilterColumnTypeEnum.REGION)?.value?.length || 0;
   }
 
-  get locations(): number {
-    return this.widgetFilterFormGroup.get(FilterColumnTypeEnum.LOCATION)?.value?.length;
+  get selectedLocations(): number {
+    return this.widgetFilterFormGroup.get(FilterColumnTypeEnum.LOCATION)?.value?.length || 0;
   }
 
-  get departments(): number {
-    return this.widgetFilterFormGroup.get(FilterColumnTypeEnum.DEPARTMENT)?.value?.length;
+  get selectedDepartments(): number {
+    return this.widgetFilterFormGroup.get(FilterColumnTypeEnum.DEPARTMENT)?.value?.length || 0;
   }
 
   constructor(
@@ -176,7 +176,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   private subscribeToOrganizationChanges(): void {
     if(this.userIsAdmin) {
-    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.ORGANIZATION)?.valueChanges.pipe().subscribe((val: number[]) => {
+    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.ORGANIZATION)?.valueChanges.subscribe((val: number[]) => {
       this.cdr.markForCheck();
       if(val?.length) {
         const selectedOrganizations: Organisation[] = val.map((id) => this.allOrganizations.find((org) => org.organizationId === id) as Organisation);
@@ -279,10 +279,14 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   }
 
   public setFilterState(): void {
-    if(this.userIsAdmin) {
-    this.allOrganizations$.pipe(takeUntil(this.destroy$), filter(Boolean)).subscribe(() => this.setFormControlValue());
+    if (this.userIsAdmin) {
+      this.allOrganizations$
+        .pipe(takeUntil(this.destroy$), filter(Boolean))
+        .subscribe(() => this.setFormControlValue());
     } else {
-    this.organizationStructure$.pipe(takeUntil(this.destroy$), filter(Boolean)).subscribe(() => this.setFormControlValue())
+      this.organizationStructure$
+        .pipe(takeUntil(this.destroy$), filter(Boolean))
+        .subscribe(() => this.setFormControlValue());
     }
   }
 }

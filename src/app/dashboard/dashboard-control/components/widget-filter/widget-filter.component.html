@@ -21,7 +21,7 @@
             [showSelectAll]="true"
           >
           </ejs-multiselect>
-          <span *ngIf="organization" class="e-badge e-badge-success e-badge-circle">{{ organization }}</span>
+          <span *ngIf="selectedOrganizations" class="e-badge e-badge-success e-badge-circle">{{ selectedOrganizations }}</span>
         </div>
       </div>
 
@@ -39,7 +39,7 @@
             [showSelectAll]="true"
           >
           </ejs-multiselect>
-          <span *ngIf="region" class="e-badge e-badge-success e-badge-circle">{{ region }}</span>
+          <span *ngIf="selectedRegions" class="e-badge e-badge-success e-badge-circle">{{ selectedRegions }}</span>
         </div>
       </div>
 
@@ -57,7 +57,7 @@
             [showSelectAll]="true"
           >
           </ejs-multiselect>
-          <span *ngIf="locations" class="e-badge e-badge-success e-badge-circle">{{ locations }}</span>
+          <span *ngIf="selectedLocations" class="e-badge e-badge-success e-badge-circle">{{ selectedLocations }}</span>
         </div>
       </div>
 
@@ -75,7 +75,7 @@
             [showSelectAll]="true"
           >
           </ejs-multiselect>
-          <span *ngIf="departments" class="e-badge e-badge-success e-badge-circle">{{ departments }}</span>
+          <span *ngIf="selectedDepartments" class="e-badge e-badge-success e-badge-circle">{{ selectedDepartments }}</span>
         </div>
       </div>
 
@@ -93,7 +93,7 @@
             [showSelectAll]="true"
           >
           </ejs-multiselect>
-          <span *ngIf="skills" class="e-badge e-badge-success e-badge-circle">{{ skills }}</span>
+          <span *ngIf="selectedSkills" class="e-badge e-badge-success e-badge-circle">{{ selectedSkills }}</span>
         </div>
       </div>
     </div>
