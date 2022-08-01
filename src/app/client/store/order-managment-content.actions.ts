@@ -234,6 +234,7 @@ export class SelectNavigationTab {
   static readonly type = '[order management] Select Navigation Tab';
   constructor(
     public pending: OrganizationOrderManagementTabs | null,
-    public active?: OrganizationOrderManagementTabs
+    public active?: OrganizationOrderManagementTabs | null,
+    public current?: OrganizationOrderManagementTabs
   ) {}
 }

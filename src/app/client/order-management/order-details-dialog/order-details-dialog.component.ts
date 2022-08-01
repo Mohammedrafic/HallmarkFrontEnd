@@ -72,6 +72,10 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     const statuses = [this.orderStatus.Open, this.orderStatus.InProgress, this.orderStatus.Filled];
     return !statuses.includes(this.order?.status);
   }
+  get canCloseOrder(): boolean {
+    const canNotClose = [ this.orderStatus.PreOpen, this.orderStatus.Incomplete ];
+    return canNotClose.includes(this.order?.status);
+  }
 
   constructor(
     private chipsCssClass: ChipsCssClass,
@@ -108,8 +112,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   setCloseOrderButtonState(): void {
     if (
       this.order?.orderType === null ||
-      this.order?.orderType === undefined ||
-      this.order?.status === OrderStatus.Incomplete
+      this.order?.orderType === undefined
     ) {
       this.disabledCloseButton = true;
       return;

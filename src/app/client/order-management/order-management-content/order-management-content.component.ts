@@ -3,7 +3,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionDispatched, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { DetailRowService, GridComponent, VirtualScrollService } from '@syncfusion/ej2-angular-grids';
 import { combineLatest, debounceTime, filter, Observable, Subject, Subscription, takeUntil, throttleTime } from 'rxjs';
-import { SetHeaderState, ShowCloseOrderDialog, ShowExportDialog, ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
+import {
+  SetHeaderState,
+  ShowCloseOrderDialog,
+  ShowExportDialog,
+  ShowFilterDialog,
+  ShowSideDialog,
+} from 'src/app/store/app.actions';
 import { ORDERS_GRID_CONFIG } from '../../client.config';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 import { CandidatesStatusText, OrderStatusText, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
@@ -81,7 +87,7 @@ import { OrderDetailsDialogComponent } from '@client/order-management/order-deta
 import isNil from 'lodash/fp/isNil';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { isArray } from 'lodash';
-import { OrderManagementContentService } from "@shared/services/order-management-content.service";
+import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 
 @Component({
   selector: 'app-order-management-content',
@@ -136,9 +142,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     { text: MoreMenuType[2], id: '2' },
   ];
 
-  public closedOrderMenu: ItemModel[] = [
-    { text: MoreMenuType[1], id: '1' },
-  ];
+  public closedOrderMenu: ItemModel[] = [{ text: MoreMenuType[1], id: '1' }];
 
   private openInProgressFilledStatuses = ['open', 'in progress', 'filled', 'custom step'];
   public optionFields = {
@@ -641,36 +645,40 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   public tabSelected(tabIndex: OrganizationOrderManagementTabs): void {
     this.activeTab = tabIndex;
     this.clearFilters();
-    this.store.dispatch(new ClearOrders());
-    this.openDetails.next(false);
-    this.selectedIndex = null;
-    this.clearSelection(this.gridWithChildRow);
 
-    switch (tabIndex) {
-      case OrganizationOrderManagementTabs.AllOrders:
-        this.isLockMenuButtonsShown = true;
-        this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
-        this.getOrders();
-        break;
-      case OrganizationOrderManagementTabs.PerDiem:
-        this.isLockMenuButtonsShown = true;
-        this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
-        this.getOrders();
-        break;
-      case OrganizationOrderManagementTabs.ReOrders:
-        this.isLockMenuButtonsShown = false;
-        this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
-        this.getOrders();
-        break;
-      case OrganizationOrderManagementTabs.OrderTemplates:
-        this.refreshGridColumns(orderTemplateColumnsConfig, this.gridWithChildRow);
-        this.getOrders();
-        break;
-      case OrganizationOrderManagementTabs.Incomplete:
-        this.isLockMenuButtonsShown = false;
-        this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
-        this.store.dispatch(new GetIncompleteOrders({}));
-        break;
+    // Don’t need reload orders if we go back from the candidate page
+    if (!this.previousSelectedOrderId) {
+      this.openDetails.next(false);
+      this.store.dispatch(new ClearOrders());
+      this.selectedIndex = null;
+      this.clearSelection(this.gridWithChildRow);
+
+      switch (tabIndex) {
+        case OrganizationOrderManagementTabs.AllOrders:
+          this.isLockMenuButtonsShown = true;
+          this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
+          this.getOrders();
+          break;
+        case OrganizationOrderManagementTabs.PerDiem:
+          this.isLockMenuButtonsShown = true;
+          this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
+          this.getOrders();
+          break;
+        case OrganizationOrderManagementTabs.ReOrders:
+          this.isLockMenuButtonsShown = false;
+          this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
+          this.getOrders();
+          break;
+        case OrganizationOrderManagementTabs.OrderTemplates:
+          this.refreshGridColumns(orderTemplateColumnsConfig, this.gridWithChildRow);
+          this.getOrders();
+          break;
+        case OrganizationOrderManagementTabs.Incomplete:
+          this.isLockMenuButtonsShown = false;
+          this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
+          this.store.dispatch(new GetIncompleteOrders({}));
+          break;
+      }
     }
   }
 
@@ -751,8 +759,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.store.dispatch(new DuplicateOrder(data.id));
         break;
       case MoreMenuType['Close']:
-        this.orderManagementContentService.getOrderById(data.id).subscribe(order => {
-          this.selectedOrder = {...order};
+        this.orderManagementContentService.getOrderById(data.id).subscribe((order) => {
+          this.selectedOrder = { ...order };
           this.store.dispatch(new ShowCloseOrderDialog(true));
         });
         break;
@@ -999,6 +1007,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       if (!isOpen) {
         this.clearSelection(this.gridWithChildRow);
         this.selectedReOrder = null;
+        this.previousSelectedOrderId = null;
         const table = document.getElementsByClassName('e-virtualtable')[0] as HTMLElement;
         if (table) {
           table.style.transform = 'translate(0px, 0px)';
