@@ -6,6 +6,13 @@
 
 .container {
 
+  .header-container {
+    .button-container {
+      display: flex;
+      gap: 12px;
+    }
+  }
+
   .deployed-icon{
     color: $primary-active-blue;
   }

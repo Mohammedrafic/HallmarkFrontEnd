@@ -57,6 +57,7 @@ export const reOrdersChildColumnToExport: ExportColumn[] = [
   { text: 'Position Status', column: 'PositionStatus' },
   { text: 'Candidate Name', column: 'CandidateName' },
   { text: 'Candidate Status', column: 'CandidateStatus' },
+  { text: 'Candidate Bill Rate', column: 'CandidateBillRate' },
   { text: 'Submission', column: 'Submission' },
   { text: 'Onboarded', column: 'Onboarded' },
 ];

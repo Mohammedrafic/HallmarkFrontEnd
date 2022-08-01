@@ -1,11 +1,13 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { Order } from '@shared/models/order-management.model';
 import { OrderType } from '@shared/enums/order-type';
-import { Store } from '@ngxs/store';
+import { Select, Store } from '@ngxs/store';
 import { AppState } from '../../../store/app.state';
 import { OrderManagementService } from '@client/order-management/order-management-content/order-management.service';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
+import { Observable } from 'rxjs';
+import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 
 @Component({
   selector: 'app-general-reorder-info',
@@ -13,7 +15,9 @@ import { OrderManagementAgencyService } from '@agency/order-management/order-man
   styleUrls: ['../general-order-info/general-order-info.component.scss'],
 })
 export class GeneralReorderInfoComponent extends DestroyableDirective implements OnChanges {
-  @Input() orderInformation: Order;
+  @Input() public orderInformation: Order;
+  @Select(AppState.isOrganizationAgencyArea)
+  public isOrganizationOrAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
 
   public orderType = OrderType;
   public agencies: { name: string; tooltip: string };

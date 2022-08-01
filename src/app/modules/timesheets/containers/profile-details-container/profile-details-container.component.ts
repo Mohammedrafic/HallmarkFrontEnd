@@ -1,6 +1,6 @@
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import {
-  ChangeDetectionStrategy, Component, ElementRef, EventEmitter,
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter,
   Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
@@ -10,7 +10,7 @@ import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popup
 import { SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 
-import { Destroyable } from '@core/helpers';
+import { DateTimeHelper, Destroyable } from '@core/helpers';
 import { FileSize } from '@core/enums';
 import { DialogAction, SubmitBtnText, TimesheetTargetStatus } from '../../enums';
 import { FileExtensionsString } from '@core/constants';
@@ -78,7 +78,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public organizationId: number | null = null;
 
+  public weekPeriod: [Date, Date] = [new Date(), new Date()];
+
   public readonly columnsToExport: ExportColumn[] = TimesheetDetailsExportOptions;
+
+  public actionButtonDisabled = false;
 
   @Select(TimesheetsState.isTimesheetOpen)
   public readonly isTimesheetOpen$: Observable<DialogActionPayload>;
@@ -104,6 +108,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     private datePipe: DatePipe,
     private router: Router,
     private timesheetDetailsService: TimesheetDetailsService,
+    private cd: ChangeDetectorRef,
   ) {
     super();
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
@@ -354,11 +359,26 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.timesheetDetails$
     .pipe(
       filter(Boolean),
+      tap((details) => { this.setActionBtnState(details)}),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(({ organizationId }) => {
+    .subscribe(({ organizationId, weekStartDate, weekEndDate }) => {
       this.organizationId = this.isAgency ? organizationId : null;
+      this.weekPeriod = [
+        new Date(DateTimeHelper.convertDateToUtc(weekStartDate)),
+        new Date(DateTimeHelper.convertDateToUtc(weekEndDate)),
+      ]
+      this.cd.markForCheck();
     });
+  }
+
+  private setActionBtnState(details: TimesheetDetailsModel): void {
+    if (this.isAgency) {
+      this.actionButtonDisabled = details.status === this.timesheetStatus.PendingApproval
+      || details.status === this.timesheetStatus.Approved;
+    } else {
+      this.actionButtonDisabled = details.status === this.timesheetStatus.Approved
+    }
   }
 }
 

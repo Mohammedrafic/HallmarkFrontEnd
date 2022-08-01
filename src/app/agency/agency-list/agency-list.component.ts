@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from "@angular/forms";
 import { Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { GridComponent } from '@syncfusion/ej2-angular-grids';
@@ -7,24 +8,27 @@ import { debounceTime, filter, Observable, Subject, takeUntil } from 'rxjs';
 import {
   ExportAgencyList,
   GetAgencyByPage,
+  GetAgencyFilteringOptions,
   SaveAgency,
   SaveAgencySucceeded,
 } from 'src/app/agency/store/agency.actions';
 import { AgencyState } from 'src/app/agency/store/agency.state';
 import { AbstractGridConfigurationComponent } from 'src/app/shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { AgencyStatus, STATUS_COLOR_GROUP } from 'src/app/shared/enums/status';
-import { Agency, AgencyPage } from 'src/app/shared/models/agency.model';
+import { Agency, AgencyFilteringOptions, AgencyListFilters, AgencyPage } from 'src/app/shared/models/agency.model';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
-import { SetHeaderState, ShowExportDialog } from 'src/app/store/app.actions';
+import { SetHeaderState, ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/export.model';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
-import { ExportOrganizations } from '@admin/store/admin.actions';
 import { DatePipe } from '@angular/common';
+import { FilteredItem } from "@shared/models/filter.model";
+import { FilterService } from "@shared/services/filter.service";
+import { agencyListFilterColumns } from "@agency/agency-list/agency-list.constants";
 
 @Component({
   selector: 'app-agency-list',
   templateUrl: './agency-list.component.html',
-  styleUrls: ['./agency-list.component.scss'],
+  styleUrls: ['./agency-list.component.scss']
 })
 export class AgencyListComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
@@ -41,28 +45,38 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
   ];
   public fileName: string;
   public defaultFileName: string;
+  public filterColumns = agencyListFilterColumns;
+  public agencyListFilterFormGroup: FormGroup;
+  public filteredItems$ = new Subject<number>();
 
+  private filters: AgencyListFilters = {};
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
 
   @Select(AgencyState.agencies)
   agencies$: Observable<AgencyPage>;
 
+  @Select(AgencyState.agencyFilteringOptions)
+  agencyFilteringOptions$: Observable<AgencyFilteringOptions>
+
   constructor(
     private store: Store,
     private router: Router,
     private actions$: Actions,
     private confirmService: ConfirmService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private filterService: FilterService,
+    private formBuilder: FormBuilder
   ) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Agency List', iconName: 'clock' }));
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetAgencyByPage(this.currentPage, this.pageSize));
-
+    this.initAgencyListFilterFormGroup();
+    this.dispatchNewPage();
     this.subscribeOnPageChanges();
+    this.subscribeOnAgencyFilteringOptions();
     this.subscribeOnSuccessAgencyByPage();
     this.setFileName();
   }
@@ -129,7 +143,10 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
       new ExportAgencyList(
         new ExportPayload(
           fileType,
-          { ids: this.selectedItems.length ? this.selectedItems.map((val) => val.createUnder.id) : null },
+          {
+            ids: this.selectedItems.length ? this.selectedItems.map((val) => val.createUnder.id) : null,
+            ...this.filters
+          },
           options ? options.columns.map((val) => val.column) : this.columnsToExport.map((val) => val.column),
           null,
           options?.fileName || this.defaultFileName
@@ -143,6 +160,52 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
     this.defaultFileName = this.getDefaultFileName();
     this.fileName = this.defaultFileName;
     this.store.dispatch(new ShowExportDialog(true));
+  }
+
+  public showFilters(): void {
+    this.store.dispatch(new GetAgencyFilteringOptions());
+    this.store.dispatch(new ShowFilterDialog(true));
+  }
+
+  public onFilterDelete(event: FilteredItem): void {
+    this.filterService.removeValue(event, this.agencyListFilterFormGroup, this.filterColumns);
+  }
+
+  public onFilterClearAll(): void {
+    this.clearFilters();
+    this.dispatchNewPage();
+  }
+
+  private clearFilters(): void {
+    this.agencyListFilterFormGroup.reset();
+    this.filteredItems = [];
+    this.currentPage = 1;
+    this.filters = {};
+    this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  public onFilterApply(): void {
+    this.filters = this.agencyListFilterFormGroup.getRawValue();
+    this.filteredItems = this.filterService.generateChips(this.agencyListFilterFormGroup, this.filterColumns);
+    this.dispatchNewPage();
+    this.store.dispatch(new ShowFilterDialog(false));
+    this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  public onFilterClose() {
+    this.agencyListFilterFormGroup.setValue({
+      searchTerm: this.filters.searchTerm || null,
+      businessUnitNames: this.filters.businessUnitNames || [],
+      statuses: this.filters.statuses || [],
+      cities: this.filters.cities || [],
+      contacts: this.filters.contacts || []
+    });
+    this.filteredItems = this.filterService.generateChips(this.agencyListFilterFormGroup, this.filterColumns);
+    this.filteredItems$.next(this.filteredItems.length);
+  }
+
+  private dispatchNewPage(): void {
+    this.store.dispatch(new GetAgencyByPage(this.currentPage, this.pageSize, this.filters));
   }
 
   private getDefaultFileName(): string {
@@ -174,14 +237,35 @@ export class AgencyListComponent extends AbstractGridConfigurationComponent impl
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(SaveAgencySucceeded))
       .subscribe((agency: { payload: Agency }) => {
-        this.store.dispatch(new GetAgencyByPage(this.currentPage, this.pageSize));
+        this.dispatchNewPage();
       });
   }
 
   private subscribeOnPageChanges(): void {
     this.pageSubject.pipe(debounceTime(1)).subscribe((page: number) => {
       this.currentPage = page;
-      this.store.dispatch(new GetAgencyByPage(this.currentPage, this.pageSize));
+      this.dispatchNewPage();
+    });
+  }
+
+  private subscribeOnAgencyFilteringOptions(): void {
+    this.agencyFilteringOptions$
+      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+      .subscribe((data: AgencyFilteringOptions) => {
+        this.filterColumns['businessUnitNames'].dataSource = data.businessUnitNames;
+        this.filterColumns['statuses'].dataSource = data.statuses;
+        this.filterColumns['cities'].dataSource = data.cities;
+        this.filterColumns['contacts'].dataSource = data.contacts;
+      });
+  }
+
+  private initAgencyListFilterFormGroup(): void {
+  this.agencyListFilterFormGroup = this.formBuilder.group({
+      searchTerm: new FormControl(null),
+      businessUnitNames: new FormControl([]),
+      statuses: new FormControl([]),
+      cities: new FormControl([]),
+      contacts: new FormControl([]),
     });
   }
 }

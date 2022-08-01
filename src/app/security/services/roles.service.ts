@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { PermissionsTree } from '@shared/models/permission.model';
-import { Role, RoleDTO, RolesPage } from '@shared/models/roles.model';
+import { Role, RoleDTO, RolesFilters, RolesPage } from '@shared/models/roles.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -14,19 +14,21 @@ export class RolesService {
   /**
    * Get the list of roles by BusinessUnitType and BusinessUnitId
    * @param BusinessUnitType
-   * @param BusinessUnitId
+   * @param BusinessUnitIds
    * @param PageNumber
    * @param PageSize
+   * @param Filters
    *
    * @return RolesPage
    */
   public getRolesPage(
     BusinessUnitType: BusinessUnitType,
-    BusinessUnitId: number,
+    BusinessUnitIds: number[],
     PageNumber: number,
-    PageSize: number
+    PageSize: number,
+    Filters: RolesFilters
   ): Observable<RolesPage> {
-    return this.http.get<RolesPage>(`/api/Roles`, { params: { BusinessUnitType, BusinessUnitId, PageNumber, PageSize } });
+    return this.http.post<RolesPage>(`/api/Roles/filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, ...Filters });
   }
 
   /**

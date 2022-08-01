@@ -9,7 +9,7 @@ import {
 import { OrganizationManagementState } from '../../../store/organization-management.state';
 import { ShowSideDialog } from '../../../../store/app.actions';
 import {
-  CANCEL_COFIRM_TEXT,
+  CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE
@@ -156,7 +156,7 @@ export class GroupSetupComponent extends AbstractGridConfigurationComponent impl
       || (!this.isEdit && (this.skillGroupsFormGroup.dirty || this.skillsId.size))
     ) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT, {
+        .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'

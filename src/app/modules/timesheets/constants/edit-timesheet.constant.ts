@@ -33,7 +33,7 @@ export const RecordAddDialogConfig: DialogConfig = {
       },
       {
         title: 'Bill Rate Type',
-        field: 'billRateId',
+        field: 'billRateConfigId',
         type: FieldType.Dropdown,
         disabled: false,
         required: true,

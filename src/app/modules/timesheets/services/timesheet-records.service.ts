@@ -52,12 +52,12 @@ export class TimesheetRecordsService {
   public findDiffs(
     data: RecordValue[], forms: Record<string, FormGroup>, defs: ColDef[],
     ): RecordValue[] {
-    const diffs: Record<string, string | number>[] = [];
+    const diffs: Record<string, string | number  | boolean>[] = [];
     const filedsToCompare = defs.filter((def) => def.cellRendererParams?.editMode).map((def) => def.field);
 
     data.forEach((dataItem) => {
       const values: RecordValue = forms[dataItem.id].getRawValue() as RecordValue;
-      const diffValues: Record<string, string | number> = {};
+      const diffValues: Record<string, string | number  | boolean> = {};
 
 
       Object.keys(dataItem).filter((key) => filedsToCompare.includes(key))
@@ -66,7 +66,7 @@ export class TimesheetRecordsService {
           const keyValue = key as keyof RecordValue;
 
           if (dataItem[keyValue] !== values[keyValue]) {
-            diffValues[keyValue] = values[keyValue] as string | number;
+            diffValues[keyValue] = values[keyValue] as string | number | boolean;
           }
 
         }

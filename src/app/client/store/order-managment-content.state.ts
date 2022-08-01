@@ -18,6 +18,7 @@ import {
   GetAssociateAgencies,
   GetAvailableSteps,
   GetHistoricalData,
+  ClearHistoricalData,
   GetIncompleteOrders,
   GetMasterShifts,
   GetOrderById,
@@ -138,6 +139,7 @@ export interface OrderManagementContentStateModel {
     navigationTab: {
       active: null,
       pending: null,
+      current: null,
     },
   },
 })
@@ -659,6 +661,11 @@ export class OrderManagementContentState {
     );
   }
 
+  @Action(ClearHistoricalData)
+  ClearHistoricalData({ patchState }: StateContext<OrderManagementContentStateModel>): void {
+    patchState({ historicalEvents: [] });
+  }
+
   @Action(GetCandidatesBasicInfo)
   GetCandidatesBasicInfo(
     { patchState }: StateContext<OrderManagementContentStateModel>,
@@ -697,8 +704,8 @@ export class OrderManagementContentState {
   @Action(SelectNavigationTab)
   SelectNavigationTab(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { active, pending }: SelectNavigationTab
+    { active, pending, current }: SelectNavigationTab
   ): void {
-    patchState({ navigationTab: { active, pending } });
+    patchState({ navigationTab: { active, pending, current } });
   }
 }

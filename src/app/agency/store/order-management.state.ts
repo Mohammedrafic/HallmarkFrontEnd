@@ -28,9 +28,11 @@ import { ShowToast } from 'src/app/store/app.actions';
 import {
   ApplyOrderApplicants,
   ApplyOrderApplicantsSucceed,
+  ClearAgencyHistoricalData,
   ClearOrders,
   ExportAgencyOrders,
   GetAgencyFilterOptions,
+  GetAgencyHistoricalData,
   GetAgencyOrderCandidatesList,
   GetAgencyOrderGeneralInformation,
   GetAgencyOrdersPage,
@@ -48,7 +50,6 @@ import {
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { OrderFilteringOptionsService } from '@shared/services/order-filtering-options.service';
 import { HistoricalEvent } from '@shared/models/historical-event.model';
-import { GetHistoricalData } from '@client/store/order-managment-content.actions';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
@@ -242,7 +243,7 @@ export class OrderManagementState {
     patchState({ orderDialogOptions: options });
     return this.orderManagementContentService.getAgencyOrderById(id, organizationId).pipe(
       tap((payload) => {
-        const groupedCredentials = getGroupedCredentials(payload.credentials);
+        const groupedCredentials = getGroupedCredentials(payload.credentials ?? payload.reOrderFrom?.credentials);
         payload.groupedCredentials = groupedCredentials;
         patchState({ selectedOrder: payload });
         return payload;
@@ -332,10 +333,10 @@ export class OrderManagementState {
     );
   }
 
-  @Action(GetHistoricalData)
-  GetHistoricalData(
+  @Action(GetAgencyHistoricalData)
+  GetAgencyHistoricalData(
     { patchState }: StateContext<OrderManagementModel>,
-    { organizationId, candidateJobId }: GetHistoricalData
+    { organizationId, candidateJobId }: GetAgencyHistoricalData
   ): Observable<HistoricalEvent[]> {
     return this.orderManagementContentService.getHistoricalData(organizationId, candidateJobId).pipe(
       tap((payload) => {
@@ -347,6 +348,11 @@ export class OrderManagementState {
         return of();
       })
     );
+  }
+
+  @Action(ClearAgencyHistoricalData)
+  ClearAgencyHistoricalData({ patchState }: StateContext<OrderManagementModel>): void {
+    patchState({ historicalEvents: [] });
   }
 
   @Action(GetOrganizationStructure)
@@ -388,10 +394,7 @@ export class OrderManagementState {
   }
 
   @Action(ClearOrders)
-  ClearOrders(
-    { patchState }: StateContext<OrderManagementModel>,
-    {}: ClearOrders
-  ): OrderManagementModel {
+  ClearOrders({ patchState }: StateContext<OrderManagementModel>, {}: ClearOrders): OrderManagementModel {
     return patchState({ ordersPage: null });
   }
 }

@@ -64,6 +64,7 @@ export const reOrdersChildColumnToExport: ExportColumn[] = [
   { text: 'Position Status', column: 'PositionStatus' },
   { text: 'Candidate Name', column: 'CandidateName' },
   { text: 'Candidate Status', column: 'CandidateStatus' },
+  { text: 'Candidate Bill Rate', column: 'CandidateBillRate' },
   { text: 'Submission', column: 'Submission' },
   { text: 'Onboarded', column: 'Onboarded' },
 ];
@@ -73,7 +74,6 @@ export const allOrdersChildColumnsToExport: ExportColumn[] = [
   { text: 'Candidate Name', column: 'CandidateName' },
   { text: 'Position Status', column: 'PositionStatus' },
   { text: 'Candidate Status', column: 'CandidateStatus' },
-  { text: 'Candidate Skill', column: 'ChildOrderSkill' },
   { text: 'Candidate Bill Rate', column: 'CandidateBillRate' },
   { text: 'Submission %', column: 'Submission' },
   { text: 'Onboard %', column: 'Onboard' },
@@ -252,10 +252,6 @@ export const PerDiemColumnsConfig = [
   },
   {
     fieldName: 'jobTitle',
-    visible: true,
-  },
-  {
-    fieldName: 'billRate',
     visible: true,
   },
   {

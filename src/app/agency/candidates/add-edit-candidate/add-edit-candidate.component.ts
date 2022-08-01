@@ -30,6 +30,9 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { UserState } from 'src/app/store/user.state';
 import { Location } from '@angular/common';
 import { ComponentCanDeactivate } from '@shared/guards/pending-changes.guard';
+import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
+import { NavigationTabModel } from '@shared/models/navigation-tab.model';
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -102,10 +105,12 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
   }
 
   public clearForm(): void {
-    const { generalInfo: { profileStatus, candidateAgencyStatus } } = this.candidateForm.getRawValue();
+    const {
+      generalInfo: { profileStatus, candidateAgencyStatus },
+    } = this.candidateForm.getRawValue();
     this.candidateForm.reset();
     const generalInfoControl = this.candidateForm.get('generalInfo');
-    generalInfoControl?.patchValue({profileStatus, candidateAgencyStatus});
+    generalInfoControl?.patchValue({ profileStatus, candidateAgencyStatus });
   }
 
   public navigateBack(): void {
@@ -115,7 +120,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
   @HostListener('window:beforeunload')
   public canDeactivate(): boolean | Observable<boolean> {
     return !this.candidateForm.dirty;
-  };
+  }
 
   public save(): void {
     if (this.candidateForm.valid) {
@@ -275,9 +280,11 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
   }
 
   private navigateToCandidates(): void {
-    const location = this.location.getState() as { orderId: number, pageToBack: string };
+    const location = this.location.getState() as { orderId: number; pageToBack: string };
     if (location.orderId) {
-      this.router.navigate([location.pageToBack], { state: { orderId: location.orderId }});
+      this.router.navigate([location.pageToBack], { state: { orderId: location.orderId } });
+      const selectedTab = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
+      this.store.dispatch(new SelectNavigationTab(selectedTab.current));
     } else {
       this.router.navigate(['/agency/candidates']);
     }
@@ -288,8 +295,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
     if (stringSsn.length >= 9) {
       return stringSsn;
     } else {
-      return this.getStringSsn(`0${ssn}`)
+      return this.getStringSsn(`0${ssn}`);
     }
   }
 }
-

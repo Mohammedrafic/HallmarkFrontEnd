@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RejectReasonDialogComponent } from './reject-reason-dialog.component';
+import { UsersFiltersComponent } from './users-filters.component';
 
-describe('RejectReasonDialogComponent', () => {
-  let component: RejectReasonDialogComponent;
-  let fixture: ComponentFixture<RejectReasonDialogComponent>;
+describe('UsersFiltersComponent', () => {
+  let component: UsersFiltersComponent;
+  let fixture: ComponentFixture<UsersFiltersComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ RejectReasonDialogComponent ]
+      declarations: [ UsersFiltersComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(RejectReasonDialogComponent);
+    fixture = TestBed.createComponent(UsersFiltersComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

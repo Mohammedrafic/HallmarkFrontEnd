@@ -3,7 +3,12 @@
     <h3>Agency list</h3>
   </ng-container>
   <ng-container right>
-    <button ejs-button cssClass="e-outline">Filters <i-feather name="sliders" class="icon"></i-feather></button>
+    <button ejs-button cssClass="e-outline button-filter" (click)="showFilters()">
+      <div class="filter-button-content">
+          <span *ngIf="(filteredItems$ | async) as filteredItems" class="e-badge e-badge-success e-badge-circle">{{filteredItems}}</span>
+        Filters <i-feather name="sliders" class="icon"></i-feather>
+      </div>
+    </button>
     <button
       ejs-dropdownbutton
       [items]="exportOptions"
@@ -102,3 +107,14 @@
 </section>
 
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
+
+<app-filter-dialog
+  [items]="filteredItems"
+  [count]="(agencies$ | async)?.totalCount"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
+  <app-agency-list-filters [form]="agencyListFilterFormGroup" [filterColumns]="filterColumns"></app-agency-list-filters>
+</app-filter-dialog>

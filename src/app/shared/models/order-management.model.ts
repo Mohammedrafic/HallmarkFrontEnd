@@ -42,6 +42,7 @@ export class OrderManagement {
   positions?: number;
   agencies?: string[] | null;
   allAgencies?: boolean;
+  jobStartDate?: Date;
 }
 
 export class OrderManagementFilter {
@@ -129,6 +130,7 @@ export type OrderCandidatesList = {
   };
   candidateStatus?: CandidateStatus;
   agencyName?: string;
+  organizationId?: number;
 };
 
 export type AgencyOrderManagementPage = PageOfCollections<AgencyOrderManagement>;
@@ -164,6 +166,7 @@ export type AgencyOrder = {
   orderId: number;
   organizationId: number;
   isLocked: boolean;
+  isClosed?: boolean;
 };
 
 export class SuggestedDetails {
@@ -261,8 +264,9 @@ export class Order {
   reOrderId?: number;
   orderId?: number;
   candidates?: CandidateModel[];
-  reasonForClosing?: string;
-  closingDate?: string;
+  orderCloseDate?: string;
+  orderClosureReason?: string;
+  orderClosureReasonId?: string;
   isTemplate?: boolean;
 }
 
@@ -312,7 +316,7 @@ export interface EditOrderDto extends Omit<Order, 'billRates' | 'status' | 'stat
 export type AcceptJobDTO = {
   actualEndDate?: string;
   actualStartDate?: string;
-  allowDeplayWoCredentials?: boolean;
+  allowDeployWoCredentials?: boolean;
   candidateBillRate?: number;
   clockId?: number;
   guaranteedWorkWeek?: string;
@@ -324,6 +328,7 @@ export type AcceptJobDTO = {
   requestComment?: string;
   billRates?: BillRate[];
   offeredStartDate?: string;
+  skillName?: string;
 };
 
 export type CandidateProfile = {

@@ -34,9 +34,9 @@
       <e-column textAlign="Right" width="80">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data, $event)">
+            <div ejs-button cssClass="e-flat primary-icon-button custom-button" [class.btn-icon__disabled]="order?.isClosed"  (click)="onEdit(data, $event)">
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
-            </button>
+            </div>
           </div>
         </ng-template>
       </e-column>
@@ -59,7 +59,7 @@
               <e-chips>
                 <ng-container [ngSwitch]="data.status">
                   <ng-container *ngSwitchCase="candidateStatuses.BillRatePending">
-                    <e-chip text="Bill Rate Pending" cssClass="e-pending"></e-chip>
+                    <e-chip text="B.R.Pending" cssClass="e-pending"></e-chip>
                   </ng-container>
                   <ng-container *ngSwitchCase="candidateStatuses.OfferedBR">
                     <e-chip text="Offered B.R." cssClass="e-pending"></e-chip>
@@ -143,7 +143,7 @@
                 id="gridPager"
                 #gridPager
                 [pageSize]="pageSize"
-                [totalRecordsCount]="candidatesList?.totalPages"
+                [totalRecordsCount]="candidatesList?.totalCount"
                 [enablePagerMessage]="false"
                 [currentPage]="currentPage"
                 (click)="onGoToClick($event)"

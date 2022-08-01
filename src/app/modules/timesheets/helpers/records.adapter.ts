@@ -52,7 +52,7 @@ export class RecordsAdapter {
     return {
       id: record.id,
       timeIn: DateTimeHelper.toUtcFormat(record.timeIn),
-      billRateId: record.billRateId,
+      billRateConfigId: record.billRateConfigId,
       departmentId: record.departmentId,
       value: record.value,
       description: record.description,

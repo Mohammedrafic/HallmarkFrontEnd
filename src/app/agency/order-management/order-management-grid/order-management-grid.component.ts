@@ -121,7 +121,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public previousSelectedOrderId: number | null;
   public selectedCandidate: any | null;
   public selectedReOrder: any | null;
-  public filters: AgencyOrderFilters = {};
+  public filters: AgencyOrderFilters = {
+    includeReOrders: true,
+  };
   public filterColumns = AgencyOrderFiltersComponent.generateFilterColumns();
   public OrderFilterFormGroup: FormGroup = AgencyOrderFiltersComponent.generateFiltersForm();
   public columnsToExport: ExportColumn[];
@@ -130,15 +132,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public isRowScaleUp: boolean = true;
   public isSubrowDisplay: boolean = false;
   public ordersPage: AgencyOrderManagementPage;
-  public showReOrders = false;
   public AgencyOrderManagementTabs = AgencyOrderManagementTabs;
+  public isLockMenuButtonsShown = true;
+  public orderTypes = OrderType;
 
-  private statusSortDerection: SortDirection = 'Ascending';
   private isAlive = true;
   private selectedIndex: number | null;
   private unsubscribe$: Subject<void> = new Subject();
   private pageSubject = new Subject<number>();
-  public isLockMenuButtonsShown = true;
 
   constructor(
     private store: Store,
@@ -281,19 +282,25 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private onTabChange(): void {
-    this.ordersTab$.pipe(takeUntil(this.unsubscribe$), tap((selected) => {
-      this.selectedTab = selected;
-      this.onGridCreated();
-      this.clearFilters();
-      this.store.dispatch(new ClearOrders());
-      this.selectedIndex = null;
-      this.dispatchNewPage();
-    })).subscribe()
+    this.ordersTab$
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        tap((selected) => {
+          this.selectedTab = selected;
+          this.onGridCreated();
+          this.clearFilters();
+          this.store.dispatch(new ClearOrders());
+          this.selectedIndex = null;
+          this.dispatchNewPage();
+        })
+      )
+      .subscribe();
   }
 
   private dispatchNewPage(): void {
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
+        this.filters.includeReOrders = true;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.PerDiem:
@@ -302,10 +309,12 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.ReOrders:
+        this.filters.includeReOrders = false;
         this.filters.orderTypes = [OrderType.ReOrder];
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       default:
+        this.filters.includeReOrders = false;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
     }
@@ -315,23 +324,19 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onGridCreated(): void {
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
-        this.showReOrders = false;
         this.isLockMenuButtonsShown = true;
         this.refreshGridColumns(MyAgencyOrdersColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.PerDiem:
         this.isLockMenuButtonsShown = true;
-        this.showReOrders = true;
         this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.ReOrders:
         this.isLockMenuButtonsShown = false;
-        this.showReOrders = false;
         this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
         break;
       default:
         this.isLockMenuButtonsShown = true;
-        this.showReOrders = false;
         this.refreshGridColumns(MyAgencyOrdersColumnsConfig, this.gridWithChildRow);
         break;
     }
@@ -357,8 +362,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         new GetAgencyOrderCandidatesList(
           event.data.orderId,
           event.data.organizationId,
-          this.currentPage,
-          this.pageSize,
+          1,
+          30,
           this.orderManagementAgencyService.excludeDeployed
         )
       );
@@ -495,7 +500,9 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.OrderFilterFormGroup.reset();
     this.filteredItems = [];
     this.currentPage = 1;
-    this.filters = {};
+    this.filters = {
+      includeReOrders: true,
+    };
     this.filteredItems$.next(this.filteredItems.length);
   }
 
@@ -523,6 +530,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           : perDiemColumnsToExport;
         break;
       case AgencyOrderManagementTabs.ReOrders:
+        if (this.selectedItems.length === 0) {
+          this.columnsToExport = [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport];
+          return;
+        }
         this.columnsToExport = hasSelectedItemChildren
           ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
           : reOrdersColumnsToExport;
@@ -557,6 +568,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.clearSelection(this.gridWithChildRow);
         this.previousSelectedOrderId = null;
         this.selectedIndex = null;
+        const table = document.getElementsByClassName('e-virtualtable')[0] as HTMLElement;
+        if (table) {
+          table.style.transform = 'translate(0px, 0px)';
+        }
       } else {
         this.openChildDialog.next(false);
         this.selectedCandidate = null;
@@ -589,13 +604,18 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private onAgencyChange(): void {
-    this.lastSelectedAgencyId$.pipe(takeWhile(() => this.isAlive), skip(1)).subscribe(() => {
-      this.openPreview.next(false);
-      this.openCandidat.next(false);
-      this.clearFilters();
-      this.dispatchNewPage();
-      this.store.dispatch(new GetAgencyFilterOptions());
-    });
+    this.lastSelectedAgencyId$
+      .pipe(
+        takeWhile(() => this.isAlive),
+        skip(1)
+      )
+      .subscribe(() => {
+        this.openPreview.next(false);
+        this.openCandidat.next(false);
+        this.clearFilters();
+        this.dispatchNewPage();
+        this.store.dispatch(new GetAgencyFilterOptions());
+      });
   }
 
   private onReloadOrderCandidatesLists(): void {

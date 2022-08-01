@@ -174,7 +174,7 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
           actualEndDate: this.candidateJob.actualEndDate,
           clockId: this.candidateJob.clockId,
           guaranteedWorkWeek: this.candidateJob.guaranteedWorkWeek,
-          allowDeplayWoCredentials: false,
+          allowDeployWoCredentials: false,
           billRates: this.billRatesData,
           offeredStartDate: this.candidateJob.offeredStartDate,
         })

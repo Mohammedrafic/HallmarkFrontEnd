@@ -17,7 +17,7 @@ import {
   ExportExternalBillRateMapping,
   GetExternalBillRateMapping, GetExternalBillRateMappingById, SaveUpdateBillRateMapping,
 } from "@organization-management/store/bill-rates.actions";
-import {CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE} from "@shared/constants";
+import {CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE} from "@shared/constants";
 import {ShowExportDialog, ShowSideDialog} from "../../../store/app.actions";
 import {AbstractGridConfigurationComponent} from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
 import {ExportedFileType} from "@shared/enums/exported-file-type";
@@ -174,7 +174,7 @@ export class BillRateTypeMappingComponent extends AbstractGridConfigurationCompo
   public onFormCancelClick(): void {
     if (this.billRateMappingForm.dirty) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT, {
+        .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'

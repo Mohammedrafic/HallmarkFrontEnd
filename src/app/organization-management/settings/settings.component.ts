@@ -28,7 +28,7 @@ import {
   SaveOrganizationSettings
 } from '../store/organization-management.actions';
 import { ShowFilterDialog, ShowSideDialog } from '../../store/app.actions';
-import { CANCEL_COFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
+import { CANCEL_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from '@shared/constants/messages';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
 import { OrganizationHierarchy } from '@shared/enums/organization-hierarchy';
@@ -298,7 +298,7 @@ export class SettingsComponent extends AbstractGridConfigurationComponent implem
       || this.locationFormGroup.dirty
       || this.departmentFormGroup.dirty) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT, {
+        .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'

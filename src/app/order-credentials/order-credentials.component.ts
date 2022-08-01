@@ -44,7 +44,7 @@ export class OrderCredentialsComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     const { credentials } = changes;
     if (credentials) {
-      credentials.currentValue.forEach((cred: IOrderCredentialItem) => this.updateGroups(cred));
+      credentials.currentValue.forEach((cred: IOrderCredentialItem) => this.updateGroups(cred, true));
     }
   }
 
@@ -168,10 +168,14 @@ export class OrderCredentialsComponent implements OnChanges {
     this.credentials = [...this.credentials];
   }
 
-  private updateGroups(cred: IOrderCredentialItem): void {
+  private updateGroups(cred: IOrderCredentialItem, areDepartmentSkillChanged?: boolean): void {
     const existedCredGroup = this.credentialsGroups.find(this.byType(cred)) as IOrderCredential;
     if (existedCredGroup) {
-      existedCredGroup.items = [...existedCredGroup.items, cred];
+      if (areDepartmentSkillChanged) {
+        existedCredGroup.items = [cred];
+      } else {
+        existedCredGroup.items = [...existedCredGroup.items, cred];
+      }
       existedCredGroup.totalCount = existedCredGroup.items.length;
     } else {
       this.credentialsGroups.push(this.createGroup(cred));

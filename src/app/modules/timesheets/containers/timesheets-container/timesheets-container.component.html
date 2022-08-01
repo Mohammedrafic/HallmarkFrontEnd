@@ -17,8 +17,8 @@
         </ejs-dropdownlist>
       </div>
     </div>
-    <app-search class="search"></app-search>
-    <app-date-week-picker [dateControl]="dateControl"></app-date-week-picker>
+    <app-search #search ngDefaultControl [formControl]="searchControl" class="search"></app-search>
+    <app-date-range-week-picker (range)="setRange($event)"></app-date-range-week-picker>
     <button
       ejs-button
       cssClass="e-outline button-filter button--no-wrap"

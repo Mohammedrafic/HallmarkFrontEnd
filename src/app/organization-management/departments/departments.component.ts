@@ -28,7 +28,7 @@ import { OrganizationManagementState } from '../store/organization-management.st
 import { MessageTypes } from '../../shared/enums/message-types';
 import { AbstractGridConfigurationComponent } from '../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
-  CANCEL_COFIRM_TEXT,
+  CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
@@ -318,7 +318,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   onDepartmentFormCancelClick(): void {
     if (this.departmentsDetailsFormGroup.dirty) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT, {
+        .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'

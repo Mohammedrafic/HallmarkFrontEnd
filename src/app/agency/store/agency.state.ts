@@ -6,7 +6,7 @@ import { catchError, Observable, of, tap } from 'rxjs';
 import { AGENCY_ADDED, RECORD_ADDED, RECORD_MODIFIED, RECORD_SAVED } from 'src/app/shared/constants/messages';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 
-import { Agency, AgencyPage } from 'src/app/shared/models/agency.model';
+import { Agency, AgencyFilteringOptions, AgencyPage } from 'src/app/shared/models/agency.model';
 import {
   AssociateOrganizations,
   AssociateOrganizationsPage,
@@ -52,9 +52,11 @@ import {
   GetBusinessUnitList,
   RemoveAgencyLogo,
   ExportAgencyList,
+  GetAgencyFilteringOptions,
 } from './agency.actions';
 import { AdminStateModel } from '@admin/store/admin.state';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
+import { UserOrganizationsAgenciesChanged } from 'src/app/store/user.actions';
 
 export interface AgencyStateModel {
   isAgencyLoading: boolean;
@@ -68,6 +70,7 @@ export interface AgencyStateModel {
   jobDistributionInitialData: JobDistributionInitialData | null;
   partnershipSettings: PartnershipSettings | null;
   businessUnits: BusinessUnit[];
+  agencyFilteringOptions: AgencyFilteringOptions | null;
 }
 
 @State<AgencyStateModel>({
@@ -86,6 +89,7 @@ export interface AgencyStateModel {
     feeExceptionsInitialData: null,
     jobDistributionInitialData: null,
     partnershipSettings: null,
+    agencyFilteringOptions: null
   },
 })
 @Injectable()
@@ -155,6 +159,12 @@ export class AgencyState {
     return state.feeSettings?.baseFee;
   }
 
+  @Selector()
+  static agencyFilteringOptions(state: AgencyStateModel): AgencyFilteringOptions | null {
+    return state.agencyFilteringOptions;
+  }
+
+
   constructor(
     private agencyService: AgencyService,
     private organizationService: OrganizationService,
@@ -168,7 +178,7 @@ export class AgencyState {
     return this.agencyService.saveAgency(payload).pipe(
       tap((agency) => {
         patchState({ isAgencyLoading: false, agency });
-        dispatch(new SaveAgencySucceeded(agency));
+        dispatch([new SaveAgencySucceeded(agency), new UserOrganizationsAgenciesChanged()]);
         if (payload.agencyDetails.id) {
           dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
         } else {
@@ -235,10 +245,10 @@ export class AgencyState {
   @Action(GetAgencyByPage)
   GetAgencyByPage(
     { patchState }: StateContext<AgencyStateModel>,
-    { pageNumber, pageSize }: GetAgencyByPage
+    { pageNumber, pageSize, filters }: GetAgencyByPage
   ): Observable<AgencyPage> {
     patchState({ isAgencyLoading: true });
-    return this.agencyService.getAgencies(pageNumber, pageSize).pipe(
+    return this.agencyService.getAgencies(pageNumber, pageSize, filters).pipe(
       tap((payload) => {
         patchState({ isAgencyLoading: false, agencyPage: payload });
         return payload;
@@ -475,4 +485,11 @@ export class AgencyState {
       })
     );
   }
+
+  @Action(GetAgencyFilteringOptions)
+  GetAgencyFilteringOptions({ patchState }: StateContext<AgencyStateModel>): Observable<AgencyFilteringOptions> {
+    return this.agencyService.getAgencyFilteringOptions().pipe(tap(data => {
+      patchState({ agencyFilteringOptions: data });
+    }));
+  };
 }

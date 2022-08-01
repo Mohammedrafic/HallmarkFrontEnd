@@ -506,6 +506,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     const extendedOrder = {
       ...this.saveTemplateDialogService.resetOrderPropertyIds(order),
       templateTitle,
+      title: isNil(order.title) ? '' : order.title,
       isTemplate: true,
     };
     const documents = this.orderDetailsFormComponent.documents;

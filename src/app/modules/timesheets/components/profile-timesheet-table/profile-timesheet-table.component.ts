@@ -184,19 +184,21 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
           return record;
       });
   
-    const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
-    const dto = RecordsAdapter.adaptRecordPutDto(
-      recordsToUpdate, organizationId, id, this.currentTab, this.idsToDelete);
-
-    this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
-    .pipe(
-      takeUntil(this.componentDestroy()),
-    )
-    .subscribe(() => {
-      this.changesSaved.emit(true);
-      this.isChangesSaved = true;
-      this.setInitialTableState();
-    });
+    if (diffs.length || this.idsToDelete.length) {
+      const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
+      const dto = RecordsAdapter.adaptRecordPutDto(
+        recordsToUpdate, organizationId, id, this.currentTab, this.idsToDelete);
+  
+      this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
+      .pipe(
+        takeUntil(this.componentDestroy()),
+      )
+      .subscribe(() => {
+        this.changesSaved.emit(true);
+        this.isChangesSaved = true;
+        this.setInitialTableState();
+      });
+    }
   }
 
   public trackByIndex(index: number, item: TabConfig): number {

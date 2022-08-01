@@ -35,17 +35,12 @@ export class TimesheetsApiService {
 
   constructor(
     private http: HttpClient,
-    private capitalizeFirst: CapitalizeFirstPipe,
   ) {}
 
   public getTimesheets(filters: TimesheetsFilterState): Observable<TimrsheetsDto> {
     return this.http.post<TimrsheetsDto>('/api/Timesheets', {
       ...filters,
     });
-  }
-
-  public getTabsCounts(): Observable<TabCountConfig> {
-    return of(MokTabsCounts);
   }
 
   public getTimesheetRecords(
@@ -64,6 +59,10 @@ export class TimesheetsApiService {
         expenses: [],
       }))
     );
+  }
+
+  public postBulkApprove(timesheetIds: number[]): Observable<void> {
+    return this.http.post<void>('/api/TimesheetState/bulkapprove', { timesheetIds });
   }
 
   public addTimesheetRecord(body: AddRecordDto): Observable<null> {

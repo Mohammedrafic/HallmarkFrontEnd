@@ -104,3 +104,12 @@ export class ClearOrders {
   static readonly type = '[agency order management] Clear Orders';
   constructor() {}
 }
+
+export class GetAgencyHistoricalData {
+  static readonly type = '[agency order management] Get Historical Data';
+  constructor(public organizationId: number, public candidateJobId: number) {}
+}
+
+export class ClearAgencyHistoricalData {
+  static readonly type = '[agency order management] Clear Historical Data';
+}

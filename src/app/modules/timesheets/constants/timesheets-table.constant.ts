@@ -149,8 +149,8 @@ export const SavedFiltersParams: string[] = [
   'pageSize',
   'organizationId',
   'orderBy',
-  'date',
-  'search',
+  'dateTimeOffset',
+  'searchTerm',
   'statusIds',
 ];
 
@@ -246,4 +246,8 @@ export const filterColumnDataSource: FilterDataSource = {
       name: '20-30-02'
     }
   ]
+};
+
+export const BulkApproveSuccessMessage = {
+  successMessage: 'Success. Timesheets Approved',
 };

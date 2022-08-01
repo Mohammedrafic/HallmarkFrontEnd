@@ -79,7 +79,7 @@ interface SecurityStateModel {
 export class SecurityState {
   @Selector()
   static bussinesData(state: SecurityStateModel): BusinessUnit[] {
-    return [BUSINNESS_DATA_DEFAULT_VALUE, ...state.bussinesData] as BusinessUnit[];
+    return state.bussinesData;
   }
 
   @Selector()
@@ -141,6 +141,11 @@ export class SecurityState {
   }
 
   @Selector()
+  static permissionsTree(state: SecurityStateModel): PermissionsTree {
+    return state.permissionsTree;
+  }
+
+  @Selector()
   static isNewRoleDataLoading(state: SecurityStateModel): boolean {
     return state.isNewRoleDataLoading;
   }
@@ -162,11 +167,8 @@ export class SecurityState {
   }
 
   @Selector()
-  static businessUserData(state: SecurityStateModel): (type: number) => BusinessUnit[] {
-    return (type: number) =>
-      type === 1
-        ? ([BUSINNESS_DATA_HALLMARK_VALUE, ...state.newRoleBussinesData] as BusinessUnit[])
-        : ([BUSINNESS_DATA_DEFAULT_VALUE, ...state.newRoleBussinesData] as BusinessUnit[]);
+  static businessUserData(state: SecurityStateModel): BusinessUnit[] {
+    return state.newRoleBussinesData;
   }
 
   constructor(
@@ -208,9 +210,9 @@ export class SecurityState {
   @Action(GetRolesPage)
   GetRolesPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitId, businessUnitType, pageNumber, pageSize }: GetRolesPage
+    { businessUnitIds, businessUnitType, pageNumber, pageSize, filters }: GetRolesPage
   ): Observable<RolesPage> {
-    return this.roleService.getRolesPage(businessUnitType, businessUnitId, pageNumber, pageSize).pipe(
+    return this.roleService.getRolesPage(businessUnitType, businessUnitIds, pageNumber, pageSize, filters).pipe(
       tap((payload) => {
         patchState({ rolesPage: payload });
         return payload;
@@ -221,9 +223,9 @@ export class SecurityState {
   @Action(GetRolePerUser)
   GetRolesPerPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitId, businessUnitType }: GetRolePerUser
+    { businessUnitIds, businessUnitType }: GetRolePerUser
   ): Observable<RolesPerUser[]> {
-    return this.userService.getRolesPerUser(businessUnitId, businessUnitType).pipe(
+    return this.userService.getRolesPerUser(businessUnitType, businessUnitIds).pipe(
       tap((payload) => {
         patchState({ rolesPerUsers: payload });
         return payload;
@@ -234,9 +236,9 @@ export class SecurityState {
   @Action(GetUsersPage)
   GetUsersPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitId, businessUnitType, pageNumber, pageSize }: GetUsersPage
+    { businessUnitIds, businessUnitType, pageNumber, pageSize, filters }: GetUsersPage
   ): Observable<UsersPage> {
-    return this.userService.getUsersPage(businessUnitType, businessUnitId, pageNumber, pageSize).pipe(
+    return this.userService.getUsersPage(businessUnitType, businessUnitIds, pageNumber, pageSize, filters).pipe(
       tap((payload) => {
         patchState({ usersPage: payload });
         return payload;

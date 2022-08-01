@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, ChangeDetectorRef } from '@angular/
 import { ICellRendererParams, ColDef } from '@ag-grid-community/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ProfileTimesheetTableComponent } from '../../profile-timesheet-table/profile-timesheet-table.component';
+import { RecordValue } from '../../../interface';
 
 @Component({
   selector: 'app-actions-cell',
@@ -14,6 +15,8 @@ export class ActionsCellComponent implements ICellRendererAngularComp {
   public editable = false;
 
   private recordId: number;
+
+  public isDeletable = true;
 
   componentParent: ProfileTimesheetTableComponent;
 
@@ -32,8 +35,9 @@ export class ActionsCellComponent implements ICellRendererAngularComp {
   }
 
   private setData(params: ICellRendererParams): void {
-    this.editable = (params.colDef as ColDef).cellRendererParams.isEditable;
+    this.editable = (params.colDef as ColDef).cellRendererParams.isEditable ;
     this.recordId = params.value;
+    this.isDeletable = (params.data as RecordValue).isGenerated as boolean;
     this.cd.markForCheck();
   }
 

@@ -206,6 +206,10 @@ export class GetHistoricalData {
   constructor(public organizationId: number, public candidateJobId: number) {}
 }
 
+export class ClearHistoricalData {
+  static readonly type = '[order management] Clear Historical Data';
+}
+
 export class ExportOrders {
   static readonly type = '[order management] Export Organization list';
   constructor(public payload: ExportPayload, public tab: OrganizationOrderManagementTabs) {}
@@ -230,6 +234,7 @@ export class SelectNavigationTab {
   static readonly type = '[order management] Select Navigation Tab';
   constructor(
     public pending: OrganizationOrderManagementTabs | null,
-    public active?: OrganizationOrderManagementTabs
+    public active?: OrganizationOrderManagementTabs | null,
+    public current?: OrganizationOrderManagementTabs
   ) {}
 }
