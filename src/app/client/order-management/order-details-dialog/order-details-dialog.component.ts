@@ -81,7 +81,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public orderStatus = OrderStatus;
   public candidatesCounter: number;
   public reOrderToEdit: Order | null;
-  public reOrderDialogTitle: string;
+  public reOrderDialogTitle = 'Edit Re-Order';
 
   public disabledCloseButton = true;
   public showCloseButton = false;
