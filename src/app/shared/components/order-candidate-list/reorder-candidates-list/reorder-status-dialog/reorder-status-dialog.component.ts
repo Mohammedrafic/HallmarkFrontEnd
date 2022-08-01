@@ -35,6 +35,7 @@ import {
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
+import PriceUtils from '@shared/utils/price.utils';
 
 const hideAcceptActionForStatuses: CandidatStatus[] = [
   CandidatStatus.OnBoard,
@@ -214,8 +215,8 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     this.acceptForm.patchValue({
       reOrderFromId,
-      offeredBillRate: hourlyRate,
-      candidateBillRate: candidateBillRateValue,
+      offeredBillRate: PriceUtils.formatNumbers(hourlyRate),
+      candidateBillRate: PriceUtils.formatNumbers(candidateBillRateValue),
       locationName,
       departmentName,
       skillName,
@@ -223,7 +224,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       shiftStartTime,
       shiftEndTime,
       openPositions,
-      hourlyRate: candidateBillRateValue,
+      hourlyRate: PriceUtils.formatNumbers(candidateBillRateValue),
     });
     this.enableFields();
   }
