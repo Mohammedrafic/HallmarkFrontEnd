@@ -89,7 +89,7 @@
           >
           <button *ngIf="activeTab !== OrganizationOrderManagementTabs.Incomplete && orderTypes.OpenPerDiem === data.orderType"
                   (click)="createReorder(data)" ejs-button cssClass="e-flat default-icon-button"
-                  [disabled]="data.status === orderStatus.PreOpen">
+                  [disabled]="data.status === orderStatus.PreOpen || data.status === orderStatus.Closed">
               <span><i-feather name="calendar" class="icon"></i-feather></span>
             </button>
             <button ejs-button cssClass="e-flat default-icon-button">

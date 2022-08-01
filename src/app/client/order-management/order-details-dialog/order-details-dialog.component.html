@@ -60,6 +60,7 @@
               cssClass="e-outline"
               *ngIf="orderType.OpenPerDiem === order?.orderType"
               (click)="createReOrder()"
+              [disabled]="order?.status === orderStatus.PreOpen || order?.status === orderStatus.Closed"
             >
               Create Re-Order
             </button>

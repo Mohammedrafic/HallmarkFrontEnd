@@ -7,7 +7,7 @@ button.e-control.e-btn {
   box-shadow: none !important;
   height: 40px;
 
-  &.e-primary:active {
+  &.e-primary:active:not([disabled]) {
     background-color: $primary-active-blue;
   }
 
