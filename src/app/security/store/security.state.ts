@@ -391,26 +391,32 @@ export class SecurityState {
   ): Observable<Organisation[]> {
     return this.userService.getUserVisibilitySettingsOrganisation(userId).pipe(
       tap((payload) => {
-        const allOrganizations = payload.map((organization: Organisation) => {
-          const organizationsId = organization.organizationId;
+        const modifiedAllOrganizations = payload.map((organization: Organisation) => {
+          const organizationId = organization.organizationId;
           return {
             ...organization,
+            organizationId,
             regions: organization.regions.map((region) => ({
               ...region,
-              organizationsId,
+              organizationId, 
+              regionId: region.id,
               locations: region.locations.map((location) => ({
                 ...location,
-                organizationsId,
+                organizationId,
+                regionId: region.id,
+                locationId: location.id,
                 departments: location.departments.map((departments) => ({
                   ...departments,
-                  organizationsId,
+                  organizationId,
+                  regionId: region.id,
+                  locationId: location.id,
                 })),
               })),
             })),
           };
         });
 
-        patchState({ organizations: allOrganizations });
+        patchState({ organizations: modifiedAllOrganizations });
         return payload;
       })
     );

@@ -4,7 +4,9 @@ export class FilteredItem {
   text: string;
   value: any;
   column: string;
-  organizationsId?: number;
+  organizationId?: number;
+  regionId?: number;
+  locationId?: number;
 }
 
 export class FilterColumn {

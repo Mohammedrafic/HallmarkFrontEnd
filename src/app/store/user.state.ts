@@ -26,7 +26,7 @@ import {
   GetUserOrganizations
 } from './user.actions';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
-import { OrganizationStructure } from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 import { B2CAuthService } from "../b2c-auth/b2c-auth.service";
 
@@ -201,9 +201,32 @@ export class UserState {
 
   @Action(GetOrganizationStructure)
   GetOrganizationStructure({ patchState }: StateContext<UserStateModel>): Observable<OrganizationStructure> {
-    return this.organizationService.getOrganizationStructure().pipe(tap((structure: OrganizationStructure) => {
-      return patchState({ organizationStructure: structure });
-    }));
+    return this.organizationService.getOrganizationStructure().pipe(
+      tap((structure: OrganizationStructure) => {
+        const organizationId = structure.organizationId;
+        const modifiedOrgStructure = {
+          ...structure,
+          regions: structure.regions.map((region: OrganizationRegion) => ({
+            ...region,
+            organizationId,
+            regionId: region.id,
+            locations: region.locations?.map((location: OrganizationLocation) => ({
+              ...location,
+              organizationId,
+              regionId: region.id,
+              locationId: location.id,
+              departments: location.departments?.map((department: OrganizationDepartment) => ({
+                ...department,
+                organizationId,
+                regionId: region.id,
+                locationId: location.id,
+              })),
+            })),
+          }) as OrganizationRegion),
+        };
+        return patchState({ organizationStructure: modifiedOrgStructure });
+      })
+    );
   }
 
   @Action(LastSelectedOrganisationAgency)

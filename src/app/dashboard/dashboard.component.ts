@@ -287,8 +287,8 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
         return;
       }
 
-      if (item.organizationsId) {
-        const organization = organizationFilter.find((organization) => organization.organizationId === item.organizationsId);
+      if (item.organizationId) {
+        const organization = organizationFilter.find((organization) => organization.organizationId === item.organizationId);
         organization && (organization[item.column as keyof FilteredDataByOrganizationId] as number[]).push(item.value);
         return;
       }
