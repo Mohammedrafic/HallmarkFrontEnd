@@ -275,7 +275,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
           new UpdateOrganisationCandidateJob({
             organizationId: this.orderCandidateJob.organizationId,
             orderId: this.orderCandidateJob.orderId,
-            jobId: value.jobId,
+            jobId: this.orderCandidateJob.jobId,
             skillName: value.skillName,
             offeredBillRate: value.hourlyRate,
             candidateBillRate: value.candidateBillRate,
@@ -341,4 +341,3 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     );
   }
 }
-
