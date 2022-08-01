@@ -49,8 +49,8 @@ import { CandidateChartStatuses } from '../enums/candidate-legend-palette.enum';
 import { Router } from '@angular/router';
 import { PositionTrend, PositionTrendDto } from '../models/position-trend.model';
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
-import { Skill } from '@shared/models/skill.model';
 import { DashboartFilterDto } from '../models/dashboard-filter-dto.model';
+import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
 
 @Injectable()
 export class DashboardService {
@@ -304,7 +304,7 @@ export class DashboardService {
     return of('temporary-widget-invoices');
   }
 
-  public getAllSkills(): Observable<Skill[]> {
-    return this.httpClient.get<Skill[]>(`/api/AssignedSkills/forOrganizations`);
+  public getAllSkills(): Observable<AllOrganizationsSkill[]> {
+    return this.httpClient.get<AllOrganizationsSkill[]>(`/api/AssignedSkills/forOrganizations`);
   }
 }

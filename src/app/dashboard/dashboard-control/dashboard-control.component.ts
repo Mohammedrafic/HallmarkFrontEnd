@@ -7,7 +7,6 @@ import { Observable, map, distinctUntilChanged } from 'rxjs';
 import { ShowFilterDialog, ShowSideDialog } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
 import { WidgetTypeEnum } from '../enums/widget-type.enum';
-import { DashboardFiltersModel } from '../models/dashboard-filters.model';
 import { WidgetOptionModel } from '../models/widget-option.model';
 import { WidgetToggleModel } from '../models/widget-toggle.model';
 import { DashboardState } from '../store/dashboard.state';
@@ -15,7 +14,7 @@ import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationStructure } from '@shared/models/organization.model';
 import { Organisation } from '@shared/models/visibility-settings.model';
-import { Skill } from '@shared/models/skill.model';
+import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
 
 @Component({
   selector: 'app-dashboard-control',
@@ -31,7 +30,7 @@ export class DashboardControlComponent extends DestroyableDirective {
   @Input() public hasWidgetPermission: boolean;
   @Input() public allOrganizations: Organisation[];
   @Input() public userIsAdmin: boolean;
-  @Input() public skills: Skill[];
+  @Input() public skills: AllOrganizationsSkill[];
 
   @Output() public widgetToggleEmitter: EventEmitter<WidgetToggleModel> = new EventEmitter();
 

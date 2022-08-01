@@ -55,7 +55,7 @@ export class FilterService {
                     : item,
                 column: key,
                 value: item,
-                organizationId: filteredItem?.organizationId || null,
+                organizationId: filteredItem?.organizationId || filteredItem?.businessUnitId || null,
                 regionId: filteredItem?.regionId || null,
                 locationId: filteredItem?.locationId || null,
               });

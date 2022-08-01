@@ -14,7 +14,7 @@ import { widgetTypeToConfigurationMapper } from '../constants/widget-type-to-con
 import { FilteredItem } from '@shared/models/filter.model';
 import { DASHBOARD_FILTER_STATE, TIME_SELECTION_OF_CHART_LINE } from '@shared/constants';
 import { TimeSelectionEnum } from '../enums/time-selection.enum';
-import { Skill } from '@shared/models/skill.model';
+import { AllOrganizationsSkill } from '../models/all-organization-skill.model';
 
 export interface DashboardStateModel {
   panels: PanelModel[];
@@ -23,7 +23,7 @@ export interface DashboardStateModel {
   isMobile: boolean;
   filteredItems: FilteredItem[];
   positionTrendTimeSelection: TimeSelectionEnum;
-  skills: Skill[];
+  skills: AllOrganizationsSkill[];
 }
 
 @State<DashboardStateModel>({
@@ -76,7 +76,7 @@ export class DashboardState {
     }
 
   @Selector()
-    static getAllSkills(state: DashboardStateModel): DashboardStateModel['skills'] {
+    static getAllOrganizationSkills(state: DashboardStateModel): DashboardStateModel['skills'] {
       return state.skills;
   }
 
@@ -140,7 +140,7 @@ export class DashboardState {
   @Action(GetAllSkills)
   private getAllSkills({patchState}: StateContext<DashboardStateModel>) {
     return this.dashboardService.getAllSkills().pipe(
-      tap((payload: Skill[]) => {
+      tap((payload: AllOrganizationsSkill[]) => {
         patchState({ skills: payload });
       })
     )
