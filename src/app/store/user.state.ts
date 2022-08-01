@@ -203,28 +203,24 @@ export class UserState {
   GetOrganizationStructure({ patchState }: StateContext<UserStateModel>): Observable<OrganizationStructure> {
     return this.organizationService.getOrganizationStructure().pipe(
       tap((structure: OrganizationStructure) => {
-        const organizationId = structure.organizationId;
-        const modifiedOrgStructure = {
-          ...structure,
-          regions: structure.regions.map((region: OrganizationRegion) => ({
-            ...region,
-            organizationId,
-            regionId: region.id,
-            locations: region.locations?.map((location: OrganizationLocation) => ({
-              ...location,
-              organizationId,
-              regionId: region.id,
-              locationId: location.id,
-              departments: location.departments?.map((department: OrganizationDepartment) => ({
-                ...department,
-                organizationId,
-                regionId: region.id,
-                locationId: location.id,
-              })),
-            })),
-          }) as OrganizationRegion),
-        };
-        return patchState({ organizationStructure: modifiedOrgStructure });
+        structure.regions.forEach((region: OrganizationRegion) => {
+
+          region['organizationId'] = structure.organizationId;
+          region['regionId'] = region.id;
+          region.locations?.forEach((location: OrganizationLocation) => {
+
+            location['organizationId'] = structure.organizationId;
+            location['regionId'] = region.id;
+            location['locationId'] = location.id;
+            location.departments.forEach((department: OrganizationDepartment) => {
+
+              department['organizationId'] = structure.organizationId;
+              department['regionId'] = region.id;
+              department['locationId'] = location.id;
+            });
+          });
+        });
+        return patchState({ organizationStructure: structure });
       })
     );
   }
