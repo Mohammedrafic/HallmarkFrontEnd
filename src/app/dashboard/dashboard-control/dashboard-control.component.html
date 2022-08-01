@@ -2,24 +2,20 @@
   [ngTemplateOutlet]="dashboardToolbar"
   [ngTemplateOutletContext]="{
     items: filteredItems$ | async,
-    filterState: dashboardFiltersState$ | async,
-    organizationStructure: (organizationStructure$ | async)?.regions
+    organizationStructure: organizationStructure$ | async
   }"
 ></ng-container>
 
 <ng-template
   #dashboardToolbar
   let-items="items"
-  let-filterState="filterState"
   let-organizationStructure="organizationStructure"
 >
   <div class="dashboard-toolbar">
     <div class="left-content">
       <app-filter-chip-list
         [items]="items"
-        [filterState]="filterState"
-        [allRegions]="organizationStructure"
-        (filterModified)="filterModified()"
+        [allRegions]="organizationStructure?.regions"
       ></app-filter-chip-list>
     </div>
     <div class="right-content">
@@ -47,5 +43,11 @@
     [isLoading]="isLoading"
   ></app-widget-list>
 
-  <app-widget-filter #filter></app-widget-filter>
+  <app-widget-filter
+    [allOrganizations]="allOrganizations"
+    [userIsAdmin]="userIsAdmin"
+    [savedFilterItems]="items"
+    [organizationStructure]="organizationStructure"
+    [allSkills]="skills"
+  ></app-widget-filter>
 </ng-template>

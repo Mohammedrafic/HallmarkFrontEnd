@@ -42,6 +42,7 @@ import { RolesPerUser, User, UsersPage } from '@shared/models/user-managment-pag
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 
 const BUSINNESS_DATA_DEFAULT_VALUE = { id: 0, name: 'All' };
 const BUSINNESS_DATA_HALLMARK_VALUE = { id: 0, name: 'Hallmark' };
@@ -392,6 +393,25 @@ export class SecurityState {
   ): Observable<Organisation[]> {
     return this.userService.getUserVisibilitySettingsOrganisation(userId).pipe(
       tap((payload) => {
+        payload.forEach((organization: Organisation) => {
+          organization.regions.forEach((region: OrganizationRegion) => {
+
+            region['organizationId'] = organization.organizationId;
+            region['regionId'] = region.id;
+            region.locations?.forEach((location: OrganizationLocation) => {
+
+              location['organizationId'] = organization.organizationId;
+              location['regionId'] = region.id;
+              location['locationId'] = location.id;
+              location.departments.forEach((department: OrganizationDepartment) => {
+
+                department['organizationId'] = organization.organizationId;
+                department['regionId'] = region.id;
+                department['locationId'] = location.id;
+              });
+            });
+          });
+        });
         patchState({ organizations: payload });
         return payload;
       })

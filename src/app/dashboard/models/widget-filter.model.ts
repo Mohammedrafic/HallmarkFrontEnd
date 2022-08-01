@@ -1,9 +1,12 @@
 import { ControlTypes } from "@shared/enums/control-types.enum";
 import { OrganizationLocation, OrganizationRegion } from "@shared/models/organization.model";
 import { Skill } from "@shared/models/skill.model";
+import { Organisation } from "@shared/models/visibility-settings.model";
 import { ValueType } from "@syncfusion/ej2-angular-grids";
+import { AllOrganizationsSkill } from "./all-organization-skill.model";
 
 export interface IFilterColumnsDataModel {
+  organizationIds?: FilterColumn;
   regionIds: FilterColumn;
   locationIds: FilterColumn;
   departmentsIds: FilterColumn;
@@ -13,7 +16,7 @@ export interface IFilterColumnsDataModel {
 export interface FilterColumn {
   type: ControlTypes;
   valueType: ValueType;
-  dataSource: OrganizationRegion[] | OrganizationLocation[] | Skill[];
+  dataSource: OrganizationRegion[] | OrganizationLocation[] | Skill[] | Organisation[] | AllOrganizationsSkill[];
   valueField: string;
   valueId: string;
 }
