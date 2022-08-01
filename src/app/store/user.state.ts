@@ -26,7 +26,7 @@ import {
   GetUserOrganizations
 } from './user.actions';
 import { LasSelectedOrganizationAgency, UserAgencyOrganization } from '@shared/models/user-agency-organization.model';
-import { OrganizationStructure } from '@shared/models/organization.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { OrganizationService } from '@shared/services/organization.service';
 import { B2CAuthService } from "../b2c-auth/b2c-auth.service";
 
@@ -201,9 +201,28 @@ export class UserState {
 
   @Action(GetOrganizationStructure)
   GetOrganizationStructure({ patchState }: StateContext<UserStateModel>): Observable<OrganizationStructure> {
-    return this.organizationService.getOrganizationStructure().pipe(tap((structure: OrganizationStructure) => {
-      return patchState({ organizationStructure: structure });
-    }));
+    return this.organizationService.getOrganizationStructure().pipe(
+      tap((structure: OrganizationStructure) => {
+        structure.regions.forEach((region: OrganizationRegion) => {
+
+          region['organizationId'] = structure.organizationId;
+          region['regionId'] = region.id;
+          region.locations?.forEach((location: OrganizationLocation) => {
+
+            location['organizationId'] = structure.organizationId;
+            location['regionId'] = region.id;
+            location['locationId'] = location.id;
+            location.departments.forEach((department: OrganizationDepartment) => {
+
+              department['organizationId'] = structure.organizationId;
+              department['regionId'] = region.id;
+              department['locationId'] = location.id;
+            });
+          });
+        });
+        return patchState({ organizationStructure: structure });
+      })
+    );
   }
 
   @Action(LastSelectedOrganisationAgency)

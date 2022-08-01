@@ -9,8 +9,8 @@
     widgetsData: widgetsData$ | async,
     timeSelection: timeSelection$ | async,
     allOrganizations: allOrganizations$ | async,
-    skills: skills$ | async,
-    dashboardFiltersState: dashboardFiltersState$| async
+    skills: allOrganizationsSkills$ | async,
+    userIsAdmin: userIsAdmin$ | async
   }"
 ></ng-container>
 
@@ -24,7 +24,7 @@
   let-timeSelection="timeSelection"
   let-allOrganizations="allOrganizations"
   let-skills="skills"
-  let-dashboardFiltersState="dashboardFiltersState"
+  let-userIsAdmin="userIsAdmin"
 >
   <app-dashboard-control
     (widgetToggleEmitter)="handleWidgetToggleEvent($event)"
@@ -36,7 +36,6 @@
     [allOrganizations]="allOrganizations"
     [userIsAdmin]="userIsAdmin"
     [skills]="skills"
-    [dashboardFiltersState]="dashboardFiltersState"
   ></app-dashboard-control>
 
   <ng-container [ngTemplateOutlet]="widgetsTemplate" #outlet></ng-container>

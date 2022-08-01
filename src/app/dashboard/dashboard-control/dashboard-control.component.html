@@ -15,7 +15,6 @@
     <div class="left-content">
       <app-filter-chip-list
         [items]="items"
-        [filterState]="dashboardFiltersState"
         [allRegions]="organizationStructure?.regions"
       ></app-filter-chip-list>
     </div>
@@ -48,7 +47,6 @@
     [allOrganizations]="allOrganizations"
     [userIsAdmin]="userIsAdmin"
     [savedFilterItems]="items"
-    [dashboardFilterState]="dashboardFiltersState"
     [organizationStructure]="organizationStructure"
     [allSkills]="skills"
   ></app-widget-filter>
