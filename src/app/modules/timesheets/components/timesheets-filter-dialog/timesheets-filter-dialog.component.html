@@ -61,7 +61,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="input-container">
+      <div [class.full-width]="isAgency" class="input-container">
         <label for="department">Department</label>
         <div class="input-group dropdown">
           <ejs-multiselect
@@ -75,7 +75,7 @@
             placeholder=""></ejs-multiselect>
         </div>
       </div>
-      <div class="input-container">
+      <div *ngIf="!isAgency" class="input-container">
         <label for="agencyName">Select Agency</label>
         <div class="input-group dropdown">
           <ejs-multiselect

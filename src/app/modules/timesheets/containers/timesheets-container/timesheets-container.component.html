@@ -50,6 +50,7 @@
 
 <app-timesheets-filter-dialog
   [activeTabIdx]="activeTabIdx"
+  [isAgency]="isAgency"
   (appliedFiltersAmount)="changeFiltersAmount($event)"
   (resetFilters)="resetFilters()"
   (updateTableByFilters)="updateTableByFilters($event)"
