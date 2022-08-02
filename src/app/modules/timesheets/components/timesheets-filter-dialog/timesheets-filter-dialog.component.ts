@@ -40,6 +40,7 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
   readonly organizationStructure$: Observable<OrganizationStructure>;
 
   @Input() activeTabIdx: number;
+  @Input() isAgency: boolean;
 
   @Output() readonly updateTableByFilters: EventEmitter<any> = new EventEmitter<any>();
   @Output() readonly resetFilters: EventEmitter<void> = new EventEmitter<void>();
