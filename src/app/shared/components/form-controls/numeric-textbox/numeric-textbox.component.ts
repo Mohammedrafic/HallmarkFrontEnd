@@ -18,6 +18,7 @@ export class NumericTextboxComponent extends BaseFormControlDirective {
   @Input() public min: number;
   @Input() public max: number;
   @Input() public format: string;
+  @Input() public fieldValue: number | null;
   @Input() public htmlAttributes: { [key: string]: string };
 
   @Output() public changeValueEmitter: EventEmitter<number> = new EventEmitter();
