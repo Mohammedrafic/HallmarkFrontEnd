@@ -230,16 +230,18 @@ export class DashboardService {
 
   
   private getFirstLastWeekDay(startDate: Date): ITimeSlice {
+    const millisecondsOfminute = 60000;
     const today = new Date();
-    const tzOffSet = new Date().getTimezoneOffset() * 60000;
+    const tzOffSet = new Date().getTimezoneOffset() * millisecondsOfminute;
     const dateFrom = new Date(startDate.setDate(startDate.getDate() - startDate.getDay()) - tzOffSet).toISOString();
     const dateTo = new Date(today.setDate(today.getDate() - today.getDay() + 6)).toISOString();
     return { dateFrom, dateTo };
   }
 
   private getFirstLastMonthDay(startDate: Date): ITimeSlice {
+    const millisecondsOfminute = 60000;
     const today = new Date();
-    const tzOffSet = new Date().getTimezoneOffset() * 60000;
+    const tzOffSet = new Date().getTimezoneOffset() * millisecondsOfminute;
     const dateFrom = new Date(new Date(startDate.getFullYear(), startDate.getMonth(), 1).getTime() - tzOffSet).toISOString();
     const dateTo = new Date(new Date(today.getFullYear(), today.getMonth() + 1, 0).getTime() - tzOffSet).toISOString();
     return { dateFrom, dateTo };
