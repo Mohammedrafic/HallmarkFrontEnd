@@ -43,6 +43,9 @@ export class OrderManagement {
   agencies?: string[] | null;
   allAgencies?: boolean;
   jobStartDate?: Date;
+  orderCloseDate?: string;
+  orderClosureReason?: string;
+  orderClosureReasonId?: string;
 }
 
 export class OrderManagementFilter {
@@ -87,6 +90,9 @@ export type AgencyOrderManagement = {
   positions?: number;
   agencies?: string[] | null;
   allAgencies?: boolean;
+  orderCloseDate?: string;
+  orderClosureReason?: string;
+  orderClosureReasonId?: string;
 };
 
 export type OrderManagementChild = {
@@ -109,6 +115,10 @@ export type OrderManagementChild = {
     jobId: number;
     organizationId: number;
   };
+  selected: any;
+  closeDate?: string;
+  positionClosureReason?: string;
+  positionClosureReasonId?: number;
 };
 
 export type OrderCandidatesList = {

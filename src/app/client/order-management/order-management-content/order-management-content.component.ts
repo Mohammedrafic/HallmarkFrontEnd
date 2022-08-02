@@ -98,6 +98,7 @@ import { OrderManagementService } from '@client/order-management/order-managemen
 import { isArray } from 'lodash';
 import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
+import { GetCandidateJob } from "@agency/store/order-management.actions";
 
 @Component({
   selector: 'app-order-management-content',
@@ -145,6 +146,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     { text: MoreMenuType[1], id: '1' },
     { text: MoreMenuType[2], id: '2' },
   ];
+
+  public moreMenu: ItemModel[] = [
+    { text: MoreMenuType[0], id: '0' },
+    { text: MoreMenuType[1], id: '1' },
+  ];
+
   public reOrdersMenu: ItemModel[] = [
     { text: MoreMenuType[0], id: '0' },
     { text: MoreMenuType[2], id: '2' },
@@ -1113,6 +1120,16 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     });
   }
 
+  public getMoreMenu(order: OrderManagement): ItemModel[] {
+    const orderStatuses = [OrderStatus.InProgressOfferAccepted, OrderStatus.Filled];
+    if (orderStatuses.includes(OrderStatus.InProgressOfferAccepted)) {
+      if (Boolean(order.children?.some((child) => orderStatuses.includes(child.orderStatus)))) {
+        return this.moreMenu;
+      }
+    }
+    return this.moreMenuWithCloseButton;
+  }
+
   private handleDashboardFilters(): void {
     if (this.isRedirectedFromDashboard) {
       this.applyDashboardFilters();
@@ -1161,5 +1178,21 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.orderManagementService.orderPerDiemId$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((orderId: number) => (this.orderPerDiemId = orderId));
+  }
+
+  updateOrderDetails(order: Order | OrderManagement): void {
+    this.store.dispatch(new GetOrderById(order.id, order.organizationId as number));
+    this.getOrders();
+  }
+
+  updatePositionDetails(position: OrderManagementChild): void {
+    this.orderManagementContentService.getCandidateJob(position.organizationId, position.jobId).subscribe(res => {
+      this.selectedCandidate = {
+        ...position,
+        closeDate: position.closeDate,
+        positionClosureReason: position.positionClosureReason,
+        positionClosureReasonId: position.positionClosureReasonId,
+      };
+    });
   }
 }

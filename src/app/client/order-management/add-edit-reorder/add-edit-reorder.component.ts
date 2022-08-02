@@ -132,19 +132,12 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   private saveReorder(): void {
     const reorder: ReorderModel = this.reorderForm.getRawValue();
     const agencyIds = this.numberOfAgencies === reorder.agencies.length ? null : reorder.agencies;
-    const orderForRequest: ReorderRequestModel = {
-      reOrderId: this.isEditMode ? this.order.id : 0,
-      reOrderFromId: this.isEditMode ? this.order.reOrderFromId! : this.order.id,
-      candidateProfileIds: reorder.candidates,
-      agencyIds: agencyIds,
-      reorderDate: reorder.reorderDate,
-      shiftEndTime: reorder.shiftEndTime,
-      shiftStartTime: reorder.shiftStartTime,
-      billRate: reorder.billRate,
-      openPositions: reorder.openPosition,
-    };
+    const reOrderId = this.isEditMode ? this.order.id : 0;
+    const reOrderFromId = this.isEditMode ? this.order.reOrderFromId! : this.order.id;
+    const payload = { reorder, agencyIds, reOrderId, reOrderFromId };
+
     this.reorderService
-      .addReorder(orderForRequest)
+      .saveReorder(<ReorderRequestModel>payload)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED));

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { Order } from '@shared/models/order-management.model';
+import { AgencyOrder, AgencyOrderManagement, Order, OrderManagement } from '@shared/models/order-management.model';
 
 @Component({
   selector: 'app-order-close-reason-info',
@@ -7,5 +7,5 @@ import { Order } from '@shared/models/order-management.model';
   styleUrls: ['../general-order-info/general-order-info.component.scss', './order-close-reason-info.component.scss']
 })
 export class OrderCloseReasonInfoComponent {
-  @Input() orderInformation: Order;
+  @Input() orderInformation: Order | OrderManagement | AgencyOrderManagement;
 }

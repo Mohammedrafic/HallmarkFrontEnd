@@ -6,7 +6,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
-import { Order, OrderManagement } from '@shared/models/order-management.model';
+import { Order, OrderManagement, OrderManagementChild } from '@shared/models/order-management.model';
 import { ShowCloseOrderDialog } from '../../../store/app.actions';
 import { OrderType, OrderTypeTitlesMap } from '@shared/enums/order-type';
 import { RejectReasonPage } from '@shared/models/reject-reason.model';
@@ -16,6 +16,7 @@ import { RejectReasonState } from "@organization-management/store/reject-reason.
 import { CloseOrderPayload } from "@client/order-management/close-order/models/closeOrderPayload.model";
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
 import { ConfirmService } from "@shared/services/confirm.service";
+import { ClosePositionPayload } from "@client/order-management/close-order/models/closePositionPayload.model";
 
 @Component({
   selector: 'app-close-order',
@@ -24,7 +25,9 @@ import { ConfirmService } from "@shared/services/confirm.service";
 })
 export class CloseOrderComponent extends DestroyableDirective implements OnChanges, OnInit {
   @Input() public order: Order | OrderManagement;
+  @Input() candidate: OrderManagementChild;
   @Output() private closeOrderSuccess: EventEmitter<Order | OrderManagement> = new EventEmitter<Order | OrderManagement>();
+  @Output() private closePositionSuccess: EventEmitter<OrderManagementChild> = new EventEmitter<OrderManagementChild>();
 
   @Select(RejectReasonState.closureReasonsPage)
   public closureReasonsPage$: Observable<RejectReasonPage>;
@@ -129,12 +132,11 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
       });
   }
 
-  private closePosition(formData: Omit<CloseOrderPayload, 'orderId'>): void {
-    //TODO change to close positions method
+  private closePosition(formData: ClosePositionPayload): void {
     this.closeOrderService
-      .closePosition({...formData, orderId: this.order.id})
+      .closePosition({...formData, jobId: this.candidate.jobId})
       .subscribe(() => {
-        this.closeOrderSuccess.emit(this.order);
+        this.closePositionSuccess.emit(this.candidate);
         this.closeDialog();
       });
   }

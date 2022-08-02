@@ -153,6 +153,7 @@
           [reOrder]="child"
           [order]="data"
           [selected]="selectedReOrder?.selected?.order === data.id && selectedReOrder?.selected.reOrder === child.id"
+          [hideAgency]="true"
           (clickEvent)="onOpenReorderDialog($event, data)"
         ></app-grid-subrow-reorder>
       </ng-container>
@@ -167,7 +168,7 @@
           selectedCandidate?.selected?.order === data.id &&
           selectedCandidate?.selected.positionId === child.positionId
         "
-        [isAgency]="true"
+        [isAgency]="false"
         (clickEvent)="onOpenCandidateDialog($event, data)"
       ></app-grid-subrow-candidate>
     </ng-template>

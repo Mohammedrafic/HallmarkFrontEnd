@@ -40,7 +40,7 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
     this.orderCandidatePage$.pipe(takeUntil(this.destroy$)).subscribe((order) => {
       this.orderCandidatePage = order;
       this.orderCandidates = {
-        isClosed: Boolean(this.order?.orderCloseDate) || Boolean(this.order?.orderClosureReason),
+        isClosed: Boolean(this.order?.orderCloseDate) || Boolean(this.order?.orderClosureReasonId),
         orderId: this.order?.id,
         organizationId: this.order?.organizationId as number,
       };

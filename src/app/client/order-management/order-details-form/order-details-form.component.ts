@@ -562,14 +562,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
-    this.store
-      .dispatch(new GetRegions())
-      .pipe(take(1))
-      .subscribe(() => {
-        if (this.isEditMode && this.order) {
-          this.generalInformationForm.controls['regionId'].patchValue(this.order.regionId);
-        }
-      });
+    this.store.dispatch(new GetRegions());
     this.store.dispatch(new GetMasterSkillsByOrganization());
     this.store.dispatch(new GetProjectSpecialData());
     this.store.dispatch(new GetMasterShifts());
@@ -589,12 +582,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
           this.populateForms(order);
         } else if (order?.isTemplate) {
           this.order = order;
-          this.generalInformationForm.controls['regionId'].patchValue(this.order.regionId);
           this.populateForms(order);
         } else {
           this.isEditMode = false;
           this.order = null;
-          //this.resetForms(); TODO: clarify
         }
       });
 
@@ -766,6 +757,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         emitEvent: false,
       })
     );
+
+    this.regions$
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(() => this.generalInformationForm.controls['regionId'].patchValue(order.regionId));
 
     this.generalInformationForm.controls['hourlyRate'].patchValue(hourlyRate);
     this.generalInformationForm.controls['openPositions'].patchValue(order.openPositions);

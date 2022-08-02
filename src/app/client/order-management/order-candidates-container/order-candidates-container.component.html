@@ -4,7 +4,7 @@
   <app-general-order-info *ngSwitchDefault [orderInformation]="order"></app-general-order-info>
 </section>
 <div class="separator"></div>
-<ng-container *ngIf="order?.orderClosureReason">
+<ng-container *ngIf="order?.orderClosureReasonId">
   <app-order-close-reason-info [orderInformation]="order"></app-order-close-reason-info>
   <div class="separator"></div>
 </ng-container>

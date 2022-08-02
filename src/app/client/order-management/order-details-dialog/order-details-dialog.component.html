@@ -41,7 +41,7 @@
             <button
               ejs-button
               cssClass="e-outline edit-button"
-              [disabled]="!!order?.orderClosureReason"
+              [disabled]="!!(order?.orderClosureReasonId || order?.orderCloseDate)"
               (click)="editOrder(order)"
             >
               <i-feather name="edit" class="icon"></i-feather>
@@ -50,7 +50,7 @@
               ejs-button
               cssClass="e-outline"
               *ngIf="!canCloseOrder"
-              [disabled]="!!order?.orderClosureReason || disabledCloseButton"
+              [disabled]="!!(order?.orderClosureReasonId || order?.orderCloseDate) || disabledCloseButton"
               (click)="closeOrder(order)"
             >
               Close Order
@@ -74,6 +74,7 @@
             </button>
             <button
               ejs-button
+              cssClass="e-outline"
               *ngIf="orderType.ReOrder !== order?.orderType"
               [isPrimary]="true"
               (click)="lockOrder()"
@@ -144,7 +145,6 @@
             </e-tabitem>
           </e-tabitems>
         </ejs-tab>
-        <app-close-order [order]="order" (closeOrderSuccess)="updateOrderDetails($event)"></app-close-order>
         <app-side-dialog
           [header]="reOrderDialogTitle"
           (formCancelClicked)="clearEditReOrder()"
