@@ -39,7 +39,7 @@
                 "src/app/styles/variables"
               ]
             },
-            "scripts": [],
+            "scripts": ["src/assets/js/logireport.js"],
             "allowedCommonJsDependencies": ["lodash"]
           },
           "configurations": {
@@ -108,7 +108,7 @@
             "styles": [
               "src/app/styles/styles.scss"
             ],
-            "scripts": []
+            "scripts": [ "src/assets/js/logireport.js" ]
           }
         },
         "lint": {

@@ -1,8 +1,7 @@
-import { FactoryTarget } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
+import { LogiReportTypes } from '@shared/enums/logi-report-type.enum';
+import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { SetHeaderState } from 'src/app/store/app.actions';
 
 @Component({
@@ -10,21 +9,22 @@ import { SetHeaderState } from 'src/app/store/app.actions';
   templateUrl: './state-wise-skills.component.html',
   styleUrls: ['./state-wise-skills.component.scss']
 })
-export class StateWiseSkillsComponent  {
-
-  private _sanitizer: DomSanitizer;
+export class StateWiseSkillsComponent implements OnInit {
   public paramsData: any = {};
-  public reportName: string = "/Dashboard/DemoDashboard.cls";
-  public catelogName: string = "/Dashboard/POC.cat";
-  public title: string = "State Wise Skills";
-  constructor(private store: Store,
-    private router: Router,
-    private route: ActivatedRoute, sanitizer: DomSanitizer) {
+  public reportName: LogiReportFileDetails = { name: "/POC/1st_dashboard.dsh" };
+  public catelogName: LogiReportFileDetails = { name: "/POC/POC.cat" };
+  public resultList: LogiReportFileDetails[] = [
+    { name: "/POC - 1st_dashboard.dsh" }
+  ];
+  public title: string = "Dashboard";
+  public reportType: LogiReportTypes = LogiReportTypes.PageReport;
+
+  constructor(private store: Store) {
     store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
-    this._sanitizer = sanitizer;
   }
 
-  
+  ngOnInit(): void {
+  }
 }
 
 
