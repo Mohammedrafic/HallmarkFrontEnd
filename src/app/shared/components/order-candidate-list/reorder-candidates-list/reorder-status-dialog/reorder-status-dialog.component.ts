@@ -274,7 +274,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   private updateOrganizationCandidateJob(status: { id: ApplicantStatusEnum; text: string }): void {
     this.acceptForm.markAllAsTouched();
-    if (this.acceptForm.valid && this.orderCandidateJob) {
+    if (this.acceptForm.valid && this.orderCandidateJob && status) {
       const value = this.acceptForm.getRawValue();
 
       this.store

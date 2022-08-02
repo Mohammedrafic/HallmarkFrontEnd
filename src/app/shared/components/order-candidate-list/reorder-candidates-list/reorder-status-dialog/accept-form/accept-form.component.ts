@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import PriceUtils from '@shared/utils/price.utils';
 
 const showHourlyRateForStatuses: CandidatStatus[] = [
   CandidatStatus.BillRatePending,
@@ -18,7 +19,7 @@ export class AcceptFormComponent {
   @Input() formGroup: FormGroup;
   @Input() status: CandidatStatus;
 
-  public billRateMask = '00.00';
+  public priceUtils = PriceUtils;
 
   get showHourlyRate(): boolean {
     return showHourlyRateForStatuses.includes(this.status);
