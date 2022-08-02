@@ -64,6 +64,7 @@ export type OrderManagementPage = PageOfCollections<OrderManagement>;
 
 export type AgencyOrderManagement = {
   orderId: number;
+  id?: number;
   reOrderId?: number;
   reOrderFromId?: number;
   statusText: string;
