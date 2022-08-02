@@ -146,7 +146,7 @@
           </e-tabitems>
         </ejs-tab>
         <app-side-dialog
-          [header]="reOrderDialogTitle"
+          [header]="reOrderDialogTitle$ | async"
           (formCancelClicked)="clearEditReOrder()"
           (formSaveClicked)="onSaveReOrder()"
         >
