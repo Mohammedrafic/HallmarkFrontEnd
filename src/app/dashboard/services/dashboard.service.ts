@@ -223,28 +223,40 @@ export class DashboardService {
   private getWeeksTimeRanges(week: number): ITimeSlice {
     const numberWeek = week * 7;
     const today = new Date();
-    const dateFrom = this.getDateAsISOString(new Date(today.getFullYear(), today.getMonth(), today.getDate() - numberWeek).getTime());
-    const dateTo = this.getDateAsISOString(new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime());
-    return {dateFrom, dateTo};
+    const sixWeeksAgo = new Date(today.getFullYear(), today.getMonth(), today.getDate() - numberWeek);
+    const timeRanges = this.getFirstLastWeekDay(sixWeeksAgo);
+    return { ...timeRanges };
   }
 
-  private getMonthTimeRanges(month: number): ITimeSlice{
-    const date = new Date();
-    const dateFrom = this.getDateAsISOString(date.setMonth(date.getMonth() - month + 1));
-    const dateTo = this.getDateAsISOString(date.setMonth(date.getMonth() + month));
+  
+  private getFirstLastWeekDay(startDate: Date): ITimeSlice {
+    const today = new Date();
+    const tzOffSet = new Date().getTimezoneOffset() * 60000;
+    const dateFrom = new Date(startDate.setDate(startDate.getDate() - startDate.getDay()) - tzOffSet).toISOString();
+    const dateTo = new Date(today.setDate(today.getDate() - today.getDay() + 6)).toISOString();
     return { dateFrom, dateTo };
   }
 
-  private calculateTimeRanges(timeSelection: TimeSelectionEnum) {
-    if(timeSelection === TimeSelectionEnum.Weekly) {
-      return this.getWeeksTimeRanges(6);
-    } else {
-      return this.getMonthTimeRanges(6);
-    }  
+  private getFirstLastMonthDay(startDate: Date): ITimeSlice {
+    const today = new Date();
+    const tzOffSet = new Date().getTimezoneOffset() * 60000;
+    const dateFrom = new Date(new Date(startDate.getFullYear(), startDate.getMonth(), 1).getTime() - tzOffSet).toISOString();
+    const dateTo = new Date(new Date(today.getFullYear(), today.getMonth() + 1, 0).getTime() - tzOffSet).toISOString();
+    return { dateFrom, dateTo };
   }
 
-  private getDateAsISOString(timestamp: number): string {
-    return new Date(timestamp).toISOString();
+  private getMonthTimeRanges(month: number): ITimeSlice {
+    const date = new Date();
+    const  timeRanges  = this.getFirstLastMonthDay(new Date(date.setMonth(date.getMonth() - month)));
+    return { ...timeRanges };
+  }
+
+  private calculateTimeRanges(timeSelection: TimeSelectionEnum): ITimeSlice {
+    if(timeSelection === TimeSelectionEnum.Weekly) {
+      return this.getWeeksTimeRanges(5);
+    } else {
+      return this.getMonthTimeRanges(5);
+    }  
   }
 
   private getOrderPositionWidgetData(filter: DashboartFilterDto, orderStatus: OrderStatus): Observable<CandidatesPositionDataModel> {
