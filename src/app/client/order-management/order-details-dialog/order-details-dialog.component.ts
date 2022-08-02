@@ -23,15 +23,10 @@ import { OrderType } from '@shared/enums/order-type';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-import {
-  Order,
-  OrderCandidatesListPage,
-  OrderManagement,
-  OrderManagementChild,
-} from '@shared/models/order-management.model';
+import { Order, OrderCandidatesListPage, OrderManagementChild } from '@shared/models/order-management.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OrderStatus } from '@shared/enums/order-management';
-import { ApproveOrder, DeleteOrder, GetOrderById, SetLock } from '@client/store/order-managment-content.actions';
+import { ApproveOrder, DeleteOrder, SetLock } from '@client/store/order-managment-content.actions';
 import { ConfirmService } from '@shared/services/confirm.service';
 import {
   CANCEL_CONFIRM_TEXT,
@@ -45,6 +40,8 @@ import { Location } from '@angular/common';
 import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
 import { ShowCloseOrderDialog, ShowSideDialog } from '../../../store/app.actions';
 import { AddEditReorderComponent } from '@client/order-management/add-edit-reorder/add-edit-reorder.component';
+import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
+import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
 
 @Component({
   selector: 'app-order-details-dialog',
@@ -83,7 +80,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public orderStatus = OrderStatus;
   public candidatesCounter: number;
   public reOrderToEdit: Order | null;
-  public reOrderDialogTitle = 'Edit Re-Order';
+  public reOrderDialogTitle$ = this.addEditReorderService.reOrderDialogTitle$;
 
   public disabledCloseButton = true;
   public showCloseButton = false;
@@ -110,7 +107,8 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     private store: Store,
     private confirmService: ConfirmService,
     private location: Location,
-    private actions: Actions
+    private actions: Actions,
+    private addEditReorderService: AddEditReorderService
   ) {}
 
   ngOnInit(): void {
@@ -199,7 +197,6 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   createReOrder(): void {
-    this.reOrderDialogTitle = 'Add Re-Order';
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -210,7 +207,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
   public editOrder(data: Order) {
     if (this.isReOrder && data.orderType !== OrderType.OpenPerDiem) {
       this.order = { ...data };
-      this.reOrderDialogTitle = 'Edit Re-Order';
+      this.addEditReorderService.setReOrderDialogTitle(SidebarDialogTitlesEnum.EditReOrder);
       this.store.dispatch(new ShowSideDialog(true));
     } else {
       this.router.navigate(['./edit', data.id], { relativeTo: this.route });
@@ -239,8 +236,9 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
         .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
-          okButtonClass: 'delete-button'
-        }).pipe(filter(confirm => !!confirm))
+          okButtonClass: 'delete-button',
+        })
+        .pipe(filter((confirm) => !!confirm))
         .subscribe(() => {
           this.closeReOrderEmitter.emit();
           this.reOrderToEdit = null;

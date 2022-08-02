@@ -8,7 +8,7 @@ $headerHeight: 19px;
 }
 
 .app-widget-wrapper {
-  display: flex;
+  display: inline;
   flex-direction: column;
   height: 100%;
   padding: 24px;
@@ -20,10 +20,11 @@ $headerHeight: 19px;
   }
 
   &.with-legend {
-    --chartHeight: 70%;
+    --chartHeight: 60%;
 
     .app-widget-wrapper__chart {
-      border-bottom: 1px solid rgba($secondary-dark-blue-40, 0.32);
+      float:left;
+      width:50%;
     }
   }
 
@@ -40,6 +41,7 @@ $headerHeight: 19px;
     font-weight: 700;
     color: #1a1b2e;
     height: $headerHeight;
+    padding-left:16px;
   }
 
   &__projection-wrapper {
@@ -49,6 +51,7 @@ $headerHeight: 19px;
 
   &__chart {
     max-height: var(--chartHeight);
+    padding-top:10%;
   }
 
   &__position-chat {
@@ -57,12 +60,13 @@ $headerHeight: 19px;
   }
 
   &__legend {
-    height: calc(100% - #{var(--chartHeight)});
+    height: 80%;
     overflow: auto;
-    padding: 12px 12px 0 0;
-    margin-right: -12px;
+    padding-top: 25px;
+    margin-right: 12px;
     cursor: default;
     box-sizing: border-box;
+
   }
 
   &__loader {
@@ -80,6 +84,8 @@ $headerHeight: 19px;
         font-weight: 700;
         color: #1a1b2e;
         line-height: 16px;
+        padding-left:12px;
+        padding-top:12px;
       }
     }
   }

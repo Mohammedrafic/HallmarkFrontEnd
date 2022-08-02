@@ -10,7 +10,7 @@ trigger:
 - release.*
 - task*
 - strory*
-- pipeline*
+- demo*
 
 pool:
   # vmImage: ubuntu-latest

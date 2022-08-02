@@ -28,6 +28,7 @@ import {
   GetOrganizationsStructureAll,
   GetNewRoleBusinessByUnitTypeSucceeded,
   ExportUserList,
+  ExportRoleList,
 } from './security.actions';
 import { Role, RolesPage } from '@shared/models/roles.model';
 import { RolesService } from '../services/roles.service';
@@ -167,8 +168,11 @@ export class SecurityState {
   }
 
   @Selector()
-  static businessUserData(state: SecurityStateModel): BusinessUnit[] {
-    return state.newRoleBussinesData;
+  static businessUserData(state: SecurityStateModel): (type: number) => BusinessUnit[] {
+    return (type: number) =>
+      type === 1
+        ? ([BUSINNESS_DATA_HALLMARK_VALUE, ...state.newRoleBussinesData] as BusinessUnit[])
+        : ([BUSINNESS_DATA_DEFAULT_VALUE, ...state.newRoleBussinesData] as BusinessUnit[]);
   }
 
   constructor(
@@ -210,9 +214,9 @@ export class SecurityState {
   @Action(GetRolesPage)
   GetRolesPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitIds, businessUnitType, pageNumber, pageSize, filters }: GetRolesPage
+    { businessUnitIds, businessUnitType, pageNumber, pageSize, sortModel, filterModel, filters }: GetRolesPage
   ): Observable<RolesPage> {
-    return this.roleService.getRolesPage(businessUnitType, businessUnitIds, pageNumber, pageSize, filters).pipe(
+    return this.roleService.getRolesPage(businessUnitType, businessUnitIds, pageNumber, pageSize, sortModel, filterModel, filters).pipe(
       tap((payload) => {
         patchState({ rolesPage: payload });
         return payload;
@@ -223,9 +227,9 @@ export class SecurityState {
   @Action(GetRolePerUser)
   GetRolesPerPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitIds, businessUnitType }: GetRolePerUser
+    { businessUnitId, businessUnitType }: GetRolePerUser
   ): Observable<RolesPerUser[]> {
-    return this.userService.getRolesPerUser(businessUnitType, businessUnitIds).pipe(
+    return this.userService.getRolesPerUser(businessUnitId, businessUnitType).pipe(
       tap((payload) => {
         patchState({ rolesPerUsers: payload });
         return payload;
@@ -236,9 +240,9 @@ export class SecurityState {
   @Action(GetUsersPage)
   GetUsersPage(
     { patchState }: StateContext<SecurityStateModel>,
-    { businessUnitIds, businessUnitType, pageNumber, pageSize, filters }: GetUsersPage
+    { businessUnitId, businessUnitType, pageNumber, pageSize, sortModel, filterModel }: GetUsersPage
   ): Observable<UsersPage> {
-    return this.userService.getUsersPage(businessUnitType, businessUnitIds, pageNumber, pageSize, filters).pipe(
+    return this.userService.getUsersPage(businessUnitType, businessUnitId, pageNumber, pageSize, sortModel, filterModel).pipe(
       tap((payload) => {
         patchState({ usersPage: payload });
         return payload;
@@ -421,6 +425,16 @@ export class SecurityState {
   @Action(ExportUserList)
   ExportUserList({}: StateContext<SecurityStateModel>, { payload }: ExportUserList): Observable<Blob> {
     return this.userService.export(payload).pipe(
+      tap((file: Blob) => {
+        const url = window.URL.createObjectURL(file);
+        saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);
+      })
+    );
+  }
+
+  @Action(ExportRoleList)
+  ExportRoleList({}: StateContext<SecurityStateModel>, { payload }: ExportRoleList): Observable<Blob> {
+    return this.roleService.export(payload).pipe(
       tap((file: Blob) => {
         const url = window.URL.createObjectURL(file);
         saveSpreadSheetDocument(url, payload.filename || 'export', payload.exportFileType);

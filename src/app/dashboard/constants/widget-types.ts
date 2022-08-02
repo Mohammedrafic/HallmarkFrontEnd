@@ -12,4 +12,8 @@ export const widgetTypes: Record<string, WidgetTypeEnum> = {
   11: WidgetTypeEnum.INVOICES,
   12: WidgetTypeEnum.CHAT,
   13: WidgetTypeEnum.TASKS,
+  14: WidgetTypeEnum.APPLICANTS_BY_POSITIONS,
+  15: WidgetTypeEnum.OPEN_POSITIONS_TREND,
+  16: WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND,
+
 };

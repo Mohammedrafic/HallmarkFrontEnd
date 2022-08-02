@@ -1,8 +1,8 @@
 export enum ActivePositionsChartStatuses {
   OPEN = 'Open',
   IN_PROGRESS = 'In progress',
-  PENDING = 'In Progress (Pending)',
-  ACCEPTED = 'In Progress (Accepted)',
+  PENDING = 'Pending',
+  ACCEPTED = 'Accepted',
   FILLED = 'Filled',
   CLOSED = 'Closed',
   INCOMPLETE = 'Incomplete',

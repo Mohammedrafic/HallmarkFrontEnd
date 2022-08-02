@@ -40,6 +40,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public dialogTitle: string = 'Add Re-Order';
   public candidates$: Observable<CandidateModel[]>;
   public agencies$: Observable<AgencyModel[]>;
+  public billRate$: Observable<number>;
 
   private numberOfAgencies: number;
 
@@ -82,10 +83,11 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   }
 
   private initAgenciesAndCandidates(): void {
-    const { id, organizationId, reOrderFromId } = this.order;
+    const { id, organizationId, reOrderFromId, skillId } = this.order;
     const isReOrder = !isNil(reOrderFromId) && reOrderFromId !== 0;
     const orderId = isReOrder ? reOrderFromId : id;
     this.candidates$ = this.reorderService.getCandidates(orderId, organizationId!).pipe(shareReplay());
+    this.billRate$ = this.reorderService.getBillRate(organizationId!, skillId).pipe(filter(() => !this.isEditMode));
     this.agencies$ = this.reorderService.getAgencies(orderId, organizationId!).pipe(
       tap((agencyIds: AgencyModel[]) => (this.numberOfAgencies = agencyIds.length)),
       shareReplay()

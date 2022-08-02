@@ -98,6 +98,8 @@ import { OrderManagementService } from '@client/order-management/order-managemen
 import { isArray } from 'lodash';
 import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
+import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
+import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
 
 @Component({
   selector: 'app-order-management-content',
@@ -226,7 +228,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     private location: Location,
     private readonly actions: Actions,
     private orderManagementService: OrderManagementService,
-    private orderManagementContentService: OrderManagementContentService
+    private orderManagementContentService: OrderManagementContentService,
+    private addEditReOrderService: AddEditReorderService
   ) {
     super();
     this.isRedirectedFromDashboard =
@@ -342,7 +345,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public createReorder(data: any): void {
-    this.store.dispatch([new ShowSideDialog(true), new GetOrderById(data.id, data.organizationId, {} as any)]);
+    this.openReOrderDialog(data.id, data.organizationId);
+    this.addEditReOrderService.setReOrderDialogTitle(SidebarDialogTitlesEnum.AddReOrder);
     this.creatingReorder = true;
     this.gridWithChildRow.selectRow(parseInt(data.index));
   }
@@ -812,13 +816,18 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public editOrder(data: OrderManagement): void {
     if (!isNil(data.reOrderFromId) && data.reOrderFromId !== 0) {
-      this.store.dispatch(new GetOrderById(data.id, data.organizationId, {} as any));
-      this.actions$
-        .pipe(first(), ofActionCompleted(GetOrderById))
-        .subscribe(() => this.store.dispatch(new ShowSideDialog(true)));
+      this.addEditReOrderService.setReOrderDialogTitle(SidebarDialogTitlesEnum.EditReOrder);
+      this.openReOrderDialog(data.id, data.organizationId);
     } else {
       this.router.navigate(['./edit', data.id], { relativeTo: this.route });
     }
+  }
+
+  private openReOrderDialog(orderId: number, organizationId: number): void {
+    this.store.dispatch(new GetOrderById(orderId, organizationId, {} as any));
+    this.actions$
+      .pipe(first(), ofActionCompleted(GetOrderById))
+      .subscribe(() => this.store.dispatch(new ShowSideDialog(true)));
   }
 
   private onReloadOrderCandidatesLists(): void {
@@ -1147,7 +1156,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     combineLatest([this.organizationId$, this.filteredItems$])
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(([organizationId, items]) => {
-        this.filteredItems = items.filter((item: FilteredItem) => (item.organizationId === organizationId && item.column !== FilterColumnTypeEnum.ORGANIZATION) || item.column === FilterColumnTypeEnum.SKILL);
+        this.filteredItems = items.filter(
+          (item: FilteredItem) =>
+            (item.organizationId === organizationId && item.column !== FilterColumnTypeEnum.ORGANIZATION) ||
+            item.column === FilterColumnTypeEnum.SKILL
+        );
 
         this.filteredItems.forEach((item: FilteredItem) => {
           const filterKey = item.column as keyof OrderFilter;
@@ -1161,10 +1174,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private setFilterState(): void {
-    this.organizationStructure$.pipe(
+    this.organizationStructure$
+      .pipe(
         takeUntil(this.unsubscribe$),
         filter((orgs) => !!orgs)
-      ).subscribe(() => {
+      )
+      .subscribe(() => {
         Object.entries(this.filters).forEach(([key, value]) => {
           this.OrderFilterFormGroup.get(key)?.setValue(value);
         });
@@ -1194,7 +1209,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   updatePositionDetails(position: OrderManagementChild): void {
-    this.orderManagementContentService.getCandidateJob(position.organizationId, position.jobId).subscribe(res => {
+    this.orderManagementContentService.getCandidateJob(position.organizationId, position.jobId).subscribe((res) => {
       this.selectedCandidate = {
         ...position,
         closeDate: res.closeDate,

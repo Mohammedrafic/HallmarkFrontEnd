@@ -1,3 +1,4 @@
 {
-  "API_BASE_URL": "%%API_ENDPOINT_URL%%"
+  "API_BASE_URL": "%%API_ENDPOINT_URL%%",
+  "LOGIREPORT_BASE_URL": "https://10.20.1.4:6888/"
 }
