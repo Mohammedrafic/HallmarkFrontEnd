@@ -441,10 +441,31 @@ export class OrderFilter {
   agencyIds?: number[];
   agencyType?: string | number | null;
   includeReOrders?: boolean;
-  sortModel?: any = {};
-  filterModel?: any = {};
+  sortModel?: SortModel = {};
+  filterModel?: FilterModel = {};
   isTemplate?: boolean;
   templateTitle?: string;
+}
+
+export class SortModel {
+
+  sort?: string;
+  colId?:string
+}
+
+export class FilterModel {
+
+  condition1?: FilterModel;
+  condition2?: FilterModel;
+  filter?: any;
+  filterType?: string;
+  type?: string;
+  values?: string[];
+  logicalOperator?: string;
+  filterTo?: any;
+  dateFrom?: string;
+  dateTo?: string;
+
 }
 
 export class OrderPartnerAgency {

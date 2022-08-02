@@ -127,9 +127,6 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
       },
       {
         field: 'businessUnitName',
-        // cellRenderer: function(params: { data: { businessUnitName: string }; }) {
-        //   return params.data.businessUnitName || "All";
-        // },
         filter: 'agSetColumnFilter',
         filterParams: {
           values: (params: { success: (arg0: any) => void; }) => {
@@ -238,8 +235,7 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
           },
         },
       ],
-      //defaultToolPanel: 'columns',
-    };
+          };
   }
 
   ngOnInit(): void {

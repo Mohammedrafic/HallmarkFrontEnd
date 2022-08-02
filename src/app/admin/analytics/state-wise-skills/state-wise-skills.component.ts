@@ -10,7 +10,7 @@ import { SetHeaderState } from 'src/app/store/app.actions';
   templateUrl: './state-wise-skills.component.html',
   styleUrls: ['./state-wise-skills.component.scss']
 })
-export class StateWiseSkillsComponent implements OnInit {
+export class StateWiseSkillsComponent  {
 
   private _sanitizer: DomSanitizer;
   public paramsData: any = {};
@@ -24,9 +24,7 @@ export class StateWiseSkillsComponent implements OnInit {
     this._sanitizer = sanitizer;
   }
 
-  ngOnInit(): void {
-
-  }
+  
 }
 
 
