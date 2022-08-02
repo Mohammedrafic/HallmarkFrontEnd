@@ -98,7 +98,6 @@ import { OrderManagementService } from '@client/order-management/order-managemen
 import { isArray } from 'lodash';
 import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
-import { GetCandidateJob } from "@agency/store/order-management.actions";
 
 @Component({
   selector: 'app-order-management-content',
@@ -1182,6 +1181,15 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   updateOrderDetails(order: Order | OrderManagement): void {
     this.store.dispatch(new GetOrderById(order.id, order.organizationId as number));
+    this.store.dispatch(
+      new GetAgencyOrderCandidatesList(
+        order.id,
+        order.organizationId as number,
+        1,
+        30,
+        this.orderManagementService.excludeDeployed
+      )
+    );
     this.getOrders();
   }
 
