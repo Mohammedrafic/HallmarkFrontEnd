@@ -312,7 +312,6 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
   }
 
   public export(event: ExportOptions): void {
-    debugger;
     this.closeExport();
     this.defaultExport(event.fileType, event);
   }
@@ -403,7 +402,6 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
 
   createServerSideDatasource() {
     let self = this;
-    // this.dispatchNewPage();
     return {
       getRows: function (params: any) {
         setTimeout(() => {
@@ -427,7 +425,7 @@ export class UserGridComponent extends AbstractGridConfigurationComponent implem
           self.store.dispatch(new GetUsersPage(businessUnit, business || null, isNaN(postData.pageNumber) ? self.currentPage : postData.pageNumber, postData.pageSize, sort, filter));
           self.usersPage$.pipe().subscribe((data: any) => {
             self.itemList = data.items;
-            params.successCallback(self.itemList, data.totalCount);
+            params.successCallback(self.itemList, data.totalCount || 1);
           });
         }, 500);
       }
