@@ -1,5 +1,4 @@
 <ng-container
-  *ngIf="isOrganization$ | async"
   [ngTemplateOutlet]="dashboardTemplate"
   [ngTemplateOutletContext]="{
     isLoading: isLoading$ | async,

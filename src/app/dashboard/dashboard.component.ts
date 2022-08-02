@@ -72,7 +72,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
   public hasOrderManagePermission: boolean = true;
 
   public widgetsData$: Observable<WidgetsDataModel>;
-  public isOrganization$: Observable<boolean>;
 
   constructor(
     private readonly store: Store,
@@ -85,7 +84,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   public ngOnInit(): void {
     this.getAdminOrganizationsStructureAll();
-    this.isUserOrganization();
     this.getCurrentUserPermissions();
     this.subscribeOnPermissions();
     this.getDashboardFilterState();
@@ -124,14 +122,6 @@ export class DashboardComponent extends DestroyableDirective implements OnInit, 
 
   private hasPermission(permissions: number[], id: number): boolean{
     return permissions.includes(id);
-  }
-
-  private isUserOrganization(): void {
-    this.isOrganization$ = this.lastSelectedOrganizationAgency$.pipe(
-      map((businessUnitType: string): boolean => {
-        return businessUnitType !== BusinessUnitType[4];
-      })
-    );
   }
 
   private resetDashboardState(): void {
