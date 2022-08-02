@@ -135,13 +135,13 @@ export class UserState {
       if (businessUnitType) {
         menu.menuItems = menu.menuItems.filter((menuItem: MenuItem) => menuItem.id !== education && menuItem.id !== faq)
         .map((menuItem: MenuItem) => {
-          menuItem.icon = MENU_CONFIG[businessUnitType][menuItem.id].icon;
-          menuItem.route = MENU_CONFIG[businessUnitType][menuItem.id].route;
+          menuItem.icon = MENU_CONFIG[businessUnitType][menuItem.id]?.icon;
+          menuItem.route = MENU_CONFIG[businessUnitType][menuItem.id]?.route;
           if (menuItem.children) {
             menuItem.children = menuItem.children.map((child: any) => {
               return {
                 title: child.title,
-                route: MENU_CONFIG[businessUnitType][child.id].route,
+                route: MENU_CONFIG[businessUnitType][child.id]?.route,
                 icon: ''
               };
             }) as ChildMenuItem[];
