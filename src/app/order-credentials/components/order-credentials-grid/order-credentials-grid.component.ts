@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 
-import { GridComponent } from '@syncfusion/ej2-angular-grids';
+import { GridComponent, GroupSettingsModel, PageSettingsModel } from '@syncfusion/ej2-angular-grids';
 
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 
@@ -16,23 +16,29 @@ import { ConfirmService } from '@shared/services/confirm.service';
 export class OrderCredentialsGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @ViewChild('grid') grid: GridComponent;
 
-  @Input() credential: IOrderCredential;
-
+  @Input() credential: IOrderCredentialItem[];
   @Output() edit: EventEmitter<IOrderCredentialItem> = new EventEmitter();
   @Output() update: EventEmitter<IOrderCredentialItem> = new EventEmitter();
   @Output() delete: EventEmitter<number> = new EventEmitter();
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
-
+  public groupOptions: GroupSettingsModel;
+  public pageMaxCount:number;
+  public gridPageSettings: PageSettingsModel;
+  public pageSizes: any;
   constructor(private confirmService: ConfirmService) {
     super();
   }
+
 
   ngOnInit(): void {
     this.pageSubject.pipe(takeUntil(this.unsubscribe$), debounceTime(1)).subscribe((page) => {
       this.currentPage = page;
     });
+    this.allowSorting=true;
+    this.groupOptions = { columns: ['credentialType'] };
+    this.gridPageSettings = { pageSizes: this.rowsPerPageDropDown, pageSize: this.pageSize};
   }
 
   ngOnDestroy(): void {
@@ -44,23 +50,8 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
     this.update.emit(Object.assign({}, { ...data }));
   }
 
-  public dataBound(): void {
-    this.grid.hideScroll();
-  }
-
   public onEdit(event: MouseEvent, data: IOrderCredentialItem): void {
     this.edit.emit(data);
-  }
-
-  public onRowsDropDownChanged(): void {
-    this.pageSize  = parseInt(this.activeRowsPerPageDropDown);
-    this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
-  }
-
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-    }
   }
 
   public onRemoveButtonClick(credential: IOrderCredentialItem): void {
@@ -76,6 +67,5 @@ export class OrderCredentialsGridComponent extends AbstractGridConfigurationComp
         this.delete.emit(credential.credentialId);
       }
     });
-  }
-
+ }
 }
