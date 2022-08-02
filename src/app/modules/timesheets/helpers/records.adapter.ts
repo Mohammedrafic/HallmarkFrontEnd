@@ -48,6 +48,17 @@ export class RecordsAdapter {
     return data;
   }
 
+  static adaptRecordsDiffs(records: RecordValue[], diffs: RecordValue[], deleteIds: number[]): RecordValue[] {
+    return records.map((record) => {
+      const updatedItem = diffs.find((item) => item.id === record.id);
+
+      if (updatedItem) {
+        return updatedItem
+      }
+        return record;
+    }).filter((record) => !deleteIds.includes(record.id));
+  }
+
   private static adaptRecordsToPut(record: RecordValue): PutRecord {
     return {
       id: record.id,

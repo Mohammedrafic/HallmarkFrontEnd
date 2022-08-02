@@ -1189,9 +1189,9 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.orderManagementContentService.getCandidateJob(position.organizationId, position.jobId).subscribe(res => {
       this.selectedCandidate = {
         ...position,
-        closeDate: position.closeDate,
-        positionClosureReason: position.positionClosureReason,
-        positionClosureReasonId: position.positionClosureReasonId,
+        closeDate: res.closeDate,
+        positionClosureReason: res.positionClosureReason,
+        positionClosureReasonId: res.positionClosureReasonId,
       };
     });
   }

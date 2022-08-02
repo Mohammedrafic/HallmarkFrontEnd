@@ -394,6 +394,9 @@ export type OrderCandidateJob = {
   allowDeployCredentials: boolean;
   hasAllRequiredOnboardedCredentials: boolean;
   offeredStartDate: string;
+  closeDate?: string;
+  positionClosureReason?: string;
+  positionClosureReasonId?: number;
 };
 
 export type CandidatesBasicInfo = {
