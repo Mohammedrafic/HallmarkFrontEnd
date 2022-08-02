@@ -192,3 +192,7 @@ export const MapedRecordsType = {
 export const AddSuccessMessage = {
   successMessage: 'Record was added successfully',
 }
+
+export const PutSuccess = {
+  successMessage: 'Records were updated successfully'
+}

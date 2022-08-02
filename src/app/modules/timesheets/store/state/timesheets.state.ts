@@ -26,6 +26,7 @@ import {
   DefaultFiltersState,
   DefaultTimesheetCollection,
   DefaultTimesheetState, filteringOptionsMapping,
+  PutSuccess,
   rejectTimesheetDialogData,
   SavedFiltersParams,
   submitTimesheetDialogData
@@ -244,6 +245,11 @@ export class TimesheetsState {
       switchMap(() => {
         const state = ctx.getState();
         const { id, organizationId } = state.selectedTimeSheet as Timesheet;
+        /**
+         * TODO: make all messages for toast in one constant.
+         */
+        this.store.dispatch(new ShowToast(MessageTypes.Success, PutSuccess.successMessage));
+        this.store.dispatch(new Timesheets.GetTimesheetDetails(body.timesheetId, body.organizationId, isAgency));
         return this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
       }),
     )
@@ -484,6 +490,7 @@ export class TimesheetsState {
       tap(() => {
         this.store.dispatch([
           new ShowToast(MessageTypes.Success, AddSuccessMessage.successMessage),
+          new Timesheets.GetTimesheetDetails(body.timesheetId, body.organizationId, isAgency),
         ]);
         const state = ctx.getState();
         const { id, organizationId } = state.selectedTimeSheet as Timesheet;
