@@ -10,7 +10,7 @@ trigger:
 - release.*
 - task*
 - strory*
-- pipeline*
+- demo*
 
 pool:
   # vmImage: ubuntu-latest
@@ -71,7 +71,7 @@ steps:
 - task: Docker@2
   displayName: Build an image
   inputs:
-    containerRegistry: 'shruse2e2acr'
+    containerRegistry: 'shruse2acr'
     repository: 'einsteinui'
     command: 'buildAndPush'
     dockerfile: '**/Dockerfile'

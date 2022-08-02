@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
-import { UsersFilters } from "@shared/models/user.model";
 import {
   Organisation,
   UserVisibilitySettingBody,
@@ -20,34 +19,32 @@ export class UsersService {
   /**
    * Get the list of users by BusinessUnitType and BusinessUnitId
    * @param BusinessUnitType
-   * @param BusinessUnitIds
+   * @param BusinessUnitId
    * @param PageNumber
    * @param PageSize
-   * @param Filters
    *
    * @return UsersPage
    */
   public getUsersPage(
     BusinessUnitType: BusinessUnitType,
-    BusinessUnitIds: number[],
+    BusinessUnitId: number,
     PageNumber: number,
     PageSize: number,
-    Filters: UsersFilters
+    SortModel: any,
+    FilterModel: any
   ): Observable<UsersPage> {
-    return this.http.post<UsersPage>(`/api/Users/Filtered`, {
-      BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, ...Filters
-    });
+    return this.http.post<UsersPage>(`/api/Users/Filtered`, { BusinessUnitType, BusinessUnitId, PageNumber, PageSize, SortModel, FilterModel });
   }
 
   /**
    * Get the list of roles for user by BusinessUnitType and BusinessUnitId
    * @param BusinessUnitType
-   * @param BusinessUnitIds
+   * @param BusinessUnitId
    *
    * @return RolesPerUser
    */
-  public getRolesPerUser(BusinessUnitType: BusinessUnitType, BusinessUnitIds: number[]): Observable<RolesPerUser[]> {
-    return this.http.post<RolesPerUser[]>(`/api/Roles/basicinfo`, { BusinessUnitType, BusinessUnitIds });
+  public getRolesPerUser(BusinessUnitType: BusinessUnitType, BusinessUnitId: number): Observable<RolesPerUser[]> {
+    return this.http.get<RolesPerUser[]>(`/api/Roles/basicinfo`, { params: { BusinessUnitType, BusinessUnitId } });
   }
 
   /**

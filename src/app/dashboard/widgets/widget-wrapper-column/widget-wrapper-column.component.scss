@@ -1,0 +1,70 @@
+@import 'mixins';
+
+$headerHeight: 19px;
+
+:host {
+  display: block;
+  height: 100%;
+}
+
+.app-widget-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 24px;
+  box-sizing: border-box;
+  --chartHeight: 100%;
+
+  @media screen and (max-width: 1700px) {
+    padding-left: 16px;
+  }
+
+  &.with-legend {
+    --chartHeight: 70%;
+
+    .app-widget-wrapper__chart {
+      border-bottom: 1px solid rgba($secondary-dark-blue-40, 0.32);
+     
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  &__title {
+    @include with-ellipsis;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1b2e;
+    height: $headerHeight;
+  }
+
+  &__projection-wrapper {
+    flex: 1;
+    height: calc(100% - #{$headerHeight});
+   
+  }
+
+  &__chart {
+    height: var(--chartHeight);
+  }
+
+  &__legend {
+    height: calc(100% - #{var(--chartHeight)});
+    overflow: auto;
+    padding: 12px 12px 0 0;
+    margin-right: -12px;
+    cursor: default;
+    box-sizing: border-box;
+  }
+
+  &__loader {
+    display: grid;
+    height: 100%;
+    place-items: center;
+  }
+}

@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  host: 'https://dev.einstein2.com/einsteinapi'
+  host: '%%API_ENDPOINT_URL%%'
 };
 
 /*

@@ -136,6 +136,21 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: 'security/user-list',
     },
+    40: {
+      // Custom Reports
+      icon: 'pie-chart',
+      route: '/analytics/state-wise-skills',
+    },
+    41: {
+      // state wise skills
+      icon: '',
+      route: '/analytics/state-wise-skills',
+    },
+    42: {
+      // Candidate Statistics
+      icon: '',
+      route: '/analytics/candidate-stats',
+    },
   },
 
   [BusinessUnitType.MSP]: {

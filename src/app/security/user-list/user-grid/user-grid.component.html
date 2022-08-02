@@ -1,4 +1,4 @@
-<ejs-grid
+<!-- <ejs-grid
   #usersGrid
   id="users-grid"
   class="users-grid"
@@ -99,17 +99,43 @@
       </div>
     </div>
   </ng-template>
-</ejs-grid>
+</ejs-grid> -->
 
+<!-- [serverSideInfiniteScroll]="true"
+[serverSideFilterOnServer]="true"
+[serverSideSortOnServer]="true" -->
+<section>
+  <ag-grid-angular #agGridPagination
+                  style="width: 100%; height: 550px;"
+                  class="ag-theme-alpine"
+                  [animateRows]="true"
+                  [columnDefs]="columnDefs"
+                  [defaultColDef]="defaultColDef"
+                  [suppressAggFuncInHeader]="true"
+                  [modules]="modules"                
+                  [cacheBlockSize]="cacheBlockSize"
+                  [rowModelType]="rowModelType"
+                  [frameworkComponents]="frameworkComponents"                                
+                  [pagination]="true"
+                  [paginationPageSize]="paginationPageSize"                    
+                  (gridReady)="onGridReady($event)"                
+                  [sideBar]="sideBar"                                                
+                  toolPanel="columns"
+                  [serverSideStoreType]="serverSideStoreType"                
+                  [paginationAutoPageSize]="false"
+                  [maxBlocksInCache] ="maxBlocksInCache">
+  </ag-grid-angular>
+</section>
+<div class="row">
+  <div class="col-md-6"></div>
+  <div class="col-md-6 text-right">
+    <ejs-dropdownlist
+      id="rowsPerPage"
+      class="dropdown-no-border"
+      [dataSource]="rowsPerPageDropDown"
+      [(value)]="activeRowsPerPageDropDown"
+      (change)="onPageSizeChanged($event)">
+    </ejs-dropdownlist>
+  </div>
+</div>
 <app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
-
-<app-filter-dialog
-  [items]="filteredItems"
-  [count]="(usersPage$ | async)?.totalCount"
-  (deleteFilter)="onFilterDelete($event)"
-  (clearAllFiltersClicked)="onFilterClearAll()"
-  (applyFilterClicked)="onFilterApply()"
-  (closeDialogClicked)="onFilterClose()"
->
-  <app-users-filters [form]="usersFilterFormGroup" [filterColumns]="filterColumns"></app-users-filters>
-</app-filter-dialog>
