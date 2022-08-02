@@ -18,4 +18,6 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.FILLED_POSITIONS_TREND]: PositionTrend;
   [WidgetTypeEnum.CHAT]: string;
   [WidgetTypeEnum.INVOICES]: string;
+  [WidgetTypeEnum.OPEN_POSITIONS_TREND]: PositionTrend;
+  [WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]: PositionTrend;
 }

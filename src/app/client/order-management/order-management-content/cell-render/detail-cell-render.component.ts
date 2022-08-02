@@ -16,7 +16,6 @@ export class DetailRowCellRenderer implements ICellRendererAngularComp {
   }
 
   onOpenDialog(event: any) {
-    debugger;
     this.params.clicked(event,this.params.data);
   }
 

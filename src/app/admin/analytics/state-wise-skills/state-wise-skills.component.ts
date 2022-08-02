@@ -12,23 +12,22 @@ import { SetHeaderState } from 'src/app/store/app.actions';
 })
 export class StateWiseSkillsComponent implements OnInit {
 
-  private _sanitizer:DomSanitizer;
-  public paramsData:any={};
-  public reportName:string="/Dashboard/DemoDashboard.cls";
-  public catelogName:string="/Dashboard/POC.cat";
-  public title:string="State Wise Skills";
+  private _sanitizer: DomSanitizer;
+  public paramsData: any = {};
+  public reportName: string = "/Dashboard/DemoDashboard.cls";
+  public catelogName: string = "/Dashboard/POC.cat";
+  public title: string = "State Wise Skills";
   constructor(private store: Store,
     private router: Router,
-    private route: ActivatedRoute,sanitizer: DomSanitizer) {
-store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
-this._sanitizer=sanitizer;
+    private route: ActivatedRoute, sanitizer: DomSanitizer) {
+    store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
+    this._sanitizer = sanitizer;
+  }
+
+  ngOnInit(): void {
+
+  }
 }
-
-  ngOnInit(): void {  
-  
-  }
-
-  }
 
 
 

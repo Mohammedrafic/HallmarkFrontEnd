@@ -21,8 +21,6 @@ export class SearchMenuComponent implements OnChanges {
 
   public searchContentWindowHeight: string;
 
-
-
   public constructor(
    
     private router: Router,

@@ -51,6 +51,10 @@
                      [tasks]="widgetsData?.[widgetTypeEnum.TASKS]"></app-tasks>
           <app-trend-chart *ngSwitchCase="widgetTypeEnum.FILLED_POSITIONS_TREND"
                            [widget]="widgetsData?.[widgetTypeEnum.FILLED_POSITIONS_TREND]"></app-trend-chart>
+          <app-trend-chart *ngSwitchCase="widgetTypeEnum.OPEN_POSITIONS_TREND"
+                           [widget]="widgetsData?.[widgetTypeEnum.OPEN_POSITIONS_TREND]"></app-trend-chart>
+          <app-trend-chart *ngSwitchCase="widgetTypeEnum.IN_PROGRESS_POSITIONS_TREND"
+                           [widget]="widgetsData?.[widgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]"></app-trend-chart>
           <app-chat *ngSwitchCase="widgetTypeEnum.CHAT"
                     [chatData]="widgetsData?.[widgetTypeEnum.CHAT]"></app-chat>
           <app-invoices-chart *ngSwitchCase="widgetTypeEnum.INVOICES"

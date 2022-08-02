@@ -60,6 +60,7 @@ export class DashboardService {
     (filters: DashboartFilterDto, timeSelection: TimeSelectionEnum) => Observable<unknown>
   > = {
     [WidgetTypeEnum.APPLICANTS_BY_REGION]: (filters: DashboartFilterDto) => this.getApplicantsByRegionWidgetData(filters),
+    [WidgetTypeEnum.APPLICANTS_BY_POSITIONS]: (filters: DashboartFilterDto) => this.getApplicantsByPositionsWidgetData(filters),
     [WidgetTypeEnum.ACTIVE_POSITIONS]: (filters: DashboartFilterDto) => this.getActivePositionWidgetData(filters),
     [WidgetTypeEnum.CANDIDATES]: (filters: DashboartFilterDto) => this.getCandidatesWidgetData(filters),
     [WidgetTypeEnum.FILLED_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getFilledPositionTrendWidgetData(filters),
@@ -70,6 +71,8 @@ export class DashboardService {
     [WidgetTypeEnum.INVOICES]: () => this.getInvocesWidgetData(),
     [WidgetTypeEnum.TASKS]: () => this.getTasksWidgetData(),
     [WidgetTypeEnum.CHAT]: () => this.getChatWidgetData(),
+    [WidgetTypeEnum.OPEN_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getOpenPositionTrendWidgetData(filters),
+    [WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]: (filters: DashboartFilterDto) => this.getInProgressPositionTrendWidgetData(filters),
   };
 
   private readonly mapData$: Observable<LayerSettingsModel> = this.getMapData();
@@ -156,8 +159,22 @@ export class DashboardService {
     );
   }
 
+  private getApplicantsByPositionsWidgetData(
+    filters: DashboartFilterDto
+  ): Observable<CandidatesByStateWidgetAggregatedDataModel> {
+    return forkJoin({ mapData: this.mapData$, applicantsByRegion: this.getApplicantsByPositions(filters) }).pipe(
+      map((data: ApplicantsByRegionDataModel) => {
+        return this.getFormattedPostionsByStatesWidgetAggregatedData(data);
+      })
+    );
+  }
+
   private getApplicantsByRegion(filter: DashboartFilterDto): Observable<CandidatesByStatesResponseModel> {
     return this.httpClient.post<CandidatesByStatesResponseModel>(`${this.baseUrl}/GetCandidatesStatesAggregated`, { ...filter });
+  }
+
+  private getApplicantsByPositions(filter: DashboartFilterDto ): Observable<CandidatesByStatesResponseModel> {
+    return this.httpClient.post<CandidatesByStatesResponseModel>(`${this.baseUrl}/GetPostionsStatesAggregated`, { ...filter });
   }
 
   private getMapData(): Observable<LayerSettingsModel> {
@@ -188,7 +205,39 @@ export class DashboardService {
       colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
     };
 
-    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates };
+    const title = "";
+    const description = "";
+    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates,title,description };
+  }
+
+  private getFormattedPostionsByStatesWidgetAggregatedData({
+    mapData,
+    applicantsByRegion,
+  }: ApplicantsByRegionDataModel): CandidatesByStateWidgetAggregatedDataModel {
+    const candidatesWithState = flow([
+      Object.entries,
+      (arr) => arr.filter(([key, value]: [key: string, value: number]) => key !== 'Unknown'),
+      Object.fromEntries,
+    ])(applicantsByRegion);
+    const maxCandidatesValue = flow(values, max)(candidatesWithState);
+    const unknownStateCandidates = applicantsByRegion['Unknown'];
+    const title = "Open Positions";
+    const description = "Open and in progress Position by  State";
+
+    const combinedData = { ...mapData, ...USAMapCandidatesDataLayerSettings };
+    const dataSource = lodashMap(
+      (stateDefinition: Record<string, string>) => ({
+        ...stateDefinition,
+        candidates: applicantsByRegion[stateDefinition['code']] ?? 0,
+      }),
+      combinedData.dataSource
+    );
+    const shapeSettings = {
+      ...combinedData.shapeSettings,
+      colorMapping: [{ from: 0, to: maxCandidatesValue, color: ['#ecf2ff', '#2368ee'] }],
+    };
+
+    return { chartData: [{ ...combinedData, dataSource, shapeSettings }], unknownStateCandidates, title, description };
   }
 
   private getDashboardState(): Observable<PanelModel[]> {
@@ -289,12 +338,53 @@ export class DashboardService {
       map((data: PositionTrendDto) => {
         const [previousValue, currentValue] = data.values.slice(-2);
         const coefficient = previousValue === 0 ? 1 : previousValue;
-
+        const title = "Filled Position Trend";
+        const description = "Filled Position Trend";
         return {
           id: WidgetTypeEnum.FILLED_POSITIONS_TREND,
           percentRatio: ((currentValue - previousValue) / coefficient) * 100,
           total: data.total,
           chartData: data.values.map((item: number, index: number) => ({ x: index, y: item })),
+          title: title,
+          description: description
+        };
+      })
+    );
+  }
+
+  private getOpenPositionTrendWidgetData(filter: DashboartFilterDto): Observable<PositionTrend> {
+    return this.httpClient.post<PositionTrendDto>(`${this.baseUrl}/getopenpositiontrend`, { ...filter }).pipe(
+      map((data: PositionTrendDto) => {
+        const [previousValue, currentValue] = data.values.slice(-2);
+        const coefficient = previousValue === 0 ? 1 : previousValue;
+        const title = "Open Position Trend";
+        const description = "open Position trend";
+        return {
+          id: WidgetTypeEnum.OPEN_POSITIONS_TREND,
+          percentRatio: ((currentValue - previousValue) / coefficient) * 100,
+          total: data.total,
+          chartData: data.values.map((item: number, index: number) => ({ x: index, y: item })),
+          title: title,
+          description: description
+        };
+      })
+    );
+  }
+
+  private getInProgressPositionTrendWidgetData(filter: DashboartFilterDto): Observable<PositionTrend> {
+    return this.httpClient.post<PositionTrendDto>(`${this.baseUrl}/getinprogresstrend`, { ...filter }).pipe(
+      map((data: PositionTrendDto) => {
+        const [previousValue, currentValue] = data.values.slice(-2);
+        const coefficient = previousValue === 0 ? 1 : previousValue;
+        const title = "In Progress Position Trend";
+        const description = "In  Progress Position trend";
+        return {
+          id: WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND,
+          percentRatio: ((currentValue - previousValue) / coefficient) * 100,
+          total: data.total,
+          chartData: data.values.map((item: number, index: number) => ({ x: index, y: item })),
+          title: title,
+          description: description
         };
       })
     );
