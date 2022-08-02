@@ -3,7 +3,7 @@ export enum OrganizationOrderManagementTabs {
   PerDiem = 'Per Diem',
   ReOrders = 'Re-Orders',
   Incomplete = 'Incomplete',
-  OrderTemplates = 'Order Templates'
+  OrderTemplates = 'Order Templates',
 }
 
 export enum AgencyOrderManagementTabs {

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
-import { Select, Store } from '@ngxs/store';
-import { Observable, takeUntil } from 'rxjs';
+import { Store } from '@ngxs/store';
+import { takeUntil } from 'rxjs';
 
 import { SelectingEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
 
@@ -21,12 +21,18 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
   @Output() selectedTab = new EventEmitter<AgencyOrderManagementTabs>();
 
   public tabTitle = AgencyOrderManagementTabs;
-  public tabsArray = Object.values(AgencyOrderManagementTabs);
+  public tabsArray = Object.values(AgencyOrderManagementTabs).filter(
+    (tab: string) => tab !== AgencyOrderManagementTabs.AllAgencies && tab !== AgencyOrderManagementTabs.OtherAgencies
+  );
 
   private selectedTabIndex: number;
   private previousSelectedOrderId: number;
 
-  constructor(private orderManagementAgencyService: OrderManagementAgencyService, private store: Store, private location: Location) {
+  constructor(
+    private orderManagementAgencyService: OrderManagementAgencyService,
+    private store: Store,
+    private location: Location
+  ) {
     super();
   }
 
@@ -51,7 +57,8 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
   }
 
   private selectPerDiemTab(): void {
-    const perDiemTabIndex = 3;
+    //TODO: change perDiemTabIndex to 3 , when we implemented other tabs
+    const perDiemTabIndex = 1;
     this.orderManagementAgencyService.orderPerDiemId$.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.tabNavigation.select(perDiemTabIndex);
     });
