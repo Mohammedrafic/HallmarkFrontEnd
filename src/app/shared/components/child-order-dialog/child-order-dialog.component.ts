@@ -5,13 +5,22 @@ import { Observable, Subject, takeWhile } from 'rxjs';
 
 import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
+import {
+  AccordionClickArgs,
+  AccordionComponent,
+  ExpandEventArgs,
+  SelectEventArgs,
+  TabComponent
+} from '@syncfusion/ej2-angular-navigations';
 
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { OrderType } from '@shared/enums/order-type';
-import { AgencyOrderManagement, Order, OrderManagementChild, } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, Order, OrderCandidateJob, OrderManagementChild, } from '@shared/models/order-management.model';
+import { AcceptFormComponent } from "@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component";
+import { AccordionOneField } from "@shared/models/accordion-one-field.model";
+import PriceUtils from "@shared/utils/price.utils";
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
-import { ApplicantStatus } from '@shared/enums/applicant-status.enum';
+import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
@@ -42,12 +51,16 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
   @ViewChild('tab') tab: TabComponent;
+  @ViewChild('accordionElement') accordionComponent: AccordionComponent;
 
   @Select(OrderManagementState.selectedOrder)
   public agencySelectedOrder$: Observable<Order>;
 
   @Select(OrderManagementContentState.selectedOrder)
   public orgSelectedOrder$: Observable<Order>;
+
+  @Select(OrderManagementContentState.candidatesJob)
+  candidateJobState$: Observable<OrderCandidateJob>;
 
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
@@ -59,6 +72,11 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   public selectedOrder$: Observable<Order>;
   public orderStatusText = OrderStatusText;
   public disabledCloseButton = true;
+  public accordionOneField: AccordionOneField;
+  public accordionClickElement: HTMLElement | null;
+  public acceptForm = AcceptFormComponent.generateFormGroup();
+  public candidateJob: OrderCandidateJob | null;
+  public candidateStatus = CandidatStatus;
 
   private isAlive = true;
 
@@ -68,6 +86,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.isAgency = this.router.url.includes('agency');
     this.isOrganization = this.router.url.includes('client');
     this.selectedOrder$ = this.isAgency ? this.agencySelectedOrder$ : this.orgSelectedOrder$;
+    this.subscribeOnCandidateJob();
     this.onOpenEvent();
   }
 
@@ -118,6 +137,16 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.sideDialog.hide();
     this.openEvent.next(null);
     this.selectedTemplate = null;
+  }
+
+  public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
+    this.accordionOneField = new AccordionOneField(this.accordionComponent);
+    this.accordionClickElement = this.accordionOneField.clickedOnAccordion(accordionClick);
+  }
+
+  public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
+    this.accordionOneField = new AccordionOneField(this.accordionComponent);
+    this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
   }
 
   private getTemplate(): void {
@@ -182,6 +211,72 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
         disabledBodyOverflow(false);
       }
     });
+  }
+
+  private subscribeOnCandidateJob(): void {
+    this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
+      this.candidateJob = orderCandidateJob;
+      if (orderCandidateJob) {
+        this.setAcceptForm(orderCandidateJob);
+      }
+    });
+  }
+
+  private setAcceptForm({
+                         order: {
+                           reOrderFromId,
+                           hourlyRate,
+                           locationName,
+                           departmentName,
+                           skillName,
+                           orderOpenDate,
+                           shiftStartTime,
+                           shiftEndTime,
+                           openPositions,
+                         },
+                         candidateBillRate,
+                         offeredBillRate,
+                         orderId,
+                         positionId,
+                       }: OrderCandidateJob) {
+    const candidateBillRateValue = candidateBillRate ?? hourlyRate;
+    const isBillRatePending =
+      this.candidateJob?.applicantStatus.applicantStatus === CandidatStatus.BillRatePending
+        ? candidateBillRate
+        : offeredBillRate;
+    this.acceptForm.patchValue({
+      reOrderFromId: `${reOrderFromId}-${orderId}-${positionId}`,
+      offeredBillRate: PriceUtils.formatNumbers(hourlyRate),
+      candidateBillRate: PriceUtils.formatNumbers(candidateBillRateValue),
+      locationName,
+      departmentName,
+      skillName,
+      orderOpenDate,
+      shiftStartTime,
+      shiftEndTime,
+      openPositions,
+      hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
+    });
+    this.enableFields();
+  }
+
+  private enableFields(): void {
+    this.acceptForm.get('candidateBillRate')?.enable();
+    switch (this.candidateJob?.applicantStatus.applicantStatus) {
+      case !this.isAgency && CandidatStatus.BillRatePending:
+        this.acceptForm.get('hourlyRate')?.enable();
+        this.acceptForm.get('candidateBillRate')?.disable();
+        break;
+      case CandidatStatus.OfferedBR:
+      case CandidatStatus.OnBoard:
+      case CandidatStatus.Rejected:
+      case CandidatStatus.BillRatePending:
+        this.acceptForm.disable();
+        break;
+
+      default:
+        break;
+    }
   }
 }
 

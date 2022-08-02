@@ -62,11 +62,11 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   constructor(private chipsCssClass: ChipsCssClass) {}
 
   public get isReOrder(): boolean {
-    return !isNil(this.order?.reOrderId);
+    return !isNil(this.order?.reOrderId || this.order?.id);
   }
 
   public get getTitle(): string {
-    return this.isReOrder ? `Re-Order ID ${this.order?.orderId}` : `Order ID ${this.order?.orderId}`;
+    return this.isReOrder ? `Re-Order ID ${this.order?.orderId || this.order?.id}` : `Order ID ${this.order?.orderId || this.order?.id}`;
   }
 
   ngOnInit(): void {

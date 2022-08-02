@@ -9,6 +9,7 @@ import { Order } from '@shared/models/order-management.model';
 import { Observable, takeUntil } from 'rxjs';
 import { OrderType } from '@shared/enums/order-type';
 import { OrderManagementService } from '../order-management-content/order-management.service';
+import { OrderStatus } from "@shared/enums/order-management";
 
 @Component({
   selector: 'app-order-candidates-container',
@@ -40,7 +41,7 @@ export class OrderCandidatesContainerComponent extends DestroyableDirective impl
     this.orderCandidatePage$.pipe(takeUntil(this.destroy$)).subscribe((order) => {
       this.orderCandidatePage = order;
       this.orderCandidates = {
-        isClosed: Boolean(this.order?.orderCloseDate) || Boolean(this.order?.orderClosureReasonId),
+        isClosed: this.order?.status === OrderStatus.Closed,
         orderId: this.order?.id,
         organizationId: this.order?.organizationId as number,
       };
