@@ -174,15 +174,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     const diffs = this.timesheetRecordsService.findDiffs(
       this.records[this.currentTab], this.formControls, this.timesheetColDef);
 
-    const recordsToUpdate = this.records[this.currentTab]
-      .map((record) => {
-        const updatedItem = diffs.find((item) => item.id === record.id);
-
-        if (updatedItem) {
-          return updatedItem
-        }
-          return record;
-      });
+    const recordsToUpdate = RecordsAdapter.adaptRecordsDiffs(
+      this.records[this.currentTab], diffs, this.idsToDelete);
   
     if (diffs.length || this.idsToDelete.length) {
       const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
@@ -196,6 +189,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       .subscribe(() => {
         this.changesSaved.emit(true);
         this.isChangesSaved = true;
+        this.idsToDelete = [];
         this.setInitialTableState();
       });
     }
