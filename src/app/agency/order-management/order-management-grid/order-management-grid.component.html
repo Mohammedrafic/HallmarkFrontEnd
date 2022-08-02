@@ -168,7 +168,7 @@
           selectedCandidate?.selected?.order === data.id &&
           selectedCandidate?.selected.positionId === child.positionId
         "
-        [isAgency]="true"
+        [isAgency]="false"
         (clickEvent)="onOpenCandidateDialog($event, data)"
       ></app-grid-subrow-candidate>
     </ng-template>
