@@ -14,9 +14,9 @@ import { AcceptFormComponent } from './accept-form/accept-form.component';
 import {
   GetRejectReasonsForAgency,
   RejectCandidateForAgencySuccess,
+  RejectCandidateJob as RejectAgencyCandidateJob,
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
-  RejectCandidateJob as RejectAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { AbstractControl, FormControl } from '@angular/forms';
@@ -88,7 +88,12 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   get showAccept(): boolean {
-    return !this.isBillRatePending && !hideAcceptActionForStatuses.includes(this.currentCandidateApplicantStatus);
+    return (
+      !this.isBillRatePending &&
+      !hideAcceptActionForStatuses.includes(this.currentCandidateApplicantStatus) &&
+      [CandidatStatus.Offered].includes(this.currentCandidateApplicantStatus) &&
+      this.isAgency
+    );
   }
 
   get hourlyRate(): AbstractControl | null {
@@ -335,6 +340,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       case CandidatStatus.OnBoard:
       case CandidatStatus.Rejected:
       case CandidatStatus.BillRatePending:
+      case !this.isAgency && CandidatStatus.Offered:
         this.acceptForm.disable();
         break;
 
