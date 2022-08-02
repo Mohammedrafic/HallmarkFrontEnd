@@ -75,6 +75,7 @@ export namespace Timesheets {
     constructor(
       public readonly payload?: TimesheetsFilterState | null,
       public readonly saveStatuses = false,
+      public readonly saveOrganizationId = false,
     ) {
     }
   }
