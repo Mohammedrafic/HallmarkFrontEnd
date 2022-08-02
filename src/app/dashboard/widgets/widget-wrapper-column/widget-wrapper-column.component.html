@@ -11,10 +11,17 @@
 
 <ng-template #regularWidgetTemplate>
   <div class="app-widget-wrapper__projection-wrapper">
-    <div class="app-widget-wrapper__chart">
+
+    <div *ngIf="header" class="app-widget-wrapper__header">
+      <ng-container [ngTemplateOutlet]="header"></ng-container>
+    </div>
+    <div *ngIf="chart" class="app-widget-wrapper__chart">
       <ng-container [ngTemplateOutlet]="chart"></ng-container>
     </div>
-    <div *ngIf="legend" class="app-widget-wrapper__legend">
+    <div *ngIf="chartLine" class="app-widget-wrapper__chart-line">
+      <ng-container  [ngTemplateOutlet]="chartLine"></ng-container>
+    </div>
+    <div *ngIf="legend" class="app-widget-wrapper__legend" [ngClass]="{'app-widget-wrapper__legend-chart-line': chartLine}">
       <ng-container [ngTemplateOutlet]="legend"></ng-container>
     </div>
   </div>

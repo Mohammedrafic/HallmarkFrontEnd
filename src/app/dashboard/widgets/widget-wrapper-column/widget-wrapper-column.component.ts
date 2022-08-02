@@ -10,6 +10,8 @@ export class WidgetWrapperColumnComponent {
   @Input() public isLoading: boolean;
   @Input() public title: string;
 
+  @ContentChild('header') public readonly header: TemplateRef<HTMLElement>;
   @ContentChild('chart') public readonly chart: TemplateRef<HTMLElement>;
+  @ContentChild('chartLine') public readonly chartLine: TemplateRef<HTMLElement>;
   @ContentChild('legend') public readonly legend: TemplateRef<HTMLElement>;
 }
