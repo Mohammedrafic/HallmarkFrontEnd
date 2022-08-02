@@ -36,7 +36,7 @@
   &__legend-text {
     font-size: 14px;
     line-height: 17px;
-    text-overflow: @include with-ellipsis;
+    text-overflow:ellipsis;
     width: 100px;
     white-space: nowrap;
     overflow: hidden;
