@@ -14,7 +14,7 @@
           <div class="e-card-header-caption">
             <h3 class="e-card-title preview-title">Position ID {{ order?.orderId || order?.id }}/{{ candidate?.positionId }}</h3>
             <div class="order-statuses">
-              <ejs-chiplist #chipList class="events-off" *ngIf="candidate">
+              <ejs-chiplist #chipList class="events-off" *ngIf="candidate?.orderStatus">
                 <e-chips>
                   <e-chip [text]="orderStatusText[candidate.orderStatus]" [cssClass]="orderStatusText[candidate.orderStatus] | chipsCssClass"></e-chip>
                 </e-chips>
@@ -46,6 +46,10 @@
                     </section>
                     <hr />
                     <ng-container *ngIf="currentOrder?.orderClosureReasonId">
+                      <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
+                      <hr />
+                    </ng-container>
+                    <ng-container *ngIf="currentOrder?.orderClosureReason">
                       <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
                       <hr />
                     </ng-container>

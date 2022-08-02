@@ -115,6 +115,10 @@ export type OrderManagementChild = {
     jobId: number;
     organizationId: number;
   };
+  selected: any;
+  closeDate?: string;
+  positionClosureReason?: string;
+  positionClosureReasonId?: number;
 };
 
 export type OrderCandidatesList = {

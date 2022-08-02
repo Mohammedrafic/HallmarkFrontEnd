@@ -305,9 +305,4 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
       distinctUntilChanged()
     );
   }
-
-  updateOrderDetails(order: Order | OrderManagement): void {
-    this.store.dispatch(new GetOrderById(order.id, order.organizationId as number));
-    this.updateOrders.emit();
-  }
 }

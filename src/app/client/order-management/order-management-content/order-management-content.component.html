@@ -686,3 +686,10 @@
   [openEvent]="openChildDialog"
 ></app-child-order-dialog>
 
+<app-close-order
+  [order]="selectedOrder"
+  [candidate]="selectedCandidate"
+  (closeOrderSuccess)="updateOrderDetails($event)"
+  (closePositionSuccess)="updatePositionDetails($event)">
+</app-close-order>
+
