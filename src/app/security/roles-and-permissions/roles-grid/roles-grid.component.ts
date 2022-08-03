@@ -41,13 +41,12 @@ enum Active {
   styleUrls: ['./roles-grid.component.scss'],
   providers: [RolesFilterService]
 })
-export class RolesGridComponent extends AbstractGridConfigurationComponent implements OnInit, AfterViewInit, OnDestroy {
+export class RolesGridComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() filterForm: FormGroup;
   @Input() filteredItems$: Subject<number>;
 
   @Output() editRoleEvent = new EventEmitter();
   @Input() export$: Subject<ExportedFileType>;
-  // @ViewChild('rolesGrid') grid: GridComponent;
 
   @Select(SecurityState.roleGirdData)
   public roleGirdData$: Observable<Role[]>;
@@ -284,15 +283,11 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
           self.dispatchNewPage(sort, filter);
           self.rolesPage$.pipe().subscribe((data: any) => {
             self.itemList = data.items;            
-            params.successCallback(self.itemList, data.totalCount);
+            params.successCallback(self.itemList, data.totalCount || 1);
           });
         }, 500);
       }
     }
-  }
-
-  ngAfterViewInit(): void {
-    // this.grid.rowHeight = GRID_CONFIG.initialRowHeight;
   }
 
   public rowDataBound(args: RowDataBoundEventArgs): void {
@@ -300,10 +295,6 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     if (data.isDefault) {
       args.row?.classList.add('default-role');
     }
-  }
-
-  dataBound() {
-    // const a = this.grid.getRows();
   }
 
   ngOnDestroy(): void {
@@ -322,7 +313,6 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
         okButtonClass: 'delete-button',
       })
       .subscribe((confirm) => {
-        // this.grid.clearRowSelection();
         if (confirm && data.id) {
          this.store.dispatch(new RemoveRole(data.id))
         }
@@ -399,7 +389,6 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
         filter(({ isDialogShown }) => !!!isDialogShown)
       )
       .subscribe(() => {
-        // this.grid.clearRowSelection();
       });
   }
   
