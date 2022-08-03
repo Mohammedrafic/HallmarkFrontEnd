@@ -1,4 +1,4 @@
-<app-widget-wrapper-column [isLoading]="isLoading">
+<app-widget-wrapper [isLoading]="isLoading">
   <ng-template #header>
     <div class="widget-header">
       <h3 class="widget-header__title">{{ 'Positions Trend' }}</h3>
@@ -22,7 +22,7 @@
       </div>
     </div>
   </ng-template>
-  <ng-template #chartLine>
+  <ng-template #lineChart>
     <ejs-chart
       #sfComponent
       [chartArea]="chartArea"
@@ -84,4 +84,4 @@
       [showPercentRatio]="true"
     ></app-widget-legend>
   </ng-template>
-</app-widget-wrapper-column>
+</app-widget-wrapper>
