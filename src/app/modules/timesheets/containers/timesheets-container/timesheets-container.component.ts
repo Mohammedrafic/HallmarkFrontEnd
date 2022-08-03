@@ -97,7 +97,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   ngOnInit(): void {
-    this.initComponentState();
     this.startFiltersWatching();
     this.startOrganizationWatching();
     this.startSearchWatching();
