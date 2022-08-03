@@ -46,7 +46,7 @@ export class LogiReportComponent implements OnInit {
         cstTitleBar: { tstyle: 0, bstyle: 1 }
       }
     }
-    var server = {
+    let server = {
       url: this.reportUrl,
       authorized_user: this.uId,
       jrd_prefer: this.jrdPrefer,
@@ -56,7 +56,7 @@ export class LogiReportComponent implements OnInit {
         reslst: this.resultList,
         active: 1
       };
-    var task = this.factory.runDashboard(server, resExt, entryId);
+    let task = this.factory.runDashboard(server, resExt, entryId);
   }
 
   public ShowReport(entryId: string): void {
@@ -89,16 +89,16 @@ export class LogiReportComponent implements OnInit {
         }
       }
     }
-    var server = {
+    let server = {
       url: this.reportUrl,
       authorized_user: this.uId,
       jrd_prefer: this.jrdPrefer,
       jrd_studio_mode: "edit",
       "jrs.param_page": true
     };
-    var prptRes = this.reportName;
-    var catRes = this.catelogName;
-    var test = this.factory.runReport(
+    let prptRes = this.reportName;
+    let catRes = this.catelogName;
+    let test = this.factory.runReport(
       server, prptRes, catRes, this.paramsData, entryId);
   };
 }
