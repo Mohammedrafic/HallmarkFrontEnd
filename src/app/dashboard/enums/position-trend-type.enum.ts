@@ -1,6 +1,6 @@
 export enum PositionTrendTypeEnum {
   OPEN = 'Open',
-  ONBOARD = 'Onboard',
+  FILLED = 'Filled',
   CLOSED = 'Closed',
   IN_PROGRESS = 'In Progress'
 }

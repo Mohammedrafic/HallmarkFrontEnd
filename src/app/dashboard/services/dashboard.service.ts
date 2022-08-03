@@ -254,7 +254,7 @@ export class DashboardService {
         map((positions: PositionsByTypeResponseModel) => {
           return {
             [PositionTrendTypeEnum.OPEN]: this.convertDtoToPositionTypes(positions.openJobs, timeSelection),
-            [PositionTrendTypeEnum.ONBOARD]: this.convertDtoToPositionTypes(positions.onboardCandidates, timeSelection),
+            [PositionTrendTypeEnum.FILLED]: this.convertDtoToPositionTypes(positions.onboardCandidates, timeSelection),
             [PositionTrendTypeEnum.CLOSED]: this.convertDtoToPositionTypes(positions.closedJobs, timeSelection),
             [PositionTrendTypeEnum.IN_PROGRESS]: this.convertDtoToPositionTypes(positions.inProgressJobs, timeSelection),
           };

@@ -46,8 +46,8 @@
           [type]="type"
         ></e-series>
         <e-series
-          [dataSource]="(filteredChartData$ | async)?.[positionTypeEnum.ONBOARD] ?? []"
-          [name]="positionTypeEnum.ONBOARD"
+          [dataSource]="(filteredChartData$ | async)?.[positionTypeEnum.FILLED] ?? []"
+          [name]="positionTypeEnum.FILLED"
           [width]="lineWidthInPixels"
           [xName]="xAxisName"
           [yName]="yAxisName"
