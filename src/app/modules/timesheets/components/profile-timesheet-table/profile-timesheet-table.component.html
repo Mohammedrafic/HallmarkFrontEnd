@@ -16,13 +16,15 @@
         </ejs-tab>
       </div>
 
-      <button class="add-action spaced"
-            cssClass="e-action-button"
-            ejs-button
-            (click)="openAddDialog()"
-            [disabled]="actionsDisabled"
+      <button
+        *ngIf="currentTab !== tableTypes.Expenses"
+        class="add-action spaced"
+        cssClass="e-action-button"
+        ejs-button
+        (click)="openAddDialog()"
+        [disabled]="actionsDisabled"
       >
-      <i-feather name="plus" class="icon"></i-feather> Add Record
+        <i-feather name="plus" class="icon"></i-feather> Add Record
       </button>
       <ng-container *ngIf="recordsToShow?.[currentTab]?.length || isEditOn">
         <button

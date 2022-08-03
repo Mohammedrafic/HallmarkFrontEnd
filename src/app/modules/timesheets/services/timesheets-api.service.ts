@@ -3,30 +3,11 @@ import { Injectable } from '@angular/core';
 
 import { catchError, map, Observable, of } from 'rxjs';
 
-import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
-import {
-  TimesheetsFilterState,
-  TabCountConfig,
-  TimesheetRecordsDto,
-  DropdownOption,
-  CandidateHoursAndMilesData,
-  RecordValue,
-  CostCentersDto,
-  AddRecordDto,
-  PutRecordDto, TimesheetsFilteringOptions
-} from '../interface';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
-  DataSourceItem,
-  FilterDataSource,
-} from '../interface';
-import { TimeSheetsPage, TimrsheetsDto } from '../store/model/timesheets.model';
-import {
-  filterColumnDataSource,
-  MokTabsCounts,
-  MockCandidateHoursAndMilesData,
-} from '../constants';
-import { TimesheetsTableFiltersColumns } from '../enums';
+  TimesheetsFilterState, TimesheetRecordsDto, DropdownOption, CostCentersDto,
+  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, DataSourceItem } from '../interface';
+import { TimrsheetsDto } from '../store/model/timesheets.model';
 import { CostCenterAdapter } from '../helpers';
 import { RecordsAdapter } from '../helpers/records.adapter';
 
@@ -65,8 +46,8 @@ export class TimesheetsApiService {
     return this.http.post<void>('/api/TimesheetState/bulkapprove', { timesheetIds });
   }
 
-  public addTimesheetRecord(body: AddRecordDto): Observable<null> {
-    return this.http.post<null>(`/api/Timesheets/${body.timesheetId}/records`, body);
+  public addTimesheetRecord(body: AddRecordDto): Observable<void> {
+    return this.http.post<void>(`/api/Timesheets/${body.timesheetId}/records`, body);
   }
 
   public putTimesheetRecords(
@@ -82,7 +63,8 @@ export class TimesheetsApiService {
   public getFiltersDataSource(
     organizationId: number | null = null
   ): Observable<TimesheetsFilteringOptions> {
-    return this.http.get<TimesheetsFilteringOptions>(`/api/Timesheets/filteringOptions${organizationId ? `/${organizationId}` : ''}`);
+    return this.http.get<TimesheetsFilteringOptions>(
+      `/api/Timesheets/filteringOptions${organizationId ? `/${organizationId}` : ''}`);
   }
 
   public getCandidateCostCenters(jobId: number, orgId: number, isAgency: boolean): Observable<DropdownOption[]>{
