@@ -37,12 +37,6 @@ import { RejectReason } from '@shared/models/reject-reason.model';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import PriceUtils from '@shared/utils/price.utils';
 
-const hideAcceptActionForStatuses: CandidatStatus[] = [
-  CandidatStatus.OnBoard,
-  CandidatStatus.Rejected,
-  CandidatStatus.BillRatePending,
-];
-
 @Component({
   selector: 'app-reorder-status-dialog',
   templateUrl: './reorder-status-dialog.component.html',
@@ -89,10 +83,10 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   get showAccept(): boolean {
     return (
-      !this.isBillRatePending &&
-      !hideAcceptActionForStatuses.includes(this.currentCandidateApplicantStatus) &&
-      [CandidatStatus.Offered].includes(this.currentCandidateApplicantStatus) &&
-      this.isAgency
+      this.isAgency &&
+      ![CandidatStatus.BillRatePending, CandidatStatus.OnBoard, CandidatStatus.Rejected].includes(
+        this.currentCandidateApplicantStatus
+      )
     );
   }
 
@@ -280,7 +274,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   private updateOrganizationCandidateJob(status: { id: ApplicantStatusEnum; text: string }): void {
     this.acceptForm.markAllAsTouched();
-    if (this.acceptForm.valid && this.orderCandidateJob) {
+    if (this.acceptForm.valid && this.orderCandidateJob && status) {
       const value = this.acceptForm.getRawValue();
 
       this.store

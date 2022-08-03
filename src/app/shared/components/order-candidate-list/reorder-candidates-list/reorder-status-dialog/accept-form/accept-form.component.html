@@ -17,7 +17,7 @@
             formControlName="offeredBillRate"
             class="e-input"
             type="text"
-            [mask]="billRateMask"
+            [mask]="'00.00'"
             [dropSpecialCharacters]="false"
           />
         </div>
@@ -38,12 +38,12 @@
         <label>Candidate Bill Rate</label>
         <div class="input-group">
           <input
-            appValidateWithMessage
             formControlName="candidateBillRate"
             class="e-input"
             type="text"
-            [mask]="billRateMask"
-            [dropSpecialCharacters]="false"
+            (focus)="priceUtils.setPriceMask(formGroup, 'candidateBillRate', $event)"
+            (blur)="priceUtils.setTwoDecimals(formGroup, 'candidateBillRate', $event)"
+            maxlength="5"
           />
         </div>
       </div>
@@ -63,12 +63,12 @@
         <label class="input-group">Offered Bill Rate</label>
         <div class="input-group">
           <input
-            appValidateWithMessage
             formControlName="hourlyRate"
             class="e-input"
             type="text"
-            [mask]="billRateMask"
-            [dropSpecialCharacters]="false"
+            (focus)="priceUtils.setPriceMask(formGroup, 'hourlyRate', $event)"
+            (blur)="priceUtils.setTwoDecimals(formGroup, 'hourlyRate', $event)"
+            maxlength="5"
           />
         </div>
       </div>
