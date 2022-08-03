@@ -1,10 +1,8 @@
 import { Component, Inject, Input, OnInit } from '@angular/core';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Store } from '@ngxs/store';
-import { SetHeaderState } from 'src/app/store/app.actions';
-import { AppSettings, APP_SETTINGS, APP_SETTINGS_URL } from 'src/app.settings';
-declare const com:any;
+import { AppSettings, APP_SETTINGS } from 'src/app.settings';
+import { LogiReportTypes } from 'src/app/shared/enums/logi-report-type.enum';
+import { LogiReportFileDetails } from '@shared/models/logi-report-file';
+declare const com: any;
 
 @Component({
   selector: 'app-logi-report',
@@ -12,69 +10,95 @@ declare const com:any;
   styleUrls: ['./logi-report.component.scss']
 })
 export class LogiReportComponent implements OnInit {
-
-  private _sanitizer:DomSanitizer;
-  private factory:any;
-  private reportIframeName="reportIframe";
+  private factory: any;
+  private reportIframeName: string = "reportIframe";
+  private uId: string = "admin";
+  private jrdPrefer: any;
+  private reportUrl: string;
   @Input() paramsData: any | {};
-  @Input() reportName:string ;
-  @Input() catelogName:string ;
-  
+  @Input() reportName: LogiReportFileDetails;
+  @Input() catelogName: LogiReportFileDetails;
+  @Input() reportType: LogiReportTypes;
+  @Input() resultList: LogiReportFileDetails[];
 
-
-  constructor(private store: Store,
-    private router: Router,
-    private route: ActivatedRoute,sanitizer: DomSanitizer, @Inject(APP_SETTINGS) private appSettings: AppSettings) {
-this._sanitizer=sanitizer;
-
-}
+  constructor(@Inject(APP_SETTINGS) private appSettings: AppSettings) {
+  }
 
   ngOnInit(): void {
-    
-   this.factory=com.jinfonet.api.AppFactory;  
-   this.ShowReport(this.reportIframeName);
+    this.factory = com.jinfonet.api.AppFactory;
+    this.reportUrl = this.appSettings.reportServerUrl + 'jinfonet/tryView.jsp';
+    if (this.reportType == LogiReportTypes.DashBoard) {
+      this.showDashBoard(this.reportIframeName);
+    }
+    else {
+      this.ShowReport(this.reportIframeName);
+    }
   }
-  
 
-  public ShowReport(entryId:string):void {
-    
-      var server = {
-        url: this.appSettings.reportServerUrl+'jinfonet/tryView.jsp',
-    user: "admin",
-       pass: "admin",
-        jrd_prefer:{
-            // For page report
-            pagereport:{
-                feature_UserInfoBar:true,
-                feature_ToolBar: true,
-                feature_Toolbox: true,
-                feature_DSOTree: true,
-                feature_TOCTree: true,
-                feature_PopupMenu: true,
-                feature_ADHOC: true
-            },
-            
-            // For web report
-            webreport:{
-                viewMode:{
-                    hasToolbar: true,
-                    hasSideArea: true
-                },
-                editMode:{
-                  hasToolbar: true,
-                  hasSideArea: true
-                }
-            }
+  public showDashBoard(entryId: string): void {
+    this.jrdPrefer = {
+      // For dashboard
+      dashboard: {
+        viewMode: {
+          toolbar: true,
+          taskbar: true
         },
-        jrd_studio_mode: "edit",
-        "jrs.param_page": true
-    };
-     
-     var prptRes = {name:this.reportName};
-     var catRes = {name:this.catelogName};
-  
-      
-      var test = this.factory.runReport(
-      server, prptRes, catRes, this.paramsData, entryId);
+        cstTitleBar: { tstyle: 0, bstyle: 1 }
+      }
+    }
+    let server = {
+      url: this.reportUrl,
+      authorized_user: this.uId,
+      jrd_prefer: this.jrdPrefer,
+      jrd_dashboard_mode: "edit",
+    },
+      resExt = {
+        reslst: this.resultList,
+        active: 1
       };
+    let task = this.factory.runDashboard(server, resExt, entryId);
   }
+
+  public ShowReport(entryId: string): void {
+    if (this.reportType == LogiReportTypes.PageReport) {
+      this.jrdPrefer = {
+        // For page report
+        pagereport: {
+          feature_UserInfoBar: true,
+          feature_ToolBar: true,
+          feature_Toolbox: true,
+          feature_DSOTree: true,
+          feature_TOCTree: true,
+          feature_PopupMenu: true,
+          feature_ADHOC: true
+        }
+      };
+    }
+    else if (this.reportType == LogiReportTypes.WebReport) {
+      this.jrdPrefer = {
+        // For web report
+        webreport: {
+          viewMode: {
+            hasToolbar: true,
+            hasSideArea: true
+          },
+          editMode: {
+            hasToolbar: true,
+            hasSideArea: true
+          }
+        }
+      }
+    }
+    let server = {
+      url: this.reportUrl,
+      authorized_user: this.uId,
+      jrd_prefer: this.jrdPrefer,
+      jrd_studio_mode: "edit",
+      "jrs.param_page": true
+    };
+    let prptRes = this.reportName;
+    let catRes = this.catelogName;
+    let test = this.factory.runReport(
+      server, prptRes, catRes, this.paramsData, entryId);
+  };
+}

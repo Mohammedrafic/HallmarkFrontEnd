@@ -5,24 +5,18 @@ import { LogiReportFileDetails } from '@shared/models/logi-report-file';
 import { SetHeaderState } from 'src/app/store/app.actions';
 
 @Component({
-  selector: 'app-state-wise-skills',
-  templateUrl: './state-wise-skills.component.html',
-  styleUrls: ['./state-wise-skills.component.scss']
+  selector: 'app-page-report',
+  templateUrl: './page-report.component.html',
+  styleUrls: ['./page-report.component.scss']
 })
-export class StateWiseSkillsComponent {
+export class PageReportComponent {
   public paramsData: any = {};
-  public reportName: LogiReportFileDetails = { name: "/POC/1st_dashboard.dsh" };
-  public catelogName: LogiReportFileDetails = { name: "/POC/POC.cat" };
-  public resultList: LogiReportFileDetails[] = [
-    { name: "/POC - 1st_dashboard.dsh" }
-  ];
-  public title: string = "Dashboard";
+  public reportName: LogiReportFileDetails = { name: "/Dashboard/DemoDashboard.cls" };
+  public catelogName: LogiReportFileDetails = { name: "/Dashboard/POC.cat" };
+  public title: string = "Page Report";
   public reportType: LogiReportTypes = LogiReportTypes.PageReport;
 
   constructor(store: Store) {
     store.dispatch(new SetHeaderState({ title: this.title, iconName: '' }));
   }
 }
-
-
-

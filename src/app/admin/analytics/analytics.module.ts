@@ -5,15 +5,15 @@ import { StateWiseSkillsComponent } from './state-wise-skills/state-wise-skills.
 import { CandidateStatsComponent } from './candidate-stats/candidate-stats.component';
 import { AnalyticsRoutingModule } from './analytics-routing.module';
 import { LogiReportComponent } from '@shared/components/logi-report/logi-report.component';
-
-
+import { PageReportComponent } from './page-report/page-report.component';
 
 @NgModule({
   declarations: [
     AnalyticsComponent,
     StateWiseSkillsComponent,
     CandidateStatsComponent,
-    LogiReportComponent],
+    LogiReportComponent,
+    PageReportComponent],
   imports: [
     CommonModule,
     AnalyticsRoutingModule
