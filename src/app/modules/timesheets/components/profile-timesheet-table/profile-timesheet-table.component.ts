@@ -71,6 +71,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public currentTab: RecordFields = RecordFields.Time;
 
+  public readonly tableTypes = RecordFields;
+
   public isFirstSelected = true;
 
   public recordsToShow: TimesheetRecordsDto;

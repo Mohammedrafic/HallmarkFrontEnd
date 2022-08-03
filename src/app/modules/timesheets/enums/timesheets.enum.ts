@@ -37,6 +37,7 @@ export enum TimesheetDetailsActions {
   DownloadAttachment = '[timesheet details] download attachment',
   AddTimesheetRecord = '[timesheet details] Add timesheet record',
   NoWorkPerformed = '[timesheet details] No work performed',
+  GetDetailsByDate ='[timesheet details] Get timesheet details by date',
 }
 
 export enum TIMETHEETS_STATUSES {

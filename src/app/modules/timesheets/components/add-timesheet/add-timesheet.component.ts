@@ -5,10 +5,10 @@ import {
 
 import { Select, Store } from '@ngxs/store';
 import {
-  filter, takeUntil, Observable,
+  filter, takeUntil, Observable, iif,
 } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { tap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 
 import { GlobalWindow } from '@core/tokens';
 import { CustomFormGroup } from '@core/interface';
@@ -122,13 +122,17 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
         this.formType = value.type;
         this.setDateBounds(value.initDate, 7);
         this.populateOptions();
+        this.sideAddDialog.show();
+        this.cd.markForCheck();
       }),
+      filter((value) => value.type === RecordFields.Time),
+      switchMap(() => this.watchForDayChange()),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(() => {
-      this.sideAddDialog.show();
-      this.cd.markForCheck();
-    })
+    .subscribe((day) => {
+      this.form.controls['timeIn'].patchValue(new Date(day.setHours(0, 0, 0)));
+      this.form.controls['timeOut'].patchValue(new Date(day.setHours(0, 0, 0)));
+    });
   }
 
   private closeDialog(): void {
@@ -147,5 +151,9 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
         item.options = item.options?.filter((rate) => rate.text !== 'Mileage' && rate.text !== 'Charge');
       }
     })
+  }
+
+  private watchForDayChange(): Observable<Date> {
+    return this.form.controls['day'].valueChanges
   }
 }

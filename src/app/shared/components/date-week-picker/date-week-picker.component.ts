@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild,
-  OnChanges, Output, EventEmitter } from '@angular/core';
+  OnChanges } from '@angular/core';
 import { FormControl } from '@angular/forms';
 
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
@@ -8,7 +8,11 @@ import { RenderDayCellEventArgs } from '@syncfusion/ej2-angular-calendars';
 import { DatePickerComponent } from '@syncfusion/ej2-angular-calendars/src/datepicker/datepicker.component';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
+import { DateWeekService } from '@core/services';
 
+/**
+ * DateWeekService has to provided in parent module.
+ */
 @Component({
   selector: 'app-date-week-picker',
   templateUrl: './date-week-picker.component.html',
@@ -22,11 +26,15 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
 
   @Input() initDates: [Date, Date];
 
-  @Output() readonly dateChanged: EventEmitter<[string, string]> = new EventEmitter();
-
   public readonly maxDate = new Date(new Date().setHours(23, 59, 59));
 
   private startDateValue: string;
+
+  constructor(
+    private weekService: DateWeekService,
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
     this.startDatepickerWatching();
@@ -92,11 +100,12 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
 
   private setControlValue(value: string): void {
     const dateRange = DateTimeHelper.getRange(value);
+
     this.startDateValue = value;
     this.dateControl.patchValue(dateRange, { emitEvent: false });
 
-    this.dateChanged.emit([
-      DateTimeHelper.toUtcFormat(value),
+    this.weekService.setRange([
+      DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(value, true)),
       DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(value))
     ]);
   }
@@ -104,9 +113,9 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
   private setWeekPeriod(range: string,): void {
     this.dateControl.setValue(range, { emitEvent: false });
 
-    this.dateChanged.emit([
+    this.weekService.setRange([
       DateTimeHelper.toUtcFormat(new Date(this.startDateValue)),
       DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(this.startDateValue)),
-    ]);
+    ]); 
   }
 }

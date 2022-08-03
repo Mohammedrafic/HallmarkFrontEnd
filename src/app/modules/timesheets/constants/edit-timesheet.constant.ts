@@ -6,9 +6,17 @@ export const RecordAddDialogConfig: DialogConfig = {
     title: 'Add Timesheet Record',
     fields: [
       {
+        title: 'Day',
+        field: 'day',
+        type: FieldType.Date,
+        disabled: false,
+        required: true,
+        widthStyle: FieldWidthStyle.Long,
+      },
+      {
         title: 'Time in',
         field: 'timeIn',
-        type: FieldType.TimeCalendar,
+        type: FieldType.Time,
         disabled: false,
         required: true,
         widthStyle: FieldWidthStyle.Short,
@@ -16,7 +24,7 @@ export const RecordAddDialogConfig: DialogConfig = {
       {
         title: 'Time out',
         field: 'timeOut',
-        type: FieldType.TimeCalendar,
+        type: FieldType.Time,
         disabled: false,
         required: true,
         widthStyle: FieldWidthStyle.Short,
@@ -196,3 +204,5 @@ export const AddSuccessMessage = {
 export const PutSuccess = {
   successMessage: 'Records were updated successfully'
 }
+
+export const GetBydateErrMessage = 'Timesheet for selected week does not exist';

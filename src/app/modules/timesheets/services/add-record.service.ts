@@ -14,15 +14,13 @@ export class AddRecordService {
 
   createForm(type: RecordFields): CustomFormGroup<AddTimsheetForm> {
     if (type === RecordFields.Time) {
-      const options: AbstractControlOptions = {
-        validators: dateRangeValidator,
-      };
       return this.fb.group({
+          day: [null, [Validators.required]],
           timeIn: [null, [Validators.required]],
           timeOut: [null, [Validators.required]],
           departmentId: [null, Validators.required],
           billRateConfigId: [null, Validators.required],
-        }, options ) as CustomFormGroup<AddTimsheetForm>;
+        }) as CustomFormGroup<AddTimsheetForm>;
     }
 
     if (type === RecordFields.Miles) {

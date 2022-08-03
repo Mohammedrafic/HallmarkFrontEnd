@@ -61,6 +61,7 @@ import { TimesheetDetailsService } from './services/timesheet-details.service';
 import { FileViewerModule } from '../../shared/modules/file-viewer/file-viewer.module';
 import { DateRangeWeekPickerModule } from '@shared/components/date-range-week-picker/date-range-week-picker.module';
 import { TimesheetsTabsComponent } from './components/timesheets-tabs/timesheets-tabs.component';
+import { DateWeekService } from '@core/services';
 
 const gridIcons = {
   MessageSquare,
@@ -162,6 +163,7 @@ const gridIcons = {
     ChipsCssClass,
     TimesheetRecordsService,
     TimesheetDetailsService,
+    DateWeekService,
   ]
 })
 export class TimesheetsModule {}

@@ -31,6 +31,9 @@ export class TimesheetsService {
     }) as CustomFormGroup<TimsheetForm>;
   }
 
+  /**
+   * TODO: rename it
+   */
   public getStream(): Observable<number> {
     return this.currentSelectedTableRowIndex.getStream();
   }

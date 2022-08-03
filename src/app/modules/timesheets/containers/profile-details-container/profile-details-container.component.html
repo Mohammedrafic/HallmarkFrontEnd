@@ -37,9 +37,7 @@
           class="timesheet-details-upload-container"
           #uploadContainer>
 
-            <app-date-week-picker [initDates]="weekPeriod">
-
-            </app-date-week-picker>
+            <app-date-week-picker [initDates]="weekPeriod"></app-date-week-picker>
 
             <button
              ejs-button
@@ -95,9 +93,6 @@
       <div class="order-header">
         <div class="order-meta">
           <h2 class="order-id">Order ID {{ timesheetDetails?.orderId}}</h2>
-          <h2 class="week-dates">Week Period:
-            {{ timesheetDetails?.weekStartDate | date:'MM/dd/yyyy': 'UTC' }}
-            - {{ timesheetDetails?.weekEndDate | date:'MM/dd/yyyy': 'UTC' }}</h2>
         </div>
         <div class="bootstrap reject-reason-input" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
           <div class="e-input input">{{rejectReason}}</div>
