@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Store } from '@ngxs/store';
-import { distinctUntilChanged, filter, Observable, skip, switchMap, tap } from 'rxjs';
+import { distinctUntilChanged, filter, Observable, skip, switchMap, take, tap } from 'rxjs';
 
 import { ConfirmService } from '@shared/services/confirm.service';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -71,6 +71,18 @@ export class TimesheetDetailsService {
       distinctUntilChanged((prev, next) => {
         return (prev[0] === next[0]) || (prev[1] === next[1]);
       }),
+    )
+  }
+
+  public confirmTimesheetLeave(message: string): Observable<boolean> {
+    return this.confirmService.confirm(message, {
+      title: 'Unsaved Progress',
+      okButtonLabel: 'Proceed',
+      okButtonClass: 'delete-button',
+    })
+    .pipe(
+      take(1),
+      filter((submitted) => submitted)
     )
   }
 }

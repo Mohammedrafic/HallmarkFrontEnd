@@ -19,7 +19,7 @@
             format="HH:mm"
             [value]="dateValue"
             [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-            [enableMask]="false"
+            [enableMask]="true"
             [step]="30"
             maskPlaceholder="HH:MM"
             (change)="handleTimeChange($event)">
@@ -34,7 +34,7 @@
             format="HH:mm"
             [value]="dateValue"
             [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
-            [enableMask]="false"
+            [enableMask]="true"
             [min]="dateSettings.timeOut.min"
             [max]="dateSettings.timeOut.max"
             (change)="handleTimeChange($event)">
