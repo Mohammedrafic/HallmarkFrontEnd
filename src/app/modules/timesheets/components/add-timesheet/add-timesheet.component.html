@@ -50,7 +50,7 @@ cssClass="dialog short"
                       format="HH:mm"
                       [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                       [enableMask]="true"
-                      [step]="30"
+                      [step]="15"
                       (change)="updateValidity()"
                       maskPlaceholder="HH:MM">
                     </ejs-timepicker>
@@ -67,7 +67,7 @@ cssClass="dialog short"
                       name="startDateTime"
                       [formControlName]="field.field"
                       appValidateWithMessage
-                      [step]="30"
+                      [step]="15"
                       placeholder="Select Date and Time"
                       [min]="field.field === 'timeIn' ? dateSettings.timeIn.min : dateSettings.timeOut.min"
                       [max]="field.field === 'timeIn' ? dateSettings.timeIn.max : dateSettings.timeOut.max"
