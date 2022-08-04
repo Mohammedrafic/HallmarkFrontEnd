@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
+import { ONLY_LETTERS } from '@shared/constants';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Titles } from '@shared/enums/title';
 import { User } from '@shared/models/user-managment-page.model';
@@ -363,6 +364,15 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
         Validators.required,
         Validators.minLength(9),
         Validators.pattern(/^[0-9\s\-]+$/),
+      ]),
+      organizationPrefix: new FormControl({
+        value: organization ? organization.generalInformation.organizationPrefix : '',
+        disabled: this.user?.businessUnitType === BusinessUnitType.Organization
+      }, [
+        Validators.required,
+        Validators.maxLength(3),
+        Validators.minLength(3),
+        Validators.pattern(ONLY_LETTERS)
       ]),
       addressLine1: new FormControl(organization ? organization.generalInformation.addressLine1 : '', [
         Validators.required,
