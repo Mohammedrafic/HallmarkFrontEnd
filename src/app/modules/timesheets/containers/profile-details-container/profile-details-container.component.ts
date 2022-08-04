@@ -24,7 +24,8 @@ import {
   CandidateMilesData, ChangeStatusData, DialogActionPayload, OpenAddDialogMeta,
   Timesheet, TimesheetDetailsModel } from '../../interface';
 import {
-  ConfirmDeleteTimesheetDialogContent, ConfirmUnsavedChages, rejectTimesheetDialogData,
+  ConfirmDeleteTimesheetDialogContent, rejectTimesheetDialogData,
+  TimesheetConfirmMessages,
   TimesheetDetailsExportOptions } from '../../constants';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
@@ -142,7 +143,14 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
    * TODO: add debouncer
    */
   public onNextPreviousOrder(next: boolean): void {
-    this.nextPreviousOrderEvent.emit(next);
+    if (!this.isChangesSaved) {
+      this.timesheetDetailsService.confirmTimesheetLeave(TimesheetConfirmMessages.confirmTimesheetOrder)
+      .subscribe(() => {
+        this.nextPreviousOrderEvent.emit(next);
+      });
+    } else {
+      this.nextPreviousOrderEvent.emit(next);
+    }
   }
 
   public handleEditChanges(event: boolean): void {
@@ -155,15 +163,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public handleProfileClose(): void {
     if (!this.isChangesSaved) {
-      this.confirmService.confirm(ConfirmUnsavedChages, {
-        title: 'Unsaved Progress',
-        okButtonLabel: 'Proceed',
-        okButtonClass: 'delete-button',
-      })
-      .pipe(
-        take(1),
-        filter((submitted) => submitted)
-      )
+      this.timesheetDetailsService.confirmTimesheetLeave(TimesheetConfirmMessages.confirmUnsavedChages)
       .subscribe(() => {
         this.closeDialog();
       });
