@@ -12,20 +12,20 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { filter, forkJoin, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
+import { filter, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
-import { FileSize } from '@core/enums';
+import { DialogAction, FileSize } from '@core/enums';
 import { FileExtensionsString } from '@core/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportColumn, ExportPayload } from '@shared/models/export.model';
-import { DialogAction, SubmitBtnText, TimesheetTargetStatus } from '../../enums';
+import { SubmitBtnText, TimesheetTargetStatus } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import {

@@ -23,7 +23,7 @@ import { INVOICES_TAB_CONFIG } from '../../constants/invoices.constant';
 import { ItemModel } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { InvoiceRecordsTableComponent } from '../../components/invoice-records-table/invoice-records-table.component';
-import { DialogAction } from '../../../timesheets/enums';
+import { DialogAction } from '@core/enums';
 import { InvoicesService } from '../../services/invoices.service';
 import { AllInvoicesTableComponent } from '../../components/all-invoices-table/all-invoices-table.component';
 import { InvoicesState } from '../../store/state/invoices.state';
@@ -42,7 +42,7 @@ export class InvoicesContainerComponent extends Destroyable {
     onPageChange: this.onPageChange.bind(this),
     onPageSizeChange: this.onPageSizeChange.bind(this),
   };
-
+  
   public readonly formGroup: FormGroup = this.fb.group({
     search: ['']
   });
@@ -113,6 +113,10 @@ export class InvoicesContainerComponent extends Destroyable {
   public handleChangeTab(tabIdx: number): void {
     this.selectedTabIdx = tabIdx;
     this.getInvoicesByTab();
+  }
+
+  public openAddDialog(): void {
+    this.store.dispatch(new Invoices.ToggleManulaInvoiceDialog(DialogAction.Open));
   }
 
   private onPageChange(page: number): void {

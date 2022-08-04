@@ -107,8 +107,3 @@ export enum FilteringOptionsFields {
   Skills = 'skills',
   Statuses = 'statuses'
 }
-
-export enum DialogAction {
-  Open = 'open',
-  Close = 'close',
-}

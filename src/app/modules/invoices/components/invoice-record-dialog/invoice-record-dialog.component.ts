@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
 import { DialogComponent } from "@syncfusion/ej2-angular-popups";
-import { DropdownOption } from "../../../timesheets/interface";
+import { DropdownOption } from "@core/interface";
 
 @Component({
   selector: 'app-invoice-record-dialog',

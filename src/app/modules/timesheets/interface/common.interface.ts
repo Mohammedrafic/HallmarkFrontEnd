@@ -1,18 +1,12 @@
-import { TimesheetsModel } from './../store/model/timesheets.model';
-import { FieldWidthStyle } from './../enums/add-edit-timesheet.enum';
-import { RecordFields } from './../enums/timesheet-common.enum';
 
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
-import { FieldType } from '../enums';
+import { FieldType, FieldWidthStyle } from '@core/enums';
+import { DropdownOption } from '@core/interface';
 import { Attachment } from '@shared/components/attachments/models/attachment.interface';
-
-
-export interface DropdownOption {
-  text: string;
-  value: string | number;
-}
+import { TimesheetsModel } from './../store/model/timesheets.model';
+import { RecordFields } from './../enums/timesheet-common.enum';
 
 export interface DialogConfigField {
   title: string;

@@ -12,13 +12,14 @@ import { switchMap, tap } from 'rxjs/operators';
 
 import { GlobalWindow } from '@core/tokens';
 import { CustomFormGroup } from '@core/interface';
+import { DialogAction, FieldType } from '@core/enums';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { TimesheetsState } from './../../store/state/timesheets.state';
 import { AddRecordService } from '../../services/add-record.service';
 import { AddTimsheetForm } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { RecordAddDialogConfig, TimesheetConfirmMessages } from '../../constants';
-import { DialogAction, FieldType, RecordFields } from '../../enums';
+import { RecordFields } from '../../enums';
 import { TimesheetDateHelper } from '../../helpers';
 import { RecordsAdapter } from '../../helpers/records.adapter';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';

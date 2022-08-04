@@ -9,47 +9,25 @@ import { patch } from '@ngxs/store/operators';
 import { downloadBlobFile } from '@shared/utils/file.utils';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { DialogAction } from '@core/enums';
 import { TimesheetsModel, TimeSheetsPage, TimrsheetsDto } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
+import { RecordFields, TimesheetTargetStatus, TimesheetsTableFiltersColumns,
+  FilteringOptionsFields } from '../../enums';
 import {
-  DialogAction,
-  RecordFields,
-  TimesheetTargetStatus,
-  TimesheetsTableFiltersColumns,
-  FilteringOptionsFields
-} from '../../enums';
+  AddSuccessMessage, DefaultFiltersState, DefaultTimesheetCollection, DefaultTimesheetState,
+  filteringOptionsMapping, GetBydateErrMessage, PutSuccess, SavedFiltersParams } from '../../constants';
 import {
-  AddSuccessMessage,
-  DefaultFiltersState,
-  DefaultTimesheetCollection,
-  DefaultTimesheetState,
-  filteringOptionsMapping,
-  GetBydateErrMessage,
-  PutSuccess,
-  SavedFiltersParams,
-} from '../../constants';
-import {
-  Attachment,
-  CandidateHoursAndMilesData,
-  CandidateInfo,
-  CandidateMilesData,
-  DataSourceItem,
-  FilterColumns,
-  TabCountConfig,
-  Timesheet,
-  TimesheetDetailsModel,
-  TimesheetInvoice,
-  TimesheetRecordsDto,
-  TimesheetsFilterState,
-  TimesheetStatistics,
-  DropdownOption,
-  TimesheetsFilteringOptions,
-} from '../../interface';
+  Attachment, CandidateHoursAndMilesData, CandidateInfo, CandidateMilesData, DataSourceItem,
+  FilterColumns, TabCountConfig, Timesheet, TimesheetDetailsModel, TimesheetInvoice, TimesheetRecordsDto,
+  TimesheetsFilterState, TimesheetStatistics, TimesheetsFilteringOptions } from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
 import { reduceFiltersState } from '../../helpers';
+import { DropdownOption } from '@core/interface';
+
 
 @State<TimesheetsModel>({
   name: 'timesheets',

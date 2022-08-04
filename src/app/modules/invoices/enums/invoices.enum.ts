@@ -8,4 +8,5 @@ export enum INVOICES_STATUSES {
 export enum INVOICES_ACTIONS {
   GET = '[invoices] GET',
   TOGGLE_INVOICE_DIALOG = '[invoices] TOGGLE INVOICE DIALOG',
+  ToggleManualInvoice = '[invoices] toggle manual invoice dialog',
 }

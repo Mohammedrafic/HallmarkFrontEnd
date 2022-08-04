@@ -3,9 +3,10 @@ import { Injectable } from '@angular/core';
 
 import { catchError, map, Observable, of } from 'rxjs';
 
+import { DropdownOption } from '@core/interface';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
-  TimesheetsFilterState, TimesheetRecordsDto, DropdownOption, CostCentersDto,
+  TimesheetsFilterState, TimesheetRecordsDto, CostCentersDto,
   AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, DataSourceItem } from '../interface';
 import { TimrsheetsDto } from '../store/model/timesheets.model';
 import { CostCenterAdapter } from '../helpers';

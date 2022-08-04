@@ -1,0 +1,133 @@
+@import "colors";
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+}
+
+.dialog-container {
+  padding: 24px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: $black;
+  margin: 0;
+}
+
+.button-cancel {
+  margin-right: 8px;
+}
+
+.input-group {
+  margin-top: 5px;
+
+  &.short {
+    width: 150px;
+  }
+}
+
+.row {
+  width: 100%;
+  display: flex;
+
+  .input-container:nth-child(2) {
+    margin-left: 12px;
+  }
+}
+
+.input-container {
+  width: 100%;
+
+  &.long {
+    grid-column-start: 1;
+    grid-column-end: 3;
+  }
+
+  &.flexed {
+    display: flex;
+    align-items: center;
+  }
+
+  label {
+    margin-bottom: 12px;
+  }
+}
+
+
+.grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 20px;
+}
+
+::ng-deep {
+  .input-container.long {
+    .e-switch-wrapper, body.light .bootstrap .e-css.e-switch-wrapper {
+      height: 12px!important;
+      width: 34px!important;
+    }
+    
+    .e-switch-wrapper .e-switch-handle {
+      background-color: #f5f5f5!important;
+      box-shadow: 0 3px 1px -2px rgb(0 0 0 / 20%), 0 2px 2px 0 rgb(0 0 0 / 14%), 0 1px 5px 0 rgb(0 0 0 / 12%)!important;
+      height: 18px!important;
+      width: 18px!important;
+      left: 0!important;
+      &.e-switch-active {
+        background-color: $primary-active-blue-10!important;
+        left: 100%!important;
+      }
+    }
+
+    .e-switch-wrapper .e-switch-inner.e-switch-active,
+    .e-css.e-switch-wrapper .e-switch-inner.e-switch-active {
+      opacity: 1 !important;
+      background-color: $primary-active-blue-80!important;
+      border: 0px!important;
+    }
+  }
+}
+
+.switch-label {
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.man-invoice-textbox {
+  height: 103px;
+}
+
+::ng-deep {
+  .e-input.man-invoice-textbox {
+    .e-input-group.e-control-wrapper.e-multi-line-input {
+      height: 103px;
+    }
+  }
+}
+
+.droparea {
+  color: $primary-active-blue-10;
+  font-weight: 400;
+  font-size: 12px;
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .browse-link {
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: 700;
+  }
+}

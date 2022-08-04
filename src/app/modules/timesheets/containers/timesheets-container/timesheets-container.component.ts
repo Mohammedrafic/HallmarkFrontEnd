@@ -28,11 +28,12 @@ import {
 } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
-import { DialogAction, ExportType } from '../../enums';
+import { ExportType } from '../../enums';
 import { TimesheetsService } from '../../services/timesheets.service';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { ProfileDetailsContainerComponent } from '../profile-details-container/profile-details-container.component';
 import { AppState } from '../../../../store/app.state';
+import { DialogAction } from '@core/enums';
 
 @Component({
   selector: 'app-timesheets-container.ts',

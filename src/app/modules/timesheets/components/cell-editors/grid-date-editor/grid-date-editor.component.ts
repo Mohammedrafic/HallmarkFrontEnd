@@ -6,8 +6,8 @@ import { ICellRendererParams, ColDef } from '@ag-grid-community/core';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
 import { DateTimeHelper } from '@core/helpers';
-import { EditFieldTypes } from './../../../enums/add-edit-timesheet.enum';
 import { TimesheetDateHelper } from '../../../helpers';
+import { EditFieldTypes } from '@core/enums';
 
 @Component({
   selector: 'app-grid-date-editor',

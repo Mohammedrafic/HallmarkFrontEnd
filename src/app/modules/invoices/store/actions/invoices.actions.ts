@@ -1,6 +1,6 @@
 import { GetInvoicesData } from '../../interfaces';
 import { INVOICES_ACTIONS } from '../../enums/invoices.enum';
-import { DialogAction } from '../../../timesheets/enums';
+import { DialogAction } from '@core/enums';
 
 export namespace Invoices {
   export class Get {
@@ -19,5 +19,13 @@ export namespace Invoices {
       public readonly prevId?: string,
       public readonly nextId?: string) {
     }
+  }
+
+  export class ToggleManulaInvoiceDialog {
+    static readonly type = INVOICES_ACTIONS.ToggleManualInvoice;
+
+    constructor(
+      public readonly action: DialogAction,
+    ) {}
   }
 }

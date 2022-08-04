@@ -10,7 +10,7 @@ import { GridDateEditorComponent } from '../components/cell-editors/grid-date-ed
 import { GridDayComponent } from '../components/cell-editors/grid-day/grid-day.component';
 import { GridValuesHelper } from '../helpers/grid-values.helper';
 import { InputEditorComponent } from '../components/cell-editors/input-editor/input-editor.component';
-import { EditFieldTypes } from '../enums';
+import { EditFieldTypes } from '@core/enums';
 
 const commonColumn: ColDef = {
   filter: true,

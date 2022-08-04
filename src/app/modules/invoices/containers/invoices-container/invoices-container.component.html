@@ -16,6 +16,10 @@
     </button>
     <app-export-button (optionSelected)="onExportOptionSelect($event)"></app-export-button>
     <button ejs-button class="e-primary"
+      (click)="openAddDialog()">
+      Add Manual Invoice
+    </button>
+    <button ejs-button class="e-primary"
             (click)="createInvoiceDialog.show()">
       Create Invoice
     </button>
@@ -81,3 +85,5 @@
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
   (updateTable)="handleUpdateTable()"
 ></app-invoice-detail-container>
+
+<app-manual-invoice-dialog></app-manual-invoice-dialog>

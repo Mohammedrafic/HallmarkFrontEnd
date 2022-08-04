@@ -7,7 +7,7 @@ import { PageOfCollections } from "@shared/models/page.model";
 import { InvoiceRecord } from "../../interfaces";
 import { InvoicesModel } from "../invoices.model";
 import { tap } from "rxjs/internal/operators/tap";
-import { DialogAction } from '../../../timesheets/enums';
+import { DialogAction } from '@core/enums';
 
 @State<InvoicesModel>({
   name: 'invoices',
@@ -63,4 +63,9 @@ export class InvoicesState {
       ...(isOpen ? {prevInvoiceId: prevId, nextInvoiceId: nextId} : {}),
     });
   }
+
+  @Action(Invoices.ToggleManulaInvoiceDialog)
+  ToggleManInvoiceDialog(
+    { action }: Invoices.ToggleManulaInvoiceDialog
+  ): void {}
 }
