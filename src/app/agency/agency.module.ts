@@ -27,6 +27,7 @@ import {
   Sliders,
   Trash2,
   Unlock,
+  Upload,
   X,
 } from 'angular-feather/icons';
 import {
@@ -83,6 +84,7 @@ import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
 import { AgencyListFiltersComponent } from './agency-list/agency-list-filters/agency-list-filters.component';
 import { MultiselectDropdownModule } from "@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module";
+import { ImportCandidatesComponent } from './candidates/import-candidates/import-candidates.component';
 
 const sidebarIcons = {
   Sliders,
@@ -107,6 +109,7 @@ const sidebarIcons = {
   AlertTriangle,
   ChevronDown,
   ChevronRight,
+  Upload,
 };
 
 @NgModule({
@@ -144,6 +147,7 @@ const sidebarIcons = {
     CandidatDetailsComponent,
     AgencyOrderFiltersComponent,
     AgencyListFiltersComponent,
+    ImportCandidatesComponent,
   ],
   imports: [
     CommonModule,
