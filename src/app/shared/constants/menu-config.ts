@@ -45,6 +45,7 @@ export const MENU_CONFIG: any = {
       icon: 'user',
       route: '/admin/master-data',
     },
+
     11: {
       // Organization List
       icon: '',
@@ -151,6 +152,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/candidate-stats',
     },
+    43: {
+      // Page Report
+      icon: '',
+      route: '/analytics/page-report',
+    },    
   },
 
   [BusinessUnitType.MSP]: {
@@ -190,6 +196,7 @@ export const MENU_CONFIG: any = {
       icon: 'user',
       route: '/admin/master-data',
     },
+
     11: {
       // Organization List
       icon: '',
@@ -284,7 +291,7 @@ export const MENU_CONFIG: any = {
     40: {
       // Custom Reports
       icon: 'pie-chart',
-      route: '/analytics/state-wise-skills',
+      route: '/analytics/dashboard-report',
     },
     41: {
       // state wise skills
@@ -296,6 +303,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/candidate-stats',
     },
+    43: {
+      // Page Report
+      icon: '',
+      route: '/analytics/page-report',
+    },   
   },
 
   [BusinessUnitType.Organization]: {
@@ -335,6 +347,7 @@ export const MENU_CONFIG: any = {
       icon: 'user',
       route: '',
     },
+
     11: {
       // Organization List
       icon: '',
@@ -442,6 +455,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: '/analytics/candidate-stats',
     },
+    43: {
+      // Page Report
+      icon: '',
+      route: '/analytics/page-report',
+    },   
   },
 
   [BusinessUnitType.Agency]: {
@@ -481,6 +499,7 @@ export const MENU_CONFIG: any = {
       icon: 'user',
       route: '',
     },
+
     11: {
       // Organization List
       icon: '',
@@ -592,6 +611,11 @@ export const MENU_CONFIG: any = {
       // Candidate Statistics
       icon: '',
       route: '/analytics/candidate-stats',
+    },
+    43: {
+      // Page Report
+      icon: '',
+      route: '/analytics/page-report',
     },
   },
 };

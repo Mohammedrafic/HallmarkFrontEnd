@@ -30,6 +30,7 @@ export class OrderManagement {
   skillName: string;
   orderType: number;
   billRate: number;
+  numberOfOpenPositions: number;
   openPositions: number;
   candidates: number;
   startDate: string;
@@ -462,13 +463,11 @@ export class OrderFilter {
 }
 
 export class SortModel {
-
   sort?: string;
-  colId?:string
+  colId?: string;
 }
 
 export class FilterModel {
-
   condition1?: FilterModel;
   condition2?: FilterModel;
   filter?: any;
@@ -479,7 +478,6 @@ export class FilterModel {
   filterTo?: any;
   dateFrom?: string;
   dateTo?: string;
-
 }
 
 export class OrderPartnerAgency {

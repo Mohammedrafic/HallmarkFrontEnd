@@ -5,4 +5,4 @@ export * from './timesheets-table.constant';
 export * from './timesheets.constant';
 export * from './timsheets-details.constant';
 export * from './export-options';
-export * from './confirm-delete-timesheet-dialog-content.const';
+export * from './confirm-messages.constant';

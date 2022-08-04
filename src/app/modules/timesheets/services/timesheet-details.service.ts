@@ -1,19 +1,23 @@
 import { Injectable } from '@angular/core';
+
 import { Store } from '@ngxs/store';
-import { ActivatedRoute } from '@angular/router';
+import { distinctUntilChanged, filter, Observable, skip, switchMap, take, tap } from 'rxjs';
+
 import { ConfirmService } from '@shared/services/confirm.service';
-import { filter, Observable, switchMap, take, tap } from 'rxjs';
+import { MessageTypes } from '@shared/enums/message-types';
+import { DateWeekService } from '@core/services';
 import { approveTimesheetDialogData, submitTimesheetDialogData } from '../constants';
 import { TimesheetDetails } from '../store/actions/timesheet-details.actions';
 import { ShowToast } from '../../../store/app.actions';
-import { MessageTypes } from '@shared/enums/message-types';
 import { Timesheets } from '../store/actions/timesheets.actions';
+
 
 @Injectable()
 export class TimesheetDetailsService {
   constructor(
     private store: Store,
     private confirmService: ConfirmService,
+    private weekService: DateWeekService,
   ) { }
 
   public approveTimesheet(timesheetId: number): Observable<void> {
@@ -58,5 +62,27 @@ export class TimesheetDetailsService {
           ]);
         })
       );
+  }
+
+  public watchRangeStream(): Observable<[string, string]> {
+    return this.weekService.getRangeStream()
+    .pipe(
+      skip(1),
+      distinctUntilChanged((prev, next) => {
+        return (prev[0] === next[0]) || (prev[1] === next[1]);
+      }),
+    )
+  }
+
+  public confirmTimesheetLeave(message: string): Observable<boolean> {
+    return this.confirmService.confirm(message, {
+      title: 'Unsaved Progress',
+      okButtonLabel: 'Proceed',
+      okButtonClass: 'delete-button',
+    })
+    .pipe(
+      take(1),
+      filter((submitted) => submitted)
+    )
   }
 }

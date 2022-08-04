@@ -7,7 +7,7 @@ import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { filter, merge, Observable, takeUntil, tap } from 'rxjs';
 import { GetCandidateJob } from '@agency/store/order-management.actions';
-import { GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
+import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 
 enum ReorderCandidateStutuses {
   BillRatePending = 44,
@@ -58,6 +58,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
         this.store.dispatch(new GetCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
       } else if (this.isOrganization) {
         this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
+        this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
       }
     }
   }

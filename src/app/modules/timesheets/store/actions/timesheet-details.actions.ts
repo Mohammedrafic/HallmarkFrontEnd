@@ -76,14 +76,14 @@ export namespace TimesheetDetails {
   export class UploadFiles {
     static readonly type = TimesheetDetailsActions.UploadFiles;
 
-    constructor(public payload: TimesheetUploadFilesData) {
+    constructor(public readonly payload: TimesheetUploadFilesData) {
     }
   }
 
   export class DeleteAttachment {
     static readonly type = TimesheetDetailsActions.DeleteFile;
 
-    constructor(public payload: DeleteAttachmentData) {
+    constructor(public readonly payload: DeleteAttachmentData) {
     }
   }
 
@@ -111,7 +111,7 @@ export namespace TimesheetDetails {
     static readonly type = TimesheetDetailsActions.DownloadAttachment;
 
     constructor(
-      public payload: DownloadAttachmentData,
+      public readonly payload: DownloadAttachmentData,
     ) {}
   }
 
@@ -119,7 +119,7 @@ export namespace TimesheetDetails {
     static readonly type = '[file viewer] file loaded';
 
     constructor(
-      public file: Blob,
+      public readonly file: Blob,
     ) {}
   }
 
@@ -127,7 +127,7 @@ export namespace TimesheetDetails {
     static readonly type = '[timesheet details] attachment loaded';
 
     constructor(
-      public file: Blob,
+      public readonly file: Blob,
     ) {}
   }
 
@@ -144,9 +144,20 @@ export namespace TimesheetDetails {
     static readonly type = TimesheetDetailsActions.NoWorkPerformed;
 
     constructor(
-      public noWorkPerformed: boolean,
-      public timesheetId: number,
-      public organizationId: number | null,
+      public readonly noWorkPerformed: boolean,
+      public readonly timesheetId: number,
+      public readonly organizationId: number | null,
+    ) {}
+  }
+
+  export class GetDetailsByDate {
+    static readonly type = TimesheetDetailsActions.GetDetailsByDate;
+
+    constructor(
+      public readonly orgId: number,
+      public readonly startdate: string,
+      public readonly jobId: number,
+      public readonly isAgency: boolean,
     ) {}
   }
 }
