@@ -1,0 +1,25 @@
+<ejs-dialog
+  #sideDialog
+  cssClass="dialog"
+  [width]="width"
+  [target]="targetElement"
+  [visible]="false"
+  [isModal]="true"
+  [animationSettings]="{ effect: 'SlideRight' }">
+  <ng-template #content>
+    <section class="container">
+      <section class="header-container">
+        <div class="e-card-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title">Import</h3>
+          </div>
+          <div class="e-card-content">
+            <button ejs-button cssClass="e-outline" (click)="onCancel()">Cancel</button>
+            <button ejs-button cssClass="e-primary">Import</button>
+          </div>
+        </div>
+      </section>
+      <section class="import-candidates-container"></section>
+    </section>
+  </ng-template>
+</ejs-dialog>
