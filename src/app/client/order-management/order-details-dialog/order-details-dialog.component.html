@@ -38,10 +38,21 @@
               <div class="vertical-divider"></div>
             </div>
 
-            <button ejs-button cssClass="e-outline edit-button" [disabled]="!!order?.orderClosureReason" (click)="editOrder(order)"><i-feather name="edit" class="icon"></i-feather></button>
-            <button ejs-button cssClass="e-outline"
-                    [disabled]="!!order?.orderClosureReason || disabledCloseButton"
-                    (click)="closeOrder(order)">
+            <button
+              ejs-button
+              cssClass="e-outline edit-button"
+              [disabled]="!!(order?.orderClosureReasonId || order?.orderCloseDate)"
+              (click)="editOrder(order)"
+            >
+              <i-feather name="edit" class="icon"></i-feather>
+            </button>
+            <button
+              ejs-button
+              cssClass="e-outline"
+              *ngIf="!canCloseOrder"
+              [disabled]="!!(order?.orderClosureReasonId || order?.orderCloseDate) || disabledCloseButton"
+              (click)="closeOrder(order)"
+            >
               Close Order
             </button>
             <button
@@ -49,6 +60,7 @@
               cssClass="e-outline"
               *ngIf="orderType.OpenPerDiem === order?.orderType"
               (click)="createReOrder()"
+              [disabled]="order?.status === orderStatus.PreOpen || order?.status === orderStatus.Closed"
             >
               Create Re-Order
             </button>
@@ -62,6 +74,7 @@
             </button>
             <button
               ejs-button
+              cssClass="e-outline"
               *ngIf="orderType.ReOrder !== order?.orderType"
               [isPrimary]="true"
               (click)="lockOrder()"
@@ -132,13 +145,18 @@
             </e-tabitem>
           </e-tabitems>
         </ejs-tab>
-        <app-close-order [order]="order" (closeOrderSuccess)="updateOrderDetails($event)"></app-close-order>
-        <app-add-edit-reorder
-          [order]="reOrderToEdit || order"
-          (saveEmitter)="saveReOrder()"
-          (closeEmitter)="clearEditReOrder()"
+        <app-side-dialog
+          [header]="reOrderDialogTitle$ | async"
+          (formCancelClicked)="clearEditReOrder()"
+          (formSaveClicked)="onSaveReOrder()"
         >
-        </app-add-edit-reorder>
+          <app-add-edit-reorder
+            *ngIf="isReOrderDialogOpened$ | async"
+            [order]="reOrderToEdit || order"
+            (saveEmitter)="saveReOrder()"
+          >
+          </app-add-edit-reorder>
+        </app-side-dialog>
       </div>
     </section>
   </ng-template>

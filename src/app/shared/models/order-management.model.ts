@@ -30,6 +30,7 @@ export class OrderManagement {
   skillName: string;
   orderType: number;
   billRate: number;
+  numberOfOpenPositions: number;
   openPositions: number;
   candidates: number;
   startDate: string;
@@ -43,6 +44,9 @@ export class OrderManagement {
   agencies?: string[] | null;
   allAgencies?: boolean;
   jobStartDate?: Date;
+  orderCloseDate?: string;
+  orderClosureReason?: string;
+  orderClosureReasonId?: string;
 }
 
 export class OrderManagementFilter {
@@ -61,6 +65,7 @@ export type OrderManagementPage = PageOfCollections<OrderManagement>;
 
 export type AgencyOrderManagement = {
   orderId: number;
+  id?: number;
   reOrderId?: number;
   reOrderFromId?: number;
   statusText: string;
@@ -87,6 +92,9 @@ export type AgencyOrderManagement = {
   positions?: number;
   agencies?: string[] | null;
   allAgencies?: boolean;
+  orderCloseDate?: string;
+  orderClosureReason?: string;
+  orderClosureReasonId?: string;
 };
 
 export type OrderManagementChild = {
@@ -109,6 +117,10 @@ export type OrderManagementChild = {
     jobId: number;
     organizationId: number;
   };
+  selected: any;
+  closeDate?: string;
+  positionClosureReason?: string;
+  positionClosureReasonId?: number;
 };
 
 export type OrderCandidatesList = {
@@ -384,6 +396,9 @@ export type OrderCandidateJob = {
   allowDeployCredentials: boolean;
   hasAllRequiredOnboardedCredentials: boolean;
   offeredStartDate: string;
+  closeDate?: string;
+  positionClosureReason?: string;
+  positionClosureReasonId?: number;
 };
 
 export type CandidatesBasicInfo = {
@@ -441,8 +456,28 @@ export class OrderFilter {
   agencyIds?: number[];
   agencyType?: string | number | null;
   includeReOrders?: boolean;
+  sortModel?: SortModel = {};
+  filterModel?: FilterModel = {};
   isTemplate?: boolean;
   templateTitle?: string;
+}
+
+export class SortModel {
+  sort?: string;
+  colId?: string;
+}
+
+export class FilterModel {
+  condition1?: FilterModel;
+  condition2?: FilterModel;
+  filter?: any;
+  filterType?: string;
+  type?: string;
+  values?: string[];
+  logicalOperator?: string;
+  filterTo?: any;
+  dateFrom?: string;
+  dateTo?: string;
 }
 
 export class OrderPartnerAgency {

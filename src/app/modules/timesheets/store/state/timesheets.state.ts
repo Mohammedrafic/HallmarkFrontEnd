@@ -1,6 +1,8 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap, tap, throttleTime } from 'rxjs';
+import { catchError, debounceTime, forkJoin, mergeMap, Observable, of,
+  switchMap, tap, throttleTime, throwError } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
@@ -15,13 +17,17 @@ import {
   DialogAction,
   RecordFields,
   TimesheetTargetStatus,
-  TimesheetsTableFiltersColumns, FilteringOptionsFields
+  TimesheetsTableFiltersColumns,
+  FilteringOptionsFields
 } from '../../enums';
 import {
   AddSuccessMessage,
   DefaultFiltersState,
   DefaultTimesheetCollection,
-  DefaultTimesheetState, filteringOptionsMapping,
+  DefaultTimesheetState,
+  filteringOptionsMapping,
+  GetBydateErrMessage,
+  PutSuccess,
   SavedFiltersParams,
 } from '../../constants';
 import {
@@ -183,7 +189,7 @@ export class TimesheetsState {
   @Action(Timesheets.UpdateFiltersState)
   UpdateFiltersState(
     { setState, getState }: StateContext<TimesheetsModel>,
-    { payload, saveStatuses }: Timesheets.UpdateFiltersState,
+    { payload, saveStatuses, saveOrganizationId }: Timesheets.UpdateFiltersState,
   ): Observable<null> {
     const oldFilters: TimesheetsFilterState = getState().timesheetsFilters || DefaultFiltersState;
     let filters: TimesheetsFilterState = reduceFiltersState(oldFilters, SavedFiltersParams);
@@ -191,9 +197,15 @@ export class TimesheetsState {
 
     return of(null).pipe(
       throttleTime(100),
-      tap(() => setState(patch<TimesheetsModel>({
-        timesheetsFilters: payload || saveStatuses ? filters : DefaultFiltersState,
-      })))
+      tap(() =>
+        setState(patch<TimesheetsModel>({
+          timesheetsFilters: payload || saveStatuses ?
+            filters :
+            Object.assign({}, DefaultFiltersState, saveOrganizationId && {
+              organizationId: oldFilters.organizationId,
+            }),
+        })
+      )),
     );
   }
 
@@ -228,14 +240,22 @@ export class TimesheetsState {
   PutTimesheetRecords(
     ctx: StateContext<TimesheetsModel>,
     { body, isAgency }: TimesheetDetails.PutTimesheetRecords,
-  ): Observable<TimesheetRecordsDto> {
+  ): Observable<TimesheetRecordsDto | void> {
     return this.timesheetsApiService.putTimesheetRecords(body)
     .pipe(
       switchMap(() => {
         const state = ctx.getState();
         const { id, organizationId } = state.selectedTimeSheet as Timesheet;
+        /**
+         * TODO: make all messages for toast in one constant.
+         */
+        this.store.dispatch(new ShowToast(MessageTypes.Success, PutSuccess.successMessage));
+        this.store.dispatch(new Timesheets.GetTimesheetDetails(body.timesheetId, body.organizationId, isAgency));
         return this.store.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
       }),
+      catchError((err: HttpErrorResponse) => {
+        return ctx.dispatch(new ShowToast(MessageTypes.Error, err.error.errors[''][0]))
+      })
     )
   }
 
@@ -468,17 +488,71 @@ export class TimesheetsState {
   }
 
   @Action(TimesheetDetails.AddTimesheetRecord)
-  AddTimesheetRecord(ctx: StateContext<TimesheetsModel>, { body, isAgency }: TimesheetDetails.AddTimesheetRecord) {
+  AddTimesheetRecord(ctx: StateContext<TimesheetsModel>,
+    { body, isAgency }: TimesheetDetails.AddTimesheetRecord): Observable<void> {
     return this.timesheetsApiService.addTimesheetRecord(body)
     .pipe(
       tap(() => {
         this.store.dispatch([
           new ShowToast(MessageTypes.Success, AddSuccessMessage.successMessage),
+          new Timesheets.GetTimesheetDetails(body.timesheetId, body.organizationId, isAgency),
         ]);
         const state = ctx.getState();
         const { id, organizationId } = state.selectedTimeSheet as Timesheet;
         ctx.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
+      }),
+      catchError((err: HttpErrorResponse) => {
+        return ctx.dispatch(new ShowToast(MessageTypes.Error, err.error.errors[''][0]))
       })
     )
+  }
+
+  @Action(TimesheetDetails.GetDetailsByDate)
+  GetDetailsByDate(
+    ctx: StateContext<TimesheetsModel>,
+    { orgId, startdate, jobId, isAgency }: TimesheetDetails.GetDetailsByDate,
+  ): Observable<[void, void]> {
+    return this.timesheetDetailsApiService.getDetailsByDate(orgId, startdate, jobId)
+      .pipe(
+        tap((res: TimesheetDetailsModel) => ctx.patchState({
+            timesheetDetails: res,
+          }),
+        ),
+        mergeMap((res) => forkJoin([
+          ctx.dispatch(new TimesheetDetails.GetBillRates(res.jobId, orgId, isAgency)),
+          ctx.dispatch(new TimesheetDetails.GetCostCenters(res.jobId, orgId, isAgency)),
+        ])),
+        catchError((err: HttpErrorResponse) => {
+          if (err.status === 400) {
+            ctx.dispatch(new ShowToast(MessageTypes.Error, GetBydateErrMessage));
+
+            ctx.patchState({
+              timesheetDetails: {
+                ...ctx.getState().timesheetDetails as TimesheetDetailsModel,
+                status: 0,
+                statusText: '',
+                rejectionReason: undefined,
+                noWorkPerformed: false,
+                isNotExist: true,
+                timesheetStatistic: {
+                  cumulativeCharge: 0,
+                  cumulativeHours: 0,
+                  cumulativeMiles: 0,
+                  weekCharge: 0,
+                  weekHours: 0,
+                  weekMiles: 0,
+                  timesheetStatisticDetails: [],
+                }
+              },
+              timeSheetRecords: {
+                [RecordFields.Time]: [],
+                [RecordFields.Miles]: [],
+                [RecordFields.Expenses]: [],
+              }
+            })
+          }
+          return throwError(() => err);
+        })
+      );
   }
 }

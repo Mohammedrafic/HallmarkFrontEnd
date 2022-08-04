@@ -11,7 +11,7 @@
     </ejs-chiplist>
   </div>
   <div class="info">
-    <div class="data">{{reOrder.positions || reOrder.numberOfPositions}} / {{reOrder.openPositions || reOrder.numberOfOpenPositions}}</div>
+    <div class="data">{{reOrder.positions ?? reOrder.numberOfOpenPositions}} / {{reOrder.openPositions || reOrder.numberOfPositions}}</div>
     <div class="title">Open Positions</div>
   </div>
   <div class="info agency-name" *ngIf="!hideAgency">
@@ -26,7 +26,7 @@
     <div class="title">Agency Name</div>
   </div>
   <div class="info general-info">
-    <div class="data"> {{order.billRate | billRate: reOrder.billRate: reOrder.status: reOrder.billRate}}</div>
+    <div class="data"> {{reOrder.billRate | billRate: reOrder.billRate: reOrder.status: reOrder.billRate}}</div>
     <div class="title">Bill Rate $</div>
   </div>
   <div class="info general-info">

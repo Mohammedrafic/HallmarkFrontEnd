@@ -407,21 +407,21 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public onOpenReorderDialog(reOrder: AgencyOrderManagement, order: AgencyOrderManagement): void {
     this.selectedReOrder = reOrder;
     this.selectedReOrder.selected = {
-      order: order.orderId,
-      reOrder: reOrder.orderId,
+      order: order.orderId || order.id,
+      reOrder: reOrder.orderId || reOrder.id,
     };
     this.clearSelection(this.gridWithChildRow);
-    this.store.dispatch(new GetOrderById(reOrder.orderId, order.organizationId));
+    this.store.dispatch(new GetOrderById(reOrder.orderId || reOrder.id as number, order.organizationId));
     this.store.dispatch(
       new GetAgencyOrderCandidatesList(
-        reOrder.orderId,
+        reOrder.orderId || reOrder.id as number,
         order.organizationId,
         this.currentPage,
         this.pageSize,
         this.orderManagementAgencyService.excludeDeployed
       )
     );
-    this.store.dispatch(new GetAgencyOrderGeneralInformation(reOrder.orderId, order.organizationId));
+    this.store.dispatch(new GetAgencyOrderGeneralInformation(reOrder.orderId || reOrder.id as number, order.organizationId));
     this.selectedOrder = reOrder;
     this.selectedIndex = null;
     this.openPreview.next(true);
@@ -530,6 +530,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           : perDiemColumnsToExport;
         break;
       case AgencyOrderManagementTabs.ReOrders:
+        if (this.selectedItems.length === 0) {
+          this.columnsToExport = [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport];
+          return;
+        }
         this.columnsToExport = hasSelectedItemChildren
           ? [...reOrdersColumnsToExport, ...reOrdersChildColumnToExport]
           : reOrdersColumnsToExport;

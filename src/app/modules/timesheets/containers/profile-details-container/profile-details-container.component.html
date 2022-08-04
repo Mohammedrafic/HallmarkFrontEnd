@@ -4,6 +4,7 @@
   cssClass="dialog timesheet-details-dialog"
   [width]="'1180px'"
   [visible]="false"
+  [isModal]="true"
   [animationSettings]="{ effect: 'SlideRight' }"
 >
   <ng-template #content>
@@ -35,9 +36,7 @@
           class="timesheet-details-upload-container"
           #uploadContainer>
 
-            <app-date-week-picker [initDates]="weekPeriod">
-
-            </app-date-week-picker>
+            <app-date-week-picker [initDates]="weekPeriod" [isAbleToChange]="isChangesSaved"></app-date-week-picker>
 
             <button
              ejs-button
@@ -93,9 +92,6 @@
       <div class="order-header">
         <div class="order-meta">
           <h2 class="order-id">Order ID {{ timesheetDetails?.orderId}}</h2>
-          <h2 class="week-dates">Week Period:
-            {{ timesheetDetails?.weekStartDate | date:'MM/dd/yyyy': 'UTC' }}
-            - {{ timesheetDetails?.weekEndDate | date:'MM/dd/yyyy': 'UTC' }}</h2>
         </div>
         <div class="bootstrap reject-reason-input" *ngIf="timesheetDetails?.rejectionReason as rejectReason">
           <div class="e-input input">{{rejectReason}}</div>
@@ -140,9 +136,8 @@
               ></app-profile-cumulative-hours>
           </div>
 
-          <div class="tile-dark-blue miles">
-
-            <app-profile-miles [milesData]="{weekMiles: 0, cumulativeMiles: 0, weekCharge: 0, cumulativeCharge: 0}"></app-profile-miles>
+          <div class="tile-dark-blue miles" *ngIf="milesData$ | async as milesData">
+            <app-profile-miles [milesData]="milesData"></app-profile-miles>
           </div>
 
           <div class="tile-dark-blue profile-attachments" *ngIf="timesheetDetails?.attachments?.length">

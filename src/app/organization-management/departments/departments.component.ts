@@ -28,7 +28,7 @@ import { OrganizationManagementState } from '../store/organization-management.st
 import { MessageTypes } from '../../shared/enums/message-types';
 import { AbstractGridConfigurationComponent } from '../../shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import {
-  CANCEL_COFIRM_TEXT,
+  CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
@@ -44,6 +44,7 @@ import { FilterService } from '@shared/services/filter.service';
 import { OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
+
 
 export const MESSAGE_REGIONS_OR_LOCATIONS_NOT_SELECTED = 'Region or Location were not selected';
 
@@ -76,6 +77,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedRegion: Region;
+  defaultValue: any;
 
   @Select(OrganizationManagementState.locationsByRegionId)
   locations$: Observable<Location[]>;
@@ -97,6 +99,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   ];
   public fileName: string;
   public defaultFileName: string;
+    defaultLocationValue: any;
 
   get dialogHeader(): string {
     return this.isEdit ? 'Edit' : 'Add';
@@ -146,7 +149,10 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
     });
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(id => {
       this.clearFilters();
-      this.store.dispatch(new GetRegions());
+      this.store.dispatch(new GetRegions()).pipe(takeUntil(this.unsubscribe$))
+        .subscribe((data) => {
+          this.defaultValue = data.organizationManagement.regions[0].id;
+        });;
     });
   }
 
@@ -242,7 +248,12 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   onRegionDropDownChanged(event: ChangeEventArgs): void {
     this.selectedRegion = event.itemData as Region;
     if (this.selectedRegion?.id) {
-      this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id));
+      this.store.dispatch(new GetLocationsByRegionId(this.selectedRegion.id)).pipe(takeUntil(this.unsubscribe$))
+        .subscribe((data) => {
+          if (data.organizationManagement.locations.length > 0) {
+            this.defaultLocationValue = data.organizationManagement.locations[0].id;
+          }
+        });
       this.isLocationsDropDownEnabled = true;
     } else {
       this.store.dispatch(new ClearLocationList());
@@ -318,7 +329,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
   onDepartmentFormCancelClick(): void {
     if (this.departmentsDetailsFormGroup.dirty) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT, {
+        .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'

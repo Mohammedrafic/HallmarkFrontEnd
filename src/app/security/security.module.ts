@@ -1,7 +1,9 @@
+import { ModuleRegistry } from '@ag-grid-enterprise/all-modules';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
+import { InputModule } from "@shared/components/form-controls/input/input.module";
 import { MultiselectDropdownModule } from "@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module";
 import { SharedModule } from '@shared/shared.module';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
@@ -25,7 +27,9 @@ import { UserSettingsComponent } from './user-list/add-edit-user/user-settings/u
 import { VisibilitySettingsComponent } from './user-list/add-edit-user/visibility-settings/visibility-settings.component';
 import { AddEditVisibilityComponent } from './user-list/add-edit-user/visibility-settings/add-edit-visibility/add-edit-visibility.component';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
+import { AgGridModule } from '@ag-grid-community/angular';
 import { RolesFiltersComponent } from './roles-and-permissions/roles-grid/roles-filters/roles-filters.component';
+import { UsersFiltersComponent } from './user-list/user-grid/users-filters/users-filters.component';
 
 const scurityIcons = {
   Sliders,
@@ -47,13 +51,13 @@ const scurityIcons = {
     VisibilitySettingsComponent,
     AddEditVisibilityComponent,
     RolesFiltersComponent,
+    UsersFiltersComponent,
   ],
   imports: [
     CommonModule,
     SharedModule,
     SecurityRoutingModule,
     ReactiveFormsModule,
-
     DialogModule,
     ButtonAllModule,
     DropDownListModule,
@@ -66,8 +70,10 @@ const scurityIcons = {
     MaskedTextBoxModule,
     MultiSelectAllModule,
     ChipListModule,
+    AgGridModule,
     DropDownButtonModule,
     MultiselectDropdownModule,
+    InputModule,
 
     FeatherModule.pick(scurityIcons),
   ],

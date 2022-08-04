@@ -1,4 +1,4 @@
-<app-widget-wrapper [isLoading]="isLoading">
+<app-widget-wrapper-column [isLoading]="isLoading">
   <ng-template #header>
     <div class="widget-header">
       <h3 class="widget-header__title">{{ 'Positions Trend' }}</h3>
@@ -22,7 +22,7 @@
       </div>
     </div>
   </ng-template>
-  <ng-template #chart>
+  <ng-template #chartLine>
     <ejs-chart
       #sfComponent
       [chartArea]="chartArea"
@@ -46,8 +46,8 @@
           [type]="type"
         ></e-series>
         <e-series
-          [dataSource]="(filteredChartData$ | async)?.[positionTypeEnum.ONBOARD] ?? []"
-          [name]="positionTypeEnum.ONBOARD"
+          [dataSource]="(filteredChartData$ | async)?.[positionTypeEnum.FILLED] ?? []"
+          [name]="positionTypeEnum.FILLED"
           [width]="lineWidthInPixels"
           [xName]="xAxisName"
           [yName]="yAxisName"
@@ -84,4 +84,4 @@
       [showPercentRatio]="true"
     ></app-widget-legend>
   </ng-template>
-</app-widget-wrapper>
+</app-widget-wrapper-column>

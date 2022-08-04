@@ -36,6 +36,18 @@ export class TimesheetDetailsApiService {
     return this.http.get<TimesheetDetailsModel>(endpoint);
   }
 
+  public getDetailsByDate(
+    orgId: number,
+    startDate: string,
+    id: number,
+  ): Observable<TimesheetDetailsModel> {
+    return this.http.post<TimesheetDetailsModel>('/api/Timesheets/detailsbydate', {
+      organizationId: orgId,
+      weekStartDate: startDate,
+      jobId: id,
+    });
+  }
+
   public organizationUploadFiles(timesheetId: number, files: TimesheetFileData[]): Observable<void> {
     const formData = new FormData();
     files.forEach((file) => formData.append('files', file.blob, file.fileName))

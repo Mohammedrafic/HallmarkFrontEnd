@@ -77,8 +77,16 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
     );
   }
 
+  get showDropdown(): boolean {
+    return !this.isRejected && !this.isAgency && !this.isOnboard && !this.isWithdraw;
+  }
+
   get isRejected(): boolean {
     return [ApplicantStatusEnum.Rejected].includes(this.candidate?.status);
+  }
+
+  get isWithdraw(): boolean {
+    return [ApplicantStatusEnum.Withdraw].includes(this.candidate?.status);
   }
 
   get showAcceptButton(): boolean {
@@ -92,7 +100,10 @@ export class CandidatesStatusModalComponent implements OnInit, OnDestroy {
   }
 
   get showClockId(): boolean {
-    return [ApplicantStatusEnum.Accepted, ApplicantStatusEnum.OnBoarded].includes(this.candidate?.status);
+    return (
+      [ApplicantStatusEnum.Accepted, ApplicantStatusEnum.OnBoarded].includes(this.candidate?.status) &&
+      !this.orderCandidateJob?.hasAllRequiredOnboardedCredentials
+    );
   }
 
   get isOnboard(): boolean {

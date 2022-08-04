@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, debounceTime } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, debounceTime, throttleTime } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { Destroyable } from '@core/helpers';
@@ -75,7 +75,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
   public filters: TimesheetsFilterState | undefined;
   public readonly searchControl: FormControl = new FormControl('');
-  public readonly dateControl: FormControl = new FormControl(null);
   public readonly organizationControl: FormControl = new FormControl(null);
   public readonly currentSelectedTableRowIndex: Observable<number>
     = this.timesheetsService.getStream();
@@ -98,7 +97,6 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   ngOnInit(): void {
-    this.initComponentState();
     this.startFiltersWatching();
     this.startOrganizationWatching();
     this.startSearchWatching();
@@ -136,7 +134,11 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   public resetFilters(): void {
-    this.store.dispatch(new Timesheets.UpdateFiltersState(null, this.activeTabIdx !== 0));
+    this.store.dispatch(new Timesheets.UpdateFiltersState(
+      null,
+      this.activeTabIdx !== 0,
+      this.isAgency,
+    ));
   }
 
   public updateTableByFilters(filters: any): void {
@@ -161,6 +163,12 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   public changeFiltersAmount(amount: number): void {
     this.appliedFiltersAmount = amount;
+  }
+
+  public setRange(range: string[]): void {
+    this.store.dispatch(new Timesheets.UpdateFiltersState({
+      ...(range[0] && range[1] && { startDate: range[0], endDate: range[1] }),
+    }));
   }
 
   public bulkApprove(data: RowNode[]): void {

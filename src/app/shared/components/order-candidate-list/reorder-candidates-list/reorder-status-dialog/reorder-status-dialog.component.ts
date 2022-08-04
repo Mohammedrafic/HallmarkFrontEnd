@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { BehaviorSubject, combineLatest, merge, mergeMap, Observable, of, Subject, takeUntil, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, merge, mergeMap, Observable, of, Subject, takeUntil, tap } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -14,17 +14,13 @@ import { AcceptFormComponent } from './accept-form/accept-form.component';
 import {
   GetRejectReasonsForAgency,
   RejectCandidateForAgencySuccess,
+  RejectCandidateJob as RejectAgencyCandidateJob,
   ReloadOrderCandidatesLists,
   UpdateAgencyCandidateJob,
-  RejectCandidateJob as RejectAgencyCandidateJob,
 } from '@agency/store/order-management.actions';
 import { ApplicantStatus as ApplicantStatusEnum, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { AbstractControl, FormControl } from '@angular/forms';
-import {
-  OPTION_FIELDS,
-  ReOrderBillRate,
-  ReOrderOfferedBillRate,
-} from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-candidate.constants';
+import { OPTION_FIELDS } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-candidate.constants';
 import {
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
@@ -35,12 +31,10 @@ import {
 } from '@client/store/order-managment-content.actions';
 import { RejectReason } from '@shared/models/reject-reason.model';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
-
-const hideAcceptActionForStatuses: CandidatStatus[] = [
-  CandidatStatus.OnBoard,
-  CandidatStatus.Rejected,
-  CandidatStatus.BillRatePending,
-];
+import PriceUtils from '@shared/utils/price.utils';
+import { ShowToast } from '../../../../../store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
+import { SET_READONLY_STATUS } from '@shared/constants';
 
 @Component({
   selector: 'app-reorder-status-dialog',
@@ -53,6 +47,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   @Select(OrderManagementState.rejectionReasonsList)
   agencyRejectionReasonsList$: Observable<RejectReason[]>;
+
+  @Select(OrderManagementContentState.applicantStatuses)
+  applicantStatuses$: Observable<ApplicantStatus[]>;
 
   @Input() openEvent: Subject<boolean>;
   @Input() candidate: OrderCandidatesList;
@@ -87,7 +84,12 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   get showAccept(): boolean {
-    return !this.isBillRatePending && !hideAcceptActionForStatuses.includes(this.currentCandidateApplicantStatus);
+    return (
+      this.isAgency &&
+      ![CandidatStatus.BillRatePending, CandidatStatus.OnBoard, CandidatStatus.Rejected].includes(
+        this.currentCandidateApplicantStatus
+      )
+    );
   }
 
   get hourlyRate(): AbstractControl | null {
@@ -103,10 +105,10 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public rejectReasons: RejectReason[] = [];
   public currentCandidateApplicantStatus: number;
   public optionFields = OPTION_FIELDS;
-  public jobStatus$: BehaviorSubject<Array<{ text: string; id: CandidatStatus }>> = new BehaviorSubject<
-    Array<{ text: string; id: CandidatStatus }>
-  >(ReOrderBillRate);
+  public jobStatus$: BehaviorSubject<ApplicantStatus[]> = new BehaviorSubject<ApplicantStatus[]>([]);
   public openRejectDialog = new Subject<boolean>();
+
+  private defaultApplicantStatuses: ApplicantStatus[];
 
   constructor(private store: Store, private actions$: Actions) {
     super();
@@ -121,6 +123,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       this.subscribeOnReasonsList(),
       this.subscribeOnUpdateCandidateJobSucceed(),
       this.subscribeOnHourlyRateChanges(),
+      this.subscribeOnApplicantStatusesChanges(),
     ])
       .pipe(takeUntil(this.destroy$))
       .subscribe();
@@ -137,7 +140,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
         orderId: this.orderCandidateJob.orderId,
         nextApplicantStatus: applicantStatus,
         candidateBillRate: value.candidateBillRate,
-        offeredBillRate: value.offeredBillRate,
+        offeredBillRate: value.hourlyRate ? value.hourlyRate : null,
         requestComment: value.comments,
         actualStartDate: this.orderCandidateJob.actualStartDate,
         actualEndDate: this.orderCandidateJob.actualEndDate,
@@ -150,11 +153,13 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     );
   }
 
-  public onJobStatusChange(value: { itemData: { text: string; id: number } }): void {
-    if (value.itemData?.id === ApplicantStatusEnum.Rejected) {
-      this.onReject();
+  public onJobStatusChange(event: {
+    itemData: { applicantStatus: ApplicantStatusEnum; statusText: string; isEnabled: boolean };
+  }): void {
+    if (event.itemData?.isEnabled) {
+      this.handleOnboardedCandidate(event);
     } else {
-      this.updateOrganizationCandidateJob(value.itemData);
+      !event && this.store.dispatch(new ShowToast(MessageTypes.Error, SET_READONLY_STATUS));
     }
   }
 
@@ -170,7 +175,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   public onCloseDialog(): void {
     this.openEvent.next(false);
-    this.jobStatus$.next(ReOrderBillRate);
+    this.jobStatus$.next([]);
     this.sideDialog.hide();
     this.jobStatus$.next([]);
   }
@@ -198,15 +203,9 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   }
 
   private setValueForm({
-    order: { locationName, departmentName, skillName, orderOpenDate, shiftStartTime, shiftEndTime, openPositions },
-    jobId,
-    offeredBillRate,
-    candidateBillRate,
-  }: OrderCandidateJob) {
-    this.acceptForm.patchValue({
-      jobId,
-      offeredBillRate,
-      candidateBillRate,
+    order: {
+      reOrderFromId,
+      hourlyRate,
       locationName,
       departmentName,
       skillName,
@@ -214,7 +213,29 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       shiftStartTime,
       shiftEndTime,
       openPositions,
-      hourlyRate: candidateBillRate,
+    },
+    candidateBillRate,
+    offeredBillRate,
+    orderId,
+    positionId,
+  }: OrderCandidateJob) {
+    const candidateBillRateValue = candidateBillRate ?? hourlyRate;
+    const isBillRatePending =
+      this.orderCandidateJob.applicantStatus.applicantStatus === CandidatStatus.BillRatePending
+        ? candidateBillRate
+        : offeredBillRate;
+    this.acceptForm.patchValue({
+      reOrderFromId: `${reOrderFromId}-${orderId}-${positionId}`,
+      offeredBillRate: PriceUtils.formatNumbers(hourlyRate),
+      candidateBillRate: PriceUtils.formatNumbers(candidateBillRateValue),
+      locationName,
+      departmentName,
+      skillName,
+      orderOpenDate,
+      shiftStartTime,
+      shiftEndTime,
+      openPositions,
+      hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
     });
     this.enableFields();
   }
@@ -256,23 +277,32 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     );
   }
 
-  private updateOrganizationCandidateJob(status: { id: ApplicantStatusEnum; text: string }): void {
-    this.acceptForm.markAllAsTouched();
-    if (this.acceptForm.valid && this.orderCandidateJob) {
-      const value = this.acceptForm.getRawValue();
+  private handleOnboardedCandidate(event: {
+    itemData: { applicantStatus: ApplicantStatusEnum; statusText: string };
+  }): void {
+    if (event.itemData?.applicantStatus === ApplicantStatusEnum.Rejected) {
+      this.onReject();
+    } else {
+      this.updateOrganizationCandidateJob(event.itemData);
+    }
+  }
 
+  private updateOrganizationCandidateJob(status: { applicantStatus: ApplicantStatusEnum; statusText: string }): void {
+    this.acceptForm.markAllAsTouched();
+    if (this.acceptForm.valid && this.orderCandidateJob && status) {
+      const value = this.acceptForm.getRawValue();
       this.store
         .dispatch(
           new UpdateOrganisationCandidateJob({
             organizationId: this.orderCandidateJob.organizationId,
             orderId: this.orderCandidateJob.orderId,
-            jobId: value.jobId,
+            jobId: this.orderCandidateJob.jobId,
             skillName: value.skillName,
             offeredBillRate: value.hourlyRate,
             candidateBillRate: value.candidateBillRate,
             nextApplicantStatus: {
-              applicantStatus: status.id,
-              statusText: status.text,
+              applicantStatus: status.applicantStatus,
+              statusText: status.statusText,
             },
           })
         )
@@ -287,6 +317,16 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     );
   }
 
+  private subscribeOnApplicantStatusesChanges(): Observable<ApplicantStatus[]> {
+    return this.applicantStatuses$.pipe(
+      filter((statuses: ApplicantStatus[]) => !!statuses),
+      tap((statuses: ApplicantStatus[]) => {
+        this.defaultApplicantStatuses = statuses;
+        this.jobStatus$.next(this.excludeSelectedStatus(CandidatStatus.OfferedBR));
+      })
+    );
+  }
+
   private createJobStatusControl(): void {
     this.jobStatusControl = new FormControl('');
   }
@@ -296,13 +336,21 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       ? this.hourlyRate.valueChanges.pipe(
           tap((value: number) => {
             if (this.hourlyRate?.valid) {
-              this.jobStatus$.next(
-                this.orderCandidateJob.candidateBillRate === value ? ReOrderBillRate : ReOrderOfferedBillRate
-              );
+              const isOfferedBR =
+                this.orderCandidateJob.candidateBillRate === +value ? CandidatStatus.OfferedBR : CandidatStatus.OnBoard;
+              this.jobStatus$.next(this.excludeSelectedStatus(isOfferedBR));
+            } else {
+              this.jobStatus$.next(this.excludeSelectedStatus(CandidatStatus.OfferedBR));
             }
           })
         )
       : of([]);
+  }
+
+  private excludeSelectedStatus(selectedStatus: number): ApplicantStatus[] {
+    return this.defaultApplicantStatuses?.filter(
+      (status: ApplicantStatus) => status.applicantStatus !== selectedStatus
+    );
   }
 
   private enableFields(): void {
@@ -316,6 +364,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       case CandidatStatus.OnBoard:
       case CandidatStatus.Rejected:
       case CandidatStatus.BillRatePending:
+      case !this.isAgency && CandidatStatus.Offered:
         this.acceptForm.disable();
         break;
 

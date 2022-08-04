@@ -30,7 +30,8 @@ export interface TimesheetsFilterState {
   pageNumber?: number;
   pageSize?: number;
   organizationId?: number;
-  date?: string;
+  startDate?: string;
+  endDate?: string;
   searchTerm?: string;
   orderIds?: string[];
   locationIds?: string[];
@@ -42,6 +43,11 @@ export interface TimesheetsFilterState {
   billRate?: number;
   skillIds?: string[];
   isAgency?: boolean;
+}
+
+export interface TimesheetWeekFilter {
+  startDate: string;
+  endDate: string;
 }
 
 export interface TimesheetsSelectedRowEvent {

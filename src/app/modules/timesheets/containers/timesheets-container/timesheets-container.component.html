@@ -18,7 +18,7 @@
       </div>
     </div>
     <app-search #search ngDefaultControl [formControl]="searchControl" class="search"></app-search>
-    <app-date-week-picker [dateControl]="dateControl"></app-date-week-picker>
+    <app-date-range-week-picker (range)="setRange($event)"></app-date-range-week-picker>
     <button
       ejs-button
       cssClass="e-outline button-filter button--no-wrap"
@@ -50,6 +50,7 @@
 
 <app-timesheets-filter-dialog
   [activeTabIdx]="activeTabIdx"
+  [isAgency]="isAgency"
   (appliedFiltersAmount)="changeFiltersAmount($event)"
   (resetFilters)="resetFilters()"
   (updateTableByFilters)="updateTableByFilters($event)"

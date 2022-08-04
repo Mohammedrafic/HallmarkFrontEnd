@@ -45,4 +45,3 @@ export interface TimesheetsModel {
   organizations: DataSourceItem[];
   selectedOrganizationId: number;
 }
-

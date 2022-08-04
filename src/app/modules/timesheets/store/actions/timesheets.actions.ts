@@ -1,4 +1,4 @@
-import { TIMESHEETS_ACTIONS, DialogAction, TimesheetsTableColumns, RecordFields, TimesheetsTableFiltersColumns } from '../../enums';
+import { TIMESHEETS_ACTIONS, DialogAction, RecordFields, TimesheetsTableFiltersColumns } from '../../enums';
 import { DataSourceItem, Timesheet, TimesheetsFilterState } from '../../interface';
 import { OrganizationRegion } from '@shared/models/organization.model';
 
@@ -75,6 +75,7 @@ export namespace Timesheets {
     constructor(
       public readonly payload?: TimesheetsFilterState | null,
       public readonly saveStatuses = false,
+      public readonly saveOrganizationId = false,
     ) {
     }
   }

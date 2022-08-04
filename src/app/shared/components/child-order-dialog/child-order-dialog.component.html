@@ -14,7 +14,7 @@
           <div class="e-card-header-caption">
             <h3 class="e-card-title preview-title">Position ID {{ order?.orderId || order?.id }}/{{ candidate?.positionId }}</h3>
             <div class="order-statuses">
-              <ejs-chiplist #chipList class="events-off" *ngIf="candidate">
+              <ejs-chiplist #chipList class="events-off" *ngIf="candidate?.orderStatus">
                 <e-chips>
                   <e-chip [text]="orderStatusText[candidate.orderStatus]" [cssClass]="orderStatusText[candidate.orderStatus] | chipsCssClass"></e-chip>
                 </e-chips>
@@ -45,6 +45,14 @@
                       <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
                     </section>
                     <hr />
+                    <ng-container *ngIf="currentOrder?.orderClosureReasonId">
+                      <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
+                      <hr />
+                    </ng-container>
+                    <ng-container *ngIf="currentOrder?.orderClosureReason">
+                      <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
+                      <hr />
+                    </ng-container>
                     <ng-container *ngIf="currentOrder?.orderClosureReason">
                       <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
                       <hr />
@@ -60,7 +68,63 @@
                 <section class="candidate">
                   <ng-container [ngSwitch]="selectedTemplate">
                     <ng-container *ngSwitchCase="template.onboarded">
-                      <app-onboarded-candidate [candidate]="$any(candidate)" [isTab]="true" (closeModalEvent)="onClose()"></app-onboarded-candidate>
+                      <section class="container onboarded-candidate-container">
+                        <section class="header-container">
+                          <div class="e-card-header">
+                            <div class="e-card-header-caption candidate-status">
+                              <h3 class="e-card-title candidate-title">
+                                {{ candidate?.lastName }}, {{ candidate?.firstName }}
+                              </h3>
+                              <ejs-chiplist *ngIf="candidate.candidateStatus" [text]="candidateStatus[candidate.candidateStatus]">
+                                <e-chips>
+                                  <e-chip [cssClass]="candidateStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
+                                </e-chips>
+                              </ejs-chiplist>
+                            </div>
+                          </div>
+                        </section>
+                        <section class="content-container">
+                          <div class="job-details">
+                            <ejs-accordion
+                              #accordionElement
+                              expandMode="Single"
+                              (expanding)="toForbidExpandSecondRow($event)"
+                              (clicked)="clickedOnAccordion($event)"
+                            >
+                              <e-accordionitems>
+                                <e-accordionitem expanded="true">
+                                  <ng-template #header>
+                                    <div>Job Details</div>
+                                  </ng-template>
+                                  <ng-template #content>
+                                    <app-accept-form
+                                      [formGroup]="acceptForm"
+                                      [status]="$any(candidateJob?.applicantStatus?.applicantStatus)"
+                                    ></app-accept-form>
+                                  </ng-template>
+                                </e-accordionitem>
+                                <e-accordionitem>
+                                  <ng-template #header>
+                                    <div>Historical Events</div>
+                                  </ng-template>
+                                  <ng-template #content>
+                                    <app-historical-events [organizationId]="candidateJob?.organizationId!" [candidateJobId]="candidate.jobId" [candidateId]="candidate.candidateId" [isAgency]="isAgency"></app-historical-events>
+                                  </ng-template>
+                                </e-accordionitem>
+                              </e-accordionitems>
+                            </ejs-accordion>
+                          </div>
+                          <div class="comments">
+                            <app-comments></app-comments>
+                          </div>
+                        </section>
+
+                        <section class="bill-rates">
+                          <app-bill-rates-view-grid
+                            [billRatesData]="candidateJob?.billRates || []"
+                          ></app-bill-rates-view-grid>
+                        </section>
+                      </section>
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.accept">

@@ -5,10 +5,13 @@
       <!-- TBI: total count -->
       <!-- <span class="tab-navigation e-badge e-badge-success e-badge-circle">2</span> -->
     </div>
-    <div>{{ tabTitle.OtherAgencies }}</div>
-    <div>
-      {{ tabTitle.AllAgencies }}
-    </div>
+    <!--    Temporary hidden tabs   -->
+    <ng-container *ngIf="false">
+      <div>{{ tabTitle.OtherAgencies }}</div>
+      <div>
+        {{ tabTitle.AllAgencies }}
+      </div>
+    </ng-container>
     <div>{{ tabTitle.PerDiem }}</div>
     <div>{{ tabTitle.ReOrders }}</div>
   </div>

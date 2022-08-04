@@ -49,7 +49,7 @@
           </div>
         </ng-template>
       </e-column>
-      <e-column field="agencies" headerText="Agency" textAlign="Left" width="200">
+      <e-column field="agencies" headerText="Agency" textAlign="Left" width="200" *ngIf="!isAgency">
         <ng-template #template let-data>
           {{data.agencies?.length ? data.agencies.join(', ') : ""}}
         </ng-template>
@@ -71,7 +71,7 @@
       </e-column>
       <e-column field="openPositions" headerText="# POSITIONS" width="120">
         <ng-template #template let-data>
-          <span>{{ data.positions }}/{{ data.openPositions }}</span>
+          <span>{{ data.acceptedPositions }}/{{ data.openPositions }}</span>
         </ng-template>
       </e-column>
     </e-columns>

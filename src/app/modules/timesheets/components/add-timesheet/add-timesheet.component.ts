@@ -8,7 +8,7 @@ import {
   filter, takeUntil, Observable,
 } from 'rxjs';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { tap } from 'rxjs/operators';
+import { switchMap, tap } from 'rxjs/operators';
 
 import { GlobalWindow } from '@core/tokens';
 import { CustomFormGroup } from '@core/interface';
@@ -17,7 +17,7 @@ import { TimesheetsState } from './../../store/state/timesheets.state';
 import { AddRecordService } from '../../services/add-record.service';
 import { AddTimsheetForm } from '../../interface';
 import { Timesheets } from '../../store/actions/timesheets.actions';
-import { RecordAddDialogConfig, ConfirmAddFormCancel } from '../../constants';
+import { RecordAddDialogConfig, TimesheetConfirmMessages } from '../../constants';
 import { DialogAction, FieldType, RecordFields } from '../../enums';
 import { TimesheetDateHelper } from '../../helpers';
 import { RecordsAdapter } from '../../helpers/records.adapter';
@@ -75,7 +75,7 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
 
   public cancelChanges(): void {
     if (this.form.touched) {
-      this.confirmService.confirm(ConfirmAddFormCancel, {
+      this.confirmService.confirm(TimesheetConfirmMessages.confirmAddFormCancel, {
         title: 'Unsaved Progress',
         okButtonLabel: 'Proceed',
         okButtonClass: 'delete-button',
@@ -116,19 +116,24 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
   private getDialogState(): void {
     this.dialogState$
     .pipe(
-      filter((value) => !!value.state),
+      filter((value) => value.state),
       tap((value) => {
         this.form = this.addRecordService.createForm(value.type);
         this.formType = value.type;
         this.setDateBounds(value.initDate, 7);
         this.populateOptions();
+        this.sideAddDialog.show();
+        this.cd.markForCheck();
       }),
+      filter((value) => value.type === RecordFields.Time),
+      switchMap(() => this.watchForDayChange()),
+      filter((day) => !!day),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(() => {
-      this.sideAddDialog.show();
-      this.cd.markForCheck();
-    })
+    .subscribe((day) => {
+      this.form.controls['timeIn'].patchValue(new Date(day.setHours(0, 0, 0)));
+      this.form.controls['timeOut'].patchValue(new Date(day.setHours(0, 0, 0)));
+    });
   }
 
   private closeDialog(): void {
@@ -147,5 +152,9 @@ export class AddTimesheetComponent extends TimesheetDateHelper implements OnInit
         item.options = item.options?.filter((rate) => rate.text !== 'Mileage' && rate.text !== 'Charge');
       }
     })
+  }
+
+  private watchForDayChange(): Observable<Date> {
+    return this.form.controls['day'].valueChanges
   }
 }

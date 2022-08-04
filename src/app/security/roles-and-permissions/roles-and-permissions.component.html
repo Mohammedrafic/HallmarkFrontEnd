@@ -29,19 +29,23 @@
     <ng-container>
       <button ejs-button cssClass="e-outline" (click)="showFilters()">
         <div class="filter-button-content">
-          <span *ngIf="(filteredItems$ | async) as filteredItems" class="e-badge e-badge-success e-badge-circle">{{
-            filteredItems
-            }}</span>
+          <span *ngIf="(filteredItems$ | async) as filteredItems" class="e-badge e-badge-success e-badge-circle">{{filteredItems}}</span>
           Filters <i-feather name="sliders" class="icon"></i-feather>
         </div>
       </button>
+      <button
+        ejs-dropdownbutton
+        [items]="exportOptions"
+        (select)="exportSelected($event)"        
+        id="importButton"
+        cssClass="e-outline button-export">Export <i-feather name="download" class="icon"></i-feather></button>
       <button ejs-button [isPrimary]="true" (click)="onAddNewRole()">Add Role</button>
     </ng-container>
   </ng-container>
 </app-page-toolbar>
 
 <section class="role-and-permissions last-content-section-padding">
-  <app-roles-grid [filterForm]="businessForm" [filteredItems$]="filteredItems$" (editRoleEvent)="onEdit($event)"></app-roles-grid>
+  <app-roles-grid [filterForm]="businessForm" [export$]="exportRoles$" [filteredItems$]="filteredItems$" (editRoleEvent)="onEdit($event)"></app-roles-grid>
 </section>
 
 <app-side-dialog [header]="dialogTitle" (formCancelClicked)="onAddCancel()" (formSaveClicked)="onSave()">

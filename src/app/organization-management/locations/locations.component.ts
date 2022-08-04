@@ -2,7 +2,7 @@ import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { filter, Observable, Subject, takeUntil, throttleTime } from 'rxjs';
+import { filter, Observable, Subject, takeUntil, throttleTime ,take} from 'rxjs';
 import { ChangeEventArgs, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 import { GridComponent, PagerComponent } from '@syncfusion/ej2-angular-grids';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -29,7 +29,7 @@ import { Location, LocationFilter, LocationFilterOptions, LocationsPage } from '
 
 import { PhoneTypes } from '@shared/enums/phone-types';
 import {
-  CANCEL_COFIRM_TEXT,
+  CANCEL_CONFIRM_TEXT,
   DELETE_CONFIRM_TITLE,
   DELETE_RECORD_TEXT,
   DELETE_RECORD_TITLE,
@@ -69,6 +69,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   regions$: Observable<Region[]>;
   regionFields: FieldSettingsModel = { text: 'name', value: 'id' };
   selectedRegion: Region;
+  defaultValue:any;
 
   @Select(OrganizationManagementState.locationsByRegionId)
   locations$: Observable<LocationsPage>;
@@ -160,7 +161,10 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
     });
     this.organization$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
-      this.store.dispatch(new GetRegions());
+      this.store.dispatch(new GetRegions()).pipe(takeUntil(this.unsubscribe$))
+      .subscribe((data) => {
+        this.defaultValue=data.organizationManagement.regions[0].id;
+      });;
     });
   }
 
@@ -365,7 +369,7 @@ export class LocationsComponent extends AbstractGridConfigurationComponent imple
   onFormCancelClick(): void {
     if (this.locationDetailsFormGroup.dirty) {
       this.confirmService
-        .confirm(CANCEL_COFIRM_TEXT, {
+        .confirm(CANCEL_CONFIRM_TEXT, {
           title: DELETE_CONFIRM_TITLE,
           okButtonLabel: 'Leave',
           okButtonClass: 'delete-button'

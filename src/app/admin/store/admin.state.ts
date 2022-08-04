@@ -58,6 +58,7 @@ import { RECORD_ADDED, RECORD_CANNOT_BE_DELETED, RECORD_MODIFIED, usedByOrderErr
 import { CredentialType } from '@shared/models/credential-type.model';
 import { CredentialsService } from '@shared/services/credentials.service';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
+import { UserOrganizationsAgenciesChanged } from 'src/app/store/user.actions';
 
 interface DropdownOption {
   id: number;
@@ -234,7 +235,7 @@ export class AdminState {
     patchState({ isOrganizationLoading: true });
     return this.organizationService.saveOrganization(payload).pipe(tap((payloadResponse) => {
       patchState({ isOrganizationLoading: false });
-      dispatch(new SaveOrganizationSucceeded(payloadResponse));
+      dispatch([new SaveOrganizationSucceeded(payloadResponse), new UserOrganizationsAgenciesChanged()]);
       if (payload.organizationId) {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_MODIFIED));
       } else {

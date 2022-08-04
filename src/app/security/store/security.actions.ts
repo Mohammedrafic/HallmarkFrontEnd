@@ -16,6 +16,8 @@ export class GetRolesPage {
     public businessUnitIds: number[],
     public pageNumber: number,
     public pageSize: number,
+    public sortModel: any,
+    public filterModel: any,
     public filters: RolesFilters
   ) {}
 }
@@ -31,7 +33,9 @@ export class GetUsersPage {
     public businessUnitType: BusinessUnitType,
     public businessUnitId: number,
     public pageNumber: number,
-    public pageSize: number
+    public pageSize: number,
+    public sortModel: any,
+    public filterModel: any
   ) {}
 }
 
@@ -112,5 +116,10 @@ export class GetOrganizationsStructureAll {
 
 export class ExportUserList {
   static readonly type = '[security] Export User List';
+  constructor(public payload: ExportPayload) {}
+}
+
+export class ExportRoleList {
+  static readonly type = '[security] Export Role List';
   constructor(public payload: ExportPayload) {}
 }

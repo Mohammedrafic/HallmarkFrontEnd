@@ -37,6 +37,7 @@ export class TabNavigationComponent extends DestroyableDirective implements OnIn
   public onSelect(event: SelectingEventArgs): void {
     const tabsArray = Object.values(OrganizationOrderManagementTabs);
     this.selectedTab.emit(tabsArray[event.selectingIndex]);
+    this.store.dispatch(new SelectNavigationTab(null, null, tabsArray[event.selectingIndex]));
   }
 
   private selectPerDiemTab(): void {

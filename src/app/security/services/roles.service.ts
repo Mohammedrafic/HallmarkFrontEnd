@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { ExportPayload } from '@shared/models/export.model';
 import { PermissionsTree } from '@shared/models/permission.model';
 import { Role, RoleDTO, RolesFilters, RolesPage } from '@shared/models/roles.model';
 import { Observable } from 'rxjs';
@@ -26,9 +27,11 @@ export class RolesService {
     BusinessUnitIds: number[],
     PageNumber: number,
     PageSize: number,
+    SortModel: any,
+    FilterModel: any,
     Filters: RolesFilters
   ): Observable<RolesPage> {
-    return this.http.post<RolesPage>(`/api/Roles/filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, ...Filters });
+    return this.http.post<RolesPage>(`/api/Roles/Filtered`, { BusinessUnitType, BusinessUnitIds, PageNumber, PageSize, SortModel, FilterModel, ...Filters });
   }
 
   /**
@@ -66,4 +69,13 @@ export class RolesService {
      public getRolesForCopy(BusinessUnitType: BusinessUnitType, BusinessUnitId: number): Observable<Role[]> {
       return this.http.get<Role[]>(`/api/Roles/listByBusinessUnit`, { params: { BusinessUnitType, BusinessUnitId } });
     }
+
+  /**
+  * Export users list
+  * @param payload
+  */
+  public export(payload: ExportPayload): Observable<Blob> {
+    console.log(payload);
+    return this.http.post(`/api/Roles/export`, payload, { responseType: 'blob' });
+  }
 }

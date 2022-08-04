@@ -5,6 +5,7 @@ export interface PositionTrend {
   total: number;
   percentRatio: number;
   chartData: { x: number; y: number }[];
+  title: string;
 }
 
 export interface PositionTrendDto {

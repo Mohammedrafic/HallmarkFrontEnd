@@ -92,10 +92,11 @@ export type AgencyOrderFilteringOptions = {
 };
 
 export type AgencyListFilters = {
-  name?: string;
-  status?: number[];
-  city?: string;
-  contactPerson?: string;
+  searchTerm?: string;
+  businessUnitNames?: string[];
+  statuses?: string[];
+  cities?: string[];
+  contacts?: string[];
 };
 
 export class AgencyFilteringOptions {

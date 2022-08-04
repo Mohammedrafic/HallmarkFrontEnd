@@ -1,0 +1,38 @@
+<div
+  class="search-menu-content row"
+ 
+  [style.marginTop]="searchContentWindowHeight"
+>
+  <div class="col-12" *ngIf="!isMaximized">
+    <div class="e-input-group">
+      <span class="input-search-icon">search</span>
+      <input
+        #searchInput
+        class="input-search e-input"
+        id="search-menu-search-input"
+        type="text"
+        placeholder="Start typing"
+    
+      />
+    </div>
+  </div>
+  <div class="col-12 search-menu-result-container">
+    <div class="history-container" >
+      <div class="section-label-container">
+        <span class="section-label">Recent History</span>
+      </div>
+    
+    </div>
+    <div class="result-container">
+      <div class="section-label-container">
+        <span class="section-label">Search Results</span>
+      </div>
+      <div class="center-align" *ngIf="searchResult === null || searchResult.length === 0">
+        <span class="list-text">No Results</span>
+      </div>
+      <div class="list-item" *ngFor="let item of searchResult" (mousedown)="onItemClick(item)" >
+        <span class="list-text">{{ item.title }}</span>
+      </div>
+    </div>
+  </div>
+</div>

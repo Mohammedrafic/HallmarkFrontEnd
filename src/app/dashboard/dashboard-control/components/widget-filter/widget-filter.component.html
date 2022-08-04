@@ -1,13 +1,30 @@
 <app-filter-dialog
-  [items]="filteredItems$ | async"
+  [items]="savedFilterItems"
   [showResultsCounter]="false"
   (deleteFilter)="onFilterDelete($event)"
   (clearAllFiltersClicked)="onFilterClearAll()"
   (applyFilterClicked)="onFilterApply()"
-  (closeDialogClicked)="onFilterClose()"
 >
   <form [formGroup]="widgetFilterFormGroup">
     <div class="bootstrap">
+      <div *ngIf="userIsAdmin" class="input-container">
+        <label>Organization</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="organizationIds"
+            placeholder="All"
+            [fields]="orgsFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.organizationIds?.dataSource"
+            [showSelectAll]="true"
+          >
+          </ejs-multiselect>
+          <span *ngIf="selectedOrganizations" class="e-badge e-badge-success e-badge-circle">{{ selectedOrganizations }}</span>
+        </div>
+      </div>
+
       <div class="input-container">
         <label>Region</label>
         <div class="input-group multiselect">
@@ -22,7 +39,7 @@
             [showSelectAll]="true"
           >
           </ejs-multiselect>
-          <span *ngIf="region" class="e-badge e-badge-success e-badge-circle">{{ region }}</span>
+          <span *ngIf="selectedRegions" class="e-badge e-badge-success e-badge-circle">{{ selectedRegions }}</span>
         </div>
       </div>
 
@@ -40,7 +57,7 @@
             [showSelectAll]="true"
           >
           </ejs-multiselect>
-          <span *ngIf="locations" class="e-badge e-badge-success e-badge-circle">{{ locations }}</span>
+          <span *ngIf="selectedLocations" class="e-badge e-badge-success e-badge-circle">{{ selectedLocations }}</span>
         </div>
       </div>
 
@@ -58,7 +75,7 @@
             [showSelectAll]="true"
           >
           </ejs-multiselect>
-          <span *ngIf="departments" class="e-badge e-badge-success e-badge-circle">{{ departments }}</span>
+          <span *ngIf="selectedDepartments" class="e-badge e-badge-success e-badge-circle">{{ selectedDepartments }}</span>
         </div>
       </div>
 
@@ -76,7 +93,7 @@
             [showSelectAll]="true"
           >
           </ejs-multiselect>
-          <span *ngIf="skills" class="e-badge e-badge-success e-badge-circle">{{ skills }}</span>
+          <span *ngIf="selectedSkills" class="e-badge e-badge-success e-badge-circle">{{ selectedSkills }}</span>
         </div>
       </div>
     </div>

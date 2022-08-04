@@ -1,5 +1,4 @@
 <ng-container
-  *ngIf="isOrganization$ | async"
   [ngTemplateOutlet]="dashboardTemplate"
   [ngTemplateOutletContext]="{
     isLoading: isLoading$ | async,
@@ -7,7 +6,10 @@
     selectedWidgets: selectedWidgets$ | async,
     widgets: widgets$ | async,
     widgetsData: widgetsData$ | async,
-    timeSelection: timeSelection$ | async
+    timeSelection: timeSelection$ | async,
+    allOrganizations: allOrganizations$ | async,
+    skills: allOrganizationsSkills$ | async,
+    userIsAdmin: userIsAdmin$ | async
   }"
 ></ng-container>
 
@@ -19,6 +21,9 @@
   let-widgets="widgets"
   let-widgetsData="widgetsData"
   let-timeSelection="timeSelection"
+  let-allOrganizations="allOrganizations"
+  let-skills="skills"
+  let-userIsAdmin="userIsAdmin"
 >
   <app-dashboard-control
     (widgetToggleEmitter)="handleWidgetToggleEvent($event)"
@@ -27,6 +32,9 @@
     [widgets]="widgets"
     [hasOrderManagePermission]="hasOrderManagePermission"
     [hasWidgetPermission]="hasWidgetPermission"
+    [allOrganizations]="allOrganizations"
+    [userIsAdmin]="userIsAdmin"
+    [skills]="skills"
   ></app-dashboard-control>
 
   <ng-container [ngTemplateOutlet]="widgetsTemplate" #outlet></ng-container>

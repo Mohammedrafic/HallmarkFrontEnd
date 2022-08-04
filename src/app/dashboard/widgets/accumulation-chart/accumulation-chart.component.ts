@@ -25,14 +25,14 @@ import { WidgetLegengDataModel } from '../../models/widget-legend-data.model';
 })
 export class AccumulationChartComponent
   extends AbstractSFComponentDirective<SFAccumulationChartComponent>
-  implements OnChanges, OnInit
-{
+  implements OnChanges, OnInit {
   @Input() public chartData: ChartAccumulation | undefined;
   @Input() public isLoading: boolean;
 
   public toggleLegend: number[] = [];
   public filteredChartData$: Observable<DonutChartData[]>;
   public legendData: WidgetLegengDataModel[] = [];
+  public totalScore: number = 0;
 
   public readonly tooltipSettings: TooltipSettingsModel = {
     enable: true,
@@ -50,11 +50,15 @@ export class AccumulationChartComponent
   }
 
   public redirectToSourceContent(): void {
-      this.dashboardService.redirectToUrl('client/order-management');
+    this.dashboardService.redirectToUrl('client/order-management');
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
     changes['chartData'] && this.handleChartDataChanges();
+    this.totalScore = 0;
+    this.chartData?.chartData.forEach(obj => {
+      this.totalScore += obj.value;
+    });
   }
 
   public ngOnInit(): void {

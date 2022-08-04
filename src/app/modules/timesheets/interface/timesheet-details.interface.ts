@@ -80,6 +80,7 @@ export interface TimesheetDetailsModel {
   invoices: TimesheetInvoice[];
   weekEndDate: string;
   weekStartDate: string;
+  isNotExist?: boolean;  
 }
 
 export interface OpenAddDialogMeta {

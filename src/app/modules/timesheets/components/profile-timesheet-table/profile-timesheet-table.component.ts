@@ -1,6 +1,6 @@
 import {
   AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component,
-  EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
+  EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { combineLatest, Observable, takeUntil } from 'rxjs';
@@ -13,8 +13,8 @@ import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-c
 import { Destroyable } from '@core/helpers';
 import { RecordFields } from './../../enums';
 import {
-  TimesheetRecordsColdef, TimesheetRecordsColConfig, RecordsTabConfig, ConfirmRecordDelete,
-  ConfirmTabChange,
+  TimesheetRecordsColdef, TimesheetRecordsColConfig, RecordsTabConfig,
+  TimesheetConfirmMessages,
 } from './../../constants';
 import { ConfirmService } from './../../../../shared/services/confirm.service';
 import { TabConfig, DropdownOption } from './../../interface/common.interface';
@@ -71,6 +71,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public currentTab: RecordFields = RecordFields.Time;
 
+  public readonly tableTypes = RecordFields;
+
   public isFirstSelected = true;
 
   public recordsToShow: TimesheetRecordsDto;
@@ -116,7 +118,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.isFirstSelected = false;
 
     if (!this.isChangesSaved && (this.slectingindex !== selectEvent.selectedIndex)) {
-      this.confirmService.confirm(ConfirmTabChange, {
+      this.confirmService.confirm(TimesheetConfirmMessages.confirmTabChange, {
         title: 'Unsaved Progress',
         okButtonLabel: 'Proceed',
         okButtonClass: 'delete-button',
@@ -174,15 +176,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     const diffs = this.timesheetRecordsService.findDiffs(
       this.records[this.currentTab], this.formControls, this.timesheetColDef);
 
-    const recordsToUpdate = this.records[this.currentTab]
-      .map((record) => {
-        const updatedItem = diffs.find((item) => item.id === record.id);
-
-        if (updatedItem) {
-          return updatedItem
-        }
-          return record;
-      });
+    const recordsToUpdate = RecordsAdapter.adaptRecordsDiffs(
+      this.records[this.currentTab], diffs, this.idsToDelete);
   
     if (diffs.length || this.idsToDelete.length) {
       const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
@@ -196,6 +191,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       .subscribe(() => {
         this.changesSaved.emit(true);
         this.isChangesSaved = true;
+        this.idsToDelete = [];
         this.setInitialTableState();
       });
     }
@@ -206,7 +202,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   }
 
   public deleteRecord(id: number): void {
-    this.confirmService.confirm(ConfirmRecordDelete, {
+    this.confirmService.confirm(TimesheetConfirmMessages.confirmRecordDelete, {
       title: 'Delete Record',
       okButtonLabel: 'Proceed',
       okButtonClass: 'delete-button',
@@ -236,6 +232,10 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     this.timesheetRecords$
     .pipe(
       tap((res) => {
+        if (this.isEditOn) {
+          this.isEditOn = false;
+          this.cancelChanges();
+        }
         this.records = res;
         this.recordsToShow = JSON.parse(JSON.stringify(res));
       }),
@@ -256,9 +256,16 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       if (!this.records[this.currentTab].length) {
         this.gridApi.showNoRowsOverlay();
       }
+      this.setEditModeColDef();
       this.gridApi.setColumnDefs(this.timesheetColDef);
       this.cd.markForCheck();
     });
+  }
+
+  private setInitialTableState(): void {
+    this.isEditOn = false;
+    this.formControls = {};
+    this.setEditModeColDef();
   }
 
   private setEditModeColDef(): void {
@@ -271,12 +278,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     });
 
     this.gridApi.setColumnDefs(this.timesheetColDef);
-  }
-
-  private setInitialTableState(): void {
-    this.isEditOn = false;
-    this.formControls = {};
-    this.setEditModeColDef();
   }
 
   private changeColDefs(idx: number): void {

@@ -7,6 +7,7 @@ import { PositionTrend } from './position-trend.model';
 
 export interface WidgetsDataModel {
   [WidgetTypeEnum.APPLICANTS_BY_REGION]: CandidatesByStateWidgetAggregatedDataModel;
+  [WidgetTypeEnum.APPLICANTS_BY_POSITIONS]: CandidatesByStateWidgetAggregatedDataModel;
   [WidgetTypeEnum.CANDIDATES]: ChartAccumulation;
   [WidgetTypeEnum.POSITIONS_BY_TYPES]: PositionsByTypeAggregatedModel;
   [WidgetTypeEnum.IN_PROGRESS_POSITIONS]: CandidatesPositionDataModel;
@@ -17,4 +18,6 @@ export interface WidgetsDataModel {
   [WidgetTypeEnum.FILLED_POSITIONS_TREND]: PositionTrend;
   [WidgetTypeEnum.CHAT]: string;
   [WidgetTypeEnum.INVOICES]: string;
+  [WidgetTypeEnum.OPEN_POSITIONS_TREND]: PositionTrend;
+  [WidgetTypeEnum.IN_PROGRESS_POSITIONS_TREND]: PositionTrend;
 }
