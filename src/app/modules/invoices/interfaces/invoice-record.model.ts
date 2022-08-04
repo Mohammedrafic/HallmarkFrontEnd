@@ -1,4 +1,4 @@
-import { RecordValue } from '../../timesheets/interface';
+import { Attachment } from '../../timesheets/interface';
 import { BillRateType } from '@shared/models';
 
 
@@ -21,6 +21,7 @@ export interface InvoiceRecord {
   miles: number;
   amount: number;
   timesheetId?: number;
+  attachments: Attachment[];
   timesheetRecords: InvoiceRecordTimesheetEntry[];
 }
 

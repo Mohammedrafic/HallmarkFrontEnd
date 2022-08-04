@@ -7,7 +7,7 @@ import { ExportPayload } from '@shared/models/export.model';
 import {
   ChangeStatusData,
   DeleteAttachmentData,
-  DownloadAttachmentData,
+  DownloadAttachmentRequestData,
   TimesheetDetailsModel,
   TimesheetFileData
 } from '../interface';
@@ -56,13 +56,13 @@ export class TimesheetDetailsApiService {
       this.agencyDeleteAttachment(fileId, timesheetId, organizationId)
   }
 
-  public downloadAttachment({fileId, organizationId}: DownloadAttachmentData): Observable<Blob> {
+  public downloadAttachment({fileId, organizationId}: DownloadAttachmentRequestData): Observable<Blob> {
     return organizationId === null ?
       this.organizationDownloadAttachment(fileId) :
       this.agencyDownloadAttachment(fileId, organizationId);
   }
 
-  public downloadPDFAttachment({fileId, organizationId}: DownloadAttachmentData): Observable<Blob> {
+  public downloadPDFAttachment({fileId, organizationId}: DownloadAttachmentRequestData): Observable<Blob> {
     return organizationId === null ?
       this.organizationDownloadPDFAttachment(fileId) :
       this.agencyDownloadPDFAttachment(fileId, organizationId);

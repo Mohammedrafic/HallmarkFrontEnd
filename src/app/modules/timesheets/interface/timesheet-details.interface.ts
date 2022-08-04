@@ -1,7 +1,6 @@
-import { RecordFields } from './../enums/timesheet-common.enum';
-import { TableColumnAlign } from '../enums';
+import { RecordFields, TableColumnAlign } from '../enums';
 import { TimesheetStatistics } from './timesheet-statistics.interface';
-import { TimesheetAttachment } from './timesheet-attachment.interface';
+import { Attachment } from '@shared/components/attachments/models/attachment.interface';
 import { TimesheetInvoice } from './timesheet-invoice.interface';
 import { RecordValue } from './common.interface';
 
@@ -77,7 +76,7 @@ export interface TimesheetDetailsModel {
   jobEndDate: string;
   unitName: string;
   timesheetStatistic: TimesheetStatistics;
-  attachments: TimesheetAttachment[];
+  attachments: Attachment[];
   invoices: TimesheetInvoice[];
   weekEndDate: string;
   weekStartDate: string;

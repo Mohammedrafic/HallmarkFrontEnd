@@ -39,7 +39,6 @@ import { AddTimesheetComponent } from './components/add-timesheet/add-timesheet.
 import { AddRecordService } from './services/add-record.service';
 import { ProfileDetailsJobInfoComponent } from './components/profile-details-job-info/profile-details-job-info.component';
 import { ProfileCumulativeHoursComponent } from './components/profile-cumulative-hours/profile-cumulative-hours.component';
-import { TimesheetAttachmentsComponent } from './components/profile-uploads/timesheet-attachments.component';
 import { ProfileInvoicesComponent } from './components/profile-invoices/profile-invoices.component';
 import { TimesheetsService } from './services/timesheets.service';
 import { TimesheetRejectReasonDialogComponent } from './components/reject-reason-dialog/timesheet-reject-reason-dialog.component';
@@ -61,6 +60,7 @@ import { TimesheetDetailsService } from './services/timesheet-details.service';
 import { FileViewerModule } from './modules/file-viewer/file-viewer.module';
 import { DateRangeWeekPickerModule } from '@shared/components/date-range-week-picker/date-range-week-picker.module';
 import { TimesheetsTabsComponent } from './components/timesheets-tabs/timesheets-tabs.component';
+import { AttachmentsModule } from '@shared/components/attachments';
 
 const gridIcons = {
   MessageSquare,
@@ -100,7 +100,6 @@ const gridIcons = {
     AddTimesheetComponent,
     ProfileDetailsJobInfoComponent,
     ProfileCumulativeHoursComponent,
-    TimesheetAttachmentsComponent,
     ProfileInvoicesComponent,
     TimesheetRejectReasonDialogComponent,
     GridDateEditorComponent,
@@ -150,6 +149,7 @@ const gridIcons = {
     GridModule,
     PdfViewerModule,
     FileViewerModule,
+    AttachmentsModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [

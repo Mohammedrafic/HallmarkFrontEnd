@@ -10,8 +10,7 @@
     <section class="container" *ngIf="timesheetDetails$ | async as timesheetDetails">
       <div class="profile-details-header">
         <ng-container>
-<!--            TODO: Replace with default avatar placeholder-->
-            <img class="e-avatar e-avatar-xlarge" [src]="timesheetDetails.candidateId | candidateAvatar"/>
+            <img class="e-avatar e-avatar-xlarge" alt="avatar" [src]="timesheetDetails.candidateId | candidateAvatar"/>
         </ng-container>
 
         <div class="flex flex-column">
@@ -146,12 +145,12 @@
             <app-profile-miles [milesData]="{weekMiles: 0, cumulativeMiles: 0, weekCharge: 0, cumulativeCharge: 0}"></app-profile-miles>
           </div>
 
-          <div class="tile-dark-blue profile-uploads" *ngIf="timesheetDetails?.attachments?.length">
-            <app-attachments-uploads [attachments]="timesheetDetails.attachments"
-                                     [organizationId]="timesheetDetails.organizationId"
-                                     [timesheetId]="timesheetDetails.id"
-                                     [isAgency]="isAgency"
-            ></app-attachments-uploads>
+          <div class="tile-dark-blue profile-attachments" *ngIf="timesheetDetails?.attachments?.length">
+              <h3 class="attachments-title">Attachments</h3>
+
+              <app-attachments-list [attachments]="timesheetDetails.attachments"
+                                    [attachmentsListConfig]="attachmentsListConfig$ | async"
+              ></app-attachments-list>
           </div>
 
          <div class="tile-dark-blue profile-invoices" *ngIf="timesheetDetails?.invoices?.length">

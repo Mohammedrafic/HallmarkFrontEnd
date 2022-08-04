@@ -38,6 +38,12 @@
     .align-right {
       text-align: right;
     }
+
+    .invoice-records-attachments-list {
+      app-attachments-list {
+        height: 100%;
+      }
+    }
   }
 }
 

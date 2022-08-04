@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { filter, forkJoin, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
+import { filter, forkJoin, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
@@ -46,6 +46,7 @@ import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
+import { AttachmentsListConfig } from '@shared/components/attachments';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -117,6 +118,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public readonly maxFileSize: number = FileSize.MB_10;
   public readonly timesheetStatus: typeof TimesheetStatus = TimesheetStatus;
 
+  public attachmentsListConfig$: Observable<AttachmentsListConfig>;
+
   constructor(
     private store: Store,
     private route: ActivatedRoute,
@@ -129,6 +132,10 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     super();
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
     this.submitText = this.isAgency ? SubmitBtnText.Submit : SubmitBtnText.Approve;
+    this.attachmentsListConfig$ = this.timesheetDetails$.pipe(
+      tap(({id}) => console.log(id, this.organizationId, this.isAgency)),
+      map(({id}) => this.timesheetDetailsService.getAttachmentsListConfig(id, this.organizationId, this.isAgency))
+    )
   }
 
   public get isNextDisabled(): boolean {
@@ -345,7 +352,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   /**
    * TODO: change this method
    */
-  public browse() : void {
+  public browse(): void {
     this.uploadArea.nativeElement
       ?.getElementsByClassName('e-file-select-wrap')[0]
       ?.querySelector('button')?.click();
@@ -383,7 +390,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       this.weekPeriod = [
         new Date(DateTimeHelper.convertDateToUtc(weekStartDate)),
         new Date(DateTimeHelper.convertDateToUtc(weekEndDate)),
-      ]
+      ];
       this.cd.markForCheck();
     });
   }

@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 
-import { catchError, debounceTime, filter, forkJoin, map, mergeMap, Observable, of, switchMap, take, tap, throttleTime } from 'rxjs';
+import { catchError, debounceTime, forkJoin, mergeMap, Observable, of, switchMap, tap, throttleTime } from 'rxjs';
 import { Action, Selector, State, StateContext, Store } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 
 import { downloadBlobFile } from '@shared/utils/file.utils';
 import { MessageTypes } from '@shared/enums/message-types';
-import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { TimesheetsModel, TimeSheetsPage, TimrsheetsDto } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
@@ -14,33 +13,26 @@ import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import {
   DialogAction,
-  TimesheetsTableColumns,
-  TIMETHEETS_STATUSES,
   RecordFields,
   TimesheetTargetStatus,
   TimesheetsTableFiltersColumns, FilteringOptionsFields
 } from '../../enums';
 import {
   AddSuccessMessage,
-  approveTimesheetDialogData,
   DefaultFiltersState,
   DefaultTimesheetCollection,
   DefaultTimesheetState, filteringOptionsMapping,
-  rejectTimesheetDialogData,
   SavedFiltersParams,
-  submitTimesheetDialogData
 } from '../../constants';
 import {
+  Attachment,
   CandidateHoursAndMilesData,
   CandidateInfo,
   CandidateMilesData,
   DataSourceItem,
   FilterColumns,
-  FilterDataSource,
   TabCountConfig,
   Timesheet,
-  TimesheetAttachment,
-  TimesheetAttachments,
   TimesheetDetailsModel,
   TimesheetInvoice,
   TimesheetRecordsDto,
@@ -52,7 +44,6 @@ import {
 import { ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
 import { reduceFiltersState } from '../../helpers';
-import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 
 @State<TimesheetsModel>({
   name: 'timesheets',
@@ -64,7 +55,6 @@ export class TimesheetsState {
     private timesheetsApiService: TimesheetsApiService,
     private timesheetDetailsApiService: TimesheetDetailsApiService,
     private store: Store,
-    private confirmService: ConfirmService,
   ) {
   }
 
@@ -114,7 +104,7 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static timeSheetAttachments(state: TimesheetsModel): TimesheetAttachment[] {
+  static timeSheetAttachments(state: TimesheetsModel): Attachment[] {
     return state.candidateAttachments.attachments;
   }
 
@@ -430,11 +420,11 @@ export class TimesheetsState {
   ): Observable<Blob> {
     return this.timesheetDetailsApiService.downloadAttachment(payload)
       .pipe(
-        tap((file: Blob) => this.store.dispatch(new TimesheetDetails.AttachmentLoaded(file))),
+        tap((file: Blob) => downloadBlobFile(file, payload.fileName)),
         catchError(() => this.store.dispatch(
-          new ShowToast(MessageTypes.Error, 'File not found'))
-        ),
-      );
+          new ShowToast(MessageTypes.Error, 'File not found')
+        ))
+      )
   }
 
   @Action(TimesheetDetails.NoWorkPerformed)

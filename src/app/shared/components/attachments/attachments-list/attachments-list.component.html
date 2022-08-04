@@ -1,0 +1,21 @@
+<ng-container *ngIf="attachments?.length">
+    <div class="attachment" *ngFor="let attachment of attachments; trackBy: trackById">
+        <i-feather *ngIf="attachmentsListConfig?.download"
+                   (click)="attachmentsListConfig?.download(attachment)"
+                   name="download"
+                   class="icon file-icon"
+        ></i-feather>
+
+        <ejs-tooltip [content]="attachment.fileName"
+                     (click)="preview(attachment)"
+                     position="BottomCenter"
+                     class="file-name"
+        >
+            {{attachment.fileName}}
+        </ejs-tooltip>
+
+        <div class="delete-icon" *ngIf="attachmentsListConfig?.delete">
+            <i-feather name="trash-2" class="icon" (click)="attachmentsListConfig?.delete(attachment)"></i-feather>
+        </div>
+    </div>
+</ng-container>

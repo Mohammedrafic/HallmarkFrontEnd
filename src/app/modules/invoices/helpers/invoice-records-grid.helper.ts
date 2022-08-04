@@ -2,7 +2,7 @@ import {
   ColDef,
   GetDetailRowDataParams,
   GridOptions, ICellRendererParams,
-  IDetailCellRendererParams,
+  IDetailCellRendererParams, RowHeightParams,
   ValueGetterParams
 } from '@ag-grid-community/core';
 import {
@@ -17,16 +17,24 @@ import { ToggleRowExpansionHeaderCellComponent } from '../components/grid-icon-c
 import { GridValuesHelper } from '../../timesheets/helpers';
 import { GridCellLinkComponent } from '@shared/components/grid/components/grid-cell-link/grid-cell-link.component';
 import { GridCellLinkParams } from '@shared/components/grid/models';
+import { Attachment, AttachmentsListComponent, AttachmentsListParams } from '@shared/components/attachments';
 
 export class InvoiceRecordsGridHelper {
   public static getRowNestedGridOptions(): GridOptions {
     return {
       masterDetail: true,
       detailCellRenderer: InvoiceRecordsTableRowDetailsComponent,
+      animateRows: true,
+      getRowHeight: (params: RowHeightParams) => {
+        if (params?.node?.detail) {
+          const data = params.data as InvoiceRecord;
+          return data.timesheetRecords.length * params.api.getSizesForCurrentTheme().rowHeight + 1;
+        }
+
+        return null;
+      },
       detailCellRendererParams: {
         detailGridOptions: {
-          headerHeight: 0,
-          domLayout: 'autoHeight',
           columnDefs: InvoiceRecordsGridHelper.getRowDetailsColumnDefinitions(),
         },
         getDetailRowData: (params: GetDetailRowDataParams) => {
@@ -126,10 +134,6 @@ export class InvoiceRecordsGridHelper {
         }
       },
       {
-        field: 'agency',
-        headerName: 'AGENCY',
-      },
-      {
         field: 'orderId',
         headerName: 'ORDER ID',
         width: 110,
@@ -149,6 +153,20 @@ export class InvoiceRecordsGridHelper {
       {
         field: 'location',
         headerName: 'Location',
+      },
+      {
+        field: 'attachments',
+        cellRenderer: AttachmentsListComponent,
+        cellRendererParams: (params: ICellRendererParams) => {
+          return {
+            attachments: (params.data as InvoiceRecord).attachments,
+            attachmentsListConfig: {
+              download: (item: Attachment) => {},
+              preview: (item: Attachment) => {},
+            }
+          } as AttachmentsListParams;
+        },
+        cellClass: 'invoice-records-attachments-list',
       },
       {
         field: 'department',

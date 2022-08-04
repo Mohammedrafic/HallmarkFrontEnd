@@ -1,14 +1,12 @@
 import { TimesheetsModel } from './../store/model/timesheets.model';
 import { FieldWidthStyle } from './../enums/add-edit-timesheet.enum';
-import { ColDef } from '@ag-grid-community/core';
 import { RecordFields } from './../enums/timesheet-common.enum';
-import { FormGroup } from '@angular/forms';
 
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
 import { FieldType } from '../enums';
-import { TimesheetAttachment } from './timesheet-attachment.interface';
+import { Attachment } from '@shared/components/attachments/models/attachment.interface';
 
 
 export interface DropdownOption {
@@ -61,10 +59,10 @@ export interface RecordValue {
   extDepartmentId: string;
   total:  number;
   value: 10;
-};
+}
 
 export interface TimesheetAttachments {
-  attachments: TimesheetAttachment[];
+  attachments: Attachment[];
 }
 
 export interface TabConfig {

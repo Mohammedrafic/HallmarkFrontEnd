@@ -123,14 +123,6 @@ export namespace TimesheetDetails {
     ) {}
   }
 
-  export class AttachmentLoaded {
-    static readonly type = '[timesheet details] attachment loaded';
-
-    constructor(
-      public file: Blob,
-    ) {}
-  }
-
   export class AddTimesheetRecord {
     static readonly type = TimesheetDetailsActions.AddTimesheetRecord;
 

@@ -22,6 +22,16 @@ export function generateInvoiceRecords(amount: number = 100): InvoiceRecord[] {
       expenses: 36,
       agency: 'Test Agency',
       orderId: 2234,
+      attachments: [
+        {
+          id: 1,
+          fileName: 'File1'
+        },
+        {
+          id: 2,
+          fileName: 'File2'
+        },
+      ],
       timesheetRecords: [
         {
           date: '07/01/2022',
