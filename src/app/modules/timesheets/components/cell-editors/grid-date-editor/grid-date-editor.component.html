@@ -20,7 +20,7 @@
             [value]="dateValue"
             [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
             [enableMask]="true"
-            [step]="30"
+            [step]="15"
             maskPlaceholder="HH:MM"
             (change)="handleTimeChange($event)">
         </ejs-timepicker>
@@ -29,7 +29,7 @@
         <ng-template ngSwitchCase="dateTime">
           <ejs-timepicker
             name="startDateTime"
-            [step]="30"
+            [step]="15"
             placeholder="HH:MM"
             format="HH:mm"
             [value]="dateValue"
