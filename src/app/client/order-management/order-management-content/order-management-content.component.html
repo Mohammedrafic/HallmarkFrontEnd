@@ -192,7 +192,9 @@
       <e-column field="regionName" headerText="REGION" textAlign="Left" width="200" [visible]="false"></e-column>
       <e-column field="openPositions" headerText="# OF POSITIONS" width="180">
         <ng-template #template let-data>
-          <div class="align-right">{{ data.numberOfOpenPositions }}/{{ data.openPositions }}</div>
+          <ng-container *ngIf="data.orderType !== orderTypes.OpenPerDiem">
+            <div class="align-right">{{ data.numberOfOpenPositions }}/{{ data.openPositions }}</div>
+          </ng-container>
         </ng-template>
       </e-column>
       <e-column field="locationName" headerText="LOCATION" textAlign="Left" width="200"></e-column>
