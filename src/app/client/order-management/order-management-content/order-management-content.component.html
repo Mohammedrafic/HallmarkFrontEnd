@@ -141,13 +141,20 @@
             "
           >
             <div>
-              <b>{{ data.id }}</b>
+              <b>
+                <span *ngIf="activeTab === OrganizationOrderManagementTabs.OrderTemplates">
+                  {{ data.id }}
+                </span>
+                <span *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates">
+                  {{ data.organizationPrefix }}-{{ data.id }}
+                </span>
+              </b>
             </div>
           </ng-container>
 
           <ng-template #withToggle>
             <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-              <b>{{ data.id }}</b
+              <b>{{ data.organizationPrefix }}-{{ data.id }}</b
               ><i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
             </div>
           </ng-template>
@@ -164,13 +171,13 @@
         <ng-template #template let-data>
           <ng-container *ngIf="!data.children?.length; else withToggle">
             <div>
-              <b>{{ data.id }}</b>
+              <b>{{ data.organizationPrefix }}-{{ data.id }}</b>
             </div>
           </ng-container>
 
           <ng-template #withToggle>
             <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-              <b>{{ data.id }}</b>
+              <b>{{ data.organizationPrefix }}-{{ data.id }}</b>
               <i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
             </div>
           </ng-template>

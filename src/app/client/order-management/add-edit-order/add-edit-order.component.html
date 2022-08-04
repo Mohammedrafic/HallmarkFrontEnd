@@ -4,7 +4,10 @@
   </div>
   <div class="form-title">
     <h3>{{ title }} Order</h3>
-    <span *ngIf="orderId > 0" class="order-id">ID: {{ orderId }}</span>
+    <span *ngIf="orderId > 0" class="order-id">
+      ID: <span *ngIf="orderDetailsFormComponent?.order?.isTemplate">{{ orderId }}</span>
+      <span *ngIf="!orderDetailsFormComponent?.order?.isTemplate">{{ prefix }}-{{ orderId }}</span>
+    </span>
   </div>
   <div class="controls-form stick-right">
     <button ejs-button cssClass="e-outline button-import" (click)="onImportDataClick()">

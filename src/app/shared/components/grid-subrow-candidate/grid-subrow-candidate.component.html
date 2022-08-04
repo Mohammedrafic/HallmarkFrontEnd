@@ -1,6 +1,6 @@
 <div class="candidate-row"  [ngClass]="{'selected': selected}" (click)="clickEvent.emit(candidat)">
   <div class="info">
-    <div class="data">{{ order.orderId || order.id }}/{{ candidat.positionId }}</div>
+    <div class="data">{{ order.organizationPrefix }}-{{ order.orderId || order.id }}-{{ candidat.positionId }}</div>
     <div class="title">Position ID</div>
   </div>
   <div class="info status">
