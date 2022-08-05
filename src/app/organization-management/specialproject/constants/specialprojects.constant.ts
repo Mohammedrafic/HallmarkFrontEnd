@@ -1,5 +1,5 @@
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
-import { ColDef, DateFilter, ICellRendererParams } from '@ag-grid-community/core';
+import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
 import { PurchaseOrderTableColumns, PurchaseOrderHeaderText, SpecialProjectTableColumns, SpecialProjectHeaderText } from '../enums/specialproject.enum';
 import { ActionCellRendererComponent } from '../../../shared/components/cell-renderer/action-cellrenderer.component';
 import { DatePipe } from '@angular/common';
@@ -111,12 +111,12 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
   return [
     {
       field: SpecialProjectTableColumns.Id,
-      headerName: SpecialProjectHeaderText.ProjectId,
+      headerName: SpecialProjectHeaderText.Id,
       hide: true
     },
     {
-      field: SpecialProjectTableColumns.Category,
-      headerName: SpecialProjectHeaderText.ProjectCategory,
+      field: SpecialProjectTableColumns.ProjectTypeId,
+      headerName: SpecialProjectHeaderText.ProjectTypeId,
       ...commonColumn,
       filter: 'agSetColumnFilter',
       filterParams: {
@@ -125,7 +125,7 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
     },
     {
       field: SpecialProjectTableColumns.Name,
-      headerName: SpecialProjectHeaderText.ProjectName,
+      headerName: SpecialProjectHeaderText.Name,
       ...commonColumn,
       filter: 'agTextColumnFilter',
       filterParams: {
@@ -133,8 +133,8 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       }
     },
     {
-      field: PurchaseOrderTableColumns.Region,
-      headerName: PurchaseOrderHeaderText.Region,
+      field: "regionName",
+      headerName: SpecialProjectHeaderText.Region,
       ...commonColumn,
       filter: 'agSetColumnFilter',
       filterParams: {
@@ -142,8 +142,8 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       }
     },
     {
-      field: PurchaseOrderTableColumns.Location,
-      headerName: PurchaseOrderHeaderText.Location,
+      field: SpecialProjectTableColumns.Location,
+      headerName: SpecialProjectHeaderText.Location,
       ...commonColumn,
       filter: 'agSetColumnFilter',
       filterParams: {
@@ -151,8 +151,8 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       }
     },
     {
-      field: PurchaseOrderTableColumns.SkillName,
-      headerName: PurchaseOrderHeaderText.SkillName,
+      field: SpecialProjectTableColumns.SkillName,
+      headerName: SpecialProjectHeaderText.SkillName,
       ...commonColumn,
       filter: 'agSetColumnFilter',
       filterParams: {
@@ -160,8 +160,8 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       }
     },
     {
-      field: PurchaseOrderTableColumns.Department,
-      headerName: PurchaseOrderHeaderText.Department,
+      field: SpecialProjectTableColumns.Department,
+      headerName: SpecialProjectHeaderText.Department,
       ...commonColumn,
       filter: 'agSetColumnFilter',
       filterParams: {
@@ -169,8 +169,8 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       }
     },
     {
-      field: 'budget',
-      headerName: PurchaseOrderHeaderText.Budget,
+      field: SpecialProjectTableColumns.ProjectBudget,
+      headerName: SpecialProjectHeaderText.ProjectBudget,
       ...commonColumn,
       filter: 'agNumberColumnFilter',
       filterParams: {
@@ -178,8 +178,8 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       }
     },
     {
-      field: PurchaseOrderTableColumns.StartDate,
-      headerName: PurchaseOrderHeaderText.StartDate,
+      field: SpecialProjectTableColumns.StartDate,
+      headerName: SpecialProjectHeaderText.StartDate,
       cellRenderer: (params: ICellRendererParams) => {
         const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string
         return str?.length > 0 ? str : "";
@@ -187,8 +187,8 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       ...commonColumn
     },
     {
-      field: PurchaseOrderTableColumns.EndDate,
-      headerName: PurchaseOrderHeaderText.EndDate,
+      field: SpecialProjectTableColumns.EndDate,
+      headerName: SpecialProjectHeaderText.EndDate,
       cellRenderer: (params: ICellRendererParams) => {
         const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string
         return str?.length > 0 ? str : "";

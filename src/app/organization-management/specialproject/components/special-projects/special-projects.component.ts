@@ -59,16 +59,14 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
   ngOnDestroy(): void {
   }
 
-  public override updatePage(): void {
-    this.getSpecialProjects();
-  }
-
   getSpecialProjects(): void {
     this.store.dispatch(new GetSpecialProjects());
-  
+    debugger;
     this.specialProjectPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (data?.items) {
-        //this.rowData = data.items;
+        debugger;
+        this.rowData = data.items;
+        this.gridApi.setRowData(this.rowData);
       }
     });
   
@@ -129,8 +127,8 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
 
   gridOptions: GridOptions = {
     pagination: true,
-    cacheBlockSize: 2,
-    paginationPageSize: 2,
+    cacheBlockSize: 30,
+    paginationPageSize: 30,
     columnDefs: this.columnDefinitions,
     rowData: this.rowData,
     sideBar: this.sideBar
