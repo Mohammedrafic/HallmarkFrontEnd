@@ -9,10 +9,11 @@ import {
   GridApi,
   GridReadyEvent,
   HeaderCheckboxSelectionCallbackParams,
-  IDatasource, IGetRowsParams, GridOptions, ICellRendererParams
+  GridOptions
 } from '@ag-grid-community/core';
 import { ColumnDefinitionModel } from '../../../../shared/components/grid/models/column-definition.model';
 import { PurchaseOrdderColumnsDefinition } from '../../constants/specialprojects.constant';
+import { GRID_CONFIG } from '../../../../shared/constants';
 
 @Component({
   selector: 'app-purchase-orders',
@@ -22,7 +23,7 @@ import { PurchaseOrdderColumnsDefinition } from '../../constants/specialprojects
 
 export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
-
+  public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public gridApi!: GridApi;
   public rowData : PurchaseOrder[]=[];
   public rowSelection: 'single' | 'multiple' = 'single';
@@ -119,13 +120,59 @@ export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent 
     return params.columnApi.getRowGroupColumns().length === 0;
   };
 
+  onPageSizeChanged(event: any) {
+    this.gridOptions.cacheBlockSize = Number(event.value.toLowerCase().replace("rows", ""));
+    this.gridOptions.paginationPageSize = Number(event.value.toLowerCase().replace("rows", ""));
+    if (this.gridApi != null) {
+      this.gridApi.paginationSetPageSize(Number(event.value.toLowerCase().replace("rows", "")));
+      this.gridApi.setRowData(this.rowData);
+    }
+  }
+
+  public sideBar = {
+    toolPanels: [
+      {
+        id: 'columns',
+        labelDefault: 'Columns',
+        labelKey: 'columns',
+        iconKey: 'columns',
+        toolPanel: 'agColumnsToolPanel',
+        toolPanelParams: {
+          suppressRowGroups: true,
+          suppressValues: true,
+          suppressPivots: true,
+          suppressPivotMode: true,
+          suppressColumnFilter: true,
+          suppressColumnSelectAll: true,
+          suppressColumnExpandAll: true,
+        },
+      },
+      {
+        id: 'filters',
+        labelDefault: 'Filters',
+        labelKey: 'filters',
+        iconKey: 'filters',
+        toolPanel: 'agFiltersToolPanel',
+        toolPanelParams: {
+          suppressRowGroups: true,
+          suppressValues: true,
+          suppressPivots: true,
+          suppressPivotMode: true,
+          suppressColumnFilter: true,
+          suppressColumnSelectAll: true,
+          suppressColumnExpandAll: true,
+        },
+      },
+    ],
+  };
 
   gridOptions: GridOptions = {
     pagination: true,
     cacheBlockSize: 2,
     paginationPageSize: 2,
     columnDefs: this.columnDefinitions,
-    rowData:this.rowData
+    rowData: this.rowData,
+    sideBar:this.sideBar
   };
 
   onGridReady(params: GridReadyEvent) {

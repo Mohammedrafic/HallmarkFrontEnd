@@ -11,6 +11,7 @@ export class SpecialProjectService {
   * Get the SpecialProjects
   */
   public getSpecialProjects(): Observable<SpecialProjectPage> {
+    debugger;
     return this.http.get<SpecialProjectPage>(`/api/Orders/all`);
   }
 }
