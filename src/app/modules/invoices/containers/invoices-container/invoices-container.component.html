@@ -1,9 +1,9 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tabs-list
+    <app-invoices-table-tabs
       [tabConfig]="tabsConfig"
       (changeTab)="handleChangeTab($event)">
-    </app-tabs-list>
+    </app-invoices-table-tabs>
   </ng-container>
 
   <ng-container right>
@@ -12,7 +12,10 @@
       ejs-button
       cssClass="e-outline button-filter button--no-wrap"
       (click)="showFilters()">
-      Filters <i-feather name="sliders" class="icon"></i-feather>
+      <div class="filter-button-content">
+        <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-circle">{{ appliedFiltersAmount }}</span>
+        Filters <i-feather name="sliders" class="icon"></i-feather>
+      </div>
     </button>
     <app-export-button (optionSelected)="onExportOptionSelect($event)"></app-export-button>
     <button ejs-button class="e-primary"
@@ -87,3 +90,10 @@
 ></app-invoice-detail-container>
 
 <app-manual-invoice-dialog></app-manual-invoice-dialog>
+
+<app-invoices-filters-dialog
+  [activeTabIdx]="selectedTabIdx"
+  (appliedFiltersAmount)="changeFiltersAmount($event)"
+  (resetFilters)="resetFilters()"
+  (updateTableByFilters)="updateTableByFilters($event)">
+</app-invoices-filters-dialog>

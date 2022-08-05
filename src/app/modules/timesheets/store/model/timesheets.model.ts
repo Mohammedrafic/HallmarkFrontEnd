@@ -1,8 +1,8 @@
-import { DropdownOption } from '@core/interface';
+import { DataSourceItem, DropdownOption } from '@core/interface';
 import { PageOfCollections } from '@shared/models/page.model';
 import { RecordFields } from '../../enums';
 import {
-  CandidateHoursAndMilesData, CandidateInfo, DataSourceItem, FilterColumns,
+  CandidateHoursAndMilesData, CandidateInfo, FilterColumns,
   TabCountConfig, Timesheet, TimesheetAttachments, TimesheetDetailsModel, TimesheetInvoice,
   TimesheetRecordsDto, TimesheetsFilterState } from '../../interface';
 

@@ -1,10 +1,15 @@
-import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
-import { Observable, of } from "rxjs";
-import { PageOfCollections } from "@shared/models/page.model";
-import { GetInvoicesData, InvoiceRecord } from "../interfaces";
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { FormBuilder } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+
 import { BaseObservable } from '@core/helpers';
+import { CustomFormGroup } from '@core/interface';
+import { PageOfCollections } from '@shared/models/page.model';
+
+import { GetInvoicesData, InvoiceRecord } from '../interfaces';
 import { generateInvoiceRecords } from '../helpers/generate-invoices-mock.helper';
+import { InvoiceFilterForm } from '../interfaces/form.interface';
 
 const mockedRecords: InvoiceRecord[] = generateInvoiceRecords(10);
 
@@ -14,7 +19,19 @@ export class InvoicesService {
 
   constructor(
     private http: HttpClient,
+    private fb: FormBuilder,
   ) {
+  }
+
+  public createForm(): CustomFormGroup<InvoiceFilterForm> {
+    return this.fb.group({
+      orderIds: [''],
+      regionsIds: [''],
+      locationIds: [''],
+      departmentIds: [''],
+      agencyIds: [''],
+      skillIds: [''],
+    }) as CustomFormGroup<InvoiceFilterForm>;
   }
 
   public getInvoices({pageSize, page}: GetInvoicesData): Observable<PageOfCollections<InvoiceRecord>> {

@@ -1,0 +1,19 @@
+@import '../../styles/variables/colors';
+
+.bootstrap .row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 12px;
+}
+
+.input-container {
+  margin-bottom: 12px;
+
+  :last-child {
+    margin-bottom: 0;
+  }
+
+  label {
+    color: $secondary-dark-blue-15;
+  }
+}

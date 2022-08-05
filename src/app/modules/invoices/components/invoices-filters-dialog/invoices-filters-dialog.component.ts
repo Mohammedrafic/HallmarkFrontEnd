@@ -1,6 +1,9 @@
 import {
-  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter,
-  Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component, EventEmitter, Input, OnChanges,
+  OnInit, Output, SimpleChanges
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
@@ -8,56 +11,47 @@ import { Observable, takeUntil } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import { FilteredItem } from '@shared/models/filter.model';
+import { Destroyable, leftOnlyValidValues } from '@core/helpers';
+import { PageOfCollections } from '@shared/models/page.model';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { FilterService } from '@shared/services/filter.service';
-import { Destroyable, findItemById, leftOnlyValidValues } from '@core/helpers';
-import { OrganizationDepartment, OrganizationLocation, OrganizationRegion,
-  OrganizationStructure } from '@shared/models/organization.model';
 import { DataSourceItem } from '@core/interface';
 
-import { TimesheetsState } from '../../store/state/timesheets.state';
-import { TimeSheetsPage } from '../../store/model/timesheets.model';
-import { filterOptionFields } from '../../constants';
-import { FilterColumns, TimesheetsFilterState } from '../../interface';
-import { TimesheetsService } from '../../services/timesheets.service';
-import { TimesheetsTableFiltersColumns } from '../../enums';
-import { Timesheets } from '../../store/actions/timesheets.actions';
-import { UserState } from '../../../../store/user.state';
+import { InvoicesState } from '../../store/state/invoices.state';
+import { InvoiceFilterColumns, InvoiceRecord, InvoicesFilterState } from '../../interfaces';
+import { InvoicesService } from '../../services';
+import { InvoicesTableFiltersColumns } from '../../enums/invoices.enum';
+import { Invoices } from '../../store/actions/invoices.actions';
+import { invoicesFilterOptionFields } from '../../constants';
+import { findSelectedItems } from '../../helpers/functions.helper';
 
 @Component({
-  selector: 'app-timesheets-filter-dialog',
-  templateUrl: './timesheets-filter-dialog.component.html',
-  styleUrls: ['./timesheets-filter-dialog.component.scss'],
+  selector: 'app-invoices-filters-dialog',
+  templateUrl: './invoices-filters-dialog.component.html',
+  styleUrls: ['./invoices-filters-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class TimesheetsFilterDialogComponent extends Destroyable implements OnInit, OnChanges {
-  @Select(TimesheetsState.timesheets)
-  readonly timesheets$: Observable<TimeSheetsPage>;
-
-  @Select(TimesheetsState.timesheetsFilters)
-  readonly timesheetsFilters$!: Observable<TimesheetsFilterState>;
-
-  @Select(UserState.organizationStructure)
-  readonly organizationStructure$: Observable<OrganizationStructure>;
+export class InvoicesFiltersDialogComponent extends Destroyable implements OnInit, OnChanges {
+  @Select(InvoicesState.invoicesData)
+  public invoicesData$: Observable<PageOfCollections<InvoiceRecord> | null>;
 
   @Input() activeTabIdx: number;
-  @Input() isAgency: boolean;
 
-  @Output() readonly updateTableByFilters: EventEmitter<any> = new EventEmitter<any>();
+  @Output() readonly updateTableByFilters: EventEmitter<InvoicesFilterState> = new EventEmitter<InvoicesFilterState>();
   @Output() readonly resetFilters: EventEmitter<void> = new EventEmitter<void>();
   @Output() readonly appliedFiltersAmount: EventEmitter<number> = new EventEmitter<number>();
 
   public allRegions: OrganizationRegion[] = [];
   public orgRegions: OrganizationRegion[] = [];
   public filteredItems: FilteredItem[] = [];
-  public filterOptionFields = filterOptionFields;
-  public filterColumns: FilterColumns;
   public formGroup: FormGroup;
-  public showStatuses = true;
+  public filterOptionFields = invoicesFilterOptionFields;
+  public filterColumns: InvoiceFilterColumns;
 
   constructor(
-    private store: Store,
     private filterService: FilterService,
-    private timesheetsService: TimesheetsService,
+    private invoicesService: InvoicesService,
+    private store: Store,
     private cdr: ChangeDetectorRef
   ) {
     super();
@@ -72,7 +66,6 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
 
   ngOnChanges(changes: SimpleChanges): void {
     if (!changes['activeTabIdx'].firstChange) {
-      this.showStatuses = this.activeTabIdx === 0;
       this.clearAllFilters(false);
     }
   }
@@ -92,15 +85,16 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
   }
 
   public applyFilters(): void {
-    const filters = leftOnlyValidValues(this.formGroup);
+    const filters: InvoicesFilterState = leftOnlyValidValues(this.formGroup);
 
     this.updateTableByFilters.emit(filters);
     this.filteredItems = this.filterService.generateChips(this.formGroup, this.filterColumns);
     this.appliedFiltersAmount.emit(this.filteredItems.length);
   }
 
+
   private initFiltersColumns(): void {
-    this.store.select(TimesheetsState.timesheetsFiltersColumns)
+    this.store.select(InvoicesState.invoiceFiltersColumns)
       .pipe(
         filter(Boolean),
         takeUntil(this.componentDestroy()),
@@ -113,26 +107,26 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
   }
 
   private startRegionsWatching(): void {
-    this.formGroup.get(TimesheetsTableFiltersColumns.RegionsIds)?.valueChanges
+    this.formGroup.get(InvoicesTableFiltersColumns.RegionsIds)?.valueChanges
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((val: number[]) => {
         if (val?.length) {
-          const selectedRegions: OrganizationRegion[] = this.findSelectedItems(val, this.orgRegions);
+          const selectedRegions: OrganizationRegion[] = findSelectedItems(val, this.orgRegions);
 
           const res: OrganizationLocation[] = [];
           selectedRegions.forEach(region => {
             region.locations?.forEach(location => location.regionName = region.name);
             res.push(...region.locations as []);
           });
-          this.setDataSourceByFormKey(TimesheetsTableFiltersColumns.LocationIds, res);
+          this.setDataSourceByFormKey(InvoicesTableFiltersColumns.LocationIds, res);
         } else {
-          this.resetDataSourceAndChips(TimesheetsTableFiltersColumns.LocationIds);
+          this.resetDataSourceAndChips(InvoicesTableFiltersColumns.LocationIds);
         }
       });
   }
 
   private startLocationsWatching(): void {
-    this.formGroup.get(TimesheetsTableFiltersColumns.LocationIds)?.valueChanges
+    this.formGroup.get(InvoicesTableFiltersColumns.LocationIds)?.valueChanges
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((locationIds: number[]) => {
         if (locationIds?.length) {
@@ -141,21 +135,21 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
             const selectedLocation = this.filterColumns.locationIds.dataSource.find((location: OrganizationLocation) => location.id === id);
             res.push(...selectedLocation?.departments as []);
           });
-          this.setDataSourceByFormKey(TimesheetsTableFiltersColumns.DepartmentIds, res);
+          this.setDataSourceByFormKey(InvoicesTableFiltersColumns.DepartmentIds, res);
         } else {
-          this.resetDataSourceAndChips(TimesheetsTableFiltersColumns.DepartmentIds);
+          this.resetDataSourceAndChips(InvoicesTableFiltersColumns.DepartmentIds);
         }
       });
   }
 
   private setDataSourceByFormKey(
-    key: TimesheetsTableFiltersColumns,
+    key: InvoicesTableFiltersColumns,
     source: DataSourceItem[] | OrganizationRegion[]
   ): void {
-    this.store.dispatch(new Timesheets.SetFiltersDataSource(key, source));
+    this.store.dispatch(new Invoices.SetFiltersDataSource(key, source));
   }
 
-  private resetDataSourceAndChips(key: TimesheetsTableFiltersColumns): void {
+  private resetDataSourceAndChips(key: InvoicesTableFiltersColumns): void {
     this.setDataSourceByFormKey(key, []);
     this.formGroup.get(key)?.setValue([]);
     if (this.filteredItems.length) {
@@ -165,15 +159,6 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
   }
 
   private initFormGroup(): void {
-    this.formGroup = this.timesheetsService.createForm();
-  }
-
-  private findSelectedItems(source: any[], arr: any[]): any[] {
-    return source.reduce((acc: any[], itemId: number) => {
-        acc.push(findItemById(arr, itemId));
-
-        return acc;
-      },
-      []);
+    this.formGroup = this.invoicesService.createForm();
   }
 }

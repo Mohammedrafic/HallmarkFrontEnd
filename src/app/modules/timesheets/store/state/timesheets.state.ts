@@ -10,6 +10,8 @@ import { downloadBlobFile } from '@shared/utils/file.utils';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DialogAction } from '@core/enums';
+import { DataSourceItem, DropdownOption } from '@core/interface';
+
 import { TimesheetsModel, TimeSheetsPage, TimrsheetsDto } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
@@ -20,13 +22,12 @@ import {
   AddSuccessMessage, DefaultFiltersState, DefaultTimesheetCollection, DefaultTimesheetState,
   filteringOptionsMapping, GetBydateErrMessage, PutSuccess, SavedFiltersParams } from '../../constants';
 import {
-  Attachment, CandidateHoursAndMilesData, CandidateInfo, CandidateMilesData, DataSourceItem,
+  Attachment, CandidateHoursAndMilesData, CandidateInfo, CandidateMilesData,
   FilterColumns, TabCountConfig, Timesheet, TimesheetDetailsModel, TimesheetInvoice, TimesheetRecordsDto,
   TimesheetsFilterState, TimesheetStatistics, TimesheetsFilteringOptions } from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
 import { reduceFiltersState } from '../../helpers';
-import { DropdownOption } from '@core/interface';
 
 
 @State<TimesheetsModel>({

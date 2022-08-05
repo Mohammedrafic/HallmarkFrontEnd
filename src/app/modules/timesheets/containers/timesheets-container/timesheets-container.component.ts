@@ -17,9 +17,11 @@ import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organizati
 import { SearchComponent } from '@shared/components/search/search.component';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RowNode } from '@ag-grid-community/core';
+import { DialogAction } from '@core/enums';
+import { DataSourceItem } from '@core/interface';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { DataSourceItem, TabConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
+import { TabConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
 import {
   TimesheetExportOptions,
   TAB_ADMIN_TIMESHEETS,
@@ -33,7 +35,6 @@ import { TimesheetsService } from '../../services/timesheets.service';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { ProfileDetailsContainerComponent } from '../profile-details-container/profile-details-container.component';
 import { AppState } from '../../../../store/app.state';
-import { DialogAction } from '@core/enums';
 
 @Component({
   selector: 'app-timesheets-container.ts',
