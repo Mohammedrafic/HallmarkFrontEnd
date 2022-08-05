@@ -60,8 +60,9 @@ import { TimesheetDetailsService } from './services/timesheet-details.service';
 import { FileViewerModule } from '../../shared/modules/file-viewer/file-viewer.module';
 import { DateRangeWeekPickerModule } from '@shared/components/date-range-week-picker/date-range-week-picker.module';
 import { TimesheetsTabsComponent } from './components/timesheets-tabs/timesheets-tabs.component';
-import { DateWeekService } from '@core/services';
+import { AddDialogHelperService, DateWeekService } from '@core/services';
 import { AttachmentsModule } from '@shared/components/attachments';
+import { AddDialogHelper } from '@core/helpers';
 
 const gridIcons = {
   MessageSquare,
@@ -164,6 +165,11 @@ const gridIcons = {
     TimesheetRecordsService,
     TimesheetDetailsService,
     DateWeekService,
+    AddDialogHelper,
+    {
+      provide: AddDialogHelperService,
+      useClass: AddRecordService,
+    },
   ]
 })
 export class TimesheetsModule {}

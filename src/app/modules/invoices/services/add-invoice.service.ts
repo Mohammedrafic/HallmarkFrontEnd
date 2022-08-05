@@ -7,19 +7,19 @@ export class AddInvoiceService {
     private fb: FormBuilder,
   ) {}
 
-  public createManInvoiceForm(): FormGroup {
+  public createForm(): FormGroup {
     return this.fb.group({
       orderId: [null, Validators.required],
-      candidateName: [null, Validators.required],
-      agency: [null, Validators.required],
-      workLocationId: [null, Validators.required],
-      workDepartmentId: [null, Validators.required],
-      serviceDate: ['', Validators.required],
+      name: [null, Validators.required],
+      unitId: [null, Validators.required],
+      locationId: [null, Validators.required],
+      departmentId: [null, Validators.required],
+      date: ['', Validators.required],
       value: [null, [Validators.required, Validators.min(1), Validators.max(Number.MAX_SAFE_INTEGER)]],
       reasonId: [null, Validators.required],
-      linkInvoiceId: [null],
+      link: [null],
       vendorFee: [null, Validators.required],
-      comment: [null],
+      description: [null],
     });
   }
 }

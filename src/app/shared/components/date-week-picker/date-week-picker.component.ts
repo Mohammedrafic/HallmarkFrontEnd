@@ -49,6 +49,9 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     this.setInitDate();
   }
 
+  /**
+   * TODO: try to use renderer2 here
+   */
   public renderCell(args: RenderDayCellEventArgs): void {
     if (this.dateControl.value && typeof this.dateControl.value === 'string') {
       const [from, to] = DateTimeHelper.getWeekStartEnd(this.dateControl.value);

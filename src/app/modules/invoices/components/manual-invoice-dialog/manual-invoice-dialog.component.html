@@ -1,5 +1,5 @@
 <ejs-dialog
-  #manInvoiceDialog
+  #sideAddDialog
   cssClass="dialog filter"
   [width]="496"
   [visible]="false"
@@ -11,7 +11,7 @@
       <div class="dialog-header">
         <h3 class="title">{{ dialogConfig.title | titlecase }}</h3>
         <div class="controls">
-          <button ejs-button cssClass="e-outline button-cancel" (click)="cancel()">Cancel</button>
+          <button ejs-button cssClass="e-outline button-cancel" (click)="closeDialog()">Cancel</button>
           <button ejs-button [isPrimary]="true">Save</button>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import { FieldType, FieldWidthStyle } from '@core/enums';
-import { DropdownOption } from '@core/interface';
+import { DropdownOption, FileForUpload } from '@core/interface';
 
 export interface ManInvoiceInputConfig {
   field: string;
@@ -14,4 +14,24 @@ export interface ManInvoiceInputConfig {
 export interface AddManInvoiceDialogConfig {
   title: string;
   fields: ManInvoiceInputConfig[];
+}
+
+export interface AddManInvoiceForm {
+  orderId: number | string;
+  name: string;
+  unitId: number;
+  locationId: number;
+  departmentId: number;
+  value: number;
+  date: Date;
+  link: string;
+  vendorFee: boolean;
+  reasonId: number;
+  description: string;
+}
+
+export interface ManualInvoiceReason {
+  id: number;
+  reason: string;
+  businessUnitId: number;
 }

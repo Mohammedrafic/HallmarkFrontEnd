@@ -1,18 +1,15 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Inject, OnInit, ViewChild } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 
-import { Actions, ofActionDispatched } from '@ngxs/store';
-import { filter, takeUntil } from 'rxjs';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
+import { ofActionDispatched } from '@ngxs/store';
+import { filter, takeUntil, tap } from 'rxjs';
 
-import { Destroyable } from '@core/helpers';
-import { GlobalWindow } from '@core/tokens';
-import { FieldType, DialogAction } from '@core/enums';
+import { AddDialogHelper } from '@core/helpers';
+import { CustomFormGroup } from '@core/interface';
+import { DialogAction } from '@core/enums';
 import { ManualInvoiceDialogConfig } from '../../constants';
-import { AddManInvoiceDialogConfig } from '../../interfaces';
+import { AddManInvoiceDialogConfig, AddManInvoiceForm } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
-import { AddInvoiceService } from '../../services';
-
+import { InvoiceConfirmMessages } from '../../constants/messages.constant';
 
 @Component({
   selector: 'app-manual-invoice-dialog',
@@ -20,48 +17,12 @@ import { AddInvoiceService } from '../../services';
   styleUrls: ['./manual-invoice-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ManualInvoiceDialogComponent extends Destroyable implements OnInit {
-  @ViewChild('manInvoiceDialog') protected manInvoiceDialog: DialogComponent;
-
-  @ViewChild('uploadArea') protected uploadArea: ElementRef<HTMLDivElement>;
-
-  @ViewChild('dropEl')
-  public dropEl: HTMLDivElement;
-
+export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceForm> implements OnInit {
   public readonly dialogConfig: AddManInvoiceDialogConfig = ManualInvoiceDialogConfig;
-
-  public form: FormGroup;
-
-  public targetElement: HTMLBodyElement;
-
-  public readonly FieldTypes = FieldType;
-
-  public readonly dropDownFieldsConfig = {
-    text: 'text',
-    value: 'value',
-  };
-
-  constructor(
-    private addService: AddInvoiceService,
-    private actions$: Actions,
-    @Inject(GlobalWindow) private readonly globalWindow: WindowProxy & typeof globalThis,
-  ) {
-    super();
-    this.form = this.addService.createManInvoiceForm();
-    this.targetElement = this.globalWindow.document.body as HTMLBodyElement;
-  }
 
   ngOnInit(): void {
     this.getDialogState();
-  }
-
-  public cancel(): void {
-    this.form.reset();
-    this.manInvoiceDialog.hide();
-  }
-
-  public trackByIndex(idx: number): number {
-    return idx;
+    this.confirmMessages = InvoiceConfirmMessages;
   }
 
   private getDialogState(): void {
@@ -69,10 +30,34 @@ export class ManualInvoiceDialogComponent extends Destroyable implements OnInit 
     .pipe(
       ofActionDispatched(Invoices.ToggleManulaInvoiceDialog),
       filter((payload: Invoices.ToggleManulaInvoiceDialog) => payload.action === DialogAction.Open),
+      tap(() => {
+        this.form = this.addService.createForm() as CustomFormGroup<AddManInvoiceForm>;
+      }),
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
-      this.manInvoiceDialog.show();
+      this.sideAddDialog.show();
+      this.cd.markForCheck();
     })
+  }
+
+  public override closeDialog(): void {
+    super.closeDialog();
+    // this.store.dispatch(new Timesheets.ToggleTimesheetAddDialog(DialogAction.Close, this.formType, ''));
+  }
+
+  private populateOptions(): void {
+    /**
+     * Commented for future implementation
+     */
+    // this.dialogConfig[this.formType].fields.forEach((item) => {
+    //   if (item.optionsStateKey) {
+    //     item.options = this.store.snapshot().timesheets[item.optionsStateKey];
+    //   }
+      
+    //   if (item.optionsStateKey === 'billRateTypes') {
+    //     item.options = item.options?.filter((rate) => rate.text !== 'Mileage' && rate.text !== 'Charge');
+    //   }
+    // })
   }
 }

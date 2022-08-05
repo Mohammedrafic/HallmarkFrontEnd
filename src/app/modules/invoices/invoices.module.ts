@@ -41,6 +41,8 @@ import { ManualInvoiceDialogComponent } from './components/manual-invoice-dialog
 import { InvoicesFiltersDialogComponent } from './components/invoices-filters-dialog/invoices-filters-dialog.component';
 import { InvoicesApiService } from './services/invoices-api.service';
 import { InvoicesTableTabsComponent } from './components/invoices-table-tabs/invoices-table-tabs.component';
+import { AddDialogHelperService } from '@core/services';
+import { InvoiceApiService } from './services/invoice-api.service';
 
 @NgModule({
   declarations: [
@@ -104,6 +106,11 @@ import { InvoicesTableTabsComponent } from './components/invoices-table-tabs/inv
     InvoicesApiService,
     ChipsCssClass,
     AddInvoiceService,
+    InvoiceApiService,
+    {
+      provide: AddDialogHelperService,
+      useClass: AddInvoiceService,
+    },
   ]
 })
 export class InvoicesModule { }

@@ -13,7 +13,7 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       widthStyle: FieldWidthStyle.Long,
     },
     {
-      field: 'candidateName',
+      field: 'name',
       title: 'Candidate Name',
       disabled: false,
       required: true,
@@ -21,7 +21,7 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       widthStyle: FieldWidthStyle.Short,
     },
     {
-      field: 'agency',
+      field: 'unitId',
       title: 'Agency',
       disabled: false,
       required: true,
@@ -29,7 +29,7 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       widthStyle: FieldWidthStyle.Short,
     },
     {
-      field: 'workLocationId',
+      field: 'locationId',
       title: 'Worked Location',
       disabled: false,
       required: true,
@@ -37,7 +37,7 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       widthStyle: FieldWidthStyle.Short,
     },
     {
-      field: 'workDepartmentId',
+      field: 'departmentId',
       title: 'Worked Department',
       disabled: false,
       required: true,
@@ -53,7 +53,7 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       widthStyle: FieldWidthStyle.Short,
     },
     {
-      field: 'serviceDate',
+      field: 'date',
       title: 'Service Date',
       disabled: false,
       required: true,
@@ -61,7 +61,7 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       widthStyle: FieldWidthStyle.Short,
     },
     {
-      field: 'linkInvoiceId',
+      field: 'link',
       title: 'Linked Invoice',
       disabled: false,
       required: true,
@@ -86,7 +86,7 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       widthStyle: FieldWidthStyle.Long,
     },
     {
-      field: 'comment',
+      field: 'description',
       title: 'Comments',
       disabled: false,
       required: false,

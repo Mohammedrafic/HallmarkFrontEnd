@@ -165,7 +165,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
    */
   public onNextPreviousOrder(next: boolean): void {
     if (!this.isChangesSaved) {
-      this.timesheetDetailsService.confirmTimesheetLeave(TimesheetConfirmMessages.confirmTimesheetOrder)
+      this.timesheetDetailsService.confirmTimesheetLeave(TimesheetConfirmMessages.confirmOrderChange)
       .subscribe(() => {
         this.nextPreviousOrderEvent.emit(next);
       });

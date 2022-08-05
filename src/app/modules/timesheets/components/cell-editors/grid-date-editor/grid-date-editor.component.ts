@@ -5,8 +5,7 @@ import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams, ColDef } from '@ag-grid-community/core';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 
-import { DateTimeHelper } from '@core/helpers';
-import { TimesheetDateHelper } from '../../../helpers';
+import { TimesheetDateHelper, DateTimeHelper } from '@core/helpers';
 import { EditFieldTypes } from '@core/enums';
 
 @Component({

@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, debounceTime, throttleTime } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, debounceTime } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { Destroyable } from '@core/helpers';
@@ -23,11 +23,8 @@ import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.a
 import { UserState } from 'src/app/store/user.state';
 import { TabConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
 import {
-  TimesheetExportOptions,
-  TAB_ADMIN_TIMESHEETS,
-  UNIT_ORGANIZATIONS_FIELDS,
-  BulkApproveSuccessMessage
-} from '../../constants';
+  TimesheetExportOptions,  TAB_ADMIN_TIMESHEETS,  UNIT_ORGANIZATIONS_FIELDS,
+  BulkApproveSuccessMessage } from '../../constants';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { ExportType } from '../../enums';

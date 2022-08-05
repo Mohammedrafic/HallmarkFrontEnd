@@ -12,3 +12,10 @@ export interface DataSourceItem {
   id: number;
   name: string;
 }
+export interface CommonDialogConformMessages {
+  confirmUnsavedChages: string;
+  confirmTabChange: string;
+  confirmAddFormCancel: string;
+  confirmRecordDelete: string;
+  confirmOrderChange: string;
+}
