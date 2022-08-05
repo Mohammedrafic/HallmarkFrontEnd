@@ -22,6 +22,7 @@ import {
   GetDepartmentsByLocationId,
   GetLocationsByRegionId,
   GetMasterSkillsByOrganization,
+  GetOrganizationSettings,
   GetRegions,
 } from '@organization-management/store/organization-management.actions';
 import {
@@ -71,6 +72,7 @@ import { disableControls } from '@shared/utils/form.utils';
 import { AlertService } from '@shared/services/alert.service';
 import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
 import { ReasonForRequisitionList } from '@shared/models/reason-for-requisition-list';
+import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 
 @Component({
   selector: 'app-order-details-form',
@@ -168,6 +170,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public reasonsForRequisition = ReasonForRequisitionList;
   public reasonForRequisitionFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
+  public isSpecialProjectFieldsRequired: boolean;
+  private mandatorySpecialProjectDetailsKey: string = "MandatorySpecialProjectDetails";
+
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order | null>;
 
@@ -219,6 +224,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   workflows$: Observable<WorkflowByDepartmentAndSkill[]>;
   workflowFields: FieldSettingsModel = { text: 'workflowGroupName', value: 'workflowGroupId' };
 
+  @Select(OrganizationManagementState.organizationSettings)
+  organizationSettings$: Observable<OrganizationSettingsGet[]>;
+
   private isEditMode: boolean;
 
   private touchedFields: Set<string> = new Set();
@@ -236,7 +244,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.orderTypeForm = this.formBuilder.group({
       orderType: [null, Validators.required],
     });
-
+    this.store.dispatch(new GetOrganizationSettings());
     this.generalInformationForm = this.formBuilder.group({
       title: [null, [Validators.required, Validators.maxLength(50)]],
       regionId: [null, Validators.required],
@@ -313,7 +321,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
       this.store.dispatch(new SetIsDirtyOrderForm(this.generalInformationForm.dirty));
     });
-
+    this.getOrganizationSettings();
     this.jobDistributionForm = this.formBuilder.group({
       jobDistribution: [[], Validators.required],
       agency: [null],
@@ -377,9 +385,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
     this.specialProject = this.formBuilder.group({
       reasonForRequestId: [null, Validators.required],
-      projectTypeId: [null, Validators.required],
-      projectNameId: [null, Validators.required],
-      poNumberId: [null, Validators.required],
+      projectTypeId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
+      projectNameId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
+      poNumberId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
     });
 
     this.specialProject.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
@@ -670,7 +678,27 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         .subscribe();
     }
   }
+  private getOrganizationSettings(): void {
+    this.organizationSettings$.pipe(takeUntil(this.unsubscribe$)).subscribe((settings) => {
+      this.isSpecialProjectFieldsRequired = settings.find(x => x.settingKey === this.mandatorySpecialProjectDetailsKey)?.value === "true";
+      if (this.specialProject != null) {
+        if (this.isSpecialProjectFieldsRequired === true) {
+          this.specialProject.controls['projectTypeId'].setValidators(Validators.required);
+          this.specialProject.controls['projectNameId'].setValidators(Validators.required);
+          this.specialProject.controls['poNumberId'].setValidators(Validators.required);          
+        } else {
+          this.specialProject.controls['projectTypeId'].clearValidators();
+          this.specialProject.controls['projectNameId'].clearValidators();
+          this.specialProject.controls['poNumberId'].clearValidators();
+          
+        }
+        this.specialProject.controls['projectTypeId'].updateValueAndValidity();
+          this.specialProject.controls['projectNameId'].updateValueAndValidity();
+          this.specialProject.controls['poNumberId'].updateValueAndValidity();
 
+      }
+    })
+  }
   private isFieldTouched(field: string): boolean {
     return this.touchedFields.has(field);
   }

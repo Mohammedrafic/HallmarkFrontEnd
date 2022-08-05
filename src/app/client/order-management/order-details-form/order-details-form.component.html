@@ -632,7 +632,7 @@
               </div>
               <!-- Special Project Category -->
               <div class="input-container bootstrap form-line-item-20">
-                <label>Special Project Category<span class="required">*</span></label>
+                <label>Special Project Category<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
                     formControlName="projectTypeId"
@@ -644,7 +644,7 @@
               </div>
               <!-- Project Name -->
               <div class="input-container bootstrap form-line-item-20">
-                <label>Project Name<span class="required">*</span></label>
+                <label>Project Name<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
                     formControlName="projectNameId"
@@ -656,7 +656,7 @@
               </div>
               <!-- PO# -->
               <div class="input-container bootstrap form-line-item-20">
-                <label>PO#<span class="required">*</span></label>
+                <label>PO#<span class="required" *ngIf="isSpecialProjectFieldsRequired">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
                     formControlName="poNumberId"
