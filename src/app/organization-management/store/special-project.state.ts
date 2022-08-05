@@ -8,12 +8,14 @@ import { SpecialProjectService } from '@shared/services/special-project.service'
 
 export interface SpecialProjectStateModel {
   specialProjectPage: SpecialProjectPage | null;
+  isSpecialProjectLoading:boolean
 }
 
 @State<SpecialProjectStateModel>({
   name: 'specialProjects',
   defaults: {
-    specialProjectPage: null
+    specialProjectPage: null,
+    isSpecialProjectLoading: false,
   },
 })
 @Injectable()
@@ -24,16 +26,17 @@ export class SpecialProjectState {
     return state.specialProjectPage;
   }
 
+  @Selector()
+  static isSpecialProjectLoading(state: SpecialProjectStateModel): boolean { return state.isSpecialProjectLoading; }
+
   constructor(private specialProjectService: SpecialProjectService) { }
 
   @Action(GetSpecialProjects)
-  GetSpecialProjects(
-    { patchState }: StateContext<SpecialProjectStateModel>,
-    {  }: GetSpecialProjects
-  ): Observable<SpecialProjectPage> {
+  GetSpecialProjects({ patchState }: StateContext<SpecialProjectStateModel>, { }: GetSpecialProjects): Observable<SpecialProjectPage> {
+    patchState({ isSpecialProjectLoading: true });
     return this.specialProjectService.getSpecialProjects().pipe(
       tap((payload) => {
-        patchState({ specialProjectPage: payload });
+        patchState({ isSpecialProjectLoading: false, specialProjectPage: payload });
         return payload;
       })
     );

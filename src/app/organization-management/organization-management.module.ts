@@ -75,6 +75,7 @@ import { ManualInvoiceRejectReasonComponent } from './reasons/manual-invoice-rej
 import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
 import { PurchaseOrdersComponent } from './specialproject/components/purchase-orders/purchase-orders.component';
 import { SpecialProjectsComponent } from './specialproject/components/special-projects/special-projects.component';
+import { SpecialProjectState } from './store/special-project.state';
 
 const sidebarIcons = {
   Download,
@@ -171,6 +172,8 @@ const sidebarIcons = {
       ShiftsState,
       HolidaysState,
       BillRatesState,
+      SpecialProjectState
+
     ]),
   ],
   providers: [

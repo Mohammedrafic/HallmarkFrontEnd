@@ -1,16 +1,14 @@
-<section class="flex-column specialproject-grid">
-  <ag-grid-angular class="ag-theme-alpine grid"
+<section class="flex-column specialproject-grid app-grid">
+  <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
                    [gridOptions]="gridOptions"
-                   (gridReady)="onGridReady($event)"></ag-grid-angular>
+                   (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight"
+                   [headerHeight]="52"></ag-grid-angular>
   <div class="row">
-    <div class="col-md-6"></div>
-    <div class="col-md-6">
-      <ejs-dropdownlist id="rowsPerPage"
-                        class="dropdown-no-border"
-                        [dataSource]="rowsPerPageDropDown"
-                        [(value)]="activeRowsPerPageDropDown"
-                        (change)="onPageSizeChanged($event)">
-      </ejs-dropdownlist>
-    </div>
+    <ejs-dropdownlist id="rowsPerPage"
+                      class="dropdown-no-border"
+                      [dataSource]="rowsPerPageDropDown"
+                      [(value)]="activeRowsPerPageDropDown"
+                      (change)="onPageSizeChanged($event)">
+    </ejs-dropdownlist>
   </div>
 </section>
