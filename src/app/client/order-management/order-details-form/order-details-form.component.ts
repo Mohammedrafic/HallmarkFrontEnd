@@ -62,7 +62,6 @@ import { endTimeValidator, startTimeValidator } from '@shared/validators/date.va
 import { integerValidator } from '@shared/validators/integer.validator';
 import { currencyValidator } from '@shared/validators/currency.validator';
 
-import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { ORDER_CONTACT_DETAIL_TITLES, ORDER_EDITS, ORDER_PER_DIEM_EDITS } from '@shared/constants';
 import PriceUtils from '@shared/utils/price.utils';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -73,6 +72,7 @@ import { disableControls } from '@shared/utils/form.utils';
 import { AlertService } from '@shared/services/alert.service';
 import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
 import { ReasonForRequisitionList } from '@shared/models/reason-for-requisition-list';
+import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 
 @Component({
   selector: 'app-order-details-form',
@@ -165,6 +165,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     { id: JobClassification.Students, name: 'Students' },
     { id: JobClassification.Volunteers, name: 'Volunteers' },
   ];
+
+  public masterShiftNames = [
+    { id: MasterShiftName.Day, name: 'Day' },
+    { id: MasterShiftName.Evening, name: 'Evening' },
+    { id: MasterShiftName.Night, name: 'Night' },
+    { id: MasterShiftName.Rotating, name: 'Rotating' },
+  ];
+
   public jobClassificationFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public reasonsForRequisition = ReasonForRequisitionList;
@@ -406,30 +414,19 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     const agencyControl = this.jobDistributionForm.get('agency') as AbstractControl;
     const jobDistributionsControl = this.jobDistributionForm.get('jobDistributions') as AbstractControl;
 
-    this.departmentIdControl.valueChanges
-      .pipe(
-        takeUntil(this.unsubscribe$),
-        switchMap((departmentId: number) => {
-          if (!departmentId || this.isEditMode) {
-            return of(null);
-          }
-          return this.store.dispatch(new GetContactDetails(departmentId));
-        })
-      )
-      .subscribe();
+    this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((departmentId: number) => {
+      if (!departmentId || this.isEditMode) {
+        return;
+      }
+      this.store.dispatch(new GetContactDetails(departmentId));
+    });
 
-    this.locationIdControl.valueChanges
-      .pipe(
-        takeUntil(this.unsubscribe$),
-        switchMap((locationId: number) => {
-          if (!locationId || this.isEditMode) {
-            return of(null);
-          }
-
-          return this.store.dispatch(new GetSuggestedDetails(locationId));
-        })
-      )
-      .subscribe();
+    this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((locationId: number) => {
+      if (!locationId || this.isEditMode) {
+        return;
+      }
+      this.store.dispatch(new GetSuggestedDetails(locationId));
+    });
 
     combineLatest([orderTypeControl.valueChanges, departmentIdControl.valueChanges, skillIdControl.valueChanges])
       .pipe(takeUntil(this.unsubscribe$))
@@ -472,26 +469,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       }
 
       this.autoSetupJobEndDateControl(duration, jobStartDate);
-    });
-
-    shiftRequirementIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((shiftId) => {
-      const masterShifts = this.store.selectSnapshot(OrderManagementContentState.masterShifts);
-      const masterShift = masterShifts.find((i) => i.id === shiftId);
-
-      if (!masterShift) {
-        return;
-      }
-
-      let [startH, startM, startS] = getHoursMinutesSeconds(masterShift.startTime);
-      let [endH, endM, endS] = getHoursMinutesSeconds(masterShift.endTime);
-      let startDate = new Date();
-      let endDate = new Date();
-
-      startDate.setHours(startH, startM, startS);
-      endDate.setHours(endH, endM, endS);
-
-      this.generalInformationForm.controls['shiftStartTime'].patchValue(startDate);
-      this.generalInformationForm.controls['shiftEndTime'].patchValue(endDate);
     });
 
     shiftEndTimeControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
@@ -586,25 +563,21 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetAssociateAgencies());
     this.store.dispatch(new GetOrganizationStatesWithKeyCode());
 
-    this.selectedOrder$
-      .pipe(
-        filter((order: Order | null) => !!order),
-        takeUntil(this.unsubscribe$)
-      )
-      .subscribe((order) => {
-        const isEditMode = !!this.route.snapshot.paramMap.get('orderId');
-        if (order && isEditMode) {
-          this.isEditMode = true;
-          this.order = order;
-          this.populateForms(order);
-        } else if (order?.isTemplate) {
-          this.order = order;
-          this.populateForms(order);
-        } else {
-          this.isEditMode = false;
-          this.order = null;
-        }
-      });
+    this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+      const isEditMode = !!this.route.snapshot.paramMap.get('orderId');
+      if (order && isEditMode) {
+        this.isEditMode = true;
+        this.order = order;
+        this.populateForms(order);
+      } else if (order?.isTemplate) {
+        this.order = order;
+        this.populateForms(order);
+      } else {
+        this.isEditMode = false;
+        this.order = null;
+        this.populateNewOrderForm();
+      }
+    });
 
     this.suggestedDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((suggestedDetails) => {
       if (!suggestedDetails) {
@@ -624,8 +597,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       firstWorlLocationsControl.controls['city'].patchValue(city);
       firstWorlLocationsControl.controls['zipCode'].patchValue(zipCode);
     });
-
-    this.populateNewOrderForm();
   }
 
   public ngOnDestroy(): void {
@@ -981,9 +952,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private populateNewOrderForm(): void {
-    const isEditMode = !!this.route.snapshot.paramMap.get('orderId');
-    if (isEditMode) return;
-
     this.store.dispatch(new GetRegularLocalBillRate());
 
     this.orderTypeForm.controls['orderType'].patchValue(OrderType.Traveler);
