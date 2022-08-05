@@ -14,10 +14,11 @@ import {
 import { ColumnDefinitionModel } from '../../../../shared/components/grid/models/column-definition.model';
 import { SpecialProjectColumnsDefinition } from '../../constants/specialprojects.constant';
 import { Select, Store } from '@ngxs/store';
-import { GetSpecialProjects } from '../../../store/special-project.actions';
+import { DeletSpecialProject, GetSpecialProjects, SaveSpecialProject } from '../../../store/special-project.actions';
 import { SpecialProjectState } from '../../../store/special-project.state';
 import { Observable, Subject, takeUntil } from 'rxjs';
-import { GRID_CONFIG } from '../../../../shared/constants';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '../../../../shared/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
 
 @Component({
   selector: 'app-special-projects',
@@ -40,13 +41,13 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
   public rowSelection: 'single' | 'multiple' = 'single';
   public actionCellrenderParams: any = {
     handleOnEdit: (params: any) => {
-      alert('edit')
+      this.saveSpecialProject(params);
     },
     handleOnDelete: (params: any) => {
-      alert('Delete')
+      this.deleteSpecialProject(params);
     }
   }
-  constructor(private store: Store, private datePipe: DatePipe) {
+  constructor(private store: Store, private confirmService: ConfirmService,private datePipe: DatePipe) {
     super();
   }
 
@@ -57,19 +58,6 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
     this.getSpecialProjects();
   }
   ngOnDestroy(): void {
-  }
-
-  getSpecialProjects(): void {
-    this.store.dispatch(new GetSpecialProjects());
-    debugger;
-    this.specialProjectPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
-      if (data?.items) {
-        debugger;
-        this.rowData = data.items;
-        this.gridApi.setRowData(this.rowData);
-      }
-    });
-  
   }
 
   checkboxSelection = (params: CheckboxSelectionCallbackParams) => {
@@ -134,11 +122,48 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
     sideBar: this.sideBar
   };
 
-
-
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
     this.gridApi.sizeColumnsToFit();
     this.gridApi.setRowData(this.rowData);
+  }
+
+
+  getSpecialProjects(): void {
+    this.store.dispatch(new GetSpecialProjects());
+    this.specialProjectPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (data?.items) {
+        this.rowData = data.items;
+        this.gridApi.setRowData(this.rowData);
+      }
+    });
+  
+  }
+
+  saveSpecialProject(params: any):void{
+    // var specialProject: SpecialProject;
+    //   specialProject=
+    //   {id:0,projectTypeId:1,
+    //     regionId:8,regionName:'East',locationId:7,locationName:'Defiance Hospital',
+    //     departmentId:654,departmentName:'CARDIOLOGY CLINIC ',startDate:new Date(),
+    //     endDate:new Date(),isDeleted:false,
+    //     name:'test001',organizationId:2,projectBudget:2000.90,skillId:7};
+    //   this.store.dispatch(new SaveSpecialProject(specialProject));
+  }
+
+  deleteSpecialProject(params: any): void {
+    this.addActiveCssClass(event);
+    this.confirmService
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button'
+      })
+      .subscribe((confirm) => {
+        if (confirm && params.id) {
+          this.store.dispatch(new DeletSpecialProject(params.id));
+        }
+        this.removeActiveCssClass();
+      });
   }
 }

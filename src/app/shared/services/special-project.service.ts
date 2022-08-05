@@ -7,22 +7,12 @@ import { SpecialProject, SpecialProjectPage } from 'src/app/shared/models/specia
 export class SpecialProjectService {
 
   constructor(private http: HttpClient) { }
-  /**
-  * Get the SpecialProjects
-  */
-  // public getSpecialProjects(): Observable<SpecialProjectPage> {
-  //   debugger;
-  //   return this.http.get<SpecialProjectPage>(`/api/Orders/all`);
-  // }
-
-
-
+ 
     /**
    * Get all special projects
    * @return list of special projects
    */
      public getSpecialProjects(): Observable<SpecialProjectPage> {
-      debugger;
       return this.http.get<SpecialProjectPage>(`/api/SpecialProjects`);
     }
   
@@ -47,7 +37,7 @@ export class SpecialProjectService {
      * @param id
      */
      public removeSpecialProject(id: number): Observable<any> {
-      return this.http.delete<SpecialProject>(`/api/SpecialProjects/${id}`);
+      return this.http.delete<SpecialProject>(`/api/SpecialProjects?id=${id}`);
     }
   }
   
