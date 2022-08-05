@@ -28,9 +28,11 @@ import {
   ClearSelectedOrder,
   ClearSuggestions,
   GetAssociateAgencies,
+  GetContactDetails,
   GetMasterShifts,
   GetOrganizationStatesWithKeyCode,
   GetProjectSpecialData,
+  GetRegularLocalBillRate,
   GetSuggestedDetails,
   GetWorkflows,
   SetIsDirtyOrderForm,
@@ -219,6 +221,12 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   workflows$: Observable<WorkflowByDepartmentAndSkill[]>;
   workflowFields: FieldSettingsModel = { text: 'workflowGroupName', value: 'workflowGroupId' };
 
+  @Select(OrderManagementContentState.contactDetails)
+  contactDetails$: Observable<Department>;
+
+  @Select(OrderManagementContentState.regularLocalBillRate)
+  regularLocalBillRate$: Observable<any>;
+
   private isEditMode: boolean;
 
   private touchedFields: Set<string> = new Set();
@@ -398,6 +406,18 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     const agencyControl = this.jobDistributionForm.get('agency') as AbstractControl;
     const jobDistributionsControl = this.jobDistributionForm.get('jobDistributions') as AbstractControl;
 
+    this.departmentIdControl.valueChanges
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        switchMap((departmentId: number) => {
+          if (!departmentId || this.isEditMode) {
+            return of(null);
+          }
+          return this.store.dispatch(new GetContactDetails(departmentId));
+        })
+      )
+      .subscribe();
+
     this.locationIdControl.valueChanges
       .pipe(
         takeUntil(this.unsubscribe$),
@@ -485,7 +505,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
 
     jobDistributionControl.valueChanges
-      .pipe(takeUntil(this.unsubscribe$))
+      .pipe(takeUntil(this.unsubscribe$), debounceTime(600))
       .subscribe((jobDistributionIds: JobDistribution[]) => {
         if (jobDistributionIds.includes(JobDistribution.All)) {
           jobDistributionIds = [
@@ -591,15 +611,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         return;
       }
 
-      const contactDetailsFormArray = this.contactDetailsForm.controls['contactDetails'] as FormArray;
-      const firstContactDetailsControl = contactDetailsFormArray.at(0) as FormGroup;
-
       const { name, email, mobilePhone } = suggestedDetails.contactDetails;
       const { address, state, city, zipCode } = suggestedDetails.workLocation;
 
-      firstContactDetailsControl.controls['name'].patchValue(name);
-      firstContactDetailsControl.controls['email'].patchValue(email);
-      firstContactDetailsControl.controls['mobilePhone'].patchValue(mobilePhone);
+      this.populateContactDetailsForm(name, email, mobilePhone);
 
       const workLocationsFormArray = this.workLocationForm.controls['workLocations'] as FormArray;
       const firstWorlLocationsControl = workLocationsFormArray.at(0) as FormGroup;
@@ -609,12 +624,22 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       firstWorlLocationsControl.controls['city'].patchValue(city);
       firstWorlLocationsControl.controls['zipCode'].patchValue(zipCode);
     });
+
+    this.populateNewOrderForm();
   }
 
   public ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.store.dispatch([new ClearSelectedOrder(), new ClearSuggestions()]);
+  }
+
+  private populateContactDetailsForm(name: string, email: string, mobilePhone: string): void {
+    const contactDetailsFormArray = this.contactDetailsForm.controls['contactDetails'] as FormArray;
+    const firstContactDetailsControl = contactDetailsFormArray.at(0) as FormGroup;
+    firstContactDetailsControl.controls['name'].patchValue(name);
+    firstContactDetailsControl.controls['email'].patchValue(email);
+    firstContactDetailsControl.controls['mobilePhone'].patchValue(mobilePhone);
   }
 
   public onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -649,7 +674,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.markTouchedField(fieldName);
   }
 
-  onSkillsDropDownChanged(event: ChangeEventArgs) {
+  public onSkillsDropDownChanged(event: ChangeEventArgs): void {
     const fieldName = 'skills';
     this.userEditsOrder(this.isFieldTouched(fieldName));
     this.selectedSkills = event.itemData as SkillCategory;
@@ -907,10 +932,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       id: new FormControl(orderContactDetails?.id || 0),
       name: new FormControl(orderContactDetails?.name || '', [Validators.required, Validators.maxLength(50)]),
       title: new FormControl(orderContactDetails?.title || '', Validators.required),
-      email: new FormControl(orderContactDetails?.email || '', [
-        Validators.required,
-        Validators.pattern(/^\S+@\S+\.\S+$/),
-      ]),
+      email: new FormControl(orderContactDetails?.email || '', [Validators.required, Validators.email]),
       mobilePhone: new FormControl(orderContactDetails?.mobilePhone || '', [
         Validators.minLength(10),
         Validators.pattern(/^[0-9]+$/),
@@ -956,5 +978,25 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private resetDepartment(): void {
     this.departmentIdControl.reset(null, { emitValue: false });
     this.departmentIdControl.markAsUntouched();
+  }
+
+  private populateNewOrderForm(): void {
+    const isEditMode = !!this.route.snapshot.paramMap.get('orderId');
+    if (isEditMode) return;
+
+    this.store.dispatch(new GetRegularLocalBillRate());
+
+    this.orderTypeForm.controls['orderType'].patchValue(OrderType.Traveler);
+    this.generalInformationForm.controls['duration'].patchValue(Duration.ThirteenWeeks);
+    this.jobDistributionForm.controls['jobDistribution'].patchValue([JobDistribution.All]);
+
+    this.contactDetails$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((contactDetails) => {
+      const { facilityContact, facilityPhoneNo, facilityEmail } = contactDetails;
+      this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
+    });
+
+    this.regularLocalBillRate$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((regularLocalBillRate) => {
+      this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0]);
+    });
   }
 }
