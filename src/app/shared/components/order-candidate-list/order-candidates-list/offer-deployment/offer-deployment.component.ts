@@ -196,7 +196,9 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
                 );
               }
             });
-          this.closeDialog();
+          if (!reloadJob) {
+            this.closeDialog();
+          }
         }
       }
     } else {
