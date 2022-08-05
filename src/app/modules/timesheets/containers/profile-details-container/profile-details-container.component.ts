@@ -25,8 +25,7 @@ import {
   Timesheet, TimesheetDetailsModel } from '../../interface';
 import {
   ConfirmDeleteTimesheetDialogContent, rejectTimesheetDialogData,
-  TimesheetConfirmMessages,
-  TimesheetDetailsExportOptions } from '../../constants';
+  TimesheetConfirmMessages, TimesheetDetailsExportOptions } from '../../constants';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';
@@ -42,9 +41,15 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @ViewChild('candidateDialog')
   public candidateDialog: DialogComponent;
 
+  /**
+   * TODO: move chips to separate shared component.
+   */
   @ViewChild('chipList')
   public chipList: ChipListComponent;
 
+  /**
+   * TODO: try to use file-uploader component from invoices with tooltip as separate shared component.
+   */
   @ViewChild('dropEl')
   public dropEl: HTMLDivElement;
 
