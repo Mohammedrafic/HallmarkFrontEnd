@@ -1,0 +1,16 @@
+<section class="flex-column specialproject-grid">
+  <ag-grid-angular class="ag-theme-alpine grid"
+                   [gridOptions]="gridOptions"
+                   (gridReady)="onGridReady($event)"></ag-grid-angular>
+  <div class="row">
+    <div class="col-md-6"></div>
+    <div class="col-md-6">
+      <ejs-dropdownlist id="rowsPerPage"
+                        class="dropdown-no-border"
+                        [dataSource]="rowsPerPageDropDown"
+                        [(value)]="activeRowsPerPageDropDown"
+                        (change)="onPageSizeChanged($event)">
+      </ejs-dropdownlist>
+    </div>
+  </div>
+</section>

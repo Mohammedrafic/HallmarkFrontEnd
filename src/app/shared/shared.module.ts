@@ -116,6 +116,7 @@ import { AcceptFormComponent } from './components/order-candidate-list/reorder-c
 import { NgxMaskModule } from 'ngx-mask';
 import { CloseOrderSideDialogComponent } from '@shared/components/close-order-side-dialog/close-order-side-dialog.component';
 import { OrderCloseReasonInfoComponent } from '@shared/components/order-close-reason-info/order-close-reason-info.component';
+import { ActionCellRendererComponent } from '@shared/components/cell-renderer/action-cellrenderer.component';
 
 const icons = {
   AlertCircle,
@@ -185,6 +186,7 @@ const COMPONENTS = [
   ReorderCandidatesListComponent,
   OrderReOrdersContainerComponent,
   OrderCloseReasonInfoComponent,
+  ActionCellRendererComponent
 ];
 
 @NgModule({

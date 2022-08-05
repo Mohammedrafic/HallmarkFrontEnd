@@ -38,6 +38,7 @@ import { NgxsModule } from '@ngxs/store';
 import { OrganizationManagementState } from './store/organization-management.state';
 import { CredentialsState } from './store/credentials.state';
 import { SharedModule } from '@shared/shared.module';
+import { AgGridModule } from '@ag-grid-community/angular';
 import { ShiftsState } from './store/shifts.state';
 import { OrganizationManagementComponent } from './organization-management.component';
 import { OrganizationManagementRoutingModule } from './organization-management-routing.module';
@@ -69,6 +70,9 @@ import { FilteredCredentialsComponent } from './credentials/credentials-setup/fi
 import { MapCredentialsFormComponent } from './credentials/credentials-setup/map-credentials-form/map-credentials-form.component';
 import { ReasonsComponent } from './reasons/reasons.component';
 import { ClosureReasonComponent } from './reasons/closure-reason/closure-reason.component';
+import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
+import { PurchaseOrdersComponent } from './specialproject/components/purchase-orders/purchase-orders.component';
+import { SpecialProjectsComponent } from './specialproject/components/special-projects/special-projects.component';
 
 const sidebarIcons = {
   Download,
@@ -114,7 +118,10 @@ const sidebarIcons = {
     FilteredCredentialsComponent,
     MapCredentialsFormComponent,
     ReasonsComponent,
-    ClosureReasonComponent
+    ClosureReasonComponent,
+    SpecialProjectContainerComponent,
+    PurchaseOrdersComponent,
+    SpecialProjectsComponent
   ],
   imports: [
     CommonModule,
@@ -146,6 +153,7 @@ const sidebarIcons = {
     AutoCompleteModule,
     DropDownButtonModule,
     MaskedTextBoxModule,
+    AgGridModule,
 
     FeatherModule.pick(sidebarIcons),
 
