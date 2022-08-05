@@ -15,11 +15,37 @@
           </div>
           <div class="e-card-content">
             <button ejs-button cssClass="e-outline" (click)="onCancel()">Cancel</button>
-            <button ejs-button cssClass="e-primary">Import</button>
+            <button ejs-button cssClass="e-primary" [disabled]="!selectedFile">Import</button>
           </div>
         </div>
       </section>
-      <section class="import-candidates-container"></section>
+      <section class="import-candidates-container">
+        <section class="file-uploader-container">
+          <div class="section-header">
+            <span class="message">Upload file, then hit import button</span>
+            <span class="action-link-btn">Download template</span>
+          </div>
+          <div class="file-uploader" #fileUploader>
+            <div id="droparea" class="droparea" (click)="browse()">
+              <span>Drag & Drop or <span class="browse-link">browse</span> files here</span>
+            </div>
+            <div class="file-info" [class.selected-file]="selectedFile">
+              <ejs-uploader
+                #previewupload
+                [dropArea]="dropElement"
+                [allowedExtensions]="allowedExtensions"
+                [autoUpload]="false"
+                [multiple]="false"
+                [maxFileSize]="maxFileSize"
+                (removing)="clear()"
+                (selected)="selectFile($event)"
+              >
+              </ejs-uploader>
+              <button *ngIf="selectedFile" ejs-button class="clear-button" cssClass="e-outline" (click)="clear()">Clear</button>
+            </div>
+          </div>
+        </section>
+      </section>
     </section>
   </ng-template>
 </ejs-dialog>
