@@ -122,6 +122,7 @@ import { CloseOrderSideDialogComponent } from '@shared/components/close-order-si
 import { OrderCloseReasonInfoComponent } from '@shared/components/order-close-reason-info/order-close-reason-info.component';
 import { CommentComponent } from './components/comments/comment/comment.component';
 import { CommentsState } from './components/comments/store/comments.state';
+import { ActionCellRendererComponent } from '@shared/components/cell-renderer/action-cellrenderer.component';
 
 const icons = {
   AlertCircle,
@@ -196,6 +197,7 @@ const COMPONENTS = [
   ReorderCandidatesListComponent,
   OrderReOrdersContainerComponent,
   OrderCloseReasonInfoComponent,
+  ActionCellRendererComponent
 ];
 
 @NgModule({
