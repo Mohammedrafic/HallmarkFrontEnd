@@ -382,4 +382,8 @@ export class OrderManagementContentService {
   public duplicate(payload: number): Observable<number> {
     return this.http.post<number>(`/api/Orders/${payload}/duplicate`, {});
   }
+
+  public getRegularLocalBillRate(): Observable<string[]> {
+    return this.http.get<string[]>('/api/billrates/regular/fororder');
+  }
 }

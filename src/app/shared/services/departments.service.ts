@@ -33,6 +33,13 @@ export class DepartmentsService {
   }
 
   /**
+   * Get department data
+   */
+   public getDepartmentData(departmentId: number): Observable<Department> {
+    return this.http.get<Department>(`/api/Departments/${departmentId}`);
+  }
+
+  /**
    * Update department
    */
   public updateDepartment(department: Department): Observable<void> {
