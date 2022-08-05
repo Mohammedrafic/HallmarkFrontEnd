@@ -46,6 +46,7 @@ import {
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
   GetContactDetails,
+  GetRegularLocalBillRate,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -111,6 +112,7 @@ export interface OrderManagementContentStateModel {
   historicalEvents: HistoricalEvent[] | null;
   navigationTab: NavigationTabModel;
   contactDetails: Department | null;
+  regularLocalBillRate: string[];
 }
 
 @State<OrderManagementContentStateModel>({
@@ -146,6 +148,7 @@ export interface OrderManagementContentStateModel {
       current: null,
     },
     contactDetails: null,
+    regularLocalBillRate: [],
   },
 })
 @Injectable()
@@ -275,6 +278,11 @@ export class OrderManagementContentState {
   @Selector()
   static contactDetails(state: OrderManagementContentStateModel): Department | null {
     return state.contactDetails;
+  }
+
+  @Selector()
+  static regularLocalBillRate(state: OrderManagementContentStateModel): string[] {
+    return state.regularLocalBillRate;
   }
 
   constructor(
@@ -728,6 +736,15 @@ export class OrderManagementContentState {
     return this.departmentService.getDepartmentData(departmentId).pipe(
       tap((contactDetails: Department) => {
         patchState({ contactDetails });
+      })
+    );
+  }
+
+  @Action(GetRegularLocalBillRate)
+  GetRegularLocalBillRate ({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<string[]> {
+    return this.orderManagementService.getRegularLocalBillRate().pipe(
+      tap((regularLocalBillRate: string[]) => {
+        patchState({ regularLocalBillRate });
       })
     );
   }
