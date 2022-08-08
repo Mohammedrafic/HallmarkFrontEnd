@@ -1,5 +1,10 @@
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import type { ColumnState, Module, SelectionChangedEvent, SortChangedEvent } from '@ag-grid-community/core';
+import type {
+  GridOptions,
+  Module,
+  SelectionChangedEvent,
+  SortChangedEvent
+} from '@ag-grid-community/core';
 import { BehaviorSubject, combineLatest, filter, takeUntil, delay } from 'rxjs';
 
 import {
@@ -38,6 +43,8 @@ export class GridComponent<Data> extends DestroyableDirective implements OnChang
   @Input() public pageSize: number = GRID_CONFIG.rowsPerPageDropDownObject[0].value;
   @Input() public rowData: Data[] | null | undefined;
   @Input() public totalRecordsCount: number = 1;
+  @Input() public gridOptions: GridOptions;
+  @Input() public paginationPanel = true;
 
   @Input() set changeTableSelectedIndex(next: number | null) {
     if (next !== null) {

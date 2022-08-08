@@ -1,9 +1,9 @@
 <app-page-toolbar>
   <ng-container left>
-    <app-tabs-list
+    <app-invoices-table-tabs
       [tabConfig]="tabsConfig"
       (changeTab)="handleChangeTab($event)">
-    </app-tabs-list>
+    </app-invoices-table-tabs>
   </ng-container>
 
   <ng-container right>
@@ -12,22 +12,27 @@
       ejs-button
       cssClass="e-outline button-filter button--no-wrap"
       (click)="showFilters()">
-      Filters <i-feather name="sliders" class="icon"></i-feather>
+      <div class="filter-button-content">
+        <span *ngIf="appliedFiltersAmount" class="e-badge e-badge-success e-badge-circle">{{ appliedFiltersAmount }}</span>
+        Filters <i-feather name="sliders" class="icon"></i-feather>
+      </div>
     </button>
     <app-export-button (optionSelected)="onExportOptionSelect($event)"></app-export-button>
     <button ejs-button class="e-primary"
-            [disabled]="!invoiceRecordsTable?.selectedItems?.length"
+      (click)="openAddDialog()">
+      Add Manual Invoice
+    </button>
+    <button ejs-button class="e-primary"
             (click)="createInvoiceDialog.show()">
       Create Invoice
     </button>
   </ng-container>
 </app-page-toolbar>
 
-<section>
+<section class="invoices-table-container">
   <ng-container [ngSwitch]="selectedTabIdx">
     <ng-container *ngSwitchCase="0">
       <app-invoice-records-table [tableData]="invoiceRecordsData$ | async"
-                                 [config]="tableConfig"
                                  #invoiceRecordsTable
       ></app-invoice-records-table>
     </ng-container>
@@ -83,3 +88,12 @@
   (nextPreviousOrderEvent)="onNextPreviousOrderEvent($event)"
   (updateTable)="handleUpdateTable()"
 ></app-invoice-detail-container>
+
+<app-manual-invoice-dialog></app-manual-invoice-dialog>
+
+<app-invoices-filters-dialog
+  [activeTabIdx]="selectedTabIdx"
+  (appliedFiltersAmount)="changeFiltersAmount($event)"
+  (resetFilters)="resetFilters()"
+  (updateTableByFilters)="updateTableByFilters($event)">
+</app-invoices-filters-dialog>

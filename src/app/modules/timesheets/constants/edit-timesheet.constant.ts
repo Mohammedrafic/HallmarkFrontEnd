@@ -1,4 +1,5 @@
-import { FieldType, FieldWidthStyle, RecordFields, TableColumnAlign } from '../enums';
+import { FieldType, FieldWidthStyle } from '@core/enums';
+import { RecordFields, TableColumnAlign } from '../enums';
 import { DetailsTableConfig, DialogConfig } from '../interface';
 
 export const RecordAddDialogConfig: DialogConfig = {

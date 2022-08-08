@@ -5,7 +5,7 @@
         <i-feather name="user" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{orderInformation.title}}</div>
+        <div class="title">{{ orderInformation.title }}</div>
         <div class="sup-title">Job title</div>
       </div>
     </div>
@@ -14,7 +14,7 @@
         <i-feather name="folder" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{orderInformation.departmentName}}</div>
+        <div class="title">{{ orderInformation.departmentName }}</div>
         <div class="sup-title">Department</div>
       </div>
     </div>
@@ -23,12 +23,12 @@
         <i-feather name="map-pin" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{orderInformation.locationName}}</div>
+        <div class="title">{{ orderInformation.locationName }}</div>
         <div class="sup-title">Location</div>
       </div>
     </div>
     <div class="column last-column">
-      <div class="cost">${{orderInformation.hourlyRate}}</div>
+      <div class="cost">${{ orderInformation.hourlyRate }}</div>
       <div class="sup-title">Bill Rate</div>
     </div>
     <div class="column">
@@ -36,17 +36,38 @@
         <i-feather name="calendar" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{orderInformation.jobStartDate | date: 'MM/dd/yyy'}}</div>
+        <div class="title">{{ orderInformation.jobStartDate | date: 'MM/dd/yyy' }}</div>
         <div class="sup-title">Start Date</div>
       </div>
     </div>
-    <div class="column">
+    <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column">
       <div class="icon">
         <i-feather name="calendar" class="icon"></i-feather>
       </div>
       <div>
-        <div class="title">{{orderInformation.jobEndDate | date: 'MM/dd/yyy'}}</div>
+        <div class="title">{{ orderInformation.jobEndDate | date: 'MM/dd/yyy' }}</div>
         <div class="sup-title">End Date</div>
+      </div>
+    </div>
+    <div *ngIf="orderInformation.orderType === orderType.PermPlacement" class="column">
+      <div class="icon">
+        <i-feather name="percent" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">{{ orderInformation?.orderPlacementFee }}%</div>
+        <div class="sup-title">Order Placement Fee</div>
+      </div>
+    </div>
+    <div *ngIf="orderInformation.orderType === orderType.PermPlacement" class="column">
+      <div class="icon">
+        <i-feather name="dollar-sign" class="icon"></i-feather>
+      </div>
+      <div>
+        <div class="title">
+          {{ orderInformation?.annualSalaryRangeFrom | currency }} -
+          {{ orderInformation?.annualSalaryRangeTo | currency }}
+        </div>
+        <div class="sup-title">Annual Salary Range</div>
       </div>
     </div>
   </div>
@@ -54,31 +75,33 @@
 <section class="candidates-additional-info" *ngIf="orderInformation">
   <div class="container-row">
     <div class="column">
-      <div class="title">{{orderType[orderInformation.orderType]}}</div>
+      <div class="title">{{ orderType[orderInformation.orderType] }}</div>
       <div class="sup-title">Job Type</div>
     </div>
     <div class="column">
-      <div class="title">{{orderInformation.acceptedPositions}} / {{orderInformation.openPositions}}</div>
+      <div class="title">{{ orderInformation.acceptedPositions }} / {{ orderInformation.openPositions }}</div>
       <div class="sup-title">Open Positions</div>
     </div>
     <div class="column">
-      <div class="title">{{orderInformation.shiftStartTime | date: 'hh:mm'}} - {{orderInformation.shiftEndTime | date: 'hh:mm'}}</div>
+      <div class="title">
+        {{ orderInformation.shiftStartTime | date: 'hh:mm' }} - {{ orderInformation.shiftEndTime | date: 'hh:mm' }}
+      </div>
       <div class="sup-title">Shift</div>
     </div>
-    <div class="column">
-      <div class="title">${{orderInformation.joiningBonus}} / ${{orderInformation.compBonus}}</div>
+    <div *ngIf="orderInformation.orderType !== orderType.PermPlacement" class="column">
+      <div class="title">${{ orderInformation.joiningBonus }} / ${{ orderInformation.compBonus }}</div>
       <div class="sup-title">Start / End Bonus</div>
     </div>
     <div class="column">
-      <div class="title">{{activeValue(orderInformation.onCallRequired)}}</div>
+      <div class="title">{{ activeValue(orderInformation.onCallRequired) }}</div>
       <div class="sup-title">Oncall</div>
     </div>
     <div class="column">
-      <div class="title">{{activeValue(orderInformation.nO_OT)}}</div>
+      <div class="title">{{ activeValue(orderInformation.nO_OT) }}</div>
       <div class="sup-title">Do Not Consider OT</div>
     </div>
     <div class="column">
-      <div class="title">{{orderInformation.orderOpenDate | date: 'MM/dd/yyy'}}</div>
+      <div class="title">{{ orderInformation.orderOpenDate | date: 'MM/dd/yyy' }}</div>
       <div class="sup-title">Distributed On</div>
     </div>
   </div>

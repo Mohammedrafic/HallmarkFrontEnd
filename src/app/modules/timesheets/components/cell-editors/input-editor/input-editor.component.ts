@@ -4,7 +4,7 @@ import { ChangeDetectionStrategy, Component, ChangeDetectorRef } from '@angular/
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams, ColDef } from '@ag-grid-community/core';
 
-import { EditFieldTypes } from '../../../enums';
+import { EditFieldTypes } from '@core/enums';
 
 @Component({
   selector: 'app-input-editor',

@@ -1,0 +1,26 @@
+@import 'colors';
+
+:host {
+  display: flex;
+  align-items: center;
+  height: 100%;
+
+  .title-value-cell-renderer-container {
+    line-height: normal;
+    text-align: left;
+
+    .cell-title {
+      font-style: normal;
+      font-weight: 400;
+      font-size: 12px;
+      color: $secondary-dark-blue-30;
+      margin-bottom: 5px;
+    }
+
+    .cell-value {
+      font-weight: 700;
+      font-size: 12px;
+      color: $black;
+    }
+  }
+}

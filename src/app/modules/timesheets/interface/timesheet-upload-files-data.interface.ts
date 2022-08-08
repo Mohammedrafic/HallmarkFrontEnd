@@ -17,5 +17,11 @@ export interface DeleteAttachmentData {
 
 export interface DownloadAttachmentData {
   fileId: number;
+  fileName: string;
+  organizationId: number | null;
+}
+
+export interface DownloadAttachmentRequestData {
+  fileId: number;
   organizationId: number | null;
 }

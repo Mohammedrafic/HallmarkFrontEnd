@@ -34,7 +34,7 @@ export class CandidateAvatarPipe implements PipeTransform, OnDestroy {
       this.request || (this.request = this.candidateService.getCandidatePhoto(candidateId)
         .pipe(
           switchMap((blob: Blob) => ObservableHelper.blobToBase64Observable(blob)),
-          catchError(() => of('/assets/default-avatar.svg'))
+          catchError(() => of('assets/default-avatar.svg'))
         )
     ));
   }

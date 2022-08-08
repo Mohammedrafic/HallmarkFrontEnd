@@ -283,6 +283,9 @@ export class Order {
   orderClosureReasonId?: string;
   isTemplate?: boolean;
   organizationPrefix?: string;
+  orderPlacementFee?: number;
+  annualSalaryRangeFrom?: number;
+  annualSalaryRangeTo?: number;
 }
 
 export class ReOrder {

@@ -102,7 +102,7 @@
 
       &.e-level-1, &.e-level-2 {
         & > .e-text-content {
-          background-color: $sidebar-item-selected-hover-blue;
+          background-color: $secondary-dark-blue-10-1;
         }
       }
 
@@ -133,7 +133,7 @@
       .e-hover {
 
         .e-text-content {
-          background-color: $sidebar-item-selected-hover-blue;
+          background-color: $secondary-dark-blue-10-1;
         }
 
         ul > li > .e-text-content {
@@ -204,7 +204,7 @@
     }
 
     .icon-container:hover {
-      background-color: $sidebar-item-selected-hover-blue;
+      background-color: $secondary-dark-blue-10-1;
 
       .icon {
         color: $primary-active-blue-15;

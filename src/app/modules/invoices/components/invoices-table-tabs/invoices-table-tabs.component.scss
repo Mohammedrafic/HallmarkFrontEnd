@@ -1,0 +1,20 @@
+:host::ng-deep {
+  .e-toolbar-items.e-lib.e-hscroll.e-control.e-touch {
+    padding: 0 !important;
+  }
+  .e-scroll-nav.e-scroll-right-nav.e-lib.e-touch,
+  .e-scroll-nav.e-scroll-left-nav.e-lib.e-touch {
+    display: none;
+  }
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+}
+
+.tab-navigation {
+  &.e-badge {
+    margin-left: 0.3rem;
+  }
+}
