@@ -9,20 +9,22 @@ import { patch } from '@ngxs/store/operators';
 import { downloadBlobFile } from '@shared/utils/file.utils';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
+import { DialogAction } from '@core/enums';
+import { DataSourceItem, DropdownOption } from '@core/interface';
+
 import { TimesheetsModel, TimeSheetsPage, TimrsheetsDto } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import {
-  DialogAction, RecordFields, TimesheetTargetStatus, TimesheetsTableFiltersColumns, FilteringOptionsFields
+  RecordFields, TimesheetTargetStatus, TimesheetsTableFiltersColumns, FilteringOptionsFields
 } from '../../enums';
 import {
   AddSuccessMessage, DefaultFiltersState, DefaultTimesheetCollection, DefaultTimesheetState,
   filteringOptionsMapping, GetBydateErrMessage, PutSuccess, SavedFiltersParams } from '../../constants';
 import {
-  CandidateHoursAndMilesData, CandidateInfo, CandidateMilesData, DataSourceItem, FilterColumns,
-  TabCountConfig, Timesheet, TimesheetAttachment, TimesheetDetailsModel, TimesheetInvoice,
-  TimesheetRecordsDto, TimesheetsFilterState, TimesheetStatistics, DropdownOption,
+  Attachment, CandidateHoursAndMilesData, CandidateInfo, CandidateMilesData, FilterColumns, TabCountConfig,
+  Timesheet, TimesheetDetailsModel, TimesheetInvoice, TimesheetRecordsDto, TimesheetsFilterState, TimesheetStatistics,
   TimesheetsFilteringOptions } from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
@@ -86,7 +88,7 @@ export class TimesheetsState {
   }
 
   @Selector([TimesheetsState])
-  static timeSheetAttachments(state: TimesheetsModel): TimesheetAttachment[] {
+  static timeSheetAttachments(state: TimesheetsModel): Attachment[] {
     return state.candidateAttachments.attachments;
   }
 
@@ -416,11 +418,11 @@ export class TimesheetsState {
   ): Observable<Blob> {
     return this.timesheetDetailsApiService.downloadAttachment(payload)
       .pipe(
-        tap((file: Blob) => this.store.dispatch(new TimesheetDetails.AttachmentLoaded(file))),
+        tap((file: Blob) => downloadBlobFile(file, payload.fileName)),
         catchError(() => this.store.dispatch(
-          new ShowToast(MessageTypes.Error, 'File not found'))
-        ),
-      );
+          new ShowToast(MessageTypes.Error, 'File not found')
+        ))
+      )
   }
 
   @Action(TimesheetDetails.NoWorkPerformed)

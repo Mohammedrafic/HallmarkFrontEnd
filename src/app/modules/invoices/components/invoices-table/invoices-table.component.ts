@@ -7,7 +7,7 @@ import { Invoice, InvoicesTable } from "../../interfaces";
   styleUrls: ['./invoices-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InvoicesTableComponent<T> extends InvoicesTable<Invoice> {
+export class InvoicesTableComponent extends InvoicesTable<Invoice> {
   constructor() {
     super();
   }

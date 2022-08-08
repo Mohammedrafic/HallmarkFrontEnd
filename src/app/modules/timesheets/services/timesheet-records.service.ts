@@ -5,7 +5,8 @@ import { ColDef } from '@ag-grid-community/core';
 import { merge, Observable } from 'rxjs';
 import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 
-import { DropdownOption, TimesheetRecordsDto, RecordValue } from './../interface';
+import { DropdownOption } from '@core/interface';
+import { TimesheetRecordsDto, RecordValue } from './../interface';
 import { TimesheetsApiService } from './timesheets-api.service';
 import { RecordFields } from '../enums';
 

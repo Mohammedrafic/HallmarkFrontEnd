@@ -9,14 +9,12 @@ import { FilterColumns, FilterDataSource, TimesheetsFilterState } from '../inter
 import {
   TimesheetTableStatusCellComponent
 } from '../components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
-import { GridValuesHelper } from '../helpers/grid-values.helper';
 import {
   TimesheetTableApproveCellComponent
 } from '../components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
 import { TimeSheetsPage } from '../store/model/timesheets.model';
 import { TimesheetTableLinkComponent } from '../components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
-
-const valueHelper = new GridValuesHelper();
+import { GridValuesHelper } from '../helpers';
 
 const commonColumn: ColDef = {
   sortable: true,
@@ -94,7 +92,7 @@ export const TimesheetsColumnsDefinition = (isAgency = false): ColumnDefinitionM
       minWidth: 240,
       cellClass: 'bold',
       ...commonColumn,
-      valueFormatter: (params: ValueFormatterParams) => valueHelper.formatDate(params.value, 'W - ccc M/d/yy'),
+      valueFormatter: (params: ValueFormatterParams) => GridValuesHelper.formatDate(params.value, 'W - ccc M/d/yy'),
     },
     {
       field: TimesheetsTableColumns.Department,

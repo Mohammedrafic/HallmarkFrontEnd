@@ -1,9 +1,19 @@
-@import '../../../../styles/variables/colors';
+@import 'colors';
+
+:host {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
 .tab-navigation {
   &.e-badge {
     margin-left: 0.3rem;
   }
+}
+
+.invoices-table-container {
+  flex-grow: 1;
 }
 
 .create-invoice-dialog-content {

@@ -1,18 +1,9 @@
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-  ViewChild
-} from '@angular/core';
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input,
+  OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 
-import { filter, Observable, takeUntil, throttleTime } from 'rxjs';
+import { Observable, takeUntil } from 'rxjs';
 
 import { Destroyable } from '@core/helpers';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
@@ -20,16 +11,14 @@ import { ChipListComponent } from '@syncfusion/ej2-angular-buttons';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 
 import { InvoicesState } from '../../store/state/invoices.state';
-import { DialogActionPayload } from '../../../timesheets/interface';
 import { Invoice } from '../../interfaces';
-import { DialogAction } from '../../../timesheets/enums';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { TimesheetDetails } from '../../../timesheets/store/actions/timesheet-details.actions';
 import { ExportPayload } from '@shared/models/export.model';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
-import { InvoicesModel } from '../../store/invoices.model';
 import { INVOICES_STATUSES } from '../../enums/invoices.enum';
+import { DialogAction } from '@core/enums';
 
 interface ExportOption extends ItemModel {
   ext: string | null;

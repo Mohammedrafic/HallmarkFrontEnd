@@ -1,7 +1,13 @@
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
-import { AllInvoicesTableColumns, Invoice, InvoiceItem, InvoicePage } from '../interfaces';
-import { INVOICES_STATUSES } from '../enums/invoices.enum';
-import { TableColumnAlign } from '../../timesheets/enums';
+import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
+
+import {
+  AllInvoicesTableColumns,
+  InvoiceFilterColumns,
+  InvoicePage,
+} from '../interfaces';
+import { FilteringOptionsFields, TableColumnAlign } from '../../timesheets/enums';
+import { InvoicesTableFiltersColumns } from '../enums/invoices.enum';
 
 export const INVOICES_TAB_CONFIG: TabsListConfig[] = [
   {
@@ -148,4 +154,32 @@ export const AllInvoicesTableConfig: AllInvoicesTableColumns = {
     width: 140,
     header: 'Due Date',
   },
-}
+};
+
+export const invoicesFilterOptionFields = {
+  text: 'name',
+  value: 'id'
+};
+
+const defaultColumnMapping = {
+  type: ControlTypes.Multiselect,
+  valueType: ValueType.Id,
+  valueField: 'name',
+  valueId: 'id',
+};
+
+export const InvoiceDefaultFilterColumns: InvoiceFilterColumns = {
+  [InvoicesTableFiltersColumns.OrderIds]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.SkillIds]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.DepartmentIds]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.AgencyIds]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.RegionsIds]: defaultColumnMapping,
+  [InvoicesTableFiltersColumns.LocationIds]: defaultColumnMapping,
+} as InvoiceFilterColumns;
+
+
+export const InvoicesFilteringOptionsMapping: Map<FilteringOptionsFields, InvoicesTableFiltersColumns> = new Map()
+  .set(FilteringOptionsFields.Agencies, InvoicesTableFiltersColumns.AgencyIds)
+  .set(FilteringOptionsFields.Orders, InvoicesTableFiltersColumns.OrderIds)
+  .set(FilteringOptionsFields.Regions, InvoicesTableFiltersColumns.RegionsIds)
+  .set(FilteringOptionsFields.Skills, InvoicesTableFiltersColumns.SkillIds);

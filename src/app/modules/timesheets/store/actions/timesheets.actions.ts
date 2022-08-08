@@ -1,6 +1,9 @@
-import { TIMESHEETS_ACTIONS, DialogAction, TimesheetsTableColumns, RecordFields, TimesheetsTableFiltersColumns } from '../../enums';
-import { DataSourceItem, Timesheet, TimesheetsFilterState } from '../../interface';
 import { OrganizationRegion } from '@shared/models/organization.model';
+import { DialogAction } from '@core/enums';
+import { DataSourceItem } from '@core/interface';
+
+import { TIMESHEETS_ACTIONS, RecordFields, TimesheetsTableFiltersColumns } from '../../enums';
+import { Timesheet, TimesheetsFilterState } from '../../interface';
 
 export namespace Timesheets {
   export class GetAll {
