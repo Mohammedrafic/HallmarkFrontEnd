@@ -384,9 +384,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
 
     this.specialProject = this.formBuilder.group({
-      projectTypeId: [null, Validators.required],
-      projectNameId: [null, Validators.required],
-      poNumberId: [null, Validators.required],
+      projectTypeId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
+      projectNameId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
+      poNumberId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
     });
 
     this.specialProject.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
