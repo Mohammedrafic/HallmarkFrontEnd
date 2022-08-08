@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { SpecialProjectTabs, AddButtonText } from '@shared/enums/special-project-tabs.enum'
@@ -73,7 +73,8 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
 
 
   constructor(private store: Store,
-    private datePipe: DatePipe) { }
+    private datePipe: DatePipe,
+    private changeDetectorRef: ChangeDetectorRef  ) { }
 
   ngOnInit(): void {
     this.orgStructureDataSetup();
@@ -107,14 +108,14 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
 
   private createForm(): void {
     this.form = new FormGroup({
-      projectCategory: new FormControl('', this.selectedTab == SpecialProjectTabs.SpecialProjects ? [Validators.required] : []),
-      projectName: new FormControl('', this.selectedTab == SpecialProjectTabs.SpecialProjects ? [Validators.required, Validators.maxLength(100), Validators.minLength(3)] : []),
-      poName: new FormControl('', this.selectedTab == SpecialProjectTabs.PurchaseOrders ? [Validators.required, Validators.maxLength(100), Validators.minLength(3)] : []),
-      poDescription: new FormControl('', this.selectedTab == SpecialProjectTabs.PurchaseOrders ? [Validators.required, Validators.maxLength(100), Validators.minLength(3)] : []),
-      regionIds: new FormControl('', [Validators.required]),
-      locationIds: new FormControl('', [Validators.required]),
-      departmentsIds: new FormControl('', [Validators.required]),
-      skillIds: new FormControl('', [Validators.required]),
+      projectCategory: new FormControl(0, this.selectedTab == SpecialProjectTabs.SpecialProjects ? [Validators.required] : []),
+      projectName: new FormControl(null, this.selectedTab == SpecialProjectTabs.SpecialProjects ? [Validators.required, Validators.maxLength(100), Validators.minLength(3)] : []),
+      poName: new FormControl(null, this.selectedTab == SpecialProjectTabs.PurchaseOrders ? [Validators.required, Validators.maxLength(100), Validators.minLength(3)] : []),
+      poDescription: new FormControl(null, this.selectedTab == SpecialProjectTabs.PurchaseOrders ? [Validators.required, Validators.maxLength(100), Validators.minLength(3)] : []),
+      regionIds: new FormControl(0, [Validators.required]),
+      locationIds: new FormControl(0, [Validators.required]),
+      departmentsIds: new FormControl(0, [Validators.required]),
+      skillIds: new FormControl(0, [Validators.required]),
       allowOnOrderCreation: new FormControl(null),
       startDate: new FormControl(null, [Validators.required]),
       endDate: new FormControl(null, [Validators.required]),
@@ -186,6 +187,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
 
 
   private onOrganizationStructureDataLoadHandler(): void {
+    let ref=
     this.organizationStructure$
       .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
       .subscribe((structure: OrganizationStructure) => {
@@ -196,8 +198,10 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   }
 
   private onOrgStructureControlValueChangedHandler(): void {
+
     this.form.get('regionIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
+        this.form.get('locationIds')?.setValue([]);
         const selectedRegions: OrganizationRegion[] = [];
         val.forEach((id) =>
           selectedRegions.push(this.regions.find((region) => region.id === id) as OrganizationRegion)
@@ -205,15 +209,17 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         this.orgStructureData.locationIds.dataSource = [];
         selectedRegions.forEach((region) => {
           region.locations?.forEach((location) => (location.regionName = region.name));
-          this.orgStructureData.locationIds.dataSource.push(...(region.locations as []));
+            this.orgStructureData.locationIds.dataSource.push(...(region?.locations as []));
         });
       } else {
         this.orgStructureData.locationIds.dataSource = [];
         this.form.get('locationIds')?.setValue([]);
       }
+      this.changeDetectorRef.detectChanges();
     });
     this.form.get('locationIds')?.valueChanges.subscribe((val: number[]) => {
       if (val?.length) {
+        this.form.get('departmentsIds')?.setValue([]);
         const selectedLocations: OrganizationLocation[] = [];
         val.forEach((id) =>
           selectedLocations.push(
@@ -222,13 +228,15 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         );
         this.orgStructureData.departmentsIds.dataSource = [];
         selectedLocations.forEach((location) => {
-          this.orgStructureData.departmentsIds.dataSource.push(...(location.departments as []));
+          this.orgStructureData.departmentsIds.dataSource.push(...(location?.departments as []));
         });
       } else {
         this.orgStructureData.departmentsIds.dataSource = [];
         this.form.get('departmentsIds')?.setValue([]);
       }
+      this.changeDetectorRef.detectChanges();
     });
+   
   }
 
   private onSkillDataLoadHandler(): void {
@@ -241,6 +249,24 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   }
 
   public closeDialog(): void {
+    if (this.isEdit) {
+      this.isEdit = false;
+      switch (this.selectedTab) {
+        case SpecialProjectTabs.SpecialProjects:
+          this.createForm();
+          this.addButtonTitle = AddButtonText.AddSpecialProject;
+          break;
+        case SpecialProjectTabs.PurchaseOrders:
+          this.createForm();
+          this.addButtonTitle = AddButtonText.AddPurchaseOrder;
+          break;
+        case SpecialProjectTabs.SpecialProjectCategories:
+          this.createForm();
+          this.addButtonTitle = AddButtonText.AddSpecialProjectCategory;
+          break;
+      }
+    }
+    this.form.reset();
     this.store.dispatch(new ShowSideDialog(false));
   }
 
@@ -294,6 +320,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
     this.title = DialogMode.Add;
     this.title = this.addButtonTitle;
     this.isEdit = false;
+    this.onOrgStructureControlValueChangedHandler();
     this.store.dispatch(new ShowSideDialog(true));
   }
 
@@ -311,6 +338,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         this.addButtonTitle = AddButtonText.EditSpecialProjectCategory;
         break;
     }
+    this.onOrgStructureControlValueChangedHandler();
     this.title = this.addButtonTitle;
     this.store.dispatch(new GetSpecialProjectById(data?.id != undefined ? data?.id : 0));
     this.specialProjectEntity$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
@@ -328,11 +356,11 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
           projectBudget: data.projectBudget,
           poName: '',
           poDescription: '',
-          allowOnOrderCreation:false
+          allowOnOrderCreation: false
         });
         this.store.dispatch(new ShowSideDialog(true));
       }
     });
-    
+
   }
 }

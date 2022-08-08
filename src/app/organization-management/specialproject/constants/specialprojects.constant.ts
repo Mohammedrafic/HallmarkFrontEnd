@@ -184,7 +184,28 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
         const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string
         return str?.length > 0 ? str : "";
       },
-      ...commonColumn
+      ...commonColumn,
+      filter: 'agDateColumnFilter',
+      filterParams: {
+        comparator: (filterLocalDateAtMidnight:Date, cellValue:string) => {
+          if (cellValue == null) {
+            return 0;
+          }
+          const dateAsString = datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateParts = dateAsString.split('/');
+          const year = Number(dateParts[2]);
+          const month = Number(dateParts[0]) - 1;
+          const day = Number(dateParts[1]);
+          const cellDate = new Date(year, month, day);
+
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        }
+      }
     },
     {
       field: SpecialProjectTableColumns.EndDate,
@@ -193,7 +214,28 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
         const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string
         return str?.length > 0 ? str : "";
       },
-      ...commonColumn
+      ...commonColumn,
+      filter: 'agDateColumnFilter',
+      filterParams: {
+        comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
+          if (cellValue == null) {
+            return 0;
+          }
+          const dateAsString = datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateParts = dateAsString.split('/');
+          const year = Number(dateParts[2]);
+          const month = Number(dateParts[0]) - 1;
+          const day = Number(dateParts[1]);
+          const cellDate = new Date(year, month, day);
+
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        }
+      }
     },
     {
       field: '',
