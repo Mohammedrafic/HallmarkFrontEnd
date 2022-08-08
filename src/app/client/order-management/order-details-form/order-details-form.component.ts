@@ -200,7 +200,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   @Select(OrderManagementContentState.projectSpecialData)
   projectSpecialData$: Observable<ProjectSpecialData>;
-  reasonsForRequestFields: FieldSettingsModel = { text: 'reasonForRequest', value: 'id' };
   specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
@@ -385,10 +384,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
 
     this.specialProject = this.formBuilder.group({
-      reasonForRequestId: [null, Validators.required],
-      projectTypeId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
-      projectNameId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
-      poNumberId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
+      projectTypeId: [null, Validators.required],
+      projectNameId: [null, Validators.required],
+      poNumberId: [null, Validators.required],
     });
 
     this.specialProject.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
@@ -877,7 +875,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.specialProject.controls['projectTypeId'].patchValue(order.projectTypeId);
       this.specialProject.controls['projectNameId'].patchValue(order.projectNameId);
-      this.specialProject.controls['reasonForRequestId'].patchValue(order.reasonForRequestId);
       this.specialProject.controls['poNumberId'].patchValue(order.poNumberId);
     });
 

@@ -230,8 +230,6 @@ export class Order {
   skillId: number;
   skillName?: number;
   orderType: OrderType;
-  reasonForRequestId: number | null;
-  reasonForRequest?: string | null;
   poNumberId: number | null;
   projectTypeId: number | null;
   projectNameId: number | null;
