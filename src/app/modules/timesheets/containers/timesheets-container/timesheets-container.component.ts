@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, debounceTime, throttleTime } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, debounceTime } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { Destroyable } from '@core/helpers';
@@ -19,7 +19,7 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { RowNode } from '@ag-grid-community/core';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { DataSourceItem, TabConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
+import { DataSourceItem, TabConfig, TabCountConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
 import {
   TimesheetExportOptions,
   TAB_ADMIN_TIMESHEETS,
@@ -49,6 +49,9 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
 
   @Select(TimesheetsState.timesheets)
   readonly timesheets$: Observable<TimeSheetsPage>;
+
+  @Select(TimesheetsState.tabCounts)
+  readonly tabCounts$: Observable<TabCountConfig>;
 
   @Select(TimesheetsState.timesheetsFilters)
   readonly timesheetsFilters$!: Observable<TimesheetsFilterState>;
@@ -245,7 +248,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
   }
 
   private calcTabsChips(): void {
-    this.store.select(TimesheetsState.tabCounts)
+    this.tabCounts$
     .pipe(
       filter(Boolean),
       takeUntil(this.componentDestroy()),

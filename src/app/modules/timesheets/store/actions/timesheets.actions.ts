@@ -1,10 +1,15 @@
-import { TIMESHEETS_ACTIONS, DialogAction, TimesheetsTableColumns, RecordFields, TimesheetsTableFiltersColumns } from '../../enums';
-import { DataSourceItem, Timesheet, TimesheetsFilterState } from '../../interface';
 import { OrganizationRegion } from '@shared/models/organization.model';
+
+import { TIMESHEETS_ACTIONS, DialogAction, RecordFields, TimesheetsTableFiltersColumns } from '../../enums';
+import { DataSourceItem, Timesheet, TimesheetsFilterState } from '../../interface';
 
 export namespace Timesheets {
   export class GetAll {
     static readonly type = TIMESHEETS_ACTIONS.GET_TIMESHEETS;
+  }
+
+  export class GetTabsCounts {
+    static readonly type = TIMESHEETS_ACTIONS.GET_TABS_COUNTS;
   }
 
   export class ToggleCandidateDialog {
