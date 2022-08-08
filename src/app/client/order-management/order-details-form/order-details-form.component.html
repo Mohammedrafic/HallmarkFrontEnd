@@ -680,9 +680,9 @@
       (selectDocuments)="onDocumentsSelected($event)"
       (deleteDocument)="onDocumentDeleted($event)">
     </app-document-uploader>
-    <div tabindex="0" class="e-card comments" *ngIf="isPerDiem">
+    <div tabindex="0" class="e-card comments">
       <div class="e-card-content">
-        <app-comments [useBackground]="false"></app-comments>
+        <app-comments [comments]="comments" [useBackground]="false"></app-comments>
       </div>
     </div>
   </div>
