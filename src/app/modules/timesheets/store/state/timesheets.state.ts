@@ -12,7 +12,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DialogAction } from '@core/enums';
 import { DataSourceItem, DropdownOption } from '@core/interface';
 
-import { TimesheetsModel, TimeSheetsPage, TimrsheetsDto } from '../model/timesheets.model';
+import { TimesheetsModel, TimeSheetsPage } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';

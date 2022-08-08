@@ -21,7 +21,7 @@ import { DialogAction } from '@core/enums';
 import { DataSourceItem } from '@core/interface';
 import { SetHeaderState, ShowFilterDialog, ShowToast } from 'src/app/store/app.actions';
 import { UserState } from 'src/app/store/user.state';
-import { TabConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
+import { TabConfig, TabCountConfig, TimesheetsFilterState, TimesheetsSelectedRowEvent } from '../../interface';
 import {
   TimesheetExportOptions,  TAB_ADMIN_TIMESHEETS,  UNIT_ORGANIZATIONS_FIELDS,
   BulkApproveSuccessMessage } from '../../constants';
