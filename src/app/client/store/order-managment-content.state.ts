@@ -20,7 +20,6 @@ import {
   GetHistoricalData,
   ClearHistoricalData,
   GetIncompleteOrders,
-  GetMasterShifts,
   GetOrderById,
   GetOrderFilterDataSources,
   GetOrders,
@@ -65,7 +64,6 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { ProjectName, ProjectType } from '@shared/models/project.model';
-import { MasterShift } from '@shared/models/master-shift.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectsService } from '@shared/services/projects.service';
 import { ShiftsService } from '@shared/services/shift.service';
@@ -103,7 +101,6 @@ export interface OrderManagementContentStateModel {
   projectSpecialData: ProjectSpecialData | null;
   suggestedDetails: SuggestedDetails | null;
   projectNames: ProjectName[];
-  masterShifts: MasterShift[];
   associateAgencies: AssociateAgency[];
   predefinedBillRates: BillRate[];
   isDirtyOrderForm: boolean;
@@ -112,7 +109,7 @@ export interface OrderManagementContentStateModel {
   historicalEvents: HistoricalEvent[] | null;
   navigationTab: NavigationTabModel;
   contactDetails: Department | null;
-  regularLocalBillRate: string[];
+  regularLocalBillRate: BillRate[];
 }
 
 @State<OrderManagementContentStateModel>({
@@ -135,7 +132,6 @@ export interface OrderManagementContentStateModel {
     projectNames: [],
     projectSpecialData: null,
     suggestedDetails: null,
-    masterShifts: [],
     associateAgencies: [],
     predefinedBillRates: [],
     isDirtyOrderForm: false,
@@ -201,11 +197,6 @@ export class OrderManagementContentState {
   @Selector()
   static projectNames(state: OrderManagementContentStateModel): ProjectName[] {
     return state.projectNames;
-  }
-
-  @Selector()
-  static masterShifts(state: OrderManagementContentStateModel): MasterShift[] {
-    return state.masterShifts;
   }
 
   @Selector()
@@ -281,7 +272,7 @@ export class OrderManagementContentState {
   }
 
   @Selector()
-  static regularLocalBillRate(state: OrderManagementContentStateModel): string[] {
+  static regularLocalBillRate(state: OrderManagementContentStateModel): BillRate[] {
     return state.regularLocalBillRate;
   }
 
@@ -503,15 +494,6 @@ export class OrderManagementContentState {
     return this.projectsService.getProjectNames().pipe(
       tap((payload) => {
         patchState({ projectNames: payload });
-      })
-    );
-  }
-
-  @Action(GetMasterShifts)
-  GetMasterShifts({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<MasterShift[]> {
-    return this.shiftsService.getAllMasterShifts().pipe(
-      tap((payload) => {
-        patchState({ masterShifts: payload });
       })
     );
   }
@@ -741,9 +723,12 @@ export class OrderManagementContentState {
   }
 
   @Action(GetRegularLocalBillRate)
-  GetRegularLocalBillRate ({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<string[]> {
-    return this.orderManagementService.getRegularLocalBillRate().pipe(
-      tap((regularLocalBillRate: string[]) => {
+  GetRegularLocalBillRate(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { orderType, departmentId, skillId }: GetRegularLocalBillRate
+  ): Observable<BillRate[]> {
+    return this.orderManagementService.getRegularLocalBillRate(orderType, departmentId, skillId).pipe(
+      tap((regularLocalBillRate: BillRate[]) => {
         patchState({ regularLocalBillRate });
       })
     );

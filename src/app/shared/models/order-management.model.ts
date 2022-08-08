@@ -244,7 +244,7 @@ export class Order {
   duration: Duration;
   jobStartDate: Date;
   jobEndDate: Date;
-  shiftRequirementId: number;
+  shift: number;
   shiftStartTime: Date;
   shiftEndTime: Date;
   classification: JobClassification;
