@@ -10,11 +10,92 @@
 
     button {
       margin-left: 8px;
+
+      &:disabled {
+        background-color: $primary-active-blue-10;
+        opacity: 0.3;
+        color: $white;
+      }
     }
   }
 
   .import-candidates-container {
-    display: flex;
-    height: 100%;
+    .file-uploader-container {
+      height: 100%;
+      width: 100%;
+      margin: 0 -24px;
+      padding: 24px;
+      background-color: $secondary-dark-blue-50;
+
+      .section-header {
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+
+        .message {
+          color: $secondary-dark-blue-20;
+          font-size: 14px;
+        }
+      }
+
+      .file-uploader {
+        display: flex;
+
+        #droparea {
+          height: 127px;
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          color: $primary-active-blue-10;
+          font-size: 12px;
+          cursor: pointer;
+
+          .browse-link {
+            text-decoration: underline;
+            font-weight: 700;
+          }
+        }
+
+        .file-info {
+          .clear-button {
+            width: 100%;
+          }
+
+          .e-file-select-wrap, .e-upload-actions {
+            display: none;
+          }
+
+          .e-upload-files {
+            border: unset;
+
+            .e-file-container {
+              margin-left: unset;
+
+              .e-file-name, .e-file-type {
+                padding: unset;
+              }
+            }
+
+            .e-file-remove-btn {
+              padding: unset;
+              margin: -16px 0 0;
+            }
+          }
+        }
+
+        .selected-file {
+          width: 100%;
+          margin-left: 24px;
+        }
+      }
+    }
+  }
+
+  .action-link-btn {
+    color: $primary-active-blue-10;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
   }
 }

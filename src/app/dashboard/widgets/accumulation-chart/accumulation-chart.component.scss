@@ -15,24 +15,9 @@
     font-size: 25px;
     font-weight: bold;
     line-height: 24px;
-    width:50%;
-    top:40%;
-    position:absolute;
-    text-align:center
-    
-  }
-}
-
-.e-custom {
-  &.e-checkbox-wrapper {
-    .e-frame {
-      height: 16px;
-      width: 16px;
-    }
-
-    .e-check {
-      font-size: 10px;
-      line-height: 8px;
-    }
+    width: 50%;
+    top: 40%;
+    position: absolute;
+    text-align: center;
   }
 }

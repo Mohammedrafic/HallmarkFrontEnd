@@ -71,6 +71,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public SelectedTab = SelectedTab;
   public orderId: number;
+  public prefix: string;
 
   public title: string;
   public submitMenuItems: ItemModel[] = [
@@ -114,6 +115,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   public ngOnInit(): void {
     if (this.orderId > 0) {
       this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
+        this.prefix = order?.organizationPrefix as string;
         if (order?.credentials) {
           this.orderCredentials = [...order.credentials];
         }
