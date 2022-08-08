@@ -9,11 +9,13 @@ import {
   Briefcase,
   Calendar,
   CheckCircle,
+  DollarSign,
   Download,
   Edit,
   Folder,
   Mail,
   MapPin,
+  Percent,
   Plus,
   Send,
   Trash2,
@@ -138,6 +140,8 @@ const icons = {
   Trash2,
   Eye,
   EyeOff
+  DollarSign,
+  Percent,
 };
 
 const COMPONENTS = [

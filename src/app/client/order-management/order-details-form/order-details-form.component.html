@@ -9,7 +9,8 @@
             formControlName="orderType"
             appValidateWithMessage
             [dataSource]="orderTypes"
-            [fields]="orderTypeFields">
+            [fields]="orderTypeFields"
+          >
           </ejs-dropdownlist>
         </div>
       </div>
@@ -40,12 +41,7 @@
                 <div class="input-container bootstrap form-line-item-20">
                   <label>Job Title<span class="required">*</span></label>
                   <div class="input-group">
-                    <input
-                      class="e-input"
-                      type="text"
-                      appValidateWithMessage
-                      formControlName="title"
-                      maxlength="50" />
+                    <input class="e-input" type="text" appValidateWithMessage formControlName="title" maxlength="50" />
                   </div>
                 </div>
 
@@ -58,7 +54,8 @@
                       appValidateWithMessage
                       [dataSource]="regions$ | async"
                       [fields]="regionFields"
-                      (select)="onRegionDropDownChanged($event)">
+                      (select)="onRegionDropDownChanged($event)"
+                    >
                     </ejs-dropdownlist>
                   </div>
                 </div>
@@ -73,7 +70,8 @@
                       [enabled]="isLocationsDropDownEnabled"
                       [dataSource]="locations$ | async"
                       [fields]="locationFields"
-                      (select)="onLocationDropDownChanged($event)">
+                      (select)="onLocationDropDownChanged($event)"
+                    >
                     </ejs-dropdownlist>
                   </div>
                 </div>
@@ -88,7 +86,8 @@
                       [enabled]="isDepartmentsDropDownEnabled"
                       [dataSource]="departments$ | async"
                       [fields]="departmentFields"
-                      (select)="onDepartmentDropDownChanged($event)">
+                      (select)="onDepartmentDropDownChanged($event)"
+                    >
                     </ejs-dropdownlist>
                   </div>
                 </div>
@@ -100,10 +99,10 @@
                     <ejs-dropdownlist
                       formControlName="skillId"
                       appValidateWithMessage
-                      [dataSource]="(skills$ | async)"
+                      [dataSource]="skills$ | async"
                       [fields]="skillFields"
                       (select)="onSkillsDropDownChanged($event)"
-                      >
+                    >
                     </ejs-dropdownlist>
                   </div>
                 </div>
@@ -112,7 +111,7 @@
               <ng-container *ngIf="!isPerDiem">
                 <div class="form-line">
                   <!-- Hourly rate -->
-                  <div class="input-container bootstrap form-line-item-20">
+                  <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
                     <label>Hourly rate<span class="required">*</span></label>
                     <div class="input-group">
                       <input
@@ -121,12 +120,12 @@
                         formControlName="hourlyRate"
                         appValidateWithMessage
                         maxlength="10"
-                        (focus)="priceUtils.setPriceMask(generalInformationForm,'hourlyRate', $event)"
+                        (focus)="priceUtils.setPriceMask(generalInformationForm, 'hourlyRate', $event)"
                         (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'hourlyRate', $event)"
                       />
                     </div>
                   </div>
-  
+
                   <!-- # Open Positions -->
                   <div class="input-container bootstrap form-line-item-20">
                     <label># Open Positions<span class="required">*</span></label>
@@ -136,10 +135,11 @@
                         type="text"
                         formControlName="openPositions"
                         appValidateWithMessage
-                        maxlength="10" />
+                        maxlength="10"
+                      />
                     </div>
                   </div>
-  
+
                   <!-- Min Yrs. Req. -->
                   <div class="input-container bootstrap form-line-item-20">
                     <label>Min Yrs. Req.</label>
@@ -149,12 +149,13 @@
                         type="text"
                         formControlName="minYrsRequired"
                         appValidateWithMessage
-                        maxlength="10" />
+                        maxlength="10"
+                      />
                     </div>
                   </div>
-  
+
                   <!-- Joining Bonus -->
-                  <div class="input-container bootstrap form-line-item-20">
+                  <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
                     <label>Joining Bonus</label>
                     <div class="input-group">
                       <input
@@ -164,13 +165,64 @@
                         appValidateWithMessage
                         type="text"
                         (focus)="priceUtils.setPriceMask(generalInformationForm, 'joiningBonus', $event)"
-                        (blur)="priceUtils.setTwoDecimals(generalInformationForm,'joiningBonus', $event)"
+                        (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'joiningBonus', $event)"
                       />
                     </div>
                   </div>
-  
+
+                  <!-- Order Placement Fee (%) -->
+                  <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
+                    <label>Order Placement Fee (%)<span class="required">*</span></label>
+                    <div class="input-group">
+                      <ejs-numerictextbox
+                        class="e-input"
+                        formControlName="orderPlacementFee"
+                        format="###.00'%'"
+                        max="100"
+                        min="0"
+                        appValidateWithMessage
+                        [decimals]="2"
+                        [showSpinButton]="false"
+                        [validateDecimalOnType]="true"
+                        [htmlAttributes]="{ maxLength: '6' }"
+                      ></ejs-numerictextbox>
+                    </div>
+                  </div>
+
+                  <!-- Annual Salary Range From -->
+                  <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
+                    <label>Annual Salary Range From<span class="required">*</span></label>
+                    <div class="input-group">
+                      <input
+                        class="e-input"
+                        formControlName="annualSalaryRangeFrom"
+                        maxlength="10"
+                        appValidateWithMessage
+                        type="text"
+                        (focus)="priceUtils.setPriceMask(generalInformationForm, 'annualSalaryRangeFrom', $event)"
+                        (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'annualSalaryRangeFrom', $event)"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- Annual Salary Range To -->
+                  <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
+                    <label>Annual Salary Range To<span class="required">*</span></label>
+                    <div class="input-group">
+                      <input
+                        class="e-input"
+                        formControlName="annualSalaryRangeTo"
+                        maxlength="10"
+                        appValidateWithMessage
+                        type="text"
+                        (focus)="priceUtils.setPriceMask(generalInformationForm, 'annualSalaryRangeTo', $event)"
+                        (blur)="priceUtils.setTwoDecimals(generalInformationForm, 'annualSalaryRangeTo', $event)"
+                      />
+                    </div>
+                  </div>
+
                   <!-- Comp. Bonus -->
-                  <div class="input-container bootstrap form-line-item-20">
+                  <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
                     <label>Comp. Bonus</label>
                     <div class="input-group">
                       <input
@@ -185,21 +237,22 @@
                     </div>
                   </div>
                 </div>
-  
+
                 <div class="form-line">
                   <!-- Duration -->
-                  <div class="input-container bootstrap form-line-item-20">
+                  <div *ngIf="!isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
                     <label>Duration<span class="required">*</span></label>
                     <div class="input-group dropdown">
                       <ejs-dropdownlist
                         formControlName="duration"
                         appValidateWithMessage
                         [dataSource]="durations"
-                        [fields]="durationFields">
+                        [fields]="durationFields"
+                      >
                       </ejs-dropdownlist>
                     </div>
                   </div>
-  
+
                   <!-- Job Start Date -->
                   <div class="datepicker-container form-line-item-20">
                     <label>Job Start Date<span class="required">*</span></label>
@@ -212,13 +265,14 @@
                         appValidateWithMessage
                         [enableMask]="true"
                         [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                        [min]="today">
+                        [min]="today"
+                      >
                       </ejs-datepicker>
                     </div>
                   </div>
-  
+
                   <!-- Job End Date -->
-                  <div class="datepicker-container form-line-item-20">
+                  <div *ngIf="!isPermPlacementOrder" class="datepicker-container form-line-item-20">
                     <label>Job End Date<span class="required">*</span></label>
                     <div class="input-group datepicker bootstrap">
                       <ejs-datepicker
@@ -232,12 +286,13 @@
                         [enabled]="isJobEndDateControlEnabled"
                         [enableMask]="true"
                         [maskPlaceholder]="{ month: 'MM', day: 'DD', year: 'YYYY' }"
-                        [min]="generalInformationForm.controls['jobStartDate'].value">
+                        [min]="generalInformationForm.controls['jobStartDate'].value"
+                      >
                       </ejs-datepicker>
                     </div>
                   </div>
                 </div>
-  
+
                 <div class="form-line">
                   <!-- Shift Requirements -->
                   <div class="input-container bootstrap form-line-item-20">
@@ -247,11 +302,12 @@
                         formControlName="shiftRequirementId"
                         appValidateWithMessage
                         [dataSource]="masterShiftNames"
-                        [fields]="masterShiftFields">
+                        [fields]="masterShiftFields"
+                      >
                       </ejs-dropdownlist>
                     </div>
                   </div>
-  
+
                   <!-- Shift Start Time -->
                   <div class="input-container calendar form-line-item-20">
                     <label for="startTime">Shift Start Time<span class="required">*</span></label>
@@ -263,11 +319,12 @@
                         format="hh:mm a"
                         [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                         [enableMask]="true"
-                        maskPlaceholder="HH:MM">
+                        maskPlaceholder="HH:MM"
+                      >
                       </ejs-timepicker>
                     </div>
                   </div>
-  
+
                   <!-- Shift End Time -->
                   <div class="input-container calendar form-line-item-20">
                     <label for="startTime">Shift End Time<span class="required">*</span></label>
@@ -279,7 +336,8 @@
                         format="hh:mm a"
                         [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
                         [enableMask]="true"
-                        maskPlaceholder="HH:MM">
+                        maskPlaceholder="HH:MM"
+                      >
                       </ejs-timepicker>
                     </div>
                   </div>
@@ -304,7 +362,8 @@
                       [dataSource]="jobDistributions"
                       [fields]="jobDistributionFields"
                       [allowFiltering]="false"
-                      [showDropDownIcon]="true">
+                      [showDropDownIcon]="true"
+                    >
                     </ejs-multiselect>
                   </div>
                 </div>
@@ -325,14 +384,14 @@
                       [fields]="associateAgencyFields"
                       [showSelectAll]="true"
                       [allowFiltering]="false"
-                      [showDropDownIcon]="true">
+                      [showDropDownIcon]="true"
+                    >
                     </ejs-multiselect>
                   </div>
                 </div>
               </div>
             </form>
           </div>
-
         </div>
         <div class="job-description">
           <div class="title">Job Description</div>
@@ -347,7 +406,8 @@
                       formControlName="classification"
                       appValidateWithMessage
                       [dataSource]="jobClassifications"
-                      [fields]="jobClassificationFields">
+                      [fields]="jobClassificationFields"
+                    >
                     </ejs-dropdownlist>
                   </div>
                 </div>
@@ -371,7 +431,8 @@
                       [multiline]="true"
                       appValidateWithMessage
                       maxlength="500"
-                      formControlName="jobDescription">
+                      formControlName="jobDescription"
+                    >
                     </ejs-textbox>
                   </div>
                 </div>
@@ -386,7 +447,8 @@
                       [multiline]="true"
                       appValidateWithMessage
                       maxlength="500"
-                      formControlName="unitDescription">
+                      formControlName="unitDescription"
+                    >
                     </ejs-textbox>
                   </div>
                 </div>
@@ -401,7 +463,8 @@
                       formControlName="reasonForRequisition"
                       appValidateWithMessage
                       [dataSource]="reasonsForRequisition"
-                      [fields]="reasonForRequisitionFields">
+                      [fields]="reasonForRequisitionFields"
+                    >
                     </ejs-dropdownlist>
                   </div>
                 </div>
@@ -420,7 +483,11 @@
           <div class="contact-details-form-container">
             <form [formGroup]="contactDetailsForm">
               <ng-container formArrayName="contactDetails">
-                <div class="form-line" [formGroupName]="i" *ngFor="let contact of contactDetailsFormArray.controls; let i = index;">
+                <div
+                  class="form-line"
+                  [formGroupName]="i"
+                  *ngFor="let contact of contactDetailsFormArray.controls; let i = index"
+                >
                   <!-- Title -->
                   <div class="contact-details-title-container form-line-item-25">
                     <div *ngIf="!isEditContactTitle[i]" class="input-container bootstrap">
@@ -429,7 +496,8 @@
                         <ejs-dropdownlist
                           [dataSource]="contactDetailTitles"
                           appValidateWithMessage
-                          formControlName="title">
+                          formControlName="title"
+                        >
                         </ejs-dropdownlist>
                       </div>
                     </div>
@@ -437,11 +505,7 @@
                     <div *ngIf="isEditContactTitle[i]" class="input-container bootstrap">
                       <label>Title<span class="required">*</span></label>
                       <div class="input-group">
-                        <input
-                          class="e-input"
-                          type="text"
-                          appValidateWithMessage
-                          formControlName="title" />
+                        <input class="e-input" type="text" appValidateWithMessage formControlName="title" />
                       </div>
                     </div>
 
@@ -451,7 +515,8 @@
                         type="button"
                         cssClass="e-outline"
                         class="icon-button"
-                        (click)="editContactTitleHandler(i)">
+                        (click)="editContactTitleHandler(i)"
+                      >
                         <i-feather name="edit3" class="icon"></i-feather>
                       </button>
                     </div>
@@ -461,12 +526,7 @@
                   <div class="input-container bootstrap form-line-item-25">
                     <label>Contact Person<span class="required">*</span></label>
                     <div class="input-group">
-                      <input
-                        class="e-input"
-                        type="text"
-                        appValidateWithMessage
-                        maxLength="50"
-                        formControlName="name" />
+                      <input class="e-input" type="text" appValidateWithMessage maxLength="50" formControlName="name" />
                     </div>
                   </div>
 
@@ -480,7 +540,8 @@
                         formControlName="mobilePhone"
                         appValidateWithMessage
                         placeholder=" "
-                        maxlength="10">
+                        maxlength="10"
+                      >
                       </ejs-maskedtextbox>
                     </div>
                   </div>
@@ -489,11 +550,7 @@
                   <div class="input-container bootstrap form-line-item-25">
                     <label>Email<span class="required">*</span></label>
                     <div class="input-group">
-                      <input
-                        class="e-input"
-                        type="email"
-                        appValidateWithMessage
-                        formControlName="email" />
+                      <input class="e-input" type="email" appValidateWithMessage formControlName="email" />
                     </div>
                   </div>
 
@@ -505,7 +562,8 @@
                       type="button"
                       cssClass="e-outline"
                       class="icon-button"
-                      (click)="removeContact(i)">
+                      (click)="removeContact(i)"
+                    >
                       <i-feather name="trash2" class="icon"></i-feather>
                     </button>
                   </div>
@@ -525,7 +583,11 @@
 
           <form [formGroup]="workLocationForm">
             <ng-container formArrayName="workLocations">
-              <div class="form-line" [formGroupName]="i" *ngFor="let workLocation of workLocationsFormArray.controls; let i = index;">
+              <div
+                class="form-line"
+                [formGroupName]="i"
+                *ngFor="let workLocation of workLocationsFormArray.controls; let i = index"
+              >
                 <!-- Address -->
                 <div class="input-container bootstrap form-line-item-40">
                   <label>Address<span class="required">*</span></label>
@@ -535,7 +597,8 @@
                       type="text"
                       appValidateWithMessage
                       maxlength="100"
-                      formControlName="address" />
+                      formControlName="address"
+                    />
                   </div>
                 </div>
 
@@ -547,7 +610,8 @@
                       [dataSource]="organizationStatesWithKeyCode$ | async"
                       [fields]="organizationStateWithKeyCodeFields"
                       appValidateWithMessage
-                      formControlName="state">
+                      formControlName="state"
+                    >
                     </ejs-dropdownlist>
                   </div>
                 </div>
@@ -556,12 +620,7 @@
                 <div class="input-container bootstrap form-line-item-20">
                   <label>City<span class="required">*</span></label>
                   <div class="input-group">
-                    <input
-                      class="e-input"
-                      type="text"
-                      appValidateWithMessage
-                      maxlength="20"
-                      formControlName="city" />
+                    <input class="e-input" type="text" appValidateWithMessage maxlength="20" formControlName="city" />
                   </div>
                 </div>
 
@@ -569,12 +628,7 @@
                 <div class="input-container bootstrap form-line-item-20">
                   <label>Zip Code<span class="required">*</span></label>
                   <div class="input-group">
-                    <input
-                      class="e-input"
-                      type="text"
-                      appValidateWithMessage
-                      formControlName="zipCode"
-                      maxlength="6"/>
+                    <input class="e-input" type="text" appValidateWithMessage formControlName="zipCode" maxlength="6" />
                   </div>
                 </div>
 
@@ -586,7 +640,8 @@
                     type="button"
                     cssClass="e-outline"
                     class="icon-button"
-                    (click)="removeWorkLocation(i)">
+                    (click)="removeWorkLocation(i)"
+                  >
                     <i-feather name="trash2" class="icon"></i-feather>
                   </button>
                 </div>
@@ -607,7 +662,8 @@
                     formControlName="workflowId"
                     appValidateWithMessage
                     [dataSource]="workflows$ | async"
-                    [fields]="workflowFields">
+                    [fields]="workflowFields"
+                  >
                   </ejs-dropdownlist>
                 </div>
               </div>
@@ -626,7 +682,8 @@
                     formControlName="reasonForRequestId"
                     appValidateWithMessage
                     [dataSource]="(projectSpecialData$ | async)?.reasonsForRequest"
-                    [fields]="reasonsForRequestFields">
+                    [fields]="reasonsForRequestFields"
+                  >
                   </ejs-dropdownlist>
                 </div>
               </div>
@@ -638,7 +695,8 @@
                     formControlName="projectTypeId"
                     appValidateWithMessage
                     [dataSource]="(projectSpecialData$ | async)?.specialProjectCategories"
-                    [fields]="specialProjectCategoriesFields">
+                    [fields]="specialProjectCategoriesFields"
+                  >
                   </ejs-dropdownlist>
                 </div>
               </div>
@@ -650,7 +708,8 @@
                     formControlName="projectNameId"
                     appValidateWithMessage
                     [dataSource]="(projectSpecialData$ | async)?.projectNames"
-                    [fields]="projectNameFields">
+                    [fields]="projectNameFields"
+                  >
                   </ejs-dropdownlist>
                 </div>
               </div>
@@ -662,7 +721,8 @@
                     formControlName="poNumberId"
                     appValidateWithMessage
                     [dataSource]="(projectSpecialData$ | async)?.poNumbers"
-                    [fields]="poNumberFields">
+                    [fields]="poNumberFields"
+                  >
                   </ejs-dropdownlist>
                 </div>
               </div>
@@ -678,7 +738,8 @@
       uploaderTitle="Documents"
       [documents]="order?.documents"
       (selectDocuments)="onDocumentsSelected($event)"
-      (deleteDocument)="onDocumentDeleted($event)">
+      (deleteDocument)="onDocumentDeleted($event)"
+    >
     </app-document-uploader>
     <div tabindex="0" class="e-card comments">
       <div class="e-card-content">

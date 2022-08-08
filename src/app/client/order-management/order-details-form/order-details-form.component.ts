@@ -3,18 +3,7 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import {
-  combineLatest,
-  debounceTime,
-  filter,
-  Observable,
-  of,
-  Subject,
-  switchMap,
-  take,
-  takeUntil,
-  throttleTime,
-} from 'rxjs';
+import { combineLatest, debounceTime, filter, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
 
 import { ChangeEventArgs, DropDownListComponent, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -243,6 +232,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private unsubscribe$: Subject<void> = new Subject();
 
   public isPerDiem = false;
+  public isPermPlacementOrder = false;
 
   public comments: Comment[] = [] /*[ // TODO: Mocked data, remove after BE
     {
@@ -308,50 +298,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
     this.orderTypeForm.valueChanges.pipe(takeUntil(this.unsubscribe$), throttleTime(500)).subscribe((val) => {
       this.isPerDiem = val.orderType === OrderType.OpenPerDiem;
+      this.isPermPlacementOrder = val.orderType === OrderType.PermPlacement;
       this.orderTypeChanged.emit(val.orderType);
       this.store.dispatch(new SetIsDirtyOrderForm(this.orderTypeForm.dirty));
-      if (this.isPerDiem) {
-        this.generalInformationForm.controls['hourlyRate'].setValidators(null);
-        this.generalInformationForm.controls['openPositions'].setValidators(null);
-        this.generalInformationForm.controls['minYrsRequired'].setValidators(null);
-        this.generalInformationForm.controls['joiningBonus'].setValidators(null);
-        this.generalInformationForm.controls['compBonus'].setValidators(null);
-        this.generalInformationForm.controls['duration'].setValidators(null);
-        this.generalInformationForm.controls['jobStartDate'].setValidators(null);
-        this.generalInformationForm.controls['jobEndDate'].setValidators(null);
-        this.generalInformationForm.controls['shiftRequirementId'].setValidators(null);
-        this.generalInformationForm.controls['shiftStartTime'].setValidators(null);
-        this.generalInformationForm.controls['shiftEndTime'].setValidators(null);
-      } else {
-        this.generalInformationForm.controls['hourlyRate'].setValidators([
-          Validators.required,
-          Validators.maxLength(10),
-          currencyValidator(1),
-        ]);
-        this.generalInformationForm.controls['openPositions'].setValidators([
-          Validators.required,
-          Validators.maxLength(10),
-          integerValidator(1),
-        ]);
-        this.generalInformationForm.controls['minYrsRequired'].setValidators([
-          Validators.maxLength(10),
-          integerValidator(1),
-        ]);
-        this.generalInformationForm.controls['joiningBonus'].setValidators([
-          Validators.maxLength(10),
-          currencyValidator(1),
-        ]);
-        this.generalInformationForm.controls['compBonus'].setValidators([
-          Validators.maxLength(10),
-          currencyValidator(1),
-        ]);
-        this.generalInformationForm.controls['duration'].setValidators(Validators.required);
-        this.generalInformationForm.controls['jobStartDate'].setValidators(Validators.required);
-        this.generalInformationForm.controls['jobEndDate'].setValidators(Validators.required);
-        this.generalInformationForm.controls['shiftRequirementId'].setValidators(Validators.required);
-        this.generalInformationForm.controls['shiftStartTime'].setValidators(Validators.required);
-        this.generalInformationForm.controls['shiftEndTime'].setValidators(Validators.required);
-      }
+      this.handlePerDiemOrder();
+      this.handlePermPlacementOrder();
       Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
         this.generalInformationForm.controls[key].updateValueAndValidity({ onlySelf: false, emitEvent: false });
       });
@@ -685,6 +636,51 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.markTouchedField(fieldName);
   }
 
+  private handlePerDiemOrder(): void {
+    if (this.isPerDiem) {
+      this.generalInformationForm.controls['hourlyRate'].setValidators(null);
+      this.generalInformationForm.controls['openPositions'].setValidators(null);
+      this.generalInformationForm.controls['minYrsRequired'].setValidators(null);
+      this.generalInformationForm.controls['joiningBonus'].setValidators(null);
+      this.generalInformationForm.controls['compBonus'].setValidators(null);
+      this.generalInformationForm.controls['duration'].setValidators(null);
+      this.generalInformationForm.controls['jobStartDate'].setValidators(null);
+      this.generalInformationForm.controls['jobEndDate'].setValidators(null);
+      this.generalInformationForm.controls['shiftRequirementId'].setValidators(null);
+      this.generalInformationForm.controls['shiftStartTime'].setValidators(null);
+      this.generalInformationForm.controls['shiftEndTime'].setValidators(null);
+    } else {
+      this.generalInformationForm.controls['hourlyRate']?.setValidators([
+        Validators.required,
+        Validators.maxLength(10),
+        currencyValidator(1),
+      ]);
+      this.generalInformationForm.controls['openPositions'].setValidators([
+        Validators.required,
+        Validators.maxLength(10),
+        integerValidator(1),
+      ]);
+      this.generalInformationForm.controls['minYrsRequired'].setValidators([
+        Validators.maxLength(10),
+        integerValidator(1),
+      ]);
+      this.generalInformationForm.controls['joiningBonus']?.setValidators([
+        Validators.maxLength(10),
+        currencyValidator(1),
+      ]);
+      this.generalInformationForm.controls['compBonus']?.setValidators([
+        Validators.maxLength(10),
+        currencyValidator(1),
+      ]);
+      this.generalInformationForm.controls['duration']?.setValidators(Validators.required);
+      this.generalInformationForm.controls['jobStartDate'].setValidators(Validators.required);
+      this.generalInformationForm.controls['jobEndDate']?.setValidators(Validators.required);
+      this.generalInformationForm.controls['shiftRequirementId'].setValidators(Validators.required);
+      this.generalInformationForm.controls['shiftStartTime'].setValidators(Validators.required);
+      this.generalInformationForm.controls['shiftEndTime'].setValidators(Validators.required);
+    }
+  }
+
   private userEditsOrder(fieldIsTouched: boolean): void {
     if (!fieldIsTouched && this.isEditMode && !this.alreadyShownDialog) {
       this.alreadyShownDialog = true;
@@ -763,8 +759,59 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.get(controlName)?.patchValue(value, { emitEvent: false });
   }
 
+  private handlePermPlacementOrder(): void {
+    const listOfPermPlacementControls = ['orderPlacementFee', 'annualSalaryRangeFrom', 'annualSalaryRangeTo'];
+    const listOfGeneralOrderControls = ['hourlyRate', 'jobEndDate', 'duration', 'joiningBonus', 'compBonus'];
+
+    if (this.isPermPlacementOrder) {
+      this.addPermPlacementControls(listOfPermPlacementControls);
+      this.removeValidators(listOfGeneralOrderControls);
+    } else {
+      this.removePermPlacementControls(listOfPermPlacementControls);
+    }
+  }
+
+  private populatePermPlacementControls(order: Order): void {
+    this.handlePermPlacementOrder();
+
+    if (this.isPermPlacementOrder)
+      this.generalInformationForm.patchValue({
+        orderPlacementFee: order?.orderPlacementFee,
+        annualSalaryRangeFrom: order?.annualSalaryRangeFrom,
+        annualSalaryRangeTo: order?.annualSalaryRangeTo,
+      });
+  }
+
+  private removePermPlacementControls(controls: string[]): void {
+    controls.forEach((control: string) => {
+      this.generalInformationForm.contains(control) &&
+        this.generalInformationForm.removeControl(control, { emitEvent: false });
+    });
+  }
+
+  private removeValidators(controls: string[]): void {
+    controls.forEach((controlName: string) => {
+      if (this.generalInformationForm.contains(controlName)) {
+        const control = this.generalInformationForm.get(controlName);
+        control?.clearValidators();
+      }
+    });
+  }
+
+  private addPermPlacementControls(controlNames: string[]): void {
+    controlNames.forEach((controlName: string) => {
+      const formControl = this.formBuilder.control(null, [
+        Validators.required,
+        Validators.maxLength(10),
+        currencyValidator(1),
+      ]);
+      this.generalInformationForm.addControl(controlName, formControl, { emitEvent: false });
+    });
+  }
+
   private populateForms(order: Order): void {
     const isStatusEditOrProgress = order.status === OrderStatus.Filled || order.status === OrderStatus.InProgress;
+    this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
 
     const hourlyRate = order.hourlyRate ? parseFloat(order.hourlyRate.toString()).toFixed(2) : '';
     const joiningBonus = order.joiningBonus ? parseFloat(order.joiningBonus.toString()).toFixed(2) : '';
@@ -796,6 +843,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.controls['duration'].patchValue(order.duration);
     this.generalInformationForm.controls['shiftStartTime'].patchValue(order.shiftStartTime);
     this.generalInformationForm.controls['shiftEndTime'].patchValue(order.shiftEndTime);
+
+    this.populatePermPlacementControls(order);
 
     this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.specialProject.controls['projectTypeId'].patchValue(order.projectTypeId);
