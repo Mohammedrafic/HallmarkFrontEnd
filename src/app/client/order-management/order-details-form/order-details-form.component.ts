@@ -302,7 +302,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
       this.handlePerDiemOrder();
       this.handlePermPlacementOrder();
-     
+
       Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
         this.generalInformationForm.controls[key].updateValueAndValidity({ onlySelf: false, emitEvent: false });
       });
@@ -420,7 +420,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         }
 
         this.store.dispatch(new GetRegularLocalBillRate(orderType, departmentId, skillId));
-
         this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
       });
 
@@ -1053,7 +1052,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
 
     this.regularLocalBillRate$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((regularLocalBillRate) => {
-      this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0]);
+      if (regularLocalBillRate.length > 0) {
+        this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0].rateHour);
+      }
     });
   }
 
