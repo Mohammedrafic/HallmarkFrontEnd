@@ -94,7 +94,7 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   get isReadOnlyBillRates(): boolean {
-    return this.candidate.status === ApplicantStatusEnum.Withdraw;
+    return this.candidate.status === ApplicantStatusEnum.Withdraw || this.isRejected;
   }
 
   get isDeployedCandidate(): boolean {

@@ -9,15 +9,19 @@ import {
   Briefcase,
   Calendar,
   CheckCircle,
+  DollarSign,
   Download,
   Edit,
   Folder,
   Mail,
   MapPin,
+  Percent,
   Plus,
   Send,
   Trash2,
   User,
+  Eye,
+  EyeOff
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxAllModule,
@@ -116,6 +120,7 @@ import { AcceptFormComponent } from './components/order-candidate-list/reorder-c
 import { NgxMaskModule } from 'ngx-mask';
 import { CloseOrderSideDialogComponent } from '@shared/components/close-order-side-dialog/close-order-side-dialog.component';
 import { OrderCloseReasonInfoComponent } from '@shared/components/order-close-reason-info/order-close-reason-info.component';
+import { CommentComponent } from './components/comments/comment/comment.component';
 
 const icons = {
   AlertCircle,
@@ -133,6 +138,10 @@ const icons = {
   Edit,
   Plus,
   Trash2,
+  Eye,
+  EyeOff,
+  DollarSign,
+  Percent,
 };
 
 const COMPONENTS = [
@@ -168,6 +177,7 @@ const COMPONENTS = [
   CustomProgressBarComponent,
   BillRatesViewGridComponent,
   CommentsComponent,
+  CommentComponent,
   AcceptCandidateComponent,
   OnboardedCandidateComponent,
   ApplyCandidateComponent,

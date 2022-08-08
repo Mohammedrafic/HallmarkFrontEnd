@@ -1,10 +1,9 @@
-import { AbstractControlOptions, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { Injectable } from '@angular/core';
 
 import { CustomFormGroup } from '@core/interface';
 import { RecordFields } from '../enums';
 import { AddTimsheetForm } from '../interface';
-import { dateRangeValidator } from '@core/helpers';
 
 @Injectable()
 export class AddRecordService {

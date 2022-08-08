@@ -1,4 +1,4 @@
-import { AbstractControl } from '@angular/forms';
+import { AbstractControl, FormGroup } from '@angular/forms';
 import { ValidatorFn } from '@angular/forms';
 import { ValidationErrors } from '@angular/forms';
 
@@ -12,3 +12,17 @@ export const dateRangeValidator: ValidatorFn = ((control: AbstractControl): Vali
   }
   return null;
 });
+
+export const leftOnlyValidValues = <T>(formGroup: FormGroup): T => {
+  return Object.entries(formGroup.controls).reduce((acc: any, [key, control]: [string, AbstractControl]) => {
+    if (
+      control.dirty &&
+      (!Array.isArray(control.value) && control.value ||
+        Array.isArray(control.value) && control.value.length)
+    ) {
+      acc[key] = control.value;
+    }
+
+    return acc;
+  }, {});
+}

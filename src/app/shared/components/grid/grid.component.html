@@ -12,9 +12,10 @@
     [headerHeight]="52"
     [suppressRowClickSelection]="suppressRowClickSelection"
     [rowSelection]="rowSelection"
+    [gridOptions]="gridOptions"
     class="ag-theme-alpine app-grid__component"
   ></ag-grid-angular>
-  <app-grid-pagination
+  <app-grid-pagination *ngIf="paginationPanel"
     (navigateToPageEmitter)="navigateToPageEmitter.emit($event)"
     (pageSizeChangeEmitter)="pageSizeChangeEmitter.emit($event)"
     (approveEmitter)="approveEmitter.emit(selectedTableRows)"

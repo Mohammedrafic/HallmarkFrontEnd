@@ -6,6 +6,9 @@ export enum FieldType {
   Number = 'number',
   Dropdown = 'dropdown',
   Date = 'date',
+  SearchDD = 'searchDD',
+  Toggle = 'toggle',
+  TextArea = 'textarea',
  }
 
 
@@ -21,3 +24,7 @@ export enum FieldType {
   Short = 'short',
  }
  
+ export enum DialogAction {
+  Open = 'open',
+  Close = 'close',
+}

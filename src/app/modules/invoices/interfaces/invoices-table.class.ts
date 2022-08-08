@@ -8,6 +8,9 @@ import { PageOfCollections } from "@shared/models/page.model";
 import { InvoicesTableConfig } from "./invoices-table.model";
 import { ChangeEventArgs } from "@syncfusion/ej2-angular-dropdowns";
 
+/**
+ * TODO: move to helpers
+ */
 @Directive()
 export class InvoicesTable<T> extends AbstractGridConfigurationComponent {
   @ViewChild('grid')

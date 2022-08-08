@@ -6,7 +6,7 @@ import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
 import { ChangeEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { Store } from '@ngxs/store';
 
-import { DropdownOption } from '../../../interface';
+import { DropdownOption } from '@core/interface';
 
 @Component({
   selector: 'app-dropdown-editor',
