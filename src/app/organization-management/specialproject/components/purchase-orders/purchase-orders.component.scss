@@ -1,4 +1,4 @@
-
+@import '../../styles/variables/colors';
 @import '@ag-grid-community/core/dist/styles/ag-grid.scss';
 @import '@ag-grid-community/core/dist/styles/ag-theme-alpine';
 
@@ -58,5 +58,10 @@ app-grid {
   .ag-root-wrapper {
     border-bottom-right-radius: 15px !important;
     border-bottom-left-radius: 15px !important;
+  }
+
+  .ag-header-cell-text {
+    font-weight: 600 !important;
+    color: $secondary-dark-blue-15 !important;
   }
 }

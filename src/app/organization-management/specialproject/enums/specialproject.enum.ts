@@ -42,7 +42,7 @@ export enum SpecialProjectTableColumns {
   Department = 'departmentName',
   SkillId ='skillId',
   SkillName = 'skillName',
-  ProjectBudget = 'projectBudget ',
+  ProjectBudget = 'projectBudget',
   StartDate = 'startDate',
   EndDate = 'endDate',
   IsDeleted ='isDeleted'
