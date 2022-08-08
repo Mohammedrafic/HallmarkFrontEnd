@@ -14,7 +14,6 @@ import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { LineChartComponent } from './line-chart.component';
 import { WidgetWrapperModule } from '../widget-wrapper/widget-wrapper.module';
 import { WidgetLegendModule } from '../widget-legend/widget-legend.module';
-import { WidgetWrapperColumnModule } from '../widget-wrapper-column/widget-wrapper-column.module';
 
 @NgModule({
   imports: [
@@ -23,7 +22,6 @@ import { WidgetWrapperColumnModule } from '../widget-wrapper-column/widget-wrapp
     WidgetWrapperModule,
     ButtonModule,
     WidgetLegendModule,
-    WidgetWrapperColumnModule,
   ],
   exports: [LineChartComponent],
   declarations: [LineChartComponent],

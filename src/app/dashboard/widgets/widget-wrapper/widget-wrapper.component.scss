@@ -8,23 +8,24 @@ $headerHeight: 19px;
 }
 
 .app-widget-wrapper {
-  display: inline;
+  display: flex;
   flex-direction: column;
   height: 100%;
   padding: 24px;
   box-sizing: border-box;
   --chartHeight: 100%;
 
-  @media screen and (max-width: 1700px) {
-    padding-left: 16px;
-  }
-
   &.with-legend {
     --chartHeight: 60%;
 
     .app-widget-wrapper__chart {
-      float:left;
-      width:50%;
+      float: left;
+      width: 50%;
+    }
+
+    .app-widget-wrapper__map-chart,
+    .app-widget-wrapper__line-chart {
+      border-bottom: 1px solid rgba($secondary-dark-blue-40, 0.32);
     }
   }
 
@@ -41,7 +42,6 @@ $headerHeight: 19px;
     font-weight: 700;
     color: #1a1b2e;
     height: $headerHeight;
-    padding-left:16px;
   }
 
   &__projection-wrapper {
@@ -50,11 +50,20 @@ $headerHeight: 19px;
   }
 
   &__chart {
-    max-height: var(--chartHeight);
-    padding-top:10%;
+    height: var(--chartHeight);
+    padding-top: 10%;
   }
 
-  &__position-chat {
+  &__line-chart {
+    height: 47%;
+    margin-top: 5%;
+  }
+
+  &__map-chart {
+    height: calc(60% - #{$headerHeight});
+  }
+
+  &__position-chart {
     height: 100%;
     margin-right: -16px;
   }
@@ -63,10 +72,18 @@ $headerHeight: 19px;
     height: 80%;
     overflow: auto;
     padding-top: 25px;
-    margin-right: 12px;
     cursor: default;
     box-sizing: border-box;
+  }
 
+  .line-chart-legend {
+    height: 43%;
+    margin-right: -12px;
+  }
+
+  .map-chart-legend {
+    height: 30%;
+    box-sizing: content-box;
   }
 
   &__loader {
@@ -84,8 +101,7 @@ $headerHeight: 19px;
         font-weight: 700;
         color: #1a1b2e;
         line-height: 16px;
-        padding-left:12px;
-        padding-top:12px;
+        padding-top: 12px;
       }
     }
   }

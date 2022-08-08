@@ -1,4 +1,5 @@
-import { CostCenter, CostCentersDto, DropdownOption } from './../interface/common.interface';
+import { DropdownOption } from '@core/interface';
+import { CostCenter, CostCentersDto } from './../interface/common.interface';
 
 export const CostCenterAdapter = (res: CostCentersDto) => {
   const options: DropdownOption[] = [];

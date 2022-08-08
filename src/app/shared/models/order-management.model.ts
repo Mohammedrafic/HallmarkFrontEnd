@@ -47,6 +47,7 @@ export class OrderManagement {
   orderCloseDate?: string;
   orderClosureReason?: string;
   orderClosureReasonId?: string;
+  organizationPrefix: string;
 }
 
 export class OrderManagementFilter {
@@ -95,6 +96,7 @@ export type AgencyOrderManagement = {
   orderCloseDate?: string;
   orderClosureReason?: string;
   orderClosureReasonId?: string;
+  organizationPrefix: string;
 };
 
 export type OrderManagementChild = {
@@ -280,6 +282,10 @@ export class Order {
   orderClosureReason?: string;
   orderClosureReasonId?: string;
   isTemplate?: boolean;
+  organizationPrefix?: string;
+  orderPlacementFee?: number;
+  annualSalaryRangeFrom?: number;
+  annualSalaryRangeTo?: number;
 }
 
 export class ReOrder {

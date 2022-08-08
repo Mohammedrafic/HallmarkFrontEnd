@@ -26,11 +26,13 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
 
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
+  private openImportDialog: Subject<void> = new Subject<void>();
 
   @Select(CandidateState.candidates)
   private _candidates$: Observable<CandidatePage>;
-  
+
   public candidates$: Observable<CandidatePage>;
+  public openImportDialog$: Observable<void> = this.openImportDialog.asObservable();
 
   @Select(UserState.lastSelectedAgencyId)
   lastSelectedAgencyId$: Observable<number>;
@@ -90,6 +92,10 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public onImport(): void {
+    this.openImportDialog.next();
   }
 
   public navigateToCandidateForm(): void {

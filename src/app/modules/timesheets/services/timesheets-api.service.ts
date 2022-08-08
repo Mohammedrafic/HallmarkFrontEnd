@@ -3,14 +3,14 @@ import { Injectable } from '@angular/core';
 
 import { catchError, map, Observable, of } from 'rxjs';
 
-import { BillRate } from '@shared/models/bill-rate.model';
 import {
-  TimesheetsFilterState, TimesheetRecordsDto, DropdownOption, CostCentersDto,
-  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, DataSourceItem, TabCountConfig
-} from '../interface';
-import { TimeSheetsPage } from '../store/model/timesheets.model';
+  TimesheetsFilterState, TimesheetRecordsDto, CostCentersDto,
+  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions } from '../interface';
+import { BillRate } from '@shared/models/bill-rate.model';
+import { DataSourceItem, DropdownOption } from '@core/interface';
+
 import { CostCenterAdapter } from '../helpers';
-import { RecordsAdapter } from '../helpers/records.adapter';
+import { RecordsAdapter } from '../helpers';
 
 @Injectable()
 export class TimesheetsApiService {

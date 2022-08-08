@@ -1,10 +1,13 @@
 import { PageOfCollections } from "@shared/models/page.model";
-import { InvoiceRecord } from "../interfaces";
+import { InvoiceFilterColumns, InvoiceRecord, InvoicesFilterState } from '../interfaces';
+import { InvoicesTableFiltersColumns } from '../enums/invoices.enum';
 
 export interface InvoicesModel {
-  invoicesData: PageOfCollections<InvoiceRecord>;
+  invoicesData: PageOfCollections<InvoiceRecord> | null;
+  invoicesFilters: InvoicesFilterState | null;
+  invoiceFiltersColumns: InvoiceFilterColumns;
   isInvoiceDetailDialogOpen: boolean;
-  selectedInvoiceId: number;
-  prevInvoiceId?: string;
-  nextInvoiceId?: string;
+  selectedInvoiceId: number | null;
+  prevInvoiceId: string | null;
+  nextInvoiceId: string | null;
 }

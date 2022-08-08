@@ -838,8 +838,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           new GetAgencyOrderCandidatesList(
             this.selectedDataRow.id,
             this.selectedDataRow.organizationId as number,
-            this.currentPage,
-            this.pageSize,
+            1,
+            30,
             this.orderManagementService.excludeDeployed
           )
         );

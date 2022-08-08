@@ -1,0 +1,24 @@
+@import 'colors';
+
+.e-file-select-wrap, .e-upload-actions {
+  display: none;
+}
+
+.droparea {
+  height: 118px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $primary-active-blue-10;
+  font-size: 12px;
+  cursor: pointer;
+
+  &.hidden {
+    display: none;
+  }
+
+  .browse-link {
+    text-decoration: underline;
+    font-weight: 700;
+  }
+}

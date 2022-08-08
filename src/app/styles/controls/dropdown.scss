@@ -86,6 +86,22 @@ body.light, body.dark {
       display: none !important;
     }
   }
+
+  .comments-container {
+    ejs-dropdownlist {
+      span.e-input-group.e-control-wrapper,
+      span.e-input-group.e-control-wrapper:hover,
+      span.e-input-group.e-control-wrapper:active,
+      span.e-input-group.e-control-wrapper.e-input-focus {
+        border-width: 0 !important;
+        background-color: transparent;
+
+        input {
+          text-align: right;
+        }
+      }
+    }
+  }
 }
 
 /** Begin organization-agency-dropdown styles */
