@@ -204,6 +204,7 @@ export class OrderContactDetails {
   title: string;
   email: string;
   mobilePhone: string;
+  isPrimaryContact: boolean;
 }
 
 export class OrderWorkLocation {

@@ -3,18 +3,7 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import {
-  combineLatest,
-  debounceTime,
-  filter,
-  Observable,
-  of,
-  Subject,
-  switchMap,
-  take,
-  takeUntil,
-  throttleTime,
-} from 'rxjs';
+import { combineLatest, debounceTime, filter, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
 
 import { ChangeEventArgs, DropDownListComponent, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -73,6 +62,7 @@ import { AlertService } from '@shared/services/alert.service';
 import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
 import { ReasonForRequisitionList } from '@shared/models/reason-for-requisition-list';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
+import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
 
 @Component({
   selector: 'app-order-details-form',
@@ -680,8 +670,17 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public removeContact(index: number): void {
+    const isPrimaryContact = this.contactDetailsFormArray.controls[index].get('isPrimaryContact')?.value;
     this.isEditContactTitle.splice(index, 1);
     this.contactDetailsFormArray.removeAt(index);
+
+    if (isPrimaryContact) {
+      this.setDefaultPrimaryContact();
+    }
+  }
+
+  private setDefaultPrimaryContact(): void {
+    this.contactDetailsFormArray.controls[0].get('isPrimaryContact')?.patchValue(true);
   }
 
   public editContactTitleHandler(i: number): void {
@@ -908,6 +907,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         Validators.minLength(10),
         Validators.pattern(/^[0-9]+$/),
       ]),
+      isPrimaryContact: new FormControl(
+        orderContactDetails ? orderContactDetails.isPrimaryContact : !this.contactDetailsFormArray?.length
+      ),
     });
   }
 
@@ -965,6 +967,16 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
     this.regularLocalBillRate$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((regularLocalBillRate) => {
       this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0]);
+    });
+  }
+
+  public selectPrimaryContact(event: ChangeArgs): void {
+    const checkedValue = Number(event.value);
+    this.contactDetailsFormArray.controls.forEach((control, index) => {
+      const primaryContact = control.get('isPrimaryContact');
+      if (primaryContact) {
+        index !== checkedValue ? primaryContact.patchValue(false) : primaryContact.patchValue(true);
+      }
     });
   }
 }
