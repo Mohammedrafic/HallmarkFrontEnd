@@ -12,7 +12,7 @@
       <section class="header-container">
         <div class="e-card-header preview-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title preview-title">Position ID {{ order?.orderId || order?.id }}/{{ candidate?.positionId }}</h3>
+            <h3 class="e-card-title preview-title">Position ID {{ order?.organizationPrefix }}-{{ order?.orderId || order?.id }}-{{ candidate?.positionId }}</h3>
             <div class="order-statuses">
               <ejs-chiplist #chipList class="events-off" *ngIf="candidate?.orderStatus">
                 <e-chips>

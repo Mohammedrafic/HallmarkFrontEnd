@@ -55,7 +55,7 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
   public renderCell(args: RenderDayCellEventArgs): void {
     if (this.dateControl.value && typeof this.dateControl.value === 'string') {
       const [from, to] = DateTimeHelper.getWeekStartEnd(this.dateControl.value);
-      
+
       if (DateTimeHelper.isDateBetween(args.date, from, to)) {
         args.element?.classList.add('e-highlightselectedrange');
       }
@@ -160,6 +160,6 @@ export class DateWeekPickerComponent extends Destroyable implements OnInit, OnCh
     this.weekService.setRange([
       DateTimeHelper.toUtcFormat(new Date(this.startDateValue)),
       DateTimeHelper.toUtcFormat(DateTimeHelper.getWeekDate(this.startDateValue)),
-    ]); 
+    ]);
   }
 }

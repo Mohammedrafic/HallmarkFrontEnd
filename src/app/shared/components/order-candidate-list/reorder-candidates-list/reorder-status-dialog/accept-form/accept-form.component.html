@@ -137,5 +137,11 @@
       </div>
     </div>
   </div>
+  <div class="input-container bootstrap" *ngIf="isRejected">
+    <label>Rejection Reason</label>
+    <div class="input-group input-readonly">
+      <input formControlName="rejectReason" class="e-input" type="text" readonly/>
+    </div>
+  </div>
 </form>
 

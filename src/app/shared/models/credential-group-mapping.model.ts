@@ -1,4 +1,3 @@
-// TODO: can be changed after BE implementation
 export class SkillGroupMapping {
   mappingId?: number;
   skillGroupName?: string;

@@ -45,6 +45,8 @@ import {
   SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
+  GetContactDetails,
+  GetRegularLocalBillRate,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -80,6 +82,8 @@ import { HistoricalEvent } from '@shared/models/historical-event.model';
 import { GetCandidatesBasicInfo } from '@agency/store/order-management.actions';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { NavigationTabModel } from '@shared/models/navigation-tab.model';
+import { DepartmentsService } from '@shared/services/departments.service';
+import { Department } from '@shared/models/department.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -107,6 +111,8 @@ export interface OrderManagementContentStateModel {
   orderFilterDataSources: OrderFilterDataSource | null;
   historicalEvents: HistoricalEvent[] | null;
   navigationTab: NavigationTabModel;
+  contactDetails: Department | null;
+  regularLocalBillRate: string[];
 }
 
 @State<OrderManagementContentStateModel>({
@@ -141,6 +147,8 @@ export interface OrderManagementContentStateModel {
       pending: null,
       current: null,
     },
+    contactDetails: null,
+    regularLocalBillRate: [],
   },
 })
 @Injectable()
@@ -267,11 +275,22 @@ export class OrderManagementContentState {
     return state.navigationTab;
   }
 
+  @Selector()
+  static contactDetails(state: OrderManagementContentStateModel): Department | null {
+    return state.contactDetails;
+  }
+
+  @Selector()
+  static regularLocalBillRate(state: OrderManagementContentStateModel): string[] {
+    return state.regularLocalBillRate;
+  }
+
   constructor(
     private orderManagementService: OrderManagementContentService,
     private projectsService: ProjectsService,
     private shiftsService: ShiftsService,
-    private rejectReasonService: RejectReasonService
+    private rejectReasonService: RejectReasonService,
+    private departmentService: DepartmentsService
   ) {}
 
   @Action(GetIncompleteOrders)
@@ -707,5 +726,26 @@ export class OrderManagementContentState {
     { active, pending, current }: SelectNavigationTab
   ): void {
     patchState({ navigationTab: { active, pending, current } });
+  }
+
+  @Action(GetContactDetails)
+  GetContactDetails(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { departmentId }: GetContactDetails
+  ): Observable<Department> {
+    return this.departmentService.getDepartmentData(departmentId).pipe(
+      tap((contactDetails: Department) => {
+        patchState({ contactDetails });
+      })
+    );
+  }
+
+  @Action(GetRegularLocalBillRate)
+  GetRegularLocalBillRate ({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<string[]> {
+    return this.orderManagementService.getRegularLocalBillRate().pipe(
+      tap((regularLocalBillRate: string[]) => {
+        patchState({ regularLocalBillRate });
+      })
+    );
   }
 }

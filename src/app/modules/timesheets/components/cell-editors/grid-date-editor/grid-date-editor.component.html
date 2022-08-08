@@ -3,7 +3,6 @@
   <ng-template [ngSwitchCase]="false">
     <div class="init-value-wrapper">
       <span class="value-block">
-        <span class="value">{{ value | date:'MM/dd/yyyy': 'UTC'}}</span>
         <span class="value">{{ value | date:'H:mm': 'UTC'}}</span>
       </span>
     </div>
@@ -20,7 +19,7 @@
             [value]="dateValue"
             [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
             [enableMask]="true"
-            [step]="30"
+            [step]="15"
             maskPlaceholder="HH:MM"
             (change)="handleTimeChange($event)">
         </ejs-timepicker>
@@ -29,7 +28,7 @@
         <ng-template ngSwitchCase="dateTime">
           <ejs-timepicker
             name="startDateTime"
-            [step]="30"
+            [step]="15"
             placeholder="HH:MM"
             format="HH:mm"
             [value]="dateValue"

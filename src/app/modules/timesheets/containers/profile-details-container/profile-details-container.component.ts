@@ -1,15 +1,7 @@
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output,
-  ViewChild
-} from '@angular/core';
+  ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter,
+  Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { filter, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
@@ -25,23 +17,15 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportColumn, ExportPayload } from '@shared/models/export.model';
-import { SubmitBtnText, TimesheetTargetStatus } from '../../enums';
+import { DialogAction, SubmitBtnText, TimesheetTargetStatus } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import {
-  CandidateMilesData,
-  ChangeStatusData,
-  DialogActionPayload,
-  OpenAddDialogMeta,
-  Timesheet,
-  TimesheetDetailsModel
-} from '../../interface';
+  CandidateMilesData, ChangeStatusData, DialogActionPayload, OpenAddDialogMeta,
+  Timesheet, TimesheetDetailsModel } from '../../interface';
 import {
-  ConfirmDeleteTimesheetDialogContent,
-  rejectTimesheetDialogData,
-  TimesheetConfirmMessages,
-  TimesheetDetailsExportOptions
-} from '../../constants';
+  ConfirmDeleteTimesheetDialogContent, rejectTimesheetDialogData,
+  TimesheetConfirmMessages, TimesheetDetailsExportOptions } from '../../constants';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';
@@ -58,9 +42,15 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @ViewChild('candidateDialog')
   public candidateDialog: DialogComponent;
 
+  /**
+   * TODO: move chips to separate shared component.
+   */
   @ViewChild('chipList')
   public chipList: ChipListComponent;
 
+  /**
+   * TODO: try to use file-uploader component from invoices with tooltip as separate shared component.
+   */
   @ViewChild('dropEl')
   public dropEl: HTMLDivElement;
 
@@ -129,6 +119,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     private datePipe: DatePipe,
     private router: Router,
     private timesheetDetailsService: TimesheetDetailsService,
+
     private cd: ChangeDetectorRef,
   ) {
     super();

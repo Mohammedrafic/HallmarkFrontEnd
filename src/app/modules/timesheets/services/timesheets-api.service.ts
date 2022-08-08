@@ -3,11 +3,13 @@ import { Injectable } from '@angular/core';
 
 import { catchError, map, Observable, of } from 'rxjs';
 
-import { DataSourceItem, DropdownOption } from '@core/interface';
+import {
+  TimesheetsFilterState, TabCountConfig, TimesheetRecordsDto, DropdownOption, CandidateHoursAndMilesData,
+  RecordValue, CostCentersDto, AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, DataSourceItem, } from '../interface';
 import { BillRate } from '@shared/models/bill-rate.model';
 import {
-  TimesheetsFilterState, TimesheetRecordsDto, CostCentersDto,
-  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, } from '../interface';
+  TimesheetsFilterState, TimesheetRecordsDto, DropdownOption, CostCentersDto,
+  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, DataSourceItem } from '../interface';
 import { TimrsheetsDto } from '../store/model/timesheets.model';
 import { CostCenterAdapter } from '../helpers';
 import { RecordsAdapter } from '../helpers';

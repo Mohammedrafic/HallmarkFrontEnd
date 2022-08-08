@@ -84,7 +84,7 @@ export class AddTimesheetComponent extends AddDialogHelper<AddTimsheetForm> impl
       if (item.optionsStateKey) {
         item.options = this.store.snapshot().timesheets[item.optionsStateKey];
       }
-      
+
       if (item.optionsStateKey === 'billRateTypes') {
         item.options = item.options?.filter((rate) => rate.text !== 'Mileage' && rate.text !== 'Charge');
       }

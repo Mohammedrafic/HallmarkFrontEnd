@@ -241,12 +241,12 @@
                 <div class="form-line">
                   <!-- Shift Requirements -->
                   <div class="input-container bootstrap form-line-item-20">
-                    <label>Shift Requirement<span class="required">*</span></label>
+                    <label>Shift Name<span class="required">*</span></label>
                     <div class="input-group dropdown">
                       <ejs-dropdownlist
                         formControlName="shiftRequirementId"
                         appValidateWithMessage
-                        [dataSource]="masterShifts$ | async"
+                        [dataSource]="masterShiftNames"
                         [fields]="masterShiftFields">
                       </ejs-dropdownlist>
                     </div>
@@ -680,9 +680,9 @@
       (selectDocuments)="onDocumentsSelected($event)"
       (deleteDocument)="onDocumentDeleted($event)">
     </app-document-uploader>
-    <div tabindex="0" class="e-card comments" *ngIf="isPerDiem">
+    <div tabindex="0" class="e-card comments">
       <div class="e-card-content">
-        <app-comments [useBackground]="false"></app-comments>
+        <app-comments [comments]="comments" [useBackground]="false"></app-comments>
       </div>
     </div>
   </div>

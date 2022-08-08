@@ -25,6 +25,10 @@ export class AcceptFormComponent {
     return showHourlyRateForStatuses.includes(this.status);
   }
 
+  get isRejected(): boolean {
+    return this.status === CandidatStatus.Rejected;
+  }
+
   static generateFormGroup(): FormGroup {
     return new FormGroup({
       reOrderFromId: new FormControl({ value: '', disabled: true }),
@@ -38,6 +42,7 @@ export class AcceptFormComponent {
       shiftEndTime: new FormControl({ value: '', disabled: true }),
       openPositions: new FormControl({ value: '', disabled: true }),
       hourlyRate: new FormControl({ value: '', disabled: false }, [Validators.required]),
+      rejectReason: new FormControl({ value: '', disabled: true }),
     });
   }
 }

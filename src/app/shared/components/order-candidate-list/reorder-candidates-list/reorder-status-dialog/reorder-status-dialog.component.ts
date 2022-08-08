@@ -76,7 +76,10 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public selectedOrder$: Observable<Order>;
 
   get isBillRatePending(): boolean {
-    return this.currentCandidateApplicantStatus === CandidatStatus.BillRatePending && !this.isAgency;
+    return (
+      [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR].includes(this.currentCandidateApplicantStatus) &&
+      !this.isAgency
+    );
   }
 
   get isOfferedBillRate(): boolean {
@@ -218,6 +221,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     offeredBillRate,
     orderId,
     positionId,
+    rejectReason,
   }: OrderCandidateJob) {
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     const isBillRatePending =
@@ -236,6 +240,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
       shiftEndTime,
       openPositions,
       hourlyRate: PriceUtils.formatNumbers(isBillRatePending),
+      rejectReason,
     });
     this.enableFields();
   }

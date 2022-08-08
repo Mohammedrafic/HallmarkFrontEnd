@@ -238,3 +238,12 @@ export class SelectNavigationTab {
     public current?: OrganizationOrderManagementTabs
   ) {}
 }
+
+export class GetContactDetails {
+  static readonly type = '[order management] Get Contact Details';
+  constructor(public departmentId: number) {}
+}
+
+export class GetRegularLocalBillRate {
+  static readonly type = '[order management] Get Regular Local Bill Rate';
+}
