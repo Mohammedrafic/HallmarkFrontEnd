@@ -17,7 +17,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportColumn, ExportPayload } from '@shared/models/export.model';
-import { DialogAction, SubmitBtnText, TimesheetTargetStatus } from '../../enums';
+import { SubmitBtnText, TimesheetTargetStatus } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import {

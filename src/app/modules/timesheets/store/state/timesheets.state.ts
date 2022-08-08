@@ -17,15 +17,14 @@ import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
 import {
-  DialogAction, RecordFields, TimesheetTargetStatus, TimesheetsTableFiltersColumns, FilteringOptionsFields
+  RecordFields, TimesheetTargetStatus, TimesheetsTableFiltersColumns, FilteringOptionsFields
 } from '../../enums';
 import {
   AddSuccessMessage, DefaultFiltersState, DefaultTimesheetCollection, DefaultTimesheetState,
   filteringOptionsMapping, GetBydateErrMessage, PutSuccess, SavedFiltersParams } from '../../constants';
 import {
-  Attachment, CandidateHoursAndMilesData, CandidateInfo, CandidateMilesData, DataSourceItem, FilterColumns,
-  TabCountConfig, Timesheet, TimesheetAttachment, TimesheetDetailsModel, TimesheetInvoice,
-  TimesheetRecordsDto, TimesheetsFilterState, TimesheetStatistics, DropdownOption,
+  Attachment, CandidateHoursAndMilesData, CandidateInfo, CandidateMilesData, FilterColumns, TabCountConfig,
+  Timesheet, TimesheetDetailsModel, TimesheetInvoice, TimesheetRecordsDto, TimesheetsFilterState, TimesheetStatistics,
   TimesheetsFilteringOptions } from '../../interface';
 import { ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetailsApiService } from '../../services/timesheet-details-api.service';
