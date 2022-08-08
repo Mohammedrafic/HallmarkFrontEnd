@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, Input, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, Input, ViewEncapsulation, Output, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
@@ -29,6 +29,7 @@ import { ConfirmService } from '@shared/services/confirm.service';
 
 export class SpecialProjectsComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
+  @Output() onEdit = new EventEmitter<SpecialProject>();
 
   @Select(SpecialProjectState.specialProjectPage)
   specialProjectPage$: Observable<SpecialProjectPage>;
@@ -40,8 +41,8 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
   public rowData: SpecialProject[]=[];
   public rowSelection: 'single' | 'multiple' = 'single';
   public actionCellrenderParams: any = {
-    handleOnEdit: (params: any) => {
-      this.saveSpecialProject(params);
+    handleOnEdit: (params: SpecialProject) => {
+      this.onEdit.next(params);
     },
     handleOnDelete: (params: any) => {
       this.deleteSpecialProject(params);
@@ -59,14 +60,6 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
   }
   ngOnDestroy(): void {
   }
-
-  checkboxSelection = (params: CheckboxSelectionCallbackParams) => {
-    return params.columnApi.getRowGroupColumns().length === 0;
-  };
-
-  headerCheckboxSelection = (params: HeaderCheckboxSelectionCallbackParams)=> {
-    return params.columnApi.getRowGroupColumns().length === 0;
-  };
 
   onPageSizeChanged(event: any) {
     this.gridOptions.cacheBlockSize = Number(event.value.toLowerCase().replace("rows", ""));
@@ -129,7 +122,7 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
   }
 
 
-  getSpecialProjects(): void {
+  public getSpecialProjects(): void {
     this.store.dispatch(new GetSpecialProjects());
     this.specialProjectPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (data?.items) {
@@ -138,17 +131,6 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
       }
     });
   
-  }
-
-  saveSpecialProject(params: any):void{
-    // var specialProject: SpecialProject;
-    //   specialProject=
-    //   {id:0,projectTypeId:1,
-    //     regionId:8,regionName:'East',locationId:7,locationName:'Defiance Hospital',
-    //     departmentId:654,departmentName:'CARDIOLOGY CLINIC ',startDate:new Date(),
-    //     endDate:new Date(),isDeleted:false,
-    //     name:'test001',organizationId:2,projectBudget:2000.90,skillId:7};
-    //   this.store.dispatch(new SaveSpecialProject(specialProject));
   }
 
   deleteSpecialProject(params: any): void {
@@ -161,7 +143,9 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
       })
       .subscribe((confirm) => {
         if (confirm && params.id) {
-          this.store.dispatch(new DeletSpecialProject(params.id));
+          this.store.dispatch(new DeletSpecialProject(params.id)).subscribe(val => {
+            this.getSpecialProjects();
+          });
         }
         this.removeActiveCssClass();
       });

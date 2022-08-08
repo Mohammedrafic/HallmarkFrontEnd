@@ -5,23 +5,34 @@ import { catchError, Observable, of, tap } from 'rxjs';
 import { SpecialProject, SpecialProjectPage } from 'src/app/shared/models/special-project.model';
 import { GetSpecialProjects,SaveSpecialProject, SaveSpecialProjectSucceeded, SetIsDirtySpecialProjectForm,
   DeletSpecialProject, 
-  DeletSpecialProjectSucceeded} from './special-project.actions';
+  DeletSpecialProjectSucceeded,
+  GetProjectTypes,
+  GetSpecialProjectById} from './special-project.actions';
 import { SpecialProjectService } from '@shared/services/special-project.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
 import { RECORD_ADDED } from '@shared/constants';
+import { OrderManagementContentStateModel } from '@client/store/order-managment-content.state';
+import { ProjectType } from '@shared/models/project.model';
+import { ProjectsService } from '@shared/services/projects.service';
+import { any } from 'lodash/fp';
 
 export interface SpecialProjectStateModel {
   specialProjectPage: SpecialProjectPage | null;
-  isSpecialProjectLoading:boolean
+  isSpecialProjectLoading: boolean,
+  projectTypes: ProjectType[];
+  SpecialProjectEntity: SpecialProject | null;
 }
+
 
 @State<SpecialProjectStateModel>({
   name: 'specialProjects',
   defaults: {
     specialProjectPage: null,
     isSpecialProjectLoading: false,
+    projectTypes: [],
+    SpecialProjectEntity: null
   },
 })
 @Injectable()
@@ -35,8 +46,19 @@ export class SpecialProjectState {
   @Selector()
   static isSpecialProjectLoading(state: SpecialProjectStateModel): boolean { return state.isSpecialProjectLoading; }
 
+  @Selector()
+  static projectTypes(state: SpecialProjectStateModel): ProjectType[] {
+    return state.projectTypes;
+  }
+
+  @Selector()
+  static SpecialProjectEntity(state: SpecialProjectStateModel): SpecialProject | null {
+    return state.SpecialProjectEntity;
+  }
+
   
-  constructor(private specialProjectService: SpecialProjectService) { }
+  constructor(private specialProjectService: SpecialProjectService,
+    private projectsService: ProjectsService  ) { }
 
   @Action(GetSpecialProjects)
   GetSpecialProjects({ patchState }: StateContext<SpecialProjectStateModel>, { }: GetSpecialProjects): Observable<SpecialProjectPage> {
@@ -68,12 +90,34 @@ export class SpecialProjectState {
   }
 
   @Action(DeletSpecialProject)
-  DeletSpecialProject({ dispatch }: StateContext<SpecialProjectStateModel>, { id }: DeletSpecialProject): Observable<any> {
+  DeletSpecialProject({ patchState, dispatch }: StateContext<SpecialProjectStateModel>, { id }: DeletSpecialProject): Observable<any> {
+    patchState({ isSpecialProjectLoading: true });
     return this.specialProjectService.removeSpecialProject(id).pipe(
       tap(() => {
-        dispatch(new DeletSpecialProjectSucceeded());
+        patchState({ isSpecialProjectLoading: false });
+        const message = 'Special Project deleted successfully';
+        const actions = [new DeletSpecialProjectSucceeded(), new ShowToast(MessageTypes.Success, message)];
+        dispatch([...actions, new DeletSpecialProjectSucceeded()]);
       }),
       catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, 'Special Project cannot be deleted'))))
+    );
+  }
+
+  @Action(GetProjectTypes)
+  GetProjectTypes({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<ProjectType[]> {
+    return this.projectsService.getProjectTypes().pipe(
+      tap((payload) => {
+        patchState({ projectTypes: payload });
+      })
+    );
+  }
+
+  @Action(GetSpecialProjectById)
+  GetSpecialProjectsById({ patchState }: StateContext<SpecialProjectStateModel>, { id }: GetSpecialProjectById): Observable<SpecialProject> {
+    return this.specialProjectService.getSpecialProjectById(id).pipe(
+      tap((payload) => {
+        patchState({ SpecialProjectEntity: payload });
+      })
     );
   }
 }
