@@ -1051,11 +1051,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
     });
 
-    this.regularLocalBillRate$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((regularLocalBillRate) => {
-      if (regularLocalBillRate.length > 0) {
-        this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0].rateHour);
-      }
-    });
+    this.regularLocalBillRate$
+      .pipe(takeUntil(this.unsubscribe$), filter((billRate) => !!billRate.length))
+      .subscribe((regularLocalBillRate) => this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0].rateHour));
   }
 
   public selectPrimaryContact(event: ChangeArgs): void {
