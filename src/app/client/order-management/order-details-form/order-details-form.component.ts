@@ -675,7 +675,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.generalInformationForm.controls['duration']?.setValidators(Validators.required);
       this.generalInformationForm.controls['jobStartDate'].setValidators(Validators.required);
       this.generalInformationForm.controls['jobEndDate']?.setValidators(Validators.required);
-      this.generalInformationForm.controls['shiftRequirementId'].setValidators(Validators.required);
+      this.generalInformationForm.controls['shift'].setValidators(Validators.required);
       this.generalInformationForm.controls['shiftStartTime'].setValidators(Validators.required);
       this.generalInformationForm.controls['shiftEndTime'].setValidators(Validators.required);
     }
