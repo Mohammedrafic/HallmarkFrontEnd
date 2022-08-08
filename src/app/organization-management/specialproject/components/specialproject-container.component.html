@@ -1,10 +1,5 @@
 <section class="container">
   <div class="toolbar-buttons">
-    <button ejs-button cssClass="e-outline button-filter">
-      <div class="filter-button-content">
-        Filters <i-feather name="sliders" class="icon"></i-feather>
-      </div>
-    </button>
     <button ejs-button [isPrimary]="true" (click)="handleOnAdd()">{{addButtonTitle}}</button>
   </div>
   <ejs-tab (selected)="onTabSelected($event)">
@@ -12,14 +7,14 @@
       <e-tabitem>
         <ng-template #headerText><div>Special Projects</div></ng-template>
         <ng-template #content>
-          <app-special-projects [form]="form"></app-special-projects>
+          <app-special-projects [form]="form" (onEdit)="onEditClick($event)"></app-special-projects>
         </ng-template>
       </e-tabitem>
 
       <e-tabitem>
         <ng-template #headerText><div>Purchase Orders</div></ng-template>
         <ng-template #content>
-         
+
           <app-purchase-orders [form]="form"></app-purchase-orders>
         </ng-template>
       </e-tabitem>
@@ -41,8 +36,11 @@
           <label>Project Category<span class="required">*</span></label>
           <div class="input-group dropdown">
             <ejs-dropdownlist formControlName="projectCategory"
-                              appValidateWithMessage>
+                              appValidateWithMessage
+                              [dataSource]=" this.orgStructureData.projectTypeIds.dataSource"
+                              [fields]="projectTypeFields">
             </ejs-dropdownlist>
+
           </div>
         </div>
       </div>
@@ -107,8 +105,11 @@
           <ejs-multiselect mode="CheckBox"
                            formControlName="regionIds"
                            placeholder="All"
+                           selectAllText="Select All"
+                           appValidateWithMessage
                            [fields]="optionFields"
-                           [allowFiltering]="true"
+                           [showSelectAll]="true"
+                           [allowFiltering]="false"
                            [showDropDownIcon]="true"
                            [dataSource]="orgStructureData.regionIds.dataSource">
           </ejs-multiselect>
@@ -122,8 +123,11 @@
           <ejs-multiselect mode="CheckBox"
                            formControlName="locationIds"
                            placeholder="All"
+                           selectAllText="Select All"
+                           appValidateWithMessage
                            [fields]="optionFields"
-                           [allowFiltering]="true"
+                           [showSelectAll]="true"
+                           [allowFiltering]="false"
                            [showDropDownIcon]="true"
                            [dataSource]="orgStructureData.locationIds.dataSource">
           </ejs-multiselect>
@@ -137,8 +141,11 @@
           <ejs-multiselect mode="CheckBox"
                            formControlName="departmentsIds"
                            placeholder="All"
+                           selectAllText="Select All"
+                           appValidateWithMessage
                            [fields]="optionFields"
-                           [allowFiltering]="true"
+                           [showSelectAll]="true"
+                           [allowFiltering]="false"
                            [showDropDownIcon]="true"
                            [dataSource]="orgStructureData.departmentsIds.dataSource">
           </ejs-multiselect>
@@ -152,8 +159,11 @@
           <ejs-multiselect mode="CheckBox"
                            formControlName="skillIds"
                            placeholder="All"
+                           selectAllText="Select All"
+                           appValidateWithMessage
                            [fields]="skillsFields"
-                           [allowFiltering]="true"
+                           [showSelectAll]="true"
+                           [allowFiltering]="false"
                            [showDropDownIcon]="true"
                            [dataSource]="orgStructureData.skillIds.dataSource">
           </ejs-multiselect>
@@ -205,8 +215,8 @@
                                 [maxlength]="10"
                                 [validateDecimalOnType]="true"
                                 [showSpinButton]="false"
-                                decimals='0'
-                                format="#"
+                                decimals='2'
+                                format="#.##"
                                 formControlName="projectBudget">
             </ejs-numerictextbox>
           </div>

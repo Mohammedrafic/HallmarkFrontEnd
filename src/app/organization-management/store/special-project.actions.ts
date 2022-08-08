@@ -30,3 +30,13 @@ export class DeletSpecialProjectSucceeded {
   constructor() {}
 }
 
+export class GetProjectTypes {
+  static readonly type = '[SpecialProject] Get Project Types';
+  constructor() { }
+}
+
+export class GetSpecialProjectById {
+  static readonly type = '[SpecialProject] Get SpecialProject by Id';
+  constructor(public id: number) { }
+}
+
