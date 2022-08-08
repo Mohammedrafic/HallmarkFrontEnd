@@ -2,7 +2,7 @@
   <ejs-grid
     #reasonGrid
     class="grid-component"
-    [dataSource]="(rejectReasonPage$ | async)?.items"
+    [dataSource]="(reasons$ | async)?.items"
     [allowSorting]="false"
     [allowResizing]="true"
     [allowSelection]="false"
@@ -48,7 +48,7 @@
                 format="#"
                 placeholder="Go to:"
                 min="1"
-                [max]="(rejectReasonPage$ | async)?.totalCount"
+                [max]="(reasons$ | async)?.totalCount"
                 [showSpinButton]="false"
                 (change)="onGoToClick($event)"
               >
@@ -59,7 +59,7 @@
                 id="gridPager"
                 #gridPager
                 [pageSize]="pageSize"
-                [totalRecordsCount]="(rejectReasonPage$ | async)?.totalPages"
+                [totalRecordsCount]="(reasons$ | async)?.totalPages"
                 [enablePagerMessage]="false"
                 [currentPage]="currentPage"
                 (click)="onGoToClick($event)"
