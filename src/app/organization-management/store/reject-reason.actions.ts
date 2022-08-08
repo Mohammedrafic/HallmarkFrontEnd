@@ -55,3 +55,37 @@ export class SaveClosureReasons {
 export class SaveClosureReasonsError {
   static readonly type = '[reject reason] Save Closure Reason Error';
 }
+
+export class CreateManualInvoiceRejectReason {
+  static readonly type = '[reject reason] Save Manual Invoice Reason';
+  constructor(public payload: RejectReason){}
+}
+
+export class UpdateManualInvoiceRejectReasonSuccess {
+  static readonly type = '[reject reason] Manual Invoice Reason Success';
+}
+
+export class UpdateManualInvoiceRejectReason {
+  static readonly type = '[reject reason] Update Manual Invoice Reason';
+  constructor(public payload: RejectReason) {
+  }
+}
+
+export class RemoveManualInvoiceRejectReason {
+  static readonly type = '[reject reason] Remove Manual Invoice Reason';
+  constructor(public id: number){}
+}
+
+export class GetManualInvoiceRejectReasonsByPage {
+  static readonly type = '[reject reason] Get Manual Invoice reasons by Page';
+  constructor(
+    public pageNumber?: number,
+    public pageSize?: number,
+    public orderBy?: string,
+    public getAll?: boolean
+  ) { }
+}
+
+export class SaveManualInvoiceRejectReasonError {
+  static readonly type = '[reject reason] Save Manual Invoice Reason Error';
+}

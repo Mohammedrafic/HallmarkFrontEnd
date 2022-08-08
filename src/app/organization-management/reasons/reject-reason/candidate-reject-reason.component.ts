@@ -1,14 +1,6 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { AbstractGridConfigurationComponent } from "@shared/components/abstract-grid-configuration/abstract-grid-configuration.component";
-import { ConfirmService } from "@shared/services/confirm.service";
-import {
-  DELETE_RECORD_TEXT,
-  DELETE_RECORD_TITLE,
-} from "@shared/constants";
-import { UserState } from "src/app/store/user.state";
-import { Actions, ofActionSuccessful, Select, Store } from "@ngxs/store";
-import { FormGroup } from "@angular/forms";
-import { Observable, Subject, takeWhile, throttleTime } from "rxjs";
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ofActionSuccessful, Select } from "@ngxs/store";
+import { Observable, takeWhile } from "rxjs";
 import {
   GetRejectReasonsByPage,
   RemoveRejectReasons,
@@ -16,106 +8,37 @@ import {
   UpdateRejectReasonsSuccess
 } from "@organization-management/store/reject-reason.actions";
 import { RejectReasonState } from "@organization-management/store/reject-reason.state";
-import { RejectReason, RejectReasonPage } from "@shared/models/reject-reason.model";
-import { DialogMode } from "@shared/enums/dialog-mode.enum";
+import { RejectReasonPage } from "@shared/models/reject-reason.model";
+import { ReasonsComponent } from '@organization-management/reasons/models/reasons-component.class';
 
 @Component({
   selector: 'app-candidate-reject-reason',
   templateUrl: './candidate-reject-reason.component.html',
   styleUrls: ['./candidate-reject-reason.component.scss']
 })
-export class CandidateRejectReasonComponent extends AbstractGridConfigurationComponent implements OnInit,OnDestroy {
-  @Input() form: FormGroup;
-
-  @Output() onEditReasons = new EventEmitter<RejectReason>();
-
+export class CandidateRejectReasonComponent extends ReasonsComponent implements OnInit,OnDestroy {
   @Select(RejectReasonState.rejectReasonsPage)
-  public rejectReasonPage$: Observable<RejectReasonPage>;
+  public reasons$: Observable<RejectReasonPage>;
 
-  @Select(UserState.lastSelectedOrganizationId)
-  organizationId$: Observable<number>;
-
-  private isAlive = true;
-  private pageSubject = new Subject<number>();
-
-  constructor(
-    private store: Store,
-    private actions$: Actions,
-    private confirmService: ConfirmService
-  ) {
-    super();
-  }
-
-  ngOnInit(): void {
-    this.subscribeOnSaveReasonError();
-    this.subscribeOnUpdateReasonSuccess();
-    this.subscribeOnOrganization();
-  }
-
-  ngOnDestroy(): void {
-    this.isAlive = false;
-  }
-
-  public onEdit(data: RejectReason) {
-    this.onEditReasons.emit(data);
-  }
-
-  public onRemove(id: number): void {
-    this.confirmService
-      .confirm(DELETE_RECORD_TEXT, {
-        title: DELETE_RECORD_TITLE,
-        okButtonLabel: 'Delete',
-        okButtonClass: 'delete-button'
-      })
-      .subscribe((confirm: boolean) => {
-        if (confirm) {
-          this.store.dispatch(new RemoveRejectReasons(id));
-        }
-      });
-  }
-
-  public onRowsDropDownChanged(): void {
-    this.pageSize = parseInt(this.activeRowsPerPageDropDown);
-    this.pageSettings = { ...this.pageSettings, pageSize: this.pageSize };
-    this.dispatchNewPage();
-  }
-
-  public onGoToClick(event: any): void {
-    if (event.currentPage || event.value) {
-      this.pageSubject.next(event.currentPage || event.value);
-    }
-  }
-
-  private dispatchNewPage(): void {
-    this.store.dispatch(new GetRejectReasonsByPage(this.currentPage, this.pageSize))
-  }
-
-  private initGrid(): void {
+  protected getData(): void {
     this.store.dispatch(new GetRejectReasonsByPage(this.currentPage, this.pageSize));
   }
 
-  private subscribeOnSaveReasonError(): void {
+  protected remove(id: number): void {
+    this.store.dispatch(new RemoveRejectReasons(id));
+  }
+
+  protected subscribeOnSaveReasonError(): void {
     this.actions$.pipe(
       ofActionSuccessful(SaveRejectReasonsError),
       takeWhile(() => this.isAlive)
-    ).subscribe(() => this.form.controls['reason'].setErrors({'incorrect': true}));
+    ).subscribe(() => this.setReasonControlError());
   }
 
-  private subscribeOnUpdateReasonSuccess(): void {
+  protected subscribeOnUpdateReasonSuccess(): void {
     this.actions$.pipe(
       ofActionSuccessful(UpdateRejectReasonsSuccess),
       takeWhile(() => this.isAlive)
-    ).subscribe(() => this.initGrid());
-  }
-
-  private subscribeOnOrganization(): void {
-    this.organizationId$.pipe(takeWhile(() => this.isAlive)).subscribe(id => {
-      this.currentPage = 1;
-      this.store.dispatch(new GetRejectReasonsByPage(this.currentPage, this.pageSize));
-    });
-    this.pageSubject.pipe(takeWhile(() => this.isAlive), throttleTime(100)).subscribe((page) => {
-      this.currentPage = page;
-      this.dispatchNewPage();
-    });
+    ).subscribe(() => this.getData());
   }
 }

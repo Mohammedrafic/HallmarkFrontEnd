@@ -12,7 +12,7 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { DialogAction } from '@core/enums';
 import { DataSourceItem, DropdownOption } from '@core/interface';
 
-import { TimesheetsModel, TimeSheetsPage, TimrsheetsDto } from '../model/timesheets.model';
+import { TimesheetsModel, TimeSheetsPage } from '../model/timesheets.model';
 import { TimesheetsApiService } from '../../services/timesheets-api.service';
 import { Timesheets } from '../actions/timesheets.actions';
 import { TimesheetDetails } from '../actions/timesheet-details.actions';
@@ -146,8 +146,8 @@ export class TimesheetsState {
 
   @Action(Timesheets.GetAll)
   GetTimesheets(
-    { patchState, getState }: StateContext<TimesheetsModel>,
-  ): Observable<TimrsheetsDto> {
+    { patchState, getState, dispatch }: StateContext<TimesheetsModel>,
+  ): Observable<TimeSheetsPage> {
     patchState({
       timesheets: DefaultTimesheetCollection,
     });
@@ -156,10 +156,27 @@ export class TimesheetsState {
 
     return this.timesheetsApiService.getTimesheets(filters)
       .pipe(
-        tap((res: TimrsheetsDto) => {
+        tap((res: TimeSheetsPage) => {
           patchState({
-            timesheets: res.items,
-            tabCounts: res.tabsCounts,
+            timesheets: res,
+          });
+
+          dispatch(new Timesheets.GetTabsCounts());
+        })
+      );
+  }
+
+  @Action(Timesheets.GetTabsCounts)
+  GetTabsCounts(
+    { patchState, getState }: StateContext<TimesheetsModel>,
+  ): Observable<TabCountConfig> {
+    const filters = getState().timesheetsFilters || {};
+
+    return this.timesheetsApiService.getTabsCounts(filters)
+      .pipe(
+        tap((res: TabCountConfig) => {
+          patchState({
+            tabCounts: res,
           });
         }));
   }

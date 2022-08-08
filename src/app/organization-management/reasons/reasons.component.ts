@@ -1,18 +1,29 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Actions, ofActionSuccessful, Store } from '@ngxs/store';
-import { RemoveRejectReasons, SaveClosureReasons, SaveClosureReasonsError, SaveRejectReasons, SaveRejectReasonsError, SaveRejectReasonsSuccess, UpdateClosureReasonsSuccess, UpdateRejectReasons } from '@organization-management/store/reject-reason.actions';
+import {
+  SaveClosureReasons,
+  SaveClosureReasonsError,
+  CreateManualInvoiceRejectReason, SaveManualInvoiceRejectReasonError,
+  SaveRejectReasons,
+  SaveRejectReasonsError,
+  SaveRejectReasonsSuccess,
+  UpdateClosureReasonsSuccess, UpdateManualInvoiceRejectReason, UpdateManualInvoiceRejectReasonSuccess,
+  UpdateRejectReasons
+} from '@organization-management/store/reject-reason.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
-import { CANCEL_REJECTION_REASON, CHARS_HYPHEN_APOSTROPHE, DELETE_CONFIRM_TITLE, DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, ONLY_LETTERS } from '@shared/constants';
+import { CANCEL_REJECTION_REASON, CHARS_HYPHEN_APOSTROPHE, DELETE_CONFIRM_TITLE } from '@shared/constants';
 import { DialogMode } from '@shared/enums/dialog-mode.enum';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { delay, filter, takeWhile } from 'rxjs';
 import { ShowSideDialog } from 'src/app/store/app.actions';
+import { RejectReason } from '@shared/models/reject-reason.model';
 
 export enum ReasonsNavigationTabs {
   Rejection,
   Requisition,
-  Closure
+  Closure,
+  ManualInvoice,
 }
 
 @Component({
@@ -54,11 +65,11 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
 
   private subscribeOnSaveReasonSuccess(): void {
     this.actions$.pipe(
-      ofActionSuccessful(SaveRejectReasonsSuccess, UpdateClosureReasonsSuccess),
+      ofActionSuccessful(SaveRejectReasonsSuccess, UpdateClosureReasonsSuccess, UpdateManualInvoiceRejectReasonSuccess),
       takeWhile(() => this.isAlive)
     ).subscribe(() =>this.closeSideDialog());
     this.actions$.pipe(
-      ofActionSuccessful(SaveRejectReasonsError, SaveClosureReasonsError),
+      ofActionSuccessful(SaveRejectReasonsError, SaveClosureReasonsError, SaveManualInvoiceRejectReasonError),
       takeWhile(() => this.isAlive)
     ).subscribe(() => this.isSaving = false);
   }
@@ -93,6 +104,16 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
             reason: this.form.value.reason
           }
           this.store.dispatch(new SaveClosureReasons(payload));
+          break;
+        case ReasonsNavigationTabs.ManualInvoice:
+          const data: RejectReason = {
+            id: this.form.value.id,
+            reason: this.form.value.reason
+          };
+
+          this.store.dispatch(
+            this.isEdit ? new UpdateManualInvoiceRejectReason(data) : new CreateManualInvoiceRejectReason(data)
+          );
           break;
       }
     }
@@ -139,4 +160,3 @@ export class ReasonsComponent extends AbstractGridConfigurationComponent impleme
     }
   }
 }
-

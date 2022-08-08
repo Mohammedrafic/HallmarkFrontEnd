@@ -2,12 +2,16 @@ import { OrganizationRegion } from '@shared/models/organization.model';
 import { DialogAction } from '@core/enums';
 import { DataSourceItem } from '@core/interface';
 
-import { TIMESHEETS_ACTIONS, RecordFields, TimesheetsTableFiltersColumns } from '../../enums';
+import { RecordFields, TIMESHEETS_ACTIONS, TimesheetsTableFiltersColumns } from '../../enums';
 import { Timesheet, TimesheetsFilterState } from '../../interface';
 
 export namespace Timesheets {
   export class GetAll {
     static readonly type = TIMESHEETS_ACTIONS.GET_TIMESHEETS;
+  }
+
+  export class GetTabsCounts {
+    static readonly type = TIMESHEETS_ACTIONS.GET_TABS_COUNTS;
   }
 
   export class ToggleCandidateDialog {

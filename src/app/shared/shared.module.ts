@@ -139,7 +139,7 @@ const icons = {
   Plus,
   Trash2,
   Eye,
-  EyeOff
+  EyeOff,
   DollarSign,
   Percent,
 };
