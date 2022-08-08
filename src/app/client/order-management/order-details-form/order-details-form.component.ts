@@ -18,7 +18,6 @@ import {
   ClearSuggestions,
   GetAssociateAgencies,
   GetContactDetails,
-  GetMasterShifts,
   GetOrganizationStatesWithKeyCode,
   GetProjectSpecialData,
   GetRegularLocalBillRate,
@@ -35,7 +34,6 @@ import { Location } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
 import { Department } from '@shared/models/department.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
-import { MasterShift } from '@shared/models/master-shift.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
@@ -63,6 +61,7 @@ import { GetPredefinedCredentials } from '@order-credentials/store/credentials.a
 import { ReasonForRequisitionList } from '@shared/models/reason-for-requisition-list';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
+import { BillRate } from '@shared/models';
 
 @Component({
   selector: 'app-order-details-form',
@@ -163,6 +162,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     { id: MasterShiftName.Rotating, name: 'Rotating' },
   ];
 
+  public masterShiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
+
   public jobClassificationFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public reasonsForRequisition = ReasonForRequisitionList;
@@ -200,10 +201,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
 
-  @Select(OrderManagementContentState.masterShifts)
-  masterShifts$: Observable<MasterShift[]>;
-  masterShiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
-
   @Select(OrderManagementContentState.associateAgencies)
   associateAgencies$: Observable<AssociateAgency[]>;
   associateAgencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
@@ -223,7 +220,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   contactDetails$: Observable<Department>;
 
   @Select(OrderManagementContentState.regularLocalBillRate)
-  regularLocalBillRate$: Observable<any>;
+  regularLocalBillRate$: Observable<BillRate[]>;
 
   private isEditMode: boolean;
 
@@ -257,7 +254,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       duration: [null, Validators.required],
       jobStartDate: [null, Validators.required],
       jobEndDate: [null, Validators.required],
-      shiftRequirementId: [null, Validators.required],
+      shift: [null, Validators.required],
       shiftStartTime: [null, Validators.required],
       shiftEndTime: [null, Validators.required],
     });
@@ -275,7 +272,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         this.generalInformationForm.controls['duration'].setValidators(null);
         this.generalInformationForm.controls['jobStartDate'].setValidators(null);
         this.generalInformationForm.controls['jobEndDate'].setValidators(null);
-        this.generalInformationForm.controls['shiftRequirementId'].setValidators(null);
+        this.generalInformationForm.controls['shift'].setValidators(null);
         this.generalInformationForm.controls['shiftStartTime'].setValidators(null);
         this.generalInformationForm.controls['shiftEndTime'].setValidators(null);
       } else {
@@ -304,7 +301,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         this.generalInformationForm.controls['duration'].setValidators(Validators.required);
         this.generalInformationForm.controls['jobStartDate'].setValidators(Validators.required);
         this.generalInformationForm.controls['jobEndDate'].setValidators(Validators.required);
-        this.generalInformationForm.controls['shiftRequirementId'].setValidators(Validators.required);
+        this.generalInformationForm.controls['shift'].setValidators(Validators.required);
         this.generalInformationForm.controls['shiftStartTime'].setValidators(Validators.required);
         this.generalInformationForm.controls['shiftEndTime'].setValidators(Validators.required);
       }
@@ -397,7 +394,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     const skillIdControl = this.generalInformationForm.get('skillId') as AbstractControl;
     const durationControl = this.generalInformationForm.get('duration') as AbstractControl;
     const jobStartDateControl = this.generalInformationForm.get('jobStartDate') as AbstractControl;
-    const shiftRequirementIdControl = this.generalInformationForm.get('shiftRequirementId') as AbstractControl;
     const shiftStartTimeControl = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
     const shiftEndTimeControl = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
     const jobDistributionControl = this.jobDistributionForm.get('jobDistribution') as AbstractControl;
@@ -424,6 +420,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         if (isNaN(parseInt(orderType)) || !departmentId || !skillId) {
           return;
         }
+
+        this.store.dispatch(new GetRegularLocalBillRate(orderType, departmentId, skillId));
 
         this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
       });
@@ -549,7 +547,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetRegions());
     this.store.dispatch(new GetMasterSkillsByOrganization());
     this.store.dispatch(new GetProjectSpecialData());
-    this.store.dispatch(new GetMasterShifts());
     this.store.dispatch(new GetAssociateAgencies());
     this.store.dispatch(new GetOrganizationStatesWithKeyCode());
 
@@ -744,11 +741,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => this.generalInformationForm.controls['skillId'].patchValue(order.skillId));
 
-    this.masterShifts$.pipe(takeUntil(this.unsubscribe$)).subscribe(() =>
-      this.generalInformationForm.controls['shiftRequirementId'].patchValue(order.shiftRequirementId, {
-        emitEvent: false,
-      })
-    );
+    this.generalInformationForm.controls['shift'].patchValue(order.shift, { emitEvent: false });
 
     this.regions$
       .pipe(takeUntil(this.unsubscribe$))
@@ -954,8 +947,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private populateNewOrderForm(): void {
-    this.store.dispatch(new GetRegularLocalBillRate());
-
     this.orderTypeForm.controls['orderType'].patchValue(OrderType.Traveler);
     this.generalInformationForm.controls['duration'].patchValue(Duration.ThirteenWeeks);
     this.jobDistributionForm.controls['jobDistribution'].patchValue([JobDistribution.All]);
