@@ -38,6 +38,7 @@ import { NgxsModule } from '@ngxs/store';
 import { OrganizationManagementState } from './store/organization-management.state';
 import { CredentialsState } from './store/credentials.state';
 import { SharedModule } from '@shared/shared.module';
+import { AgGridModule } from '@ag-grid-community/angular';
 import { ShiftsState } from './store/shifts.state';
 import { OrganizationManagementComponent } from './organization-management.component';
 import { OrganizationManagementRoutingModule } from './organization-management-routing.module';
@@ -70,6 +71,10 @@ import { MapCredentialsFormComponent } from './credentials/credentials-setup/map
 import { ReasonsComponent } from './reasons/reasons.component';
 import { ClosureReasonComponent } from './reasons/closure-reason/closure-reason.component';
 import { ManualInvoiceRejectReasonComponent } from './reasons/manual-invoice-reject-reason/manual-invoice-reject-reason.component';
+import { SpecialProjectContainerComponent } from './specialproject/components/specialproject-container.component';
+import { PurchaseOrdersComponent } from './specialproject/components/purchase-orders/purchase-orders.component';
+import { SpecialProjectsComponent } from './specialproject/components/special-projects/special-projects.component';
+import { SpecialProjectState } from './store/special-project.state';
 
 const sidebarIcons = {
   Download,
@@ -117,6 +122,10 @@ const sidebarIcons = {
     ReasonsComponent,
     ClosureReasonComponent,
     ManualInvoiceRejectReasonComponent,
+    ClosureReasonComponent,
+    SpecialProjectContainerComponent,
+    PurchaseOrdersComponent,
+    SpecialProjectsComponent
   ],
   imports: [
     CommonModule,
@@ -148,6 +157,7 @@ const sidebarIcons = {
     AutoCompleteModule,
     DropDownButtonModule,
     MaskedTextBoxModule,
+    AgGridModule,
 
     FeatherModule.pick(sidebarIcons),
 
@@ -159,6 +169,8 @@ const sidebarIcons = {
       ShiftsState,
       HolidaysState,
       BillRatesState,
+      SpecialProjectState
+
     ]),
   ],
   providers: [
