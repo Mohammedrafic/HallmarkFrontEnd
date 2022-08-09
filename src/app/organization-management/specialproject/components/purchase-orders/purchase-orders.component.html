@@ -1,7 +1,7 @@
-<section class="flex-column specialproject-grid app-grid">
+<section class="specialproject-grid app-grid">
   <ag-grid-angular class="ag-theme-alpine grid app-grid__component"
                    [gridOptions]="gridOptions"
-                   (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight"
+                   (gridReady)="onGridReady($event)" [rowHeight]="gridConfig.initialRowHeight" domLayout="autoHeight"
                    [headerHeight]="52"></ag-grid-angular>
   <div class="row">
     <ejs-dropdownlist id="rowsPerPage"

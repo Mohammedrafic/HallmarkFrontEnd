@@ -376,6 +376,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   }
 
   public handleOnAdd(): void {
+    this.id=0;
     this.title = DialogMode.Add;
     this.title = this.addButtonTitle;
     this.isEdit = false;

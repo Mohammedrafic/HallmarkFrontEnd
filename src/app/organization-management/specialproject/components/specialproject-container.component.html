@@ -1,3 +1,4 @@
+<section class="flex-column">
 <section class="container">
   <div class="toolbar-buttons">
     <button ejs-button [isPrimary]="true" (click)="handleOnAdd()">{{addButtonTitle}}</button>
@@ -25,6 +26,7 @@
       </e-tabitem>
     </e-tabitems>
   </ejs-tab>
+</section>
 </section>
 
 <app-side-dialog header="{{ title }}" (formCancelClicked)="closeDialog()" (formSaveClicked)="handleOnSave()">
