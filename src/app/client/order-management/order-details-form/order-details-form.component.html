@@ -684,22 +684,9 @@
         <div class="special-project">
           <div class="title">Special Project</div>
           <form [formGroup]="specialProject">
-            <div class="form-line">
-              <!-- Reason for Request -->
-              <div class="input-container bootstrap form-line-item-40">
-                <label>Reason for Request<span class="required">*</span></label>
-                <div class="input-group dropdown">
-                  <ejs-dropdownlist
-                    formControlName="reasonForRequestId"
-                    appValidateWithMessage
-                    [dataSource]="(projectSpecialData$ | async)?.reasonsForRequest"
-                    [fields]="reasonsForRequestFields"
-                  >
-                  </ejs-dropdownlist>
-                </div>
-              </div>
+            <div class="form-line">              
               <!-- Special Project Category -->
-              <div class="input-container bootstrap form-line-item-20">
+              <div class="input-container bootstrap form-line-item-30">
                 <label>Special Project Category<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
@@ -712,7 +699,7 @@
                 </div>
               </div>
               <!-- Project Name -->
-              <div class="input-container bootstrap form-line-item-20">
+              <div class="input-container bootstrap form-line-item-30">
                 <label>Project Name<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
@@ -725,7 +712,7 @@
                 </div>
               </div>
               <!-- PO# -->
-              <div class="input-container bootstrap form-line-item-20">
+              <div class="input-container bootstrap form-line-item-30">
                 <label>PO#<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
