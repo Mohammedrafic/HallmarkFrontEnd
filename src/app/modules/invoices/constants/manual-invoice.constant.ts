@@ -1,15 +1,27 @@
 import { FieldType, FieldWidthStyle } from '@core/enums';
+import { ManInvoiceOptionsKeys } from '../enums';
+import { ManInvoiceOptionsKeys } from '../enums';
 import { AddManInvoiceDialogConfig } from '../interfaces';
 
-export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
+export const ManualInvoiceDialogConfig = (isAgency: boolean): AddManInvoiceDialogConfig => ({
   title: 'Add Manual Invoice',
   fields: [
+    ...isAgency ? [{
+      field: 'unitId',
+      title: 'Organization',
+      disabled: false,
+      required: true,
+      type: FieldType.Dropdown,
+      widthStyle: FieldWidthStyle.Long,
+      optionsStateKey: ManInvoiceOptionsKeys.Organizations,
+      options: [],
+    }] : [],
     {
       field: 'orderId',
       title: 'Order ID | Position ID',
       disabled: false,
       required: true,
-      type: FieldType.SearchDD,
+      type: FieldType.Input,
       widthStyle: FieldWidthStyle.Long,
     },
     {
@@ -18,16 +30,20 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       disabled: false,
       required: true,
       type: FieldType.Dropdown,
-      widthStyle: FieldWidthStyle.Short,
+      widthStyle: isAgency ? FieldWidthStyle.Long : FieldWidthStyle.Short,
+      optionsStateKey: ManInvoiceOptionsKeys.Candidates,
+      options: [],
     },
-    {
+    ...!isAgency ? [{
       field: 'unitId',
       title: 'Agency',
       disabled: false,
       required: true,
       type: FieldType.Dropdown,
       widthStyle: FieldWidthStyle.Short,
-    },
+      optionsStateKey: ManInvoiceOptionsKeys.Agencies,
+      options: [],
+    }] : [],
     {
       field: 'locationId',
       title: 'Worked Location',
@@ -35,6 +51,10 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       required: true,
       type: FieldType.Dropdown,
       widthStyle: FieldWidthStyle.Short,
+      optionsStateKey: ManInvoiceOptionsKeys.Locations,
+      options: [],
+      optionsStateKey: ManInvoiceOptionsKeys.Locations,
+      options: [],
     },
     {
       field: 'departmentId',
@@ -43,6 +63,10 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       required: true,
       type: FieldType.Dropdown,
       widthStyle: FieldWidthStyle.Short,
+      optionsStateKey: ManInvoiceOptionsKeys.Departments,
+      options: [],
+      optionsStateKey: ManInvoiceOptionsKeys.Departments,
+      options: [],
     },
     {
       field: 'value',
@@ -84,6 +108,10 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       required: true,
       type: FieldType.Dropdown,
       widthStyle: FieldWidthStyle.Long,
+      optionsStateKey: ManInvoiceOptionsKeys.Reasons,
+      options: [],
+      optionsStateKey: ManInvoiceOptionsKeys.Reasons,
+      options: [],
     },
     {
       field: 'description',
@@ -94,4 +122,4 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       widthStyle: FieldWidthStyle.Long,
     }
   ],
-};
+});

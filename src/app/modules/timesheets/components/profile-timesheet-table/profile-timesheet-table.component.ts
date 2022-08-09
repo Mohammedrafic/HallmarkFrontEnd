@@ -12,14 +12,13 @@ import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-c
 
 import { Destroyable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
-import { RecordFields } from './../../enums';
+import { RecordFields } from '../../enums';
 import {
   TimesheetRecordsColdef, TimesheetRecordsColConfig, RecordsTabConfig,
   TimesheetConfirmMessages,
-} from './../../constants';
-import { ConfirmService } from './../../../../shared/services/confirm.service';
-import { TabConfig } from './../../interface/common.interface';
-import { DialogActionPayload, OpenAddDialogMeta, TimesheetRecordsDto } from '../../interface';
+} from '../../constants';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { DialogActionPayload, OpenAddDialogMeta, TimesheetRecordsDto, TabConfig } from '../../interface';
 import { TimesheetRecordsService } from '../../services/timesheet-records.service';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { RecordsAdapter } from '../../helpers';
@@ -179,12 +178,12 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
     const recordsToUpdate = RecordsAdapter.adaptRecordsDiffs(
       this.records[this.currentTab], diffs, this.idsToDelete);
-  
+
     if (diffs.length || this.idsToDelete.length) {
       const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
       const dto = RecordsAdapter.adaptRecordPutDto(
         recordsToUpdate, organizationId, id, this.currentTab, this.idsToDelete);
-  
+
       this.store.dispatch(new TimesheetDetails.PutTimesheetRecords(dto, this.isAgency))
       .pipe(
         takeUntil(this.componentDestroy()),
@@ -247,7 +246,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         ]);
       }),
       filter(() => !!this.gridApi),
-      tap((data) => { 
+      tap((data) => {
         this.timesheetRecordsService.controlTabsVisibility(data[0], this.tabs);
         this.gridApi.hideOverlay();
        }),

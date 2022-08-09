@@ -75,6 +75,7 @@
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span></label>
                   <div class="input-group">
                     <ejs-autocomplete
+                    [fields]="dropDownFieldsConfig"
                     [formControlName]="field.field"
                     ></ejs-autocomplete>
                   </div>

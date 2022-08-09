@@ -1,17 +1,18 @@
 import { ActivatedRoute } from '@angular/router';
+import { ChangeDetectorRef, Directive, Inject, Injector, ViewChild } from '@angular/core';
 
-import { CommonDialogConformMessages } from './../interface/common.interface';
-import { CustomFormGroup } from '@core/interface';
-import { ChangeDetectorRef, Directive, Inject, ViewChild } from '@angular/core';
-import { ConfirmService } from '@shared/services/confirm.service';
 import { Actions, Store } from '@ngxs/store';
+import { filter, takeUntil } from 'rxjs';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 
 import { GlobalWindow } from '@core/tokens';
-import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { filter, takeUntil } from 'rxjs';
+import { CustomFormGroup } from '@core/interface';
+import { ConfirmService } from '@shared/services/confirm.service';
 import { FieldType } from '@core/enums';
 import { AddDialogHelperService } from '@core/services';
 import { TimesheetDateHelper } from './date.helper';
+import { CommonDialogConformMessages } from './../interface/common.interface';
+
 
 @Directive()
 export class AddDialogHelper<T> extends TimesheetDateHelper {
@@ -39,6 +40,7 @@ export class AddDialogHelper<T> extends TimesheetDateHelper {
     protected actions$: Actions,
     protected cd: ChangeDetectorRef,
     protected route: ActivatedRoute,
+    protected injector: Injector,
     @Inject(GlobalWindow) protected readonly globalWindow: WindowProxy & typeof globalThis,
   ) {
     super();
@@ -62,7 +64,7 @@ export class AddDialogHelper<T> extends TimesheetDateHelper {
         okButtonClass: 'delete-button',
       })
       .pipe(
-        filter((value) => !!value),
+        filter((value) => value),
         takeUntil(this.componentDestroy())
       )
       .subscribe(() => {

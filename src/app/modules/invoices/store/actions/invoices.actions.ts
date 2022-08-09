@@ -23,7 +23,7 @@ export namespace Invoices {
     }
   }
 
-  export class ToggleManulaInvoiceDialog {
+  export class ToggleManualInvoiceDialog {
     static readonly type = INVOICES_ACTIONS.ToggleManualInvoice;
 
     constructor(
@@ -55,5 +55,29 @@ export namespace Invoices {
       public readonly dataSource: DataSourceItem[] | OrganizationRegion[]
     ) {
     }
+  }
+
+  export class GetInvoicesReasons {
+    static readonly type = INVOICES_ACTIONS.GetReasons;
+  }
+
+  export class GetManInvoiceMeta {
+    static readonly type = INVOICES_ACTIONS.GetMeta;
+
+    constructor(
+      public readonly orgId?: number,
+    ) {}
+  }
+
+  export class SaveManulaInvoice {
+    static readonly type = INVOICES_ACTIONS.SaveManualinvoice;
+
+    constructor(
+      public readonly payload: any,
+    ) {}
+  }
+
+  export class GetOrganizations {
+    static readonly type = INVOICES_ACTIONS.GetOrganizations;
   }
 }
