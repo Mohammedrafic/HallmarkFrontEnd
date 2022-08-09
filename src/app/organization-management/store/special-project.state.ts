@@ -3,16 +3,18 @@ import { Injectable } from '@angular/core';
 import { getAllErrors } from '@shared/utils/error.utils';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { SpecialProject, SpecialProjectPage } from 'src/app/shared/models/special-project.model';
-import { GetSpecialProjects,SaveSpecialProject, SaveSpecialProjectSucceeded, SetIsDirtySpecialProjectForm,
-  DeletSpecialProject, 
+import {
+  GetSpecialProjects, SaveSpecialProject, SaveSpecialProjectSucceeded, SetIsDirtySpecialProjectForm,
+  DeletSpecialProject,
   DeletSpecialProjectSucceeded,
   GetProjectTypes,
-  GetSpecialProjectById} from './special-project.actions';
+  GetSpecialProjectById
+} from './special-project.actions';
 import { SpecialProjectService } from '@shared/services/special-project.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from 'src/app/shared/enums/message-types';
 import { SaveOrderSucceeded } from '@client/store/order-managment-content.actions';
-import { RECORD_ADDED } from '@shared/constants';
+import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
 import { OrderManagementContentStateModel } from '@client/store/order-managment-content.state';
 import { ProjectType } from '@shared/models/project.model';
 import { ProjectsService } from '@shared/services/projects.service';
@@ -56,9 +58,9 @@ export class SpecialProjectState {
     return state.SpecialProjectEntity;
   }
 
-  
+
   constructor(private specialProjectService: SpecialProjectService,
-    private projectsService: ProjectsService  ) { }
+    private projectsService: ProjectsService) { }
 
   @Action(GetSpecialProjects)
   GetSpecialProjects({ patchState }: StateContext<SpecialProjectStateModel>, { }: GetSpecialProjects): Observable<SpecialProjectPage> {
@@ -76,10 +78,11 @@ export class SpecialProjectState {
     { dispatch }: StateContext<SpecialProjectStateModel>,
     { specialProject }: SaveSpecialProject
   ): Observable<SpecialProject | void> {
+    var isEdit = specialProject.id > 0 ? true : false;
     return this.specialProjectService.saveSpecialProject(specialProject).pipe(
       tap((order) => {
         dispatch([
-          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          new ShowToast(MessageTypes.Success, isEdit ? RECORD_MODIFIED : RECORD_ADDED),
           new SaveSpecialProjectSucceeded(),
           new SetIsDirtySpecialProjectForm(false),
         ]);
