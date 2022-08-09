@@ -3,7 +3,7 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import {forkJoin, Observable, takeUntil} from 'rxjs';
 
 import { PageOfCollections } from '@shared/models/page.model';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
@@ -114,7 +114,9 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
   }
 
   public openAddDialog(): void {
-    this.store.dispatch(new Invoices.ToggleManulaInvoiceDialog(DialogAction.Open));
+    this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Open));
+    this.store.dispatch(new Invoices.GetInvoicesReasons);
+    this.store.dispatch(new Invoices.GetManInvoiceMeta());
   }
 
   public changeFiltersAmount(amount: number): void {

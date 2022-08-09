@@ -1,4 +1,5 @@
 import { FieldType, FieldWidthStyle } from '@core/enums';
+import { ManInvoiceOptionsKeys } from '../enums';
 import { AddManInvoiceDialogConfig } from '../interfaces';
 
 export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
@@ -9,7 +10,7 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       title: 'Order ID | Position ID',
       disabled: false,
       required: true,
-      type: FieldType.SearchDD,
+      type: FieldType.Input,
       widthStyle: FieldWidthStyle.Long,
     },
     {
@@ -19,6 +20,8 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       required: true,
       type: FieldType.Dropdown,
       widthStyle: FieldWidthStyle.Short,
+      optionsStateKey: ManInvoiceOptionsKeys.Candidates,
+      options: [],
     },
     {
       field: 'unitId',
@@ -27,6 +30,8 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       required: true,
       type: FieldType.Dropdown,
       widthStyle: FieldWidthStyle.Short,
+      optionsStateKey: ManInvoiceOptionsKeys.Agencies,
+      options: [],
     },
     {
       field: 'locationId',
@@ -35,6 +40,8 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       required: true,
       type: FieldType.Dropdown,
       widthStyle: FieldWidthStyle.Short,
+      optionsStateKey: ManInvoiceOptionsKeys.Locations,
+      options: [],
     },
     {
       field: 'departmentId',
@@ -43,6 +50,8 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       required: true,
       type: FieldType.Dropdown,
       widthStyle: FieldWidthStyle.Short,
+      optionsStateKey: ManInvoiceOptionsKeys.Departments,
+      options: [],
     },
     {
       field: 'value',
@@ -84,6 +93,8 @@ export const ManualInvoiceDialogConfig: AddManInvoiceDialogConfig = {
       required: true,
       type: FieldType.Dropdown,
       widthStyle: FieldWidthStyle.Long,
+      optionsStateKey: ManInvoiceOptionsKeys.Reasons,
+      options: [],
     },
     {
       field: 'description',

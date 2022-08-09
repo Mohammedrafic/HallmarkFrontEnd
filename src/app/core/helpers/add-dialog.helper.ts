@@ -62,7 +62,7 @@ export class AddDialogHelper<T> extends TimesheetDateHelper {
         okButtonClass: 'delete-button',
       })
       .pipe(
-        filter((value) => !!value),
+        filter((value) => value),
         takeUntil(this.componentDestroy())
       )
       .subscribe(() => {

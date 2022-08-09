@@ -9,4 +9,6 @@ export const DefaultInvoicesState: InvoicesModel = {
   nextInvoiceId: null,
   prevInvoiceId: null,
   selectedInvoiceId: null,
+  invoiceReasons: [],
+  invoiceMeta: [],
 };

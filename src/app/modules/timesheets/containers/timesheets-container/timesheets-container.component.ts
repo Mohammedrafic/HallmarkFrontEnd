@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { FormControl } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, debounceTime, throttleTime } from 'rxjs';
+import { distinctUntilChanged, Observable, switchMap, takeUntil, filter, debounceTime } from 'rxjs';
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 
 import { Destroyable } from '@core/helpers';
