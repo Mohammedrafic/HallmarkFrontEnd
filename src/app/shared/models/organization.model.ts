@@ -15,6 +15,7 @@ export class Organization {
   contactDetails: ContactDetails[];
   preferences: Preferences;
   dbConnectionStringName: string;
+  isOrganizationUsed?: boolean;
 
   constructor(organizationId: number, businessUnitId: number, generalInformation: GeneralInformation, billingDetails: BillingDetails, contactDetails: ContactDetails[], preferences: Preferences, isSameAsOrg: boolean, dataBaseConnection: string) {
     if (organizationId) {

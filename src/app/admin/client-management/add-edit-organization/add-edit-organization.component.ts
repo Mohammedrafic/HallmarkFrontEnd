@@ -367,7 +367,7 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
       ]),
       organizationPrefix: new FormControl({
         value: organization ? organization.generalInformation.organizationPrefix : '',
-        disabled: this.user?.businessUnitType === BusinessUnitType.Organization
+        disabled: this.user?.businessUnitType === BusinessUnitType.Organization || organization?.isOrganizationUsed
       }, [
         Validators.required,
         Validators.maxLength(3),
@@ -473,6 +473,10 @@ export class AddEditOrganizationComponent implements OnInit, OnDestroy {
       //Populate state dropdown with values based on selected country
       this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
       this.store.dispatch(new SetBillingStatesByCountry(organization.billingDetails.country));
+      this.store.dispatch(new SetDirtyState(false));
+    } else {
+      this.store.dispatch(new SetGeneralStatesByCountry(Country.USA));
+      this.store.dispatch(new SetBillingStatesByCountry(Country.USA));
       this.store.dispatch(new SetDirtyState(false));
     }
   }

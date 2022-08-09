@@ -4,5 +4,6 @@ export class Comment {
   isExternal: boolean;
   creationDate: Date;
   new?: boolean;
+  unread?: boolean;
 }
   

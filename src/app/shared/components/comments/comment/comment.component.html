@@ -1,4 +1,4 @@
-<section class="comment" [class.new]="comment.new">
+<section #message class="comment" [class.new]="comment.new || comment.unread">
   <div class="comment-header">
     <div class="name">
       <span class="avatar"><i-feather name="user" class="icon"></i-feather></span>Michael Smith
