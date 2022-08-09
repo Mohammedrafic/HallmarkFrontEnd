@@ -137,6 +137,11 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: 'security/user-list',
     },
+    34: {
+      // Candidates
+      icon: 'file-text',
+      route: 'agency/candidates',
+    },
     40: {
       // Custom Reports
       icon: 'pie-chart',
@@ -156,7 +161,7 @@ export const MENU_CONFIG: any = {
       // Page Report
       icon: '',
       route: '/analytics/page-report',
-    },    
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -307,7 +312,7 @@ export const MENU_CONFIG: any = {
       // Page Report
       icon: '',
       route: '/analytics/page-report',
-    },   
+    },
   },
 
   [BusinessUnitType.Organization]: {
@@ -459,7 +464,7 @@ export const MENU_CONFIG: any = {
       // Page Report
       icon: '',
       route: '/analytics/page-report',
-    },   
+    },
   },
 
   [BusinessUnitType.Agency]: {
