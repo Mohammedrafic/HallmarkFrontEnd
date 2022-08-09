@@ -14,6 +14,7 @@ import { CredentialsSetupComponent } from './credentials/credentials-setup/crede
 import { JobOrderComponent } from './workflow/job-order/job-order.component';
 import { BillRatesComponent } from './bill-rates/bill-rates.component';
 import { ReasonsComponent } from './reasons/reasons.component';
+import { RegionsComponent } from './regions/regions.component';
 
 const routes: Routes = [
   {
@@ -30,6 +31,13 @@ const routes: Routes = [
       {
         path: 'locations',
         component: LocationsComponent,
+        data: {
+          isOrganizationArea: true
+        }
+      },
+      {
+        path: 'regions',
+        component: RegionsComponent,
         data: {
           isOrganizationArea: true
         }
