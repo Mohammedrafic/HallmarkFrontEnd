@@ -187,6 +187,7 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       ...commonColumn,
       filter: 'agDateColumnFilter',
       filterParams: {
+        buttons: ['reset'],
         comparator: (filterLocalDateAtMidnight:Date, cellValue:string) => {
           if (cellValue == null) {
             return 0;
@@ -196,8 +197,8 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
           const year = Number(dateParts[2]);
           const month = Number(dateParts[0]) - 1;
           const day = Number(dateParts[1]);
-          const cellDate = new Date(year, month, day);
 
+          const cellDate = new Date(year, month, day);
           if (cellDate < filterLocalDateAtMidnight) {
             return -1;
           } else if (cellDate > filterLocalDateAtMidnight) {
@@ -217,6 +218,7 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       ...commonColumn,
       filter: 'agDateColumnFilter',
       filterParams: {
+        buttons: ['reset'],
         comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
           if (cellValue == null) {
             return 0;

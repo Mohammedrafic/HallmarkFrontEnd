@@ -74,7 +74,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
 
   constructor(private store: Store,
     private datePipe: DatePipe,
-    private changeDetectorRef: ChangeDetectorRef  ) { }
+    private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.orgStructureDataSetup();
@@ -103,6 +103,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   private onOrganizationChangedHandler(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.organizationId = data;
+      this.childC?.getSpecialProjects();
     });
   }
 
@@ -187,14 +188,13 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
 
 
   private onOrganizationStructureDataLoadHandler(): void {
-    let ref=
-    this.organizationStructure$
-      .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
-      .subscribe((structure: OrganizationStructure) => {
-        this.orgStructure = structure;
-        this.regions = structure.regions;
-        this.orgStructureData.regionIds.dataSource = this.regions;
-      });
+      this.organizationStructure$
+        .pipe(takeUntil(this.unsubscribe$), filter(Boolean))
+        .subscribe((structure: OrganizationStructure) => {
+          this.orgStructure = structure;
+          this.regions = structure.regions;
+          this.orgStructureData.regionIds.dataSource = this.regions;
+        });
   }
 
   private onOrgStructureControlValueChangedHandler(): void {
@@ -209,7 +209,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         this.orgStructureData.locationIds.dataSource = [];
         selectedRegions.forEach((region) => {
           region.locations?.forEach((location) => (location.regionName = region.name));
-            this.orgStructureData.locationIds.dataSource.push(...(region?.locations as []));
+          this.orgStructureData.locationIds.dataSource.push(...(region?.locations as []));
         });
       } else {
         this.orgStructureData.locationIds.dataSource = [];
@@ -236,7 +236,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
       }
       this.changeDetectorRef.detectChanges();
     });
-   
+
   }
 
   private onSkillDataLoadHandler(): void {
@@ -249,22 +249,20 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   }
 
   public closeDialog(): void {
-    if (this.isEdit) {
-      this.isEdit = false;
-      switch (this.selectedTab) {
-        case SpecialProjectTabs.SpecialProjects:
-          this.createForm();
-          this.addButtonTitle = AddButtonText.AddSpecialProject;
-          break;
-        case SpecialProjectTabs.PurchaseOrders:
-          this.createForm();
-          this.addButtonTitle = AddButtonText.AddPurchaseOrder;
-          break;
-        case SpecialProjectTabs.SpecialProjectCategories:
-          this.createForm();
-          this.addButtonTitle = AddButtonText.AddSpecialProjectCategory;
-          break;
-      }
+    this.isEdit = false;
+    switch (this.selectedTab) {
+      case SpecialProjectTabs.SpecialProjects:
+        this.createForm();
+        this.addButtonTitle = AddButtonText.AddSpecialProject;
+        break;
+      case SpecialProjectTabs.PurchaseOrders:
+        this.createForm();
+        this.addButtonTitle = AddButtonText.AddPurchaseOrder;
+        break;
+      case SpecialProjectTabs.SpecialProjectCategories:
+        this.createForm();
+        this.addButtonTitle = AddButtonText.AddSpecialProjectCategory;
+        break;
     }
     this.form.reset();
     this.store.dispatch(new ShowSideDialog(false));
@@ -312,7 +310,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
     this.store.dispatch(new SaveSpecialProject(specialProject)).subscribe(val => {
       this.form.reset();
       this.childC.getSpecialProjects();
-      this.store.dispatch(new ShowSideDialog(false));
+      this.closeDialog();
     });
   }
 
