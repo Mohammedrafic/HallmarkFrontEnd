@@ -430,7 +430,8 @@ export class OrganizationManagementState {
   }
 
   @Action(DeleteRegionById)
-  DeleteRegionById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, { regionId }: DeleteRegionById): Observable<void> {
+  DeleteRegionById({ patchState, dispatch }: StateContext<OrganizationManagementStateModel>, 
+    { regionId }: DeleteRegionById): Observable<void> {
     return this.regionService.deleteRegionById(regionId).pipe(tap((payload) => {
       patchState({ isLocationLoading: false });
       dispatch(new GetRegions());
@@ -657,7 +658,8 @@ export class OrganizationManagementState {
   }
 
   @Action(GetCredential)
-  GetCredential({ patchState }: StateContext<OrganizationManagementStateModel>, { payload }: GetCredential): Observable<Credential[] | CredentialPage> {
+  GetCredential({ patchState }: StateContext<OrganizationManagementStateModel>,
+    { payload }: GetCredential): Observable<Credential[] | CredentialPage> {
     return this.credentialsService.getCredential(payload).pipe(tap((payload) => {
       patchState({ credentials: payload });
       return payload;
