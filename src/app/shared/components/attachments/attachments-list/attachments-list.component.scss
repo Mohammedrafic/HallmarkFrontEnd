@@ -1,36 +1,20 @@
-@import 'colors';
-@import 'mixins';
+@import "colors";
+@import "mixins";
 
 :host {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  box-sizing: border-box;
-}
-
-h3 {
-  padding: 0 16px 10px 14px;
-  margin: 0;
-  font-weight: 700;
-  font-size: 14px;
-  color: $black;
-}
-
-.uploads-list {
   display: flex;
   flex-direction: column;
   overflow: auto;
-  padding: 0 16px 0 14px;
 
   .attachment {
     display: flex;
     align-items: center;
     padding-bottom: 8px;
+    line-height: normal;
 
     .file-icon {
       flex-shrink: 0;
+      display: inline-flex;
     }
 
     .file-icon, .file-name {
@@ -49,6 +33,7 @@ h3 {
       margin-left: auto;
 
       i-feather {
+        display: inline-flex;
         margin-left: 30px;
         cursor: pointer;
       }

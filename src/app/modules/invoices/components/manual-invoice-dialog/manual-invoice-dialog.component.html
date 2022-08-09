@@ -1,0 +1,118 @@
+<ejs-dialog
+  #sideAddDialog
+  cssClass="dialog filter"
+  [width]="496"
+  [visible]="false"
+  [isModal]="true"
+  [animationSettings]="{ effect: 'SlideRight' }"
+>
+  <ng-template #content>
+    <div class="dialog-container">
+      <div class="dialog-header">
+        <h3 class="title">{{ dialogConfig.title | titlecase }}</h3>
+        <div class="controls">
+          <button ejs-button cssClass="e-outline button-cancel" (click)="closeDialog()">Cancel</button>
+          <button ejs-button [isPrimary]="true">Save</button>
+        </div>
+      </div>
+
+      <div class="form" *ngIf="form">
+        <form [formGroup]="form" autocomplete="off" class="bootstrap grid">
+
+          <ng-container *ngFor="let field of dialogConfig.fields; trackBy:trackByIndex">
+            <ng-container [ngSwitch]="field.type">
+
+              <ng-template [ngSwitchCase]="FieldTypes.Dropdown">
+                <div class="input-container" [ngClass]="field.widthStyle || ''">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                  </label>
+                  <div class="input-group dropdown">
+                    <ejs-dropdownlist
+                      [fields]="dropDownFieldsConfig"
+                      [formControlName]="field.field"
+                      [dataSource]="field.options"
+                      appValidateWithMessage
+                    ></ejs-dropdownlist>
+                  </div>
+                </div>
+              </ng-template>
+
+              <ng-template [ngSwitchCase]="FieldTypes.Input">
+                <div class="input-container" [ngClass]="field.widthStyle || ''">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                  </label>
+                  <div class="input-group">
+                    <input
+                      class="e-input"
+                      [name]="field.field"
+                      appValidateWithMessage
+                      [formControlName]="field.field"
+                    />
+                  </div>
+                </div>
+              </ng-template>
+
+              <ng-template [ngSwitchCase]="FieldTypes.Date">
+                <div class="input-container" [ngClass]="field.widthStyle || ''">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                  </label>
+                  <div class="input-group">
+                    <ejs-datepicker
+                      name="serviceDate"
+                      class="datepicker"
+                      format="dd/MM/yyyy"
+                      appValidateWithMessage
+                      placeholder="DD/MM/YYYY"
+                      [formControlName]="field.field"
+                    >
+                    </ejs-datepicker>
+                  </div>
+                </div>
+              </ng-template>
+
+              <ng-template [ngSwitchCase]="FieldTypes.SearchDD">
+                <div class="input-container" [ngClass]="field.widthStyle || ''">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span></label>
+                  <div class="input-group">
+                    <ejs-autocomplete
+                    [fields]="dropDownFieldsConfig"
+                    [formControlName]="field.field"
+                    ></ejs-autocomplete>
+                  </div>
+                </div>
+              </ng-template>
+
+              <ng-template [ngSwitchCase]="FieldTypes.TextArea">
+                <div class="input-container long">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span></label>
+                  <ejs-textbox
+                    class="e-input man-invoice-textbox"
+                    type="text"
+                    [multiline]="true"
+                    appValidateWithMessage
+                    maxlength="500"
+                    [formControlName]="field.field">
+                  </ejs-textbox>
+                </div>
+              </ng-template>
+
+              <ng-template [ngSwitchCase]="FieldTypes.Toggle">
+                <div class="input-container long flexed">
+                  <ejs-switch
+                  class="toggle"
+                  [formControlName]="field.field">
+                  >
+                  </ejs-switch>
+                  <span class="switch-label">{{ field.title }}</span>
+                </div>
+              </ng-template>
+
+            </ng-container>
+          </ng-container>
+
+        </form>
+        <app-file-uploader [maxFiles]="5"></app-file-uploader>
+      </div>
+    </div>
+  </ng-template>
+</ejs-dialog>

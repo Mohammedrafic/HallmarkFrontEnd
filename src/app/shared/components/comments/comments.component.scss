@@ -25,6 +25,7 @@
     .dropdown-container {
       color: $primary-active-blue-10;
       font-size: 14px;
+      width: 105px;
     }
   }
 
@@ -32,6 +33,14 @@
     height: 100%;
     margin-top: 10px;
     padding: 0 16px;
+    overflow: auto;
+  }
+
+  .no-comments {
+    font-size: 14px;
+    color: $secondary-dark-blue-30;
+    margin-top: 45px;
+    text-align: center;
   }
 
   .comments-controls {
@@ -39,24 +48,53 @@
     padding: 0 16px;
     position: relative;
 
+    .comment-text-box {
+      max-height: 60px;
+
+      textarea {
+        padding-top: 9px;
+        padding-right: 65px;
+        height: auto;
+      }
+    }
+
     .actions {
       position: absolute;
       top: 50%;
       transform: translate(0, -50%);
       right: 30px;
+      color: $secondary-dark-blue-20;
+      display: flex;
 
-      i-feather {
-        width: 13px;
-        height: 13px;
-      }
+      .control-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 24px;
+        width: 24px;
+        border-radius: 4px;
+        cursor: pointer;
 
-      .lock {
-        color: $supportive-red;
-        margin-right: 10px;
+        &:hover {
+          background-color: $secondary-dark-blue-40;
+        }
       }
 
       .send {
-        color: $secondary-dark-blue-20;
+        color: $primary-active-blue;
+
+        &:hover {
+          background-color: $primary-active-blue-70;
+        }
+      }
+
+      i-feather {
+        width: 14px;
+        height: 14px;
+      }
+
+      .visibility {
+        margin-right: 5px;
       }
     }
   }

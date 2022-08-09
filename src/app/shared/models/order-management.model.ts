@@ -204,6 +204,7 @@ export class OrderContactDetails {
   title: string;
   email: string;
   mobilePhone: string;
+  isPrimaryContact: boolean;
 }
 
 export class OrderWorkLocation {
@@ -243,7 +244,7 @@ export class Order {
   duration: Duration;
   jobStartDate: Date;
   jobEndDate: Date;
-  shiftRequirementId: number;
+  shift: number;
   shiftStartTime: Date;
   shiftEndTime: Date;
   classification: JobClassification;
@@ -283,6 +284,9 @@ export class Order {
   orderClosureReasonId?: string;
   isTemplate?: boolean;
   organizationPrefix?: string;
+  orderPlacementFee?: number;
+  annualSalaryRangeFrom?: number;
+  annualSalaryRangeTo?: number;
 }
 
 export class ReOrder {

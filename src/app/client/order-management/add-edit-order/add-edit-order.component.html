@@ -15,11 +15,13 @@
       <i-feather name="upload" class="icon"></i-feather>
     </button>
 
-    <ejs-splitbutton content="Submit"
-                     cssClass="e-primary"
-                     [items]="submitMenuItems"
-                     (click)="save()"
-                     (select)="onSplitButtonSelect($event)">
+    <ejs-splitbutton
+      content="Submit"
+      cssClass="e-primary"
+      [items]="submitMenuItems"
+      (click)="save()"
+      (select)="onSplitButtonSelect($event)"
+    >
     </ejs-splitbutton>
   </div>
 </section>
@@ -36,10 +38,12 @@
       <ng-template #content>
         <ng-container>
           <section class="order-details-form-section">
-            <app-order-details-form #orderDetailsForm
-                                    (orderTypeChanged)="onOrderTypeChange($event)"
-                                    [disableOrderType]="disableOrderType"
-                                    [isActive]="selectedTab === SelectedTab.OrderDetails"></app-order-details-form>
+            <app-order-details-form
+              #orderDetailsForm
+              (orderTypeChanged)="onOrderTypeChange($event)"
+              [disableOrderType]="disableOrderType"
+              [isActive]="selectedTab === SelectedTab.OrderDetails"
+            ></app-order-details-form>
           </section>
         </ng-container>
       </ng-template>
@@ -53,10 +57,12 @@
         </div>
       </ng-template>
       <ng-template #content>
-        <app-order-credentials [isActive]="selectedTab === SelectedTab.Credentials"
-                               [credentials]="orderCredentials"
-                               (credentialChanged)="onCredentialChanged($event)"
-                               (credentialDeleted)="onCredentialDeleted($event)"></app-order-credentials>
+        <app-order-credentials
+          [isActive]="selectedTab === SelectedTab.Credentials"
+          [credentials]="orderCredentials"
+          (credentialChanged)="onCredentialChanged($event)"
+          (credentialDeleted)="onCredentialDeleted($event)"
+        ></app-order-credentials>
       </ng-template>
     </e-tabitem>
 
@@ -69,10 +75,12 @@
       </ng-template>
       <ng-template #content>
         <section class="bill-rates-section">
-          <app-bill-rates #billRates
-                          [billRates]="orderBillRates"
-                          [isActive]="selectedTab === SelectedTab.BillRates"
-                          (billRatesChanged)="onBillRatesChanged()">
+          <app-bill-rates
+            #billRates
+            [billRates]="orderBillRates"
+            [isActive]="selectedTab === SelectedTab.BillRates"
+            (billRatesChanged)="onBillRatesChanged()"
+          >
           </app-bill-rates>
         </section>
       </ng-template>
@@ -80,7 +88,9 @@
   </e-tabitems>
 </ejs-tab>
 
-<app-save-template-dialog *ngIf="isSaveForTemplate"
-                          [order]="generalInformationForm"
-                          (closeEmitter)="closeSaveTemplateDialog()"
-                          (createEmitter)="createTemplate($event)"></app-save-template-dialog>
+<app-save-template-dialog
+  *ngIf="isSaveForTemplate"
+  [order]="generalInformationForm"
+  (closeEmitter)="closeSaveTemplateDialog()"
+  (createEmitter)="createTemplate($event)"
+></app-save-template-dialog>

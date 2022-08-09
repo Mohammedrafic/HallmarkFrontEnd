@@ -3,21 +3,49 @@
     <div class="title">
       Comments
     </div>
-    <div class="dropdown-container">All</div>
+    <div class="dropdown-container bootstrap">
+      <ejs-dropdownlist
+        [dataSource]="commentsFilterItems"
+        [(value)]="selectedFilter"
+        (select)="onFilterChange($event)"
+      ></ejs-dropdownlist>
+    </div>
   </div>
-  <div class="comments-body">
-
+  <div #body class="comments-body" (scroll)="onScroll()">
+    <ng-container *ngFor="let comment of comments">
+      <app-comment 
+        *ngIf="selectedFilter === commentsFilter.All || comment.isExternal === showExternal"
+        [scrolledToMessage$]="scrolledToMessage$"
+        [comment]="comment"
+        (onCommentAdded)="onCommentAdded.emit(comment)"
+        (onRead)="onRead.emit(comment)"></app-comment>
+    </ng-container>
+    <div class="no-comments" *ngIf="!comments.length">
+      There are no comments to display yet!
+    </div>
   </div>
   <div class="comments-controls">
     <div class="input-group bootstrap">
-      <input id="externalId"
-        class="e-input"
-        type="text"
-        placeholder="Enter your comment here..."/>
+      <ejs-textbox
+        class="comment-text-box"
+        #textBox
+        [multiline]="true"
+        (created)="textBoxInit()"
+        maxlength="500"
+        [(value)]="message"
+        placeholder="Enter your comment here..."></ejs-textbox>
     </div>
     <div class="actions">
-      <i-feather name="lock" class="icon lock"></i-feather>
-      <i-feather name="send" class="icon send"></i-feather>
+      <ejs-tooltip
+        [content]="isExternal ? 'External' : 'Internal'">
+        <span class="control-wrapper visibility" (click)="visibilityHandler()">
+          <i-feather *ngIf="!isExternal" name="eye-off" class="icon"></i-feather>
+          <i-feather *ngIf="isExternal" name="eye" class="icon"></i-feather>
+        </span>
+      </ejs-tooltip>
+      <span class="control-wrapper send" (click)="send()">
+        <i-feather name="send" class="icon"></i-feather>
+      </span>
     </div>
   </div>
 </section>

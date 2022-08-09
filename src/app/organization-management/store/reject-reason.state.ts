@@ -2,14 +2,14 @@ import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { Injectable } from "@angular/core";
 import { RejectReasonService } from "@shared/services/reject-reason.service";
 import {
-  GetClosureReasonsByPage,
+  GetClosureReasonsByPage, GetManualInvoiceRejectReasonsByPage,
   GetRejectReasonsByPage,
-  RemoveClosureReasons,
+  RemoveClosureReasons, RemoveManualInvoiceRejectReason,
   RemoveRejectReasons,
   SaveClosureReasons,
-  SaveClosureReasonsError,
+  SaveClosureReasonsError, CreateManualInvoiceRejectReason, SaveManualInvoiceRejectReasonError,
   SaveRejectReasons, SaveRejectReasonsError, SaveRejectReasonsSuccess,
-  UpdateClosureReasonsSuccess,
+  UpdateClosureReasonsSuccess, UpdateManualInvoiceRejectReason, UpdateManualInvoiceRejectReasonSuccess,
   UpdateRejectReasons, UpdateRejectReasonsSuccess
 } from "@organization-management/store/reject-reason.actions";
 import { catchError, Observable, tap } from "rxjs";
@@ -23,6 +23,7 @@ import { RECORD_ADDED, RECORD_DELETE, RECORD_MODIFIED } from "@shared/constants"
 export interface RejectReasonStateModel {
   rejectReasonsPage: RejectReasonPage | null;
   closureReasonsPage: RejectReasonPage | null;
+  manualInvoicesReasonsPage: RejectReasonPage | null;
   isReasonLoading: boolean
 }
 
@@ -31,7 +32,8 @@ export interface RejectReasonStateModel {
   defaults: {
     rejectReasonsPage: null,
     closureReasonsPage: null,
-    isReasonLoading: false
+    manualInvoicesReasonsPage: null,
+    isReasonLoading: false,
   }
 })
 @Injectable()
@@ -44,6 +46,11 @@ export class RejectReasonState {
   @Selector()
   static closureReasonsPage(state: RejectReasonStateModel): RejectReasonPage | null {
     return state.closureReasonsPage;
+  }
+
+  @Selector()
+  static manualInvoiceReasonsPage(state: RejectReasonStateModel): RejectReasonPage | null {
+    return state.manualInvoicesReasonsPage;
   }
 
   constructor(private rejectReasonService:RejectReasonService) {}
@@ -161,6 +168,78 @@ export class RejectReasonState {
       }),
       catchError((error: HttpErrorResponse) => {
         dispatch(new SaveClosureReasonsError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(UpdateManualInvoiceRejectReason)
+  UpdateManualInvoiceReason(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { payload }: UpdateManualInvoiceRejectReason
+  ): Observable<void> {
+    return this.rejectReasonService.updateManualInvoiceReason(payload).pipe(
+      tap(() => dispatch([
+          new UpdateManualInvoiceRejectReasonSuccess(),
+          new ShowToast(MessageTypes.Success, RECORD_MODIFIED)
+        ])
+      ),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveManualInvoiceRejectReasonError());
+        return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
+      })
+    );
+  }
+
+  @Action(RemoveManualInvoiceRejectReason)
+  RemoveManualInvoiceReason(
+    { dispatch }: StateContext<RejectReasonStateModel>,
+    { id }: RemoveManualInvoiceRejectReason
+  ): Observable<void> {
+    return this.rejectReasonService.removeManualInvoiceReason(id).pipe(
+      tap(() => dispatch([
+          new UpdateManualInvoiceRejectReasonSuccess(),
+          new ShowToast(MessageTypes.Success, RECORD_DELETE)
+        ])
+      )
+    );
+  }
+
+  @Action(GetManualInvoiceRejectReasonsByPage)
+  GetManualInvoiceReasonsByPage(
+    { patchState }: StateContext<RejectReasonStateModel>,
+    { pageNumber, pageSize, orderBy, getAll }: GetManualInvoiceRejectReasonsByPage
+  ): Observable<RejectReasonPage> {
+    patchState({ isReasonLoading: true });
+
+    return this.rejectReasonService.getManualInvoiceReasonsByPage(pageNumber, pageSize, orderBy, getAll).pipe(
+      tap((payload) => {
+        patchState({manualInvoicesReasonsPage: payload});
+        return payload;
+      })
+    );
+  }
+
+  @Action(CreateManualInvoiceRejectReason)
+  SaveManualInvoiceReason(
+    { dispatch}: StateContext<RejectReasonStateModel>,
+    { payload }: CreateManualInvoiceRejectReason
+  ): Observable<RejectReason | void> {
+    const request: Observable<RejectReason | void> = payload.id ?
+      this.rejectReasonService.updateManualInvoiceReason(payload) :
+      this.rejectReasonService.saveManualInvoiceReason(payload);
+
+    return request.pipe(
+      tap((payload) => {
+        dispatch([
+          new ShowToast(MessageTypes.Success, RECORD_ADDED),
+          new UpdateManualInvoiceRejectReasonSuccess()
+        ]);
+
+        return payload;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        dispatch(new SaveManualInvoiceRejectReasonError());
         return dispatch(new ShowToast(MessageTypes.Error, getAllErrors(error.error)));
       })
     );

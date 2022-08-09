@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { map, Observable, switchMap } from 'rxjs';
+import { map, Observable, switchMap, tap } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import {
   AcceptJobDTO,
@@ -383,7 +383,7 @@ export class OrderManagementContentService {
     return this.http.post<number>(`/api/Orders/${payload}/duplicate`, {});
   }
 
-  public getRegularLocalBillRate(): Observable<string[]> {
-    return this.http.get<string[]>('/api/billrates/regular/fororder');
+  public getRegularLocalBillRate(orderType: OrderType, departmentId: number, skillId: number): Observable<BillRate[]> {
+    return this.http.get<BillRate[]>('/api/billrates/regular/fororder', { params: { orderType, departmentId, skillId } });
   }
 }

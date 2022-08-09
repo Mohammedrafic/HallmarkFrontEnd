@@ -1,26 +1,13 @@
+import { DataSourceItem, DropdownOption } from '@core/interface';
 import { PageOfCollections } from '@shared/models/page.model';
 import { RecordFields } from '../../enums';
 import {
-  CandidateHoursAndMilesData,
-  CandidateInfo, DataSourceItem,
-  DropdownOption,
-  FilterColumns,
-  TabCountConfig,
-  Timesheet,
-  TimesheetAttachments,
-  TimesheetDetailsModel,
-  TimesheetInvoice,
-  TimesheetRecordsDto,
-  TimesheetsFilterState,
-} from '../../interface';
+  CandidateHoursAndMilesData, CandidateInfo, FilterColumns,
+  TabCountConfig, Timesheet, TimesheetAttachments, TimesheetDetailsModel, TimesheetInvoice,
+  TimesheetRecordsDto, TimesheetsFilterState } from '../../interface';
 
 
 export type TimeSheetsPage = PageOfCollections<Timesheet>;
-
-export type TimrsheetsDto = {
-  items: TimeSheetsPage,
-  tabsCounts: TabCountConfig,
-};
 
 export interface TimesheetsModel {
   timesheets: TimeSheetsPage | null;
@@ -45,4 +32,3 @@ export interface TimesheetsModel {
   organizations: DataSourceItem[];
   selectedOrganizationId: number;
 }
-

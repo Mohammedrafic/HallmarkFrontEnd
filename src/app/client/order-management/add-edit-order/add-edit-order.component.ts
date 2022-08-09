@@ -86,6 +86,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
   private unsubscribe$: Subject<void> = new Subject();
 
   public isPerDiem = false;
+  public isPermPlacementOrder = false;
   public disableOrderType = false;
   public isSaveForTemplate = false;
 
@@ -116,11 +117,15 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (this.orderId > 0) {
       this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
         this.prefix = order?.organizationPrefix as string;
+        this.isPermPlacementOrder = order?.orderType === OrderType.PermPlacement;
         if (order?.credentials) {
           this.orderCredentials = [...order.credentials];
         }
         if (order?.billRates) {
           this.orderBillRates = [...order.billRates];
+        }
+        if (this.isPermPlacementOrder) {
+          this.tab.hideTab(SelectedTab.BillRates, this.isPermPlacementOrder);
         }
 
         if (order?.status === OrderStatus.Incomplete) {
@@ -166,7 +171,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public onOrderTypeChange(orderType: OrderType): void {
     this.isPerDiem = orderType === OrderType.OpenPerDiem;
-    this.tab.hideTab(SelectedTab.BillRates, this.isPerDiem);
+    this.isPermPlacementOrder = orderType === OrderType.PermPlacement;
+    this.tab.hideTab(SelectedTab.BillRates, this.isPerDiem || this.isPermPlacementOrder);
   }
 
   public navigateBack(): void {
@@ -240,7 +246,10 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       this.orderDetailsFormComponent.workLocationForm.valid &&
       (this.orderDetailsFormComponent.workflowForm.disabled || this.orderDetailsFormComponent.workflowForm.valid) &&
       this.orderDetailsFormComponent.specialProject.valid &&
-      (this.billRatesComponent?.billRatesControl.valid || this.orderBillRates.length || this.isPerDiem)
+      (this.billRatesComponent?.billRatesControl.valid ||
+        this.orderBillRates.length ||
+        this.isPerDiem ||
+        this.isPermPlacementOrder)
     ) {
       const order = this.collectOrderData(true);
       const documents = this.orderDetailsFormComponent.documents;
@@ -295,7 +304,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   private collectOrderData(isSubmit: boolean): CreateOrderDto {
     let orderBillRates: BillRate[] | null;
-    if (this.isPerDiem) {
+    if (this.isPerDiem || this.isPermPlacementOrder) {
       orderBillRates = null;
     } else {
       orderBillRates = this.billRatesComponent?.billRatesControl.value || this.orderBillRates;
@@ -332,7 +341,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       duration,
       jobStartDate,
       jobEndDate,
-      shiftRequirementId,
+      shift,
       shiftStartTime,
       shiftEndTime,
       jobDistributions,
@@ -349,6 +358,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       workflowId,
       credentials,
       canApprove,
+      annualSalaryRangeFrom,
+      annualSalaryRangeTo,
+      orderPlacementFee,
     } = allValues;
 
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
@@ -375,7 +387,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       duration,
       jobStartDate,
       jobEndDate,
-      shiftRequirementId,
+      shift,
       shiftStartTime,
       shiftEndTime,
       classification,
@@ -394,6 +406,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       workflowId,
       isSubmit,
       canApprove,
+      annualSalaryRangeFrom,
+      annualSalaryRangeTo,
+      orderPlacementFee,
       isTemplate: false,
     };
 
