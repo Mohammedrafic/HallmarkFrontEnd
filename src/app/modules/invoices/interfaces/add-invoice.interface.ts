@@ -1,7 +1,6 @@
 import { FieldType, FieldWidthStyle } from '@core/enums';
 import { DropdownOption, FileForUpload } from '@core/interface';
 import { ManInvoiceOptionsKeys } from '../enums';
-import { ManInvoiceOptionsKeys } from '../enums';
 
 export interface ManInvoiceInputConfig {
   field: string;
@@ -11,8 +10,7 @@ export interface ManInvoiceInputConfig {
   type: FieldType;
   widthStyle: FieldWidthStyle;
   optionsStateKey?: ManInvoiceOptionsKeys;
-  optionsStateKey?: ManInvoiceOptionsKeys;
-  options?: DropdownOption[][];
+  options?: DropdownOption[];
 };
 
 export interface AddManInvoiceDialogConfig {
