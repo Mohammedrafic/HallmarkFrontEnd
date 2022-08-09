@@ -5,11 +5,13 @@ import { map, Observable, distinctUntilChanged, debounceTime } from 'rxjs';
 import { Actions, ofActionCompleted, Store } from '@ngxs/store';
 
 import { CustomFormGroup, DropdownOption } from '@core/interface';
+import { MessageTypes } from '@shared/enums/message-types';
 import { AddManInvoiceDialogConfig, AddManInvoiceForm, ManualInvoiceInputOptions,
   ManualInvoiceMeta } from '../../interfaces';
 import { InvoiceMetaAdapter } from '../invoice-meta.adapter';
 import { ManualInvoiceStrategy } from './strategy.interface';
 import { Invoices } from '../../store/actions/invoices.actions';
+import { ShowToast } from 'src/app/store/app.actions';
 
 @Injectable({ providedIn: 'any'})
 export class AgencyStrategy implements ManualInvoiceStrategy {
@@ -25,6 +27,7 @@ export class AgencyStrategy implements ManualInvoiceStrategy {
     config: AddManInvoiceDialogConfig,
     ): void {
       if (!meta.length) {
+        this.store.dispatch(new ShowToast(MessageTypes.Warning, 'Sorry, but such order or position was not found'));
         return;
       }
   

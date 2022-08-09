@@ -4,6 +4,8 @@ import { Actions, ofActionCompleted, Store } from '@ngxs/store';
 import { map, Observable } from 'rxjs';
 
 import { CustomFormGroup, DropdownOption } from '@core/interface';
+import { MessageTypes } from '@shared/enums/message-types';
+import { ShowToast } from 'src/app/store/app.actions';
 import { AddManInvoiceDialogConfig, AddManInvoiceForm, ManualInvoiceInputOptions,
   ManualInvoiceMeta } from '../../interfaces';
 import { InvoiceMetaAdapter } from '../invoice-meta.adapter';
@@ -24,6 +26,7 @@ export class OrganizationStrategy implements ManualInvoiceStrategy {
     config: AddManInvoiceDialogConfig,
     ): void {
       if (!meta.length) {
+        this.store.dispatch(new ShowToast(MessageTypes.Warning, 'Sorry but such order or position was not found'));
         return;
       }
   
