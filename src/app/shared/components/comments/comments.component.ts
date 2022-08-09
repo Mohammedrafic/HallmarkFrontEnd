@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Store } from '@ngxs/store';
 import { Comment } from '@shared/models/comment.model';
 import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { TextBoxComponent } from '@syncfusion/ej2-angular-inputs';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
+import { MarkCommentAsRead, SaveComment } from './store/comments.actions';
 
 enum CommentsFilter {
   All = 'All',
@@ -19,9 +21,8 @@ enum CommentsFilter {
 export class CommentsComponent {
   @Input() useBackground: boolean = true;
   @Input() comments: Comment[] = [];
-
-  @Output() onCommentAdded = new EventEmitter<Comment>();
-  @Output() onRead = new EventEmitter<Comment>();
+  @Input() commentContainerId: number;
+  @Input() isCreating: boolean = false;
 
   @ViewChild('textBox')
   public textBox: TextBoxComponent;
@@ -39,15 +40,24 @@ export class CommentsComponent {
   public message: string;
   public scroll$ = new Subject<HTMLElement | null>();
   public scrolledToMessage$ = new Subject<void>();
+  public markAsRead$ = new Subject<number[]>();
+
+  public readMessagesIds: number[] = []; 
 
   private hasUnreadMessages = false;
 
-  constructor() {
+  constructor(private store: Store) {
     this.scroll$.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((messageEl: HTMLElement | null) => {
       if (messageEl) {
         this.scrollToSpecificMessage(messageEl);
       } else {
         this.scrollToLastMessage();
+      }
+    });
+    this.markAsRead$.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((ids: number[]) => {
+      if (ids.length) {
+        this.store.dispatch(new MarkCommentAsRead(this.readMessagesIds));
+        this.readMessagesIds = [];
       }
     });
   }
@@ -79,6 +89,11 @@ export class CommentsComponent {
     return !!this.comments.find((message: Comment) => message.unread);
   }
 
+  public onRead(comment: Comment): void {
+    this.readMessagesIds.push(comment.id);
+    this.markAsRead$.next(this.readMessagesIds);
+  }
+
   public onScroll(): void {
     if (this.hasUnreadMessages) {
       this.scrolledToMessage$.next();
@@ -95,13 +110,17 @@ export class CommentsComponent {
   }
 
   public send(): void {
+    const comment = {
+      id: 0, text: this.message, creationDate: new Date(), isExternal: this.isExternal, new: true, commentContainerId: this.commentContainerId
+    };
     if (this.message) {
-      this.comments.push({
-        id: 0, text: this.message, creationDate: new Date(), isExternal: this.isExternal, new: true
-      });
+      this.comments.push(comment);
       this.message = '';
       this.scroll$.next(null);
     }
+    if (!this.isCreating) {
+      this.store.dispatch(new SaveComment(comment))
+    } 
   }
 
   public onFilterChange(event: SelectEventArgs): void {

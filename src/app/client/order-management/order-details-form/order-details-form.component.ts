@@ -223,7 +223,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.regularLocalBillRate)
   regularLocalBillRate$: Observable<BillRate[]>;
 
-  private isEditMode: boolean;
+  public isEditMode: boolean;
 
   private touchedFields: Set<string> = new Set();
   private alreadyShownDialog: boolean = false;
@@ -232,9 +232,11 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public isPerDiem = false;
   public isPermPlacementOrder = false;
 
+  public commentContainerId: number = 0;
+
   public comments: Comment[] = []; /*[ // TODO: Mocked data, remove after BE
     {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet', isExternal: true, creationDate: new Date(), unread: true
+      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet', isExternal: true, creationDate: new Date()
     },
     {
       id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date()
@@ -552,6 +554,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       if (order && isEditMode) {
         this.isEditMode = true;
         this.order = order;
+        this.commentContainerId = order.commentContainerId as number;
         this.populateForms(order);
       } else if (order?.isTemplate) {
         this.order = order;

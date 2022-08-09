@@ -556,9 +556,9 @@ export class OrderManagementContentState {
   @Action(SaveOrder)
   SaveOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents }: SaveOrder
+    { order, documents, comments }: SaveOrder
   ): Observable<Order | void> {
-    return this.orderManagementService.saveOrder(order, documents).pipe(
+    return this.orderManagementService.saveOrder(order, documents, comments).pipe(
       tap((order) => {
         dispatch([
           new ShowToast(MessageTypes.Success, RECORD_ADDED),
