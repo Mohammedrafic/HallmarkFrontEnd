@@ -224,12 +224,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.contactDetails)
   contactDetails$: Observable<Department>;
 
-  public isEditMode: boolean;
-
   @Select(OrganizationManagementState.organizationSettings)
   organizationSettings$: Observable<OrganizationSettingsGet[]>;
 
-  private isEditMode: boolean;
+  public isEditMode: boolean;
 
   private touchedFields: Set<string> = new Set();
   private alreadyShownDialog: boolean = false;
