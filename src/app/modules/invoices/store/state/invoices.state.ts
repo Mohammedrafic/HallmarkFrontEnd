@@ -1,23 +1,27 @@
+import { Injectable } from '@angular/core';
+
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 import { debounceTime, Observable, of, throttleTime } from 'rxjs';
 import { tap } from 'rxjs/internal/operators/tap';
-import { Injectable } from '@angular/core';
 
 import { PageOfCollections } from '@shared/models/page.model';
 import { DialogAction } from '@core/enums';
-
+import { DataSourceItem } from '@core/interface';
 import { Invoices } from '../actions/invoices.actions';
 import { InvoicesService } from '../../services';
-import { InvoiceFilterColumns, InvoiceRecord, InvoicesFilteringOptions, InvoicesFilterState } from '../../interfaces';
+import {
+  InvoiceFilterColumns, InvoiceRecord, InvoicesFilteringOptions, InvoicesFilterState,
+  ManualInvoiceMeta, ManualInvoiceReason } from '../../interfaces';
 import { InvoicesModel } from '../invoices.model';
 import { FilteringOptionsFields } from '../../../timesheets/enums';
 import { DefaultInvoicesState } from '../../constants';
 import { DefaultFiltersState, SavedFiltersParams } from '../../../timesheets/constants';
 import { reduceFiltersState } from '../../../timesheets/helpers';
-import { InvoicesApiService } from '../../services/invoices-api.service';
+import { InvoicesApiService } from '../../services';
 import { InvoicesTableFiltersColumns } from '../../enums/invoices.enum';
 import { InvoicesFilteringOptionsMapping } from '../../constants';
+import { InvoiceMetaAdapter } from '../../helpers/invoice-meta.adapter';
 
 @State<InvoicesModel>({
   name: 'invoices',
@@ -59,6 +63,11 @@ export class InvoicesState {
   @Selector([InvoicesState])
   static prevInvoiceId(state: InvoicesModel): string | null {
     return state?.prevInvoiceId ?? null;
+  }
+
+  @Selector([InvoicesState])
+  static invoiceReasons(state: InvoicesModel): ManualInvoiceReason[] {
+    return state.invoiceReasons;
   }
 
   @Action(Invoices.Get)
@@ -158,8 +167,63 @@ export class InvoicesState {
       );
   }
 
-  @Action(Invoices.ToggleManulaInvoiceDialog)
+  @Action(Invoices.ToggleManualInvoiceDialog)
   ToggleManInvoiceDialog(
-    { action }: Invoices.ToggleManulaInvoiceDialog
+    { action }: Invoices.ToggleManualInvoiceDialog
   ): void {}
+
+  @Action(Invoices.GetInvoicesReasons)
+  GetInvoicesReasons(
+    { patchState }: StateContext<InvoicesModel>,
+  ): Observable<ManualInvoiceReason[]> {
+    return this.invoicesAPIService.getInvoiceReasons()
+      .pipe(
+        tap((res) => {
+          patchState(
+            {
+              invoiceReasons: res,
+            }
+          );
+        }),
+      )
+  }
+
+  @Action(Invoices.GetManInvoiceMeta)
+  GetInvoiceMeta(
+    { patchState }: StateContext<InvoicesModel>,
+    { orgId }: Invoices.GetManInvoiceMeta,
+  ): Observable<ManualInvoiceMeta[]> {
+    return this.invoicesAPIService.getManInvoiceMeta(orgId)
+      .pipe(
+        tap((res) => {
+          patchState({
+            invoiceMeta: res,
+          });
+        }),
+      );
+  }
+
+  @Action(Invoices.SaveManulaInvoice)
+  SaveManualInvoice(
+    { payload }: Invoices.SaveManulaInvoice,
+  ): Observable<void> {
+    return this.invoicesAPIService.saveManualInvoice(payload);
+  }
+
+  @Action(Invoices.GetOrganizations)
+  GetOrganizations(
+    { patchState }: StateContext<InvoicesModel>,
+  ): Observable<DataSourceItem[]> {
+    return this.invoicesAPIService.getOrganizations()
+    .pipe(
+      tap((res) => {
+        patchState({
+          organizations: res.map((item) => ({
+            text: item.name,
+            value: item.id,
+          }))
+        })
+      })
+    )
+  }
 }

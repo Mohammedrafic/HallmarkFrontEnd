@@ -266,7 +266,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           )
         );
       } else {
-        this.store.dispatch(new SaveOrder(order, documents));
+        this.store.dispatch(new SaveOrder(order, documents, this.orderDetailsFormComponent.isEditMode ? undefined : this.orderDetailsFormComponent.comments));
       }
     } else {
       this.orderDetailsFormComponent.orderTypeForm.markAllAsTouched();
@@ -340,7 +340,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       duration,
       jobStartDate,
       jobEndDate,
-      shiftRequirementId,
+      shift,
       shiftStartTime,
       shiftEndTime,
       jobDistributions,
@@ -385,7 +385,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       duration,
       jobStartDate,
       jobEndDate,
-      shiftRequirementId,
+      shift,
       shiftStartTime,
       shiftEndTime,
       classification,
@@ -473,7 +473,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         )
       );
     } else {
-      this.store.dispatch(new SaveOrder(order, documents));
+      this.store.dispatch(new SaveOrder(
+        order, documents
+      ));
     }
   }
 

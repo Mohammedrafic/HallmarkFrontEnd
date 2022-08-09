@@ -69,6 +69,7 @@ import { FilteredCredentialsComponent } from './credentials/credentials-setup/fi
 import { MapCredentialsFormComponent } from './credentials/credentials-setup/map-credentials-form/map-credentials-form.component';
 import { ReasonsComponent } from './reasons/reasons.component';
 import { ClosureReasonComponent } from './reasons/closure-reason/closure-reason.component';
+import { RegionsComponent } from './regions/regions.component';
 import { ManualInvoiceRejectReasonComponent } from './reasons/manual-invoice-reject-reason/manual-invoice-reject-reason.component';
 
 const sidebarIcons = {
@@ -115,8 +116,10 @@ const sidebarIcons = {
     FilteredCredentialsComponent,
     MapCredentialsFormComponent,
     ReasonsComponent,
-    ClosureReasonComponent,
+
     ManualInvoiceRejectReasonComponent,
+    ClosureReasonComponent,
+    RegionsComponent
   ],
   imports: [
     CommonModule,

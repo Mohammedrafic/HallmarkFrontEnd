@@ -19,10 +19,8 @@ import {
   ClearSuggestions,
   GetAssociateAgencies,
   GetContactDetails,
-  GetMasterShifts,
   GetOrganizationStatesWithKeyCode,
   GetProjectSpecialData,
-  GetRegularLocalBillRate,
   GetSuggestedDetails,
   GetWorkflows,
   SetIsDirtyOrderForm,
@@ -36,7 +34,6 @@ import { Location } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
 import { Department } from '@shared/models/department.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
-import { MasterShift } from '@shared/models/master-shift.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
@@ -64,6 +61,9 @@ import { GetPredefinedCredentials } from '@order-credentials/store/credentials.a
 import { ReasonForRequisitionList } from '@shared/models/reason-for-requisition-list';
 import { Comment } from '@shared/models/comment.model';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
+import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
+import { BillRate } from '@shared/models';
+import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 
 @Component({
@@ -165,6 +165,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     { id: MasterShiftName.Rotating, name: 'Rotating' },
   ];
 
+  public masterShiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
+
   public jobClassificationFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public reasonsForRequisition = ReasonForRequisitionList;
@@ -204,10 +206,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
 
-  @Select(OrderManagementContentState.masterShifts)
-  masterShifts$: Observable<MasterShift[]>;
-  masterShiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
-
   @Select(OrderManagementContentState.associateAgencies)
   associateAgencies$: Observable<AssociateAgency[]>;
   associateAgencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
@@ -226,8 +224,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.contactDetails)
   contactDetails$: Observable<Department>;
 
-  @Select(OrderManagementContentState.regularLocalBillRate)
-  regularLocalBillRate$: Observable<any>;
+  public isEditMode: boolean;
 
   @Select(OrganizationManagementState.organizationSettings)
   organizationSettings$: Observable<OrganizationSettingsGet[]>;
@@ -241,7 +238,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public isPerDiem = false;
   public isPermPlacementOrder = false;
 
-  public comments: Comment[] = [] /*[ // TODO: Mocked data, remove after BE
+  public commentContainerId: number = 0;
+
+  public comments: Comment[] = []; /*[ // TODO: Mocked data, remove after BE
     {
       id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet', isExternal: true, creationDate: new Date()
     },
@@ -255,13 +254,13 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       id: 0, text: 'Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: false, creationDate: new Date()
     },
     {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment', isExternal: true, creationDate: new Date()
+      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment', isExternal: true, creationDate: new Date(), unread: true,
     },
     {
-      id: 0, text: '500 chars comment Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second linecomment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: false, creationDate: new Date()
+      id: 0, text: '500 chars comment Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second linecomment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: false, creationDate: new Date(), unread: true
     },
     {
-      id: 0, text: 'short', isExternal: false, creationDate: new Date()
+      id: 0, text: 'short', isExternal: false, creationDate: new Date(), unread: true,
     },
     {
       id: 0, text: 'Some Text', isExternal: true, creationDate: new Date()
@@ -270,7 +269,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date()
     },
     {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date()
+      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date(), unread: true
     },
   ];*/
 
@@ -278,7 +277,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     private store: Store,
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private orderManagementService: OrderManagementContentService
   ) {
     this.orderTypeForm = this.formBuilder.group({
       orderType: [null, Validators.required],
@@ -298,7 +298,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       duration: [null, Validators.required],
       jobStartDate: [null, Validators.required],
       jobEndDate: [null, Validators.required],
-      shiftRequirementId: [null, Validators.required],
+      shift: [null, Validators.required],
       shiftStartTime: [null, Validators.required],
       shiftEndTime: [null, Validators.required],
     });
@@ -308,8 +308,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.isPermPlacementOrder = val.orderType === OrderType.PermPlacement;
       this.orderTypeChanged.emit(val.orderType);
       this.store.dispatch(new SetIsDirtyOrderForm(this.orderTypeForm.dirty));
+
       this.handlePerDiemOrder();
       this.handlePermPlacementOrder();
+
       Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
         this.generalInformationForm.controls[key].updateValueAndValidity({ onlySelf: false, emitEvent: false });
       });
@@ -425,6 +427,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
           return;
         }
 
+        this.populateHourlyRateField(orderType, departmentId, skillId);
         this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
       });
 
@@ -549,7 +552,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetRegions());
     this.store.dispatch(new GetMasterSkillsByOrganization());
     this.store.dispatch(new GetProjectSpecialData());
-    this.store.dispatch(new GetMasterShifts());
     this.store.dispatch(new GetAssociateAgencies());
     this.store.dispatch(new GetOrganizationStatesWithKeyCode());
 
@@ -558,6 +560,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       if (order && isEditMode) {
         this.isEditMode = true;
         this.order = order;
+        this.commentContainerId = order.commentContainerId as number;
         this.populateForms(order);
       } else if (order?.isTemplate) {
         this.order = order;
@@ -601,6 +604,18 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     firstContactDetailsControl.controls['name'].patchValue(name);
     firstContactDetailsControl.controls['email'].patchValue(email);
     firstContactDetailsControl.controls['mobilePhone'].patchValue(mobilePhone);
+  }
+
+  private populateHourlyRateField(orderType: OrderType, departmentId: number, skillId: number): void {
+    this.orderManagementService
+      .getRegularLocalBillRate(orderType, departmentId, skillId)
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((billRate) => !!billRate.length)
+      )
+      .subscribe((billRates: BillRate[]) =>
+        this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour)
+      );
   }
 
   public onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -681,7 +696,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.generalInformationForm.controls['duration']?.setValidators(Validators.required);
       this.generalInformationForm.controls['jobStartDate'].setValidators(Validators.required);
       this.generalInformationForm.controls['jobEndDate']?.setValidators(Validators.required);
-      this.generalInformationForm.controls['shiftRequirementId'].setValidators(Validators.required);
+      this.generalInformationForm.controls['shift'].setValidators(Validators.required);
       this.generalInformationForm.controls['shiftStartTime'].setValidators(Validators.required);
       this.generalInformationForm.controls['shiftEndTime'].setValidators(Validators.required);
     }
@@ -735,8 +750,17 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public removeContact(index: number): void {
+    const isPrimaryContact = this.contactDetailsFormArray.controls[index].get('isPrimaryContact')?.value;
     this.isEditContactTitle.splice(index, 1);
     this.contactDetailsFormArray.removeAt(index);
+
+    if (isPrimaryContact) {
+      this.setDefaultPrimaryContact();
+    }
+  }
+
+  private setDefaultPrimaryContact(): void {
+    this.contactDetailsFormArray.controls[0].get('isPrimaryContact')?.patchValue(true);
   }
 
   public editContactTitleHandler(i: number): void {
@@ -851,11 +875,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => this.generalInformationForm.controls['skillId'].patchValue(order.skillId));
 
-    this.masterShifts$.pipe(takeUntil(this.unsubscribe$)).subscribe(() =>
-      this.generalInformationForm.controls['shiftRequirementId'].patchValue(order.shiftRequirementId, {
-        emitEvent: false,
-      })
-    );
+    this.generalInformationForm.controls['shift'].patchValue(order.shift, { emitEvent: false });
 
     this.regions$
       .pipe(takeUntil(this.unsubscribe$))
@@ -1015,6 +1035,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         Validators.minLength(10),
         Validators.pattern(/^[0-9]+$/),
       ]),
+      isPrimaryContact: new FormControl(
+        orderContactDetails ? orderContactDetails.isPrimaryContact : !this.contactDetailsFormArray?.length
+      ),
     });
   }
 
@@ -1059,8 +1082,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private populateNewOrderForm(): void {
-    this.store.dispatch(new GetRegularLocalBillRate());
-
     this.orderTypeForm.controls['orderType'].patchValue(OrderType.Traveler);
     this.generalInformationForm.controls['duration'].patchValue(Duration.ThirteenWeeks);
     this.jobDistributionForm.controls['jobDistribution'].patchValue([JobDistribution.All]);
@@ -1069,9 +1090,15 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       const { facilityContact, facilityPhoneNo, facilityEmail } = contactDetails;
       this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
     });
+  }
 
-    this.regularLocalBillRate$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((regularLocalBillRate) => {
-      this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0]);
+  public selectPrimaryContact(event: ChangeArgs): void {
+    const checkedValue = Number(event.value);
+    this.contactDetailsFormArray.controls.forEach((control, index) => {
+      const primaryContact = control.get('isPrimaryContact');
+      if (primaryContact) {
+        index !== checkedValue ? primaryContact.patchValue(false) : primaryContact.patchValue(true);
+      }
     });
   }
 }

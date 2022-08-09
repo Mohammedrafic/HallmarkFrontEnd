@@ -1,4 +1,5 @@
 export const ORG_SETTINGS: { [key: string]: Object }[] = [
+  { text: 'Regions', id: 11, route: './regions' },
   { text: 'Locations', id: 2, route: './locations' },
   { text: 'Departments', id: 1, route: './departments' },
   { text: 'Shifts', id: 5, route: './shifts' },

@@ -208,4 +208,12 @@ export class CandidateService {
   public getCredentialGroupedFiles(candidateId: number): Observable<CredentialGroupedFiles[]> {
     return this.http.get<CredentialGroupedFiles[]>(`/api/CandidateCredentials/groupedCandidateCredentialsFiles/${candidateId}`);
   }
+
+  /**
+   * Get Candidate Profile Template
+   * @return blob
+   */
+  public getCandidateProfileTemplate(): Observable<any> {
+    return this.http.get('/api/CandidateProfile/template', { responseType: 'blob' });
+  }
 }

@@ -42,7 +42,6 @@ import { InvoicesFiltersDialogComponent } from './components/invoices-filters-di
 import { InvoicesApiService } from './services/invoices-api.service';
 import { InvoicesTableTabsComponent } from './components/invoices-table-tabs/invoices-table-tabs.component';
 import { AddDialogHelperService } from '@core/services';
-import { InvoiceApiService } from './services/invoice-api.service';
 
 @NgModule({
   declarations: [
@@ -106,7 +105,6 @@ import { InvoiceApiService } from './services/invoice-api.service';
     InvoicesApiService,
     ChipsCssClass,
     AddInvoiceService,
-    InvoiceApiService,
     {
       provide: AddDialogHelperService,
       useClass: AddInvoiceService,

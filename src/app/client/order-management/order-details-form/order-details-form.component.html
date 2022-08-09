@@ -299,7 +299,7 @@
                     <label>Shift Name<span class="required">*</span></label>
                     <div class="input-group dropdown">
                       <ejs-dropdownlist
-                        formControlName="shiftRequirementId"
+                        formControlName="shift"
                         appValidateWithMessage
                         [dataSource]="masterShiftNames"
                         [fields]="masterShiftFields"
@@ -554,6 +554,17 @@
                     </div>
                   </div>
 
+                  <!--Primary contact-->
+                  <div *ngIf="contactDetailsFormArray.controls.length > 1" class="radio-button">
+                    <label>Primary</label>
+                    <ejs-radiobutton
+                      name="primaryContact"
+                      [value]="i"
+                      [checked]="contact.get('isPrimaryContact')?.value"
+                      (change)="selectPrimaryContact($event)"
+                    ></ejs-radiobutton>
+                  </div>
+
                   <!-- Remove button -->
                   <div class="input-container remove-button-container">
                     <button
@@ -730,7 +741,11 @@
     </app-document-uploader>
     <div tabindex="0" class="e-card comments">
       <div class="e-card-content">
-        <app-comments [comments]="comments" [useBackground]="false"></app-comments>
+        <app-comments
+          [comments]="comments"
+          [commentContainerId]="commentContainerId"
+          [useBackground]="false"
+          [isCreating]="!isEditMode"></app-comments>
       </div>
     </div>
   </div>

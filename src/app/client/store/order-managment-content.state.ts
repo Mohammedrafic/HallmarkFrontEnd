@@ -20,7 +20,6 @@ import {
   GetHistoricalData,
   ClearHistoricalData,
   GetIncompleteOrders,
-  GetMasterShifts,
   GetOrderById,
   GetOrderFilterDataSources,
   GetOrders,
@@ -46,7 +45,6 @@ import {
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
   GetContactDetails,
-  GetRegularLocalBillRate,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -65,7 +63,6 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { ProjectName, ProjectType } from '@shared/models/project.model';
-import { MasterShift } from '@shared/models/master-shift.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectsService } from '@shared/services/projects.service';
 import { ShiftsService } from '@shared/services/shift.service';
@@ -103,7 +100,6 @@ export interface OrderManagementContentStateModel {
   projectSpecialData: ProjectSpecialData | null;
   suggestedDetails: SuggestedDetails | null;
   projectNames: ProjectName[];
-  masterShifts: MasterShift[];
   associateAgencies: AssociateAgency[];
   predefinedBillRates: BillRate[];
   isDirtyOrderForm: boolean;
@@ -112,7 +108,6 @@ export interface OrderManagementContentStateModel {
   historicalEvents: HistoricalEvent[] | null;
   navigationTab: NavigationTabModel;
   contactDetails: Department | null;
-  regularLocalBillRate: string[];
 }
 
 @State<OrderManagementContentStateModel>({
@@ -135,7 +130,6 @@ export interface OrderManagementContentStateModel {
     projectNames: [],
     projectSpecialData: null,
     suggestedDetails: null,
-    masterShifts: [],
     associateAgencies: [],
     predefinedBillRates: [],
     isDirtyOrderForm: false,
@@ -148,7 +142,6 @@ export interface OrderManagementContentStateModel {
       current: null,
     },
     contactDetails: null,
-    regularLocalBillRate: [],
   },
 })
 @Injectable()
@@ -201,11 +194,6 @@ export class OrderManagementContentState {
   @Selector()
   static projectNames(state: OrderManagementContentStateModel): ProjectName[] {
     return state.projectNames;
-  }
-
-  @Selector()
-  static masterShifts(state: OrderManagementContentStateModel): MasterShift[] {
-    return state.masterShifts;
   }
 
   @Selector()
@@ -280,10 +268,6 @@ export class OrderManagementContentState {
     return state.contactDetails;
   }
 
-  @Selector()
-  static regularLocalBillRate(state: OrderManagementContentStateModel): string[] {
-    return state.regularLocalBillRate;
-  }
 
   constructor(
     private orderManagementService: OrderManagementContentService,
@@ -507,15 +491,6 @@ export class OrderManagementContentState {
     );
   }
 
-  @Action(GetMasterShifts)
-  GetMasterShifts({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<MasterShift[]> {
-    return this.shiftsService.getAllMasterShifts().pipe(
-      tap((payload) => {
-        patchState({ masterShifts: payload });
-      })
-    );
-  }
-
   @Action(GetAssociateAgencies)
   GetAssociateAgencies({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<AssociateAgency[]> {
     return this.orderManagementService.getAssociateAgencies().pipe(
@@ -574,9 +549,9 @@ export class OrderManagementContentState {
   @Action(SaveOrder)
   SaveOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents }: SaveOrder
+    { order, documents, comments }: SaveOrder
   ): Observable<Order | void> {
-    return this.orderManagementService.saveOrder(order, documents).pipe(
+    return this.orderManagementService.saveOrder(order, documents, comments).pipe(
       tap((order) => {
         dispatch([
           new ShowToast(MessageTypes.Success, RECORD_ADDED),
@@ -740,12 +715,4 @@ export class OrderManagementContentState {
     );
   }
 
-  @Action(GetRegularLocalBillRate)
-  GetRegularLocalBillRate ({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<string[]> {
-    return this.orderManagementService.getRegularLocalBillRate().pipe(
-      tap((regularLocalBillRate: string[]) => {
-        patchState({ regularLocalBillRate });
-      })
-    );
-  }
 }
