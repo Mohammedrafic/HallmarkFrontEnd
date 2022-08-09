@@ -1053,7 +1053,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
     this.regularLocalBillRate$
       .pipe(takeUntil(this.unsubscribe$), filter((billRate) => !!billRate.length))
-      .subscribe((regularLocalBillRate) => this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0].rateHour));
+      .subscribe((regularLocalBillRate) => {this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0].rateHour)});
   }
 
   public selectPrimaryContact(event: ChangeArgs): void {

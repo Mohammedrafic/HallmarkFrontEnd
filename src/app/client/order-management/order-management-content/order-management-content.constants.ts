@@ -144,6 +144,14 @@ export const ReOrdersColumnsConfig = [
     fieldName: 'candidates',
     visible: true,
   },
+  {
+    fieldName: 'annualSalaryRangeFrom',
+    visible: false,
+  },
+  {
+    fieldName: 'annualSalaryRangeTo',
+    visible: false,
+  }
 ];
 
 export const AllOrdersColumnsConfig = [
@@ -203,6 +211,14 @@ export const AllOrdersColumnsConfig = [
     fieldName: 'candidates',
     visible: true,
   },
+  {
+    fieldName: 'annualSalaryRangeFrom',
+    visible: false,
+  },
+  {
+    fieldName: 'annualSalaryRangeTo',
+    visible: false,
+  }
 ];
 
 export const PerDiemColumnsConfig = [
@@ -258,6 +274,14 @@ export const PerDiemColumnsConfig = [
     fieldName: 'candidates',
     visible: true,
   },
+  {
+    fieldName: 'annualSalaryRangeFrom',
+    visible: false,
+  },
+  {
+    fieldName: 'annualSalaryRangeTo',
+    visible: false,
+  }
 ];
 
 export const orderTemplateColumnsConfig = [
@@ -321,4 +345,79 @@ export const orderTemplateColumnsConfig = [
     fieldName: 'regionName',
     visible: true,
   },
+  {
+    fieldName: 'annualSalaryRangeFrom',
+    visible: false,
+  },
+  {
+    fieldName: 'annualSalaryRangeTo',
+    visible: false,
+  }
+];
+
+export const PermPlacementColumnsConfig = [
+  {
+    fieldName: 'id',
+    visible: true,
+  },
+  {
+    fieldName: 'orderType',
+    visible: false,
+  },
+  {
+    fieldName: 'startDate',
+    visible: true,
+  },
+  {
+    fieldName: 'reOrderFromId',
+    visible: false,
+  },
+  {
+    fieldName: 'shift',
+    visible: false,
+  },
+  {
+    fieldName: 'agencies',
+    visible: false,
+  },
+  {
+    fieldName: 'shiftsNext90Days',
+    visible: false,
+  },
+  {
+    fieldName: 'templateTitle',
+    visible: false,
+  },
+  {
+    fieldName: 'actions',
+    visible: true,
+  },
+  {
+    fieldName: 'statusText',
+    visible: true,
+  },
+  {
+    fieldName: 'jobTitle',
+    visible: true,
+  },
+  {
+    fieldName: 'openPositions',
+    visible: true,
+  },
+  {
+    fieldName: 'billRate',
+    visible: false,
+  },
+  {
+    fieldName: 'candidates',
+    visible: true,
+  },
+  {
+    fieldName: 'annualSalaryRangeFrom',
+    visible: true,
+  },
+  {
+    fieldName: 'annualSalaryRangeTo',
+    visible: true,
+  }
 ];

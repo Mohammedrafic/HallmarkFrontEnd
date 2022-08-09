@@ -19,7 +19,6 @@ import {
   PagerComponent,
   RowDataBoundEventArgs,
   SelectionSettingsModel,
-  SortDirection,
   TextWrapSettingsModel,
 } from '@syncfusion/ej2-angular-grids';
 import { CheckBoxComponent } from '@syncfusion/ej2-angular-buttons';
@@ -34,6 +33,7 @@ import {
   perDiemChildColumnsToExport,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
+  PermPlacementColumnsConfig,
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
@@ -308,6 +308,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.filters.includeReOrders = true;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
+        case AgencyOrderManagementTabs.PermPlacement:
+        this.filters.orderTypes = [OrderType.PermPlacement];
+        this.filters.includeReOrders = false;
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        break;
       case AgencyOrderManagementTabs.ReOrders:
         this.filters.includeReOrders = false;
         this.filters.orderTypes = [OrderType.ReOrder];
@@ -330,6 +335,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       case AgencyOrderManagementTabs.PerDiem:
         this.isLockMenuButtonsShown = true;
         this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
+        break;
+        case AgencyOrderManagementTabs.PermPlacement:
+        this.isLockMenuButtonsShown = false;
+        this.refreshGridColumns(PermPlacementColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.ReOrders:
         this.isLockMenuButtonsShown = false;
