@@ -70,11 +70,6 @@ export class InvoicesState {
     return state.invoiceReasons;
   }
 
-  @Selector([InvoicesState])
-  static invoiceReasons(state: InvoicesModel): ManualInvoiceReason[] {
-    return state.invoiceReasons;
-  }
-
   @Action(Invoices.Get)
   GetInvoices(
     { patchState }: StateContext<InvoicesModel>,

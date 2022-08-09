@@ -1,6 +1,5 @@
 import { FieldType, FieldWidthStyle } from '@core/enums';
 import { ManInvoiceOptionsKeys } from '../enums';
-import { ManInvoiceOptionsKeys } from '../enums';
 import { AddManInvoiceDialogConfig } from '../interfaces';
 
 export const ManualInvoiceDialogConfig = (isAgency: boolean): AddManInvoiceDialogConfig => ({
@@ -53,8 +52,6 @@ export const ManualInvoiceDialogConfig = (isAgency: boolean): AddManInvoiceDialo
       widthStyle: FieldWidthStyle.Short,
       optionsStateKey: ManInvoiceOptionsKeys.Locations,
       options: [],
-      optionsStateKey: ManInvoiceOptionsKeys.Locations,
-      options: [],
     },
     {
       field: 'departmentId',
@@ -63,8 +60,6 @@ export const ManualInvoiceDialogConfig = (isAgency: boolean): AddManInvoiceDialo
       required: true,
       type: FieldType.Dropdown,
       widthStyle: FieldWidthStyle.Short,
-      optionsStateKey: ManInvoiceOptionsKeys.Departments,
-      options: [],
       optionsStateKey: ManInvoiceOptionsKeys.Departments,
       options: [],
     },
@@ -108,8 +103,6 @@ export const ManualInvoiceDialogConfig = (isAgency: boolean): AddManInvoiceDialo
       required: true,
       type: FieldType.Dropdown,
       widthStyle: FieldWidthStyle.Long,
-      optionsStateKey: ManInvoiceOptionsKeys.Reasons,
-      options: [],
       optionsStateKey: ManInvoiceOptionsKeys.Reasons,
       options: [],
     },

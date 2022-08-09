@@ -9,9 +9,7 @@ import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { DialogAction } from '@core/enums';
 import { ManualInvoiceDialogConfig } from '../../constants';
 import {
- 
-  AddManInvoiceDialogConfig,   AddManInvoiceForm,  ManualInvoiceInputOptions,  ManualInvoiceMeta,
-  ManualInvoiceReason,  ManualInvoiceInputOptions,  ManualInvoiceMeta,
+  AddManInvoiceDialogConfig,   AddManInvoiceForm, ManualInvoiceInputOptions,  ManualInvoiceMeta,
   ManualInvoiceReason } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoiceConfirmMessages } from '../../constants/messages.constant';
