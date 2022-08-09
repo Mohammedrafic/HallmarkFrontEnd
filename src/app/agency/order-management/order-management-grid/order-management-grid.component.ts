@@ -308,7 +308,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.filters.includeReOrders = true;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
-        case AgencyOrderManagementTabs.PermPlacement:
+      case AgencyOrderManagementTabs.PermPlacement:
         this.filters.orderTypes = [OrderType.PermPlacement];
         this.filters.includeReOrders = false;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
@@ -336,7 +336,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.isLockMenuButtonsShown = true;
         this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
         break;
-        case AgencyOrderManagementTabs.PermPlacement:
+      case AgencyOrderManagementTabs.PermPlacement:
         this.isLockMenuButtonsShown = false;
         this.refreshGridColumns(PermPlacementColumnsConfig, this.gridWithChildRow);
         break;
