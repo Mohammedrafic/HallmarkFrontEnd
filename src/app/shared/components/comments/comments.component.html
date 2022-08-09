@@ -17,8 +17,7 @@
         *ngIf="selectedFilter === commentsFilter.All || comment.isExternal === showExternal"
         [scrolledToMessage$]="scrolledToMessage$"
         [comment]="comment"
-        (onCommentAdded)="onCommentAdded.emit(comment)"
-        (onRead)="onRead.emit(comment)"></app-comment>
+        (onRead)="onRead(comment)"></app-comment>
     </ng-container>
     <div class="no-comments" *ngIf="!comments.length">
       There are no comments to display yet!

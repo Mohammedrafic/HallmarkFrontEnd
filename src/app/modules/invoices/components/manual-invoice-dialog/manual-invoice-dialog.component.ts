@@ -5,7 +5,7 @@ import {ofActionCompleted, ofActionDispatched, Select} from '@ngxs/store';
 import { filter, Observable, takeUntil, tap, distinctUntilChanged, debounceTime, map } from 'rxjs';
 
 import { AddDialogHelper } from '@core/helpers';
-import { CustomFormGroup, DropdownOption } from '@core/interface';
+import { CustomFormGroup } from '@core/interface';
 import { DialogAction } from '@core/enums';
 import { ManualInvoiceDialogConfig } from '../../constants';
 import {
@@ -46,6 +46,8 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   ngOnInit(): void {
     this.strategy = this.injector.get<ManualInvoiceStrategy>(
       ManualInvoiceStrategyMap.get(this.isAgency) as ProviderToken<ManualInvoiceStrategy>);
+    this.form = this.addService.createForm() as CustomFormGroup<AddManInvoiceForm>;
+    this.watchForSearch();
     this.getDialogState();
     this.getReasons();
     this.getOrganizationList();
@@ -58,9 +60,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       ofActionDispatched(Invoices.ToggleManualInvoiceDialog),
       filter((payload: Invoices.ToggleManualInvoiceDialog) => payload.action === DialogAction.Open),
       tap(() => {
-        this.form = this.addService.createForm() as CustomFormGroup<AddManInvoiceForm>;
         this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
-        this.watchForSearch();
         this.sideAddDialog.show();
         this.cd.markForCheck();
       }),
@@ -68,7 +68,6 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
-      console.log()
       this.searchOptions = this.store.snapshot().invoices.invoiceMeta;
       this.cd.markForCheck();
     });;

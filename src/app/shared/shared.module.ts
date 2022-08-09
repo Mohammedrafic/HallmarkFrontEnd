@@ -121,6 +121,7 @@ import { NgxMaskModule } from 'ngx-mask';
 import { CloseOrderSideDialogComponent } from '@shared/components/close-order-side-dialog/close-order-side-dialog.component';
 import { OrderCloseReasonInfoComponent } from '@shared/components/order-close-reason-info/order-close-reason-info.component';
 import { CommentComponent } from './components/comments/comment/comment.component';
+import { CommentsState } from './components/comments/store/comments.state';
 
 const icons = {
   AlertCircle,
@@ -226,7 +227,7 @@ const COMPONENTS = [
     TextBoxModule,
     MaskedTextBoxAllModule,
     TabAllModule,
-    NgxsModule.forFeature([BillRateState, SecurityState]),
+    NgxsModule.forFeature([BillRateState, SecurityState, CommentsState]),
     PageToolbarModule,
     FilterDialogModule,
     SideMenuModule,

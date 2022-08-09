@@ -45,8 +45,12 @@ export class CommentComponent {
 
   private isScrolledIntoView(): void {
     if (this.messageRef) {
+      const container = this.messageRef.nativeElement.parentElement.parentElement;
+      if (!container) {
+        return;
+      }
       const rect = this.messageRef.nativeElement.getBoundingClientRect();
-      const containerRect = this.messageRef.nativeElement.parentElement.parentElement.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
       const isVisible = (rect.top >= containerRect.top) && (rect.bottom <= containerRect.bottom);
 
       if (isVisible) {

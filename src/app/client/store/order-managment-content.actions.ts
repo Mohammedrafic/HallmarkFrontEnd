@@ -10,6 +10,7 @@ import { OrderType } from '@shared/enums/order-type';
 import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { ExportPayload } from '@shared/models/export.model';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { Comment } from '@shared/models/comment.model';
 
 export class GetIncompleteOrders {
   static readonly type = '[order management] Get Incomplete Orders';
@@ -138,7 +139,7 @@ export class SetIsDirtyOrderForm {
 
 export class SaveOrder {
   static readonly type = '[order management] Save Order';
-  constructor(public order: CreateOrderDto, public documents: Blob[]) {}
+  constructor(public order: CreateOrderDto, public documents: Blob[], public comments?: Comment[] | undefined) {}
 }
 
 export class SaveOrderSucceeded {
@@ -238,4 +239,3 @@ export class GetContactDetails {
   static readonly type = '[order management] Get Contact Details';
   constructor(public departmentId: number) {}
 }
-
