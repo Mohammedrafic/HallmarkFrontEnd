@@ -1,124 +1,62 @@
-import { Component, OnDestroy, OnInit, Input } from '@angular/core';
+import { Component, OnDestroy, OnInit, Input, Output, ViewEncapsulation, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { PurchaseOrder, PurchaseOrderPage } from "@shared/models/purchase-order.model";
 import { DatePipe } from '@angular/common';
 
 import {
-  CheckboxSelectionCallbackParams,
   GridApi,
   GridReadyEvent,
-  HeaderCheckboxSelectionCallbackParams,
   GridOptions
 } from '@ag-grid-community/core';
-import { ColumnDefinitionModel } from '../../../../shared/components/grid/models/column-definition.model';
+import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { PurchaseOrdderColumnsDefinition } from '../../constants/specialprojects.constant';
-import { GRID_CONFIG } from '../../../../shared/constants';
+import { Select, Store } from '@ngxs/store';
+import { Observable, Subject, takeUntil } from 'rxjs';
+import { DELETE_RECORD_TEXT, DELETE_RECORD_TITLE, GRID_CONFIG } from '@shared/constants';
+import { ConfirmService } from '@shared/services/confirm.service';
+import { PurchaseOrderState } from '../../../store/purchase-order.state';
+import { DeletPurchaseOrder, GetPurchaseOrders } from '../../../store/purchase-order.actions';
 
 @Component({
   selector: 'app-purchase-orders',
   templateUrl: './purchase-orders.component.html',
-  styleUrls: ['./purchase-orders.component.scss']
+  styleUrls: ['./purchase-orders.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 
 export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent implements OnInit, OnDestroy {
   @Input() form: FormGroup;
+  @Output() onEdit = new EventEmitter<PurchaseOrder>();
+
+  @Select(PurchaseOrderState.purchaseOrderPage)
+  purchaseOrderPage$: Observable<PurchaseOrderPage>;
+
+  private unsubscribe$: Subject<void> = new Subject();
   public readonly gridConfig: typeof GRID_CONFIG = GRID_CONFIG;
   public gridApi!: GridApi;
   public rowData : PurchaseOrder[]=[];
   public rowSelection: 'single' | 'multiple' = 'single';
   public actionCellrenderParams: any = {
     handleOnEdit: (params: any) => {
-      alert('edit')
+      this.onEdit.next(params);
     },
     handleOnDelete: (params: any) => {
-      alert('delete')
+      this.deletePurchaseOrder(params);
     }
   }
-  constructor(private datePipe: DatePipe) {
+  constructor(private store: Store, private confirmService: ConfirmService, private datePipe: DatePipe) {
     super();
   }
 
   public readonly columnDefinitions: ColumnDefinitionModel[] = PurchaseOrdderColumnsDefinition(this.actionCellrenderParams,this.datePipe);
   
   ngOnInit(): void {
-    this.rowData = [{
-      id: 1,
-      poName: 'test1',
-      poDescription: 'testdesc',
-      regionId: 1,
-      regionName: 'testreg',
-      locationId: 2,
-      locationName: 'testloc',
-      departmentId: 1,
-      departmentName: 'testdept',
-      skillId: 2,
-      skillName: 'testskilln',
-      budget: 100,
-      startDate: new Date(),
-      endDate: new Date()
-    },
-      {
-        id: 2,
-        poName: 'test2',
-        poDescription: 'testdesc',
-        regionId: 1,
-        regionName: 'testreg',
-        locationId: 2,
-        locationName: 'testloc',
-        departmentId: 1,
-        departmentName: 'testdept',
-        skillId: 2,
-        skillName: 'testskilln',
-        budget: 100,
-        startDate: new Date(),
-        endDate: new Date()
-      }
-      ,
-      {
-        id: 3,
-        poName: 'test3',
-        poDescription: 'testdesc',
-        regionId: 1,
-        regionName: 'testreg',
-        locationId: 2,
-        locationName: 'testloc',
-        departmentId: 1,
-        departmentName: 'testdept',
-        skillId: 2,
-        skillName: 'testskilln',
-        budget: 100,
-        startDate: new Date(),
-        endDate: new Date()
-      }
-      ,
-      {
-        id: 4,
-        poName: 'test4',
-        poDescription: 'testdesc',
-        regionId: 1,
-        regionName: 'testreg',
-        locationId: 2,
-        locationName: 'testloc',
-        departmentId: 1,
-        departmentName: 'testdept',
-        skillId: 2,
-        skillName: 'testskilln',
-        budget: 100,
-        startDate: new Date(),
-        endDate: new Date()
-      }]
+    this.getPurchaseOrders();
   }
+
   ngOnDestroy(): void {
   }
-
-  checkboxSelection = (params: CheckboxSelectionCallbackParams) => {
-    return params.columnApi.getRowGroupColumns().length === 0;
-  };
-
-  headerCheckboxSelection = (params: HeaderCheckboxSelectionCallbackParams)=> {
-    return params.columnApi.getRowGroupColumns().length === 0;
-  };
 
   onPageSizeChanged(event: any) {
     this.gridOptions.cacheBlockSize = Number(event.value.toLowerCase().replace("rows", ""));
@@ -168,8 +106,8 @@ export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent 
 
   gridOptions: GridOptions = {
     pagination: true,
-    cacheBlockSize: 2,
-    paginationPageSize: 2,
+    cacheBlockSize: this.pageSize,
+    paginationPageSize: this.pageSize,
     columnDefs: this.columnDefinitions,
     rowData: this.rowData,
     sideBar:this.sideBar
@@ -179,5 +117,33 @@ export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent 
     this.gridApi = params.api;
     this.gridApi.sizeColumnsToFit();
     this.gridApi.setRowData(this.rowData);
+  }
+
+  public getPurchaseOrders(): void {
+    this.store.dispatch(new GetPurchaseOrders());
+    this.purchaseOrderPage$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (data?.items) {
+        this.rowData = data.items;
+        this.gridApi.setRowData(this.rowData);
+      }
+    });
+  }
+
+  deletePurchaseOrder(params: any): void {
+    this.addActiveCssClass(event);
+    this.confirmService
+      .confirm(DELETE_RECORD_TEXT, {
+        title: DELETE_RECORD_TITLE,
+        okButtonLabel: 'Delete',
+        okButtonClass: 'delete-button'
+      })
+      .subscribe((confirm) => {
+        if (confirm && params.id) {
+          this.store.dispatch(new DeletPurchaseOrder(params.id)).subscribe(val => {
+            this.getPurchaseOrders();
+          });
+        }
+        this.removeActiveCssClass();
+      });
   }
 }

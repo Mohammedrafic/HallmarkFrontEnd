@@ -19,3 +19,4 @@ export class SpecialProject {
 }
 
 export type SpecialProjectPage = PageOfCollections<SpecialProject>;
+

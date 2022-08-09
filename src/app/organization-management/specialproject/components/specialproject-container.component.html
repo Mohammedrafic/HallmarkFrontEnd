@@ -14,8 +14,7 @@
       <e-tabitem>
         <ng-template #headerText><div>Purchase Orders</div></ng-template>
         <ng-template #content>
-
-          <app-purchase-orders [form]="form"></app-purchase-orders>
+          <app-purchase-orders [form]="form" (onEdit)="onEditClick($event)"></app-purchase-orders>
         </ng-template>
       </e-tabitem>
       <e-tabitem>
@@ -28,7 +27,7 @@
   </ejs-tab>
 </section>
 
-<app-side-dialog header="{{ title }}" (formCancelClicked)="closeDialog()" (formSaveClicked)="saveSpecialProject()">
+<app-side-dialog header="{{ title }}" (formCancelClicked)="closeDialog()" (formSaveClicked)="handleOnSave()">
   <form [formGroup]="form" class="specialproject-form-dialog form-container bootstrap" id="addEditspecialProjectForm">
     <section *ngIf="selectedTab==SpecialProjectTabs.SpecialProjects">
       <div class="form-elemet">

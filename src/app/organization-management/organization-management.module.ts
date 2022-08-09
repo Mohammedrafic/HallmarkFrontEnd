@@ -76,6 +76,7 @@ import { SpecialProjectContainerComponent } from './specialproject/components/sp
 import { PurchaseOrdersComponent } from './specialproject/components/purchase-orders/purchase-orders.component';
 import { SpecialProjectsComponent } from './specialproject/components/special-projects/special-projects.component';
 import { SpecialProjectState } from './store/special-project.state';
+import { PurchaseOrderState } from './store/purchase-order.state';
 
 const sidebarIcons = {
   Download,
@@ -172,8 +173,8 @@ const sidebarIcons = {
       ShiftsState,
       HolidaysState,
       BillRatesState,
-      SpecialProjectState
-
+      SpecialProjectState,
+      PurchaseOrderState
     ]),
   ],
   providers: [

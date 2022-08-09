@@ -108,8 +108,8 @@ export class SpecialProjectsComponent extends AbstractGridConfigurationComponent
 
   gridOptions: GridOptions = {
     pagination: true,
-    cacheBlockSize: 30,
-    paginationPageSize: 30,
+    cacheBlockSize: this.pageSize,
+    paginationPageSize: this.pageSize,
     columnDefs: this.columnDefinitions,
     rowData: this.rowData,
     sideBar: this.sideBar

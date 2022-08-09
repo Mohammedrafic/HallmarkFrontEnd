@@ -17,7 +17,11 @@ import { ProjectType } from '@shared/models/project.model';
 import { GetProjectTypes, GetSpecialProjectById, SaveSpecialProject } from '../../store/special-project.actions';
 import { SpecialProject } from '@shared/models/special-project.model';
 import { GetAllOrganizationSkills } from '../../store/organization-management.actions';
-import { SpecialProjectsComponent } from '../components/special-projects/special-projects.component'
+import { SpecialProjectsComponent } from '../components/special-projects/special-projects.component';
+import { PurchaseOrdersComponent } from '../components/purchase-orders/purchase-orders.component'
+import { GetPurchaseOrders, GetPurchaseOrderById, SavePurchaseOrder } from '../../store/purchase-order.actions';
+import { PurchaseOrder } from '../../../shared/models/purchase-order.model';
+import { PurchaseOrderState } from '../../store/purchase-order.state';
 
 
 @Component({
@@ -28,6 +32,7 @@ import { SpecialProjectsComponent } from '../components/special-projects/special
 
 export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   @ViewChild(SpecialProjectsComponent, { static: false }) childC: SpecialProjectsComponent;
+  @ViewChild(PurchaseOrdersComponent, { static: false }) childPurchaseComponent: PurchaseOrdersComponent;
   public form: FormGroup;
   public SpecialProjectTabs = SpecialProjectTabs;
   public selectedTab: SpecialProjectTabs = SpecialProjectTabs.SpecialProjects;
@@ -69,7 +74,10 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   @Select(SpecialProjectState.SpecialProjectEntity)
   specialProjectEntity$: Observable<SpecialProject>;
 
-  projectId: number = 0;
+  @Select(PurchaseOrderState.purchaseOrderEntity)
+  purchaseOrderEntity$: Observable<PurchaseOrder>;
+
+  id: number = 0;
 
 
   constructor(private store: Store,
@@ -103,7 +111,18 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   private onOrganizationChangedHandler(): void {
     this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       this.organizationId = data;
-      this.childC?.getSpecialProjects();
+      switch (this.selectedTab) {
+        case SpecialProjectTabs.SpecialProjects:
+          this.childC?.getSpecialProjects();
+          break;
+        case SpecialProjectTabs.PurchaseOrders:
+          this.childPurchaseComponent?.getPurchaseOrders();
+          break;
+        case SpecialProjectTabs.SpecialProjectCategories:
+          
+          break;
+      }
+      
     });
   }
 
@@ -268,7 +287,7 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
     this.store.dispatch(new ShowSideDialog(false));
   }
 
-  public saveSpecialProject(): void {
+  public handleOnSave(): void {
     this.form.markAllAsTouched();
     if (this.form.invalid) {
       return;
@@ -289,9 +308,25 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
       let dept = this.orgStructureData.departmentsIds.dataSource.find((x: OrganizationDepartment) => x.id === this.form.value.departmentsIds[0]);
       deptName = dept.name;
     }
+
+    switch (this.selectedTab) {
+      case SpecialProjectTabs.SpecialProjects:
+        this.saveSpecialProject(regionName, locationName, deptName);
+        break;
+      case SpecialProjectTabs.PurchaseOrders:
+        this.savePurchaseOrder(regionName, locationName, deptName);
+        break;
+      case SpecialProjectTabs.SpecialProjectCategories:
+       
+        break;
+    }
+    
+  }
+
+  public saveSpecialProject(regionName: string, locationName: string, deptName:string) {
     let specialProject: SpecialProject =
     {
-      id: this.projectId,
+      id: this.id,
       projectTypeId: this.form.value.projectCategory,
       regionId: this.form.value.regionIds[0],
       regionName: regionName,
@@ -314,6 +349,32 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
     });
   }
 
+  public savePurchaseOrder(regionName: string, locationName: string, deptName: string) {
+    let purchaseOrder: PurchaseOrder =
+    {
+      id: this.id,
+      poName: this.form.value.poName,
+      poNumber: this.form.value.poDescription,
+      regionId: this.form.value.regionIds[0],
+      regionName: regionName,
+      locationId: this.form.value.locationIds[0],
+      locationName: locationName,
+      departmentId: this.form.value.departmentsIds[0],
+      departmentName: deptName,
+      skillId: this.form.value.skillIds[0],
+      startDate: this.form.value.startDate,
+      endDate: this.form.value.endDate,
+      isDeleted: false,
+      organizationId: this.organizationId,
+      projectBudget: this.form.value.projectBudget,
+    };
+    this.store.dispatch(new SavePurchaseOrder(purchaseOrder)).subscribe(val => {
+      this.form.reset();
+      this.childPurchaseComponent.getPurchaseOrders();
+      this.closeDialog();
+    });
+  }
+
   public handleOnAdd(): void {
     this.title = DialogMode.Add;
     this.title = this.addButtonTitle;
@@ -322,26 +383,31 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
     this.store.dispatch(new ShowSideDialog(true));
   }
 
-  public onEditClick(data: SpecialProject): void {
+  public onEditClick(data: any): void {
     this.isEdit = true;
     this.title = DialogMode.Edit;
+    this.onOrgStructureControlValueChangedHandler();
     switch (this.selectedTab) {
       case SpecialProjectTabs.SpecialProjects:
         this.addButtonTitle = AddButtonText.EditSpecialProject;
+        this.getSpecialProjectById(data.id);
         break;
       case SpecialProjectTabs.PurchaseOrders:
         this.addButtonTitle = AddButtonText.EditPurchaseOrder;
+        this.getPurchaseOrderById(data.id);
         break;
       case SpecialProjectTabs.SpecialProjectCategories:
         this.addButtonTitle = AddButtonText.EditSpecialProjectCategory;
         break;
     }
-    this.onOrgStructureControlValueChangedHandler();
     this.title = this.addButtonTitle;
-    this.store.dispatch(new GetSpecialProjectById(data?.id != undefined ? data?.id : 0));
+  }
+
+  public getSpecialProjectById(id: number) {
+    this.store.dispatch(new GetSpecialProjectById(id));
     this.specialProjectEntity$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
       if (data) {
-        this.projectId = data?.id;
+        this.id = data?.id;
         this.form.setValue({
           projectCategory: data.projectTypeId || 0,
           regionIds: [data.regionId || 0],
@@ -359,6 +425,29 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         this.store.dispatch(new ShowSideDialog(true));
       }
     });
+  }
 
+  public getPurchaseOrderById(id: number) {
+    this.store.dispatch(new GetPurchaseOrderById(id));
+    this.purchaseOrderEntity$.pipe(takeUntil(this.unsubscribe$)).subscribe((data) => {
+      if (data) {
+        this.id = data?.id;
+        this.form.setValue({
+          projectCategory: 0,
+          regionIds: [data.regionId || 0],
+          locationIds: [data.locationId || 0],
+          departmentsIds: [data.departmentId || 0],
+          skillIds: [data.skillId || 0],
+          startDate: data.startDate,
+          endDate: data.endDate,
+          projectName: '',
+          projectBudget: data.projectBudget,
+          poName: data.poName,
+          poDescription: data.poNumber,
+          allowOnOrderCreation: false
+        });
+        this.store.dispatch(new ShowSideDialog(true));
+      }
+    });
   }
 }
