@@ -14,7 +14,7 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
   return [
     {
       field: PurchaseOrderTableColumns.Id,
-      headerName: PurchaseOrderHeaderText.POId,
+      headerName: PurchaseOrderHeaderText.Id,
       hide:true
     },
     {
@@ -27,8 +27,8 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
       }
     },
     {
-      field: PurchaseOrderTableColumns.PODescription,
-      headerName: PurchaseOrderHeaderText.PODescription,
+      field: PurchaseOrderTableColumns.PONumber,
+      headerName: PurchaseOrderHeaderText.PONumber,
       ...commonColumn,
       filter: 'agTextColumnFilter',
       filterParams: {
@@ -72,8 +72,8 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
       }
     },
     {
-      field: 'budget',
-      headerName: PurchaseOrderHeaderText.Budget,
+      field: PurchaseOrderTableColumns.ProjectBudget,
+      headerName: PurchaseOrderHeaderText.ProjectBudget,
       ...commonColumn,
       filter: 'agNumberColumnFilter',
       filterParams: {
@@ -87,7 +87,29 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
         const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string
         return str?.length > 0 ? str : "";
       },
-      ...commonColumn
+      ...commonColumn,
+      filter: 'agDateColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
+          if (cellValue == null) {
+            return 0;
+          }
+          const dateAsString = datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateParts = dateAsString.split('/');
+          const year = Number(dateParts[2]);
+          const month = Number(dateParts[0]) - 1;
+          const day = Number(dateParts[1]);
+          const cellDate = new Date(year, month, day);
+
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        }
+      }
     },
     {
       field: PurchaseOrderTableColumns.EndDate,
@@ -96,7 +118,29 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
         const str = datePipe?.transform(params.value, 'MM/dd/yyyy') as string
         return str?.length > 0 ? str : "";
       },
-      ...commonColumn
+      ...commonColumn,
+      filter: 'agDateColumnFilter',
+      filterParams: {
+        buttons: ['reset'],
+        comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
+          if (cellValue == null) {
+            return 0;
+          }
+          const dateAsString = datePipe?.transform(cellValue, 'MM/dd/yyyy') as string
+          const dateParts = dateAsString.split('/');
+          const year = Number(dateParts[2]);
+          const month = Number(dateParts[0]) - 1;
+          const day = Number(dateParts[1]);
+
+          const cellDate = new Date(year, month, day);
+          if (cellDate < filterLocalDateAtMidnight) {
+            return -1;
+          } else if (cellDate > filterLocalDateAtMidnight) {
+            return 1;
+          }
+          return 0;
+        }
+      }
     },
     {
       field: '',

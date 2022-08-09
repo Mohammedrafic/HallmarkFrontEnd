@@ -1,35 +1,43 @@
 
 export enum PurchaseOrderTableColumns {
-  Checkbox = 'checkbox',
-  Id='id',
+  Id = 'id',
+  OrganizationId ="organizationId",
   POName = 'poName',
-  PODescription = 'poDescription',
+  PONumber = 'poNumber',
+  RegionId = 'regionId',
   Region = 'regionName',
+  LocationId = 'locationId',
   Location = 'locationName',
+  DepartmentId = 'departmentId',
   Department = 'departmentName',
+  SkillId = 'skillId',
   SkillName = 'skillName',
-  Budget = 'budget ',
+  ProjectBudget = 'projectBudget',
   StartDate = 'startDate',
-  EndDate ='endDate',
-  Controls = 'controls',
+  EndDate = 'endDate',
+  IsDeleted = 'isDeleted'
 }
 
 export enum PurchaseOrderHeaderText {
-  POId='Purchase Id',
+  Id = 'Id',
+  OrganizationId = 'Organization Id',
   POName = 'PO Name',
-  PODescription = 'PO Description',
-  Region = 'Region',
-  Location = 'Location',
-  Department = 'Department',
-  SkillName = 'Skill',
-  Budget = 'Budget ',
+  PONumber = 'PO Number',
+  RegionId = 'Region Id',
+  Region = 'Region Name',
+  LocationId = 'Location Id',
+  Location = 'Location Name',
+  DepartmentId = 'Department Id',
+  Department = 'Department Name',
+  SkillId = 'Skill Id',
+  SkillName = 'Skill Name',
+  ProjectBudget = 'Project Budget',
   StartDate = 'Start Date',
   EndDate = 'End Date',
-  Controls = 'controls',
+  IsDeleted = 'IsDeleted'
 }
 
 export enum SpecialProjectTableColumns {
-  // Checkbox = 'checkbox',
   Id = 'id',
   Name = 'name',
   OrganizationId ='organizationId',
