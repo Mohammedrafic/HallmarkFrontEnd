@@ -111,11 +111,6 @@ export class GetProjectNames {
   constructor() {}
 }
 
-export class GetMasterShifts {
-  static readonly type = '[order management] Get Master Shifts';
-  constructor() {}
-}
-
 export class GetAssociateAgencies {
   static readonly type = '[order management] Get Associate Agencies';
   constructor() {}
@@ -246,4 +241,5 @@ export class GetContactDetails {
 
 export class GetRegularLocalBillRate {
   static readonly type = '[order management] Get Regular Local Bill Rate';
+  constructor(public orderType: OrderType, public departmentId: number, public skillId: number) {}
 }

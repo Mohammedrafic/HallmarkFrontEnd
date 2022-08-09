@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Shift, ShiftsPage } from 'src/app/shared/models/shift.model';
 import { ExportPayload } from '@shared/models/export.model';
-import { MasterShift } from '@shared/models/master-shift.model';
 
 @Injectable({ providedIn: 'root' })
 export class ShiftsService {
@@ -30,14 +29,6 @@ export class ShiftsService {
    */
   public getShifts(pageNumber: number, pageSize: number): Observable<ShiftsPage> {
     return this.http.post<ShiftsPage>(`/api/MasterShifts/filter`, { pageNumber: pageNumber, pageSize: pageSize });
-  }
-
-  /**
-   * Get all master shifts
-   * @return list of all master shifts
-   */
-  public getAllMasterShifts(): Observable<MasterShift[]> {
-    return this.http.get<MasterShift[]>('/api/MasterShifts/all');
   }
 
   /**
