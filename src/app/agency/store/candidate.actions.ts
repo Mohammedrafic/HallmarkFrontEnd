@@ -183,3 +183,13 @@ export class UploadCredentialFilesSucceeded {
   static readonly type = '[candidate] Upload Credential Files Succeeded';
   constructor() { }
 }
+
+export class GetCandidateProfileTemplate {
+  static readonly type = '[candidate] Get Candidate Profile Template';
+  constructor() { }
+}
+
+export class GetCandidateProfileTemplateSucceeded {
+  static readonly type = '[candidate] Get Candidate Profile Template Succeeded';
+  constructor(public payload: Blob) { }
+}

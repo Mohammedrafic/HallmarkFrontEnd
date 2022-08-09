@@ -11,7 +11,7 @@
       <div class="dialog-header">
         <h3 class="title">{{ dialogConfig.title | titlecase }}</h3>
         <div class="controls">
-          <button ejs-button cssClass="e-outline button-cancel" (click)="closeDialog()">Cancel</button>
+          <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
           <button ejs-button [isPrimary]="true">Save</button>
         </div>
       </div>
@@ -75,6 +75,7 @@
                   <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span></label>
                   <div class="input-group">
                     <ejs-autocomplete
+                    [fields]="dropDownFieldsConfig"
                     [formControlName]="field.field"
                     ></ejs-autocomplete>
                   </div>

@@ -20,6 +20,8 @@ import {
   GetCandidateByIdSucceeded,
   GetCandidatePhoto,
   GetCandidatePhotoSucceeded,
+  GetCandidateProfileTemplate,
+  GetCandidateProfileTemplateSucceeded,
   GetCandidatesByPage,
   GetCandidatesCredentialByPage,
   GetCredentialFiles,
@@ -392,6 +394,17 @@ export class CandidateState {
         patchState({ groupedCandidateCredentialsFiles: payload });
         return payload;
       })
+    );
+  }
+
+  @Action(GetCandidateProfileTemplate)
+  GetCandidateProfileTemplate({ dispatch }: StateContext<CandidateStateModel>): Observable<any> {
+    return this.candidateService.getCandidateProfileTemplate().pipe(
+      tap((payload) => {
+        dispatch(new GetCandidateProfileTemplateSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Template was not found'))))
     );
   }
 }

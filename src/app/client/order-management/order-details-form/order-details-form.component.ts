@@ -20,7 +20,6 @@ import {
   GetContactDetails,
   GetOrganizationStatesWithKeyCode,
   GetProjectSpecialData,
-  GetRegularLocalBillRate,
   GetSuggestedDetails,
   GetWorkflows,
   SetIsDirtyOrderForm,
@@ -63,6 +62,7 @@ import { Comment } from '@shared/models/comment.model';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
 import { BillRate } from '@shared/models';
+import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 
 @Component({
   selector: 'app-order-details-form',
@@ -220,10 +220,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.contactDetails)
   contactDetails$: Observable<Department>;
 
-  @Select(OrderManagementContentState.regularLocalBillRate)
-  regularLocalBillRate$: Observable<BillRate[]>;
-
-  private isEditMode: boolean;
+  public isEditMode: boolean;
 
   private touchedFields: Set<string> = new Set();
   private alreadyShownDialog: boolean = false;
@@ -231,6 +228,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   public isPerDiem = false;
   public isPermPlacementOrder = false;
+
+  public commentContainerId: number = 0;
 
   public comments: Comment[] = []; /*[ // TODO: Mocked data, remove after BE
     {
@@ -246,13 +245,13 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       id: 0, text: 'Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: false, creationDate: new Date()
     },
     {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment', isExternal: true, creationDate: new Date()
+      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment', isExternal: true, creationDate: new Date(), unread: true,
     },
     {
-      id: 0, text: '500 chars comment Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second linecomment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: false, creationDate: new Date()
+      id: 0, text: '500 chars comment Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second linecomment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: false, creationDate: new Date(), unread: true
     },
     {
-      id: 0, text: 'short', isExternal: false, creationDate: new Date()
+      id: 0, text: 'short', isExternal: false, creationDate: new Date(), unread: true,
     },
     {
       id: 0, text: 'Some Text', isExternal: true, creationDate: new Date()
@@ -261,7 +260,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date()
     },
     {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date()
+      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date(), unread: true
     },
   ];*/
 
@@ -269,7 +268,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     private store: Store,
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private orderManagementService: OrderManagementContentService
   ) {
     this.orderTypeForm = this.formBuilder.group({
       orderType: [null, Validators.required],
@@ -419,7 +419,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.store.dispatch(new GetRegularLocalBillRate(orderType, departmentId, skillId));
+        this.populateHourlyRateField(orderType, departmentId, skillId);
         this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
       });
 
@@ -552,6 +552,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       if (order && isEditMode) {
         this.isEditMode = true;
         this.order = order;
+        this.commentContainerId = order.commentContainerId as number;
         this.populateForms(order);
       } else if (order?.isTemplate) {
         this.order = order;
@@ -595,6 +596,18 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     firstContactDetailsControl.controls['name'].patchValue(name);
     firstContactDetailsControl.controls['email'].patchValue(email);
     firstContactDetailsControl.controls['mobilePhone'].patchValue(mobilePhone);
+  }
+
+  private populateHourlyRateField(orderType: OrderType, departmentId: number, skillId: number): void {
+    this.orderManagementService
+      .getRegularLocalBillRate(orderType, departmentId, skillId)
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((billRate) => !!billRate.length)
+      )
+      .subscribe((billRates: BillRate[]) =>
+        this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour)
+      );
   }
 
   public onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -1050,10 +1063,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       const { facilityContact, facilityPhoneNo, facilityEmail } = contactDetails;
       this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
     });
-
-    this.regularLocalBillRate$
-      .pipe(takeUntil(this.unsubscribe$), filter((billRate) => !!billRate.length))
-      .subscribe((regularLocalBillRate) => {this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0].rateHour)});
   }
 
   public selectPrimaryContact(event: ChangeArgs): void {

@@ -287,6 +287,7 @@ export class Order {
   orderPlacementFee?: number;
   annualSalaryRangeFrom?: number;
   annualSalaryRangeTo?: number;
+  commentContainerId?: number;
 }
 
 export class ReOrder {

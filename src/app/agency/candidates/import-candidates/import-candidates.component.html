@@ -23,7 +23,7 @@
         <section class="file-uploader-container">
           <div class="section-header">
             <span class="message">Upload file, then hit import button</span>
-            <span class="action-link-btn">Download template</span>
+            <span class="action-link-btn" (click)="downloadTemplate()">Download template</span>
           </div>
           <div class="file-uploader" #fileUploader>
             <div id="droparea" class="droparea" (click)="browse()">

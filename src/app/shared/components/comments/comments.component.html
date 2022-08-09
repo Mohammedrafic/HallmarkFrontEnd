@@ -11,12 +11,13 @@
       ></ejs-dropdownlist>
     </div>
   </div>
-  <div #body class="comments-body">
+  <div #body class="comments-body" (scroll)="onScroll()">
     <ng-container *ngFor="let comment of comments">
       <app-comment 
-        *ngIf="selectedFilter === commentsFilter.All || comment.isExternal === showExternal" 
+        *ngIf="selectedFilter === commentsFilter.All || comment.isExternal === showExternal"
+        [scrolledToMessage$]="scrolledToMessage$"
         [comment]="comment"
-        (onCommentAdded)="onCommentAdded.emit(comment)"></app-comment>
+        (onRead)="onRead(comment)"></app-comment>
     </ng-container>
     <div class="no-comments" *ngIf="!comments.length">
       There are no comments to display yet!

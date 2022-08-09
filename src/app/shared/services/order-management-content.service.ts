@@ -28,6 +28,7 @@ import { RejectReasonPayload } from '@shared/models/reject-reason.model';
 import { HistoricalEvent } from '../models/historical-event.model';
 import { ExportPayload } from '@shared/models/export.model';
 import { AgencyOrderManagementTabs, OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
+import { Comment } from '@shared/models/comment.model';
 
 @Injectable({ providedIn: 'root' })
 export class OrderManagementContentService {
@@ -251,7 +252,7 @@ export class OrderManagementContentService {
   /**
    * Get workLocation and contactDetails based on location
    * @param locationId
-   * @returns suggessted details data
+   * @returns suggested details data
    */
   public getSuggestedDetails(locationId: number | string): Observable<SuggestedDetails> {
     return this.http.get<SuggestedDetails>(`/api/Orders/suggestedDetails/${locationId}`);
@@ -263,10 +264,16 @@ export class OrderManagementContentService {
    * @param documents array of attached documents
    * @return saved order
    */
-  public saveOrder(order: CreateOrderDto, documents: Blob[]): Observable<Order> {
+  public saveOrder(order: CreateOrderDto, documents: Blob[], comments: Comment[] | undefined): Observable<Order> {
     return this.http.post<Order>('/api/Orders', order).pipe(
       switchMap((createdOrder) => {
         const formData = new FormData();
+        if (comments?.length) {
+          comments.forEach((comment: Comment) => {
+            comment.commentContainerId = createdOrder.commentContainerId as number;
+          });
+          this.http.post('/api/Comments', comments[0]).subscribe(); // TODO: Pending bulk save
+        }
         documents.forEach((document) => formData.append('documents', document));
         return this.http.post(`/api/Orders/${createdOrder.id}/documents`, formData).pipe(map(() => createdOrder));
       })
