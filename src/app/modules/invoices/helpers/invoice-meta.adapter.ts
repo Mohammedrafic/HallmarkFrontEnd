@@ -58,4 +58,18 @@ export class InvoiceMetaAdapter {
     });
     return values;
   }
+
+  static createOrgOptions(meta: ManualInvoiceMeta[]): DropdownOption[] {
+    const values: DropdownOption[] = [];
+
+    meta.forEach((item) => {
+      if (!values.find((option) => option.value === item.agencyId)) {
+        values.push({
+          text: item.organizationName,
+          value: item.organizationId,
+        });
+      }
+    });
+    return values;
+  }
 }

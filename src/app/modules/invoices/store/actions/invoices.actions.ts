@@ -68,4 +68,16 @@ export namespace Invoices {
       public readonly orgId?: number,
     ) {}
   }
+
+  export class SaveManulaInvoice {
+    static readonly type = INVOICES_ACTIONS.SaveManualinvoice;
+
+    constructor(
+      public readonly payload: any,
+    ) {}
+  }
+
+  export class GetOrganizations {
+    static readonly type = INVOICES_ACTIONS.GetOrganizations;
+  }
 }

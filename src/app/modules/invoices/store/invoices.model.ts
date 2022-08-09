@@ -13,5 +13,5 @@ export interface InvoicesModel {
   nextInvoiceId: string | null;
   invoiceReasons: ManualInvoiceReason[];
   invoiceMeta: ManualInvoiceMeta[];
-
+  organizations: DropdownOption[];
 }

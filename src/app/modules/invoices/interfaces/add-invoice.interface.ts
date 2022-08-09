@@ -1,6 +1,7 @@
 import { FieldType, FieldWidthStyle } from '@core/enums';
 import { DropdownOption, FileForUpload } from '@core/interface';
 import { ManInvoiceOptionsKeys } from '../enums';
+import { ManInvoiceOptionsKeys } from '../enums';
 
 export interface ManInvoiceInputConfig {
   field: string;
@@ -10,7 +11,8 @@ export interface ManInvoiceInputConfig {
   type: FieldType;
   widthStyle: FieldWidthStyle;
   optionsStateKey?: ManInvoiceOptionsKeys;
-  options?: DropdownOption[];
+  optionsStateKey?: ManInvoiceOptionsKeys;
+  options?: DropdownOption[][];
 };
 
 export interface AddManInvoiceDialogConfig {
@@ -54,6 +56,7 @@ export interface ManualInvoiceMeta {
   agencyId: number;
   agencyName: string;
   organizationId: number;
+  organizationName: string;
 }
 
 export interface ManualInvoiceInputOptions {
@@ -62,4 +65,5 @@ export interface ManualInvoiceInputOptions {
   [ManInvoiceOptionsKeys.Candidates]: DropdownOption[];
   [ManInvoiceOptionsKeys.Agencies]: DropdownOption[];
   [ManInvoiceOptionsKeys.Reasons]: DropdownOption[];
+  [ManInvoiceOptionsKeys.Organizations]: DropdownOption[];
 }

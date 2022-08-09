@@ -116,7 +116,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
   public openAddDialog(): void {
     this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Open));
     this.store.dispatch(new Invoices.GetInvoicesReasons);
-    this.store.dispatch(new Invoices.GetManInvoiceMeta());
   }
 
   public changeFiltersAmount(amount: number): void {

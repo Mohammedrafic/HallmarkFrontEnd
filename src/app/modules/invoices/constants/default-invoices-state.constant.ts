@@ -11,4 +11,5 @@ export const DefaultInvoicesState: InvoicesModel = {
   selectedInvoiceId: null,
   invoiceReasons: [],
   invoiceMeta: [],
+  organizations: [],
 };

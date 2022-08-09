@@ -33,12 +33,12 @@ import { RejectReasonState } from "@organization-management/store/reject-reason.
       UserState,
       RejectReasonState
     ]),
-    // NgxsReduxDevtoolsPluginModule.forRoot({
-    //   disabled: environment.production
-    // }),
-    // NgxsLoggerPluginModule.forRoot({
-    //   disabled: environment.production
-    // }),
+    NgxsReduxDevtoolsPluginModule.forRoot({
+      disabled: environment.production
+    }),
+    NgxsLoggerPluginModule.forRoot({
+      disabled: environment.production
+    }),
     NgxMaskModule.forRoot(),
 
     // B2C

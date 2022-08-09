@@ -1,22 +1,18 @@
+import { Injectable } from '@angular/core';
+
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
 import { debounceTime, Observable, of, throttleTime } from 'rxjs';
 import { tap } from 'rxjs/internal/operators/tap';
-import { Injectable } from '@angular/core';
 
 import { PageOfCollections } from '@shared/models/page.model';
 import { DialogAction } from '@core/enums';
-
+import { DataSourceItem } from '@core/interface';
 import { Invoices } from '../actions/invoices.actions';
 import { InvoicesService } from '../../services';
 import {
-  InvoiceFilterColumns,
-  InvoiceRecord,
-  InvoicesFilteringOptions,
-  InvoicesFilterState,
-  ManualInvoiceMeta,
-  ManualInvoiceReason
-} from '../../interfaces';
+  InvoiceFilterColumns, InvoiceRecord, InvoicesFilteringOptions, InvoicesFilterState,
+  ManualInvoiceMeta, ManualInvoiceReason } from '../../interfaces';
 import { InvoicesModel } from '../invoices.model';
 import { FilteringOptionsFields } from '../../../timesheets/enums';
 import { DefaultInvoicesState } from '../../constants';
@@ -67,6 +63,11 @@ export class InvoicesState {
   @Selector([InvoicesState])
   static prevInvoiceId(state: InvoicesModel): string | null {
     return state?.prevInvoiceId ?? null;
+  }
+
+  @Selector([InvoicesState])
+  static invoiceReasons(state: InvoicesModel): ManualInvoiceReason[] {
+    return state.invoiceReasons;
   }
 
   @Selector([InvoicesState])
@@ -205,5 +206,29 @@ export class InvoicesState {
           });
         }),
       );
+  }
+
+  @Action(Invoices.SaveManulaInvoice)
+  SaveManualInvoice(
+    { payload }: Invoices.SaveManulaInvoice,
+  ): Observable<void> {
+    return this.invoicesAPIService.saveManualInvoice(payload);
+  }
+
+  @Action(Invoices.GetOrganizations)
+  GetOrganizations(
+    { patchState }: StateContext<InvoicesModel>,
+  ): Observable<DataSourceItem[]> {
+    return this.invoicesAPIService.getOrganizations()
+    .pipe(
+      tap((res) => {
+        patchState({
+          organizations: res.map((item) => ({
+            text: item.name,
+            value: item.id,
+          }))
+        })
+      })
+    )
   }
 }

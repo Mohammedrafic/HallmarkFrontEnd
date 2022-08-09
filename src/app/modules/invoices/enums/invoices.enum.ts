@@ -15,6 +15,8 @@ export enum INVOICES_ACTIONS {
   SET_FILTERS_DATA_SOURCE = '[invoices] SET FILTERS DATA SOURCE',
   GetReasons = '[invoices] Get reasons for manual invoices',
   GetMeta = '[invoices] Get manual invoice metadata',
+  SaveManualinvoice = '[invoices] Save manual invoice',
+  GetOrganizations = '[invoices] Get organizations',
 }
 
 export enum InvoicesTableFiltersColumns {

@@ -3,21 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import {ActivatedRoute} from "@angular/router";
 
 import { Observable } from 'rxjs';
-import {map} from "rxjs/operators";
+import {map} from 'rxjs/operators';
 
-import {PageOfCollections} from "@shared/models/page.model";
+import {PageOfCollections} from '@shared/models/page.model';
+import { DataSourceItem } from '@core/interface';
 import {InvoicesFilteringOptions, ManualInvoiceMeta, ManualInvoiceReason} from '../interfaces';
 
 @Injectable()
 export class InvoicesApiService {
-  private isAgency: boolean;
-
   constructor(
     private http: HttpClient,
-    private route: ActivatedRoute,
-  ) {
-    this.isAgency = this.route.snapshot.data['isAgencyArea'];
-  }
+  ) {}
 
   public getFiltersDataSource(
     organizationId: number | null = null
@@ -33,8 +29,17 @@ export class InvoicesApiService {
   }
 
   public getManInvoiceMeta(orgId?: number): Observable<ManualInvoiceMeta[]> {
-    const endpoint = this.isAgency ? `/api/ManualInvoices/creationmetadata/organization/${orgId}`
+
+    const endpoint = orgId ? `/api/ManualInvoices/creationmetadata/organization/${orgId}`
       : '/api/ManualInvoices/creationmetadata';
     return this.http.get<ManualInvoiceMeta[]>(endpoint);
+  }
+
+  public saveManualInvoice(payload: any): Observable<void> {
+    return this.http.post<void>(``, payload);
+  }
+
+  public getOrganizations(): Observable<DataSourceItem[]> {
+    return this.http.get<DataSourceItem[]>(`/api/Agency/partneredorganizations`);
   }
 }
