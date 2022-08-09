@@ -1,5 +1,9 @@
-<app-widget-wrapper-column [title]="chartData?.title ?? ''" [isLoading]="isLoading">
-  <ng-template #chart>
+<app-widget-wrapper [isLoading]="isLoading">
+  <ng-template #header>
+    <h3 class="widget-header__title">Applicants by Region</h3>
+  </ng-template>
+
+  <ng-template #mapChart>
     <app-map class="app-maps-chart__map" [layers]="chartData?.chartData"></app-map>
   </ng-template>
 
@@ -14,8 +18,7 @@
       </div>
 
       <div *ngIf="chartData?.description" class="app-maps-chart__unknown-candidates">
-        <span class="app-maps-chart__text">{{ chartData?.description?? '' }}</span>
-       
+        <span class="app-maps-chart__text">{{ chartData?.description ?? '' }}</span>
       </div>
 
       <div *ngIf="chartData?.unknownStateCandidates" class="app-maps-chart__unknown-candidates">
@@ -24,4 +27,4 @@
       </div>
     </div>
   </ng-template>
-</app-widget-wrapper-column>
+</app-widget-wrapper>

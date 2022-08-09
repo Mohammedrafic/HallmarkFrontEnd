@@ -20,7 +20,6 @@ import {
   GetHistoricalData,
   ClearHistoricalData,
   GetIncompleteOrders,
-  GetMasterShifts,
   GetOrderById,
   GetOrderFilterDataSources,
   GetOrders,
@@ -45,6 +44,8 @@ import {
   SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
+  GetContactDetails,
+  GetRegularLocalBillRate,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -63,7 +64,6 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { ProjectName, ProjectType } from '@shared/models/project.model';
-import { MasterShift } from '@shared/models/master-shift.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectsService } from '@shared/services/projects.service';
 import { ShiftsService } from '@shared/services/shift.service';
@@ -80,6 +80,8 @@ import { HistoricalEvent } from '@shared/models/historical-event.model';
 import { GetCandidatesBasicInfo } from '@agency/store/order-management.actions';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { NavigationTabModel } from '@shared/models/navigation-tab.model';
+import { DepartmentsService } from '@shared/services/departments.service';
+import { Department } from '@shared/models/department.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -99,7 +101,6 @@ export interface OrderManagementContentStateModel {
   projectSpecialData: ProjectSpecialData | null;
   suggestedDetails: SuggestedDetails | null;
   projectNames: ProjectName[];
-  masterShifts: MasterShift[];
   associateAgencies: AssociateAgency[];
   predefinedBillRates: BillRate[];
   isDirtyOrderForm: boolean;
@@ -107,6 +108,8 @@ export interface OrderManagementContentStateModel {
   orderFilterDataSources: OrderFilterDataSource | null;
   historicalEvents: HistoricalEvent[] | null;
   navigationTab: NavigationTabModel;
+  contactDetails: Department | null;
+  regularLocalBillRate: BillRate[];
 }
 
 @State<OrderManagementContentStateModel>({
@@ -129,7 +132,6 @@ export interface OrderManagementContentStateModel {
     projectNames: [],
     projectSpecialData: null,
     suggestedDetails: null,
-    masterShifts: [],
     associateAgencies: [],
     predefinedBillRates: [],
     isDirtyOrderForm: false,
@@ -141,6 +143,8 @@ export interface OrderManagementContentStateModel {
       pending: null,
       current: null,
     },
+    contactDetails: null,
+    regularLocalBillRate: [],
   },
 })
 @Injectable()
@@ -193,11 +197,6 @@ export class OrderManagementContentState {
   @Selector()
   static projectNames(state: OrderManagementContentStateModel): ProjectName[] {
     return state.projectNames;
-  }
-
-  @Selector()
-  static masterShifts(state: OrderManagementContentStateModel): MasterShift[] {
-    return state.masterShifts;
   }
 
   @Selector()
@@ -267,11 +266,22 @@ export class OrderManagementContentState {
     return state.navigationTab;
   }
 
+  @Selector()
+  static contactDetails(state: OrderManagementContentStateModel): Department | null {
+    return state.contactDetails;
+  }
+
+  @Selector()
+  static regularLocalBillRate(state: OrderManagementContentStateModel): BillRate[] {
+    return state.regularLocalBillRate;
+  }
+
   constructor(
     private orderManagementService: OrderManagementContentService,
     private projectsService: ProjectsService,
     private shiftsService: ShiftsService,
-    private rejectReasonService: RejectReasonService
+    private rejectReasonService: RejectReasonService,
+    private departmentService: DepartmentsService
   ) {}
 
   @Action(GetIncompleteOrders)
@@ -488,15 +498,6 @@ export class OrderManagementContentState {
     );
   }
 
-  @Action(GetMasterShifts)
-  GetMasterShifts({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<MasterShift[]> {
-    return this.shiftsService.getAllMasterShifts().pipe(
-      tap((payload) => {
-        patchState({ masterShifts: payload });
-      })
-    );
-  }
-
   @Action(GetAssociateAgencies)
   GetAssociateAgencies({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<AssociateAgency[]> {
     return this.orderManagementService.getAssociateAgencies().pipe(
@@ -555,9 +556,9 @@ export class OrderManagementContentState {
   @Action(SaveOrder)
   SaveOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents }: SaveOrder
+    { order, documents, comments }: SaveOrder
   ): Observable<Order | void> {
-    return this.orderManagementService.saveOrder(order, documents).pipe(
+    return this.orderManagementService.saveOrder(order, documents, comments).pipe(
       tap((order) => {
         dispatch([
           new ShowToast(MessageTypes.Success, RECORD_ADDED),
@@ -707,5 +708,29 @@ export class OrderManagementContentState {
     { active, pending, current }: SelectNavigationTab
   ): void {
     patchState({ navigationTab: { active, pending, current } });
+  }
+
+  @Action(GetContactDetails)
+  GetContactDetails(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { departmentId }: GetContactDetails
+  ): Observable<Department> {
+    return this.departmentService.getDepartmentData(departmentId).pipe(
+      tap((contactDetails: Department) => {
+        patchState({ contactDetails });
+      })
+    );
+  }
+
+  @Action(GetRegularLocalBillRate)
+  GetRegularLocalBillRate(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { orderType, departmentId, skillId }: GetRegularLocalBillRate
+  ): Observable<BillRate[]> {
+    return this.orderManagementService.getRegularLocalBillRate(orderType, departmentId, skillId).pipe(
+      tap((regularLocalBillRate: BillRate[]) => {
+        patchState({ regularLocalBillRate });
+      })
+    );
   }
 }

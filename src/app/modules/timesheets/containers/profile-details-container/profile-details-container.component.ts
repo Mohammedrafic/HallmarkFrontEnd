@@ -4,32 +4,33 @@ import {
   Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
-import { filter, Observable, take, takeUntil, switchMap, throttleTime, tap } from 'rxjs';
+import { filter, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
 import { SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
-import { FileSize } from '@core/enums';
+import { DialogAction, FileSize } from '@core/enums';
 import { FileExtensionsString } from '@core/constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportColumn, ExportPayload } from '@shared/models/export.model';
-import { DialogAction, SubmitBtnText, TimesheetTargetStatus } from '../../enums';
+import { SubmitBtnText, TimesheetTargetStatus } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import {
   CandidateMilesData, ChangeStatusData, DialogActionPayload, OpenAddDialogMeta,
   Timesheet, TimesheetDetailsModel } from '../../interface';
 import {
-  ConfirmDeleteTimesheetDialogContent, ConfirmUnsavedChages, rejectTimesheetDialogData,
-  TimesheetDetailsExportOptions } from '../../constants';
+  ConfirmDeleteTimesheetDialogContent, rejectTimesheetDialogData,
+  TimesheetConfirmMessages, TimesheetDetailsExportOptions } from '../../constants';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
+import { AttachmentsListConfig } from '@shared/components/attachments';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -41,9 +42,15 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   @ViewChild('candidateDialog')
   public candidateDialog: DialogComponent;
 
+  /**
+   * TODO: move chips to separate shared component.
+   */
   @ViewChild('chipList')
   public chipList: ChipListComponent;
 
+  /**
+   * TODO: try to use file-uploader component from invoices with tooltip as separate shared component.
+   */
   @ViewChild('dropEl')
   public dropEl: HTMLDivElement;
 
@@ -103,6 +110,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public readonly maxFileSize: number = FileSize.MB_10;
   public readonly timesheetStatus: typeof TimesheetStatus = TimesheetStatus;
 
+  public attachmentsListConfig$: Observable<AttachmentsListConfig>;
+
   constructor(
     private store: Store,
     private route: ActivatedRoute,
@@ -116,6 +125,10 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     super();
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
     this.submitText = this.isAgency ? SubmitBtnText.Submit : SubmitBtnText.Approve;
+    this.attachmentsListConfig$ = this.timesheetDetails$.pipe(
+      tap(({id}) => console.log(id, this.organizationId, this.isAgency)),
+      map(({id}) => this.timesheetDetailsService.getAttachmentsListConfig(id, this.organizationId, this.isAgency))
+    )
   }
 
   public get isNextDisabled(): boolean {
@@ -142,7 +155,14 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
    * TODO: add debouncer
    */
   public onNextPreviousOrder(next: boolean): void {
-    this.nextPreviousOrderEvent.emit(next);
+    if (!this.isChangesSaved) {
+      this.timesheetDetailsService.confirmTimesheetLeave(TimesheetConfirmMessages.confirmOrderChange)
+      .subscribe(() => {
+        this.nextPreviousOrderEvent.emit(next);
+      });
+    } else {
+      this.nextPreviousOrderEvent.emit(next);
+    }
   }
 
   public handleEditChanges(event: boolean): void {
@@ -155,15 +175,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
 
   public handleProfileClose(): void {
     if (!this.isChangesSaved) {
-      this.confirmService.confirm(ConfirmUnsavedChages, {
-        title: 'Unsaved Progress',
-        okButtonLabel: 'Proceed',
-        okButtonClass: 'delete-button',
-      })
-      .pipe(
-        take(1),
-        filter((submitted) => submitted)
-      )
+      this.timesheetDetailsService.confirmTimesheetLeave(TimesheetConfirmMessages.confirmUnsavedChages)
       .subscribe(() => {
         this.closeDialog();
       });
@@ -378,7 +390,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       this.weekPeriod = [
         new Date(DateTimeHelper.convertDateToUtc(weekStartDate)),
         new Date(DateTimeHelper.convertDateToUtc(weekEndDate)),
-      ]
+      ];
       this.cd.markForCheck();
     });
   }

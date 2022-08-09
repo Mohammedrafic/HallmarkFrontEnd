@@ -17,8 +17,6 @@ export class GridDayComponent implements ICellRendererAngularComp {
 
   public dayDate: string;
 
-  private readonly formatHelper = new GridValuesHelper();
-
   public agInit(params: ICellRendererParams): void {
     this.setDayValues(params);
   }
@@ -29,7 +27,7 @@ export class GridDayComponent implements ICellRendererAngularComp {
   }
 
   private setDayValues(params: ICellRendererParams): void {
-    this.dayName = this.formatHelper.formatDate(params.value, 'E');
-    this.dayDate = this.formatHelper.formatDate(params.value, 'MMM d');
+    this.dayName = GridValuesHelper.formatDate(params.value, 'E');
+    this.dayDate = GridValuesHelper.formatDate(params.value, 'MMM d');
   }
 }

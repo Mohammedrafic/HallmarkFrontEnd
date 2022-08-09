@@ -3,18 +3,7 @@ import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Valida
 import { ActivatedRoute } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import {
-  combineLatest,
-  debounceTime,
-  filter,
-  Observable,
-  of,
-  Subject,
-  switchMap,
-  take,
-  takeUntil,
-  throttleTime,
-} from 'rxjs';
+import { combineLatest, debounceTime, filter, Observable, Subject, take, takeUntil, throttleTime } from 'rxjs';
 
 import { ChangeEventArgs, DropDownListComponent, FieldSettingsModel } from '@syncfusion/ej2-angular-dropdowns';
 
@@ -28,9 +17,10 @@ import {
   ClearSelectedOrder,
   ClearSuggestions,
   GetAssociateAgencies,
-  GetMasterShifts,
+  GetContactDetails,
   GetOrganizationStatesWithKeyCode,
   GetProjectSpecialData,
+  GetRegularLocalBillRate,
   GetSuggestedDetails,
   GetWorkflows,
   SetIsDirtyOrderForm,
@@ -44,7 +34,6 @@ import { Location } from '@shared/models/location.model';
 import { Region } from '@shared/models/region.model';
 import { Department } from '@shared/models/department.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
-import { MasterShift } from '@shared/models/master-shift.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { JobDistributionModel } from '@shared/models/job-distribution.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
@@ -60,7 +49,6 @@ import { endTimeValidator, startTimeValidator } from '@shared/validators/date.va
 import { integerValidator } from '@shared/validators/integer.validator';
 import { currencyValidator } from '@shared/validators/currency.validator';
 
-import { getHoursMinutesSeconds } from '@shared/utils/date-time.utils';
 import { ORDER_CONTACT_DETAIL_TITLES, ORDER_EDITS, ORDER_PER_DIEM_EDITS } from '@shared/constants';
 import PriceUtils from '@shared/utils/price.utils';
 import { MaskedDateTimeService } from '@syncfusion/ej2-angular-calendars';
@@ -71,6 +59,10 @@ import { disableControls } from '@shared/utils/form.utils';
 import { AlertService } from '@shared/services/alert.service';
 import { GetPredefinedCredentials } from '@order-credentials/store/credentials.actions';
 import { ReasonForRequisitionList } from '@shared/models/reason-for-requisition-list';
+import { Comment } from '@shared/models/comment.model';
+import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
+import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
+import { BillRate } from '@shared/models';
 
 @Component({
   selector: 'app-order-details-form',
@@ -163,6 +155,16 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     { id: JobClassification.Students, name: 'Students' },
     { id: JobClassification.Volunteers, name: 'Volunteers' },
   ];
+
+  public masterShiftNames = [
+    { id: MasterShiftName.Day, name: 'Day' },
+    { id: MasterShiftName.Evening, name: 'Evening' },
+    { id: MasterShiftName.Night, name: 'Night' },
+    { id: MasterShiftName.Rotating, name: 'Rotating' },
+  ];
+
+  public masterShiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
+
   public jobClassificationFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public reasonsForRequisition = ReasonForRequisitionList;
@@ -200,10 +202,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
 
-  @Select(OrderManagementContentState.masterShifts)
-  masterShifts$: Observable<MasterShift[]>;
-  masterShiftFields: FieldSettingsModel = { text: 'name', value: 'id' };
-
   @Select(OrderManagementContentState.associateAgencies)
   associateAgencies$: Observable<AssociateAgency[]>;
   associateAgencyFields: FieldSettingsModel = { text: 'agencyName', value: 'agencyId' };
@@ -219,13 +217,55 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   workflows$: Observable<WorkflowByDepartmentAndSkill[]>;
   workflowFields: FieldSettingsModel = { text: 'workflowGroupName', value: 'workflowGroupId' };
 
-  private isEditMode: boolean;
+  @Select(OrderManagementContentState.contactDetails)
+  contactDetails$: Observable<Department>;
+
+  @Select(OrderManagementContentState.regularLocalBillRate)
+  regularLocalBillRate$: Observable<BillRate[]>;
+
+  public isEditMode: boolean;
 
   private touchedFields: Set<string> = new Set();
   private alreadyShownDialog: boolean = false;
   private unsubscribe$: Subject<void> = new Subject();
 
   public isPerDiem = false;
+  public isPermPlacementOrder = false;
+
+  public commentContainerId: number = 0;
+
+  public comments: Comment[] = []; /*[ // TODO: Mocked data, remove after BE
+    {
+      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet', isExternal: true, creationDate: new Date()
+    },
+    {
+      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date()
+    },
+    {
+      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date()
+    },
+    {
+      id: 0, text: 'Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: false, creationDate: new Date()
+    },
+    {
+      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment', isExternal: true, creationDate: new Date(), unread: true,
+    },
+    {
+      id: 0, text: '500 chars comment Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second linecomment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: false, creationDate: new Date(), unread: true
+    },
+    {
+      id: 0, text: 'short', isExternal: false, creationDate: new Date(), unread: true,
+    },
+    {
+      id: 0, text: 'Some Text', isExternal: true, creationDate: new Date()
+    },
+    {
+      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date()
+    },
+    {
+      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date(), unread: true
+    },
+  ];*/
 
   constructor(
     private store: Store,
@@ -251,57 +291,20 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       duration: [null, Validators.required],
       jobStartDate: [null, Validators.required],
       jobEndDate: [null, Validators.required],
-      shiftRequirementId: [null, Validators.required],
+      shift: [null, Validators.required],
       shiftStartTime: [null, Validators.required],
       shiftEndTime: [null, Validators.required],
     });
 
     this.orderTypeForm.valueChanges.pipe(takeUntil(this.unsubscribe$), throttleTime(500)).subscribe((val) => {
       this.isPerDiem = val.orderType === OrderType.OpenPerDiem;
+      this.isPermPlacementOrder = val.orderType === OrderType.PermPlacement;
       this.orderTypeChanged.emit(val.orderType);
       this.store.dispatch(new SetIsDirtyOrderForm(this.orderTypeForm.dirty));
-      if (this.isPerDiem) {
-        this.generalInformationForm.controls['hourlyRate'].setValidators(null);
-        this.generalInformationForm.controls['openPositions'].setValidators(null);
-        this.generalInformationForm.controls['minYrsRequired'].setValidators(null);
-        this.generalInformationForm.controls['joiningBonus'].setValidators(null);
-        this.generalInformationForm.controls['compBonus'].setValidators(null);
-        this.generalInformationForm.controls['duration'].setValidators(null);
-        this.generalInformationForm.controls['jobStartDate'].setValidators(null);
-        this.generalInformationForm.controls['jobEndDate'].setValidators(null);
-        this.generalInformationForm.controls['shiftRequirementId'].setValidators(null);
-        this.generalInformationForm.controls['shiftStartTime'].setValidators(null);
-        this.generalInformationForm.controls['shiftEndTime'].setValidators(null);
-      } else {
-        this.generalInformationForm.controls['hourlyRate'].setValidators([
-          Validators.required,
-          Validators.maxLength(10),
-          currencyValidator(1),
-        ]);
-        this.generalInformationForm.controls['openPositions'].setValidators([
-          Validators.required,
-          Validators.maxLength(10),
-          integerValidator(1),
-        ]);
-        this.generalInformationForm.controls['minYrsRequired'].setValidators([
-          Validators.maxLength(10),
-          integerValidator(1),
-        ]);
-        this.generalInformationForm.controls['joiningBonus'].setValidators([
-          Validators.maxLength(10),
-          currencyValidator(1),
-        ]);
-        this.generalInformationForm.controls['compBonus'].setValidators([
-          Validators.maxLength(10),
-          currencyValidator(1),
-        ]);
-        this.generalInformationForm.controls['duration'].setValidators(Validators.required);
-        this.generalInformationForm.controls['jobStartDate'].setValidators(Validators.required);
-        this.generalInformationForm.controls['jobEndDate'].setValidators(Validators.required);
-        this.generalInformationForm.controls['shiftRequirementId'].setValidators(Validators.required);
-        this.generalInformationForm.controls['shiftStartTime'].setValidators(Validators.required);
-        this.generalInformationForm.controls['shiftEndTime'].setValidators(Validators.required);
-      }
+
+      this.handlePerDiemOrder();
+      this.handlePermPlacementOrder();
+
       Object.keys(this.generalInformationForm.controls).forEach((key: string) => {
         this.generalInformationForm.controls[key].updateValueAndValidity({ onlySelf: false, emitEvent: false });
       });
@@ -391,25 +394,25 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     const skillIdControl = this.generalInformationForm.get('skillId') as AbstractControl;
     const durationControl = this.generalInformationForm.get('duration') as AbstractControl;
     const jobStartDateControl = this.generalInformationForm.get('jobStartDate') as AbstractControl;
-    const shiftRequirementIdControl = this.generalInformationForm.get('shiftRequirementId') as AbstractControl;
     const shiftStartTimeControl = this.generalInformationForm.get('shiftStartTime') as AbstractControl;
     const shiftEndTimeControl = this.generalInformationForm.get('shiftEndTime') as AbstractControl;
     const jobDistributionControl = this.jobDistributionForm.get('jobDistribution') as AbstractControl;
     const agencyControl = this.jobDistributionForm.get('agency') as AbstractControl;
     const jobDistributionsControl = this.jobDistributionForm.get('jobDistributions') as AbstractControl;
 
-    this.locationIdControl.valueChanges
-      .pipe(
-        takeUntil(this.unsubscribe$),
-        switchMap((locationId: number) => {
-          if (!locationId || this.isEditMode) {
-            return of(null);
-          }
+    this.departmentIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((departmentId: number) => {
+      if (!departmentId || this.isEditMode) {
+        return;
+      }
+      this.store.dispatch(new GetContactDetails(departmentId));
+    });
 
-          return this.store.dispatch(new GetSuggestedDetails(locationId));
-        })
-      )
-      .subscribe();
+    this.locationIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((locationId: number) => {
+      if (!locationId || this.isEditMode) {
+        return;
+      }
+      this.store.dispatch(new GetSuggestedDetails(locationId));
+    });
 
     combineLatest([orderTypeControl.valueChanges, departmentIdControl.valueChanges, skillIdControl.valueChanges])
       .pipe(takeUntil(this.unsubscribe$))
@@ -418,6 +421,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
           return;
         }
 
+        this.store.dispatch(new GetRegularLocalBillRate(orderType, departmentId, skillId));
         this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
       });
 
@@ -454,26 +458,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       this.autoSetupJobEndDateControl(duration, jobStartDate);
     });
 
-    shiftRequirementIdControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((shiftId) => {
-      const masterShifts = this.store.selectSnapshot(OrderManagementContentState.masterShifts);
-      const masterShift = masterShifts.find((i) => i.id === shiftId);
-
-      if (!masterShift) {
-        return;
-      }
-
-      let [startH, startM, startS] = getHoursMinutesSeconds(masterShift.startTime);
-      let [endH, endM, endS] = getHoursMinutesSeconds(masterShift.endTime);
-      let startDate = new Date();
-      let endDate = new Date();
-
-      startDate.setHours(startH, startM, startS);
-      endDate.setHours(endH, endM, endS);
-
-      this.generalInformationForm.controls['shiftStartTime'].patchValue(startDate);
-      this.generalInformationForm.controls['shiftEndTime'].patchValue(endDate);
-    });
-
     shiftEndTimeControl.valueChanges.pipe(takeUntil(this.unsubscribe$)).subscribe((val) => {
       this.maxTime = val || this.defaultMaxTime;
       shiftStartTimeControl.updateValueAndValidity({ onlySelf: true, emitEvent: false });
@@ -485,7 +469,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
 
     jobDistributionControl.valueChanges
-      .pipe(takeUntil(this.unsubscribe$))
+      .pipe(takeUntil(this.unsubscribe$), debounceTime(600))
       .subscribe((jobDistributionIds: JobDistribution[]) => {
         if (jobDistributionIds.includes(JobDistribution.All)) {
           jobDistributionIds = [
@@ -562,44 +546,35 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetRegions());
     this.store.dispatch(new GetMasterSkillsByOrganization());
     this.store.dispatch(new GetProjectSpecialData());
-    this.store.dispatch(new GetMasterShifts());
     this.store.dispatch(new GetAssociateAgencies());
     this.store.dispatch(new GetOrganizationStatesWithKeyCode());
 
-    this.selectedOrder$
-      .pipe(
-        filter((order: Order | null) => !!order),
-        takeUntil(this.unsubscribe$)
-      )
-      .subscribe((order) => {
-        const isEditMode = !!this.route.snapshot.paramMap.get('orderId');
-        if (order && isEditMode) {
-          this.isEditMode = true;
-          this.order = order;
-          this.populateForms(order);
-        } else if (order?.isTemplate) {
-          this.order = order;
-          this.populateForms(order);
-        } else {
-          this.isEditMode = false;
-          this.order = null;
-        }
-      });
+    this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+      const isEditMode = !!this.route.snapshot.paramMap.get('orderId');
+      if (order && isEditMode) {
+        this.isEditMode = true;
+        this.order = order;
+        this.commentContainerId = order.commentContainerId as number;
+        this.populateForms(order);
+      } else if (order?.isTemplate) {
+        this.order = order;
+        this.populateForms(order);
+      } else {
+        this.isEditMode = false;
+        this.order = null;
+        this.populateNewOrderForm();
+      }
+    });
 
     this.suggestedDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((suggestedDetails) => {
       if (!suggestedDetails) {
         return;
       }
 
-      const contactDetailsFormArray = this.contactDetailsForm.controls['contactDetails'] as FormArray;
-      const firstContactDetailsControl = contactDetailsFormArray.at(0) as FormGroup;
-
       const { name, email, mobilePhone } = suggestedDetails.contactDetails;
       const { address, state, city, zipCode } = suggestedDetails.workLocation;
 
-      firstContactDetailsControl.controls['name'].patchValue(name);
-      firstContactDetailsControl.controls['email'].patchValue(email);
-      firstContactDetailsControl.controls['mobilePhone'].patchValue(mobilePhone);
+      this.populateContactDetailsForm(name, email, mobilePhone);
 
       const workLocationsFormArray = this.workLocationForm.controls['workLocations'] as FormArray;
       const firstWorlLocationsControl = workLocationsFormArray.at(0) as FormGroup;
@@ -615,6 +590,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.store.dispatch([new ClearSelectedOrder(), new ClearSuggestions()]);
+  }
+
+  private populateContactDetailsForm(name: string, email: string, mobilePhone: string): void {
+    const contactDetailsFormArray = this.contactDetailsForm.controls['contactDetails'] as FormArray;
+    const firstContactDetailsControl = contactDetailsFormArray.at(0) as FormGroup;
+    firstContactDetailsControl.controls['name'].patchValue(name);
+    firstContactDetailsControl.controls['email'].patchValue(email);
+    firstContactDetailsControl.controls['mobilePhone'].patchValue(mobilePhone);
   }
 
   public onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -649,11 +632,56 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.markTouchedField(fieldName);
   }
 
-  onSkillsDropDownChanged(event: ChangeEventArgs) {
+  public onSkillsDropDownChanged(event: ChangeEventArgs): void {
     const fieldName = 'skills';
     this.userEditsOrder(this.isFieldTouched(fieldName));
     this.selectedSkills = event.itemData as SkillCategory;
     this.markTouchedField(fieldName);
+  }
+
+  private handlePerDiemOrder(): void {
+    if (this.isPerDiem) {
+      this.generalInformationForm.controls['hourlyRate'].setValidators(null);
+      this.generalInformationForm.controls['openPositions'].setValidators(null);
+      this.generalInformationForm.controls['minYrsRequired'].setValidators(null);
+      this.generalInformationForm.controls['joiningBonus'].setValidators(null);
+      this.generalInformationForm.controls['compBonus'].setValidators(null);
+      this.generalInformationForm.controls['duration'].setValidators(null);
+      this.generalInformationForm.controls['jobStartDate'].setValidators(null);
+      this.generalInformationForm.controls['jobEndDate'].setValidators(null);
+      this.generalInformationForm.controls['shiftRequirementId'].setValidators(null);
+      this.generalInformationForm.controls['shiftStartTime'].setValidators(null);
+      this.generalInformationForm.controls['shiftEndTime'].setValidators(null);
+    } else {
+      this.generalInformationForm.controls['hourlyRate']?.setValidators([
+        Validators.required,
+        Validators.maxLength(10),
+        currencyValidator(1),
+      ]);
+      this.generalInformationForm.controls['openPositions'].setValidators([
+        Validators.required,
+        Validators.maxLength(10),
+        integerValidator(1),
+      ]);
+      this.generalInformationForm.controls['minYrsRequired'].setValidators([
+        Validators.maxLength(10),
+        integerValidator(1),
+      ]);
+      this.generalInformationForm.controls['joiningBonus']?.setValidators([
+        Validators.maxLength(10),
+        currencyValidator(1),
+      ]);
+      this.generalInformationForm.controls['compBonus']?.setValidators([
+        Validators.maxLength(10),
+        currencyValidator(1),
+      ]);
+      this.generalInformationForm.controls['duration']?.setValidators(Validators.required);
+      this.generalInformationForm.controls['jobStartDate'].setValidators(Validators.required);
+      this.generalInformationForm.controls['jobEndDate']?.setValidators(Validators.required);
+      this.generalInformationForm.controls['shift'].setValidators(Validators.required);
+      this.generalInformationForm.controls['shiftStartTime'].setValidators(Validators.required);
+      this.generalInformationForm.controls['shiftEndTime'].setValidators(Validators.required);
+    }
   }
 
   private userEditsOrder(fieldIsTouched: boolean): void {
@@ -684,8 +712,17 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public removeContact(index: number): void {
+    const isPrimaryContact = this.contactDetailsFormArray.controls[index].get('isPrimaryContact')?.value;
     this.isEditContactTitle.splice(index, 1);
     this.contactDetailsFormArray.removeAt(index);
+
+    if (isPrimaryContact) {
+      this.setDefaultPrimaryContact();
+    }
+  }
+
+  private setDefaultPrimaryContact(): void {
+    this.contactDetailsFormArray.controls[0].get('isPrimaryContact')?.patchValue(true);
   }
 
   public editContactTitleHandler(i: number): void {
@@ -734,8 +771,59 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.get(controlName)?.patchValue(value, { emitEvent: false });
   }
 
+  private handlePermPlacementOrder(): void {
+    const listOfPermPlacementControls = ['orderPlacementFee', 'annualSalaryRangeFrom', 'annualSalaryRangeTo'];
+    const listOfGeneralOrderControls = ['hourlyRate', 'jobEndDate', 'duration', 'joiningBonus', 'compBonus'];
+
+    if (this.isPermPlacementOrder) {
+      this.addPermPlacementControls(listOfPermPlacementControls);
+      this.removeValidators(listOfGeneralOrderControls);
+    } else {
+      this.removePermPlacementControls(listOfPermPlacementControls);
+    }
+  }
+
+  private populatePermPlacementControls(order: Order): void {
+    this.handlePermPlacementOrder();
+
+    if (this.isPermPlacementOrder)
+      this.generalInformationForm.patchValue({
+        orderPlacementFee: order?.orderPlacementFee,
+        annualSalaryRangeFrom: order?.annualSalaryRangeFrom,
+        annualSalaryRangeTo: order?.annualSalaryRangeTo,
+      });
+  }
+
+  private removePermPlacementControls(controls: string[]): void {
+    controls.forEach((control: string) => {
+      this.generalInformationForm.contains(control) &&
+        this.generalInformationForm.removeControl(control, { emitEvent: false });
+    });
+  }
+
+  private removeValidators(controls: string[]): void {
+    controls.forEach((controlName: string) => {
+      if (this.generalInformationForm.contains(controlName)) {
+        const control = this.generalInformationForm.get(controlName);
+        control?.clearValidators();
+      }
+    });
+  }
+
+  private addPermPlacementControls(controlNames: string[]): void {
+    controlNames.forEach((controlName: string) => {
+      const formControl = this.formBuilder.control(null, [
+        Validators.required,
+        Validators.maxLength(10),
+        currencyValidator(1),
+      ]);
+      this.generalInformationForm.addControl(controlName, formControl, { emitEvent: false });
+    });
+  }
+
   private populateForms(order: Order): void {
     const isStatusEditOrProgress = order.status === OrderStatus.Filled || order.status === OrderStatus.InProgress;
+    this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
 
     const hourlyRate = order.hourlyRate ? parseFloat(order.hourlyRate.toString()).toFixed(2) : '';
     const joiningBonus = order.joiningBonus ? parseFloat(order.joiningBonus.toString()).toFixed(2) : '';
@@ -749,11 +837,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(() => this.generalInformationForm.controls['skillId'].patchValue(order.skillId));
 
-    this.masterShifts$.pipe(takeUntil(this.unsubscribe$)).subscribe(() =>
-      this.generalInformationForm.controls['shiftRequirementId'].patchValue(order.shiftRequirementId, {
-        emitEvent: false,
-      })
-    );
+    this.generalInformationForm.controls['shift'].patchValue(order.shift, { emitEvent: false });
 
     this.regions$
       .pipe(takeUntil(this.unsubscribe$))
@@ -767,6 +851,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.controls['duration'].patchValue(order.duration);
     this.generalInformationForm.controls['shiftStartTime'].patchValue(order.shiftStartTime);
     this.generalInformationForm.controls['shiftEndTime'].patchValue(order.shiftEndTime);
+
+    this.populatePermPlacementControls(order);
 
     this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.specialProject.controls['projectTypeId'].patchValue(order.projectTypeId);
@@ -907,14 +993,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       id: new FormControl(orderContactDetails?.id || 0),
       name: new FormControl(orderContactDetails?.name || '', [Validators.required, Validators.maxLength(50)]),
       title: new FormControl(orderContactDetails?.title || '', Validators.required),
-      email: new FormControl(orderContactDetails?.email || '', [
-        Validators.required,
-        Validators.pattern(/^\S+@\S+\.\S+$/),
-      ]),
+      email: new FormControl(orderContactDetails?.email || '', [Validators.required, Validators.email]),
       mobilePhone: new FormControl(orderContactDetails?.mobilePhone || '', [
         Validators.minLength(10),
         Validators.pattern(/^[0-9]+$/),
       ]),
+      isPrimaryContact: new FormControl(
+        orderContactDetails ? orderContactDetails.isPrimaryContact : !this.contactDetailsFormArray?.length
+      ),
     });
   }
 
@@ -956,5 +1042,30 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private resetDepartment(): void {
     this.departmentIdControl.reset(null, { emitValue: false });
     this.departmentIdControl.markAsUntouched();
+  }
+
+  private populateNewOrderForm(): void {
+    this.orderTypeForm.controls['orderType'].patchValue(OrderType.Traveler);
+    this.generalInformationForm.controls['duration'].patchValue(Duration.ThirteenWeeks);
+    this.jobDistributionForm.controls['jobDistribution'].patchValue([JobDistribution.All]);
+
+    this.contactDetails$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe((contactDetails) => {
+      const { facilityContact, facilityPhoneNo, facilityEmail } = contactDetails;
+      this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
+    });
+
+    this.regularLocalBillRate$
+      .pipe(takeUntil(this.unsubscribe$), filter((billRate) => !!billRate.length))
+      .subscribe((regularLocalBillRate) => this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0].rateHour));
+  }
+
+  public selectPrimaryContact(event: ChangeArgs): void {
+    const checkedValue = Number(event.value);
+    this.contactDetailsFormArray.controls.forEach((control, index) => {
+      const primaryContact = control.get('isPrimaryContact');
+      if (primaryContact) {
+        index !== checkedValue ? primaryContact.patchValue(false) : primaryContact.patchValue(true);
+      }
+    });
   }
 }

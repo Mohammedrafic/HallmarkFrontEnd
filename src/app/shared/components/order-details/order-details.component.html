@@ -2,7 +2,7 @@
   <div class="job-description-accordion">
     <ejs-accordion>
       <e-accordionitems>
-        <e-accordionitem expanded='true'>
+        <e-accordionitem expanded="true">
           <ng-template #header>
             <div>Job Description</div>
           </ng-template>
@@ -19,15 +19,12 @@
       <div class="contacts">
         <div class="contact-title">Supervisor Contacts</div>
         <div class="contact-details">
-          <span>
-            <i-feather name="user" class="icon"></i-feather> {{ contactDetails?.name }}
-          </span>
-          <span>
-            <i-feather name="mail" class="icon"></i-feather> {{ contactDetails?.email }}
-          </span>
+          <span> <i-feather name="user" class="icon"></i-feather> {{ contactDetails?.name }} </span>
+          <span> <i-feather name="mail" class="icon"></i-feather> {{ contactDetails?.email }} </span>
           <span>
             <i-feather name="map-pin" class="icon"></i-feather>
-            {{ contactDetails?.address }}, {{ contactDetails?.city }}, {{ contactDetails?.state }}, {{ contactDetails?.zipCode }}
+            {{ contactDetails?.address }}, {{ contactDetails?.city }}, {{ contactDetails?.state }},
+            {{ contactDetails?.zipCode }}
           </span>
         </div>
       </div>
@@ -48,9 +45,24 @@
                   <div class="credential-title">{{ cred.value.credentialName }}</div>
                   <div>
                     <ejs-tooltip target=".icon" position="TopCenter" [windowCollision]="true">
-                      <i-feather title="Req. for Submission" [name]="cred.value.reqForSubmission ? 'check-circle' : 'alert-triangle'" [class.active]="cred.value.reqForSubmission" class="icon"></i-feather>
-                      <i-feather title="Req. for Onboard" [name]="cred.value.reqForOnboard ? 'check-circle' : 'alert-triangle'" [class.active]="cred.value.reqForOnboard" class="icon"></i-feather>
-                      <i-feather title="Optional" [name]="cred.value.optional ? 'check-circle' : 'alert-triangle'" [class.active]="cred.value.optional" class="icon"></i-feather>
+                      <i-feather
+                        title="Req. for Submission"
+                        [name]="cred.value.reqForSubmission ? 'check-circle' : 'alert-triangle'"
+                        [class.active]="cred.value.reqForSubmission"
+                        class="icon"
+                      ></i-feather>
+                      <i-feather
+                        title="Req. for Onboard"
+                        [name]="cred.value.reqForOnboard ? 'check-circle' : 'alert-triangle'"
+                        [class.active]="cred.value.reqForOnboard"
+                        class="icon"
+                      ></i-feather>
+                      <i-feather
+                        title="Optional"
+                        [name]="cred.value.optional ? 'check-circle' : 'alert-triangle'"
+                        [class.active]="cred.value.optional"
+                        class="icon"
+                      ></i-feather>
                     </ejs-tooltip>
                   </div>
                 </div>
@@ -62,6 +74,9 @@
     </div>
   </div>
 </section>
-<section class="bill-rates" *ngIf="order && order?.orderType !== orderType.OpenPerDiem">
+<section
+  class="bill-rates"
+  *ngIf="order && order?.orderType !== orderType.OpenPerDiem && order?.orderType !== orderType.PermPlacement"
+>
   <app-bill-rates-view-grid [billRatesData]="order.billRates"></app-bill-rates-view-grid>
 </section>

@@ -70,6 +70,7 @@ import { MapCredentialsFormComponent } from './credentials/credentials-setup/map
 import { ReasonsComponent } from './reasons/reasons.component';
 import { ClosureReasonComponent } from './reasons/closure-reason/closure-reason.component';
 import { RegionsComponent } from './regions/regions.component';
+import { ManualInvoiceRejectReasonComponent } from './reasons/manual-invoice-reject-reason/manual-invoice-reject-reason.component';
 
 const sidebarIcons = {
   Download,
@@ -115,6 +116,8 @@ const sidebarIcons = {
     FilteredCredentialsComponent,
     MapCredentialsFormComponent,
     ReasonsComponent,
+
+    ManualInvoiceRejectReasonComponent,
     ClosureReasonComponent,
     RegionsComponent
   ],

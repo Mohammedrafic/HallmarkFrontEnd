@@ -34,7 +34,7 @@
       <e-column field="id" headerText="re-order id" textAlign="Left" width="100">
         <ng-template #template let-data>
           <div class="link" (click)="onViewNavigation(data)">
-            {{data.id}}
+            {{data.organizationPrefix}}-{{data.id}}
           </div>
         </ng-template>
       </e-column>

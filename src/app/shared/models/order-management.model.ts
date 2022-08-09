@@ -47,6 +47,7 @@ export class OrderManagement {
   orderCloseDate?: string;
   orderClosureReason?: string;
   orderClosureReasonId?: string;
+  organizationPrefix: string;
 }
 
 export class OrderManagementFilter {
@@ -95,6 +96,7 @@ export type AgencyOrderManagement = {
   orderCloseDate?: string;
   orderClosureReason?: string;
   orderClosureReasonId?: string;
+  organizationPrefix: string;
 };
 
 export type OrderManagementChild = {
@@ -202,6 +204,7 @@ export class OrderContactDetails {
   title: string;
   email: string;
   mobilePhone: string;
+  isPrimaryContact: boolean;
 }
 
 export class OrderWorkLocation {
@@ -241,7 +244,7 @@ export class Order {
   duration: Duration;
   jobStartDate: Date;
   jobEndDate: Date;
-  shiftRequirementId: number;
+  shift: number;
   shiftStartTime: Date;
   shiftEndTime: Date;
   classification: JobClassification;
@@ -280,6 +283,11 @@ export class Order {
   orderClosureReason?: string;
   orderClosureReasonId?: string;
   isTemplate?: boolean;
+  organizationPrefix?: string;
+  orderPlacementFee?: number;
+  annualSalaryRangeFrom?: number;
+  annualSalaryRangeTo?: number;
+  commentContainerId?: number;
 }
 
 export class ReOrder {

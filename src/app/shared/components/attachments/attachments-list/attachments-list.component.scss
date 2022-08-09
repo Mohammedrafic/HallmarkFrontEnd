@@ -1,0 +1,42 @@
+@import "colors";
+@import "mixins";
+
+:host {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+
+  .attachment {
+    display: flex;
+    align-items: center;
+    padding-bottom: 8px;
+    line-height: normal;
+
+    .file-icon {
+      flex-shrink: 0;
+      display: inline-flex;
+    }
+
+    .file-icon, .file-name {
+      color: $primary-active-blue-10;
+      cursor: pointer;
+    }
+
+    .file-name {
+      padding-left: 10px;
+
+      @include with-ellipsis();
+    }
+
+    .delete-icon {
+      display: flex;
+      margin-left: auto;
+
+      i-feather {
+        display: inline-flex;
+        margin-left: 30px;
+        cursor: pointer;
+      }
+    }
+  }
+}

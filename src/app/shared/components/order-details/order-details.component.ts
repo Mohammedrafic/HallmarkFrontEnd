@@ -31,7 +31,7 @@ export class OrderDetailsComponent implements OnDestroy {
       return;
     }
     const { contactDetails, workLocations, reOrderFrom } = this.order || {};
-    const contact = contactDetails?.length ? contactDetails : reOrderFrom?.contactDetails!;
+    const contact = contactDetails?.length ? contactDetails.filter((contact) => contact.isPrimaryContact) : reOrderFrom?.contactDetails!;
     const location = workLocations?.length ? workLocations : reOrderFrom?.workLocations!;
     this.contactDetails = {
       name: contact?.[0]?.name,

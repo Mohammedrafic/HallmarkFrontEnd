@@ -4,12 +4,15 @@ import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of } from 'rxjs';
 
 import { BillRate } from '@shared/models/bill-rate.model';
+import { DataSourceItem, DropdownOption } from '@core/interface';
+
 import {
-  TimesheetsFilterState, TimesheetRecordsDto, DropdownOption, CostCentersDto,
-  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, DataSourceItem } from '../interface';
-import { TimrsheetsDto } from '../store/model/timesheets.model';
+  TimesheetsFilterState, TimesheetRecordsDto, CostCentersDto,
+  AddRecordDto, PutRecordDto, TimesheetsFilteringOptions, TabCountConfig
+} from '../interface';
 import { CostCenterAdapter } from '../helpers';
-import { RecordsAdapter } from '../helpers/records.adapter';
+import { RecordsAdapter } from '../helpers';
+import { TimeSheetsPage } from '../store/model/timesheets.model';
 
 @Injectable()
 export class TimesheetsApiService {
@@ -18,8 +21,14 @@ export class TimesheetsApiService {
     private http: HttpClient,
   ) {}
 
-  public getTimesheets(filters: TimesheetsFilterState): Observable<TimrsheetsDto> {
-    return this.http.post<TimrsheetsDto>('/api/Timesheets', {
+  public getTimesheets(filters: TimesheetsFilterState): Observable<TimeSheetsPage> {
+    return this.http.post<TimeSheetsPage>('/api/Timesheets', {
+      ...filters,
+    });
+  }
+
+  public getTabsCounts(filters: TimesheetsFilterState): Observable<TabCountConfig> {
+    return this.http.post<TabCountConfig>('/api/Timesheets/tabcounters', {
       ...filters,
     });
   }

@@ -1,8 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { InvoiceRecord, InvoicesTable } from "../../interfaces";
-import { ItemModel } from "@syncfusion/ej2-splitbuttons/src/common/common-model";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input } from '@angular/core';
+import { InvoiceRecord } from "../../interfaces";
 import { MoreMenuType } from "../../../timesheets/enums";
 import { Timesheet } from 'src/app/modules/timesheets/interface';
+import { ColDef, GridApi, GridOptions, RowNode } from '@ag-grid-community/core';
+import { GridReadyEventModel } from '@shared/components/grid/models/grid-ready-event.model';
+import { PageOfCollections } from '@shared/models/page.model';
+import { InvoiceRecordsGridHelper } from '../../helpers/invoice-records-grid.helper';
 
 @Component({
   selector: 'app-invoice-records-table',
@@ -10,22 +13,21 @@ import { Timesheet } from 'src/app/modules/timesheets/interface';
   styleUrls: ['./invoice-records-table.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InvoiceRecordsTableComponent extends InvoicesTable<InvoiceRecord> {
-  public readonly moreMenuWithDelete: ItemModel[] = [
-    {text: MoreMenuType.Edit, id: '0'},
-    {text: MoreMenuType.Duplicate, id: '1'},
-    {text: MoreMenuType.Delete, id: '3'}
-  ];
+export class InvoiceRecordsTableComponent {
+  @Input()
+  public tableData: PageOfCollections<InvoiceRecord> | null = null;
 
-  public readonly moreMenuWithClose: ItemModel[] = [
-    {text: MoreMenuType.Edit, id: '0'},
-    {text: MoreMenuType.Duplicate, id: '1'},
-    {text: MoreMenuType.Close, id: '2'}
-  ];
+  public gridApi: GridApi | null = null;
 
-  constructor() {
-    super();
-  }
+  public isLoading: boolean = false;
+  public newSelectedIndex: number | null = null;
+  public sortHandler: EventEmitter<unknown> = new EventEmitter<unknown>();
+  public currentPage: number;
+  public pageSize: number;
+
+  public readonly columnDefs: ColDef[] = InvoiceRecordsGridHelper.getInvoiceRecordsGridColumnDefinitions();
+
+  public readonly gridOptions: GridOptions = InvoiceRecordsGridHelper.getRowNestedGridOptions();
 
   public menuOptionSelected(event: any, data: Timesheet): void {
     switch (event.item.properties.text) {
@@ -42,5 +44,29 @@ export class InvoiceRecordsTableComponent extends InvoicesTable<InvoiceRecord> {
         break;
       }
     }
+  }
+
+  onGoToClick(event: number) {
+
+  }
+
+  public gridReady(event: GridReadyEventModel) {
+    this.gridApi = event.api;
+  }
+
+  onRowsDropDownChanged(event: number) {
+
+  }
+
+  bulkApprove(event: RowNode[]) {
+
+  }
+
+  bulkExport(event: RowNode[]) {
+
+  }
+
+  selectedRow(event: any) {
+
   }
 }

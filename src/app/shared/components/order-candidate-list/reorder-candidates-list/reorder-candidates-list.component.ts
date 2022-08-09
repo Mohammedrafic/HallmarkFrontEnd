@@ -8,6 +8,7 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { filter, merge, Observable, takeUntil, tap } from 'rxjs';
 import { GetCandidateJob } from '@agency/store/order-management.actions';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
+import { CandidatStatus } from '@shared/enums/applicant-status.enum';
 
 enum ReorderCandidateStutuses {
   BillRatePending = 44,
@@ -57,8 +58,13 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
       if (this.isAgency) {
         this.store.dispatch(new GetCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
       } else if (this.isOrganization) {
+        const isGetAvailableSteps = [CandidatStatus.BillRatePending, CandidatStatus.OfferedBR].includes(
+          this.candidate.status
+        );
+
         this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.candidateJobId));
-        this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
+        isGetAvailableSteps &&
+          this.store.dispatch(new GetAvailableSteps(this.order.organizationId, this.candidate.candidateJobId));
       }
     }
   }

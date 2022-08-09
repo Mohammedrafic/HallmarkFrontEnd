@@ -78,6 +78,33 @@ export class RejectReasonService {
     return this.http.put<RejectReason>('/api/orderclosurereasons', payload);
   }
 
+  public getManualInvoiceReasonsByPage(
+    pageNumber?: number,
+    pageSize?: number,
+    orderBy?: string,
+    getAll?: boolean
+  ): Observable<RejectReasonPage> {
+    return this.http.get<RejectReasonPage>('/api/ManualInvoiceReasons', {
+      params: this.getCloseReasonsParams(pageNumber, pageSize, orderBy, getAll),
+    });
+  }
+
+  public saveManualInvoiceReason(payload: RejectReason): Observable<RejectReason> {
+    const { reason } = payload;
+
+    return this.http.post<RejectReason>('/api/ManualInvoiceReasons', {
+      reason
+    });
+  }
+
+  public removeManualInvoiceReason(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/ManualInvoiceReasons/${id}`);
+  }
+
+  public updateManualInvoiceReason(payload: RejectReason): Observable<void> {
+    return this.http.put<void>('/api/ManualInvoiceReasons', payload);
+  }
+
   private getCloseReasonsParams(pageNumber?: number, pageSize?: number, orderBy?: string, getAll?: boolean): HttpParams {
     let params = {};
     if (pageNumber) params = {...params, pageNumber};

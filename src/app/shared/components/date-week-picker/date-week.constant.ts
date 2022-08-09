@@ -1,0 +1,1 @@
+export const ConfirmWeekChangeMessage = 'Are you sure you want to change week period without saving changes?'

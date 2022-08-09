@@ -33,6 +33,10 @@
   }
 }
 
+.prefix-id {
+  text-transform: uppercase;
+}
+
 .create-under-container {
   margin-bottom: 20px;
 }
@@ -95,7 +99,6 @@
 
   .id-container {
     display: flex;
-    width: 70%;
   }
 
   .input-container, .dropdown-container {

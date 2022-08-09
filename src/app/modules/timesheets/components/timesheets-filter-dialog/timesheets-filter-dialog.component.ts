@@ -9,18 +9,18 @@ import { filter } from 'rxjs/operators';
 
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { Destroyable } from '@core/helpers';
+import { Destroyable, findItemById, leftOnlyValidValues } from '@core/helpers';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion,
   OrganizationStructure } from '@shared/models/organization.model';
+import { DataSourceItem } from '@core/interface';
 
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { TimeSheetsPage } from '../../store/model/timesheets.model';
 import { filterOptionFields } from '../../constants';
-import { DataSourceItem, FilterColumns, TimesheetsFilterState } from '../../interface';
+import { FilterColumns, TimesheetsFilterState } from '../../interface';
 import { TimesheetsService } from '../../services/timesheets.service';
 import { TimesheetsTableFiltersColumns } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
-import { findItemById, leftOnlyValidValues } from '../../helpers';
 import { UserState } from '../../../../store/user.state';
 
 @Component({

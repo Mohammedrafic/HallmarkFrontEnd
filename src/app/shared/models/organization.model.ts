@@ -15,6 +15,7 @@ export class Organization {
   contactDetails: ContactDetails[];
   preferences: Preferences;
   dbConnectionStringName: string;
+  isOrganizationUsed?: boolean;
 
   constructor(organizationId: number, businessUnitId: number, generalInformation: GeneralInformation, billingDetails: BillingDetails, contactDetails: ContactDetails[], preferences: Preferences, isSameAsOrg: boolean, dataBaseConnection: string) {
     if (organizationId) {
@@ -23,6 +24,7 @@ export class Organization {
     this.parentBusinessUnitId = businessUnitId;
     this.generalInformation = generalInformation;
     this.generalInformation.organizationId = organizationId || 0;
+    this.generalInformation.organizationPrefix = this.generalInformation.organizationPrefix.toUpperCase();
     if (this.generalInformation.externalId === '') {
       this.generalInformation.externalId = null;
     }
@@ -60,6 +62,7 @@ export class GeneralInformation {
   fax: string;
   website: string;
   status: number;
+  organizationPrefix: string;
 }
 
 export class BillingDetails {
