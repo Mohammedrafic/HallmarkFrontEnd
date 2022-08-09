@@ -20,7 +20,6 @@ import {
   GetContactDetails,
   GetOrganizationStatesWithKeyCode,
   GetProjectSpecialData,
-  GetRegularLocalBillRate,
   GetSuggestedDetails,
   GetWorkflows,
   SetIsDirtyOrderForm,
@@ -63,6 +62,7 @@ import { Comment } from '@shared/models/comment.model';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
 import { BillRate } from '@shared/models';
+import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 
 @Component({
   selector: 'app-order-details-form',
@@ -220,9 +220,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.contactDetails)
   contactDetails$: Observable<Department>;
 
-  @Select(OrderManagementContentState.regularLocalBillRate)
-  regularLocalBillRate$: Observable<BillRate[]>;
-
   private isEditMode: boolean;
 
   private touchedFields: Set<string> = new Set();
@@ -269,7 +266,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     private store: Store,
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private orderManagementService: OrderManagementContentService
   ) {
     this.orderTypeForm = this.formBuilder.group({
       orderType: [null, Validators.required],
@@ -419,7 +417,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.store.dispatch(new GetRegularLocalBillRate(orderType, departmentId, skillId));
+        this.populateHourlyRateField(orderType, departmentId, skillId);
         this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
       });
 
@@ -595,6 +593,18 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     firstContactDetailsControl.controls['name'].patchValue(name);
     firstContactDetailsControl.controls['email'].patchValue(email);
     firstContactDetailsControl.controls['mobilePhone'].patchValue(mobilePhone);
+  }
+
+  private populateHourlyRateField(orderType: OrderType, departmentId: number, skillId: number): void {
+    this.orderManagementService
+      .getRegularLocalBillRate(orderType, departmentId, skillId)
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((billRate) => !!billRate.length)
+      )
+      .subscribe((billRates: BillRate[]) =>
+        this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour)
+      );
   }
 
   public onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -1050,10 +1060,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       const { facilityContact, facilityPhoneNo, facilityEmail } = contactDetails;
       this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
     });
-
-    this.regularLocalBillRate$
-      .pipe(takeUntil(this.unsubscribe$), filter((billRate) => !!billRate.length))
-      .subscribe((regularLocalBillRate) => this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0].rateHour));
   }
 
   public selectPrimaryContact(event: ChangeArgs): void {
