@@ -1,4 +1,3 @@
-import { FileUploaderComponent } from './components/file-uploader/file-uploader.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -43,6 +42,7 @@ import { InvoicesApiService } from './services/invoices-api.service';
 import { InvoicesTableTabsComponent } from './components/invoices-table-tabs/invoices-table-tabs.component';
 import { AddDialogHelperService } from '@core/services';
 import { InvoiceApiService } from './services/invoice-api.service';
+import { FileUploaderModule } from '@shared/components/file-uploader/file-uploader.module';
 
 @NgModule({
   declarations: [
@@ -58,7 +58,6 @@ import { InvoiceApiService } from './services/invoice-api.service';
     InvoiceRecordsTableRowDetailsComponent,
     ToggleRowExpansionHeaderCellComponent,
     ManualInvoiceDialogComponent,
-    FileUploaderComponent,
     InvoicesFiltersDialogComponent,
     InvoicesTableTabsComponent,
   ],
@@ -100,6 +99,7 @@ import { InvoiceApiService } from './services/invoice-api.service';
     AutoCompleteAllModule,
     DatePickerAllModule,
     MultiSelectModule,
+    FileUploaderModule,
   ],
   providers: [
     InvoicesService,

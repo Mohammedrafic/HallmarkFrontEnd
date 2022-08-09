@@ -57,12 +57,14 @@ import {
 } from './components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
 import { TimesheetTableLinkComponent } from './components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 import { TimesheetDetailsService } from './services/timesheet-details.service';
-import { FileViewerModule } from '../../shared/modules/file-viewer/file-viewer.module';
+import { FileViewerModule } from '@shared/modules/file-viewer/file-viewer.module';
 import { DateRangeWeekPickerModule } from '@shared/components/date-range-week-picker/date-range-week-picker.module';
 import { TimesheetsTabsComponent } from './components/timesheets-tabs/timesheets-tabs.component';
 import { AddDialogHelperService, DateWeekService } from '@core/services';
 import { AttachmentsModule } from '@shared/components/attachments';
 import { AddDialogHelper } from '@core/helpers';
+import { UploadButtonComponent } from './components/upload-button/upload-button.component';
+import { FileUploaderModule } from '@shared/components/file-uploader/file-uploader.module';
 
 const gridIcons = {
   MessageSquare,
@@ -114,6 +116,7 @@ const gridIcons = {
     ProfileMilesComponent,
     InputEditorComponent,
     TimesheetsTabsComponent,
+    UploadButtonComponent,
   ],
   imports: [
     CommonModule,
@@ -152,6 +155,7 @@ const gridIcons = {
     PdfViewerModule,
     FileViewerModule,
     AttachmentsModule,
+    FileUploaderModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [

@@ -1,18 +1,23 @@
 import { ActivatedRoute, NavigationStart, Router } from '@angular/router';
 import {
-  ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter,
-  Input, OnInit, Output, ViewChild } from '@angular/core';
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import { filter, map, Observable, switchMap, take, takeUntil, tap, throttleTime } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
-import { DialogComponent, TooltipComponent } from '@syncfusion/ej2-angular-popups';
-import { SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
+import { DialogComponent } from '@syncfusion/ej2-angular-popups';
 import { ChipListComponent, SwitchComponent } from '@syncfusion/ej2-angular-buttons';
 
 import { DateTimeHelper, Destroyable } from '@core/helpers';
-import { DialogAction, FileSize } from '@core/enums';
-import { FileExtensionsString } from '@core/constants';
+import { DialogAction } from '@core/enums';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -21,16 +26,25 @@ import { SubmitBtnText, TimesheetTargetStatus } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import {
-  CandidateMilesData, ChangeStatusData, DialogActionPayload, OpenAddDialogMeta,
-  Timesheet, TimesheetDetailsModel } from '../../interface';
+  CandidateMilesData,
+  ChangeStatusData,
+  DialogActionPayload,
+  OpenAddDialogMeta,
+  Timesheet,
+  TimesheetDetailsModel
+} from '../../interface';
 import {
-  ConfirmDeleteTimesheetDialogContent, rejectTimesheetDialogData,
-  TimesheetConfirmMessages, TimesheetDetailsExportOptions } from '../../constants';
+  ConfirmDeleteTimesheetDialogContent,
+  rejectTimesheetDialogData,
+  TimesheetConfirmMessages,
+  TimesheetDetailsExportOptions
+} from '../../constants';
 import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
 import { AttachmentsListConfig } from '@shared/components/attachments';
+import { FileForUpload } from '@core/interface';
 
 @Component({
   selector: 'app-profile-details-container',
@@ -47,18 +61,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
    */
   @ViewChild('chipList')
   public chipList: ChipListComponent;
-
-  /**
-   * TODO: try to use file-uploader component from invoices with tooltip as separate shared component.
-   */
-  @ViewChild('dropEl')
-  public dropEl: HTMLDivElement;
-
-  @ViewChild('uploadTooltip')
-  public uploadTooltip: TooltipComponent;
-
-  @ViewChild('uploadArea')
-  public uploadArea: ElementRef<HTMLDivElement>;
 
   @ViewChild('dnwSwitch')
   public dnwSwitch: SwitchComponent;
@@ -106,8 +108,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public readonly milesData$: Observable<CandidateMilesData>
 
   public readonly exportedFileType: typeof ExportedFileType = ExportedFileType;
-  public readonly allowedFileExtensions: string = FileExtensionsString;
-  public readonly maxFileSize: number = FileSize.MB_10;
+
   public readonly timesheetStatus: typeof TimesheetStatus = TimesheetStatus;
 
   public attachmentsListConfig$: Observable<AttachmentsListConfig>;
@@ -328,16 +329,11 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     );
   }
 
-  public onFilesSelected(event: SelectedEventArgs, orgId: number): void {
+  public onFilesSelected(files: FileForUpload[]): void {
     this.store.dispatch(new TimesheetDetails.UploadFiles({
       timesheetId: this.timesheetId,
-      organizationId: this.isAgency ? orgId : null,
-      files: event.filesData.map((fileData) => {
-        return {
-          blob: fileData.rawFile as Blob,
-          fileName: fileData.name,
-        }
-      }),
+      organizationId: this.organizationId,
+      files,
     }))
       .pipe(
         takeUntil(this.componentDestroy())
@@ -347,14 +343,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
           new Timesheets.GetTimesheetDetails(this.timesheetId, this.organizationId as number, this.isAgency)
         );
       });
-
-    this.uploadTooltip?.close();
-  }
-
-  public browse() : void {
-    this.uploadArea.nativeElement
-      ?.getElementsByClassName('e-file-select-wrap')[0]
-      ?.querySelector('button')?.click();
   }
 
   private refreshData(): Observable<TimesheetDetailsModel> {
@@ -415,4 +403,3 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     });
   }
 }
-

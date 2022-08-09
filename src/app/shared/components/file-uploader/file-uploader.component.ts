@@ -23,6 +23,8 @@ export class FileUploaderComponent {
 
   @Input() maxFileSize: number = 5242880;
 
+  @Input() showSelectedFiles: boolean = true;
+
   @Output() uploadFilesChanged: EventEmitter<FileForUpload[]> = new EventEmitter();
 
   public files: FileForUpload[] = [];
@@ -35,9 +37,15 @@ export class FileUploaderComponent {
 
   public filesSelected(event: SelectedEventArgs): void {
     this.files = [...this.files, ...FileAdapter.adaptRawEventFiles(event.filesData)];
+    this.emitSelectedFiles();
   }
 
   public removeFile(event: RemovingEventArgs): void {
     this.files = this.files.filter((file) => file.fileName !== event.filesData[0].name);
+    this.emitSelectedFiles();
+  }
+
+  private emitSelectedFiles(): void {
+    this.uploadFilesChanged.emit(this.files);
   }
 }
