@@ -79,6 +79,7 @@ export class SpecialProjectState {
     { specialProject }: SaveSpecialProject
   ): Observable<SpecialProject | void> {
     var isEdit = specialProject.id > 0 ? true : false;
+    console.log(isEdit);
     return this.specialProjectService.saveSpecialProject(specialProject).pipe(
       tap((order) => {
         dispatch([
