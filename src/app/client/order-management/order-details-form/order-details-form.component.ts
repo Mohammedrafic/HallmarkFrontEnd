@@ -63,6 +63,7 @@ import { Comment } from '@shared/models/comment.model';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
 import { BillRate } from '@shared/models';
+import { greaterThanValidator } from '@shared/validators/greater-than.validator';
 
 @Component({
   selector: 'app-order-details-form',
@@ -277,24 +278,27 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       orderType: [null, Validators.required],
     });
 
-    this.generalInformationForm = this.formBuilder.group({
-      title: [null, [Validators.required, Validators.maxLength(50)]],
-      regionId: [null, Validators.required],
-      locationId: [null, Validators.required],
-      departmentId: [null, Validators.required],
-      skillId: [null, Validators.required],
-      hourlyRate: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
-      openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
-      minYrsRequired: [null, [Validators.maxLength(10), integerValidator(1)]],
-      joiningBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
-      compBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
-      duration: [null, Validators.required],
-      jobStartDate: [null, Validators.required],
-      jobEndDate: [null, Validators.required],
-      shift: [null, Validators.required],
-      shiftStartTime: [null, Validators.required],
-      shiftEndTime: [null, Validators.required],
-    });
+    this.generalInformationForm = this.formBuilder.group(
+      {
+        title: [null, [Validators.required, Validators.maxLength(50)]],
+        regionId: [null, Validators.required],
+        locationId: [null, Validators.required],
+        departmentId: [null, Validators.required],
+        skillId: [null, Validators.required],
+        hourlyRate: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
+        openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
+        minYrsRequired: [null, [Validators.maxLength(10), integerValidator(1)]],
+        joiningBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
+        compBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
+        duration: [null, Validators.required],
+        jobStartDate: [null, Validators.required],
+        jobEndDate: [null, Validators.required],
+        shift: [null, Validators.required],
+        shiftStartTime: [null, Validators.required],
+        shiftEndTime: [null, Validators.required],
+      },
+      { validators: greaterThanValidator('annualSalaryRangeFrom', 'annualSalaryRangeTo') }
+    );
 
     this.orderTypeForm.valueChanges.pipe(takeUntil(this.unsubscribe$), throttleTime(500)).subscribe((val) => {
       this.isPerDiem = val.orderType === OrderType.OpenPerDiem;
@@ -811,6 +815,14 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private addPermPlacementControls(controlNames: string[]): void {
+    // const group = this.formBuilder.group(
+    //   {
+    //     orderPlacementFee: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
+    //     annualSalaryRangeFrom: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
+    //     annualSalaryRangeTo: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
+    //   },
+    //   { validators: greaterThanValidator('annualSalaryRangeFrom', 'annualSalaryRangeTo') }
+    // );
     controlNames.forEach((controlName: string) => {
       const formControl = this.formBuilder.control(null, [
         Validators.required,
@@ -819,6 +831,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       ]);
       this.generalInformationForm.addControl(controlName, formControl, { emitEvent: false });
     });
+    // this.generalInformationForm.addControl(controlName, formControl, { emitEvent: false });
   }
 
   private populateForms(order: Order): void {
@@ -1055,8 +1068,13 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
 
     this.regularLocalBillRate$
-      .pipe(takeUntil(this.unsubscribe$), filter((billRate) => !!billRate.length))
-      .subscribe((regularLocalBillRate) => this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0].rateHour));
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((billRate) => !!billRate.length)
+      )
+      .subscribe((regularLocalBillRate) =>
+        this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0].rateHour)
+      );
   }
 
   public selectPrimaryContact(event: ChangeArgs): void {
