@@ -13,7 +13,7 @@ import {
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
-  ReloadOrganisationOrderCandidatesLists,
+  ReloadOrganisationOrderCandidatesLists, SetIsDirtyOrderForm,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
@@ -25,6 +25,7 @@ import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations
 import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { SET_READONLY_STATUS } from '@shared/constants';
+import { toCorrectTimezoneFormat } from "@shared/utils/date-time.utils";
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -79,7 +80,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   }
 
   get isOnBoarded(): boolean {
-    return this.candidate.candidateStatus === ApplicantStatusEnum.OnBoarded;
+    return this.candidate.status === ApplicantStatusEnum.OnBoarded;
   }
 
   get isDeployedCandidate(): boolean {
@@ -148,6 +149,45 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
     this.accordionOneField = new AccordionOneField(this.accordionComponent);
     this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
+  }
+
+  public onBillRatesChanged(value: BillRate | number): void {
+    console.log(value, typeof value);
+    let billRates;
+    if (typeof value === 'number') {
+      this.candidateJob?.billRates.splice(value, 1);
+      billRates = this.candidateJob?.billRates;
+    } else {
+      billRates = [...this.candidateJob?.billRates as BillRate[], value];
+    }
+
+    this.store
+      .dispatch(
+        new UpdateOrganisationCandidateJob({
+          orderId: this.candidateJob?.orderId as number,
+          organizationId: this.candidateJob?.organizationId  as number,
+          jobId: this.candidateJob?.jobId  as number,
+          nextApplicantStatus: {
+            applicantStatus: 60,
+            statusText: 'Onboard',
+          },
+          candidateBillRate: this.candidateJob?.candidateBillRate as number,
+          offeredBillRate: this.candidateJob?.offeredBillRate,
+          requestComment: this.candidateJob?.requestComment as string,
+          actualStartDate: this.candidateJob?.actualStartDate as string,
+          actualEndDate: this.candidateJob?.actualEndDate as string,
+          clockId: this.candidateJob?.clockId,
+          guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
+          offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.availableStartDate as string),
+          allowDeployWoCredentials: true,
+          billRates,
+        })
+      )
+      .subscribe(() => {
+        this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+        this.closeDialog();
+        this.store.dispatch(new SetIsDirtyOrderForm(true));
+      });
   }
 
   private onAccept(): void {

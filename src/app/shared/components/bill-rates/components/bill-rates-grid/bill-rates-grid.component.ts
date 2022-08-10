@@ -34,6 +34,10 @@ export class BillRatesGridComponent extends AbstractGridConfigurationComponent i
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
 
+  public get isEditAllowed(): boolean {
+    return this.billRatesData.some(billRate => billRate.editAllowed);
+  }
+
   constructor() {
     super();
   }

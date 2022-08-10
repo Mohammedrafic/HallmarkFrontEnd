@@ -21,7 +21,7 @@
             [allowResizing]="allowResizing"
             (dataBound)="dataBound()">
     <e-columns>
-      <e-column [visible]="!readOnlyMode" textAlign="Right" width="120">
+      <e-column [visible]="isEditAllowed" textAlign="Right" width="120">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit($event, data)">
@@ -43,12 +43,12 @@
       </e-column>
 
       <e-column headerText="Pay Rate Type">
-        <ng-template #template let-data>{{BillRateType[data.billRateConfig.type]}}</ng-template>
+        <ng-template #template let-data>{{BillRateType[data.billType]}}</ng-template>
       </e-column>
 
       <e-column headerText="Rates/Hours" textAlign="Right">
         <ng-template #template let-data>
-          {{ data.rateHour | rateHourPipe: data.billRateConfig.title:data.billRateConfig.type:billRateOptions }}
+          {{ data.rateHour | rateHourPipe: data.billRateConfigId:data.billRateConfig.type:billRateOptions }}
         </ng-template>
       </e-column>
 
@@ -58,6 +58,17 @@
 
       <e-column headerText="Effective Date" textAlign="Right">
         <ng-template #template let-data>{{data.effectiveDate | date:'M/d/y'}}</ng-template>
+      </e-column>
+
+      <e-column headerText="Allow Edit">
+        <ng-template #template let-data>
+          <div class="checkbox bootstrap">
+            <ejs-checkbox
+              [checked]="data.editAllowed"
+              [disabled]="true">
+            </ejs-checkbox>
+          </div>
+        </ng-template>
       </e-column>
     </e-columns>
   </ejs-grid>

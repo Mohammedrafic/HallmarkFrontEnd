@@ -224,7 +224,11 @@
     </div>
   </section>
   <section>
-    <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
+    <app-bill-rates #billRates
+                    [billRates]="billRatesData"
+                    [isActive]="true"
+                    (billRatesChanged)="onBillRatesChanged($event)">
+    </app-bill-rates>
   </section>
 </section>
 

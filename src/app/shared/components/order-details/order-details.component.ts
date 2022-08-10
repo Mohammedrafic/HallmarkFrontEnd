@@ -2,6 +2,8 @@ import { Component, Input, OnDestroy } from '@angular/core';
 import { Order, OrderContactDetails, OrderWorkLocation } from '@shared/models/order-management.model';
 import { Subject } from 'rxjs';
 import { OrderType } from '@shared/enums/order-type';
+import { SetIsDirtyOrderForm } from "@client/store/order-managment-content.actions";
+import { Store } from "@ngxs/store";
 
 type ContactDetails = Partial<OrderContactDetails> & Partial<OrderWorkLocation>;
 @Component({
@@ -21,9 +23,15 @@ export class OrderDetailsComponent implements OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
 
+  constructor(private store: Store) {}
+
   public ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public onBillRatesChanged(): void {
+    this.store.dispatch(new SetIsDirtyOrderForm(true));
   }
 
   private getContactDetails(): void {
@@ -42,4 +50,5 @@ export class OrderDetailsComponent implements OnDestroy {
       zipCode: location?.[0]?.zipCode,
     };
   }
+
 }

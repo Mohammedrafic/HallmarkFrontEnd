@@ -1,5 +1,6 @@
 import { MasterSkillByOrganization, Skill } from '@shared/models/skill.model';
 import { PageOfCollections } from '@shared/models/page.model';
+import { FieldSettingsModel } from "@syncfusion/ej2-angular-dropdowns";
 
 export enum BillRateCategory {
   BaseRate = 1,
@@ -14,6 +15,12 @@ export enum BillRateType {
   Additional = 3,
 }
 
+export const BillRateTypes = [
+  {id: BillRateType.Fixed, name: 'Fixed'},
+  {id: BillRateType.Times, name: 'Times'},
+  {id: BillRateType.Additional, name: 'Additional'},
+]
+
 export enum BillRateUnit
 {
   Currency = 1,
@@ -25,7 +32,7 @@ export type BillRateOption = {
   id: number;
   category: BillRateCategory;
   title: string;
-  type: BillRateType;
+  billTypes: BillRateType[];
   unit: BillRateUnit;
   intervalMin: boolean;
   intervalMax: boolean;
@@ -41,6 +48,7 @@ export interface BillRate {
   intervalMin: number | null;
   intervalMax: number | null;
   effectiveDate: string;
+  editAllowed?: boolean;
 }
 
 export interface OrderBillRateDto extends Omit<BillRate, 'billRateConfig' | 'billRateGroupId'> { }
@@ -74,6 +82,7 @@ export class ExternalBillRateMapped {
 
 export class BillRateSetup {
   billRateSettingId: number;
+  billRateConfigId: number;
   regionId: number;
   regionName: string;
   locationId: number;
@@ -96,6 +105,8 @@ export class BillRateSetup {
   regularLocal: boolean;
   displayInTimesheet: boolean;
   displayInJob: boolean;
+  editAllowed: boolean;
+  billType: number;
 }
 
 export class BillRateSetupPost {
@@ -117,6 +128,8 @@ export class BillRateSetupPost {
   displayInTimesheet: boolean;
   displayInJob: boolean;
   forceUpsert?: boolean;
+  billType: number;
+  editAllowed: number;
 }
 
 export class BillRateFilters {

@@ -37,7 +37,7 @@ import {
   BillRateSetup,
   BillRateSetupPage,
   BillRateSetupPost,
-  BillRateType,
+  BillRateType, BillRateTypes,
   BillRateUnit
 } from '@shared/models/bill-rate.model';
 import { OrderTypeOptions } from '@shared/enums/order-type';
@@ -107,6 +107,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   public intervalMinField: AbstractControl;
   public intervalMaxField: AbstractControl;
   public billRateCategory = BillRateCategory;
+  public billRateTypesOptions = BillRateTypes;
   public billRateType = BillRateType;
   public filters: BillRateFilters = {};
   public filterColumns: any;
@@ -370,6 +371,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       const isAllRegions = this.billRatesFormGroup.controls['regionIds'].value.length === this.allRegions.length;
       const billRate: BillRateSetupPost = {
         billRateSettingId: this.editRecordId,
+        billType: this.billRatesFormGroup.controls['billRatesType'].value,
         regionIds: isAllRegions ? [] : this.billRatesFormGroup.controls['regionIds'].value, // [] means All on the BE side
         locationIds: isAllRegions && this.billRatesFormGroup.controls['locationIds'].value.length === this.locations.length
           ? [] : this.billRatesFormGroup.controls['locationIds'].value, // [] means All on the BE side
@@ -390,6 +392,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         regularLocal: this.billRatesFormGroup.controls['regularLocal'].value ? this.billRatesFormGroup.controls['regularLocal'].value : false,
         displayInTimesheet: this.billRatesFormGroup.controls['displayInTimesheet'].value ? this.billRatesFormGroup.controls['displayInTimesheet'].value : false,
         displayInJob: this.billRatesFormGroup.controls['displayInJob'].value ? this.billRatesFormGroup.controls['displayInJob'].value : false,
+        editAllowed: this.billRatesFormGroup.controls['editAllowed'].value || false,
       }
 
       this.billRateToPost = billRate;
@@ -451,6 +454,10 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
 
   public displayInJobChange(data: any, event: any): void {
     this.onClickedCheckboxHandler(data, 'displayInJob', event.checked);
+  }
+
+  public displayInEditAllowedChange(data: any, event: any): void {
+    this.onClickedCheckboxHandler(data, 'editAllowed', event.checked);
   }
 
   public onRowsDropDownChanged(): void {
@@ -531,7 +538,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       billRateTitleId: ['', [Validators.required]],
       orderTypeIds: ['', [Validators.required]],
       billRatesCategory: [{ value: '', disabled: true }],
-      billRatesType: [{ value: '', disabled: true }],
+      billRatesType: ['', [Validators.required]],
       billRateValueRateTimes: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(11), currencyValidator(1)]],
       effectiveDate: [null, [Validators.required]],
       intervalMin: [''],
@@ -541,7 +548,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       considerFor7thDayOt: [null],
       regularLocal: [null],
       displayInTimesheet: [null],
-      displayInJob: [null]
+      displayInJob: [null],
+      editAllowed: [null]
     });
 
     this.billRateFilterFormGroup = this.formBuilder.group({
@@ -627,7 +635,6 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
           this.isIntervalMaxEnabled = foundBillRateOption.intervalMax;
           this.billRatesFormGroup.get('billRateValueRateTimes')?.setValue('');
           this.billRatesFormGroup.get('billRatesCategory')?.setValue(BillRateCategory[foundBillRateOption.category]);
-          this.billRatesFormGroup.get('billRatesType')?.setValue(BillRateType[foundBillRateOption.type]);
         }
 
         if (this.isIntervalMinEnabled) {
@@ -691,7 +698,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       this.billRatesFormGroup.controls['skillIds'].setValue(data.skills.map((skill: any) => skill.id));
     }
 
-    const foundBillRateOption = this.billRatesOptions.find(option => option.title === data.billRateTitle && option.type === data.billRateType);
+    const foundBillRateOption = this.billRatesOptions.find(option => option.id === data.billRateConfigId);
     if (foundBillRateOption) {
       this.billRatesFormGroup.controls['billRateTitleId'].setValue(foundBillRateOption.id);
     }
@@ -713,6 +720,8 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     this.billRatesFormGroup.controls['regularLocal'].setValue(data.regularLocal);
     this.billRatesFormGroup.controls['displayInTimesheet'].setValue(data.displayInTimesheet);
     this.billRatesFormGroup.controls['displayInJob'].setValue(data.displayInJob);
+    this.billRatesFormGroup.controls['editAllowed'].setValue(data.editAllowed);
+    this.billRatesFormGroup.controls['billRatesType'].setValue(data.billType);
   }
 
   // TODO: temporary solution, until specific service provided

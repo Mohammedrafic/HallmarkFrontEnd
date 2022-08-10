@@ -29,7 +29,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     }
   }
 
-  @Output() billRatesChanged: EventEmitter<void> = new EventEmitter();
+  @Output() billRatesChanged: EventEmitter<BillRate | number> = new EventEmitter();
 
   public billRateFormHeader: string;
   public billRatesControl: FormArray;
@@ -77,6 +77,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     this.editBillRateIndex = null;
     this.billRateForm.reset();
     this.billRateFormHeader = 'Add Bill Rate';
+    this.billRateForm.patchValue({ id: 0, editAllowed: false});
     this.selectedBillRateUnit = BillRateUnit.Multiplier;
     this.store.dispatch(new ShowSideDialog(true));
   }
@@ -85,8 +86,9 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     this.billRateFormHeader = 'Edit Bill Rate';
     this.editBillRateIndex = index;
 
-    const foundBillRateOption = this.billRatesOptions.find(option => option.title === value.billRateConfig.title && option.type === value.billRateConfig.type);
+    const foundBillRateOption = this.billRatesOptions.find(option => option.id === value.billRateConfigId);
     const rateHour = foundBillRateOption?.unit === BillRateUnit.Hours ? String(value.rateHour) : parseFloat(value.rateHour.toString()).toFixed(2);
+    console.log(rateHour)
     this.billRateForm.patchValue({
       billRateConfig: value.billRateConfig,
       billRateConfigId: value.billRateConfigId,
@@ -94,7 +96,8 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       id: value.id,
       intervalMax: value.intervalMax && String(value.intervalMax),
       intervalMin: value.intervalMin && String(value.intervalMin),
-      rateHour: rateHour
+      rateHour: rateHour,
+      editAllowed: false,
      }, { emitEvent: false });
 
     if (!value.billRateConfig.intervalMin) {
@@ -126,8 +129,9 @@ export class BillRatesComponent implements OnInit, OnDestroy {
         filter((confirm) => !!confirm)
       )
       .subscribe(() => {
-        this.billRatesControl.removeAt(Number(index));
-        this.billRatesChanged.emit();
+        const removeIndex = Number(index);
+        this.billRatesControl.removeAt(removeIndex);
+        this.billRatesChanged.emit(removeIndex);
       });
   }
 
@@ -179,7 +183,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       } else {
         this.billRatesControl.push(this.fromValueToBillRate(value));
       }
-      this.billRatesChanged.emit();
+      this.billRatesChanged.emit(this.billRateForm.value);
       this.billRateForm.reset();
       this.store.dispatch(new ShowSideDialog(false));
     }
