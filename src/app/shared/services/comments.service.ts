@@ -9,12 +9,12 @@ import { Comment } from '@shared/models/comment.model';
 export class CommentsService {
   public constructor(private readonly httpClient: HttpClient) {}
 
-  public getComments(): Observable<Comment[]> {
-    return this.httpClient.get<Comment[]>('/api/Comments');
+  public getComments(commentContainerId: number, isExternal: boolean | null, isAgency: boolean): Observable<Comment[]> {
+    return this.httpClient.post<Comment[]>('/api/Comments/filter', { commentContainerId, isExternal, isAgency });
   }
 
   public saveComment(comment: Comment): Observable<Comment> {
-    return this.httpClient.post<Comment>('/api/Comments', comment);
+    return this.httpClient.post<Comment>('/api/Comments', { comments: [ comment ] });
   }
 
   public markCommentAsRead(ids: number[]): Observable<void> {

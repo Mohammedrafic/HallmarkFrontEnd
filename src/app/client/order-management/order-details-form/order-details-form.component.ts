@@ -63,6 +63,9 @@ import { Comment } from '@shared/models/comment.model';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
 import { BillRate } from '@shared/models';
+import { GetComments } from '@shared/components/comments/store/comments.actions';
+import { UserState } from 'src/app/store/user.state';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 
@@ -237,39 +240,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public isPermPlacementOrder = false;
 
   public commentContainerId: number = 0;
+  public orderId: string | null;
 
-  public comments: Comment[] = []; /*[ // TODO: Mocked data, remove after BE
-    {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet', isExternal: true, creationDate: new Date()
-    },
-    {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date()
-    },
-    {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date()
-    },
-    {
-      id: 0, text: 'Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: false, creationDate: new Date()
-    },
-    {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment', isExternal: true, creationDate: new Date(), unread: true,
-    },
-    {
-      id: 0, text: '500 chars comment Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second linecomment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: false, creationDate: new Date(), unread: true
-    },
-    {
-      id: 0, text: 'short', isExternal: false, creationDate: new Date(), unread: true,
-    },
-    {
-      id: 0, text: 'Some Text', isExternal: true, creationDate: new Date()
-    },
-    {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date()
-    },
-    {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date(), unread: true
-    },
-  ];*/
+  public comments: Comment[] = []; 
 
   constructor(
     private store: Store,
@@ -547,6 +520,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
+    this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
     this.store.dispatch(new GetRegions());
     this.store.dispatch(new GetMasterSkillsByOrganization());
     this.store.dispatch(new GetProjectSpecialData());
@@ -554,11 +528,13 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetOrganizationStatesWithKeyCode());
 
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-      const isEditMode = !!this.route.snapshot.paramMap.get('orderId');
+      const isEditMode = !!this.orderId;
       if (order && isEditMode) {
+        const user = this.store.selectSnapshot(UserState.user);
         this.isEditMode = true;
         this.order = order;
         this.commentContainerId = order.commentContainerId as number;
+        this.store.dispatch(new GetComments(this.commentContainerId, null, user?.businessUnitType === BusinessUnitType.Agency));
         this.populateForms(order);
       } else if (order?.isTemplate) {
         this.order = order;

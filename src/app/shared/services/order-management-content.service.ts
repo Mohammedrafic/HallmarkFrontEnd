@@ -272,7 +272,7 @@ export class OrderManagementContentService {
           comments.forEach((comment: Comment) => {
             comment.commentContainerId = createdOrder.commentContainerId as number;
           });
-          this.http.post('/api/Comments', comments[0]).subscribe(); // TODO: Pending bulk save
+          this.http.post('/api/Comments', { comments }).subscribe();
         }
         documents.forEach((document) => formData.append('documents', document));
         return this.http.post(`/api/Orders/${createdOrder.id}/documents`, formData).pipe(map(() => createdOrder));
