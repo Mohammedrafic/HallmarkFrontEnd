@@ -457,7 +457,8 @@
         class="input-container"
         *ngIf="
           activeTab !== OrganizationOrderManagementTabs.ReOrders &&
-          activeTab !== OrganizationOrderManagementTabs.PerDiem
+          activeTab !== OrganizationOrderManagementTabs.PerDiem &&
+          activeTab !== OrganizationOrderManagementTabs.PermPlacement
         "
       >
         <label>Order Type</label>
@@ -515,7 +516,7 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem">
+    <div class="row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem && activeTab !== OrganizationOrderManagementTabs.PermPlacement">
       <div class="input-container">
         <label>Bill Rate From</label>
         <div class="input-group">
@@ -540,6 +541,20 @@
         <label>Candidates Count To</label>
         <div class="input-group">
           <input class="e-input" type="text" maxlength="50" formControlName="candidatesCountTo" />
+        </div>
+      </div>
+    </div>
+    <div *ngIf="activeTab === OrganizationOrderManagementTabs.PermPlacement" class="row bootstrap">
+      <div class="input-container">
+        <label>Annual Salary From</label>
+        <div class="input-group">
+          <input class="e-input" type="text" maxlength="50" formControlName="annualSalaryRangeFrom" />
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Annual Salary To</label>
+        <div class="input-group">
+          <input class="e-input" type="text" maxlength="50" formControlName="annualSalaryRangeTo" />
         </div>
       </div>
     </div>
