@@ -177,7 +177,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public reasonForRequisitionFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public isSpecialProjectFieldsRequired: boolean;
-  private mandatorySpecialProjectDetailsKey: string = "MandatorySpecialProjectDetails";
+  private mandatorySpecialProjectDetailsKey: string = 'MandatorySpecialProjectDetails';
 
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order | null>;
@@ -256,24 +256,25 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       orderType: [null, Validators.required],
     });
     this.store.dispatch(new GetOrganizationSettings());
-    this.generalInformationForm = this.formBuilder.group({
-      title: [null, [Validators.required, Validators.maxLength(50)]],
-      regionId: [null, Validators.required],
-      locationId: [null, Validators.required],
-      departmentId: [null, Validators.required],
-      skillId: [null, Validators.required],
-      hourlyRate: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
-      openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
-      minYrsRequired: [null, [Validators.maxLength(10), integerValidator(1)]],
-      joiningBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
-      compBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
-      duration: [null, Validators.required],
-      jobStartDate: [null, Validators.required],
-      jobEndDate: [null, Validators.required],
-      shift: [null, Validators.required],
-      shiftStartTime: [null, Validators.required],
-      shiftEndTime: [null, Validators.required],
-    },
+    this.generalInformationForm = this.formBuilder.group(
+      {
+        title: [null, [Validators.required, Validators.maxLength(50)]],
+        regionId: [null, Validators.required],
+        locationId: [null, Validators.required],
+        departmentId: [null, Validators.required],
+        skillId: [null, Validators.required],
+        hourlyRate: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
+        openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
+        minYrsRequired: [null, [Validators.maxLength(10), integerValidator(1)]],
+        joiningBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
+        compBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
+        duration: [null, Validators.required],
+        jobStartDate: [null, Validators.required],
+        jobEndDate: [null, Validators.required],
+        shift: [null, Validators.required],
+        shiftStartTime: [null, Validators.required],
+        shiftEndTime: [null, Validators.required],
+      },
       { validators: greaterThanValidator('annualSalaryRangeFrom', 'annualSalaryRangeTo') }
     );
 
@@ -537,7 +538,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         this.isEditMode = true;
         this.order = order;
         this.commentContainerId = order.commentContainerId as number;
-        this.store.dispatch(new GetComments(this.commentContainerId, null, user?.businessUnitType === BusinessUnitType.Agency));
+        this.store.dispatch(
+          new GetComments(this.commentContainerId, null, user?.businessUnitType === BusinessUnitType.Agency)
+        );
         this.populateForms(order);
       } else if (order?.isTemplate) {
         this.order = order;
@@ -695,7 +698,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
   private getOrganizationSettings(): void {
     this.organizationSettings$.pipe(takeUntil(this.unsubscribe$)).subscribe((settings) => {
-      this.isSpecialProjectFieldsRequired = settings.find(x => x.settingKey === this.mandatorySpecialProjectDetailsKey)?.value === "true";
+      this.isSpecialProjectFieldsRequired =
+        settings.find((x) => x.settingKey === this.mandatorySpecialProjectDetailsKey)?.value === 'true';
       if (this.specialProject != null) {
         if (this.isSpecialProjectFieldsRequired === true) {
           this.specialProject.controls['projectTypeId'].setValidators(Validators.required);
@@ -705,14 +709,12 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
           this.specialProject.controls['projectTypeId'].clearValidators();
           this.specialProject.controls['projectNameId'].clearValidators();
           this.specialProject.controls['poNumberId'].clearValidators();
-
         }
         this.specialProject.controls['projectTypeId'].updateValueAndValidity();
-          this.specialProject.controls['projectNameId'].updateValueAndValidity();
-          this.specialProject.controls['poNumberId'].updateValueAndValidity();
-
+        this.specialProject.controls['projectNameId'].updateValueAndValidity();
+        this.specialProject.controls['poNumberId'].updateValueAndValidity();
       }
-    })
+    });
   }
   private isFieldTouched(field: string): boolean {
     return this.touchedFields.has(field);
@@ -826,14 +828,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   private addPermPlacementControls(controlNames: string[]): void {
-    // const group = this.formBuilder.group(
-    //   {
-    //     orderPlacementFee: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
-    //     annualSalaryRangeFrom: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
-    //     annualSalaryRangeTo: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
-    //   },
-    //   { validators: greaterThanValidator('annualSalaryRangeFrom', 'annualSalaryRangeTo') }
-    // );
     controlNames.forEach((controlName: string) => {
       const formControl = this.formBuilder.control(null, [
         Validators.required,
@@ -842,7 +836,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       ]);
       this.generalInformationForm.addControl(controlName, formControl, { emitEvent: false });
     });
-    // this.generalInformationForm.addControl(controlName, formControl, { emitEvent: false });
   }
 
   private populateForms(order: Order): void {
