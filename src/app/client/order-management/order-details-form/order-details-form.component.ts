@@ -68,6 +68,7 @@ import { UserState } from 'src/app/store/user.state';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { greaterThanValidator } from '@shared/validators/greater-than.validator';
 
 @Component({
   selector: 'app-order-details-form',
@@ -176,7 +177,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public reasonForRequisitionFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
   public isSpecialProjectFieldsRequired: boolean;
-  private mandatorySpecialProjectDetailsKey: string = "MandatorySpecialProjectDetails";
+  private mandatorySpecialProjectDetailsKey: string = 'MandatorySpecialProjectDetails';
 
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order | null>;
@@ -242,7 +243,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public commentContainerId: number = 0;
   public orderId: string | null;
 
-  public comments: Comment[] = []; 
+  public comments: Comment[] = [];
 
   constructor(
     private store: Store,
@@ -255,24 +256,27 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       orderType: [null, Validators.required],
     });
     this.store.dispatch(new GetOrganizationSettings());
-    this.generalInformationForm = this.formBuilder.group({
-      title: [null, [Validators.required, Validators.maxLength(50)]],
-      regionId: [null, Validators.required],
-      locationId: [null, Validators.required],
-      departmentId: [null, Validators.required],
-      skillId: [null, Validators.required],
-      hourlyRate: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
-      openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
-      minYrsRequired: [null, [Validators.maxLength(10), integerValidator(1)]],
-      joiningBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
-      compBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
-      duration: [null, Validators.required],
-      jobStartDate: [null, Validators.required],
-      jobEndDate: [null, Validators.required],
-      shift: [null, Validators.required],
-      shiftStartTime: [null, Validators.required],
-      shiftEndTime: [null, Validators.required],
-    });
+    this.generalInformationForm = this.formBuilder.group(
+      {
+        title: [null, [Validators.required, Validators.maxLength(50)]],
+        regionId: [null, Validators.required],
+        locationId: [null, Validators.required],
+        departmentId: [null, Validators.required],
+        skillId: [null, Validators.required],
+        hourlyRate: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
+        openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
+        minYrsRequired: [null, [Validators.maxLength(10), integerValidator(1)]],
+        joiningBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
+        compBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
+        duration: [null, Validators.required],
+        jobStartDate: [null, Validators.required],
+        jobEndDate: [null, Validators.required],
+        shift: [null, Validators.required],
+        shiftStartTime: [null, Validators.required],
+        shiftEndTime: [null, Validators.required],
+      },
+      { validators: greaterThanValidator('annualSalaryRangeFrom', 'annualSalaryRangeTo') }
+    );
 
     this.orderTypeForm.valueChanges.pipe(takeUntil(this.unsubscribe$), throttleTime(500)).subscribe((val) => {
       this.isPerDiem = val.orderType === OrderType.OpenPerDiem;
@@ -534,7 +538,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         this.isEditMode = true;
         this.order = order;
         this.commentContainerId = order.commentContainerId as number;
-        this.store.dispatch(new GetComments(this.commentContainerId, null, user?.businessUnitType === BusinessUnitType.Agency));
+        this.store.dispatch(
+          new GetComments(this.commentContainerId, null, user?.businessUnitType === BusinessUnitType.Agency)
+        );
         this.populateForms(order);
       } else if (order?.isTemplate) {
         this.order = order;
@@ -692,24 +698,23 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
   private getOrganizationSettings(): void {
     this.organizationSettings$.pipe(takeUntil(this.unsubscribe$)).subscribe((settings) => {
-      this.isSpecialProjectFieldsRequired = settings.find(x => x.settingKey === this.mandatorySpecialProjectDetailsKey)?.value === "true";
+      this.isSpecialProjectFieldsRequired =
+        settings.find((x) => x.settingKey === this.mandatorySpecialProjectDetailsKey)?.value === 'true';
       if (this.specialProject != null) {
         if (this.isSpecialProjectFieldsRequired === true) {
           this.specialProject.controls['projectTypeId'].setValidators(Validators.required);
           this.specialProject.controls['projectNameId'].setValidators(Validators.required);
-          this.specialProject.controls['poNumberId'].setValidators(Validators.required);          
+          this.specialProject.controls['poNumberId'].setValidators(Validators.required);
         } else {
           this.specialProject.controls['projectTypeId'].clearValidators();
           this.specialProject.controls['projectNameId'].clearValidators();
           this.specialProject.controls['poNumberId'].clearValidators();
-          
         }
         this.specialProject.controls['projectTypeId'].updateValueAndValidity();
-          this.specialProject.controls['projectNameId'].updateValueAndValidity();
-          this.specialProject.controls['poNumberId'].updateValueAndValidity();
-
+        this.specialProject.controls['projectNameId'].updateValueAndValidity();
+        this.specialProject.controls['poNumberId'].updateValueAndValidity();
       }
-    })
+    });
   }
   private isFieldTouched(field: string): boolean {
     return this.touchedFields.has(field);

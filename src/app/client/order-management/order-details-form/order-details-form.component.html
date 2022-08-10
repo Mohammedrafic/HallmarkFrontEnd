@@ -291,9 +291,57 @@
                       </ejs-datepicker>
                     </div>
                   </div>
+
+                  <!-- Shift Requirements -->
+                  <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
+                    <label>Shift Name<span class="required">*</span></label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist
+                        formControlName="shift"
+                        appValidateWithMessage
+                        [dataSource]="masterShiftNames"
+                        [fields]="masterShiftFields"
+                      >
+                      </ejs-dropdownlist>
+                    </div>
+                  </div>
+
+                  <!-- Shift Start Time -->
+                  <div *ngIf="isPermPlacementOrder" class="input-container calendar form-line-item-20">
+                    <label for="startTime">Shift Start Time<span class="required">*</span></label>
+                    <div class="input-group datepicker bootstrap">
+                      <ejs-timepicker
+                        placeholder="HH:MM"
+                        formControlName="shiftStartTime"
+                        appValidateWithMessage
+                        format="hh:mm a"
+                        [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                        [enableMask]="true"
+                        maskPlaceholder="HH:MM"
+                      >
+                      </ejs-timepicker>
+                    </div>
+                  </div>
+
+                  <!-- Shift End Time -->
+                  <div *ngIf="isPermPlacementOrder" class="input-container calendar form-line-item-20">
+                    <label for="startTime">Shift End Time<span class="required">*</span></label>
+                    <div class="input-group datepicker bootstrap">
+                      <ejs-timepicker
+                        placeholder="HH:MM"
+                        formControlName="shiftEndTime"
+                        appValidateWithMessage
+                        format="hh:mm a"
+                        [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                        [enableMask]="true"
+                        maskPlaceholder="HH:MM"
+                      >
+                      </ejs-timepicker>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="form-line">
+                <div class="form-line" *ngIf="!isPermPlacementOrder">
                   <!-- Shift Requirements -->
                   <div class="input-container bootstrap form-line-item-20">
                     <label>Shift Name<span class="required">*</span></label>
@@ -684,7 +732,7 @@
         <div class="special-project">
           <div class="title">Special Project</div>
           <form [formGroup]="specialProject">
-            <div class="form-line">              
+            <div class="form-line">
               <!-- Special Project Category -->
               <div class="input-container bootstrap form-line-item-30">
                 <label>Special Project Category<span class="required">*</span></label>
