@@ -115,6 +115,14 @@ export const ReOrdersColumnsConfig: GridColumn[] = [
     fieldName: 'shiftsNext90Days',
     visible: false,
   },
+  {
+    fieldName: 'annualSalaryRangeFrom',
+    visible: false,
+  },
+  {
+    fieldName: 'annualSalaryRangeTo',
+    visible: false,
+  }
 ];
 
 export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
@@ -146,6 +154,14 @@ export const MyAgencyOrdersColumnsConfig: GridColumn[] = [
     fieldName: 'shiftsNext90Days',
     visible: false,
   },
+  {
+    fieldName: 'annualSalaryRangeFrom',
+    visible: false,
+  },
+  {
+    fieldName: 'annualSalaryRangeTo',
+    visible: false,
+  }
 ];
 
 export const PerDiemColumnsConfig = [
@@ -181,4 +197,59 @@ export const PerDiemColumnsConfig = [
     fieldName: 'shiftsNext90Days',
     visible: true,
   },
+  {
+    fieldName: 'annualSalaryRangeFrom',
+    visible: false,
+  },
+  {
+    fieldName: 'annualSalaryRangeTo',
+    visible: false,
+  }
+];
+
+export const PermPlacementColumnsConfig = [
+  {
+    fieldName: 'orderId',
+    visible: true,
+  },
+  {
+    fieldName: 'type',
+    visible: false,
+  },
+  {
+    fieldName: 'jobStartDate',
+    visible: true,
+  },
+  {
+    fieldName: 'reOrderId',
+    visible: false,
+  },
+  {
+    fieldName: 'shift',
+    visible: false,
+  },
+  {
+    fieldName: 'numberOfPositions',
+    visible: true,
+  },
+  {
+    fieldName: 'billRate',
+    visible: false,
+  },
+  {
+    fieldName: 'shiftsNext90Days',
+    visible: false,
+  },
+  {
+    fieldName: 'organizationName',
+    visible: false,
+  },
+  {
+    fieldName: 'annualSalaryRangeFrom',
+    visible: true,
+  },
+  {
+    fieldName: 'annualSalaryRangeTo',
+    visible: true,
+  }
 ];
