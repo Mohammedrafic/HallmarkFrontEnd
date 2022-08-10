@@ -236,7 +236,7 @@
         </ejs-datepicker>
       </div>
     </div>
-    <div class="input-container calendar" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders">
+    <div class="input-container calendar" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders && activeTab !== AgencyOrderManagementTabs.PermPlacement">
       <label for="jobEndDate">Job End Date</label>
       <div class="input-group datepicker">
         <ejs-datepicker id="jobEndDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobEndDate">
