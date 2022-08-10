@@ -80,6 +80,7 @@ import {
   perDiemChildColumnsToExport,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
+  PermPlacementColumnsConfig,
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
@@ -388,6 +389,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.filters.isTemplate = false;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
+      case OrganizationOrderManagementTabs.PermPlacement:
+        this.filters.orderTypes = [OrderType.PermPlacement];
+        this.filters.isTemplate = false;
+        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
+        break;
       case OrganizationOrderManagementTabs.ReOrders:
         this.filters.orderTypes = [OrderType.ReOrder];
         this.filters.isTemplate = false;
@@ -685,6 +691,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         case OrganizationOrderManagementTabs.PerDiem:
           this.isLockMenuButtonsShown = true;
           this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
+          this.getOrders();
+          break;
+        case OrganizationOrderManagementTabs.PermPlacement:
+          this.isLockMenuButtonsShown = false;
+          this.refreshGridColumns(PermPlacementColumnsConfig, this.gridWithChildRow);
           this.getOrders();
           break;
         case OrganizationOrderManagementTabs.ReOrders:

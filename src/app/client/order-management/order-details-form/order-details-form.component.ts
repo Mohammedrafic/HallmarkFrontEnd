@@ -11,6 +11,7 @@ import {
   GetDepartmentsByLocationId,
   GetLocationsByRegionId,
   GetMasterSkillsByOrganization,
+  GetOrganizationSettings,
   GetRegions,
 } from '@organization-management/store/organization-management.actions';
 import {
@@ -20,7 +21,6 @@ import {
   GetContactDetails,
   GetOrganizationStatesWithKeyCode,
   GetProjectSpecialData,
-  GetRegularLocalBillRate,
   GetSuggestedDetails,
   GetWorkflows,
   SetIsDirtyOrderForm,
@@ -63,6 +63,11 @@ import { Comment } from '@shared/models/comment.model';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
 import { BillRate } from '@shared/models';
+import { GetComments } from '@shared/components/comments/store/comments.actions';
+import { UserState } from 'src/app/store/user.state';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
+import { OrderManagementContentService } from '@shared/services/order-management-content.service';
+import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
 
 @Component({
@@ -171,6 +176,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public reasonsForRequisition = ReasonForRequisitionList;
   public reasonForRequisitionFields: FieldSettingsModel = { text: 'name', value: 'id' };
 
+  public isSpecialProjectFieldsRequired: boolean;
+  private mandatorySpecialProjectDetailsKey: string = "MandatorySpecialProjectDetails";
+
   @Select(OrderManagementContentState.selectedOrder)
   selectedOrder$: Observable<Order | null>;
 
@@ -198,7 +206,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
 
   @Select(OrderManagementContentState.projectSpecialData)
   projectSpecialData$: Observable<ProjectSpecialData>;
-  reasonsForRequestFields: FieldSettingsModel = { text: 'reasonForRequest', value: 'id' };
   specialProjectCategoriesFields: FieldSettingsModel = { text: 'projectType', value: 'id' };
   projectNameFields: FieldSettingsModel = { text: 'projectName', value: 'id' };
   poNumberFields: FieldSettingsModel = { text: 'poNumber', value: 'id' };
@@ -221,8 +228,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   @Select(OrderManagementContentState.contactDetails)
   contactDetails$: Observable<Department>;
 
-  @Select(OrderManagementContentState.regularLocalBillRate)
-  regularLocalBillRate$: Observable<BillRate[]>;
+  @Select(OrganizationManagementState.organizationSettings)
+  organizationSettings$: Observable<OrganizationSettingsGet[]>;
 
   public isEditMode: boolean;
 
@@ -234,69 +241,39 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   public isPermPlacementOrder = false;
 
   public commentContainerId: number = 0;
+  public orderId: string | null;
 
-  public comments: Comment[] = []; /*[ // TODO: Mocked data, remove after BE
-    {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet', isExternal: true, creationDate: new Date()
-    },
-    {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date()
-    },
-    {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date()
-    },
-    {
-      id: 0, text: 'Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: false, creationDate: new Date()
-    },
-    {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment', isExternal: true, creationDate: new Date(), unread: true,
-    },
-    {
-      id: 0, text: '500 chars comment Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second linecomment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: false, creationDate: new Date(), unread: true
-    },
-    {
-      id: 0, text: 'short', isExternal: false, creationDate: new Date(), unread: true,
-    },
-    {
-      id: 0, text: 'Some Text', isExternal: true, creationDate: new Date()
-    },
-    {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date()
-    },
-    {
-      id: 0, text: 'comment Lorem Ipsum Dolor Amet Comment Text Lorem Ipsum Dolor Amet Some Long Text goes to second line', isExternal: true, creationDate: new Date(), unread: true
-    },
-  ];*/
+  public comments: Comment[] = [];
 
   constructor(
     private store: Store,
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private orderManagementService: OrderManagementContentService
   ) {
     this.orderTypeForm = this.formBuilder.group({
       orderType: [null, Validators.required],
     });
-
-    this.generalInformationForm = this.formBuilder.group(
-      {
-        title: [null, [Validators.required, Validators.maxLength(50)]],
-        regionId: [null, Validators.required],
-        locationId: [null, Validators.required],
-        departmentId: [null, Validators.required],
-        skillId: [null, Validators.required],
-        hourlyRate: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
-        openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
-        minYrsRequired: [null, [Validators.maxLength(10), integerValidator(1)]],
-        joiningBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
-        compBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
-        duration: [null, Validators.required],
-        jobStartDate: [null, Validators.required],
-        jobEndDate: [null, Validators.required],
-        shift: [null, Validators.required],
-        shiftStartTime: [null, Validators.required],
-        shiftEndTime: [null, Validators.required],
-      },
+    this.store.dispatch(new GetOrganizationSettings());
+    this.generalInformationForm = this.formBuilder.group({
+      title: [null, [Validators.required, Validators.maxLength(50)]],
+      regionId: [null, Validators.required],
+      locationId: [null, Validators.required],
+      departmentId: [null, Validators.required],
+      skillId: [null, Validators.required],
+      hourlyRate: [null, [Validators.required, Validators.maxLength(10), currencyValidator(1)]],
+      openPositions: [null, [Validators.required, Validators.maxLength(10), integerValidator(1)]],
+      minYrsRequired: [null, [Validators.maxLength(10), integerValidator(1)]],
+      joiningBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
+      compBonus: [null, [Validators.maxLength(10), currencyValidator(1)]],
+      duration: [null, Validators.required],
+      jobStartDate: [null, Validators.required],
+      jobEndDate: [null, Validators.required],
+      shift: [null, Validators.required],
+      shiftStartTime: [null, Validators.required],
+      shiftEndTime: [null, Validators.required],
+    },
       { validators: greaterThanValidator('annualSalaryRangeFrom', 'annualSalaryRangeTo') }
     );
 
@@ -320,7 +297,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.generalInformationForm.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
       this.store.dispatch(new SetIsDirtyOrderForm(this.generalInformationForm.dirty));
     });
-
+    this.getOrganizationSettings();
     this.jobDistributionForm = this.formBuilder.group({
       jobDistribution: [[], Validators.required],
       agency: [null],
@@ -383,10 +360,9 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     });
 
     this.specialProject = this.formBuilder.group({
-      reasonForRequestId: [null, Validators.required],
-      projectTypeId: [null, Validators.required],
-      projectNameId: [null, Validators.required],
-      poNumberId: [null, Validators.required],
+      projectTypeId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
+      projectNameId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
+      poNumberId: [null, this.isSpecialProjectFieldsRequired ? Validators.required : ''],
     });
 
     this.specialProject.valueChanges.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe(() => {
@@ -425,7 +401,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.store.dispatch(new GetRegularLocalBillRate(orderType, departmentId, skillId));
+        this.populateHourlyRateField(orderType, departmentId, skillId);
         this.store.dispatch(new SetPredefinedBillRatesData(orderType, departmentId, skillId));
       });
 
@@ -547,6 +523,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   }
 
   public ngOnInit(): void {
+    this.orderId = this.route.snapshot.paramMap.get('orderId') || null;
     this.store.dispatch(new GetRegions());
     this.store.dispatch(new GetMasterSkillsByOrganization());
     this.store.dispatch(new GetProjectSpecialData());
@@ -554,11 +531,13 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetOrganizationStatesWithKeyCode());
 
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-      const isEditMode = !!this.route.snapshot.paramMap.get('orderId');
+      const isEditMode = !!this.orderId;
       if (order && isEditMode) {
+        const user = this.store.selectSnapshot(UserState.user);
         this.isEditMode = true;
         this.order = order;
         this.commentContainerId = order.commentContainerId as number;
+        this.store.dispatch(new GetComments(this.commentContainerId, null, user?.businessUnitType === BusinessUnitType.Agency));
         this.populateForms(order);
       } else if (order?.isTemplate) {
         this.order = order;
@@ -602,6 +581,18 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     firstContactDetailsControl.controls['name'].patchValue(name);
     firstContactDetailsControl.controls['email'].patchValue(email);
     firstContactDetailsControl.controls['mobilePhone'].patchValue(mobilePhone);
+  }
+
+  private populateHourlyRateField(orderType: OrderType, departmentId: number, skillId: number): void {
+    this.orderManagementService
+      .getRegularLocalBillRate(orderType, departmentId, skillId)
+      .pipe(
+        takeUntil(this.unsubscribe$),
+        filter((billRate) => !!billRate.length)
+      )
+      .subscribe((billRates: BillRate[]) =>
+        this.generalInformationForm.controls['hourlyRate'].patchValue(billRates[0].rateHour)
+      );
   }
 
   public onRegionDropDownChanged(event: ChangeEventArgs): void {
@@ -702,7 +693,27 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         .subscribe();
     }
   }
+  private getOrganizationSettings(): void {
+    this.organizationSettings$.pipe(takeUntil(this.unsubscribe$)).subscribe((settings) => {
+      this.isSpecialProjectFieldsRequired = settings.find(x => x.settingKey === this.mandatorySpecialProjectDetailsKey)?.value === "true";
+      if (this.specialProject != null) {
+        if (this.isSpecialProjectFieldsRequired === true) {
+          this.specialProject.controls['projectTypeId'].setValidators(Validators.required);
+          this.specialProject.controls['projectNameId'].setValidators(Validators.required);
+          this.specialProject.controls['poNumberId'].setValidators(Validators.required);
+        } else {
+          this.specialProject.controls['projectTypeId'].clearValidators();
+          this.specialProject.controls['projectNameId'].clearValidators();
+          this.specialProject.controls['poNumberId'].clearValidators();
 
+        }
+        this.specialProject.controls['projectTypeId'].updateValueAndValidity();
+          this.specialProject.controls['projectNameId'].updateValueAndValidity();
+          this.specialProject.controls['poNumberId'].updateValueAndValidity();
+
+      }
+    })
+  }
   private isFieldTouched(field: string): boolean {
     return this.touchedFields.has(field);
   }
@@ -870,7 +881,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.projectSpecialData$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
       this.specialProject.controls['projectTypeId'].patchValue(order.projectTypeId);
       this.specialProject.controls['projectNameId'].patchValue(order.projectNameId);
-      this.specialProject.controls['reasonForRequestId'].patchValue(order.reasonForRequestId);
       this.specialProject.controls['poNumberId'].patchValue(order.poNumberId);
     });
 
@@ -1066,15 +1076,6 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
       const { facilityContact, facilityPhoneNo, facilityEmail } = contactDetails;
       this.populateContactDetailsForm(facilityContact, facilityEmail, facilityPhoneNo);
     });
-
-    this.regularLocalBillRate$
-      .pipe(
-        takeUntil(this.unsubscribe$),
-        filter((billRate) => !!billRate.length)
-      )
-      .subscribe((regularLocalBillRate) =>
-        this.generalInformationForm.controls['hourlyRate'].patchValue(regularLocalBillRate[0].rateHour)
-      );
   }
 
   public selectPrimaryContact(event: ChangeArgs): void {
