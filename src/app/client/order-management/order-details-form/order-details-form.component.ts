@@ -63,11 +63,9 @@ import { Comment } from '@shared/models/comment.model';
 import { MasterShiftName } from '@shared/enums/master-shifts-id.enum';
 import { ChangeArgs } from '@syncfusion/ej2-angular-buttons';
 import { BillRate } from '@shared/models';
-import { GetComments } from '@shared/components/comments/store/comments.actions';
-import { UserState } from 'src/app/store/user.state';
-import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { OrganizationSettingsGet } from '@shared/models/organization-settings.model';
+import { CommentsService } from '@shared/services/comments.service';
 import { greaterThanValidator } from '@shared/validators/greater-than.validator';
 
 @Component({
@@ -250,7 +248,8 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private route: ActivatedRoute,
     private alertService: AlertService,
-    private orderManagementService: OrderManagementContentService
+    private orderManagementService: OrderManagementContentService,
+    private commentsService: CommentsService
   ) {
     this.orderTypeForm = this.formBuilder.group({
       orderType: [null, Validators.required],
@@ -534,13 +533,10 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
       const isEditMode = !!this.orderId;
       if (order && isEditMode) {
-        const user = this.store.selectSnapshot(UserState.user);
         this.isEditMode = true;
         this.order = order;
         this.commentContainerId = order.commentContainerId as number;
-        this.store.dispatch(
-          new GetComments(this.commentContainerId, null, user?.businessUnitType === BusinessUnitType.Agency)
-        );
+        this.getComments();
         this.populateForms(order);
       } else if (order?.isTemplate) {
         this.order = order;
@@ -576,6 +572,12 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
     this.store.dispatch([new ClearSelectedOrder(), new ClearSuggestions()]);
+  }
+
+  private getComments(): void {
+    this.commentsService.getComments(this.commentContainerId, null).subscribe((comments: Comment[]) => {
+      this.comments = comments;
+    });
   }
 
   private populateContactDetailsForm(name: string, email: string, mobilePhone: string): void {

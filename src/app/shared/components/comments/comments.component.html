@@ -8,6 +8,7 @@
         [dataSource]="commentsFilterItems"
         [(value)]="selectedFilter"
         (select)="onFilterChange($event)"
+        [readonly]="disabled"
       ></ejs-dropdownlist>
     </div>
   </div>
@@ -32,9 +33,10 @@
         (created)="textBoxInit()"
         maxlength="500"
         [(value)]="message"
+        [readonly]="disabled"
         placeholder="Enter your comment here..."></ejs-textbox>
     </div>
-    <div class="actions">
+    <div class="actions" [class.readonly]="disabled">
       <ejs-tooltip
         [content]="isExternal ? 'External' : 'Internal'">
         <span class="control-wrapper visibility" (click)="visibilityHandler()">

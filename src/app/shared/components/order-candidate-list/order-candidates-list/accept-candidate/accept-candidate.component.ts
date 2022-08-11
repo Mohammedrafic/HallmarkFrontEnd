@@ -20,6 +20,8 @@ import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations';
 import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
+import { CommentsService } from '@shared/services/comments.service';
+import { Comment } from '@shared/models/comment.model';
 
 @Component({
   selector: 'app-accept-candidate',
@@ -90,7 +92,9 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
   private unsubscribe$: Subject<void> = new Subject();
   private isWithdraw: boolean;
 
-  constructor(private store: Store, private actions$: Actions, private datePipe: DatePipe) {}
+  public comments: Comment[] = [];
+
+  constructor(private store: Store, private actions$: Actions, private datePipe: DatePipe, private commentsService: CommentsService) {}
 
   ngOnChanges(): void {
     this.checkReadOnlyStatuses();
@@ -210,10 +214,17 @@ export class AcceptCandidateComponent implements OnInit, OnDestroy, OnChanges {
     return this.datePipe.transform(date, 'MM/dd/yyyy');
   }
 
+  private getComments(): void {
+    this.commentsService.getComments(this.candidateJob?.commentContainerId as number, null).subscribe((comments: Comment[]) => {
+      this.comments = comments;
+    });
+  }
+
   private patchForm(): void {
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
       this.candidateJob = value;
       if (value) {
+        this.getComments();
         this.billRatesData = [...value.billRates];
         this.form.patchValue({
           jobId: value.orderId,

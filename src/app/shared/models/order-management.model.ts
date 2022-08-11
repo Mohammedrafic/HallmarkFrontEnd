@@ -48,6 +48,7 @@ export class OrderManagement {
   orderClosureReason?: string;
   orderClosureReasonId?: string;
   organizationPrefix: string;
+  commentContainerId?: number;
 }
 
 export class OrderManagementFilter {
@@ -123,6 +124,7 @@ export type OrderManagementChild = {
   closeDate?: string;
   positionClosureReason?: string;
   positionClosureReasonId?: number;
+  commentContainerId?: number;
 };
 
 export type OrderCandidatesList = {
@@ -407,6 +409,7 @@ export type OrderCandidateJob = {
   closeDate?: string;
   positionClosureReason?: string;
   positionClosureReasonId?: number;
+  commentContainerId?: number;
 };
 
 export type CandidatesBasicInfo = {

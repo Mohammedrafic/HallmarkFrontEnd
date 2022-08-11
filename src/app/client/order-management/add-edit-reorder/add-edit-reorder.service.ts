@@ -1,4 +1,4 @@
-import { BehaviorSubject, catchError, map, Observable, of } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
 import { Store } from '@ngxs/store';
 
 import { Injectable } from '@angular/core';
@@ -12,6 +12,7 @@ import { OrderManagementContentService } from '@shared/services/order-management
 import { OrderType } from '@shared/enums/order-type';
 import { BillRate } from '@shared/models';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
+import { Comment } from '@shared/models/comment.model';
 
 @Injectable({
   providedIn: 'root',
@@ -59,7 +60,7 @@ export class AddEditReorderService {
     }
   }
 
-  public saveReorder({ reOrderId, reOrderFromId, agencyIds, reorder }: ReorderRequestModel): Observable<void> {
+  public saveReorder({ reOrderId, reOrderFromId, agencyIds, reorder }: ReorderRequestModel, comments: Comment[]): Observable<any> {
     const prepareFields = {
       reOrderId,
       reOrderFromId,
@@ -71,7 +72,16 @@ export class AddEditReorderService {
       billRate: reorder.billRate,
       openPositions: reorder.openPosition,
     };
-    return this.http.put<void>('/api/reorders', prepareFields);
+    return this.http.put<any>('/api/reorders', prepareFields).pipe(tap((reOrder: any) => {
+      if (!prepareFields.reOrderId && comments?.length) {
+        comments.forEach((comment: Comment) => {
+          comment.commentContainerId = reOrder.commentContainerId as number;
+        });
+        this.http.post('/api/Comments', { comments }).subscribe();
+        return reOrder;
+      }
+      return reOrder;
+    }));
   }
 
   public getBillRate(departmentId: number, skillId: number): Observable<number> {

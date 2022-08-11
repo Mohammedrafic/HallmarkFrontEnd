@@ -12,8 +12,8 @@
         </e-accordionitem>
       </e-accordionitems>
     </ejs-accordion>
-    <div class="comments">
-      <app-comments></app-comments>
+    <div class="comments" *ngIf="!isPosition">
+      <app-comments [comments]="comments" [commentContainerId]="order.commentContainerId || 0"></app-comments>
     </div>
     <div class="contacts-container">
       <div class="contacts">
