@@ -21,7 +21,7 @@
       <e-tabitem>
         <ng-template #headerText><div>Special Project Categories</div></ng-template>
         <ng-template #content>
-          <span>Tab3</span>
+          <app-special-project-category [form]="form" (onEdit)="onEditClick($event)"></app-special-project-category>
         </ng-template>
       </e-tabitem>
     </e-tabitems>
@@ -88,142 +88,143 @@
     </section>
     <section *ngIf="selectedTab==SpecialProjectTabs.SpecialProjectCategories">
       <div class="input-container bootstrap">
-        <label>SpecialProjectCategories<span class="required">*</span></label>
+        <label>Category Name<span class="required">*</span></label>
         <div class="input-group">
           <input class="e-input"
                  type="text"
                  appValidateWithMessage
-                 placeholder="test12"
                  maxlength="100"
-                 formControlName="test123" />
+                 formControlName="SpecialProjectCategoryName" />
         </div>
       </div>
     </section>
-    <div class="form-elemet">
-      <div class="input-container bootstrap">
-        <label>Region<span class="required">*</span></label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="regionIds"
-                           placeholder="All"
-                           selectAllText="Select All"
-                           appValidateWithMessage
-                           [fields]="optionFields"
-                           [showSelectAll]="true"
-                           [allowFiltering]="false"
-                           [showDropDownIcon]="true"
-                           [dataSource]="orgStructureData.regionIds.dataSource">
-          </ejs-multiselect>
-        </div>
-      </div>
-    </div>
-    <div class="form-elemet">
-      <div class="input-container bootstrap">
-        <label>Location<span class="required">*</span></label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="locationIds"
-                           placeholder="All"
-                           selectAllText="Select All"
-                           appValidateWithMessage
-                           [fields]="optionFields"
-                           [showSelectAll]="true"
-                           [allowFiltering]="false"
-                           [showDropDownIcon]="true"
-                           [dataSource]="orgStructureData.locationIds.dataSource">
-          </ejs-multiselect>
-        </div>
-      </div>
-    </div>
-    <div class="form-elemet">
-      <div class="input-container bootstrap">
-        <label>Department<span class="required">*</span></label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="departmentsIds"
-                           placeholder="All"
-                           selectAllText="Select All"
-                           appValidateWithMessage
-                           [fields]="optionFields"
-                           [showSelectAll]="true"
-                           [allowFiltering]="false"
-                           [showDropDownIcon]="true"
-                           [dataSource]="orgStructureData.departmentsIds.dataSource">
-          </ejs-multiselect>
-        </div>
-      </div>
-    </div>
-    <div class="form-elemet">
-      <div class="input-container bootstrap">
-        <label>Skill<span class="required">*</span></label>
-        <div class="input-group multiselect">
-          <ejs-multiselect mode="CheckBox"
-                           formControlName="skillIds"
-                           placeholder="All"
-                           selectAllText="Select All"
-                           appValidateWithMessage
-                           [fields]="skillsFields"
-                           [showSelectAll]="true"
-                           [allowFiltering]="false"
-                           [showDropDownIcon]="true"
-                           [dataSource]="orgStructureData.skillIds.dataSource">
-          </ejs-multiselect>
-        </div>
-      </div>
-    </div>
-    <div class="form-elemet">
-      <div class="input-container bootstrap">
-        <ejs-checkbox formControlName="allowOnOrderCreation" label="Prepopulate in all orders created with this combination  "></ejs-checkbox>
-      </div>
-    </div>
-    <div class="form-elemet">
-      <div class="group">
-        <div class="input-container calendar">
-          <label for="startDate">Start Date <span class="required">*</span></label>
-          <div class="input-group datepicker">
-            <ejs-datepicker id="startDate"
-                            class="datepicker"
-                            format="MM/dd/yyyy"
-                            placeholder="MM/DD/YYYY"
-                            appValidateWithMessage
-                            formControlName="startDate">
-            </ejs-datepicker>
-          </div>
-        </div>
-        <div class="input-container calendar">
-          <label for="endDate">End Date <span class="required">*</span></label>
-          <div class="input-group datepicker">
-            <ejs-datepicker id="endDate"
-                            class="datepicker"
-                            format="MM/dd/yyyy"
-                            placeholder="MM/DD/YYYY"
-                            appValidateWithMessage
-                            formControlName="endDate">
-            </ejs-datepicker>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="form-elemet">
-      <div class="group">
+    <section *ngIf="selectedTab!=SpecialProjectTabs.SpecialProjectCategories">
+      <div class="form-elemet">
         <div class="input-container bootstrap">
-          <label>Project Budget<span class="required">*</span></label>
-          <div class="input-group">
-            <ejs-numerictextbox id="projectBudget"
-                                class="numeric-input"
-                                appValidateWithMessage
-                                min="0"
-                                [maxlength]="10"
-                                [validateDecimalOnType]="true"
-                                [showSpinButton]="false"
-                                decimals='2'
-                                format="#.##"
-                                formControlName="projectBudget">
-            </ejs-numerictextbox>
+          <label>Region<span class="required">*</span></label>
+          <div class="input-group multiselect">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="regionIds"
+                             placeholder="All"
+                             selectAllText="Select All"
+                             appValidateWithMessage
+                             [fields]="optionFields"
+                             [showSelectAll]="true"
+                             [allowFiltering]="false"
+                             [showDropDownIcon]="true"
+                             [dataSource]="orgStructureData.regionIds.dataSource">
+            </ejs-multiselect>
           </div>
         </div>
       </div>
-    </div>
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <label>Location<span class="required">*</span></label>
+          <div class="input-group multiselect">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="locationIds"
+                             placeholder="All"
+                             selectAllText="Select All"
+                             appValidateWithMessage
+                             [fields]="optionFields"
+                             [showSelectAll]="true"
+                             [allowFiltering]="false"
+                             [showDropDownIcon]="true"
+                             [dataSource]="orgStructureData.locationIds.dataSource">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <label>Department<span class="required">*</span></label>
+          <div class="input-group multiselect">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="departmentsIds"
+                             placeholder="All"
+                             selectAllText="Select All"
+                             appValidateWithMessage
+                             [fields]="optionFields"
+                             [showSelectAll]="true"
+                             [allowFiltering]="false"
+                             [showDropDownIcon]="true"
+                             [dataSource]="orgStructureData.departmentsIds.dataSource">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <label>Skill<span class="required">*</span></label>
+          <div class="input-group multiselect">
+            <ejs-multiselect mode="CheckBox"
+                             formControlName="skillIds"
+                             placeholder="All"
+                             selectAllText="Select All"
+                             appValidateWithMessage
+                             [fields]="skillsFields"
+                             [showSelectAll]="true"
+                             [allowFiltering]="false"
+                             [showDropDownIcon]="true"
+                             [dataSource]="orgStructureData.skillIds.dataSource">
+            </ejs-multiselect>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="input-container bootstrap">
+          <ejs-checkbox formControlName="allowOnOrderCreation" label="Prepopulate in all orders created with this combination  "></ejs-checkbox>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container calendar">
+            <label for="startDate">Start Date <span class="required">*</span></label>
+            <div class="input-group datepicker">
+              <ejs-datepicker id="startDate"
+                              class="datepicker"
+                              format="MM/dd/yyyy"
+                              placeholder="MM/DD/YYYY"
+                              appValidateWithMessage
+                              formControlName="startDate">
+              </ejs-datepicker>
+            </div>
+          </div>
+          <div class="input-container calendar">
+            <label for="endDate">End Date <span class="required">*</span></label>
+            <div class="input-group datepicker">
+              <ejs-datepicker id="endDate"
+                              class="datepicker"
+                              format="MM/dd/yyyy"
+                              placeholder="MM/DD/YYYY"
+                              appValidateWithMessage
+                              formControlName="endDate">
+              </ejs-datepicker>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-elemet">
+        <div class="group">
+          <div class="input-container bootstrap">
+            <label>Project Budget<span class="required">*</span></label>
+            <div class="input-group">
+              <ejs-numerictextbox id="projectBudget"
+                                  class="numeric-input"
+                                  appValidateWithMessage
+                                  min="0"
+                                  [maxlength]="10"
+                                  [validateDecimalOnType]="true"
+                                  [showSpinButton]="false"
+                                  decimals='2'
+                                  format="#.##"
+                                  formControlName="projectBudget">
+              </ejs-numerictextbox>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </form>
 </app-side-dialog>
 

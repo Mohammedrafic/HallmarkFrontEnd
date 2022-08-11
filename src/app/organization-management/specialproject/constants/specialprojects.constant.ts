@@ -1,6 +1,10 @@
 import { ColumnDefinitionModel } from '@shared/components/grid/models/column-definition.model';
 import { ColDef, ICellRendererParams } from '@ag-grid-community/core';
-import { PurchaseOrderTableColumns, PurchaseOrderHeaderText, SpecialProjectTableColumns, SpecialProjectHeaderText } from '../enums/specialproject.enum';
+import {
+  PurchaseOrderTableColumns, PurchaseOrderHeaderText,
+  SpecialProjectTableColumns, SpecialProjectHeaderText,
+  SpecilaProjectCategoryTableColumns, SpecilaProjectCategoryHeaderText
+} from '../enums/specialproject.enum';
 import { ActionCellRendererComponent } from '../../../shared/components/cell-renderer/action-cellrenderer.component';
 import { DatePipe } from '@angular/common';
 
@@ -108,7 +112,8 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
             return 1;
           }
           return 0;
-        }
+        },
+        inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       }
     },
     {
@@ -139,7 +144,8 @@ export const PurchaseOrdderColumnsDefinition = (actionCellParams: ICellRendererP
             return 1;
           }
           return 0;
-        }
+        },
+        inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       }
     },
     {
@@ -249,7 +255,8 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
             return 1;
           }
           return 0;
-        }
+        },
+        inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
       }
     },
     {
@@ -280,7 +287,33 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
             return 1;
           }
           return 0;
-        }
+        },
+        inRangeFloatingFilterDateFormat: 'DD MMM YYYY'
+      },
+    },
+    {
+      field: '',
+      headerName: 'Action',
+      cellRenderer: ActionCellRendererComponent,
+      cellRendererParams: actionCellParams
+    }
+  ];
+};
+
+export const SpecialProjectCategoryColumnsDefinition = (actionCellParams: ICellRendererParams): ColumnDefinitionModel[] => {
+  return [
+    {
+      field: SpecilaProjectCategoryTableColumns.Id,
+      headerName: SpecilaProjectCategoryHeaderText.Id,
+      hide: true
+    },
+    {
+      field: SpecilaProjectCategoryTableColumns.Name,
+      headerName: SpecilaProjectCategoryHeaderText.Name,
+      ...commonColumn,
+      filter: 'agTextColumnFilter',
+      filterParams: {
+        buttons: ['reset']
       }
     },
     {

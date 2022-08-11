@@ -74,3 +74,17 @@ export enum SpecialProjectHeaderText {
   EndDate = 'End Date',
   IsDeleted ='IsDeleted',
 }
+
+export enum SpecilaProjectCategoryTableColumns {
+  Id = 'id',
+  OrganizationId = "organizationId",
+  Name = 'specialProjectCategory',
+  IsDeleted = 'isDeleted'
+}
+
+export enum SpecilaProjectCategoryHeaderText {
+  Id = 'Id',
+  OrganizationId = 'Organization Id',
+  Name = 'Category',
+  IsDeleted = 'IsDeleted'
+}
