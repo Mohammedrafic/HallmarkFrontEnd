@@ -7,3 +7,7 @@ export const InvoiceConfirmMessages: CommonDialogConformMessages = {
   confirmRecordDelete: 'Are you sure you want to delete this record?',
   confirmOrderChange: 'Are you sure you want to change invoice without saving changes?',
 }
+
+export const ManualInvoiceMessages = {
+  successAdd: 'Manual invoice was added successfully'
+}

@@ -12,4 +12,7 @@ export const DefaultInvoicesState: InvoicesModel = {
   invoiceReasons: [],
   invoiceMeta: [],
   organizations: [],
+  organizationLocations: [],
+  selectedOrganizationId: 0,
+  regions: [],
 };

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Actions, ofActionCompleted, Store } from '@ngxs/store';
-import { map, Observable } from 'rxjs';
+import { map, Observable, zip } from 'rxjs';
 
 import { CustomFormGroup, DropdownOption } from '@core/interface';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -20,44 +20,75 @@ export class OrganizationStrategy implements ManualInvoiceStrategy {
     private store: Store,
     ) {}
 
-  populateOptions(meta: ManualInvoiceMeta[],
+  public populateOptions(
+    meta: ManualInvoiceMeta[],
     options: ManualInvoiceInputOptions,
     form: CustomFormGroup<AddManInvoiceForm>,
     config: AddManInvoiceDialogConfig,
+    isPosition: boolean,
     ): void {
       if (!meta.length) {
-        this.store.dispatch(new ShowToast(MessageTypes.Warning, 'Sorry but such order or position was not found'));
+        this.store.dispatch(new ShowToast(MessageTypes.Warning, 'Sorry, but such order or position was not found'));
         return;
       }
-  
-      options.invoiceLocations = InvoiceMetaAdapter.createLocationsOptions(meta);
-      options.invoiceCandidates = InvoiceMetaAdapter.createCandidateOptions(meta);
-      options.invoiceDepartments = InvoiceMetaAdapter.createDepartmentsOptions(meta);
-      options.invoiceAgencies = InvoiceMetaAdapter.createAgencyOptions(meta);
 
-      this.connectConfigOptions(config, options);
-  
-      form.get('locationId')?.patchValue(options.invoiceLocations[0].value);
-      form.get('departmentId')?.patchValue(options.invoiceDepartments[0].value);
-      form.get('name')?.patchValue(options.invoiceCandidates[0].value);
-      form.get('unitId')?.patchValue(options.invoiceAgencies[0].value);
+      if (isPosition) {
+        options.invoiceCandidates = [{
+          text: `${meta[0].candidateFirstName} ${meta[0].candidateLastName}`,
+          value: meta[0].candidateId,
+        }];
+
+        options.invoiceAgencies = [{
+          text: meta[0].agencyName,
+          value: meta[0].agencyId,
+        }];
+
+        this.connectConfigOptions(config, options);
+        form.get('unitId')?.patchValue(meta[0].agencyId, { emitEvent: false, onlySelf: true });
+        form.get('nameId')?.patchValue(meta[0].candidateId);
+
+      } else {
+
+        options.invoiceAgencies = InvoiceMetaAdapter.createAgencyOptions(meta);
+        this.connectConfigOptions(config, options);
+        form.get('unitId')?.patchValue(options.invoiceAgencies[0].value);
+        form.get('nameId')?.patchValue(options.invoiceCandidates[0].value);
+      }      
   }
 
-  getMeta(): Observable<null> {
-    this.store.dispatch(new Invoices.GetManInvoiceMeta());
+  public populateCandidates(
+    id: number,
+    meta: ManualInvoiceMeta[],
+    options: ManualInvoiceInputOptions,
+    config: AddManInvoiceDialogConfig,
+    orderId: number,
+    ): void {
+    const metaData = meta.filter((item) => (item.agencyId === id && item.orderId === Number(orderId)));
+    options.invoiceCandidates =  InvoiceMetaAdapter.createCandidateOptions(metaData);
 
-    return this.actions$
+    this.connectConfigOptions(config, options);
+  }
+
+  public getMeta(): Observable<null> {
+    this.store.dispatch(new Invoices.GetManInvoiceMeta());
+    this.store.dispatch(new Invoices.GetOrganizationStructure(0, false));
+
+    return zip(
+      this.actions$.pipe(ofActionCompleted(Invoices.GetManInvoiceMeta)),
+      this.actions$.pipe(ofActionCompleted(Invoices.GetOrganizationStructure)),
+      )
       .pipe(
-        ofActionCompleted(Invoices.GetManInvoiceMeta),
         map(() => null),
       )
   }
 
-  connectConfigOptions(config: AddManInvoiceDialogConfig, options: ManualInvoiceInputOptions): void {
+  public connectConfigOptions(config: AddManInvoiceDialogConfig, options: ManualInvoiceInputOptions): void {
     config.fields.forEach((item) => {
       if (item.optionsStateKey) {
         item.options = options[item.optionsStateKey] as DropdownOption[];
       }
     });
   }
+
+
 }

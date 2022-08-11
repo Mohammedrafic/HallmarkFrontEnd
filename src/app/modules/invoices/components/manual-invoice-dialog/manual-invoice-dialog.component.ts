@@ -1,22 +1,24 @@
-import { switchMap } from 'rxjs/operators';
 import { ChangeDetectionStrategy, Component, OnInit, ProviderToken } from '@angular/core';
 
-import {ofActionCompleted, ofActionDispatched, Select} from '@ngxs/store';
+import { ofActionDispatched, Select } from '@ngxs/store';
 import { filter, Observable, takeUntil, tap, distinctUntilChanged, debounceTime, map } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 import { AddDialogHelper } from '@core/helpers';
-import { CustomFormGroup } from '@core/interface';
+import { CustomFormGroup, FileForUpload } from '@core/interface';
 import { DialogAction } from '@core/enums';
+import { MessageTypes } from '@shared/enums/message-types';
+import { OrganizationLocation, OrganizationDepartment, OrganizationRegion } from '@shared/models/organization.model';
+import { ShowToast } from 'src/app/store/app.actions';
 import { ManualInvoiceDialogConfig } from '../../constants';
 import {
   AddManInvoiceDialogConfig,   AddManInvoiceForm, ManualInvoiceInputOptions,  ManualInvoiceMeta,
   ManualInvoiceReason } from '../../interfaces';
 import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoiceConfirmMessages } from '../../constants/messages.constant';
-import {InvoicesState} from "../../store/state/invoices.state";
-import { InvoicesAdapter } from '../../helpers';
+import { InvoicesState } from "../../store/state/invoices.state";
+import { InvoiceMetaAdapter, InvoicesAdapter, ManualInvoiceAdapter } from '../../helpers';
 import { ManualInvoiceStrategy, ManualInvoiceStrategyMap } from '../../helpers/manual-invoice-strategy';
-
 
 @Component({
   selector: 'app-manual-invoice-dialog',
@@ -26,6 +28,8 @@ import { ManualInvoiceStrategy, ManualInvoiceStrategyMap } from '../../helpers/m
 })
 export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceForm> implements OnInit {
   public readonly dialogConfig: AddManInvoiceDialogConfig = ManualInvoiceDialogConfig(this.isAgency);
+
+  public readonly today = new Date();
 
   private searchOptions: ManualInvoiceMeta[];
 
@@ -37,8 +41,11 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     invoiceCandidates: [],
     invoiceAgencies: [],
     reasons: [],
-    organizations: [],
   }
+
+  private filesForUpload: FileForUpload[];
+
+  private postionSearch: ManualInvoiceMeta | null;
 
   @Select(InvoicesState.invoiceReasons)
   public invoiceReasons$: Observable<ManualInvoiceReason[]>;
@@ -46,12 +53,45 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   ngOnInit(): void {
     this.strategy = this.injector.get<ManualInvoiceStrategy>(
       ManualInvoiceStrategyMap.get(this.isAgency) as ProviderToken<ManualInvoiceStrategy>);
+      
     this.form = this.addService.createForm() as CustomFormGroup<AddManInvoiceForm>;
+
     this.watchForSearch();
+    this.watchForCandidate();
+    this.watchForLocation();
+    this.watchForAgency();
     this.getDialogState();
     this.getReasons();
-    this.getOrganizationList();
     this.confirmMessages = InvoiceConfirmMessages;
+  }
+
+  public override closeDialog(): void {
+    super.closeDialog();
+    this.clearDialog();
+    this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Close));
+  }
+
+  public saveManualInvoice(): void {
+    if (!this.form.valid) {
+      this.form.updateValueAndValidity();
+      this.cd.markForCheck();
+      return;
+    }
+
+    const orgId = this.store.snapshot().user.lastSelectedOrganizationId;
+    const dto = ManualInvoiceAdapter.adapPostDto(this.form.value, this.searchOptions, orgId);
+
+    if (!dto) {
+      this.store.dispatch(new ShowToast(MessageTypes.Warning, 'Sorry such job ID not found'));
+      return;
+    }
+
+    this.store.dispatch(new Invoices.SaveManulaInvoice(dto))
+    this.closeDialog();
+  }
+
+  public setFilesForUpload(files: FileForUpload[]): void {
+    this.filesForUpload = files;
   }
 
   private getDialogState(): void {
@@ -70,19 +110,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     .subscribe(() => {
       this.searchOptions = this.store.snapshot().invoices.invoiceMeta;
       this.cd.markForCheck();
-    });;
-  }
-
-  public override closeDialog(): void {
-    super.closeDialog();
-    this.clearDialog();
-    this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Close));
-  }
-
-  public saveManualInvoice(): void {
-    if (this.form.valid) {
-
-    }
+    });
   }
 
   private getReasons(): void {
@@ -102,6 +130,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       filter((value) => !!value),
       distinctUntilChanged(),
       debounceTime(1000),
+      tap(() => this.clearDialog()),
       takeUntil(this.componentDestroy()),
     )
     .subscribe((value) => {
@@ -114,38 +143,102 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       });
       
       if (!item) {
+        this.postionSearch = null;
         const basedOnOrder = this.searchOptions.filter((item) => item.orderId.toString() === concatedValue) || [];
-        this.strategy.populateOptions(basedOnOrder, this.dropDownOptions, this.form, this.dialogConfig);
+        this.strategy.populateOptions(basedOnOrder, this.dropDownOptions, this.form, this.dialogConfig, false);
       } else {
-        this.strategy.populateOptions([item], this.dropDownOptions, this.form, this.dialogConfig);
+        this.postionSearch = item;
+        this.strategy.populateOptions([item], this.dropDownOptions, this.form, this.dialogConfig, true);
       }
       this.cd.markForCheck();
     });
   }
 
+  private watchForCandidate(): void {
+    this.form.get('nameId')?.valueChanges
+    .pipe(
+      filter((value) => !!value),
+      takeUntil(this.componentDestroy()),
+    )
+    .subscribe((id) => {
+      this.populateLocations(id);
+    });
+  }
+
+  public populateLocations(id: number): void {
+    const regions = this.store.snapshot().invoices.regions as OrganizationRegion[];
+    const orderId = this.form.get('orderId')?.value.split('-')[0];
+
+    const candidateLocationId = this.searchOptions.find((item) => {
+      return (item.orderId === Number(orderId)
+      && item.candidateId === Number(id));
+    })?.locationId;
+
+    const candidateRegion = regions.find((item) => {
+      return !!item.locations?.find((location) => location.id === candidateLocationId)
+    }) as OrganizationRegion;
+
+    const locations = InvoiceMetaAdapter.createLocationsOptions(candidateRegion?.locations || [] as OrganizationLocation[]);
+    this.dropDownOptions.invoiceLocations = locations;
+    this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
+    if (this.postionSearch) {
+      this.form.get('locationId')?.patchValue(this.postionSearch.locationId);
+    } else {
+      this.form.get('locationId')?.patchValue(this.dropDownOptions.invoiceLocations[0].value);
+    }
+    this.cd.markForCheck();
+  }
+
+  private watchForLocation(): void {
+    this.form.controls['locationId'].valueChanges
+    .pipe(
+      filter((value) => !!value),
+      takeUntil(this.componentDestroy())
+    )
+    .subscribe((id) => {
+      this.populateDepartments(id);
+    });
+  }
+
+  private watchForAgency(): void {
+    this.form.controls['unitId'].valueChanges
+    .pipe(
+      filter((value) => !!value),
+      takeUntil(this.componentDestroy())
+    )
+    .subscribe((id) => {
+      const orderId = this.form.get('orderId')?.value;
+
+      this.strategy.populateCandidates(id, this.searchOptions, this.dropDownOptions, this.dialogConfig, orderId);
+      this.cd.markForCheck();
+    });
+  }
+
   private clearDialog(): void {
-    this.form.reset();
-    this.searchOptions = [];
+    this.form.reset({
+      vendorFee: true,
+    });
     this.dropDownOptions.invoiceLocations = [];
     this.dropDownOptions.invoiceAgencies = [];
     this.dropDownOptions.invoiceCandidates = [];
     this.dropDownOptions.invoiceDepartments = [];
-    this.dropDownOptions.organizations = [];
   }
 
-  private getOrganizationList(): void {
-    if (this.isAgency) {
-      this.store.dispatch(new Invoices.GetOrganizations());
+  private populateDepartments(id: number): void {
+    const locations: OrganizationLocation[] = this.store.snapshot().invoices.organizationLocations;
+    const deps = locations.find((location) => location.id === id)?.departments as OrganizationDepartment[];
+    
+    this.dropDownOptions.invoiceDepartments = InvoiceMetaAdapter.createDepartmentsOptions(deps);
+    this.updateOptions();
+  }
 
-      this.actions$
-      .pipe(
-        ofActionCompleted(Invoices.GetOrganizations),
-        takeUntil(this.componentDestroy()),
-      )
-      .subscribe(() => {
-        this.dropDownOptions.organizations = this.store.snapshot().invoices.organizations;
-        this.cd.markForCheck();
-      })
+  private updateOptions(): void {
+    this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
+    if (this.postionSearch) {
+      this.form.get('departmentId')?.patchValue(this.postionSearch.departmentId);
+    } else {
+      this.form.get('departmentId')?.patchValue(this.dropDownOptions.invoiceDepartments[0].value);
     }
+    this.cd.markForCheck();
   }
 }

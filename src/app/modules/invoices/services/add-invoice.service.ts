@@ -10,16 +10,16 @@ export class AddInvoiceService {
   public createForm(): FormGroup {
     return this.fb.group({
       orderId: [null, Validators.required],
-      name: [null, Validators.required],
+      nameId: [null, Validators.required],
       unitId: [null, Validators.required],
       locationId: [null, Validators.required],
       departmentId: [null, Validators.required],
       date: ['', Validators.required],
       value: [null, [Validators.required, Validators.min(1), Validators.max(Number.MAX_SAFE_INTEGER)]],
-      reasonId: [null, Validators.required],
+      reasonId: [null],
       link: [null],
-      vendorFee: [null, Validators.required],
-      description: [null],
+      vendorFee: [true],
+      description: [null, Validators.maxLength(250)],
     });
   }
 }
