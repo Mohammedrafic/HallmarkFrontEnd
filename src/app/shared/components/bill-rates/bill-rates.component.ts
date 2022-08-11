@@ -20,7 +20,7 @@ import { BillRateState } from '@shared/components/bill-rates/store/bill-rate.sta
   styleUrls: ['./bill-rates.component.scss'],
 })
 export class BillRatesComponent implements OnInit, OnDestroy {
-  @Input() isActive = false;
+  @Input() isActive: boolean | null = false;
   @Input() readOnlyMode = false;
   @Input() set billRates(values: BillRate[]) {
     if (values) {
@@ -45,7 +45,10 @@ export class BillRatesComponent implements OnInit, OnDestroy {
   private editBillRateIndex: string | null;
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private confirmService: ConfirmService, private store: Store) {
+  constructor(
+    private confirmService: ConfirmService,
+    private store: Store,
+  ) {
     this.billRatesControl = new FormArray([]);
   }
 
@@ -88,7 +91,6 @@ export class BillRatesComponent implements OnInit, OnDestroy {
 
     const foundBillRateOption = this.billRatesOptions.find(option => option.id === value.billRateConfigId);
     const rateHour = foundBillRateOption?.unit === BillRateUnit.Hours ? String(value.rateHour) : parseFloat(value.rateHour.toString()).toFixed(2);
-    console.log(rateHour)
     this.billRateForm.patchValue({
       billRateConfig: value.billRateConfig,
       billRateConfigId: value.billRateConfigId,

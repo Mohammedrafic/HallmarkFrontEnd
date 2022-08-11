@@ -226,7 +226,7 @@
   <section>
     <app-bill-rates #billRates
                     [billRates]="billRatesData"
-                    [isActive]="true"
+                    [isActive]="isActiveCandidateDialog$ | async"
                     (billRatesChanged)="onBillRatesChanged($event)">
     </app-bill-rates>
   </section>

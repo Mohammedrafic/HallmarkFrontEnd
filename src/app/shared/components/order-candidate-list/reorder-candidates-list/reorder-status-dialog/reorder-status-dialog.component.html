@@ -79,7 +79,7 @@
       <section class="bill-rates">
         <app-bill-rates #billRates
                         [billRates]="orderCandidateJob?.billRates || []"
-                        [isActive]="true"
+                        [isActive]="isActiveCandidateDialog$ | async"
                         (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)">
         </app-bill-rates>
       </section>

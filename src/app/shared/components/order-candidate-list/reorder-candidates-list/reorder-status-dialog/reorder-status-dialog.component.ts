@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { BehaviorSubject, combineLatest, filter, merge, mergeMap, Observable, of, Subject, takeUntil, tap } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
@@ -36,6 +36,7 @@ import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { SET_READONLY_STATUS } from '@shared/constants';
 import { BillRate } from "@shared/models";
+import { OrderCandidateListViewService } from "@shared/components/order-candidate-list/order-candidate-list-view.service";
 
 @Component({
   selector: 'app-reorder-status-dialog',
@@ -111,14 +112,17 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public optionFields = OPTION_FIELDS;
   public jobStatus$: BehaviorSubject<ApplicantStatus[]> = new BehaviorSubject<ApplicantStatus[]>([]);
   public openRejectDialog = new Subject<boolean>();
+  public isActiveCandidateDialog$: Observable<boolean>;
 
   private defaultApplicantStatuses: ApplicantStatus[];
 
-  constructor(private store: Store, private actions$: Actions) {
+  constructor(private store: Store, private actions$: Actions, private orderCandidateListViewService: OrderCandidateListViewService
+  ) {
     super();
   }
 
   ngOnInit(): void {
+    this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
     this.createJobStatusControl();
     combineLatest([
       this.onOpenEvent(),
@@ -182,6 +186,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     this.jobStatus$.next([]);
     this.sideDialog.hide();
     this.jobStatus$.next([]);
+    this.orderCandidateListViewService.setIsCandidateOpened(false);
   }
 
   public onNextPreviousOrder(next: boolean): void {

@@ -26,6 +26,7 @@ import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { SET_READONLY_STATUS } from '@shared/constants';
 import { toCorrectTimezoneFormat } from "@shared/utils/date-time.utils";
+import { OrderCandidateListViewService } from "@shared/components/order-candidate-list/order-candidate-list-view.service";
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -66,6 +67,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public accordionClickElement: HTMLElement | null;
   public accordionOneField: AccordionOneField;
   public nextApplicantStatuses: ApplicantStatus[];
+  public isActiveCandidateDialog$: Observable<boolean>;
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');
@@ -89,9 +91,15 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private datePipe: DatePipe, private store: Store, private actions$: Actions) {}
+  constructor(
+    private datePipe: DatePipe,
+    private store: Store,
+    private actions$: Actions,
+    private orderCandidateListViewService: OrderCandidateListViewService
+    ) {}
 
   ngOnInit(): void {
+    this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
     this.createForm();
     this.patchForm();
     this.subscribeOnDate();
@@ -139,6 +147,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.billRatesData = [];
     this.isRejected = false;
     this.nextApplicantStatuses = [];
+    this.orderCandidateListViewService.setIsCandidateOpened(false);
   }
 
   public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
