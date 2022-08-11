@@ -1,5 +1,8 @@
 <div class="timesheet-picker-container">
-  <button ejs-button cssClass="e-outline" (click)="prevWeek()">
+  <button
+    ejs-button cssClass="e-outline"
+    (click)="prevWeek()"
+    [disabled]="isPrevDisabled">
     <i-feather name="chevron-left" class="icon"></i-feather>
   </button>
   <ejs-datepicker
@@ -13,11 +16,16 @@
       [showTodayButton]="false"
       [allowEdit]="false"
       [max]="maxDate"
+      [min]="minDate"
       (renderDayCell)="renderCell($event)"
       (cleared)="clearControl()"
     >
   </ejs-datepicker>
-  <button ejs-button cssClass="e-outline" (click)="nextWeek()">
+  <button
+    ejs-button
+    cssClass="e-outline"
+    (click)="nextWeek()"
+    [disabled]="isNextDisabled">
     <i-feather name="chevron-right" class="icon"></i-feather>
   </button>
 </div>

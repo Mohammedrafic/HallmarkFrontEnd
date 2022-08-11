@@ -9,7 +9,7 @@ import { filter } from 'rxjs/operators';
 
 import { FilteredItem } from '@shared/models/filter.model';
 import { FilterService } from '@shared/services/filter.service';
-import { Destroyable, findItemById, leftOnlyValidValues } from '@core/helpers';
+import { Destroyable, leftOnlyValidValues } from '@core/helpers';
 import { OrganizationDepartment, OrganizationLocation, OrganizationRegion,
   OrganizationStructure } from '@shared/models/organization.model';
 import { DataSourceItem } from '@core/interface';
@@ -22,6 +22,7 @@ import { TimesheetsService } from '../../services/timesheets.service';
 import { TimesheetsTableFiltersColumns } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { UserState } from '../../../../store/user.state';
+import { findSelectedItems } from '../../../invoices/helpers/functions.helper';
 
 @Component({
   selector: 'app-timesheets-filter-dialog',
@@ -117,7 +118,7 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
       .pipe(takeUntil(this.componentDestroy()))
       .subscribe((val: number[]) => {
         if (val?.length) {
-          const selectedRegions: OrganizationRegion[] = this.findSelectedItems(val, this.orgRegions);
+          const selectedRegions: OrganizationRegion[] = findSelectedItems(val, this.orgRegions);
 
           const res: OrganizationLocation[] = [];
           selectedRegions.forEach(region => {
@@ -166,14 +167,5 @@ export class TimesheetsFilterDialogComponent extends Destroyable implements OnIn
 
   private initFormGroup(): void {
     this.formGroup = this.timesheetsService.createForm();
-  }
-
-  private findSelectedItems(source: any[], arr: any[]): any[] {
-    return source.reduce((acc: any[], itemId: number) => {
-        acc.push(findItemById(arr, itemId));
-
-        return acc;
-      },
-      []);
   }
 }

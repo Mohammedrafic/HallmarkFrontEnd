@@ -22,16 +22,19 @@ import { ConfirmService } from '@shared/services/confirm.service';
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { MessageTypes } from '@shared/enums/message-types';
 import { ExportColumn, ExportPayload } from '@shared/models/export.model';
+import { AttachmentsListConfig } from '@shared/components/attachments';
 import { SubmitBtnText, TimesheetTargetStatus } from '../../enums';
 import { Timesheets } from '../../store/actions/timesheets.actions';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import {
   CandidateMilesData,
   ChangeStatusData,
+  CustomExport,
   DialogActionPayload,
   OpenAddDialogMeta,
   Timesheet,
-  TimesheetDetailsModel
+  TimesheetDetailsModel,
+  WorkWeek,
 } from '../../interface';
 import {
   ConfirmDeleteTimesheetDialogContent,
@@ -43,7 +46,6 @@ import { ShowExportDialog, ShowToast } from '../../../../store/app.actions';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
 import { TimesheetDetailsService } from '../../services/timesheet-details.service';
 import { TimesheetStatus } from '../../enums/timesheet-status.enum';
-import { AttachmentsListConfig } from '@shared/components/attachments';
 import { FileForUpload } from '@core/interface';
 
 @Component({
@@ -88,6 +90,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
   public organizationId: number | null = null;
 
   public weekPeriod: [Date, Date] = [new Date(), new Date()];
+
+  public workWeeks: WorkWeek<Date>[];
 
   public readonly columnsToExport: ExportColumn[] = TimesheetDetailsExportOptions;
 
@@ -313,10 +317,7 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     )
   }
 
-  /**
-   * TODO: move event interface to interface folder and get rid of any
-   */
-  public customExport(event: {columns: any[]; fileName: string; fileType: ExportedFileType }): void {
+  public customExport(event: CustomExport): void {
     this.closeExport();
     this.exportProfileDetails(event.fileType);
   }
@@ -372,13 +373,17 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
       tap((details) => { this.setActionBtnState(details)}),
       takeUntil(this.componentDestroy()),
     )
-    .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId }) => {
+    .subscribe(({ organizationId, weekStartDate, weekEndDate, jobId, candidateWorkPeriods }) => {
       this.organizationId = this.isAgency ? organizationId : null;
       this.jobId = jobId;
       this.weekPeriod = [
         new Date(DateTimeHelper.convertDateToUtc(weekStartDate)),
         new Date(DateTimeHelper.convertDateToUtc(weekEndDate)),
       ];
+      this.workWeeks = candidateWorkPeriods.map((el: WorkWeek<string>): WorkWeek<Date> => ({
+        weekStartDate: new Date(DateTimeHelper.convertDateToUtc(el.weekStartDate)),
+        weekEndDate: new Date(DateTimeHelper.convertDateToUtc(el.weekEndDate)),
+      }));
       this.cd.markForCheck();
     });
   }
@@ -399,7 +404,8 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     )
     .subscribe((range) => {
       this.store.dispatch(new TimesheetDetails.GetDetailsByDate(
-        this.organizationId as number, range[0], this.jobId, this.isAgency));
+        this.organizationId as number, range[0], this.jobId, this.isAgency)
+      );
     });
   }
 }

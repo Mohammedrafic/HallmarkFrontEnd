@@ -147,7 +147,8 @@ export const SavedFiltersParams: string[] = [
   'pageSize',
   'organizationId',
   'orderBy',
-  'dateTimeOffset',
+  'startDate',
+  'endDate',
   'searchTerm',
   'statusIds',
 ];

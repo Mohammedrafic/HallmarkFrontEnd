@@ -36,7 +36,11 @@
           class="timesheet-details-upload-container"
           #uploadContainer>
 
-            <app-date-week-picker [initDates]="weekPeriod" [isAbleToChange]="isChangesSaved"></app-date-week-picker>
+            <app-date-week-picker
+              [initDates]="weekPeriod"
+              [availibleDates]="workWeeks"
+              [isAbleToChange]="isChangesSaved">
+            </app-date-week-picker>
 
             <app-upload-button [container]="uploadContainer"
                               (filesSelected)="onFilesSelected($event)"

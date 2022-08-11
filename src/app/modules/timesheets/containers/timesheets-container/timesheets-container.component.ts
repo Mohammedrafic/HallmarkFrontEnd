@@ -93,6 +93,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     store.dispatch([
       new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }),
       new Timesheets.ResetFiltersState(),
+      new Timesheets.SelectOrganization(0),
     ]);
 
     this.isAgency = this.router.url.includes('agency');
