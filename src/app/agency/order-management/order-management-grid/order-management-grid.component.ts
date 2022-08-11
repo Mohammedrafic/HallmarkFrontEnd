@@ -19,7 +19,6 @@ import {
   PagerComponent,
   RowDataBoundEventArgs,
   SelectionSettingsModel,
-  SortDirection,
   TextWrapSettingsModel,
 } from '@syncfusion/ej2-angular-grids';
 import { CheckBoxComponent } from '@syncfusion/ej2-angular-buttons';
@@ -34,6 +33,7 @@ import {
   perDiemChildColumnsToExport,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
+  PermPlacementColumnsConfig,
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
@@ -308,6 +308,11 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.filters.includeReOrders = true;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
+      case AgencyOrderManagementTabs.PermPlacement:
+        this.filters.orderTypes = [OrderType.PermPlacement];
+        this.filters.includeReOrders = false;
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        break;
       case AgencyOrderManagementTabs.ReOrders:
         this.filters.includeReOrders = false;
         this.filters.orderTypes = [OrderType.ReOrder];
@@ -330,6 +335,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       case AgencyOrderManagementTabs.PerDiem:
         this.isLockMenuButtonsShown = true;
         this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
+        break;
+      case AgencyOrderManagementTabs.PermPlacement:
+        this.isLockMenuButtonsShown = false;
+        this.refreshGridColumns(PermPlacementColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.ReOrders:
         this.isLockMenuButtonsShown = false;
@@ -473,7 +482,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       skillIds: this.filters.skillIds || [],
       orderTypes:
         this.selectedTab === AgencyOrderManagementTabs.PerDiem ||
-        this.selectedTab === AgencyOrderManagementTabs.ReOrders
+        this.selectedTab === AgencyOrderManagementTabs.ReOrders || 
+        this.selectedTab === AgencyOrderManagementTabs.PermPlacement
           ? []
           : this.filters.orderTypes || [],
       jobTitle: this.filters.jobTitle || null,
@@ -487,6 +497,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       candidatesCountTo: this.filters.candidatesCountTo || null,
       organizationIds: this.filters.organizationIds || [],
       orderStatuses: this.filters.orderStatuses || [],
+      annualSalaryRangeFrom: this.filters.annualSalaryRangeFrom || null,
+      annualSalaryRangeTo: this.filters.annualSalaryRangeTo || null
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     this.filteredItems$.next(this.filteredItems.length);
@@ -551,6 +563,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.filters.orderId = this.filters.orderId || null;
     this.filters.billRateFrom = this.filters.billRateFrom || null;
     this.filters.billRateTo = this.filters.billRateTo || null;
+    this.filters.jobStartDate = this.filters.jobStartDate || null;
+    this.filters.jobEndDate = this.filters.jobEndDate || null;
+    this.filters.annualSalaryRangeFrom = this.filters.annualSalaryRangeFrom || null;
+    this.filters.annualSalaryRangeTo = this.filters.annualSalaryRangeTo || null;
     this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
     this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
     this.filters.openPositions = this.filters.openPositions || null;

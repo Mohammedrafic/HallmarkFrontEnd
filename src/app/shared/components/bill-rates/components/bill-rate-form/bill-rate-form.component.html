@@ -28,7 +28,14 @@
     <div class="input-container bootstrap form-line-item-20">
       <label>Bill Rates Type<span class="required">*</span></label>
       <div class="input-group">
-        <input class="e-input" type="text" placeholder="Times" disabled [value]="typeValue" />
+        <div class="input-group dropdown">
+          <ejs-dropdownlist
+            formControlName="billType"
+            [fields]="billRateFields"
+            appValidateWithMessage
+            [dataSource]="billRateTypes"
+          ></ejs-dropdownlist>
+        </div>
       </div>
     </div>
   </div>

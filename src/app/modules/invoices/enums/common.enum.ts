@@ -4,5 +4,4 @@ export enum ManInvoiceOptionsKeys {
   Candidates = 'invoiceCandidates',
   Agencies = 'invoiceAgencies',
   Reasons = 'reasons',
-  Organizations = 'organizations',
 }

@@ -45,7 +45,6 @@ import {
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
   GetContactDetails,
-  GetRegularLocalBillRate,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -109,7 +108,6 @@ export interface OrderManagementContentStateModel {
   historicalEvents: HistoricalEvent[] | null;
   navigationTab: NavigationTabModel;
   contactDetails: Department | null;
-  regularLocalBillRate: BillRate[];
 }
 
 @State<OrderManagementContentStateModel>({
@@ -144,7 +142,6 @@ export interface OrderManagementContentStateModel {
       current: null,
     },
     contactDetails: null,
-    regularLocalBillRate: [],
   },
 })
 @Injectable()
@@ -271,10 +268,6 @@ export class OrderManagementContentState {
     return state.contactDetails;
   }
 
-  @Selector()
-  static regularLocalBillRate(state: OrderManagementContentStateModel): BillRate[] {
-    return state.regularLocalBillRate;
-  }
 
   constructor(
     private orderManagementService: OrderManagementContentService,
@@ -556,9 +549,9 @@ export class OrderManagementContentState {
   @Action(SaveOrder)
   SaveOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents }: SaveOrder
+    { order, documents, comments }: SaveOrder
   ): Observable<Order | void> {
-    return this.orderManagementService.saveOrder(order, documents).pipe(
+    return this.orderManagementService.saveOrder(order, documents, comments).pipe(
       tap((order) => {
         dispatch([
           new ShowToast(MessageTypes.Success, RECORD_ADDED),
@@ -722,15 +715,4 @@ export class OrderManagementContentState {
     );
   }
 
-  @Action(GetRegularLocalBillRate)
-  GetRegularLocalBillRate(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
-    { orderType, departmentId, skillId }: GetRegularLocalBillRate
-  ): Observable<BillRate[]> {
-    return this.orderManagementService.getRegularLocalBillRate(orderType, departmentId, skillId).pipe(
-      tap((regularLocalBillRate: BillRate[]) => {
-        patchState({ regularLocalBillRate });
-      })
-    );
-  }
 }

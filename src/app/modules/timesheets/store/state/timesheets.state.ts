@@ -488,13 +488,14 @@ export class TimesheetsState {
     return this.timesheetsApiService.addTimesheetRecord(body)
     .pipe(
       tap(() => {
-        this.store.dispatch([
-          new ShowToast(MessageTypes.Success, AddSuccessMessage.successMessage),
-          new Timesheets.GetTimesheetDetails(body.timesheetId, body.organizationId, isAgency),
-        ]);
         const state = ctx.getState();
         const { id, organizationId } = state.selectedTimeSheet as Timesheet;
-        ctx.dispatch(new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency));
+
+        ctx.dispatch([
+          new ShowToast(MessageTypes.Success, AddSuccessMessage.successMessage),
+          new Timesheets.GetTimesheetDetails(body.timesheetId, body.organizationId, isAgency),
+          new TimesheetDetails.GetTimesheetRecords(id, organizationId, isAgency)
+        ]);
       }),
       catchError((err: HttpErrorResponse) => {
         return ctx.dispatch(new ShowToast(MessageTypes.Error, err.error.errors[''][0]))

@@ -23,7 +23,7 @@ export class CommentComponent {
   constructor(private cd: ChangeDetectorRef) { }
 
   ngOnInit(): void {
-    if (this.comment.unread) {
+    if (!this.comment.isRead) {
       this.unreadObserverSubscription = this.scrolledToMessage$.subscribe(() => {
         this.isScrolledIntoView();
       });
@@ -38,19 +38,23 @@ export class CommentComponent {
   }
 
   ngAfterViewInit(): void {
-    if (this.comment.unread) {
+    if (!this.comment.isRead) {
       this.isScrolledIntoView();
     }
   }
 
   private isScrolledIntoView(): void {
     if (this.messageRef) {
+      const container = this.messageRef.nativeElement.parentElement.parentElement;
+      if (!container) {
+        return;
+      }
       const rect = this.messageRef.nativeElement.getBoundingClientRect();
-      const containerRect = this.messageRef.nativeElement.parentElement.parentElement.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
       const isVisible = (rect.top >= containerRect.top) && (rect.bottom <= containerRect.bottom);
 
       if (isVisible) {
-        this.comment.unread = false;
+        this.comment.isRead = true;
         this.onRead.emit(this.comment);
         this.unreadObserverSubscription.unsubscribe();
         this.cd.detectChanges();

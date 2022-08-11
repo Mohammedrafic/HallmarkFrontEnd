@@ -7,7 +7,8 @@ import {map} from 'rxjs/operators';
 
 import {PageOfCollections} from '@shared/models/page.model';
 import { DataSourceItem } from '@core/interface';
-import {InvoicesFilteringOptions, ManualInvoiceMeta, ManualInvoiceReason} from '../interfaces';
+import {InvoicesFilteringOptions, ManualInvoiceMeta, ManualInvoicePostDto, ManualInvoiceReason} from '../interfaces';
+import { OrganizationStructure } from '@shared/models/organization.model';
 
 @Injectable()
 export class InvoicesApiService {
@@ -30,16 +31,22 @@ export class InvoicesApiService {
 
   public getManInvoiceMeta(orgId?: number): Observable<ManualInvoiceMeta[]> {
 
-    const endpoint = orgId ? `/api/ManualInvoices/creationmetadata/organization/${orgId}`
-      : '/api/ManualInvoices/creationmetadata';
+    const endpoint = orgId ? `/api/ManualInvoiceRecords/creationmetadata/organization/${orgId}`
+      : '/api/ManualInvoiceRecords/creationmetadata';
     return this.http.get<ManualInvoiceMeta[]>(endpoint);
   }
 
-  public saveManualInvoice(payload: any): Observable<void> {
-    return this.http.post<void>(``, payload);
+  public saveManualInvoice(payload: ManualInvoicePostDto): Observable<ManualInvoiceMeta> {
+    return this.http.post<ManualInvoiceMeta>('/api/ManualInvoiceRecords', payload);
   }
 
   public getOrganizations(): Observable<DataSourceItem[]> {
     return this.http.get<DataSourceItem[]>(`/api/Agency/partneredorganizations`);
+  }
+
+  public getOrgStructure(orgId: number, isAgency: boolean): Observable<OrganizationStructure> {
+    const endpoint = isAgency ? `/api/Organizations/structure/partnered/${orgId}`
+    : '/api/Organizations/structure'
+    return this.http.get<any>(endpoint);
   }
 }

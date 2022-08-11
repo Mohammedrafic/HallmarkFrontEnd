@@ -48,6 +48,7 @@ export class OrderManagement {
   orderClosureReason?: string;
   orderClosureReasonId?: string;
   organizationPrefix: string;
+  commentContainerId?: number;
 }
 
 export class OrderManagementFilter {
@@ -123,6 +124,7 @@ export type OrderManagementChild = {
   closeDate?: string;
   positionClosureReason?: string;
   positionClosureReasonId?: number;
+  commentContainerId?: number;
 };
 
 export type OrderCandidatesList = {
@@ -172,6 +174,8 @@ export type AgencyOrderFilters = {
   jobStartDate?: Date | null;
   jobEndDate?: Date | null;
   includeReOrders?: boolean;
+  annualSalaryRangeFrom?: string | null;
+  annualSalaryRangeTo?: string | null;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -231,8 +235,6 @@ export class Order {
   skillId: number;
   skillName?: number;
   orderType: OrderType;
-  reasonForRequestId: number | null;
-  reasonForRequest?: string | null;
   poNumberId: number | null;
   projectTypeId: number | null;
   projectNameId: number | null;
@@ -287,6 +289,7 @@ export class Order {
   orderPlacementFee?: number;
   annualSalaryRangeFrom?: number;
   annualSalaryRangeTo?: number;
+  commentContainerId?: number;
 }
 
 export class ReOrder {
@@ -406,6 +409,7 @@ export type OrderCandidateJob = {
   closeDate?: string;
   positionClosureReason?: string;
   positionClosureReasonId?: number;
+  commentContainerId?: number;
 };
 
 export type CandidatesBasicInfo = {
@@ -467,6 +471,8 @@ export class OrderFilter {
   filterModel?: FilterModel = {};
   isTemplate?: boolean;
   templateTitle?: string;
+  annualSalaryRangeFrom?: string | null;
+  annualSalaryRangeTo?: string | null;
 }
 
 export class SortModel {

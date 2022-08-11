@@ -1,9 +1,7 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 
-import { Select, Store } from '@ngxs/store';
-import { OrderManagement } from '@shared/models/order-management.model';
 import { Order } from '@shared/models/order-management.model';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
 import {OrderType} from "@shared/enums/order-type";
 
 @Component({
@@ -11,30 +9,17 @@ import {OrderType} from "@shared/enums/order-type";
   templateUrl: './order-details-container.component.html',
   styleUrls: ['./order-details-container.component.scss']
 })
-export class OrderDetailsContainerComponent implements OnInit, OnDestroy {
+export class OrderDetailsContainerComponent implements OnDestroy {
   private unsubscribe$: Subject<void> = new Subject();
   public orderType = OrderType;
 
   public order: Order;
   @Input() set currentOrder(value: Order) {
     this.order = value;
-    this.init();
-  }
-
-  constructor(private store: Store) {
-
-  }
-
-  ngOnInit(): void {
-
   }
 
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
-  }
-
-  public init() : void {
-
   }
 }

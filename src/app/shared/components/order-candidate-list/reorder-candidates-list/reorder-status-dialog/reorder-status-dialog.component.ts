@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { BehaviorSubject, combineLatest, filter, merge, mergeMap, Observable, of, Subject, takeUntil, tap } from 'rxjs';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
@@ -35,6 +35,8 @@ import PriceUtils from '@shared/utils/price.utils';
 import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { SET_READONLY_STATUS } from '@shared/constants';
+import { BillRate } from "@shared/models";
+import { OrderCandidateListViewService } from "@shared/components/order-candidate-list/order-candidate-list-view.service";
 
 @Component({
   selector: 'app-reorder-status-dialog',
@@ -110,14 +112,17 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public optionFields = OPTION_FIELDS;
   public jobStatus$: BehaviorSubject<ApplicantStatus[]> = new BehaviorSubject<ApplicantStatus[]>([]);
   public openRejectDialog = new Subject<boolean>();
+  public isActiveCandidateDialog$: Observable<boolean>;
 
   private defaultApplicantStatuses: ApplicantStatus[];
 
-  constructor(private store: Store, private actions$: Actions) {
+  constructor(private store: Store, private actions$: Actions, private orderCandidateListViewService: OrderCandidateListViewService
+  ) {
     super();
   }
 
   ngOnInit(): void {
+    this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
     this.createJobStatusControl();
     combineLatest([
       this.onOpenEvent(),
@@ -181,6 +186,7 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
     this.jobStatus$.next([]);
     this.sideDialog.hide();
     this.jobStatus$.next([]);
+    this.orderCandidateListViewService.setIsCandidateOpened(false);
   }
 
   public onNextPreviousOrder(next: boolean): void {
@@ -313,6 +319,48 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
         )
         .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
     }
+  }
+
+  updateOrganizationCandidateJobWithBillRate(bill: BillRate): void {
+    this.acceptForm.markAllAsTouched();
+    if (!this.acceptForm.errors && this.orderCandidateJob) {
+      const value = this.acceptForm.getRawValue();
+      this.store
+        .dispatch(
+          new UpdateOrganisationCandidateJob({
+            organizationId: this.orderCandidateJob.organizationId,
+            orderId: this.orderCandidateJob.orderId,
+            jobId: this.orderCandidateJob.jobId,
+            skillName: value.skillName,
+            offeredBillRate: this.orderCandidateJob?.offeredBillRate,
+            candidateBillRate: this.orderCandidateJob.candidateBillRate,
+            nextApplicantStatus: {
+              applicantStatus: this.orderCandidateJob.applicantStatus.applicantStatus,
+              statusText: this.orderCandidateJob.applicantStatus.statusText,
+            },
+            billRates: this.getBillRateForUpdate(bill),
+          })
+        )
+        .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
+    }
+  }
+
+  getBillRateForUpdate(value: BillRate): BillRate[] {
+    let billRates;
+    const existingBillRateIndex = this.orderCandidateJob.billRates.findIndex(billRate => billRate.id === value.id);
+    if (existingBillRateIndex > -1) {
+      this.orderCandidateJob.billRates.splice(existingBillRateIndex, 1, value);
+      billRates = this.orderCandidateJob?.billRates;
+    } else {
+      if (typeof value === 'number') {
+        this.orderCandidateJob?.billRates.splice(value, 1);
+        billRates = this.orderCandidateJob?.billRates;
+      } else {
+        billRates = [...this.orderCandidateJob?.billRates as BillRate[], value];
+      }
+    }
+
+    return billRates;
   }
 
   private subscribeOnUpdateCandidateJobSucceed(): Observable<void> {

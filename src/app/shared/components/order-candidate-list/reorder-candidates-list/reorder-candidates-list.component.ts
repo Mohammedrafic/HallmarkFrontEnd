@@ -9,6 +9,7 @@ import { filter, merge, Observable, takeUntil, tap } from 'rxjs';
 import { GetCandidateJob } from '@agency/store/order-management.actions';
 import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
 import { CandidatStatus } from '@shared/enums/applicant-status.enum';
+import { OrderCandidateListViewService } from "@shared/components/order-candidate-list/order-candidate-list-view.service";
 
 enum ReorderCandidateStutuses {
   BillRatePending = 44,
@@ -30,7 +31,11 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
 
   private selectedIndex: number;
 
-  constructor(protected override store: Store, protected override router: Router) {
+  constructor(
+    protected override store: Store,
+    protected override router: Router,
+    private orderCandidateListViewService: OrderCandidateListViewService,
+  ) {
     super(store, router);
   }
 
@@ -50,6 +55,7 @@ export class ReorderCandidatesListComponent extends AbstractOrderCandidateListCo
     this.getCandidateJobData();
 
     this.dialogNextPreviousOption = this.getDialogNextPreviousOption(this.candidate);
+    this.orderCandidateListViewService.setIsCandidateOpened(true);
     this.openDetails.next(true);
   }
 

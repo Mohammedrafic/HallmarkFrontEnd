@@ -28,7 +28,14 @@
       format="MM/dd/yyyy"
       placeholder="MM/DD/YYYY"
     ></app-datepicker>
-    <app-comments [useBackground]="false"></app-comments>
+    <div tabindex="0" class="e-card comments">
+      <div class="e-card-content">
+        <app-comments
+          [comments]="comments"
+          [commentContainerId]="commentContainerId"
+          [useBackground]="false"></app-comments>
+      </div>
+    </div>
     <p class="warning">
       <i-feather name="alert-circle" class="icon"></i-feather>
       <span>

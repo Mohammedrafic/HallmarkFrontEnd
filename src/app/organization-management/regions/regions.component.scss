@@ -1,0 +1,119 @@
+@import "../../styles/variables/colors";
+.flex-column {
+  .toolbar {
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    padding: 24px 0;
+
+    .details {
+      display: flex;
+      align-items: center;
+
+      ejs-dropdownlist.e-control {
+        span.e-input-group {
+          height: 40px !important;
+        }
+      }
+
+      .region-dropdown {
+        margin-right: 12px;
+        width: 207px;
+      }
+
+      .e-input-group.e-control-wrapper input {
+        padding-left: 16px;
+        padding-bottom: 7px;
+        padding-top: 5px;
+      }
+    }
+
+    .button-filter {
+      margin-left: 12px;
+      margin-right: 6px;
+    }
+
+    .button-import {
+      margin-left: 6px;
+      margin-right: 12px;
+    }
+
+    .button-export {
+      margin-right: 12px;
+    }
+  }
+
+  .grid-component {
+    overflow-y: auto;
+  }
+}
+
+.input-group {
+  margin-top: 5px;
+}
+
+.input-container {
+  margin-bottom: 15px;
+}
+
+.form-container {
+  padding-top: 24px;
+
+  .input-container {
+    margin-bottom: 12px;
+    width: 386px;
+
+    input {
+      height: 40px;
+    }
+
+    ejs-dropdownlist.e-control {
+      span.e-input-group {
+        height: 40px !important;
+      }
+    }
+
+    ejs-datepicker.e-control {
+      span.e-input-group {
+        height: 40px !important;
+      }
+    }
+  }
+
+  .group {
+    display: flex;
+
+    .input-container {
+      width: 187px;
+      padding-right: 12px;
+    }
+  }
+
+  .large-group {
+    display: flex;
+    padding-top: 12px;
+
+    .input-container:first-child {
+      padding-right: 12px;
+    }
+  }
+
+  .title {
+    padding-top: 17px;
+    font-size: 16px;
+    font-weight: 700;
+    margin-left: 0;
+    line-height: 28px;
+  }
+
+  .combined-group {
+    display: flex;
+    .input-container:first-child {
+      padding-right: 12px;
+    }
+
+    .input-container:last-child {
+      width: 187px;
+    }
+  }
+}
