@@ -19,12 +19,12 @@ export interface AddManInvoiceDialogConfig {
 }
 
 export interface AddManInvoiceForm {
-  orderId: number | string;
-  name: string;
+  orderId: string;
+  nameId: number;
   unitId: number;
   locationId: number;
   departmentId: number;
-  value: number;
+  value: string;
   date: Date;
   link: string;
   vendorFee: boolean;
@@ -63,5 +63,16 @@ export interface ManualInvoiceInputOptions {
   [ManInvoiceOptionsKeys.Candidates]: DropdownOption[];
   [ManInvoiceOptionsKeys.Agencies]: DropdownOption[];
   [ManInvoiceOptionsKeys.Reasons]: DropdownOption[];
-  [ManInvoiceOptionsKeys.Organizations]: DropdownOption[];
+}
+
+export interface ManualInvoicePostDto {
+  organizationId: number;
+  jobId: number;
+  amount: number;
+  serviceDate: string;
+  linkedInvoiceId: number;
+  vendorFeeApplicable: boolean;
+  manualInvoiceReasonId: number;
+  comment: string;
+  departmentId: number;
 }

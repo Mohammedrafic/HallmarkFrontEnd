@@ -17,6 +17,8 @@ export enum INVOICES_ACTIONS {
   GetMeta = '[invoices] Get manual invoice metadata',
   SaveManualinvoice = '[invoices] Save manual invoice',
   GetOrganizations = '[invoices] Get organizations',
+  GetOrganizationStructure = '[invoices] Get organization structure',
+  SelectOrganization = '[invoices] Select another organization',
 }
 
 export enum InvoicesTableFiltersColumns {
