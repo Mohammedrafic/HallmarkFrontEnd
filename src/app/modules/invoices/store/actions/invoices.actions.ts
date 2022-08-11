@@ -1,4 +1,4 @@
-import { GetInvoicesData, InvoicesFilterState } from '../../interfaces';
+import { GetInvoicesData, InvoicesFilterState, ManualInvoicePostDto } from '../../interfaces';
 import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums/invoices.enum';
 import { DialogAction } from '@core/enums';
 import { OrganizationRegion } from '@shared/models/organization.model';
@@ -73,11 +73,27 @@ export namespace Invoices {
     static readonly type = INVOICES_ACTIONS.SaveManualinvoice;
 
     constructor(
-      public readonly payload: any,
+      public readonly payload: ManualInvoicePostDto,
     ) {}
   }
 
   export class GetOrganizations {
     static readonly type = INVOICES_ACTIONS.GetOrganizations;
+  }
+
+  export class GetOrganizationStructure {
+    static readonly type = INVOICES_ACTIONS.GetOrganizationStructure;
+
+    constructor(
+      public readonly orgId: number,
+      public readonly isAgency: boolean,
+    ) {}
+  }
+
+  export class SelectOrganization {
+    static readonly type = INVOICES_ACTIONS.SelectOrganization;
+
+    constructor(public readonly id: number) {
+    }
   }
 }

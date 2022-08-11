@@ -48,7 +48,8 @@ export interface BillRate {
   intervalMin: number | null;
   intervalMax: number | null;
   effectiveDate: string;
-  editAllowed?: boolean;
+  editAllowed: boolean;
+  billType: boolean;
 }
 
 export interface OrderBillRateDto extends Omit<BillRate, 'billRateConfig' | 'billRateGroupId'> { }

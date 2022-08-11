@@ -21,7 +21,7 @@
             [allowResizing]="allowResizing"
             (dataBound)="dataBound()">
     <e-columns>
-      <e-column [visible]="isEditAllowed" textAlign="Right" width="120">
+      <e-column [visible]="!readOnlyMode" textAlign="Right" width="120">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
             <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit($event, data)">

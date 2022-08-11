@@ -159,7 +159,6 @@ export class RegionsComponent extends AbstractGridConfigurationComponent  implem
     });
     this.organization$.pipe(takeUntil(this.unsubscribe$), filter(Boolean)).subscribe(organization => {
       this.store.dispatch(new SetGeneralStatesByCountry(organization.generalInformation.country));
-      debugger
       this.store.dispatch(new GetRegions()).pipe(takeUntil(this.unsubscribe$))
       .subscribe((data) => {
         this.defaultValue=data.organizationManagement.regions[0].id;

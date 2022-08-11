@@ -122,6 +122,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
   private pageSubject = new Subject<number>();
   private unsubscribe$: Subject<void> = new Subject();
   private editRecordId?: number;
+  private billRateValueValidators = [currencyValidator(1), Validators.minLength(1)];
 
   public columnsToExport: ExportColumn[] = [
     { text:'Region', column: 'Region'},
@@ -539,7 +540,7 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       orderTypeIds: ['', [Validators.required]],
       billRatesCategory: [{ value: '', disabled: true }],
       billRatesType: ['', [Validators.required]],
-      billRateValueRateTimes: [null, [Validators.required, Validators.minLength(1), Validators.maxLength(11), currencyValidator(1)]],
+      billRateValueRateTimes: [null, [Validators.required , Validators.maxLength(11), ...this.billRateValueValidators]],
       effectiveDate: [null, [Validators.required]],
       intervalMin: [''],
       intervalMax: [''],
@@ -630,10 +631,12 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
       .subscribe((typeId: number) => {
         const foundBillRateOption = this.billRatesOptions.find(option => option.id === typeId);
         if (foundBillRateOption) {
+          this.setBillRateTypes(foundBillRateOption);
           this.selectedBillRateUnit = foundBillRateOption.unit;
           this.isIntervalMinEnabled = foundBillRateOption.intervalMin;
           this.isIntervalMaxEnabled = foundBillRateOption.intervalMax;
           this.billRatesFormGroup.get('billRateValueRateTimes')?.setValue('');
+          this.updateAmountValidators();
           this.billRatesFormGroup.get('billRatesCategory')?.setValue(BillRateCategory[foundBillRateOption.category]);
         }
 
@@ -659,6 +662,10 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
     });
   }
 
+  setBillRateTypes(billRateOption: BillRateOption): void {
+    this.billRateTypesOptions = BillRateTypes.filter(type => billRateOption.billTypes.includes(type.id));
+  }
+
   private onClickedCheckboxHandler(data: any, controlName: string, isChecked: boolean): void {
     if (!this.isReadOnly) {
       this.editRecordId = data.billRateSettingId;
@@ -668,6 +675,15 @@ export class BillRateSetupComponent extends AbstractGridConfigurationComponent i
         this.onFormSaveClick();
       });
     }
+  }
+
+  updateAmountValidators(): void {
+    if (this.selectedBillRateUnit === this.BillRateUnitList.Currency) {
+      this.billRatesFormGroup.get('billRateValueRateTimes')?.removeValidators(this.billRateValueValidators)
+    } else {
+      this.billRatesFormGroup.get('billRateValueRateTimes')?.addValidators(this.billRateValueValidators)
+    }
+    this.billRatesFormGroup.get('billRateValueRateTimes')?.updateValueAndValidity();
   }
 
   private setupFormValues(data: BillRateSetup): void {

@@ -1,15 +1,16 @@
 import { DropdownOption } from '@core/interface';
+import { OrganizationDepartment, OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 import { ManualInvoiceMeta } from '../interfaces';
 
 export class InvoiceMetaAdapter {
-  static createLocationsOptions(meta: ManualInvoiceMeta[]): DropdownOption[] {
+  static createLocationsOptions(meta: OrganizationLocation[]): DropdownOption[] {
     const values: DropdownOption[] = [];
 
     meta.forEach((item) => {
-      if (!values.find((option) => option.value === item.locationId)) {
+      if (!values.find((option) => option.value === item.id)) {
         values.push({
-          text: item.locationName,
-          value: item.locationId,
+          text: item.name,
+          value: item.id,
         });
       }
     });
@@ -17,14 +18,14 @@ export class InvoiceMetaAdapter {
     return values;
   }
 
-  static createDepartmentsOptions(meta: ManualInvoiceMeta[]): DropdownOption[] {
+  static createDepartmentsOptions(meta: OrganizationDepartment[]): DropdownOption[] {
     const values: DropdownOption[] = [];
 
     meta.forEach((item) => {
-      if (!values.find((value) => value.value === item.departmentId)) {
+      if (!values.find((value) => value.value === item.id)) {
         values.push({
-          text: item.departmentName,
-          value: item.departmentId,
+          text: item.name,
+          value: item.id,
         });
       }
     });
@@ -71,5 +72,18 @@ export class InvoiceMetaAdapter {
       }
     });
     return values;
+  }
+
+  static createLocationsStructure(regions: OrganizationRegion[]): OrganizationLocation[] {
+    const locationsData: OrganizationLocation[] = [];
+
+    regions.forEach((region) => {
+      const locations = region.locations as OrganizationLocation[];
+      locations.forEach((location) => {
+        locationsData.push(location);
+      });
+    });
+
+    return locationsData;
   }
 }

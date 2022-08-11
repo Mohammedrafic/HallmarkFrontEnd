@@ -132,7 +132,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.addMenuItem(SubmitButtonItem.SaveForLater, 'Save For Later');
           this.removeMenuItem(SubmitButtonItem.Save);
         } else {
-          if (order?.orderType === OrderType.OpenPerDiem) {
+          if (order?.orderType === OrderType.OpenPerDiem || order?.orderType === OrderType.PermPlacement) {
             this.disableOrderType = true;
           }
           this.addMenuItem(SubmitButtonItem.Save, 'Save');
@@ -330,7 +330,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       departmentId,
       skillId,
       projectTypeId,
-      projectNameId,      
+      projectNameId,
       poNumberId,
       hourlyRate,
       openPositions,
@@ -363,8 +363,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     } = allValues;
 
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
-      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate } = billRate;
-      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate };
+      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed } = billRate;
+      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed };
     });
 
     const order: CreateOrderDto | EditOrderDto = {

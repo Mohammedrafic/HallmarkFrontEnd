@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
-import { debounceTime, Observable, of, throttleTime } from 'rxjs';
+import { debounceTime, Observable, of, throttleTime, catchError } from 'rxjs';
 import { tap } from 'rxjs/internal/operators/tap';
 
 import { PageOfCollections } from '@shared/models/page.model';
 import { DialogAction } from '@core/enums';
 import { DataSourceItem } from '@core/interface';
+import { MessageTypes } from '@shared/enums/message-types';
+import { ShowToast } from 'src/app/store/app.actions';
 import { Invoices } from '../actions/invoices.actions';
 import { InvoicesService } from '../../services';
 import {
@@ -15,13 +17,14 @@ import {
   ManualInvoiceMeta, ManualInvoiceReason } from '../../interfaces';
 import { InvoicesModel } from '../invoices.model';
 import { FilteringOptionsFields } from '../../../timesheets/enums';
-import { DefaultInvoicesState } from '../../constants';
+import { DefaultInvoicesState, ManualInvoiceMessages } from '../../constants';
 import { DefaultFiltersState, SavedFiltersParams } from '../../../timesheets/constants';
 import { reduceFiltersState } from '../../../timesheets/helpers';
 import { InvoicesApiService } from '../../services';
 import { InvoicesTableFiltersColumns } from '../../enums/invoices.enum';
 import { InvoicesFilteringOptionsMapping } from '../../constants';
 import { InvoiceMetaAdapter } from '../../helpers/invoice-meta.adapter';
+import { OrganizationStructure } from '@shared/models/organization.model';
 
 @State<InvoicesModel>({
   name: 'invoices',
@@ -48,6 +51,11 @@ export class InvoicesState {
   @Selector([InvoicesState])
   static invoiceFiltersColumns(state: InvoicesModel): InvoiceFilterColumns {
     return state.invoiceFiltersColumns;
+  }
+
+  @Selector([InvoicesState])
+  static invoicesOrganizations(state: InvoicesModel): DataSourceItem[] {
+    return state.organizations;
   }
 
   // @Selector([InvoicesState])
@@ -205,9 +213,20 @@ export class InvoicesState {
 
   @Action(Invoices.SaveManulaInvoice)
   SaveManualInvoice(
+    ctx: StateContext<InvoicesModel>,
     { payload }: Invoices.SaveManulaInvoice,
-  ): Observable<void> {
-    return this.invoicesAPIService.saveManualInvoice(payload);
+    /**
+     * TODO: change return type afte invoice get implementation
+     */
+  ): Observable<ManualInvoiceMeta> {
+    return this.invoicesAPIService.saveManualInvoice(payload)
+    .pipe(
+      tap(() => {
+        ctx.dispatch([
+          new ShowToast(MessageTypes.Success, ManualInvoiceMessages.successAdd)
+        ]);
+      }),
+    );
   }
 
   @Action(Invoices.GetOrganizations)
@@ -218,12 +237,38 @@ export class InvoicesState {
     .pipe(
       tap((res) => {
         patchState({
-          organizations: res.map((item) => ({
-            text: item.name,
-            value: item.id,
-          }))
-        })
+          organizations: res,
+        });
       })
     )
+  }
+
+  @Action(Invoices.GetOrganizationStructure)
+  GetStructure(
+    { patchState }: StateContext<InvoicesModel>,
+    { orgId, isAgency }: Invoices.GetOrganizationStructure,
+  ): Observable<OrganizationStructure> {
+    return this.invoicesAPIService.getOrgStructure(orgId, isAgency)
+    .pipe(
+      tap((res) => {
+        patchState({
+          organizationLocations: InvoiceMetaAdapter.createLocationsStructure(res.regions),
+          regions: res.regions,
+        });
+      }),
+    )
+  }
+
+  @Action(Invoices.SelectOrganization)
+  SelectOrganization(
+    { patchState }: StateContext<InvoicesModel>,
+    { id }: Invoices.SelectOrganization
+  ): Observable<null> {
+    return of(null).pipe(
+      debounceTime(100),
+      tap(() => patchState({
+        selectedOrganizationId: id,
+      }))
+    );
   }
 }
