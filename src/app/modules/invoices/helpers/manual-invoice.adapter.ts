@@ -5,7 +5,7 @@ export class ManualInvoiceAdapter {
   static adapPostDto(formData: AddManInvoiceForm,
     rawData: ManualInvoiceMeta[], orgId: number): ManualInvoicePostDto | null {
     const jobPosition = rawData.find((item) => {
-        return (item.orderId === Number(formData.orderId)
+        return ((item.orderId === Number(formData.orderId) || `${item.orderId}-${item.jobId}` === formData.orderId)
         && item.candidateId === Number(formData.nameId));
     });
 
