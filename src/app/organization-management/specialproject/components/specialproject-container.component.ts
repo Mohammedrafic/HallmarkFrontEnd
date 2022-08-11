@@ -26,6 +26,7 @@ import { SpecialProjectCategoryState } from '../../store/special-project-categor
 import { SpecialProjectCategoryComponent } from '../components/special-project-categories/special-project-categories.component';
 import { SpecialProjectCategory } from '../../../shared/models/special-project-category.model';
 import { GetSpecialProjectCategoryById, SaveSpecialProjectCategory } from '../../store/special-project-category.actions';
+import { FormControlNames } from '../enums/specialproject.enum';
 
 @Component({
   selector: 'app-specialproject-container',
@@ -132,40 +133,68 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
   }
 
   private createForm(): void {
-    this.form = new FormGroup({
-      projectCategory: new FormControl(0, this.selectedTab == SpecialProjectTabs.SpecialProjects ? [Validators.required] : []),
-      projectName: new FormControl(null, this.selectedTab == SpecialProjectTabs.SpecialProjects ? [Validators.required, Validators.maxLength(100), Validators.minLength(3)] : []),
-      poName: new FormControl(null, this.selectedTab == SpecialProjectTabs.PurchaseOrders ? [Validators.required, Validators.maxLength(100), Validators.minLength(3)] : []),
-      poDescription: new FormControl(null, this.selectedTab == SpecialProjectTabs.PurchaseOrders ? [Validators.required, Validators.maxLength(100), Validators.minLength(3)] : []),
-      regionIds: new FormControl(0, this.selectedTab != SpecialProjectTabs.SpecialProjectCategories ? [Validators.required] : []),
-      locationIds: new FormControl(0, this.selectedTab != SpecialProjectTabs.SpecialProjectCategories ? [Validators.required] : []),
-      departmentsIds: new FormControl(0, this.selectedTab != SpecialProjectTabs.SpecialProjectCategories ? [Validators.required] : []),
-      skillIds: new FormControl(0, this.selectedTab != SpecialProjectTabs.SpecialProjectCategories ? [Validators.required] : []),
-      allowOnOrderCreation: new FormControl(null),
-      startDate: new FormControl(null, this.selectedTab != SpecialProjectTabs.SpecialProjectCategories ? [Validators.required] : []),
-      endDate: new FormControl(null, this.selectedTab != SpecialProjectTabs.SpecialProjectCategories ? [Validators.required] : []),
-      projectBudget: new FormControl(null, this.selectedTab != SpecialProjectTabs.SpecialProjectCategories ? [Validators.required, Validators.minLength(1), Validators.maxLength(11)] : []),
-      SpecialProjectCategoryName: new FormControl(null, this.selectedTab == SpecialProjectTabs.SpecialProjectCategories ? [Validators.required, Validators.maxLength(100), Validators.minLength(3)] : []),
-    })
+    this.form = new FormGroup({})
+    this.addRemoveFormcontrols();
   }
 
   public onTabSelected(selectedTab: any): void {
     this.selectedTab = selectedTab.selectedIndex;
+    this.addRemoveFormcontrols();
+  }
+
+  public addRemoveFormcontrols() {
     switch (this.selectedTab) {
       case SpecialProjectTabs.SpecialProjects:
-        this.createForm();
         this.addButtonTitle = AddButtonText.AddSpecialProject;
+        this.form.addControl(FormControlNames.ProjectCategory, new FormControl(null, [Validators.required]));
+        this.form.addControl(FormControlNames.ProjectName, new FormControl(null, [Validators.required, Validators.maxLength(100), Validators.minLength(3)]));
+        this.form.addControl(FormControlNames.RegionIds, new FormControl(null, [Validators.required]));
+        this.form.addControl(FormControlNames.LocationIds, new FormControl(null, [Validators.required]));
+        this.form.addControl(FormControlNames.DepartmentsIds, new FormControl(null, [Validators.required]));
+        this.form.addControl(FormControlNames.SkillIds, new FormControl(null, [Validators.required]));
+        this.form.addControl(FormControlNames.AllowOnOrderCreation, new FormControl(null));
+        this.form.addControl(FormControlNames.StartDate, new FormControl(null, [Validators.required]));
+        this.form.addControl(FormControlNames.EndDate, new FormControl(null, [Validators.required]));
+        this.form.addControl(FormControlNames.ProjectBudget, new FormControl(null, [Validators.required, Validators.minLength(1), Validators.maxLength(11)]));
+        if (this.form.contains(FormControlNames.PoName)) this.form.removeControl(FormControlNames.PoName);
+        if (this.form.contains(FormControlNames.PoDescription)) this.form.removeControl(FormControlNames.PoDescription);
+        if (this.form.contains(FormControlNames.SpecialProjectCategoryName)) this.form.removeControl(FormControlNames.SpecialProjectCategoryName);
         break;
       case SpecialProjectTabs.PurchaseOrders:
-        this.createForm();
         this.addButtonTitle = AddButtonText.AddPurchaseOrder;
+        this.form.addControl(FormControlNames.PoName, new FormControl(null, [Validators.required, Validators.maxLength(100), Validators.minLength(3)]));
+        this.form.addControl(FormControlNames.PoDescription, new FormControl(null, [Validators.required, Validators.maxLength(100), Validators.minLength(3)]));
+        this.form.addControl(FormControlNames.RegionIds, new FormControl(null, [Validators.required]));
+        this.form.addControl(FormControlNames.LocationIds, new FormControl(null, [Validators.required]));
+        this.form.addControl(FormControlNames.DepartmentsIds, new FormControl(null, [Validators.required]));
+        this.form.addControl(FormControlNames.SkillIds, new FormControl(null, [Validators.required]));
+        this.form.addControl(FormControlNames.AllowOnOrderCreation, new FormControl(null));
+        this.form.addControl(FormControlNames.StartDate, new FormControl(null, [Validators.required]));
+        this.form.addControl(FormControlNames.EndDate, new FormControl(null, [Validators.required]));
+        this.form.addControl(FormControlNames.ProjectBudget, new FormControl(null, [Validators.required, Validators.minLength(1), Validators.maxLength(11)]));
+        if (this.form.contains(FormControlNames.ProjectCategory)) this.form.removeControl(FormControlNames.ProjectCategory);
+        if (this.form.contains(FormControlNames.ProjectName)) this.form.removeControl(FormControlNames.ProjectName);
+        if (this.form.contains(FormControlNames.SpecialProjectCategoryName)) this.form.removeControl(FormControlNames.SpecialProjectCategoryName);
         break;
       case SpecialProjectTabs.SpecialProjectCategories:
-        this.createForm();
         this.addButtonTitle = AddButtonText.AddSpecialProjectCategory;
+        this.form.addControl(FormControlNames.SpecialProjectCategoryName, new FormControl(null, [Validators.required, Validators.maxLength(100), Validators.minLength(3)]));
+        if (this.form.contains(FormControlNames.ProjectCategory)) this.form.removeControl(FormControlNames.ProjectCategory);
+        if (this.form.contains(FormControlNames.ProjectName)) this.form.removeControl(FormControlNames.ProjectName);
+        if (this.form.contains(FormControlNames.PoName)) this.form.removeControl(FormControlNames.PoName);
+        if (this.form.contains(FormControlNames.PoDescription)) this.form.removeControl(FormControlNames.PoDescription);
+        if (this.form.contains(FormControlNames.RegionIds)) this.form.removeControl(FormControlNames.RegionIds);
+        if (this.form.contains(FormControlNames.LocationIds)) this.form.removeControl(FormControlNames.LocationIds);
+        if (this.form.contains(FormControlNames.DepartmentsIds)) this.form.removeControl(FormControlNames.DepartmentsIds);
+        if (this.form.contains(FormControlNames.SkillIds)) this.form.removeControl(FormControlNames.SkillIds);
+        if (this.form.contains(FormControlNames.AllowOnOrderCreation)) this.form.removeControl(FormControlNames.AllowOnOrderCreation);
+        if (this.form.contains(FormControlNames.StartDate)) this.form.removeControl(FormControlNames.StartDate);
+        if (this.form.contains(FormControlNames.EndDate)) this.form.removeControl(FormControlNames.EndDate);
+        if (this.form.contains(FormControlNames.ProjectBudget)) this.form.removeControl(FormControlNames.ProjectBudget);
         break;
     }
   }
+
   private orgStructureDataSetup(): void {
     this.orgStructureData = {
       poName: { type: ControlTypes.Text, valueType: ValueType.Text },
@@ -277,15 +306,12 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
     this.isEdit = false;
     switch (this.selectedTab) {
       case SpecialProjectTabs.SpecialProjects:
-        this.createForm();
         this.addButtonTitle = AddButtonText.AddSpecialProject;
         break;
       case SpecialProjectTabs.PurchaseOrders:
-        this.createForm();
         this.addButtonTitle = AddButtonText.AddPurchaseOrder;
         break;
       case SpecialProjectTabs.SpecialProjectCategories:
-        this.createForm();
         this.addButtonTitle = AddButtonText.AddSpecialProjectCategory;
         break;
     }
@@ -430,19 +456,16 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
       if (data) {
         this.id = data?.id;
         this.form.setValue({
-          projectCategory: data.projectTypeId || 0,
-          regionIds: [data.regionId || 0],
-          locationIds: [data.locationId || 0],
-          departmentsIds: [data.departmentId || 0],
-          skillIds: [data.skillId || 0],
+          projectCategory: data.projectTypeId || null,
+          regionIds: data.regionId ? [data.regionId] : null,
+          locationIds: data.locationId ? [data.locationId] : null,
+          departmentsIds: data.departmentId ? [data.departmentId] : null,
+          skillIds: data.skillId ? [data.skillId] : null,
           startDate: data.startDate,
           endDate: data.endDate,
           projectName: data.name,
           projectBudget: data.projectBudget,
-          poName: '',
-          poDescription: '',
-          allowOnOrderCreation: false,
-          SpecialProjectCategoryName: ''
+          allowOnOrderCreation: false
         });
         this.store.dispatch(new ShowSideDialog(true));
       }
@@ -455,19 +478,16 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
       if (data) {
         this.id = data?.id;
         this.form.setValue({
-          projectCategory: 0,
-          regionIds: [data.regionId || 0],
-          locationIds: [data.locationId || 0],
-          departmentsIds: [data.departmentId || 0],
-          skillIds: [data.skillId || 0],
+          regionIds: data.regionId ? [data.regionId] : null,
+          locationIds: data.locationId ? [data.locationId] : null,
+          departmentsIds: data.departmentId ? [data.departmentId] : null,
+          skillIds: data.skillId ? [data.skillId] : null,
           startDate: data.startDate,
           endDate: data.endDate,
-          projectName: '',
-          projectBudget: data.projectBudget,
           poName: data.poName,
+          projectBudget: data.projectBudget,
           poDescription: data.poNumber,
-          allowOnOrderCreation: false,
-          SpecialProjectCategoryName: ''
+          allowOnOrderCreation: false
         });
         this.store.dispatch(new ShowSideDialog(true));
       }
@@ -481,21 +501,11 @@ export class SpecialProjectContainerComponent implements OnInit, OnDestroy {
         this.id = data?.id;
         this.form.setValue({
           SpecialProjectCategoryName: data.specialProjectCategory,
-          projectCategory: 0,
-          regionIds: [0],
-          locationIds: [0],
-          departmentsIds: [0],
-          skillIds: [0],
-          startDate: null,
-          endDate: null,
-          projectName: '',
-          projectBudget: 0,
-          poName: '',
-          poDescription: '',
-          allowOnOrderCreation: false
         });
         this.store.dispatch(new ShowSideDialog(true));
       }
     });
   }
+
+
 }

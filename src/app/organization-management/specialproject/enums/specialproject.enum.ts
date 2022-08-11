@@ -40,39 +40,39 @@ export enum PurchaseOrderHeaderText {
 export enum SpecialProjectTableColumns {
   Id = 'id',
   Name = 'name',
-  OrganizationId ='organizationId',
+  OrganizationId = 'organizationId',
   ProjectTypeName = 'specialProjectCategory',
   RegionId = 'regionId',
   Region = 'regionName',
-  LocationId='locationId',
+  LocationId = 'locationId',
   Location = 'locationName',
-  DepartmentId ='departmentId',
+  DepartmentId = 'departmentId',
   Department = 'departmentName',
-  SkillId ='skillId',
+  SkillId = 'skillId',
   SkillName = 'skillName',
   ProjectBudget = 'projectBudget',
   StartDate = 'startDate',
   EndDate = 'endDate',
-  IsDeleted ='isDeleted'
+  IsDeleted = 'isDeleted'
 }
 
 export enum SpecialProjectHeaderText {
   Id = 'Id',
   Name = 'Name',
-  OrganizationId ='Organization Id',
+  OrganizationId = 'Organization Id',
   ProjectTypeName = 'ProjectType Name',
   RegionId = 'Region Id',
   Region = 'Region Name',
-  LocationId='Location Id',
+  LocationId = 'Location Id',
   Location = 'Location Name',
-  DepartmentId ='Department Id',
+  DepartmentId = 'Department Id',
   Department = 'Department Name',
-  SkillId ='Skill Id',
+  SkillId = 'Skill Id',
   SkillName = 'Skill Name',
   ProjectBudget = 'Project Budget',
   StartDate = 'Start Date',
   EndDate = 'End Date',
-  IsDeleted ='IsDeleted',
+  IsDeleted = 'IsDeleted',
 }
 
 export enum SpecilaProjectCategoryTableColumns {
@@ -87,4 +87,20 @@ export enum SpecilaProjectCategoryHeaderText {
   OrganizationId = 'Organization Id',
   Name = 'Category',
   IsDeleted = 'IsDeleted'
+}
+
+export enum FormControlNames {
+  ProjectCategory = 'projectCategory',
+  ProjectName = 'projectName',
+  RegionIds = 'regionIds',
+  LocationIds = 'locationIds',
+  DepartmentsIds = 'departmentsIds',
+  SkillIds = 'skillIds',
+  AllowOnOrderCreation = 'allowOnOrderCreation',
+  StartDate = 'startDate',
+  EndDate = 'endDate',
+  ProjectBudget = 'projectBudget',
+  PoName = 'poName',
+  PoDescription = 'poDescription',
+  SpecialProjectCategoryName = 'SpecialProjectCategoryName',
 }
