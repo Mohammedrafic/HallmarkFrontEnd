@@ -703,7 +703,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           this.getOrders();
           break;
         case OrganizationOrderManagementTabs.PermPlacement:
-          this.isLockMenuButtonsShown = false;
+          this.isLockMenuButtonsShown = true;
           this.refreshGridColumns(PermPlacementColumnsConfig, this.gridWithChildRow);
           this.getOrders();
           break;

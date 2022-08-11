@@ -337,7 +337,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.PermPlacement:
-        this.isLockMenuButtonsShown = false;
+        this.isLockMenuButtonsShown = true;
         this.refreshGridColumns(PermPlacementColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.ReOrders:
