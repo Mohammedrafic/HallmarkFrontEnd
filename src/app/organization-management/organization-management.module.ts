@@ -122,11 +122,9 @@ const sidebarIcons = {
     FilteredCredentialsComponent,
     MapCredentialsFormComponent,
     ReasonsComponent,
-
     ManualInvoiceRejectReasonComponent,
     ClosureReasonComponent,
-    RegionsComponent
-    ClosureReasonComponent,
+    RegionsComponent,
     SpecialProjectContainerComponent,
     PurchaseOrdersComponent,
     SpecialProjectsComponent
