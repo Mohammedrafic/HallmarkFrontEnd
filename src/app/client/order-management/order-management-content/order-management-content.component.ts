@@ -251,6 +251,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       jobStartDate: new FormControl(null),
       jobEndDate: new FormControl(null),
       orderStatuses: new FormControl([]),
+      annualSalaryRangeFrom: new FormControl(null),
+      annualSalaryRangeTo: new FormControl(null),
       candidateStatuses: new FormControl([]),
       candidatesCountFrom: new FormControl(null),
       candidatesCountTo: new FormControl(null),
@@ -421,7 +423,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       skillIds: this.filters.skillIds || [],
       orderTypes:
         this.activeTab === OrganizationOrderManagementTabs.PerDiem ||
-        this.activeTab === OrganizationOrderManagementTabs.ReOrders
+        this.activeTab === OrganizationOrderManagementTabs.ReOrders || 
+        this.activeTab === OrganizationOrderManagementTabs.PermPlacement
           ? []
           : this.filters.orderTypes || [],
       jobTitle: this.filters.jobTitle || null,
@@ -437,6 +440,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       agencyIds: this.filters.agencyIds || [],
       agencyType: this.filters.agencyType ? String(this.filters.agencyType) : '0',
       templateTitle: this.filters.templateTitle || null,
+      annualSalaryRangeFrom: this.filters.annualSalaryRangeFrom || null,
+      annualSalaryRangeTo: this.filters.annualSalaryRangeTo || null
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
   }
@@ -503,6 +508,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filters.orderId = this.filters.orderId || null;
     this.filters.billRateFrom = this.filters.billRateFrom || null;
     this.filters.billRateTo = this.filters.billRateTo || null;
+    this.filters.jobStartDate = this.filters.jobStartDate || null;
+    this.filters.jobEndDate = this.filters.jobEndDate || null;
+    this.filters.annualSalaryRangeFrom = this.filters.annualSalaryRangeFrom || null;
+    this.filters.annualSalaryRangeTo = this.filters.annualSalaryRangeTo || null;
     this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
     this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
     this.filters.openPositions = this.filters.openPositions || null;
@@ -967,6 +976,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       },
       agencyType: { type: ControlTypes.Radio, dataSource: { 1: 'Yes', 2: 'No' }, default: '0' },
       templateTitle: { type: ControlTypes.Text, valueType: ValueType.Text },
+      annualSalaryRangeFrom: {
+        type: ControlTypes.Text,
+        valueType: ValueType.Text,
+      },
+      annualSalaryRangeTo: {
+        type: ControlTypes.Text,
+        valueType: ValueType.Text,
+      },
     };
     this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe(() => {
       this.onFilterApply();

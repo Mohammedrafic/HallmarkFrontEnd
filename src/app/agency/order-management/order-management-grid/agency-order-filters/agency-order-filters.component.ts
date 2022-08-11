@@ -230,6 +230,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       openPositions: new FormControl(null),
       jobStartDate: new FormControl(null),
       jobEndDate: new FormControl(null),
+      annualSalaryRangeFrom: new FormControl(null),
+      annualSalaryRangeTo: new FormControl(null),
     });
   }
 
@@ -300,6 +302,8 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
       openPositions: { type: ControlTypes.Text, valueType: ValueType.Text },
       jobStartDate: { type: ControlTypes.Date, valueType: ValueType.Text },
       jobEndDate: { type: ControlTypes.Date, valueType: ValueType.Text },
+      annualSalaryRangeFrom: { type: ControlTypes.Text, valueType: ValueType.Text },
+      annualSalaryRangeTo: { type: ControlTypes.Text, valueType: ValueType.Text },
     };
   }
 }

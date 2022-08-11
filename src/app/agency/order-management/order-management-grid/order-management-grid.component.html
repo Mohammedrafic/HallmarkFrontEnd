@@ -143,8 +143,16 @@
       </ng-template>
     </e-column>
     <e-column field="shiftsNext90Days" headerText="# of Shifts Next 90 Days " width="150" [visible]="false"></e-column>
-    <e-column field="annualSalaryRangeFrom" headerText="Annual Salary From" textAlign="Left" width="200" [visible]="false"></e-column>
-    <e-column field="annualSalaryRangeTo" headerText="Annual Salary To" textAlign="Left" width="200" [visible]="false"></e-column>
+    <e-column field="annualSalaryRangeFrom" headerText="Annual Salary From" textAlign="Left" width="200" [visible]="false">
+      <ng-template #template let-data>
+        <span>{{ data.annualSalaryRangeFrom | currency: 'USD': 'symbol':'1.0-2' }}</span>
+      </ng-template>
+    </e-column>
+    <e-column field="annualSalaryRangeTo" headerText="Annual Salary To" textAlign="Left" width="200" [visible]="false">
+      <ng-template #template let-data>
+        <span>{{ data.annualSalaryRangeTo | currency: 'USD': 'symbol':'1.0-2' }}</span>
+      </ng-template>
+    </e-column>
   </e-columns>
 
   <ng-template #detailTemplate let-data>

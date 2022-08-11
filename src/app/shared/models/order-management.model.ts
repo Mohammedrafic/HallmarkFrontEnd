@@ -172,6 +172,8 @@ export type AgencyOrderFilters = {
   jobStartDate?: Date | null;
   jobEndDate?: Date | null;
   includeReOrders?: boolean;
+  annualSalaryRangeFrom?: string | null;
+  annualSalaryRangeTo?: string | null;
 };
 
 export type OrderCandidatesListPage = PageOfCollections<OrderCandidatesList>;
@@ -466,6 +468,8 @@ export class OrderFilter {
   filterModel?: FilterModel = {};
   isTemplate?: boolean;
   templateTitle?: string;
+  annualSalaryRangeFrom?: string | null;
+  annualSalaryRangeTo?: string | null;
 }
 
 export class SortModel {
