@@ -841,6 +841,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
   private populateForms(order: Order): void {
     const isStatusEditOrProgress = order.status === OrderStatus.Filled || order.status === OrderStatus.InProgress;
     this.isPermPlacementOrder = order.orderType === OrderType.PermPlacement;
+    this.orderTypeChanged.emit(order.orderType);
 
     const hourlyRate = order.hourlyRate ? parseFloat(order.hourlyRate.toString()).toFixed(2) : '';
     const joiningBonus = order.joiningBonus ? parseFloat(order.joiningBonus.toString()).toFixed(2) : '';

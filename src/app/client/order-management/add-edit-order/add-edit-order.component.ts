@@ -132,7 +132,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.addMenuItem(SubmitButtonItem.SaveForLater, 'Save For Later');
           this.removeMenuItem(SubmitButtonItem.Save);
         } else {
-          if (order?.orderType === OrderType.OpenPerDiem) {
+          if (order?.orderType === OrderType.OpenPerDiem || order?.orderType === OrderType.PermPlacement) {
             this.disableOrderType = true;
           }
           this.addMenuItem(SubmitButtonItem.Save, 'Save');
@@ -330,7 +330,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       departmentId,
       skillId,
       projectTypeId,
-      projectNameId,      
+      projectNameId,
       poNumberId,
       hourlyRate,
       openPositions,
