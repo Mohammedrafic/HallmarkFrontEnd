@@ -16,6 +16,7 @@ export class SpecialProject {
     startDate :Date;
     endDate: Date;
     isDeleted :boolean;
+    specialProjectCategory? : string ;
 }
 
 export type SpecialProjectPage = PageOfCollections<SpecialProject>;

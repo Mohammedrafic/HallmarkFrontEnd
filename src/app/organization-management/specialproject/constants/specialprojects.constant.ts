@@ -165,8 +165,8 @@ export const SpecialProjectColumnsDefinition = (actionCellParams: ICellRendererP
       hide: true
     },
     {
-      field: SpecialProjectTableColumns.ProjectTypeId,
-      headerName: SpecialProjectHeaderText.ProjectTypeId,
+      field: SpecialProjectTableColumns.ProjectTypeName,
+      headerName: SpecialProjectHeaderText.ProjectTypeName,
       ...commonColumn,
       filter: 'agSetColumnFilter',
       filterParams: {

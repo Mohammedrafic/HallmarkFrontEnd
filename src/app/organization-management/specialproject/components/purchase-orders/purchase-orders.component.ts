@@ -115,7 +115,6 @@ export class PurchaseOrdersComponent extends AbstractGridConfigurationComponent 
 
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
-    this.gridApi.sizeColumnsToFit();
     this.gridApi.setRowData(this.rowData);
   }
 
