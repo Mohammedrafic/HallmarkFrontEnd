@@ -29,7 +29,7 @@ export class BillRatesComponent implements OnInit, OnDestroy {
     }
   }
 
-  @Output() billRatesChanged: EventEmitter<BillRate | number> = new EventEmitter();
+  @Output() billRatesChanged: EventEmitter<any> = new EventEmitter();
 
   public billRateFormHeader: string;
   public billRatesControl: FormArray;
@@ -97,7 +97,8 @@ export class BillRatesComponent implements OnInit, OnDestroy {
       intervalMax: value.intervalMax && String(value.intervalMax),
       intervalMin: value.intervalMin && String(value.intervalMin),
       rateHour: rateHour,
-      editAllowed: false,
+      billType: value.billType,
+      editAllowed: value.editAllowed || false,
      }, { emitEvent: false });
 
     if (!value.billRateConfig.intervalMin) {

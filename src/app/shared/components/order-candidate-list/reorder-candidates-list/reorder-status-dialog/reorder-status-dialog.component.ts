@@ -35,6 +35,7 @@ import PriceUtils from '@shared/utils/price.utils';
 import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { SET_READONLY_STATUS } from '@shared/constants';
+import { BillRate } from "@shared/models";
 
 @Component({
   selector: 'app-reorder-status-dialog',
@@ -313,6 +314,48 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
         )
         .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
     }
+  }
+
+  updateOrganizationCandidateJobWithBillRate(bill: BillRate): void {
+    this.acceptForm.markAllAsTouched();
+    if (!this.acceptForm.errors && this.orderCandidateJob) {
+      const value = this.acceptForm.getRawValue();
+      this.store
+        .dispatch(
+          new UpdateOrganisationCandidateJob({
+            organizationId: this.orderCandidateJob.organizationId,
+            orderId: this.orderCandidateJob.orderId,
+            jobId: this.orderCandidateJob.jobId,
+            skillName: value.skillName,
+            offeredBillRate: this.orderCandidateJob?.offeredBillRate,
+            candidateBillRate: this.orderCandidateJob.candidateBillRate,
+            nextApplicantStatus: {
+              applicantStatus: this.orderCandidateJob.applicantStatus.applicantStatus,
+              statusText: this.orderCandidateJob.applicantStatus.statusText,
+            },
+            billRates: this.getBillRateForUpdate(bill),
+          })
+        )
+        .subscribe(() => this.store.dispatch(new ReloadOrganisationOrderCandidatesLists()));
+    }
+  }
+
+  getBillRateForUpdate(value: BillRate): BillRate[] {
+    let billRates;
+    const existingBillRateIndex = this.orderCandidateJob.billRates.findIndex(billRate => billRate.id === value.id);
+    if (existingBillRateIndex > -1) {
+      this.orderCandidateJob.billRates.splice(existingBillRateIndex, 1, value);
+      billRates = this.orderCandidateJob?.billRates;
+    } else {
+      if (typeof value === 'number') {
+        this.orderCandidateJob?.billRates.splice(value, 1);
+        billRates = this.orderCandidateJob?.billRates;
+      } else {
+        billRates = [...this.orderCandidateJob?.billRates as BillRate[], value];
+      }
+    }
+
+    return billRates;
   }
 
   private subscribeOnUpdateCandidateJobSucceed(): Observable<void> {

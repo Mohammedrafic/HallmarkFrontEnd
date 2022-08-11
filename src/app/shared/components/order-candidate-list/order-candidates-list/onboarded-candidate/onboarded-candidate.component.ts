@@ -151,43 +151,55 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
   }
 
-  public onBillRatesChanged(value: BillRate | number): void {
-    console.log(value, typeof value);
+  public onBillRatesChanged(bill: BillRate): void {
+    this.form.markAllAsTouched();
+    if (!this.form.errors && this.candidateJob) {
+      this.store
+        .dispatch(
+          new UpdateOrganisationCandidateJob({
+            orderId: this.candidateJob?.orderId as number,
+            organizationId: this.candidateJob?.organizationId as number,
+            jobId: this.candidateJob?.jobId as number,
+            nextApplicantStatus: {
+              applicantStatus: 60,
+              statusText: 'Onboard',
+            },
+            actualStartDate: this.candidateJob?.actualStartDate as string,
+            actualEndDate: this.candidateJob?.actualEndDate as string,
+            offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.availableStartDate as string),
+            candidateBillRate: this.candidateJob?.candidateBillRate as number,
+            offeredBillRate: this.candidateJob?.offeredBillRate,
+            requestComment: this.candidateJob?.requestComment as string,
+            clockId: this.candidateJob?.clockId,
+            guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
+            billRates: this.getBillRateForUpdate(bill),
+
+          })
+        )
+        .subscribe(() => {
+          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+          this.closeDialog();
+          this.store.dispatch(new SetIsDirtyOrderForm(true));
+        });
+    }
+  }
+
+  getBillRateForUpdate(value: BillRate): BillRate[] {
     let billRates;
-    if (typeof value === 'number') {
-      this.candidateJob?.billRates.splice(value, 1);
+    const existingBillRateIndex = this.candidateJob?.billRates.findIndex(billRate => billRate.id === value.id) as number;
+    if (existingBillRateIndex > -1) {
+      this.candidateJob?.billRates.splice(existingBillRateIndex, 1, value);
       billRates = this.candidateJob?.billRates;
     } else {
-      billRates = [...this.candidateJob?.billRates as BillRate[], value];
+      if (typeof value === 'number') {
+        this.candidateJob?.billRates.splice(value, 1);
+        billRates = this.candidateJob?.billRates;
+      } else {
+        billRates = [...this.candidateJob?.billRates as BillRate[], value];
+      }
     }
 
-    this.store
-      .dispatch(
-        new UpdateOrganisationCandidateJob({
-          orderId: this.candidateJob?.orderId as number,
-          organizationId: this.candidateJob?.organizationId  as number,
-          jobId: this.candidateJob?.jobId  as number,
-          nextApplicantStatus: {
-            applicantStatus: 60,
-            statusText: 'Onboard',
-          },
-          candidateBillRate: this.candidateJob?.candidateBillRate as number,
-          offeredBillRate: this.candidateJob?.offeredBillRate,
-          requestComment: this.candidateJob?.requestComment as string,
-          actualStartDate: this.candidateJob?.actualStartDate as string,
-          actualEndDate: this.candidateJob?.actualEndDate as string,
-          clockId: this.candidateJob?.clockId,
-          guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
-          offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.availableStartDate as string),
-          allowDeployWoCredentials: true,
-          billRates,
-        })
-      )
-      .subscribe(() => {
-        this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
-        this.closeDialog();
-        this.store.dispatch(new SetIsDirtyOrderForm(true));
-      });
+    return billRates as BillRate[];
   }
 
   private onAccept(): void {
@@ -226,7 +238,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
       this.candidateJob = value;
       if (value) {
-        this.billRatesData = [...value.billRates];
+        this.billRatesData = [...value?.billRates];
         this.form.patchValue({
           jobId: value.orderId,
           date: [value.order.jobStartDate, value.order.jobEndDate],
