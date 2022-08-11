@@ -56,29 +56,17 @@
                 <div class="input-container" [ngClass]="field.widthStyle || ''">
                   <label [for]="field.field">{{ field.title }}<span *ngIf="field.required" class="required">*</span>
                   </label>
-                  <div class="input-group">
+                  <div class="input-group picker">
                     <ejs-datepicker
                       name="serviceDate"
                       class="datepicker"
-                      format="dd/MM/yyyy"
+                      format="MM/dd/yyyy"
                       appValidateWithMessage
-                      placeholder="DD/MM/YYYY"
+                      placeholder="MM/DD/YYYY"
                       [max]="today"
                       [formControlName]="field.field"
                     >
                     </ejs-datepicker>
-                  </div>
-                </div>
-              </ng-template>
-
-              <ng-template [ngSwitchCase]="FieldTypes.SearchDD">
-                <div class="input-container" [ngClass]="field.widthStyle || ''">
-                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span></label>
-                  <div class="input-group">
-                    <ejs-autocomplete
-                    [fields]="dropDownFieldsConfig"
-                    [formControlName]="field.field"
-                    ></ejs-autocomplete>
                   </div>
                 </div>
               </ng-template>

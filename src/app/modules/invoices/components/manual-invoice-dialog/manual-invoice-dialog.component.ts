@@ -18,7 +18,7 @@ import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoiceConfirmMessages } from '../../constants/messages.constant';
 import { InvoicesState } from "../../store/state/invoices.state";
 import { InvoiceMetaAdapter, InvoicesAdapter, ManualInvoiceAdapter } from '../../helpers';
-import { ManualInvoiceStrategy, ManualInvoiceStrategyMap } from '../../helpers/manual-invoice-strategy';
+import { ManualInvoiceStrategy, ManualInvoiceStrategyMap } from '../../helpers/manual-invoice-strategy';``
 
 @Component({
   selector: 'app-manual-invoice-dialog',
@@ -82,7 +82,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     const dto = ManualInvoiceAdapter.adapPostDto(this.form.value, this.searchOptions, orgId);
 
     if (!dto) {
-      this.store.dispatch(new ShowToast(MessageTypes.Warning, 'Sorry such job ID not found'));
+      this.store.dispatch(new ShowToast(MessageTypes.Warning, 'Sorry, such job ID not found'));
       return;
     }
 
