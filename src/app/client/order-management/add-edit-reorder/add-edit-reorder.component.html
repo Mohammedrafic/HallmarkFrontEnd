@@ -80,5 +80,13 @@
       label="Open Positions"
     ></app-numeric-textbox>
   </div>
-  <app-comments [useBackground]="false"></app-comments>
+  <div tabindex="0" class="e-card comments">
+    <div class="e-card-content">
+      <app-comments
+        [comments]="comments"
+        [commentContainerId]="commentContainerId"
+        [useBackground]="false"
+        [isCreating]="!isEditMode"></app-comments>
+    </div>
+  </div>
 </form>

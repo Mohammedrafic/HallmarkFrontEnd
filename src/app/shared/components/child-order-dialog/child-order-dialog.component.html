@@ -40,7 +40,7 @@
             <e-tabitem>
               <ng-template #headerText>Order Details</ng-template>
               <ng-template #content>
-                  <section class="order-details"  *ngIf="selectedOrder$ | async as currentOrder">
+                  <section class="order-details" *ngIf="selectedOrder$ | async as currentOrder">
                     <section class="job-details">
                       <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
                     </section>
@@ -57,7 +57,7 @@
                       <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
                       <hr />
                     </ng-container>
-                    <app-order-details [currentOrder]="currentOrder"></app-order-details>
+                    <app-order-details [isPosition]="true" [currentOrder]="currentOrder"></app-order-details>
                   </section>
               </ng-template>
             </e-tabitem>
@@ -115,7 +115,7 @@
                             </ejs-accordion>
                           </div>
                           <div class="comments">
-                            <app-comments></app-comments>
+                            <app-comments *ngIf="candidateJob" [comments]="comments" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
                           </div>
                         </section>
 

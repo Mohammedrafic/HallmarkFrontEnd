@@ -3,7 +3,10 @@ export class Comment {
   text: string;
   isExternal: boolean;
   commentContainerId: number;
-  creationDate: Date;
+  createdAt: Date;
+  firstName: string;
+  lastName: string;
+  userId: string;
   new?: boolean;
   isRead?: boolean;
 }

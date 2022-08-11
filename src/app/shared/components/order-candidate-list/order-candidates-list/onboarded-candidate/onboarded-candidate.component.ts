@@ -26,6 +26,8 @@ import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { SET_READONLY_STATUS } from '@shared/constants';
 import { toCorrectTimezoneFormat } from "@shared/utils/date-time.utils";
+import { CommentsService } from '@shared/services/comments.service';
+import { Comment } from '@shared/models/comment.model';
 import { OrderCandidateListViewService } from "@shared/components/order-candidate-list/order-candidate-list-view.service";
 
 @Component({
@@ -91,11 +93,14 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
 
+  public comments: Comment[] = [];
+
   constructor(
     private datePipe: DatePipe,
     private store: Store,
     private actions$: Actions,
-    private orderCandidateListViewService: OrderCandidateListViewService
+    private orderCandidateListViewService: OrderCandidateListViewService,
+    private commentsService: CommentsService
     ) {}
 
   ngOnInit(): void {
@@ -113,6 +118,12 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private getComments(): void {
+    this.commentsService.getComments(this.candidateJob?.commentContainerId as number, null).subscribe((comments: Comment[]) => {
+      this.comments = comments;
+    });
   }
 
   public onDropDownChanged(event: { itemData: { applicantStatus: ApplicantStatus; isEnabled: boolean } }): void {
@@ -247,6 +258,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
       this.candidateJob = value;
       if (value) {
+        this.getComments();
         this.billRatesData = [...value?.billRates];
         this.form.patchValue({
           jobId: value.orderId,

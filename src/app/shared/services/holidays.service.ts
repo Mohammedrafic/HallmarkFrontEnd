@@ -45,7 +45,6 @@ export class HolidaysService {
    * @return list of holidays
    */
      public getAllMasterHolidays(): Observable<Holiday[]> {
-       // TODO: pending BE
       return this.http.get<Holiday[]>('/api/MasterHolidays/all');
     }
 

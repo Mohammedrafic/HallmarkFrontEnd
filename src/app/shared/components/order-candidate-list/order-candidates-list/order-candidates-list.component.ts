@@ -69,6 +69,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
           this.store.dispatch(
             new GetOrderApplicantsData(this.order.orderId, this.order.organizationId, this.candidate.candidateId)
           );
+          data.candidateJobId && this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));
           this.openDialog(this.apply);
         } else if (allowedAcceptStatuses.includes(this.candidate.status)) {
           this.store.dispatch(new GetCandidateJob(this.order.organizationId, data.candidateJobId));

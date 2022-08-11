@@ -38,6 +38,8 @@ import { ShowToast } from 'src/app/store/app.actions';
 import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
+import { Comment } from '@shared/models/comment.model';
+import { CommentsService } from '@shared/services/comments.service';
 
 @Component({
   selector: 'app-offer-deployment',
@@ -110,7 +112,9 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
   private currentApplicantStatus: ApplicantStatus;
   private readOnlyMode: boolean;
 
-  constructor(private store: Store, private actions$: Actions) {}
+  public comments: Comment[] = [];
+
+  constructor(private store: Store, private actions$: Actions, private commentsService: CommentsService) {}
 
   public ngOnChanges(changes: SimpleChanges): void {
     this.readOnlyMode =
@@ -256,11 +260,18 @@ export class OfferDeploymentComponent implements OnInit, OnDestroy, OnChanges {
     });
   }
 
+  private getComments(): void {
+    this.commentsService.getComments(this.candidateJob?.commentContainerId as number, null).subscribe((comments: Comment[]) => {
+      this.comments = comments;
+    });
+  }
+
   private subscribeOnInitialData(): void {
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrderCandidateJob) => {
       this.candidateJob = data;
 
       if (data) {
+        this.getComments();
         this.currentApplicantStatus = data.applicantStatus;
         this.billRatesData = [...data.billRates];
         this.setFormValue(data);

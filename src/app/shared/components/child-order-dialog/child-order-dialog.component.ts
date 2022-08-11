@@ -28,6 +28,8 @@ import { OrderStatusText } from '@shared/enums/status';
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
 import { ShowCloseOrderDialog } from '../../../store/app.actions';
 import { OrderStatus } from '@shared/enums/order-management';
+import { CommentsService } from '@shared/services/comments.service';
+import { Comment } from '@shared/models/comment.model';
 
 enum Template {
   accept,
@@ -62,6 +64,9 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Select(OrderManagementContentState.candidatesJob)
   candidateJobState$: Observable<OrderCandidateJob>;
 
+  @Select(OrderManagementState.candidatesJob)
+  public agencyCandidatesJob$: Observable<OrderCandidateJob>;
+
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public orderType = OrderType;
@@ -77,10 +82,11 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   public acceptForm = AcceptFormComponent.generateFormGroup();
   public candidateJob: OrderCandidateJob | null;
   public candidateStatus = CandidatStatus;
+  public comments: Comment[] = [];
 
   private isAlive = true;
 
-  constructor(private chipsCssClass: ChipsCssClass, private router: Router, private store: Store) {}
+  constructor(private chipsCssClass: ChipsCssClass, private router: Router, private store: Store, private commentsService: CommentsService) {}
 
   ngOnInit(): void {
     this.isAgency = this.router.url.includes('agency');
@@ -198,9 +204,9 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.openEvent.pipe(takeWhile(() => this.isAlive)).subscribe((data) => {
       if (data) {
         this.tab.select(1);
-        const [order, candidat] = data;
+        const [order, candidate] = data;
         this.order = order as MergedOrder;
-        this.candidate = candidat;
+        this.candidate = candidate;
         this.getTemplate();
         windowScrollTop();
         this.sideDialog.show();
@@ -213,13 +219,31 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  private subscribeOnCandidateJob(): void {
-    this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
-      this.candidateJob = orderCandidateJob;
-      if (orderCandidateJob) {
-        this.setAcceptForm(orderCandidateJob);
-      }
+  private getComments(): void {
+    this.commentsService.getComments(this.candidateJob?.commentContainerId as number, null).subscribe((comments: Comment[]) => {
+      this.comments = comments;
     });
+  }
+
+  private subscribeOnCandidateJob(): void {
+    if (this.isOrganization) {
+      this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
+        this.candidateJob = orderCandidateJob;
+        if (orderCandidateJob) {
+          this.getComments();
+          this.setAcceptForm(orderCandidateJob);
+        }
+      });
+    }
+    if (this.isAgency) {
+      this.agencyCandidatesJob$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
+        this.candidateJob = orderCandidateJob;
+        if (orderCandidateJob) {
+          this.getComments();
+          this.setAcceptForm(orderCandidateJob);
+        }
+      });
+    }
   }
 
   private setAcceptForm({
