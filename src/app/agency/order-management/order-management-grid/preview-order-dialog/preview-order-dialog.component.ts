@@ -66,7 +66,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   }
 
   public get getTitle(): string {
-    return this.isReOrder ? `Re-Order ID ` : `Order ID ` + `${this.order?.organizationPrefix}-${this.order?.orderId || this.order?.id}`;
+    return this.isReOrder ? `Re-Order ID ` : `Order ID ` + `${this.order?.organizationPrefix}-${this.order?.publicId}`;
   }
 
   ngOnInit(): void {
