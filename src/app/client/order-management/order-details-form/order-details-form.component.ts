@@ -553,10 +553,7 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
         return;
       }
 
-      const { name, email, mobilePhone } = suggestedDetails.contactDetails;
       const { address, state, city, zipCode } = suggestedDetails.workLocation;
-
-      this.populateContactDetailsForm(name, email, mobilePhone);
 
       const workLocationsFormArray = this.workLocationForm.controls['workLocations'] as FormArray;
       const firstWorlLocationsControl = workLocationsFormArray.at(0) as FormGroup;

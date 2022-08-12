@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
-import { filter, Observable, takeUntil } from 'rxjs';
+import { debounceTime, filter, Observable, takeUntil, throttleTime } from 'rxjs';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
@@ -39,20 +39,24 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   @Select(SecurityState.organisations) public readonly allOrganizations$: Observable<UserStateModel['organizations']>;
 
-  public filteredItems: FilteredItem[] = [];
+
+  private filteredItems: FilteredItem[] = [];
+  private filters: DashboardFiltersModel = {} as DashboardFiltersModel;
+  private regions: OrganizationRegion[] = [];
+  private sortedSkillsByOrgId: Record<string, AllOrganizationsSkill[]> = {};
+  private commonSkillsIds: number[] = [];
+
   public widgetFilterFormGroup: FormGroup;
-  public filters: DashboardFiltersModel = {} as DashboardFiltersModel;
   public filterColumns: IFilterColumnsDataModel = {} as IFilterColumnsDataModel;
-  public regions: OrganizationRegion[] = [];
-  public optionFields = {
+  public readonly optionFields = {
     text: 'name',
     value: 'id',
   };
-  public skillsFields = {
+  public readonly skillsFields = {
     text: 'skillDescription',
     value: 'id',
   };
-  public orgsFields = {
+  public readonly orgsFields = {
     text: 'name',
     value: 'organizationId',
   };
@@ -77,6 +81,10 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     return this.widgetFilterFormGroup.get(FilterColumnTypeEnum.DEPARTMENT)?.value?.length || 0;
   }
 
+  get commonSkills(): AllOrganizationsSkill[] {
+    return this.sortedSkillsByOrgId['null'] || [];
+  }
+
   constructor(
     private readonly store: Store,
     private readonly fb: FormBuilder,
@@ -94,7 +102,6 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
-    changes['savedFilterItems'] && this.getFilterState();
     changes['allSkills'] && this.onSkillDataLoadHandler();
     changes['organizationStructure'] && this.onOrganizationStructureDataLoadHandler();
     changes['userIsAdmin'] && this.setupAdminFilter();
@@ -122,10 +129,10 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     this.actions
       .pipe(ofActionDispatched(ShowFilterDialog), filter((data) => data.isDialogShown), takeUntil(this.destroy$))
       .subscribe(() => {
-        this.getFilterState();
+        this.onSkillDataLoadHandler();
         this.onOrganizationStructureDataLoadHandler();
         this.onFilterControlValueChangedHandler();
-        this.onSkillDataLoadHandler();
+        this.getFilterState();
         this.setFilterState();
       });
   }
@@ -176,20 +183,28 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   private subscribeToOrganizationChanges(): void {
     if(this.userIsAdmin) {
-    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.ORGANIZATION)?.valueChanges.subscribe((val: number[]) => {
+    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.ORGANIZATION)?.valueChanges.pipe(throttleTime(100)).subscribe((val: number[]) => {
       this.cdr.markForCheck();
       if(val?.length) {
         const selectedOrganizations: Organisation[] = val.map((id) => this.allOrganizations.find((org) => org.organizationId === id) as Organisation);
       
         this.filterColumns.regionIds.dataSource = [];
+        this.filterColumns.skillIds.dataSource = [];
+        const allOrganizationSkills: AllOrganizationsSkill[] = [];
+        
         selectedOrganizations.forEach((organization: Organisation) => {
+          this.sortedSkillsByOrgId[organization.organizationId] && allOrganizationSkills.push(...this.sortedSkillsByOrgId[organization.organizationId]);
           organization.regions?.forEach((region: OrganizationRegion) => (region.orgName = organization.name));
           this.filterColumns.regionIds.dataSource.push(...(organization.regions as []));
         })
+        
+        this.filterColumns.skillIds.dataSource.push(...this.commonSkills as [], ...allOrganizationSkills as [])
       } else {
         this.filterColumns.regionIds.dataSource = [];
+        this.filterColumns.skillIds.dataSource = this.commonSkills;
+        this.setCommonSkillsToFormControl();
         this.widgetFilterFormGroup.get(FilterColumnTypeEnum.REGION)?.setValue([]);
-        this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
+        this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns)
       }
     })
   }
@@ -198,7 +213,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   public onFilterControlValueChangedHandler(): void {
     this.subscribeToOrganizationChanges();
 
-    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.REGION)?.valueChanges.subscribe((val: number[]) => {
+    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.REGION)?.valueChanges.pipe(throttleTime(100)).subscribe((val: number[]) => {
       this.cdr.markForCheck();
       if (val?.length) {
         const selectedRegions: OrganizationRegion[] = val.map((id) => {
@@ -219,7 +234,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
       }
     });
 
-    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.LOCATION)?.valueChanges.subscribe((val: number[]) => {
+    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.LOCATION)?.valueChanges.pipe(throttleTime(100)).subscribe((val: number[]) => {
       this.cdr.markForCheck();
       if (val?.length) {
         const selectedLocations: OrganizationLocation[] = val.map((id) => (this.filterColumns.locationIds.dataSource as any[]).find((location: OrganizationLocation) => location.id === id));
@@ -235,9 +250,17 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
       }
     });
 
-    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.DEPARTMENT)?.valueChanges.subscribe(() => this.cdr.markForCheck());
+    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.DEPARTMENT)?.valueChanges.pipe(throttleTime(100)).subscribe(() => this.cdr.markForCheck());
 
-    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.valueChanges.subscribe(() => this.cdr.markForCheck());
+    this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.valueChanges.pipe(throttleTime(100)).subscribe(() => this.cdr.markForCheck());
+  }
+
+  private setCommonSkillsToFormControl(): void {
+    const selectedSkills = this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.value;
+    if(selectedSkills.length) {
+      const commonSkills = selectedSkills.filter((value: number) => this.commonSkillsIds.includes(value));
+      this.widgetFilterFormGroup.get(FilterColumnTypeEnum.SKILL)?.setValue([...commonSkills]);
+    }
   }
 
   private onOrganizationStructureDataLoadHandler(): void {
@@ -255,8 +278,26 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   }
 
   private onSkillDataLoadHandler(): void {
-    if(this.allSkills) {
-      this.filterColumns.skillIds.dataSource = this.allSkills;
+    if (this.allSkills) {
+      let skills;
+      this.sortedSkillsByOrgId = {};
+      this.commonSkillsIds = [];
+      if (this.userIsAdmin) {
+        this.allSkills.forEach((skill) => {
+          if (skill.businessUnitId === null) {
+            this.commonSkillsIds.push(skill.id);
+          }
+          if (skill.businessUnitId in this.sortedSkillsByOrgId) {
+            this.sortedSkillsByOrgId[skill.businessUnitId].push(skill);
+          } else {
+            this.sortedSkillsByOrgId[skill.businessUnitId] = [skill];
+          }
+        });
+        skills = this.commonSkills;
+      } else {
+        skills = this.allSkills;
+      }
+      this.filterColumns.skillIds.dataSource = skills;
     }
   }
 
@@ -281,11 +322,11 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   public setFilterState(): void {
     if (this.userIsAdmin) {
       this.allOrganizations$
-        .pipe(takeUntil(this.destroy$), filter(Boolean))
+        .pipe(takeUntil(this.destroy$), filter(Boolean), debounceTime(300))
         .subscribe(() => this.setFormControlValue());
     } else {
       this.organizationStructure$
-        .pipe(takeUntil(this.destroy$), filter(Boolean))
+        .pipe(takeUntil(this.destroy$), filter(Boolean), debounceTime(300))
         .subscribe(() => this.setFormControlValue());
     }
   }
