@@ -239,3 +239,8 @@ export class GetContactDetails {
   static readonly type = '[order management] Get Contact Details';
   constructor(public departmentId: number) {}
 }
+
+export class GetExtensions {
+  static readonly type = '[order management] Get Extensions';
+  constructor(public id: number) {}
+}

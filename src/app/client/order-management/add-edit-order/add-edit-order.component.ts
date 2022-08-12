@@ -71,6 +71,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public SelectedTab = SelectedTab;
   public orderId: number;
+  public publicId: number;
   public prefix: string;
 
   public title: string;
@@ -117,6 +118,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (this.orderId > 0) {
       this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
         this.prefix = order?.organizationPrefix as string;
+        this.publicId = order?.publicId as number;
         this.isPermPlacementOrder = order?.orderType === OrderType.PermPlacement;
         if (order?.credentials) {
           this.orderCredentials = [...order.credentials];

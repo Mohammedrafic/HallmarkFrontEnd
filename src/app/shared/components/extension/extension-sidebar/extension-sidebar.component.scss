@@ -1,0 +1,48 @@
+@import "../../../../styles/variables/colors";
+
+.extension {
+  display: flex;
+  flex-direction: column;
+  row-gap: 20px;
+
+  &__info {
+    display: flex;
+    column-gap: 20px;
+
+    .extension__details {
+      display: flex;
+      flex-direction: column;
+      row-gap: 20px;
+      width: 60%;
+
+      .config {
+        display: flex;
+        flex-direction: column;
+        row-gap: 12px;
+
+        .durations {
+          display: flex;
+          align-items: flex-end;
+          column-gap: 12px;
+        }
+
+        .extension-dates {
+          display: flex;
+          column-gap: 12px;
+
+          &__control {
+            width: 50%;
+          }
+        }
+
+        .bill-rate__control {
+          width: 50%;
+        }
+      }
+    }
+  }
+
+  &__comments {
+    width: 40%;
+  }
+}

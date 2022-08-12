@@ -4,14 +4,14 @@
       <h3>Candidates List</h3>
     </div>
     <div class="input-container">
-      <div class="input-group switch" >
+      <div class="input-group switch">
         <ejs-switch
           id="switcher"
           class="switch"
-          (change)="onSwitcher($event);"
+          (change)="onSwitcher($event)"
           [checked]="includeDeployedCandidates"
         ></ejs-switch>
-        <label class="switch-label" for="switcher">Include <br/>Deployed</label>
+        <label class="switch-label" for="switcher">Include <br />Deployed</label>
       </div>
     </div>
   </div>
@@ -34,7 +34,12 @@
       <e-column textAlign="Right" width="80">
         <ng-template #template let-data>
           <div class="row-tool-buttons">
-            <div ejs-button cssClass="e-flat primary-icon-button custom-button" [class.btn-icon__disabled]="order?.isClosed" (click)="onEdit(data, $event)">
+            <div
+              ejs-button
+              cssClass="e-flat primary-icon-button custom-button"
+              [class.btn-icon__disabled]="order?.isClosed"
+              (click)="onEdit(data, $event)"
+            >
               <span class="edit-button"><i-feather name="edit" class="icon"></i-feather></span>
             </div>
           </div>
@@ -42,10 +47,11 @@
       </e-column>
       <e-column field="firstName" headerText="Name" textAlign="Left" width="140">
         <ng-template #template let-data>
-          <div class="link" (click)="onViewNavigation(data)">{{data.lastName}}, {{data.firstName}}
+          <div class="link" (click)="onViewNavigation(data)">
+            {{ data.lastName }}, {{ data.firstName }}
             <ng-container *ngIf="data.deployedCandidateInfo && data.statusName !== 'Onboard'">
               <ejs-tooltip content="Deployed Candidate" position="TopRight">
-                <i-feather name="briefcase" class="icon" ></i-feather>
+                <i-feather name="§" class="icon"></i-feather>
               </ejs-tooltip>
             </ng-container>
           </div>
@@ -63,25 +69,25 @@
         </ng-template>
       </e-column>
       <e-column field="skill" headerText="Skill" textAlign="Left" width="230" *ngIf="isAgency; else agencyColumn">
-        </e-column>
+      </e-column>
       <ng-template #agencyColumn>
         <e-column field="agency" textAlign="Left" headerText="Agency" width="200" *ngIf="!isAgency">
           <ng-template #template let-data>
-            {{data.agencyName}}
+            {{ data.agencyName }}
           </ng-template>
         </e-column>
       </ng-template>
       <e-column field="hourlyBillRate" textAlign="Right" headerText="Bill Rate &dollar;" width="200">
         <ng-template #template let-data>
           <div class="align-right">
-            {{data.hourlyBillRate | billRate: data.candidateBillRate: data.status: data.offeredBillRate}}
+            {{ data.hourlyBillRate | billRate: data.candidateBillRate:data.status:data.offeredBillRate }}
           </div>
         </ng-template>
       </e-column>
       <e-column field="submissionsPercentage" headerText="Submission %" textAlign="Left" width="130">
         <ng-template #template let-data>
           <div class="progress-bar">
-            <span>{{data.submissionsPercentage}}</span>
+            <span>{{ data.submissionsPercentage }}</span>
             <app-custom-progress-bar [value]="data.submissionsPercentage"></app-custom-progress-bar>
           </div>
         </ng-template>
@@ -89,7 +95,7 @@
       <e-column field="onboardedPercentage" headerText="Onboard %" textAlign="Left" width="130">
         <ng-template #template let-data>
           <div class="progress-bar">
-            <span>{{data.onboardedPercentage}}</span>
+            <span>{{ data.onboardedPercentage }}</span>
             <app-custom-progress-bar [value]="data.onboardedPercentage"></app-custom-progress-bar>
           </div>
         </ng-template>
@@ -152,25 +158,38 @@
   <ng-container *ngTemplateOutlet="templateState | async"></ng-container>
 
   <ng-template #onboarded>
-    <app-onboarded-candidate (closeModalEvent)="onCloseDialog()" [candidate]="candidate" [isAgency]="isAgency"></app-onboarded-candidate>
+    <app-onboarded-candidate
+      (closeModalEvent)="onCloseDialog()"
+      [candidate]="candidate"
+      [isAgency]="isAgency"
+    ></app-onboarded-candidate>
   </ng-template>
 
   <ng-template #accept>
-    <app-accept-candidate (closeModalEvent)="onCloseDialog()" [candidate]="candidate" [isAgency]="isAgency"></app-accept-candidate>
+    <app-accept-candidate
+      (closeModalEvent)="onCloseDialog()"
+      [candidate]="candidate"
+      [isAgency]="isAgency"
+    ></app-accept-candidate>
   </ng-template>
 
   <ng-template #apply>
-    <app-apply-candidate (closeDialogEmitter)="onCloseDialog()"
-                         [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
-                         [candidate]="candidate"
-                         [isAgency]="isAgency"
-                         [isLocked]="(selectedOrder$ | async)?.isLocked"
+    <app-apply-candidate
+      (closeDialogEmitter)="onCloseDialog()"
+      [billRatesData]="$any((selectedOrder$ | async)?.billRates)"
+      [candidate]="candidate"
+      [isAgency]="isAgency"
+      [isLocked]="(selectedOrder$ | async)?.isLocked"
     >
     </app-apply-candidate>
   </ng-template>
 
   <ng-template #offerDeployment>
-    <app-offer-deployment (closeDialogEmitter)="onCloseDialog()" [candidate]="candidate" [isAgency]="isAgency"></app-offer-deployment>
+    <app-offer-deployment
+      (closeDialogEmitter)="onCloseDialog()"
+      [candidate]="candidate"
+      [isAgency]="isAgency"
+    ></app-offer-deployment>
   </ng-template>
   <ng-template #footerTemplate>
     <app-dialog-next-previous title="Candidate" [options]="dialogNextPreviousOption"></app-dialog-next-previous>

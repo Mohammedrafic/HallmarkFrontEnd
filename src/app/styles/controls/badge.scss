@@ -18,3 +18,23 @@
   transition: transform 500ms;
   transform: translate(-0.7rem, -0.7rem);
 }
+
+.e-badge.e-badge-success.e-badge-pill {
+  background-color: $primary-active-blue-15 !important;
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.default-icon-button {
+  &.with-badge {
+    position: relative;
+
+    .e-badge {
+      &.right-overflow {
+        position: absolute;
+        left: 15px;
+        top: 5px;
+      }
+    }
+  }
+}

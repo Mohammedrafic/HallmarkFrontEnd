@@ -10,19 +10,32 @@ import {
   AccordionComponent,
   ExpandEventArgs,
   SelectEventArgs,
-  TabComponent
+  SelectingEventArgs,
+  TabComponent,
 } from '@syncfusion/ej2-angular-navigations';
 
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { OrderType } from '@shared/enums/order-type';
-import { AgencyOrderManagement, Order, OrderCandidateJob, OrderManagementChild, } from '@shared/models/order-management.model';
-import { AcceptFormComponent } from "@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component";
-import { AccordionOneField } from "@shared/models/accordion-one-field.model";
-import PriceUtils from "@shared/utils/price.utils";
+import {
+  AgencyOrderManagement,
+  Order,
+  OrderCandidateJob,
+  OrderFilter,
+  OrderManagementChild,
+} from '@shared/models/order-management.model';
+import { AcceptFormComponent } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
+import { AccordionOneField } from '@shared/models/accordion-one-field.model';
+import PriceUtils from '@shared/utils/price.utils';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
-import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
-import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
+import { GetAgencyExtensions, GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
+import {
+  GetAvailableSteps,
+  GetOrganisationCandidateJob,
+  ReloadOrganisationOrderCandidatesLists,
+  UpdateOrganisationCandidateJob,
+  GetExtensions
+} from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrderStatusText } from '@shared/enums/status';
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
@@ -30,6 +43,12 @@ import { ShowCloseOrderDialog } from '../../../store/app.actions';
 import { OrderStatus } from '@shared/enums/order-management';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
+import { BillRate } from "@shared/models";
+import { toCorrectTimezoneFormat } from "@shared/utils/date-time.utils";
+import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
+import { ExtensionSidebarComponent } from '@shared/components/extension/extension-sidebar/extension-sidebar.component';
+import { addDays } from '@shared/utils/date-time.utils';
+import { AppState } from '../../../store/app.state';
 
 enum Template {
   accept,
@@ -49,11 +68,13 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() order: MergedOrder;
   @Input() openEvent: Subject<[AgencyOrderManagement, OrderManagementChild] | null>;
   @Input() candidate: OrderManagementChild;
+  @Input() filters: OrderFilter;
 
   @ViewChild('sideDialog') sideDialog: DialogComponent;
   @ViewChild('chipList') chipList: ChipListComponent;
   @ViewChild('tab') tab: TabComponent;
   @ViewChild('accordionElement') accordionComponent: AccordionComponent;
+  @ViewChild(ExtensionSidebarComponent) extensionSidebarComponent: ExtensionSidebarComponent;
 
   @Select(OrderManagementState.selectedOrder)
   public agencySelectedOrder$: Observable<Order>;
@@ -66,6 +87,9 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
 
   @Select(OrderManagementState.candidatesJob)
   public agencyCandidatesJob$: Observable<OrderCandidateJob>;
+
+  @Select(OrderManagementContentState.extensions) organizationExtensions$: Observable<any>;
+  @Select(OrderManagementState.extensions) agencyExtensions$: Observable<any>;
 
   public firstActive = true;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
@@ -83,24 +107,41 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   public candidateJob: OrderCandidateJob | null;
   public candidateStatus = CandidatStatus;
   public comments: Comment[] = [];
+  public isExtensionSidebarShown: boolean;
+  public isAddExtensionBtnAvailable: boolean;
+  public extensions$: Observable<any>;
+
+  public readonly buttonTypeEnum = ButtonTypeEnum;
+  public readonly orderStatus = OrderStatus;
 
   private isAlive = true;
 
-  constructor(private chipsCssClass: ChipsCssClass, private router: Router, private store: Store, private commentsService: CommentsService) {}
+  constructor(
+    private chipsCssClass: ChipsCssClass,
+    private router: Router,
+    private store: Store,
+    private commentsService: CommentsService
+  ) {}
 
   ngOnInit(): void {
     this.isAgency = this.router.url.includes('agency');
     this.isOrganization = this.router.url.includes('client');
     this.selectedOrder$ = this.isAgency ? this.agencySelectedOrder$ : this.orgSelectedOrder$;
+    this.extensions$ = this.isAgency ? this.agencyExtensions$ : this.organizationExtensions$;
     this.subscribeOnCandidateJob();
     this.onOpenEvent();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['candidate']?.currentValue) {
+    const candidate = changes['candidate']?.currentValue;
+    if (candidate) {
       this.setCloseOrderButtonState();
+      this.setAddExtensionBtnState(candidate);
+
       if (this.chipList) {
-        this.chipList.cssClass = this.chipsCssClass.transform(this.orderStatusText[changes['candidate'].currentValue.orderStatus]);
+        this.chipList.cssClass = this.chipsCssClass.transform(
+          this.orderStatusText[changes['candidate'].currentValue.orderStatus]
+        );
       }
     }
   }
@@ -110,7 +151,8 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   setCloseOrderButtonState(): void {
-    this.disabledCloseButton = !!this.candidate?.positionClosureReasonId || this.candidate.orderStatus !== OrderStatus.Filled;
+    this.disabledCloseButton =
+      !!this.candidate?.positionClosureReasonId || this.candidate.orderStatus !== OrderStatus.Filled;
   }
 
   closeOrder(order: MergedOrder): void {
@@ -118,7 +160,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.order = { ...order };
   }
 
-  public onTabSelecting(event: SelectEventArgs): void {
+  public onTabSelecting(event: SelectingEventArgs): void {
     if (event.isSwiped) {
       event.cancel = true;
     }
@@ -135,8 +177,6 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
       }
     });
   }
-
-  public onCloseDialog(): void {}
 
   public onClose(): void {
     this.tab.select(0);
@@ -155,14 +195,97 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
   }
 
+  public onBillRatesChanged(bill: BillRate): void {
+    if (!this.acceptForm.errors && this.candidateJob) {
+      this.store
+        .dispatch(
+          new UpdateOrganisationCandidateJob({
+            orderId: this.candidateJob?.orderId as number,
+            organizationId: this.candidateJob?.organizationId as number,
+            jobId: this.candidateJob?.jobId as number,
+            nextApplicantStatus: {
+              applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
+              statusText: this.candidateJob.applicantStatus.statusText,
+            },
+            actualStartDate: this.candidateJob?.actualStartDate as string,
+            actualEndDate: this.candidateJob?.actualEndDate as string,
+            offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.availableStartDate as string),
+            candidateBillRate: this.candidateJob?.candidateBillRate as number,
+            offeredBillRate: this.candidateJob?.offeredBillRate,
+            requestComment: this.candidateJob?.requestComment as string,
+            clockId: this.candidateJob?.clockId,
+            guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
+            billRates: this.getBillRateForUpdate(bill),
+
+          })
+        )
+        .subscribe(() => {
+          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+        });
+    }
+  }
+
+  getBillRateForUpdate(value: BillRate): BillRate[] {
+    let billRates;
+    const existingBillRateIndex = this.candidateJob?.billRates.findIndex(billRate => billRate.id === value.id) as number;
+    if (existingBillRateIndex > -1) {
+      this.candidateJob?.billRates.splice(existingBillRateIndex, 1, value);
+      billRates = this.candidateJob?.billRates;
+    } else {
+      if (typeof value === 'number') {
+        this.candidateJob?.billRates.splice(value, 1);
+        billRates = this.candidateJob?.billRates;
+      } else {
+        billRates = [...this.candidateJob?.billRates as BillRate[], value];
+      }
+    }
+
+    return billRates as BillRate[];
+  }
+
+  public showExtensionDialog(): void {
+    this.isExtensionSidebarShown = true;
+  }
+
+  public closeExtensionSidebar(): void {
+    this.isExtensionSidebarShown = false;
+  }
+
+  public saveExtension(): void {
+    this.extensionSidebarComponent.saveExtension();
+  }
+
+  public getExtensions(): void {
+    const { isAgencyArea } = this.store.selectSnapshot(AppState.isOrganizationAgencyArea);
+
+    if (isAgencyArea) {
+      this.store.dispatch(new GetAgencyExtensions(this.candidateJob?.jobId!, this.candidateJob?.organizationId!));
+    } else {
+      this.store.dispatch(new GetExtensions(this.candidateJob?.jobId!));
+    }
+  }
+
+  public updateGrid(): void {
+    this.closeExtensionSidebar();
+    this.getExtensions();
+  }
+
+  private setAddExtensionBtnState(candidate: OrderManagementChild): void {
+    const isOrderTravelerOrContractToPerm =
+      this.order.orderType === OrderType.Traveler || this.order.orderType === OrderType.ContractToPerm;
+    const isOrderFilledOrProgress =
+      this.order.status === OrderStatus.Filled || this.order.status === OrderStatus.InProgress;
+    const dateAvailable = candidate.closeDate
+      ? addDays(candidate.closeDate, 14)?.getTime()! >= new Date().getTime()
+      : true;
+    this.isAddExtensionBtnAvailable =
+      this.isOrganization && isOrderTravelerOrContractToPerm && isOrderFilledOrProgress && dateAvailable;
+  }
+
   private getTemplate(): void {
     if (this.order && this.candidate) {
       if (this.isAgency) {
-        const allowedApplyStatuses = [
-          ApplicantStatus.NotApplied,
-          ApplicantStatus.Applied,
-          ApplicantStatus.Shortlisted,
-        ];
+        const allowedApplyStatuses = [ApplicantStatus.NotApplied, ApplicantStatus.Applied, ApplicantStatus.Shortlisted];
         const allowedAcceptStatuses = [
           ApplicantStatus.Offered,
           ApplicantStatus.Accepted,
@@ -194,7 +317,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
           this.selectedTemplate = Template.offerDeployment;
         } else if (allowedOnboardedStatuses.includes(this.candidate.candidateStatus)) {
           this.store.dispatch(new GetOrganisationCandidateJob(this.order.organizationId, this.candidate.jobId));
-          this.selectedTemplate =  Template.onboarded;
+          this.selectedTemplate = Template.onboarded;
         }
       }
     }
@@ -220,9 +343,11 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private getComments(): void {
-    this.commentsService.getComments(this.candidateJob?.commentContainerId as number, null).subscribe((comments: Comment[]) => {
-      this.comments = comments;
-    });
+    this.commentsService
+      .getComments(this.candidateJob?.commentContainerId as number, null)
+      .subscribe((comments: Comment[]) => {
+        this.comments = comments;
+      });
   }
 
   private subscribeOnCandidateJob(): void {
@@ -230,6 +355,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
       this.candidateJobState$.pipe(takeWhile(() => this.isAlive)).subscribe((orderCandidateJob) => {
         this.candidateJob = orderCandidateJob;
         if (orderCandidateJob) {
+          this.getExtensions();
           this.getComments();
           this.setAcceptForm(orderCandidateJob);
         }
@@ -247,22 +373,22 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private setAcceptForm({
-                         order: {
-                           reOrderFromId,
-                           hourlyRate,
-                           locationName,
-                           departmentName,
-                           skillName,
-                           orderOpenDate,
-                           shiftStartTime,
-                           shiftEndTime,
-                           openPositions,
-                         },
-                         candidateBillRate,
-                         offeredBillRate,
-                         orderId,
-                         positionId,
-                       }: OrderCandidateJob) {
+    order: {
+      reOrderFromId,
+      hourlyRate,
+      locationName,
+      departmentName,
+      skillName,
+      orderOpenDate,
+      shiftStartTime,
+      shiftEndTime,
+      openPositions,
+    },
+    candidateBillRate,
+    offeredBillRate,
+    orderId,
+    positionId,
+  }: OrderCandidateJob) {
     const candidateBillRateValue = candidateBillRate ?? hourlyRate;
     const isBillRatePending =
       this.candidateJob?.applicantStatus.applicantStatus === CandidatStatus.BillRatePending
@@ -303,4 +429,3 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     }
   }
 }
-

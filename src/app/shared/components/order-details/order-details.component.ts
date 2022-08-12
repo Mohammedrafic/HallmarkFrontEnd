@@ -35,7 +35,7 @@ export class OrderDetailsComponent implements OnDestroy {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['currentOrder']?.currentValue && (changes['currentOrder']?.currentValue.id !== changes['currentOrder']?.previousValue?.id)) {
+    if (changes['currentOrder']?.currentValue) {
       this.getComments();
     }
   }

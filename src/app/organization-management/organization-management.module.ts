@@ -2,36 +2,47 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { GridModule, ResizeService, PagerModule, PageService } from '@syncfusion/ej2-angular-grids';
-import { ButtonModule, ChipListModule, CheckBoxModule, RadioButtonModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
-import { DropDownListModule, ListBoxModule, MultiSelectAllModule, AutoCompleteModule } from '@syncfusion/ej2-angular-dropdowns';
+import { GridModule, PagerModule, PageService, ResizeService } from '@syncfusion/ej2-angular-grids';
 import {
-  UploaderModule,
-  TextBoxModule,
+  ButtonModule,
+  CheckBoxModule,
+  ChipListModule,
+  RadioButtonModule,
+  SwitchModule,
+} from '@syncfusion/ej2-angular-buttons';
+import {
+  AutoCompleteModule,
+  DropDownListModule,
+  ListBoxModule,
+  MultiSelectAllModule,
+} from '@syncfusion/ej2-angular-dropdowns';
+import {
+  MaskedTextBoxModule,
   NumericTextBoxModule,
-  MaskedTextBoxModule
+  TextBoxModule,
+  UploaderModule,
 } from '@syncfusion/ej2-angular-inputs';
-import { SidebarModule, TabModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
-import { DatePickerModule, TimePickerModule, DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
+import { SidebarModule, TabAllModule, TabModule } from '@syncfusion/ej2-angular-navigations';
+import { DatePickerModule, DateTimePickerModule, TimePickerModule } from '@syncfusion/ej2-angular-calendars';
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { FeatherModule } from 'angular-feather';
 import {
-  Download,
-  Upload,
-  Sliders,
-  Edit,
-  Trash2,
-  AlignJustify,
-  Menu,
-  FileText,
-  MapPin,
-  Plus,
   AlertCircle,
-  Edit3,
+  AlignJustify,
   ChevronDown,
   ChevronRight,
   Copy,
-  Search
+  Download,
+  Edit,
+  Edit3,
+  FileText,
+  MapPin,
+  Menu,
+  Plus,
+  Search,
+  Sliders,
+  Trash2,
+  Upload,
 } from 'angular-feather/icons';
 
 import { NgxsModule } from '@ngxs/store';
@@ -88,7 +99,7 @@ const sidebarIcons = {
   ChevronDown,
   ChevronRight,
   Copy,
-  Search
+  Search,
 };
 @NgModule({
   declarations: [
@@ -164,9 +175,7 @@ const sidebarIcons = {
       BillRatesState,
     ]),
   ],
-  providers: [
-    ResizeService,
-    PageService
-  ]
+  exports: [BillRatesComponent],
+  providers: [ResizeService, PageService],
 })
-export class OrganizationManagementModule { }
+export class OrganizationManagementModule {}

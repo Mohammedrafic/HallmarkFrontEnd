@@ -12,6 +12,7 @@ import { CandidateModel } from '@client/order-management/add-edit-reorder/models
 
 export class OrderManagement {
   id: number;
+  publicId?: number;
   reOrderFromId?: number;
   organizationId: number;
   status: number;
@@ -49,6 +50,7 @@ export class OrderManagement {
   orderClosureReasonId?: string;
   organizationPrefix: string;
   commentContainerId?: number;
+  extensionFromId?: number | null;
 }
 
 export class OrderManagementFilter {
@@ -68,6 +70,7 @@ export type OrderManagementPage = PageOfCollections<OrderManagement>;
 export type AgencyOrderManagement = {
   orderId: number;
   id?: number;
+  publicId?: number;
   reOrderId?: number;
   reOrderFromId?: number;
   statusText: string;
@@ -101,6 +104,7 @@ export type AgencyOrderManagement = {
 };
 
 export type OrderManagementChild = {
+  orderPublicId?: number;
   candidateBillRate: number;
   candidateId: number;
   candidateMasterCredentialIds: number[];
@@ -227,6 +231,7 @@ export class GetPredefinedBillRatesData {
 
 export class Order {
   id: number;
+  publicId?: number;
   reOrderFromId?: number;
   title: string;
   regionId: number;
@@ -290,6 +295,9 @@ export class Order {
   annualSalaryRangeFrom?: number;
   annualSalaryRangeTo?: number;
   commentContainerId?: number;
+  extensionFromId?: number | null;
+  extensionInitialOrderId?: number | null;
+  hasParentExtension?: boolean;
 }
 
 export class ReOrder {

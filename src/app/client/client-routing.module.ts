@@ -21,33 +21,33 @@ const routes: Routes = [
         loadChildren: () => import('../dashboard/dashboard.module').then((mod) => mod.DashboardModule),
         data: {
           isOrganizationArea: true,
-          isAgencyArea: true
-        }
+          isAgencyArea: true,
+        },
       },
       {
         path: 'order-management',
         component: OrderManagementContentComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'order-management/add',
         component: AddEditOrderComponent,
         data: {
           isOrganizationArea: true,
-          isEditing: false
+          isEditing: false,
         },
-        canDeactivate: [UnsavedOrderChangesGuard]
+        canDeactivate: [UnsavedOrderChangesGuard],
       },
       {
         path: 'order-management/edit/:orderId',
         component: AddEditOrderComponent,
         data: {
           isOrganizationArea: true,
-          isEditing: true
+          isEditing: true,
         },
-        canDeactivate: [UnsavedOrderChangesGuard]
+        canDeactivate: [UnsavedOrderChangesGuard],
       },
       {
         path: 'time-sheets/:param',
@@ -59,11 +59,15 @@ const routes: Routes = [
         data: {
           isOrganizationArea: true,
           isAgencyArea: false,
-        }
+        },
       },
       {
         path: 'candidates',
         component: CandidatesContentComponent,
+        data: {
+          isOrganizationArea: true,
+          isAgencyArea: false,
+        },
       },
       {
         path: 'reports',
@@ -75,12 +79,14 @@ const routes: Routes = [
         data: {
           isOrganizationArea: true,
           isAgencyArea: false,
-        }
+        },
       },
       {
         path: 'organization-management',
         loadChildren: () =>
-          import('../organization-management/organization-management.module').then((m) => m.OrganizationManagementModule),
+          import('../organization-management/organization-management.module').then(
+            (m) => m.OrganizationManagementModule
+          ),
         //     canLoad: [ AdminGuard ],
         //     canActivate: [ AdminGuard ]
       },

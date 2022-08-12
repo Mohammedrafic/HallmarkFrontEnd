@@ -1,0 +1,40 @@
+@import "../../../../../styles/variables/colors";
+
+.common-info {
+  background-color: $secondary-dark-blue-50;
+  border-radius: 8px;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 30px;
+  padding: 20px;
+
+  .section {
+    .title {
+      display: flex;
+      align-items: center;
+
+      &-text {
+        font-weight: 700;
+        font-size: 14px;
+        color: $black;
+      }
+
+      .icon {
+        color: $secondary-dark-blue-40;
+        height: 16px;
+        width: 16px;
+        margin-right: 4px;
+      }
+    }
+
+    .sub-title {
+      font-weight: 400;
+      font-size: 14px;
+      margin-top: 3px;
+      margin-left: 20px;
+      color: $secondary-dark-blue-30;
+    }
+
+  }
+}

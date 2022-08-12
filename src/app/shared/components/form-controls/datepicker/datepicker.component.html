@@ -1,9 +1,4 @@
-<app-form-control-wrapper
-  [formGroup]="formGroupInstance"
-  [label]="label"
-  [id]="id"
-  [required]="required"
->
+<app-form-control-wrapper [formGroup]="formGroupInstance" [label]="label" [id]="id" [required]="required">
   <div class="input-group datepicker">
     <ejs-datepicker
       class="datepicker"
@@ -14,6 +9,7 @@
       [min]="min"
       [id]="id"
       [placeholder]="placeholder"
+      [enabled]="enabled"
     >
     </ejs-datepicker>
     <app-error-message [control]="getControl()"></app-error-message>
