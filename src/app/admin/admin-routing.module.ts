@@ -13,6 +13,7 @@ import {
 import { MasterHolidaysComponent } from './master-data/holidays/holidays.component';
 import { RejectReasonMasterComponent } from "@admin/master-data/reject-reason-master/reject-reason-master.component";
 import { AnalyticsComponent } from './analytics/analytics.component';
+import { ManualInvoiceReasonsComponent } from '@admin/master-data/manual-invoice-reasons/manual-invoice-reasons.component';
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
@@ -65,6 +66,10 @@ const routes: Routes = [
           {
             path: 'reject-reason',
             component: RejectReasonMasterComponent
+          },
+          {
+            path: 'manual-invoice-reasons',
+            component: ManualInvoiceReasonsComponent
           }
         ]
       },
