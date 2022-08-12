@@ -120,9 +120,10 @@
                         </section>
 
                         <section class="bill-rates">
-                          <app-bill-rates-view-grid
-                            [billRatesData]="candidateJob?.billRates || []"
-                          ></app-bill-rates-view-grid>
+                          <app-bill-rates [billRates]="candidateJob?.billRates || []"
+                                          [isActive]="true"
+                                          (billRatesChanged)="onBillRatesChanged($event)">
+                          </app-bill-rates>
                         </section>
                       </section>
                     </ng-container>

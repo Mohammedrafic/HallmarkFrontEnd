@@ -22,7 +22,11 @@ import PriceUtils from "@shared/utils/price.utils";
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
 import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
-import { GetAvailableSteps, GetOrganisationCandidateJob } from '@client/store/order-managment-content.actions';
+import {
+  GetAvailableSteps,
+  GetOrganisationCandidateJob, ReloadOrganisationOrderCandidatesLists, SetIsDirtyOrderForm,
+  UpdateOrganisationCandidateJob
+} from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrderStatusText } from '@shared/enums/status';
 import { disabledBodyOverflow, windowScrollTop } from '@shared/utils/styles.utils';
@@ -30,6 +34,8 @@ import { ShowCloseOrderDialog } from '../../../store/app.actions';
 import { OrderStatus } from '@shared/enums/order-management';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
+import { BillRate } from "@shared/models";
+import { toCorrectTimezoneFormat } from "@shared/utils/date-time.utils";
 
 enum Template {
   accept,
@@ -153,6 +159,54 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
     this.accordionOneField = new AccordionOneField(this.accordionComponent);
     this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
+  }
+
+  public onBillRatesChanged(bill: BillRate): void {
+    if (!this.acceptForm.errors && this.candidateJob) {
+      this.store
+        .dispatch(
+          new UpdateOrganisationCandidateJob({
+            orderId: this.candidateJob?.orderId as number,
+            organizationId: this.candidateJob?.organizationId as number,
+            jobId: this.candidateJob?.jobId as number,
+            nextApplicantStatus: {
+              applicantStatus: this.candidateJob.applicantStatus.applicantStatus,
+              statusText: this.candidateJob.applicantStatus.statusText,
+            },
+            actualStartDate: this.candidateJob?.actualStartDate as string,
+            actualEndDate: this.candidateJob?.actualEndDate as string,
+            offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.availableStartDate as string),
+            candidateBillRate: this.candidateJob?.candidateBillRate as number,
+            offeredBillRate: this.candidateJob?.offeredBillRate,
+            requestComment: this.candidateJob?.requestComment as string,
+            clockId: this.candidateJob?.clockId,
+            guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
+            billRates: this.getBillRateForUpdate(bill),
+
+          })
+        )
+        .subscribe(() => {
+          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+        });
+    }
+  }
+
+  getBillRateForUpdate(value: BillRate): BillRate[] {
+    let billRates;
+    const existingBillRateIndex = this.candidateJob?.billRates.findIndex(billRate => billRate.id === value.id) as number;
+    if (existingBillRateIndex > -1) {
+      this.candidateJob?.billRates.splice(existingBillRateIndex, 1, value);
+      billRates = this.candidateJob?.billRates;
+    } else {
+      if (typeof value === 'number') {
+        this.candidateJob?.billRates.splice(value, 1);
+        billRates = this.candidateJob?.billRates;
+      } else {
+        billRates = [...this.candidateJob?.billRates as BillRate[], value];
+      }
+    }
+
+    return billRates as BillRate[];
   }
 
   private getTemplate(): void {
