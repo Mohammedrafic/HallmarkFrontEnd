@@ -1,4 +1,8 @@
-import { FiltersModal, FiltersPageModal } from '@shared/components/candidate-details/models/candidate.model';
+import {
+  CandidateMessage,
+  FiltersModal,
+  FiltersPageModal,
+} from '@shared/components/candidate-details/models/candidate.model';
 
 export class GetCandidateDetailsPage {
   static readonly type = '[candidate details] Get Candidate Details by Page';
@@ -28,6 +32,11 @@ export class SetPageFilters {
 export class GetCandidateRegions {
   static readonly type = '[candidate details] Get Candidate Regions';
   constructor() {}
+}
+
+export class SetCandidateMessage {
+  static readonly type = '[candidate details] Set Candidate Message';
+  constructor(public title: string | null, public position: number | null) {}
 }
 
 export class GetCandidateSkills {

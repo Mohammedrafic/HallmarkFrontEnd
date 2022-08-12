@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { SetPageNumber, SetPageSize } from '@shared/components/candidate-details/store/candidate.actions';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { CandidateDetailsPage } from '@shared/components/candidate-details/models/candidate.model';
+import { ColDef } from '@ag-grid-community/core';
 
 @Component({
   selector: 'app-candidate-grid',
@@ -27,7 +28,7 @@ export class CandidateGridComponent extends DestroyableDirective implements OnIn
   public readonly statusEnum = CandidateStatus;
   public isAgency = false;
   public isLoading = false;
-  public readonly columnDefinitions = CandidatesColumnsDefinition(this.isAgency);
+  public columnDefinitions: ColDef[];
 
   constructor(private router: Router, private store: Store) {
     super();
@@ -35,6 +36,7 @@ export class CandidateGridComponent extends DestroyableDirective implements OnIn
 
   ngOnInit(): void {
     this.isAgency = this.router.url.includes('agency');
+    this.columnDefinitions = CandidatesColumnsDefinition(this.isAgency);
   }
 
   public onRowsDropDownChanged(pageSize: number): void {

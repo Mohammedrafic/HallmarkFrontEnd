@@ -1,6 +1,22 @@
 @import "../../../styles/variables/colors.scss";
 @import "../../../styles/variables/mixins.scss";
 
+.candidate-message {
+  display: flex;
+  align-items: center;
+
+  &__itm {
+    color: $title-black;
+    font-size: 14px;
+    font-weight: 400;
+    margin: 0 17px;
+
+    span {
+      font-weight: 700;
+    }
+  }
+}
+
 .candidate-profile-container {
   display: flex;
 

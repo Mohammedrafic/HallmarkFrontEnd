@@ -7,7 +7,7 @@ import { CandidatesDetailsModel } from '@shared/components/candidate-details/mod
 
 const valueHelper = new GridHelper();
 
-export const CandidatesColumnsDefinition = (isAgency = false) => {
+export const CandidatesColumnsDefinition = (isAgency: boolean) => {
   return [
     {
       field: 'name',
@@ -83,8 +83,8 @@ export const CandidatesColumnsDefinition = (isAgency = false) => {
     },
     {
       field: 'businessUnitName',
-      headerName: `${!isAgency ? 'AGENCY NAME' : 'ORGANIZATION NAME'}`,
       width: 160,
+      headerValueGetter: () => (isAgency ? 'AGENCY NAME' : 'ORGANIZATION NAME'),
     },
   ];
 };

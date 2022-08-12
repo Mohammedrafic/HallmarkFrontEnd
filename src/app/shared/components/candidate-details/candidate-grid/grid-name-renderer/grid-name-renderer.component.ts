@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
 import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { SetLastSelectedOrganizationAgencyId } from '../../../../../store/user.actions';
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
+import { CandidatesDetailsModel } from '@shared/components/candidate-details/models/candidate.model';
+import { SetCandidateMessage } from '@shared/components/candidate-details/store/candidate.actions';
 
 @Component({
   selector: 'app-grid-name-renderer',
@@ -15,7 +17,7 @@ import { disabledBodyOverflow } from '@shared/utils/styles.utils';
   styleUrls: ['./grid-name-renderer.component.scss'],
 })
 export class GridNameRendererComponent implements ICellRendererAngularComp {
-  public cellValue: any;
+  public cellValue: CandidatesDetailsModel;
   public valueHelper = new GridHelper();
 
   constructor(private store: Store, private router: Router) {}
@@ -45,6 +47,8 @@ export class GridNameRendererComponent implements ICellRendererAngularComp {
         })
       );
     }
+
+    this.store.dispatch(new SetCandidateMessage(this.cellValue.jobTitle, this.cellValue.positionId));
 
     this.router.navigate([url, this.cellValue.candidateProfileId], {
       state: { orderId: this.cellValue.orderId, pageToBack, isNavigateFromCandidateDetails: true, readonly },

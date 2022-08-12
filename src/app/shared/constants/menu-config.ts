@@ -298,8 +298,12 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: 'security/user-list',
     },
-    //i missed route
     35: {
+      // Candidate Details
+      icon: 'users',
+      route: 'agency/candidate-details',
+    },
+    37: {
       // Candidate Details
       icon: 'users',
       route: 'agency/candidate-details',

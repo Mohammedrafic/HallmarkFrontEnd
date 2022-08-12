@@ -16,6 +16,10 @@ export interface CandidatesDetailsModel extends CandidatesBasicInfo {
   scheduledDate: string;
   department: string;
   location: string;
+  middleName: string;
+  firstName: string;
+  lastName: string;
+  jobTitle: string;
 }
 
 export type CandidateDetailsPage = PageOfCollections<CandidatesDetailsModel>;
@@ -53,4 +57,9 @@ export type NavigationTabModel = {
   active: number | null;
   pending: number | null;
   isRedirect: boolean;
+};
+
+export type CandidateMessage = {
+  title: string | null;
+  position: number | null;
 };
