@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, Output, EventEmitter, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 
@@ -14,6 +14,7 @@ export class ButtonComponent {
   @Input() public tabindex: number;
   @Input() public text: string;
   @Input() public type: ButtonTypeEnum;
+  @Input() public disabled: boolean;
 
   @Output() public readonly clickEmitter: EventEmitter<void> = new EventEmitter();
 }

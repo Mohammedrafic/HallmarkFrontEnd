@@ -28,6 +28,7 @@ export const STATUS_COLOR_GROUP = {
     'Incomplete',
     'shortlisted',
     'in progress (pending)',
+    'ex',
     INVOICES_STATUSES.PENDING_PAYMENT,
   ], // yellow
   'e-default': ['closed', 'Inactive', 'inactive', 'Closed', 'withdraw', TIMETHEETS_STATUSES.REJECTED], // hard gray

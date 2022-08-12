@@ -83,6 +83,8 @@ import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/
 import { SaveTemplateDialogModule } from '@client/order-management/save-template-dialog/save-template-dialog.module';
 import { CloseOrderModule } from '@client/order-management/close-order/close-order.module';
 import { CandidateListModule } from '@shared/components/candidate-list/candidate-list.module';
+import { ChildOrderDialogModule } from '@shared/components/child-order-dialog/child-order-dialog.module';
+import { ExtensionModule } from '@shared/components/extension/extension.module';
 
 const gridIcons = {
   MessageSquare,
@@ -162,8 +164,10 @@ const gridIcons = {
     CandidateListModule,
     SwitchModule,
 
+    ChildOrderDialogModule,
     //STORE
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
+    ExtensionModule,
   ],
   providers: [
     ResizeService,

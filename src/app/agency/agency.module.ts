@@ -88,6 +88,7 @@ import { AgencyListFiltersComponent } from './agency-list/agency-list-filters/ag
 import { ImportCandidatesComponent } from './candidates/import-candidates/import-candidates.component';
 import { MultiselectDropdownModule } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module';
 import { CandidateListModule } from '@shared/components/candidate-list/candidate-list.module';
+import { ChildOrderDialogModule } from '@shared/components/child-order-dialog/child-order-dialog.module';
 
 const sidebarIcons = {
   Sliders,
@@ -185,6 +186,7 @@ const sidebarIcons = {
     NgxMaskModule.forChild(),
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),
     CandidateListModule,
+    ChildOrderDialogModule,
   ],
   exports: [FileViewerComponent],
 })

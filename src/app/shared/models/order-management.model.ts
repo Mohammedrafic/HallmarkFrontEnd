@@ -50,6 +50,7 @@ export class OrderManagement {
   orderClosureReasonId?: string;
   organizationPrefix: string;
   commentContainerId?: number;
+  extensionFromId?: number | null;
 }
 
 export class OrderManagementFilter {
@@ -294,6 +295,9 @@ export class Order {
   annualSalaryRangeFrom?: number;
   annualSalaryRangeTo?: number;
   commentContainerId?: number;
+  extensionFromId?: number | null;
+  extensionInitialOrderId?: number | null;
+  hasParentExtension?: boolean;
 }
 
 export class ReOrder {

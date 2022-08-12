@@ -16,16 +16,29 @@
             <div class="order-statuses">
               <ejs-chiplist #chipList class="events-off" *ngIf="candidate?.orderStatus">
                 <e-chips>
-                  <e-chip [text]="orderStatusText[candidate.orderStatus]" [cssClass]="orderStatusText[candidate.orderStatus] | chipsCssClass"></e-chip>
+                  <e-chip
+                    [text]="orderStatusText[candidate.orderStatus]"
+                    [cssClass]="orderStatusText[candidate.orderStatus] | chipsCssClass"
+                  ></e-chip>
                 </e-chips>
               </ejs-chiplist>
             </div>
           </div>
           <div class="e-card-content dialog-controls">
-            <button ejs-button cssClass="e-outline"
-                    *ngIf="!isAgency"
-                    [disabled]="disabledCloseButton"
-                    (click)="closeOrder(order)">
+            <app-button
+              *ngIf="isAddExtensionBtnAvailable"
+              (clickEmitter)="showExtensionDialog()"
+              [type]="buttonTypeEnum.OUTLINED"
+              [disabled]="candidate?.orderStatus === orderStatus.InProgressOfferAccepted"
+              text="Add Extension"
+            ></app-button>
+            <button
+              ejs-button
+              cssClass="e-outline"
+              *ngIf="!isAgency"
+              [disabled]="disabledCloseButton"
+              (click)="closeOrder(order)"
+            >
               Close Position
             </button>
             <button ejs-button type="submit" cssClass="e-flat close-button" (click)="onClose()">
@@ -61,6 +74,7 @@
                   </section>
               </ng-template>
             </e-tabitem>
+
             <e-tabitem>
               <ng-template #headerText>Candidate</ng-template>
               <ng-template #content>
@@ -75,9 +89,14 @@
                               <h3 class="e-card-title candidate-title">
                                 {{ candidate?.lastName }}, {{ candidate?.firstName }}
                               </h3>
-                              <ejs-chiplist *ngIf="candidate.candidateStatus" [text]="candidateStatus[candidate.candidateStatus]">
+                              <ejs-chiplist
+                                *ngIf="candidate.candidateStatus"
+                                [text]="candidateStatus[candidate.candidateStatus]"
+                              >
                                 <e-chips>
-                                  <e-chip [cssClass]="candidateStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
+                                  <e-chip
+                                    [cssClass]="candidateStatus[candidate.candidateStatus] | chipsCssClass"
+                                  ></e-chip>
                                 </e-chips>
                               </ejs-chiplist>
                             </div>
@@ -108,7 +127,12 @@
                                     <div>Historical Events</div>
                                   </ng-template>
                                   <ng-template #content>
-                                    <app-historical-events [organizationId]="candidateJob?.organizationId!" [candidateJobId]="candidate.jobId" [candidateId]="candidate.candidateId" [isAgency]="isAgency"></app-historical-events>
+                                    <app-historical-events
+                                      [organizationId]="candidateJob?.organizationId!"
+                                      [candidateJobId]="candidate.jobId"
+                                      [candidateId]="candidate.candidateId"
+                                      [isAgency]="isAgency"
+                                    ></app-historical-events>
                                   </ng-template>
                                 </e-accordionitem>
                               </e-accordionitems>
@@ -129,7 +153,11 @@
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.accept">
-                      <app-accept-candidate [candidate]="$any(candidate)" [isTab]="true" (closeModalEvent)="onClose()"></app-accept-candidate>
+                      <app-accept-candidate
+                        [candidate]="$any(candidate)"
+                        [isTab]="true"
+                        (closeModalEvent)="onClose()"
+                      ></app-accept-candidate>
                     </ng-container>
 
                     <ng-container *ngSwitchCase="template.apply">
@@ -150,6 +178,19 @@
                 </section>
               </ng-template>
             </e-tabitem>
+
+            <e-tabitem>
+              <ng-template #headerText>Extensions</ng-template>
+              <ng-template #content>
+                <section class="order-details" *ngIf="selectedOrder$ | async as currentOrder">
+                  <section class="job-details">
+                    <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
+                  </section>
+                  <hr />
+                  <app-extension-grid [data]="extensions$ | async" class="extension-grid"></app-extension-grid>
+                </section>
+              </ng-template>
+            </e-tabitem>
           </e-tabitems>
         </ejs-tab>
       </div>
@@ -157,3 +198,46 @@
   </ng-template>
 </ejs-dialog>
 
+<ejs-dialog
+  id="extension-sidebar"
+  #extensionSidebar
+  cssClass="dialog"
+  width="45%"
+  [target]="targetElement"
+  [visible]="isExtensionSidebarShown"
+  [animationSettings]="{ effect: 'SlideRight' }"
+  [isModal]="true"
+>
+  <ng-template #content>
+    <section class="container preview-dialog">
+      <section class="header-container">
+        <div class="e-card-header preview-header">
+          <div class="e-card-header-caption">
+            <h3 class="e-card-title preview-title">Add Extension</h3>
+          </div>
+          <div class="e-card-content dialog-controls">
+            <app-button
+              (clickEmitter)="closeExtensionSidebar()"
+              [type]="buttonTypeEnum.OUTLINED"
+              text="Cancel"
+            ></app-button>
+            <app-button
+              (clickEmitter)="saveExtension()"
+              [type]="buttonTypeEnum.PRIMARY"
+              [disabled]="candidate?.orderStatus === orderStatus.InProgressOfferAccepted"
+              text="Save"
+            ></app-button>
+          </div>
+        </div>
+      </section>
+    </section>
+    <div class="extension-sidebar">
+      <app-extension-sidebar
+        *ngIf="isExtensionSidebarShown"
+        [candidateJob]="candidateJob!"
+        [orderPosition]="candidate"
+        (saveEmitter)="updateGrid()"
+      ></app-extension-sidebar>
+    </div>
+  </ng-template>
+</ejs-dialog>

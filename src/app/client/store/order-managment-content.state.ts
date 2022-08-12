@@ -4,6 +4,7 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { catchError, Observable, of, tap } from 'rxjs';
 import {
   ApproveOrder,
+  ClearHistoricalData,
   ClearOrders,
   ClearPredefinedBillRates,
   ClearSelectedOrder,
@@ -17,8 +18,9 @@ import {
   GetAgencyOrderCandidatesList,
   GetAssociateAgencies,
   GetAvailableSteps,
+  GetContactDetails,
+  GetExtensions,
   GetHistoricalData,
-  ClearHistoricalData,
   GetIncompleteOrders,
   GetOrderById,
   GetOrderFilterDataSources,
@@ -44,7 +46,6 @@ import {
   SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
-  GetContactDetails,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -81,6 +82,8 @@ import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { NavigationTabModel } from '@shared/models/navigation-tab.model';
 import { DepartmentsService } from '@shared/services/departments.service';
 import { Department } from '@shared/models/department.model';
+import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
+import { ExtensionGridModel } from '@shared/components/extension/extension-sidebar/models/extension.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -108,6 +111,7 @@ export interface OrderManagementContentStateModel {
   historicalEvents: HistoricalEvent[] | null;
   navigationTab: NavigationTabModel;
   contactDetails: Department | null;
+  extensions: any;
 }
 
 @State<OrderManagementContentStateModel>({
@@ -142,6 +146,7 @@ export interface OrderManagementContentStateModel {
       current: null,
     },
     contactDetails: null,
+    extensions: null,
   },
 })
 @Injectable()
@@ -268,13 +273,18 @@ export class OrderManagementContentState {
     return state.contactDetails;
   }
 
+  @Selector()
+  static extensions(state: OrderManagementContentStateModel): any | null {
+    return state.extensions;
+  }
 
   constructor(
     private orderManagementService: OrderManagementContentService,
     private projectsService: ProjectsService,
     private shiftsService: ShiftsService,
+    private departmentService: DepartmentsService,
     private rejectReasonService: RejectReasonService,
-    private departmentService: DepartmentsService
+    private extensionSidebarService: ExtensionSidebarService
   ) {}
 
   @Action(GetIncompleteOrders)
@@ -715,4 +725,11 @@ export class OrderManagementContentState {
     );
   }
 
+  @Action(GetExtensions)
+  GetExtensions(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { id }: GetExtensions
+  ): Observable<ExtensionGridModel[]> {
+    return this.extensionSidebarService.getExtensions(id).pipe(tap((extensions) => patchState({ extensions })));
+  }
 }
