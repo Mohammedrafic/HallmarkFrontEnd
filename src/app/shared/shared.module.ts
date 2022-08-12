@@ -30,7 +30,7 @@ import {
   TextBoxModule,
   UploaderModule,
 } from '@syncfusion/ej2-angular-inputs';
-import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
+import { DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 
 import { ValidateDirective } from './directives/validate.directive';
 import { ErrorMessageComponent } from './components/error-message/error-message.component';
@@ -232,6 +232,7 @@ const COMPONENTS = [
     FilterDialogModule,
     SideMenuModule,
     SwitchModule,
+    MultiSelectModule,
     NgxMaskModule.forChild(),
   ],
   exports: [

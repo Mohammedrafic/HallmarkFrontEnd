@@ -1,0 +1,187 @@
+<ejs-grid #grid
+          [dataSource]="(candidates$ | async)?.items"
+          [allowSelection]="true"
+          [allowPaging]="allowPaging"
+          [pageSettings]="pageSettings"
+          [height]="gridHeight"
+          [rowHeight]="rowHeight"
+          [enableVirtualization]="true"
+          [resizeSettings]="resizeSettings"
+          [allowSorting]="allowSorting"
+          [allowResizing]="allowResizing"
+          (dataBound)="dataBound()"
+          [selectionSettings]="selectionOptions"
+          (actionBegin)="actionBegin($event)"
+          (rowSelected)="rowSelected($event, grid)"
+          (rowDeselected)="rowDeselected($event, grid)"
+>
+  <e-columns>
+    <e-column type="checkbox" [customAttributes]="{ class: 'bootstrap' }" width="50"></e-column>
+    <e-column textAlign="Right" width="80" *ngIf="isAgency">
+      <ng-template #template let-data>
+        <div class="row-tool-buttons">
+          <button ejs-button cssClass="e-flat primary-icon-button" (click)="onEdit(data)">
+            <span><i-feather name="edit" class="icon"></i-feather></span>
+          </button>
+          <button ejs-button [disabled]="data.profileStatus === statusEnum.Inactive" cssClass="e-flat secondary-icon-button enabled-button">
+            <span><i-feather name="trash-2" class="icon"></i-feather></span>
+          </button>
+        </div>
+      </ng-template>
+    </e-column>
+    <e-column field="lastName" headerText="Name" width=200>
+      <ng-template #template let-data>
+        <div class="name-wrapper">
+          <ng-container *ngIf="false">
+            <!--TODO: user icon-->
+            <div class="user-photo">
+              <ng-container *ngIf="data.photo; else defaultPhoto">
+
+              </ng-container>
+              <ng-template #defaultPhoto>
+                <i-feather name="user" class="user-icon"></i-feather>
+              </ng-template>
+            </div>
+          </ng-container>
+          {{data.lastName}}, {{data.firstName}} {{data.middleName}}
+        </div>
+      </ng-template>
+    </e-column>
+    <e-column field="profileStatus" headerText="Profile Status" width=200>
+      <ng-template #template let-data>
+        <div>
+          <ejs-chiplist class="events-off">
+            <e-chips>
+              <e-chip [text]="statusEnum[data.profileStatus]"
+                      [cssClass]="getChipCssClass(statusEnum[data.profileStatus])">
+              </e-chip>
+            </e-chips>
+          </ejs-chiplist>
+        </div>
+      </ng-template>
+    </e-column>
+    <e-column headerText="Skill" field="candidateProfileSkills" width=200>
+      <ng-template #template let-data>
+        <div *ngFor="let skill of data.candidateProfileSkills">{{skill.skillDescription || skill}}</div>
+      </ng-template>
+    </e-column>
+    <e-column textAlign="Right" field="lastAssignmentEndDate" headerText="Current Assignment End Date">
+      <ng-template #template let-data>
+        {{data.lastAssignmentEndDate | date: 'MM/dd/yyy'}}
+      </ng-template>
+    </e-column>
+    <e-column field="candidateStatus" headerText="Candidate status" textAlign="Left" width="150">
+      <ng-template #template let-data>
+        <div class="status-cell" *ngIf="getCandidateStatusName(data.candidateStatus)">
+          <ejs-chiplist>
+            <e-chips>
+              <e-chip [text]="getCandidateStatusName(data.candidateStatus)" [cssClass]="getCandidateStatusName(data.candidateStatus) | chipsCssClass"></e-chip>
+            </e-chips>
+          </ejs-chiplist>
+        </div>
+      </ng-template>
+    </e-column>
+    <e-column headerText="Region" field="region">
+    </e-column>
+  </e-columns>
+  <ng-template #pagerTemplate let-data>
+    <div class="e-pagertemplate">
+      <div class="control-section">
+        <div class="content-wrapper">
+          <section class="left-side-pager-controls">
+            <ejs-dropdownlist id="rowsPerPage"
+                              class="dropdown-no-border"
+                              [dataSource]="rowsPerPageDropDown"
+                              [(value)]="activeRowsPerPageDropDown"
+                              (change)="onRowsDropDownChanged()">
+            </ejs-dropdownlist>
+            <ejs-numerictextbox id="goToPage"
+                                class="numeric-input-no-border"
+                                format="#"
+                                placeholder="Go to:"
+                                min="1"
+                                [max]="(candidates$ | async)?.totalPages"
+                                [showSpinButton]="false"
+                                (change)="onGoToClick($event)">
+            </ejs-numerictextbox>
+          </section>
+          <section class="right-side-pager-controls">
+            <ejs-pager id="gridPager"
+                       #gridPager
+                       [pageSize]="pageSize"
+                       [totalRecordsCount]="(candidates$ | async)?.totalCount"
+                       [enablePagerMessage]="false"
+                       [currentPage]="currentPage"
+                       (click)="onGoToClick($event)">
+            </ejs-pager>
+          </section>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</ejs-grid>
+
+<app-filter-dialog
+  [items]="filteredItems"
+  [count]="(candidates$ | async)?.totalCount"
+  (deleteFilter)="onFilterDelete($event)"
+  (clearAllFiltersClicked)="onFilterClearAll()"
+  (applyFilterClicked)="onFilterApply()"
+  (closeDialogClicked)="onFilterClose()"
+>
+  <form [formGroup]="CandidateFilterFormGroup">
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Region</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="regionsIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.regionsIds.dataSource"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Skill</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="skillsIds"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.skillsIds.dataSource"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+    <div class="bootstrap">
+      <div class="input-container">
+        <label>Position Status</label>
+        <div class="input-group multiselect">
+          <ejs-multiselect
+            mode="CheckBox"
+            formControlName="profileStatuses"
+            placeholder="All"
+            [fields]="optionFields"
+            [allowFiltering]="true"
+            [showDropDownIcon]="true"
+            [dataSource]="filterColumns.profileStatuses.dataSource"
+          >
+          </ejs-multiselect>
+        </div>
+      </div>
+    </div>
+  </form>
+</app-filter-dialog>
+
+<app-export-dialog [columns]="columnsToExport" [fileName]="fileName" (cancel)="closeExport()" (export)="export($event)"></app-export-dialog>
