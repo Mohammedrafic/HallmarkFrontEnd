@@ -1,0 +1,9 @@
+<ejs-tab id="tab-default" heightAdjustMode="Auto" #tabNavigation (selecting)="onSelect($event)" (created)="onTabCreated()">
+  <div class="e-tab-header">
+    <div>{{ tabTitle[tabTitle.All] }}</div>
+    <div>{{ tabTitle[tabTitle.Confirmed] }}</div>
+    <div>{{ tabTitle[tabTitle.Active] }}</div>
+    <div>{{ tabTitle[tabTitle.Past] }}</div>
+  </div>
+  <div class="e-content"></div>
+</ejs-tab>

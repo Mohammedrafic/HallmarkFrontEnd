@@ -1,0 +1,22 @@
+@import "colors";
+
+.tab-legend {
+  display: flex;
+  gap: 17px;
+
+  &__item {
+    font-size: 12px;
+    color: $secondary-dark-blue-20;
+    font-weight: 400;
+
+    span {
+      font-weight: 700;
+      color: $secondary-dark-blue-15;
+    }
+  }
+}
+
+.candidates-grid {
+  margin-top: 24px;
+  height: 800px;
+}

@@ -85,6 +85,7 @@ import { CloseOrderModule } from '@client/order-management/close-order/close-ord
 import { CandidateListModule } from '@shared/components/candidate-list/candidate-list.module';
 import { ChildOrderDialogModule } from '@shared/components/child-order-dialog/child-order-dialog.module';
 import { ExtensionModule } from '@shared/components/extension/extension.module';
+import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
 
 const gridIcons = {
   MessageSquare,
@@ -163,7 +164,7 @@ const gridIcons = {
     CloseOrderModule,
     CandidateListModule,
     SwitchModule,
-
+    CandidateDetailsModule,
     ChildOrderDialogModule,
     //STORE
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),

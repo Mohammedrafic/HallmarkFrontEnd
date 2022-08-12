@@ -34,7 +34,7 @@ export class AccumulationChartComponent
   public filteredChartData$: Observable<DonutChartData[]>;
   public legendData: WidgetLegengDataModel[] = [];
   public totalScore: number = 0;
-  public legendPosition: LegendPositionEnum = LegendPositionEnum.Right
+  public legendPosition: LegendPositionEnum = LegendPositionEnum.Right;
 
   public readonly tooltipSettings: TooltipSettingsModel = {
     enable: true,

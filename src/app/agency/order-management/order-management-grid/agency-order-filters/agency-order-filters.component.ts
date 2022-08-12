@@ -2,7 +2,7 @@ import { OrderManagementState } from '@agency/store/order-management.state';
 import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
-import { MultiSelectComponent } from "@syncfusion/ej2-angular-dropdowns";
+import { MultiSelectComponent } from '@syncfusion/ej2-angular-dropdowns';
 import { debounceTime, filter, forkJoin, Observable, takeUntil, tap } from 'rxjs';
 
 import { isEmpty } from 'lodash';
@@ -12,7 +12,7 @@ import { OrderTypeOptions } from '@shared/enums/order-type';
 import { AgencyOrderFilteringOptions } from '@shared/models/agency.model';
 import { GetOrganizationStructure } from '@agency/store/order-management.actions';
 import { OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
-import { ShowFilterDialog } from "src/app/store/app.actions";
+import { ShowFilterDialog } from 'src/app/store/app.actions';
 import { getDepartmentFromLocations, getLocationsFromRegions } from './agency-order-filters.utils';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
@@ -179,10 +179,10 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
           );
           candidateStatusesData = candidateStatuses.filter((status) =>
             [
-              CandidatesStatusText['Bill Rate Pending'], 
-              CandidatesStatusText['Offered Bill Rate'], 
-              CandidatesStatusText.Onboard, 
-              CandidatesStatusText.Rejected
+              CandidatesStatusText['Bill Rate Pending'],
+              CandidatesStatusText['Offered Bill Rate'],
+              CandidatesStatusText.Onboard,
+              CandidatesStatusText.Rejected,
             ].includes(status.status)
           ); // TODO: after BE implementation also add Pending, Rejected
         } else if (this.activeTab === AgencyOrderManagementTabs.PerDiem) {
@@ -307,4 +307,3 @@ export class AgencyOrderFiltersComponent extends DestroyableDirective implements
     };
   }
 }
-

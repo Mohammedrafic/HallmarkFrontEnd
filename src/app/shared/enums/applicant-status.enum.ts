@@ -22,6 +22,7 @@ export enum CandidatStatus {
   OfferedBR = 47,
   Accepted = 50,
   'OnBoard' = 60,
+  End = 70,
   Offboard = 90,
   Rejected = 100,
 

@@ -5,12 +5,11 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 import { CreatedCandidateStatus } from '@shared/enums/status';
 import { SelectEventArgs, TabComponent } from '@syncfusion/ej2-angular-navigations';
-import { filter, Observable, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 
 import { CandidateGeneralInfoComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-general-info/candidate-general-info.component';
 import { CandidateProfessionalSummaryComponent } from 'src/app/agency/candidates/add-edit-candidate/candidate-professional-summary/candidate-professional-summary.component';
 import { CandidateState } from 'src/app/agency/store/candidate.state';
-import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from 'src/app/shared/constants/messages';
 import { ConfirmService } from 'src/app/shared/services/confirm.service';
 import { CandidateContactDetailsComponent } from './candidate-contact-details/candidate-contact-details.component';
 import { SetHeaderState } from 'src/app/store/app.actions';
@@ -26,13 +25,14 @@ import {
   UploadCandidatePhoto,
 } from '../../store/candidate.actions';
 import { Candidate } from 'src/app/shared/models/candidate.model';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UserState } from 'src/app/store/user.state';
 import { Location } from '@angular/common';
 import { ComponentCanDeactivate } from '@shared/guards/pending-changes.guard';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { SelectNavigationTab } from '@client/store/order-managment-content.actions';
-import { NavigationTabModel } from '@shared/models/navigation-tab.model';
+import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
+import { SelectNavigation } from '@shared/components/candidate-details/store/candidate.actions';
 
 @Component({
   selector: 'app-add-edit-candidate',
@@ -48,6 +48,7 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
   public photo: Blob | null = null;
   // Used for disabling form and remove creation actions
   public readonlyMode = false;
+  public isCredentialStep = false;
 
   private filesDetails: Blob[] = [];
   private unsubscribe$: Subject<void> = new Subject();
@@ -271,22 +272,43 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
   }
 
   private pagePermissions(): void {
+    const location = this.location.getState() as { readonly: boolean };
+
+    if (location.readonly) {
+      this.candidateForm.disable();
+      this.readonlyMode = true;
+      this.isCredentialStep = false;
+    }
+
     this.route.data.subscribe((data) => {
       if (data['readonly']) {
         this.readonlyMode = true;
+        this.isCredentialStep = true;
         this.candidateForm.disable();
       }
     });
   }
 
   private navigateToCandidates(): void {
-    const location = this.location.getState() as { orderId: number; pageToBack: string };
-    if (location.orderId) {
-      this.router.navigate([location.pageToBack], { state: { orderId: location.orderId } });
-      const selectedTab = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
-      this.store.dispatch(new SelectNavigationTab(selectedTab.current));
-    } else {
-      this.router.navigate(['/agency/candidates']);
+    const location = this.location.getState() as {
+      orderId: number;
+      pageToBack: string;
+      isNavigateFromCandidateDetails: boolean;
+    };
+
+    switch (true) {
+      case location.orderId && !location.isNavigateFromCandidateDetails:
+        this.router.navigate([location.pageToBack], { state: { orderId: location.orderId } });
+        const selectedNavigation = this.store.selectSnapshot(OrderManagementContentState.navigationTab);
+        this.store.dispatch(new SelectNavigationTab(selectedNavigation.current));
+        break;
+      case location.orderId && location.isNavigateFromCandidateDetails:
+        this.router.navigate([location.pageToBack]);
+        const selectedTab = this.store.selectSnapshot(CandidateDetailsState.navigationTab);
+        this.store.dispatch(new SelectNavigation(selectedTab.active, null, true));
+        break;
+      default:
+        this.router.navigate(['/agency/candidates']);
     }
   }
 
