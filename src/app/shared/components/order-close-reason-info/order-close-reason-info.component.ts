@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { AgencyOrder, AgencyOrderManagement, Order, OrderManagement } from '@shared/models/order-management.model';
+import { AgencyOrderManagement, Order, OrderManagement, OrderManagementChild } from '@shared/models/order-management.model';
 
 @Component({
   selector: 'app-order-close-reason-info',
@@ -8,4 +8,13 @@ import { AgencyOrder, AgencyOrderManagement, Order, OrderManagement } from '@sha
 })
 export class OrderCloseReasonInfoComponent {
   @Input() orderInformation: Order | OrderManagement | AgencyOrderManagement;
+  @Input() candidate: OrderManagementChild;
+
+  get closeReason(): string {
+    return this.candidate?.positionClosureReason || this.orderInformation?.orderClosureReason as string;
+  }
+
+  get closeDate(): string {
+    return this.candidate?.closeDate || this.orderInformation?.orderCloseDate as string;
+  }
 }

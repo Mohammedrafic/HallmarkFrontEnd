@@ -307,6 +307,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
           ApplicantStatus.Shortlisted,
           ApplicantStatus.PreOfferCustom,
           ApplicantStatus.Offered,
+          ApplicantStatus.Offboard,
         ];
         const allowedOnboardedStatuses = [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded];
 

@@ -37,6 +37,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public candidate: OrderCandidatesList;
+  public applicantStatus = ApplicantStatus;
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
@@ -51,7 +52,7 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   }
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
-    if (this.order?.isClosed) {
+    if (this.order?.isClosed || data.status === ApplicantStatus.Offboard) {
       return;
     }
 
