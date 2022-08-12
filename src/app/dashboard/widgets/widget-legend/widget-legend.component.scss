@@ -37,10 +37,13 @@
     font-size: 14px;
     line-height: 17px;
     text-overflow:ellipsis;
-    width: 100px;
     white-space: nowrap;
     overflow: hidden;
     color: $secondary-dark-blue-15;
+
+    &.right {
+      width: 100px;
+    }
   }
 
   &__point {
