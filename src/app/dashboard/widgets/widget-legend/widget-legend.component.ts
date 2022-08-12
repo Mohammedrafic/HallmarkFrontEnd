@@ -1,4 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+
+import { LegendPositionEnum } from '../../enums/legend-position.enum';
 import { WidgetLegengDataModel } from '../../models/widget-legend-data.model';
 
 @Component({
@@ -8,8 +10,9 @@ import { WidgetLegengDataModel } from '../../models/widget-legend-data.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WidgetLegendComponent {
-  @Input() legendData: WidgetLegengDataModel[];
-  @Input() showPercentRatio: boolean = false;
+  @Input() public legendData: WidgetLegengDataModel[];
+  @Input() public showPercentRatio: boolean = false;
+  @Input() public legendPosition: LegendPositionEnum = LegendPositionEnum.Bottom;
 
   @Output() onClickLegend: EventEmitter<void> = new EventEmitter();
   @Output() changeCheckbox: EventEmitter<string> = new EventEmitter();
