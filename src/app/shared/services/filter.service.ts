@@ -47,12 +47,12 @@ export class FilterService {
         switch (filterColumns[key].type) {
           case ControlTypes.Multiselect:
             val.forEach((item: any) => {
-             const filteredItem = filterColumns[key].dataSource.find((data: any) => data[filterColumns[key].valueId] === item);
+              const filteredItem = filterColumns[key].dataSource.find(
+                (data: any) => data[filterColumns[key].valueId] === item
+              );
               chips.push({
                 text:
-                  filterColumns[key].valueType === ValueType.Id
-                    ? filteredItem[filterColumns[key].valueField]
-                    : item,
+                  filterColumns[key].valueType === ValueType.Id ? filteredItem[filterColumns[key].valueField] : item,
                 column: key,
                 value: item,
                 organizationId: filteredItem?.organizationId || filteredItem?.businessUnitId || null,
@@ -71,7 +71,7 @@ export class FilterService {
               chips.push({ text: datePipe.transform(val, 'MM/dd/yyyy'), column: key, value: val });
             }
             break;
-            
+
           case ControlTypes.Radio:
             if (filterColumns[key].dataSource[val]) {
               chips.push({ text: filterColumns[key].dataSource[val], column: key, value: val });
@@ -87,4 +87,3 @@ export class FilterService {
     return chips;
   }
 }
-

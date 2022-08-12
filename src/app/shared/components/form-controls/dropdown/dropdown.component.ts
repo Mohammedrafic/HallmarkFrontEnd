@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 import { BaseFormControlDirective } from '@shared/components/form-controls/base-form-control.directive';
 import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base/drop-down-base-model';
@@ -11,5 +11,6 @@ import { FieldSettingsModel } from '@syncfusion/ej2-dropdowns/src/drop-down-base
 })
 export class DropdownComponent<T> extends BaseFormControlDirective {
   @Input() public dataSource: T[] | null | undefined;
-  @Input() public fields: FieldSettingsModel
+  @Input() public fields: FieldSettingsModel;
+  @Input() public hideBorder: boolean = true;
 }

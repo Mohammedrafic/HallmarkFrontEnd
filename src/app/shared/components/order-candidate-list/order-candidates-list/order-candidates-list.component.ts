@@ -16,6 +16,7 @@ import { ApplyCandidateComponent } from './apply-candidate/apply-candidate.compo
 import { OfferDeploymentComponent } from './offer-deployment/offer-deployment.component';
 import { OnboardedCandidateComponent } from './onboarded-candidate/onboarded-candidate.component';
 import { AbstractOrderCandidateListComponent } from '../abstract-order-candidate-list.component';
+import { OrderCandidateListViewService } from "@shared/components/order-candidate-list/order-candidate-list-view.service";
 
 @Component({
   selector: 'app-order-candidates-list',
@@ -36,22 +37,28 @@ export class OrderCandidatesListComponent extends AbstractOrderCandidateListComp
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public dialogNextPreviousOption: DialogNextPreviousOption = { next: false, previous: false };
   public candidate: OrderCandidatesList;
+  public applicantStatus = ApplicantStatus;
 
   get isShowDropdown(): boolean {
     return [ApplicantStatus.Rejected, ApplicantStatus.OnBoarded].includes(this.candidate.status) && !this.isAgency;
   }
 
-  constructor(protected override store: Store, protected override router: Router) {
+  constructor(
+    protected override store: Store,
+    protected override router: Router,
+    private orderCandidateListViewService: OrderCandidateListViewService,
+  ) {
     super(store, router);
   }
 
   public onEdit(data: OrderCandidatesList, event: MouseEvent): void {
-    if (this.order?.isClosed) {
+    if (this.order?.isClosed || data.status === ApplicantStatus.Offboard) {
       return;
     }
 
     this.candidate = { ...data };
 
+    this.orderCandidateListViewService.setIsCandidateOpened(true);
     if (this.order && this.candidate) {
       if (this.isAgency) {
         const allowedApplyStatuses = [ApplicantStatus.NotApplied, ApplicantStatus.Withdraw];

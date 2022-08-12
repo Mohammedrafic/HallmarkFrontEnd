@@ -1,4 +1,5 @@
-<div class="app-grid">
+<div class="app-grid" [class.grid-title]="title">
+  <p *ngIf="title" class="title">{{ title }}</p>
   <ag-grid-angular
     (gridReady)="handleGridReadyEvent($event)"
     (selectionChanged)="handleMultiSelectionChanged($event)"

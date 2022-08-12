@@ -17,6 +17,7 @@
               <ejs-chiplist #chipList>
                 <e-chips>
                   <e-chip [text]="order?.statusText"></e-chip>
+                  <e-chip *ngIf="order?.extensionFromId" text="Ex" cssClass="e-warning ex-chip"></e-chip>
                 </e-chips>
               </ejs-chiplist>
               <div class="vertical-divider"></div>

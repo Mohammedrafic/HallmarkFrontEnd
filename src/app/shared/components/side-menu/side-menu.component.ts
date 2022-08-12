@@ -5,7 +5,7 @@ import { ListBox, ListBoxChangeEventArgs, SelectionSettingsModel } from '@syncfu
 @Component({
   selector: 'app-side-menu',
   templateUrl: './side-menu.component.html',
-  styleUrls: ['./side-menu.component.scss']
+  styleUrls: ['./side-menu.component.scss'],
 })
 export class SideMenuComponent implements AfterViewInit {
   @Input() config: { [key: string]: Object }[];
@@ -16,10 +16,7 @@ export class SideMenuComponent implements AfterViewInit {
 
   private currentItem: Object;
 
-  constructor(private router: Router,
-              private route: ActivatedRoute) {
-
-  }
+  constructor(private router: Router, private route: ActivatedRoute) {}
 
   ngAfterViewInit(): void {
     const menuItem = this.config[0];

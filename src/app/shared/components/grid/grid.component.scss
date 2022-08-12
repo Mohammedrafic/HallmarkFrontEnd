@@ -10,6 +10,31 @@ app-grid {
   flex-direction: column;
   height: 100%;
 
+  &.grid-title {
+    position: relative;
+    padding-top: 57px;
+
+    .title {
+      background-color: var(--grid-background-color);
+      position: absolute;
+      top: 0;
+      width: 100%;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 17px;
+      border: 1px solid var(--grid-border-color);
+      font-weight: bold;
+      font-size: 16px;
+      border-top-left-radius: var(--grid-border-radius);
+      border-top-right-radius: var(--grid-border-radius);
+    }
+
+    .ag-root-wrapper {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+  }
+
   &__component {
     width: 100%;
     flex: 1;

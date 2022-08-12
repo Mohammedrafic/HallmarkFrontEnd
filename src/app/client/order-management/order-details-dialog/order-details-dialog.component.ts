@@ -196,7 +196,7 @@ export class OrderDetailsDialogComponent implements OnInit, OnChanges, OnDestroy
     });
   }
 
-  createReOrder(): void {
+  public createReOrder(): void {
     this.store.dispatch(new ShowSideDialog(true));
   }
 

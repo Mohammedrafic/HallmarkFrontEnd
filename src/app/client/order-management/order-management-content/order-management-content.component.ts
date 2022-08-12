@@ -101,6 +101,7 @@ import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-f
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
+import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
 
 @Component({
   selector: 'app-order-management-content',
@@ -211,6 +212,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public fileName: string;
   public defaultFileName: string;
+  public selectedRowRef: any;
 
   private isRedirectedFromDashboard: boolean;
   private dashboardFilterSubscription: Subscription;
@@ -288,6 +290,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.onChildDialogChange();
     this.onLockUpdatedSucceededHandler();
     this.listenRedirectFromReOrder();
+    this.onCommentRead();
+    this.listenRedirectFromExtension();
   }
 
   ngOnDestroy(): void {
@@ -611,6 +615,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.openChildDialog.next(false);
         if (!isArray(event.data)) {
           this.openDetails.next(true);
+          this.selectedRowRef = event;
         }
       }
     }
@@ -703,7 +708,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
           this.getOrders();
           break;
         case OrganizationOrderManagementTabs.PermPlacement:
-          this.isLockMenuButtonsShown = false;
+          this.isLockMenuButtonsShown = true;
           this.refreshGridColumns(PermPlacementColumnsConfig, this.gridWithChildRow);
           this.getOrders();
           break;
@@ -1166,6 +1171,15 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     return this.moreMenuWithCloseButton;
   }
 
+  private onCommentRead(): void {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateGridCommentsCounter)).subscribe((data) => {
+      if (data.orderId && this.selectedRowRef) {
+        this.selectedRowRef.data.unreadComments -= data.readComments;
+        this.gridWithChildRow.setRowData(data.orderId, this.selectedRowRef.data);
+      }
+    });
+  }
+
   private handleDashboardFilters(): void {
     if (this.isRedirectedFromDashboard) {
       this.applyDashboardFilters();
@@ -1214,6 +1228,13 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.isRedirectedFromDashboard = false;
         this.dashboardFilterSubscription.unsubscribe();
       });
+  }
+
+  private listenRedirectFromExtension(): void {
+    this.orderManagementService.orderId$.pipe(filter(Boolean)).subscribe((id: number) => {
+      const index = (this.gridWithChildRow.dataSource as Order[])?.findIndex((order: Order) => order.id === id);
+      this.gridWithChildRow.selectRow(index);
+    });
   }
 
   private listenRedirectFromReOrder(): void {

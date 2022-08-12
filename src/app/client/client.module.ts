@@ -30,6 +30,7 @@ import {
   User,
   X,
   XCircle,
+  Slash,
 } from 'angular-feather/icons';
 import {
   ColumnMenuService,
@@ -43,7 +44,13 @@ import {
   SortService,
   ToolbarService,
 } from '@syncfusion/ej2-angular-grids';
-import { ButtonModule, CheckBoxModule, ChipListModule, RadioButtonModule } from '@syncfusion/ej2-angular-buttons';
+import {
+  ButtonModule,
+  CheckBoxModule,
+  ChipListModule,
+  RadioButtonModule,
+  SwitchModule,
+} from '@syncfusion/ej2-angular-buttons';
 import { DropDownButtonModule, SplitButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { MaskedTextBoxModule, NumericTextBoxModule, TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DropDownListModule, MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
@@ -75,6 +82,9 @@ import { AgGridModule } from '@ag-grid-community/angular';
 import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
 import { SaveTemplateDialogModule } from '@client/order-management/save-template-dialog/save-template-dialog.module';
 import { CloseOrderModule } from '@client/order-management/close-order/close-order.module';
+import { CandidateListModule } from '@shared/components/candidate-list/candidate-list.module';
+import { ChildOrderDialogModule } from '@shared/components/child-order-dialog/child-order-dialog.module';
+import { ExtensionModule } from '@shared/components/extension/extension.module';
 
 const gridIcons = {
   MessageSquare,
@@ -92,6 +102,7 @@ const gridIcons = {
   Edit,
   Copy,
   XCircle,
+  Slash,
   Edit3,
   Trash2,
   X,
@@ -150,9 +161,13 @@ const gridIcons = {
     AddEditReorderModule,
     SaveTemplateDialogModule,
     CloseOrderModule,
+    CandidateListModule,
+    SwitchModule,
 
+    ChildOrderDialogModule,
     //STORE
     NgxsModule.forFeature([OrderManagementContentState, OrganizationManagementState]),
+    ExtensionModule,
   ],
   providers: [
     ResizeService,
@@ -167,4 +182,4 @@ const gridIcons = {
     MaskedDateTimeService,
   ],
 })
-export class ClientModule { }
+export class ClientModule {}

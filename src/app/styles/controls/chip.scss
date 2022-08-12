@@ -1,6 +1,17 @@
 @import '../../styles/variables/colors.scss';
 
 .status-cell {
+  &.ex-chip {
+    ejs-chiplist.e-control.e-chip-list {
+      flex-wrap: nowrap;
+
+      .e-chip.ex {
+        margin-left: 10px;
+        width: auto;
+      }
+    }
+  }
+
   ejs-chiplist.e-control.e-chip-list {
     .e-chip {
       cursor: default;
