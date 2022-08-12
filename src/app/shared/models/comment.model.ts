@@ -6,7 +6,6 @@ export class Comment {
   createdAt: Date;
   firstName: string;
   lastName: string;
-  userId: string;
   new?: boolean;
   isRead?: boolean;
 }

@@ -5,7 +5,7 @@ import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { TextBoxComponent } from '@syncfusion/ej2-angular-inputs';
 import { debounceTime, Observable, Subject, takeUntil, tap } from 'rxjs';
 import { UserState } from 'src/app/store/user.state';
-import { MarkCommentAsRead, SaveComment } from './store/comments.actions';
+import { MarkCommentAsRead, SaveComment, UpdateGridCommentsCounter } from './store/comments.actions';
 import { CommentsState } from './store/comments.state';
 
 enum CommentsFilter {
@@ -23,10 +23,13 @@ enum CommentsFilter {
 export class CommentsComponent {
   @Input() useBackground: boolean = true;
   @Input() disabled: boolean = false;
+  @Input() orderId: number;
   @Input() set comments(value: Comment[]) {
     this.commentsList = value;
-    this.hasUnreadMessages = this.hasUnread();
-    this.initView$.next();
+    if (value.length) {
+      this.hasUnreadMessages = this.hasUnread();
+      this.initView$.next();
+    }
   }
   get comments(): Comment[] {
     return this.commentsList;
@@ -73,6 +76,9 @@ export class CommentsComponent {
     this.markAsRead$.pipe(takeUntil(this.unsubscribe$), debounceTime(500)).subscribe((ids: number[]) => {
       if (ids.length) {
         this.store.dispatch(new MarkCommentAsRead(this.readMessagesIds));
+        if (this.orderId) {
+          this.store.dispatch(new UpdateGridCommentsCounter(this.readMessagesIds.length, this.orderId));
+        }
         this.readMessagesIds = [];
       }
     });
@@ -92,11 +98,11 @@ export class CommentsComponent {
   }
 
   private scrollToLastMessage(): void {
-    this.body?.nativeElement.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest'});
+    this.body?.nativeElement.lastElementChild?.scrollIntoView({ block: 'nearest'});
   }
 
   private scrollToSpecificMessage(messageEl: HTMLElement): void {
-    messageEl.scrollIntoView({ behavior: 'smooth', block: 'nearest'});
+    messageEl.scrollIntoView({ block: 'nearest'});
   }
 
   private hasUnread(): boolean {
@@ -124,6 +130,9 @@ export class CommentsComponent {
   }
 
   public send(): void {
+    if (!this.message) {
+      return;
+    }
     const user = this.store.selectSnapshot(UserState).user;
     const comment = {
       id: 0, 
@@ -131,17 +140,14 @@ export class CommentsComponent {
       createdAt: new Date(),
       firstName: user.firstName,
       lastName: user.lastName,
-      userId: user.id,
       isExternal: this.isExternal, 
       new: true, 
       commentContainerId: this.commentContainerId,
       isRead: true
     };
-    if (this.message) {
-      this.comments.push(comment);
-      this.message = '';
-      this.scroll$.next(null);
-    }
+    this.comments.push(comment);
+    this.message = '';
+    this.scroll$.next(null);
     if (!this.isCreating) {
       this.store.dispatch(new SaveComment(comment))
     } 

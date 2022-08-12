@@ -76,7 +76,9 @@
       </form>
     </div>
     <div class="extension__comments">
-      <app-comments></app-comments>
+      <app-comments
+        [comments]="comments"
+        [isCreating]="true"></app-comments>
     </div>
   </div>
   <div class="extension__bill-rates">

@@ -14,11 +14,15 @@ export class CommentsService {
 
   public getComments(commentContainerId: number, isExternal: boolean | null): Observable<Comment[]> {
     const user = this.store.selectSnapshot(UserState.user);
-    return this.httpClient.post<Comment[]>('/api/Comments/filter', { commentContainerId, isExternal, isAgency: user?.businessUnitType === BusinessUnitType.Agency, userId: user?.id });
+    return this.httpClient.post<Comment[]>('/api/Comments/filter', { commentContainerId, isExternal, isAgency: user?.businessUnitType === BusinessUnitType.Agency });
   }
 
   public saveComment(comment: Comment): Observable<Comment> {
     return this.httpClient.post<Comment>('/api/Comments', { comments: [ comment ] });
+  }
+
+  public saveCommentsBulk(comments: Comment[]): Observable<Comment> {
+    return this.httpClient.post<Comment>('/api/Comments', { comments });
   }
 
   public markCommentAsRead(ids: number[]): Observable<void> {

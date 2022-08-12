@@ -28,13 +28,12 @@ import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
-import { GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
+import { GetAgencyExtensions, GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import {
   GetAvailableSteps,
   GetOrganisationCandidateJob,
-  ReloadOrganisationOrderCandidatesLists, SetIsDirtyOrderForm,
+  ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
-  GetAgencyExtensions,
   GetExtensions
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';

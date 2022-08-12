@@ -13,6 +13,7 @@ import isNil from 'lodash/fp/isNil';
 import { addDays } from '@shared/utils/date-time.utils';
 import { OrderCandidateJob, OrderManagementChild } from '@shared/models/order-management.model';
 import { BillRatesComponent } from '@shared/components/bill-rates/bill-rates.component';
+import { Comment } from '@shared/models/comment.model';
 
 @Component({
   selector: 'app-extension-sidebar',
@@ -34,6 +35,7 @@ export class ExtensionSidebarComponent implements OnInit {
 
   public minDate: Date;
   public extensionForm: FormGroup;
+  public comments: Comment[] = [];
 
   public constructor(
     public formBuilder: FormBuilder,
@@ -60,6 +62,7 @@ export class ExtensionSidebarComponent implements OnInit {
         ...extension,
         jobId: this.orderPosition.jobId,
         orderId: this.candidateJob.orderId,
+        comments: this.comments
       })
       .subscribe({
         next: () => this.saveEmitter.emit(),

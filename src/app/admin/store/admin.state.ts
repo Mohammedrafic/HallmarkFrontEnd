@@ -59,6 +59,7 @@ import { CredentialType } from '@shared/models/credential-type.model';
 import { CredentialsService } from '@shared/services/credentials.service';
 import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { UserOrganizationsAgenciesChanged } from 'src/app/store/user.actions';
+import { HttpErrorResponse } from '@angular/common/http';
 
 interface DropdownOption {
   id: number;
@@ -231,7 +232,7 @@ export class AdminState {
   }
 
   @Action(SaveOrganization)
-  SaveOrganization({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveOrganization): Observable<Organization> {
+  SaveOrganization({ patchState, dispatch }: StateContext<AdminStateModel>, { payload }: SaveOrganization): Observable<Organization | void> {
     patchState({ isOrganizationLoading: true });
     return this.organizationService.saveOrganization(payload).pipe(tap((payloadResponse) => {
       patchState({ isOrganizationLoading: false });
@@ -242,6 +243,12 @@ export class AdminState {
         dispatch(new ShowToast(MessageTypes.Success, RECORD_ADDED));
       }
       return payloadResponse;
+    }), 
+    catchError((error: HttpErrorResponse) => {
+      if (error.error.errors.Organization) {
+        return dispatch(new ShowToast(MessageTypes.Error, 'Such prefix already exists'));
+      }
+      return dispatch(new ShowToast(MessageTypes.Error, 'Changes were not saved. Please try again'));
     }));
   }
 

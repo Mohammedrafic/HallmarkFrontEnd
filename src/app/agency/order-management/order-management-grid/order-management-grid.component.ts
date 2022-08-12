@@ -73,6 +73,7 @@ import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/expor
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { PreviewOrderDialogComponent } from '@agency/order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
+import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -135,6 +136,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public AgencyOrderManagementTabs = AgencyOrderManagementTabs;
   public isLockMenuButtonsShown = true;
   public orderTypes = OrderType;
+  public selectedRowRef: any;
 
   private isAlive = true;
   private selectedIndex: number | null;
@@ -179,12 +181,22 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     });
     this.subscribeOnPageChanges();
     this.onTabChange();
+    this.onCommentRead();
   }
 
   ngOnDestroy(): void {
     this.isAlive = false;
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private onCommentRead(): void {
+    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateGridCommentsCounter)).subscribe((data) => {
+      if (data.orderId && this.selectedRowRef) {
+        this.selectedRowRef.data.unreadComments -= data.readComments;
+        this.gridWithChildRow.setRowData(data.orderId, this.selectedRowRef.data);
+      }
+    });
   }
 
   public onExportSelectedSubscribe(): void {

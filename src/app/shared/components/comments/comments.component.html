@@ -44,9 +44,12 @@
           <i-feather *ngIf="isExternal" name="eye" class="icon"></i-feather>
         </span>
       </ejs-tooltip>
-      <span class="control-wrapper send" (click)="send()">
-        <i-feather name="send" class="icon"></i-feather>
-      </span>
+      <ejs-tooltip
+        [content]="'Send'">
+        <span class="control-wrapper send" (click)="send()">
+          <i-feather name="send" class="icon"></i-feather>
+        </span>
+      </ejs-tooltip>
     </div>
   </div>
 </section>
