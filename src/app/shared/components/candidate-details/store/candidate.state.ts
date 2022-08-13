@@ -6,6 +6,7 @@ import {
   GetCandidateSkills,
   SelectNavigation,
   SetCandidateMessage,
+  SetNavigation,
   SetPageFilters,
   SetPageNumber,
   SetPageSize,
@@ -124,6 +125,11 @@ export class CandidateDetailsState {
   ): void {
     patchState({ navigationTab: { active: active!, pending, isRedirect: isRedirect! } });
     patchState({ isNavigate: isRedirect });
+  }
+
+  @Action(SetNavigation)
+  SetNavigation({ patchState }: StateContext<CandidateDetailsStateModel>, { isNavigate }: SetNavigation): void {
+    patchState({ isNavigate });
   }
 
   @Action(SetPageNumber)

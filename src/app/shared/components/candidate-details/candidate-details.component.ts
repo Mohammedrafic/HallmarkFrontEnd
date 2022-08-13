@@ -6,6 +6,7 @@ import {
   GetCandidateDetailsPage,
   GetCandidateRegions,
   GetCandidateSkills,
+  SetNavigation,
   SetPageFilters,
 } from '@shared/components/candidate-details/store/candidate.actions';
 import { CandidateDetailsState } from '@shared/components/candidate-details/store/candidate.state';
@@ -25,6 +26,7 @@ import {
   NavigationTabModel,
 } from '@shared/components/candidate-details/models/candidate.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
+import { UserState } from '../../../store/user.state';
 
 @Component({
   selector: 'app-candidate-details',
@@ -42,19 +44,25 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   private pageSize$: Observable<number>;
 
   @Select(CandidateDetailsState.candidateSkills)
-  candidateSkills$: Observable<MasterSkillByOrganization[]>;
+  public candidateSkills$: Observable<MasterSkillByOrganization[]>;
 
   @Select(CandidateDetailsState.candidateDetails)
-  candidates$: Observable<CandidateDetailsPage>;
+  public candidates$: Observable<CandidateDetailsPage>;
 
   @Select(CandidateDetailsState.filtersPage)
-  filtersPage$: Observable<FiltersModal>;
+  public filtersPage$: Observable<FiltersModal>;
 
   @Select(CandidateDetailsState.candidateRegions)
-  candidateRegions$: Observable<CandidatesDetailsRegions[]>;
+  public candidateRegions$: Observable<CandidatesDetailsRegions[]>;
+
+  @Select(UserState.lastSelectedAgencyId)
+  lastSelectedAgencyId$: Observable<number>;
+
+  @Select(UserState.lastSelectedOrganizationId)
+  lastSelectedOrganizationId$: Observable<number>;
 
   public filtersForm: FormGroup;
-  public filters: FiltersModal = {};
+  public filters: FiltersModal | null;
   public filterColumns: FilterColumnsModel;
   public filteredItems: FilteredItem[] = [];
   public orderTypes = OrderTypeOptions;
@@ -92,6 +100,8 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     ])
       .pipe(takeUntil(this.destroy$))
       .subscribe();
+
+    this.subscribeOnAgencyOrganizationChanges();
   }
 
   public onFilterClearAll(): void {
@@ -114,11 +124,11 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
 
   public onFilterClose(): void {
     this.filtersForm.setValue({
-      orderTypes: this.filters.orderTypes || [],
-      startDate: this.filters.startDate || null,
-      endDate: this.filters.endDate || null,
-      skillsIds: this.filters.skillsIds || [],
-      regionsIds: this.filters.regionsIds || [],
+      orderTypes: this.filters?.orderTypes || [],
+      startDate: this.filters?.startDate || null,
+      endDate: this.filters?.endDate || null,
+      skillsIds: this.filters?.skillsIds || [],
+      regionsIds: this.filters?.regionsIds || [],
     });
     this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns, this.datePipe);
   }
@@ -138,6 +148,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       filter((currentPage: number) => !!currentPage),
       tap((currentPage: number) => {
         this.pageNumber = currentPage;
+        this.setActiveTab();
         this.updateFilters();
         this.updatePage();
       })
@@ -149,6 +160,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
       filter((currentSize: number) => !!currentSize),
       tap((currentSize: number) => {
         this.pageSize = currentSize;
+        this.setActiveTab();
         this.updateFilters();
         this.updatePage();
       })
@@ -159,9 +171,14 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     return this.candidateTab$.pipe(
       filter(({ active }: NavigationTabModel) => active === 0 || !!active),
       tap((selectedTab: NavigationTabModel) => {
-        const isNavigate = this.store.selectSnapshot(CandidateDetailsState.isNavigate);
         this.selectedTab = selectedTab.active;
-        isNavigate ? this.updateFilters() : this.clearFilters();
+        if (this.isNavigationFromAnotherPage()) {
+          this.updateFilters();
+          this.store.dispatch(new SetNavigation(false));
+        } else {
+          this.clearFilters();
+        }
+        this.store.dispatch(new SetNavigation(false));
         this.updatePage();
       })
     );
@@ -246,9 +263,31 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
     this.pageSize = 30;
     this.filtersForm.reset();
     this.filteredItems = [];
-    this.filters = {};
+    this.filters = null;
     this.filteredItems = this.filterService.generateChips(this.filtersForm, this.filterColumns, this.datePipe);
     this.store.dispatch(new SetPageFilters(this.filters));
+  }
+
+  private isNavigationFromAnotherPage(): boolean | null {
+    return this.store.selectSnapshot(CandidateDetailsState.isNavigate);
+  }
+
+  private setActiveTab(): void {
+    const tabs = this.store.selectSnapshot(CandidateDetailsState.navigationTab);
+    if (!this.selectedTab) {
+      this.selectedTab = tabs.pending;
+    }
+  }
+
+  private subscribeOnAgencyOrganizationChanges(): void {
+    combineLatest([this.lastSelectedOrganizationId$, this.lastSelectedAgencyId$])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (!this.isNavigationFromAnotherPage()) {
+          this.clearFilters();
+          this.updatePage();
+        }
+      });
   }
 
   private updatePage(): void {

@@ -191,12 +191,14 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   private onCommentRead(): void {
-    this.actions$.pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateGridCommentsCounter)).subscribe((data) => {
-      if (data.orderId && this.selectedRowRef) {
-        this.selectedRowRef.data.unreadComments -= data.readComments;
-        this.gridWithChildRow.setRowData(data.orderId, this.selectedRowRef.data);
-      }
-    });
+    this.actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateGridCommentsCounter))
+      .subscribe((data) => {
+        if (data.orderId && this.selectedRowRef) {
+          this.selectedRowRef.data.unreadComments -= data.readComments;
+          this.gridWithChildRow.setRowData(data.orderId, this.selectedRowRef.data);
+        }
+      });
   }
 
   public onExportSelectedSubscribe(): void {
@@ -515,7 +517,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       skillIds: this.filters.skillIds || [],
       orderTypes:
         this.selectedTab === AgencyOrderManagementTabs.PerDiem ||
-        this.selectedTab === AgencyOrderManagementTabs.ReOrders || 
+        this.selectedTab === AgencyOrderManagementTabs.ReOrders ||
         this.selectedTab === AgencyOrderManagementTabs.PermPlacement
           ? []
           : this.filters.orderTypes || [],
@@ -531,7 +533,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       organizationIds: this.filters.organizationIds || [],
       orderStatuses: this.filters.orderStatuses || [],
       annualSalaryRangeFrom: this.filters.annualSalaryRangeFrom || null,
-      annualSalaryRangeTo: this.filters.annualSalaryRangeTo || null
+      annualSalaryRangeTo: this.filters.annualSalaryRangeTo || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     this.filteredItems$.next(this.filteredItems.length);

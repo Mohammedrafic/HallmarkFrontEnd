@@ -29,7 +29,7 @@ export class TabNavigationComponent extends DestroyableDirective {
   public onTabCreated(): void {
     this.candidateTab$
       .pipe(
-        filter(({ pending }: NavigationTabModel) => !!pending),
+        filter(({ pending }: NavigationTabModel) => pending === 0 || !!pending),
         takeUntil(this.destroy$)
       )
       .subscribe(({ pending }: NavigationTabModel) => {

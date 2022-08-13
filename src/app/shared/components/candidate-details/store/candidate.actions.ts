@@ -1,8 +1,4 @@
-import {
-  CandidateMessage,
-  FiltersModal,
-  FiltersPageModal,
-} from '@shared/components/candidate-details/models/candidate.model';
+import { FiltersModal, FiltersPageModal } from '@shared/components/candidate-details/models/candidate.model';
 
 export class GetCandidateDetailsPage {
   static readonly type = '[candidate details] Get Candidate Details by Page';
@@ -26,12 +22,17 @@ export class SetPageSize {
 
 export class SetPageFilters {
   static readonly type = '[candidate details] Set Page Filters';
-  constructor(public filters: FiltersModal) {}
+  constructor(public filters: FiltersModal | null) {}
 }
 
 export class GetCandidateRegions {
   static readonly type = '[candidate details] Get Candidate Regions';
   constructor() {}
+}
+
+export class SetNavigation {
+  static readonly type = '[candidate details] Set Navigation';
+  constructor(public isNavigate: boolean) {}
 }
 
 export class SetCandidateMessage {

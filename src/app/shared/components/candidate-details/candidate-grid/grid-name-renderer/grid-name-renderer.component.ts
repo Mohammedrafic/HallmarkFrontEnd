@@ -37,7 +37,7 @@ export class GridNameRendererComponent implements ICellRendererAngularComp {
       user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
     const pageToBack = this.router.url;
     const readonly =
-      user?.businessUnitType === BusinessUnitType.Organization || user?.businessUnitType === BusinessUnitType.MSP;
+      user?.businessUnitType === BusinessUnitType.Hallmark || user?.businessUnitType === BusinessUnitType.MSP;
 
     if (readonly) {
       this.store.dispatch(
