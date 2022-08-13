@@ -15,7 +15,6 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { FilterService } from '@shared/services/filter.service';
 import { FilteredItem } from '@shared/models/filter.model';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
-import { OrderTypeOptions } from '@shared/enums/order-type';
 import { DatePipe } from '@angular/common';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import {
@@ -27,6 +26,7 @@ import {
 } from '@shared/components/candidate-details/models/candidate.model';
 import { MasterSkillByOrganization } from '@shared/models/skill.model';
 import { UserState } from '../../../store/user.state';
+import { OrderTypeOptionsForCandidates } from '@shared/components/candidate-details/candidate-details.constant';
 
 @Component({
   selector: 'app-candidate-details',
@@ -65,7 +65,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   public filters: FiltersModal | null;
   public filterColumns: FilterColumnsModel;
   public filteredItems: FilteredItem[] = [];
-  public orderTypes = OrderTypeOptions;
+  public orderTypes = OrderTypeOptionsForCandidates;
   public candidatesPage: CandidateDetailsPage;
 
   public pageNumber = 1;
@@ -140,7 +140,7 @@ export class CandidateDetailsComponent extends DestroyableDirective implements O
   }
 
   private setHeaderName(): void {
-    this.store.dispatch(new SetHeaderState({ title: 'Candidate Details', iconName: 'users' }));
+    this.store.dispatch(new SetHeaderState({ title: 'Candidate Assignment', iconName: 'users' }));
   }
 
   private subscribeOnPageNumberChange(): Observable<number> {

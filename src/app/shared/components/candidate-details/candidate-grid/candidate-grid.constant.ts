@@ -10,29 +10,33 @@ const valueHelper = new GridHelper();
 export const CandidatesColumnsDefinition = (isAgency: boolean) => {
   return [
     {
-      field: 'name',
+      field: 'firstName',
       headerName: 'NAME',
       width: 160,
       cellRenderer: GridNameRendererComponent,
+      sortable: true,
     },
     {
       field: 'status',
       headerName: 'STATUS',
       width: 160,
       cellRenderer: GridStatusRendererComponent,
+      sortable: true,
     },
     {
       field: 'classification',
       headerName: 'CLASSIFICATION',
-      width: 150,
+      width: 170,
       valueFormatter: (params: { data: CandidatesDetailsModel }) => `${JobClassification[params.data.classification]}`,
+      sortable: true,
     },
     {
       field: 'startDate',
       headerName: 'START DATE',
-      width: 140,
+      width: 150,
       valueFormatter: (params: { data: CandidatesDetailsModel }) =>
         `${valueHelper.formatDate(params.data.startDate, 'MM/dd/yyyy')}`,
+      sortable: true,
     },
     {
       field: 'endDate',
@@ -40,51 +44,66 @@ export const CandidatesColumnsDefinition = (isAgency: boolean) => {
       width: 140,
       valueFormatter: (params: { data: CandidatesDetailsModel }) =>
         `${valueHelper.formatDate(params.data.endDate, 'MM/dd/yyyy')}`,
+      sortable: true,
     },
     {
       field: 'scheduledDate',
       headerName: 'SCHEDULED DATE',
-      width: 160,
+      width: 180,
       valueFormatter: (params: { data: CandidatesDetailsModel }) =>
         `${valueHelper.formatDate(params.data.scheduledDate, 'MM/dd/yyyy')}`,
+      sortable: true,
     },
     {
       field: 'region',
       headerName: 'REGION',
       width: 140,
+      sortable: true,
     },
     {
-      field: 'locationDepartment',
+      field: 'location',
       headerName: 'LOCATION/DEPARTMENT',
-      width: 200,
+      width: 220,
       valueFormatter: (params: { data: CandidatesDetailsModel }) =>
         `${params.data.location}, ${params.data.department}`,
+      sortable: true,
     },
     {
       field: 'initialRate',
       headerName: 'INITIAL RATE',
-      width: 130,
+      width: 150,
+      sortable: true,
     },
     {
       field: 'billRate',
       headerName: 'BILL RATE',
-      width: 120,
+      width: 140,
+      sortable: true,
     },
     {
       field: 'positionId',
       headerName: 'POSITION ID',
-      width: 130,
+      width: 150,
       cellRenderer: GridPositionRendererComponent,
+      sortable: true,
     },
     {
       field: 'assignment',
       headerName: 'ASSIGNMENT',
       width: 160,
+      sortable: true,
     },
     {
       field: 'businessUnitName',
+      width: 170,
+      headerValueGetter: () => (!isAgency ? 'AGENCY NAME' : 'ORGANIZATION NAME'),
+      sortable: true,
+    },
+    {
+      field: 'skill',
+      headerName: 'SKILL',
       width: 160,
-      headerValueGetter: () => (isAgency ? 'AGENCY NAME' : 'ORGANIZATION NAME'),
+      sortable: true,
     },
   ];
 };

@@ -36,10 +36,9 @@ export class GridNameRendererComponent implements ICellRendererAngularComp {
     const url =
       user?.businessUnitType === BusinessUnitType.Organization ? '/agency/candidates' : '/agency/candidates/edit';
     const pageToBack = this.router.url;
-    const readonly =
-      user?.businessUnitType === BusinessUnitType.Hallmark || user?.businessUnitType === BusinessUnitType.MSP;
+    const readonly = user?.businessUnitType === BusinessUnitType.Organization;
 
-    if (readonly) {
+    if (user?.businessUnitType === BusinessUnitType.Hallmark || user?.businessUnitType === BusinessUnitType.MSP) {
       this.store.dispatch(
         new SetLastSelectedOrganizationAgencyId({
           lastSelectedAgencyId: this.cellValue.agencyId,
