@@ -185,6 +185,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   ngOnDestroy(): void {
+    this.orderManagementAgencyService.orderMyAgencyId = null;
     this.isAlive = false;
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -356,6 +357,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
     }
+
+    this.clearOrderMyAgencyId();
     this.checkSelectedChildrenItem();
   }
 
@@ -693,8 +696,19 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   private hasOrderMyAgencyId(): void {
     const { orderMyAgencyId } = this.orderManagementAgencyService;
     if (orderMyAgencyId) {
+      this.OrderFilterFormGroup.patchValue({ orderId: orderMyAgencyId.orderId.toString() });
+      this.filters = this.OrderFilterFormGroup.getRawValue();
       this.filters.orderId = orderMyAgencyId.orderId;
-      this.OrderFilterFormGroup.patchValue({ orderId: this.filters.orderId });
+      this.filters.includeReOrders = false;
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
+      this.filteredItems$.next(this.filteredItems.length);
+    }
+  }
+
+  private clearOrderMyAgencyId(): void {
+    const { orderMyAgencyId } = this.orderManagementAgencyService;
+    if (orderMyAgencyId && this.selectedTab && this.selectedTab !== AgencyOrderManagementTabs.MyAgency) {
+      this.orderManagementAgencyService.orderMyAgencyId = null;
     }
   }
 
