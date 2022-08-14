@@ -6,6 +6,7 @@ import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.e
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { SearchComponent } from '@shared/components/search/search.component';
 import { TabNavigationComponent } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
+import { GetAgencyFilterOptions } from '@agency/store/order-management.actions';
 
 @Component({
   selector: 'app-order-management',
@@ -40,6 +41,7 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
 
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
+    this.store.dispatch(new GetAgencyFilterOptions());
   }
 
   public onExportSelected(event: any): void {
