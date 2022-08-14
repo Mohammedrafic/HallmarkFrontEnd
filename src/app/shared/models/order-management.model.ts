@@ -298,6 +298,7 @@ export class Order {
   extensionFromId?: number | null;
   extensionInitialOrderId?: number | null;
   hasParentExtension?: boolean;
+  hasExtensions?: boolean;
 }
 
 export class ReOrder {
