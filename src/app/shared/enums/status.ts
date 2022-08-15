@@ -99,5 +99,4 @@ export enum CandidatesStatusText {
 export const CandidateStatusOptions = [
   { id: CandidateStatus.Inactive, name: 'Inactive' },
   { id: CandidateStatus.Active, name: 'Active' },
-  { id: CandidateStatus.Incomplete, name: 'Incomplete' },
 ];

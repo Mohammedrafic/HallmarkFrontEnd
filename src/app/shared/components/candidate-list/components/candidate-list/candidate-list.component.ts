@@ -148,7 +148,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.dispatchNewPage();
     this.store.dispatch(new ShowFilterDialog(false));
     this.filteredItems$.next(this.filteredItems.length);
-    console.log('LSAJHDJLFJAHSLDJFHLJAH', this.filterColumns);
   }
 
   public onFilterClose(): void {
@@ -161,17 +160,8 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.filteredItems$.next(this.filteredItems.length);
   }
 
-  public getCandidateStatusName(status: number): string {
-    switch (status) {
-      case ApplicantStatus.OnBoarded:
-        return 'Onboard';
-        break;
-      case ApplicantStatus.Accepted:
-        return 'Accepted';
-        break;
-      default:
-        return '';
-    }
+  public showCandidateStatus(status: number): boolean {
+    return [ApplicantStatus.OnBoarded, ApplicantStatus.Accepted].includes(status);
   }
 
   public dataBound(): void {

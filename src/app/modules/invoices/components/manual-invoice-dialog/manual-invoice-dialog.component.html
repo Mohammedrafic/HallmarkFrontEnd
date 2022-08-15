@@ -87,6 +87,7 @@
 
               <ng-template [ngSwitchCase]="FieldTypes.Toggle">
                 <div class="input-container long flexed">
+                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span></label>
                   <ejs-switch
                   class="toggle"
                   onLabel="Yes"
@@ -94,7 +95,6 @@
                   [formControlName]="field.field">
                   >
                   </ejs-switch>
-                  <span class="switch-label">{{ field.title }}</span>
                 </div>
               </ng-template>
 

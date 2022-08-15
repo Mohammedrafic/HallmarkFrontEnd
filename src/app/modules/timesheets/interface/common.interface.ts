@@ -1,4 +1,3 @@
-
 import { ItemModel } from '@syncfusion/ej2-splitbuttons/src/common/common-model';
 import { SelectionSettingsModel, TextWrapSettingsModel } from '@syncfusion/ej2-grids/src/grid/base/grid-model';
 
@@ -6,7 +5,7 @@ import { FieldType, FieldWidthStyle } from '@core/enums';
 import { DropdownOption } from '@core/interface';
 import { Attachment } from '@shared/components/attachments/models/attachment.interface';
 import { TimesheetsModel } from './../store/model/timesheets.model';
-import { RecordFields } from './../enums/timesheet-common.enum';
+import { RecordFields, RecordsMode } from './../enums';
 
 export interface DialogConfigField {
   title: string;
@@ -31,10 +30,24 @@ export interface DialogConfig {
   expenses: DialogConfigBlock;
 }
 
+export interface RawTimsheetRecordsDto {
+  timesheets: RecordValue[];
+  miles: RecordValue[];
+  expenses: RecordValue[];
+  timesheetsCalculated: RecordValue[];
+  milesCalculated: RecordValue[];
+  expensesCalculated: RecordValue[];
+}
+
 export interface TimesheetRecordsDto {
-  [RecordFields.Time]: RecordValue[];
-  [RecordFields.Miles]: RecordValue[];
-  [RecordFields.Expenses]: RecordValue[];
+  [RecordFields.Time]: RecordsDetails;
+  [RecordFields.Miles]: RecordsDetails;
+  [RecordFields.Expenses]: RecordsDetails;
+}
+
+export interface RecordsDetails {
+  [RecordsMode.Edit]: RecordValue[];
+  [RecordsMode.View]: RecordValue[];
 }
 
 export interface RecordValue {
