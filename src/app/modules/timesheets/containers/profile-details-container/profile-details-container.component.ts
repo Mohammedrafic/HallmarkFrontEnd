@@ -131,7 +131,6 @@ export class ProfileDetailsContainerComponent extends Destroyable implements OnI
     this.isAgency = this.route.snapshot.data['isAgencyArea'];
     this.submitText = this.isAgency ? SubmitBtnText.Submit : SubmitBtnText.Approve;
     this.attachmentsListConfig$ = this.timesheetDetails$.pipe(
-      tap(({id}) => console.log(id, this.organizationId, this.isAgency)),
       map(({id}) => this.timesheetDetailsService.getAttachmentsListConfig(id, this.organizationId, this.isAgency))
     )
   }

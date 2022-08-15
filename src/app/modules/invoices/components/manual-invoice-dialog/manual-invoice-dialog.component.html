@@ -11,8 +11,8 @@
       <div class="dialog-header">
         <h3 class="title">{{ dialogConfig.title | titlecase }}</h3>
         <div class="controls">
-          <button ejs-button cssClass="e-outline button-cancel" (click)="closeDialog()">Cancel</button>
-          <button ejs-button [isPrimary]="true">Save</button>
+          <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
+          <button ejs-button [isPrimary]="true" (click)="saveManualInvoice()">Save</button>
         </div>
       </div>
 
@@ -54,29 +54,19 @@
 
               <ng-template [ngSwitchCase]="FieldTypes.Date">
                 <div class="input-container" [ngClass]="field.widthStyle || ''">
-                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span>
+                  <label [for]="field.field">{{ field.title }}<span *ngIf="field.required" class="required">*</span>
                   </label>
-                  <div class="input-group">
+                  <div class="input-group picker">
                     <ejs-datepicker
                       name="serviceDate"
                       class="datepicker"
-                      format="dd/MM/yyyy"
+                      format="MM/dd/yyyy"
                       appValidateWithMessage
-                      placeholder="DD/MM/YYYY"
+                      placeholder="MM/DD/YYYY"
+                      [max]="today"
                       [formControlName]="field.field"
                     >
                     </ejs-datepicker>
-                  </div>
-                </div>
-              </ng-template>
-
-              <ng-template [ngSwitchCase]="FieldTypes.SearchDD">
-                <div class="input-container" [ngClass]="field.widthStyle || ''">
-                  <label [for]="field.field">{{ field.title }} <span *ngIf="field.required" class="required">*</span></label>
-                  <div class="input-group">
-                    <ejs-autocomplete
-                    [formControlName]="field.field"
-                    ></ejs-autocomplete>
                   </div>
                 </div>
               </ng-template>
@@ -99,6 +89,8 @@
                 <div class="input-container long flexed">
                   <ejs-switch
                   class="toggle"
+                  onLabel="Yes"
+                  offLabel="No"
                   [formControlName]="field.field">
                   >
                   </ejs-switch>
@@ -110,7 +102,9 @@
           </ng-container>
 
         </form>
-        <app-file-uploader [maxFiles]="5"></app-file-uploader>
+        <app-file-uploader [maxFiles]="5"
+          (uploadFilesChanged)="setFilesForUpload($event)">
+        </app-file-uploader>
       </div>
     </div>
   </ng-template>

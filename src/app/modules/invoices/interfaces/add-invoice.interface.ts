@@ -1,5 +1,6 @@
 import { FieldType, FieldWidthStyle } from '@core/enums';
 import { DropdownOption, FileForUpload } from '@core/interface';
+import { ManInvoiceOptionsKeys } from '../enums';
 
 export interface ManInvoiceInputConfig {
   field: string;
@@ -8,7 +9,8 @@ export interface ManInvoiceInputConfig {
   required: boolean;
   type: FieldType;
   widthStyle: FieldWidthStyle;
-  options?: DropdownOption;
+  optionsStateKey?: ManInvoiceOptionsKeys;
+  options?: DropdownOption[];
 };
 
 export interface AddManInvoiceDialogConfig {
@@ -17,12 +19,12 @@ export interface AddManInvoiceDialogConfig {
 }
 
 export interface AddManInvoiceForm {
-  orderId: number | string;
-  name: string;
+  orderId: string;
+  nameId: number;
   unitId: number;
   locationId: number;
   departmentId: number;
-  value: number;
+  value: string;
   date: Date;
   link: string;
   vendorFee: boolean;
@@ -34,4 +36,43 @@ export interface ManualInvoiceReason {
   id: number;
   reason: string;
   businessUnitId: number;
+}
+
+export interface ManualInvoiceMeta {
+  jobId: number;
+  orderId: number;
+  positionId: number;
+  formattedOrderId: string;
+  candidateId: number;
+  candidateFirstName: string;
+  candidateMiddleName: string;
+  candidateLastName: string;
+  locationId: number;
+  locationName: string;
+  departmentId: number;
+  departmentName: string;
+  agencyId: number;
+  agencyName: string;
+  organizationId: number;
+  organizationName: string;
+}
+
+export interface ManualInvoiceInputOptions {
+  [ManInvoiceOptionsKeys.Locations]: DropdownOption[];
+  [ManInvoiceOptionsKeys.Departments]: DropdownOption[];
+  [ManInvoiceOptionsKeys.Candidates]: DropdownOption[];
+  [ManInvoiceOptionsKeys.Agencies]: DropdownOption[];
+  [ManInvoiceOptionsKeys.Reasons]: DropdownOption[];
+}
+
+export interface ManualInvoicePostDto {
+  organizationId: number;
+  jobId: number;
+  amount: number;
+  serviceDate: string;
+  linkedInvoiceId: number;
+  vendorFeeApplicable: boolean;
+  manualInvoiceReasonId: number;
+  comment: string;
+  departmentId: number;
 }

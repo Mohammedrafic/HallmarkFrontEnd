@@ -114,7 +114,7 @@
         </ejs-multiselect>
       </div>
     </div>
-    <div class="input-container" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders && activeTab !== AgencyOrderManagementTabs.PerDiem">
+    <div class="input-container" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders && activeTab !== AgencyOrderManagementTabs.PerDiem && activeTab !== AgencyOrderManagementTabs.PermPlacement">
       <label>Order Type</label>
       <div class="input-group multiselect">
         <ejs-multiselect
@@ -170,7 +170,7 @@
       </div>
     </div>
   </div>
-  <div class="row" *ngIf="activeTab !== AgencyOrderManagementTabs.PerDiem">
+  <div class="row" *ngIf="activeTab !== AgencyOrderManagementTabs.PerDiem && activeTab !== AgencyOrderManagementTabs.PermPlacement">
     <div class="input-container">
       <label>Bill Rate From</label>
       <div class="input-group">
@@ -184,7 +184,21 @@
       </div>
     </div>
   </div>
-  <div class="row" *ngIf="activeTab === AgencyOrderManagementTabs.ReOrders || activeTab === AgencyOrderManagementTabs.PerDiem">
+  <div class="row" *ngIf="activeTab === AgencyOrderManagementTabs.PermPlacement">
+    <div class="input-container">
+      <label>Annual Salary From</label>
+      <div class="input-group">
+        <input class="e-input" type="text" maxlength="50" formControlName="annualSalaryRangeFrom" />
+      </div>
+    </div>
+    <div class="input-container">
+      <label>Annual Salary To</label>
+      <div class="input-group">
+        <input class="e-input" type="text" maxlength="50" formControlName="annualSalaryRangeTo" />
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="activeTab === AgencyOrderManagementTabs.ReOrders || activeTab === AgencyOrderManagementTabs.PerDiem || activeTab === AgencyOrderManagementTabs.PermPlacement">
     <div class="input-container">
       <label>Candidates Count From</label>
       <div class="input-group">
@@ -207,7 +221,7 @@
     </div>
   </div>
   <div>
-    <div class="input-container">
+    <div *ngIf="activeTab !== AgencyOrderManagementTabs.PermPlacement" class="input-container">
       <label for="numberOfPositions"># of Positions</label>
       <div class="input-group">
         <input id="numberOfPositions" class="e-input" type="text" maxlength="50" formControlName="openPositions" />
@@ -222,7 +236,7 @@
         </ejs-datepicker>
       </div>
     </div>
-    <div class="input-container calendar" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders">
+    <div class="input-container calendar" *ngIf="activeTab !== AgencyOrderManagementTabs.ReOrders && activeTab !== AgencyOrderManagementTabs.PermPlacement">
       <label for="jobEndDate">Job End Date</label>
       <div class="input-group datepicker">
         <ejs-datepicker id="jobEndDate" class="datepicker" format="MM/dd/yyyy" placeholder="MM/DD/YYYY" formControlName="jobEndDate">

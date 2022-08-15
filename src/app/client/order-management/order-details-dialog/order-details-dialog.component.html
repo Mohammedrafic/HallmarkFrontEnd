@@ -12,11 +12,12 @@
       <section class="header-container">
         <div class="e-card-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title">{{ isReOrder ? 'Re-Order' : 'Order' }} ID {{ order?.organizationPrefix }}-{{ order?.id }}</h3>
+            <h3 class="e-card-title">{{ isReOrder ? 'Re-Order' : 'Order' }} ID {{ order?.organizationPrefix }}-{{ order?.publicId }}</h3>
             <div class="order-statuses">
               <ejs-chiplist #chipList>
                 <e-chips>
                   <e-chip [text]="order?.statusText"></e-chip>
+                  <e-chip *ngIf="order?.extensionFromId" text="Ex" cssClass="e-warning ex-chip"></e-chip>
                 </e-chips>
               </ejs-chiplist>
               <div class="vertical-divider"></div>

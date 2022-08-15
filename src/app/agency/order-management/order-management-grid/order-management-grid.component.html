@@ -14,8 +14,8 @@
   [selectionSettings]="selectionOptions"
   [textWrapSettings]="wrapSettings"
   [enableVirtualization]="true"
-  (rowSelected)="onRowClick($event)"
   (rowDeselected)="onRowDeselect($event, gridWithChildRow)"
+  (rowSelected)="onRowClick($event)"
   (dataBound)="onDataBound()"
   (actionBegin)="actionBegin($event)"
   (created)="onGridCreated()"
@@ -48,13 +48,14 @@
           <button *ngIf="isLockMenuButtonsShown" ejs-button cssClass="e-flat" [disabled]="true">
             <span><i-feather [name]="data.isLocked ? 'lock' : 'unlock'" class="icon"></i-feather></span>
           </button>
-          <button ejs-button cssClass="e-flat default-icon-button">
+          <button ejs-button cssClass="e-flat default-icon-button with-badge">
             <span><i-feather name="message-square" class="icon"></i-feather></span>
+            <span *ngIf="data.unreadComments" class="e-badge e-badge-success e-badge-pill right-overflow">{{ data.unreadComments }}</span>
           </button>
         </div>
       </ng-template>
     </e-column>
-    <e-column field="orderId" headerText="ORDER ID" width="142">
+    <e-column field="orderId" headerText="ORDER ID" isPrimaryKey="true" width="142">
       <ng-template #template let-data>
         <ng-container
         *ngIf="
@@ -65,13 +66,13 @@
         "
       >
           <div>
-            <b>{{ data.organizationPrefix }}-{{ data.orderId }}</b>
+            <b>{{ data.organizationPrefix }}-{{ data.publicId }}</b>
           </div>
         </ng-container>
 
         <ng-template #withToggle>
           <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-            <b>{{ data.organizationPrefix }}-{{ data.orderId }}</b
+            <b>{{ data.organizationPrefix }}-{{ data.publicId }}</b
             ><i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
           </div>
         </ng-template>
@@ -81,13 +82,13 @@
       <ng-template #template let-data>
         <ng-container *ngIf="!data.children?.length; else withToggle">
           <div>
-            <b>{{ data.organizationPrefix }}-{{ data.orderId }}</b>
+            <b>{{ data.organizationPrefix }}-{{ data.publicId }}</b>
           </div>
         </ng-container>
 
         <ng-template #withToggle>
           <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-            <b>{{ data.organizationPrefix }}-{{ data.orderId }}</b>
+            <b>{{ data.organizationPrefix }}-{{ data.publicId }}</b>
             <i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
           </div>
         </ng-template>
@@ -143,6 +144,16 @@
       </ng-template>
     </e-column>
     <e-column field="shiftsNext90Days" headerText="# of Shifts Next 90 Days " width="150" [visible]="false"></e-column>
+    <e-column field="annualSalaryRangeFrom" headerText="Annual Salary From" textAlign="Left" width="200" [visible]="false">
+      <ng-template #template let-data>
+        <span>{{ data.annualSalaryRangeFrom | currency: 'USD': 'symbol':'1.0-2' }}</span>
+      </ng-template>
+    </e-column>
+    <e-column field="annualSalaryRangeTo" headerText="Annual Salary To" textAlign="Left" width="200" [visible]="false">
+      <ng-template #template let-data>
+        <span>{{ data.annualSalaryRangeTo | currency: 'USD': 'symbol':'1.0-2' }}</span>
+      </ng-template>
+    </e-column>
   </e-columns>
 
   <ng-template #detailTemplate let-data>

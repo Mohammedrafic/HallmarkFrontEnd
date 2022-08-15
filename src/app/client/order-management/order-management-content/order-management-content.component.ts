@@ -80,6 +80,7 @@ import {
   perDiemChildColumnsToExport,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
+  PermPlacementColumnsConfig,
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
@@ -100,6 +101,7 @@ import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-f
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import { AddEditReorderService } from '@client/order-management/add-edit-reorder/add-edit-reorder.service';
 import { SidebarDialogTitlesEnum } from '@shared/enums/sidebar-dialog-titles.enum';
+import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
 
 @Component({
   selector: 'app-order-management-content',
@@ -210,6 +212,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
   public fileName: string;
   public defaultFileName: string;
+  public selectedRowRef: any;
 
   private isRedirectedFromDashboard: boolean;
   private dashboardFilterSubscription: Subscription;
@@ -250,6 +253,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       jobStartDate: new FormControl(null),
       jobEndDate: new FormControl(null),
       orderStatuses: new FormControl([]),
+      annualSalaryRangeFrom: new FormControl(null),
+      annualSalaryRangeTo: new FormControl(null),
       candidateStatuses: new FormControl([]),
       candidatesCountFrom: new FormControl(null),
       candidatesCountTo: new FormControl(null),
@@ -285,9 +290,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.onChildDialogChange();
     this.onLockUpdatedSucceededHandler();
     this.listenRedirectFromReOrder();
+    this.onCommentRead();
+    this.listenRedirectFromExtension();
   }
 
   ngOnDestroy(): void {
+    this.orderManagementService.orderAllOrdersId = null;
     this.store.dispatch(new ClearSelectedOrder());
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
@@ -380,11 +388,17 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       case OrganizationOrderManagementTabs.AllOrders:
         this.filters.isTemplate = false;
         this.filters.includeReOrders = true;
+        this.hasOrderAllOrdersId();
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
       case OrganizationOrderManagementTabs.PerDiem:
         this.filters.orderTypes = [OrderType.OpenPerDiem];
         this.filters.includeReOrders = true;
+        this.filters.isTemplate = false;
+        this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
+        break;
+      case OrganizationOrderManagementTabs.PermPlacement:
+        this.filters.orderTypes = [OrderType.PermPlacement];
         this.filters.isTemplate = false;
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
@@ -403,6 +417,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.store.dispatch([new GetOrders(this.filters), new GetOrderFilterDataSources()]);
         break;
     }
+
+    this.clearOrderAllOrdersId();
     this.checkSelectedChildrenItem();
   }
 
@@ -415,7 +431,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       skillIds: this.filters.skillIds || [],
       orderTypes:
         this.activeTab === OrganizationOrderManagementTabs.PerDiem ||
-        this.activeTab === OrganizationOrderManagementTabs.ReOrders
+        this.activeTab === OrganizationOrderManagementTabs.ReOrders ||
+        this.activeTab === OrganizationOrderManagementTabs.PermPlacement
           ? []
           : this.filters.orderTypes || [],
       jobTitle: this.filters.jobTitle || null,
@@ -431,6 +448,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       agencyIds: this.filters.agencyIds || [],
       agencyType: this.filters.agencyType ? String(this.filters.agencyType) : '0',
       templateTitle: this.filters.templateTitle || null,
+      annualSalaryRangeFrom: this.filters.annualSalaryRangeFrom || null,
+      annualSalaryRangeTo: this.filters.annualSalaryRangeTo || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
   }
@@ -488,6 +507,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   public onFilterClearAll(): void {
+    this.orderManagementService.orderAllOrdersId = null;
     this.clearFilters();
     this.getOrders();
   }
@@ -497,6 +517,10 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     this.filters.orderId = this.filters.orderId || null;
     this.filters.billRateFrom = this.filters.billRateFrom || null;
     this.filters.billRateTo = this.filters.billRateTo || null;
+    this.filters.jobStartDate = this.filters.jobStartDate || null;
+    this.filters.jobEndDate = this.filters.jobEndDate || null;
+    this.filters.annualSalaryRangeFrom = this.filters.annualSalaryRangeFrom || null;
+    this.filters.annualSalaryRangeTo = this.filters.annualSalaryRangeTo || null;
     this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
     this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
     this.filters.openPositions = this.filters.openPositions || null;
@@ -534,6 +558,21 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
 
     this.openPerDiemDetails();
     this.selectNavigationTab();
+    this.openMyAllTabWithCandidate();
+  }
+
+  private openMyAllTabWithCandidate(): void {
+    const { orderAllOrdersId } = this.orderManagementService;
+    if (orderAllOrdersId && this.ordersPage?.items) {
+      const orderAllOrders = this.ordersPage.items.find((order: any) => order.id === orderAllOrdersId.orderId);
+      if (orderAllOrders) {
+        const candidate = orderAllOrders.children.find(
+          (candidate: OrderManagementChild) => candidate.candidateId === orderAllOrdersId.candidateId
+        );
+        this.gridWithChildRow.detailRowModule.expand(0);
+        this.onOpenCandidateDialog(candidate as OrderManagementChild, orderAllOrders);
+      }
+    }
   }
 
   /* Trigger when user redirect to per diem order from re-order */
@@ -596,6 +635,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         this.openChildDialog.next(false);
         if (!isArray(event.data)) {
           this.openDetails.next(true);
+          this.selectedRowRef = event;
         }
       }
     }
@@ -685,6 +725,11 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         case OrganizationOrderManagementTabs.PerDiem:
           this.isLockMenuButtonsShown = true;
           this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
+          this.getOrders();
+          break;
+        case OrganizationOrderManagementTabs.PermPlacement:
+          this.isLockMenuButtonsShown = true;
+          this.refreshGridColumns(PermPlacementColumnsConfig, this.gridWithChildRow);
           this.getOrders();
           break;
         case OrganizationOrderManagementTabs.ReOrders:
@@ -956,6 +1001,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       },
       agencyType: { type: ControlTypes.Radio, dataSource: { 1: 'Yes', 2: 'No' }, default: '0' },
       templateTitle: { type: ControlTypes.Text, valueType: ValueType.Text },
+      annualSalaryRangeFrom: {
+        type: ControlTypes.Text,
+        valueType: ValueType.Text,
+      },
+      annualSalaryRangeTo: {
+        type: ControlTypes.Text,
+        valueType: ValueType.Text,
+      },
     };
     this.search$.pipe(takeUntil(this.unsubscribe$), debounceTime(300)).subscribe(() => {
       this.onFilterApply();
@@ -1138,6 +1191,24 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     return this.moreMenuWithCloseButton;
   }
 
+  private onCommentRead(): void {
+    this.actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateGridCommentsCounter))
+      .subscribe((data) => {
+        if (data.orderId && this.selectedRowRef) {
+          this.selectedRowRef.data.unreadComments -= data.readComments;
+          this.gridWithChildRow.setRowData(data.orderId, this.selectedRowRef.data);
+        }
+      });
+  }
+
+  private clearOrderAllOrdersId(): void {
+    const { orderAllOrdersId } = this.orderManagementService;
+    if (orderAllOrdersId && this.activeTab && this.activeTab !== OrganizationOrderManagementTabs.AllOrders) {
+      this.orderManagementService.orderAllOrdersId = null;
+    }
+  }
+
   private handleDashboardFilters(): void {
     if (this.isRedirectedFromDashboard) {
       this.applyDashboardFilters();
@@ -1188,10 +1259,29 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       });
   }
 
+  private listenRedirectFromExtension(): void {
+    this.orderManagementService.orderId$.pipe(filter(Boolean)).subscribe((id: number) => {
+      const index = (this.gridWithChildRow.dataSource as Order[])?.findIndex((order: Order) => order.id === id);
+      this.gridWithChildRow.selectRow(index);
+    });
+  }
+
   private listenRedirectFromReOrder(): void {
     this.orderManagementService.orderPerDiemId$
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((orderId: number) => (this.orderPerDiemId = orderId));
+  }
+
+  private hasOrderAllOrdersId(): void {
+    const { orderAllOrdersId } = this.orderManagementService;
+    if (orderAllOrdersId) {
+      this.OrderFilterFormGroup.patchValue({ orderId: orderAllOrdersId.orderId.toString() });
+      this.filters = this.OrderFilterFormGroup.getRawValue();
+      this.filters.orderId = orderAllOrdersId.orderId;
+      this.filters.agencyType = null;
+      this.filters.includeReOrders = false;
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
+    }
   }
 
   updateOrderDetails(order: Order | OrderManagement): void {

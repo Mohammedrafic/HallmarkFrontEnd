@@ -4,12 +4,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { AgencyComponent } from './agency.component';
 import { AgencyListComponent } from './agency-list/agency-list.component';
 import { AddEditAgencyComponent } from './agency-list/add-edit-agency/add-edit-agency.component';
-import { CandidatesComponent } from "./candidates/candidates.component";
-import { AddEditCandidateComponent } from "./candidates/add-edit-candidate/add-edit-candidate.component";
+import { CandidatesComponent } from './candidates/candidates.component';
+import { AddEditCandidateComponent } from './candidates/add-edit-candidate/add-edit-candidate.component';
 import { ClearAgencyGuard } from './guards/clear-agency.guard';
-import { ProfileComponent } from "@agency/profile/profile.component";
+import { ProfileComponent } from '@agency/profile/profile.component';
 import { OrderManagementComponent } from './order-management/order-management.component';
 import { PendingChangesGuard } from '@shared/guards/pending-changes.guard';
+import { CandidateDetailsComponent } from '@shared/components/candidate-details/candidate-details.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -22,8 +23,8 @@ const routes: Routes = [
         loadChildren: () => import('../dashboard/dashboard.module').then((mod) => mod.DashboardModule),
         data: {
           isOrganizationArea: true,
-          isAgencyArea: true
-        }
+          isAgencyArea: true,
+        },
       },
       {
         path: 'organization',
@@ -36,19 +37,26 @@ const routes: Routes = [
       {
         path: 'agency-list/add',
         component: AddEditAgencyComponent,
-        canDeactivate: [PendingChangesGuard, ClearAgencyGuard]
+        canDeactivate: [PendingChangesGuard, ClearAgencyGuard],
       },
       {
         path: 'agency-list/edit/:id',
         component: AddEditAgencyComponent,
-        canDeactivate: [PendingChangesGuard, ClearAgencyGuard]
+        canDeactivate: [PendingChangesGuard, ClearAgencyGuard],
       },
       {
         path: 'profile',
         component: ProfileComponent,
         data: {
-          isAgencyArea: true
-        }
+          isAgencyArea: true,
+        },
+      },
+      {
+        path: 'candidate-details',
+        component: CandidateDetailsComponent,
+        data: {
+          isAgencyArea: true,
+        },
       },
       {
         path: 'candidates',
@@ -62,24 +70,24 @@ const routes: Routes = [
         component: AddEditCandidateComponent,
         canDeactivate: [PendingChangesGuard],
         data: {
-          isAgencyArea: true
-        }
+          isAgencyArea: true,
+        },
       },
       {
         path: 'candidates/edit/:id',
         component: AddEditCandidateComponent,
         canDeactivate: [PendingChangesGuard],
         data: {
-          isAgencyArea: true
-        }
+          isAgencyArea: true,
+        },
       },
       {
         path: 'candidates/:id',
         component: AddEditCandidateComponent,
         data: {
           isAgencyArea: true,
-          readonly: true
-        }
+          readonly: true,
+        },
       },
       {
         path: 'timesheets',
@@ -87,7 +95,7 @@ const routes: Routes = [
         data: {
           isOrganizationArea: false,
           isAgencyArea: true,
-        }
+        },
       },
       {
         path: 'invoices',
@@ -95,14 +103,14 @@ const routes: Routes = [
         data: {
           isOrganizationArea: false,
           isAgencyArea: true,
-        }
+        },
       },
       {
         path: 'order-management',
         component: OrderManagementComponent,
         data: {
-          isAgencyArea: true
-        }
+          isAgencyArea: true,
+        },
       },
     ],
   },

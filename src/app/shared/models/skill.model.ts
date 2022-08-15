@@ -1,4 +1,4 @@
-import { SkillCategory } from "./skill-category.model";
+import { SkillCategory } from './skill-category.model';
 
 export class Skill {
   id: number;
@@ -76,4 +76,9 @@ export class MasterSkillDataSources {
   skillCategories: SkillCategory[];
   skillAbbreviations: string[];
   skillDescriptions: string[];
+}
+
+export interface ListOfSkills {
+  id: number;
+  name: string;
 }

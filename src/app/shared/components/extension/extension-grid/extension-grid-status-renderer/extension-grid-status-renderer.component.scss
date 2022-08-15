@@ -1,0 +1,16 @@
+:host {
+  display: flex;
+  align-items: center;
+  height: 100%;
+
+  &::ng-deep {
+    ejs-chiplist.e-control.e-chip-list {
+      flex-wrap: nowrap;
+
+      .e-chip.ex-chip {
+        margin-left: 10px;
+        width: auto;
+      }
+    }
+  }
+}

@@ -25,6 +25,7 @@ export class BaseFormControlDirective
   @Input() public placeholder: string;
   @Input() public required: boolean;
   @Input() public disabled = false;
+  @Input() public enabled = true;
 
   private value: any;
 

@@ -1,28 +1,22 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CandidateCredential, CandidateCredentialPage, CredentialGroupedFiles } from "@shared/models/candidate-credential.model";
-import { CredentialType } from "@shared/models/credential-type.model";
-import { Credential } from "@shared/models/credential.model";
+import {
+  CandidateCredential,
+  CandidateCredentialPage,
+  CredentialGroupedFiles,
+} from '@shared/models/candidate-credential.model';
+import { CredentialType } from '@shared/models/credential-type.model';
+import { Credential } from '@shared/models/credential.model';
 import { Observable } from 'rxjs';
-import { Candidate, CandidatePage } from 'src/app/shared/models/candidate.model';
-import { Education } from "src/app/shared/models/education.model";
-import { Experience } from "src/app/shared/models/experience.model";
+import { Candidate } from 'src/app/shared/models/candidate.model';
+import { Education } from 'src/app/shared/models/education.model';
+import { Experience } from 'src/app/shared/models/experience.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CandidateService {
   constructor(private http: HttpClient) {}
-
-  /**
-   * Get candidates by page number
-   * @param pageNumber
-   * @param pageSize
-   * @return list of candidates
-   */
-  public getCandidates(pageNumber: number, pageSize: number): Observable<CandidatePage> {
-    return this.http.get<CandidatePage>(`/api/CandidateProfile`, { params: { PageNumber: pageNumber, PageSize: pageSize }});
-  }
 
   /**
    * Get Candidate by id
@@ -39,7 +33,9 @@ export class CandidateService {
    * @return Created/Updated candidate
    */
   public saveCandidate(candidate: Candidate): Observable<Candidate> {
-    return candidate.id ? this.http.put<Candidate>(`/api/CandidateProfile`, candidate) : this.http.post<Candidate>(`/api/CandidateProfile`, candidate);
+    return candidate.id
+      ? this.http.put<Candidate>(`/api/CandidateProfile`, candidate)
+      : this.http.post<Candidate>(`/api/CandidateProfile`, candidate);
   }
 
   /**
@@ -83,9 +79,9 @@ export class CandidateService {
    * @return Created/Updated Experience
    */
   public saveExperience(experience: Experience): Observable<Experience> {
-    return experience.id ?
-      this.http.put<Experience>(`/api/Experience`, experience) :
-      this.http.post<Experience>(`/api/Experience`, experience);
+    return experience.id
+      ? this.http.put<Experience>(`/api/Experience`, experience)
+      : this.http.post<Experience>(`/api/Experience`, experience);
   }
 
   /**
@@ -111,9 +107,9 @@ export class CandidateService {
    * @return Created/Updated Education
    */
   public saveEducation(education: Education): Observable<Education> {
-    return education.id ?
-      this.http.put<Education>(`/api/Education`, education) :
-      this.http.post<Education>(`/api/Education`, education);
+    return education.id
+      ? this.http.put<Education>(`/api/Education`, education)
+      : this.http.post<Education>(`/api/Education`, education);
   }
 
   /**
@@ -131,11 +127,14 @@ export class CandidateService {
    * @param id
    * @return list of candidates credential
    */
-  public getCredentialByCandidateId(pageNumber: number, pageSize: number, id: number): Observable<CandidateCredentialPage> {
-    return this.http.get<CandidateCredentialPage>(
-      `/api/CandidateCredentials/candidateProfileId/${id}`,
-      { params: { PageNumber: pageNumber, PageSize: pageSize }}
-    );
+  public getCredentialByCandidateId(
+    pageNumber: number,
+    pageSize: number,
+    id: number
+  ): Observable<CandidateCredentialPage> {
+    return this.http.get<CandidateCredentialPage>(`/api/CandidateCredentials/candidateProfileId/${id}`, {
+      params: { PageNumber: pageNumber, PageSize: pageSize },
+    });
   }
 
   /**
@@ -145,7 +144,9 @@ export class CandidateService {
    * @return list of candidates credential
    */
   public getMasterCredentials(searchTerm: string, credentialTypeId: number | string): Observable<Credential[]> {
-    return this.http.get<Credential[]>(`/api/MasterCredentials/forAgency`, { params: { SearchTerm: searchTerm, CredentialTypeId: credentialTypeId }});
+    return this.http.get<Credential[]>(`/api/MasterCredentials/forAgency`, {
+      params: { SearchTerm: searchTerm, CredentialTypeId: credentialTypeId },
+    });
   }
 
   /**
@@ -154,9 +155,9 @@ export class CandidateService {
    * @return Created/Updated CandidateCredential
    */
   public saveCredential(credential: CandidateCredential): Observable<CandidateCredential> {
-    return credential.id ?
-      this.http.put<CandidateCredential>(`/api/CandidateCredentials`, credential) :
-      this.http.post<CandidateCredential>(`/api/CandidateCredentials`, credential);
+    return credential.id
+      ? this.http.put<CandidateCredential>(`/api/CandidateCredentials`, credential)
+      : this.http.post<CandidateCredential>(`/api/CandidateCredentials`, credential);
   }
 
   /**
@@ -181,7 +182,7 @@ export class CandidateService {
    */
   public saveCredentialFiles(files: Blob[], candidateCredentialId: number): Observable<any> {
     const formData = new FormData();
-    files.forEach(file => formData.append('credentialFiles', file))
+    files.forEach((file) => formData.append('credentialFiles', file));
     return this.http.post(`/api/CandidateCredentials/${candidateCredentialId}/credentialFile`, formData);
   }
 
@@ -206,6 +207,16 @@ export class CandidateService {
    * @return CredentialGroupedFiles array
    */
   public getCredentialGroupedFiles(candidateId: number): Observable<CredentialGroupedFiles[]> {
-    return this.http.get<CredentialGroupedFiles[]>(`/api/CandidateCredentials/groupedCandidateCredentialsFiles/${candidateId}`);
+    return this.http.get<CredentialGroupedFiles[]>(
+      `/api/CandidateCredentials/groupedCandidateCredentialsFiles/${candidateId}`
+    );
+  }
+
+  /**
+   * Get Candidate Profile Template
+   * @return blob
+   */
+  public getCandidateProfileTemplate(): Observable<any> {
+    return this.http.get('/api/CandidateProfile/template', { responseType: 'blob' });
   }
 }

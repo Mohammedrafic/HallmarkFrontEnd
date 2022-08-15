@@ -220,11 +220,15 @@
       </ejs-accordion>
     </div>
     <div class="comments">
-      <app-comments></app-comments>
+      <app-comments *ngIf="candidateJob" [comments]="comments" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
     </div>
   </section>
   <section>
-    <app-bill-rates-view-grid [billRatesData]="billRatesData"></app-bill-rates-view-grid>
+    <app-bill-rates #billRates
+                    [billRates]="billRatesData"
+                    [isActive]="isActiveCandidateDialog$ | async"
+                    (billRatesChanged)="onBillRatesChanged($event)">
+    </app-bill-rates>
   </section>
 </section>
 

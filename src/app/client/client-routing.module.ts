@@ -9,6 +9,7 @@ import { ReportsContentComponent } from './reports/reports-content/reports-conte
 import { ClientComponent } from './client.component';
 import { AddEditOrderComponent } from './order-management/add-edit-order/add-edit-order.component';
 import { UnsavedOrderChangesGuard } from './guards/unsaved-order-changes.guard';
+import { CandidateDetailsComponent } from '@shared/components/candidate-details/candidate-details.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -21,33 +22,33 @@ const routes: Routes = [
         loadChildren: () => import('../dashboard/dashboard.module').then((mod) => mod.DashboardModule),
         data: {
           isOrganizationArea: true,
-          isAgencyArea: true
-        }
+          isAgencyArea: true,
+        },
       },
       {
         path: 'order-management',
         component: OrderManagementContentComponent,
         data: {
-          isOrganizationArea: true
-        }
+          isOrganizationArea: true,
+        },
       },
       {
         path: 'order-management/add',
         component: AddEditOrderComponent,
         data: {
           isOrganizationArea: true,
-          isEditing: false
+          isEditing: false,
         },
-        canDeactivate: [UnsavedOrderChangesGuard]
+        canDeactivate: [UnsavedOrderChangesGuard],
       },
       {
         path: 'order-management/edit/:orderId',
         component: AddEditOrderComponent,
         data: {
           isOrganizationArea: true,
-          isEditing: true
+          isEditing: true,
         },
-        canDeactivate: [UnsavedOrderChangesGuard]
+        canDeactivate: [UnsavedOrderChangesGuard],
       },
       {
         path: 'time-sheets/:param',
@@ -59,11 +60,15 @@ const routes: Routes = [
         data: {
           isOrganizationArea: true,
           isAgencyArea: false,
-        }
+        },
       },
       {
         path: 'candidates',
         component: CandidatesContentComponent,
+        data: {
+          isOrganizationArea: true,
+          isAgencyArea: false,
+        },
       },
       {
         path: 'reports',
@@ -75,14 +80,23 @@ const routes: Routes = [
         data: {
           isOrganizationArea: true,
           isAgencyArea: false,
-        }
+        },
       },
       {
         path: 'organization-management',
         loadChildren: () =>
-          import('../organization-management/organization-management.module').then((m) => m.OrganizationManagementModule),
+          import('../organization-management/organization-management.module').then(
+            (m) => m.OrganizationManagementModule
+          ),
         //     canLoad: [ AdminGuard ],
         //     canActivate: [ AdminGuard ]
+      },
+      {
+        path: 'candidate-details',
+        component: CandidateDetailsComponent,
+        data: {
+          isOrganizationArea: true,
+        },
       },
     ],
   },

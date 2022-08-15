@@ -88,11 +88,12 @@ body.light, body.dark {
   }
 
   .comments-container {
-    ejs-dropdownlist {
+    ejs-dropdownlist.e-control {
       span.e-input-group.e-control-wrapper,
       span.e-input-group.e-control-wrapper:hover,
       span.e-input-group.e-control-wrapper:active,
-      span.e-input-group.e-control-wrapper.e-input-focus {
+      span.e-input-group.e-control-wrapper.e-input-focus,
+      span.e-input-group.e-control-wrapper.e-readonly.e-ddl input.e-input[readonly] {
         border-width: 0 !important;
         background-color: transparent;
 

@@ -13,6 +13,12 @@ export enum INVOICES_ACTIONS {
   RESET_FILTERS_STATE = '[invoices] RESET FILTERS STATE',
   GET_FILTERS_DATA_SOURCE = '[invoices] GET FILTERS DATA SOURCE',
   SET_FILTERS_DATA_SOURCE = '[invoices] SET FILTERS DATA SOURCE',
+  GetReasons = '[invoices] Get reasons for manual invoices',
+  GetMeta = '[invoices] Get manual invoice metadata',
+  SaveManualinvoice = '[invoices] Save manual invoice',
+  GetOrganizations = '[invoices] Get organizations',
+  GetOrganizationStructure = '[invoices] Get organization structure',
+  SelectOrganization = '[invoices] Select another organization',
 }
 
 export enum InvoicesTableFiltersColumns {

@@ -87,13 +87,20 @@
             class="row-tool-buttons"
             (click)="stopPropagation($event)"
           >
-          <button *ngIf="activeTab !== OrganizationOrderManagementTabs.Incomplete && orderTypes.OpenPerDiem === data.orderType"
-                  (click)="createReorder(data)" ejs-button cssClass="e-flat default-icon-button"
-                  [disabled]="data.status === orderStatus.PreOpen || data.status === orderStatus.Closed">
+            <button
+              *ngIf="
+                activeTab !== OrganizationOrderManagementTabs.Incomplete && orderTypes.OpenPerDiem === data.orderType
+              "
+              (click)="createReorder(data)"
+              ejs-button
+              cssClass="e-flat default-icon-button"
+              [disabled]="data.status === orderStatus.PreOpen || data.status === orderStatus.Closed"
+            >
               <span><i-feather name="calendar" class="icon"></i-feather></span>
             </button>
-            <button ejs-button cssClass="e-flat default-icon-button">
+            <button ejs-button cssClass="e-flat default-icon-button with-badge">
               <span><i-feather name="message-square" class="icon"></i-feather></span>
+              <span *ngIf="data.unreadComments" class="e-badge e-badge-success e-badge-pill right-overflow">{{ data.unreadComments }}</span>
             </button>
             <button
               ejs-button
@@ -125,7 +132,7 @@
           </ng-template>
         </ng-template>
       </e-column>
-      <e-column field="id" width="120">
+      <e-column field="id" isPrimaryKey="true" width="120">
         <ng-template #headerTemplate let-data>
           <span class="e-headertext">
             {{ activeTab !== OrganizationOrderManagementTabs.OrderTemplates ? 'ORDER ID' : 'TEMPLATE ID' }}
@@ -134,19 +141,14 @@
         <ng-template #template let-data>
           <ng-container
             *ngIf="
-              data.orderType === orderTypes.OpenPerDiem
-                ? !data.reOrders?.length
-                : !data.children?.length;
+              data.orderType === orderTypes.OpenPerDiem ? !data.reOrders?.length : !data.children?.length;
               else withToggle
             "
           >
             <div>
               <b>
                 <span *ngIf="activeTab === OrganizationOrderManagementTabs.OrderTemplates">
-                  {{ data.id }}
-                </span>
-                <span *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates">
-                  {{ data.organizationPrefix }}-{{ data.id }}
+                  {{ data.organizationPrefix }}-{{ data.publicId }}
                 </span>
               </b>
             </div>
@@ -154,7 +156,7 @@
 
           <ng-template #withToggle>
             <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-              <b>{{ data.organizationPrefix }}-{{ data.id }}</b
+              <b>{{ data.organizationPrefix }}-{{ data.publicId }}</b
               ><i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
             </div>
           </ng-template>
@@ -171,13 +173,13 @@
         <ng-template #template let-data>
           <ng-container *ngIf="!data.children?.length; else withToggle">
             <div>
-              <b>{{ data.organizationPrefix }}-{{ data.id }}</b>
+              <b>{{ data.organizationPrefix }}-{{ data.publicId }}</b>
             </div>
           </ng-container>
 
           <ng-template #withToggle>
             <div class="subrow-toggle" (click)="onSubrowToggle($event, data)">
-              <b>{{ data.organizationPrefix }}-{{ data.id }}</b>
+              <b>{{ data.organizationPrefix }}-{{ data.publicId }}</b>
               <i-feather [name]="subrowsState.has(+data.index) ? 'chevron-down' : 'chevron-right'"></i-feather>
             </div>
           </ng-template>
@@ -185,10 +187,11 @@
       </e-column>
       <e-column field="statusText" headerText="STATUS" width="200">
         <ng-template #template let-data>
-          <div class="status-cell">
+          <div class="status-cell" [class.ex-chip]="data?.extensionFromId">
             <ejs-chiplist>
               <e-chips>
                 <e-chip [text]="data.statusText" [cssClass]="data.statusText | chipsCssClass"></e-chip>
+                <e-chip *ngIf="data?.extensionFromId" text="Ex" cssClass="e-warning ex"></e-chip>
               </e-chips>
             </ejs-chiplist>
           </div>
@@ -266,6 +269,28 @@
         width="150"
         [visible]="false"
       ></e-column>
+      <e-column
+        field="annualSalaryRangeFrom"
+        headerText="Annual Salary From"
+        textAlign="Left"
+        width="200"
+        [visible]="false"
+      >
+        <ng-template #template let-data>
+          <span>{{ data.annualSalaryRangeFrom | currency: 'USD':'symbol':'1.0-2' }}</span>
+        </ng-template>
+      </e-column>
+      <e-column
+        field="annualSalaryRangeTo"
+        headerText="Annual Salary To"
+        textAlign="Left"
+        width="200"
+        [visible]="false"
+      >
+        <ng-template #template let-data>
+          <span>{{ data.annualSalaryRangeTo | currency: 'USD':'symbol':'1.0-2' }}</span>
+        </ng-template>
+      </e-column>
     </e-columns>
 
     <ng-template #detailTemplate let-data>
@@ -455,7 +480,8 @@
         class="input-container"
         *ngIf="
           activeTab !== OrganizationOrderManagementTabs.ReOrders &&
-          activeTab !== OrganizationOrderManagementTabs.PerDiem
+          activeTab !== OrganizationOrderManagementTabs.PerDiem &&
+          activeTab !== OrganizationOrderManagementTabs.PermPlacement
         "
       >
         <label>Order Type</label>
@@ -513,7 +539,13 @@
         </div>
       </div>
     </div>
-    <div class="row bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem">
+    <div
+      class="row bootstrap"
+      *ngIf="
+        activeTab !== OrganizationOrderManagementTabs.PerDiem &&
+        activeTab !== OrganizationOrderManagementTabs.PermPlacement
+      "
+    >
       <div class="input-container">
         <label>Bill Rate From</label>
         <div class="input-group">
@@ -541,6 +573,20 @@
         </div>
       </div>
     </div>
+    <div *ngIf="activeTab === OrganizationOrderManagementTabs.PermPlacement" class="row bootstrap">
+      <div class="input-container">
+        <label>Annual Salary From</label>
+        <div class="input-group">
+          <input class="e-input" type="text" maxlength="50" formControlName="annualSalaryRangeFrom" />
+        </div>
+      </div>
+      <div class="input-container">
+        <label>Annual Salary To</label>
+        <div class="input-group">
+          <input class="e-input" type="text" maxlength="50" formControlName="annualSalaryRangeTo" />
+        </div>
+      </div>
+    </div>
     <div class="bootstrap" *ngIf="activeTab !== OrganizationOrderManagementTabs.PerDiem">
       <div class="input-container">
         <label for="numberOfPositions"># of Positions</label>
@@ -565,7 +611,13 @@
           </ejs-datepicker>
         </div>
       </div>
-      <div class="input-container calendar" *ngIf="activeTab !== OrganizationOrderManagementTabs.ReOrders">
+      <div
+        class="input-container calendar"
+        *ngIf="
+          activeTab !== OrganizationOrderManagementTabs.ReOrders &&
+          activeTab !== OrganizationOrderManagementTabs.PermPlacement
+        "
+      >
         <label for="jobEndDate">Job End Date</label>
         <div class="input-group datepicker">
           <ejs-datepicker
@@ -693,12 +745,15 @@
   [order]="$any(selectedOrder)"
   [candidate]="selectedCandidate"
   [openEvent]="openChildDialog"
+  [filters]="filters"
 ></app-child-order-dialog>
 
 <app-close-order
   [order]="selectedOrder"
   [candidate]="selectedCandidate"
   (closeOrderSuccess)="updateOrderDetails($event)"
-  (closePositionSuccess)="updatePositionDetails($event)">
+  (closePositionSuccess)="updatePositionDetails($event)"
+>
 </app-close-order>
 
+<!--<app-extension-grid class="extension-grid"></app-extension-grid>-->

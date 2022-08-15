@@ -82,7 +82,7 @@
       </e-column>
       <e-column field="billRateType" headerText="BILL RATE TYPE" width=200>
         <ng-template #template let-data>
-          <span>{{ billRateType[data.billRateType] }}</span>
+          <span>{{ billRateType[data.billType] }}</span>
         </ng-template>
       </e-column>
       <e-column field="effectiveDate" headerText="EFFECTIVE DATE" width=180>
@@ -92,7 +92,7 @@
       </e-column>
       <e-column field="rateHour" headerText="BILL RATE VALUE (RATE/TIMES)" width=250 textAlign="Right">
         <ng-template #template let-data>
-          <span>{{ data.rateHour | rateHourPipe: data.billRateTitle:data.billRateType:billRatesOptions }}</span>
+          <span>{{ data.rateHour | rateHourPipe: data.billRateConfigId:data.billRateType:billRatesOptions }}</span>
         </ng-template>
       </e-column>
       <e-column field="intervalMin" headerText="INTERVAL MIN" width=180 textAlign="Right"></e-column>
@@ -159,6 +159,16 @@
               [checked]="data.displayInJob"
               [disabled]="isReadOnly"
               (change)="displayInJobChange(data, $event)"></ejs-checkbox>
+          </div>
+        </ng-template>
+      </e-column>
+      <e-column field="editAllowed" headerText="ALLOW EDIT" width=200>
+        <ng-template #template let-data>
+          <div class="checkbox bootstrap" (click)="stopPropagation($event)">
+            <ejs-checkbox
+              [checked]="data.editAllowed"
+              [disabled]="isReadOnly"
+              (change)="displayInEditAllowedChange(data, $event)"></ejs-checkbox>
           </div>
         </ng-template>
       </e-column>
@@ -350,15 +360,15 @@
         </div>
 
         <div class="input-container">
-          <label for="billRatesType">Bill Rates Type</label>
-          <div class="input-group">
-            <input
-              id="billRatesType"
-              class="e-input e-disabled"
-              type="text"
-              placeholder="Times"
-              formControlName="billRatesType"
-            />
+          <label for="billRatesType">Bill Rates Type <span class="required">*</span></label>
+          <div class="input-group dropdown">
+            <ejs-dropdownlist
+              id="billRatesTitle"
+              appValidateWithMessage
+              [dataSource]="billRateTypesOptions"
+              [fields]="fields"
+              formControlName="billRatesType">
+            </ejs-dropdownlist>
           </div>
         </div>
       </div>
@@ -511,6 +521,16 @@
               id="displayInJob"
               label="Display in Job"
               formControlName="displayInJob"
+            ></ejs-checkbox>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <div class="input-group">
+            <ejs-checkbox
+              id="editAllowed"
+              label="Allowed edit"
+              formControlName="editAllowed"
             ></ejs-checkbox>
           </div>
         </div>

@@ -8,7 +8,7 @@
         </h3>
         <ejs-chiplist *ngIf="isTab && candidate.candidateStatus && !isDeployedCandidate">
           <e-chips>
-            <e-chip [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
+            <e-chip  [text]="candidatStatus[candidate.orderStatus]" [cssClass]="candidatStatus[candidate.candidateStatus] | chipsCssClass"></e-chip>
           </e-chips>
         </ejs-chiplist>
       </div>
@@ -178,7 +178,7 @@
       </ejs-accordion>
     </div>
     <div class="comments">
-      <app-comments></app-comments>
+      <app-comments *ngIf="candidateJob" [comments]="comments" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
     </div>
   </section>
   <section class="bill-rates">

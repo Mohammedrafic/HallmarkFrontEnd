@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, FormControl } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import {distinctUntilChanged, filter, forkJoin, Observable, switchMap, takeUntil} from 'rxjs';
 
 import { PageOfCollections } from '@shared/models/page.model';
 import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
@@ -28,6 +28,8 @@ import { InvoiceRecordsTableComponent } from '../../components/invoice-records-t
 import { InvoicesService } from '../../services';
 import { AllInvoicesTableComponent } from '../../components/all-invoices-table/all-invoices-table.component';
 import { InvoicesState } from '../../store/state/invoices.state';
+import { UNIT_ORGANIZATIONS_FIELDS } from 'src/app/modules/timesheets/constants';
+import { DataSourceItem } from '@core/interface';
 
 @Component({
   selector: 'app-invoices-container',
@@ -38,6 +40,9 @@ import { InvoicesState } from '../../store/state/invoices.state';
 export class InvoicesContainerComponent extends Destroyable implements OnInit {
   @Select(InvoicesState.invoicesData)
   public invoiceRecordsData$: Observable<PageOfCollections<InvoiceRecord>>;
+
+  @Select(InvoicesState.invoicesOrganizations)
+  readonly organizations$: Observable<DataSourceItem[]>;
 
   @ViewChild('createInvoiceDialog')
   public createInvoiceDialog: DialogComponent;
@@ -56,6 +61,8 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
     onPageChange: this.onPageChange.bind(this),
     onPageSizeChange: this.onPageSizeChange.bind(this),
   };
+
+  public readonly organizationControl: FormControl = new FormControl(null);
 
   public allInvoices: InvoicePage;
 
@@ -80,6 +87,10 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
     = this.invoicesService.getCurrentTableIdxStream();
   public pageSize = 30;
 
+  public isAgency = false;
+
+  public readonly unitOrganizationsFields = UNIT_ORGANIZATIONS_FIELDS;
+
   constructor(
     private store: Store,
     private fb: FormBuilder,
@@ -95,9 +106,15 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
       page: 1,
       type: ''
     }));
+    this.isAgency = this.route.snapshot.data['isAgencyArea'];
   }
 
   ngOnInit(): void {
+    
+    if (this.isAgency) {
+      this.initOrganizationsList();
+      this.startOrganizationWatching();
+    }
     this.initFilters();
   }
 
@@ -114,7 +131,8 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
   }
 
   public openAddDialog(): void {
-    this.store.dispatch(new Invoices.ToggleManulaInvoiceDialog(DialogAction.Open));
+    this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Open));
+    this.store.dispatch(new Invoices.GetInvoicesReasons);
   }
 
   public changeFiltersAmount(amount: number): void {
@@ -190,6 +208,33 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
       new Invoices.UpdateFiltersState(),
       new Invoices.GetFiltersDataSource()
     ]);
+  }
+
+  private startOrganizationWatching(): void {
+    this.organizationControl.valueChanges.pipe(
+      filter(Boolean),
+      distinctUntilChanged(),
+      switchMap((organizationId: number) => this.store.dispatch(
+        [
+          new Invoices.SelectOrganization(organizationId),
+        ]
+      )),
+      takeUntil(this.componentDestroy()),
+    ).subscribe();
+  }
+
+  private initOrganizationsList(): void {
+    this.store.dispatch(new Invoices.GetOrganizations())
+    .pipe(
+      switchMap(() => this.organizations$.pipe(
+        filter((res: DataSourceItem[]) => !!res.length),
+      )),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(res => {
+      this.organizationControl.setValue(res[0].id, { emitEvent: false });
+      this.store.dispatch(new Invoices.SelectOrganization(res[0].id),
+      )
+    });
   }
 }
 

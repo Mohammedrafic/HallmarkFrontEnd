@@ -17,6 +17,8 @@ import { CloseOrderPayload } from "@client/order-management/close-order/models/c
 import { DELETE_CONFIRM_TEXT, DELETE_CONFIRM_TITLE } from "@shared/constants";
 import { ConfirmService } from "@shared/services/confirm.service";
 import { ClosePositionPayload } from "@client/order-management/close-order/models/closePositionPayload.model";
+import { CommentsService } from '@shared/services/comments.service';
+import { Comment } from '@shared/models/comment.model';
 
 @Component({
   selector: 'app-close-order',
@@ -39,6 +41,8 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
   public dialogTitleType: string;
   public isPosition: boolean = false;
   public closeForm: FormGroup;
+  public commentContainerId: number = 0;
+  public comments: Comment[] = [];
 
   public constructor(
     private formBuilder: FormBuilder,
@@ -46,6 +50,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     private actions: Actions,
     private closeOrderService: CloseOrderService,
     private confirmService: ConfirmService,
+    private commentsService: CommentsService
   ) {
     super();
   }
@@ -99,6 +104,20 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     this.minDate = this.order.orderType !== OrderType.OpenPerDiem ? this.order?.jobStartDate as Date : null;
   }
 
+  private getComments(): void {
+    let entity;
+    if (this.isPosition) {
+      this.commentContainerId = this.candidate.commentContainerId as number;
+      entity = this.candidate;
+    } else {
+      this.commentContainerId = this.order.commentContainerId as number;
+      entity = this.order;
+    }
+    this.commentsService.getComments(entity.commentContainerId as number, null).subscribe((comments: Comment[]) => {
+      this.comments = comments;
+    });
+  }
+
   public setCloseDateAvailability(isPosition: boolean): void {
     this.isPosition = isPosition;
     if (this.isPosition && this.order?.orderType === OrderType.ReOrder) {
@@ -107,6 +126,7 @@ export class CloseOrderComponent extends DestroyableDirective implements OnChang
     } else {
       this.closeForm.get('closingDate')?.enable();
     }
+    this.getComments();
   }
 
   private closeDialog(): void {

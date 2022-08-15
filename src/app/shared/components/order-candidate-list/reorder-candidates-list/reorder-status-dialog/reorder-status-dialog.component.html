@@ -77,9 +77,11 @@
       </section>
 
       <section class="bill-rates">
-        <app-bill-rates-view-grid
-          [billRatesData]="orderCandidateJob?.billRates || []"
-        ></app-bill-rates-view-grid>
+        <app-bill-rates #billRates
+                        [billRates]="orderCandidateJob?.billRates || []"
+                        [isActive]="isActiveCandidateDialog$ | async"
+                        (billRatesChanged)="updateOrganizationCandidateJobWithBillRate($event)">
+        </app-bill-rates>
       </section>
     </section>
   </ng-template>

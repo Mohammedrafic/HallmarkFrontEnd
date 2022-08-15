@@ -4,6 +4,7 @@ import { getAllErrors } from '@shared/utils/error.utils';
 import { catchError, Observable, of, tap } from 'rxjs';
 import {
   ApproveOrder,
+  ClearHistoricalData,
   ClearOrders,
   ClearPredefinedBillRates,
   ClearSelectedOrder,
@@ -17,10 +18,10 @@ import {
   GetAgencyOrderCandidatesList,
   GetAssociateAgencies,
   GetAvailableSteps,
+  GetContactDetails,
+  GetExtensions,
   GetHistoricalData,
-  ClearHistoricalData,
   GetIncompleteOrders,
-  GetMasterShifts,
   GetOrderById,
   GetOrderFilterDataSources,
   GetOrders,
@@ -45,8 +46,6 @@ import {
   SetPredefinedBillRatesData,
   UpdateOrganisationCandidateJob,
   UpdateOrganisationCandidateJobSucceed,
-  GetContactDetails,
-  GetRegularLocalBillRate,
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentService } from '@shared/services/order-management-content.service';
 import {
@@ -65,7 +64,6 @@ import { DialogNextPreviousOption } from '@shared/components/dialog-next-previou
 import { OrganizationStateWithKeyCode } from '@shared/models/organization-state-with-key-code.model';
 import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.model';
 import { ProjectName, ProjectType } from '@shared/models/project.model';
-import { MasterShift } from '@shared/models/master-shift.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectsService } from '@shared/services/projects.service';
 import { ShiftsService } from '@shared/services/shift.service';
@@ -84,6 +82,8 @@ import { saveSpreadSheetDocument } from '@shared/utils/file.utils';
 import { NavigationTabModel } from '@shared/models/navigation-tab.model';
 import { DepartmentsService } from '@shared/services/departments.service';
 import { Department } from '@shared/models/department.model';
+import { ExtensionSidebarService } from '@shared/components/extension/extension-sidebar/extension-sidebar.service';
+import { ExtensionGridModel } from '@shared/components/extension/extension-sidebar/models/extension.model';
 
 export interface OrderManagementContentStateModel {
   ordersPage: OrderManagementPage | null;
@@ -103,7 +103,6 @@ export interface OrderManagementContentStateModel {
   projectSpecialData: ProjectSpecialData | null;
   suggestedDetails: SuggestedDetails | null;
   projectNames: ProjectName[];
-  masterShifts: MasterShift[];
   associateAgencies: AssociateAgency[];
   predefinedBillRates: BillRate[];
   isDirtyOrderForm: boolean;
@@ -112,7 +111,7 @@ export interface OrderManagementContentStateModel {
   historicalEvents: HistoricalEvent[] | null;
   navigationTab: NavigationTabModel;
   contactDetails: Department | null;
-  regularLocalBillRate: string[];
+  extensions: any;
 }
 
 @State<OrderManagementContentStateModel>({
@@ -135,7 +134,6 @@ export interface OrderManagementContentStateModel {
     projectNames: [],
     projectSpecialData: null,
     suggestedDetails: null,
-    masterShifts: [],
     associateAgencies: [],
     predefinedBillRates: [],
     isDirtyOrderForm: false,
@@ -148,7 +146,7 @@ export interface OrderManagementContentStateModel {
       current: null,
     },
     contactDetails: null,
-    regularLocalBillRate: [],
+    extensions: null,
   },
 })
 @Injectable()
@@ -201,11 +199,6 @@ export class OrderManagementContentState {
   @Selector()
   static projectNames(state: OrderManagementContentStateModel): ProjectName[] {
     return state.projectNames;
-  }
-
-  @Selector()
-  static masterShifts(state: OrderManagementContentStateModel): MasterShift[] {
-    return state.masterShifts;
   }
 
   @Selector()
@@ -281,16 +274,17 @@ export class OrderManagementContentState {
   }
 
   @Selector()
-  static regularLocalBillRate(state: OrderManagementContentStateModel): string[] {
-    return state.regularLocalBillRate;
+  static extensions(state: OrderManagementContentStateModel): any | null {
+    return state.extensions;
   }
 
   constructor(
     private orderManagementService: OrderManagementContentService,
     private projectsService: ProjectsService,
     private shiftsService: ShiftsService,
+    private departmentService: DepartmentsService,
     private rejectReasonService: RejectReasonService,
-    private departmentService: DepartmentsService
+    private extensionSidebarService: ExtensionSidebarService
   ) {}
 
   @Action(GetIncompleteOrders)
@@ -507,15 +501,6 @@ export class OrderManagementContentState {
     );
   }
 
-  @Action(GetMasterShifts)
-  GetMasterShifts({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<MasterShift[]> {
-    return this.shiftsService.getAllMasterShifts().pipe(
-      tap((payload) => {
-        patchState({ masterShifts: payload });
-      })
-    );
-  }
-
   @Action(GetAssociateAgencies)
   GetAssociateAgencies({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<AssociateAgency[]> {
     return this.orderManagementService.getAssociateAgencies().pipe(
@@ -574,9 +559,9 @@ export class OrderManagementContentState {
   @Action(SaveOrder)
   SaveOrder(
     { dispatch }: StateContext<OrderManagementContentStateModel>,
-    { order, documents }: SaveOrder
+    { order, documents, comments }: SaveOrder
   ): Observable<Order | void> {
-    return this.orderManagementService.saveOrder(order, documents).pipe(
+    return this.orderManagementService.saveOrder(order, documents, comments).pipe(
       tap((order) => {
         dispatch([
           new ShowToast(MessageTypes.Success, RECORD_ADDED),
@@ -740,12 +725,11 @@ export class OrderManagementContentState {
     );
   }
 
-  @Action(GetRegularLocalBillRate)
-  GetRegularLocalBillRate ({ patchState }: StateContext<OrderManagementContentStateModel>): Observable<string[]> {
-    return this.orderManagementService.getRegularLocalBillRate().pipe(
-      tap((regularLocalBillRate: string[]) => {
-        patchState({ regularLocalBillRate });
-      })
-    );
+  @Action(GetExtensions)
+  GetExtensions(
+    { patchState }: StateContext<OrderManagementContentStateModel>,
+    { id }: GetExtensions
+  ): Observable<ExtensionGridModel[]> {
+    return this.extensionSidebarService.getExtensions(id).pipe(tap((extensions) => patchState({ extensions })));
   }
 }

@@ -19,6 +19,8 @@ import { shareReplay } from 'rxjs/operators';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
+import { Comment } from '@shared/models/comment.model';
+import { CommentsService } from '@shared/services/comments.service';
 
 @Component({
   selector: 'app-add-edit-reorder',
@@ -41,13 +43,16 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
   public candidates$: Observable<CandidateModel[]>;
   public agencies$: Observable<AgencyModel[]>;
   public billRate$: Observable<number>;
+  public commentContainerId: number = 0;
+  public comments: Comment[] = [];
 
   private numberOfAgencies: number;
 
   public constructor(
     private formBuilder: FormBuilder,
     private store: Store,
-    private reorderService: AddEditReorderService
+    private reorderService: AddEditReorderService,
+    private commentsService: CommentsService
   ) {
     super();
   }
@@ -60,6 +65,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     this.initAgenciesAndCandidates();
     this.createReorderForm();
     this.listenCandidateChanges();
+    this.commentContainerId = this.order.commentContainerId as number;
   }
 
   public override ngOnDestroy(): void {
@@ -74,9 +80,16 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     }
   }
 
+  private getComments(): void {
+    this.commentsService.getComments(this.order.commentContainerId as number, null).subscribe((comments: Comment[]) => {
+      this.comments = comments;
+    });
+  }
+
   private createReorderForm(): void {
     if (this.isEditMode) {
       this.initForm(this.order);
+      this.getComments();
     } else {
       this.initForm();
     }
@@ -139,7 +152,7 @@ export class AddEditReorderComponent extends DestroyableDirective implements OnI
     const payload = { reorder, agencyIds, reOrderId, reOrderFromId };
 
     this.reorderService
-      .saveReorder(<ReorderRequestModel>payload)
+      .saveReorder(<ReorderRequestModel>payload, this.comments)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         this.store.dispatch(new ShowToast(MessageTypes.Success, this.isEditMode ? RECORD_MODIFIED : RECORD_ADDED));

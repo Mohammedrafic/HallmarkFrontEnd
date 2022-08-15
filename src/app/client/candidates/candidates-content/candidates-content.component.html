@@ -1,1 +1,41 @@
-<p>candidates-content works!</p>
+<app-page-toolbar>
+  <ng-container left>
+    <h3>Candidates</h3>
+  </ng-container>
+  <ng-container right>
+    <div class="button-group" >
+      <ejs-switch
+        id="switcher"
+        (change)="onSwitcher($event);"
+        [checked]="true"
+      ></ejs-switch>
+      <label for="switcher" class="switch-text">Include Deployed Candidates</label>
+      <button
+        ejs-dropdownbutton
+        cssClass="e-outline button-export"
+        [items]="exportOptions"
+        (select)="exportSelected($event)"
+      >
+        Export <i-feather name="download" class="icon"></i-feather>
+      </button>
+      <button ejs-button id="filterButton" cssClass="e-outline button-filter" (click)="showFilters()">
+        <div class="filter-button-content">
+          <span *ngIf="(filteredItems$ | async) || 0 as filteredItems" class="e-badge e-badge-success e-badge-circle">{{
+            filteredItems
+            }}</span>
+          Filters <i-feather name="sliders" class="icon"></i-feather>
+        </div>
+      </button>
+    </div>
+  </ng-container>
+</app-page-toolbar>
+
+<section>
+  <app-candidate-list
+    [filteredItems$]="filteredItems$"
+    [export$]="exportUsers$"
+    [search$]="search$"
+    [includeDeployedCandidates$]="includeDeployedCandidates$"
+    [isAgency]="false"
+  ></app-candidate-list>
+</section>

@@ -137,6 +137,26 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: 'security/user-list',
     },
+    34: {
+      // Candidates
+      icon: 'file-text',
+      route: 'agency/candidates',
+    },
+    36: {
+      // Candidates
+      icon: 'file-text',
+      route: 'client/candidates',
+    },
+    35: {
+      // Candidate Details
+      icon: '',
+      route: 'agency/candidate-details',
+    },
+    37: {
+      // Candidate Details
+      icon: 'users',
+      route: 'client/candidate-details',
+    },
     40: {
       // Custom Reports
       icon: 'pie-chart',
@@ -156,7 +176,7 @@ export const MENU_CONFIG: any = {
       // Page Report
       icon: '',
       route: '/analytics/page-report',
-    },    
+    },
   },
 
   [BusinessUnitType.MSP]: {
@@ -212,11 +232,6 @@ export const MENU_CONFIG: any = {
       icon: 'file-text',
       route: '/client/order-management',
     },
-    14: {
-      // Candidates
-      icon: 'file-text',
-      route: 'agency/candidates',
-    },
     15: {
       // Timesheets
       icon: 'clock',
@@ -252,11 +267,6 @@ export const MENU_CONFIG: any = {
       icon: 'file-text',
       route: 'agency/order-management',
     },
-    23: {
-      // Candidates
-      icon: 'file-text',
-      route: 'agency/candidates',
-    },
     24: {
       // Timesheets
       icon: 'clock',
@@ -288,6 +298,16 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: 'security/user-list',
     },
+    35: {
+      // Candidate Details
+      icon: 'users',
+      route: 'agency/candidate-details',
+    },
+    37: {
+      // Candidate Details
+      icon: 'users',
+      route: 'agency/candidate-details',
+    },
     40: {
       // Custom Reports
       icon: 'pie-chart',
@@ -307,7 +327,7 @@ export const MENU_CONFIG: any = {
       // Page Report
       icon: '',
       route: '/analytics/page-report',
-    },   
+    },
   },
 
   [BusinessUnitType.Organization]: {
@@ -371,7 +391,7 @@ export const MENU_CONFIG: any = {
     15: {
       // Timesheets
       icon: 'clock',
-      route: 'client/timesheets'
+      route: 'client/timesheets',
     },
     16: {
       // Invoices
@@ -440,6 +460,16 @@ export const MENU_CONFIG: any = {
       icon: '',
       route: 'security/user-list',
     },
+    36: {
+      // Candidates
+      icon: 'file-text',
+      route: 'client/candidates',
+    },
+    37: {
+      // Candidate Details
+      icon: 'users',
+      route: 'client/candidate-details',
+    },
     40: {
       // Custom Reports
       icon: 'pie-chart',
@@ -459,7 +489,7 @@ export const MENU_CONFIG: any = {
       // Page Report
       icon: '',
       route: '/analytics/page-report',
-    },   
+    },
   },
 
   [BusinessUnitType.Agency]: {
@@ -523,7 +553,7 @@ export const MENU_CONFIG: any = {
     15: {
       // Timesheets
       icon: 'clock',
-      route: 'agency/timesheets'
+      route: 'agency/timesheets',
     },
     16: {
       // Invoices
@@ -564,7 +594,7 @@ export const MENU_CONFIG: any = {
     24: {
       // Timesheets
       icon: 'clock',
-      route: 'agency/timesheets'
+      route: 'agency/timesheets',
     },
     25: {
       // Invoices
@@ -596,6 +626,11 @@ export const MENU_CONFIG: any = {
       // User List
       icon: '',
       route: 'security/user-list',
+    },
+    35: {
+      // Candidate Details
+      icon: 'users',
+      route: 'agency/candidate-details',
     },
     40: {
       // Custom Reports

@@ -291,15 +291,63 @@
                       </ejs-datepicker>
                     </div>
                   </div>
+
+                  <!-- Shift Requirements -->
+                  <div *ngIf="isPermPlacementOrder" class="input-container bootstrap form-line-item-20">
+                    <label>Shift Name<span class="required">*</span></label>
+                    <div class="input-group dropdown">
+                      <ejs-dropdownlist
+                        formControlName="shift"
+                        appValidateWithMessage
+                        [dataSource]="masterShiftNames"
+                        [fields]="masterShiftFields"
+                      >
+                      </ejs-dropdownlist>
+                    </div>
+                  </div>
+
+                  <!-- Shift Start Time -->
+                  <div *ngIf="isPermPlacementOrder" class="input-container calendar form-line-item-20">
+                    <label for="startTime">Shift Start Time<span class="required">*</span></label>
+                    <div class="input-group datepicker bootstrap">
+                      <ejs-timepicker
+                        placeholder="HH:MM"
+                        formControlName="shiftStartTime"
+                        appValidateWithMessage
+                        format="hh:mm a"
+                        [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                        [enableMask]="true"
+                        maskPlaceholder="HH:MM"
+                      >
+                      </ejs-timepicker>
+                    </div>
+                  </div>
+
+                  <!-- Shift End Time -->
+                  <div *ngIf="isPermPlacementOrder" class="input-container calendar form-line-item-20">
+                    <label for="startTime">Shift End Time<span class="required">*</span></label>
+                    <div class="input-group datepicker bootstrap">
+                      <ejs-timepicker
+                        placeholder="HH:MM"
+                        formControlName="shiftEndTime"
+                        appValidateWithMessage
+                        format="hh:mm a"
+                        [maskPlaceholder]="{ hour: 'HH', minute: 'MM' }"
+                        [enableMask]="true"
+                        maskPlaceholder="HH:MM"
+                      >
+                      </ejs-timepicker>
+                    </div>
+                  </div>
                 </div>
 
-                <div class="form-line">
+                <div class="form-line" *ngIf="!isPermPlacementOrder">
                   <!-- Shift Requirements -->
                   <div class="input-container bootstrap form-line-item-20">
                     <label>Shift Name<span class="required">*</span></label>
                     <div class="input-group dropdown">
                       <ejs-dropdownlist
-                        formControlName="shiftRequirementId"
+                        formControlName="shift"
                         appValidateWithMessage
                         [dataSource]="masterShiftNames"
                         [fields]="masterShiftFields"
@@ -554,6 +602,17 @@
                     </div>
                   </div>
 
+                  <!--Primary contact-->
+                  <div *ngIf="contactDetailsFormArray.controls.length > 1" class="radio-button">
+                    <label>Primary</label>
+                    <ejs-radiobutton
+                      name="primaryContact"
+                      [value]="i"
+                      [checked]="contact.get('isPrimaryContact')?.value"
+                      (change)="selectPrimaryContact($event)"
+                    ></ejs-radiobutton>
+                  </div>
+
                   <!-- Remove button -->
                   <div class="input-container remove-button-container">
                     <button
@@ -674,21 +733,8 @@
           <div class="title">Special Project</div>
           <form [formGroup]="specialProject">
             <div class="form-line">
-              <!-- Reason for Request -->
-              <div class="input-container bootstrap form-line-item-40">
-                <label>Reason for Request<span class="required">*</span></label>
-                <div class="input-group dropdown">
-                  <ejs-dropdownlist
-                    formControlName="reasonForRequestId"
-                    appValidateWithMessage
-                    [dataSource]="(projectSpecialData$ | async)?.reasonsForRequest"
-                    [fields]="reasonsForRequestFields"
-                  >
-                  </ejs-dropdownlist>
-                </div>
-              </div>
               <!-- Special Project Category -->
-              <div class="input-container bootstrap form-line-item-20">
+              <div class="input-container bootstrap form-line-item-30">
                 <label>Special Project Category<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
@@ -701,7 +747,7 @@
                 </div>
               </div>
               <!-- Project Name -->
-              <div class="input-container bootstrap form-line-item-20">
+              <div class="input-container bootstrap form-line-item-30">
                 <label>Project Name<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
@@ -714,7 +760,7 @@
                 </div>
               </div>
               <!-- PO# -->
-              <div class="input-container bootstrap form-line-item-20">
+              <div class="input-container bootstrap form-line-item-30">
                 <label>PO#<span class="required">*</span></label>
                 <div class="input-group dropdown">
                   <ejs-dropdownlist
@@ -743,7 +789,11 @@
     </app-document-uploader>
     <div tabindex="0" class="e-card comments">
       <div class="e-card-content">
-        <app-comments [comments]="comments" [useBackground]="false"></app-comments>
+        <app-comments
+          [comments]="comments"
+          [commentContainerId]="commentContainerId"
+          [useBackground]="false"
+          [isCreating]="!orderId"></app-comments>
       </div>
     </div>
   </div>

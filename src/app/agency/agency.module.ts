@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import { AccordionModule, TabAllModule } from '@syncfusion/ej2-angular-navigations';
-import { ButtonModule, CheckBoxModule, ChipListModule } from '@syncfusion/ej2-angular-buttons';
+import { ButtonModule, CheckBoxModule, ChipListModule, SwitchModule } from '@syncfusion/ej2-angular-buttons';
 import { FeatherModule } from 'angular-feather';
 import {
   AlertCircle,
@@ -24,11 +24,13 @@ import {
   MoreVertical,
   Plus,
   Search,
+  Slash,
   Sliders,
   Trash2,
   Unlock,
   Upload,
   X,
+  XCircle,
 } from 'angular-feather/icons';
 import {
   MaskedTextBoxModule,
@@ -83,8 +85,11 @@ import { AgencyOrderFiltersComponent } from './order-management/order-management
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
 import { AddEditReorderModule } from '@client/order-management/add-edit-reorder/add-edit-reorder.module';
 import { AgencyListFiltersComponent } from './agency-list/agency-list-filters/agency-list-filters.component';
-import { MultiselectDropdownModule } from "@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module";
 import { ImportCandidatesComponent } from './candidates/import-candidates/import-candidates.component';
+import { MultiselectDropdownModule } from '@shared/components/form-controls/multiselect-dropdown/multiselect-dropdown.module';
+import { CandidateListModule } from '@shared/components/candidate-list/candidate-list.module';
+import { ChildOrderDialogModule } from '@shared/components/child-order-dialog/child-order-dialog.module';
+import { CandidateDetailsModule } from '@shared/components/candidate-details/candidate-details.module';
 
 const sidebarIcons = {
   Sliders,
@@ -110,6 +115,8 @@ const sidebarIcons = {
   ChevronDown,
   ChevronRight,
   Upload,
+  XCircle,
+  Slash,
 };
 
 @NgModule({
@@ -154,7 +161,7 @@ const sidebarIcons = {
     AgencyRoutingModule,
     SharedModule,
     ReactiveFormsModule,
-
+    SwitchModule,
     PdfViewerModule,
     ListBoxModule,
     ButtonModule,
@@ -176,12 +183,13 @@ const sidebarIcons = {
     MaskedTextBoxModule,
     DropDownButtonModule,
     AddEditReorderModule,
+    CandidateDetailsModule,
     FeatherModule.pick(sidebarIcons),
     NgxMaskModule.forChild(),
     NgxsModule.forFeature([AgencyState, CandidateState, OrderManagementState]),
+    CandidateListModule,
+    ChildOrderDialogModule,
   ],
-  exports: [
-    FileViewerComponent
-  ]
+  exports: [FileViewerComponent],
 })
 export class AgencyModule {}

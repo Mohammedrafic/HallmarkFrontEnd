@@ -19,7 +19,6 @@ import {
   PagerComponent,
   RowDataBoundEventArgs,
   SelectionSettingsModel,
-  SortDirection,
   TextWrapSettingsModel,
 } from '@syncfusion/ej2-angular-grids';
 import { CheckBoxComponent } from '@syncfusion/ej2-angular-buttons';
@@ -34,6 +33,7 @@ import {
   perDiemChildColumnsToExport,
   PerDiemColumnsConfig,
   perDiemColumnsToExport,
+  PermPlacementColumnsConfig,
   reOrdersChildColumnToExport,
   ReOrdersColumnsConfig,
   reOrdersColumnsToExport,
@@ -73,6 +73,7 @@ import { ExportColumn, ExportOptions, ExportPayload } from '@shared/models/expor
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 import { PreviewOrderDialogComponent } from '@agency/order-management/order-management-grid/preview-order-dialog/preview-order-dialog.component';
 import { OrderManagementAgencyService } from '@agency/order-management/order-management-agency.service';
+import { UpdateGridCommentsCounter } from '@shared/components/comments/store/comments.actions';
 
 @Component({
   selector: 'app-order-management-grid',
@@ -135,6 +136,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public AgencyOrderManagementTabs = AgencyOrderManagementTabs;
   public isLockMenuButtonsShown = true;
   public orderTypes = OrderType;
+  public selectedRowRef: any;
 
   private isAlive = true;
   private selectedIndex: number | null;
@@ -179,12 +181,25 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     });
     this.subscribeOnPageChanges();
     this.onTabChange();
+    this.onCommentRead();
   }
 
   ngOnDestroy(): void {
+    this.orderManagementAgencyService.orderMyAgencyId = null;
     this.isAlive = false;
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private onCommentRead(): void {
+    this.actions$
+      .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateGridCommentsCounter))
+      .subscribe((data) => {
+        if (data.orderId && this.selectedRowRef) {
+          this.selectedRowRef.data.unreadComments -= data.readComments;
+          this.gridWithChildRow.setRowData(data.orderId, this.selectedRowRef.data);
+        }
+      });
   }
 
   public onExportSelectedSubscribe(): void {
@@ -247,6 +262,23 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     }
 
     this.openPerDiemDetails();
+    this.openMyAgencyTabWithCandidate();
+  }
+
+  private openMyAgencyTabWithCandidate(): void {
+    const { orderMyAgencyId } = this.orderManagementAgencyService;
+    if (orderMyAgencyId && this.ordersPage) {
+      const orderMyAgency = this.ordersPage.items.find(
+        (order: AgencyOrderManagement) => order.orderId === orderMyAgencyId.orderId
+      );
+      if (orderMyAgency) {
+        const candidate = orderMyAgency.children.find(
+          (candidate: OrderManagementChild) => candidate.candidateId === orderMyAgencyId.candidateId
+        );
+        this.gridWithChildRow.detailRowModule.expand(0);
+        this.onOpenCandidateDialog(candidate as OrderManagementChild, orderMyAgency);
+      }
+    }
   }
 
   /* Trigger when user redirect to per diem order from re-order */
@@ -301,11 +333,17 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     switch (this.selectedTab) {
       case AgencyOrderManagementTabs.MyAgency:
         this.filters.includeReOrders = true;
+        this.hasOrderMyAgencyId();
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.PerDiem:
         this.filters.orderTypes = [OrderType.OpenPerDiem];
         this.filters.includeReOrders = true;
+        this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
+        break;
+      case AgencyOrderManagementTabs.PermPlacement:
+        this.filters.orderTypes = [OrderType.PermPlacement];
+        this.filters.includeReOrders = false;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       case AgencyOrderManagementTabs.ReOrders:
@@ -314,10 +352,13 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
       default:
+        this.hasOrderMyAgencyId();
         this.filters.includeReOrders = false;
         this.store.dispatch(new GetAgencyOrdersPage(this.currentPage, this.pageSize, this.filters));
         break;
     }
+
+    this.clearOrderMyAgencyId();
     this.checkSelectedChildrenItem();
   }
 
@@ -330,6 +371,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       case AgencyOrderManagementTabs.PerDiem:
         this.isLockMenuButtonsShown = true;
         this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
+        break;
+      case AgencyOrderManagementTabs.PermPlacement:
+        this.isLockMenuButtonsShown = true;
+        this.refreshGridColumns(PermPlacementColumnsConfig, this.gridWithChildRow);
         break;
       case AgencyOrderManagementTabs.ReOrders:
         this.isLockMenuButtonsShown = false;
@@ -411,17 +456,19 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       reOrder: reOrder.orderId || reOrder.id,
     };
     this.clearSelection(this.gridWithChildRow);
-    this.store.dispatch(new GetOrderById(reOrder.orderId || reOrder.id as number, order.organizationId));
+    this.store.dispatch(new GetOrderById(reOrder.orderId || (reOrder.id as number), order.organizationId));
     this.store.dispatch(
       new GetAgencyOrderCandidatesList(
-        reOrder.orderId || reOrder.id as number,
+        reOrder.orderId || (reOrder.id as number),
         order.organizationId,
         this.currentPage,
         this.pageSize,
         this.orderManagementAgencyService.excludeDeployed
       )
     );
-    this.store.dispatch(new GetAgencyOrderGeneralInformation(reOrder.orderId || reOrder.id as number, order.organizationId));
+    this.store.dispatch(
+      new GetAgencyOrderGeneralInformation(reOrder.orderId || (reOrder.id as number), order.organizationId)
+    );
     this.selectedOrder = reOrder;
     this.selectedIndex = null;
     this.openPreview.next(true);
@@ -473,7 +520,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       skillIds: this.filters.skillIds || [],
       orderTypes:
         this.selectedTab === AgencyOrderManagementTabs.PerDiem ||
-        this.selectedTab === AgencyOrderManagementTabs.ReOrders
+        this.selectedTab === AgencyOrderManagementTabs.ReOrders ||
+        this.selectedTab === AgencyOrderManagementTabs.PermPlacement
           ? []
           : this.filters.orderTypes || [],
       jobTitle: this.filters.jobTitle || null,
@@ -487,6 +535,8 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
       candidatesCountTo: this.filters.candidatesCountTo || null,
       organizationIds: this.filters.organizationIds || [],
       orderStatuses: this.filters.orderStatuses || [],
+      annualSalaryRangeFrom: this.filters.annualSalaryRangeFrom || null,
+      annualSalaryRangeTo: this.filters.annualSalaryRangeTo || null,
     });
     this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns, this.datePipe);
     this.filteredItems$.next(this.filteredItems.length);
@@ -542,6 +592,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   }
 
   public onFilterClearAll(): void {
+    this.orderManagementAgencyService.orderMyAgencyId = null;
     this.clearFilters();
     this.dispatchNewPage();
   }
@@ -551,6 +602,10 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
     this.filters.orderId = this.filters.orderId || null;
     this.filters.billRateFrom = this.filters.billRateFrom || null;
     this.filters.billRateTo = this.filters.billRateTo || null;
+    this.filters.jobStartDate = this.filters.jobStartDate || null;
+    this.filters.jobEndDate = this.filters.jobEndDate || null;
+    this.filters.annualSalaryRangeFrom = this.filters.annualSalaryRangeFrom || null;
+    this.filters.annualSalaryRangeTo = this.filters.annualSalaryRangeTo || null;
     this.filters.candidatesCountFrom = this.filters.candidatesCountFrom || null;
     this.filters.candidatesCountTo = this.filters.candidatesCountTo || null;
     this.filters.openPositions = this.filters.openPositions || null;
@@ -636,6 +691,25 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
             }
           });
       });
+  }
+
+  private hasOrderMyAgencyId(): void {
+    const { orderMyAgencyId } = this.orderManagementAgencyService;
+    if (orderMyAgencyId) {
+      this.OrderFilterFormGroup.patchValue({ orderId: orderMyAgencyId.orderId.toString() });
+      this.filters = this.OrderFilterFormGroup.getRawValue();
+      this.filters.orderId = orderMyAgencyId.orderId;
+      this.filters.includeReOrders = false;
+      this.filteredItems = this.filterService.generateChips(this.OrderFilterFormGroup, this.filterColumns);
+      this.filteredItems$.next(this.filteredItems.length);
+    }
+  }
+
+  private clearOrderMyAgencyId(): void {
+    const { orderMyAgencyId } = this.orderManagementAgencyService;
+    if (orderMyAgencyId && this.selectedTab && this.selectedTab !== AgencyOrderManagementTabs.MyAgency) {
+      this.orderManagementAgencyService.orderMyAgencyId = null;
+    }
   }
 
   private subscribeOnPageChanges(): void {

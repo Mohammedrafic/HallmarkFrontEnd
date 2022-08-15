@@ -1,0 +1,32 @@
+@import "colors";
+
+.flex-column {
+  h3 {
+    color: $title-black;
+    margin: 8px;
+  }
+
+  .tools-button-group {
+    padding-top: 4px;
+
+    .button-filter {
+      margin-right: 12px;
+    }
+  }
+
+  ejs-grid {
+    table.e-table {
+      width: 100% !important;
+    }
+  }
+
+  .grid-component {
+    overflow-y: auto;
+    height: 100%;
+  }
+
+}
+
+.reason-form {
+  margin-top: 24px;
+}

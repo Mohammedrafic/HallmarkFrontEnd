@@ -71,6 +71,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public SelectedTab = SelectedTab;
   public orderId: number;
+  public publicId: number;
   public prefix: string;
 
   public title: string;
@@ -117,6 +118,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     if (this.orderId > 0) {
       this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
         this.prefix = order?.organizationPrefix as string;
+        this.publicId = order?.publicId as number;
         this.isPermPlacementOrder = order?.orderType === OrderType.PermPlacement;
         if (order?.credentials) {
           this.orderCredentials = [...order.credentials];
@@ -132,7 +134,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           this.addMenuItem(SubmitButtonItem.SaveForLater, 'Save For Later');
           this.removeMenuItem(SubmitButtonItem.Save);
         } else {
-          if (order?.orderType === OrderType.OpenPerDiem) {
+          if (order?.orderType === OrderType.OpenPerDiem || order?.orderType === OrderType.PermPlacement) {
             this.disableOrderType = true;
           }
           this.addMenuItem(SubmitButtonItem.Save, 'Save');
@@ -266,7 +268,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
           )
         );
       } else {
-        this.store.dispatch(new SaveOrder(order, documents));
+        this.store.dispatch(new SaveOrder(order, documents, this.orderDetailsFormComponent.isEditMode ? undefined : this.orderDetailsFormComponent.comments));
       }
     } else {
       this.orderDetailsFormComponent.orderTypeForm.markAllAsTouched();
@@ -331,7 +333,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       skillId,
       projectTypeId,
       projectNameId,
-      reasonForRequestId,
       poNumberId,
       hourlyRate,
       openPositions,
@@ -341,7 +342,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       duration,
       jobStartDate,
       jobEndDate,
-      shiftRequirementId,
+      shift,
       shiftStartTime,
       shiftEndTime,
       jobDistributions,
@@ -364,8 +365,8 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
     } = allValues;
 
     const billRates: OrderBillRateDto[] = (allValues.billRates as BillRate[])?.map((billRate: BillRate) => {
-      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate } = billRate;
-      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate };
+      const { id, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed } = billRate;
+      return { id: id || 0, billRateConfigId, rateHour, intervalMin, intervalMax, effectiveDate, billType, editAllowed };
     });
 
     const order: CreateOrderDto | EditOrderDto = {
@@ -377,7 +378,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       orderType,
       projectTypeId,
       projectNameId,
-      reasonForRequestId,
       poNumberId,
       hourlyRate,
       openPositions,
@@ -387,7 +387,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       duration,
       jobStartDate,
       jobEndDate,
-      shiftRequirementId,
+      shift,
       shiftStartTime,
       shiftEndTime,
       classification,
@@ -475,7 +475,9 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
         )
       );
     } else {
-      this.store.dispatch(new SaveOrder(order, documents));
+      this.store.dispatch(new SaveOrder(
+        order, documents
+      ));
     }
   }
 

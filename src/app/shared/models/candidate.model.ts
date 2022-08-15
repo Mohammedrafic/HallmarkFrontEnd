@@ -1,5 +1,5 @@
-import { PageOfCollections } from "./page.model";
-import { JobDistributionMasterSkills } from "@shared/models/associate-organizations.model";
+import { PageOfCollections } from './page.model';
+import { JobDistributionMasterSkills } from '@shared/models/associate-organizations.model';
 
 export class Candidate {
   id?: number;

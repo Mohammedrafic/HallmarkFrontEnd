@@ -13,7 +13,7 @@ import {
   GetRejectReasonsForOrganisation,
   RejectCandidateForOrganisationSuccess,
   RejectCandidateJob,
-  ReloadOrganisationOrderCandidatesLists,
+  ReloadOrganisationOrderCandidatesLists, SetIsDirtyOrderForm,
   UpdateOrganisationCandidateJob,
 } from '@client/store/order-managment-content.actions';
 import { ApplicantStatus as ApplicantStatusEnum } from '@shared/enums/applicant-status.enum';
@@ -25,6 +25,10 @@ import { AccordionClickArgs, ExpandEventArgs } from '@syncfusion/ej2-navigations
 import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { SET_READONLY_STATUS } from '@shared/constants';
+import { toCorrectTimezoneFormat } from "@shared/utils/date-time.utils";
+import { CommentsService } from '@shared/services/comments.service';
+import { Comment } from '@shared/models/comment.model';
+import { OrderCandidateListViewService } from "@shared/components/order-candidate-list/order-candidate-list-view.service";
 
 @Component({
   selector: 'app-onboarded-candidate',
@@ -65,6 +69,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public accordionClickElement: HTMLElement | null;
   public accordionOneField: AccordionOneField;
   public nextApplicantStatuses: ApplicantStatus[];
+  public isActiveCandidateDialog$: Observable<boolean>;
 
   get startDateControl(): AbstractControl | null {
     return this.form.get('startDate');
@@ -79,7 +84,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   }
 
   get isOnBoarded(): boolean {
-    return this.candidate.candidateStatus === ApplicantStatusEnum.OnBoarded;
+    return this.candidate.status === ApplicantStatusEnum.OnBoarded;
   }
 
   get isDeployedCandidate(): boolean {
@@ -88,9 +93,18 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
 
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(private datePipe: DatePipe, private store: Store, private actions$: Actions) {}
+  public comments: Comment[] = [];
+
+  constructor(
+    private datePipe: DatePipe,
+    private store: Store,
+    private actions$: Actions,
+    private orderCandidateListViewService: OrderCandidateListViewService,
+    private commentsService: CommentsService
+    ) {}
 
   ngOnInit(): void {
+    this.isActiveCandidateDialog$ = this.orderCandidateListViewService.getIsCandidateOpened();
     this.createForm();
     this.patchForm();
     this.subscribeOnDate();
@@ -104,6 +118,12 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  private getComments(): void {
+    this.commentsService.getComments(this.candidateJob?.commentContainerId as number, null).subscribe((comments: Comment[]) => {
+      this.comments = comments;
+    });
   }
 
   public onDropDownChanged(event: { itemData: { applicantStatus: ApplicantStatus; isEnabled: boolean } }): void {
@@ -138,6 +158,7 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.billRatesData = [];
     this.isRejected = false;
     this.nextApplicantStatuses = [];
+    this.orderCandidateListViewService.setIsCandidateOpened(false);
   }
 
   public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
@@ -148,6 +169,57 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
   public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
     this.accordionOneField = new AccordionOneField(this.accordionComponent);
     this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
+  }
+
+  public onBillRatesChanged(bill: BillRate): void {
+    this.form.markAllAsTouched();
+    if (!this.form.errors && this.candidateJob) {
+      this.store
+        .dispatch(
+          new UpdateOrganisationCandidateJob({
+            orderId: this.candidateJob?.orderId as number,
+            organizationId: this.candidateJob?.organizationId as number,
+            jobId: this.candidateJob?.jobId as number,
+            nextApplicantStatus: {
+              applicantStatus: 60,
+              statusText: 'Onboard',
+            },
+            actualStartDate: this.candidateJob?.actualStartDate as string,
+            actualEndDate: this.candidateJob?.actualEndDate as string,
+            offeredStartDate: toCorrectTimezoneFormat(this.candidateJob?.availableStartDate as string),
+            candidateBillRate: this.candidateJob?.candidateBillRate as number,
+            offeredBillRate: this.candidateJob?.offeredBillRate,
+            requestComment: this.candidateJob?.requestComment as string,
+            clockId: this.candidateJob?.clockId,
+            guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
+            billRates: this.getBillRateForUpdate(bill),
+
+          })
+        )
+        .subscribe(() => {
+          this.store.dispatch(new ReloadOrganisationOrderCandidatesLists());
+          this.closeDialog();
+          this.store.dispatch(new SetIsDirtyOrderForm(true));
+        });
+    }
+  }
+
+  getBillRateForUpdate(value: BillRate): BillRate[] {
+    let billRates;
+    const existingBillRateIndex = this.candidateJob?.billRates.findIndex(billRate => billRate.id === value.id) as number;
+    if (existingBillRateIndex > -1) {
+      this.candidateJob?.billRates.splice(existingBillRateIndex, 1, value);
+      billRates = this.candidateJob?.billRates;
+    } else {
+      if (typeof value === 'number') {
+        this.candidateJob?.billRates.splice(value, 1);
+        billRates = this.candidateJob?.billRates;
+      } else {
+        billRates = [...this.candidateJob?.billRates as BillRate[], value];
+      }
+    }
+
+    return billRates as BillRate[];
   }
 
   private onAccept(): void {
@@ -186,7 +258,8 @@ export class OnboardedCandidateComponent implements OnInit, OnDestroy {
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((value) => {
       this.candidateJob = value;
       if (value) {
-        this.billRatesData = [...value.billRates];
+        this.getComments();
+        this.billRatesData = [...value?.billRates];
         this.form.patchValue({
           jobId: value.orderId,
           date: [value.order.jobStartDate, value.order.jobEndDate],

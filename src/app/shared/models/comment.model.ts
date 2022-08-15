@@ -2,7 +2,11 @@ export class Comment {
   id: number;
   text: string;
   isExternal: boolean;
-  creationDate: Date;
+  commentContainerId: number;
+  createdAt: Date;
+  firstName: string;
+  lastName: string;
   new?: boolean;
+  isRead?: boolean;
 }
   

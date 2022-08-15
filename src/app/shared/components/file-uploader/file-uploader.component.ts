@@ -1,10 +1,15 @@
-import { Component, ChangeDetectionStrategy, ViewChild, ElementRef, Input, Output, EventEmitter } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ViewChild, ElementRef, Input, Output,
+  EventEmitter, ChangeDetectorRef } from '@angular/core';
 
 import { RemovingEventArgs, SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
+import { UploaderComponent } from '@syncfusion/ej2-angular-inputs';
+import { Store } from '@ngxs/store';
 
 import { FileAdapter } from '@core/helpers/adapters';
 import { FileForUpload } from '@core/interface';
 import { AllowedFileExtensions } from './file-uploader.constant';
+import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
 
 @Component({
   selector: 'app-file-uploader',
@@ -16,6 +21,8 @@ export class FileUploaderComponent {
   @ViewChild('droparea') protected droparea: ElementRef<HTMLDivElement>;
 
   @ViewChild('uploadArea') protected uploadArea: ElementRef<HTMLDivElement>;
+
+  @ViewChild('fileUploader') protected fileUploader: UploaderComponent;
 
   @Input() maxFiles = 1;
 
@@ -29,6 +36,11 @@ export class FileUploaderComponent {
 
   public files: FileForUpload[] = [];
 
+  constructor(
+    private store: Store,
+    private cd: ChangeDetectorRef,
+  ) {}
+
   public browseFiles(): void {
     this.uploadArea.nativeElement
     ?.getElementsByClassName('e-file-select-wrap')[0]
@@ -36,16 +48,26 @@ export class FileUploaderComponent {
   }
 
   public filesSelected(event: SelectedEventArgs): void {
-    this.files = [...this.files, ...FileAdapter.adaptRawEventFiles(event.filesData)];
-    this.emitSelectedFiles();
+    if (this.files.length + event.filesData.length < this.maxFiles) {
+      this.setFiles(event);
+    } else {
+      event.filesData.splice(this.maxFiles, event.filesData.length);
+      this.setFiles(event);
+      this.showFileNumberExceed();
+    }
   }
 
   public removeFile(event: RemovingEventArgs): void {
     this.files = this.files.filter((file) => file.fileName !== event.filesData[0].name);
-    this.emitSelectedFiles();
+    this.uploadFilesChanged.emit(this.files);
   }
 
-  private emitSelectedFiles(): void {
+  private showFileNumberExceed(): void {
+    this.store.dispatch(new ShowToast(MessageTypes.Warning, `Maximum number of files for upload is ${this.maxFiles}`));
+  }
+
+  private setFiles(event: SelectedEventArgs): void {
+    this.files = [...this.files, ...FileAdapter.adaptRawEventFiles(event.filesData)];
     this.uploadFilesChanged.emit(this.files);
   }
 }
