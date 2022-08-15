@@ -8,7 +8,7 @@ import { TabComponent } from '@syncfusion/ej2-angular-navigations';
 import { DropdownOption } from '@core/interface';
 import { TimesheetRecordsDto, RecordValue } from './../interface';
 import { TimesheetsApiService } from './timesheets-api.service';
-import { RecordFields } from '../enums';
+import { RecordFields, RecordsMode } from '../enums';
 
 @Injectable()
 export class TimesheetRecordsService {
@@ -31,10 +31,11 @@ export class TimesheetRecordsService {
     records: TimesheetRecordsDto,
     currentTab: RecordFields,
     colDefs: ColDef[],
+    currenMode: RecordsMode,
     ): Record<string, FormGroup> {
     const formGroups: Record<string, FormGroup> = {};
 
-    records[currentTab].forEach((record) => {
+    records[currentTab][currenMode].forEach((record) => {
       const config = colDefs.filter((item) => item.cellRendererParams?.editMode);
       const controls: Record<string, string[] | number[] | Validators[]> = {};
 
@@ -45,8 +46,11 @@ export class TimesheetRecordsService {
         controls[field] = [value as string | number, Validators.required];
       });
 
+      controls['billRateConfigId'] = [record['billRateConfigId'], Validators.required]
+
       formGroups[record.id] = this.fb.group(controls);
     });
+
     return formGroups;
   }
 

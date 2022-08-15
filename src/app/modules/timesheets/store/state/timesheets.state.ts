@@ -541,9 +541,18 @@ export class TimesheetsState {
                 }
               },
               timeSheetRecords: {
-                [RecordFields.Time]: [],
-                [RecordFields.Miles]: [],
-                [RecordFields.Expenses]: [],
+                timesheets: {
+                  editMode: [],
+                  viewMode: [],
+                },
+                miles: {
+                  editMode: [],
+                  viewMode: [],
+                },
+                expenses: {
+                  editMode: [],
+                  viewMode: [],
+                },
               }
             })
           }

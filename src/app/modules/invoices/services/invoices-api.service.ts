@@ -46,10 +46,16 @@ export class InvoicesApiService {
     return this.http.post<ManualInvoiceTimesheetResponse>('/api/ManualInvoiceRecords', payload);
   }
 
+    /**
+   * TODO: remove this with shared service
+   */
   public getOrganizations(): Observable<DataSourceItem[]> {
     return this.http.get<DataSourceItem[]>(`/api/Agency/partneredorganizations`);
   }
 
+  /**
+   * TODO: remove this with shared service
+   */
   public getOrgStructure(orgId: number, isAgency: boolean): Observable<OrganizationStructure> {
     const endpoint = isAgency ? `/api/Organizations/structure/partnered/${orgId}`
     : '/api/Organizations/structure'
