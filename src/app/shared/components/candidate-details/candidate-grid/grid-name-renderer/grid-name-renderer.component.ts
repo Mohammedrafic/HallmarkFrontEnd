@@ -10,6 +10,7 @@ import { SetLastSelectedOrganizationAgencyId } from '../../../../../store/user.a
 import { disabledBodyOverflow } from '@shared/utils/styles.utils';
 import { CandidatesDetailsModel } from '@shared/components/candidate-details/models/candidate.model';
 import { SetCandidateMessage } from '@shared/components/candidate-details/store/candidate.actions';
+import { CandidatesStatusText } from '@shared/enums/status';
 
 @Component({
   selector: 'app-grid-name-renderer',
@@ -47,7 +48,14 @@ export class GridNameRendererComponent implements ICellRendererAngularComp {
       );
     }
 
-    this.store.dispatch(new SetCandidateMessage(this.cellValue.jobTitle, this.cellValue.positionId));
+    if (this.cellValue.status === CandidatesStatusText.Onboard) {
+      this.store.dispatch(
+        new SetCandidateMessage(
+          this.cellValue.jobTitle,
+          `${this.cellValue.organizationPrefix}-${this.cellValue.orderId}-${this.cellValue.positionId}`
+        )
+      );
+    }
 
     this.router.navigate([url, this.cellValue.candidateProfileId], {
       state: { orderId: this.cellValue.orderId, pageToBack, isNavigateFromCandidateDetails: true, readonly },

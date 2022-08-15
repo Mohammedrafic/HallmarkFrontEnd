@@ -20,6 +20,7 @@ export interface CandidatesDetailsModel extends CandidatesBasicInfo {
   firstName: string;
   lastName: string;
   jobTitle: string;
+  status: number;
 }
 
 export type CandidateDetailsPage = PageOfCollections<CandidatesDetailsModel>;
@@ -61,5 +62,5 @@ export type NavigationTabModel = {
 
 export type CandidateMessage = {
   title: string | null;
-  position: number | null;
+  position: string | null;
 };

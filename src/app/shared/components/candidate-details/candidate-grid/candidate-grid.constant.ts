@@ -10,7 +10,7 @@ const valueHelper = new GridHelper();
 export const CandidatesColumnsDefinition = (isAgency: boolean) => {
   return [
     {
-      field: 'firstName',
+      field: 'lastName',
       headerName: 'NAME',
       width: 160,
       cellRenderer: GridNameRendererComponent,

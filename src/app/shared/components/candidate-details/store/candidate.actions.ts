@@ -37,7 +37,7 @@ export class SetNavigation {
 
 export class SetCandidateMessage {
   static readonly type = '[candidate details] Set Candidate Message';
-  constructor(public title: string | null, public position: number | null) {}
+  constructor(public title: string | null, public position: string | null) {}
 }
 
 export class GetCandidateSkills {
