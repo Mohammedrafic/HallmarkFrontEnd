@@ -90,6 +90,103 @@
         }
       }
     }
+
+    .candidates {
+      margin-top: 24px;
+      position: relative;
+
+      &.first-active {
+        .e-tab .e-tab-header:not(.e-vertical) .e-indicator {
+          left: 0 !important;
+          right: 98px !important;
+        }
+      }
+
+      .error-template-button {
+        position: absolute;
+        z-index: 2;
+        right: 0;
+        top: 12px;
+
+        i-feather {
+          margin-left: 4px;
+        }
+      }
+
+      .tab-badge {
+        background-color: $primary-active-blue-10;
+        border-radius: 50%;
+        color: white;
+        padding: 1px 5px;
+        font-size: 10px;
+      }
+
+      span {
+        margin-left: 12px;
+      }
+
+      .candidates-selector {
+        display: flex;
+        height: 100%;
+        border-top: 1px solid $secondary-dark-blue-45;
+        margin: 1px -24px 0;
+
+        .left {
+          .side-menu {
+            width: 231px;
+            background-color: $white;
+            height: 100%;
+            border: 1px solid $secondary-dark-blue-45;
+            border-top: none;
+            border-bottom: none;
+            overflow-y: auto;
+
+            .list-box {
+              .e-listbox-wrapper {
+                border: none;
+
+                .e-list-group-item, .e-list-item {
+                  height: 48px;
+                  padding: 14px 24px;
+                  border-bottom: 1px solid $secondary-dark-blue-45;
+                  background-color: $white;
+                  color: $secondary-dark-blue-10;
+                  font-size: 14px;
+                  line-height: 20px;
+                }
+
+                .e-list-group-item {
+                  font-weight: 700;
+                  border-top: none;
+                  cursor: default;
+                }
+
+                .e-list-item {
+                  &.e-selected {
+                    background-color: $primary-active-blue;
+                    color: #FFF;
+                    font-weight: 700;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .right {
+          width: 100%;
+          margin: 0 24px;
+
+          .profile-list-container {
+            height: 170px;
+          }
+
+          .education-list-container, .experience-list-container {
+            height: 218px;
+          }
+        }
+      }
+    }
   }
 
   .action-link-btn {
@@ -97,5 +194,17 @@
     cursor: pointer;
     font-weight: 700;
     font-size: 14px;
+
+    i-feather {
+      vertical-align: sub;
+    }
+  }
+
+  #tooltip {
+    display: inline-block;
+  }
+
+  #tooltip [disabled] {
+    pointer-events: none;
   }
 }

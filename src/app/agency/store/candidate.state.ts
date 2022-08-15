@@ -4,13 +4,10 @@ import { CredentialType } from '@shared/models/credential-type.model';
 import { Credential } from '@shared/models/credential.model';
 import { catchError, Observable, of, tap } from 'rxjs';
 
-import {
-  CandidateCredential,
-  CandidateCredentialPage,
-  CredentialGroupedFiles,
-} from '@shared/models/candidate-credential.model';
-import { RECORD_ADDED, RECORD_MODIFIED } from 'src/app/shared/constants/messages';
-import { MessageTypes } from 'src/app/shared/enums/message-types';
+import { CandidateCredential, CandidateCredentialPage, CredentialGroupedFiles } from "@shared/models/candidate-credential.model";
+import { CandidateImportResult } from "@shared/models/candidate-profile-import.model";
+import { RECORD_ADDED, RECORD_MODIFIED } from "src/app/shared/constants/messages";
+import { MessageTypes } from "src/app/shared/enums/message-types";
 import { Candidate, CandidatePage } from 'src/app/shared/models/candidate.model';
 import { Education } from 'src/app/shared/models/education.model';
 import { Experience } from 'src/app/shared/models/experience.model';
@@ -24,6 +21,8 @@ import {
   GetCandidateByIdSucceeded,
   GetCandidatePhoto,
   GetCandidatePhotoSucceeded,
+  GetCandidateProfileErrors,
+  GetCandidateProfileErrorsSucceeded,
   GetCandidateProfileTemplate,
   GetCandidateProfileTemplateSucceeded,
   GetCandidatesCredentialByPage,
@@ -45,6 +44,8 @@ import {
   RemoveExperience,
   RemoveExperienceSucceeded,
   SaveCandidate,
+  SaveCandidateImportResult,
+  SaveCandidateImportResultSucceeded,
   SaveCandidatesCredential,
   SaveCandidatesCredentialFailed,
   SaveCandidatesCredentialSucceeded,
@@ -54,6 +55,8 @@ import {
   SaveExperience,
   SaveExperienceSucceeded,
   UploadCandidatePhoto,
+  UploadCandidateProfileFile,
+  UploadCandidateProfileFileSucceeded,
   UploadCredentialFiles,
   UploadCredentialFilesSucceeded,
 } from './candidate.actions';
@@ -430,7 +433,40 @@ export class CandidateState {
         dispatch(new GetCandidateProfileTemplateSucceeded(payload));
         return payload;
       }),
-      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Template was not found'))))
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the template'))))
+    );
+  }
+
+  @Action(GetCandidateProfileErrors)
+  GetCandidateProfileErrors({ dispatch }: StateContext<CandidateStateModel>, { payload }: GetCandidateProfileErrors): Observable<any> {
+    return this.candidateService.getCandidateProfileErrors(payload).pipe(
+      tap((payload) => {
+        dispatch(new GetCandidateProfileErrorsSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Cannot download the file'))))
+    );
+  }
+
+  @Action(UploadCandidateProfileFile)
+  UploadCandidateProfileFile({ dispatch }: StateContext<CandidateStateModel>, { payload }: UploadCandidateProfileFile): Observable<CandidateImportResult | Observable<void>> {
+    return this.candidateService.uploadCandidateProfileFile(payload).pipe(
+      tap((payload) => {
+        dispatch(new UploadCandidateProfileFileSucceeded(payload));
+        return payload;
+      }),
+      catchError((error: any) => of(dispatch(new ShowToast(MessageTypes.Error, error && error.error ? getAllErrors(error.error) : 'File was not uploaded'))))
+    );
+  }
+
+  @Action(SaveCandidateImportResult)
+  SaveCandidateImportResult({ dispatch }: StateContext<CandidateStateModel>, { payload }: SaveCandidateImportResult): Observable<CandidateImportResult | Observable<void>> {
+    return this.candidateService.saveCandidateImportResult(payload).pipe(
+      tap((payload) => {
+        dispatch(new SaveCandidateImportResultSucceeded(payload));
+        return payload;
+      }),
+      catchError(() => of(dispatch(new ShowToast(MessageTypes.Error, 'Candidates were not imported'))))
     );
   }
 }

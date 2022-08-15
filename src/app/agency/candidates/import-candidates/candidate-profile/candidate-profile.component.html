@@ -1,0 +1,11 @@
+<div class="grid-container" *ngIf="candidateProfile">
+  <div class="grid-title">Candidate Profile</div>
+  <app-grid
+    (gridReadyEmitter)="gridReady($event)"
+    [suppressRowClickSelection]="true"
+    [columnDefinitions]="columnDefs"
+    [rowData]="[candidateProfile]"
+    [totalRecordsCount]="1"
+    [paginationPanel]="false"
+  ></app-grid>
+</div>

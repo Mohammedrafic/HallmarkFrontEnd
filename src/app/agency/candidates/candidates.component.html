@@ -36,6 +36,7 @@
 
 <section>
   <app-candidate-list
+    #candidateList
     [filteredItems$]="filteredItems$"
     [export$]="exportUsers$"
     [search$]="search$"
@@ -44,4 +45,4 @@
   ></app-candidate-list>
 </section>
 
-<app-import-candidates [openEvent]="openImportDialog$"></app-import-candidates>
+<app-import-candidates [openEvent]="openImportDialog$" (reloadCandidateList)="reloadCandidatesList()"></app-import-candidates>

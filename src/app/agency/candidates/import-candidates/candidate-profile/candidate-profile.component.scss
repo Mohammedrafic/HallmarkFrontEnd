@@ -1,0 +1,12 @@
+@import "colors.scss";
+
+.grid-container {
+  height: 123px;
+
+  .grid-title {
+    margin: 24px 0 12px;
+    color: $black;
+    font-size: 14px;
+    font-weight: 700;
+  }
+}

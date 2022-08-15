@@ -1,9 +1,10 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
 import { Observable, Subject } from 'rxjs';
 import { ShowExportDialog, ShowFilterDialog } from 'src/app/store/app.actions';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
+import { CandidateListComponent } from "@shared/components/candidate-list/components/candidate-list/candidate-list.component";
 import { ExportedFileType } from '@shared/enums/exported-file-type';
 
 @Component({
@@ -12,6 +13,8 @@ import { ExportedFileType } from '@shared/enums/exported-file-type';
   styleUrls: ['./candidates.component.scss'],
 })
 export class CandidatesComponent extends AbstractGridConfigurationComponent implements OnDestroy {
+  @ViewChild('candidateList') candidateList: CandidateListComponent;
+
   public includeDeployedCandidates$: Subject<boolean> = new Subject<boolean>();
   public filteredItems$ = new Subject<number>();
   public search$ = new Subject<string>();
@@ -29,6 +32,10 @@ export class CandidatesComponent extends AbstractGridConfigurationComponent impl
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  public reloadCandidatesList(): void {
+    this.candidateList?.dispatchNewPage();
   }
 
   public onImport(): void {

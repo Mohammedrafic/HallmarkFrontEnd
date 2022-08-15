@@ -245,6 +245,19 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.clearSelection(this.grid);
   }
 
+  public dispatchNewPage(): void {
+    const candidateListRequest: CandidateListRequest = {
+      orderBy: '',
+      pageNumber: this.currentPage,
+      pageSize: this.pageSize,
+      profileStatuses: this.filters.profileStatuses!,
+      skillsIds: this.filters.skillsIds!,
+      regionsIds: this.filters.regionsIds!,
+      includeDeployedCandidates: this.includeDeployedCandidates,
+    };
+    this.store.dispatch(new GetCandidatesByPage(candidateListRequest));
+  }
+
   private updateCandidates(): void {
     this.candidates$ = this._candidates$.pipe(
       map((value: CandidateList) => {
@@ -285,19 +298,6 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     this.currentPage = 1;
     this.filters = {};
     this.filteredItems$.next(this.filteredItems.length);
-  }
-
-  private dispatchNewPage(): void {
-    const candidateListRequest: CandidateListRequest = {
-      orderBy: '',
-      pageNumber: this.currentPage,
-      pageSize: this.pageSize,
-      profileStatuses: this.filters.profileStatuses!,
-      skillsIds: this.filters.skillsIds!,
-      regionsIds: this.filters.regionsIds!,
-      includeDeployedCandidates: this.includeDeployedCandidates,
-    };
-    this.store.dispatch(new GetCandidatesByPage(candidateListRequest));
   }
 
   private candidateFilterSetup(): void {
