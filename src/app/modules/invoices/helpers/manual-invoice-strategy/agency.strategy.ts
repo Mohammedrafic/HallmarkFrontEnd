@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { map, Observable, zip } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { map, Observable, distinctUntilChanged, debounceTime, zip } from 'rxjs';
 import { Actions, ofActionCompleted, Store } from '@ngxs/store';
 
 import { CustomFormGroup, DropdownOption } from '@core/interface';

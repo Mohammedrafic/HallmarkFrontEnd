@@ -1,15 +1,16 @@
 import { Component, ChangeDetectionStrategy, ViewChild, ElementRef, Input, Output,
-  EventEmitter, ChangeDetectorRef } from '@angular/core';
+  EventEmitter, ChangeDetectorRef, OnInit } from '@angular/core';
 
 import { RemovingEventArgs, SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
 import { UploaderComponent } from '@syncfusion/ej2-angular-inputs';
-import { Store } from '@ngxs/store';
+import { Actions, Store, ofActionDispatched } from '@ngxs/store';
 
 import { FileAdapter } from '@core/helpers/adapters';
 import { FileForUpload } from '@core/interface';
 import { AllowedFileExtensions } from './file-uploader.constant';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
+import { Invoices } from '../../store/actions/invoices.actions';
 
 @Component({
   selector: 'app-file-uploader',
@@ -17,7 +18,7 @@ import { MessageTypes } from '@shared/enums/message-types';
   styleUrls: ['./file-uploader.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FileUploaderComponent {
+export class FileUploaderComponent implements OnInit {
   @ViewChild('droparea') protected droparea: ElementRef<HTMLDivElement>;
 
   @ViewChild('uploadArea') protected uploadArea: ElementRef<HTMLDivElement>;
@@ -38,8 +39,13 @@ export class FileUploaderComponent {
 
   constructor(
     private store: Store,
+    private actions$: Actions,
     private cd: ChangeDetectorRef,
   ) {}
+
+  ngOnInit(): void {
+    this.watchForClearEvent();
+  }
 
   public browseFiles(): void {
     this.uploadArea.nativeElement
@@ -69,5 +75,14 @@ export class FileUploaderComponent {
   private setFiles(event: SelectedEventArgs): void {
     this.files = [...this.files, ...FileAdapter.adaptRawEventFiles(event.filesData)];
     this.uploadFilesChanged.emit(this.files);
+  }
+
+  private watchForClearEvent(): void {
+    this.actions$.pipe(
+      ofActionDispatched(Invoices.ClearAttachments),
+    )
+    .subscribe(() => {
+      this.fileUploader.clearAll();
+    });
   }
 }

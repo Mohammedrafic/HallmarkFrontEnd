@@ -70,3 +70,17 @@ export type InvoiceFilterColumns = {
 export type InvoicesFilteringOptions = {
   [key in FilteringOptionsFields]: DataSourceItem[];
 }
+
+export interface ManualInvoiceTimesheetResponse {
+  id: number;
+  dateTime: string;
+  amount: number;
+  departmentId: number;
+  organizationId: number;
+  comment: string;
+  manualInvoiceCreationReasonId: number;
+  vendorFeeApplicable: boolean;
+  calculationDescription: string,
+  timesheetId: number;
+  invoiceId: number;
+}

@@ -19,6 +19,7 @@ export enum INVOICES_ACTIONS {
   GetOrganizations = '[invoices] Get organizations',
   GetOrganizationStructure = '[invoices] Get organization structure',
   SelectOrganization = '[invoices] Select another organization',
+  ClearManInvoiceAttachments = '[invoices] clear manual invoice attachments',
 }
 
 export enum InvoicesTableFiltersColumns {
