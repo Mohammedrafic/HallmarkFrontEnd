@@ -41,7 +41,6 @@ import { InvoicesFiltersDialogComponent } from './components/invoices-filters-di
 import { InvoicesApiService } from './services/invoices-api.service';
 import { InvoicesTableTabsComponent } from './components/invoices-table-tabs/invoices-table-tabs.component';
 import { AddDialogHelperService } from '@core/services';
-import { InvoiceApiService } from './services/invoice-api.service';
 import { FileUploaderModule } from '@shared/components/file-uploader/file-uploader.module';
 import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
 import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper.service';
@@ -110,7 +109,6 @@ import { InvoicesTableFiltersColumns } from './enums/invoices.enum';
     InvoicesApiService,
     ChipsCssClass,
     AddInvoiceService,
-    InvoiceApiService,
     FiltersDialogHelper,
     {
       provide: AddDialogHelperService,
