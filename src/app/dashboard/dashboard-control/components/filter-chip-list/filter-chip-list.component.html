@@ -3,7 +3,7 @@
     <div class="filter-chips__list" #resize>
       <div class="filter-chips__applied-filters">Applied Filters: {{ items.length ? '' : 'None' }}</div>
       <div class="filter-chips__container" *ngFor="let filter of chipList">
-        <div class="filter-chips__item" *ngIf="!!filter.value; else filterName">
+        <div class="filter-chips__item" *ngIf="filter.hasOwnProperty('value'); else filterName">
           <ejs-chiplist [chips]="[filter]" enableDelete="true" (delete)="deleteChip($event)"></ejs-chiplist>
         </div>
         <ng-template #filterName><span class="filter-chips__title">{{ filter }}</span></ng-template>

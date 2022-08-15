@@ -9,7 +9,7 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { FilterService } from '@shared/services/filter.service';
-import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
+import { DashboardFiltersModel, FilterName } from 'src/app/dashboard/models/dashboard-filters.model';
 import { IFilterColumnsDataModel } from 'src/app/dashboard/models/widget-filter.model';
 import { SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
@@ -34,6 +34,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   @Input() public dashboardFilterState: DashboardFiltersModel;
   @Input() public organizationStructure: OrganizationStructure;
   @Input() public allSkills: AllOrganizationsSkill[];
+  @Input() public orderedFilters: Record<FilterName, FilteredItem[]>;
 
   @Select(UserState.organizationStructure) private readonly organizationStructure$: Observable<OrganizationStructure>;
 
@@ -48,6 +49,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   public widgetFilterFormGroup: FormGroup;
   public filterColumns: IFilterColumnsDataModel = {} as IFilterColumnsDataModel;
+  public orderedFilterChips: (string | FilteredItem)[][] = [];
   public readonly optionFields = {
     text: 'name',
     value: 'id',
@@ -106,6 +108,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     changes['organizationStructure'] && this.onOrganizationStructureDataLoadHandler();
     changes['userIsAdmin'] && this.setupAdminFilter();
     changes['allOrganizations'] && this.onAllOrganizationsDataLoadHandler();
+    changes['orderedFilters'] && this.orderChipList();
   }
 
   private setupAdminFilter(): void {
@@ -329,5 +332,9 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
         .pipe(takeUntil(this.destroy$), filter(Boolean), debounceTime(300))
         .subscribe(() => this.setFormControlValue());
     }
+  }
+
+  private orderChipList(): void {
+    this.orderedFilterChips = Object.entries(this.orderedFilters).map((item) => item.flat()); 
   }
 }
