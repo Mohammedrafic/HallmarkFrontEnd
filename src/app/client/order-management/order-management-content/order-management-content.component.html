@@ -111,6 +111,7 @@
               <span><i-feather [name]="data.isLocked ? 'lock' : 'unlock'" class="icon"></i-feather></span>
             </button>
             <button
+              (click)="$event.stopPropagation()"
               ejs-dropdownbutton
               [items]="
                 (data.orderCloseDate && closedOrderMenu) ||
