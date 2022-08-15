@@ -77,6 +77,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public isFirstSelected = true;
 
+  public readonly modeValues = RecordsMode;
+
   public recordsToShow: TimesheetRecordsDto;
 
   public currentMode: RecordsMode = RecordsMode.View;
