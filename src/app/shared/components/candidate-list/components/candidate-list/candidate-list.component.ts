@@ -355,12 +355,12 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
 
   private subscribeOnExportAction(): void {
     this.export$.pipe(takeWhile(() => this.isAlive)).subscribe((event: ExportedFileType) => {
-      this.defaultFileName = `Candidate List/${this.generateDateTime(this.datePipe)}`;
+      this.defaultFileName = `Candidates ${this.generateDateTime(this.datePipe)}`;
       this.defaultExport(event);
     });
   }
 
   private setFileName(): void {
-    this.fileName = `Candidate List/${this.generateDateTime(this.datePipe)}`;
+    this.fileName = `Candidates ${this.generateDateTime(this.datePipe)}`;
   }
 }
