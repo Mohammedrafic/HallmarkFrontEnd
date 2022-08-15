@@ -148,9 +148,6 @@
             <div>
               <b>
                 <span *ngIf="activeTab === OrganizationOrderManagementTabs.OrderTemplates">
-                  {{ data.id }}
-                </span>
-                <span *ngIf="activeTab !== OrganizationOrderManagementTabs.OrderTemplates">
                   {{ data.organizationPrefix }}-{{ data.publicId }}
                 </span>
               </b>

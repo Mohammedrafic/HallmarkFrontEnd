@@ -37,13 +37,10 @@ export class ExtensionSidebarComponent implements OnInit {
   public extensionForm: FormGroup;
   public comments: Comment[] = [];
 
-  public constructor(
-    public formBuilder: FormBuilder,
-    private extensionSidebarService: ExtensionSidebarService,
-  ) {}
+  public constructor(public formBuilder: FormBuilder, private extensionSidebarService: ExtensionSidebarService) {}
 
   public ngOnInit(): void {
-    this.minDate = new Date(this.candidateJob?.actualEndDate);
+    this.minDate = addDays(this.candidateJob?.actualEndDate, 1)!;
     this.initExtensionForm();
     this.listenPrimaryDuration();
     this.listenDurationChanges();

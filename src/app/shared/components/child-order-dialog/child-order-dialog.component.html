@@ -12,7 +12,9 @@
       <section class="header-container">
         <div class="e-card-header preview-header">
           <div class="e-card-header-caption">
-            <h3 class="e-card-title preview-title">Position ID {{ order?.organizationPrefix }}-{{ order?.publicId }}-{{ candidate?.positionId }}</h3>
+            <h3 class="e-card-title preview-title">
+              Position ID {{ order?.organizationPrefix }}-{{ order?.publicId }}-{{ candidate?.positionId }}
+            </h3>
             <div class="order-statuses">
               <ejs-chiplist #chipList class="events-off" *ngIf="candidate?.orderStatus">
                 <e-chips>
@@ -26,7 +28,7 @@
           </div>
           <div class="e-card-content dialog-controls">
             <app-button
-              *ngIf="isAddExtensionBtnAvailable"
+              *ngIf="isAddExtensionBtnAvailable && !order?.hasExtensions"
               (clickEmitter)="showExtensionDialog()"
               [type]="buttonTypeEnum.OUTLINED"
               [disabled]="candidate?.orderStatus === orderStatus.InProgressOfferAccepted"
@@ -58,20 +60,15 @@
                       <app-general-order-info [orderInformation]="currentOrder"></app-general-order-info>
                     </section>
                     <hr />
-                    <ng-container *ngIf="currentOrder?.orderClosureReasonId">
-                      <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
-                      <hr />
-                    </ng-container>
-                    <ng-container *ngIf="currentOrder?.orderClosureReason">
-                      <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
-                      <hr />
-                    </ng-container>
-                    <ng-container *ngIf="currentOrder?.orderClosureReason">
-                      <app-order-close-reason-info [orderInformation]="currentOrder"></app-order-close-reason-info>
+                    <ng-container *ngIf="currentOrder?.orderClosureReasonId || candidate?.positionClosureReasonId">
+                      <app-order-close-reason-info
+                        [candidate]="candidate"
+                        [orderInformation]="currentOrder">
+                      </app-order-close-reason-info>
                       <hr />
                     </ng-container>
                     <app-order-details [isPosition]="true" [currentOrder]="currentOrder"></app-order-details>
-                  </section>
+                </section>
               </ng-template>
             </e-tabitem>
 
@@ -139,14 +136,20 @@
                             </ejs-accordion>
                           </div>
                           <div class="comments">
-                            <app-comments *ngIf="candidateJob" [comments]="comments" [commentContainerId]="candidateJob.commentContainerId || 0"></app-comments>
+                            <app-comments
+                              *ngIf="candidateJob"
+                              [comments]="comments"
+                              [commentContainerId]="candidateJob.commentContainerId || 0"
+                            ></app-comments>
                           </div>
                         </section>
 
                         <section class="bill-rates">
-                          <app-bill-rates [billRates]="candidateJob?.billRates || []"
-                                          [isActive]="true"
-                                          (billRatesChanged)="onBillRatesChanged($event)">
+                          <app-bill-rates
+                            [billRates]="candidateJob?.billRates || []"
+                            [isActive]="true"
+                            (billRatesChanged)="onBillRatesChanged($event)"
+                          >
                           </app-bill-rates>
                         </section>
                       </section>
@@ -179,7 +182,7 @@
               </ng-template>
             </e-tabitem>
 
-            <e-tabitem>
+            <e-tabitem *ngIf="order?.orderType === orderType.ContractToPerm || order?.orderType === orderType.Traveler">
               <ng-template #headerText>Extensions</ng-template>
               <ng-template #content>
                 <section class="order-details" *ngIf="selectedOrder$ | async as currentOrder">

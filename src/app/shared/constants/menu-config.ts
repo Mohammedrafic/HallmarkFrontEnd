@@ -147,6 +147,16 @@ export const MENU_CONFIG: any = {
       icon: 'file-text',
       route: 'client/candidates',
     },
+    35: {
+      // Candidate Details
+      icon: '',
+      route: 'agency/candidate-details',
+    },
+    37: {
+      // Candidate Details
+      icon: 'users',
+      route: 'client/candidate-details',
+    },
     40: {
       // Custom Reports
       icon: 'pie-chart',
@@ -287,6 +297,16 @@ export const MENU_CONFIG: any = {
       // User List
       icon: '',
       route: 'security/user-list',
+    },
+    35: {
+      // Candidate Details
+      icon: 'users',
+      route: 'agency/candidate-details',
+    },
+    37: {
+      // Candidate Details
+      icon: 'users',
+      route: 'agency/candidate-details',
     },
     40: {
       // Custom Reports
@@ -445,6 +465,11 @@ export const MENU_CONFIG: any = {
       icon: 'file-text',
       route: 'client/candidates',
     },
+    37: {
+      // Candidate Details
+      icon: 'users',
+      route: 'client/candidate-details',
+    },
     40: {
       // Custom Reports
       icon: 'pie-chart',
@@ -601,6 +626,11 @@ export const MENU_CONFIG: any = {
       // User List
       icon: '',
       route: 'security/user-list',
+    },
+    35: {
+      // Candidate Details
+      icon: 'users',
+      route: 'agency/candidate-details',
     },
     40: {
       // Custom Reports

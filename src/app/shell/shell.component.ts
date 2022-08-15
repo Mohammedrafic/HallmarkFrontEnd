@@ -3,7 +3,12 @@ import { Router } from '@angular/router';
 
 import { Select, Store } from '@ngxs/store';
 import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
-import { ContextMenuComponent, NodeSelectEventArgs, SidebarComponent, TreeViewComponent } from '@syncfusion/ej2-angular-navigations';
+import {
+  ContextMenuComponent,
+  NodeSelectEventArgs,
+  SidebarComponent,
+  TreeViewComponent,
+} from '@syncfusion/ej2-angular-navigations';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
 import { AppState } from 'src/app/store/app.state';
@@ -36,12 +41,12 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   sideBarMenu: MenuItem[];
   sideBarMenuField: Object;
   activeMenuItemData: MenuItem;
-  public userLogin:{firstName:string, lastName:string};
+  public userLogin: { firstName: string; lastName: string };
 
   private unsubscribe$: Subject<void> = new Subject();
 
   @ViewChild('sidebar') sidebar: SidebarComponent;
-  @ViewChild ('treevalidate') tree: TreeViewComponent;
+  @ViewChild('treevalidate') tree: TreeViewComponent;
   @ViewChild('contextmenu') contextmenu: ContextMenuComponent;
   @ViewChild('searchInputContainer')
   public searchInputContainer: ElementRef;
@@ -80,25 +85,22 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   @Select(AppState.isOrganizationAgencyArea)
   isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
   profileDatasource: ItemModel[] = [
+    { text: 'Edit Profile', id: '0', iconCss: 'e-ddb-icons e-settings' },
 
-    { text: "Edit Profile", id: '0', iconCss: 'e-ddb-icons e-settings' },
-
-    { text: "LogOut", id: '1', iconCss: 'e-ddb-icons e-logout' }
-
+    { text: 'LogOut', id: '1', iconCss: 'e-ddb-icons e-logout' },
   ];
 
-  constructor(private store: Store,
-              private router: Router) { }
-  
+  constructor(private store: Store, private router: Router) {}
+
   ngOnInit(): void {
-    this.isDarkTheme$.pipe(takeUntil(this.unsubscribe$)).subscribe(isDark => {
+    this.isDarkTheme$.pipe(takeUntil(this.unsubscribe$)).subscribe((isDark) => {
       this.isDarkTheme = isDark;
       this.setTheme(isDark);
     });
     this.initSidebarFields();
     this.user$.pipe(takeUntil(this.unsubscribe$)).subscribe((user: User) => {
       if (user) {
-        this.userLogin = user; 
+        this.userLogin = user;
         this.store.dispatch(new GetUserMenuConfig(user.businessUnitType));
       }
     });
@@ -110,9 +112,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   }
 
   onSelectProfileMenu(event: any) {
-
     switch (Number(event.item.properties.id)) {
-
       case 0:
         break;
 
@@ -120,15 +120,12 @@ export class ShellPageComponent implements OnInit, OnDestroy {
         this.logout();
         break;
     }
-
   }
-
-  
 
   onSideBarCreated(): void {
     // code placed here since this.sidebar = undefined in ngOnInit() as sidebar not creates in time
-    this.isSideBarDocked$.pipe(takeUntil(this.unsubscribe$)).subscribe(isDocked => this.sidebar.isOpen = isDocked);
-    this.isFirstLoad$.pipe(takeUntil(this.unsubscribe$)).subscribe(isFirstLoad => {
+    this.isSideBarDocked$.pipe(takeUntil(this.unsubscribe$)).subscribe((isDocked) => (this.sidebar.isOpen = isDocked));
+    this.isFirstLoad$.pipe(takeUntil(this.unsubscribe$)).subscribe((isFirstLoad) => {
       this.isFirstLoad = isFirstLoad;
       if (isFirstLoad) {
         // TODO: Should be decided after Login: CLIENT_SIDEBAR_MENU, ADMIN_SIDEBAR_MENU etc.
@@ -168,7 +165,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     if (args.node.classList.contains('e-level-1') && this.sidebar.isOpen) {
       this.tree.collapseAll();
       this.tree.expandAll([args.node]);
-      this.tree.expandOn = 'None'
+      this.tree.expandOn = 'None';
     }
   }
 
@@ -188,10 +185,11 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     if (data.children && data.children.length > 0 && !this.sidebar.isOpen) {
       this.activeMenuItemData = data;
       const boundingRectangle = event.target.getBoundingClientRect();
-      this.contextmenu.items = data.children.map((child: any) => {
-        child.text = child.title;
-        return child;
-      }) || [];
+      this.contextmenu.items =
+        data.children.map((child: any) => {
+          child.text = child.title;
+          return child;
+        }) || [];
 
       // workaround to eliminate UI glitch with context menu resizing
       setTimeout(() => this.contextmenu.open(boundingRectangle.top, parseInt(this.dockSize)));
@@ -202,7 +200,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
     if (!this.sidebar.isOpen) {
       event.items.forEach((item: any) => {
         if (item.route === this.router.url && item.id) {
-          const contextMenuItem = document.getElementById(item.id)
+          const contextMenuItem = document.getElementById(item.id);
           if (contextMenuItem) {
             // added left colored border
             contextMenuItem.classList.add('e-selected');
@@ -224,9 +222,8 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   }
 
   public onGetHelp(): void {
-    window.open('https://helpdocumentation.azurewebsites.net/', "_blank");
+    window.open('https://helpdocumentation.azurewebsites.net/', '_blank');
   }
-
 
   private setSideBarForFirstLoad(route: string): void {
     if (this.isFirstLoad && route !== this.router.url) {
@@ -243,50 +240,38 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   public onSearchFocus(): void {
     this.searchHeight = 100;
     this.isSearching = true;
-   
+
     if (this.isMaximized) {
       this.searchInput?.nativeElement?.focus();
     } else {
-        this.searchMenuInstance.setFocus();
+      this.searchMenuInstance.setFocus();
     }
   }
 
   public onSearchChange(): void {
-
-    this.searchResult = this.getData(this.searchString.toLowerCase())  
- 
+    this.searchResult = this.getData(this.searchString.toLowerCase());
   }
 
   getData(searchText: string) {
-
     const menuItems = [...this.sideBarMenu];
 
-    return this.getValueLogic(menuItems, searchText)
-
+    return this.getValueLogic(menuItems, searchText);
   }
 
   getValueLogic(data: any, filterText: string) {
-
     const arr: any = [];
 
     if (data && Array.isArray(data)) {
-
       for (let i = 0; i < data.length; i++) {
-
         const ele = data[i];
 
         ele && ele.title.toLowerCase().includes(filterText.toLocaleLowerCase())
-
           ? arr.push(ele)
-
           : arr.push(...this.getValueLogic(ele.children, filterText));
-
       }
-
     }
 
     return arr;
-
   }
 
   public onSearchFocusOut(): void {

@@ -44,13 +44,18 @@ export class LineChartComponent extends AbstractSFComponentDirective<ChartCompon
     minimum: 0,
     majorGridLines: { width: 1, dashArray: '5' },
     lineStyle: { width: 0 },
+    labelStyle: { fontFamily: 'Open Sans', size: '14px', color: 'var(--secondary-dark-blue-20)' }
   };
 
   public readonly chartArea: ChartAreaModel = { border: { width: 0 } };
   public readonly legendShape: string = 'Circle';
   public readonly lineWidthInPixels: number = 3;
   public readonly positionTypeEnum: typeof PositionTrendTypeEnum = PositionTrendTypeEnum;
-  public readonly primaryXAxis: AxisModel = { valueType: 'Category', majorGridLines: { width: 0 } };
+  public readonly primaryXAxis: AxisModel = { 
+    valueType: 'Category',
+    majorGridLines: { width: 0 },
+    labelStyle: { fontFamily: 'Open Sans', size: '14px', color: 'var(--secondary-dark-blue-20)' }
+  };
   public readonly xAxisName: keyof PositionByTypeDataModel = 'month';
   public readonly yAxisName: keyof PositionByTypeDataModel = 'value';
   public readonly type: string = 'Spline';

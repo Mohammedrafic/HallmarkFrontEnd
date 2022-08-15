@@ -33,15 +33,27 @@
     <ng-template #detailTemplate let-data>
       <table class="detailtable" width="100%">
         <colgroup>
-          <col width="400">
-          <col width="150">
-          <col width="150">
-          <col width="150">
-          <col width="400">
           <col width="120">
+          <col width="400">
+          <col width="150">
+          <col width="150">
+          <col width="150">
+          <col width="400">
         </colgroup>
         <tbody>
         <tr *ngFor="let child of data.children">
+          <td class="e-rowcell e-templatecell">
+            <div class="row-tool-buttons">
+              <button
+                ejs-button
+                cssClass="e-flat primary-icon-button"
+                (click)="onEditButtonClick(data, child, $event)"
+                [disabled]="!hasAccess"
+              >
+                <span class="edit-button" ><i-feather name="edit" class="icon"></i-feather></span>
+              </button>
+            </div>
+          </td>
           <td class="e-rowcell e-templatecell"></td>
           <td class="e-rowcell e-templatecell">{{child.regionName}}</td>
           <td class="e-rowcell e-templatecell">{{child.locationName}}</td>
@@ -58,18 +70,6 @@
             </span>
             <span *ngIf="data.controlType === organizationSettingControlType.Text">{{child.value}}</span>
             <span *ngIf="data.controlType === organizationSettingControlType.DateTime">{{child.value | date: 'MM/dd/yyyy'}}</span>
-          </td>
-          <td class="e-rowcell e-templatecell">
-            <div class="row-tool-buttons">
-              <button
-                ejs-button
-                cssClass="e-flat primary-icon-button"
-                (click)="onEditButtonClick(data, child, $event)"
-                [disabled]="!hasAccess"
-              >
-                <span class="edit-button" ><i-feather name="edit" class="icon"></i-feather></span>
-              </button>
-            </div>
           </td>
         </tr>
         </tbody>

@@ -1,11 +1,12 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Subject } from 'rxjs';
 import { SetHeaderState, ShowFilterDialog } from 'src/app/store/app.actions';
 import { AgencyOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { AbstractGridConfigurationComponent } from '@shared/components/abstract-grid-configuration/abstract-grid-configuration.component';
 import { SearchComponent } from '@shared/components/search/search.component';
-import { TabNavigationComponent } from "@client/order-management/order-management-content/tab-navigation/tab-navigation.component";
+import { TabNavigationComponent } from '@client/order-management/order-management-content/tab-navigation/tab-navigation.component';
+import { GetAgencyFilterOptions } from '@agency/store/order-management.actions';
 
 @Component({
   selector: 'app-order-management',
@@ -16,7 +17,6 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
   @ViewChild('search') search: SearchComponent;
   @ViewChild('tabNavigation') tabNavigation: TabNavigationComponent;
 
-
   public selectedTab: AgencyOrderManagementTabs;
   public selectedTabCases = AgencyOrderManagementTabs;
   public filteredItems$ = new Subject<number>();
@@ -24,9 +24,7 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
   public search$ = new Subject<string>();
   private unsubscribe$: Subject<void> = new Subject();
 
-  constructor(
-    private store: Store
-  ) {
+  constructor(private store: Store) {
     super();
     this.store.dispatch(new SetHeaderState({ title: 'Order Management', iconName: 'file-text' }));
   }
@@ -43,6 +41,7 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
 
   public showFilters(): void {
     this.store.dispatch(new ShowFilterDialog(true));
+    this.store.dispatch(new GetAgencyFilterOptions());
   }
 
   public onExportSelected(event: any): void {
@@ -55,6 +54,5 @@ export class OrderManagementComponent extends AbstractGridConfigurationComponent
 
   onSelectTab(tab: number): void {
     this.tabNavigation.tabNavigation.select(tab);
-
   }
 }

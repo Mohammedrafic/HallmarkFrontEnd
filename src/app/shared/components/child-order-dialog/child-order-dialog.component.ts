@@ -31,10 +31,10 @@ import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.
 import { GetAgencyExtensions, GetCandidateJob, GetOrderApplicantsData } from '@agency/store/order-management.actions';
 import {
   GetAvailableSteps,
+  GetExtensions,
   GetOrganisationCandidateJob,
   ReloadOrganisationOrderCandidatesLists,
   UpdateOrganisationCandidateJob,
-  GetExtensions
 } from '@client/store/order-managment-content.actions';
 import { OrderManagementContentState } from '@client/store/order-managment-content.state';
 import { OrderStatusText } from '@shared/enums/status';
@@ -43,11 +43,10 @@ import { ShowCloseOrderDialog } from '../../../store/app.actions';
 import { OrderStatus } from '@shared/enums/order-management';
 import { CommentsService } from '@shared/services/comments.service';
 import { Comment } from '@shared/models/comment.model';
-import { BillRate } from "@shared/models";
-import { toCorrectTimezoneFormat } from "@shared/utils/date-time.utils";
+import { BillRate } from '@shared/models';
+import { addDays, toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { ButtonTypeEnum } from '@shared/components/button/enums/button-type.enum';
 import { ExtensionSidebarComponent } from '@shared/components/extension/extension-sidebar/extension-sidebar.component';
-import { addDays } from '@shared/utils/date-time.utils';
 import { AppState } from '../../../store/app.state';
 
 enum Template {
@@ -216,7 +215,6 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
             clockId: this.candidateJob?.clockId,
             guaranteedWorkWeek: this.candidateJob?.guaranteedWorkWeek,
             billRates: this.getBillRateForUpdate(bill),
-
           })
         )
         .subscribe(() => {
@@ -227,7 +225,9 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
 
   getBillRateForUpdate(value: BillRate): BillRate[] {
     let billRates;
-    const existingBillRateIndex = this.candidateJob?.billRates.findIndex(billRate => billRate.id === value.id) as number;
+    const existingBillRateIndex = this.candidateJob?.billRates.findIndex(
+      (billRate) => billRate.id === value.id
+    ) as number;
     if (existingBillRateIndex > -1) {
       this.candidateJob?.billRates.splice(existingBillRateIndex, 1, value);
       billRates = this.candidateJob?.billRates;
@@ -236,7 +236,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
         this.candidateJob?.billRates.splice(value, 1);
         billRates = this.candidateJob?.billRates;
       } else {
-        billRates = [...this.candidateJob?.billRates as BillRate[], value];
+        billRates = [...(this.candidateJob?.billRates as BillRate[]), value];
       }
     }
 
@@ -278,8 +278,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     const dateAvailable = candidate.closeDate
       ? addDays(candidate.closeDate, 14)?.getTime()! >= new Date().getTime()
       : true;
-    this.isAddExtensionBtnAvailable =
-      this.isOrganization && isOrderTravelerOrContractToPerm && isOrderFilledOrProgress && dateAvailable;
+    this.isAddExtensionBtnAvailable = this.isOrganization && isOrderFilledOrProgress && dateAvailable;
   }
 
   private getTemplate(): void {
@@ -308,6 +307,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
           ApplicantStatus.Shortlisted,
           ApplicantStatus.PreOfferCustom,
           ApplicantStatus.Offered,
+          ApplicantStatus.Offboard,
         ];
         const allowedOnboardedStatuses = [ApplicantStatus.Accepted, ApplicantStatus.OnBoarded];
 
