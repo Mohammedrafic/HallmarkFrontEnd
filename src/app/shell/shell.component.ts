@@ -15,11 +15,13 @@ import { AppState } from 'src/app/store/app.state';
 import { SIDEBAR_CONFIG } from '../client/client.config';
 import { Menu, MenuItem } from '../shared/models/menu.model';
 import { User } from '../shared/models/user.model';
-import { SetHeaderState, SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
+import { SetIsFirstLoadState, ToggleSidebarState, ToggleTheme } from '../store/app.actions';
 import { GetUserMenuConfig, LogoutUser } from '../store/user.actions';
 import { UserState } from '../store/user.state';
-import { ItemModel, MenuEventArgs, BeforeOpenCloseMenuEventArgs } from '@syncfusion/ej2-angular-splitbuttons';
+import { ItemModel } from '@syncfusion/ej2-angular-splitbuttons';
 import { SearchMenuComponent } from './components/search-menu/search-menu.component';
+import { OrderManagementService } from "@client/order-management/order-management-content/order-management.service";
+import { OrderManagementAgencyService } from "@agency/order-management/order-management-agency.service";
 enum THEME {
   light = 'light',
   dark = 'dark',
@@ -89,10 +91,19 @@ export class ShellPageComponent implements OnInit, OnDestroy {
 
     { text: 'LogOut', id: '1', iconCss: 'e-ddb-icons e-logout' },
   ];
+  private routers: Array<string> = ['Organization/Order Management', 'Agency/Order Management'];
 
-  constructor(private store: Store, private router: Router) {}
+  constructor(
+    private store: Store,
+    private router: Router,
+    private orderManagementService: OrderManagementService,
+    private orderManagementAgencyService: OrderManagementAgencyService,
+  ) {
+
+  }
 
   ngOnInit(): void {
+    this.subsToOrderAgencyIds();
     this.isDarkTheme$.pipe(takeUntil(this.unsubscribe$)).subscribe((isDark) => {
       this.isDarkTheme = isDark;
       this.setTheme(isDark);
@@ -109,6 +120,11 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
+  }
+
+  subsToOrderAgencyIds(): void {
+    this.orderManagementAgencyService.orderMyAgencyId$.subscribe(() => this.tree.selectedNodes = [this.routers[1]]);
+    this.orderManagementService.orderAllOrdersId$.subscribe(() => this.tree.selectedNodes = [this.routers[0]]);
   }
 
   onSelectProfileMenu(event: any) {
@@ -156,7 +172,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
         if (this.router.url === '/') {
           this.router.navigate([this.sideBarMenu[0].route]);
         }
-        this.sideBarMenuField = { dataSource: this.sideBarMenu, id: 'title', text: 'title', child: 'children' };
+        this.sideBarMenuField = { dataSource: this.sideBarMenu, id: 'anch', text: 'title', child: 'children' };
       }
     });
   }
@@ -175,7 +191,7 @@ export class ShellPageComponent implements OnInit, OnDestroy {
   }
 
   onSubMenuItemClick(event: any): void {
-    this.tree.selectedNodes = [this.activeMenuItemData.title];
+    this.tree.selectedNodes = [this.activeMenuItemData.anch];
     this.setSideBarForFirstLoad(event.item.route);
     this.router.navigate([event.item.route]);
   }
