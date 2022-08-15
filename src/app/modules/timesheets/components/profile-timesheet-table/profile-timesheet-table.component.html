@@ -26,7 +26,8 @@
       >
         <i-feather name="plus" class="icon"></i-feather> Add Record
       </button>
-      <ng-container *ngIf="recordsToShow?.[currentTab]?.[currentMode]?.length || isEditOn">
+      <ng-container *ngIf="recordsToShow?.[currentTab]?.[modeValues.View]?.length ||
+      recordsToShow?.[currentTab]?.[modeValues.Edit]?.length || isEditOn">
         <button
           *ngIf="!isEditOn; else editHandlers"
           [disabled]="actionsDisabled"
