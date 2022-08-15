@@ -28,3 +28,7 @@ export enum FieldType {
   Open = 'open',
   Close = 'close',
 }
+
+export enum FilesClearEvent {
+  ClearAll = 'clearAllFiles',
+}
