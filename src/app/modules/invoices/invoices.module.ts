@@ -43,6 +43,10 @@ import { InvoicesTableTabsComponent } from './components/invoices-table-tabs/inv
 import { AddDialogHelperService } from '@core/services';
 import { InvoiceApiService } from './services/invoice-api.service';
 import { FileUploaderModule } from '@shared/components/file-uploader/file-uploader.module';
+import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
+import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper.service';
+import { APP_FILTERS_CONFIG } from '@core/constants/filters-helper.constant';
+import { InvoicesTableFiltersColumns } from './enums/invoices.enum';
 
 @NgModule({
   declarations: [
@@ -107,10 +111,19 @@ import { FileUploaderModule } from '@shared/components/file-uploader/file-upload
     ChipsCssClass,
     AddInvoiceService,
     InvoiceApiService,
+    FiltersDialogHelper,
     {
       provide: AddDialogHelperService,
       useClass: AddInvoiceService,
     },
+    {
+      provide: FiltersDialogHelperService,
+      useClass: InvoicesService,
+    },
+    {
+      provide: APP_FILTERS_CONFIG,
+      useValue: InvoicesTableFiltersColumns,
+    }
   ]
 })
 export class InvoicesModule { }

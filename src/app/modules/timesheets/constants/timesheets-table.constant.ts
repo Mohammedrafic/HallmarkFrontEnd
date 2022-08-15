@@ -167,11 +167,6 @@ export const DefaultTimesheetCollection: TimeSheetsPage = {
   hasPreviousPage: false,
 };
 
-export const filterOptionFields = {
-  text: 'name',
-  value: 'id'
-};
-
 export const filteringOptionsMapping: Map<FilteringOptionsFields, TimesheetsTableFiltersColumns> = new Map()
   .set(FilteringOptionsFields.Agencies, TimesheetsTableFiltersColumns.AgencyIds)
   .set(FilteringOptionsFields.Orders, TimesheetsTableFiltersColumns.OrderIds)

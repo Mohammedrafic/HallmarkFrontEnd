@@ -2,11 +2,15 @@ import { Injectable } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 
 import { Observable } from 'rxjs';
+import { Store } from '@ngxs/store';
 
-import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
-import { CustomFormGroup } from '@core/interface';
+import { OrganizationRegion } from '@shared/models/organization.model';
+import { CustomFormGroup, DataSourceItem } from '@core/interface';
 import { BaseObservable } from '@core/helpers';
+
 import { TimsheetForm } from '../interface';
+import { Timesheets } from '../store/actions/timesheets.actions';
+import { TimesheetsTableFiltersColumns } from '../enums';
 
 @Injectable()
 export class TimesheetsService {
@@ -15,7 +19,10 @@ export class TimesheetsService {
    */
   private currentSelectedTableRowIndex: BaseObservable<number> = new BaseObservable<number>(null as any);
 
-  constructor(private capitalizeFirst: CapitalizeFirstPipe, private fb: FormBuilder,) {
+  constructor(
+    private fb: FormBuilder,
+    private store: Store
+  ) {
   }
 
   public createForm(): CustomFormGroup<TimsheetForm> {
@@ -29,6 +36,13 @@ export class TimesheetsService {
       regionsIds: [[]],
       locationIds: [[]],
     }) as CustomFormGroup<TimsheetForm>;
+  }
+
+  public setDataSourceByFormKey(
+    key: TimesheetsTableFiltersColumns,
+    source: DataSourceItem[] | OrganizationRegion[],
+  ): void {
+    this.store.dispatch(new Timesheets.SetFiltersDataSource(key, source));
   }
 
   /**
