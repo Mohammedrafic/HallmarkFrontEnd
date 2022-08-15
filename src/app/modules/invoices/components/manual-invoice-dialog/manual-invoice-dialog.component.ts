@@ -6,7 +6,7 @@ import { switchMap } from 'rxjs/operators';
 
 import { AddDialogHelper } from '@core/helpers';
 import { CustomFormGroup, FileForUpload } from '@core/interface';
-import { DialogAction } from '@core/enums';
+import { DialogAction, FilesClearEvent } from '@core/enums';
 import { OrganizationLocation, OrganizationDepartment, OrganizationRegion } from '@shared/models/organization.model';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
@@ -30,6 +30,8 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   public readonly dialogConfig: AddManInvoiceDialogConfig = ManualInvoiceDialogConfig(this.isAgency);
 
   public readonly today = new Date();
+
+  public clearFiles: FilesClearEvent | null;
 
   private searchOptions: ManualInvoiceMeta[];
 
@@ -76,7 +78,8 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     this.clearDialog();
     this.dropDownOptions.reasons = [];
     this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Close));
-    this.store.dispatch(new Invoices.ClearAttachments());
+    this.clearFiles = FilesClearEvent.ClearAll;
+    this.cd.markForCheck();
   }
 
   public saveManualInvoice(): void {
@@ -108,6 +111,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       ofActionDispatched(Invoices.ToggleManualInvoiceDialog),
       filter((payload: Invoices.ToggleManualInvoiceDialog) => payload.action === DialogAction.Open),
       tap(() => {
+        this.clearFiles = null;
         this.strategy.connectConfigOptions(this.dialogConfig, this.dropDownOptions);
         this.sideAddDialog.show();
         this.cd.markForCheck();

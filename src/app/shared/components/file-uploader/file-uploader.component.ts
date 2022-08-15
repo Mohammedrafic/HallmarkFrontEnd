@@ -1,16 +1,16 @@
 import { Component, ChangeDetectionStrategy, ViewChild, ElementRef, Input, Output,
-  EventEmitter, ChangeDetectorRef, OnInit } from '@angular/core';
+  EventEmitter, ChangeDetectorRef, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 
 import { RemovingEventArgs, SelectedEventArgs } from '@syncfusion/ej2-angular-inputs';
 import { UploaderComponent } from '@syncfusion/ej2-angular-inputs';
-import { Actions, Store, ofActionDispatched } from '@ngxs/store';
+import { Actions, Store } from '@ngxs/store';
 
 import { FileAdapter } from '@core/helpers/adapters';
 import { FileForUpload } from '@core/interface';
 import { AllowedFileExtensions } from './file-uploader.constant';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
-import { Invoices } from '../../store/actions/invoices.actions';
+import { FilesClearEvent } from '@core/enums';
 
 @Component({
   selector: 'app-file-uploader',
@@ -18,7 +18,7 @@ import { Invoices } from '../../store/actions/invoices.actions';
   styleUrls: ['./file-uploader.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FileUploaderComponent implements OnInit {
+export class FileUploaderComponent implements OnChanges {
   @ViewChild('droparea') protected droparea: ElementRef<HTMLDivElement>;
 
   @ViewChild('uploadArea') protected uploadArea: ElementRef<HTMLDivElement>;
@@ -33,6 +33,8 @@ export class FileUploaderComponent implements OnInit {
 
   @Input() showSelectedFiles: boolean = true;
 
+  @Input() clearAll: FilesClearEvent | null;
+
   @Output() uploadFilesChanged: EventEmitter<FileForUpload[]> = new EventEmitter();
 
   public files: FileForUpload[] = [];
@@ -43,8 +45,11 @@ export class FileUploaderComponent implements OnInit {
     private cd: ChangeDetectorRef,
   ) {}
 
-  ngOnInit(): void {
-    this.watchForClearEvent();
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log(changes)
+    if (changes['clearAll'] && changes['clearAll'].currentValue === FilesClearEvent.ClearAll) {
+      this.fileUploader.clearAll();
+    }
   }
 
   public browseFiles(): void {
@@ -75,14 +80,5 @@ export class FileUploaderComponent implements OnInit {
   private setFiles(event: SelectedEventArgs): void {
     this.files = [...this.files, ...FileAdapter.adaptRawEventFiles(event.filesData)];
     this.uploadFilesChanged.emit(this.files);
-  }
-
-  private watchForClearEvent(): void {
-    this.actions$.pipe(
-      ofActionDispatched(Invoices.ClearAttachments),
-    )
-    .subscribe(() => {
-      this.fileUploader.clearAll();
-    });
   }
 }
