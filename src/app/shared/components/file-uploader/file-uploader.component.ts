@@ -30,6 +30,8 @@ export class FileUploaderComponent {
 
   @Input() maxFileSize: number = 5242880;
 
+  @Input() showSelectedFiles: boolean = true;
+
   @Output() uploadFilesChanged: EventEmitter<FileForUpload[]> = new EventEmitter();
 
   public files: FileForUpload[] = [];

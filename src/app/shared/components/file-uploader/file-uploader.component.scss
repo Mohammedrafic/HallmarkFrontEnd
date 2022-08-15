@@ -4,6 +4,12 @@
   display: none;
 }
 
+.hide-selected-files {
+  .e-upload-files {
+    display: none;
+  }
+}
+
 .droparea {
   height: 118px;
   display: flex;
