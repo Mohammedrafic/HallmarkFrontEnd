@@ -1,8 +1,6 @@
-import { DataSourceItem } from './../../../core/interface/common.interface';
+import { DataSourceItem } from '@core/interface';
 import { PageOfCollections } from '@shared/models/page.model';
-import {DropdownOption} from '@core/interface';
 import {InvoiceFilterColumns, InvoiceRecord, InvoicesFilterState, ManualInvoiceMeta, ManualInvoiceReason} from '../interfaces';
-import { InvoicesTableFiltersColumns } from '../enums/invoices.enum';
 import { OrganizationLocation, OrganizationRegion } from '@shared/models/organization.model';
 
 export interface InvoicesModel {

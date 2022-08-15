@@ -7,9 +7,9 @@ import { switchMap } from 'rxjs/operators';
 import { AddDialogHelper } from '@core/helpers';
 import { CustomFormGroup, FileForUpload } from '@core/interface';
 import { DialogAction } from '@core/enums';
-import { MessageTypes } from '@shared/enums/message-types';
 import { OrganizationLocation, OrganizationDepartment, OrganizationRegion } from '@shared/models/organization.model';
 import { ShowToast } from 'src/app/store/app.actions';
+import { MessageTypes } from '@shared/enums/message-types';
 import { ManualInvoiceDialogConfig } from '../../constants';
 import {
   AddManInvoiceDialogConfig,   AddManInvoiceForm, ManualInvoiceInputOptions,  ManualInvoiceMeta,
@@ -18,7 +18,7 @@ import { Invoices } from '../../store/actions/invoices.actions';
 import { InvoiceConfirmMessages } from '../../constants/messages.constant';
 import { InvoicesState } from "../../store/state/invoices.state";
 import { InvoiceMetaAdapter, InvoicesAdapter, ManualInvoiceAdapter } from '../../helpers';
-import { ManualInvoiceStrategy, ManualInvoiceStrategyMap } from '../../helpers/manual-invoice-strategy';``
+import { ManualInvoiceStrategy, ManualInvoiceStrategyMap } from '../../helpers/manual-invoice-strategy';
 
 @Component({
   selector: 'app-manual-invoice-dialog',
@@ -50,13 +50,19 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   @Select(InvoicesState.invoiceReasons)
   public invoiceReasons$: Observable<ManualInvoiceReason[]>;
 
+  @Select(InvoicesState.selectedOrgId)
+  public selectedOrg$: Observable<number>;
+
   ngOnInit(): void {
     this.strategy = this.injector.get<ManualInvoiceStrategy>(
       ManualInvoiceStrategyMap.get(this.isAgency) as ProviderToken<ManualInvoiceStrategy>);
       
-    this.form = this.addService.createForm() as CustomFormGroup<AddManInvoiceForm>;
+    this.form = this.addService.createForm(this.isAgency) as CustomFormGroup<AddManInvoiceForm>;
 
     this.watchForSearch();
+    this.watchForCandidate();
+    this.watchForLocation();
+    this.watchForAgency();
     this.watchForCandidate();
     this.watchForLocation();
     this.watchForAgency();
@@ -68,7 +74,9 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
   public override closeDialog(): void {
     super.closeDialog();
     this.clearDialog();
+    this.dropDownOptions.reasons = [];
     this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Close));
+    this.store.dispatch(new Invoices.ClearAttachments());
   }
 
   public saveManualInvoice(): void {
@@ -82,11 +90,11 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     const dto = ManualInvoiceAdapter.adapPostDto(this.form.value, this.searchOptions, orgId);
 
     if (!dto) {
-      this.store.dispatch(new ShowToast(MessageTypes.Warning, 'Sorry, such job ID not found'));
+      this.store.dispatch(new ShowToast(MessageTypes.Warning, 'Sorry such job ID not found'));
       return;
     }
 
-    this.store.dispatch(new Invoices.SaveManulaInvoice(dto))
+    this.store.dispatch(new Invoices.SaveManulaInvoice(dto, this.filesForUpload, this.isAgency));
     this.closeDialog();
   }
 
@@ -121,6 +129,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
       )
       .subscribe((data) => {
         this.dropDownOptions.reasons = data;
+        this.cd.markForCheck();
       });
   }
 
@@ -136,13 +145,16 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     .subscribe((value) => {
       const concatedValue = value.replace(/\s/g, '').toLowerCase();
       this.form.get('orderId')?.patchValue(concatedValue, { emitEvent: false, onlySelf: true });
-
+      if (this.isAgency) {
+        this.form.get('unitId')?.patchValue(this.store.snapshot().invoices.selectedOrganizationId);
+      }
       const item = this.searchOptions.find((item) => {
         const concatedInputValue = item.formattedOrderId.replace(/\s/g, '').toLowerCase();
         return concatedInputValue === concatedValue;
       });
       
       if (!item) {
+        this.postionSearch = null;
         this.postionSearch = null;
         const basedOnOrder = this.searchOptions.filter((item) => item.orderId.toString() === concatedValue) || [];
         this.strategy.populateOptions(basedOnOrder, this.dropDownOptions, this.form, this.dialogConfig, false);
@@ -222,6 +234,7 @@ export class ManualInvoiceDialogComponent extends AddDialogHelper<AddManInvoiceF
     this.dropDownOptions.invoiceAgencies = [];
     this.dropDownOptions.invoiceCandidates = [];
     this.dropDownOptions.invoiceDepartments = [];
+    this.filesForUpload = [];
   }
 
   private populateDepartments(id: number): void {

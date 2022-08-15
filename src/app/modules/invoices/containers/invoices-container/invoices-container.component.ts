@@ -110,7 +110,6 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
   }
 
   ngOnInit(): void {
-    
     if (this.isAgency) {
       this.initOrganizationsList();
       this.startOrganizationWatching();
@@ -132,7 +131,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
 
   public openAddDialog(): void {
     this.store.dispatch(new Invoices.ToggleManualInvoiceDialog(DialogAction.Open));
-    this.store.dispatch(new Invoices.GetInvoicesReasons);
+    this.store.dispatch(new Invoices.GetInvoicesReasons(this.organizationControl.value));
   }
 
   public changeFiltersAmount(amount: number): void {

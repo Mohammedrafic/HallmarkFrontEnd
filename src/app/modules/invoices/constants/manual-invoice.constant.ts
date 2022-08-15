@@ -5,16 +5,6 @@ import { AddManInvoiceDialogConfig } from '../interfaces';
 export const ManualInvoiceDialogConfig = (isAgency: boolean): AddManInvoiceDialogConfig => ({
   title: 'Add Manual Invoice',
   fields: [
-    // ...isAgency ? [{
-    //   field: 'unitId',
-    //   title: 'Organization',
-    //   disabled: false,
-    //   required: true,
-    //   type: FieldType.Dropdown,
-    //   widthStyle: FieldWidthStyle.Long,
-    //   optionsStateKey: ManInvoiceOptionsKeys.Organizations,
-    //   options: [],
-    // }] : [],
     {
       field: 'orderId',
       title: 'Order ID | Position ID',
