@@ -14,6 +14,7 @@ import { MasterHolidaysComponent } from './master-data/holidays/holidays.compone
 import { RejectReasonMasterComponent } from "@admin/master-data/reject-reason-master/reject-reason-master.component";
 import { AnalyticsComponent } from './analytics/analytics.component';
 import { ManualInvoiceReasonsComponent } from '@admin/master-data/manual-invoice-reasons/manual-invoice-reasons.component';
+import { AlertsComponent } from './alerts/alerts.component';
 const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
@@ -84,6 +85,10 @@ const routes: Routes = [
       {
         path: 'analytics',
         component: AnalyticsComponent
+      },
+      {
+        path: 'alerts',
+        component: AlertsComponent
       }
     ],
   },

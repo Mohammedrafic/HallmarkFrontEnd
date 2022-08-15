@@ -121,6 +121,7 @@ import { CloseOrderSideDialogComponent } from '@shared/components/close-order-si
 import { OrderCloseReasonInfoComponent } from '@shared/components/order-close-reason-info/order-close-reason-info.component';
 import { CommentComponent } from './components/comments/comment/comment.component';
 import { CommentsState } from './components/comments/store/comments.state';
+import { ToggleSwitchComponent } from './components/toggle-switch/toggle-switch.component';
 
 const icons = {
   AlertCircle,
@@ -256,6 +257,7 @@ const COMPONENTS = [
     CandidatesStatusModalComponent,
     ReorderStatusDialogComponent,
     AcceptFormComponent,
+    ToggleSwitchComponent,
   ],
   providers: [
     DatePipe,

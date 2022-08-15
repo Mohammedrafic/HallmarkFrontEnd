@@ -1,0 +1,66 @@
+<app-page-toolbar>
+    <ng-container left>
+      <div class="bootstrap business-dropdowns" [formGroup]="businessForm">
+        <div class="dropdown-container">
+          <div class="input-group dropdown">
+            <ejs-dropdownlist
+              appValidateWithMessage
+              formControlName="businessUnit"
+              [fields]="optionFields"
+              [dataSource]="businessUnits"
+              placeholder="Business Unit"
+            ></ejs-dropdownlist>
+          </div>
+        </div>
+        <div class="dropdown-container">
+          <app-multiselect-dropdown
+            [formGroupInstance]="businessForm"
+            [fields]="bussinesDataFields"
+            [dataSource]="bussinesData$ | async"
+            [showSelectAll]="true"
+            controlName="business"
+            placeholder="Business"
+            selectAllText="All"
+          ></app-multiselect-dropdown>
+        </div>
+      </div>
+    </ng-container>
+    
+  </app-page-toolbar>
+  
+  <section class="role-and-permissions last-content-section-padding">  
+      <ag-grid-angular #agGridPagination
+                      style="width: 100%; height: 550px;"
+                      class="ag-theme-alpine"
+                      [animateRows]="true"
+                      [columnDefs]="columnDefs"
+                      [defaultColDef]="defaultColDef"
+                      [suppressAggFuncInHeader]="true"
+                      [modules]="modules"                
+                      [cacheBlockSize]="cacheBlockSize"
+                      [rowModelType]="rowModelType"
+                      [frameworkComponents]="frameworkComponents"
+                      [pagination]="true"
+                      [paginationPageSize]="paginationPageSize"                    
+                      (gridReady)="onGridReady($event)"
+                      [sideBar]="sideBar"                                                
+                      toolPanel="columns"
+                      [serverSideStoreType]="serverSideStoreType"                
+                      [paginationAutoPageSize]="false"
+                      [maxBlocksInCache] ="maxBlocksInCache">
+      </ag-grid-angular>
+  </section>
+  <div class="row">
+    <div class="col-md-6"></div>
+    <div class="col-md-6 text-right">
+      <ejs-dropdownlist
+        id="rowsPerPage"
+        class="dropdown-no-border"
+        [dataSource]="rowsPerPageDropDown"
+        [(value)]="activeRowsPerPageDropDown"
+        (change)="onPageSizeChanged($event)">
+      </ejs-dropdownlist></div>
+  </div>
+  
+  
+  
