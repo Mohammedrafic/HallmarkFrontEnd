@@ -26,7 +26,7 @@
       >
         <i-feather name="plus" class="icon"></i-feather> Add Record
       </button>
-      <ng-container *ngIf="recordsToShow?.[currentTab]?.length || isEditOn">
+      <ng-container *ngIf="recordsToShow?.[currentTab]?.[currentMode]?.length || isEditOn">
         <button
           *ngIf="!isEditOn; else editHandlers"
           [disabled]="actionsDisabled"
@@ -41,7 +41,12 @@
 
       <ng-template #editHandlers>
         <button ejs-button cssClass="e-outline button-cancel" (click)="cancelChanges()">Cancel</button>
-        <button (click)="saveChanges()" ejs-button [isPrimary]="true" [disabled]="actionsDisabled">Save</button>
+        <button (click)="saveChanges()" ejs-button [isPrimary]="true" [disabled]="actionsDisabled" class="spinner-btn">
+          <div #spinner class="spinner-container" *ngIf="loading; else savetext"></div>
+          <ng-template #savetext>
+            <span>Save</span>
+          </ng-template>
+        </button>
       </ng-template>
     </div>
 
@@ -49,7 +54,7 @@
       <ag-grid-angular #grid
         *ngIf="recordsToShow"
         [columnDefs]="timesheetColDef"
-        [rowData]="recordsToShow[currentTab]"
+        [rowData]="recordsToShow[currentTab][currentMode]"
         [context]="context"
         [rowHeight]="64"
         [modules]="modules"

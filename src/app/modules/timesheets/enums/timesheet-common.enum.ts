@@ -14,3 +14,8 @@ export enum RecordFields {
   Miles = 'miles',
   Expenses = 'expenses',
 }
+
+export enum RecordsMode {
+  View = 'viewMode',
+  Edit = 'editMode',
+}

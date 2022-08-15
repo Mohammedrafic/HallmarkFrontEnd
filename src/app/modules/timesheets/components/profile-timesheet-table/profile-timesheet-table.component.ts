@@ -1,6 +1,6 @@
 import {
   AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component,
-  EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
+  ElementRef, EventEmitter, Input, OnChanges, Output, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 import { combineLatest, Observable, takeUntil } from 'rxjs';
@@ -9,20 +9,21 @@ import { Select, Store } from '@ngxs/store';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { TabComponent, SelectingEventArgs } from '@syncfusion/ej2-angular-navigations';
 import { GridApi, GridReadyEvent, IClientSideRowModel, Module } from '@ag-grid-community/core';
+import { createSpinner, showSpinner } from '@syncfusion/ej2-angular-popups';
 
 import { Destroyable } from '@core/helpers';
 import { DropdownOption } from '@core/interface';
-import { RecordFields } from '../../enums';
+import { RecordFields, RecordsMode } from '../../enums';
 import {
   TimesheetRecordsColdef, TimesheetRecordsColConfig, RecordsTabConfig,
-  TimesheetConfirmMessages,
-} from '../../constants';
+  TimesheetConfirmMessages } from '../../constants';
 import { ConfirmService } from '@shared/services/confirm.service';
 import { DialogActionPayload, OpenAddDialogMeta, TimesheetRecordsDto, TabConfig } from '../../interface';
-import { TimesheetRecordsService } from '../../services/timesheet-records.service';
+import { TimesheetRecordsService } from '../../services';
 import { TimesheetsState } from '../../store/state/timesheets.state';
 import { RecordsAdapter } from '../../helpers';
 import { TimesheetDetails } from '../../store/actions/timesheet-details.actions';
+import { DropdownEditorComponent } from '../cell-editors/dropdown-editor/dropdown-editor.component';
 
 /**
  * TODO: move tabs into separate component if possible
@@ -38,12 +39,13 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   @ViewChild('grid') readonly grid: IClientSideRowModel;
 
+  @ViewChild('spinner') readonly spinner: ElementRef;
+
   @Input() timesheetId: number;
 
   @Input() isAgency: boolean;
 
-  @Input()
-  public actionsDisabled: boolean = false;
+  @Input() actionsDisabled: boolean = false;
 
   @Output() readonly openAddSideDialog: EventEmitter<OpenAddDialogMeta> = new EventEmitter<OpenAddDialogMeta>();
 
@@ -77,6 +79,12 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public recordsToShow: TimesheetRecordsDto;
 
+  public currentMode: RecordsMode = RecordsMode.View;
+
+  public context: { componentParent: ProfileTimesheetTableComponent };
+
+  public loading = false;
+
   private records: TimesheetRecordsDto;
 
   private isChangesSaved = true;
@@ -88,8 +96,6 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
   private slectingindex: number;
 
   private idsToDelete: number[] = [];
-
-  public context: { componentParent: ProfileTimesheetTableComponent };
 
   constructor(
     private store: Store,
@@ -155,6 +161,9 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public editTimesheets(): void {
     this.isEditOn = true;
+    this.currentMode = RecordsMode.Edit;
+    this.gridApi.refreshCells()
+    this.recordsToShow = JSON.parse(JSON.stringify(this.records));
     this.createForm();
     this.setEditModeColDef();
   }
@@ -166,6 +175,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public cancelChanges(): void {
     this.changesSaved.emit(true);
+    this.loading = false;
     this.isChangesSaved = true;
     this.recordsToShow = JSON.parse(JSON.stringify(this.records));
     this.idsToDelete = [];
@@ -174,12 +184,19 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   public saveChanges(): void {
     const diffs = this.timesheetRecordsService.findDiffs(
-      this.records[this.currentTab], this.formControls, this.timesheetColDef);
+      this.records[this.currentTab][this,this.currentMode], this.formControls, this.timesheetColDef);
 
     const recordsToUpdate = RecordsAdapter.adaptRecordsDiffs(
-      this.records[this.currentTab], diffs, this.idsToDelete);
+      this.records[this.currentTab][this,this.currentMode], diffs, this.idsToDelete);
 
     if (diffs.length || this.idsToDelete.length) {
+      this.loading = true;
+      this.cd.detectChanges();
+      createSpinner({
+        target: this.spinner.nativeElement,
+      });
+      showSpinner(this.spinner.nativeElement);
+
       const { organizationId, id } = this.store.snapshot().timesheets.selectedTimeSheet;
       const dto = RecordsAdapter.adaptRecordPutDto(
         recordsToUpdate, organizationId, id, this.currentTab, this.idsToDelete);
@@ -189,10 +206,12 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
         takeUntil(this.componentDestroy()),
       )
       .subscribe(() => {
+        this.loading = false;
         this.changesSaved.emit(true);
         this.isChangesSaved = true;
         this.idsToDelete = [];
         this.setInitialTableState();
+        this.cd.detectChanges();
       });
     }
   }
@@ -213,7 +232,8 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
     )
     .subscribe(() => {
       this.idsToDelete.push(id);
-      this.recordsToShow[this.currentTab] = this.recordsToShow[this.currentTab].filter((record) => record.id !== id);
+      this.recordsToShow[this.currentTab][this.currentMode] = this.recordsToShow[this.currentTab][this.currentMode]
+      .filter((record) => record.id !== id);
       this.cd.markForCheck();
     });
   }
@@ -224,7 +244,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private createForm(): void {
     this.formControls = this.timesheetRecordsService.createEditForm(
-      this.records, this.currentTab, this.timesheetColDef);
+      this.records, this.currentTab, this.timesheetColDef, this.currentMode);
     this.watchFormChanges();
   }
 
@@ -234,6 +254,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       tap((res) => {
         if (this.isEditOn) {
           this.isEditOn = false;
+          this.currentMode = RecordsMode.View;
           this.cancelChanges();
         }
         this.records = res;
@@ -253,7 +274,7 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
       takeUntil(this.componentDestroy()),
     )
     .subscribe(() => {
-      if (!this.records[this.currentTab].length) {
+      if (!this.records[this.currentTab][this.currentMode].length) {
         this.gridApi.showNoRowsOverlay();
       }
       this.setEditModeColDef();
@@ -264,16 +285,44 @@ export class ProfileTimesheetTableComponent extends Destroyable implements After
 
   private setInitialTableState(): void {
     this.isEditOn = false;
+    this.currentMode = RecordsMode.View;
     this.formControls = {};
     this.setEditModeColDef();
+    this.cd.markForCheck();
   }
 
   private setEditModeColDef(): void {
     this.timesheetColDef = this.timesheetColDef.map((def) => {
+      if (this.isEditOn && def.field === 'billRateConfigName') {
+        const editData = {
+          cellRenderer: DropdownEditorComponent,
+          cellRendererParams: {
+            editMode: true,
+            isEditable: true,
+            options: [],
+            storeField: 'billRateTypes',
+          }
+        }
+        def.field = 'billRateConfigId';
+        def = {
+          ...def,
+          ...editData,
+        };
+      } else if (!this.isEditOn && def.field === 'billRateConfigId') {
+        def.field = 'billRateConfigName';
+        delete def.cellRenderer;
+        delete def.cellRendererParams;
+      }
+
       if (def.cellRendererParams && def.cellRendererParams.editMode) {
         def.cellRendererParams.isEditable = this.isEditOn;
         def.cellRendererParams.formGroup = this.formControls;
       }
+
+      if (def.field === 'billRate' || def.field === 'total') {
+        def.hide = this.isEditOn;
+      }
+
       return def;
     });
 
