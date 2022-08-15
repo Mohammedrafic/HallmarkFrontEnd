@@ -7,7 +7,7 @@ export class AddInvoiceService {
     private fb: FormBuilder,
   ) {}
 
-  public createForm(): FormGroup {
+  public createForm(isAgency: boolean): FormGroup {
     return this.fb.group({
       orderId: [null, Validators.required],
       nameId: [null, Validators.required],

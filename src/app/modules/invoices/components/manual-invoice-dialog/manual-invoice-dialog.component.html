@@ -62,7 +62,7 @@
                       class="datepicker"
                       format="MM/dd/yyyy"
                       appValidateWithMessage
-                      placeholder="MM/DD/YYYY"
+                      placeholder="DD/MM/YYYY"
                       [max]="today"
                       [formControlName]="field.field"
                     >
@@ -103,6 +103,7 @@
 
         </form>
         <app-file-uploader [maxFiles]="5"
+          [clearAll]="clearFiles"
           (uploadFilesChanged)="setFilesForUpload($event)">
         </app-file-uploader>
       </div>

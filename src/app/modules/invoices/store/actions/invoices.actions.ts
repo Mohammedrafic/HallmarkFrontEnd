@@ -2,7 +2,7 @@ import { GetInvoicesData, InvoicesFilterState, ManualInvoicePostDto } from '../.
 import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums/invoices.enum';
 import { DialogAction } from '@core/enums';
 import { OrganizationRegion } from '@shared/models/organization.model';
-import { DataSourceItem } from '@core/interface';
+import { DataSourceItem, FileForUpload } from '@core/interface';
 
 export namespace Invoices {
   export class Get {
@@ -59,6 +59,10 @@ export namespace Invoices {
 
   export class GetInvoicesReasons {
     static readonly type = INVOICES_ACTIONS.GetReasons;
+
+    constructor(
+      public readonly orgId: number | null,
+    ) {}
   }
 
   export class GetManInvoiceMeta {
@@ -74,6 +78,8 @@ export namespace Invoices {
 
     constructor(
       public readonly payload: ManualInvoicePostDto,
+      public readonly files: FileForUpload[],
+      public readonly isAgency: boolean,
     ) {}
   }
 
@@ -95,5 +101,9 @@ export namespace Invoices {
 
     constructor(public readonly id: number) {
     }
+  }
+
+  export class ClearAttachments {
+    static readonly type = INVOICES_ACTIONS.ClearManInvoiceAttachments;
   }
 }

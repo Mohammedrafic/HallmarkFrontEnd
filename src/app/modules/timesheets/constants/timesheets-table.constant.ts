@@ -147,7 +147,8 @@ export const SavedFiltersParams: string[] = [
   'pageSize',
   'organizationId',
   'orderBy',
-  'dateTimeOffset',
+  'startDate',
+  'endDate',
   'searchTerm',
   'statusIds',
 ];
@@ -164,11 +165,6 @@ export const DefaultTimesheetCollection: TimeSheetsPage = {
   totalCount: 0,
   hasNextPage: false,
   hasPreviousPage: false,
-};
-
-export const filterOptionFields = {
-  text: 'name',
-  value: 'id'
 };
 
 export const filteringOptionsMapping: Map<FilteringOptionsFields, TimesheetsTableFiltersColumns> = new Map()

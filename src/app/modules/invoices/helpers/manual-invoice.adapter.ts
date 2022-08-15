@@ -4,8 +4,10 @@ import { AddManInvoiceForm, ManualInvoiceMeta, ManualInvoicePostDto } from '../i
 export class ManualInvoiceAdapter {
   static adapPostDto(formData: AddManInvoiceForm,
     rawData: ManualInvoiceMeta[], orgId: number): ManualInvoicePostDto | null {
+    const order = formData.orderId.split('-')[0];
+
     const jobPosition = rawData.find((item) => {
-        return ((item.orderId === Number(formData.orderId) || `${item.orderId}-${item.jobId}` === formData.orderId)
+        return (item.orderId === Number(order)
         && item.candidateId === Number(formData.nameId));
     });
 

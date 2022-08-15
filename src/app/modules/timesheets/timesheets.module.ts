@@ -24,8 +24,6 @@ import { DatePickerModule, MaskedDateTimeService } from '@syncfusion/ej2-angular
 import { AccumulationChartAllModule, ChartAllModule } from '@syncfusion/ej2-angular-charts';
 
 import { ControlConverterModule } from '@shared/pipes/control-converter/control-converter.module';
-import { CapitalizeFirstModule } from '@shared/pipes/capitalize-first/capitalize-first.module';
-import { CapitalizeFirstPipe } from '@shared/pipes/capitalize-first/capitalize-first.pipe';
 import { SharedModule } from '@shared/shared.module';
 import { DateWeekPickerModule } from '@shared/components/date-week-picker/date-week-picker.module';
 import { TimesheetsRoutingModule } from './timesheets-routing.module';
@@ -57,12 +55,18 @@ import {
 } from './components/timesheets-table/timesheet-table-approve-cell/timesheet-table-approve-cell.component';
 import { TimesheetTableLinkComponent } from './components/timesheets-table/timesheet-table-link/timesheet-table-link.component';
 import { TimesheetDetailsService } from './services/timesheet-details.service';
-import { FileViewerModule } from '../../shared/modules/file-viewer/file-viewer.module';
+import { FileViewerModule } from '@shared/modules/file-viewer/file-viewer.module';
 import { DateRangeWeekPickerModule } from '@shared/components/date-range-week-picker/date-range-week-picker.module';
 import { TimesheetsTabsComponent } from './components/timesheets-tabs/timesheets-tabs.component';
 import { AddDialogHelperService, DateWeekService } from '@core/services';
 import { AttachmentsModule } from '@shared/components/attachments';
 import { AddDialogHelper } from '@core/helpers';
+import { UploadButtonComponent } from './components/upload-button/upload-button.component';
+import { FileUploaderModule } from '@shared/components/file-uploader/file-uploader.module';
+import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
+import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper.service';
+import { TimesheetsTableFiltersColumns } from './enums';
+import { APP_FILTERS_CONFIG } from '@core/constants/filters-helper.constant';
 
 const gridIcons = {
   MessageSquare,
@@ -114,6 +118,7 @@ const gridIcons = {
     ProfileMilesComponent,
     InputEditorComponent,
     TimesheetsTabsComponent,
+    UploadButtonComponent,
   ],
   imports: [
     CommonModule,
@@ -140,7 +145,6 @@ const gridIcons = {
     FormsModule,
     CheckBoxModule,
     ControlConverterModule,
-    CapitalizeFirstModule,
     DateWeekPickerModule,
     DateRangeWeekPickerModule,
     UploaderModule,
@@ -152,6 +156,7 @@ const gridIcons = {
     PdfViewerModule,
     FileViewerModule,
     AttachmentsModule,
+    FileUploaderModule,
   ],
   exports: [TimesheetsContainerComponent],
   providers: [
@@ -159,16 +164,24 @@ const gridIcons = {
     AddRecordService,
     MaskedDateTimeService,
     TimesheetsService,
-    CapitalizeFirstPipe,
     TimesheetDetailsApiService,
     ChipsCssClass,
     TimesheetRecordsService,
     TimesheetDetailsService,
     DateWeekService,
     AddDialogHelper,
+    FiltersDialogHelper,
     {
       provide: AddDialogHelperService,
       useClass: AddRecordService,
+    },
+    {
+      provide: APP_FILTERS_CONFIG,
+      useValue: TimesheetsTableFiltersColumns,
+    },
+    {
+      provide: FiltersDialogHelperService,
+      useClass: TimesheetsService,
     },
   ]
 })

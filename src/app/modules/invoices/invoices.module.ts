@@ -1,4 +1,3 @@
-import { FileUploaderComponent } from './components/file-uploader/file-uploader.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -42,6 +41,11 @@ import { InvoicesFiltersDialogComponent } from './components/invoices-filters-di
 import { InvoicesApiService } from './services/invoices-api.service';
 import { InvoicesTableTabsComponent } from './components/invoices-table-tabs/invoices-table-tabs.component';
 import { AddDialogHelperService } from '@core/services';
+import { FileUploaderModule } from '@shared/components/file-uploader/file-uploader.module';
+import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
+import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper.service';
+import { APP_FILTERS_CONFIG } from '@core/constants/filters-helper.constant';
+import { InvoicesTableFiltersColumns } from './enums/invoices.enum';
 
 @NgModule({
   declarations: [
@@ -57,7 +61,6 @@ import { AddDialogHelperService } from '@core/services';
     InvoiceRecordsTableRowDetailsComponent,
     ToggleRowExpansionHeaderCellComponent,
     ManualInvoiceDialogComponent,
-    FileUploaderComponent,
     InvoicesFiltersDialogComponent,
     InvoicesTableTabsComponent,
   ],
@@ -99,16 +102,26 @@ import { AddDialogHelperService } from '@core/services';
     AutoCompleteAllModule,
     DatePickerAllModule,
     MultiSelectModule,
+    FileUploaderModule,
   ],
   providers: [
     InvoicesService,
     InvoicesApiService,
     ChipsCssClass,
     AddInvoiceService,
+    FiltersDialogHelper,
     {
       provide: AddDialogHelperService,
       useClass: AddInvoiceService,
     },
+    {
+      provide: FiltersDialogHelperService,
+      useClass: InvoicesService,
+    },
+    {
+      provide: APP_FILTERS_CONFIG,
+      useValue: InvoicesTableFiltersColumns,
+    }
   ]
 })
 export class InvoicesModule { }

@@ -93,6 +93,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     store.dispatch([
       new SetHeaderState({ iconName: 'clock', title: 'Timesheets' }),
       new Timesheets.ResetFiltersState(),
+      new Timesheets.SelectOrganization(0),
     ]);
 
     this.isAgency = this.router.url.includes('agency');
@@ -143,7 +144,7 @@ export class TimesheetsContainerComponent extends Destroyable implements OnInit 
     ));
   }
 
-  public updateTableByFilters(filters: any): void {
+  public updateTableByFilters(filters: TimesheetsFilterState): void {
     this.store.dispatch(new Timesheets.UpdateFiltersState({ ...filters }));
     this.store.dispatch(new ShowFilterDialog(false));
   }

@@ -1,15 +1,20 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder } from '@angular/forms';
+
 import { Observable, of } from 'rxjs';
+import { Store } from '@ngxs/store';
 
 import { BaseObservable } from '@core/helpers';
-import { CustomFormGroup } from '@core/interface';
+import { CustomFormGroup, DataSourceItem } from '@core/interface';
 import { PageOfCollections } from '@shared/models/page.model';
+import { OrganizationRegion } from '@shared/models/organization.model';
 
 import { GetInvoicesData, InvoiceRecord } from '../interfaces';
 import { generateInvoiceRecords } from '../helpers/generate-invoices-mock.helper';
 import { InvoiceFilterForm } from '../interfaces/form.interface';
+import { InvoicesTableFiltersColumns } from '../enums/invoices.enum';
+import { Invoices } from '../store/actions/invoices.actions';
 
 const mockedRecords: InvoiceRecord[] = generateInvoiceRecords(10);
 
@@ -20,6 +25,7 @@ export class InvoicesService {
   constructor(
     private http: HttpClient,
     private fb: FormBuilder,
+    private store: Store
   ) {
   }
 
@@ -32,6 +38,13 @@ export class InvoicesService {
       agencyIds: [''],
       skillIds: [''],
     }) as CustomFormGroup<InvoiceFilterForm>;
+  }
+
+  public setDataSourceByFormKey(
+    key: InvoicesTableFiltersColumns,
+    source: DataSourceItem[] | OrganizationRegion[]
+  ): void {
+    this.store.dispatch(new Invoices.SetFiltersDataSource(key, source));
   }
 
   public getInvoices({pageSize, page}: GetInvoicesData): Observable<PageOfCollections<InvoiceRecord>> {

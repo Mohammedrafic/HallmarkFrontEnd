@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { patch } from '@ngxs/store/operators';
-import { debounceTime, Observable, of, throttleTime, catchError } from 'rxjs';
+import { debounceTime, Observable, of, throttleTime, catchError, forkJoin, map, switchMap } from 'rxjs';
 import { tap } from 'rxjs/internal/operators/tap';
 
 import { PageOfCollections } from '@shared/models/page.model';
@@ -23,7 +23,7 @@ import { reduceFiltersState } from '../../../timesheets/helpers';
 import { InvoicesApiService } from '../../services';
 import { InvoicesTableFiltersColumns } from '../../enums/invoices.enum';
 import { InvoicesFilteringOptionsMapping } from '../../constants';
-import { InvoiceMetaAdapter } from '../../helpers/invoice-meta.adapter';
+import { InvoiceMetaAdapter } from '../../helpers';
 import { OrganizationStructure } from '@shared/models/organization.model';
 
 @State<InvoicesModel>({
@@ -76,6 +76,11 @@ export class InvoicesState {
   @Selector([InvoicesState])
   static invoiceReasons(state: InvoicesModel): ManualInvoiceReason[] {
     return state.invoiceReasons;
+  }
+
+  @Selector([InvoicesState])
+  static selectedOrgId(state: InvoicesModel): number {
+    return state.selectedOrganizationId;
   }
 
   @Action(Invoices.Get)
@@ -176,15 +181,15 @@ export class InvoicesState {
   }
 
   @Action(Invoices.ToggleManualInvoiceDialog)
-  ToggleManInvoiceDialog(
-    { action }: Invoices.ToggleManualInvoiceDialog
-  ): void {}
+  ToggleManInvoiceDialog(): void {}
 
   @Action(Invoices.GetInvoicesReasons)
   GetInvoicesReasons(
     { patchState }: StateContext<InvoicesModel>,
+    { orgId }: Invoices.GetInvoicesReasons,
   ): Observable<ManualInvoiceReason[]> {
-    return this.invoicesAPIService.getInvoiceReasons()
+
+    return this.invoicesAPIService.getInvoiceOrgReasons(orgId)
       .pipe(
         tap((res) => {
           patchState(
@@ -214,13 +219,15 @@ export class InvoicesState {
   @Action(Invoices.SaveManulaInvoice)
   SaveManualInvoice(
     ctx: StateContext<InvoicesModel>,
-    { payload }: Invoices.SaveManulaInvoice,
+    { payload, files, isAgency }: Invoices.SaveManulaInvoice,
     /**
      * TODO: change return type afte invoice get implementation
      */
-  ): Observable<ManualInvoiceMeta> {
+  ): Observable<number[]> {
     return this.invoicesAPIService.saveManualInvoice(payload)
     .pipe(
+      switchMap((res) => this.invoicesAPIService.saveManualInvoiceAttachments(
+        files, isAgency ? res.organizationId : null,  res.timesheetId,)),
       tap(() => {
         ctx.dispatch([
           new ShowToast(MessageTypes.Success, ManualInvoiceMessages.successAdd)
