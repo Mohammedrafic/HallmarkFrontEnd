@@ -21,6 +21,7 @@ export interface CandidatesDetailsModel extends CandidatesBasicInfo {
   lastName: string;
   jobTitle: string;
   status: number;
+  publicId: number;
 }
 
 export type CandidateDetailsPage = PageOfCollections<CandidatesDetailsModel>;
