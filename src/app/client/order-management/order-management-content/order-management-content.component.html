@@ -114,8 +114,8 @@
               (click)="$event.stopPropagation()"
               ejs-dropdownbutton
               [items]="
-                (data.orderCloseDate && closedOrderMenu) ||
-                (activeTab === OrganizationOrderManagementTabs.ReOrders && reOrdersMenu) ||
+                (data.status === orderStatus.Closed && closedOrderMenu) ||
+                (activeTab === OrganizationOrderManagementTabs.ReOrders && getMenuForReorders(data)) ||
                 (data.isMoreMenuWithDeleteButton ? moreMenuWithDeleteButton : getMoreMenu(data))
               "
               (select)="menuOptionSelected($event, data)"

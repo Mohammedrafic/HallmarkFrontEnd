@@ -78,7 +78,7 @@
 
       <section class="bill-rates">
         <app-bill-rates-view-grid
-          *ngIf="isAgency || !orderCandidateJob?.applicantStatus; else editBlock"
+          *ngIf="billRatesViewMode; else editBlock"
           [billRatesData]="orderCandidateJob?.billRates || []"
         ></app-bill-rates-view-grid>
         <ng-template #editBlock>

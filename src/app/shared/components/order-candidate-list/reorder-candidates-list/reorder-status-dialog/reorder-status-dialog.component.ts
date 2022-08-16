@@ -37,6 +37,8 @@ import { MessageTypes } from '@shared/enums/message-types';
 import { SET_READONLY_STATUS } from '@shared/constants';
 import { BillRate } from '@shared/models';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
+import { CandidatesStatusText } from '@shared/enums/status';
+import { OrderType } from '@shared/enums/order-type';
 
 @Component({
   selector: 'app-reorder-status-dialog',
@@ -99,6 +101,15 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
 
   get hourlyRate(): AbstractControl | null {
     return this.acceptForm.get('hourlyRate');
+  }
+
+  get billRatesViewMode(): boolean {
+    return (
+      this.isAgency ||
+      !this.orderCandidateJob?.applicantStatus ||
+      (this.orderCandidateJob?.applicantStatus.applicantStatus === CandidatesStatusText.Offered &&
+        this.orderCandidateJob?.order.orderType === OrderType.ReOrder)
+    );
   }
 
   public jobStatusControl: FormControl;

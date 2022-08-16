@@ -1191,6 +1191,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     return this.moreMenuWithCloseButton;
   }
 
+  public getMenuForReorders(order: OrderManagement): ItemModel[] {
+    if (!order.children.length && order.orderCloseDate && order.status !== OrderStatus.Closed) {
+      return this.moreMenu;
+    }
+
+    return this.reOrdersMenu;
+  }
+
   private onCommentRead(): void {
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateGridCommentsCounter))
