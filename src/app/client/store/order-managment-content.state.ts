@@ -21,7 +21,6 @@ import {
   GetContactDetails,
   GetExtensions,
   GetHistoricalData,
-  GetIncompleteOrders,
   GetOrderById,
   GetOrderFilterDataSources,
   GetOrders,
@@ -66,7 +65,6 @@ import { WorkflowByDepartmentAndSkill } from '@shared/models/workflow-mapping.mo
 import { ProjectName, ProjectType } from '@shared/models/project.model';
 import { AssociateAgency } from '@shared/models/associate-agency.model';
 import { ProjectsService } from '@shared/services/projects.service';
-import { ShiftsService } from '@shared/services/shift.service';
 import { ShowToast } from 'src/app/store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { RECORD_ADDED, RECORD_MODIFIED } from '@shared/constants';
@@ -281,34 +279,25 @@ export class OrderManagementContentState {
   constructor(
     private orderManagementService: OrderManagementContentService,
     private projectsService: ProjectsService,
-    private shiftsService: ShiftsService,
     private departmentService: DepartmentsService,
     private rejectReasonService: RejectReasonService,
     private extensionSidebarService: ExtensionSidebarService
   ) {}
 
-  @Action(GetIncompleteOrders)
-  GetIncompleteOrders(
-    { patchState }: StateContext<OrderManagementContentStateModel>,
-    { payload }: GetIncompleteOrders
-  ): Observable<OrderManagementPage> {
-    return this.orderManagementService.getIncompleteOrders(payload).pipe(
-      tap((payload) => {
-        patchState({ ordersPage: payload });
-      })
-    );
-  }
-
-  @Action(GetOrders)
+  @Action(GetOrders, { cancelUncompleted: true })
   GetOrders(
     { patchState }: StateContext<OrderManagementContentStateModel>,
-    { payload }: GetOrders
+    { payload, isIncomplete }: GetOrders
   ): Observable<OrderManagementPage> {
-    return this.orderManagementService.getOrders(payload).pipe(
+    return !isIncomplete ? this.orderManagementService.getOrders(payload).pipe(
       tap((payload) => {
         this.orderManagementService.countShiftsWithinPeriod(payload);
         patchState({ ordersPage: payload });
         return payload;
+      })
+    ) : this.orderManagementService.getIncompleteOrders(payload).pipe(
+      tap((payload) => {
+        patchState({ ordersPage: payload });
       })
     );
   }

@@ -24,7 +24,6 @@ import {
   OrderManagementChild,
 } from '@shared/models/order-management.model';
 import { AcceptFormComponent } from '@shared/components/order-candidate-list/reorder-candidates-list/reorder-status-dialog/accept-form/accept-form.component';
-import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { ChipsCssClass } from '@shared/pipes/chips-css-class.pipe';
 import { ApplicantStatus, CandidatStatus } from '@shared/enums/applicant-status.enum';
@@ -100,8 +99,6 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
   public selectedOrder$: Observable<Order>;
   public orderStatusText = OrderStatusText;
   public disabledCloseButton = true;
-  public accordionOneField: AccordionOneField;
-  public accordionClickElement: HTMLElement | null;
   public acceptForm = AcceptFormComponent.generateFormGroup();
   public candidateJob: OrderCandidateJob | null;
   public candidateStatus = CandidatStatus;
@@ -182,16 +179,6 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
     this.sideDialog.hide();
     this.openEvent.next(null);
     this.selectedTemplate = null;
-  }
-
-  public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionClickElement = this.accordionOneField.clickedOnAccordion(accordionClick);
-  }
-
-  public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
   }
 
   public onBillRatesChanged(bill: BillRate): void {
@@ -290,6 +277,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
           ApplicantStatus.Accepted,
           ApplicantStatus.Rejected,
           ApplicantStatus.OnBoarded,
+          ApplicantStatus.Offboard,
         ];
 
         if (allowedApplyStatuses.includes(this.candidate.candidateStatus)) {

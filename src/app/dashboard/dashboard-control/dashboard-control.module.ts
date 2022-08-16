@@ -10,14 +10,12 @@ import { WidgetListComponent } from './components/widget-list/widget-list.compon
 import { DialogModule } from '@syncfusion/ej2-angular-popups';
 import { SharedModule } from '@shared/shared.module';
 import { InlineLoaderModule } from '@shared/components/inline-loader/inline-loader.module';
-import { WidgetFilterComponent } from './components/widget-filter/widget-filter.component';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MultiSelectAllModule } from '@syncfusion/ej2-angular-dropdowns';
 import { FilterChipListModule } from './components/filter-chip-list/filter-chip-list.module';
+import { WidgetFilterModule } from './components/widget-filter/widget-filter.module';
 
 
 @NgModule({
-  declarations: [DashboardControlComponent, WidgetListComponent, WidgetFilterComponent],
+  declarations: [DashboardControlComponent, WidgetListComponent],
   imports: [
     CommonModule,
     ButtonModule,
@@ -26,9 +24,8 @@ import { FilterChipListModule } from './components/filter-chip-list/filter-chip-
     SharedModule,
     FeatherModule.pick({ Sliders }),
     InlineLoaderModule,
-    ReactiveFormsModule,
-    MultiSelectAllModule,
-    FilterChipListModule
+    FilterChipListModule,
+    WidgetFilterModule
   ],
   exports: [DashboardControlComponent],
 })

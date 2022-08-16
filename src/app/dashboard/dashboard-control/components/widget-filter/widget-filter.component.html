@@ -1,6 +1,4 @@
 <app-filter-dialog
-  [items]="savedFilterItems"
-  [showResultsCounter]="false"
   (deleteFilter)="onFilterDelete($event)"
   (clearAllFiltersClicked)="onFilterClearAll()"
   (applyFilterClicked)="onFilterApply()"
@@ -98,4 +96,17 @@
       </div>
     </div>
   </form>
+
+  <ng-template #groupedChips>
+    <div class="ordered-chips">
+      <div class="ordered-chips__section" *ngFor="let filters of orderedFilterChips">
+        <ng-container *ngFor="let chip of filters">
+          <div class="ordered-chips__value" *ngIf="chip.hasOwnProperty('value'); else filterName">
+            <ejs-chiplist [chips]="[chip]" enableDelete="true" (delete)="deleteChip($event)"></ejs-chiplist>
+          </div>
+          <ng-template #filterName><span class="ordered-chips__title">{{ chip }}</span></ng-template>
+        </ng-container>
+      </div>
+    </div>
+  </ng-template>
 </app-filter-dialog>

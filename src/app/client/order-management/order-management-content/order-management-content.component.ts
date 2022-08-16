@@ -35,7 +35,6 @@ import {
   ExportOrders,
   GetAgencyOrderCandidatesList,
   GetAvailableSteps,
-  GetIncompleteOrders,
   GetOrderById,
   GetOrderFilterDataSources,
   GetOrders,
@@ -279,8 +278,8 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     const locationState = this.location.getState() as { orderId: number };
     this.previousSelectedOrderId = locationState.orderId;
 
-    this.onOrganizationChangedHandler();
     this.onGridPageChangedHandler();
+    this.onOrganizationChangedHandler();
     this.onOrdersDataLoadHandler();
 
     this.onOrderDetailsDialogOpenEventHandler();
@@ -410,7 +409,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
       case OrganizationOrderManagementTabs.Incomplete:
         this.columnsToExport = allOrdersColumnsToExport;
         this.filters.isTemplate = false;
-        this.store.dispatch(new GetIncompleteOrders({ pageNumber: this.currentPage, pageSize: this.pageSize }));
+        this.store.dispatch(new GetOrders({ pageNumber: this.currentPage, pageSize: this.pageSize }, true));
         break;
       case OrganizationOrderManagementTabs.OrderTemplates:
         this.filters.isTemplate = true;
@@ -720,33 +719,28 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
         case OrganizationOrderManagementTabs.AllOrders:
           this.isLockMenuButtonsShown = true;
           this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
-          this.getOrders();
           break;
         case OrganizationOrderManagementTabs.PerDiem:
           this.isLockMenuButtonsShown = true;
           this.refreshGridColumns(PerDiemColumnsConfig, this.gridWithChildRow);
-          this.getOrders();
           break;
         case OrganizationOrderManagementTabs.PermPlacement:
           this.isLockMenuButtonsShown = true;
           this.refreshGridColumns(PermPlacementColumnsConfig, this.gridWithChildRow);
-          this.getOrders();
           break;
         case OrganizationOrderManagementTabs.ReOrders:
           this.isLockMenuButtonsShown = false;
           this.refreshGridColumns(ReOrdersColumnsConfig, this.gridWithChildRow);
-          this.getOrders();
           break;
         case OrganizationOrderManagementTabs.OrderTemplates:
           this.refreshGridColumns(orderTemplateColumnsConfig, this.gridWithChildRow);
-          this.getOrders();
           break;
         case OrganizationOrderManagementTabs.Incomplete:
           this.isLockMenuButtonsShown = false;
           this.refreshGridColumns(AllOrdersColumnsConfig, this.gridWithChildRow);
-          this.store.dispatch(new GetIncompleteOrders({}));
           break;
       }
+      this.pageSubject.next(1);
     }
   }
 
@@ -900,12 +894,12 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   private onOrganizationChangedHandler(): void {
-    this.organizationId$.pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+    this.organizationId$.pipe(takeUntil(this.unsubscribe$), debounceTime(400)).subscribe(() => {
       if (!this.isRedirectedFromDashboard) {
         this.clearFilters();
       }
       if (!this.previousSelectedOrderId) {
-        this.getOrders();
+        this.pageSubject.next(1)
       }
       this.store.dispatch(new GetAllOrganizationSkills());
     });
@@ -1191,6 +1185,14 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
     return this.moreMenuWithCloseButton;
   }
 
+  public getMenuForReorders(order: OrderManagement): ItemModel[] {
+    if (!order.children.length && order.orderCloseDate && order.status !== OrderStatus.Closed) {
+      return this.moreMenu;
+    }
+
+    return this.reOrdersMenu;
+  }
+
   private onCommentRead(): void {
     this.actions$
       .pipe(takeUntil(this.unsubscribe$), ofActionSuccessful(UpdateGridCommentsCounter))
@@ -1299,6 +1301,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   updatePositionDetails(position: OrderManagementChild): void {
+    this.getOrders();
     this.orderManagementContentService.getCandidateJob(position.organizationId, position.jobId).subscribe((res) => {
       this.selectedCandidate = {
         ...position,

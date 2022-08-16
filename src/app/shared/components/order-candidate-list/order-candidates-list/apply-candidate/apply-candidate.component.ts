@@ -12,8 +12,6 @@ import { BillRate } from '@shared/models/bill-rate.model';
 import { OrderApplicantsInitialData } from '@shared/models/order-applicants.model';
 import { OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
 import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
-import { ExpandEventArgs, AccordionClickArgs } from '@syncfusion/ej2-navigations';
-import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import PriceUtils from '@shared/utils/price.utils';
 import { toCorrectTimezoneFormat } from '@shared/utils/date-time.utils';
 import { Comment } from '@shared/models/comment.model';
@@ -42,8 +40,6 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   public today = new Date();
   public organizationId: number;
   public priceUtils = PriceUtils;
-  public accordionClickElement: HTMLElement | null;
-  public accordionOneField: AccordionOneField;
 
   @Select(OrderManagementState.orderApplicantsInitialData)
   public orderApplicantsInitialData$: Observable<OrderApplicantsInitialData>;
@@ -107,16 +103,6 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     }
   }
 
-  public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionClickElement = this.accordionOneField.clickedOnAccordion(accordionClick);
-  }
-
-  public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
-  }
-
   private createForm(): void {
     this.formGroup = new FormGroup({
       orderId: new FormControl(null),
@@ -146,9 +132,11 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private getComments(): void {
-    this.commentsService.getComments(this.candidateJob?.commentContainerId as number, null).subscribe((comments: Comment[]) => {
-      this.comments = comments;
-    });
+    this.commentsService
+      .getComments(this.candidateJob?.commentContainerId as number, null)
+      .subscribe((comments: Comment[]) => {
+        this.comments = comments;
+      });
   }
 
   private subscribeOnInitialData(): void {

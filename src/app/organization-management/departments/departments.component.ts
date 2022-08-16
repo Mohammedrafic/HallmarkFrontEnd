@@ -151,7 +151,7 @@ export class DepartmentsComponent extends AbstractGridConfigurationComponent imp
       this.clearFilters();
       this.store.dispatch(new GetRegions()).pipe(takeUntil(this.unsubscribe$))
         .subscribe((data) => {
-          this.defaultValue = data.organizationManagement.regions[0].id;
+          this.defaultValue = data.organizationManagement.regions[0]?.id;
         });;
     });
   }

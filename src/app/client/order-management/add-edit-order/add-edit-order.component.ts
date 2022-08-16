@@ -104,7 +104,6 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
     if (this.orderId > 0) {
       this.title = 'Edit';
-      store.dispatch(new GetSelectedOrderById(this.orderId));
     } else {
       this.title = 'Create';
     }
@@ -116,6 +115,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
 
   public ngOnInit(): void {
     if (this.orderId > 0) {
+      this.store.dispatch(new GetSelectedOrderById(this.orderId));
       this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order: Order) => {
         this.prefix = order?.organizationPrefix as string;
         this.publicId = order?.publicId as number;
