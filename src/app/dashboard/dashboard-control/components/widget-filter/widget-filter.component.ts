@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
-import { bufferCount, debounceTime, filter, Observable, takeUntil, throttleTime } from 'rxjs';
+import { debounceTime, filter, Observable, takeUntil, throttleTime } from 'rxjs';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
@@ -18,7 +18,6 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
 import { AllOrganizationsSkill } from 'src/app/dashboard/models/all-organization-skill.model';
-import { isEqual } from 'lodash';
 import { DeleteEventArgs } from '@syncfusion/ej2-angular-buttons';
 
 
