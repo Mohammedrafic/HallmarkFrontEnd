@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
-import { debounceTime, filter, Observable, takeUntil, throttleTime } from 'rxjs';
+import { bufferCount, debounceTime, filter, Observable, takeUntil, throttleTime } from 'rxjs';
 
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
@@ -18,6 +18,8 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
 import { AllOrganizationsSkill } from 'src/app/dashboard/models/all-organization-skill.model';
+import { isEqual } from 'lodash';
+import { DeleteEventArgs } from '@syncfusion/ej2-angular-buttons';
 
 
 @Component({
@@ -336,5 +338,14 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   private orderChipList(): void {
     this.orderedFilterChips = Object.entries(this.orderedFilters).map((item) => item.flat()); 
+  }
+
+  public deleteChip(event: DeleteEventArgs): void {
+    const filteredItem = event.data as FilteredItem;
+    this.filterService.removeValue(filteredItem, this.widgetFilterFormGroup, this.filterColumns);
+    this.widgetFilterFormGroup.valueChanges.pipe(takeUntil(this.destroy$), debounceTime(300)).subscribe(() => {
+      this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
+      this.saveFilteredItems(this.filteredItems);
+    });
   }
 }
