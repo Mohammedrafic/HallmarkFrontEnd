@@ -12,14 +12,9 @@ import { ExportPayload } from '@shared/models/export.model';
 import { OrganizationOrderManagementTabs } from '@shared/enums/order-management-tabs.enum';
 import { Comment } from '@shared/models/comment.model';
 
-export class GetIncompleteOrders {
-  static readonly type = '[order management] Get Incomplete Orders';
-  constructor(public payload: OrderManagementFilter | object) {}
-}
-
 export class GetOrders {
   static readonly type = '[order management] Get Orders';
-  constructor(public payload: OrderManagementFilter | object) {}
+  constructor(public payload: OrderManagementFilter | object, public isIncomplete?: boolean | undefined) {}
 }
 
 export class ClearOrders {
