@@ -105,7 +105,7 @@
       <div class="title">{{ orderType[orderInformation.orderType] }}</div>
       <div class="sup-title">Job Type</div>
     </div>
-    <div class="column">
+    <div class="column" *ngIf="!orderInformation.extensionFromId">
       <div class="title">{{ orderInformation.acceptedPositions }} / {{ orderInformation.openPositions }}</div>
       <div class="sup-title">Open Positions</div>
     </div>
