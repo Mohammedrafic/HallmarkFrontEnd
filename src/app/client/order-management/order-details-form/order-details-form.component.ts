@@ -530,23 +530,25 @@ export class OrderDetailsFormComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetAssociateAgencies());
     this.store.dispatch(new GetOrganizationStatesWithKeyCode());
 
-    this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
-      const isEditMode = !!this.orderId;
-      if (order && isEditMode) {
-        this.isEditMode = true;
-        this.order = order;
-        this.commentContainerId = order.commentContainerId as number;
-        this.getComments();
-        this.populateForms(order);
-      } else if (order?.isTemplate) {
-        this.order = order;
-        this.populateForms(order);
-      } else {
-        this.isEditMode = false;
-        this.order = null;
-        this.populateNewOrderForm();
-      }
-    });
+    if (this.orderId) {
+      this.selectedOrder$.pipe(takeUntil(this.unsubscribe$)).subscribe((order) => {
+        const isEditMode = !!this.orderId;
+        if (order && isEditMode) {
+          this.isEditMode = true;
+          this.order = order;
+          this.commentContainerId = order.commentContainerId as number;
+          this.getComments();
+          this.populateForms(order);
+        } else if (order?.isTemplate) {
+          this.order = order;
+          this.populateForms(order);
+        }
+      });
+    } else {
+      this.isEditMode = false;
+      this.order = null;
+      this.populateNewOrderForm();
+    }
 
     this.suggestedDetails$.pipe(takeUntil(this.unsubscribe$)).subscribe((suggestedDetails) => {
       if (!suggestedDetails) {
