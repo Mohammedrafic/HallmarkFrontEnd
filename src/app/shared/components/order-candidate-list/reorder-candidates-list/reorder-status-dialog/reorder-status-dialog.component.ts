@@ -3,12 +3,10 @@ import { BehaviorSubject, combineLatest, filter, merge, mergeMap, Observable, of
 import { Actions, ofActionSuccessful, Select, Store } from '@ngxs/store';
 
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-import { AccordionClickArgs, AccordionComponent, ExpandEventArgs } from '@syncfusion/ej2-angular-navigations';
 
 import { DialogNextPreviousOption } from '@shared/components/dialog-next-previous/dialog-next-previous.component';
 import { DestroyableDirective } from '@shared/directives/destroyable.directive';
 import { ApplicantStatus, Order, OrderCandidateJob, OrderCandidatesList } from '@shared/models/order-management.model';
-import { AccordionOneField } from '@shared/models/accordion-one-field.model';
 import { OrderManagementState } from '@agency/store/order-management.state';
 import { AcceptFormComponent } from './accept-form/accept-form.component';
 import {
@@ -35,6 +33,7 @@ import PriceUtils from '@shared/utils/price.utils';
 import { ShowToast } from '../../../../../store/app.actions';
 import { MessageTypes } from '@shared/enums/message-types';
 import { SET_READONLY_STATUS } from '@shared/constants';
+import { AccordionComponent } from '@syncfusion/ej2-angular-navigations';
 import { BillRate } from '@shared/models';
 import { OrderCandidateListViewService } from '@shared/components/order-candidate-list/order-candidate-list-view.service';
 import { CandidatesStatusText } from '@shared/enums/status';
@@ -115,8 +114,6 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
   public jobStatusControl: FormControl;
   public targetElement: HTMLElement | null = document.body.querySelector('#main');
   public acceptForm = AcceptFormComponent.generateFormGroup();
-  public accordionOneField: AccordionOneField;
-  public accordionClickElement: HTMLElement | null;
   public orderCandidateJob: OrderCandidateJob;
   public rejectReasons: RejectReason[] = [];
   public currentCandidateApplicantStatus: number;
@@ -183,16 +180,6 @@ export class ReorderStatusDialogComponent extends DestroyableDirective implement
         ? this.handleOnboardedCandidate(event)
         : this.store.dispatch(new ShowToast(MessageTypes.Error, SET_READONLY_STATUS));
     }
-  }
-
-  public clickedOnAccordion(accordionClick: AccordionClickArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionClickElement = this.accordionOneField.clickedOnAccordion(accordionClick);
-  }
-
-  public toForbidExpandSecondRow(expandEvent: ExpandEventArgs): void {
-    this.accordionOneField = new AccordionOneField(this.accordionComponent);
-    this.accordionOneField.toForbidExpandSecondRow(expandEvent, this.accordionClickElement);
   }
 
   public onCloseDialog(): void {
