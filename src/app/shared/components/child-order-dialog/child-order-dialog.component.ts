@@ -277,6 +277,7 @@ export class ChildOrderDialogComponent implements OnInit, OnChanges, OnDestroy {
           ApplicantStatus.Accepted,
           ApplicantStatus.Rejected,
           ApplicantStatus.OnBoarded,
+          ApplicantStatus.Offboard,
         ];
 
         if (allowedApplyStatuses.includes(this.candidate.candidateStatus)) {
