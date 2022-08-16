@@ -75,7 +75,7 @@ export class CandidateListComponent extends AbstractGridConfigurationComponent i
     { text: 'Profile Status', column: 'ProfileStatus' },
     { text: 'Candidate Status', column: 'CandidateStatus' },
     { text: 'Skills', column: 'Skill' },
-    { text: 'Current Assignment End Date', column: 'LastAssignmentEndDate' },
+    { text: 'Current Assignment End Date', column: 'CurrentAssignmentEndDate' },
     { text: 'Region', column: 'Region' },
   ];
   public exportUsers$ = new Subject<ExportedFileType>();
