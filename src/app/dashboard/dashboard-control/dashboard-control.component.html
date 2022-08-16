@@ -16,6 +16,7 @@
       <app-filter-chip-list
         [items]="items"
         [allRegions]="organizationStructure?.regions"
+        [orderedFilters]="orderedFilters"
       ></app-filter-chip-list>
     </div>
     <div class="right-content">
@@ -49,5 +50,6 @@
     [savedFilterItems]="items"
     [organizationStructure]="organizationStructure"
     [allSkills]="skills"
+    [orderedFilters]="orderedFilters"
   ></app-widget-filter>
 </ng-template>

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChange, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 import { Actions, ofActionDispatched, Select, Store } from '@ngxs/store';
@@ -9,7 +9,7 @@ import { ControlTypes, ValueType } from '@shared/enums/control-types.enum';
 import { FilteredItem } from '@shared/models/filter.model';
 import { OrganizationLocation, OrganizationRegion, OrganizationStructure } from '@shared/models/organization.model';
 import { FilterService } from '@shared/services/filter.service';
-import { DashboardFiltersModel } from 'src/app/dashboard/models/dashboard-filters.model';
+import { DashboardFiltersModel, FilterName } from 'src/app/dashboard/models/dashboard-filters.model';
 import { IFilterColumnsDataModel } from 'src/app/dashboard/models/widget-filter.model';
 import { SetFilteredItems } from 'src/app/dashboard/store/dashboard.actions';
 import { ShowFilterDialog } from 'src/app/store/app.actions';
@@ -18,6 +18,8 @@ import { Organisation } from '@shared/models/visibility-settings.model';
 import { SecurityState } from 'src/app/security/store/security.state';
 import { FilterColumnTypeEnum } from 'src/app/dashboard/enums/dashboard-filter-fields.enum';
 import { AllOrganizationsSkill } from 'src/app/dashboard/models/all-organization-skill.model';
+import { DeleteEventArgs } from '@syncfusion/ej2-angular-buttons';
+import { isEqual } from 'lodash';
 
 
 @Component({
@@ -34,6 +36,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
   @Input() public dashboardFilterState: DashboardFiltersModel;
   @Input() public organizationStructure: OrganizationStructure;
   @Input() public allSkills: AllOrganizationsSkill[];
+  @Input() public orderedFilters: Record<FilterName, FilteredItem[]>;
 
   @Select(UserState.organizationStructure) private readonly organizationStructure$: Observable<OrganizationStructure>;
 
@@ -48,6 +51,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
 
   public widgetFilterFormGroup: FormGroup;
   public filterColumns: IFilterColumnsDataModel = {} as IFilterColumnsDataModel;
+  public orderedFilterChips: (string | FilteredItem)[][] = [];
   public readonly optionFields = {
     text: 'name',
     value: 'id',
@@ -106,6 +110,7 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
     changes['organizationStructure'] && this.onOrganizationStructureDataLoadHandler();
     changes['userIsAdmin'] && this.setupAdminFilter();
     changes['allOrganizations'] && this.onAllOrganizationsDataLoadHandler();
+    changes['orderedFilters'] && this.orderChipList(changes['orderedFilters']);
   }
 
   private setupAdminFilter(): void {
@@ -329,5 +334,19 @@ export class WidgetFilterComponent extends DestroyableDirective implements OnIni
         .pipe(takeUntil(this.destroy$), filter(Boolean), debounceTime(300))
         .subscribe(() => this.setFormControlValue());
     }
+  }
+
+  private orderChipList(change: SimpleChange): void {
+    if(isEqual(change.currentValue, change.previousValue)) return;
+    this.orderedFilterChips = Object.entries(this.orderedFilters).map((item) => item.flat()); 
+  }
+
+  public deleteChip(event: DeleteEventArgs): void {
+    const filteredItem = event.data as FilteredItem;
+    this.filterService.removeValue(filteredItem, this.widgetFilterFormGroup, this.filterColumns);
+    this.widgetFilterFormGroup.valueChanges.pipe(takeUntil(this.destroy$), debounceTime(300)).subscribe(() => {
+      this.filteredItems = this.filterService.generateChips(this.widgetFilterFormGroup, this.filterColumns);
+      this.saveFilteredItems(this.filteredItems);
+    });
   }
 }
