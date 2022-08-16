@@ -142,15 +142,15 @@ export const DefaultFilterColumns: FilterColumns = {
   locationIds: defaultColumnMapping,
 } as FilterColumns;
 
-export const SavedFiltersParams: string[] = [
-  'pageNumber',
-  'pageSize',
-  'organizationId',
-  'orderBy',
-  'startDate',
-  'endDate',
-  'searchTerm',
-  'statusIds',
+export const SavedFiltersParams: TimesheetsTableFiltersColumns[] = [
+  TimesheetsTableFiltersColumns.PageNumber,
+  TimesheetsTableFiltersColumns.PageSize,
+  TimesheetsTableFiltersColumns.OrganizationId,
+  TimesheetsTableFiltersColumns.OrderBy,
+  TimesheetsTableFiltersColumns.StartDate,
+  TimesheetsTableFiltersColumns.EndDate,
+  TimesheetsTableFiltersColumns.SearchTerm,
+  TimesheetsTableFiltersColumns.StatusIds,
 ];
 
 export const DefaultFiltersState: TimesheetsFilterState = {
