@@ -1307,6 +1307,7 @@ export class OrderManagementContentComponent extends AbstractGridConfigurationCo
   }
 
   updatePositionDetails(position: OrderManagementChild): void {
+    this.getOrders();
     this.orderManagementContentService.getCandidateJob(position.organizationId, position.jobId).subscribe((res) => {
       this.selectedCandidate = {
         ...position,
