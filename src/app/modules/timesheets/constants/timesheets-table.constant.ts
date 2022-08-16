@@ -4,8 +4,8 @@ import { ColumnDefinitionModel } from '@shared/components/grid/models/column-def
 import { ColDef } from '@ag-grid-community/core';
 import { ValueFormatterParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 
-import { FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns, TIMETHEETS_STATUSES } from '../enums';
-import { FilterColumns, FilterDataSource, TimesheetsFilterState } from '../interface';
+import { FilteringOptionsFields, TimesheetsTableColumns, TimesheetsTableFiltersColumns } from '../enums';
+import { FilterColumns, TimesheetsFilterState } from '../interface';
 import {
   TimesheetTableStatusCellComponent
 } from '../components/timesheets-table/timesheet-table-status-cell/timesheet-table-status-cell.component';
@@ -155,7 +155,7 @@ export const SavedFiltersParams: string[] = [
 
 export const DefaultFiltersState: TimesheetsFilterState = {
   pageNumber: 1,
-  pageSize: 30
+  pageSize: 30,
 };
 
 export const DefaultTimesheetCollection: TimeSheetsPage = {

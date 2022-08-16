@@ -2,5 +2,5 @@
    [state]="params?.navigationExtras?.state"
    [queryParams]="params?.navigationExtras?.queryParams"
    (click)="$event.stopImmediatePropagation();">
-    {{value}}
+    <span [innerHTML]="value"></span>
 </a>

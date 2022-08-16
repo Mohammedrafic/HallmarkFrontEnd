@@ -1,35 +1,41 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl } from '@angular/forms';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 import { Select, Store } from '@ngxs/store';
-import {distinctUntilChanged, filter, forkJoin, Observable, switchMap, takeUntil} from 'rxjs';
+import {
+  combineLatestWith,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
+  Observable,
+  switchMap,
+  takeUntil
+} from 'rxjs';
 
 import { PageOfCollections } from '@shared/models/page.model';
-import { TabsListConfig } from '@shared/components/tabs-list/tabs-list-config.model';
 import { Destroyable } from '@core/helpers';
 import { DialogAction } from '@core/enums';
+import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
+import { GroupInvoicesBy, Invoice, InvoicePage, InvoiceRecord, InvoicesFilterState, } from '../../interfaces';
+import { Invoices } from '../../store/actions/invoices.actions';
 import { ItemModel } from '@syncfusion/ej2-angular-navigations';
 import { DialogComponent } from '@syncfusion/ej2-angular-popups';
-
-import { SetHeaderState, ShowFilterDialog } from '../../../../store/app.actions';
-import {
-  GroupInvoicesBy,
-  Invoice,
-  InvoicePage,
-  InvoiceRecord,
-  InvoicesFilterState,
-  InvoicesTableConfig,
-  PagingQueryParams
-} from '../../interfaces';
-import { Invoices } from '../../store/actions/invoices.actions';
-import { INVOICES_TAB_CONFIG } from '../../constants';
 import { InvoiceRecordsTableComponent } from '../../components/invoice-records-table/invoice-records-table.component';
 import { InvoicesService } from '../../services';
 import { AllInvoicesTableComponent } from '../../components/all-invoices-table/all-invoices-table.component';
 import { InvoicesState } from '../../store/state/invoices.state';
 import { UNIT_ORGANIZATIONS_FIELDS } from 'src/app/modules/timesheets/constants';
 import { DataSourceItem } from '@core/interface';
+import { AppState } from '../../../../store/app.state';
+import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
+import { ColDef, GridApi, GridOptions, RowNode } from '@ag-grid-community/core';
+import { GridReadyEventModel } from '@shared/components/grid/models';
+import { InvoiceTabs, InvoiceTabsProvider, OrganizationId, OrganizationIdProvider } from '../../tokens';
+import { PendingInvoice, PendingInvoicesData } from '../../interfaces/pending-invoice-record.interface';
+import { GridComponent } from '@shared/components/grid/grid.component';
+import { PendingInvoicesGridHelper } from '../../helpers/pending-invoices-grid.helper';
+import { InvoiceRecordsGridHelper } from '../../helpers';
 
 @Component({
   selector: 'app-invoices-container',
@@ -38,9 +44,6 @@ import { DataSourceItem } from '@core/interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoicesContainerComponent extends Destroyable implements OnInit {
-  @Select(InvoicesState.invoicesData)
-  public invoiceRecordsData$: Observable<PageOfCollections<InvoiceRecord>>;
-
   @Select(InvoicesState.invoicesOrganizations)
   readonly organizations$: Observable<DataSourceItem[]>;
 
@@ -53,21 +56,40 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
   @ViewChild('allInvoicesTable')
   public allInvoicesTable: AllInvoicesTableComponent;
 
-  public readonly tabsConfig: TabsListConfig[] = INVOICES_TAB_CONFIG;
-  public selectedTabIdx = 0;
+  @ViewChild(GridComponent)
+  public gridComponent: GridComponent;
+
+  public selectedTabIdx: number = 0;
   public appliedFiltersAmount = 0;
 
-  public readonly tableConfig: InvoicesTableConfig = {
-    onPageChange: this.onPageChange.bind(this),
-    onPageSizeChange: this.onPageSizeChange.bind(this),
-  };
+  public readonly formGroup: FormGroup = this.fb.group({
+    search: ['']
+  });
 
   public readonly organizationControl: FormControl = new FormControl(null);
 
+  @Select(InvoicesState.pendingInvoicesData)
+  public readonly pendingInvoicesData$: Observable<PendingInvoicesData>;
+
+  @Select(InvoicesState.invoicesFilters)
+  public readonly invoicesFilters$: Observable<PendingInvoicesData>;
+
+  @Select(AppState.isOrganizationAgencyArea)
+  public readonly isOrganizationAgencyArea$: Observable<IsOrganizationAgencyAreaStateModel>;
+
+  public readonly isAgency$: Observable<boolean>;
+
   public allInvoices: InvoicePage;
 
-  public fieldValues: {text: 'text', value: 'value'};
-  public invoicesGroupByOptions: (ItemModel & {value: GroupInvoicesBy})[] = [
+  public colDefs: ColDef[] = [];
+  public gridOptions: GridOptions = InvoiceRecordsGridHelper.getRowNestedGridOptions();
+
+  public get dateControl(): FormControl {
+    return this.formGroup.get('date') as FormControl;
+  }
+
+  public fieldValues: { text: 'text', value: 'value' };
+  public invoicesGroupByOptions: (ItemModel & { value: GroupInvoicesBy })[] = [
     {
       text: 'Location',
       id: 'location',
@@ -85,7 +107,10 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
 
   public currentSelectedTableRowIndex: Observable<number>
     = this.invoicesService.getCurrentTableIdxStream();
-  public pageSize = 30;
+  public isLoading: boolean;
+  public newSelectedIndex: number;
+  public api: GridApi;
+  public organizationId: number | null;
 
   public isAgency = false;
 
@@ -94,27 +119,36 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
   constructor(
     private store: Store,
     private fb: FormBuilder,
-    private router: Router,
-    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
     private invoicesService: InvoicesService,
+    @Inject(InvoiceTabs) public tabsConfig$: InvoiceTabsProvider,
+    @Inject(OrganizationId) public organizationId$: OrganizationIdProvider,
   ) {
     super();
+
     this.store.dispatch(new SetHeaderState({ iconName: 'dollar-sign', title: 'Invoices' }));
-    this.store.dispatch(new Invoices.Get({
-      pageSize: 30,
-      page: 1,
-      type: ''
-    }));
-    this.isAgency = this.route.snapshot.data['isAgencyArea'];
+
+    this.isAgency$ = this.isOrganizationAgencyArea$
+      .pipe(
+        map(({isAgencyArea}) => isAgencyArea),
+      );
   }
 
-  ngOnInit(): void {
-    if (this.isAgency) {
-      this.initOrganizationsList();
-      this.startOrganizationWatching();
-    }
-    this.initFilters();
+  public ngOnInit(): void {
+    this.startFiltersWatching();
+    this.initOrganizationsList();
+    this.startOrganizationWatching();
+  }
+
+  public startFiltersWatching(): void {
+    this.organizationId$.pipe(
+      combineLatestWith(this.invoicesFilters$),
+      debounceTime(100),
+      takeUntil(this.componentDestroy()),
+    ).subscribe(([orgId]) => {
+      this.organizationId = orgId;
+      this.store.dispatch(new Invoices.GetPendingInvoices(orgId));
+    });
   }
 
   public showFilters(): void {
@@ -126,7 +160,45 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
 
   public handleChangeTab(tabIdx: number): void {
     this.selectedTabIdx = tabIdx;
-    this.getInvoicesByTab();
+
+    if (this.organizationId) {
+      this.setAgencyTable(tabIdx);
+    } else {
+      this.setOrganizationTable(tabIdx);
+    }
+
+    this.resetFilters();
+  }
+
+  public setAgencyTable(tabIndex: number): void {
+    switch (tabIndex) {
+      case 0:
+        this?.api.setColumnDefs(PendingInvoicesGridHelper.getAgencyPendingInvoicesColDefs());
+        this.resetFilters();
+        return;
+      default:
+        break;
+    }
+  }
+
+  public setOrganizationTable(tabIndex: number): void {
+    switch (tabIndex) {
+      case 0:
+        this.api?.setColumnDefs(PendingInvoicesGridHelper.getOrganizationPendingInvoicesColDefs({
+          approveInvoice: (data: PendingInvoice) => this.invoicesService.approveInvoice(data.id).subscribe(),
+          rejectInvoice: (data: PendingInvoice) => this.invoicesService.rejectInvoice(data.id).subscribe(),
+        }));
+
+        this.api.sizeColumnsToFit();
+
+        break;
+      case 1:
+        this.api?.setColumnDefs(InvoiceRecordsGridHelper.getInvoiceRecordsGridColumnDefinitions());
+        this.api.sizeColumnsToFit();
+        break;
+      default:
+        break;
+    }
   }
 
   public openAddDialog(): void {
@@ -139,7 +211,10 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
   }
 
   public resetFilters(): void {
-    this.store.dispatch(new Invoices.UpdateFiltersState(null));
+    this.store.dispatch(new Invoices.UpdateFiltersState({
+      pageNumber: 1,
+      pageSize: 30,
+    }));
   }
 
   public updateTableByFilters(filters: InvoicesFilterState): void {
@@ -147,11 +222,11 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
     this.store.dispatch(new ShowFilterDialog(false));
   }
 
-  public onInvoiceGrouping({itemData: {id}}: {itemData: {id: GroupInvoicesBy}}): void {
+  public onInvoiceGrouping({itemData: {id}}: { itemData: { id: GroupInvoicesBy } }): void {
     this.groupInvoicesBy = id;
   }
 
-  public handleRowSelected(selectedRowData: {rowIndex: number; data: Invoice}): void {
+  public handleRowSelected(selectedRowData: { rowIndex: number; data: Invoice }): void {
     this.invoicesService.setCurrentSelectedIndexValue(selectedRowData.rowIndex);
     const prevId: string = this.allInvoices.items[selectedRowData.rowIndex - 1]?.id;
     const nextId: string = this.allInvoices.items[selectedRowData.rowIndex + 1]?.id;
@@ -162,7 +237,7 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
         selectedRowData.rowIndex,
         prevId,
         nextId
-    ));
+      ));
     this.cdr.markForCheck();
   }
 
@@ -178,35 +253,46 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
     this.getInvoicesByTab();
   }
 
-  private onPageChange(page: number): void {
-    this.updateQueryParams({
-      page,
-    });
+  public handlePageChange(page: number): void {
+    this.store.dispatch(new Invoices.UpdateFiltersState({
+      pageNumber: page,
+    }))
+      .pipe(
+        takeUntil(this.componentDestroy()),
+      );
   }
 
-  private onPageSizeChange(pageSize: number): void {
-    this.updateQueryParams({
-      pageSize: pageSize,
-    });
+  public handlePageSizeChange(pageSize: number): void {
+    this.store.dispatch(new Invoices.UpdateFiltersState({
+      pageSize,
+    }))
+      .pipe(
+        takeUntil(this.componentDestroy()),
+      );
   }
 
-  private updateQueryParams(params: Partial<PagingQueryParams>): void {
-    this.route.queryParams.subscribe((currentParams: Params) => this.router.navigate([], {
-      queryParams: {
-        ...currentParams,
-        ...params,
-      },
-    }));
+  public handleSortingChange(event: string): void {
+
+  }
+
+  public gridReady(event: GridReadyEventModel): void {
+    this.api = event.api;
+    this.handleChangeTab(0);
+  }
+
+  public bulkApprove(event: RowNode[]): void {
+
+  }
+
+  public bulkExport(event: RowNode[]): void {
+
+  }
+
+  public selectedRow(event: any): void {
+
   }
 
   private getInvoicesByTab(): void {
-  }
-
-  private initFilters(): void {
-    this.store.dispatch([
-      new Invoices.UpdateFiltersState(),
-      new Invoices.GetFiltersDataSource()
-    ]);
   }
 
   private startOrganizationWatching(): void {
@@ -236,4 +322,3 @@ export class InvoicesContainerComponent extends Destroyable implements OnInit {
     });
   }
 }
-
