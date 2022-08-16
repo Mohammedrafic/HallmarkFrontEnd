@@ -52,7 +52,7 @@ export class GridNameRendererComponent implements ICellRendererAngularComp {
       this.store.dispatch(
         new SetCandidateMessage(
           this.cellValue.jobTitle,
-          `${this.cellValue.organizationPrefix}-${this.cellValue.orderId}-${this.cellValue.positionId}`
+          `${this.cellValue.organizationPrefix}-${this.cellValue.publicId}-${this.cellValue.positionId}`
         )
       );
     }
