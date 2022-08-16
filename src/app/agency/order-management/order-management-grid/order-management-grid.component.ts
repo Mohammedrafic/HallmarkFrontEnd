@@ -137,6 +137,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
   public isLockMenuButtonsShown = true;
   public orderTypes = OrderType;
   public selectedRowRef: any;
+  public openDetailsTab = false;
 
   private isAlive = true;
   private selectedIndex: number | null;
@@ -628,6 +629,7 @@ export class OrderManagementGridComponent extends AbstractGridConfigurationCompo
           table.style.transform = 'translate(0px, 0px)';
         }
       } else {
+        this.openDetailsTab = false;
         this.openChildDialog.next(false);
         this.selectedCandidate = null;
         if (this.selectedReOrder?.selected.reOrder !== this.selectedOrder.orderId) {

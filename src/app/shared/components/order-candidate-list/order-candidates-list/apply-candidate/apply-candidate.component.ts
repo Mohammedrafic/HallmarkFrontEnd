@@ -155,7 +155,7 @@ export class ApplyCandidateComponent implements OnInit, OnDestroy, OnChanges {
     this.candidateJobState$.pipe(takeUntil(this.unsubscribe$)).subscribe((data: OrderCandidateJob) => {
       this.candidateJob = data;
 
-      if (data) {
+      if (data?.candidateProfile.id === this.candidate.candidateId) {
         this.getComments();
       }
     });

@@ -85,7 +85,6 @@
           <div
             *ngIf="!data?.isTemplate; else templateButtons"
             class="row-tool-buttons"
-            (click)="stopPropagation($event)"
           >
             <button
               *ngIf="
@@ -112,6 +111,7 @@
               <span><i-feather [name]="data.isLocked ? 'lock' : 'unlock'" class="icon"></i-feather></span>
             </button>
             <button
+              (click)="$event.stopPropagation()"
               ejs-dropdownbutton
               [items]="
                 (data.orderCloseDate && closedOrderMenu) ||
@@ -147,7 +147,7 @@
           >
             <div>
               <b>
-                <span *ngIf="activeTab === OrganizationOrderManagementTabs.OrderTemplates">
+                <span>
                   {{ data.organizationPrefix }}-{{ data.publicId }}
                 </span>
               </b>

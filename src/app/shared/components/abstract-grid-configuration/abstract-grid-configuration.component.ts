@@ -63,7 +63,7 @@ export abstract class AbstractGridConfigurationComponent {
     persistSelection: true,
   };
   selectedItems: any[] = [];
-  idFieldName = 'id';
+  idFieldName = 'id'; // Override in child component in case different id property
 
   filteredItems: FilteredItem[] = [];
   filteredCount = 0;
