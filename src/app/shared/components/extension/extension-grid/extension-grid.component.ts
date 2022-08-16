@@ -15,7 +15,12 @@ export class ExtensionGridComponent {
   @Input() public data: any = [];
 
   public readonly columnDefinitions: ColumnDefinitionModel[] = [
-    { field: 'id', headerName: 'Extension ID', cellRenderer: ExtensionGridIdRendererComponent, maxWidth: 100 },
+    {  
+      headerName: 'Extension ID', 
+      cellRenderer: ExtensionGridIdRendererComponent, 
+      maxWidth: 100,
+      valueGetter: (params) => `${params.data.organizationPrefix}-${params.data.publicId}`,
+    },
     {
       field: 'statusText',
       headerName: 'Status',

@@ -96,10 +96,11 @@
     </e-column>
     <e-column field="status" headerText="STATUS" width="152">
       <ng-template #template let-data>
-        <div class="status-cell">
+        <div class="status-cell" [class.ex-chip]="data?.extensionFromId">
           <ejs-chiplist>
             <e-chips>
               <e-chip [text]="data.statusText" [cssClass]="data.statusText | chipsCssClass"></e-chip>
+              <e-chip *ngIf="data?.extensionFromId" text="Ex" cssClass="e-warning ex"></e-chip>
             </e-chips>
           </ejs-chiplist>
         </div>
