@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
+import { BusinessUnitType } from '@shared/enums/business-unit-type';
 import { Comment } from '@shared/models/comment.model';
 import { SelectEventArgs } from '@syncfusion/ej2-angular-dropdowns';
 import { TextBoxComponent } from '@syncfusion/ej2-angular-inputs';
@@ -90,6 +91,11 @@ export class CommentsComponent {
         this.scroll$.next(null);
       }
     });
+    const user = this.store.selectSnapshot(UserState).user;
+    this.isAgencyUser = user.businessUnitType === BusinessUnitType.Agency;
+    if (this.isAgencyUser) {
+      this.isExternal = true;
+    }
   }
 
   ngOnDestroy(): void {
@@ -126,7 +132,11 @@ export class CommentsComponent {
   }
 
   public visibilityHandler(): void {
-    this.isExternal = !this.isExternal;
+    if (this.isAgencyUser) {
+      this.isExternal = true;
+    } else {
+      this.isExternal = !this.isExternal;
+    }
   }
 
   public send(): void {

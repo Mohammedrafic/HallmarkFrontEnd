@@ -36,6 +36,19 @@ body.light, body.dark {
     }
 
     ejs-textbox {
+      &.readonly {
+        span.e-input-group {
+          &:hover {
+            border-color: $grey !important;
+          }
+
+          &.e-input-focus {
+            border-color: $grey !important;
+            border-width: 1px !important;
+          }
+        }
+      }
+
       &.ng-touched.ng-invalid.e-control.e-textbox {
         span.e-input-group {
           border-color: $supportive-red;
@@ -48,6 +61,10 @@ body.light, body.dark {
 
       span.e-input-group {
         border-radius: 8px !important;
+
+        textarea {
+          border-radius: 8px !important;
+        }
 
         &.e-input-focus, &:active {
           box-shadow: none !important;

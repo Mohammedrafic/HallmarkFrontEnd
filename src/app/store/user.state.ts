@@ -137,12 +137,14 @@ export class UserState {
         .map((menuItem: MenuItem) => {
           menuItem.icon = MENU_CONFIG[businessUnitType][menuItem.id]?.icon;
           menuItem.route = MENU_CONFIG[businessUnitType][menuItem.id]?.route;
+          menuItem.anch = menuItem.title;
           if (menuItem.children) {
             menuItem.children = menuItem.children.map((child: any) => {
               return {
                 title: child.title,
                 route: MENU_CONFIG[businessUnitType][child.id]?.route,
-                icon: ''
+                icon: '',
+                anch: `${menuItem.title}/${child.title}`,
               };
             }) as ChildMenuItem[];
           } else {

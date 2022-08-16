@@ -4,6 +4,7 @@
   </div>
   <ejs-uploader
     #fileUploader
+    [class.hide-selected-files]="!showSelectedFiles"
     [dropArea]="droparea"
     [allowedExtensions]="allowedFileExtensions"
     [maxFileSize]="maxFileSize"
@@ -14,4 +15,3 @@
     (removing)="removeFile($event)"
   ></ejs-uploader>
 </div>
-  

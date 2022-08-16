@@ -58,6 +58,7 @@ const amountColdef = (headerText: string): ColDef => (
   {
     field: 'value',
     headerName: headerText,
+    resizable: true,
     type: 'rightAligned',
     ...commonColumn,
     cellClass: 'common-cell',
@@ -69,8 +70,8 @@ const actionCol: ColDef = {
   field: 'id',
   headerName: '',
   type: 'rightAligned',
-  resizable: false,
-  width: 60,
+  flex: 1,
+  resizable: true,
   cellRenderer: ActionsCellComponent,
   cellRendererParams: {
     editMode: true,
@@ -129,19 +130,12 @@ export const TimesheetRecordsColdef: ColDef[] = [
   },
   editableCostCenterDef,
   {
-    field: 'billRateConfigId',
+    field: 'billRateConfigName',
     headerName: 'Bill rate type',
     ...commonColumn,
     width: 180,
     filterValueGetter: (value) => { return value.data.billRateConfigName },
-    cellRenderer: DropdownEditorComponent,
     type: 'rightAligned',
-    cellRendererParams: {
-      editMode: true,
-      isEditable: false,
-      options: [],
-      storeField: 'billRateTypes',
-    }
   },
   amountColdef('Hours'),
   billRateColDef,

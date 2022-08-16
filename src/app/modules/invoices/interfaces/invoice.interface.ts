@@ -55,6 +55,7 @@ export interface InvoicesFilterState {
   departmentIds?: string[];
   agencyIds?: string[];
   skillIds?: string[];
+  organizationId?: number | null;
 }
 
 export type InvoiceFilterColumns = {
@@ -69,4 +70,18 @@ export type InvoiceFilterColumns = {
 
 export type InvoicesFilteringOptions = {
   [key in FilteringOptionsFields]: DataSourceItem[];
+}
+
+export interface ManualInvoiceTimesheetResponse {
+  id: number;
+  dateTime: string;
+  amount: number;
+  departmentId: number;
+  organizationId: number;
+  comment: string;
+  manualInvoiceCreationReasonId: number;
+  vendorFeeApplicable: boolean;
+  calculationDescription: string,
+  timesheetId: number;
+  invoiceId: number;
 }

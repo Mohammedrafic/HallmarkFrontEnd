@@ -1,15 +1,25 @@
-import { FileUploaderComponent } from './components/file-uploader/file-uploader.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 import {
-  AlignJustify, ChevronDown, ChevronRight, Lock, Menu, MessageSquare, MoreVertical,
-  Package, Percent, Sliders, X } from 'angular-feather/icons';
+  AlignJustify,
+  ChevronDown,
+  ChevronRight,
+  Lock,
+  Menu,
+  MessageSquare,
+  MoreVertical,
+  Package,
+  Percent,
+  Sliders,
+  Trash2,
+  X
+} from 'angular-feather/icons';
 import { GridAllModule, PagerModule } from '@syncfusion/ej2-angular-grids';
 import { AutoCompleteAllModule, DropDownListModule, MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 import { NumericTextBoxModule, TextBoxAllModule, UploaderAllModule } from '@syncfusion/ej2-angular-inputs';
-import { NgxsModule } from '@ngxs/store';
+import { NgxsModule, Store } from '@ngxs/store';
 import { FeatherModule } from 'angular-feather';
 import { TabModule } from '@syncfusion/ej2-angular-navigations';
 import { DropDownButtonModule } from '@syncfusion/ej2-angular-splitbuttons';
@@ -26,22 +36,41 @@ import { InvoicesContainerComponent } from './containers/invoices-container/invo
 import { InvoiceRecordsTableComponent } from './components/invoice-records-table/invoice-records-table.component';
 import { InvoicesRoutingModule } from './invoices-routing.module';
 import { InvoicesState } from './store/state/invoices.state';
-import { InvoicesService } from './services';
+import { AddInvoiceService, InvoicesService } from './services';
 import { InvoicesTableComponent } from './components/invoices-table/invoices-table.component';
 import { InvoiceRecordDialogComponent } from './components/invoice-record-dialog/invoice-record-dialog.component';
 import { AllInvoicesTableComponent } from './components/all-invoices-table/all-invoices-table.component';
 import { AllInvoicesSubrowComponent } from './components/all-invoices-subrow/all-invoices-subrow.component';
-import { InvoiceDetailContainerComponent } from './containers/invoice-details-container/invoice-detail-container.component';
-import { InvoiceDetailInvoiceInfoComponent } from './components/invoice-detail-invoice-info/invoice-detail-invoice-info.component';
+import {
+  InvoiceDetailContainerComponent
+} from './containers/invoice-details-container/invoice-detail-container.component';
+import {
+  InvoiceDetailInvoiceInfoComponent
+} from './components/invoice-detail-invoice-info/invoice-detail-invoice-info.component';
 import { InvoiceDetailTableComponent } from './components/invoice-detail-table/invoice-detail-table.component';
-import { InvoiceRecordsTableRowDetailsComponent } from './components/invoice-records-table-row-details/invoice-records-table-row-details.component';
-import { ToggleRowExpansionHeaderCellComponent } from './components/grid-icon-cell/toggle-row-expansion-header-cell.component';
-import { AddInvoiceService } from './services';
+import {
+  InvoiceRecordsTableRowDetailsComponent
+} from './components/invoice-records-table-row-details/invoice-records-table-row-details.component';
+import {
+  ToggleRowExpansionHeaderCellComponent
+} from './components/grid-icon-cell/toggle-row-expansion-header-cell.component';
 import { ManualInvoiceDialogComponent } from './components/manual-invoice-dialog/manual-invoice-dialog.component';
 import { InvoicesFiltersDialogComponent } from './components/invoices-filters-dialog/invoices-filters-dialog.component';
 import { InvoicesApiService } from './services/invoices-api.service';
 import { InvoicesTableTabsComponent } from './components/invoices-table-tabs/invoices-table-tabs.component';
 import { AddDialogHelperService } from '@core/services';
+import { GridActionsCellComponent } from './components/grid-actions-cell/grid-actions-cell.component';
+import { FileUploaderModule } from '@shared/components/file-uploader/file-uploader.module';
+import { FiltersDialogHelper } from '@core/helpers/filters-dialog.helper';
+import { FiltersDialogHelperService } from '@core/services/filters-dialog-helper.service';
+import { APP_FILTERS_CONFIG } from '@core/constants/filters-helper.constant';
+import { InvoicesTableFiltersColumns } from './enums/invoices.enum';
+import { InvoiceTabs, OrganizationId } from './tokens';
+import { AGENCY_INVOICE_TABS, ORGANIZATION_INVOICE_TABS } from './constants';
+import { map, of, switchMap } from 'rxjs';
+import { AppState } from '../../store/app.state';
+import { UserState } from '../../store/user.state';
+import { IsOrganizationAgencyAreaStateModel } from '@shared/models/is-organization-agency-area-state.model';
 
 @NgModule({
   declarations: [
@@ -57,9 +86,9 @@ import { AddDialogHelperService } from '@core/services';
     InvoiceRecordsTableRowDetailsComponent,
     ToggleRowExpansionHeaderCellComponent,
     ManualInvoiceDialogComponent,
-    FileUploaderComponent,
     InvoicesFiltersDialogComponent,
     InvoicesTableTabsComponent,
+    GridActionsCellComponent,
   ],
   imports: [
     CommonModule,
@@ -77,6 +106,7 @@ import { AddDialogHelperService } from '@core/services';
       X,
       Percent,
       Package,
+      Trash2,
     }),
     TabModule,
     DropDownButtonModule,
@@ -99,15 +129,41 @@ import { AddDialogHelperService } from '@core/services';
     AutoCompleteAllModule,
     DatePickerAllModule,
     MultiSelectModule,
+    FileUploaderModule,
   ],
   providers: [
     InvoicesService,
     InvoicesApiService,
     ChipsCssClass,
     AddInvoiceService,
+    FiltersDialogHelper,
     {
       provide: AddDialogHelperService,
       useClass: AddInvoiceService,
+    },
+    {
+      provide: FiltersDialogHelperService,
+      useClass: InvoicesService,
+    },
+    {
+      provide: APP_FILTERS_CONFIG,
+      useValue: InvoicesTableFiltersColumns,
+    },
+    {
+      provide: InvoiceTabs,
+      useFactory: (store: Store) => store.select(AppState.isOrganizationAgencyArea).pipe(
+          map((data: IsOrganizationAgencyAreaStateModel) => data.isAgencyArea),
+          map((agency: boolean) => agency ? AGENCY_INVOICE_TABS : ORGANIZATION_INVOICE_TABS),
+      ),
+      deps: [Store],
+    },
+    {
+      provide: OrganizationId,
+      useFactory: (store: Store) => store.select(AppState.isOrganizationAgencyArea).pipe(
+        map((data: IsOrganizationAgencyAreaStateModel) => data.isAgencyArea),
+        switchMap((agency: boolean) => agency ? store.select(UserState.lastSelectedOrganizationId) : of(null)),
+      ),
+      deps: [Store]
     },
   ]
 })

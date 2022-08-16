@@ -33,6 +33,7 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   @Input() order: AgencyOrderManagement;
   @Input() openEvent: Subject<boolean>;
   @Input() openCandidateTab: boolean;
+  @Input() openDetailsTab: boolean;
 
   @Output() compareEvent = new EventEmitter<never>();
   @Output() nextPreviousOrderEvent = new EventEmitter<boolean>();
@@ -92,8 +93,8 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   public onTabCreated(): void {
     this.tab.selected.pipe(takeWhile(() => this.isAlive)).subscribe((event: SelectEventArgs) => {
       const visibilityTabIndex = 0;
+      this.tab.refresh();
       if (event.selectedIndex !== visibilityTabIndex) {
-        this.tab.refresh();
         this.firstActive = false;
       } else {
         this.firstActive = true;
@@ -125,8 +126,12 @@ export class PreviewOrderDialogComponent implements OnInit, OnChanges, OnDestroy
   private onOpenEvent(): void {
     this.openEvent.pipe(takeWhile(() => this.isAlive)).subscribe((isOpen) => {
       if (isOpen) {
-        this.tab.select(1);
-
+        if (this.openDetailsTab) {
+          this.tab.select(0);
+        } else {
+          this.tab.select(1);
+        }
+        
         windowScrollTop();
         this.sideDialog.show();
         disabledBodyOverflow(true);

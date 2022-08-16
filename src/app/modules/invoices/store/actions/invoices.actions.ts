@@ -2,13 +2,20 @@ import { GetInvoicesData, InvoicesFilterState, ManualInvoicePostDto } from '../.
 import { INVOICES_ACTIONS, InvoicesTableFiltersColumns } from '../../enums/invoices.enum';
 import { DialogAction } from '@core/enums';
 import { OrganizationRegion } from '@shared/models/organization.model';
-import { DataSourceItem } from '@core/interface';
+import { DataSourceItem, FileForUpload } from '@core/interface';
 
 export namespace Invoices {
   export class Get {
     static readonly type = INVOICES_ACTIONS.GET;
 
     constructor(public readonly payload: GetInvoicesData) {
+    }
+  }
+
+  export class GetPendingInvoices {
+    static readonly type = INVOICES_ACTIONS.GET_PENDING_INVOICES;
+
+    constructor(public readonly organizationId: number | null) {
     }
   }
 
@@ -59,6 +66,10 @@ export namespace Invoices {
 
   export class GetInvoicesReasons {
     static readonly type = INVOICES_ACTIONS.GetReasons;
+
+    constructor(
+      public readonly orgId: number | null,
+    ) {}
   }
 
   export class GetManInvoiceMeta {
@@ -74,6 +85,8 @@ export namespace Invoices {
 
     constructor(
       public readonly payload: ManualInvoicePostDto,
+      public readonly files: FileForUpload[],
+      public readonly isAgency: boolean,
     ) {}
   }
 
@@ -94,6 +107,38 @@ export namespace Invoices {
     static readonly type = INVOICES_ACTIONS.SelectOrganization;
 
     constructor(public readonly id: number) {
+    }
+  }
+
+  export class ClearAttachments {
+    static readonly type = INVOICES_ACTIONS.ClearManInvoiceAttachments;
+  }
+
+  export class SubmitInvoice {
+    static readonly type = INVOICES_ACTIONS.SubmitInvoice;
+
+    constructor(
+      public readonly invoiceId: number,
+      public readonly orgId: number | null,
+    ) {
+    }
+  }
+
+  export class ApproveInvoice {
+    static readonly type = INVOICES_ACTIONS.ApproveInvoice;
+
+    constructor(
+      public readonly invoiceId: number,
+    ) {
+    }
+  }
+
+  export class RejectInvoice {
+    static readonly type = INVOICES_ACTIONS.RejectInvoice;
+
+    constructor(
+      public readonly invoiceId: number,
+    ) {
     }
   }
 }

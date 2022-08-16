@@ -281,12 +281,6 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
   private pagePermissions(): void {
     const location = this.location.getState() as { readonly: boolean };
 
-    if (location.readonly) {
-      this.candidateForm.disable();
-      this.readonlyMode = true;
-      this.isCredentialStep = false;
-    }
-
     this.route.data.subscribe((data) => {
       if (data['readonly']) {
         this.readonlyMode = true;
@@ -294,6 +288,12 @@ export class AddEditCandidateComponent implements OnInit, OnDestroy, ComponentCa
         this.candidateForm.disable();
       }
     });
+
+    if (location.readonly) {
+      this.candidateForm.disable();
+      this.readonlyMode = true;
+      this.isCredentialStep = false;
+    }
   }
 
   private navigateToCandidates(): void {

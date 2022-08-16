@@ -476,7 +476,7 @@ export class AddEditOrderComponent implements OnDestroy, OnInit {
       );
     } else {
       this.store.dispatch(new SaveOrder(
-        order, documents
+        order, documents, this.orderDetailsFormComponent.comments
       ));
     }
   }
