@@ -256,7 +256,6 @@ export class RolesGridComponent extends AbstractGridConfigurationComponent imple
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
     var datasource = this.createServerSideDatasource();
-    console.log(datasource);
     params.api.setServerSideDatasource(datasource);
   }
 
